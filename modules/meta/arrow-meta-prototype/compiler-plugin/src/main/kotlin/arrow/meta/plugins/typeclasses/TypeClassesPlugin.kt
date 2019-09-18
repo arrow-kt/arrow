@@ -8,6 +8,8 @@ import arrow.meta.quotes.func
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktFile
 import arrow.meta.dsl.platform.ide
+import arrow.meta.quotes.Func
+import arrow.meta.quotes.Scope
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -31,6 +33,7 @@ import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtExpression
@@ -156,8 +159,11 @@ private fun ValueParameterDescriptor.shouldEnhanceScope(): Boolean {
   return ktParameter?.hasExtensionDefaultValue() == true
 }
 
-private fun List<String?>.run(body: Name): String =
-  fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }
+private fun List<String?>.run(body: Func.FunctionBodyScope?): String =
+  if (body != null)
+    fold(body.toString()) { acc, scope -> "$scope.run { $acc }" }
+  else ""
+
 
 private fun KtCallableDeclaration.extensionValueParamNames() =
   valueParameters.filter { it.defaultValue?.text == WithMarker }.map { it.name }

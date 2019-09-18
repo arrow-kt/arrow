@@ -1,10 +1,14 @@
 package arrow.meta.quotes
 
-import arrow.meta.phases.analysis.renderTypeParametersWithVariance
-import arrow.meta.phases.analysis.renderValueParameters
+import arrow.meta.phases.analysis.body
+import arrow.meta.phases.analysis.bodySourceAsExpression
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.KtTypeParameter
+import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
@@ -12,31 +16,25 @@ internal val EmptyElement: Name = Name.identifier("_EMPTY_ELEMENT_")
 
 interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
 
+  class FunctionBodyScope(override val value: KtExpression) : Scope<KtExpression>(value) {
+    override fun toString(): String =
+      value.bodySourceAsExpression() ?: ""
+  }
+
   class FuncScope(
-    val modality: Name,
-    val visibility: Name,
-    val typeParameters: Name,
-    val receiver: Name,
-    val name: Name,
-    val valueParameters: Name,
-    val returnType: Name,
-    val body: Name
-  )
+    override val value: KtNamedFunction,
+    val modality: Name? = value.modalityModifierType()?.value?.let(Name::identifier),
+    val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
+    val typeParameters: List<Scope<KtTypeParameter>> = value.typeParameters.map(::Scope),
+    val receiver: Name? = value.receiverTypeReference?.text?.let(Name::identifier),
+    val name: Name? = value.nameAsName,
+    val valueParameters: List<Scope<KtParameter>> = value.valueParameters.map(::Scope),
+    val returnType: Scope<KtTypeReference>? = value.typeReference?.let(::Scope),
+    val body: FunctionBodyScope? = value.body()?.let(::FunctionBodyScope)
+  ) : Scope<KtNamedFunction>(value)
 
   override fun transform(ktElement: KtNamedFunction): FuncScope =
-    FuncScope(
-      modality = ktElement.modalityModifierType()?.value?.let(Name::identifier) ?: EmptyElement,
-      visibility = ktElement.visibilityModifierType()?.value?.let(Name::identifier) ?: EmptyElement,
-      name = ktElement.nameAsName ?: EmptyElement,
-      typeParameters = ktElement.renderTypeParametersWithVariance()?.let(Name::identifier)
-        ?: EmptyElement,
-      receiver = ktElement.receiverTypeReference?.text?.let(Name::identifier) ?: EmptyElement,
-      valueParameters = ktElement.renderValueParameters()?.let(Name::identifier) ?: EmptyElement,
-      returnType = ktElement.typeReference?.text?.let(Name::identifier) ?: EmptyElement,
-      body = (ktElement.bodyExpression?.text
-        ?: ktElement.bodyBlockExpression?.text?.drop(1)?.dropLast(1)
-        )?.let(Name::identifier) ?: EmptyElement
-    )
+    FuncScope(ktElement)
 
   override fun KtNamedFunction.cleanUserQuote(quoteDeclaration: String): String =
     quoteDeclaration.trimMargin().removeEmptyTypeArgs()

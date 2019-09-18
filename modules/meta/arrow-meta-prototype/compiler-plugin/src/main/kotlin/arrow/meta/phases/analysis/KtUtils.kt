@@ -1,13 +1,16 @@
 package arrow.meta.phases.analysis
 
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
+import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
 import org.jetbrains.kotlin.psi2ir.deparenthesize
 
 fun KtClass.renderValueParameters(): String =
@@ -15,7 +18,7 @@ fun KtClass.renderValueParameters(): String =
   else getValueParameters().joinToString(separator = ", ") { it.text }
 
 fun KtClass.renderSuperTypes(): String =
-  superTypeListEntries.joinToString(", ") { it.name.orEmpty() }
+  superTypeListEntries.joinToString(", ") { it.text }
 
 fun KtClass.renderTypeParametersWithVariance(): String =
   typeParameters.joinToString(separator = ", ") { it.text }
@@ -31,6 +34,17 @@ fun KtNamedFunction.renderValueParameters(): String? =
 
 fun KtFunction.body(): KtExpression? =
   bodyExpression ?: bodyBlockExpression
+
+fun KtExpression.bodySourceAsExpression(): String? =
+  when (this) {
+    is KtBlockExpression -> statements.map {
+      when (it) {
+        is KtReturnExpression -> it.returnedExpression?.text
+        else -> text
+      }
+    }.joinToString("\n").drop(1).dropLast(1)
+    else -> text
+  }
 
 fun KtFunction.bodyExpressionText(): String =
   bodyBlockExpression?.blockExpressionsOrSingle()
@@ -52,4 +66,4 @@ fun KtElement.dfs(f: (KtElement) -> Boolean): List<KtElement> {
 }
 
 fun String.removeReturn(): String =
-  replace("return ", "")
+  replaceAfterLast("return ", "")

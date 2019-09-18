@@ -1,13 +1,3 @@
-buildscript {
-    dependencies{
-        classpath 'io.arrow-kt:gradle-plugin'
-    }
-
-    repositories {
-        mavenCentral()
-    }
-}
-
 apply plugin: 'kotlin-kapt'
 apply plugin: "arrow.meta.plugin.gradle"
 

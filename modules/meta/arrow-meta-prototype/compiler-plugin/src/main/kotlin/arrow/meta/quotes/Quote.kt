@@ -556,7 +556,6 @@ inline fun <reified K : KtElement> CompilerContext.transformFile(
 ): KtFile {
   val newSource = ktFile.sourceWithTransformations(mutations)
   val newFile = changeSource(ktFile, newSource)
-  //ktFile.printDiff(newSource)
   println("Transformed file: $ktFile. New contents: \n$newSource")
   return newFile
 }
