@@ -7,8 +7,6 @@ jdk:
 
 stages:
   - name: build
-  - name: deploy
-    if: branch = master AND type != pull_request
 
 env:
   global:
@@ -19,6 +17,12 @@ jobs:
   - stage: build
     name: "Compile and test"
     script: ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+    deploy:
+      provider: script
+      script: ./deploy-scripts/deploy.sh
+      skip_cleanup: true
+      on:
+        branch: master
   - name: "Generate docs"
     before_install:
       - gem update --system
@@ -34,12 +38,7 @@ jobs:
       provider: gcs
       access_key_id: ${GCLOUD_ACCESS_KEY_ID}
       secret_access_key: ${GCLOUD_SECRET_ACCESS_KEY}
-      bucket: "second.fortysevendegrees.com"
+      bucket: second.fortysevendegrees.com
       skip_cleanup: true
       acl: public-read
       local-dir: modules/docs/arrow-docs/build/site/*
-      # on:
-      #   branch: release
-  - stage: deploy
-    script:
-    - ./deploy-scripts/deploy.sh
