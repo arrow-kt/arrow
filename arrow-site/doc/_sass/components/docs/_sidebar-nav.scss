@@ -14,7 +14,7 @@
 
             &:hover {
                 text-decoration: none;
-               
+
             }
 
             .fa {
@@ -37,7 +37,7 @@
 
         ul {
             display: none;
-            
+
 
             li {
                 a {
@@ -55,51 +55,44 @@
                     &:hover {
                         text-decoration: none;
                     }
-                    
+
                 }
             }
         }
     }
 }
 
-#doc-version-button {
+.doc-version-container {
+  margin-top: $base-point-grid * 7;
+}
 
-    .sidebar-doc-versions {
-        display: flex;
-        justify-content: center;
+.sidebar-doc-versions {
+    display: flex;
+    justify-content: center;
 
-        position: absolute;
-        margin-left: auto;
-        margin-right: auto;
-        bottom: 25px;
-        margin: auto;
-        right: 0;
-        left: 0;
-
-        .sidebar-nav-item {
-             width: 100%;
-             &.active {
-                 > a {
-                   border-color: transparent;
-                 }
-               }
-             ul {
-                 position: sticky;
-                 width: 100%;
-                 z-index: 1;
-                 box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 16px 0px;
-                 background: $brand-primary;
-
-                 li {
-                   a {
-                     font-size: 0.800rem;
-                   }
-                 }
-
-                 li:nth-child(4) {
-                   border-top: solid 1px rgba(255, 255, 255, 0.5);
-                 }
+    .sidebar-nav-item {
+         width: 100%;
+         &.active {
+             > a {
+               border-color: transparent;
              }
-        }
+           }
+         ul {
+             position: sticky;
+             width: 100%;
+             z-index: 1;
+             box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 16px 0px;
+             background: $brand-primary;
+
+             li {
+               a {
+                 font-size: 0.800rem;
+               }
+             }
+
+             li:nth-child(4) {
+               border-top: solid 1px rgba(255, 255, 255, 0.5);
+             }
+         }
     }
 }
