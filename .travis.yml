@@ -7,7 +7,6 @@ jdk:
 
 stages:
   - name: build
-  - name: doc
   - name: deploy
     if: branch = master AND type != pull_request
 
@@ -18,8 +17,9 @@ env:
 jobs:
   include:
   - stage: build
+    name: "Compile and test"
     script: ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
-  -
+  - name: "Generate docs"
     before_install:
       - gem update --system
       - gem install bundler
