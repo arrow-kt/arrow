@@ -5,8 +5,8 @@ import org.jetbrains.kotlin.psi.KtElement
 
 open class Scope<K : KtElement>(open val value: K) {
 
-  operator fun <K: KtElement> List<Scope<K>>.rangeTo(other: String): Name =
-    Name.identifier((map { it.value.text } + other).joinToString(", "))
+  operator fun <K: KtElement> ScopedList<K>.rangeTo(other: String): Name =
+    Name.identifier((value.map { it.text } + other).joinToString(", "))
 
   override fun toString(): String =
     value.text

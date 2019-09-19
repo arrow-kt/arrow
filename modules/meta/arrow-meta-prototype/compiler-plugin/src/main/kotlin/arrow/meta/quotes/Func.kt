@@ -25,10 +25,10 @@ interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
     override val value: KtNamedFunction,
     val modality: Name? = value.modalityModifierType()?.value?.let(Name::identifier),
     val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
-    val typeParameters: List<Scope<KtTypeParameter>> = value.typeParameters.map(::Scope),
+    val typeParameters: ScopedList<KtTypeParameter> = ScopedList(value.typeParameters),
     val receiver: Name? = value.receiverTypeReference?.text?.let(Name::identifier),
     val name: Name? = value.nameAsName,
-    val valueParameters: List<Scope<KtParameter>> = value.valueParameters.map(::Scope),
+    val valueParameters: ScopedList<KtParameter> = ScopedList(value.valueParameters),
     val returnType: Scope<KtTypeReference>? = value.typeReference?.let(::Scope),
     val body: FunctionBodyScope? = value.body()?.let(::FunctionBodyScope)
   ) : Scope<KtNamedFunction>(value)

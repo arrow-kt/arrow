@@ -3,6 +3,7 @@ package arrow.meta.plugins.higherkind
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
 import arrow.meta.quotes.Scope
+import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.classOrObject
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -41,9 +42,9 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
         }
       )
 
-private val List<Scope<KtTypeParameter>>.invariant: String
-  get() = joinToString {
-    it.value.text
+private val ScopedList<KtTypeParameter>.invariant: String
+  get() = value.joinToString {
+    it.text
       .replace("out ", "")
       .replace("in ", "")
   }
