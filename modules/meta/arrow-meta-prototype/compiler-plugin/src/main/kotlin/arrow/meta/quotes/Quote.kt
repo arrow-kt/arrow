@@ -102,6 +102,7 @@ interface Quote<P : KtElement, K : KtElement, S> {
       val transformedScope = transform(ktElement)
       // the user transforms the expression into a new list of declarations
       val declarations = transformedScope.map(ktElement).map { quoteDeclaration ->
+        println("User returned declaration: \n\n${ktElement.text}\n\n")
         val declaration =
           quasiQuoteContext.compilerContext.ktPsiElementFactory
             .createDeclaration<KtDeclaration>(ktElement.cleanUserQuote(quoteDeclaration))
@@ -155,16 +156,22 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
   noinline map: S.(K) -> List<String>
 ): ExtensionPhase =
   cli {
-    analysys(
-      doAnalysis = { _, _, _, files, _, _ ->
-        files as ArrayList
-        //files.clear()
-        val fileMutations = processFiles(files, quoteFactory, match, map)
-        updateFiles(files, fileMutations)
-        null
-      },
-      analysisCompleted = { project, module, bindingTrace, files ->
-        null
+    additionalSources(
+      collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
+        println("START quote.additionalSources: $knownSources")
+        val mutableSources = arrayListOf(*knownSources.toTypedArray())
+        val fileMutations = processFiles(mutableSources, quoteFactory, match, map)
+        updateFiles(mutableSources, fileMutations)
+        println("END quote.additionalSources: $mutableSources")
+        mutableSources.forEach {
+          println("""|
+            |ktFile: $it
+            |----
+            |${it.text}
+            |----
+          """.trimMargin())
+        }
+        mutableSources
       }
     )
   } ?: ExtensionPhase.Empty

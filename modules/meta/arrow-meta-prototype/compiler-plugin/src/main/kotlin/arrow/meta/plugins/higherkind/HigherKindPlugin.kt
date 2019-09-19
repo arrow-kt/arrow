@@ -16,12 +16,6 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
   get() =
     Name.identifier("higherKindedTypes") to
       meta(
-        additionalSources(
-          collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
-            println("additionalSources.collectAdditionalSourcesAndUpdateConfiguration: $knownSources")
-            knownSources
-          }
-        ),
         classOrObject(::isHigherKindedType) { c ->
           println("Processing Higher Kind: ${c.name}")
           listOfNotNull(

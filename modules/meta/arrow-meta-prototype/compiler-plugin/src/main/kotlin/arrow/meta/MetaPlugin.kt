@@ -7,5 +7,5 @@ import org.jetbrains.kotlin.name.Name
 
 open class MetaPlugin : MetaComponentRegistrar {
   override fun intercept(): List<Pair<Name, List<ExtensionPhase>>> =
-    listOf(higherKindedTypes, typeClasses) //, higherKindedTypes, typeClasses, comprehensions)
+    listOf(higherKindedTypes) //, higherKindedTypes, typeClasses, comprehensions)
 }
