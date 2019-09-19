@@ -122,7 +122,7 @@ fun MetaComponentRegistrar.func(
 
 fun MetaComponentRegistrar.classOrObject(
   match: KtClass.() -> Boolean,
-  map: ClassOrObject.ClassScope.(KtClass) -> List<String>
+  map: ClassScope.(KtClass) -> List<String>
 ): ExtensionPhase =
   quote(ClassOrObject, match, map)
 
