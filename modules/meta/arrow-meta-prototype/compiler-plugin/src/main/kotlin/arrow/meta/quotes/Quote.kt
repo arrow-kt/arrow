@@ -50,6 +50,11 @@ import org.jetbrains.kotlin.types.KotlinTypeFactory
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import java.io.File
+import java.net.URI
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * A declaration quasi quote matches tree in the synthetic resolution and gives
@@ -165,6 +170,7 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
         files.forEach {
           val fileText = it.text
           if (fileText.contains("//metadebug")) {
+            File(it.virtualFilePath + ".meta").writeText(it.text)
             println("""|
             |ktFile: $it
             |----
