@@ -164,7 +164,7 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
         println("END quote.doAnalysis: $files")
         files.forEach {
           val fileText = it.text
-          if (fileText.startsWith("//metadebug")) {
+          if (fileText.contains("//metadebug")) {
             println("""|
             |ktFile: $it
             |----
