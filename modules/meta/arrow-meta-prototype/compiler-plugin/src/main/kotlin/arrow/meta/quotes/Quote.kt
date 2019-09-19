@@ -164,12 +164,15 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
         updateFiles(mutableSources, fileMutations)
         println("END quote.additionalSources: $mutableSources")
         mutableSources.forEach {
-          println("""|
+          val fileText = it.text
+          if (fileText.startsWith("//metadebug")) {
+            println("""|
             |ktFile: $it
             |----
             |${it.text}
             |----
           """.trimMargin())
+          }
         }
         mutableSources
       }
