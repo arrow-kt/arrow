@@ -1,9 +1,11 @@
 package arrow.core
 
+//metadebug
+
 import arrow.Kind
 import arrow.typeclasses.Applicative
 
-data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
+data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMap<A, B> by map {
 
   fun <C> map(f: (B) -> C): SortedMapK<A, C> =
     this.map.map { it.key to f(it.value) }.toMap().toSortedMap().k()

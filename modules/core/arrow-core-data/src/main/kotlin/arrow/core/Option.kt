@@ -1,6 +1,6 @@
 package arrow.core
 
-import arrow.Kind
+//metadebug
 
 /**
  * Represents optional values. Instances of `Option`
@@ -28,8 +28,8 @@ sealed class Option<out A> {
      */
     fun <A> just(a: A): Option<A> = Some(a)
 
-    tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
-      val option = f(a).fix()
+    tailrec fun <A, B> tailRecM(a: A, f: (A) -> Option<Either<A, B>>): Option<B> {
+      val option: Option<Either<A, B>> = f(a)
       return when (option) {
         is Some -> {
           when (option.t) {
@@ -80,8 +80,8 @@ sealed class Option<out A> {
   fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
-  fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
-    flatMap { a: A -> fb.fix().map { b -> f(a toT b) } }
+  fun <B, R> map2(fb: Option<B>, f: (Tuple2<A, B>) -> R): Option<R> =
+    flatMap { a: A -> fb.map { b -> f(a toT b) } }
 
   fun <B> filterMap(f: (A) -> Option<B>): Option<B> =
     flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
@@ -113,14 +113,14 @@ sealed class Option<out A> {
    * @param f the function to apply
    * @see map
    */
-  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+  fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
     when (this) {
       is None -> this
-      is Some -> f(t).fix()
+      is Some -> f(t)
     }
 
-  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
-    ff.fix().flatMap { this.fix().map(it) }
+  fun <B> ap(ff: Option<(A) -> B>): Option<B> =
+    ff.flatMap { map(it) }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -158,19 +158,15 @@ sealed class Option<out A> {
   fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    fix().let { option ->
-      when (option) {
-        is Some -> operation(initial, option.t)
-        is None -> initial
-      }
+    when (this) {
+      is Some -> operation(initial, t)
+      is None -> initial
     }
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().let { option ->
-      when (option) {
-        is Some -> operation(option.t, initial)
-        is None -> initial
-      }
+    when (this) {
+      is Some -> operation(t, initial)
+      is None -> initial
     }
 
   fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
@@ -211,13 +207,10 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+fun <A> Option<A>.orElse(alternative: () -> Option<A>): Option<A> = if (isEmpty()) alternative() else this
 
-infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
-  value
-} else {
-  fix()
-}
+infix fun <T> Option<T>.or(value: Option<T>): Option<T> =
+  if (isEmpty()) value else this
 
 fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
@@ -246,5 +239,5 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
-fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
+fun <A, B> Option<Either<A, B>>.select(f: Option<(A) -> B>): Option<B> =
   flatMap { it.fold({ l -> Option.just(l).ap(f) }, { r -> Option.just(r) }) }

@@ -12,8 +12,6 @@ import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
-internal val EmptyElement: Name = Name.identifier("_EMPTY_ELEMENT_")
-
 interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
 
   class FunctionBodyScope(override val value: KtExpression, override val context: QuasiQuoteContext) : Scope<KtExpression>(value, context) {
@@ -36,14 +34,6 @@ interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
 
   override fun transform(ktElement: KtNamedFunction): FuncScope =
     FuncScope(ktElement, quasiQuoteContext)
-
-  override fun KtNamedFunction.cleanUserQuote(quoteDeclaration: String): String =
-    quoteDeclaration.trimMargin().removeEmptyTypeArgs()
-
-  private fun String.removeEmptyTypeArgs(): String =
-    replace("<$EmptyElement>", "")
-      .replace("$EmptyElement.", "")
-      .replace("$EmptyElement", "")
 
   override fun parse(template: String): KtNamedFunction =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createFunction(template)

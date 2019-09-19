@@ -99,7 +99,7 @@ interface Quote<P : KtElement, K : KtElement, S> {
 
   fun transform(ktElement: K): S
 
-  fun K.cleanUserQuote(quoteDeclaration: String): String = quoteDeclaration
+  fun K.cleanUserQuote(quoteDeclaration: String): String = quoteDeclaration.trimMargin()
 
   fun process(ktElement: K): QuoteTransformation<K>? {
     return if (ktElement.match()) {
