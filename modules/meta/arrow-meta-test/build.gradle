@@ -1,0 +1,34 @@
+buildscript {
+    dependencies{
+        classpath 'io.arrow-kt:gradle-plugin'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'kotlin-kapt'
+apply plugin: "arrow.meta.plugin.gradle"
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+//    compile project(':arrow-optics')
+//    compile project(':arrow-annotations')
+//    kapt project(':arrow-meta')
+//    kaptTest project(':arrow-meta')
+//    compileOnly project(':arrow-meta')
+//    testCompileOnly project(':arrow-meta')
+//    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+//    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+//    testCompile project(':arrow-test')
+//    testCompile project(':arrow-syntax')
+//    testCompile project(':arrow-core')
+//    testCompile project(':arrow-mtl')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+
+compileKotlin {
+    kotlinOptions.freeCompilerArgs = ["-Xplugin=/Users/simonvergauwen/Projects/arrow/modules/meta/arrow-meta-prototype/compiler-plugin/build/libs/compiler-plugin.jar"]
+}

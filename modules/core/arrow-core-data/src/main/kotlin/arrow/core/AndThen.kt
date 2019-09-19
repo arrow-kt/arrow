@@ -1,5 +1,5 @@
 package arrow.core
-//metadebug
+// metadebug
 
 /**
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.

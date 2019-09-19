@@ -18,6 +18,7 @@ data class ScopedList<K: KtElement>(val value: List<K>, val separator: String = 
 
 class ClassScope(
   override val value: KtClass,
+  override val context: QuasiQuoteContext,
   val modality: Name? = value.modalityModifierType()?.value?.let(Name::identifier),
   val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
   val kind: Name = Name.identifier(value.getClassOrInterfaceKeyword()?.text.orEmpty()),
@@ -25,5 +26,5 @@ class ClassScope(
   val typeParameters: ScopedList<KtTypeParameter> = ScopedList(value.typeParameters),
   val valueParameters: ScopedList<KtParameter> = ScopedList(value.getValueParameters()),
   val supertypes: ScopedList<KtSuperTypeListEntry> = ScopedList(value.superTypeListEntries),
-  val body: Scope<KtClassBody>? = value.body?.let(::Scope)
-) : Scope<KtClass>(value)
+  val body: Scope<KtClassBody>? = value.body?.let { Scope(it, context) }
+) : Scope<KtClass>(value, context)

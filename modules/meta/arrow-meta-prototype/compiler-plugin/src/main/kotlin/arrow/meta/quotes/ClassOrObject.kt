@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.psi.KtElement
 interface ClassOrObject : Quote<KtElement, KtClass, ClassScope> {
 
   override fun transform(ktElement: KtClass): ClassScope =
-    ClassScope(ktElement)
+    ClassScope(ktElement, quasiQuoteContext)
 
   override fun KtClass.cleanUserQuote(quoteDeclaration: String): String =
     quoteDeclaration.trimMargin().let {

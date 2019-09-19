@@ -16,25 +16,26 @@ internal val EmptyElement: Name = Name.identifier("_EMPTY_ELEMENT_")
 
 interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
 
-  class FunctionBodyScope(override val value: KtExpression) : Scope<KtExpression>(value) {
+  class FunctionBodyScope(override val value: KtExpression, override val context: QuasiQuoteContext) : Scope<KtExpression>(value, context) {
     override fun toString(): String =
       value.bodySourceAsExpression() ?: ""
   }
 
   class FuncScope(
     override val value: KtNamedFunction,
+    override val context: QuasiQuoteContext,
     val modality: Name? = value.modalityModifierType()?.value?.let(Name::identifier),
     val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
     val typeParameters: ScopedList<KtTypeParameter> = ScopedList(value.typeParameters),
     val receiver: Name? = value.receiverTypeReference?.text?.let(Name::identifier),
     val name: Name? = value.nameAsName,
     val valueParameters: ScopedList<KtParameter> = ScopedList(value.valueParameters),
-    val returnType: Scope<KtTypeReference>? = value.typeReference?.let(::Scope),
-    val body: FunctionBodyScope? = value.body()?.let(::FunctionBodyScope)
-  ) : Scope<KtNamedFunction>(value)
+    val returnType: Scope<KtTypeReference>? = value.typeReference?.let { Scope(it, context) },
+    val body: FunctionBodyScope? = value.body()?.let { FunctionBodyScope(it, context) }
+  ) : Scope<KtNamedFunction>(value, context)
 
   override fun transform(ktElement: KtNamedFunction): FuncScope =
-    FuncScope(ktElement)
+    FuncScope(ktElement, quasiQuoteContext)
 
   override fun KtNamedFunction.cleanUserQuote(quoteDeclaration: String): String =
     quoteDeclaration.trimMargin().removeEmptyTypeArgs()
