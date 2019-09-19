@@ -21,11 +21,10 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
 import arrow.optics.*
 
 val optionalHead: Optional<ListK<Int>, Int> = Optional(
-    getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
+    getOption = { list -> list.firstOrNull().toOption() },
     set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() }
 )
 ```

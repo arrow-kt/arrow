@@ -17,10 +17,9 @@ If for a structure `S` the foci `A` can be indexed by `I` then a `Traversal` can
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
-import arrow.data.extensions.listk.traverse.*
+import arrow.core.extensions.listk.traverse.*
 
 val filterIndexStringByIndex = FilterIndex.fromTraverse<ForListK, String>({ list ->
     list.fix().map {

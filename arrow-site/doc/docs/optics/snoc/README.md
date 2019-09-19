@@ -15,7 +15,7 @@ beginner
 It can be constructed by providing the `Prism`.
 
 ```kotlin:ank
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.optics.extensions.listk.snoc.snoc
 import arrow.optics.typeclasses.Snoc
 
