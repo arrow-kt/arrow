@@ -102,7 +102,6 @@ interface Quote<P : KtElement, K : KtElement, S> {
       val transformedScope = transform(ktElement)
       // the user transforms the expression into a new list of declarations
       val declarations = transformedScope.map(ktElement).map { quoteDeclaration ->
-        println("User returned declaration: \n\n${ktElement.text}\n\n")
         val declaration =
           quasiQuoteContext.compilerContext.ktPsiElementFactory
             .createDeclaration<KtDeclaration>(ktElement.cleanUserQuote(quoteDeclaration))
@@ -156,14 +155,14 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
   noinline map: S.(K) -> List<String>
 ): ExtensionPhase =
   cli {
-    additionalSources(
-      collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
-        println("START quote.additionalSources: $knownSources")
-        val mutableSources = arrayListOf(*knownSources.toTypedArray())
-        val fileMutations = processFiles(mutableSources, quoteFactory, match, map)
-        updateFiles(mutableSources, fileMutations)
-        println("END quote.additionalSources: $mutableSources")
-        mutableSources.forEach {
+    analysys(
+      doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
+        files as ArrayList
+        println("START quote.doAnalysis: $files")
+        val fileMutations = processFiles(files, quoteFactory, match, map)
+        updateFiles(files, fileMutations)
+        println("END quote.doAnalysis: $files")
+        files.forEach {
           val fileText = it.text
           if (fileText.startsWith("//metadebug")) {
             println("""|
@@ -174,7 +173,10 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
           """.trimMargin())
           }
         }
-        mutableSources
+        null
+      },
+      analysisCompleted = { project, module, bindingTrace, files ->
+        null
       }
     )
   } ?: ExtensionPhase.Empty
@@ -566,7 +568,7 @@ inline fun <reified K : KtElement> CompilerContext.transformFile(
 ): KtFile {
   val newSource = ktFile.sourceWithTransformations(mutations)
   val newFile = changeSource(ktFile, newSource)
-  println("Transformed file: $ktFile. New contents: \n$newSource")
+  //println("Transformed file: $ktFile. New contents: \n$newSource")
   return newFile
 }
 

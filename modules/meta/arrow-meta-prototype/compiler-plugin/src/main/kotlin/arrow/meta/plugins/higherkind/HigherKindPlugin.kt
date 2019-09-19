@@ -72,7 +72,7 @@ fun isHigherKindedType(ktClass: KtClass): Boolean =
     ktClass.parent is KtFile
 
 private fun KtClass.isNested(): Boolean =
-  parent !is KtClassOrObject
+  parent is KtClassOrObject
 
 val kindName: FqName = FqName("arrow.Kind")
 

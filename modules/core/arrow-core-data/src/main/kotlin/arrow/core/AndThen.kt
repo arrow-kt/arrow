@@ -1,7 +1,5 @@
-@file:metadebug package arrow.core
-
-@Target(AnnotationTarget.FILE)
-annotation class metadebug
+//metadebug
+package arrow.core
 
 /**
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.
