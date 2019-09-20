@@ -2,8 +2,10 @@ package arrow.meta.plugins.optics
 
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
-import arrow.meta.quotes.QuasiQuoteContext
+import arrow.meta.quotes.ClassScope
+import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.classOrObject
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
@@ -16,35 +18,58 @@ val MetaComponentRegistrar.lenses: Pair<Name, List<ExtensionPhase>>
     Name.identifier("lenses") to
       meta(
         classOrObject(::isProductType) { c ->
-          println("Processing lenses : ${c.name}")
+          if (`(valueParameters)`.value.size > 10) context.compilerContext.messageCollector?.report(CompilerMessageSeverity.WARNING, "Iso cannot be generated for product type with ${`(valueParameters)`.value.size}. Maximum support is $maxArity")
           listOf(
             if (c.companionObjects.isEmpty())
               """
               |$modality $visibility data $kind $name($`(valueParameters)`) {
               |  
               |  companion object {
-              |${c.lenses(context).joinToString("\n\n") { it.text }}
+              |${lenses().joinToString("\n\n") { it.text }}
+              |
+              |$iso
               |  }
               |}""" else """
               |$modality $visibility data $kind $name($`(valueParameters)`) {
-              |  ${body!!.value.addDeclerationTobody(lenses = c.lenses(context))}
+              |  ${body!!.value.addDeclerationTobody(lenses = lenses())}
               |}"""
           )
         }
       )
 
-fun KtClass.lenses(context: QuasiQuoteContext): List<KtProperty> =
-  primaryConstructorParameters.map { param: KtParameter ->
-    context.compilerContext.ktPsiElementFactory.createProperty(
-      """
-   |    val ${param.name}: arrow.optics.Lens<${name}, ${param.typeReference!!.text}> = arrow.optics.Lens(
-   |      get = { ${name!!.toLowerCase()} -> ${name!!.toLowerCase()}.${param.name} },
-   |      set = { ${name!!.toLowerCase()}, ${param.name} -> ${name!!.toLowerCase()}.copy(${param.name} = ${param.name}) }
-   |    )""".trimMargin()
-    )
-  }
+private const val maxArity: Int = 10
 
-fun isProductType(ktClass: KtClass): Boolean =
+private fun ClassScope.lenses(): List<KtProperty> =
+  `(valueParameters)`.value.map { param: KtParameter ->
+    lens(source = value, focus = param)
+  }.map(context.compilerContext.ktPsiElementFactory::createProperty)
+
+private fun lens(source: KtClass, focus: KtParameter): String =
+  """
+  |    val ${focus.name}: arrow.optics.Lens<${source.name}, ${focus.typeReference!!.text}> = arrow.optics.Lens(
+  |      get = { ${source.name!!.toLowerCase()} -> ${source.name!!.toLowerCase()}.${focus.name} },
+  |      set = { ${source.name!!.toLowerCase()}, ${focus.name} -> ${source.name!!.toLowerCase()}.copy(${focus.name} = ${focus.name}) }
+  |    )""".trimMargin()
+
+val ClassScope.iso: String
+  get() = """
+   |    val iso: arrow.optics.Iso<${value.name}, ${`(valueParameters)`.tupledType}> = arrow.optics.Iso(
+   |      get = { (${`(valueParameters)`.destructured}) -> ${`(valueParameters)`.tupled} },
+   |      reverseGet = { (${`(valueParameters)`.destructured}) -> ${value.name}(${`(valueParameters)`.destructured}) }
+   |    )""".trimMargin()
+
+val ScopedList<KtParameter>.tupledType: String
+  // get() = "Tuple${value.size}<${value.joinToString { it.typeReference!!.text }}>"
+  get() = "Pair<${value.joinToString { it.typeReference!!.text }}>"
+
+val ScopedList<KtParameter>.tupled: String
+  // get() = "Tuple${value.size}($destructured)"
+  get() = "Pair($destructured)"
+
+val ScopedList<KtParameter>.destructured: String
+  get() = value.joinToString { it.name!! }
+
+private fun isProductType(ktClass: KtClass): Boolean =
   ktClass.isData() &&
     ktClass.primaryConstructorParameters.isNotEmpty() &&
     ktClass.primaryConstructorParameters.all { !it.isMutable } &&
@@ -52,13 +77,6 @@ fun isProductType(ktClass: KtClass): Boolean =
 
 fun KtClassBody.addDeclerationTobody(lenses: List<KtProperty>): String =
   declarations.joinToString("\n") { declaration ->
-
-    if (declaration is KtObjectDeclaration && declaration.isCompanion()) declaration.addLenses(lenses).text
+    if (declaration is KtObjectDeclaration && declaration.isCompanion()) lenses.joinToString("\n\n") { it.text }
     else declaration.text
   }
-
-
-fun KtObjectDeclaration.addLenses(lenses: List<KtProperty>): KtObjectDeclaration = apply {
-
-  (declarations as MutableList).addAll(lenses)
-}

@@ -2,8 +2,6 @@ package arrow.core
 
 import arrow.higherkind
 
-//metadebug
-
 typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 

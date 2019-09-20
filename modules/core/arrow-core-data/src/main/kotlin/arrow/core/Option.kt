@@ -2,8 +2,6 @@ package arrow.core
 
 import arrow.higherkind
 
-//metadebug
-
 /**
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.

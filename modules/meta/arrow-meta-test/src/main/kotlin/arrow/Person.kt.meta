@@ -1,0 +1,22 @@
+//metadebug
+package arrow
+
+data class Person(val name: String, val age: Int) {
+  
+  companion object {
+val name: arrow.optics.Lens<Person, String> = arrow.optics.Lens(
+      get = { person -> person.name },
+      set = { person, name -> person.copy(name = name) }
+    )
+
+val age: arrow.optics.Lens<Person, Int> = arrow.optics.Lens(
+      get = { person -> person.age },
+      set = { person, age -> person.copy(age = age) }
+    )
+
+    val iso: arrow.optics.Iso<Person, Pair<String, Int>> = arrow.optics.Iso(
+      get = { (name, age) -> Pair(name, age) },
+      reverseGet = { (name, age) -> Person(name, age) }
+    )
+  }
+}
