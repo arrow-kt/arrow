@@ -256,6 +256,17 @@ Either.cond(true, { 42 }, { "Error" })
 Either.cond(false, { 42 }, { "Error" })
 ```
 
+A shorthand for `Either.cond()` is the Boolean rightIfTrue extension method which is 
+functionally equivalent. 
+
+```kotlin:ank
+(true).rightIfTrue({ 42 }, { "Error" })
+```
+
+```kotlin:ank
+(false).rightIfTrue({ 42 }, { "Error" })
+```
+
 Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
 
 ```kotlin:ank

@@ -396,6 +396,31 @@ fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
   null -> Either.right(null)
   else -> Either.left(default())
 }
+
+/**
+ * Returns [Either.Right] if the Boolean value is true. otherwise the specified A value wrapped into an
+ * [Either.Left]
+ *
+ * Example:
+ * ```
+ * (true).rightIfTrue { "left" }   // Right(b="Nothing?")
+ * (false).rightIfTrue { "left" }  // Left(a="left")
+ * ```
+ */
+fun <A> Boolean.rightIfTrue(default: () -> A): Either<A, Nothing?> = rightIfTrue({ null }, default)
+
+/**
+ * Returns [Either.Right] if the Boolean value is true. otherwise the specified A value wrapped into an
+ * [Either.Left]
+ *
+ * Example:
+ * ```
+ * (true).rightIfTrue({ "right" }, { "left" })   // Right(b="right")
+ * (false).rightIfTrue({ "left" }, { "right" })  // Left(a="left")
+ * ```
+ */
+fun <L, R> Boolean.rightIfTrue(right: () -> R, left: () -> L): Either<L, R> = Either.cond(this, right, left)
+
 /**
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.

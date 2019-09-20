@@ -151,6 +151,15 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "rightIfTrue should return Left if value is false or right when value is true" {
+      forAll { a: Int, b: Int ->
+        (false).rightIfTrue { b } == Left(b) &&
+          (true).rightIfTrue { a } == Right(null) &&
+          (false).rightIfTrue({ b }) { a } == Left(a) &&
+          (true).rightIfTrue({ b }) { a } == Right(b)
+      }
+    }
+
     "swap should interchange values" {
       forAll { a: Int ->
         Left(a).swap() == Right(a) &&
