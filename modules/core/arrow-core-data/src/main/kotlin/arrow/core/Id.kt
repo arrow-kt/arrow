@@ -50,23 +50,22 @@ data class Id<out A>(private val value: A) {
 
   fun <B> map(f: (A) -> B): Id<B> = Id(f(extract()))
 
-  fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(extract()).fix()
+  fun <B> flatMap(f: (A) -> Id<B>): Id<B> = f(extract())
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = operation(initial, value)
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = operation(value, initial)
 
-  fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map { f(this) }
+  fun <B> coflatMap(f: (Id<A>) -> B): Id<B> = map { f(this) }
 
   fun extract(): A = value
 
-  fun <B> ap(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: Id<(A) -> B>): Id<B> = ff.flatMap { f -> map(f) }
 
   companion object {
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> {
-      val x: Either<A, B> = f(a).value()
-      return when (x) {
+      return when (val x: Either<A, B> = f(a).value()) {
         is Either.Left -> tailRecM(x.a, f)
         is Either.Right -> Id(x.b)
       }
@@ -84,5 +83,5 @@ data class Id<out A>(private val value: A) {
   override fun hashCode(): Int = value.hashCode()
 }
 
-fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =
+fun <A, B> Id<Either<A, B>>.select(f: Id<(A) -> B>): Id<B> =
   flatMap { it.fold({ l -> just(l).ap(f) }, { r -> just(r) }) }

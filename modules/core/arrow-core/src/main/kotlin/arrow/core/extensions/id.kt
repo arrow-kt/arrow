@@ -92,7 +92,7 @@ interface IdApplicative : Applicative<ForId> {
 @extension
 interface IdSelective : Selective<ForId>, IdApplicative {
   override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-    fix().idSelect(f)
+    fix().idSelect(f.fix())
 }
 
 @extension
@@ -113,7 +113,7 @@ interface IdMonad : Monad<ForId> {
     Id.just(a)
 
   override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
-    fix().idSelect(f)
+    fix().idSelect(f.fix())
 
   override val fx: MonadFx<ForId>
     get() = IdFxMonad

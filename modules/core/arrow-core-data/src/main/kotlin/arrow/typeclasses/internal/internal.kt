@@ -26,6 +26,6 @@ val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
   override fun <A, B> Kind<ForId, A>.flatMap(f: (A) -> Kind<ForId, B>): Kind<ForId, B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForId, Either<A, B>>): Kind<ForId, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForId, Either<A, B>>): Id<B> =
     Id.tailRecM(a, f)
 }
