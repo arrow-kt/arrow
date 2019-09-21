@@ -58,7 +58,7 @@ interface IdEq<A> : Eq<Id<A>> {
 
 @extension
 interface IdShow<A> : Show<Id<A>> {
-  override fun Id<A>.show(): String =
+  override fun Id<A>.showed(): String =
     toString()
 }
 
@@ -199,7 +199,7 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun Id<A>.hash(): Int = HA().run { value().hash() }
+  override fun Id<A>.hashed(): Int = HA().run { value().hashed() }
 }
 
 fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =

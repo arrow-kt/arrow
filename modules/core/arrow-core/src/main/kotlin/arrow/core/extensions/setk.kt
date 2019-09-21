@@ -47,7 +47,7 @@ interface SetKEq<A> : Eq<SetK<A>> {
 
 @extension
 interface SetKShow<A> : Show<SetK<A>> {
-  override fun SetK<A>.show(): String =
+  override fun SetK<A>.showed(): String =
     toString()
 }
 
@@ -95,7 +95,7 @@ interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
+  override fun SetK<A>.hashed(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hashed() }
   }
 }

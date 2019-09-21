@@ -44,7 +44,7 @@ interface NonEmptyListEq<A> : Eq<NonEmptyList<A>> {
 
 @extension
 interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
-  override fun NonEmptyList<A>.show(): String =
+  override fun NonEmptyList<A>.showed(): String =
     toString()
 }
 
@@ -171,8 +171,8 @@ interface NonEmptyListHash<A> : Hash<NonEmptyList<A>>, NonEmptyListEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun NonEmptyList<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
+  override fun NonEmptyList<A>.hashed(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hashed() }
   }
 }
 

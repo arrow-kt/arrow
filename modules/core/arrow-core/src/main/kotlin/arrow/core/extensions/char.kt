@@ -6,7 +6,7 @@ import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 
 interface CharShow : Show<Char> {
-  override fun Char.show(): String =
+  override fun Char.showed(): String =
     this.toString()
 }
 
@@ -32,7 +32,7 @@ interface CharOrder : Order<Char> {
 }
 
 interface CharHash : Hash<Char>, CharEq {
-  override fun Char.hash(): Int = this.hashCode()
+  override fun Char.hashed(): Int = this.hashCode()
 }
 
 fun Char.Companion.show(): Show<Char> =

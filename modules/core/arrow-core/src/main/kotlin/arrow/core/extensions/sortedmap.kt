@@ -68,7 +68,7 @@ fun <A : Comparable<A>, B> SortedMapK.Companion.monoid(SB: Semigroup<B>): Sorted
   }
 
 interface SortedMapKShow<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
-  override fun SortedMapKOf<A, B>.show(): String =
+  override fun SortedMapKOf<A, B>.showed(): String =
     toString()
 }
 

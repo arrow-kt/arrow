@@ -193,7 +193,7 @@ interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
 
 @extension
 interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
-  override fun Tuple2<A, B>.show(): String =
+  override fun Tuple2<A, B>.showed(): String =
     toString()
 }
 
@@ -205,9 +205,9 @@ interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
   override fun EQA(): Eq<A> = HA()
   override fun EQB(): Eq<B> = HB()
 
-  override fun Tuple2<A, B>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() }
+  override fun Tuple2<A, B>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
@@ -228,7 +228,7 @@ interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 
 @extension
 interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
-  override fun Tuple3<A, B, C>.show(): String =
+  override fun Tuple3<A, B, C>.showed(): String =
     toString()
 }
 
@@ -242,10 +242,10 @@ interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
   override fun EQB(): Eq<B> = HB()
   override fun EQC(): Eq<C> = HC()
 
-  override fun Tuple3<A, B, C>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() }
+  override fun Tuple3<A, B, C>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
@@ -279,17 +279,17 @@ interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D
   override fun EQC(): Eq<C> = HC()
   override fun EQD(): Eq<D> = HD()
 
-  override fun Tuple4<A, B, C, D>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() }
+  override fun Tuple4<A, B, C, D>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
-  override fun Tuple4<A, B, C, D>.show(): String =
+  override fun Tuple4<A, B, C, D>.showed(): String =
     toString()
 }
 
@@ -328,18 +328,18 @@ interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B
   override fun EQD(): Eq<D> = HD()
   override fun EQE(): Eq<E> = HE()
 
-  override fun Tuple5<A, B, C, D, E>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() }
+  override fun Tuple5<A, B, C, D, E>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
-  override fun Tuple5<A, B, C, D, E>.show(): String =
+  override fun Tuple5<A, B, C, D, E>.showed(): String =
     toString()
 }
 
@@ -383,19 +383,19 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6E
   override fun EQE(): Eq<E> = HE()
   override fun EQF(): Eq<F> = HF()
 
-  override fun Tuple6<A, B, C, D, E, F>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() }
+  override fun Tuple6<A, B, C, D, E, F>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() },
+    HF().run { f.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
-  override fun Tuple6<A, B, C, D, E, F>.show(): String =
+  override fun Tuple6<A, B, C, D, E, F>.showed(): String =
     toString()
 }
 
@@ -444,20 +444,20 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, T
   override fun EQF(): Eq<F> = HF()
   override fun EQG(): Eq<G> = HG()
 
-  override fun Tuple7<A, B, C, D, E, F, G>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() }
+  override fun Tuple7<A, B, C, D, E, F, G>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() },
+    HF().run { f.hashed() },
+    HG().run { g.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
-  override fun Tuple7<A, B, C, D, E, F, G>.show(): String =
+  override fun Tuple7<A, B, C, D, E, F, G>.showed(): String =
     toString()
 }
 
@@ -511,21 +511,21 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
   override fun EQG(): Eq<G> = HG()
   override fun EQH(): Eq<H> = HH()
 
-  override fun Tuple8<A, B, C, D, E, F, G, H>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() }
+  override fun Tuple8<A, B, C, D, E, F, G, H>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() },
+    HF().run { f.hashed() },
+    HG().run { g.hashed() },
+    HH().run { h.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
-  override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
+  override fun Tuple8<A, B, C, D, E, F, G, H>.showed(): String =
     toString()
 }
 
@@ -584,22 +584,22 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
   override fun EQH(): Eq<H> = HH()
   override fun EQI(): Eq<I> = HI()
 
-  override fun Tuple9<A, B, C, D, E, F, G, H, I>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() },
-    HI().run { i.hash() }
+  override fun Tuple9<A, B, C, D, E, F, G, H, I>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() },
+    HF().run { f.hashed() },
+    HG().run { g.hashed() },
+    HH().run { h.hashed() },
+    HI().run { i.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
-  override fun Tuple9<A, B, C, D, E, F, G, H, I>.show(): String =
+  override fun Tuple9<A, B, C, D, E, F, G, H, I>.showed(): String =
     toString()
 }
 
@@ -663,22 +663,22 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
   override fun EQI(): Eq<I> = HI()
   override fun EQJ(): Eq<J> = HJ()
 
-  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() },
-    HI().run { i.hash() },
-    HJ().run { j.hash() }
+  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.hashed(): Int = listOf(
+    HA().run { a.hashed() },
+    HB().run { b.hashed() },
+    HC().run { c.hashed() },
+    HD().run { d.hashed() },
+    HE().run { e.hashed() },
+    HF().run { f.hashed() },
+    HG().run { g.hashed() },
+    HH().run { h.hashed() },
+    HI().run { i.hashed() },
+    HJ().run { j.hashed() }
   ).fold(1) { hash, v -> 31 * hash + v }
 }
 
 @extension
 interface Tuple10Show<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
+  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.showed(): String =
     toString()
 }

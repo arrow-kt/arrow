@@ -146,7 +146,7 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
 
 @extension
 interface IorShow<L, R> : Show<Ior<L, R>> {
-  override fun Ior<L, R>.show(): String =
+  override fun Ior<L, R>.showed(): String =
     toString()
 }
 
@@ -160,10 +160,10 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
   override fun EQR(): Eq<R> = HR()
 
-  override fun Ior<L, R>.hash(): Int = when (this) {
-    is Ior.Left -> HL().run { value.hash() }
-    is Ior.Right -> HR().run { value.hash() }
-    is Ior.Both -> 31 * HL().run { leftValue.hash() } + HR().run { rightValue.hash() }
+  override fun Ior<L, R>.hashed(): Int = when (this) {
+    is Ior.Left -> HL().run { value.hashed() }
+    is Ior.Right -> HR().run { value.hashed() }
+    is Ior.Both -> 31 * HL().run { leftValue.hashed() } + HR().run { rightValue.hashed() }
   }
 }
 

@@ -36,11 +36,11 @@ interface ByteEq : Eq<Byte> {
 }
 
 interface ByteShow : Show<Byte> {
-  override fun Byte.show(): String = toString()
+  override fun Byte.showed(): String = toString()
 }
 
 interface ByteHash : Hash<Byte>, ByteEq {
-  override fun Byte.hash(): Int = hashCode()
+  override fun Byte.hashed(): Int = hashCode()
 }
 
 fun Byte.Companion.hash(): Hash<Byte> =
@@ -93,11 +93,11 @@ interface DoubleEq : Eq<Double> {
 }
 
 interface DoubleShow : Show<Double> {
-  override fun Double.show(): String = toString()
+  override fun Double.showed(): String = toString()
 }
 
 interface DoubleHash : Hash<Double>, DoubleEq {
-  override fun Double.hash(): Int = hashCode()
+  override fun Double.hashed(): Int = hashCode()
 }
 
 fun Double.Companion.hash(): Hash<Double> =
@@ -145,7 +145,7 @@ interface IntEq : Eq<Int> {
 }
 
 interface IntShow : Show<Int> {
-  override fun Int.show(): String = toString()
+  override fun Int.showed(): String = toString()
 }
 
 interface IntOrder : Order<Int> {
@@ -153,7 +153,7 @@ interface IntOrder : Order<Int> {
 }
 
 interface IntHash : Hash<Int>, IntEq {
-  override fun Int.hash(): Int = hashCode()
+  override fun Int.hashed(): Int = hashCode()
 }
 
 fun Int.Companion.hash(): Hash<Int> =
@@ -206,11 +206,11 @@ interface LongEq : Eq<Long> {
 }
 
 interface LongShow : Show<Long> {
-  override fun Long.show(): String = toString()
+  override fun Long.showed(): String = toString()
 }
 
 interface LongHash : Hash<Long>, LongEq {
-  override fun Long.hash(): Int = hashCode()
+  override fun Long.hashed(): Int = hashCode()
 }
 
 fun Long.Companion.hash(): Hash<Long> =
@@ -263,11 +263,11 @@ interface ShortEq : Eq<Short> {
 }
 
 interface ShortShow : Show<Short> {
-  override fun Short.show(): String = toString()
+  override fun Short.showed(): String = toString()
 }
 
 interface ShortHash : Hash<Short>, ShortEq {
-  override fun Short.hash(): Int = hashCode()
+  override fun Short.hashed(): Int = hashCode()
 }
 
 fun Short.Companion.hash(): Hash<Short> =
@@ -320,11 +320,11 @@ interface FloatEq : Eq<Float> {
 }
 
 interface FloatShow : Show<Float> {
-  override fun Float.show(): String = toString()
+  override fun Float.showed(): String = toString()
 }
 
 interface FloatHash : Hash<Float>, FloatEq {
-  override fun Float.hash(): Int = hashCode()
+  override fun Float.hashed(): Int = hashCode()
 }
 
 fun Float.Companion.hash(): Hash<Float> =

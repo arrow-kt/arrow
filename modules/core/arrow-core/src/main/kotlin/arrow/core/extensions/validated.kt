@@ -135,7 +135,7 @@ interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
 
 @extension
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
-  override fun Validated<L, R>.show(): String =
+  override fun Validated<L, R>.showed(): String =
     toString()
 }
 
@@ -147,9 +147,9 @@ interface ValidatedHash<L, R> : Hash<Validated<L, R>>, ValidatedEq<L, R> {
   override fun EQL(): Eq<L> = HL()
   override fun EQR(): Eq<R> = HR()
 
-  override fun Validated<L, R>.hash(): Int = fold({
-    HL().run { it.hash() }
+  override fun Validated<L, R>.hashed(): Int = fold({
+    HL().run { it.hashed() }
   }, {
-    HR().run { it.hash() }
+    HR().run { it.hashed() }
   })
 }

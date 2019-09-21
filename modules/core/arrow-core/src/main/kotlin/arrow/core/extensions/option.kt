@@ -141,7 +141,7 @@ interface OptionEq<A> : Eq<Option<A>> {
 
 @extension
 interface OptionShow<A> : Show<Option<A>> {
-  override fun Option<A>.show(): String =
+  override fun Option<A>.showed(): String =
     toString()
 }
 
@@ -289,10 +289,10 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun Option<A>.hash(): Int = fold({
+  override fun Option<A>.hashed(): Int = fold({
     None.hashCode()
   }, {
-    HA().run { it.hash() }
+    HA().run { it.hashed() }
   })
 }
 

@@ -203,7 +203,7 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 
 @extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
-  override fun Either<L, R>.show(): String =
+  override fun Either<L, R>.showed(): String =
     toString()
 }
 
@@ -217,10 +217,10 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 
   override fun EQR(): Eq<R> = HR()
 
-  override fun Either<L, R>.hash(): Int = fold({
-    HL().run { it.hash() }
+  override fun Either<L, R>.hashed(): Int = fold({
+    HL().run { it.hashed() }
   }, {
-    HR().run { it.hash() }
+    HR().run { it.hashed() }
   })
 }
 

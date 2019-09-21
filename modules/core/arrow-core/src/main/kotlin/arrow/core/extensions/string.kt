@@ -29,7 +29,7 @@ fun String.Companion.eq(): Eq<String> =
   object : StringEq {}
 
 interface StringShow : Show<String> {
-  override fun String.show(): String = this
+  override fun String.showed(): String = this
 }
 
 fun String.Companion.show(): Show<String> =
@@ -43,7 +43,7 @@ fun String.Companion.order(): Order<String> =
   object : StringOrder {}
 
 interface StringHash : Hash<String>, StringEq {
-  override fun String.hash(): Int = hashCode()
+  override fun String.hashed(): Int = hashCode()
 }
 
 fun String.Companion.hash(): Hash<String> =

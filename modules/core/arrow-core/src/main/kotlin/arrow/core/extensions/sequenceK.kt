@@ -70,7 +70,7 @@ interface SequenceKEq<A> : Eq<SequenceK<A>> {
 
 @extension
 interface SequenceKShow<A> : Show<SequenceK<A>> {
-  override fun SequenceK<A>.show(): String =
+  override fun SequenceK<A>.showed(): String =
     toString()
 }
 
@@ -173,8 +173,8 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun SequenceK<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
+  override fun SequenceK<A>.hashed(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hashed() }
   }
 }
 

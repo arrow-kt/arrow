@@ -3,7 +3,7 @@ package arrow.core
 import arrow.core.Id.Companion.just
 import arrow.higherkind
 
-fun <A> IdOf<A>.value(): A = this.fix().extract()
+fun <A> IdOf<A>.value(): A = fix().extract()
 
 /**
  *
@@ -42,6 +42,8 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * }
  * ```
  */
+
+//metadebug
 
 @higherkind
 data class Id<out A>(private val value: A) {

@@ -5,7 +5,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 
 interface BooleanShow : Show<Boolean> {
-  override fun Boolean.show(): String =
+  override fun Boolean.showed(): String =
     this.toString()
 }
 
@@ -14,7 +14,7 @@ interface BooleanEq : Eq<Boolean> {
 }
 
 interface BooleanHash : Hash<Boolean>, BooleanEq {
-  override fun Boolean.hash(): Int = this.hashCode()
+  override fun Boolean.hashed(): Int = this.hashCode()
 }
 
 fun Boolean.Companion.show(): Show<Boolean> =

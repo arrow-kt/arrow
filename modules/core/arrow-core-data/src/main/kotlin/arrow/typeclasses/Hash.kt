@@ -23,13 +23,13 @@ interface Hash<in F> : Eq<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = String.hash().run { "MyString".hash() }
+   *   val result = String.hash().run { "MyString".hashed() }
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun F.hash(): Int
+  fun F.hashed(): Int //TODO This can't be named the same as the TypeClass because in the current processor there are collisions, once we have meta then yes
 
   companion object {
 
@@ -53,7 +53,7 @@ interface Hash<in F> : Eq<F> {
      *  ```
      */
     inline operator fun <F> invoke(crossinline hashF: (F) -> Int): Hash<F> = object : Hash<F> {
-      override fun F.hash(): Int = hashF(this)
+      override fun F.hashed(): Int = hashF(this)
 
       override fun F.eqv(b: F): Boolean = this == b
     }
@@ -68,7 +68,7 @@ interface Hash<in F> : Eq<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = Hash.any().run { 1.5.hash() }
+     *   val result = Hash.any().run { 1.5.hashed() }
      *   //sampleEnd
      *   println(result)
      * }
@@ -77,7 +77,7 @@ interface Hash<in F> : Eq<F> {
     fun any(): Hash<Any?> = HashAny
 
     private object HashAny : Hash<Any?> {
-      override fun Any?.hash(): Int = hashCode()
+      override fun Any?.hashed(): Int = hashCode()
 
       override fun Any?.eqv(b: Any?): Boolean = this == b
     }

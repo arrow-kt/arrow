@@ -109,7 +109,7 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
 
 @extension
 interface MapKShow<K, A> : Show<MapK<K, A>> {
-  override fun MapK<K, A>.show(): String =
+  override fun MapK<K, A>.showed(): String =
     toString()
 }
 
@@ -122,8 +122,8 @@ interface MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
   override fun EQA(): Eq<A> = HA()
 
   // Somewhat mirrors HashMap.Node.hashCode in that the combinator there between key and value is xor
-  override fun MapK<K, A>.hash(): Int =
-    SetK.hash(HK()).run { keys.k().hash() } xor foldLeft(1) { hash, a ->
-      31 * hash + HA().run { a.hash() }
+  override fun MapK<K, A>.hashed(): Int =
+    SetK.hash(HK()).run { keys.k().hashed() } xor foldLeft(1) { hash, a ->
+      31 * hash + HA().run { a.hashed() }
     }
 }

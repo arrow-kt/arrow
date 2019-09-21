@@ -64,6 +64,8 @@ interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
     fix().retag()
 }
 
+//metadebug
+
 @extension
 interface ConstApply<A> : Apply<ConstPartialOf<A>> {
 
@@ -147,7 +149,7 @@ interface ConstEq<A, T> : Eq<Const<A, T>> {
 
 @extension
 interface ConstShow<A, T> : Show<Const<A, T>> {
-  override fun Const<A, T>.show(): String =
+  override fun Const<A, T>.showed(): String =
     toString()
 }
 
@@ -157,5 +159,5 @@ interface ConstHash<A, T> : Hash<Const<A, T>>, ConstEq<A, T> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun Const<A, T>.hash(): Int = HA().run { value().hash() }
+  override fun Const<A, T>.hashed(): Int = HA().run { value().hashed() }
 }

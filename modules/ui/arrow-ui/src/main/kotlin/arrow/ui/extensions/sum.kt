@@ -66,7 +66,7 @@ interface SumHash<F, G, A> : Hash<Sum<F, G, A>>, SumEq<F, G, A> {
   override fun EQF(): Eq<Kind<F, A>> = HF()
   override fun EQG(): Eq<Kind<G, A>> = HG()
 
-  override fun Sum<F, G, A>.hash(): Int = 31 * HF().run { left.hash() } + HG().run { right.hash() }
+  override fun Sum<F, G, A>.hashed(): Int = 31 * HF().run { left.hashed() } + HG().run { right.hashed() }
 }
 
 @extension

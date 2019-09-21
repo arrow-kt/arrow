@@ -28,8 +28,8 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
               "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>"
             else null,
             """|
-              |@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE") 
-              |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
+              |@Suppress("NOTHING_TO_INLINE") 
+              |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this
             """,
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)

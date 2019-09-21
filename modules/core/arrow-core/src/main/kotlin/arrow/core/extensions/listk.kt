@@ -62,7 +62,7 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
 
 @extension
 interface ListKShow<A> : Show<ListKOf<A>> {
-  override fun ListKOf<A>.show(): String =
+  override fun ListKOf<A>.showed(): String =
     toString()
 }
 
@@ -183,8 +183,8 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun ListKOf<A>.hash(): Int = fix().foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
+  override fun ListKOf<A>.hashed(): Int = fix().foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hashed() }
   }
 }
 

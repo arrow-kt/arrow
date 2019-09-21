@@ -14,7 +14,7 @@ interface Show<in A> {
    * @receiver object of type [A].
    * @returns a [String] representing [this@show].
    */
-  fun A.show(): String
+  fun A.showed(): String //TODO until meta this can't be named the same as the class
 
   companion object {
 
@@ -25,7 +25,7 @@ interface Show<in A> {
      * @returns a [Show] instance that is defined by the [fshow] function.
      */
     inline operator fun <A> invoke(crossinline fshow: A.() -> String): Show<A> = object : Show<A> {
-      override fun A.show(): String =
+      override fun A.showed(): String =
         fshow(this)
     }
 
@@ -35,7 +35,7 @@ interface Show<in A> {
      * @returns a [Show] instance that is defined by the [A] `toString` method.
      */
     fun <A> fromToString(): Show<A> = object : Show<A> {
-      override fun A.show(): String =
+      override fun A.showed(): String =
         toString()
     }
 
@@ -45,7 +45,7 @@ interface Show<in A> {
     fun any(): Show<Any?> = ShowAny
 
     private object ShowAny : Show<Any?> {
-      override fun Any?.show(): String =
+      override fun Any?.showed(): String =
         toString()
     }
   }

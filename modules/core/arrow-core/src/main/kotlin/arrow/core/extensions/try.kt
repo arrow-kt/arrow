@@ -101,7 +101,7 @@ interface TryEq<A> : Eq<Try<A>> {
 
 @extension
 interface TryShow<A> : Show<Try<A>> {
-  override fun Try<A>.show(): String =
+  override fun Try<A>.showed(): String =
     toString()
 }
 
@@ -200,10 +200,10 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
 
   override fun EQT(): Eq<Throwable> = HT()
 
-  override fun Try<A>.hash(): Int = fold({
-    HT().run { it.hash() }
+  override fun Try<A>.hashed(): Int = fold({
+    HT().run { it.hashed() }
   }, {
-    HA().run { it.hash() }
+    HA().run { it.hashed() }
   })
 }
 

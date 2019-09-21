@@ -5,6 +5,10 @@ import arrow.core.Option
 import arrow.core.identity
 import arrow.higherkind
 
+//metadebug
+
+fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
+
 @higherkind
 data class Const<A, out T>(private val value: A) {
 
@@ -24,11 +28,11 @@ data class Const<A, out T>(private val value: A) {
   fun value(): A = value
 }
 
-fun <A, T> Const<A, T>.combine(SG: Semigroup<A>, that: Const<A, T>): Const<A, T> = Const(SG.run { value().combine(that.value()) })
+fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> = Const(SG.run { value().combine(that.value()) })
 
-fun <A, T, U> Const<A, T>.ap(SG: Semigroup<A>, ff: Const<A, (T) -> U>): Const<A, U> = ff.retag<U>().combine(SG, retag())
+fun <A, T, U> ConstOf<A, T>.ap(SG: Semigroup<A>, ff: ConstOf<A, (T) -> U>): Const<A, U> = ff.fix().retag<U>().combine(SG, fix().retag())
 
-fun <T, A, G> Const<A, Kind<G, T>>.sequence(GA: Applicative<G>): Kind<G, Const<A, T>> =
-  traverse(GA, ::identity)
+fun <T, A, G> ConstOf<A, Kind<G, T>>.sequence(GA: Applicative<G>): Kind<G, Const<A, T>> =
+  fix().traverse(GA, ::identity)
 
 fun <A> A.const(): Const<A, Nothing> = Const(this)

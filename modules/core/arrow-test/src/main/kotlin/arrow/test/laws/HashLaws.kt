@@ -17,14 +17,14 @@ object HashLaws {
     forAll(Gen.int()) { f ->
       val a = cf(f)
       val b = cf(f)
-      EQ.run { a.eqv(b) } && HF.run { a.hash() == b.hash() }
+      EQ.run { a.eqv(b) } && HF.run { a.hashed() == b.hashed() }
     }
   }
 
   fun <F> equalHashM(HF: Hash<F>, cf: (Int) -> F) {
     forAll(Gen.int()) { f ->
       val a = cf(f)
-      HF.run { a.hash() == a.hash() }
+      HF.run { a.hashed() == a.hashed() }
     }
   }
 }

@@ -16,6 +16,6 @@ object ShowLaws {
     forAll(Gen.int()) { int: Int ->
       val a = cf(int)
       val b = cf(int)
-      EQ.run { a.eqv(b) } && a.show() == b.show()
+      EQ.run { a.eqv(b) } && a.showed() == b.showed()
     }
 }
