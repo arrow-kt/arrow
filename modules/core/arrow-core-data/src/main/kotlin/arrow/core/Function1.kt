@@ -1,9 +1,12 @@
 package arrow.core
 
+import arrow.higherkind
+
 fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
 operator fun <I, O> Function1Of<I, O>.invoke(i: I): O = this.fix().f(i)
 
+@higherkind
 class Function1<I, out O>(val f: (I) -> O) {
 
   fun <B> map(f: (O) -> B): Function1<I, B> = f.compose { a: I -> this.f(a) }.k()

@@ -165,7 +165,7 @@ interface InternalRegistry: ConfigSyntax {
     registerPostAnalysisContextEnrichment(project, ctx)
 
     val initialPhases = listOf(Name.identifier("Initial setup") to listOf(
-      enableIr(),
+      //enableIr(),
       compilerContextService(),
       registerKindAwareTypeChecker(),
       registerMetaAnalyzer()

@@ -18,7 +18,7 @@ val MetaComponentRegistrar.dummy: Pair<Name, List<ExtensionPhase>>
               |}
             """,
             """
-              |$modality $visibility $kind $name<$typeParameters>($valueParameters): SynthSuperType<Int> {
+              |$modality $visibility $kind $name<$`(typeParameters)`>($`(valueParameters)`): SynthSuperType<Int> {
               |  $body
               |  fun test2(): String = "Boom!"
               |  fun test(): Unit = println(test2())

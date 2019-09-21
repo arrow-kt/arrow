@@ -4,18 +4,12 @@ import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
 import arrow.meta.quotes.QuasiQuoteContext
 import arrow.meta.quotes.classOrObject
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
-import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.resolve.calls.callUtil.getType
-import kotlin.reflect.KProperty
 
 val MetaComponentRegistrar.lenses: Pair<Name, List<ExtensionPhase>>
   get() =
@@ -26,13 +20,13 @@ val MetaComponentRegistrar.lenses: Pair<Name, List<ExtensionPhase>>
           listOf(
             if (c.companionObjects.isEmpty())
               """
-              |$modality $visibility data $kind $name($valueParameters) {
+              |$modality $visibility data $kind $name($`(valueParameters)`) {
               |  
               |  companion object {
               |${c.lenses(context).joinToString("\n\n") { it.text }}
               |  }
               |}""" else """
-              |$modality $visibility data $kind $name($valueParameters) {
+              |$modality $visibility data $kind $name($`(valueParameters)`) {
               |  ${body!!.value.addDeclerationTobody(lenses = c.lenses(context))}
               |}"""
           )

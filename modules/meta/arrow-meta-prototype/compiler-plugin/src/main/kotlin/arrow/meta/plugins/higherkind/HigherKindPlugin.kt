@@ -22,12 +22,14 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
             /** Kind Marker **/
             "class For$name private constructor() { companion object }",
             /** Single arg type alias **/
-            "typealias ${name}Of<${typeParameters.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${typeParameters.invariant()}>",
+            "typealias ${name}Of<${`(typeParameters)`.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>",
             /** KindedJ Support **/
-            "typealias ${name}KindedJ<${typeParameters.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${typeParameters.invariant()}>",
+            if (c.arity < 5)
+              "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>"
+            else null,
             """|
               |@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE") 
-              |inline fun <${typeParameters.invariant(true)}> ${name}Of<${typeParameters.invariant()}>.fix(): $name<${typeParameters.invariant()}> = this as $name<${typeParameters.invariant()}>
+              |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
             """,
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
@@ -35,11 +37,11 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
             else null,
             /** Class redefinition with kinded super type **/
             """
-              |$annotations
-              |$modifiers $modality $visibility $kind $name<$typeParameters>($valueParameters) : ${supertypes.."${name}Of<${typeParameters.invariant()}>"} {
+              |$`@annotations`
+              |$modifiers $modality $visibility $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
               |  $body
               |}
-              |"""
+              |""".trimMargin()
           )
         }
       )
@@ -71,7 +73,8 @@ private val KtClass.partialKindAritySuffix: String
   get() = (arity - 1).let { if (it > 1) "$it" else "" }
 
 fun isHigherKindedType(ktClass: KtClass): Boolean =
-  ktClass.fqName?.asString()?.startsWith("arrow.Kind") != true &&
+  ktClass.annotationEntries.any { it.text == "@higherkind" } &&
+    ktClass.fqName?.asString()?.startsWith("arrow.Kind") != true &&
     !ktClass.isAnnotation() &&
     !ktClass.isNested() &&
     !ktClass.superTypeIsSealedInFile() &&

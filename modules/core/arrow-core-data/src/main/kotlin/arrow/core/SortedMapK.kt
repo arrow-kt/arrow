@@ -3,8 +3,10 @@ package arrow.core
 //metadebug
 
 import arrow.Kind
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 
+@higherkind
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMap<A, B> by map {
 
   fun <C> map(f: (B) -> C): SortedMapK<A, C> =

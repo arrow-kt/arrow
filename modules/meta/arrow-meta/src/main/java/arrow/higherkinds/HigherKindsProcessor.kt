@@ -10,7 +10,7 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class HigherKindsProcessor : AbstractProcessor() {
 
   private val annotatedList: MutableList<AnnotatedHigherKind> = mutableListOf<AnnotatedHigherKind>()

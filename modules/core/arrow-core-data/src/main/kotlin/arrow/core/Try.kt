@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.higherkind
+
 //metadebug
 
 typealias Failure = Try.Failure
@@ -9,6 +11,7 @@ typealias Success<A> = Try.Success<A>
   "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
   ReplaceWith("Either<Throwable, A>")
 )
+@higherkind
 sealed class Try<out A> {
 
   companion object {

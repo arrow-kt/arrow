@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 
 typealias Nel<A> = NonEmptyList<A>
@@ -8,6 +9,7 @@ typealias Nel<A> = NonEmptyList<A>
 /**
  * A List that can not be empty
  */
+@higherkind
 class NonEmptyList<out A> private constructor(
   val head: A,
   val tail: List<A>,

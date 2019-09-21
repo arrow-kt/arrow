@@ -1,7 +1,11 @@
 package arrow.core
 
-import arrow.Kind
+//metadebug
 
+import arrow.Kind
+import arrow.higherkind
+
+@higherkind
 interface FunctionK<F, G> {
 
   /**

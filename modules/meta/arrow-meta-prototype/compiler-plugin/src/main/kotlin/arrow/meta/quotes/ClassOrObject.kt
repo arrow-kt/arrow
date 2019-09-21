@@ -8,12 +8,6 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassScope> {
   override fun transform(ktElement: KtClass): ClassScope =
     ClassScope(ktElement, quasiQuoteContext)
 
-  override fun KtClass.cleanUserQuote(quoteDeclaration: String): String =
-    quoteDeclaration.trimMargin().let {
-      if (isInterface()) it.replace("interface (.*?)\\(\\)".toRegex(), "interface $1")
-      else it
-    }.replace("<>", "")
-
   override fun parse(template: String): KtClass =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createClass(template)
 

@@ -3,6 +3,9 @@ package arrow.core
 import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.higherkind
+
+//metadebug
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -10,6 +13,7 @@ import arrow.core.Either.Right
  * Represents a value of one of two possible types (a disjoint union.)
  * An instance of Either is either an instance of [Left] or [Right].
  */
+@higherkind
 sealed class Either<out A, out B> {
 
   /**

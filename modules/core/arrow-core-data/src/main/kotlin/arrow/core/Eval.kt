@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.higherkind
+
 fun <A> EvalOf<A>.value(): A = this.fix().value()
 
 /**
@@ -54,6 +56,7 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  * ```
  *
  */
+@higherkind
 sealed class Eval<out A> {
 
   companion object {

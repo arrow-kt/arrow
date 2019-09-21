@@ -99,18 +99,18 @@ interface Quote<P : KtElement, K : KtElement, S> {
 
   fun transform(ktElement: K): S
 
-  fun K.cleanUserQuote(quoteDeclaration: String): String = quoteDeclaration.trimMargin()
-
   fun process(ktElement: K): QuoteTransformation<K>? {
     return if (ktElement.match()) {
       // a new scope is transformed
       val transformedScope = transform(ktElement)
       // the user transforms the expression into a new list of declarations
-      val declarations = transformedScope.map(ktElement).map { quoteDeclaration ->
-        val declaration =
-          quasiQuoteContext.compilerContext.ktPsiElementFactory
-            .createDeclaration<KtDeclaration>(ktElement.cleanUserQuote(quoteDeclaration))
-        declaration
+      val declarations = transformedScope.map(ktElement).mapNotNull { quoteDeclaration ->
+        if (quoteDeclaration.isNotEmpty()) {
+          val declaration =
+            quasiQuoteContext.compilerContext.ktPsiElementFactory
+              .createDeclaration<KtDeclaration>(quoteDeclaration)
+          declaration
+        } else null
       }
       if (declarations.isEmpty()) null
       else QuoteTransformation(ktElement, declarations)

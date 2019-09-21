@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.higherkind
 import arrow.typeclasses.Applicative
 
 /**
@@ -14,6 +15,7 @@ import arrow.typeclasses.Applicative
  * The type class @extension mechanism will project then all syntax generated for the Wrapper also into the Wrapped
  * type constructor as extension functions.
  */
+@higherkind
 data class ListK<out A>(private val list: List<A>) : List<A> by list {
 
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
