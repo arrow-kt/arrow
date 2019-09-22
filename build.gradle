@@ -212,10 +212,10 @@ dependencyUpdates {
         final disallowedQualifiers = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'eap']
         final isDisallowed = { dependency -> { qualifier -> dependency.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ } }
         final dependencies = result.current.dependencies
-            .plus(result.outdated.dependencies)
-            .plus(result.exceeded.dependencies)
-            .plus(result.unresolved.dependencies)
-            .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+                .plus(result.outdated.dependencies)
+                .plus(result.exceeded.dependencies)
+                .plus(result.unresolved.dependencies)
+                .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
 
         def plainTextReporter = new PlainTextReporter(project, revision, gradleReleaseChannel)
         plainTextReporter.write(System.out, result)
@@ -227,8 +227,8 @@ dependencyUpdates {
             final title = "\nError: Kotlin and Coroutines must depends on release version!"
             final message = dependencies
                     .inject(title) { acc, dependency ->
-                "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
-            }
+                        "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+                    }
 
             throw new GradleException(message)
         }
@@ -237,4 +237,20 @@ dependencyUpdates {
 
 task checkDependenciesVersion {
     dependsOn dependencyUpdates
+}
+
+task publishAndRunIde {
+    [
+     ":idea-plugin:clean",
+     ":gradle-plugin:clean",
+     ":compiler-plugin:clean",
+     ":idea-plugin:build",
+     ":gradle-plugin:build",
+     ":compiler-plugin:build",
+     ":gradle-plugin:publishArrowPluginMarkerMavenPublicationToMavenLocal",
+     ':gradle-plugin:publishPluginMavenPublicationToMavenLocal',
+     ':idea-plugin:runIde'
+    ].each { taskName ->
+        dependsOn gradle.includedBuild('arrow-meta-prototype').task(taskName)
+    }
 }

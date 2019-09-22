@@ -14,14 +14,14 @@ class KindAwareTypeChecker(val typeChecker: KotlinTypeChecker) : KotlinTypeCheck
     val isKind: Boolean =
       (subType.isKind() || superType.isKind()) && (subType.typeAliasMatch(superType) || superType.typeAliasMatch(subType))
     val result = isKind || typeChecker.isSubtypeOf(p0, p1)
-    println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1 = $result")
+    //println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1 = $result")
     return result
   }
 
   override fun equalTypes(p0: KotlinType, p1: KotlinType): Boolean {
     //println("KindAwareTypeChecker.equalTypes: $p0 <-> $p1")
     val result = typeChecker.equalTypes(p0, p1)
-    println("KindAwareTypeChecker.equalTypes: $p0 <-> $p1 = $result")
+    //println("KindAwareTypeChecker.equalTypes: $p0 <-> $p1 = $result")
     return result
   }
 

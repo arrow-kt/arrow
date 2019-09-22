@@ -104,11 +104,11 @@ interface Quote<P : KtElement, K : KtElement, S> {
       // a new scope is transformed
       val transformedScope = transform(ktElement)
       // the user transforms the expression into a new list of declarations
-      val declarations = transformedScope.map(ktElement).mapNotNull { quoteDeclaration ->
+      val declarations = transformedScope.map(ktElement).map { it.trimMargin() }.mapNotNull { quoteDeclaration ->
         if (quoteDeclaration.isNotEmpty()) {
           val declaration =
             quasiQuoteContext.compilerContext.ktPsiElementFactory
-              .createDeclaration<KtDeclaration>(quoteDeclaration)
+              .createDeclaration<KtDeclaration>("@arrow.synthetic $quoteDeclaration")
           declaration
         } else null
       }

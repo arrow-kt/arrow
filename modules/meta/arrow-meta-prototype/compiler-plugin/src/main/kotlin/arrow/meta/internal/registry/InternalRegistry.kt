@@ -164,6 +164,12 @@ interface InternalRegistry: ConfigSyntax {
     val ctx = CompilerContext(project, messageCollector)
     registerPostAnalysisContextEnrichment(project, ctx)
 
+    println("System.properties are: " + System.getProperties().map {
+      "\n${it.key} : ${it.value}"
+    })
+
+    installArrowPlugin()
+
     val initialPhases = listOf(Name.identifier("Initial setup") to listOf(
       //enableIr(),
       compilerContextService(),
@@ -193,6 +199,14 @@ interface InternalRegistry: ConfigSyntax {
         registerPhase(currentPhase)
         ctx.registerIdeExclusivePhase(currentPhase)
       }
+    }
+  }
+
+  fun installArrowPlugin() {
+    val ideaPath = System.getProperty("idea.plugins.path")
+    val userDir = System.getProperty("user.dir")
+    if (ideaPath != null && ideaPath.isNotEmpty() && userDir != null && userDir.isNotEmpty()) {
+      println("Installing Arrow Plugin: $ideaPath, $userDir")
     }
   }
 

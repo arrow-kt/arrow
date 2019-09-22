@@ -221,8 +221,8 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
 fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   fix().let {
     when (it) {
-      is Right -> f(it.b)
-      is Left -> it
+      is Either.Right -> f(it.b)
+      is Either.Left -> it
     }
   }
 

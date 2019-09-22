@@ -1,6 +1,7 @@
 package arrow.meta.quotes
 
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtAnnotation
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
@@ -39,7 +40,7 @@ data class ClassBodyScope(
 class ClassScope(
   override val value: KtClass,
   override val context: QuasiQuoteContext,
-  val `@annotations`: ScopedList<KtAnnotationEntry> = ScopedList(value.annotationEntries),
+  val `@annotationEntries`: ScopedList<KtAnnotationEntry> = ScopedList(value.annotationEntries),
   val modifiers: Scope<KtModifierList>? = value.modifierList?.let {
     Scope(it, context)
   },
@@ -47,7 +48,7 @@ class ClassScope(
   val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
   val kind: Name? =
     (when {
-      value.isSealed() -> "sealed "
+      value.isSealed() -> "$`@annotationEntries` sealed "
       value.isData() -> "data "
       else -> "/* empty? */"
     } + value.getClassOrInterfaceKeyword()?.text).let(Name::identifier),

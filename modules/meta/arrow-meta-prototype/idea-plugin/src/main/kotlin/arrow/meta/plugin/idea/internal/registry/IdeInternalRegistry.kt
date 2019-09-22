@@ -12,7 +12,7 @@ internal interface IdeInternalRegistry : InternalRegistry {
     ide {
       storageComponent(
         registerModuleComponents = { container, moduleDescriptor ->
-          println("Registering meta analyzer")
+          //println("Registering meta analyzer")
           container.useImpl<MetaIdeAnalyzer>()
           //
         },

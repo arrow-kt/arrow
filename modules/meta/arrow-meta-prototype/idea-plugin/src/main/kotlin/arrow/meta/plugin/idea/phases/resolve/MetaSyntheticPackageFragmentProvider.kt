@@ -3,6 +3,7 @@ package arrow.meta.plugin.idea.phases.resolve
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.config.buildFolders
 import arrow.meta.plugin.idea.phases.config.currentProject
+import arrow.meta.quotes.ktClassOrObject
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -11,16 +12,17 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.psi.ClassFileViewProviderFactory
 import com.intellij.psi.PsiManager
+import com.intellij.psi.impl.PsiManagerImpl
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
-import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
@@ -34,11 +36,18 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileStubBuilder
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
+import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.isError
 import org.jetbrains.kotlin.utils.Printer
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -49,12 +58,14 @@ private val metaPlugin = IdeMetaPlugin()
 
 private val registered = AtomicBoolean(false)
 
-class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, AsyncFileListener, AsyncFileListener.ChangeApplier, Disposable {
+private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
+
+class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, SyntheticResolveExtension, AsyncFileListener, AsyncFileListener.ChangeApplier, Disposable {
 
   private val fileListenerInitialized: AtomicBoolean = AtomicBoolean(false)
 
   @Synchronized
-  private fun Project.registerIdeStack(postInitialize : () -> Unit) {
+  private fun Project.registerIdeStack(postInitialize: () -> Unit) {
     if (!registered.getAndSet(true)) {
       val project = currentProject()
       if (project != null) {
@@ -91,12 +102,20 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
       computeCache(project)
     }
     initializeFileListener()
-    println("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n $descriptorCache")
-    return PackageFragmentProviderImpl(
+    println("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n ${descriptorCache.toList().joinToString { 
+      "${it.first} : ${it.second.size}"
+    }}")
+    return DescriptorCachePackageFragmentProvider(module)
+  }
+
+  inner class DescriptorCachePackageFragmentProvider(val module: ModuleDescriptor) : PackageFragmentProvider {
+    override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> =
       descriptorCache.keys().toList().map { packageName ->
         BuildCachePackageFragmentDescriptor(module, packageName)
       }
-    )
+
+    override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> =
+      getPackageFragments(fqName).map { it.fqName }
   }
 
   inner class BuildCachePackageFragmentDescriptor(module: ModuleDescriptor, fqName: FqName) : PackageFragmentDescriptorImpl(module, fqName) {
@@ -144,22 +163,20 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
   override fun afterVfsChange() {
     println("MetaSyntheticPackageFragmentProvider.afterVfsChange")
     currentProject()?.let { computeCache(it) }
-    refreshingFiles.forEach {
-      it.refresh(false, true) {
-        println("Refreshed: $it")
-      }
-    }
-    refreshingFiles.clear()
+//    refreshingFiles.forEach {
+//      it.refresh(false, true) {
+//        println("Refreshed: $it")
+//      }
+//    }
+//    refreshingFiles.clear()
   }
 
   private val refreshingFiles: HashSet<VirtualFile> = hashSetOf()
 
   override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
-    refreshingFiles.addAll(events.mapNotNull { it.file })
+    //refreshingFiles.addAll(events.mapNotNull { it.file })
     return this
   }
-
-  private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
 
   @Synchronized
   private fun computeCache(project: Project): Unit {
@@ -169,8 +186,7 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
     val psiManager = project.getComponent(PsiManager::class.java)
     val buildFolders = project.buildFolders()
     val cacheService = KotlinCacheService.getInstance(project)
-    val classFileViewProvider = ClassFileViewProviderFactory()
-    val classFiles = buildFolders.packagedClasses(localFileSystem, classFileViewProvider, psiManager)
+    val classFiles = buildFolders.packagedClasses(localFileSystem, psiManager)
     if (classFiles.isNotEmpty()) {
       val resolutionFacade = cacheService.getResolutionFacade(classFiles.map { it.second })
       val resolvedDeclarations = classFiles.resolveClassesDeclarations(resolutionFacade)
@@ -178,11 +194,16 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
         val cachedDescriptors = descriptorCache[packageName] ?: emptyList()
         val leftovers = cachedDescriptors.filterNot { it in declarations }
         val newCachedPackageDescriptors = declarations + leftovers
-        println("Adding to cache: $newCachedPackageDescriptors")
-        descriptorCache[packageName] = newCachedPackageDescriptors
+        val synthDescriptors = newCachedPackageDescriptors.filter { it.isMetaSynthetic() }
+        if (synthDescriptors.isNotEmpty()) {
+          descriptorCache[packageName] = synthDescriptors
+        }
       }
     }
   }
+
+  private fun DeclarationDescriptor.isMetaSynthetic(): Boolean =
+    annotations.findAnnotation(FqName("arrow.synthetic")) != null
 
   private fun List<Pair<FqName, KtFile>>.resolveClassesDeclarations(resolutionFacade: ResolutionFacade): List<Pair<FqName, List<DeclarationDescriptor>>> =
     flatMap { (packageName, file) ->
@@ -192,10 +213,10 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
   private fun List<KtDeclaration>.resolveDeclarations(resolutionFacade: ResolutionFacade): List<DeclarationDescriptor> =
     map { ktDeclaration -> ktDeclaration.resolveDeclaration(resolutionFacade) }
 
-  private fun KtDeclaration.resolveDeclaration(resolutionFacade: ResolutionFacade) =
-    resolutionFacade.resolveToDescriptor(this, BodyResolveMode.PARTIAL_FOR_COMPLETION)
+  private fun KtDeclaration.resolveDeclaration(resolutionFacade: ResolutionFacade): DeclarationDescriptor =
+    resolutionFacade.resolveToDescriptor(this, BodyResolveMode.PARTIAL_WITH_DIAGNOSTICS)
 
-  private fun List<VirtualFile>.packagedClasses(localFileSystem: LocalFileSystem, classFileViewProvider: ClassFileViewProviderFactory, psiManager: PsiManager): List<Pair<FqName, KtFile>> =
+  private fun List<VirtualFile>.packagedClasses(localFileSystem: LocalFileSystem, psiManager: PsiManager): List<Pair<FqName, KtFile>> =
     flatMap { buildFolder ->
       val buildRoot = File(buildFolder.path)
       val matchedFiles = arrayListOf<File>()
@@ -205,13 +226,29 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
         .mapNotNull { file ->
           val maybeVirtualFile = localFileSystem.findFileByIoFile(file)
           maybeVirtualFile?.let { virtualFile ->
-            val viewProvider = classFileViewProvider.createFileViewProvider(virtualFile, KotlinLanguage.INSTANCE, psiManager, true)
-            val ktFile = KtFile(viewProvider, true)
-            KtFileStubBuilder().buildStubTree(ktFile)
-            val packageName = ktFile.packageFqName
-            packageName to ktFile
+            psiManager as PsiManagerImpl
+            val viewProvider = psiManager.fileManager.createFileViewProvider(virtualFile, true)
+            //classFileViewProvider.createFileViewProvider(virtualFile, KotlinLanguage.INSTANCE, psiManager, true)
+            if (viewProvider.hasLanguage(KotlinLanguage.INSTANCE)) {
+              val ktFile = KtFile(viewProvider, true)
+              KtFileStubBuilder().buildStubTree(ktFile)
+              val packageName = ktFile.packageFqName
+              packageName to ktFile
+            } else null
           }
         }
     }
 
+  override fun addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
+    thisDescriptor.ktClassOrObject()?.containingKtFile?.packageFqName?.let { packageName ->
+      descriptorCache[packageName]?.let { declarations ->
+        declarations.filterIsInstance<ClassDescriptor>().find {
+          it.fqNameSafe == it.fqNameSafe
+        }?.typeConstructor?.supertypes?.let { collection ->
+          supertypes.clear()
+          supertypes.addAll(collection.filterNot { it.isError })
+        }
+      }
+    }
+  }
 }

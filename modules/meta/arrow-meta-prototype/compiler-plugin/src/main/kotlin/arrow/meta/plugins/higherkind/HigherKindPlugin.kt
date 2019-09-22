@@ -27,21 +27,18 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
             if (c.arity < 5)
               "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>"
             else null,
-            """|
-              |@Suppress("NOTHING_TO_INLINE") 
-              |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this
-            """,
+            """|@Suppress("USELESS_CAST", "UNCHECKED_CAST", "NOTHING_TO_INLINE") 
+               |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
+               |""",
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
               "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"
             else null,
             /** Class redefinition with kinded super type **/
-            """
-              |$`@annotations`
-              |$modifiers $modality $visibility $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
-              |  $body
-              |}
-              |""".trimMargin()
+            """|$`@annotationEntries` $modifiers $modality $visibility $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
+               |  $body
+               |}
+               |"""
           )
         }
       )
