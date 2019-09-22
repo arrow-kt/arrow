@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -37,6 +38,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -280,4 +282,13 @@ interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
     ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
+}
+
+@extension
+interface ObservableKFunctorFilter : FunctorFilter<ForObservableK> {
+  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
 }

@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -159,6 +160,11 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       is Observable<*> -> this.observable == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): ObservableK<B> =
+    observable.flatMap { a ->
+      f(a).fold({ Observable.empty<B>() }, { b -> Observable.just(b) })
+    }.k()
 
   override fun hashCode(): Int = observable.hashCode()
 
