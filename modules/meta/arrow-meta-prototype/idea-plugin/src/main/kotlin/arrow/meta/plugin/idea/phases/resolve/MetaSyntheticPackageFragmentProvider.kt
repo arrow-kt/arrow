@@ -245,7 +245,7 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, S
         declarations.filterIsInstance<ClassDescriptor>().find {
           it.fqNameSafe == it.fqNameSafe
         }?.typeConstructor?.supertypes?.let { collection ->
-          supertypes.clear()
+          //supertypes.clear()
           supertypes.addAll(collection.filterNot { it.isError })
         }
       }

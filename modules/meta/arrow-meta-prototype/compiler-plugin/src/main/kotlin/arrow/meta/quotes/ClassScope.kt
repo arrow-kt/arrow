@@ -48,9 +48,9 @@ class ClassScope(
   val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
   val kind: Name? =
     (when {
-      value.isSealed() -> "$`@annotationEntries` sealed "
-      value.isData() -> "data "
-      else -> "/* empty? */"
+      value.isSealed() -> "@arrow.synthetic $`@annotationEntries` sealed "
+      value.isData() -> "@arrow.synthetic data "
+      else -> "@arrow.synthetic /* empty? */"
     } + value.getClassOrInterfaceKeyword()?.text).let(Name::identifier),
   val name: Name? = value.nameAsName,
   val `(typeParameters)`: ScopedList<KtTypeParameter> = ScopedList(prefix = "<", value = value.typeParameters, postfix = ">"),

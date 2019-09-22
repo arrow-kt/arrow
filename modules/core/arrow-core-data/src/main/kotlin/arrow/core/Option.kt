@@ -29,6 +29,7 @@ sealed class Option<out A> {
      */
     fun <A> just(a: A): Option<A> = Some(a)
 
+
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
       val option = f(a).fix()
       return when (option) {

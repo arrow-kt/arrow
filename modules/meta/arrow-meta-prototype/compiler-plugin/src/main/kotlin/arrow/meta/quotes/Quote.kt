@@ -109,6 +109,7 @@ interface Quote<P : KtElement, K : KtElement, S> {
           val declaration =
             quasiQuoteContext.compilerContext.ktPsiElementFactory
               .createDeclaration<KtDeclaration>("@arrow.synthetic $quoteDeclaration")
+          println("User declaration: \n${declaration.text}")
           declaration
         } else null
       }
