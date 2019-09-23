@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -48,6 +49,7 @@ import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
+import arrow.typeclasses.FunctorFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
@@ -340,6 +342,15 @@ interface FlowableKTimer : Timer<ForFlowableK> {
   override fun sleep(duration: Duration): FlowableK<Unit> =
     FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
+}
+
+@extension
+interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
+  override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
 }
 
 // TODO FlowableK does not yet have a Concurrent instance
