@@ -1,0 +1,25 @@
+// Breakpoint
+// -----------------------------------------------
+// -----------------------------------------------
+@mixin bp($point) {
+  @if $point==xlarge {
+    @media (max-width: $bp-xlarge) {
+      @content;
+    }
+  }
+  @if $point==large {
+    @media (max-width: $bp-large) {
+      @content;
+    }
+  }
+  @if $point==medium {
+    @media (max-width: $bp-medium) {
+      @content;
+    }
+  }
+  @if $point==small {
+    @media (max-width: $bp-small) {
+      @content;
+    }
+  }
+}

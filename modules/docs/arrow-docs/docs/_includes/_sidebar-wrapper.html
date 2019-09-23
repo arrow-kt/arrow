@@ -1,39 +1,45 @@
-<div id="sidebar-wrapper">
-    <div class="sidebar-brand">
-        <a class="brand" href="/">
-            <img src="/img/arrow-brand-sidebar.svg" alt="">
-            <span>Λrrow</span>
-        </a>
-        <button type="button" id="main-toggle" class="sidebar-toggle">
-            <span class="close"></span>
-        </button>
-    </div>
+<div id="sidebar-wrapper" class="{{ cat_id }}">
+  <div class="toggle-container">
+    <button type="button" id="main-toggle" class="sidebar-toggle">
+      <span class="close"></span>
+    </button>
+  </div>
+  <div class="sidebar-brand">
+    <a href="/">
+      {% assign img_url = '/img/' | append: cat_id | append: '/arrow-' | append: cat_id | append: '-brand-sidebar.svg' %}
+      <img src="{{ img_url | relative_url}}" alt="Arrow {{ cat_id }}">
+    </a>
+    {% assign cat_title = "arrow "  | append: cat_id  %}
+    {% include _sidebar-cat-dropdown.html %}
+  </div>
 
-    {% include _sidebar-doc-versions.html %}
+  <ul id="{{ cat_id }}-sidebar-nav" class="sidebar-nav">
 
-    <ul class="sidebar-nav">
-        {% for item in site.data.sidebar.options %}
-        <li class="sidebar-nav-item">
-            <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}">
-                <span>{{ item.title }}</span>
-                {% if item.nested_options %}
-                <i class="fa fa-angle-right"></i>
-                {% endif%}
-            </a>
-            {% if item.nested_options %}
-            <ul>
-                {% for nested_item in item.nested_options %}
-                <li>
-                    <a href="{{ nested_item.url }}">
-                        <i class="fa fa-circle"></i>
-                        <span>{{ nested_item.title }}</span>
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
-            {% endif%}
+    {% assign path = 'sidebar-' | append: cat_id | %}
+    {% for item in site.data[path]options %}
+    <li class="sidebar-nav-item">
+      <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}" class="{{ cat_id }}">
+        <span>{{ item.title }}</span>
+        {% if item.nested_options %}
+        <i class="fa fa-angle-right"></i>
+        {% endif%}
+      </a>
+      {% if item.nested_options %}
+      <ul>
+        {% for nested_item in item.nested_options %}
+        <li>
+          <a href="{{ nested_item.url }}">
+            <span>{{ nested_item.title }}</span>
+          </a>
         </li>
         {% endfor %}
-    </ul>
+      </ul>
+      {% endif%}
+    </li>
+    {% endfor %}
+  </ul>
 
+  <div id="doc-{{ cat_id }}-version-button" class="doc-version-container">
+    {% include _sidebar-doc-versions.html %}
+  </div>
 </div>

@@ -1,18 +1,28 @@
-<header id="masthead" class="masthead indirect-injection-first">
-    <div id="masthead-background" class="masthead-background background"></div>
-    <div class="masthead-background top indirect-injection-next"></div>
-    <div class="masthead-background bottom indirect-injection-next"></div>
-    <div class="container indirect-injection-final">
-        <div class="masthead-inner">
-            <img class="masthead-brand" src="img/arrow-brand.svg" alt="">
-            <h1 class="masthead-title">Functional companion to Kotlin's Standard Library</h1>
-            {% include _home-doc-versions.html %}
-            <div class="masthead-stars">
-                <a href="https://github.com/arrow-kt/arrow/stargazers">
-                    <i class="fa fa-star"></i>
-                    <span id="stars"></span>
-                </a>
-            </div>
+<div id="site-header">
+  <div class="wrapper">
+    <div class="header-flex">
+      <div class="header-text">
+        <h1 id="header-text">{{site.data.commons.description}}</h1>
+        {% assign codeCol = site.code %}
+        {% for code in codeCol %}
+        <div id="{{code.library}}-code-block" class="browser-content">
+          <ul class="browser-header">
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+          <div class="browser-code">{{ code }}</div>
         </div>
+        {% endfor %}
+      </div>
+      <div class="header-image">
+        <div id="base-arrow-animation" class="image-animation" alt="Arrow base"></div>
+        <div id="core-arrow-animation" class="image-animation" alt="Arrow core"></div>
+        <div id="fx-arrow-animation" class="image-animation" alt="Arrow fx"></div>
+        <div id="optics-arrow-animation" class="image-animation" alt="Arrow optics"></div>
+        <div id="meta-arrow-animation" class="image-animation" alt="Arrow meta"></div>
+        <img id="logo-white-lines" class="image-animation" src="{{ site.baseurl }}/img/home/logo-white-lines.svg" alt="Arrow white lines"></img>
+      </div>
     </div>
-</header>
+  </div>
+</div>

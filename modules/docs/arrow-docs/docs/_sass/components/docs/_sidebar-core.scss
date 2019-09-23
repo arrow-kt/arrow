@@ -1,0 +1,118 @@
+.core {
+    background: $core-background;
+}
+
+#core-sidebar-nav {
+    .sidebar-nav-item {
+        > a {
+            transition: background $base-duration $base-timing;
+
+            &:hover {
+                background: $core-hover;
+            }
+        }
+
+        &.active {
+            > a {
+                background: $core-hover;
+                border-left: 4px solid $core-color;
+            }
+        }
+
+        ul {
+            background: $core-hover;
+
+            li {
+                a {
+                    &:before {
+                        content: "•";
+                        margin-right: ($base-point-grid * 2);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#cat-core-dropdown {
+    min-width: $sidebar-cat-button;
+
+    .sidebar-nav {
+        .sidebar-nav-item {
+
+            > a {
+                transition: background $base-duration $base-timing;
+
+                &:hover {
+                    background: $core-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $core-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $core-hover;
+
+                a {
+                    color: $white;
+                    transition: all $base-duration $base-timing;
+
+
+                    &:hover {
+                        background: rgba($white, 0.05);
+                        color: rgba($white, 0.8);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#doc-core-version-button {
+    .sidebar-doc-versions {
+        .sidebar-nav-item {
+            background: $core-background;
+
+            > a {
+                transition: background $base-duration $base-timing;
+
+                &:hover {
+                    background: $core-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $core-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $core-hover;
+
+                a {
+                    color: $white;
+                    padding-left: 10px;
+
+                    &:hover {
+                        @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+                    }
+                }
+            }
+        }
+    }
+}

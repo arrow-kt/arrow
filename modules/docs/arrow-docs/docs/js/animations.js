@@ -1,183 +1,99 @@
-// We should wait until all assets on page gets loaded to trigger animations,
-// by this way avoiding any FOUC problems. Since jQuery is on the page we
-// take advantage of it.
-$(window).on("load", function() {
+// Animation instances
+// Arrow base animation
+const arrowBaseAnimation = lottie.loadAnimation({
+  container: document.getElementById('base-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: true,
+  path: 'js/json/arrow-base.json'
+});
 
-    // Function to load GitHub stats, which expects a DOM element with 'stars' as id
-    (function loadGitHubStats() {
-        var gitHubAPI = "https://api.github.com/repos/arrow-kt/arrow?callback=?";
-        $.getJSON(gitHubAPI).done(function(data) {
-            $('#stars').text(data.data.stargazers_count);
-        });
-    })();
+// core animation
+const arrowCoreAnimation = lottie.loadAnimation({
+  container: document.getElementById('core-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: false,
+  path: 'js/json/arrow-core.json'
+});
 
-    // General injection duration
-    var injectionDuration = 300;
+// fx animation
+const arrowFxAnimation = lottie.loadAnimation({
+  container: document.getElementById('fx-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: false,
+  path: 'js/json/arrow-fx.json'
+});
 
-    function setOpacity(elements, durationParam) {
-      var duration = durationParam ? durationParam : injectionDuration;
-      anime({
-        targets: elements,
-        opacity: 1,
-        duration: duration,
-        easing: 'easeInCubic',
-      })
-    }
+// optics animation
+const arrowOpticsAnimation = lottie.loadAnimation({
+  container: document.getElementById('optics-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: false,
+  path: 'js/json/arrow-optics.json'
+});
 
-    function bulgePath(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        strokeDasharray: '1',
-        easing: 'easeInOutCubic',
-        duration: 600,
-        direction: 'alternate',
-        loop: true,
-      });
-    }
+// meta animation
+const arrowMetaAnimation = lottie.loadAnimation({
+  container: document.getElementById('meta-arrow-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: false,
+  autoplay: false,
+  path: 'js/json/arrow-meta.json'
+});
 
-    function bulgePathBack(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        strokeDasharray: '3',
-        easing: 'easeInOutCubic',
-        duration: 300,
-      });
-    }
+// incubator base animation
+const incubatorBaseAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-base-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-base.json'
+});
 
-    function emitPath(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        strokeDashoffset: 30,
-        easing: 'linear',
-        elasticity: 500,
-        duration: 1000,
-        loop: true,
-      });
-    }
+// incubator core animation
+const incubatorCoreAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-core-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-core.json'
+});
 
-    function rotate(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        rotateZ: [0, 360],
-        easing: 'easeInOutCubic',
-        elasticity: 600,
-        duration: 1200,
-        loop: true,
-      });
-    }
+// incubator fx animation
+const incubatorFxAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-fx-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-fx.json'
+});
 
-    function rotateBack(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        rotateZ: 360,
-        easing: 'linear',
-        elasticity: 600,
-        duration: 600,
-      });
-    }
+// incubator optics animation
+const incubatorOpticsAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-optics-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-optics.json'
+});
 
-    function scale(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        scale: 1.2,
-        easing: 'easeInOutCubic',
-        duration: 550,
-      });
-    }
+// incubator meta animation
+const incubatorMetaAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-meta-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-meta.json'
+});
 
-    function scaleBack(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        scale: 1,
-        easing: 'linear',
-        duration: 400,
-      });
-    }
-
-    function undrawPath(elements) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        strokeDashoffset: [0, anime.setDashoffset],
-        easing: 'easeInOutCubic',
-        duration: 1500,
-        direction: 'alternate',
-        loop: true,
-        delay: function(el, i) { return i * 150 },
-      });
-    }
-
-    function drawPath(elements, duration) {
-      anime.remove(elements);
-      anime({
-        targets: elements,
-        strokeDashoffset: 0,
-        easing: 'linear',
-        duration: duration,
-      });
-    }
-
-    // This timeline is the Arrow logo, tag, and rest of the
-    // page timed injection animation
-    var pageInjectionTimeline = anime.timeline()
-      .add({
-        targets: '.indirect-injection-first',
-        opacity: 1,
-        duration: 150,
-        easing: 'easeInCubic'
-      })
-      .add({
-        targets: '.indirect-injection-next',
-        opacity: 1,
-        duration: 300,
-        easing: 'easeInSine'
-      })
-      .add({
-        targets: '.indirect-injection-final',
-        opacity: 1,
-        duration: 600,
-        easing: 'easeInSine'
-      });
-
-      // Particleground instantiation
-      try {
-          var pg = particleground(document.getElementById('masthead-background'), {
-          dotColor: '#fff',
-          lineColor: '#fff',
-          density: 18000,
-          parallaxMultiplier: 18,
-          lineWidth: 0.5,
-          proximity: 90,
-          particleRadius: 5
-        });
-      } catch(e) {
-        console.error('Particleground failure');
-        console.error(e);
-      }
-
-      // Detecting scroll to add specific class to navbar, creating that
-      // smooth transition on the opacity effect
-      $(window).scroll(function() {
-          if ($("#navigation").offset().top > 70) {
-              $("#navigation").addClass("navigation-scroll");
-          }
-          else {
-              $("#navigation").removeClass("navigation-scroll");
-          }
-      });
-
-      // This one follows mouse position and add that 3d effect to the tagline
-      $(window).on("mousemove",function(e) {
-        var ax = -($(window).innerWidth()/2- e.pageX)/120;
-        var ay = ($(window).innerHeight()/2- e.pageY)/50;
-        $(".masthead-inner").attr("style", "transform: rotateY("+ax+"deg) rotateX("+ay+"deg)");
-      });
-
+// incubator hover animation
+const incubatorHoverAnimation = lottie.loadAnimation({
+  container: document.getElementById('incubator-hover-animation'),
+  renderer: 'svg' / 'canvas' / 'html',
+  loop: true,
+  autoplay: false,
+  path: 'js/json/incubator-hover.json'
 });

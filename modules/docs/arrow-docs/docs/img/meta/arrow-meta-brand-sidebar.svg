@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="96px" height="107px" viewBox="0 0 96 107" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 56.3 (101010) - https://sketch.com -->
+    <title>1D529572-0E03-4E3B-B088-5641C8D16165</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="9.97548296%" x2="50%" y2="99.7788683%" id="linearGradient-1">
+            <stop stop-color="#CE1010" offset="0%"></stop>
+            <stop stop-color="#9D1212" offset="99.9181799%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="9.6303304%" x2="50%" y2="99.7141409%" id="linearGradient-2">
+            <stop stop-color="#F63F18" offset="0%"></stop>
+            <stop stop-color="#950F0F" offset="99.9366554%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="-7.62502133%" x2="50%" y2="76.062468%" id="linearGradient-3">
+            <stop stop-color="#132532" offset="0%"></stop>
+            <stop stop-color="#132532" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="91.6085379%" id="linearGradient-4">
+            <stop stop-color="#E5E5E5" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Arrow-Meta-Hover" transform="translate(-115.000000, -98.000000)">
+            <g id="sidebar" transform="translate(0.000000, 40.000000)">
+                <g id="logos/arrow-meta/color" transform="translate(103.000000, 58.000000)">
+                    <polygon id="Path-Copy" fill="url(#linearGradient-1)" points="60 0 12 96 61.8349609 71.125"></polygon>
+                    <polygon id="Path-Copy-2" fill="url(#linearGradient-2)" transform="translate(84.000000, 48.000000) scale(-1, 1) translate(-84.000000, -48.000000) " points="108 0 60 96 108 72"></polygon>
+                    <rect id="bound-copy" opacity="0.261579241" x="46" y="56" width="28" height="28"></rect>
+                    <polygon id="Path-5-Copy-5" fill-opacity="0.7" fill="url(#linearGradient-3)" points="12 96 60.0029907 72 108 96 60 117.773437"></polygon>
+                    <polygon id="Path-Copy" fill="#FFFFFF" points="60.0794811 48 36 96 61 83.5625"></polygon>
+                    <polygon id="Path-Copy-2" fill="url(#linearGradient-4)" transform="translate(72.000000, 72.000000) scale(-1, 1) translate(-72.000000, -72.000000) " points="84 48 60 96 84 84"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
