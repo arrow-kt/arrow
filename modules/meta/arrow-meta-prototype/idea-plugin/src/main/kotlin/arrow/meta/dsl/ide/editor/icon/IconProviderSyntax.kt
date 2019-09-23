@@ -10,6 +10,7 @@ import javax.swing.Icon
 interface IconProviderSyntax {
   /**
    * For emitting FileIcons or Icons in the StructureView
+   * check here: https://www.jetbrains.org/intellij/sdk/docs/reference_guide/work_with_icons_and_images.html?search=icon
    */
   fun IdeMetaPlugin.addIcon(
     icon: Icon? = null,

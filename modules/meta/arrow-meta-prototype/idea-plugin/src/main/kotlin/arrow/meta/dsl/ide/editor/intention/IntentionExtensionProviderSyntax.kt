@@ -119,7 +119,7 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
 
   /**
    * Defaults from [KotlinIntentionActionsFactory]
-   * TODO(): Find also an EP_NAME or keep it solely for [QuickFixContributor]
+   * Solely for [QuickFixContributor]
    */
   fun IntentionExtensionProviderSyntax.addKotlinIntention(
     createAction: (diagnostic: Diagnostic) -> IntentionAction? = { null },
