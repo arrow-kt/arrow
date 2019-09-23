@@ -3,8 +3,10 @@ package arrow.fx.rx2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.Right
+import arrow.core.extensions.option.foldable.fold
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
 import arrow.fx.internal.Platform
@@ -145,6 +147,11 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
       is Maybe<*> -> this.maybe == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): MaybeK<B> =
+    maybe.flatMap { a ->
+      f(a).fold({ Maybe.empty<B>() }, { b -> Maybe.just(b) })
+    }.k()
 
   override fun hashCode(): Int = maybe.hashCode()
 
