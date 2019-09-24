@@ -132,7 +132,7 @@ class ObservableKTests : UnitSpec() {
               .subscribe()
               .dispose()
           }.flatMap { latch.get() }
-        }.observable
+        }.value()
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)

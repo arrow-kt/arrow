@@ -50,6 +50,7 @@ import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as observableHandleErrorWith
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -119,7 +120,7 @@ interface ObservableKApplicativeError :
     ObservableK.raiseError(e)
 
   override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().observableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -130,7 +131,7 @@ interface ObservableKMonadError :
     ObservableK.raiseError(e)
 
   override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().observableHandleErrorWith { f(it).fix() }
 }
 
 @extension
