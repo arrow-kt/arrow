@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtTypeArgumentList
 import kotlin.reflect.KClass
 
-interface HintsSyntax {
+interface HintingSyntax {
   fun IdeMetaPlugin.addExpressionTypeProvider(
     informationHint: (element: KtExpression) -> String,
     expressionAt: (elementAt: PsiElement) -> MutableList<KtExpression>,
