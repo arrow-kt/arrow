@@ -278,9 +278,6 @@ options:
       - title: Annotations
         url: /docs/apidocs/arrow-annotations/
 
-      - title: AQL
-        url: /docs/apidocs/arrow-aql/
-
       - title: Benchmarks Effects
         url: /docs/apidocs/arrow-benchmarks-fx/
 
@@ -296,50 +293,11 @@ options:
       - title: Examples
         url: /docs/apidocs/arrow-examples/
 
-      - title: Free
-        url: /docs/apidocs/arrow-free/
-
-      - title: Free Extensions
-        url: /docs/apidocs/arrow-free-data/
-
-      - title: Effects
-        url: /docs/apidocs/arrow-fx/
-
-      - title: Effects MTL
-        url: /docs/apidocs/arrow-fx-mtl/
-
-      - title: Effects Reactor
-        url: /docs/apidocs/arrow-fx-reactor/
-
-      - title: Effects Rx2
-        url: /docs/apidocs/arrow-fx-rx2/
-
-      - title: Generic
-        url: /docs/apidocs/arrow-generic/
-
       - title: Integrations Retrofit Adapter
         url: /docs/apidocs/arrow-integrations-retrofit-adapter/
 
       - title: Kindedj
         url: /docs/apidocs/arrow-kindedj/
-
-      - title: Meta
-        url: /docs/apidocs/arrow-meta/
-
-      - title: Meta Test Models
-        url: /docs/apidocs/arrow-meta-test-models/
-
-      - title: MTL
-        url: /docs/apidocs/arrow-mtl/
-
-      - title: MTL Extensions
-        url: /docs/apidocs/arrow-mtl-data/
-
-      - title: Recursion
-        url: /docs/apidocs/arrow-recursion/
-
-      - title: Recursion Extensions
-        url: /docs/apidocs/arrow-recursion-data/
 
       - title: Reflect
         url: /docs/apidocs/arrow-reflect/

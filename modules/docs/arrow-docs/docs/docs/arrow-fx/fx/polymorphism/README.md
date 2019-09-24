@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Arrow Fx - Polymorphism. One Program multiple runtimes
-permalink: /docs/effects/fx/polymorphism/
+permalink: /docs/fx/polymorphism/
 ---
 
 # Polymorphism. One Program multiple runtimes
@@ -91,7 +91,7 @@ import arrow.core.Try
 import arrow.core.extensions.fx
 
 //sampleStart
-val result = 
+val result =
   Try.fx {
     val (one) = Try { 1 }
     val (two) = Try { one + one }
@@ -117,12 +117,12 @@ The result destructures syntax for all monadic expressions by receiving the valu
 ## Arrow Fx vs Tagless Final
 
 Arrow Fx eliminates the need for tagless style algebras and parametrization over expressions that require `F` as a type parameter when invoking functions.
- 
+
 When modeling effects as `suspend`, functions that are disallowed to compile in the pure environment but welcome in compositional blocks denoted as `effect { sideEffect() }`.
 
 Arrow Fx brings first class, no-compromises, direct style syntax for effectful programs that are constrained by monads that can provide an extension of `Concurrent<F>`.
  It models effects with the Kotlin Compiler's native system support for `suspend` functions and the ability to declare restricted suspended blocks with `@RestrictsSuspension` in which effects are allowed to run and compose.
- 
+
  We still preserve `F` to achieve polymorphism, but its usage is restricted to type declarations and unnecessary in program composition.
 
  As a consequence of the assimilation and elimination of the `F` type parameter from the syntax in such programs, the entire hierarchy of type class combinators we find in `Functor`, `Applicative`, and `Monad` disappear and what they model is swallowed as syntax that operates directly over the environment.

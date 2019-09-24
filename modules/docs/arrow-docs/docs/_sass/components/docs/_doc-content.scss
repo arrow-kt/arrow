@@ -87,10 +87,6 @@
         background: rgba($brand-secondary, 0.9);
     }
 
-    a {
-        @include links($core-color, $core-color, $core-color, $core-color)
-    }
-
     .header-link {
         float: left;
         font-size: 1.4rem;

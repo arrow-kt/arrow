@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Arrow Fx - Asynchronous & Concurrent Programming
-permalink: /docs/effects/fx/async/
+permalink: /docs/fx/async/
 ---
 
 # Asynchronous & Concurrent Programming
@@ -93,14 +93,14 @@ import arrow.fx.extensions.fx
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
-  
+
 data class ThreadInfo(
   val threadA: String,
   val threadB: String
 )
 
 val program = IO.fx {
-  val (threadA: String, threadB: String) = 
+  val (threadA: String, threadB: String) =
     !dispatchers().default().parMapN(
       effect { threadName() },
       effect { threadName() },
@@ -162,7 +162,7 @@ val program = IO.fx {
     effect { threadName() },
     effect { threadName() }
   ).parSequence()
-  
+
   !effect { println(result) }
 }
 //sampleEnd
@@ -214,10 +214,10 @@ import kotlin.system.*
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-suspend fun program() = 
+suspend fun program() =
   GlobalScope.async { printThreadName() }
 
-fun main() { 
+fun main() {
   runBlocking<Unit> { program().await() }
 }
 //sampleEnd
@@ -234,10 +234,10 @@ import kotlin.system.*
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-suspend fun program() = 
+suspend fun program() =
   GlobalScope.async(start = CoroutineStart.LAZY) { printThreadName() }
 
-fun main() { 
+fun main() {
   runBlocking<Unit> { program().await() }
 }
 //sampleEnd

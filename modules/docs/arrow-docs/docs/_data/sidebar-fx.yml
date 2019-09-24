@@ -47,3 +47,19 @@ options:
 
       - title: Bracket
         url: /docs/fx/typeclasses/bracket/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Effects
+        url: /docs/apidocs/arrow-fx/
+
+      - title: Effects MTL
+        url: /docs/apidocs/arrow-fx-mtl/
+
+      - title: Effects Reactor
+        url: /docs/apidocs/arrow-fx-reactor/
+
+      - title: Effects Rx2
+        url: /docs/apidocs/arrow-fx-rx2/

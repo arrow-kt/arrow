@@ -95,3 +95,31 @@ options:
 
       - title: MonadState
         url: /docs/arrow/mtl/typeclasses/monadstate/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: AQL
+        url: /docs/apidocs/arrow-aql/
+
+      - title: MTL
+        url: /docs/apidocs/arrow-mtl/
+
+      - title: MTL Extensions
+        url: /docs/apidocs/arrow-mtl-data/
+
+      - title: Recursion
+        url: /docs/apidocs/arrow-recursion/
+
+      - title: Recursion Extensions
+        url: /docs/apidocs/arrow-recursion-data/
+
+      - title: Generic
+        url: /docs/apidocs/arrow-generic/
+
+      - title: Free
+        url: /docs/apidocs/arrow-free/
+
+      - title: Free Extensions
+        url: /docs/apidocs/arrow-free-data/
