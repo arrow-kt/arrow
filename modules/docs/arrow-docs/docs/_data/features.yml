@@ -37,7 +37,7 @@ incubator:
       url: /docs/recursion/intro/
 
     - title: Arrow Generic
-      url: /docs/generic/coproduct/
+      url: /docs/generic/product/
 
     - title: Arrow Free
       url: /docs/free/free/

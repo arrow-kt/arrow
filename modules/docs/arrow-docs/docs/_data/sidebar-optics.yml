@@ -54,3 +54,6 @@ options:
 
       - title: Optics
         url: /docs/apidocs/arrow-optics/
+
+      - title: Optics MTL
+        url: /docs/apidocs/arrow-optics-mtl/

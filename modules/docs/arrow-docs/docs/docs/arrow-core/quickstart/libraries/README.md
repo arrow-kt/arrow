@@ -15,23 +15,23 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 #### Table of Content
-* [arrow-core](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core)
-* [arrow-core-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core-data)
-* [arrow-optics](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics)
-* [arrow-fx](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx)
-* [arrow-syntax](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-syntax)
-* [arrow-fx-rx2 & arrow-fx-reactor](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx-rx2&arrow-fx-reactor)
-* [arrow-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl)
-* [arrow-mtl-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl-data)
-* [arrow-optics-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics-mtl)
-* [arrow-recursion](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion)
-* [arrow-recursion-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion-data)
-* [arrow-integration-retrofit-adapter](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-integration-retrofit-adapter)
-* [arrow-free](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free)
-* [arrow-free-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free-data)
-* [arrow-aql](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-aql)
-* [arrow-meta](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-meta)
-* [arrow-generic](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-generic)
+* [arrow-core](/docs/arrow-core/quickstart/libraries/index.html#arrow-core)
+* [arrow-core-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-core-data)
+* [arrow-optics](/docs/arrow-core/quickstart/libraries/index.html#arrow-optics)
+* [arrow-fx](/docs/arrow-core/quickstart/libraries/index.html#arrow-fx)
+* [arrow-syntax](/docs/arrow-core/quickstart/libraries/index.html#arrow-syntax)
+* [arrow-fx-rx2 & arrow-fx-reactor](/docs/arrow-core/quickstart/libraries/index.html#arrow-fx-rx2&arrow-fx-reactor)
+* [arrow-mtl](/docs/arrow-core/quickstart/libraries/index.html#arrow-mtl)
+* [arrow-mtl-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-mtl-data)
+* [arrow-optics-mtl](/docs/arrow-core/quickstart/libraries/index.html#arrow-optics-mtl)
+* [arrow-recursion](/docs/arrow-core/quickstart/libraries/index.html#arrow-recrusion)
+* [arrow-recursion-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-recrusion-data)
+* [arrow-integration-retrofit-adapter](/docs/arrow-core/quickstart/libraries/index.html#arrow-integration-retrofit-adapter)
+* [arrow-free](/docs/arrow-core/quickstart/libraries/index.html#arrow-free)
+* [arrow-free-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-free-data)
+* [arrow-aql](/docs/arrow-core/quickstart/libraries/index.html#arrow-aql)
+* [arrow-meta](/docs/arrow-core/quickstart/libraries/index.html#arrow-meta)
+* [arrow-generic](/docs/arrow-core/quickstart/libraries/index.html#arrow-generic)
 
 ### arrow-core
 
@@ -131,7 +131,7 @@ dependencies {
 
 Advanced [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) to be used in programs using the Tagless-final architecture.
 
-It also includes the extensions available for datatypes in arrow-core 
+It also includes the extensions available for datatypes in arrow-core
 
 Dependency: `arrow-mtl-data`
 
@@ -175,7 +175,7 @@ dependencies {
 }
 ```
 
-This library includes the datatypes and typeclasses in Recursion schemes. 
+This library includes the datatypes and typeclasses in Recursion schemes.
 
 Dependency: `arrow-core`
 
@@ -212,7 +212,7 @@ dependencies {
 }
 ```
 
-This library includes the datatypes in Free. 
+This library includes the datatypes in Free.
 
 Dependency: `arrow-core`
 

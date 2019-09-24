@@ -39,7 +39,7 @@ options:
         url: /docs/effects/fiber/
 
       - title: Resource
-        url: /docs/apidocs/arrow-effects-data/arrow.fx/-resource/
+        url: /docs/apidocs/arrow-fx/arrow.fx/-resource/
 
   - title: Type Classes
 
@@ -47,32 +47,3 @@ options:
 
       - title: Bracket
         url: /docs/fx/typeclasses/bracket/
-
-
-  - title: API Docs
-
-    nested_options:
-
-      - title: Effects
-        url: /docs/apidocs/arrow-fx/
-
-      - title: Effects Extensions
-        url: /docs/apidocs/arrow-fx-extensions/
-
-      - title: Effects Coroutines
-        url: /docs/apidocs/arrow-fx-kotlinx-coroutines-data/
-
-      - title: Effects Coroutines Extensions
-        url: /docs/apidocs/arrow-fx-kotlinx-coroutines-extensions/
-
-      - title: Effects Rx2
-        url: /docs/apidocs/arrow-fx-rx2/
-
-      - title: Effects Rx2 Extensions
-        url: /docs/apidocs/arrow-fx-rx2-extensions/
-
-      - title: Effects Reactor
-        url: /docs/apidocs/arrow-fx-reactor/
-
-      - title: Effects Reactor Extensions
-        url: /docs/apidocs/arrow-fx-reactor-extensions/

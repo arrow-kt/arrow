@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Bracket
-permalink: /docs/arrow/effects/typeclasses/bracket/
+permalink: /docs/fx/typeclasses/bracket/
 redirect_from:
   - /docs/typeclasses/bracket/
 video: EUqg3fSahhk

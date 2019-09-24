@@ -15,25 +15,27 @@
 
 // Components
 @import "components/docs/badges";
-@import "components/docs/doc-body";
-@import "components/docs/doc-content";
-@import "components/docs/doc-header";
-@import "components/docs/media-content";
-@import "components/docs/sidebar-nav";
-@import "components/docs/sidebar";
-@import "components/docs/sidebar-core";
-@import "components/common/dropdown";
-@import "components/common/button";
-@import "components/docs/navigation";
 @import "components/docs/code";
-@import "components/docs/sidebar-fx";
-@import "components/docs/sidebar-optics";
-@import "components/docs/sidebar-meta";
-@import "components/docs/sidebar-incubator";
+@import "components/docs/doc-body";
 @import "components/docs/doc-content-core";
 @import "components/docs/doc-content-fx";
 @import "components/docs/doc-content-optics";
 @import "components/docs/doc-content-meta";
 @import "components/docs/doc-content-incubator";
+@import "components/docs/doc-content";
+@import "components/docs/doc-header";
+@import "components/docs/media-content";
+@import "components/docs/sidebar-fx";
+@import "components/docs/sidebar-optics";
+@import "components/docs/sidebar-meta";
+@import "components/docs/sidebar-incubator";
+@import "components/docs/sidebar-nav";
+@import "components/docs/sidebar";
+@import "components/docs/sidebar-core";
+@import "components/docs/navigation";
+@import "components/common/dropdown";
+@import "components/common/button";
+
+
 
 @include dropdown($dropdown-config...);

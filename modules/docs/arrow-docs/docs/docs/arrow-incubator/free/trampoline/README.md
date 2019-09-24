@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Trampoline
-permalink: /docs/arrow/free/trampoline/
+permalink: /docs/free/trampoline/
 redirect_from:
   - /docs/datatypes/trampoline/
 ---

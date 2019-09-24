@@ -24,7 +24,12 @@ collections:
 # Default Front Matter values to be set
 defaults:
   - scope:
-      path: "/docs/apidocs/arrow-optics/"
+      path: "docs/apidocs/arrow-optics"
+      type: "pages"
+    values:
+      layout: "docs-optics"
+  - scope:
+      path: "docs/apidocs/arrow-optics-mtl"
       type: "pages"
     values:
       layout: "docs-optics"
