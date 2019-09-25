@@ -1,3 +1,10 @@
+---
+layout: docs
+title: ListK
+permalink: /docs/arrow/data/listk/
+redirect_from:
+  - /docs/datatypes/listk/
+---
 ## ListK
 
 {:.beginner}
@@ -12,10 +19,10 @@ import arrow.core.k
 
 val value =
 //sampleStart
-  listOf(1, 2, 3).k()
+    listOf(1, 2, 3).k()
 //sampleEnd
 fun main() {
- println(value)
+    println(value)
 }
 ```
 
@@ -40,7 +47,7 @@ val world = listOf('w', 'o', 'r', 'l', 'd')
 val combinedList = hello.combineK(commaSpace).combineK(world)
 //sampleEnd
 fun main() {
- println("combinedList = $combinedList")
+    println("combinedList = $combinedList")
 }
 ```
 
@@ -60,7 +67,7 @@ val numbers = listOf(Math.random(), Math.random(), Math.random())
 val traversedList = numbers.traverse(Option.applicative(), { if (it > 0.5) Some(it) else None })
 //sampleEnd
 fun main() {
- println("traversedList $traversedList")
+    println("traversedList $traversedList")
 }
 ```
 
@@ -77,7 +84,7 @@ val requests = listOf(Some(Math.random()), Some(Math.random()), Some(Math.random
 val sequenceList = requests.sequence(Option.applicative())
 //sampleEnd
 fun main() {
- println("sequenceList = $sequenceList")
+    println("sequenceList = $sequenceList")
 }
 ```
 
@@ -90,10 +97,10 @@ import arrow.core.k
 import arrow.core.extensions.list.foldable.foldLeft
 val value =
 //sampleStart
-listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
+    listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
 //sampleEnd
 fun main() {
- println(value)
+    println(value)
 }
 ```
 
@@ -104,10 +111,10 @@ import arrow.core.extensions.list.apply.ap
 
 val value =
 //sampleStart
-  listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
+    listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
 //sampleEnd
 fun main() {
- println(value)
+    println(value)
 }
 ```
 

@@ -20,7 +20,7 @@ import arrow.typeclasses.Applicative
  *
  * val value =
  * //sampleStart
- * listOf(1, 2, 3).k()
+ *  listOf(1, 2, 3).k()
  * //sampleEnd
  * fun main() {
  *   println(value)
@@ -48,7 +48,7 @@ import arrow.typeclasses.Applicative
  * val combinedList = hello.combineK(commaSpace).combineK(world)
  * //sampleEnd
  * fun main() {
- * println("combinedList = $combinedList")
+ *  println("combinedList = $combinedList")
  * }
  * ```
  *
@@ -98,10 +98,10 @@ import arrow.typeclasses.Applicative
  * import arrow.core.extensions.list.foldable.foldLeft
  * val value =
  * //sampleStart
- * listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
+ *  listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
  * //sampleEnd
  * fun main() {
- * println(value)
+ *  println(value)
  * }
  * ```
  *
@@ -112,10 +112,10 @@ import arrow.typeclasses.Applicative
  *
  * val value =
  * //sampleStart
- * listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
+ *  listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
  * //sampleEnd
  * fun main() {
- * println(value)
+ *  println(value)
  * }
  * ```
  *
