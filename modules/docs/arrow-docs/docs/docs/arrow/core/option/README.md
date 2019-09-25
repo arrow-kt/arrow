@@ -364,5 +364,5 @@ DataType(Option::class).tcMarkdownList()
 
 ## Credits
 
-Contents partially adapted from [`Scala Exercises Option Tutorial`]({{ 'https://www.scala-exercises.org/std_lib/options' | relative_url }})
+Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)
 Originally based on the Scala Koans.
