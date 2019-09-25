@@ -53,7 +53,7 @@ Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }
 Let's see one example using a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
-val university: IO<University> = 
+val university: IO<University> =
   getStudentFromDatabase("Bob Roxx").flatMap { student ->
       getUniversityFromDatabase(student.universityId).flatMap { university ->
         getDeanFromDatabase(university.deanId)
@@ -136,7 +136,7 @@ IO.invoke { 1 }
 With this new style we can rewrite our original example of database fetching as:
 
 ```kotlin
-val university: IO<University> = 
+val university: IO<University> =
   IO.fx {
     val (student) = getStudentFromDatabase("Bob Roxx")
     val (university) = getUniversityFromDatabase(student.universityId)
@@ -148,7 +148,7 @@ val university: IO<University> =
 And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 ```kotlin
-fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
+fun getNLines(path: FilePath, count: Int): IO<List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
@@ -170,7 +170,7 @@ Exceptions work like old goto that can happen at any point during execution and 
 Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
+fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
@@ -188,7 +188,7 @@ For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monad
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
+fun getLineLengthAverage(path: FilePath): IO<List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
@@ -210,10 +210,10 @@ There are multiple default values and wrappers for common cases in both the stan
 
 #### Non-blocking thread jumps
 
-Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}).
+Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/async' | relative_url }}).
 Thus, it's only logical that these datatypes allow for non-blocking thread jumping.
 
-The typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}) defines an extension function for comprehensions that enables continuing the execution on a new thread.
+The typeclass [`Async`]({{ '/docs/effects/async' | relative_url }}) defines an extension function for comprehensions that enables continuing the execution on a new thread.
 This function is called `continueOn()`, takes a `CoroutineContext` and applies the effect of jumping to it, without any value returned.
 The rest of the continuation will be executed on that `CoroutineContext`. Simple as that.
 

@@ -1,5 +1,5 @@
 ---
-layout: docs-incubator
+layout: docs-core
 title: FunctorFilter
 permalink: /docs/arrow/typeclasses/functorfilter/
 redirect_from:

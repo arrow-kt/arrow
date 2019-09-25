@@ -1,5 +1,5 @@
 ---
-layout: docs-incubator
+layout: docs-core
 title: MonadFilter
 permalink: /docs/arrow/typeclasses/monadfilter/
 redirect_from:

@@ -272,12 +272,6 @@ options:
       - title: Ank
         url: /docs/apidocs/arrow-ank/
 
-      - title: Ank Gradle
-        url: /docs/apidocs/arrow-ank-gradle/
-
-      - title: Annotations
-        url: /docs/apidocs/arrow-annotations/
-
       - title: Benchmarks Effects
         url: /docs/apidocs/arrow-benchmarks-fx/
 

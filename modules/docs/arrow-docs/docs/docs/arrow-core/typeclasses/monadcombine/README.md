@@ -1,5 +1,5 @@
 ---
-layout: docs-incubator
+layout: docs-core
 title: MonadCombine
 permalink: /docs/arrow/typeclasses/monadcombine/
 redirect_from:

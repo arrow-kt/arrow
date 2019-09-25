@@ -15,23 +15,23 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 #### Table of Content
-* [arrow-core](/docs/arrow-core/quickstart/libraries/index.html#arrow-core)
-* [arrow-core-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-core-data)
-* [arrow-optics](/docs/arrow-core/quickstart/libraries/index.html#arrow-optics)
-* [arrow-fx](/docs/arrow-core/quickstart/libraries/index.html#arrow-fx)
-* [arrow-syntax](/docs/arrow-core/quickstart/libraries/index.html#arrow-syntax)
-* [arrow-fx-rx2 & arrow-fx-reactor](/docs/arrow-core/quickstart/libraries/index.html#arrow-fx-rx2&arrow-fx-reactor)
-* [arrow-mtl](/docs/arrow-core/quickstart/libraries/index.html#arrow-mtl)
-* [arrow-mtl-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-mtl-data)
-* [arrow-optics-mtl](/docs/arrow-core/quickstart/libraries/index.html#arrow-optics-mtl)
-* [arrow-recursion](/docs/arrow-core/quickstart/libraries/index.html#arrow-recrusion)
-* [arrow-recursion-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-recrusion-data)
-* [arrow-integration-retrofit-adapter](/docs/arrow-core/quickstart/libraries/index.html#arrow-integration-retrofit-adapter)
-* [arrow-free](/docs/arrow-core/quickstart/libraries/index.html#arrow-free)
-* [arrow-free-data](/docs/arrow-core/quickstart/libraries/index.html#arrow-free-data)
-* [arrow-aql](/docs/arrow-core/quickstart/libraries/index.html#arrow-aql)
-* [arrow-meta](/docs/arrow-core/quickstart/libraries/index.html#arrow-meta)
-* [arrow-generic](/docs/arrow-core/quickstart/libraries/index.html#arrow-generic)
+* [arrow-core](/docs/quickstart/libraries/index.html#arrow-core)
+* [arrow-core-data](/docs/quickstart/libraries/index.html#arrow-core-data)
+* [arrow-optics](/docs/quickstart/libraries/index.html#arrow-optics)
+* [arrow-fx](/docs/quickstart/libraries/index.html#arrow-fx)
+* [arrow-syntax](/docs/quickstart/libraries/index.html#arrow-syntax)
+* [arrow-fx-rx2 & arrow-fx-reactor](/docs/quickstart/libraries/index.html#arrow-fx-rx2&arrow-fx-reactor)
+* [arrow-mtl](/docs/quickstart/libraries/index.html#arrow-mtl)
+* [arrow-mtl-data](/docs/quickstart/libraries/index.html#arrow-mtl-data)
+* [arrow-optics-mtl](/docs/quickstart/libraries/index.html#arrow-optics-mtl)
+* [arrow-recursion](/docs/quickstart/libraries/index.html#arrow-recrusion)
+* [arrow-recursion-data](/docs/quickstart/libraries/index.html#arrow-recrusion-data)
+* [arrow-integration-retrofit-adapter](/docs/quickstart/libraries/index.html#arrow-integration-retrofit-adapter)
+* [arrow-free](/docs/quickstart/libraries/index.html#arrow-free)
+* [arrow-free-data](/docs/quickstart/libraries/index.html#arrow-free-data)
+* [arrow-aql](/docs/quickstart/libraries/index.html#arrow-aql)
+* [arrow-meta](/docs/quickstart/libraries/index.html#arrow-meta)
+* [arrow-generic](/docs/quickstart/libraries/index.html#arrow-generic)
 
 ### arrow-core
 
@@ -243,7 +243,7 @@ dependencies {
 }
 ```
 
-Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
+Allows boilerplate generation for [`@extension`](({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces/' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
 

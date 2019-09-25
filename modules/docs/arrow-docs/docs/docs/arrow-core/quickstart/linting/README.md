@@ -6,11 +6,11 @@ permalink: /docs/quickstart/linting/
 
 ## Arrow Linting
 
-Some linters might complain about some code practices that are common when working with functional programming. This section explains some of them and how they can be disabled. 
+Some linters might complain about some code practices that are common when working with functional programming. This section explains some of them and how they can be disabled.
 
 ### Working with ArrowFx
 
-When working with [Arrow Fx]({{ '/docs/effects/fx' | relative_url }}) side effects are expressed as `suspend` functions. 
+When working with [Arrow Fx]({{ '/docs/fx' | relative_url }}) side effects are expressed as `suspend` functions. 
 
 However, IDEA will show *redundant suspend modifiers* warning if a function does not invoke other suspended functions. For ArrowFx we want to be explicit about impure functions, so this warning is not useful.
 
@@ -28,6 +28,6 @@ You can disable this warning in Preferences > Editor > Inspections. Then search 
 
 ![gif](/img/linting/linting_unit_return_type.gif)
 
-If you are using [ktlint](https://ktlint.github.io/) as the linter of choice for your project, this scenario will reported as an error, making builds fail. 
+If you are using [ktlint](https://ktlint.github.io/) as the linter of choice for your project, this scenario will reported as an error, making builds fail.
 
 You can disable this errors. For that you must upgrade ktlint version to `0.34.0` or later and add `disabled_rules=no-unit-return` to the `.editorconfig` file. You can read more about this topic [here](https://github.com/pinterest/ktlint#editorconfig).

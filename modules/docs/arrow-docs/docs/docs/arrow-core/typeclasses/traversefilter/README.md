@@ -1,5 +1,5 @@
 ---
-layout: docs-incubator
+layout: docs-core
 title: TraverseFilter
 permalink: /docs/arrow/typeclasses/traversefilter/
 redirect_from:
