@@ -137,15 +137,14 @@ asking for all of it up front. Let's start with two pieces of data.
 ```kotlin:ank
 import arrow.core.Validated
 //sampleStart
-fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
- return when {
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
   else -> TODO()
  }
-}
 //sampleEnd
 ```
 
@@ -227,16 +226,14 @@ data class Config(val map: Map<String, String>) {
  }
 }
 
-fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
- return when {
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
   else -> TODO()
  }
-}
-
 //sampleStart
  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
 
@@ -300,16 +297,14 @@ data class Config(val map: Map<String, String>) {
  }
 }
 
-fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
- return when {
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
   v1 is Validated.Valid && v2 is Validated.Invalid -> v2
   v1 is Validated.Invalid && v2 is Validated.Valid -> v1
   v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
   else -> TODO()
  }
-}
-
 //sampleStart
 val config = Config(mapOf("url" to "127.0.0.1", "port" to "not a number"))
 
