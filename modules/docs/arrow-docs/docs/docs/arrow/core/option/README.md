@@ -14,7 +14,7 @@ video: 5SFTbphderE
 beginner
 
 If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you were not expecting it and thus not dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
-Kotlin tries to solve the problem by getting rid of `null` values altogether and providing its own special syntax [`Null-safety machinery based on `?``]({{ 'https://kotlinlang.org/docs/reference/null-safety.html' | relative_url }}).
+Kotlin tries to solve the problem by getting rid of `null` values altogether and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
 
 Arrow models the absence of values through the `Option` datatype similar to how Scala, Haskell and other FP languages handle optional values.
 
