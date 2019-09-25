@@ -12,7 +12,7 @@ import arrow.core.k
 
 val value =
 //sampleStart
-listOf(1, 2, 3).k()
+  listOf(1, 2, 3).k()
 //sampleEnd
 fun main() {
  println(value)
