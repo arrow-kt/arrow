@@ -53,6 +53,7 @@ import arrow.typeclasses.FunctorFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -122,7 +123,7 @@ interface FlowableKApplicativeError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -133,7 +134,7 @@ interface FlowableKMonadError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
