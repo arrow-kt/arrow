@@ -15,18 +15,6 @@ interface LineMarkerSyntax {
   /**
    * This technique adds an LineMarker on the specified PsiElement similar to the Recursive Kotlin Icon [org.jetbrains.kotlin.idea.highlighter.KotlinRecursiveCallLineMarkerProvider]
    * or Suspended Icon [org.jetbrains.kotlin.idea.highlighter.KotlinSuspendCallLineMarkerProvider]
-   */
-  fun IdeMetaPlugin.addLineMarkerProvider(
-    icon: Icon,
-    matchOn: (element: PsiElement) -> Boolean,
-    slowLineMarker: (element: PsiElement) -> LineMarkerInfo<PsiElement>?,
-    element: PsiElement,
-    message: String,
-    placed: GutterIconRenderer.Alignment = GutterIconRenderer.Alignment.LEFT
-  ): ExtensionPhase =
-    addLineMarkerProvider(matchOn, slowLineMarker)
-
-  /**
    * TODO: Add more Techniques such as the one from Elm
    */
   fun IdeMetaPlugin.addLineMarkerProvider(

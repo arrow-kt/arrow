@@ -7,40 +7,30 @@ import arrow.meta.plugin.idea.phases.editor.ExtensionProvider
 import com.intellij.codeInsight.ContainerProvider
 import com.intellij.lang.LanguageExtension
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.openapi.extensions.LoadingOrder
 import com.intellij.psi.PsiElement
 
-interface ExtensionProviderSyntax {
-  // TODO: Test impl
+interface ExtensionProviderSyntax : ExtensionProvider {
   fun <E> IdeMetaPlugin.extensionProvider(
     EP_NAME: ExtensionPointName<E>,
-    impl: E
+    impl: E,
+    loadingOrder: LoadingOrder = LoadingOrder.ANY
   ): ExtensionPhase =
-    // StorageComponent: Incosistent Container exception
     ide {
-      packageFragmentProvider { project, module, storageManager, trace, moduleInfo, lookupTracker ->
-        //analyzer?.run {
-        ExtensionProvider.addExtension(EP_NAME, impl)
-        println("ADDED another Extension: FOR ${EP_NAME.name}")
-        //}
-        null
+      addExtension(EP_NAME, impl, loadingOrder)?.run {
+        // println("ADDED another Extension: FOR ${EP_NAME.name}")
+        ExtensionPhase.Empty
       }
     } ?: ExtensionPhase.Empty
 
-  // TODO: Test impl
   fun <E> IdeMetaPlugin.extensionProvider(
     LE: LanguageExtension<E>,
     impl: E
   ): ExtensionPhase =
     ide {
-      storageComponent(
-        registerModuleComponents = { container, moduleDescriptor ->
-          analyzer?.run {
-            ExtensionProvider.addLanguageExtension(LE, impl)
-          }
-        },
-        check = { _, _, _ ->
-        }
-      )
+      addLanguageExtension(LE, impl)
+      // println("Adds LanguageExtension for ${LE.name}")
+      ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
   fun IdeMetaPlugin.addContainerProvider(f: (PsiElement) -> PsiElement?): ExtensionPhase =

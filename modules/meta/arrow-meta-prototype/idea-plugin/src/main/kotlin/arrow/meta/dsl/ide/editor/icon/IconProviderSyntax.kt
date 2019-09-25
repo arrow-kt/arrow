@@ -3,6 +3,7 @@ package arrow.meta.dsl.ide.editor.icon
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.ide.IconProvider
+import com.intellij.openapi.extensions.LoadingOrder
 import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import javax.swing.Icon
@@ -22,6 +23,7 @@ interface IconProviderSyntax {
       object : IconProvider(), DumbAware {
         override fun getIcon(p0: PsiElement, p1: Int): Icon? =
           if (matchOn(p0, p1)) icon else null
-      }
+      },
+      LoadingOrder.FIRST
     )
 }

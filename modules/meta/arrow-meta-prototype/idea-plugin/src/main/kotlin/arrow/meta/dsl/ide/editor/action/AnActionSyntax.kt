@@ -12,12 +12,40 @@ import javax.swing.Icon
 
 // TODO: Check Default of actionId
 interface AnActionSyntax : AnActionExtensionProvider {
+  fun IdeMetaPlugin.addAnAction(
+    actionId: String = "",
+    action: AnAction
+  ): ExtensionPhase =
+    ide {
+      register(actionId, action)
+      ExtensionPhase.Empty
+    } ?: ExtensionPhase.Empty
+
+  fun IdeMetaPlugin.replaceAnAction(
+    actionId: String,
+    newAction: AnAction
+  ): ExtensionPhase =
+    ide {
+      replace(actionId, newAction)
+      ExtensionPhase.Empty
+    } ?: ExtensionPhase.Empty
+
+  fun IdeMetaPlugin.unregisterAnAction(
+    actionId: String
+  ): ExtensionPhase =
+    ide {
+      println("Unregistered $actionId")
+      unregister(actionId)
+      ExtensionPhase.Empty
+    } ?: ExtensionPhase.Empty
+
   fun IdeMetaPlugin.addTimerListener(
     delay: Int,
     modalityState: ModalityState,
     run: () -> Unit
-  ): ExtensionPhase = // TODO("Check impl")
+  ): ExtensionPhase =
     ide {
+      println("TimerListener is registered")
       addTimerListener(delay, this@AnActionSyntax.timerListener(modalityState, run))
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
@@ -32,27 +60,9 @@ interface AnActionSyntax : AnActionExtensionProvider {
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
-  fun IdeMetaPlugin.addAnAction(
-    actionId: String = "",
-    action: AnAction
-  ): ExtensionPhase = // TODO("Check impl")
-    ide {
-      registerAction(actionId, action)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
-
-  fun IdeMetaPlugin.replaceAnAction(
-    actionId: String,
-    newAction: AnAction
-  ): ExtensionPhase = // TODO("Check impl")
-    ide {
-      replaceAction(actionId, newAction)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
-
   fun IdeMetaPlugin.removeTransparentTimerListener(
     listener: TimerListener
-  ): ExtensionPhase = // TODO("Check impl")
+  ): ExtensionPhase =
     ide {
       removeTimerListener(listener)
       ExtensionPhase.Empty
@@ -60,25 +70,25 @@ interface AnActionSyntax : AnActionExtensionProvider {
 
   fun IdeMetaPlugin.removeTimerListener(
     listener: TimerListener
-  ): ExtensionPhase = // TODO("Check impl")
+  ): ExtensionPhase =
     ide {
       removeTransparentTimerListener(listener)
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
   /**
-   * TODO: Add more costume attributes:
+   * TODO: Add more costume attributes: ShortCuts etc.
    * [http://www.jetbrains.org/intellij/sdk/docs/tutorials/action_system/working_with_custom_actions.html
    */
   fun AnActionSyntax.addAnAction(
     actionPerformed: (e: AnActionEvent) -> Unit,
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
+    update: (e: AnActionEvent) -> Unit = { _ -> },
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
     useSmallerFontForTextInToolbar: Boolean = false,
     startInTransaction: Boolean = false,
-    getTemplateText: String? = null,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit
+    getTemplateText: String? = null
   ): AnAction =
     object : AnAction() {
       override fun actionPerformed(e: AnActionEvent) = actionPerformed(e)
@@ -107,13 +117,13 @@ interface AnActionSyntax : AnActionExtensionProvider {
   fun AnActionSyntax.addAnAction(
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
+    update: (e: AnActionEvent) -> Unit = { _ -> },
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
     useSmallerFontForTextInToolbar: Boolean = false,
     startInTransaction: Boolean = false,
-    getTemplateText: String? = null,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit
+    getTemplateText: String? = null
   ): AnAction =
     object : AnAction(icon) {
       override fun actionPerformed(e: AnActionEvent) = actionPerformed(e)
@@ -142,13 +152,13 @@ interface AnActionSyntax : AnActionExtensionProvider {
   fun AnActionSyntax.addAnAction(
     title: String,
     actionPerformed: (e: AnActionEvent) -> Unit,
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
+    update: (e: AnActionEvent) -> Unit = { _ -> },
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
     useSmallerFontForTextInToolbar: Boolean = false,
     startInTransaction: Boolean = false,
-    getTemplateText: String? = null,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit
+    getTemplateText: String? = null
   ): AnAction =
     object : AnAction(title) {
       override fun actionPerformed(e: AnActionEvent) = actionPerformed(e)
@@ -179,13 +189,13 @@ interface AnActionSyntax : AnActionExtensionProvider {
     description: String,
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
+    update: (e: AnActionEvent) -> Unit = { _ -> },
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
     useSmallerFontForTextInToolbar: Boolean = false,
     startInTransaction: Boolean = false,
-    getTemplateText: String? = null,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit
+    getTemplateText: String? = null
   ): AnAction =
     object : AnAction(title, description, icon) {
       override fun actionPerformed(e: AnActionEvent) = actionPerformed(e)

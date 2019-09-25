@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.TimerListener
 
 interface AnActionExtensionProvider {
-  fun registerAction(actionId: String, action: AnAction): Unit? =
+  fun register(actionId: String, action: AnAction): Unit? =
     ActionManager.getInstance()?.registerAction(actionId, action)
 
-  fun unregisterAction(actionId: String): Unit? =
+  fun unregister(actionId: String): Unit? =
     ActionManager.getInstance()?.unregisterAction(actionId)
 
-  fun replaceAction(actionId: String, newAction: AnAction): Unit? =
+  fun replace(actionId: String, newAction: AnAction): Unit? =
     ActionManager.getInstance()?.replaceAction(actionId, newAction)
 
   fun addTimerListener(delay: Int, listener: TimerListener): Unit? =
@@ -25,4 +25,7 @@ interface AnActionExtensionProvider {
 
   fun removeTransparentTimerListener(listener: TimerListener): Unit? =
     ActionManager.getInstance()?.removeTransparentTimerListener(listener)
+
+  fun allActionIds(prefix: String): List<String> =
+    ActionManager.getInstance().getActionIds(prefix).toList()
 }

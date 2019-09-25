@@ -1,6 +1,5 @@
 package arrow.meta.dsl.ide.editor.inspection
 
-import arrow.meta.dsl.ide.extensions.ExtensionProviderSyntax
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeHighlighting.HighlightDisplayLevel
@@ -22,7 +21,7 @@ import org.jetbrains.kotlin.psi.KtElement
  * TODO: @param inspection should also be used with #addApplicableInspection.
  * More General Inspections can be build with [AbstractKotlinInspection] e.g.: [org.jetbrains.kotlin.idea.inspections.RedundantSuspendModifierInspection]
  */
-interface InspectionSyntax : ExtensionProviderSyntax {
+interface InspectionSyntax {
   fun IdeMetaPlugin.addInspection(
     inspection: LocalInspectionTool,
     shortName: String,
