@@ -12,7 +12,7 @@ import arrow.core.k
 
 val value =
 //sampleStart
-listOf(1, 2, 3).k()
+  listOf(1, 2, 3).k()
 //sampleEnd
 fun main() {
  println(value)
@@ -104,7 +104,7 @@ import arrow.core.extensions.list.apply.ap
 
 val value =
 //sampleStart
-listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
+  listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
 //sampleEnd
 fun main() {
  println(value)
