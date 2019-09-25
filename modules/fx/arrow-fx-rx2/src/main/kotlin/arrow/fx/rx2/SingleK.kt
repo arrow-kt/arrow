@@ -325,4 +325,3 @@ fun <A> SingleKOf<A>.unsafeRunSync(): A =
 
 fun <A> SingleK<A>.handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
-
