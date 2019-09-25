@@ -31,6 +31,7 @@ inline fun <A> FlowableKOf<A>.fix(): FlowableK<A> =
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable as Flowable<A>
 
 data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
@@ -283,4 +284,3 @@ fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Flowabl
 
 fun <A> FlowableK<A>.handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
-
