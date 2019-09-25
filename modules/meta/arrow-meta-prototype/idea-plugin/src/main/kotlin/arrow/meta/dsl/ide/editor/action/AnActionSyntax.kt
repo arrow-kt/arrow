@@ -18,11 +18,7 @@ interface AnActionSyntax : AnActionExtensionProvider {
     run: () -> Unit
   ): ExtensionPhase = // TODO("Check impl")
     ide {
-      addTimerListener(delay, object : TimerListener {
-        override fun run() = run()
-
-        override fun getModalityState(): ModalityState = modalityState
-      })
+      addTimerListener(delay, this@AnActionSyntax.timerListener(modalityState, run))
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
@@ -32,11 +28,7 @@ interface AnActionSyntax : AnActionExtensionProvider {
     run: () -> Unit
   ): ExtensionPhase = // TODO("Check impl)
     ide {
-      addTransparentTimerListener(delay, object : TimerListener {
-        override fun run() = run()
-
-        override fun getModalityState(): ModalityState = modalityState
-      })
+      addTransparentTimerListener(delay, this@AnActionSyntax.timerListener(modalityState, run))
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
@@ -74,7 +66,11 @@ interface AnActionSyntax : AnActionExtensionProvider {
       ExtensionPhase.Empty
     } ?: ExtensionPhase.Empty
 
-  fun AnActionExtensionProvider.addAnAction(
+  /**
+   * TODO: Add more costume attributes:
+   * [http://www.jetbrains.org/intellij/sdk/docs/tutorials/action_system/working_with_custom_actions.html
+   */
+  fun AnActionSyntax.addAnAction(
     actionPerformed: (e: AnActionEvent) -> Unit,
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
@@ -108,7 +104,7 @@ interface AnActionSyntax : AnActionExtensionProvider {
     }
 
 
-  fun AnActionExtensionProvider.addAnAction(
+  fun AnActionSyntax.addAnAction(
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
     displayTextInToolbar: Boolean = false,
@@ -143,7 +139,7 @@ interface AnActionSyntax : AnActionExtensionProvider {
     }
 
 
-  fun AnActionExtensionProvider.addAnAction(
+  fun AnActionSyntax.addAnAction(
     title: String,
     actionPerformed: (e: AnActionEvent) -> Unit,
     displayTextInToolbar: Boolean = false,
@@ -178,7 +174,7 @@ interface AnActionSyntax : AnActionExtensionProvider {
     }
 
 
-  fun AnActionExtensionProvider.addAnAction(
+  fun AnActionSyntax.addAnAction(
     title: String,
     description: String,
     icon: Icon,
@@ -212,5 +208,15 @@ interface AnActionSyntax : AnActionExtensionProvider {
 
       override fun beforeActionPerformedUpdate(e: AnActionEvent) =
         beforeActionPerformedUpdate(e)
+    }
+
+  fun AnActionSyntax.timerListener(
+    modalityState: ModalityState,
+    run: () -> Unit
+  ): TimerListener =
+    object : TimerListener {
+      override fun run() = run()
+
+      override fun getModalityState(): ModalityState = modalityState
     }
 }

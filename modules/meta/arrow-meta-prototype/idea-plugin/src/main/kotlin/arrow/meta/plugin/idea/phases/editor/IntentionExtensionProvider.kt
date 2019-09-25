@@ -2,15 +2,25 @@ package arrow.meta.plugin.idea.phases.editor
 
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.intention.IntentionManager
+import com.intellij.codeInsight.intention.impl.config.IntentionManagerSettings
 
 interface IntentionExtensionProvider {
-  fun registerIntention(intention: IntentionAction, category: String): Unit? =
+  fun register(intention: IntentionAction, category: String): Unit? =
     IntentionManager.getInstance()?.registerIntentionAndMetaData(intention, category)
 
-  fun registerIntention(intention: IntentionAction): Unit? =
+  fun register(intention: IntentionAction): Unit? =
     IntentionManager.getInstance()?.addAction(intention)
 
-  fun unregisterIntention(intention: IntentionAction): Unit? =
+  fun unregister(intention: IntentionAction): Unit? =
     IntentionManager.getInstance()?.unregisterIntention(intention)
+
+  fun availableIntentions(): List<IntentionAction> =
+    IntentionManager.getInstance()?.availableIntentionActions?.toList() ?: emptyList()
+
+  fun IntentionAction.isEnabled(): Boolean =
+    IntentionManagerSettings.getInstance().isEnabled(this)
+
+  fun IntentionAction.setEnabled(enabled: Boolean): Unit =
+    IntentionManagerSettings.getInstance().setEnabled(this, enabled)
 }
 
