@@ -36,6 +36,7 @@ ul {
 
         &.highlight {
             border: 1px solid $code-border-color;
+            margin-bottom: $code-margin;
 
             .hljs {
                 padding: $code-padding;
