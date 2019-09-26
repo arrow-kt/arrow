@@ -7,6 +7,10 @@
 @import "utils/mixins/breakpoint";
 @import "utils/mixins/general-mixins";
 
+// Vendors
+@import "vendors/highlight/color-brewer";
+
+
 // Base
 @import "base/reset";
 @import "base/base";

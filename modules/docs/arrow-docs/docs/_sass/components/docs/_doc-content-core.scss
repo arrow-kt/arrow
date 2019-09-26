@@ -19,6 +19,18 @@
             color: $core-color;
         }
 
+
+        .hljs-variable,
+        .hljs-template-variable,
+        .hljs-tag,
+        .hljs-name,
+        .hljs-selector-id,
+        .hljs-selector-class,
+        .hljs-regexp,
+        .hljs-deletion {
+            color: $core-color;
+        }
+
         .button-video {
             background: $white;
             border: 2px solid $core-color;
@@ -30,4 +42,5 @@
             }
         }
     }
+
 }

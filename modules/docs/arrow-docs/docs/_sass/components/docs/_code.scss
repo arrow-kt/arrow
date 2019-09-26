@@ -17,7 +17,8 @@ ul {
 .doc-content {
 
 
-    .CodeMirror {
+    .CodeMirror,
+    .hljs {
         font-size: 15px;
         font-family: $code-font-family;
 
@@ -29,6 +30,17 @@ ul {
 
     .cm-s-arrow span.cm-keyword {
         font-weight: $font-regular;
+    }
+    
+        pre {
+
+        &.highlight {
+            border: 1px solid $code-border-color;
+
+            .hljs {
+                padding: $code-padding;
+            }
+        }
     }
 }
 

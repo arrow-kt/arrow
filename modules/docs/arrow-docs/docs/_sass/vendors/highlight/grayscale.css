@@ -68,7 +68,7 @@ grayscale style (c) MY Sun <simonmysun@gmail.com>
 .hljs-bullet,
 .hljs-link {
   color: #000;
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAKElEQVQIW2NkQAO7d+/+z4gsBhJwdXVlhAvCBECKIIwAbhKZBUwBQA6hBpm5efZsgAAAABJRU5ErkJggg==) repeat;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAKElEQVQIW2NkQAO7d+/+z4gsBhJwdXVlhAvCBECKwIIwAbhKZBUwBQA6hBpm5efZsgAAAABJRU5ErkJggg==) repeat;
 }
 
 .hljs-built_in,
@@ -84,7 +84,7 @@ grayscale style (c) MY Sun <simonmysun@gmail.com>
 
 .hljs-deletion {
   color: #fff;
-  background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAE0lEQVQIW2MMDQ39zzhz5KIAQAyxweWgUHd1AAAAABJRU5ErkJggg==) repeat;
+  background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAE0lEQVQIW2MMDQ39zzhz5kwIAQAyxweWgUHd1AAAAABJRU5ErkJggg==) repeat;
 }
 
 .hljs-addition {

@@ -50,7 +50,7 @@ else depending on our needs.
 
 Let's add a couple of mock implementations for it, a **local** and a **remote** one.
 
-```Kotlin
+```kotlin
 class LocalDataSource : DataSource {
   private val localCache: Map<User, List<Task>> =
     mapOf(User(UserId("user1")) to listOf(Task("LocalTask assigned to user1")))
