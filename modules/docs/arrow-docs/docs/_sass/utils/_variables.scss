@@ -85,6 +85,14 @@ $column-12: (12/12*100%);
 $gutter-margin: ($base-point-grid * 4);
 // Border
 // -----------------------------------------------
+
+// Code
+// -----------------------------------------------
+$code-border-color: rgba($gray-primary, 0.2);
+$code-padding: 16px;
+$code-margin: 30px;
+
+
 $border-color: rgba($gray-primary, 0.1);
 $doc-header-border: rgba($brand-secondary, 0.8);
 $sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
