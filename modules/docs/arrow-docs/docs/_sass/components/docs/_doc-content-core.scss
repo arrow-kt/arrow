@@ -13,6 +13,12 @@
             code {
                 background: rgba($core-background, 0.08);
             }
+            
+            a {
+                code {
+                    text-decoration: underline;
+                }
+            }
         }
 
         .cm-s-arrow span.cm-keyword {
