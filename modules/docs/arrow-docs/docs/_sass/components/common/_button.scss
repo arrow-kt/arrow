@@ -19,6 +19,16 @@
   }
 }
 
+.error-button {
+  display: block;
+  background: none;
+  border: solid 1px;
+  padding: ($base-point-grid) ($base-point-grid * 3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .close {
   height: 28px;
   position: absolute;

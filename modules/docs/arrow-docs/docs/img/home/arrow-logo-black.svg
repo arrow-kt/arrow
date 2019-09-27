@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57.1 (83088) - https://sketch.com -->
+    <title>logos/arrow/black</title>
+    <desc>Created with Sketch.</desc>
+    <g id="logos/arrow/black" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <polygon id="lines6" stroke="#263238" stroke-width="2" transform="translate(60.000000, 48.000000) scale(-1, 1) translate(-60.000000, -48.000000) " points="108 96 60 0 12 96 60.0791153 72.3588867"></polygon>
+        <polygon id="shadow7" fill="#263238" opacity="0.1" points="60 1.42108547e-14 60 89 75 80 106.601562 94.3945312"></polygon>
+        <polyline id="path" stroke="#263238" stroke-width="2" points="75 80 59.8293825 89 45 80.1998073"></polyline>
+    </g>
+</svg>

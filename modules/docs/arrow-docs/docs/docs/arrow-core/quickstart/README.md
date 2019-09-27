@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Quick Start
-permalink: /docs/core
+permalink: /docs/core/
 ---
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core-data/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
