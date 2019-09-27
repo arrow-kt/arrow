@@ -227,20 +227,48 @@
   position: relative;
   z-index: 100;
 
-  .masthead-brand {
-    width: 230px;
+  .header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .brand {
+      margin-right: $base-point-grid * 3;
+
+      .masthead-brand {
+        position: relative;
+        top: $base-point-grid * 2;
+        width: 250px;
+      }
+    }
+
+    .header-error-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 180px;
+
+      .masthead-code-error {
+        font-size: 100px;
+        font-weight: normal;
+      }
+
+      .masthead-title {
+        font-size: 29px;
+        font-weight: normal;
+      }
+    }
   }
 
-  .header-error-text {
-    display: flex;
-    flex-direction: column;
-
-    .masthead-code-error {
-      font-size: 100px;
-    }
-
-    .masthead-title {
-      font-size: 29px;
-    }
+  .error-button {
+    display: block;
+    background: none;
+    border: solid 2px;
+    padding: ($base-point-grid) ($base-point-grid * 3);
+    font-size: 1.2rem;
+    font-weight: normal;
+    width: 60%;
+    text-transform: uppercase;
   }
 }
