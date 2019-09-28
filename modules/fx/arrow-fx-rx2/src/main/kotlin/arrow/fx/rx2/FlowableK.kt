@@ -24,7 +24,6 @@ class ForFlowableK private constructor() {
   companion object
 }
 typealias FlowableKOf<A> = arrow.Kind<ForFlowableK, A>
-typealias FlowableKKindedJ<A> = io.kindedj.Hk<ForFlowableK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> FlowableKOf<A>.fix(): FlowableK<A> =
@@ -32,9 +31,10 @@ inline fun <A> FlowableKOf<A>.fix(): FlowableK<A> =
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
-fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable
+@Suppress("UNCHECKED_CAST")
+fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable as Flowable<A>
 
-data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKindedJ<A> {
+data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
 
   fun <B> map(f: (A) -> B): FlowableK<B> =
     flowable.map(f).k()
@@ -132,9 +132,6 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     foldRight(Eval.always { GA.just(Flowable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
-
-  fun handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    flowable.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =
     flowable.observeOn(ctx.asScheduler()).k()
@@ -284,3 +281,6 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
 fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
   fix().traverse(GA, ::identity)
+
+fun <A> FlowableK<A>.handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
+  value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
