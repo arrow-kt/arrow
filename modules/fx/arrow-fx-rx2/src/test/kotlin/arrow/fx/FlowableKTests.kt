@@ -20,7 +20,6 @@ import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-class FlowableKTests : UnitSpec() {
+class FlowableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
     override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean {

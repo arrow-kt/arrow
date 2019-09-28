@@ -10,6 +10,7 @@ import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.extensions.observablek.applicativeError.applicativeError
 import arrow.fx.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.fx.rx2.fix
+import arrow.fx.rx2.value
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
@@ -57,7 +58,7 @@ class ProcCallBackTest : UnitSpec() {
           .flatMap { response ->
             response.unwrapBody(applicativeError()).fix()
           }
-          .observable
+          .value()
           .test()
           .assertValue(ResponseMock("hello, world!"))
       }

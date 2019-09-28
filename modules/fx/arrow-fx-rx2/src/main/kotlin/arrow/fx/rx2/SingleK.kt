@@ -21,7 +21,6 @@ class ForSingleK private constructor() {
   companion object
 }
 typealias SingleKOf<A> = arrow.Kind<ForSingleK, A>
-typealias SingleKKindedJ<A> = io.kindedj.Hk<ForSingleK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
@@ -29,9 +28,10 @@ inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
-fun <A> SingleKOf<A>.value(): Single<A> = fix().single
+@Suppress("UNCHECKED_CAST")
+fun <A> SingleKOf<A>.value(): Single<A> = fix().single as Single<A>
 
-data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
+data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
 
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
@@ -109,9 +109,6 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           .value().subscribe(emitter::onSuccess) {}
       emitter.setCancellable { dispose.dispose() }
     }.k()
-
-  fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
-    single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()
@@ -325,3 +322,6 @@ fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
  */
 fun <A> SingleKOf<A>.unsafeRunSync(): A =
   value().blockingGet()
+
+fun <A> SingleK<A>.handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
+  value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

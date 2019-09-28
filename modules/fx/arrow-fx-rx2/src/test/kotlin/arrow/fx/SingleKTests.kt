@@ -13,7 +13,6 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-class SingleKTests : UnitSpec() {
+class SingleKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
     override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
