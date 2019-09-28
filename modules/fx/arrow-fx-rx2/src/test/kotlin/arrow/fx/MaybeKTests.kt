@@ -13,7 +13,6 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.TimerLaws
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-class MaybeKTests : UnitSpec() {
+class MaybeKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>> {
     override fun MaybeKOf<T>.eqv(b: MaybeKOf<T>): Boolean {

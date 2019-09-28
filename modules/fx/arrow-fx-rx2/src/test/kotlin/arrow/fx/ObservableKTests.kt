@@ -16,7 +16,6 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.TimerLaws
@@ -35,7 +34,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-class ObservableKTests : UnitSpec() {
+class ObservableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
     override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean {
