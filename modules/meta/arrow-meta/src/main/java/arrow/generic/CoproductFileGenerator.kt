@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.KModifier.OUT
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName
@@ -65,7 +66,7 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
         "Represents a sealed hierarchy of ${generics.size} types where only one of the types is actually present.\n"
       )
       .addModifiers(KModifier.SEALED)
-      .addTypeVariables(generics.map { TypeVariableName(it) })
+      .addTypeVariables(generics.map { TypeVariableName(it, variance = OUT) })
       .build()
   )
 
