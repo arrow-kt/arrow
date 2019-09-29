@@ -577,12 +577,28 @@ If the value is not null than it will be transformed to the specified `Either.Le
 
 Example:
 
-```kotlin:ank
-"value".rightIfNull { "left" }
+```kotlin:ank:playground
+import arrow.core.rightIfNull
+
+val value =
+//sampleStart
+ "value".rightIfNull { "left" }
+//sampleEnd
+fun main() {
+ println(value)
+}
 ```
 
-```kotlin:ank
-null.rightIfNull { "left" }
+```kotlin:ank:playground
+import arrow.core.rightIfNull
+
+val value =
+//sampleStart
+ null.rightIfNull { "left" }
+//sampleEnd
+fun main() {
+ println(value)
+}
 ```
 
 Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.

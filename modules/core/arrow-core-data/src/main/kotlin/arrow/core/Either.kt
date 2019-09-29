@@ -571,6 +571,36 @@ import arrow.higherkind
  * }
  * ```
  *
+ * The inverse of `rightIfNotNull`, `rightIfNull`.
+ * If the value is null it will be transformed to the specified `Either.right` and the type will be `Nothing?`.
+ * If the value is not null than it will be transformed to the specified `Either.Left`.
+ *
+ * Example:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.rightIfNull
+ *
+ * val value =
+ * //sampleStart
+ *  "value".rightIfNull { "left" }
+ * //sampleEnd
+ * fun main() {
+ *  println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.rightIfNull
+ *
+ * val value =
+ * //sampleStart
+ *  null.rightIfNull { "left" }
+ * //sampleEnd
+ * fun main() {
+ *  println(value)
+ * }
+ * ```
+ *
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
  *
@@ -1017,10 +1047,6 @@ fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
  * Returns [Either.Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
  * [Either.Left].
  *
- * Example:
- * ```
- * null.rightIfNull { "left" }    // Right(b="Nothing?")
- * "value".rightIfNull { "left" } // Left(a="left")
  * ```
  */
 fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
