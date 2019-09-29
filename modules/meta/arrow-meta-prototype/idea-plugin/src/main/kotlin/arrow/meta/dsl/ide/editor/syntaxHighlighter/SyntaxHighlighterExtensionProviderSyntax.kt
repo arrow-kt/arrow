@@ -1,6 +1,6 @@
 package arrow.meta.dsl.ide.editor.syntaxHighlighter
 
-import arrow.meta.dsl.platform.ide
+import arrow.meta.dsl.platform.ideRegistry
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.lexer.Lexer
@@ -19,15 +19,14 @@ interface SyntaxHighlighterExtensionProviderSyntax {
     highlightingLexer: Lexer = KotlinLexer(),
     tokenHighlights: (tokenType: IElementType?) -> Array<TextAttributesKey>
   ): ExtensionPhase =
-    ide {
+    ideRegistry {
       SyntaxHighlighterFactory.LANGUAGE_FACTORY
-        .addExplicitExtension(KotlinLanguage.INSTANCE, addSyntaxHighlighterFactory(
-          this@SyntaxHighlighterExtensionProviderSyntax.addSyntaxHighlighter(highlightingLexer, tokenHighlights)
+        .addExplicitExtension(KotlinLanguage.INSTANCE, syntaxHighlighterFactory(
+          this@SyntaxHighlighterExtensionProviderSyntax.syntaxHighlighter(highlightingLexer, tokenHighlights)
         ))
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
-  fun SyntaxHighlighterExtensionProviderSyntax.addSyntaxHighlighter(
+  fun SyntaxHighlighterExtensionProviderSyntax.syntaxHighlighter(
     highlightingLexer: Lexer = KotlinLexer(),
     tokenHighlights: (tokenType: IElementType?) -> Array<TextAttributesKey>
   ): SyntaxHighlighter =
@@ -39,7 +38,7 @@ interface SyntaxHighlighterExtensionProviderSyntax {
         highlightingLexer
     }
 
-  fun SyntaxHighlighterExtensionProviderSyntax.addSyntaxHighlighterFactory(
+  fun SyntaxHighlighterExtensionProviderSyntax.syntaxHighlighterFactory(
     syntaxHighlighter: SyntaxHighlighter
   ): SyntaxHighlighterFactory =
     object : SingleLazyInstanceSyntaxHighlighterFactory() {

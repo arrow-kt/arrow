@@ -20,10 +20,10 @@ interface AnActionExtensionProvider {
   fun addTransparentTimerListener(delay: Int, listener: TimerListener): Unit? =
     ActionManager.getInstance()?.addTransparentTimerListener(delay, listener)
 
-  fun removeTimerListener(listener: TimerListener): Unit? =
+  fun removeTL(listener: TimerListener): Unit? =
     ActionManager.getInstance()?.removeTimerListener(listener)
 
-  fun removeTransparentTimerListener(listener: TimerListener): Unit? =
+  fun removeTransparentTL(listener: TimerListener): Unit? =
     ActionManager.getInstance()?.removeTransparentTimerListener(listener)
 
   fun allActionIds(prefix: String): List<String> =

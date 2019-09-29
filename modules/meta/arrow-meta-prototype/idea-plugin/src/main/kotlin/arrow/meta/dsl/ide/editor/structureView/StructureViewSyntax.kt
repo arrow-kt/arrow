@@ -27,9 +27,9 @@ interface StructureViewSyntax {
    */
   fun IdeMetaPlugin.addStructureViewForKtFile(
     putInfo: (info: MutableMap<String, String>) -> Unit,
-    childrenBase: (KtFile) -> MutableCollection<StructureViewTreeElement> =
+    childrenBase: (file: KtFile) -> MutableCollection<StructureViewTreeElement> =
       { KotlinStructureViewElement(it).childrenBase.toMutableList() },
-    presentableText: (KtFile) -> String? =
+    presentableText: (file: KtFile) -> String? =
       { KotlinStructureViewElement(it).presentableText },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
@@ -37,13 +37,13 @@ interface StructureViewSyntax {
   ): ExtensionPhase =
     extensionProvider(
       LanguageStructureViewBuilder.INSTANCE,
-      addStructureViewFactory { psiFile: PsiFile ->
+      structureViewFactory { psiFile: PsiFile ->
         psiFile.safeAs<KtFile>()?.run {
-          addTreeBasedStructureViewBuilder { editor: Editor? ->
-            addStructureViewModel(
+          treeBasedStructureViewBuilder { editor: Editor? ->
+            structureViewModel(
               this,
               editor,
-              { addTreeElementBase(this, childrenBase, presentableText, putInfo) },
+              { treeElementBase(this, childrenBase, presentableText, putInfo) },
               isAlwaysShowsPlus, isAlwaysLeaf, putInfo
             )
           }
@@ -57,9 +57,9 @@ interface StructureViewSyntax {
   fun IdeMetaPlugin.addStructureView(
     matchOn: (psiFile: PsiFile) -> Boolean,
     putInfo: (info: MutableMap<String, String>) -> Unit,
-    childrenBase: (PsiFile) -> MutableCollection<StructureViewTreeElement> =
+    childrenBase: (file: PsiFile) -> MutableCollection<StructureViewTreeElement> =
       { KotlinStructureViewElement(it).childrenBase.toMutableList() },
-    presentableText: (PsiFile) -> String? =
+    presentableText: (file: PsiFile) -> String? =
       { KotlinStructureViewElement(it).presentableText },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
@@ -67,13 +67,13 @@ interface StructureViewSyntax {
   ): ExtensionPhase =
     extensionProvider(
       LanguageStructureViewBuilder.INSTANCE,
-      addStructureViewFactory { psiFile: PsiFile ->
+      structureViewFactory { psiFile: PsiFile ->
         if (matchOn(psiFile))
-          addTreeBasedStructureViewBuilder { editor: Editor? ->
-            addStructureViewModel(
+          treeBasedStructureViewBuilder { editor: Editor? ->
+            structureViewModel(
               psiFile,
               editor,
-              { addTreeElementBase(psiFile, childrenBase, presentableText, putInfo) },
+              { treeElementBase(psiFile, childrenBase, presentableText, putInfo) },
               isAlwaysShowsPlus, isAlwaysLeaf, putInfo
             )
           }
@@ -85,7 +85,7 @@ interface StructureViewSyntax {
   /**
    * Use [LanguageStructureViewBuilder]
    */
-  fun StructureViewSyntax.addStructureViewFactory(
+  fun StructureViewSyntax.structureViewFactory(
     structureViewBuilder: (psiFile: PsiFile) -> StructureViewBuilder?
   ): PsiStructureViewFactory =
     PsiStructureViewFactory { psiFile -> structureViewBuilder(psiFile) }
@@ -93,7 +93,7 @@ interface StructureViewSyntax {
   /**
    * Standard impl for [StructureViewBuilder]
    */
-  fun StructureViewSyntax.addTreeBasedStructureViewBuilder(
+  fun StructureViewSyntax.treeBasedStructureViewBuilder(
     structureViewModel: (editor: Editor?) -> StructureViewModel
   ): StructureViewBuilder =
     object : TreeBasedStructureViewBuilder() {
@@ -106,10 +106,10 @@ interface StructureViewSyntax {
    * Default's from [KotlinStructureViewModel]
    * Can also be abstracted to PsiFile's
    */
-  fun StructureViewSyntax.addStructureViewModel(
+  fun StructureViewSyntax.structureViewModel(
     psiFile: PsiFile,
     editor: Editor?,
-    treeElementBase: (PsiFile) -> StructureViewTreeElement =
+    treeElementBase: (file: PsiFile) -> StructureViewTreeElement =
       { KotlinStructureViewElement(it, false) },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
@@ -128,15 +128,15 @@ interface StructureViewSyntax {
         putInfo(info)
     }
 
-  fun <File : PsiFile> StructureViewSyntax.addTreeElementBase(
-    psiFile: File,
-    childrenBase: (File) -> MutableCollection<StructureViewTreeElement> =
+  fun <F : PsiFile> StructureViewSyntax.treeElementBase(
+    psiFile: F,
+    childrenBase: (file: F) -> MutableCollection<StructureViewTreeElement> =
       { KotlinStructureViewElement(it).childrenBase.toMutableList() },
-    presentableText: (File) -> String? =
+    presentableText: (file: F) -> String? =
       { KotlinStructureViewElement(it).presentableText },
     putInfo: (info: MutableMap<String, String>) -> Unit
   ): StructureViewTreeElement =
-    object : PsiTreeElementBase<File>(psiFile), Queryable {
+    object : PsiTreeElementBase<F>(psiFile), Queryable {
       override fun getChildrenBase(): MutableCollection<StructureViewTreeElement> =
         childrenBase(psiFile)
 

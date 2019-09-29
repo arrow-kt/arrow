@@ -1,6 +1,6 @@
 package arrow.meta.dsl.ide.editor.action
 
-import arrow.meta.dsl.platform.ide
+import arrow.meta.dsl.platform.ideRegistry
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.editor.AnActionExtensionProvider
@@ -16,65 +16,58 @@ interface AnActionSyntax : AnActionExtensionProvider {
     actionId: String = "",
     action: AnAction
   ): ExtensionPhase =
-    ide {
+    ideRegistry {
       register(actionId, action)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   fun IdeMetaPlugin.replaceAnAction(
     actionId: String,
     newAction: AnAction
   ): ExtensionPhase =
-    ide {
+    ideRegistry {
       replace(actionId, newAction)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   fun IdeMetaPlugin.unregisterAnAction(
     actionId: String
   ): ExtensionPhase =
-    ide {
+    ideRegistry {
       println("Unregistered $actionId")
       unregister(actionId)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   fun IdeMetaPlugin.addTimerListener(
     delay: Int,
     modalityState: ModalityState,
     run: () -> Unit
   ): ExtensionPhase =
-    ide {
+    ideRegistry {
       println("TimerListener is registered")
       addTimerListener(delay, this@AnActionSyntax.timerListener(modalityState, run))
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   fun IdeMetaPlugin.addTransparentTimerListener(
     delay: Int,
     modalityState: ModalityState,
     run: () -> Unit
-  ): ExtensionPhase = // TODO("Check impl)
-    ide {
+  ): ExtensionPhase =
+    ideRegistry {
       addTransparentTimerListener(delay, this@AnActionSyntax.timerListener(modalityState, run))
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   fun IdeMetaPlugin.removeTransparentTimerListener(
     listener: TimerListener
   ): ExtensionPhase =
-    ide {
-      removeTimerListener(listener)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    ideRegistry {
+      removeTransparentTL(listener)
+    }
 
   fun IdeMetaPlugin.removeTimerListener(
     listener: TimerListener
   ): ExtensionPhase =
-    ide {
-      removeTransparentTimerListener(listener)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    ideRegistry {
+      removeTL(listener)
+    }
 
   /**
    * TODO: Add more costume attributes: ShortCuts etc.

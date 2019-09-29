@@ -156,7 +156,7 @@ interface RefactoringSyntax {
   /**
    * Can be used for Introducing Variables or more
    */
-  fun RefactoringSyntax.addRefactoringActionHandler(
+  fun RefactoringSyntax.refactoringActionHandler(
     invokeWithEditor: (project: Project, editor: Editor?, file: PsiFile?, dataContext: DataContext?) -> Unit,
     invoke: (project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) -> Unit
   ): RefactoringActionHandler =

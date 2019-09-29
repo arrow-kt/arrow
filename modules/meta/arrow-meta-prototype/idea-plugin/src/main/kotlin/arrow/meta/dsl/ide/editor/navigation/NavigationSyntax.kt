@@ -13,7 +13,7 @@ interface NavigationSyntax {
   ): ExtensionPhase =
     extensionProvider(
       ChooseByNameContributor.FILE_EP_NAME,
-      addChooseByNameContributor(itemsByName, names)
+      chooseByNameContributor(itemsByName, names)
     )
 
   fun IdeMetaPlugin.addChooseByNameContributorForClass(
@@ -22,7 +22,7 @@ interface NavigationSyntax {
   ): ExtensionPhase =
     extensionProvider(
       ChooseByNameContributor.CLASS_EP_NAME,
-      addChooseByNameContributor(itemsByName, names)
+      chooseByNameContributor(itemsByName, names)
     )
 
   fun IdeMetaPlugin.addChooseByNameContributorForSymbol(
@@ -31,10 +31,10 @@ interface NavigationSyntax {
   ): ExtensionPhase =
     extensionProvider(
       ChooseByNameContributor.SYMBOL_EP_NAME,
-      addChooseByNameContributor(itemsByName, names)
+      chooseByNameContributor(itemsByName, names)
     )
 
-  fun NavigationSyntax.addChooseByNameContributor(
+  fun NavigationSyntax.chooseByNameContributor(
     itemsByName: (name: String?, pattern: String?, project: Project?, includeNonProjectItems: Boolean) -> Array<NavigationItem>,
     names: (project: Project?, includeNonProjectItems: Boolean) -> Array<String>
   ): ChooseByNameContributor =

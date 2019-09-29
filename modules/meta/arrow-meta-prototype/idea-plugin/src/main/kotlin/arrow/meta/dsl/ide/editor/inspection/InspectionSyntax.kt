@@ -4,24 +4,28 @@ import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeHighlighting.HighlightDisplayLevel
 import com.intellij.codeInspection.InspectionEP
+import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.LanguageInspectionSuppressors
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.idea.inspections.AbstractApplicabilityBasedInspection
 import org.jetbrains.kotlin.idea.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.psi.KtElement
 
 /**
- * TODO: @param inspection should also be used with #addApplicableInspection.
+ * TODO: @param inspection should also be used with #applicableInspection.
+ * todo: registration is wip
  * More General Inspections can be build with [AbstractKotlinInspection] e.g.: [org.jetbrains.kotlin.idea.inspections.RedundantSuspendModifierInspection]
  */
-interface InspectionSyntax {
+interface InspectionSyntax : InspectionUtilitySyntax {
   fun IdeMetaPlugin.addInspection(
     inspection: LocalInspectionTool,
     shortName: String,
@@ -75,10 +79,50 @@ interface InspectionSyntax {
     highlightingRange: (element: K) -> TextRange? = { null },
     inspectionText: (element: K) -> String,
     applyTo: (element: K, project: Project, editor: Editor?) -> Unit,
-    isApplicable: (element: K) -> Boolean
-  ): ExtensionPhase = TODO("Adapt ExtensionProvider to Subtypes OR this is used solely for [QuickFixContributor]")
-  /*extensionProvider(
-    TODO(),
+    isApplicable: (element: K) -> Boolean,
+    inspectionHighlightType: (element: K) -> ProblemHighlightType =
+      { _ -> ProblemHighlightType.GENERIC_ERROR_OR_WARNING }
+  ): ExtensionPhase = // TODO("Adapt ExtensionProvider to Subtypes OR this is used solely for [QuickFixContributor]")
+    extensionProvider(
+      LocalInspectionEP.GLOBAL_INSPECTION,
+      object : LocalInspectionEP() {
+        override fun instantiateTool(): InspectionProfileEntry =
+          applicableInspection(defaultFixText, kClass, highlightingRange, inspectionText, applyTo, isApplicable, inspectionHighlightType)
+      }
+    )
+
+  /*fun IdeMetaPlugin.addLocalInspection(
+  ): ExtensionPhase =
+    registerExtensionPoint(EP_NAME, LocalInspectionTool::class.java).run {
+      extensionProvider(
+        EP_NAME,
+        object : LocalInspectionTool() {
+          override fun getShortName(): String = "DAMN it works"
+        }
+      )
+    }*/
+
+
+  fun IdeMetaPlugin.addInspectionSuppressor(
+    suppressFor: (element: PsiElement, toolId: String) -> Boolean,
+    suppressAction: (element: PsiElement?, toolId: String) -> Array<SuppressQuickFix>
+  ): ExtensionPhase =
+    extensionProvider(
+      LanguageInspectionSuppressors.INSTANCE,
+      inspectionSuppressor(suppressFor, suppressAction)
+    )
+
+  @Suppress("UNCHECKED_CAST")
+  fun <K : KtElement> InspectionSyntax.applicableInspection(
+    defaultFixText: String,
+    kClass: Class<K> = KtElement::class.java as Class<K>,
+    highlightingRange: (element: K) -> TextRange? = { null },
+    inspectionText: (element: K) -> String,
+    applyTo: (element: K, project: Project, editor: Editor?) -> Unit,
+    isApplicable: (element: K) -> Boolean,
+    inspectionHighlightType: (element: K) -> ProblemHighlightType =
+      { _ -> ProblemHighlightType.GENERIC_ERROR_OR_WARNING }
+  ): AbstractApplicabilityBasedInspection<K> =
     object : AbstractApplicabilityBasedInspection<K>(kClass) {
       override val defaultFixText: String
         get() = defaultFixText
@@ -94,21 +138,21 @@ interface InspectionSyntax {
 
       override fun inspectionHighlightRangeInElement(element: K): TextRange? =
         highlightingRange(element)
-    }
-  )*/
 
-  fun IdeMetaPlugin.addInspectionSuppressor(
+      override fun inspectionHighlightType(element: K): ProblemHighlightType =
+        inspectionHighlightType(element)
+    }
+
+
+  fun InspectionUtilitySyntax.inspectionSuppressor(
     suppressFor: (element: PsiElement, toolId: String) -> Boolean,
     suppressAction: (element: PsiElement?, toolId: String) -> Array<SuppressQuickFix>
-  ): ExtensionPhase =
-    extensionProvider(
-      LanguageInspectionSuppressors.INSTANCE,
-      object : InspectionSuppressor {
-        override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
-          suppressAction(element, toolId)
+  ): InspectionSuppressor =
+    object : InspectionSuppressor {
+      override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> =
+        suppressAction(element, toolId)
 
-        override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean =
-          suppressFor(element, toolId)
-      }
-    )
+      override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean =
+        suppressFor(element, toolId)
+    }
 }

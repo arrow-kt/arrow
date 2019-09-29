@@ -71,7 +71,7 @@ interface UsageSyntax {
    * @param secondaryElements if isEmpty super method is called
    * @param processUsagesInText if [Boolean] == null super method is called
    */
-  fun UsageSyntax.addFindUsagesHandler(
+  fun UsageSyntax.findUsagesHandler(
     element: PsiElement,
     processElementUsages: (element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions) -> Boolean =
       { _, _, _ -> true },

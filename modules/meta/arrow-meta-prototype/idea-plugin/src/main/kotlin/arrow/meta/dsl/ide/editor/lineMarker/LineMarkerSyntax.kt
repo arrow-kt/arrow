@@ -18,9 +18,22 @@ interface LineMarkerSyntax {
    * TODO: Add more Techniques such as the one from Elm
    */
   fun IdeMetaPlugin.addLineMarkerProvider(
-    matchOn: (element: PsiElement) -> Boolean,
-    slowLineMarker: (element: PsiElement) -> LineMarkerInfo<PsiElement>?,
-    lineMarkerInfo: (element: PsiElement) -> LineMarkerInfo<PsiElement>? = { _ -> null }
+    icon: Icon,
+    message: String,
+    placed: GutterIconRenderer.Alignment = GutterIconRenderer.Alignment.LEFT,
+    matchOn: (psi: PsiElement) -> Boolean
+  ): ExtensionPhase =
+    addLineMarkerProvider(
+      matchOn,
+      { psi: PsiElement ->
+        lineMarkerInfo(icon, psi, message, placed)
+      }
+    )
+
+  fun IdeMetaPlugin.addLineMarkerProvider(
+    matchOn: (psi: PsiElement) -> Boolean,
+    slowLineMarker: (psi: PsiElement) -> LineMarkerInfo<PsiElement>?,
+    lineMarkerInfo: (psi: PsiElement) -> LineMarkerInfo<PsiElement>? = { _ -> null }
   ): ExtensionPhase =
     extensionProvider(
       LineMarkerProviders.INSTANCE,
@@ -39,7 +52,7 @@ interface LineMarkerSyntax {
       }
     )
 
-  fun LineMarkerSyntax.addLineMarkerInfo(
+  fun LineMarkerSyntax.lineMarkerInfo(
     icon: Icon,
     element: PsiElement,
     message: String,

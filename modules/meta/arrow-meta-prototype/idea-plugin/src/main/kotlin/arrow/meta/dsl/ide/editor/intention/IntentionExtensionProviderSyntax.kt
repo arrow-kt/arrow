@@ -1,6 +1,6 @@
 package arrow.meta.dsl.ide.editor.intention
 
-import arrow.meta.dsl.platform.ide
+import arrow.meta.dsl.platform.ideRegistry
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.editor.IntentionExtensionProvider
@@ -15,16 +15,14 @@ import org.jetbrains.kotlin.idea.quickfix.QuickFixContributor
 import org.jetbrains.kotlin.psi.KtElement
 
 interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
-  // TODO: Maybe Add IdeExtensionRegistry Phase, but rn it's isomorphic to Empty
   fun IdeMetaPlugin.addIntention(
     intention: IntentionAction
   ): ExtensionPhase =
-    ide {
-      println("ADDED Intention")
+    ideRegistry {
       register(intention)?.run {
-        ExtensionPhase.Empty
+        println("ADDED Intention")
       }
-    } ?: ExtensionPhase.Empty
+    }
 
   /**
    * TODO: This Bails if there is no html and intentionDescription. Try to add them in the Function and not with the resource Folder. But this is fine for now
@@ -33,23 +31,21 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
     category: String,
     intention: IntentionAction
   ): ExtensionPhase =
-    ide {
-      println("ADDED Intention with MetaData")
+    ideRegistry {
       register(intention, category)?.run {
-        ExtensionPhase.Empty
+        println("ADDED Intention with MetaData")
       }
-    } ?: ExtensionPhase.Empty
+    }
 
 
   fun IdeMetaPlugin.unregisterIntention(
     intention: IntentionAction
   ): ExtensionPhase =
-    ide {
-      println("Unregistered Intention")
+    ideRegistry {
       unregister(intention)?.run {
-        ExtensionPhase.Empty
+        println("Unregistered Intention")
       }
-    } ?: ExtensionPhase.Empty
+    }
 
   @Suppress("UNCHECKED_CAST")
   fun <K : KtElement> IdeMetaPlugin.addIntention(
@@ -61,20 +57,19 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
       { _, _ -> },
     priority: PriorityAction.Priority = PriorityAction.Priority.LOW
   ): ExtensionPhase =
-    addIntention(addKtIntention(text, kClass, isApplicableTo, applyTo, priority))
+    addIntention(ktIntention(text, kClass, isApplicableTo, applyTo, priority))
 
   fun IdeMetaPlugin.setIntentionAsEnabled(enabled: Boolean, intention: IntentionAction): ExtensionPhase =
-    ide {
+    ideRegistry {
       intention.setEnabled(enabled)
-      ExtensionPhase.Empty
-    } ?: ExtensionPhase.Empty
+    }
 
   /**
    * You can use this in [addQuickFixContributor] for @param intentions
    * @param text == familyName for creating MetaData for an Intentions
    */
   @Suppress("UNCHECKED_CAST")
-  fun <K : KtElement> IntentionExtensionProviderSyntax.addKtIntention(
+  fun <K : KtElement> IntentionExtensionProviderSyntax.ktIntention(
     text: String = "",
     kClass: Class<K> = KtElement::class.java as Class<K>,
     isApplicableTo: (element: K, caretOffset: Int) -> Boolean =
@@ -98,7 +93,7 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
    * Defaults from [KotlinIntentionActionsFactory]
    * Solely for [QuickFixContributor]
    */
-  fun IntentionExtensionProviderSyntax.addKotlinIntention(
+  fun IntentionExtensionProviderSyntax.kotlinIntention(
     createAction: (diagnostic: Diagnostic) -> IntentionAction? = { null },
     isApplicableForCodeFragment: Boolean = false,
     doCreateActionsForAllProblems: (sameTypeDiagnostics: Collection<Diagnostic>) -> List<IntentionAction> =
