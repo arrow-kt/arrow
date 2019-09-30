@@ -5,7 +5,9 @@ import arrow.common.utils.knownError
 import arrow.common.utils.typeConstraints
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import java.io.File
+import javax.annotation.processing.Filer
 import javax.lang.model.element.Name
+import javax.tools.StandardLocation
 
 const val KindPostFix = "Of"
 const val KindPartialPostFix = "PartialOf"
@@ -31,24 +33,20 @@ data class HigherKind(
 }
 
 class HigherKindsFileGenerator(
-  private val generatedDir: File,
-  annotatedList: List<AnnotatedHigherKind>
+  private val filer: Filer
 ) {
-
-  private val higherKinds: List<HigherKind> = annotatedList.map { HigherKind(it.classOrPackageProto.`package`, it) }
 
   /**
    * Main entry point for higher kinds instance generation.
    */
-  fun generate() {
-    higherKinds.forEachIndexed { _, hk ->
-      val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
-      val source: String = elementsToGenerate.joinToString(
-        prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
-        separator = "\n", postfix = "\n")
-      val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
-      file.writeText(source)
-    }
+  fun generate(ahk: AnnotatedHigherKind) {
+    val hk = HigherKind(ahk.classOrPackageProto.`package`, ahk)
+    val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
+    val source: String = elementsToGenerate.joinToString(
+      prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
+      separator = "\n", postfix = "\n")
+    val sourceFileObject = filer.createResource(StandardLocation.SOURCE_OUTPUT, higherKindsAnnotationClass.simpleName, "${hk.target.classElement.qualifiedName}.kt")
+    sourceFileObject.openWriter().use { it.write(source) }
   }
 
   private fun genKindTypeAliases(hk: HigherKind): String = when {

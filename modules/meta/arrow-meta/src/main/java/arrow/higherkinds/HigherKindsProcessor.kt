@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.knownError
 import java.io.File
+import java.util.*
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -23,7 +24,10 @@ class HigherKindsProcessor : AbstractProcessor() {
    * Processor entry point
    */
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    annotatedList += roundEnv
+
+    val generator = HigherKindsFileGenerator(filer)
+
+    roundEnv
       .getElementsAnnotatedWith(higherKindsAnnotationClass)
       .map { element ->
         when (element.kind) {
@@ -32,11 +36,13 @@ class HigherKindsProcessor : AbstractProcessor() {
           else -> knownError("$higherKindsAnnotationName can only be used on classes")
         }
       }
+      .forEach {
+        generator.generate(it)
+      }
+  }
 
-    if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, higherKindsAnnotationClass.simpleName).also { it.mkdirs() }
-      HigherKindsFileGenerator(generatedDir, annotatedList).generate()
-    }
+  override fun getSupportedOptions(): Set<String> {
+    return Collections.singleton("org.gradle.annotation.processing.isolating")
   }
 
   private fun processClass(element: TypeElement): AnnotatedHigherKind {
