@@ -14,7 +14,7 @@ beginner
 
 [English](/docs/arrow/core/try)
 
-В Arrow [есть множество способов для обработки ошибок](http://arrow-kt.io/docs/patterns/error_handling/), что позволяет выбрать оптимальную стратегию для любой ситуации.
+В Arrow [есть множество способов для обработки ошибок]({{ 'docs/patterns/error_handling/' | relative_url }}), что позволяет выбрать оптимальную стратегию для любой ситуации.
 
 Например, существует `Option` для моделирования отсутствия значения, или `Either` для моделирования возвращенного функцией типа, который содержит в себе информацию о том завершилась ли функция исключением или вернула значение.
 
@@ -168,7 +168,7 @@ Try { "3".toInt() }.map { it + 1 }
 
 ```kotlin:ank
 import arrow.core.extensions.`try`.apply.tupled
-  
+
 tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 

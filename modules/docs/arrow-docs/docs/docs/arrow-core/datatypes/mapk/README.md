@@ -23,7 +23,7 @@ DataType(MapK::class).tcMarkdownList()
 `MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }})
 and to work with `Map` in more functional way.
 
-It can be created with calling `k()` function on Map: 
+It can be created with calling `k()` function on Map:
 
 ```kotlin:ank
 import arrow.core.MapK
@@ -53,7 +53,7 @@ val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secon
 }
 ```
 
-`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`](https://arrow-kt.io/docs/arrow/core/eval/#eval) type.
+`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`]({{ '/docs/arrow/core/eval/#eval' | relative_url }}) type.
 
 `ap` function is used when you want to apply map of transformations from `Map<K, (A)-> B>` to `Map<K,A>`, for example:
 
@@ -66,7 +66,7 @@ val map2: MapK<String, (Int) -> String> = mapOf("one" to f1, "two" to f2).k()
 
 val apResult = map1.ap(map2)
 apResult
-``` 
+```
 `ap2` acts like `map2` to `map`
 
 In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,Z>`
@@ -124,6 +124,6 @@ fun main() {
   //sampleEnd
   println(optionMap)
 }
-``` 
+```
 
 TODO: add link to `Traverse` docs when it's ready https://github.com/arrow-kt/arrow/pull/1534

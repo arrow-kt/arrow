@@ -14,7 +14,7 @@ beginner
 
 [Перевод на русский](/docs/arrow/core/try/ru)
 
-Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation.
+Arrow has [lots of different types of error handling and reporting]({{ '/docs/patterns/error_handling/' }} | relative_url), which allows you to choose the best strategy for your situation.
 
 For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed.
 
@@ -183,7 +183,7 @@ Computing over independent values:
 
 ```kotlin:ank
 import arrow.core.extensions.`try`.apply.tupled
-  
+
 tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 
