@@ -45,6 +45,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
 
 @extension
 interface MaybeKFunctor : Functor<ForMaybeK> {
@@ -112,7 +113,7 @@ interface MaybeKApplicativeError :
     MaybeK.raiseError(e)
 
   override fun <A> MaybeKOf<A>.handleErrorWith(f: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().maybeHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -123,7 +124,7 @@ interface MaybeKMonadError :
     MaybeK.raiseError(e)
 
   override fun <A> MaybeKOf<A>.handleErrorWith(f: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().maybeHandleErrorWith { f(it).fix() }
 }
 
 @extension
