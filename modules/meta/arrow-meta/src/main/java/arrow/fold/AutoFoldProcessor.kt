@@ -7,7 +7,6 @@ import arrow.common.utils.isSealed
 import arrow.common.utils.knownError
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -24,7 +23,10 @@ class AutoFoldProcessor : AbstractProcessor() {
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(foldAnnotationClass.canonicalName)
 
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    annotatedList += roundEnv
+
+    val generator = AutoFoldFileGenerator(filer)
+
+    roundEnv
       .getElementsAnnotatedWith(foldAnnotationClass)
       .map { element ->
         when {
@@ -55,10 +57,13 @@ class AutoFoldProcessor : AbstractProcessor() {
             """.trimMargin())
         }
       }
+      .forEach {
+        generator.generate(it)
+      }
 
-    if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, foldAnnotationClass.simpleName).also { it.mkdirs() }
-      AutoFoldFileGenerator(annotatedList, generatedDir).generate()
-    }
+//    if (roundEnv.processingOver()) {
+//      val generatedDir = File(this.generatedDir!!, foldAnnotationClass.simpleName).also { it.mkdirs() }
+//      AutoFoldFileGenerator(annotatedList, generatedDir).generate()
+//    }
   }
 }

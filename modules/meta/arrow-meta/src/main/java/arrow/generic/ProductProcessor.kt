@@ -6,7 +6,6 @@ import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -16,21 +15,21 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class ProductProcessor : AbstractProcessor() {
 
-  private val annotatedProduct = mutableListOf<AnnotatedGeneric>()
-
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
   override fun getSupportedAnnotationTypes() = setOf(productAnnotationClass.canonicalName)
 
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    annotatedProduct += roundEnv
+
+    val generator = ProductFileGenerator(filer)
+
+    roundEnv
       .getElementsAnnotatedWith(productAnnotationClass)
       .map(this::evalAnnotatedProductElement)
+      .forEach {
+        generator.generate(it)
+      }
 
-    if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
-      ProductFileGenerator(annotatedProduct, generatedDir).generate()
-    }
   }
 
   private fun productAnnotationError(element: Element, annotationName: String, targetName: String): String = """

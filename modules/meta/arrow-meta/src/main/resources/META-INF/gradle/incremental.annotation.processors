@@ -1,0 +1,4 @@
+arrow.higherkinds.HigherKindsProcessor,isolating
+arrow.generic.ProductProcessor,isolating
+arrow.core.extensions.ExtensionProcessor,isolating
+arrow.fold.AutoFoldProcessor,isolating

@@ -3,8 +3,8 @@ package arrow.higherkinds
 import arrow.common.Package
 import arrow.common.utils.knownError
 import arrow.common.utils.typeConstraints
+import arrow.utils.createKotlinFile
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
-import java.io.File
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Name
 import javax.tools.StandardLocation
@@ -45,7 +45,7 @@ class HigherKindsFileGenerator(
     val source: String = elementsToGenerate.joinToString(
       prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
       separator = "\n", postfix = "\n")
-    val sourceFileObject = filer.createResource(StandardLocation.SOURCE_OUTPUT, higherKindsAnnotationClass.simpleName, "${hk.target.classElement.qualifiedName}.kt")
+    val sourceFileObject = filer.createKotlinFile(higherKindsAnnotationClass.simpleName, hk.target.classElement.qualifiedName.toString(), ahk.classElement)
     sourceFileObject.openWriter().use { it.write(source) }
   }
 

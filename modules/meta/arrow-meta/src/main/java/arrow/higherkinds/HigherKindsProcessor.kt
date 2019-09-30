@@ -14,8 +14,6 @@ import javax.lang.model.element.TypeElement
 @AutoService(Processor::class)
 class HigherKindsProcessor : AbstractProcessor() {
 
-  private val annotatedList: MutableList<AnnotatedHigherKind> = mutableListOf<AnnotatedHigherKind>()
-
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(higherKindsAnnotationClass.canonicalName)
@@ -39,10 +37,6 @@ class HigherKindsProcessor : AbstractProcessor() {
       .forEach {
         generator.generate(it)
       }
-  }
-
-  override fun getSupportedOptions(): Set<String> {
-    return Collections.singleton("org.gradle.annotation.processing.isolating")
   }
 
   private fun processClass(element: TypeElement): AnnotatedHigherKind {

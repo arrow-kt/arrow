@@ -1,8 +1,10 @@
 package arrow.generic
 
+import arrow.utils.createKotlinFile
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
+import javax.annotation.processing.Filer
 
 sealed class DerivedTypeClass(val type: String)
 object Semigroup : DerivedTypeClass("arrow.typeclasses.Semigroup")
@@ -13,34 +15,35 @@ object Show : DerivedTypeClass("arrow.typeclasses.Show")
 object Hash : DerivedTypeClass("arrow.typeclasses.Hash")
 
 class ProductFileGenerator(
-  private val annotatedList: Collection<AnnotatedGeneric>,
-  private val generatedDir: File
+  private val filer: Filer
 ) {
 
   private val tuple = "arrow.core.Tuple"
   private val hlist = "arrow.generic.HList"
   private val letters = ('a'..'j').toList()
 
-  fun generate() {
-    buildProduct(annotatedList)
+  fun generate(product: AnnotatedGeneric) {
+    buildProduct(product)
     // buildInstances(annotatedList)
   }
 
-  private fun buildProduct(products: Collection<AnnotatedGeneric>) =
-    products.map(this::processElement)
-      .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
-          w.println(funString)
-        }
+  private fun buildProduct(product: AnnotatedGeneric) {
+    val (element, funString) = processElement(product)
+    filer.createKotlinFile("${productAnnotationClass.simpleName}.${element.classData.`package`}", element.sourceName, product.type)
+      .openWriter()
+      .use {
+        it.write(funString)
       }
+  }
 
-  private fun buildInstances(products: Collection<AnnotatedGeneric>) =
-    products.map { p -> processInstancesForElement(p) }
-      .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.instances.kt").printWriter().use { w ->
-          w.println(funString)
-        }
+  private fun buildInstances(product: AnnotatedGeneric) {
+    val (element, funString) = processInstancesForElement(product)
+    filer.createKotlinFile("${productAnnotationClass.simpleName}.${element.classData.`package`}.instances", element.sourceName, product.type)
+      .openWriter()
+      .use {
+        it.write(funString)
       }
+  }
 
   private fun processInstancesForElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package arrow.core

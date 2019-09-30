@@ -23,7 +23,7 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class OpticsProcessor : AbstractProcessor() {
 
   private val annotatedEles = mutableListOf<AnnotatedElement>()

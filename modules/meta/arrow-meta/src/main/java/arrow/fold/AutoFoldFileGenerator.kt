@@ -3,19 +3,21 @@ package arrow.fold
 import arrow.common.utils.fullName
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.utils.createKotlinFile
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
-import java.io.File
+import javax.annotation.processing.Filer
 
 class AutoFoldFileGenerator(
-  private val annotatedList: Collection<AnnotatedFold>,
-  private val generatedDir: File
+  private val filer: Filer
 ) {
 
-  fun generate() = annotatedList.map(this::processElement)
-    .map { (element, fold) ->
-      "${foldAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt" to
-        fileHeader(element.classData.`package`.escapedClassName) + fold
-    }.map { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
+  fun generate(annotatedFold: AnnotatedFold) {
+    val (element, fold) = processElement(annotatedFold)
+
+    filer.createKotlinFile(foldAnnotationClass.simpleName, element.type.simpleName.toString().toLowerCase(), element.type).openWriter().use {
+      it.write(fileHeader(element.classData.`package`.escapedClassName) + fold)
+    }
+  }
 
   private fun processElement(annotatedFold: AnnotatedFold): Pair<AnnotatedFold, String> =
     annotatedFold to annotatedFold.targets.let { targets ->

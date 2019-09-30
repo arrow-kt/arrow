@@ -9,6 +9,7 @@ import arrow.meta.ast.TypeName
 import arrow.meta.encoder.jvm.JvmMetaApi
 import arrow.meta.internal.memoize
 import arrow.meta.processor.MetaProcessor.AnnotatedElement
+import arrow.utils.createKotlinFile
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import java.io.File
@@ -56,41 +57,48 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
 
   abstract fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder>
 
-  private val transformList = mutableListOf<FileSpec>()
-
   /**
    * Processor entry point
    */
   @Suppress("UNCHECKED_CAST")
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-      transformList += roundEnv
-        .getElementsAnnotatedWith(annotation.java)
-        .flatMap { element ->
-          //          try {
-          val result = when (element.kind) {
-            ElementKind.INTERFACE, ElementKind.CLASS -> {
-              val typeElement = element as TypeElement
-              val encodingResult = typeElement.type()
-              encodingResult.fold({ knownError(it.toString()) }, {
-                transform(
-                  if (element.kind.isInterface)
-                    AnnotatedElement.Interface(
-                      typeElement = typeElement,
-                      type = it
-                    )
-                  else AnnotatedElement.Class(
+    roundEnv
+      .getElementsAnnotatedWith(annotation.java)
+      .map { element ->
+        //          try {
+        val result = when (element.kind) {
+          ElementKind.INTERFACE, ElementKind.CLASS -> {
+            val typeElement = element as TypeElement
+            val encodingResult = typeElement.type()
+            encodingResult.fold({ knownError(it.toString()) }, {
+              transform(
+                if (element.kind.isInterface)
+                  AnnotatedElement.Interface(
                     typeElement = typeElement,
                     type = it
-                  ))
-              })
-            }
-            else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
+                  )
+                else AnnotatedElement.Class(
+                  typeElement = typeElement,
+                  type = it
+                ))
+            })
           }
-          result.map { it.build() }
+          else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
         }
-      if (roundEnv.processingOver()) {
-        val generatedDir = File(this.generatedDir!!, annotation.java.simpleName).also { it.mkdirs() }
-        transformList.forEach { it.writeTo(generatedDir) }
+//        result.map { it.build() }
+        element to result
+      }
+      .forEach { (element, fileSpecs) ->
+        fileSpecs.forEachIndexed { i, fileSpec ->
+          filer.createKotlinFile("meta.${annotation.simpleName}", "${element.qualifiedName}${i}", element).openWriter().use {
+            fileSpec.build().writeTo(it)
+          }
+        }
+//        filer.createKotlinFile("meta.${annotation.simpleName}", "${element.qualifiedName}", element).openWriter().use {
+//          fileSpecs.forEachIndexed { i, fileSpec ->
+//            fileSpec.build().writeTo(it)
+//          }
+//        }
       }
   }
 }
