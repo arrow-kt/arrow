@@ -270,7 +270,7 @@
     font-weight: normal;
     width: 60%;
     text-transform: uppercase;
-    transition: color $base-duration $base-timing;
+    transition: all $base-duration $base-timing;
 
     &:hover {
       background-color: var(--color-primary);
