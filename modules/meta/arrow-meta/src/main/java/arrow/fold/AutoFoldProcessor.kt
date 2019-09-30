@@ -61,9 +61,5 @@ class AutoFoldProcessor : AbstractProcessor() {
         generator.generate(it)
       }
 
-//    if (roundEnv.processingOver()) {
-//      val generatedDir = File(this.generatedDir!!, foldAnnotationClass.simpleName).also { it.mkdirs() }
-//      AutoFoldFileGenerator(annotatedList, generatedDir).generate()
-//    }
   }
 }

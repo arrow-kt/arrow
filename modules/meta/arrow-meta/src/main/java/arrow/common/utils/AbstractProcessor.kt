@@ -102,13 +102,13 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       }
 
   final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-    if (!roundEnv.errorRaised()) {
-      try {
-        processDocs(roundEnv)
-        onProcess(annotations, roundEnv)
-      } catch (e: KnownException) {
-        logE(e.message, e.element)
-      }
+    try {
+      //Has effects
+      //TODO: Move to separate processor
+//        processDocs(roundEnv)
+      onProcess(annotations, roundEnv)
+    } catch (e: KnownException) {
+      logE(e.message, e.element)
     }
     return false
   }

@@ -12,21 +12,19 @@ import arrow.optics.OpticsTarget.ISO
 import arrow.optics.OpticsTarget.LENS
 import arrow.optics.OpticsTarget.OPTIONAL
 import arrow.optics.OpticsTarget.PRISM
+import arrow.utils.createKotlinFile
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 
-//@AutoService(Processor::class)
+@AutoService(Processor::class)
 class OpticsProcessor : AbstractProcessor() {
-
-  private val annotatedEles = mutableListOf<AnnotatedElement>()
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
@@ -35,7 +33,7 @@ class OpticsProcessor : AbstractProcessor() {
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
     roundEnv
       .getElementsAnnotatedWith(opticsAnnotationClass)
-      .forEach { element ->
+      .map { element ->
         if (element.classType == OTHER) knownError(element.otherClassTypeErrorMessage, element)
         if (element.hasNoCompanion) knownError("@optics annotated class $element needs to declare companion object.")
 
@@ -49,12 +47,11 @@ class OpticsProcessor : AbstractProcessor() {
           }
         }
 
-        annotatedEles.add(AnnotatedElement(element as TypeElement, element.getClassData(), targets))
+        AnnotatedElement(element as TypeElement, element.getClassData(), targets)
       }
-
-    if (roundEnv.processingOver()) {
-      annotatedEles
-        .forEach { ele ->
+      .forEach { ele ->
+          val kotlinFile = filer.createKotlinFile(ele.classData.`package`, "${ele.type.simpleName}\$\$optics", ele.type)
+          val writer = kotlinFile.openWriter()
           ele.snippets()
             .groupBy(Snippet::fqName)
             .values
@@ -66,12 +63,11 @@ class OpticsProcessor : AbstractProcessor() {
                 )
               }
             }.forEach {
-              val generatedDir = File("$generatedDir/${it.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
-              File(generatedDir, "${it.name.removeBackticks()}\$\$optics.kt").writeText(it.asFileText())
+              writer.write(it.asFileText())
             }
+          writer.close()
         }
     }
-  }
 
   private fun AnnotatedElement.snippets(): List<Snippet> = this.targets.map {
     when (it) {
