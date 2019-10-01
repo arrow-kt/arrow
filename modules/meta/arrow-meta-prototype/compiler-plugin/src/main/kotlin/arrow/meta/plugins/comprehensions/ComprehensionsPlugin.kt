@@ -1,9 +1,10 @@
 package arrow.meta.plugins.comprehensions
 
-import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
+import arrow.meta.phases.ExtensionPhase
 import arrow.meta.phases.analysis.bfs
 import arrow.meta.phases.analysis.body
+import arrow.meta.phases.analysis.countDescendantsOfType
 import arrow.meta.quotes.func
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtBlockExpression
@@ -13,7 +14,6 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
-import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -30,33 +30,47 @@ val MetaComponentRegistrar.comprehensions: Pair<Name, List<ExtensionPhase>>
           listOf(
             """
               |$modality $visibility fun $`(typeParameters)` $receiver $name $`(valueParameters)` $returnType =
-              |  ${replaceBindingsWithFlatMap(ktFunction)}
+              |  ${ktFunction.replaceBindingsWithFlatMap()}
               |"""
           )
         }
       )
 
-private fun replaceBindingsWithFlatMap(ktFunction: KtFunction): String {
-  val bindings = ktFunction.fxBlocks()
-  val result = bindings.mapIndexed { n, fxBinding ->
-    val parentCall = fxBinding.parent.safeAs<KtCallExpression>()
-    fun just(value: String) =
-      parentCall?.parent?.firstChild?.text?.let { "$it.just($value)" }
-        ?: "just($value)"
-    println("replaceBindingsWithFlatMap.parentCall.parent: ${parentCall?.parent?.reference}")
-    val fxBody = parentCall?.findDescendantOfType<KtBlockExpression>()
-    val newSource: List<String> = fxBody?.statements?.foldIndexed(emptyList()) { n, source, expression ->
-      if (expression is KtProperty && expression.hasDelegate())
-        source + "${expression.delegateExpression?.text}.flatMap { ${expression.name} ${expression.typeReference?.let { ": ${it.text}" } ?: ""} -> "
-      else if (n + 1 == fxBody.statements.size) source + just(expression.text)
-      else source + expression.text
-    } ?: emptyList()
-    val bindCount = parentCall?.collectDescendantsOfType<KtProperty>()?.size ?: 0
-    (newSource + (0 until bindCount).map { "}" }).joinToString("\n")
-  }.joinToString("\n")
-  println("replaceBindingsWithFlatMap.result: $result")
-  return result
+private fun KtFunction.replaceBindingsWithFlatMap(): String =
+  fxBlocks().joinToString("\n", transform = KtReferenceExpression::replaceBindingsWithFlatMap)
+
+private fun KtReferenceExpression.replaceBindingsWithFlatMap(): String {
+  val parentCall = parent.safeAs<KtCallExpression>()
+  println("replaceBindingsWithFlatMap.parentCall.parent: ${parentCall?.parent?.reference}")
+  val fxBody = parentCall?.findDescendantOfType<KtBlockExpression>()
+  val newSource: List<String> = fxBody.replaceBindingsWithFlatMap(parentCall)
+  return parentCall.encloseFlatMapBodies(newSource)
 }
+
+private fun KtCallExpression?.encloseFlatMapBodies(newSource: List<String>): String {
+  val bindCount = countDescendantsOfType()
+  return (newSource + (0 until bindCount).map { "}" }).joinToString("\n")
+}
+
+private fun KtBlockExpression?.replaceBindingsWithFlatMap(parentCall: KtCallExpression?): List<String> =
+  this?.statements?.foldIndexed(emptyList()) { n, source, expression ->
+    when {
+      expression is KtProperty && expression.hasDelegate() ->
+        source + expression.boundPropertyToFlatMap()
+      n + 1 == statements.size ->
+        source + parentCall.just(expression.text)
+      else ->
+        source + expression.text
+    }
+  } ?: emptyList()
+
+private fun KtProperty.boundPropertyToFlatMap(): String =
+  "${delegateExpression?.text}.flatMap { $name ${typeReference?.let { ": ${it.text}" }
+    ?: ""} -> "
+
+fun KtCallExpression?.just(value: String): String =
+  this?.parent?.firstChild?.text?.let { "$it.just($value)" }
+    ?: "just($value)"
 
 private fun KtElement.isBindingCall(): Boolean =
   this is KtReferenceExpression &&

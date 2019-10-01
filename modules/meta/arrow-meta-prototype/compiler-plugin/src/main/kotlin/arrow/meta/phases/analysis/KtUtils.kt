@@ -1,14 +1,17 @@
 package arrow.meta.phases.analysis
 
 import org.jetbrains.kotlin.psi.KtBlockExpression
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
+import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
 import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
 import org.jetbrains.kotlin.psi2ir.deparenthesize
@@ -91,3 +94,6 @@ fun KtElement.transform(f: (KtElement) -> String): String {
 
 fun String.removeReturn(): String =
   replaceAfterLast("return ", "")
+
+fun KtElement?.countDescendantsOfType(): Int =
+  this?.collectDescendantsOfType<KtProperty>()?.size ?: 0
