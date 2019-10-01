@@ -24,7 +24,7 @@ import arrow.typeclasses.Semigroup
 import arrow.core.select as fun0Select
 
 @extension
-interface Function0Semigroup<A> : Semigroup<Function0<A>> {
+class Function0Semigroup<A> : Semigroup<Function0<A>> {
   fun SA(): Semigroup<A>
 
   override fun Function0<A>.combine(b: Function0<A>): Function0<A> =
@@ -32,7 +32,7 @@ interface Function0Semigroup<A> : Semigroup<Function0<A>> {
 }
 
 @extension
-interface Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
+class Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
   fun MA(): Monoid<A>
 
   override fun SA() = MA()
@@ -42,13 +42,13 @@ interface Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
 }
 
 @extension
-interface Function0Functor : Functor<ForFunction0> {
+class Function0Functor : Functor<ForFunction0> {
   override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =
     fix().map(f)
 }
 
 @extension
-interface Function0Apply : Apply<ForFunction0> {
+class Function0Apply : Apply<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
@@ -57,7 +57,7 @@ interface Function0Apply : Apply<ForFunction0> {
 }
 
 @extension
-interface Function0Applicative : Applicative<ForFunction0> {
+class Function0Applicative : Applicative<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
@@ -69,20 +69,20 @@ interface Function0Applicative : Applicative<ForFunction0> {
 }
 
 @extension
-interface Function0Selective : Selective<ForFunction0>, Function0Applicative {
-  override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
+class Function0Selective : Selective<ForFunction0>, Function0Applicative {
+  override fun <A, B> Function0Of<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0Of<B> =
     fix().fun0Select(f)
 }
 
 @extension
-interface Function0Monad : Monad<ForFunction0> {
+class Function0Monad : Monad<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
   override fun <A, B> Function0Of<A>.flatMap(f: (A) -> Function0Of<B>): Function0<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, Function0Of<Either<A, B>>>): Function0<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> Function0Of<Either<A, B>>): Function0<B> =
     Function0.tailRecM(a, f)
 
   override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =
@@ -91,7 +91,7 @@ interface Function0Monad : Monad<ForFunction0> {
   override fun <A> just(a: A): Function0<A> =
     Function0.just(a)
 
-  override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
+  override fun <A, B> Function0Of<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0Of<B> =
     fix().fun0Select(f)
 
   override val fx: MonadFx<ForFunction0>
@@ -105,7 +105,7 @@ internal object Function0MonadFx : MonadFx<ForFunction0> {
 }
 
 @extension
-interface Function0Comonad : Comonad<ForFunction0> {
+class Function0Comonad : Comonad<ForFunction0> {
   override fun <A, B> Function0Of<A>.coflatMap(f: (Function0Of<A>) -> B): Function0<B> =
     fix().coflatMap(f)
 
@@ -117,14 +117,14 @@ interface Function0Comonad : Comonad<ForFunction0> {
 }
 
 @extension
-interface Function0Bimonad : Bimonad<ForFunction0> {
+class Function0Bimonad : Bimonad<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
   override fun <A, B> Function0Of<A>.flatMap(f: (A) -> Function0Of<B>): Function0<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, Function0Of<Either<A, B>>>): Function0<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> Function0Of<Either<A, B>>): Function0<B> =
     Function0.tailRecM(a, f)
 
   override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =

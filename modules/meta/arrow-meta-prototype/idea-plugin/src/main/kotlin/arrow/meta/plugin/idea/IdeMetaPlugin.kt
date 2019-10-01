@@ -47,5 +47,4 @@ val IdeMetaPlugin.icon: Pair<Name, List<ExtensionPhase>>
         ),
         shortName = "DAMN"
       )
-
     )

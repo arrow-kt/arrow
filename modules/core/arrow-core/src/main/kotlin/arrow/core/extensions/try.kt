@@ -39,7 +39,7 @@ fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   }
 
 @extension
-interface TrySemigroup<A> : Semigroup<Try<A>> {
+class TrySemigroup<A> : Semigroup<Try<A>> {
 
   fun SG(): Semigroup<A>
 
@@ -47,7 +47,7 @@ interface TrySemigroup<A> : Semigroup<Try<A>> {
 }
 
 @extension
-interface TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
+class TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
   fun MO(): Monoid<A>
 
   override fun SG(): Semigroup<A> = MO()
@@ -56,7 +56,7 @@ interface TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
 }
 
 @extension
-interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicative {
+class TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicative {
 
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
@@ -66,7 +66,7 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
 }
 
 @extension
-interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
+class TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 
@@ -75,13 +75,13 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
 }
 
 @extension
-interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError {
+class TryMonadThrow : MonadThrow<ForTry>, TryMonadError {
   override val fx: MonadThrowFx<ForTry>
     get() = TryFxMonadThrow
 }
 
 @extension
-interface TryEq<A> : Eq<Try<A>> {
+class TryEq<A> : Eq<Try<A>> {
 
   fun EQA(): Eq<A>
 
@@ -100,19 +100,19 @@ interface TryEq<A> : Eq<Try<A>> {
 }
 
 @extension
-interface TryShow<A> : Show<Try<A>> {
+class TryShow<A> : Show<Try<A>> {
   override fun Try<A>.showed(): String =
     toString()
 }
 
 @extension
-interface TryFunctor : Functor<ForTry> {
+class TryFunctor : Functor<ForTry> {
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
 
 @extension
-interface TryApply : Apply<ForTry> {
+class TryApply : Apply<ForTry> {
   override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
@@ -121,7 +121,7 @@ interface TryApply : Apply<ForTry> {
 }
 
 @extension
-interface TryApplicative : Applicative<ForTry> {
+class TryApplicative : Applicative<ForTry> {
   override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
@@ -133,14 +133,14 @@ interface TryApplicative : Applicative<ForTry> {
 }
 
 @extension
-interface TryMonad : Monad<ForTry> {
+class TryMonad : Monad<ForTry> {
   override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
   override fun <A, B> TryOf<A>.flatMap(f: (A) -> TryOf<B>): Try<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, TryOf<Either<A, B>>>): Try<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> =
     Try.tailRecM(a, f)
 
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
@@ -154,7 +154,7 @@ interface TryMonad : Monad<ForTry> {
 }
 
 @extension
-interface TryFoldable : Foldable<ForTry> {
+class TryFoldable : Foldable<ForTry> {
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
@@ -173,7 +173,7 @@ fun <A, G> TryOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Try<A>> =
   tryTraverse(GA, ::identity)
 
 @extension
-interface TryTraverse : Traverse<ForTry> {
+class TryTraverse : Traverse<ForTry> {
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 
@@ -191,7 +191,7 @@ interface TryTraverse : Traverse<ForTry> {
 }
 
 @extension
-interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
+class TryHash<A> : Hash<Try<A>>, TryEq<A> {
 
   fun HA(): Hash<A>
   fun HT(): Hash<Throwable>

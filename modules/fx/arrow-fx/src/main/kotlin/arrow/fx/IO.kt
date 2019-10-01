@@ -54,7 +54,7 @@ sealed class IO<out A> : IOOf<A> {
     /**
      * Delay a suspended effect.
      *
-     * ```kotlin:ank:playground:extension
+     * ```kotlin
      * import arrow.fx.IO
      * import kotlinx.coroutines.Dispatchers
      *

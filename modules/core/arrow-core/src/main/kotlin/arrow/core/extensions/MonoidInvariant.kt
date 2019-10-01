@@ -8,7 +8,7 @@ import arrow.typeclasses.MonoidOf
 import arrow.typeclasses.fix
 
 @extension
-interface MonoidInvariant<A> : Invariant<ForMonoid> {
+class MonoidInvariant<A> : Invariant<ForMonoid> {
   override fun <A, B> MonoidOf<A>.imap(f: (A) -> B, g: (B) -> A): Monoid<B> =
     object : Monoid<B> {
       override fun empty(): B = f(this@imap.fix().empty())

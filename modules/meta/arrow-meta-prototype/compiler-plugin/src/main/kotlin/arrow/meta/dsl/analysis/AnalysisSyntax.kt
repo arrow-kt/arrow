@@ -69,7 +69,7 @@ interface AnalysisSyntax {
         createPreprocessedLightFile(file)
     }
 
-  fun extraImports(extraImports: (ktFile: KtFile) -> Collection<KtImportInfo>): ExtraImports =
+  fun extraImports(extraImports: CompilerContext.(ktFile: KtFile) -> Collection<KtImportInfo>): ExtraImports =
     object : ExtraImports {
       override fun CompilerContext.extraImports(ktFile: KtFile): Collection<KtImportInfo> =
         extraImports(ktFile)

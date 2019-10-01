@@ -582,7 +582,9 @@ inline fun <reified K : KtElement> CompilerContext.transformFile(
 fun <K : KtElement> KtFile.sourceWithTransformations(mutations: ArrayList<QuoteTransformation<K>>): String =
   mutations.fold(text) { acc, transformation ->
     val originalSource = transformation.oldDescriptor.text
-    val newSource = transformation.newDeclarations.joinToString("\n\n") { it.text }
+    val newSource =
+      "" +
+      transformation.newDeclarations.joinToString("\n\n") { it.text }
     acc.replace(originalSource, newSource)
   }
 

@@ -47,7 +47,7 @@ import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
 
 @extension
-interface OptionSemigroup<A> : Semigroup<Option<A>> {
+class OptionSemigroup<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>
 
@@ -62,24 +62,24 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 }
 
 @extension
-interface OptionSemigroupal : Semigroupal<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
+class OptionSemigroupal : Semigroupal<ForOption> {
+  override fun <A, B> OptionOf<A>.product(fb: OptionOf<B>): OptionOf<Tuple2<A, B>> =
     fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
-interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
-  override fun <A> identity(): Kind<ForOption, A> = None
+class OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
+  override fun <A> identity(): OptionOf<A> = None
 }
 
 @extension
-interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
+class OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
 }
 
 @extension
-interface OptionSemiring<A> : Semiring<Option<A>> {
+class OptionSemiring<A> : Semiring<Option<A>> {
 
   fun SG(): Semiring<A>
   override fun zero(): Option<A> = None
@@ -105,7 +105,7 @@ interface OptionSemiring<A> : Semiring<Option<A>> {
 }
 
 @extension
-interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionApplicative {
+class OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
@@ -114,7 +114,7 @@ interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionAppl
 }
 
 @extension
-interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
+class OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
   override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
 
@@ -123,7 +123,7 @@ interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
 }
 
 @extension
-interface OptionEq<A> : Eq<Option<A>> {
+class OptionEq<A> : Eq<Option<A>> {
 
   fun EQ(): Eq<A>
 
@@ -140,19 +140,19 @@ interface OptionEq<A> : Eq<Option<A>> {
 }
 
 @extension
-interface OptionShow<A> : Show<Option<A>> {
+class OptionShow<A> : Show<Option<A>> {
   override fun Option<A>.showed(): String =
     toString()
 }
 
 @extension
-interface OptionFunctor : Functor<ForOption> {
+class OptionFunctor : Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
 @extension
-interface OptionApply : Apply<ForOption> {
+class OptionApply : Apply<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -161,7 +161,7 @@ interface OptionApply : Apply<ForOption> {
 }
 
 @extension
-interface OptionApplicative : Applicative<ForOption> {
+class OptionApplicative : Applicative<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -173,13 +173,13 @@ interface OptionApplicative : Applicative<ForOption> {
 }
 
 @extension
-interface OptionSelective : Selective<ForOption>, OptionApplicative {
+class OptionSelective : Selective<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
     fix().optionSelect(f)
 }
 
 @extension
-interface OptionMonad : Monad<ForOption> {
+class OptionMonad : Monad<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -209,7 +209,7 @@ internal object OptionFxMonad : MonadFx<ForOption> {
 }
 
 @extension
-interface OptionFoldable : Foldable<ForOption> {
+class OptionFoldable : Foldable<ForOption> {
   override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
@@ -230,13 +230,13 @@ interface OptionFoldable : Foldable<ForOption> {
 }
 
 @extension
-interface OptionSemigroupK : SemigroupK<ForOption> {
+class OptionSemigroupK : SemigroupK<ForOption> {
   override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
 @extension
-interface OptionMonoidK : MonoidK<ForOption> {
+class OptionMonoidK : MonoidK<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
@@ -256,7 +256,7 @@ fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, O
 }
 
 @extension
-interface OptionTraverse : Traverse<ForOption> {
+class OptionTraverse : Traverse<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
@@ -283,7 +283,7 @@ interface OptionTraverse : Traverse<ForOption> {
 }
 
 @extension
-interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
+class OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 
   fun HA(): Hash<A>
 
@@ -297,11 +297,11 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 }
 
 @extension
-interface OptionFunctorFilter : FunctorFilter<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+class OptionFunctorFilter : FunctorFilter<ForOption> {
+  override fun <A, B> OptionOf<A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
@@ -309,89 +309,89 @@ fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A
   Option.monad().fx.monad(c).fix()
 
 @extension
-interface OptionMonadCombine : MonadCombine<ForOption> {
+class OptionMonadCombine : MonadCombine<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+  override fun <A, B> OptionOf<A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
+  override fun <A, B> OptionOf<A>.flatMap(f: (A) -> OptionOf<B>): Option<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, OptionOf<Either<A, B>>>): Option<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
     Option.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForOption, A>.map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> Z): Option<Z> =
+  override fun <A, B, Z> OptionOf<A>.map2(fb: OptionOf<B>, f: (Tuple2<A, B>) -> Z): Option<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
 
-  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
+  override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
 @extension
-interface OptionTraverseFilter : TraverseFilter<ForOption> {
-  override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
+class OptionTraverseFilter : TraverseFilter<ForOption> {
+  override fun <A> OptionOf<A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
 
-  override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> =
+  override fun <G, A, B> OptionOf<A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> =
     optionTraverseFilter(AP, f)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
-  override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
+  override fun <G, A, B> OptionOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
     optionTraverse(AP, f)
 
-  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
+  override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
-  override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> OptionOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> OptionOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
   override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
+  override fun <A> OptionOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
+  override fun <A> OptionOf<A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
 @extension
-interface OptionMonadFilter : MonadFilter<ForOption> {
+class OptionMonadFilter : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+  override fun <A, B> OptionOf<A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
+  override fun <A, B> OptionOf<A>.flatMap(f: (A) -> OptionOf<B>): Option<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, OptionOf<Either<A, B>>>): Option<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
     Option.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForOption, A>.map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> Z): Option<Z> =
+  override fun <A, B, Z> OptionOf<A>.map2(fb: OptionOf<B>, f: (Tuple2<A, B>) -> Z): Option<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): Option<A> =
