@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.NonFatal
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
 import arrow.fx.OnCancel
@@ -159,6 +160,11 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       is Flux<*> -> this.flux == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): FluxK<B> =
+    flux.flatMap { a ->
+      f(a).fold({ Flux.empty<B>() }, { b -> Flux.just(b) })
+    }.k()
 
   override fun hashCode(): Int = flux.hashCode()
 
