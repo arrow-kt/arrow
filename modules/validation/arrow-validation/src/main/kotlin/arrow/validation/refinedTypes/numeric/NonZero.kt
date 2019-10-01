@@ -32,11 +32,12 @@ interface NonZero<F, A : Number> : Refinement<F, A> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
+   * import arrow.core.extensions.eq
    * import arrow.validation.refinedTypes.numeric.validated.nonZero.nonZero
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = 0.nonZero()
+   *   val result = 0.nonZero(Int.eq())
    *  //sampleEnd
    *
    *  println(result.isValid)
