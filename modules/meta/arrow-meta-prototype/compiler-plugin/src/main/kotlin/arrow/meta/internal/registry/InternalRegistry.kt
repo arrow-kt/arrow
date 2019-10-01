@@ -1,8 +1,7 @@
 package arrow.meta.internal.registry
 
+import arrow.meta.MetaComponentRegistrar
 import arrow.meta.dsl.config.ConfigSyntax
-import arrow.meta.dsl.platform.cli
-import arrow.meta.dsl.platform.ide
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.Composite
 import arrow.meta.phases.ExtensionPhase
@@ -21,6 +20,8 @@ import arrow.meta.phases.resolve.diagnostics.DiagnosticsSuppressor
 import arrow.meta.phases.resolve.synthetics.SyntheticResolver
 import arrow.meta.phases.resolve.synthetics.SyntheticScopeProvider
 import arrow.meta.plugins.higherkind.KindAwareTypeChecker
+import arrow.meta.dsl.platform.cli
+import arrow.meta.dsl.platform.ide
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -89,7 +90,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.*
+import java.util.ArrayList
 
 interface InternalRegistry: ConfigSyntax {
 
