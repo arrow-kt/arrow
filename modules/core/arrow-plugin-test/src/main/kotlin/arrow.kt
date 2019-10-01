@@ -1,33 +1,46 @@
 package arrow.extreme
 
-import arrow.Kind
-import kotlin.reflect.KProperty
+import arrow.higherkind
+import arrow.synthetic
 
-/**
- * General purpose runtime validation
- */
-open class Refined<T>(private val value: T, private val validator: (T) -> Boolean) {
-  operator fun getValue(thisRef: Any?, property: KProperty<*>): T? =
-    if (validator(value)) value else null
-}
+//metadebug
 
-operator fun Int?.plus(b: Int?): Int? =
-  if (this != null && b != null) this + b
-  else null
+@higherkind
+sealed class Option<out A>() {
 
-fun Int.Companion.Positive(value: Int): Refined<Int> = Refined(value, { it > 0 })
+  fun <B> fold(ifSome: (A) -> B, ifNone: () -> B): B =
+    when (this) {
+      is Some -> ifSome(a)
+      None -> ifNone()
+    }
+
+  fun <B> map(f: (A) -> B): Option<B> =
+    flatMap { a -> Some(f(a)) }
+
+  fun <B, C> map2(fb: Option<B>, f: (A, B) -> C): Option<C> =
+    flatMap { a ->
+      fb.flatMap { b ->
+        Some(f(a, b))
+      }
+    }
+
+  fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
+    fold({ a -> f(a) }, { None })
 
 
-
-
-operator fun <F, A> Kind<F, A>.getValue(thisRef: Any?, property: KProperty<*>): A = TODO()
-class ForId
-class Id<A>(a: A) : Kind<ForId, A>
-
-class ForList
-class List<A>(vararg val a: A) : Kind<ForList, A> {
   companion object {
-    operator fun <A> A.getValue(thisRef: Any?, property: KProperty<*>): List<A> =
-      List(this)
+    fun <A> just(a: A): Option<A> =
+      Some(a)
   }
+
 }
+
+data class Some<out A>(val a: A) : Option<A>()
+object None : Option<Nothing>()
+
+@higherkind
+class Id<out A>(val value: A)
+
+val x: IdOf<Int> = Id(1)
+
+

@@ -6,8 +6,6 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
-typealias Valid<A> = Validated.Valid<A>
-typealias Invalid<E> = Validated.Invalid<E>
 
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
@@ -42,10 +40,6 @@ sealed class Validated<out E, out A> {
         { Valid(it) }
       )
   }
-
-  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
-
-  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
 
   inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
@@ -124,6 +118,10 @@ sealed class Validated<out E, out A> {
   fun swap(): Validated<A, E> = fold({ Valid(it) }, { Invalid(it) })
 }
 
+data class Valid<out A>(val a: A) : Validated<Nothing, A>()
+
+data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
+
 /**
  * Return the Valid value, or the default if Invalid
  */
@@ -197,13 +195,13 @@ fun <E, A> ValidatedOf<E, A>.combine(
   y.fix().let { that: Validated<E, A> ->
     val fixed = this.fix()
     when {
-      fixed is Validated.Valid<A> && that is Validated.Valid -> Valid(SA.run {
+      fixed is Valid<A> && that is Valid -> Valid(SA.run {
         fixed.a.combine(that.a)
       })
-      fixed is Validated.Invalid<E> && that is Validated.Invalid -> Invalid(SE.run {
+      fixed is Invalid<E> && that is Invalid -> Invalid(SE.run {
         fixed.e.combine(that.e)
       })
-      fixed is Validated.Invalid<E> -> fixed
+      fixed is Invalid<E> -> fixed
       else -> that
     }
   }

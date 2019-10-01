@@ -1,19 +1,10 @@
 package arrow.ank
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.ListK
-import arrow.core.Nel
-import arrow.core.NonEmptyList
-import arrow.core.Validated
-import arrow.core.ValidatedNel
-import arrow.core.combine
+import arrow.core.*
 import arrow.core.extensions.list.foldable.reduceLeftOption
 import arrow.core.extensions.list.semigroup.List.semigroup
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
-import arrow.core.getOrElse
-import arrow.core.toT
-import arrow.core.validNel
 import arrow.fx.typeclasses.Concurrent
 import java.nio.file.Path
 
@@ -29,7 +20,7 @@ fun Long.humanBytes(): String {
 }
 
 fun <A> toValidatedNel(a: Either<Throwable, A>): ValidatedNel<Throwable, A> =
-  a.fold({ e -> Validated.Invalid(NonEmptyList(e)) }, { a -> Validated.Valid(a) })
+  a.fold({ e -> Invalid(NonEmptyList(e)) }, { a -> Valid(a) })
 
 fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Kind<F, Unit> = with(ankOps) {
   fx.concurrent {

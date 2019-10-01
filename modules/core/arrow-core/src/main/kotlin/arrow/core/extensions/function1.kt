@@ -31,14 +31,14 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
 @extension
-interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
+class Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
   fun SB(): Semigroup<B>
 
   override fun Function1<A, B>.combine(b: Function1<A, B>): Function1<A, B> = { a: A -> SB().run { invoke(a).combine(b(a)) } }.k()
 }
 
 @extension
-interface Function1Monoid<A, B> : Monoid<Function1<A, B>>, Function1Semigroup<A, B> {
+class Function1Monoid<A, B> : Monoid<Function1<A, B>>, Function1Semigroup<A, B> {
   fun MB(): Monoid<B>
 
   override fun SB() = MB()
@@ -47,13 +47,13 @@ interface Function1Monoid<A, B> : Monoid<Function1<A, B>>, Function1Semigroup<A,
 }
 
 @extension
-interface Function1Functor<I> : Functor<Function1PartialOf<I>> {
+class Function1Functor<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
 }
 
 @extension
-interface Function1Contravariant<O> : Contravariant<Conested<ForFunction1, O>> {
+class Function1Contravariant<O> : Contravariant<Conested<ForFunction1, O>> {
   override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
     counnest().fix().contramap(f).conest()
 
@@ -62,7 +62,7 @@ interface Function1Contravariant<O> : Contravariant<Conested<ForFunction1, O>> {
 }
 
 @extension
-interface Function1Divide<O> : Divide<Conested<ForFunction1, O>>, Function1Contravariant<O> {
+class Function1Divide<O> : Divide<Conested<ForFunction1, O>>, Function1Contravariant<O> {
   fun MO(): Monoid<O>
 
   override fun <A, B, Z> divide(fa: Kind<Conested<ForFunction1, O>, A>, fb: Kind<Conested<ForFunction1, O>, B>, f: (Z) -> Tuple2<A, B>): Kind<Conested<ForFunction1, O>, Z> =
@@ -80,7 +80,7 @@ interface Function1Divide<O> : Divide<Conested<ForFunction1, O>>, Function1Contr
 }
 
 @extension
-interface Function1Divisible<O> : Divisible<Conested<ForFunction1, O>>, Function1Divide<O> {
+class Function1Divisible<O> : Divisible<Conested<ForFunction1, O>>, Function1Divide<O> {
   override fun MO(): Monoid<O> = MOO()
   fun MOO(): Monoid<O>
 
@@ -94,7 +94,7 @@ interface Function1Divisible<O> : Divisible<Conested<ForFunction1, O>>, Function
 }
 
 @extension
-interface Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function1Divisible<O> {
+class Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function1Divisible<O> {
   override fun MOO(): Monoid<O> = MOOO()
   fun MOOO(): Monoid<O>
 
@@ -112,13 +112,13 @@ interface Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function
 }
 
 @extension
-interface Function1Profunctor : Profunctor<ForFunction1> {
+class Function1Profunctor : Profunctor<ForFunction1> {
   override fun <A, B, C, D> Function1Of<A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
 }
 
 @extension
-interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
+class Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
 
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
@@ -128,7 +128,7 @@ interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> 
 }
 
 @extension
-interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Functor<I> {
+class Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Functor<I> {
 
   override fun <A> just(a: A): Function1<I, A> =
     Function1.just(a)
@@ -141,7 +141,7 @@ interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function
 }
 
 @extension
-interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative<I> {
+class Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative<I> {
 
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
@@ -160,7 +160,7 @@ fun <A, B> Function1.Companion.fx(c: suspend MonadSyntax<Function1PartialOf<A>>.
   Function1.monad<A>().fx.monad(c).fix()
 
 @extension
-interface Function1Category : Category<ForFunction1> {
+class Function1Category : Category<ForFunction1> {
   override fun <A> id(): Function1<A, A> = Function1.id()
 
   override fun <A, B, C> Function1Of<B, C>.compose(arr: Function1Of<A, B>): Function1Of<A, C> = fix().compose(arr.fix())

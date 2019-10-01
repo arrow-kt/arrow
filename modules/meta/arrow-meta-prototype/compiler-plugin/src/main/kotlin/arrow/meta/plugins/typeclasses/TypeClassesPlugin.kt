@@ -9,7 +9,6 @@ import arrow.meta.quotes.get
 import arrow.meta.quotes.ktFile
 import arrow.meta.dsl.platform.ide
 import arrow.meta.quotes.Func
-import arrow.meta.quotes.Scope
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -33,7 +32,6 @@ import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtExpression
@@ -63,19 +61,20 @@ import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-const val WithMarker = "`*`"
+const val WithMarker = "given"
 val ExtensionAnnotation = FqName("arrow.extension")
 
 val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
   get() =
     Name.identifier("typeClasses") to
       meta(
+        enableIr(),
         func(
           match = { hasExtensionValueParameters() },
           map = { func ->
             listOf(
               """
-              |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters): $returnType =
+              |$modality $visibility fun $`(typeParameters)` $receiver $name $`(valueParameters)` $returnType =
               |  ${func.extensionValueParamNames().run(body)}
               |"""
             )
@@ -227,7 +226,7 @@ private fun KotlinType.resolveExtensions(
   internalExtensions: List<DeclarationDescriptor>,
   typeClassPackage: PackageFragmentDescriptor,
   dataTypePackage: PackageFragmentDescriptor
-): List<DeclarationDescriptor> =
+) =
   if (internalExtensions.isNotEmpty()) internalExtensions else {
     val typeClassExtensions = typeClassPackage.findExtensionProof(this)
     if (typeClassExtensions.isNotEmpty()) typeClassExtensions

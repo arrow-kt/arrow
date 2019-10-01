@@ -2,6 +2,8 @@ package arrow.core
 
 import arrow.higherkind
 
+//metadebug
+
 /**
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
@@ -28,7 +30,6 @@ sealed class Option<out A> {
      *
      */
     fun <A> just(a: A): Option<A> = Some(a)
-
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
       val option = f(a).fix()

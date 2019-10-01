@@ -1,8 +1,6 @@
 package arrow
 
-import kotlin.annotation.AnnotationRetention.RUNTIME
-
-@Retention(RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 @Target(
   /** Class, interface or object, annotation class is also included */
   AnnotationTarget.CLASS,

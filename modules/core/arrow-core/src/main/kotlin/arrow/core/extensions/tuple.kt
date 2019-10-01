@@ -44,13 +44,13 @@ import arrow.core.extensions.traverse as tuple2Traverse
 // TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
 
 @extension
-interface Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
+class Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 }
 
 @extension
-interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
+class Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
@@ -60,7 +60,7 @@ interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
 }
 
 @extension
-interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<F> {
+class Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<F> {
   fun MF(): Monoid<F>
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
@@ -74,7 +74,7 @@ interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<
 }
 
 @extension
-interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
+class Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
 
   override fun MF(): Monoid<F>
 
@@ -97,7 +97,7 @@ interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
 }
 
 @extension
-interface Tuple2Bifunctor : Bifunctor<ForTuple2> {
+class Tuple2Bifunctor : Bifunctor<ForTuple2> {
   override fun <A, B, C, D> Tuple2Of<A, B>.bimap(
     fl: (A) -> C,
     fr: (B) -> D
@@ -105,7 +105,7 @@ interface Tuple2Bifunctor : Bifunctor<ForTuple2> {
 }
 
 @extension
-interface Tuple2Comonad<F> : Comonad<Tuple2PartialOf<F>>, Tuple2Functor<F> {
+class Tuple2Comonad<F> : Comonad<Tuple2PartialOf<F>>, Tuple2Functor<F> {
   override fun <A, B> Tuple2Of<F, A>.coflatMap(f: (Tuple2Of<F, A>) -> B) =
     fix().coflatMap(f)
 
@@ -114,7 +114,7 @@ interface Tuple2Comonad<F> : Comonad<Tuple2PartialOf<F>>, Tuple2Functor<F> {
 }
 
 @extension
-interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
+class Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
   override fun <A, B> Tuple2Of<F, A>.foldLeft(b: B, f: (B, A) -> B) =
     fix().foldL(b, f)
 
@@ -123,7 +123,7 @@ interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
 }
 
 @extension
-interface Tuple2Bifoldable : Bifoldable<ForTuple2> {
+class Tuple2Bifoldable : Bifoldable<ForTuple2> {
   override fun <A, B, C> Tuple2Of<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().let { g(f(c, it.a), it.b) }
 
   override fun <A, B, C> Tuple2Of<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
@@ -138,14 +138,14 @@ fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tupl
   fix().tuple2Traverse(GA, ::identity)
 
 @extension
-interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
+class Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
     tuple2Traverse(AP, f)
 }
 
 @extension
-interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
+class Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
     AP.run {
       fix().let { tupled(f(it.a), g(it.b)) }
@@ -153,7 +153,7 @@ interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
 }
 
 @extension
-interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
+class Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
 
   fun SA(): Semigroup<A>
 
@@ -167,7 +167,7 @@ interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
 }
 
 @extension
-interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
+class Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
 
   fun MA(): Monoid<A>
 
@@ -181,7 +181,7 @@ interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
 }
 
 @extension
-interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
+class Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
 
   fun EQA(): Eq<A>
 
@@ -192,13 +192,13 @@ interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
 }
 
 @extension
-interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
+class Tuple2Show<A, B> : Show<Tuple2<A, B>> {
   override fun Tuple2<A, B>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
+class Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
 
@@ -212,7 +212,7 @@ interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
 }
 
 @extension
-interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
+class Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 
   fun EQA(): Eq<A>
 
@@ -227,13 +227,13 @@ interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 }
 
 @extension
-interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
+class Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
   override fun Tuple3<A, B, C>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
+class Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -250,7 +250,7 @@ interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
 }
 
 @extension
-interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
+class Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
   fun EQA(): Eq<A>
 
@@ -268,7 +268,7 @@ interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 }
 
 @extension
-interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D> {
+class Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -288,13 +288,13 @@ interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D
 }
 
 @extension
-interface Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
+class Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
   override fun Tuple4<A, B, C, D>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
+class Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
   fun EQA(): Eq<A>
 
@@ -315,7 +315,7 @@ interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 }
 
 @extension
-interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B, C, D, E> {
+class Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B, C, D, E> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -338,13 +338,13 @@ interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B
 }
 
 @extension
-interface Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
+class Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
   override fun Tuple5<A, B, C, D, E>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
+class Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
   fun EQA(): Eq<A>
 
@@ -368,7 +368,7 @@ interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 }
 
 @extension
-interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6Eq<A, B, C, D, E, F> {
+class Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6Eq<A, B, C, D, E, F> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -394,13 +394,13 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6E
 }
 
 @extension
-interface Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
+class Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
   override fun Tuple6<A, B, C, D, E, F>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
+class Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
 
   fun EQA(): Eq<A>
 
@@ -427,7 +427,7 @@ interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
 }
 
 @extension
-interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, Tuple7Eq<A, B, C, D, E, F, G> {
+class Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, Tuple7Eq<A, B, C, D, E, F, G> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -456,13 +456,13 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, T
 }
 
 @extension
-interface Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
+class Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
   override fun Tuple7<A, B, C, D, E, F, G>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> {
+class Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> {
 
   fun EQA(): Eq<A>
 
@@ -492,7 +492,7 @@ interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> 
 }
 
 @extension
-interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, H>>, Tuple8Eq<A, B, C, D, E, F, G, H> {
+class Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, H>>, Tuple8Eq<A, B, C, D, E, F, G, H> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -524,13 +524,13 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
 }
 
 @extension
-interface Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
+class Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
   override fun Tuple8<A, B, C, D, E, F, G, H>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H, I>> {
+class Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H, I>> {
 
   fun EQA(): Eq<A>
 
@@ -563,7 +563,7 @@ interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H
 }
 
 @extension
-interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, G, H, I>>, Tuple9Eq<A, B, C, D, E, F, G, H, I> {
+class Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, G, H, I>>, Tuple9Eq<A, B, C, D, E, F, G, H, I> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -598,13 +598,13 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
 }
 
 @extension
-interface Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
+class Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
   override fun Tuple9<A, B, C, D, E, F, G, H, I>.showed(): String =
     toString()
 }
 
 @extension
-interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
+class Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
 
   fun EQA(): Eq<A>
 
@@ -640,7 +640,7 @@ interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F,
 }
 
 @extension
-interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>>, Tuple10Eq<A, B, C, D, E, F, G, H, I, J> {
+class Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>>, Tuple10Eq<A, B, C, D, E, F, G, H, I, J> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -678,7 +678,7 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
 }
 
 @extension
-interface Tuple10Show<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
+class Tuple10Show<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.showed(): String =
     toString()
 }

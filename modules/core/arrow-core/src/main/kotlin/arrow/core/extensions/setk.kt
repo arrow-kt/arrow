@@ -21,18 +21,18 @@ import arrow.typeclasses.Show
 import arrow.core.combineK as setCombineK
 
 @extension
-interface SetKSemigroup<A> : Semigroup<SetK<A>> {
+class SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
     (this.plus(b)).k()
 }
 
 @extension
-interface SetKMonoid<A> : Monoid<SetK<A>>, SetKSemigroup<A> {
+class SetKMonoid<A> : Monoid<SetK<A>>, SetKSemigroup<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 
 @extension
-interface SetKEq<A> : Eq<SetK<A>> {
+class SetKEq<A> : Eq<SetK<A>> {
 
   fun EQ(): Eq<A>
 
@@ -46,13 +46,13 @@ interface SetKEq<A> : Eq<SetK<A>> {
 }
 
 @extension
-interface SetKShow<A> : Show<SetK<A>> {
+class SetKShow<A> : Show<SetK<A>> {
   override fun SetK<A>.showed(): String =
     toString()
 }
 
 @extension
-interface SetKFoldable : Foldable<ForSetK> {
+class SetKFoldable : Foldable<ForSetK> {
   override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -64,24 +64,24 @@ interface SetKFoldable : Foldable<ForSetK> {
 }
 
 @extension
-interface SetKSemigroupK : SemigroupK<ForSetK> {
+class SetKSemigroupK : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
 }
 
 @extension
-interface SetKSemigroupal : Semigroupal<ForSetK> {
+class SetKSemigroupal : Semigroupal<ForSetK> {
   override fun <A, B> Kind<ForSetK, A>.product(fb: Kind<ForSetK, B>): Kind<ForSetK, Tuple2<A, B>> =
     fb.fix().flatMap { b -> this.fix().map { a -> Tuple2(a, b) } }.toSet().k()
 }
 
 @extension
-interface SetKMonoidal : Monoidal<ForSetK>, SetKSemigroupal {
+class SetKMonoidal : Monoidal<ForSetK>, SetKSemigroupal {
   override fun <A> identity(): Kind<ForSetK, A> = SetK.empty()
 }
 
 @extension
-interface SetKMonoidK : MonoidK<ForSetK> {
+class SetKMonoidK : MonoidK<ForSetK> {
   override fun <A> empty(): SetK<A> =
     SetK.empty()
 
@@ -90,7 +90,7 @@ interface SetKMonoidK : MonoidK<ForSetK> {
 }
 
 @extension
-interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
+class SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
   fun HA(): Hash<A>
 
   override fun EQ(): Eq<A> = HA()

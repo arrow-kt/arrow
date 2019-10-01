@@ -10,6 +10,7 @@ import arrow.core.ForAndThen
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
+import arrow.given
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
@@ -24,18 +25,18 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.Contravariant
 
 @extension
-interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
-  fun SB(): Semigroup<B>
+class AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
 
-  override fun AndThen<A, B>.combine(b: AndThen<A, B>): AndThen<A, B> = SB().run {
-    AndThen { a: A -> invoke(a).combine(b.invoke(a)) }
-  }
+  override fun AndThen<A, B>.combine(b: AndThen<A, B>): AndThen<A, B> =
+    given<Semigroup<B>>().run {
+      AndThen { a: A -> invoke(a).combine(b.invoke(a)) }
+    }
 }
 
 @extension
-interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
+class AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B>() {
 
-  fun MB(): Monoid<B>
+  fun MB(): Monoid<B> = given
 
   override fun SB(): Semigroup<B> = MB()
 
@@ -44,13 +45,13 @@ interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
 }
 
 @extension
-interface AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
+class AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
 }
 
 @extension
-interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
+class AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
   override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
     fix().ap(ff)
 
@@ -59,7 +60,7 @@ interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
 }
 
 @extension
-interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X> {
+class AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X> {
   override fun <A> just(a: A): AndThenOf<X, A> =
     AndThen.just(a)
 
@@ -71,7 +72,7 @@ interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunct
 }
 
 @extension
-interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
+class AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
   override fun <A, B> AndThenOf<X, A>.flatMap(f: (A) -> AndThenOf<X, B>): AndThen<X, B> =
     fix().flatMap(f)
 
@@ -86,7 +87,7 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
 }
 
 @extension
-interface AndThenCategory : Category<ForAndThen> {
+class AndThenCategory : Category<ForAndThen> {
   override fun <A> id(): AndThen<A, A> =
     AndThen.id()
 
@@ -95,14 +96,14 @@ interface AndThenCategory : Category<ForAndThen> {
 }
 
 @extension
-interface AndThenContravariant<O> : Contravariant<Conested<ForAndThen, O>> {
+class AndThenContravariant<O> : Contravariant<Conested<ForAndThen, O>> {
 
   override fun <A, B> Kind<Conested<ForAndThen, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForAndThen, O>, B> =
     counnest().fix().contramap(f).conest()
 }
 
 @extension
-interface AndThenProfunctor : Profunctor<ForAndThen> {
+class AndThenProfunctor : Profunctor<ForAndThen> {
   override fun <A, B, C, D> AndThenOf<A, B>.dimap(fl: (C) -> A, fr: (B) -> D): AndThen<C, D> =
     fix().andThen(fr).compose(fl)
 }

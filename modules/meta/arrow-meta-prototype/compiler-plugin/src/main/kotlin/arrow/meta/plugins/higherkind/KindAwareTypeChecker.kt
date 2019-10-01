@@ -4,18 +4,40 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.getAbbreviation
+import org.jetbrains.kotlin.types.getSupertypeRepresentative
 import org.jetbrains.kotlin.types.typeUtil.getImmediateSuperclassNotAny
+import org.jetbrains.kotlin.types.typeUtil.supertypes
 import java.lang.IllegalStateException
 
 class KindAwareTypeChecker(val typeChecker: KotlinTypeChecker) : KotlinTypeChecker by typeChecker {
+
+  fun KotlinType.isKindReference(other: KotlinType): Boolean {
+    return arguments.isNotEmpty() &&
+      other.arguments.isNotEmpty() &&
+      (kindRegex().matches(other.toString()) ||
+        kindErrorRegex().matches(other.toString()) ||
+        kindAliasRegex().matches(other.toString()))
+  }
+
+  private fun KotlinType.kindAliasRegex() =
+    "${constructor.declarationDescriptor?.name}Of<${arguments.joinToString(", ")}>".toRegex()
+
+  private fun KotlinType.kindErrorRegex() =
+    "Kind<\\[ERROR : For${constructor.declarationDescriptor?.name}], ${arguments.joinToString(", ")}>".toRegex()
+
+  private fun KotlinType.kindRegex() =
+    "Kind<For${constructor.declarationDescriptor?.name}, ${arguments.joinToString(", ")}>".toRegex()
+
   override fun isSubtypeOf(p0: KotlinType, p1: KotlinType): Boolean {
-    val subType = p0
-    val superType = p1
-    val isKind: Boolean =
-      (subType.isKind() || superType.isKind()) && (subType.typeAliasMatch(superType) || superType.typeAliasMatch(subType))
-    val result = isKind || typeChecker.isSubtypeOf(p0, p1)
-    //println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1 = $result")
-    return result
+    val underlyingResult = typeChecker.isSubtypeOf(p0, p1)
+    return if (!underlyingResult) {
+      val subType = p0
+      val superType = p1
+      val isKind: Boolean = subType.isKindReference(superType) || superType.isKindReference(subType)
+      val result = isKind
+      //println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1 = $result, subtype supertypes: ${subType.supertypes()}")
+      result
+    } else underlyingResult
   }
 
   override fun equalTypes(p0: KotlinType, p1: KotlinType): Boolean {

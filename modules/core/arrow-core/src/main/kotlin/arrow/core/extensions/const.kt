@@ -29,19 +29,19 @@ import arrow.typeclasses.ap as constAp
 import arrow.typeclasses.combine as combineAp
 
 @extension
-interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
+class ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.imap(f: (T) -> U, g: (U) -> T): Const<A, U> =
     fix().retag()
 }
 
 @extension
-interface ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
+class ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.contramap(f: (U) -> T): Const<A, U> =
     fix().retag()
 }
 
 @extension
-interface ConstDivideInstance<O> : Divide<ConstPartialOf<O>>, ConstContravariant<O> {
+class ConstDivideInstance<O> : Divide<ConstPartialOf<O>>, ConstContravariant<O> {
   fun MO(): Monoid<O>
   override fun <A, B, Z> divide(fa: Kind<ConstPartialOf<O>, A>, fb: Kind<ConstPartialOf<O>, B>, f: (Z) -> Tuple2<A, B>): Kind<ConstPartialOf<O>, Z> =
     Const(
@@ -50,7 +50,7 @@ interface ConstDivideInstance<O> : Divide<ConstPartialOf<O>>, ConstContravariant
 }
 
 @extension
-interface ConstDivisibleInstance<O> : Divisible<ConstPartialOf<O>>, ConstDivideInstance<O> {
+class ConstDivisibleInstance<O> : Divisible<ConstPartialOf<O>>, ConstDivideInstance<O> {
   fun MOO(): Monoid<O>
   override fun MO(): Monoid<O> = MOO()
 
@@ -59,7 +59,7 @@ interface ConstDivisibleInstance<O> : Divisible<ConstPartialOf<O>>, ConstDivideI
 }
 
 @extension
-interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
+class ConstFunctor<A> : Functor<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
     fix().retag()
 }
@@ -67,7 +67,7 @@ interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
 //metadebug
 
 @extension
-interface ConstApply<A> : Apply<ConstPartialOf<A>> {
+class ConstApply<A> : Apply<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>
 
@@ -78,7 +78,7 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
+class ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>
 
@@ -94,7 +94,7 @@ interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstFoldable<A> : Foldable<ConstPartialOf<A>> {
+class ConstFoldable<A> : Foldable<ConstPartialOf<A>> {
 
   override fun <T, U> ConstOf<A, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
@@ -102,7 +102,7 @@ interface ConstFoldable<A> : Foldable<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
+class ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
 
   override fun <T, U> ConstOf<X, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
@@ -111,7 +111,7 @@ interface ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
 }
 
 @extension
-interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTraverse<X> {
+class ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTraverse<X> {
 
   override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
@@ -120,7 +120,7 @@ interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTrave
 }
 
 @extension
-interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
+class ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
 
   fun SA(): Semigroup<A>
 
@@ -129,7 +129,7 @@ interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
 }
 
 @extension
-interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
+class ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
 
   fun MA(): Monoid<A>
 
@@ -139,7 +139,7 @@ interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
 }
 
 @extension
-interface ConstEq<A, T> : Eq<Const<A, T>> {
+class ConstEq<A, T> : Eq<Const<A, T>> {
 
   fun EQ(): Eq<A>
 
@@ -148,13 +148,13 @@ interface ConstEq<A, T> : Eq<Const<A, T>> {
 }
 
 @extension
-interface ConstShow<A, T> : Show<Const<A, T>> {
+class ConstShow<A, T> : Show<Const<A, T>> {
   override fun Const<A, T>.showed(): String =
     toString()
 }
 
 @extension
-interface ConstHash<A, T> : Hash<Const<A, T>>, ConstEq<A, T> {
+class ConstHash<A, T> : Hash<Const<A, T>>, ConstEq<A, T> {
   fun HA(): Hash<A>
 
   override fun EQ(): Eq<A> = HA()

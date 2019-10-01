@@ -1,5 +1,6 @@
 package arrow.meta.internal.registry
 
+import arrow.meta.MetaComponentRegistrar
 import arrow.meta.dsl.config.ConfigSyntax
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.Composite
@@ -173,7 +174,7 @@ interface InternalRegistry: ConfigSyntax {
     val initialPhases = listOf(Name.identifier("Initial setup") to listOf(
       //enableIr(),
       compilerContextService(),
-      registerKindAwareTypeChecker(),
+      //registerKindAwareTypeChecker(),
       registerMetaAnalyzer()
     ))
     (initialPhases + intercept()).forEach { (plugin, phases) ->

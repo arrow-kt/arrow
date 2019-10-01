@@ -67,7 +67,7 @@ data class ListK<out A>(private val list: List<A>) : List<A> by list {
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
-      f: (A) -> Kind<ForListK, Either<A, B>>,
+      f: (A) -> ListKOf<Either<A, B>>,
       v: ListK<Either<A, B>>
     ) {
       if (!v.isEmpty()) {
@@ -82,7 +82,7 @@ data class ListK<out A>(private val list: List<A>) : List<A> by list {
       }
     }
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListK, Either<A, B>>): ListK<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> ListKOf<Either<A, B>>): ListK<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())
       return ListK(buf)

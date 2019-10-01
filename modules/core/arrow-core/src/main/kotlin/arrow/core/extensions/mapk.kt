@@ -54,7 +54,7 @@ interface MapKTraverse<K> : Traverse<MapKPartialOf<K>>, MapKFoldable<K> {
 }
 
 @extension
-interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
+class MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 
   fun SG(): Semigroup<A>
 
@@ -65,7 +65,7 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 }
 
 @extension
-interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
+class MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.filterMap(f: (A) -> Option<B>): Kind<MapKPartialOf<K>, B> =
     fix().map(f).sequence(Option.applicative()).fix().fold({ emptyMap<K, B>().k() }, ::identity)
 
@@ -74,7 +74,7 @@ interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
 }
 
 @extension
-interface MapKApply<K> : Apply<MapKPartialOf<K>> {
+class MapKApply<K> : Apply<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
     fix().ap(ff.fix())
 
@@ -83,7 +83,7 @@ interface MapKApply<K> : Apply<MapKPartialOf<K>> {
 }
 
 @extension
-interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
+class MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
 
   override fun SG(): Semigroup<A>
 
@@ -91,7 +91,7 @@ interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
 }
 
 @extension
-interface MapKEq<K, A> : Eq<MapK<K, A>> {
+class MapKEq<K, A> : Eq<MapK<K, A>> {
 
   fun EQK(): Eq<K>
 
@@ -108,13 +108,13 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
 }
 
 @extension
-interface MapKShow<K, A> : Show<MapK<K, A>> {
+class MapKShow<K, A> : Show<MapK<K, A>> {
   override fun MapK<K, A>.showed(): String =
     toString()
 }
 
 @extension
-interface MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
+class MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
 

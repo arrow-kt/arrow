@@ -2,20 +2,26 @@ package arrow.meta.plugins.higherkind
 
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
+import arrow.meta.dsl.platform.ide
 import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.classOrObject
 import arrow.meta.quotes.ktClassNamed
+import org.jetbrains.kotlin.diagnostics.Diagnostic
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtImportInfo
 import org.jetbrains.kotlin.psi.KtTypeParameter
+import org.jetbrains.kotlin.resolve.ImportPath
 
 val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
   get() =
     Name.identifier("higherKindedTypes") to
       meta(
+        registerKindAwareTypeChecker(),
         classOrObject(::isHigherKindedType) { c ->
           println("Processing Higher Kind: ${c.name}: ${c.superTypeIsSealedInFile()}")
           listOfNotNull(
@@ -27,15 +33,14 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
             if (c.arity < 5)
               "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>"
             else null,
-            """|@Suppress("USELESS_CAST", "UNCHECKED_CAST", "NOTHING_TO_INLINE") 
-               |inline fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
+            """|fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
                |""",
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
               "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"
             else null,
             /** Class redefinition with kinded super type **/
-            """|$`@annotationEntries` $modifiers $modality $visibility $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
+            """|$`@annotationEntries` $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
                |  $body
                |}
                |"""

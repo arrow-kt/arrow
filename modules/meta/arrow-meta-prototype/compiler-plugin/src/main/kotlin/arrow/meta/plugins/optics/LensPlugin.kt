@@ -31,7 +31,7 @@ val MetaComponentRegistrar.lenses: Pair<Name, List<ExtensionPhase>>
               |  }
               |}""" else """
               |$modality $visibility data $kind $name($`(valueParameters)`) {
-              |  ${body!!.value.addDeclerationTobody(lenses = lenses())}
+              |  ${body.value?.addDeclerationTobody(lenses = lenses())}
               |}"""
           )
         }

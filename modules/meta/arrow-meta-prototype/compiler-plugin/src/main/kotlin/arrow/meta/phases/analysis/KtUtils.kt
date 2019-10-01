@@ -65,5 +65,29 @@ fun KtElement.dfs(f: (KtElement) -> Boolean): List<KtElement> {
   return found
 }
 
+fun KtElement.bfs(f: (KtElement) -> Boolean): List<KtElement> {
+  val found = arrayListOf<KtElement>()
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      super.visitKtElement(element)
+      val result = f(element)
+      if (result) found.add(element)
+    }
+  })
+  return found
+}
+
+fun KtElement.transform(f: (KtElement) -> String): String {
+  val builder = StringBuilder()
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      val result = f(element)
+      builder.append(result)
+      super.visitKtElement(element)
+    }
+  })
+  return builder.toString()
+}
+
 fun String.removeReturn(): String =
   replaceAfterLast("return ", "")

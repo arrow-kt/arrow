@@ -17,13 +17,13 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
 
 @extension
-interface EvalFunctor : Functor<ForEval> {
+class EvalFunctor : Functor<ForEval> {
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 }
 
 @extension
-interface EvalApply : Apply<ForEval> {
+class EvalApply : Apply<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 
@@ -32,7 +32,7 @@ interface EvalApply : Apply<ForEval> {
 }
 
 @extension
-interface EvalApplicative : Applicative<ForEval> {
+class EvalApplicative : Applicative<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 
@@ -44,7 +44,7 @@ interface EvalApplicative : Applicative<ForEval> {
 }
 
 @extension
-interface EvalMonad : Monad<ForEval> {
+class EvalMonad : Monad<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 
@@ -71,7 +71,7 @@ internal object EvalFxMonad : MonadFx<ForEval> {
 }
 
 @extension
-interface EvalComonad : Comonad<ForEval> {
+class EvalComonad : Comonad<ForEval> {
   override fun <A, B> EvalOf<A>.coflatMap(f: (EvalOf<A>) -> B): Eval<B> =
     fix().coflatMap(f)
 
@@ -83,14 +83,14 @@ interface EvalComonad : Comonad<ForEval> {
 }
 
 @extension
-interface EvalBimonad : Bimonad<ForEval> {
+class EvalBimonad : Bimonad<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 
   override fun <A, B> EvalOf<A>.flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
     Eval.tailRecM(a, f)
 
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
