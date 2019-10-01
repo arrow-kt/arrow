@@ -86,6 +86,23 @@
         width: 100%;
         background: rgba($brand-secondary, 0.9);
     }
+    
+    table {
+        width: 100%;
+        thead {
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        th, td {
+            padding: $base-point-grid;
+            border: 1px solid rgba($brand-secondary, 0.9);
+        }
+        
+        tr:nth-child(2n) {
+            background: $background-color;
+        }
+    }
 
     .header-link {
         float: left;

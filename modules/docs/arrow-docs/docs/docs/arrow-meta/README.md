@@ -49,3 +49,15 @@ Lorem ipsum dolor sit amet, **consectetur adipiscing** elit. Etiam eu *sem susci
 ### Code
 
 Lorem ipsum dolor sit amet, `consectetur adipiscing` elit. Etiam eu *sem suscipit*, malesuada arcu quis, semper arcu. Nullam sit amet ligula
+
+
+### Table
+
+| Header 1      | Header 2      | Header 3  |
+|---------------|---------------|-----------|
+| Item 1        | Item 1        | Item 1    |
+| Item 2        | Item 2        | Item 2    |
+| Item 3        | Item 3        | Item 3    |
+| Item 4        | Item 4        | Item 4    |
+| Item 5        | Item 5        | Item 5    |
+
