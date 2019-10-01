@@ -10,6 +10,7 @@ import arrow.fx.rx2.extensions.observablek.async.async
 import arrow.fx.rx2.extensions.observablek.functor.functor
 import arrow.fx.rx2.extensions.observablek.functorFilter.functorFilter
 import arrow.fx.rx2.extensions.observablek.monad.flatMap
+import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.observablek.timer.timer
 import arrow.fx.rx2.extensions.observablek.traverse.traverse
 import arrow.fx.rx2.k
@@ -18,6 +19,7 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -61,8 +63,9 @@ class ObservableKTests : RxJavaSpec() {
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
       ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
-      FunctorFilterLaws.laws(ObservableK.functorFilter(), { Observable.just(it).k() }, EQ())
-    )
+      FunctorFilterLaws.laws(ObservableK.functorFilter(), { Observable.just(it).k() }, EQ()),
+      MonadFilterLaws.laws(ObservableK.monadFilter(), {Observable.just(it).k()}, EQ())
+      )
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
