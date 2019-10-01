@@ -64,8 +64,8 @@ class ObservableKTests : RxJavaSpec() {
       ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
       FunctorFilterLaws.laws(ObservableK.functorFilter(), { Observable.just(it).k() }, EQ()),
-      MonadFilterLaws.laws(ObservableK.monadFilter(), {Observable.just(it).k()}, EQ())
-      )
+      MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQ())
+    )
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
