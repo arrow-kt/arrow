@@ -12,26 +12,27 @@ import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
  * The compilation-level Gradle plugin for applying the compiler plugin to the Kotlin compiler configuration.
  */
 class ArrowKotlinGradleSubplugin : KotlinGradleSubplugin<AbstractCompile> {
-    companion object {
-        private const val GENERATED_ARTIFACT_NAME = "gradle-plugin"
-        private const val GENERATED_GROUP_ID = "io.arrow-kt"
-        private const val GENERATED_VERSION = "0.0.1"
-        private const val GENERATED_COMPILER_PLUGIN_ID = "arrow.meta.plugin.compiler"
-    }
+  companion object {
+    private const val GRADLE_ARTIFACT_NAME = "gradle-plugin"
+    private const val GROUP_ID = "io.arrow-kt"
+    private const val VERSION = "0.0.1"
+    private const val COMPILER_PLUGIN_ID = "arrow.meta.plugin.compiler"
+  }
 
-    override fun isApplicable(project: Project, task: AbstractCompile) = ArrowGradlePlugin.isEnabled(project)
+  override fun isApplicable(project: Project, task: AbstractCompile) = ArrowGradlePlugin.isEnabled(project)
 
-    override fun apply(
-      project: Project,
-      kotlinCompile: AbstractCompile,
-      javaCompile: AbstractCompile?,
-      variantData: Any?,
-      androidProjectHandler: Any?,
-      kotlinCompilation: KotlinCompilation<KotlinCommonOptions>?
-    ): List<SubpluginOption> = emptyList()
+  override fun apply(
+    project: Project,
+    kotlinCompile: AbstractCompile,
+    javaCompile: AbstractCompile?,
+    variantData: Any?,
+    androidProjectHandler: Any?,
+    kotlinCompilation: KotlinCompilation<KotlinCommonOptions>?
+  ): List<SubpluginOption> = emptyList()
 
-    override fun getPluginArtifact(): SubpluginArtifact =
-      SubpluginArtifact(GENERATED_GROUP_ID, GENERATED_ARTIFACT_NAME, GENERATED_VERSION)
+  override fun getPluginArtifact(): SubpluginArtifact =
+    SubpluginArtifact(GROUP_ID, GRADLE_ARTIFACT_NAME, VERSION)
 
-    override fun getCompilerPluginId() = GENERATED_COMPILER_PLUGIN_ID
+  override fun getCompilerPluginId() = COMPILER_PLUGIN_ID
 }
+
