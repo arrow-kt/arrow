@@ -1,6 +1,5 @@
 package arrow.meta.internal.registry
 
-import arrow.meta.MetaComponentRegistrar
 import arrow.meta.dsl.config.ConfigSyntax
 import arrow.meta.dsl.platform.cli
 import arrow.meta.dsl.platform.ide
@@ -165,9 +164,9 @@ interface InternalRegistry: ConfigSyntax {
     val ctx = CompilerContext(project, messageCollector)
     registerPostAnalysisContextEnrichment(project, ctx)
 
-    // println("System.properties are: " + System.getProperties().map {
-    //   "\n${it.key} : ${it.value}"
-    //})
+    println("System.properties are: " + System.getProperties().map {
+      "\n${it.key} : ${it.value}"
+    })
 
     installArrowPlugin()
 

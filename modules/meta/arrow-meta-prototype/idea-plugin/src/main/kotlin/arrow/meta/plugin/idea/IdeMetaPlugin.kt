@@ -4,11 +4,8 @@ import arrow.meta.MetaPlugin
 import arrow.meta.dsl.ide.IdeSyntax
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.internal.registry.IdeInternalRegistry
-import com.intellij.codeInspection.ProblemHighlightType
 import org.jetbrains.kotlin.idea.KotlinIcons
-import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtThrowExpression
 
 class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
@@ -17,6 +14,7 @@ class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
   }
 }
 
+// TODO: still WIP
 val IdeMetaPlugin.init: Pair<Name, List<ExtensionPhase>>
   get() = Name.identifier("Initial Extension Registry") to
     meta(
@@ -32,8 +30,8 @@ val IdeMetaPlugin.icon: Pair<Name, List<ExtensionPhase>>
           it is KtThrowExpression
         },
         message = "KtThrow LineMarker Example"
-      ),
-      addInspection(
+      )
+      /*addInspection(
         inspection = applicableInspection(
           "TestInspection",
           KtNamedFunction::class.java,
@@ -45,6 +43,6 @@ val IdeMetaPlugin.icon: Pair<Name, List<ExtensionPhase>>
             element.addModifier(KtTokens.SUSPEND_KEYWORD)
           }
         ),
-        shortName = "DAMN"
-      )
+        shortName = "Test"
+      )*/
     )
