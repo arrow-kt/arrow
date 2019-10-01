@@ -170,8 +170,8 @@ Exceptions work like old goto that can happen at any point during execution and 
 Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.fx {
+fun getLineLengthAverage(path: FilePath, M: Monad<F>): Kind<F, List<String>> =
+  M.fx.monad {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -188,8 +188,8 @@ For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monad
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.fx {
+fun <F> getLineLengthAverage(path: FilePath, ME: MonadError<F, Throwable>): Kind<F, List<String>> = 
+  ME.fx.monadError {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
