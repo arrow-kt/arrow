@@ -97,7 +97,7 @@ interface InspectionSyntax : InspectionUtilitySyntax {
       extensionProvider(
         EP_NAME,
         object : LocalInspectionTool() {
-          override fun getShortName(): String = "DAMN it works"
+          override fun getShortName(): String = "Test"
         }
       )
     }*/
