@@ -1,6 +1,6 @@
 nav:
-    - title: Blog
-      url: /blog
+    - title: Media
+      url: /media
 
     - title: Github
       url: https://github.com/arrow-kt/arrow
@@ -8,8 +8,6 @@ nav:
     - title: License
       url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
 
-    - title: Media
-      url: /media
 
 icon-filter:
     - title: All libraries
