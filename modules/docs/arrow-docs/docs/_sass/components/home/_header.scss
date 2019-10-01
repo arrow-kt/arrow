@@ -238,8 +238,8 @@
 
       .masthead-brand {
         position: relative;
-        top: $base-point-grid * 2;
-        width: 250px;
+        top: -10px;
+        width: 220px;
       }
     }
 
@@ -247,15 +247,15 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 180px;
+      height: 188px;
 
       .masthead-code-error {
-        font-size: 100px;
+        font-size: 7.2rem;
         font-weight: normal;
       }
 
       .masthead-title {
-        font-size: 29px;
+        font-size: 2.1rem;
         font-weight: normal;
       }
     }
@@ -265,10 +265,33 @@
     display: block;
     background: none;
     border: solid 2px;
-    padding: ($base-point-grid) ($base-point-grid * 3);
+    padding: ($base-point-grid) 26px;
     font-size: 1.2rem;
     font-weight: normal;
     width: 60%;
     text-transform: uppercase;
+    transition: all $base-duration $base-timing;
+
+    &:hover {
+      background-color: var(--color-primary);
+      color: $white;
+      border: solid 2px var(--color-primary);
+      text-decoration: none;
+    }
+  }
+}
+
+@include bp(medium) {
+  #masthead-error {
+    .header-flex {
+      flex-direction: column;
+      .brand {
+        margin-right: unset;
+      }
+      .header-error-text {
+        margin-top: $base-point-grid * 4;
+        align-items: center;
+      }
+    }
   }
 }

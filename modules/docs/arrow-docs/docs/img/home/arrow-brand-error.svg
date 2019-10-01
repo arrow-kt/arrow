@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>arrow-brand-error</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="arrow-ilust-sketch-copy" transform="translate(4.000000, 4.000000)">
+            <g id="image">
+                <polyline id="path" stroke="#263238" stroke-width="3" points="125.327375 158.408836 96 176 67.3322898 158.799374"></polyline>
+                <path d="M0,192 L96,0 L192,192 L96,144 L0,192 Z" id="path" stroke="#263238" stroke-width="3" fill="#F5F7F8"></path>
+                <polygon id="path-copy-2" fill="#263238" opacity="0.1" points="96 0 96 144 192 192"></polygon>
+                <polygon id="Path-5" fill-opacity="0.1" fill="#000000" points="96 176 96 144 124.194824 158.408836"></polygon>
+                <polygon id="Path-5-Copy" fill-opacity="0.1" fill="#000000" points="96 153.47583 96 144 124.194824 158.408836 120.444336 161.03418"></polygon>
+                <polygon id="Path-5-Copy-2" fill-opacity="0.1" fill="#000000" transform="translate(82.000000, 152.780640) scale(-1, 1) translate(-82.000000, -152.780640) " points="68 153.47583 68 144 96 158.408836 91.6149902 161.561279"></polygon>
+                <polygon id="Path-18" fill-opacity="0.1" fill="#263238" points="54.6376953 165.394531 0 192 67.3322898 173.092773 96.5 190.268555 124.501884 173.778312 192 192 138.738281 165.394531 124.194824 158.408836 96.6879883 176 67.3322898 158.408836"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
