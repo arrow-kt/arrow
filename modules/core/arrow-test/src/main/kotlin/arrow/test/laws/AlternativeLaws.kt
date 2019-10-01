@@ -49,6 +49,6 @@ object AlternativeLaws {
   ): Unit =
     forAll(Gen.int().map(cf), Gen.int().map(cf), Gen.int().map(cf)) {
       fa: Kind<F, Int>, fa2: Kind<F, Int>, fa3: Kind<F, Int> ->
-        fa.alt(fa2.alt(fa3)).equalUnderTheLaw(fa2.alt(fa3).alt(fa), EQ)
+        (fa alt (fa2 alt fa3)).equalUnderTheLaw((fa alt fa2) alt fa3, EQ)
     }
 }
