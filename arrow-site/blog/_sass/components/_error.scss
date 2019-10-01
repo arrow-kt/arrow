@@ -1,0 +1,83 @@
+// Header error layout
+// -----------------------------------------------
+// -----------------------------------------------
+
+#error-body {
+  background-image: url("../img/lines-error-header.svg");
+  background-repeat: repeat-x;
+}
+
+#masthead-error {
+  padding: ($base-point-grid * 24) 0 ($base-point-grid * 7) 0;
+  position: relative;
+  z-index: 100;
+
+  .header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 270px;
+
+    .brand {
+      margin-right: $base-point-grid * 3;
+
+      .masthead-brand {
+        position: relative;
+        top: 25px;
+        width: 216px;
+      }
+    }
+
+    .header-error-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .masthead-code-error {
+        font-size: 7.2rem;
+        font-weight: normal;
+        height: 130px;
+      }
+
+      .masthead-title {
+        font-size: 2.1rem;
+        font-weight: normal;
+        padding-bottom: $base-point-grid * 4;
+      }
+    }
+  }
+
+  .error-button {
+    display: block;
+    background: none;
+    border: solid 2px;
+    padding: ($base-point-grid) 26px;
+    font-size: 1.2rem;
+    font-weight: normal;
+    width: 60%;
+    text-transform: uppercase;
+    transition: all $base-duration $base-timing;
+
+    &:hover {
+      background-color: $white;
+      color: $brand-secondary;
+      border: solid 2px $white;
+      text-decoration: none;
+    }
+  }
+}
+
+@include bp(medium) {
+  #masthead-error {
+    .header-flex {
+      flex-direction: column;
+      .brand {
+        margin-right: unset;
+      }
+      .header-error-text {
+        margin-top: $base-point-grid * 4;
+        align-items: center;
+      }
+    }
+  }
+}

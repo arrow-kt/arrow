@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{site.data.commons.name}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{site.data.commons.description}}">
+  <meta name="keywords" content="{{site.data.commons.keywords}}">
+
+  <meta property="og:image" content="http://arrow-kt.io/img/poster.png" />
+  <meta property="og:title" content="{{site.data.commons.name}}" />
+  <meta property="og:site_name" content="{{site.data.commons.name}}" />
+  <meta property="og:url" content="http://arrow-kt.io/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="{{site.data.commons.description}}" />
+  <meta property="og:keywords" content="{{site.data.commons.keywords}}" />
+
+  <meta name="twitter:text:description" content="{{site.data.commons.description}}" />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@arrow_kt">
+  <meta name="twitter:creator" content="@arrow_kt">
+  <meta name="twitter:image" content="http://arrow-kt.io/img/twitter-card.png" />
+
+  <!-- Font Awesome -->
+  <link rel="shortcut icon" href="{{ '/img/favicon.png' | relative_url }}">
+  <!-- Arrow main css -->
+  <link rel="stylesheet" type="text/css" href="{{ '/css/styles.css' | relative_url }}">
+</head>
+
+<body id="error-body">
+  <header id="masthead-error">
+    <div class="wrapper">
+      <div class="header-flex">
+        <div class="brand">
+          <img class="masthead-brand" src="{{ 'img/arrow-error-blog.svg' | relative_url }}" alt="Code error">
+        </div>
+        <div class="header-error-text">
+          <h1 class="masthead-code-error">404</h1>
+          <h1 class="masthead-title">Resource not found</h1>
+          <a class="error-button" href="/">Back to home</a>
+        </div>
+      </div>
+    </div>
+  </header>
+</body>
+
+</html>
