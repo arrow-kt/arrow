@@ -12,5 +12,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
 
   fun <A> Kind<F, A>.many(): Kind<F, ListK<A>> = some() alt just(emptyList<A>().k())
 
+  fun <A> Kind<F, A>.orElse(b: Kind<F, A>): Kind<F, A> = this alt b
+
   infix fun <A> Kind<F, A>.alt(b: Kind<F, A>): Kind<F, A>
 }
