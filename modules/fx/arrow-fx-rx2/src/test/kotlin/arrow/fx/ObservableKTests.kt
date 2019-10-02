@@ -63,7 +63,6 @@ class ObservableKTests : RxJavaSpec() {
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
       ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
-      FunctorFilterLaws.laws(ObservableK.functorFilter(), { Observable.just(it).k() }, EQ()),
       MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQ())
     )
 
