@@ -10,9 +10,9 @@ import arrow.core.k
 interface Alternative<F> : Applicative<F>, MonoidK<F> {
   fun <A> Kind<F, A>.some(): Kind<F, ListK<A>> = map(this, many()) { (v, vs) -> (listOf(v) + vs).k() }
 
-  fun <A> Kind<F, A>.many(): Kind<F, ListK<A>> = some() alt just(emptyList<A>().k())
+  fun <A> Kind<F, A>.many(): Kind<F, ListK<A>> = some().orElse(just(emptyList<A>().k()))
 
-  fun <A> Kind<F, A>.orElse(b: Kind<F, A>): Kind<F, A> = this alt b
+  infix fun <A> Kind<F, A>.alt(b: Kind<F, A>): Kind<F, A> = this.orElse(b)
 
-  infix fun <A> Kind<F, A>.alt(b: Kind<F, A>): Kind<F, A>
+  fun <A> Kind<F, A>.orElse(b: Kind<F, A>): Kind<F, A>
 }

@@ -254,9 +254,9 @@ interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateT
     StateT(just({ s: S -> ma.map { a: A -> s toT a } }))
   }
 
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.alt(b: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> {
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.orElse(b: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> {
     val x = this.fix()
     val y = b.fix()
-    return MC().run { StateT(just({ s: S -> x.run(this, s) alt y.run(this, s) })) }
+    return MC().run { StateT(just({ s: S -> x.run(this, s).orElse(y.run(this, s)) })) }
   }
 }

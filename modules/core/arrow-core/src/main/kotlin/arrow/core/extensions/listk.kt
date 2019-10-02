@@ -230,7 +230,7 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
 
-  override fun <A> Kind<ForListK, A>.alt(b: Kind<ForListK, A>): ListK<A> =
+  override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): ListK<A> =
     fix() + b.fix()
 }
 

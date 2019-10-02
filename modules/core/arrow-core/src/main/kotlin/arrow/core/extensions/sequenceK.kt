@@ -243,7 +243,7 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
     fix().sequenceCombineK(y)
 
-  override fun <A> Kind<ForSequenceK, A>.alt(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
+  override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
     (fix() + b.fix()).k()
 }
 
