@@ -336,6 +336,12 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
 
   override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
     orElse { y.fix() }
+
+  override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
+    when (val a = fix()) {
+      is None -> b.fix()
+      is Some -> a
+    }
 }
 
 @extension
