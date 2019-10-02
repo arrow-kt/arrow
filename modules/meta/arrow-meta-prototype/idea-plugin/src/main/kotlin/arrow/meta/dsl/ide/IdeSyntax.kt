@@ -17,7 +17,6 @@ import arrow.meta.dsl.ide.editor.syntaxHighlighter.SyntaxHighlighterExtensionPro
 import arrow.meta.dsl.ide.editor.usage.UsageSyntax
 import arrow.meta.dsl.ide.extensions.ExtensionProviderSyntax
 
-// TODO: Rewrite the Nullable in each ProductSyntax to proper Arrow Datatypes
 interface IdeSyntax : IntentionExtensionProviderSyntax, IconProviderSyntax,
   SyntaxHighlighterExtensionProviderSyntax, InspectionSyntax, AnActionSyntax, ColorSyntax, HintingSyntax,
   LanguageSyntax, LineMarkerSyntax, LiveTemplateSyntax, NavigationSyntax, SearchSyntax, StructureViewSyntax,
