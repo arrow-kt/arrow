@@ -50,6 +50,7 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.typeclasses.FunctorFilter
+import arrow.typeclasses.MonadFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
@@ -354,6 +355,32 @@ interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
     fix().map(f)
 }
 
+@extension
+interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
+  override fun <A> empty(): FlowableK<A> =
+    Flowable.empty<A>().k()
+
+  override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.ap(ff: Kind<ForFlowableK, (A) -> B>): FlowableK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
+    FlowableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForFlowableK, A>.map2(fb: Kind<ForFlowableK, B>, f: (Tuple2<A, B>) -> Z): FlowableK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): FlowableK<A> =
+    FlowableK.just(a)
+}
 // TODO FlowableK does not yet have a Concurrent instance
 fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
   FlowableK.async().fx.async(c).fix()
