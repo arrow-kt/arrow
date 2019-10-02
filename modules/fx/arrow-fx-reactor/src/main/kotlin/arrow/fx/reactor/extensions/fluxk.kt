@@ -202,7 +202,7 @@ interface FluxKTimer : Timer<ForFluxK> {
 }
 
 @extension
-interface FuxKFunctorFilter : FunctorFilter<ForFluxK> {
+interface FluxKFunctorFilter : FunctorFilter<ForFluxK> {
   override fun <A, B> Kind<ForFluxK, A>.filterMap(f: (A) -> Option<B>): FluxK<B> =
     fix().filterMap(f)
 
