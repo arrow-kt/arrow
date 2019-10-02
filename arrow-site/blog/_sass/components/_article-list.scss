@@ -1,4 +1,8 @@
 #article-list {
+    a {
+      text-decoration: underline; 
+    }
+
     .main-flex {
         display: flex;
         flex-wrap: wrap;
