@@ -8,7 +8,6 @@ import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.extensions.observablek.async.async
 import arrow.fx.rx2.extensions.observablek.functor.functor
-import arrow.fx.rx2.extensions.observablek.functorFilter.functorFilter
 import arrow.fx.rx2.extensions.observablek.monad.flatMap
 import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.observablek.timer.timer
@@ -18,7 +17,6 @@ import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
