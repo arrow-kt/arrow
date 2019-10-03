@@ -92,6 +92,17 @@ class FlowableKTests : RxJavaSpec() {
 
     testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQ()))
 
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = FlowableK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
     "Multi-thread Flowables finish correctly" {
       val value: Flowable<Long> = FlowableK.fx {
         val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()

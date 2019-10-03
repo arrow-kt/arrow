@@ -131,4 +131,4 @@ interface MonoKTimer : Timer<ForMonoK> {
 
 // TODO FluxK does not yet have a Concurrent instance
 fun <A> MonoK.Companion.fx(c: suspend AsyncSyntax<ForMonoK>.() -> A): MonoK<A> =
-  MonoK.async().fx.async(c).fix()
+  defer { MonoK.async().fx.async(c).fix() }

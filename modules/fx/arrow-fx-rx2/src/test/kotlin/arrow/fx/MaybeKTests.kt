@@ -59,6 +59,17 @@ class MaybeKTests : RxJavaSpec() {
       MonadFilterLaws.laws(MaybeK.monadFilter(), { Maybe.just(it).k() }, EQ())
     )
 
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = MaybeK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
     "Multi-thread Maybes finish correctly" {
       val value: Maybe<Long> = MaybeK.fx {
         val a = Maybe.timer(2, TimeUnit.SECONDS).k().bind()

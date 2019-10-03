@@ -72,6 +72,17 @@ class FluxKTest : UnitSpec() {
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
     )
 
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = FluxK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
     "Multi-thread Fluxes finish correctly" {
       val value: Flux<Int> = FluxK.fx {
         val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().bind()
