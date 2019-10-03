@@ -34,7 +34,7 @@ buildscript {
         kotlinxCoroutinesVersion = '1.3.2'
         projectReactorVersion = '3.2.6.RELEASE'
         retrofitVersion = '2.5.0'
-        rxJavaVersion = '2.2.7'
+        rxJavaVersion = '2.2.12'
     }
 
     repositories {
