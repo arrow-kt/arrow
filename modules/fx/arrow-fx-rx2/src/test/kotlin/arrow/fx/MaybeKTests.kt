@@ -6,15 +6,15 @@ import arrow.fx.rx2.MaybeKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.extensions.maybek.async.async
-import arrow.fx.rx2.extensions.maybek.functorFilter.functorFilter
 import arrow.fx.rx2.extensions.maybek.monad.flatMap
+import arrow.fx.rx2.extensions.maybek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -56,7 +56,7 @@ class MaybeKTests : RxJavaSpec() {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
       ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false),
-      FunctorFilterLaws.laws(MaybeK.functorFilter(), { Maybe.just(it).k() }, EQ())
+      MonadFilterLaws.laws(MaybeK.monadFilter(), { Maybe.just(it).k() }, EQ())
     )
 
     "Multi-thread Maybes finish correctly" {

@@ -12,17 +12,18 @@ import arrow.fx.rx2.extensions.asyncMissing
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.flowablek.async.async
 import arrow.fx.rx2.extensions.flowablek.functor.functor
-import arrow.fx.rx2.extensions.flowablek.functorFilter.functorFilter
 import arrow.fx.rx2.extensions.flowablek.monad.flatMap
+import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
 import arrow.fx.rx2.extensions.flowablek.traverse.traverse
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -89,7 +90,7 @@ class FlowableKTests : RxJavaSpec() {
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 
-    testLaws(FunctorFilterLaws.laws(FlowableK.functorFilter(), { Flowable.just(it).k() }, EQ()))
+    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQ()))
 
     "Multi-thread Flowables finish correctly" {
       val value: Flowable<Long> = FlowableK.fx {

@@ -41,6 +41,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.Observable
@@ -292,4 +293,31 @@ interface ObservableKFunctorFilter : FunctorFilter<ForObservableK> {
 
   override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
+}
+
+@extension
+interface ObservableKMonadFilter : MonadFilter<ForObservableK> {
+  override fun <A> empty(): ObservableK<A> =
+    Observable.empty<A>().k()
+
+  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForObservableK, A>.ap(ff: Kind<ForObservableK, (A) -> B>): ObservableK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
+    ObservableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForObservableK, A>.map2(fb: Kind<ForObservableK, B>, f: (Tuple2<A, B>) -> Z): ObservableK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): ObservableK<A> =
+    ObservableK.just(a)
 }
