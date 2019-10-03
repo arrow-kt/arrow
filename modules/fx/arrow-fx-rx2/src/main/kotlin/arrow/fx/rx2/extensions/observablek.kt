@@ -277,7 +277,7 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 
 // TODO ObservableK does not yet have a Concurrent instance
 fun <A> ObservableK.Companion.fx(c: suspend AsyncSyntax<ForObservableK>.() -> A): ObservableK<A> =
-  ObservableK.async().fx.async(c).fix()
+  defer { ObservableK.async().fx.async(c).fix() }
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {

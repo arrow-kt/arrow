@@ -232,4 +232,4 @@ interface SingleKTimer : Timer<ForSingleK> {
 
 // TODO SingleK does not yet have a Concurrent instance
 fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK>.() -> A): SingleK<A> =
-  SingleK.async().fx.async(c).fix()
+  defer { SingleK.async().fx.async(c).fix() }

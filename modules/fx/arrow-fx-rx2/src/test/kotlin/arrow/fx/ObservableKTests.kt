@@ -64,6 +64,17 @@ class ObservableKTests : RxJavaSpec() {
       MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQ())
     )
 
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = ObservableK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
         val a = Observable.timer(2, SECONDS).k().bind()
