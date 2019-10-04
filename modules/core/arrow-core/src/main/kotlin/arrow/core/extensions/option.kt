@@ -6,7 +6,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
-import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
