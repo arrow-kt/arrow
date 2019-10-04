@@ -26,7 +26,7 @@ compileTestKotlin {
 
 jar {
   // Embed compiler plugin in jar
-  configurations.named("compileClasspath").get().find { it.name.startsWith("compiler-plugin") }
+  from configurations.named("compileClasspath").get().find { it.name.startsWith("compiler-plugin") }
 
   manifest {
     attributes["Specification-Title"] = project.name
