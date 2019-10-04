@@ -75,7 +75,7 @@ private val KtClass.partialKindAritySuffix: String
   get() = (arity - 1).let { if (it > 1) "$it" else "" }
 
 fun isHigherKindedType(ktClass: KtClass): Boolean =
-  ktClass.annotationEntries.any { it.text.matches(Regex("@(arrow.)?higherkind")) } &&
+  ktClass.annotationEntries.any { it.text.matches(Regex("@(arrow\\.)?higherkind")) } &&
     ktClass.fqName?.asString()?.startsWith("arrow.Kind") != true &&
     !ktClass.isAnnotation() &&
     !ktClass.isNested() &&
