@@ -5,7 +5,6 @@ plugins {
   id 'com.jfrog.bintray' version "1.8.4"
 }
 apply plugin: 'kotlin'
-//apply from: "$rootDir/gradle-plugin/plugin-marker/pluginMarker.gradle"
 
 project.group = 'io.arrow-kt'
 project.version = '0.0.1'
@@ -15,7 +14,6 @@ dependencies {
   implementation gradleApi()
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlin_version"
-  implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   compileOnly project(":compiler-plugin") { "embeddable" }
 }
 
@@ -42,8 +40,6 @@ jar {
 tasks.withType(PluginUnderTestMetadata).configureEach {
   pluginClasspath.from(configurations.compileOnly)
 }
-
-//pluginMarkerProject('compiler-plugin')
 
 gradlePlugin {
   plugins {

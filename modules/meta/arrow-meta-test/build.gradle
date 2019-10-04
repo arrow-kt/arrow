@@ -5,7 +5,6 @@ buildscript {
 
   repositories {
     mavenLocal()
-    mavenCentral()
   }
 }
 
@@ -14,9 +13,9 @@ apply plugin: "arrow.meta.plugin.gradle"
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-//    compile project(':arrow-core')
-  compile project(':arrow-annotations')
-  kapt project(':arrow-meta')
+//    compile project(':arrow-optics')
+//    compile project(':arrow-annotations')
+//    kapt project(':arrow-meta')
 //    kaptTest project(':arrow-meta')
 //    compileOnly project(':arrow-meta')
 //    testCompileOnly project(':arrow-meta')
