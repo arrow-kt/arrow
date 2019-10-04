@@ -37,7 +37,7 @@ interface ValidatedFunctor<E> : Functor<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E> {
+class ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E> {
 
   fun SE(): Semigroup<E>
 
@@ -49,7 +49,7 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
 }
 
 @extension
-interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApplicative<E> {
+class ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
 
@@ -58,7 +58,7 @@ interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApp
 }
 
 @extension
-interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicative<E> {
+class ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
 
@@ -69,7 +69,7 @@ interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>,
 }
 
 @extension
-interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
+class ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -79,14 +79,14 @@ interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
+class ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)
 }
 
 @extension
-interface ValidatedBifoldable : Bifoldable<ForValidated> {
+class ValidatedBifoldable : Bifoldable<ForValidated> {
   override fun <A, B, C> ValidatedOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fix().fold({ f(c, it) }, { g(c, it) })
 
@@ -95,7 +95,7 @@ interface ValidatedBifoldable : Bifoldable<ForValidated> {
 }
 
 @extension
-interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
+class ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
   override fun <G, A, B, C, D> ValidatedOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, ValidatedOf<C, D>> =
     fix().let {
       AP.run {
@@ -106,7 +106,7 @@ interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
 }
 
 @extension
-interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
+class ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
 
   fun SE(): Semigroup<E>
 
@@ -115,7 +115,7 @@ interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
+class ValidatedEq<L, R> : Eq<Validated<L, R>> {
 
   fun EQL(): Eq<L>
 
@@ -134,13 +134,13 @@ interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
 }
 
 @extension
-interface ValidatedShow<L, R> : Show<Validated<L, R>> {
+class ValidatedShow<L, R> : Show<Validated<L, R>> {
   override fun Validated<L, R>.showed(): String =
     toString()
 }
 
 @extension
-interface ValidatedHash<L, R> : Hash<Validated<L, R>>, ValidatedEq<L, R> {
+class ValidatedHash<L, R> : Hash<Validated<L, R>>, ValidatedEq<L, R> {
   fun HL(): Hash<L>
   fun HR(): Hash<R>
 

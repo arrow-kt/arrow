@@ -36,13 +36,13 @@ interface IorFunctor<L> : Functor<IorPartialOf<L>> {
 }
 
 @extension
-interface IorBifunctor : Bifunctor<ForIor> {
+class IorBifunctor : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
 }
 
 @extension
-interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
+class IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   fun SL(): Semigroup<L>
 
@@ -53,7 +53,7 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 }
 
 @extension
-interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
+class IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
 
   fun SL(): Semigroup<L>
 
@@ -66,7 +66,7 @@ interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
 }
 
 @extension
-interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
+class IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun SL(): Semigroup<L>
 
@@ -83,7 +83,7 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 }
 
 @extension
-interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
+class IorFoldable<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
 
@@ -92,14 +92,14 @@ interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
 }
 
 @extension
-interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
+class IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
 }
 
 @extension
-interface IorBifoldable : Bifoldable<ForIor> {
+class IorBifoldable : Bifoldable<ForIor> {
   override fun <A, B, C> IorOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fix().bifoldLeft(c, f, g)
 
@@ -108,7 +108,7 @@ interface IorBifoldable : Bifoldable<ForIor> {
 }
 
 @extension
-interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
+class IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
   override fun <G, A, B, C, D> IorOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, IorOf<C, D>> =
     fix().let {
       AP.run {
@@ -119,7 +119,7 @@ interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
 }
 
 @extension
-interface IorEq<L, R> : Eq<Ior<L, R>> {
+class IorEq<L, R> : Eq<Ior<L, R>> {
 
   fun EQL(): Eq<L>
 
@@ -145,13 +145,13 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
 }
 
 @extension
-interface IorShow<L, R> : Show<Ior<L, R>> {
+class IorShow<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.showed(): String =
     toString()
 }
 
 @extension
-interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
+class IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
   fun HL(): Hash<L>
   fun HR(): Hash<R>

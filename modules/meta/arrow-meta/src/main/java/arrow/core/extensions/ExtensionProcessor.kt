@@ -17,7 +17,7 @@ import com.squareup.kotlinpoet.FileSpec
 import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
-@AutoService(Processor::class)
+//@AutoService(Processor::class)
 class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTemplateGenerator {
 
   override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> =

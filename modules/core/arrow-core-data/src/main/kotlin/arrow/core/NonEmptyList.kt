@@ -98,7 +98,7 @@ class NonEmptyList<out A> private constructor(
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
-      f: (A) -> Kind<ForNonEmptyList, Either<A, B>>,
+      f: (A) -> NonEmptyListOf<Either<A, B>>,
       v: NonEmptyList<Either<A, B>>
     ) {
       val head: Either<A, B> = v.head
@@ -115,7 +115,7 @@ class NonEmptyList<out A> private constructor(
       }
     }
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForNonEmptyList, Either<A, B>>): NonEmptyList<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyListOf<Either<A, B>>): NonEmptyList<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())
       return fromListUnsafe(buf)

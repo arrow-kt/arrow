@@ -33,14 +33,14 @@ import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
 
 @extension
-interface IdSemigroup<A> : Semigroup<Id<A>> {
+class IdSemigroup<A> : Semigroup<Id<A>> {
   fun SA(): Semigroup<A>
 
   override fun Id<A>.combine(b: Id<A>): Id<A> = Id(SA().run { value().combine(b.value()) })
 }
 
 @extension
-interface IdMonoid<A> : Monoid<Id<A>>, IdSemigroup<A> {
+class IdMonoid<A> : Monoid<Id<A>>, IdSemigroup<A> {
   fun MA(): Monoid<A>
   override fun SA(): Semigroup<A> = MA()
 
@@ -48,7 +48,7 @@ interface IdMonoid<A> : Monoid<Id<A>>, IdSemigroup<A> {
 }
 
 @extension
-interface IdEq<A> : Eq<Id<A>> {
+class IdEq<A> : Eq<Id<A>> {
 
   fun EQ(): Eq<A>
 
@@ -57,19 +57,19 @@ interface IdEq<A> : Eq<Id<A>> {
 }
 
 @extension
-interface IdShow<A> : Show<Id<A>> {
+class IdShow<A> : Show<Id<A>> {
   override fun Id<A>.showed(): String =
     toString()
 }
 
 @extension
-interface IdFunctor : Functor<ForId> {
+class IdFunctor : Functor<ForId> {
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 }
 
 @extension
-interface IdApply : Apply<ForId> {
+class IdApply : Apply<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -78,7 +78,7 @@ interface IdApply : Apply<ForId> {
 }
 
 @extension
-interface IdApplicative : Applicative<ForId> {
+class IdApplicative : Applicative<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -90,13 +90,13 @@ interface IdApplicative : Applicative<ForId> {
 }
 
 @extension
-interface IdSelective : Selective<ForId>, IdApplicative {
-  override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+class IdSelective : Selective<ForId>, IdApplicative {
+  override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): IdOf<B> =
     fix().idSelect(f.fix())
 }
 
 @extension
-interface IdMonad : Monad<ForId> {
+class IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -112,7 +112,7 @@ interface IdMonad : Monad<ForId> {
   override fun <A> just(a: A): Id<A> =
     Id.just(a)
 
-  override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
+  override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): IdOf<B> =
     fix().idSelect(f.fix())
 
   override val fx: MonadFx<ForId>
@@ -126,7 +126,7 @@ internal object IdFxMonad : MonadFx<ForId> {
 }
 
 @extension
-interface IdComonad : Comonad<ForId> {
+class IdComonad : Comonad<ForId> {
   override fun <A, B> IdOf<A>.coflatMap(f: (IdOf<A>) -> B): Id<B> =
     fix().coflatMap(f)
 
@@ -138,7 +138,7 @@ interface IdComonad : Comonad<ForId> {
 }
 
 @extension
-interface IdBimonad : Bimonad<ForId> {
+class IdBimonad : Bimonad<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -162,7 +162,7 @@ interface IdBimonad : Bimonad<ForId> {
 }
 
 @extension
-interface IdFoldable : Foldable<ForId> {
+class IdFoldable : Foldable<ForId> {
   override fun <A, B> IdOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -178,7 +178,7 @@ fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
   idTraverse(GA, ::identity)
 
 @extension
-interface IdTraverse : Traverse<ForId> {
+class IdTraverse : Traverse<ForId> {
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 
@@ -193,7 +193,7 @@ interface IdTraverse : Traverse<ForId> {
 }
 
 @extension
-interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
+class IdHash<A> : Hash<Id<A>>, IdEq<A> {
 
   fun HA(): Hash<A>
 

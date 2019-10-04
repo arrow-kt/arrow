@@ -35,19 +35,19 @@ import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
 @extension
-interface ListKSemigroup<A> : Semigroup<ListK<A>> {
+class ListKSemigroup<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
     (this.listPlus(b)).k()
 }
 
 @extension
-interface ListKMonoid<A> : Monoid<ListK<A>>, ListKSemigroup<A> {
+class ListKMonoid<A> : Monoid<ListK<A>>, ListKSemigroup<A> {
   override fun empty(): ListK<A> =
     emptyList<A>().k()
 }
 
 @extension
-interface ListKEq<A> : Eq<ListKOf<A>> {
+class ListKEq<A> : Eq<ListKOf<A>> {
 
   fun EQ(): Eq<A>
 
@@ -61,38 +61,38 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
 }
 
 @extension
-interface ListKShow<A> : Show<ListKOf<A>> {
+class ListKShow<A> : Show<ListKOf<A>> {
   override fun ListKOf<A>.showed(): String =
     toString()
 }
 
 @extension
-interface ListKFunctor : Functor<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+class ListKFunctor : Functor<ForListK> {
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 }
 
 @extension
-interface ListKApply : Apply<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+class ListKApply : Apply<ForListK> {
+  override fun <A, B> ListKOf<A>.ap(ff: ListKOf<(A) -> B>): ListK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  override fun <A, B, Z> ListKOf<A>.map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 }
 
 @extension
-interface ListKApplicative : Applicative<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+class ListKApplicative : Applicative<ForListK> {
+  override fun <A, B> ListKOf<A>.ap(ff: ListKOf<(A) -> B>): ListK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  override fun <A, B, Z> ListKOf<A>.map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): ListK<A> =
@@ -100,20 +100,20 @@ interface ListKApplicative : Applicative<ForListK> {
 }
 
 @extension
-interface ListKMonad : Monad<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+class ListKMonad : Monad<ForListK> {
+  override fun <A, B> ListKOf<A>.ap(ff: ListKOf<(A) -> B>): ListK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.flatMap(f: (A) -> ListKOf<B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> ListKOf<Either<A, B>>): ListK<B> =
     ListK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  override fun <A, B, Z> ListKOf<A>.map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): ListK<A> =
@@ -121,63 +121,63 @@ interface ListKMonad : Monad<ForListK> {
 }
 
 @extension
-interface ListKFoldable : Foldable<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+class ListKFoldable : Foldable<ForListK> {
+  override fun <A, B> ListKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> ListKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> ListKOf<A>.isEmpty(): kotlin.Boolean =
     fix().isEmpty()
 }
 
 @extension
-interface ListKTraverse : Traverse<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+class ListKTraverse : Traverse<ForListK> {
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <G, A, B> Kind<ForListK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
+  override fun <G, A, B> ListKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     fix().traverse(AP, f)
 
-  override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> ListKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> ListKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForListK, A>.isEmpty(): Boolean =
+  override fun <A> ListKOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 }
 
 @extension
-interface ListKSemigroupK : SemigroupK<ForListK> {
-  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+class ListKSemigroupK : SemigroupK<ForListK> {
+  override fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
     fix().listCombineK(y)
 }
 
 @extension
-interface ListKSemigroupal : Semigroupal<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
+class ListKSemigroupal : Semigroupal<ForListK> {
+  override fun <A, B> ListKOf<A>.product(fb: ListKOf<B>): ListKOf<Tuple2<A, B>> =
     fb.fix().ap(fix().map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
-interface ListKMonoidal : Monoidal<ForListK>, ListKSemigroupal {
-  override fun <A> identity(): Kind<ForListK, A> = ListK.empty()
+class ListKMonoidal : Monoidal<ForListK>, ListKSemigroupal {
+  override fun <A> identity(): ListKOf<A> = ListK.empty()
 }
 
 @extension
-interface ListKMonoidK : MonoidK<ForListK> {
+class ListKMonoidK : MonoidK<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
-  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+  override fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
     fix().listCombineK(y)
 }
 
 @extension
-interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
+class ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 
   fun HA(): Hash<A>
 
@@ -189,11 +189,11 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 }
 
 @extension
-interface ListKFunctorFilter : FunctorFilter<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+class ListKFunctorFilter : FunctorFilter<ForListK> {
+  override fun <A, B> ListKOf<A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 }
 
@@ -201,56 +201,56 @@ fun <A> ListK.Companion.fx(c: suspend MonadSyntax<ForListK>.() -> A): ListK<A> =
   ListK.monad().fx.monad(c).fix()
 
 @extension
-interface ListKMonadCombine : MonadCombine<ForListK> {
+class ListKMonadCombine : MonadCombine<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
-  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.ap(ff: ListKOf<(A) -> B>): ListK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.flatMap(f: (A) -> ListKOf<B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> ListKOf<Either<A, B>>): ListK<B> =
     ListK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  override fun <A, B, Z> ListKOf<A>.map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
 
-  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
+  override fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
     fix().listCombineK(y)
 }
 
 @extension
-interface ListKMonadFilter : MonadFilter<ForListK> {
+class ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
-  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.ap(ff: ListKOf<(A) -> B>): ListK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
+  override fun <A, B> ListKOf<A>.flatMap(f: (A) -> ListKOf<B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> ListKOf<Either<A, B>>): ListK<B> =
     ListK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+  override fun <A, B> ListKOf<A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
-  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+  override fun <A, B, Z> ListKOf<A>.map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 
   override fun <A> just(a: A): ListK<A> =

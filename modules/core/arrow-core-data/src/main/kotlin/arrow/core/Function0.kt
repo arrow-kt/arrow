@@ -27,7 +27,7 @@ data class Function0<out A>(internal val f: () -> A) {
 
     fun <A> just(a: A): Function0<A> = { a }.k()
 
-    tailrec fun <A, B> loop(a: A, f: (A) -> Kind<ForFunction0, Either<A, B>>): B {
+    tailrec fun <A, B> loop(a: A, f: (A) -> Function0Of<Either<A, B>>): B {
       val fa = f(a).fix()()
       return when (fa) {
         is Either.Right -> fa.b
@@ -35,7 +35,7 @@ data class Function0<out A>(internal val f: () -> A) {
       }
     }
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForFunction0, Either<A, B>>): Function0<B> = { loop(a, f) }.k()
+    fun <A, B> tailRecM(a: A, f: (A) -> Function0Of<Either<A, B>>): Function0<B> = { loop(a, f) }.k()
   }
 }
 

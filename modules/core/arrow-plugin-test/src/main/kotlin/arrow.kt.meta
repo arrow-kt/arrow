@@ -1,0 +1,64 @@
+package arrow.extreme
+
+import arrow.higherkind
+import arrow.synthetic
+
+//metadebug
+
+@arrow.synthetic class ForOption private constructor() { companion object }
+
+@arrow.synthetic typealias OptionOf<A> = arrow.Kind<ForOption, A>
+
+@arrow.synthetic typealias OptionKindedJ<A> = arrow.HkJ<ForOption, A>
+
+@arrow.synthetic fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
+
+@arrow.synthetic @higherkind sealed class Option <out A>  : OptionOf<A> {
+  
+
+  fun <B> fold(ifSome: (A) -> B, ifNone: () -> B): B =
+    when (this) {
+      is Some -> ifSome(a)
+      None -> ifNone()
+    }
+
+  fun <B> map(f: (A) -> B): Option<B> =
+    flatMap { a -> Some(f(a)) }
+
+  fun <B, C> map2(fb: Option<B>, f: (A, B) -> C): Option<C> =
+    flatMap { a ->
+      fb.flatMap { b ->
+        Some(f(a, b))
+      }
+    }
+
+  fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
+    fold({ a -> f(a) }, { None })
+
+
+  companion object {
+    fun <A> just(a: A): Option<A> =
+      Some(a)
+  }
+
+
+}
+
+data class Some<out A>(val a: A) : Option<A>()
+object None : Option<Nothing>()
+
+@arrow.synthetic class ForId private constructor() { companion object }
+
+@arrow.synthetic typealias IdOf<A> = arrow.Kind<ForId, A>
+
+@arrow.synthetic typealias IdKindedJ<A> = arrow.HkJ<ForId, A>
+
+@arrow.synthetic fun <A> IdOf<A>.fix(): Id<A> = this as Id<A>
+
+@arrow.synthetic @higherkind /* empty? */class Id <out A> public constructor (val value: A) : IdOf<A> {
+  
+}
+
+val x: IdOf<Int> = Id(1)
+
+

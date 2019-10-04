@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtTypeParameter
 import org.jetbrains.kotlin.psi.KtTypeReference
+import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
 import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
@@ -24,11 +25,16 @@ interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
     override val context: QuasiQuoteContext,
     val modality: Name? = value.modalityModifierType()?.value?.let(Name::identifier),
     val visibility: Name? = value.visibilityModifierType()?.value?.let(Name::identifier),
-    val typeParameters: ScopedList<KtTypeParameter> = ScopedList(value.typeParameters),
-    val receiver: Name? = value.receiverTypeReference?.text?.let(Name::identifier),
+    val `(typeParameters)`: ScopedList<KtTypeParameter> = ScopedList(prefix = "<", value = value.typeParameters, postfix = ">"),
+    val receiver: ScopedList<KtTypeReference> = ScopedList(listOfNotNull(value.receiverTypeReference), postfix = "."),
     val name: Name? = value.nameAsName,
-    val valueParameters: ScopedList<KtParameter> = ScopedList(value.valueParameters),
-    val returnType: Scope<KtTypeReference>? = value.typeReference?.let { Scope(it, context) },
+    val `(valueParameters)`: ScopedList<KtParameter> = ScopedList(
+      prefix = "(",
+      value = value.valueParameters,
+      postfix = ")",
+      forceRenderSurroundings = true
+    ),
+    val returnType: ScopedList<KtTypeReference> = ScopedList(listOfNotNull(value.typeReference), prefix = " : "),
     val body: FunctionBodyScope? = value.body()?.let { FunctionBodyScope(it, context) }
   ) : Scope<KtNamedFunction>(value, context)
 

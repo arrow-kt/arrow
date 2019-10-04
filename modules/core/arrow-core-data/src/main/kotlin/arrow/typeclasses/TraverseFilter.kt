@@ -7,8 +7,8 @@ import arrow.core.IdOf
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.fix
 import arrow.core.value
+import arrow.core.fix
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.TraverseFilter)

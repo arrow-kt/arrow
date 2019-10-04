@@ -181,7 +181,7 @@ sealed class Either<out A, out B> {
 
     fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
-    tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
+    tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> {
       val ev: Either<L, Either<A, B>> = f(a).fix()
       return when (ev) {
         is Left -> Left(ev.a)
