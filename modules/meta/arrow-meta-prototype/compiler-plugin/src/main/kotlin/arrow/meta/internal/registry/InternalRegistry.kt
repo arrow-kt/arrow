@@ -164,9 +164,9 @@ interface InternalRegistry: ConfigSyntax {
     val ctx = CompilerContext(project, messageCollector)
     registerPostAnalysisContextEnrichment(project, ctx)
 
-    /*println("System.properties are: " + System.getProperties().map {
+    println("System.properties are: " + System.getProperties().map {
       "\n${it.key} : ${it.value}"
-    })*/
+    })
 
     installArrowPlugin()
 
