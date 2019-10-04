@@ -285,4 +285,4 @@ interface MaybeKMonadFilter : MonadFilter<ForMaybeK> {
 
 // TODO MaybeK does not yet have a Concurrent instance
 fun <A> MaybeK.Companion.fx(c: suspend AsyncSyntax<ForMaybeK>.() -> A): MaybeK<A> =
-  MaybeK.async().fx.async(c).fix()
+  defer { MaybeK.async().fx.async(c).fix() }

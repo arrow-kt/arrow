@@ -383,4 +383,4 @@ interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
 }
 // TODO FlowableK does not yet have a Concurrent instance
 fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
-  FlowableK.async().fx.async(c).fix()
+  defer { FlowableK.async().fx.async(c).fix() }
