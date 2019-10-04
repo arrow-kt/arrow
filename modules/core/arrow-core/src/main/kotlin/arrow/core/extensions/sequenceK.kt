@@ -8,6 +8,7 @@ import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.Tuple2
+import arrow.core.extensions.sequence.foldable.isEmpty
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
@@ -245,6 +246,14 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK> {
 
   override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
     (fix() + b.fix()).k()
+
+  override fun <A : Any> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
+    if (this.fix().isEmpty()) SequenceK.empty()
+    else map { generateSequence { it }.k() }.k()
+
+  override fun <A : Any> Kind<ForSequenceK, A>.many(): SequenceK<SequenceK<A>> =
+    if (this.fix().isEmpty()) sequenceOf(emptySequence<A>().k()).k()
+    else map { generateSequence { it }.k() }.k()
 }
 
 fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =

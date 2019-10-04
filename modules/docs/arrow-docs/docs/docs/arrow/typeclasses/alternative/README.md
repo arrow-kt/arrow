@@ -61,6 +61,12 @@ Option.monadCombine().run {
 }
 ```
 
+#### Kind<F, A>.some
+
+`fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>>`
+
+
+
 ### Laws
 
 Arrow provides `AlternativeLaws` in the form of test cases for internal verifications of lawful instances and third party apps creating their own `Alternative` instances.

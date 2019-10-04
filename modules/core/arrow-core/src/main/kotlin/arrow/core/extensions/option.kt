@@ -6,15 +6,18 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
+import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
+import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.k
 import arrow.core.orElse
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -337,11 +340,23 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
   override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
     orElse { y.fix() }
 
-  override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
+  override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Option<A> =
     when (val a = fix()) {
       is None -> b.fix()
       is Some -> a
     }
+
+  override fun <A : Any> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
+    fix().fold(
+      { Option.empty() },
+      { generateSequence { it }.k().just().fix() }
+    )
+
+  override fun <A : Any> Kind<ForOption, A>.many(): Option<SequenceK<A>> =
+    fix().fold(
+      { emptySequence<A>().k().just().fix() },
+      { generateSequence { it }.k().just().fix() }
+    )
 }
 
 @extension
