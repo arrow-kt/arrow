@@ -9,6 +9,7 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.monad.monad
+import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
 import arrow.extension
@@ -228,6 +229,9 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
+
+  override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): ListK<A> =
+    fix() + b.fix()
 }
 
 @extension

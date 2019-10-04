@@ -192,7 +192,7 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadErr
 
 // TODO FluxK does not yet have a Concurrent instance
 fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
-  FluxK.async().fx.async(c).fix()
+  defer { FluxK.async().fx.async(c).fix() }
 
 @extension
 interface FluxKTimer : Timer<ForFluxK> {

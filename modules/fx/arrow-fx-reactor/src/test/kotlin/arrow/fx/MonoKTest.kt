@@ -64,6 +64,17 @@ class MonoKTest : UnitSpec() {
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
 
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = MonoK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = MonoK.fx {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
