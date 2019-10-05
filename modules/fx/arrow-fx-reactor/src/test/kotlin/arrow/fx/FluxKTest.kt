@@ -3,21 +3,21 @@ package arrow.fx
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
-import arrow.fx.reactor.k
 import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.foldable.foldable
 import arrow.fx.reactor.extensions.fluxk.functor.functor
-import arrow.fx.reactor.extensions.fluxk.functorFilter.functorFilter
-import arrow.fx.reactor.extensions.fx
 import arrow.fx.reactor.extensions.fluxk.monad.flatMap
-import arrow.fx.reactor.extensions.fluxk.traverse.traverse
+import arrow.fx.reactor.extensions.fluxk.monadFilter.monadFilter
 import arrow.fx.reactor.extensions.fluxk.timer.timer
+import arrow.fx.reactor.extensions.fluxk.traverse.traverse
+import arrow.fx.reactor.extensions.fx
+import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
-import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -28,9 +28,9 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
-import reactor.test.expectError
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
+import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -72,7 +72,7 @@ class FluxKTest : UnitSpec() {
       AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ()),
-      FunctorFilterLaws.laws(FluxK.functorFilter(), { Flux.just(it).k() }, EQ())
+      MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQ())
     )
 
     "fx should defer evaluation until subscribed" {
