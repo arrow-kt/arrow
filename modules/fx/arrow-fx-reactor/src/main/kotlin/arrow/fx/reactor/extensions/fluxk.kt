@@ -3,6 +3,7 @@ package arrow.fx.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
@@ -27,6 +28,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -197,4 +199,13 @@ interface FluxKTimer : Timer<ForFluxK> {
   override fun sleep(duration: Duration): FluxK<Unit> =
     FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
       .map { Unit }.toFlux())
+}
+
+@extension
+interface FluxKFunctorFilter : FunctorFilter<ForFluxK> {
+  override fun <A, B> Kind<ForFluxK, A>.filterMap(f: (A) -> Option<B>): FluxK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
+    fix().map(f)
 }
