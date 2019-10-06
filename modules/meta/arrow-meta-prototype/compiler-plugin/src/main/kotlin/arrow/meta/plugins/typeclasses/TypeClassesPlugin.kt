@@ -1,14 +1,17 @@
 package arrow.meta.plugins.typeclasses
 
+import arrow.meta.Meta
+import arrow.meta.Plugin
+import arrow.meta.dsl.platform.ide
+import arrow.meta.invoke
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase
-import arrow.meta.MetaComponentRegistrar
 import arrow.meta.phases.codegen.ir.IrUtils
+import arrow.meta.quotes.FunctionBodyScope
+import arrow.meta.quotes.Transform
 import arrow.meta.quotes.func
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktFile
-import arrow.meta.dsl.platform.ide
-import arrow.meta.quotes.Func
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -31,7 +34,6 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtExpression
@@ -64,27 +66,32 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 const val WithMarker = "given"
 val ExtensionAnnotation = FqName("arrow.extension")
 
-val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
+val Meta.typeClasses: Plugin
   get() =
-    Name.identifier("typeClasses") to
+    "typeClasses" {
       meta(
         enableIr(),
         func(
           match = { hasExtensionValueParameters() },
           map = { func ->
-            listOf(
+            println("intercepting function for typeclass: ${func.text}")
+            val result =
               """
               |$modality $visibility fun $`(typeParameters)` $receiver $name $`(valueParameters)` $returnType =
               |  ${func.extensionValueParamNames().run(body)}
-              |"""
+              |""".function
+            println("result: $result")
+            Transform.replace(func,
+                result
             )
           }
         ),
         ideSyntheticBodyResolution(),
         irFunctionAccess { mapValueParameterExtensions(it) }
       )
+    }
 
-private fun MetaComponentRegistrar.ideSyntheticBodyResolution(): ExtensionPhase = ide {
+private fun Meta.ideSyntheticBodyResolution(): ExtensionPhase = ide {
   syntheticResolver(
     generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
       thisDescriptor.safeAs<LazyClassDescriptor>()?.let { lazyDescriptor ->
@@ -158,7 +165,7 @@ private fun ValueParameterDescriptor.shouldEnhanceScope(): Boolean {
   return ktParameter?.hasExtensionDefaultValue() == true
 }
 
-private fun List<String?>.run(body: Func.FunctionBodyScope?): String =
+private fun List<String?>.run(body: FunctionBodyScope?): String =
   if (body != null)
     fold(body.toString()) { acc, scope -> "$scope.run { $acc }" }
   else ""

@@ -1,6 +1,8 @@
 apply plugin: 'kotlin-kapt'
 apply plugin: "arrow.meta.plugin.gradle"
 
+println("Kotlin version: $kotlinVersion")
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')

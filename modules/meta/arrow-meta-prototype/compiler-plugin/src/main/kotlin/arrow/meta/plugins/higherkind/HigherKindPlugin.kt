@@ -1,52 +1,59 @@
 package arrow.meta.plugins.higherkind
 
-import arrow.meta.phases.ExtensionPhase
-import arrow.meta.MetaComponentRegistrar
-import arrow.meta.dsl.platform.ide
+import arrow.meta.Meta
+import arrow.meta.Plugin
+import arrow.meta.invoke
+import arrow.meta.quotes.Transform
 import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.classOrObject
 import arrow.meta.quotes.ktClassNamed
-import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtImportInfo
+import org.jetbrains.kotlin.psi.KtTypeAlias
 import org.jetbrains.kotlin.psi.KtTypeParameter
-import org.jetbrains.kotlin.resolve.ImportPath
 
-val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
+val Meta.higherKindedTypes: Plugin
   get() =
-    Name.identifier("higherKindedTypes") to
+    "higherKindedTypes" {
       meta(
         registerKindAwareTypeChecker(),
         classOrObject(::isHigherKindedType) { c ->
           println("Processing Higher Kind: ${c.name}: ${c.superTypeIsSealedInFile()}")
-          listOfNotNull(
+          Transform.replace(c, listOfNotNull(
             /** Kind Marker **/
-            "class For$name private constructor() { companion object }",
+            /** Kind Marker **/
+            "class For$name private constructor() { companion object }".`class`,
             /** Single arg type alias **/
-            "typealias ${name}Of<${`(typeParameters)`.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>",
+            /** Single arg type alias **/
+            "typealias ${name}Of<${`(typeParameters)`.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>(),
+            /** KindedJ Support **/
             /** KindedJ Support **/
             if (c.arity < 5)
-              "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>"
+              "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>()
             else null,
-            """|fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> = this as $name<${`(typeParameters)`.invariant()}>
-               |""",
+            """|fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> =
+               |  this as $name<${`(typeParameters)`.invariant()}>
+               |""".function,
+            /** generate partial aliases if this kind has > 1 type parameters **/
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
-              "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"
+              "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>".declaration<KtTypeAlias>()
             else null,
+            /** Class redefinition with kinded super type **/
             /** Class redefinition with kinded super type **/
             """|$`@annotationEntries` $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
                |  $body
                |}
-               |"""
+               |""".`class`
+          )
           )
         }
       )
+    }
+
 
 private fun ScopedList<KtTypeParameter>.invariant(constrained: Boolean = false): String =
   value.joinToString {

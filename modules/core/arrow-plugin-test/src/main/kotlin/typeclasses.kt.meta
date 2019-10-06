@@ -3,7 +3,7 @@ package arrow.extreme
 import arrow.Kind
 import arrow.given
 
-//metadebug
+//meta: Mon Oct 07 00:37:16 CEST 2019
 
 interface Mappable<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
@@ -11,8 +11,8 @@ interface Mappable<F> {
 
 object Test {
 
-  fun <F> Kind<F, Int>. addOne (M: Mappable<F> = given)  : Kind<F, Int> =
-  M.run { map { it + 1 } }
+  fun <F> Kind<F, Int>.addOne(M: Mappable<F> = given) : Kind<F, Int> =
+    map { it + 1 }
 
 }
 
