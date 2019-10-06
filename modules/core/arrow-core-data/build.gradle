@@ -17,7 +17,3 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-
-compileKotlin {
-    kotlinOptions.freeCompilerArgs = ["-Xplugin=/Users/raulraja/workspace/arrow/arrow/modules/meta/arrow-meta-prototype/compiler-plugin/build/libs/compiler-plugin.jar"]
-}
