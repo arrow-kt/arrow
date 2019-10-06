@@ -33,8 +33,8 @@ fun testCompilation(compilationData: CompilationData) {
       File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar")
     )
     pluginClasspaths = listOf(
-      // TODO
-      File("../compiler-plugin/build/libs/compiler-plugin.jar")
+      classpathOf("compiler-plugin")
+//      File("../compiler-plugin/build/libs/compiler-plugin.jar")
     )
   }.compile()
 
