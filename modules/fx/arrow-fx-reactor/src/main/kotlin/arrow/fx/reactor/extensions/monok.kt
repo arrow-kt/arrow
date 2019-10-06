@@ -28,6 +28,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
+import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
 
 @extension
 interface MonoKFunctor : Functor<ForMonoK> {
@@ -68,7 +69,7 @@ interface MonoKApplicativeError : ApplicativeError<ForMonoK, Throwable>, MonoKAp
     MonoK.raiseError(e)
 
   override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().monoHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -80,7 +81,7 @@ interface MonoKMonadError : MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKAp
     MonoK.raiseError(e)
 
   override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().monoHandleErrorWith { f(it).fix() }
 }
 
 @extension

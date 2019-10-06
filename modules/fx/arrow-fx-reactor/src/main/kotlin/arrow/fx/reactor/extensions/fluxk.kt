@@ -40,6 +40,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import kotlin.coroutines.CoroutineContext
+import arrow.fx.reactor.handleErrorWith as fluxHandleErrorWith
 
 @extension
 interface FluxKFunctor : Functor<ForFluxK> {
@@ -109,7 +110,7 @@ interface FluxKApplicativeError :
     FluxK.raiseError(e)
 
   override fun <A> FluxKOf<A>.handleErrorWith(f: (Throwable) -> FluxKOf<A>): FluxK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().fluxHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -120,7 +121,7 @@ interface FluxKMonadError :
     FluxK.raiseError(e)
 
   override fun <A> FluxKOf<A>.handleErrorWith(f: (Throwable) -> FluxKOf<A>): FluxK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().fluxHandleErrorWith { f(it).fix() }
 }
 
 @extension
