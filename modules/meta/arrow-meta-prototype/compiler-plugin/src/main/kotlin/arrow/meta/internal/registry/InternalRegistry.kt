@@ -1,6 +1,6 @@
 package arrow.meta.internal.registry
 
-import arrow.meta.MetaComponentRegistrar
+import arrow.meta.Plugin
 import arrow.meta.dsl.config.ConfigSyntax
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.Composite
@@ -22,11 +22,14 @@ import arrow.meta.phases.resolve.synthetics.SyntheticScopeProvider
 import arrow.meta.plugins.higherkind.KindAwareTypeChecker
 import arrow.meta.dsl.platform.cli
 import arrow.meta.dsl.platform.ide
+import arrow.meta.invoke
+import arrow.meta.phases.analysis.ElementScope
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
@@ -37,6 +40,7 @@ import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.TreeCopyHandler
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
@@ -92,9 +96,9 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.util.ArrayList
 
-interface InternalRegistry: ConfigSyntax {
+interface InternalRegistry : ConfigSyntax {
 
-  fun intercept(): List<Pair<Name, List<ExtensionPhase>>>
+  fun intercept(ctx: CompilerContext): List<Plugin>
 
   private fun registerPostAnalysisContextEnrichment(project: Project, ctx: CompilerContext) {
     cli {
@@ -159,10 +163,11 @@ interface InternalRegistry: ConfigSyntax {
     ide {
       println("it's the IDEA plugin")
     }
+    val scope = ElementScope.default(project)
     val messageCollector: MessageCollector? =
       cli { configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE) }
 
-    val ctx = CompilerContext(project, messageCollector)
+    val ctx = CompilerContext(project, messageCollector, scope)
     registerPostAnalysisContextEnrichment(project, ctx)
 
     println("System.properties are: " + System.getProperties().map {
@@ -171,33 +176,39 @@ interface InternalRegistry: ConfigSyntax {
 
     installArrowPlugin()
 
-    val initialPhases = listOf(Name.identifier("Initial setup") to listOf(
-      //enableIr(),
-      compilerContextService(),
-      //registerKindAwareTypeChecker(),
-      registerMetaAnalyzer()
-    ))
-    (initialPhases + intercept()).forEach { (plugin, phases) ->
-      println("Registering plugin: $plugin extensions: $phases")
-      phases.forEach { currentPhase ->
-        fun registerPhase(phase: ExtensionPhase): Unit {
-          if (phase is ExtraImports) registerExtraImports(project, phase, ctx)
-          if (phase is PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
-          if (phase is Config) registerCompilerConfiguration(project, phase, ctx)
-          if (phase is StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
-          if (phase is CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
-          if (phase is AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
-          if (phase is ClassBuilder) registerClassBuilder(project, phase, ctx)
-          if (phase is Codegen) registerCodegen(project, phase, ctx)
-          if (phase is DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
-          if (phase is PackageProvider) packageFragmentProvider(project, phase, ctx)
-          if (phase is SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
-          if (phase is IRGeneration) registerIRGeneration(project, phase, ctx)
-          if (phase is SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
-          if (phase is DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
-          if (phase is Composite) phase.phases.map(::registerPhase)
+    val initialPhases = listOf("Initial setup" {
+      listOf(
+        //enableIr(),
+        compilerContextService(),
+        //registerKindAwareTypeChecker(),
+        registerMetaAnalyzer()
+      )
+    })
+    (initialPhases + intercept(ctx)).forEach { plugin ->
+      println("Registering plugin: $plugin extensions: ${plugin.meta}")
+      plugin.meta.invoke(ctx).forEach { currentPhase ->
+        fun ExtensionPhase.registerPhase(): Unit {
+          when (this) {
+            is ExtraImports -> registerExtraImports(project, this, ctx)
+            is PreprocessedVirtualFileFactory -> registerPreprocessedVirtualFileFactory(project, this, ctx)
+            is Config -> registerCompilerConfiguration(project, this, ctx)
+            is StorageComponentContainer -> registerStorageComponentContainer(project, this, ctx)
+            is CollectAdditionalSources -> registerCollectAdditionalSources(project, this, ctx)
+            is AnalysisHandler -> registerAnalysisHandler(project, this, ctx)
+            is ClassBuilder -> registerClassBuilder(project, this, ctx)
+            is Codegen -> registerCodegen(project, this, ctx)
+            is DeclarationAttributeAlterer -> registerDeclarationAttributeAlterer(project, this, ctx)
+            is PackageProvider -> packageFragmentProvider(project, this, ctx)
+            is SyntheticResolver -> registerSyntheticResolver(project, this, ctx)
+            is IRGeneration -> registerIRGeneration(project, this, ctx)
+            is SyntheticScopeProvider -> registerSyntheticScopeProvider(project, this, ctx)
+            is DiagnosticsSuppressor -> registerDiagnosticSuppressor(project, this, ctx)
+            is Composite -> phases.map(ExtensionPhase::registerPhase)
+            is ExtensionPhase.Empty -> Unit
+            else -> messageCollector?.report(CompilerMessageSeverity.ERROR, "Unsupported extension phase: $this")
+          }
         }
-        registerPhase(currentPhase)
+        currentPhase.registerPhase()
         ctx.registerIdeExclusivePhase(currentPhase)
       }
     }
@@ -212,6 +223,7 @@ interface InternalRegistry: ConfigSyntax {
   }
 
   fun registerMetaAnalyzer(): ExtensionPhase = ExtensionPhase.Empty
+
   fun registerDiagnosticSuppressor(
     project: Project,
     phase: DiagnosticsSuppressor,

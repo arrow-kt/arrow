@@ -1,6 +1,6 @@
 package arrow.meta.dsl.codegen.ir
 
-import arrow.meta.MetaComponentRegistrar
+import arrow.meta.Meta
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.codegen.ir.IRGeneration
 import arrow.meta.phases.codegen.ir.IrUtils
@@ -287,7 +287,7 @@ interface IrSyntax {
       }, Unit)
     }
 
-  fun <A> MetaComponentRegistrar.irConst(f: IrUtils.(IrConst<A>) -> IrExpression?): IRGeneration =
+  fun <A> Meta.irConst(f: IrUtils.(IrConst<A>) -> IrExpression?): IRGeneration =
     IrGeneration { compilerContext, file, backendContext, bindingContext ->
       file.transformChildren(object : IrElementTransformer<Unit> {
         override fun <T> visitConst(expression: IrConst<T>, data: Unit): IrExpression =

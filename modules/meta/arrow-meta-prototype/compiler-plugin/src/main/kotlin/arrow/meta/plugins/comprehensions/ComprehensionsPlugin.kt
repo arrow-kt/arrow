@@ -1,84 +1,131 @@
 package arrow.meta.plugins.comprehensions
 
-import arrow.meta.MetaComponentRegistrar
-import arrow.meta.phases.ExtensionPhase
-import arrow.meta.phases.analysis.bfs
-import arrow.meta.phases.analysis.body
-import arrow.meta.phases.analysis.countDescendantsOfType
-import arrow.meta.quotes.func
-import org.jetbrains.kotlin.name.Name
+import arrow.meta.Meta
+import arrow.meta.Plugin
+import arrow.meta.invoke
+import arrow.meta.phases.analysis.ElementScope
+import arrow.meta.quotes.Transform
+import arrow.meta.quotes.quote
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.psiUtil.before
 import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
-/**
- * 1. replace all instances of bind application with flatMap:
- *  - Anonymous application using a generated flatMapArg0, flatMapArg1 etc name for each binding found
- * 2. flatMap replacements takes care scoping all bodies with as many nested flatMap as bindings are found within a body by folding inside out all binds
- */
-val MetaComponentRegistrar.comprehensions: Pair<Name, List<ExtensionPhase>>
+@ExperimentalContracts
+val Meta.comprehensions: Plugin
   get() =
-    Name.identifier("comprehensions") to
+    "comprehensions" {
       meta(
-        func(KtFunction::hasBindings) { ktFunction ->
-          listOf(
-            """
-              |$modality $visibility fun $`(typeParameters)` $receiver $name $`(valueParameters)` $returnType =
-              |  ${ktFunction.replaceBindingsWithFlatMap()}
-              |"""
+        quote(KtDotQualifiedExpression::containsFxBlock) { fxExpression ->
+          println("fxBlock: ${fxExpression.text}")
+          Transform.replace(
+            replacing = fxExpression,
+            newDeclaration = toFlatMap(fxExpression).expression
           )
         }
       )
-
-private fun KtFunction.replaceBindingsWithFlatMap(): String =
-  fxBlocks().joinToString("\n", transform = KtReferenceExpression::replaceBindingsWithFlatMap)
-
-private fun KtReferenceExpression.replaceBindingsWithFlatMap(): String {
-  val parentCall = parent.safeAs<KtCallExpression>()
-  println("replaceBindingsWithFlatMap.parentCall.parent: ${parentCall?.parent?.reference}")
-  val fxBody = parentCall?.findDescendantOfType<KtBlockExpression>()
-  val newSource: List<String> = fxBody.replaceBindingsWithFlatMap(parentCall)
-  return parentCall.encloseFlatMapBodies(newSource)
-}
-
-private fun KtCallExpression?.encloseFlatMapBodies(newSource: List<String>): String {
-  val bindCount = countDescendantsOfType()
-  return (newSource + (0 until bindCount).map { "}" }).joinToString("\n")
-}
-
-private fun KtBlockExpression?.replaceBindingsWithFlatMap(parentCall: KtCallExpression?): List<String> =
-  this?.statements?.foldIndexed(emptyList()) { n, source, expression ->
-    when {
-      expression is KtProperty && expression.hasDelegate() ->
-        source + expression.boundPropertyToFlatMap()
-      n + 1 == statements.size ->
-        source + parentCall.just(expression.text)
-      else ->
-        source + expression.text
     }
-  } ?: emptyList()
 
-private fun KtProperty.boundPropertyToFlatMap(): String =
-  "${delegateExpression?.text}.flatMap { $name ${typeReference?.let { ": ${it.text}" }
-    ?: ""} -> "
+private fun KtDotQualifiedExpression.containsFxBlock(): Boolean =
+  findDescendantOfType<KtBlockExpression> { it.isFxBlock() } != null
 
-fun KtCallExpression?.just(value: String): String =
+@ExperimentalContracts
+private fun KtExpression?.containsNestedFxBlock(): Boolean {
+  contract {
+    returns() implies (this@containsNestedFxBlock != null)
+  }
+  return this?.findDescendantOfType<KtBlockExpression> { it.isFxBlock() } != null
+}
+
+
+
+@ExperimentalContracts
+private fun ElementScope.delegationToFlatMap(ktExpression: KtExpression): String? =
+  ktExpression.findDescendantOfType<KtBlockExpression> { it.isFxBlock()}?.let {
+    toFlatMap(it)
+  }
+
+@ExperimentalContracts
+private fun ElementScope.toFlatMap(fxCall: KtDotQualifiedExpression): String =
+  fxCall.findDescendantOfType<KtBlockExpression> { it.isFxBlock() }?.let {
+    toFlatMap(it)
+  } ?: ""
+
+
+@ExperimentalContracts
+private fun ElementScope.toFlatMap(fxBlock: KtBlockExpression): String {
+  val nextBind = fxBlock.statements.filterIsInstance<KtProperty>().first()
+  val (beforeBind, afterBind) =
+    fxBlock.statements.filterNot { it == nextBind }.partition { it.before(nextBind) }
+  val flatMap = toFlatMap(nextBind, afterBind).expression.value
+  val newStatements = (beforeBind + flatMap).filterNotNull()
+  return newStatements.joinToString("\n") { it.text }
+}
+
+@ExperimentalContracts
+private fun ElementScope.toFlatMap(bind: KtProperty, remaining: List<KtExpression>): String {
+  val target = bind.delegateExpression
+  val targetSource = when {
+    target.containsNestedFxBlock() -> delegationToFlatMap(target)
+    else -> target.text
+  }
+  val argName = bind.name
+  val typeName = bind.typeReference?.let { ": ${it.text}" } ?: ""
+  return """|${targetSource}.flatMap { $argName $typeName -> 
+            |  ${toFlatMap(remaining)}  
+            |}
+            |"""
+}
+
+@ExperimentalContracts
+private fun ElementScope.toFlatMap(remaining: List<KtExpression>): String =
+  when {
+    remaining.isEmpty() -> ""
+    else -> {
+      val head = remaining[0]
+      val tail = remaining.drop(1)
+      when {
+        head.isBinding() -> toFlatMap(head, tail)
+        remaining.size == 1 -> head.returningJust()
+        else -> head.text + "\n" + toFlatMap(tail)
+      }
+    }
+  }
+
+
+@ExperimentalContracts
+private fun KtExpression?.isBinding(): Boolean {
+  contract {
+    returns() implies (this@isBinding is KtProperty)
+    returns() implies (this@isBinding != null)
+  }
+  return this is KtProperty && hasDelegate()
+}
+
+//TODO rewrite to return a DotQualifiedExpression which is the flatMap call application
+//TODO with a fold over the statements where the dotqualified expression is applied over ktelement and nesting recursively
+
+private fun KtElement?.returningJust(): String =
+  this?.let {
+    it.getParentOfType<KtCallExpression>(true).generateJust(it.text)
+  }.orEmpty()
+
+fun KtCallExpression?.generateJust(value: String): String =
   this?.parent?.firstChild?.text?.let { "$it.just($value)" }
     ?: "just($value)"
 
-private fun KtElement.isBindingCall(): Boolean =
-  this is KtReferenceExpression &&
-    text == "fx" &&
-    parent.findDescendantOfType<KtProperty>()?.hasDelegate() != null
-
-private fun KtFunction.hasBindings(): Boolean =
-  body()?.fxBlocks()?.isNotEmpty() == true
-
-private fun KtExpression.fxBlocks(): List<KtReferenceExpression> =
-  bfs { it.isBindingCall() }.filterIsInstance<KtReferenceExpression>()
+private fun KtBlockExpression.isFxBlock(): Boolean {
+  val result = statements.any { it is KtProperty && it.hasDelegate() } &&
+    getParentOfType<KtCallExpression>(true)?.firstChild.safeAs<KtReferenceExpression>()?.text == "fx"
+  println("isFxBlock ${this.text}: $result")
+  return result
+}

@@ -1,22 +1,24 @@
 package arrow.meta.plugins.dummy
 
-import arrow.meta.phases.ExtensionPhase
-import arrow.meta.MetaComponentRegistrar
+import arrow.meta.Meta
+import arrow.meta.Plugin
+import arrow.meta.invoke
+import arrow.meta.quotes.Transform
 import arrow.meta.quotes.classOrObject
-import arrow.meta.quotes.func
-import org.jetbrains.kotlin.name.Name
 
-val MetaComponentRegistrar.dummy: Pair<Name, List<ExtensionPhase>>
+val Meta.dummy: Plugin
   get() =
-    Name.identifier("Dummy") to
+    "Dummy" {
       meta(
         classOrObject({ name?.startsWith("Test") == true }) { c ->
-          listOfNotNull(
-            """
-              |class Test {
-              |  fun test(): Unit = TODO()
-              |}
-              """
+          Transform.replace(
+            replacing = c,
+            newDeclaration =
+              """|class Test {
+                 |  fun test(): Unit = TODO()
+                 |}
+                 |""".`class`
           )
         }
       )
+    }

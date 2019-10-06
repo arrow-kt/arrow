@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//metadebug
+//meta: Mon Oct 07 00:58:59 CEST 2019
 object Runner {
 
   @kotlin.jvm.JvmStatic

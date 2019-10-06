@@ -1,48 +1,55 @@
 package arrow.meta.plugins.optics
 
-import arrow.meta.phases.ExtensionPhase
-import arrow.meta.MetaComponentRegistrar
+import arrow.meta.Meta
+import arrow.meta.Plugin
+import arrow.meta.invoke
+import arrow.meta.phases.CompilerContext
 import arrow.meta.quotes.ClassScope
+import arrow.meta.quotes.Transform
 import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.classOrObject
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 
-val MetaComponentRegistrar.lenses: Pair<Name, List<ExtensionPhase>>
+val Meta.lenses: Plugin
   get() =
-    Name.identifier("lenses") to
+    "lenses" {
       meta(
         classOrObject(::isProductType) { c ->
-          if (`(valueParameters)`.value.size > 10) context.compilerContext.messageCollector?.report(CompilerMessageSeverity.WARNING, "Iso cannot be generated for product type with ${`(valueParameters)`.value.size}. Maximum support is $maxArity")
-          listOf(
+          if (`(valueParameters)`.value.size > 10)
+            messageCollector?.report(CompilerMessageSeverity.WARNING, "Iso cannot be generated for product type with ${`(valueParameters)`.value.size}. Maximum support is $maxArity")
+          Transform.replace(
+            replacing = c,
+            newDeclaration =
             if (c.companionObjects.isEmpty())
-              """
-              |$modality $visibility data $kind $name($`(valueParameters)`) {
-              |  
-              |  companion object {
-              |${lenses().joinToString("\n\n") { it.text }}
-              |
-              |$iso
-              |  }
-              |}""" else """
-              |$modality $visibility data $kind $name($`(valueParameters)`) {
-              |  ${body.value?.addDeclerationTobody(lenses = lenses())}
-              |}"""
+                     """|
+                        |$modality $visibility data $kind $name($`(valueParameters)`) {
+                        |  
+                        |  companion object {
+                        |${lenses(ctx).joinToString("\n\n") { it.text }}
+                        |
+                        |$iso
+                        |  }
+                        |}""".`class` else """
+                        |$modality $visibility data $kind $name($`(valueParameters)`) {
+                        |  ${body.value?.addDeclarationToBody(lenses = lenses(ctx))}
+                        |  
+                        |}""".`class`
           )
         }
       )
+    }
 
 private const val maxArity: Int = 10
 
-private fun ClassScope.lenses(): List<KtProperty> =
+private fun ClassScope.lenses(compilerContext: CompilerContext): List<KtProperty> =
   `(valueParameters)`.value.map { param: KtParameter ->
     lens(source = value, focus = param)
-  }.map(context.compilerContext.ktPsiElementFactory::createProperty)
+  }.map(compilerContext.ktPsiElementFactory::createProperty)
 
 private fun lens(source: KtClass, focus: KtParameter): String =
   """
@@ -75,7 +82,7 @@ private fun isProductType(ktClass: KtClass): Boolean =
     ktClass.primaryConstructorParameters.all { !it.isMutable } &&
     ktClass.typeParameters.isEmpty()
 
-fun KtClassBody.addDeclerationTobody(lenses: List<KtProperty>): String =
+fun KtClassBody.addDeclarationToBody(lenses: List<KtProperty>): String =
   declarations.joinToString("\n") { declaration ->
     if (declaration is KtObjectDeclaration && declaration.isCompanion()) lenses.joinToString("\n\n") { it.text }
     else declaration.text
