@@ -11,7 +11,6 @@ import arrow.meta.quotes.FunctionBodyScope
 import arrow.meta.quotes.Transform
 import arrow.meta.quotes.func
 import arrow.meta.quotes.get
-import arrow.meta.quotes.ktFile
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -299,7 +299,7 @@ private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinTy
     }
 
 private fun ClassifierDescriptor?.packageFragmentDescriptor(): PackageFragmentDescriptor? =
-  this?.ktFile()?.let { file -> this.module.findPackageFragmentForFile(file) }
+  this?.findPsi()?.containingFile.safeAs<KtFile>()?.let { file -> this?.module?.findPackageFragmentForFile(file) }
 
 private fun KotlinType.dataTypeDescriptor(): ClassifierDescriptor? =
   arguments[0].type.constructor.declarationDescriptor

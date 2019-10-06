@@ -75,13 +75,13 @@ class MetaIdeAnalyzer : MetaAnalyzer {
 
   private val FILE_KEY = Key.create<VirtualFile>("FILE_KEY")
 
-  fun DeclarationDescriptor?.isGenerated(): Boolean =
-    this?.findPsi()?.ktFile()?.name?.startsWith("_meta_") == true
+  private fun DeclarationDescriptor?.isGenerated(): Boolean =
+    this?.findPsi()?.containingFile?.name?.startsWith("_meta_") == true
 
   val DeclarationDescriptor?.syntheticCache: SyntheticDescriptorCache?
     get() = this?.let {
       if (!it.isGenerated()) {
-        val file: VirtualFile? = it.ktFile()?.virtualFile
+        val file: VirtualFile? = it.findPsi()?.containingFile?.virtualFile
         file?.let { cache[it.metaCacheId] }
       } else null
     }
