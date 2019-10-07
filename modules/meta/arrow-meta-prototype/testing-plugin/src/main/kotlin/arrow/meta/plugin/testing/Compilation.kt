@@ -44,9 +44,22 @@ fun testCompilation(compilationData: CompilationData): Unit {
 }
 
 private fun testConditions(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
-  val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
-  assertThat(actualGeneratedFileContent).isEqualTo(compilationData.generatedFileContent)
+  testMetaFile(compilationData, result)
+  testGeneratedClasses(compilationData, result)
+}
 
+private fun testMetaFile(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
+  val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
+  val actualGeneratedFileContentWithoutCommands = removeCommandsFrom(actualGeneratedFileContent)
+  val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent)
+
+  assertThat(actualGeneratedFileContentWithoutCommands).isEqualTo(generatedFileContentWithoutCommands)
+}
+
+fun removeCommandsFrom(actualGeneratedFileContent: String): String =
+  actualGeneratedFileContent.lines().filter { !it.startsWith("//") }.joinToString()
+
+private fun testGeneratedClasses(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
   val actualGeneratedClasses = result.generatedFiles.map { it.name }.filter { it.endsWith(".class") }
   assertThat(actualGeneratedClasses).isEqualTo(compilationData.generatedClasses.map { "$it.class" })
 }
