@@ -9,8 +9,6 @@ buildscript {
         classGraphVersion = '4.8.47'
 
         // TODO: temporary version until PR is approved and published
-        // Generated in local environment from branch:
-        // https://github.com/arrow-kt/kotlin-compile-testing/tree/pluginClasspaths
         kotlinCompileTesting = '1.2.3-SNAPSHOT'
     }
 }
@@ -24,7 +22,11 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compileOnly "io.github.classgraph:classgraph:$classGraphVersion"
     implementation "org.assertj:assertj-core:$assertjVersion"
-    implementation "com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTesting"
+
+    // TODO: temporary dependency until PR is approved and published
+    // implementation "com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTesting"
+    implementation "com.github.arrow-kt:kotlin-compile-testing:$kotlinCompileTesting"
+
     testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion"
 }
@@ -45,11 +47,11 @@ test {
 }
 
 // TODO: Temporary configuration
-// It's necessary because this plugin is using a local library for
+// A temporary version from a fork of
 // com.github.tschuchortdev:kotlin-compile-testing
-// until it's published with the contribution
+// is needed until it's published with the contribution
 repositories {
-    mavenLocal()
+    maven { url "https://jitpack.io" }
 }
 
 jar {
