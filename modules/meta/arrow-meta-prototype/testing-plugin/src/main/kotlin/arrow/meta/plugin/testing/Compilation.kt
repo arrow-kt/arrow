@@ -22,26 +22,28 @@ data class CompilationData(
   val compilationResult: CompilationResult
 )
 
-fun testCompilation(compilationData: CompilationData) {
+fun testCompilation(compilationData: CompilationData): Unit {
   val kotlinSource = SourceFile.kotlin(compilationData.sourceFileName, compilationData.sourceContent)
 
   val result = KotlinCompilation().apply {
     sources = listOf(kotlinSource)
     classpaths = listOf(
-      // TODO
+      // TODO: waiting for the next Arrow release
       // classpathOf("arrow-annotations:x.x.x")
       File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar")
     )
     pluginClasspaths = listOf(
       classpathOf("compiler-plugin")
-//      File("../compiler-plugin/build/libs/compiler-plugin.jar")
     )
   }.compile()
 
   assertThat(result.exitCode).isEqualTo(exitCodeFrom(compilationData.compilationResult))
 
-  if (!result.exitCode.equals(KotlinCompilation.ExitCode.OK)) return
+  if (result.exitCode.equals(KotlinCompilation.ExitCode.OK))
+    testConditions(compilationData, result)
+}
 
+private fun testConditions(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
   val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
   assertThat(actualGeneratedFileContent).isEqualTo(compilationData.generatedFileContent)
 
@@ -49,7 +51,8 @@ fun testCompilation(compilationData: CompilationData) {
   assertThat(actualGeneratedClasses).isEqualTo(compilationData.generatedClasses.map { "$it.class" })
 }
 
-fun contentFromResource(fromClass: Class<Any>, resourceName: String): String = fromClass.getResource("/$resourceName").readText()
+fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
+  fromClass.getResource("/$resourceName").readText()
 
 fun classpathOf(dependency: String): File {
   val regex = Regex(".*${dependency.replace(':', '-')}.*")

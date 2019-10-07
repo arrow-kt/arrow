@@ -9,12 +9,17 @@ buildscript {
         classGraphVersion = '4.8.47'
 
         // TODO: temporary version until PR is approved and published
+        // Generated in local environment from branch:
+        // https://github.com/arrow-kt/kotlin-compile-testing/tree/pluginClasspaths
         kotlinCompileTesting = '1.2.3-SNAPSHOT'
     }
 }
 
 dependencies {
     testRuntime project(":compiler-plugin")
+
+    // TODO: waiting for the next Arrow release
+    // testRuntime "io.arrow-kt:arrow-annotations:0.10.1"
 
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compileOnly "io.github.classgraph:classgraph:$classGraphVersion"
