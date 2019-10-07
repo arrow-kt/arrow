@@ -2,11 +2,15 @@ package arrow.meta.internal.registry
 
 import arrow.meta.Plugin
 import arrow.meta.dsl.config.ConfigSyntax
+import arrow.meta.dsl.platform.cli
+import arrow.meta.dsl.platform.ide
+import arrow.meta.invoke
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.Composite
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.phases.analysis.AnalysisHandler
 import arrow.meta.phases.analysis.CollectAdditionalSources
+import arrow.meta.phases.analysis.ElementScope
 import arrow.meta.phases.analysis.ExtraImports
 import arrow.meta.phases.analysis.PreprocessedVirtualFileFactory
 import arrow.meta.phases.codegen.asm.ClassBuilder
@@ -16,14 +20,9 @@ import arrow.meta.phases.config.Config
 import arrow.meta.phases.config.StorageComponentContainer
 import arrow.meta.phases.resolve.DeclarationAttributeAlterer
 import arrow.meta.phases.resolve.PackageProvider
-import arrow.meta.phases.resolve.diagnostics.DiagnosticsSuppressor
 import arrow.meta.phases.resolve.synthetics.SyntheticResolver
 import arrow.meta.phases.resolve.synthetics.SyntheticScopeProvider
 import arrow.meta.plugins.higherkind.KindAwareTypeChecker
-import arrow.meta.dsl.platform.cli
-import arrow.meta.dsl.platform.ide
-import arrow.meta.invoke
-import arrow.meta.phases.analysis.ElementScope
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -40,7 +39,6 @@ import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.TreeCopyHandler
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
@@ -56,7 +54,6 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CollectAdditionalSourcesExtension
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
@@ -77,7 +74,6 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
-import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
@@ -94,7 +90,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.util.ArrayList
+import java.util.*
 
 interface InternalRegistry : ConfigSyntax {
 
@@ -178,9 +174,7 @@ interface InternalRegistry : ConfigSyntax {
 
     val initialPhases = listOf("Initial setup" {
       listOf(
-        //enableIr(),
         compilerContextService(),
-        //registerKindAwareTypeChecker(),
         registerMetaAnalyzer()
       )
     })
@@ -202,7 +196,7 @@ interface InternalRegistry : ConfigSyntax {
             is SyntheticResolver -> registerSyntheticResolver(project, this, ctx)
             is IRGeneration -> registerIRGeneration(project, this, ctx)
             is SyntheticScopeProvider -> registerSyntheticScopeProvider(project, this, ctx)
-            is DiagnosticsSuppressor -> registerDiagnosticSuppressor(project, this, ctx)
+            //is DiagnosticsSuppressor -> registerDiagnosticSuppressor(project, this, ctx)
             is Composite -> phases.map(ExtensionPhase::registerPhase)
             is ExtensionPhase.Empty -> Unit
             else -> messageCollector?.report(CompilerMessageSeverity.ERROR, "Unsupported extension phase: $this")
@@ -223,18 +217,6 @@ interface InternalRegistry : ConfigSyntax {
   }
 
   fun registerMetaAnalyzer(): ExtensionPhase = ExtensionPhase.Empty
-
-  fun registerDiagnosticSuppressor(
-    project: Project,
-    phase: DiagnosticsSuppressor,
-    ctx: CompilerContext
-  ) {
-    Extensions.getArea(project).getExtensionPoint(DiagnosticSuppressor.EP_NAME)
-      .registerExtension(object : DiagnosticSuppressor {
-        override fun isSuppressed(diagnostic: Diagnostic): Boolean =
-          phase.run { ctx.isSuppressed(diagnostic) }
-      })
-  }
 
   fun registerExtraImports(project: Project, phase: ExtraImports, ctx: CompilerContext) {
     ExtraImportsProviderExtension.registerExtension(project, object : ExtraImportsProviderExtension {

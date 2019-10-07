@@ -18,7 +18,7 @@ object Test {
 
 fun foo() {
   Test.run {
-    val result: Option<Int> = Some(1).addOne().fix()
+    val result: Option<Int> = Some(1).addOne()
     println(result)
   }
 }

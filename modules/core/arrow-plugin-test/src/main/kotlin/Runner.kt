@@ -5,7 +5,8 @@ object Runner {
 
   @kotlin.jvm.JvmStatic
   fun main(args: Array<String>) {
-    foo()
+    println(test3().value)
+    println(test3Should().value)
   }
 
 }

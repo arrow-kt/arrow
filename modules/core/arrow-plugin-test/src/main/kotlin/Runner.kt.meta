@@ -1,11 +1,12 @@
 package arrow.extreme
 
-//meta: Mon Oct 07 14:22:57 CEST 2019
+//meta: Mon Oct 07 18:32:31 CEST 2019
 object Runner {
 
   @kotlin.jvm.JvmStatic
   fun main(args: Array<String>) {
-    foo()
+    println(test3().value)
+    println(test3Should().value)
   }
 
 }

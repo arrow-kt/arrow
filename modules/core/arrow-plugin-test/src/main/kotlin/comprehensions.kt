@@ -24,6 +24,7 @@ fun test1(): IO<Int> =
     a + b
   }
 
+
 fun test2() = //full on inference
   IO.fx {
     val a by IO(1)

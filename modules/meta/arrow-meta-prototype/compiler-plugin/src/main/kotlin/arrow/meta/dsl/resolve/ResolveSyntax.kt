@@ -1,14 +1,13 @@
 package arrow.meta.dsl.resolve
 
+import arrow.meta.dsl.platform.ide
+import arrow.meta.internal.Noop
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.phases.resolve.DeclarationAttributeAlterer
 import arrow.meta.phases.resolve.PackageProvider
-import arrow.meta.phases.resolve.diagnostics.DiagnosticsSuppressor
 import arrow.meta.phases.resolve.synthetics.SyntheticResolver
 import arrow.meta.phases.resolve.synthetics.SyntheticScopeProvider
-import arrow.meta.internal.Noop
-import arrow.meta.dsl.platform.ide
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -21,7 +20,6 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.name.Name
@@ -34,7 +32,7 @@ import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationPr
 import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
-import java.util.ArrayList
+import java.util.*
 
 interface ResolveSyntax {
   fun declarationAttributeAlterer(
@@ -121,12 +119,6 @@ interface ResolveSyntax {
       }
     } ?: ExtensionPhase.Empty
 
-  fun diagnosticsSuppressor(isSuppressed: CompilerContext.(diagnostic: Diagnostic) -> Boolean): DiagnosticsSuppressor =
-    object : DiagnosticsSuppressor {
-      override fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean =
-        isSuppressed(diagnostic)
-    }
-
   fun syntheticResolver(
     addSyntheticSupertypes: CompilerContext.(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) -> Unit = Noop.effect3,
     /**
@@ -200,4 +192,6 @@ interface ResolveSyntax {
       override fun CompilerContext.getSyntheticNestedClassNames(thisDescriptor: ClassDescriptor): List<Name> =
         getSyntheticNestedClassNames(thisDescriptor) ?: emptyList()
     }
+
+
 }

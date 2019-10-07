@@ -3,6 +3,7 @@ package arrow.meta.plugin.idea.phases.resolve
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.config.buildFolders
 import arrow.meta.plugin.idea.phases.config.currentProject
+import arrow.meta.plugins.higherkind.KindAwareTypeChecker
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktClassOrObject
 import com.intellij.openapi.Disposable
@@ -40,6 +41,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
+import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters2
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeAndGetResult
@@ -84,6 +86,7 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.isError
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -134,10 +137,18 @@ class MetaSyntheticPackageFragmentProvider :
   private fun Diagnostic.suppressMetaDiagnostics(): Boolean =
     suppressInvisibleMember() ||
       suppressNoElseInWhen() ||
+      kindsTypeMismatch() ||
       suppressUnusedParameter()
 
   private fun Diagnostic.suppressInvisibleMember(): Boolean =
     factory == Errors.INVISIBLE_MEMBER
+
+  private fun Diagnostic.kindsTypeMismatch(): Boolean =
+    factory == Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH && safeAs<DiagnosticWithParameters2<KtElement, KotlinType, KotlinType>>()?.let { diagnosticWithParameters ->
+      val a = diagnosticWithParameters.a
+      val b = diagnosticWithParameters.b
+      KotlinTypeChecker.DEFAULT.isSubtypeOf(a, b) //if this is the kind type checker then it will do the right thing otherwise this proceeds as usual with the regular type checker
+    } == true
 
   private fun Diagnostic.suppressUnusedParameter(): Boolean =
     factory == Errors.UNUSED_PARAMETER && safeAs<DiagnosticWithParameters1<KtParameter, VariableDescriptor>>()?.let { diagnosticWithParameters ->

@@ -3,7 +3,7 @@ package arrow.extreme
 import arrow.Kind
 import arrow.given
 
-//meta: Mon Oct 07 14:22:57 CEST 2019
+//meta: Mon Oct 07 18:32:31 CEST 2019
 
 interface Mappable<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
@@ -18,7 +18,7 @@ object Test {
 
 fun foo() {
   Test.run {
-    val result: Option<Int> = Some(1).addOne().fix()
+    val result: Option<Int> = Some(1).addOne()
     println(result)
   }
 }

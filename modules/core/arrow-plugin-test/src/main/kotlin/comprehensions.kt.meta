@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//meta: Mon Oct 07 14:22:57 CEST 2019
+//meta: Mon Oct 07 18:32:31 CEST 2019
 
 import kotlin.reflect.KProperty
 
@@ -23,6 +23,7 @@ fun test1(): IO<Int> =
     val b: Int by IO(2)
     a + b
   }
+
 
 fun test2() = //full on inference
   IO.fx {
