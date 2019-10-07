@@ -22,6 +22,7 @@ sealed class Node {
     override val anns: List<Modifier.AnnotationSet>,
     override val pkg: Package?,
     override val imports: List<Import>,
+    val commands: List<Command>,
     val decls: List<Decl>
   ) : Node(), Entry
 
@@ -41,6 +42,10 @@ sealed class Node {
     val names: List<String>,
     val wildcard: Boolean,
     val alias: String?
+  ) : Node()
+
+  data class Command(
+    val name: String
   ) : Node()
 
   sealed class Decl : Node() {

@@ -51,6 +51,7 @@ open class Writer(
           if (anns.isNotEmpty()) childAnns().line()
           childrenLines(pkg, extraEndLines = 1)
           childrenLines(imports, extraEndLines = 1)
+          childrenLines(commands, extraEndLines = 1)
           childrenLines(decls, extraMidLines = 1)
         }
         is Node.Package ->
@@ -58,6 +59,9 @@ open class Writer(
         is Node.Import -> {
           append("import ").appendNames(names, ".")
           if (wildcard) append(".*") else if (alias != null) append(" as ").appendName(alias)
+        }
+        is Node.Command -> {
+          append( name )
         }
         is Node.Decl.Structured -> childMods().also {
           append(when (form) {
