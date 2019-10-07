@@ -18,4 +18,21 @@ data class ScopedList<K : KtElement>(
       prefix = prefix,
       postfix = postfix
     ) { it.text }
+
+  companion object {
+    operator fun <K : KtElement> invoke(
+      value: List<Scope<K>>,
+      prefix: String = "",
+      separator: String = ", ",
+      postfix: String = "",
+      forceRenderSurroundings: Boolean = false
+    ): ScopedList<K> =
+      ScopedList(
+        prefix= prefix,
+        separator =  separator,
+        postfix = postfix,
+        forceRenderSurroundings = forceRenderSurroundings,
+        value = value.map { it }
+      )
+  }
 }

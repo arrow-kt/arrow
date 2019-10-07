@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtConstructorDelegationCall
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionCodeFragment
@@ -144,6 +145,19 @@ class DefaultElementScope(project: Project) : ElementScope {
     get() = Scope(delegate.createCompanionObject())
   override val String.companionObject: Scope<KtObjectDeclaration>
     get() = Scope(delegate.createCompanionObject(trimMargin()))
+
+  override val <A : KtDeclaration> Scope<A>.synthetic: Scope<A>
+    get() {
+      val synth = "@arrow.synthetic"
+      val declaration = value
+      return if (value != null) {
+        val expression = when (declaration) {
+          is KtDeclaration -> delegate.createDeclaration<A>("$synth ${value?.text}")
+          else -> value
+        }
+        Scope(expression)
+      } else this
+    }
 
   override fun property(modifiers: String?, name: String, type: String?, isVar: Boolean, initializer: String?): Scope<KtProperty> =
     Scope(delegate.createProperty(modifiers, name, type, isVar, initializer))

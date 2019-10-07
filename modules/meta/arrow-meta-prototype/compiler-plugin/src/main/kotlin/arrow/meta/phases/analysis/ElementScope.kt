@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtConstructorDelegationCall
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtExpressionCodeFragment
@@ -129,6 +130,8 @@ interface ElementScope {
   val companionObject: Scope<KtObjectDeclaration>
   
   val String.companionObject: Scope<KtObjectDeclaration>
+
+  val <A: KtDeclaration> Scope<A>.synthetic: Scope<A>
   
   fun property(
     modifiers: String?,

@@ -17,7 +17,7 @@ val Meta.dummy: Plugin
               """|class Test {
                  |  fun test(): Unit = TODO()
                  |}
-                 |""".`class`
+                 |""".`class`.synthetic
           )
         }
       )

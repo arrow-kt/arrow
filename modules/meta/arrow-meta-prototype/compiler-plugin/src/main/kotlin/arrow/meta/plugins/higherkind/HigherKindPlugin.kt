@@ -25,29 +25,29 @@ val Meta.higherKindedTypes: Plugin
           Transform.replace(c, listOfNotNull(
             /** Kind Marker **/
             /** Kind Marker **/
-            "class For$name private constructor() { companion object }".`class`,
+            "class For$name private constructor() { companion object }".`class`.synthetic,
             /** Single arg type alias **/
             /** Single arg type alias **/
-            "typealias ${name}Of<${`(typeParameters)`.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>(),
+            "typealias ${name}Of<${`(typeParameters)`.invariant()}> = arrow.Kind${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>().synthetic,
             /** KindedJ Support **/
             /** KindedJ Support **/
             if (c.arity < 5)
-              "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>()
+              "typealias ${name}KindedJ<${`(typeParameters)`.invariant()}> = arrow.HkJ${c.kindAritySuffix}<For$name, ${`(typeParameters)`.invariant()}>".declaration<KtTypeAlias>().synthetic
             else null,
             """|fun <${`(typeParameters)`.invariant(true)}> ${name}Of<${`(typeParameters)`.invariant()}>.fix(): $name<${`(typeParameters)`.invariant()}> =
                |  this as $name<${`(typeParameters)`.invariant()}>
-               |""".function,
+               |""".function.synthetic,
             /** generate partial aliases if this kind has > 1 type parameters **/
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
-              "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>".declaration<KtTypeAlias>()
+              "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>".declaration<KtTypeAlias>().synthetic
             else null,
             /** Class redefinition with kinded super type **/
             /** Class redefinition with kinded super type **/
             """|$`@annotationEntries` $kind $name $`(typeParameters)` $`(valueParameters)` : ${supertypes.."${name}Of<${`(typeParameters)`.invariant()}>"} {
                |  $body
                |}
-               |""".`class`
+               |""".`class`.synthetic
           )
           )
         }
