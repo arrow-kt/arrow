@@ -1,6 +1,11 @@
 #article-list {
     a {
-      text-decoration: underline; 
+        text-decoration: underline;
+        
+        &:hover {
+            text-decoration: none;
+        }
+
     }
 
     .main-flex {
@@ -32,18 +37,19 @@
             display: block;
             height: 200px;
 
-          img {
-              vertical-align: top;
-              height: 200px;
-              object-fit: cover;
-              object-position: center;
-              opacity: 0.4;
-              transition: opacity 0.2s ease-out;
-              width: 100%;
-              &:hover {
-                  opacity: 0.8;
-              }
-          }
+            img {
+                vertical-align: top;
+                height: 200px;
+                object-fit: cover;
+                object-position: center;
+                opacity: 0.4;
+                transition: opacity 0.2s ease-out;
+                width: 100%;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
         }
 
         .bottom-line-image {
@@ -57,29 +63,30 @@
 
             h2 {
                 margin-bottom: ($base-point-grid * 2);
-                font-size:  ($base-point-grid * 3);
+                font-size: ($base-point-grid * 3);
                 line-height: 30px;
             }
 
             p {
-              font-size: $article-font-size;
-              line-height: ($base-point-grid * 3);
-              margin: ($base-point-grid * 2) 0;
+                font-size: $article-font-size;
+                line-height: ($base-point-grid * 3);
+                margin: ($base-point-grid * 2) 0;
             }
 
             .tag-post-foot {
-              font-size: $article-font-size;
-              line-height: ($base-point-grid * 3);
-              padding-bottom: 2px;
-              margin: ($base-point-grid / 2) $base-point-grid 0 0;
+                font-size: $article-font-size;
+                line-height: ($base-point-grid * 3);
+                padding-bottom: 2px;
+                margin: ($base-point-grid / 2) $base-point-grid 0 0;
 
-              @include bp(medium) {
-                  display: inline-block;
-              }
+                @include bp(medium) {
+                    display: inline-block;
+                }
             }
 
             ul {
                 margin: ($base-point-grid * 2) 0;
+
                 li {
                     color: rgba($brand-primary, 0.4);
                     font-size: $article-font-size;

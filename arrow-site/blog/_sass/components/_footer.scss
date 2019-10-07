@@ -15,6 +15,15 @@
 
         .footer-dev {
             width: $column-4;
+
+            a {
+                text-decoration: underline;
+                
+                &:hover {
+                    color: rgba($white, 0.8);
+                    text-decoration: none;
+                }
+            }
         }
 
         .footer-menu {
@@ -46,6 +55,7 @@
 @include bp(medium) {
     #site-footer {
         padding: 50px 0;
+
         .footer-flex {
             justify-content: center;
             flex-wrap: wrap;
