@@ -28,8 +28,8 @@ import arrow.core.Option
 import arrow.core.extensions.option.monadCombine.monadCombine
 
 Option.monadCombine().run {
-    val x = Option.just(1)
-    val y = Option.empty()
+    val x: Option<Int> = Option.just(1)
+    val y: Option<Int> = Option.empty()
     x.orElse(y)
 }
 ```
@@ -55,8 +55,8 @@ import arrow.core.Option
 import arrow.core.extensions.option.monadCombine.monadCombine
 
 Option.monadCombine().run {
-    val x = Option.just(1)
-    val y = Option.empty()
+    val x: Option<Int> = Option.just(1)
+    val y: Option<Int> = Option.empty()
     x alt y
 }
 ```
