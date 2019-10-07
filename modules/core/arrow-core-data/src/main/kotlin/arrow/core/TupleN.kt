@@ -1,9 +1,9 @@
 package arrow.core
 
-//metadebug
+// metadebug
 
 import arrow.higherkind
-import java.util.Collections
+import java.util.*
 import kotlin.collections.LinkedHashMap
 
 @higherkind

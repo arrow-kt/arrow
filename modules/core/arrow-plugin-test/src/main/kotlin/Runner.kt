@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//metadebug
+// metadebug
 object Runner {
 
   @kotlin.jvm.JvmStatic

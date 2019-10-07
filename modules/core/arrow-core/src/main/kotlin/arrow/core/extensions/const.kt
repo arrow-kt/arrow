@@ -24,9 +24,6 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.fix
-import arrow.typeclasses.value
-import arrow.typeclasses.ap as constAp
-import arrow.typeclasses.combine as combineAp
 
 @extension
 class ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
@@ -64,7 +61,7 @@ class ConstFunctor<A> : Functor<ConstPartialOf<A>> {
     fix().retag()
 }
 
-//metadebug
+// metadebug
 
 @extension
 class ConstApply<A> : Apply<ConstPartialOf<A>> {

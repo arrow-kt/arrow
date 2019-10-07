@@ -1,9 +1,8 @@
 package arrow.extreme
 
 import arrow.higherkind
-import arrow.synthetic
 
-//metadebug
+// metadebug
 
 @higherkind
 sealed class Option<out A>() {

@@ -1,8 +1,7 @@
 package arrow.core
 
-//metadebug
+// metadebug
 
-import arrow.Kind
 import arrow.core.Function0.Companion.just
 import arrow.higherkind
 

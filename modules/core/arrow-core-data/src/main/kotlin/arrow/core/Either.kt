@@ -1,11 +1,10 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.higherkind
 
-//metadebug
+// metadebug
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala

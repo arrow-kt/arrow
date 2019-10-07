@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//metadebug
+// metadebug
 
 import kotlin.reflect.KProperty
 

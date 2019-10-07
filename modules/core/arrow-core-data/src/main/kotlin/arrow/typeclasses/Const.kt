@@ -2,10 +2,9 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.core.identity
 import arrow.higherkind
 
-//metadebug
+// metadebug
 
 fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
