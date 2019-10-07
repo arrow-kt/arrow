@@ -61,6 +61,9 @@ open class Converter {
     }
   }
 
+  open fun convertCommands(v: KtElement): List<Node.Command> =
+    v.children.filterIsInstance<PsiComment>().map { Node.Command(name = it.text) }
+
   open fun convertAnnotationSetTarget(v: KtAnnotationUseSiteTarget) = when (v.getAnnotationUseSiteTarget()) {
     AnnotationUseSiteTarget.FIELD -> Node.Modifier.AnnotationSet.Target.FIELD
     AnnotationUseSiteTarget.FILE -> Node.Modifier.AnnotationSet.Target.FILE
@@ -290,6 +293,7 @@ open class Converter {
     anns = convertAnnotationSets(v),
     pkg = v.packageDirective?.takeIf { it.packageNames.isNotEmpty() }?.let(::convertPackage),
     imports = v.importDirectives.map(::convertImport),
+    commands = convertCommands(v),
     decls = v.declarations.map(::convertDecl)
   ).map(v)
 
