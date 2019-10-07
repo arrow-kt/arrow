@@ -274,9 +274,11 @@ class MetaSyntheticPackageFragmentProvider :
           }
         }
       }
+      println("build folders: $buildFolders")
     } catch (e: Throwable) {
       e.printStackTrace()
     }
+    println("cache is: ${descriptorCache.keys().toList()}")
   }
 
   private fun List<LazyClassDescriptor>.toSynthetic(declarationProvider: DeclarationProvider): List<ClassDescriptor> =

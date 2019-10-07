@@ -1,13 +1,19 @@
 package arrow.meta
 
-import arrow.meta.phases.ExtensionPhase
+import arrow.meta.phases.CompilerContext
 import arrow.meta.plugins.comprehensions.comprehensions
-import arrow.meta.plugins.dummy.dummy
 import arrow.meta.plugins.higherkind.higherKindedTypes
+import arrow.meta.plugins.optics.lenses
 import arrow.meta.plugins.typeclasses.typeClasses
-import org.jetbrains.kotlin.name.Name
+import kotlin.contracts.ExperimentalContracts
 
-open class MetaPlugin : MetaComponentRegistrar {
-  override fun intercept(): List<Pair<Name, List<ExtensionPhase>>> =
-    listOf(higherKindedTypes, typeClasses, comprehensions) //, higherKindedTypes, typeClasses, comprehensions)
+open class MetaPlugin : Meta {
+  @ExperimentalContracts
+  override fun intercept(ctx: CompilerContext): List<Plugin> =
+    listOf(
+      higherKindedTypes,
+      typeClasses,
+      comprehensions,
+      lenses
+    )
 }

@@ -1,7 +1,6 @@
 package arrow.meta.phases.analysis
 
 import org.jetbrains.kotlin.psi.KtBlockExpression
-import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
@@ -10,10 +9,10 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
+import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
-import org.jetbrains.kotlin.psi.psiUtil.lastBlockStatementOrThis
 import org.jetbrains.kotlin.psi2ir.deparenthesize
 
 fun KtClass.renderValueParameters(): String =
@@ -56,6 +55,53 @@ fun KtFunction.bodyExpressionText(): String =
     ?: bodyExpression?.text
     ?: ""
 
+fun KtElement.transform(f: (KtElement) -> KtElement?): KtElement {
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      val result = f(element)
+      if (result != null)  {
+        element.astReplace(result)
+      }
+      super.visitKtElement(element)
+    }
+  })
+  return this
+}
+
+fun KtElement.dfsRender(f: (KtElement) -> String?): String {
+  val replacements: ArrayList<Pair<KtElement, String>> = arrayListOf()
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      val result = f(element)
+      if (result != null)  {
+        val replacement = element to result
+        if (replacement !in replacements) replacements.add(replacement)
+      }
+      super.visitKtElement(element)
+    }
+  })
+  return replacements.fold(text) { acc, (element, newSource) ->
+    acc.replace(element.text, newSource)
+  }
+}
+
+fun KtElement.bfsRender(f: (KtElement) -> String?): String {
+  val replacements: ArrayList<Pair<KtElement, String>> = arrayListOf()
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      super.visitKtElement(element)
+      val result = f(element)
+      if (result != null)  {
+        val replacement = element to result
+        if (replacement !in replacements) replacements.add(replacement)
+      }
+    }
+  })
+  return replacements.fold(text) { acc, (element, newSource) ->
+    acc.replace(element.text, newSource)
+  }
+}
+
 fun KtElement.dfs(f: (KtElement) -> Boolean): List<KtElement> {
   val found = arrayListOf<KtElement>()
   accept(object : KtTreeVisitorVoid() {
@@ -80,7 +126,7 @@ fun KtElement.bfs(f: (KtElement) -> Boolean): List<KtElement> {
   return found
 }
 
-fun KtElement.transform(f: (KtElement) -> String): String {
+fun KtElement.collectText(f: (KtElement) -> String): String {
   val builder = StringBuilder()
   accept(object : KtTreeVisitorVoid() {
     override fun visitKtElement(element: KtElement) {
@@ -95,5 +141,6 @@ fun KtElement.transform(f: (KtElement) -> String): String {
 fun String.removeReturn(): String =
   replaceAfterLast("return ", "")
 
-fun KtElement?.countDescendantsOfType(): Int =
+fun KtElement?.countProperties(): Int =
   this?.collectDescendantsOfType<KtProperty>()?.size ?: 0
+
