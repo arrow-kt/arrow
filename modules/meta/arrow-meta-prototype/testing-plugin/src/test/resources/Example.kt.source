@@ -1,0 +1,8 @@
+import arrow.higherkind
+
+//metadebug
+
+@higherkind
+class Id2<out A>(val value: A)
+
+val x: Id2Of<Int> = Id2(1)

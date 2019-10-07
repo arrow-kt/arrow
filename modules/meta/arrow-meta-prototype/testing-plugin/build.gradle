@@ -1,0 +1,62 @@
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+buildscript {
+    ext {
+        jUnitVintageVersion = '5.4.0'
+        kotlinTestVersion = '3.3.1'
+        assertjVersion = '3.13.2'
+        classGraphVersion = '4.8.47'
+
+        // TODO: temporary version until PR is approved and published
+        // Generated in local environment from branch:
+        // https://github.com/arrow-kt/kotlin-compile-testing/tree/pluginClasspaths
+        kotlinCompileTesting = '1.2.3-SNAPSHOT'
+    }
+}
+
+dependencies {
+    testRuntime project(":compiler-plugin")
+
+    // TODO: waiting for the next Arrow release
+    // testRuntime "io.arrow-kt:arrow-annotations:0.10.1"
+
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compileOnly "io.github.classgraph:classgraph:$classGraphVersion"
+    implementation "org.assertj:assertj-core:$assertjVersion"
+    implementation "com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTesting"
+    testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat 'full'
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
+}
+
+// TODO: Temporary configuration
+// It's necessary because this plugin is using a local library for
+// com.github.tschuchortdev:kotlin-compile-testing
+// until it's published with the contribution
+repositories {
+    mavenLocal()
+}
+
+jar {
+    manifest {
+        attributes["Specification-Title"] = project.name
+        attributes["Specification-Version"] = project.version
+        attributes["Implementation-Title"] = "arrow.meta.plugin.testing"
+        attributes["Implementation-Version"] = project.version
+    }
+}
