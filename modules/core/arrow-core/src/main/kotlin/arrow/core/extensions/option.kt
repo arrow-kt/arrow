@@ -345,16 +345,24 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
       is Some -> a
     }
 
-  override fun <A : Any> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
+  override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
     fix().fold(
       { Option.empty() },
-      { generateSequence { it }.k().just().fix() }
+      { Sequence { object : Iterator<A> {
+        override fun hasNext(): Boolean = true
+
+        override fun next(): A = it
+      } }.k().just().fix() }
     )
 
-  override fun <A : Any> Kind<ForOption, A>.many(): Option<SequenceK<A>> =
+  override fun <A> Kind<ForOption, A>.many(): Option<SequenceK<A>> =
     fix().fold(
       { emptySequence<A>().k().just().fix() },
-      { generateSequence { it }.k().just().fix() }
+      { Sequence { object : Iterator<A> {
+        override fun hasNext(): Boolean = true
+
+        override fun next(): A = it
+      } }.k().just().fix() }
     )
 }
 

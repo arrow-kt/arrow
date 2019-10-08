@@ -234,13 +234,21 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): ListK<A> =
     fix() + b.fix()
 
-  override fun <A : Any> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
+  override fun <A> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) ListK.empty()
-    else map { generateSequence { it }.k() }.k()
+    else map { Sequence { object : Iterator<A> {
+      override fun hasNext(): Boolean = true
 
-  override fun <A : Any> Kind<ForListK, A>.many(): ListK<SequenceK<A>> =
+      override fun next(): A = it
+    } }.k() }.k()
+
+  override fun <A> Kind<ForListK, A>.many(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) listOf(emptySequence<A>().k()).k()
-    else map { generateSequence { it }.k() }.k()
+    else map { Sequence { object : Iterator<A> {
+      override fun hasNext(): Boolean = true
+
+      override fun next(): A = it
+    } }.k() }.k()
 }
 
 @extension

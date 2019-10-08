@@ -18,7 +18,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results with at least 1 repetition.
    */
-  fun <A : Any> Kind<F, A>.some(): Kind<F, SequenceK<A>> = map(this, many()) { (v, vs) -> (sequenceOf(v) + vs).k() }
+  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = map(this, many()) { (v, vs) -> (sequenceOf(v) + vs).k() }
 
   /**
    * Repeats the computation until it fails. Does not requires it to succeed.
@@ -26,7 +26,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results.
    */
-  fun <A : Any> Kind<F, A>.many(): Kind<F, SequenceK<A>> = some().orElse(just(emptySequence<A>().k()))
+  fun <A> Kind<F, A>.many(): Kind<F, SequenceK<A>> = some().orElse(just(emptySequence<A>().k()))
 
   /**
    * Combines two computations.
