@@ -82,8 +82,7 @@ private fun ElementScope.toFlatMap(bind: KtProperty, remaining: List<KtExpressio
   val typeName = bind.typeReference?.let { ": ${it.text}" } ?: ""
   return """|${targetSource}.flatMap { $argName $typeName -> 
             |  ${toFlatMap(remaining)}  
-            |}
-            |"""
+            |}"""
 }
 
 @ExperimentalContracts
