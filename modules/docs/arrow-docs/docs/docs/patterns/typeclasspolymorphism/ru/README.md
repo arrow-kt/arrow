@@ -9,7 +9,7 @@ permalink: /docs/patterns/polymorphic_programs/ru/
 {:.advanced}
 advanced
 
-[English](/docs/patterns/polymorphic_programs/)
+[English / английский](/docs/patterns/polymorphic_programs/)
 
 Что если мы могли бы писать приложения не задумываясь о типах данных, которые будут использованы в рантайме, а просто описывать то, **как эти данные будут обработаны**?
 
