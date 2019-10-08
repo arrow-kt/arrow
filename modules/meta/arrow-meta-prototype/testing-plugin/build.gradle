@@ -3,13 +3,12 @@ apply plugin: 'kotlin-kapt'
 
 buildscript {
     ext {
-        jUnitVintageVersion = '5.4.0'
-        kotlinTestVersion = '3.3.1'
-        assertjVersion = '3.13.2'
-        classGraphVersion = '4.8.47'
+        junit_vintage_version = '5.4.0'
+        assertj_version = '3.13.2'
+        class_graph_version = '4.8.47'
 
         // TODO: temporary version until PR is approved and published
-        kotlinCompileTesting = '1.2.3-SNAPSHOT'
+        kotlin_compile_testing = '1.2.3-SNAPSHOT'
     }
 }
 
@@ -20,15 +19,15 @@ dependencies {
     // testRuntime "io.arrow-kt:arrow-annotations:0.10.1"
 
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compileOnly "io.github.classgraph:classgraph:$classGraphVersion"
-    implementation "org.assertj:assertj-core:$assertjVersion"
+    compileOnly "io.github.classgraph:classgraph:$class_graph_version"
+    implementation "org.assertj:assertj-core:$assertj_version"
 
     // TODO: temporary dependency until PR is approved and published
-    // implementation "com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTesting"
-    implementation "com.github.arrow-kt:kotlin-compile-testing:$kotlinCompileTesting"
+    // implementation "com.github.tschuchortdev:kotlin-compile-testing:$kotlin_compile_testing"
+    implementation "com.github.arrow-kt:kotlin-compile-testing:$kotlin_compile_testing"
 
-    testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion"
+    testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlin_test_version"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit_vintage_version"
 }
 
 compileKotlin {

@@ -1,0 +1,14 @@
+import arrow.higherkind
+
+//meta: <date>
+
+@arrow.synthetic class ForId2 private constructor() { companion object }
+@arrow.synthetic typealias Id2Of<A> = arrow.Kind<ForId2, A>
+@arrow.synthetic typealias Id2KindedJ<A> = arrow.HkJ<ForId2, A>
+@arrow.synthetic fun <A> Id2Of<A>.fix(): Id2<A> =
+  this as Id2<A>
+@arrow.synthetic @higherkind /* empty? */class Id2 <out A> public constructor (val value: A) : Id2Of<A> {
+  
+}
+
+val x: Id2Of<Int> = Id2(1)
