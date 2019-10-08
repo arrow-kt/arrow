@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.NonFatal
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
 import arrow.fx.OnCancel
@@ -21,7 +22,6 @@ class ForFluxK private constructor() {
   companion object
 }
 typealias FluxKOf<A> = arrow.Kind<ForFluxK, A>
-typealias FluxKKindedJ<A> = io.kindedj.Hk<ForFluxK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
@@ -29,11 +29,12 @@ inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> FluxKOf<A>.value(): Flux<A> =
-  this.fix().flux
+  this.fix().flux as Flux<A>
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
+data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
@@ -137,9 +138,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       GA.run { f(a).map2Eval(eval) { Flux.concat(Flux.just<B>(it.a), it.b.flux).k() } }
     }.value()
 
-  fun handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
-    this.fix().flux.onErrorResume { t: Throwable -> function(t).flux }.k()
-
   fun continueOn(ctx: CoroutineContext): FluxK<A> =
     flux.publishOn(ctx.asScheduler()).k()
 
@@ -159,6 +157,11 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       is Flux<*> -> this.flux == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): FluxK<B> =
+    flux.flatMap { a ->
+      f(a).fold({ Flux.empty<B>() }, { b -> Flux.just(b) })
+    }.k()
 
   override fun hashCode(): Int = flux.hashCode()
 
@@ -252,3 +255,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
 fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)
+
+fun <A> FluxKOf<A>.handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
+  value().onErrorResume { t: Throwable -> function(t).value() }.k()
