@@ -1,6 +1,7 @@
 package arrow.meta.plugin.testing
 
 import org.junit.Test
+import java.util.Optional
 
 class CompilationTest {
 
@@ -11,9 +12,9 @@ class CompilationTest {
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = contentFromResource(javaClass, "Example.kt.source"),
-        generatedFileContent = contentFromResource(javaClass, "Example.kt.meta"),
+        generatedFileContent = Optional.of(contentFromResource(javaClass, "Example.kt.meta")),
         generatedClasses = arrayListOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"),
-        compilationResult = CompilationResult.OK
+        compilationStatus = CompilationStatus.OK
       )
     )
   }
@@ -25,9 +26,9 @@ class CompilationTest {
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = "classs Error",
-        generatedFileContent = "",
+        generatedFileContent = Optional.empty(),
         generatedClasses = arrayListOf(),
-        compilationResult = CompilationResult.COMPILATION_ERROR
+        compilationStatus = CompilationStatus.COMPILATION_ERROR
       )
     )
   }

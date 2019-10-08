@@ -4,7 +4,6 @@ apply plugin: 'kotlin-kapt'
 buildscript {
     ext {
         junit_vintage_version = '5.4.0'
-        assertj_version = '3.13.2'
         class_graph_version = '4.8.47'
 
         // TODO: temporary version until PR is approved and published

@@ -6,8 +6,10 @@ import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 import java.nio.file.Paths
 import io.github.classgraph.ClassGraph
+import java.util.Optional
+import kotlin.collections.ArrayList
 
-enum class CompilationResult {
+enum class CompilationStatus {
   OK,
   INTERNAL_ERROR,
   COMPILATION_ERROR,
@@ -17,12 +19,16 @@ enum class CompilationResult {
 data class CompilationData(
   val sourceFileName: String,
   val sourceContent: String,
-  val generatedFileContent: String,
+  val generatedFileContent: Optional<String>,
   val generatedClasses: ArrayList<String>,
-  val compilationResult: CompilationResult
+  val compilationStatus: CompilationStatus
 )
 
-fun testCompilation(compilationData: CompilationData): Unit {
+data class CompilationResult(
+  val classesDirectory: String
+)
+
+fun testCompilation(compilationData: CompilationData): Optional<CompilationResult> {
   val kotlinSource = SourceFile.kotlin(compilationData.sourceFileName, compilationData.sourceContent)
 
   val result = KotlinCompilation().apply {
@@ -32,15 +38,16 @@ fun testCompilation(compilationData: CompilationData): Unit {
       // classpathOf("arrow-annotations:x.x.x")
       File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar")
     )
-    pluginClasspaths = listOf(
-      classpathOf("compiler-plugin")
-    )
+    pluginClasspaths = listOf(classpathOf("compiler-plugin"))
   }.compile()
 
-  assertThat(result.exitCode).isEqualTo(exitCodeFrom(compilationData.compilationResult))
+  assertThat(result.exitCode).isEqualTo(exitCodeFrom(compilationData.compilationStatus))
 
-  if (result.exitCode.equals(KotlinCompilation.ExitCode.OK))
+  if (result.exitCode.equals(KotlinCompilation.ExitCode.OK)) {
     testConditions(compilationData, result)
+    return Optional.of(CompilationResult(classesDirectory = result.outputDirectory.absolutePath))
+  }
+  return Optional.empty()
 }
 
 private fun testConditions(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
@@ -49,11 +56,13 @@ private fun testConditions(compilationData: CompilationData, result: KotlinCompi
 }
 
 private fun testMetaFile(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
-  val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
-  val actualGeneratedFileContentWithoutCommands = removeCommandsFrom(actualGeneratedFileContent)
-  val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent)
+  if (compilationData.generatedFileContent.isPresent) {
+    val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
+    val actualGeneratedFileContentWithoutCommands = removeCommandsFrom(actualGeneratedFileContent)
+    val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent.get())
 
-  assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringNewLines(generatedFileContentWithoutCommands)
+    assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringNewLines(generatedFileContentWithoutCommands)
+  }
 }
 
 fun removeCommandsFrom(actualGeneratedFileContent: String): String =
@@ -72,10 +81,10 @@ fun classpathOf(dependency: String): File {
   return ClassGraph().classpathFiles.first { classpath -> classpath.name.matches(regex) }
 }
 
-private fun exitCodeFrom(compilationResult: CompilationResult): KotlinCompilation.ExitCode =
-  when (compilationResult) {
-    CompilationResult.OK -> KotlinCompilation.ExitCode.OK
-    CompilationResult.INTERNAL_ERROR -> KotlinCompilation.ExitCode.INTERNAL_ERROR
-    CompilationResult.COMPILATION_ERROR -> KotlinCompilation.ExitCode.COMPILATION_ERROR
-    CompilationResult.SCRIPT_EXECUTION_ERROR -> KotlinCompilation.ExitCode.SCRIPT_EXECUTION_ERROR
+private fun exitCodeFrom(compilationStatus: CompilationStatus): KotlinCompilation.ExitCode =
+  when (compilationStatus) {
+    CompilationStatus.OK -> KotlinCompilation.ExitCode.OK
+    CompilationStatus.INTERNAL_ERROR -> KotlinCompilation.ExitCode.INTERNAL_ERROR
+    CompilationStatus.COMPILATION_ERROR -> KotlinCompilation.ExitCode.COMPILATION_ERROR
+    CompilationStatus.SCRIPT_EXECUTION_ERROR -> KotlinCompilation.ExitCode.SCRIPT_EXECUTION_ERROR
   }
