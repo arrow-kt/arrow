@@ -1,5 +1,7 @@
 package kastree.ast
 
+const val COMMAND_PREFIX = "//meta"
+
 sealed class Node {
   var tag: Any? = null
   var dynamic: String? = null
