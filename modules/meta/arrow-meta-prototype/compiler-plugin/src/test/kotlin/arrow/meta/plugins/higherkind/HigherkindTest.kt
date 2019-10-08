@@ -5,7 +5,6 @@ import arrow.meta.plugin.testing.CompilationStatus
 import arrow.meta.plugin.testing.contentFromResource
 import arrow.meta.plugin.testing.testCompilation
 import org.junit.Test
-import java.util.Optional
 
 class HigherkindTest {
 
@@ -16,7 +15,7 @@ class HigherkindTest {
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = contentFromResource(javaClass,"Example.kt.source"),
-        generatedFileContent = Optional.of(contentFromResource(javaClass, "Example.kt.meta")),
+        generatedFileContent = contentFromResource(javaClass, "Example.kt.meta"),
         generatedClasses = arrayListOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"),
         compilationStatus = CompilationStatus.OK
       )

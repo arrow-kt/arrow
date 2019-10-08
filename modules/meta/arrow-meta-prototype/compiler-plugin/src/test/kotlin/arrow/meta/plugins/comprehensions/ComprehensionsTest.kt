@@ -4,18 +4,18 @@ import arrow.meta.plugin.testing.CompilationResult
 import arrow.meta.plugin.testing.CompilationData
 import arrow.meta.plugin.testing.testCompilation
 import arrow.meta.plugin.testing.CompilationStatus
+import arrow.meta.plugin.testing.invoke
+import arrow.meta.plugin.testing.getFieldFrom
+import arrow.meta.plugin.testing.InvocationData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.io.File
-import java.net.URLClassLoader
-import java.util.Optional
 
 class ComprehensionsTest {
 
   @Test
   fun `simple_case`() {
 
-    val compilationResult: Optional<CompilationResult> = testCompilation(
+    val compilationResult: CompilationResult? = testCompilation(
       CompilationData(
         sourceFileName = "SimpleCase.kt",
         sourceContent = """
@@ -43,17 +43,21 @@ class ComprehensionsTest {
               a + b
             }
         """,
-        generatedFileContent = Optional.empty(),
+        generatedFileContent = null,
         generatedClasses = arrayListOf("\$test1\$lambda-1\$0", "IO\$Companion", "IO", "SimpleCaseKt\$\$test1\$lambda-1\$lambda-0\$1", "SimpleCaseKt"),
         compilationStatus = CompilationStatus.OK
       )
     )
 
-    assertThat(compilationResult.isPresent).isTrue()
+    assertThat(compilationResult).isNotNull
 
-    val classLoader = URLClassLoader(arrayOf(File(compilationResult.get().classesDirectory).toURI().toURL()))
-    val result = classLoader.loadClass("SimpleCaseKt").getMethod("test1").invoke(null)
-
-    assertThat(result.javaClass.getField("value").get(result)).isEqualTo(3)
+    val result = invoke(
+      InvocationData(
+        classesDirectory = compilationResult?.classesDirectory,
+        className = "SimpleCaseKt",
+        methodName = "test1"
+      )
+    )
+    assertThat(getFieldFrom(result, "value")).isEqualTo(3)
   }
 }

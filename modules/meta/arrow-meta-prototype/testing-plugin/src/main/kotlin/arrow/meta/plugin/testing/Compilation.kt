@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 import java.nio.file.Paths
 import io.github.classgraph.ClassGraph
-import java.util.Optional
+import java.net.URLClassLoader
 import kotlin.collections.ArrayList
 
 enum class CompilationStatus {
@@ -19,7 +19,7 @@ enum class CompilationStatus {
 data class CompilationData(
   val sourceFileName: String,
   val sourceContent: String,
-  val generatedFileContent: Optional<String>,
+  val generatedFileContent: String?,
   val generatedClasses: ArrayList<String>,
   val compilationStatus: CompilationStatus
 )
@@ -28,7 +28,13 @@ data class CompilationResult(
   val classesDirectory: String
 )
 
-fun testCompilation(compilationData: CompilationData): Optional<CompilationResult> {
+data class InvocationData(
+  val classesDirectory: String?,
+  val className: String,
+  val methodName: String
+)
+
+fun testCompilation(compilationData: CompilationData): CompilationResult? {
   val kotlinSource = SourceFile.kotlin(compilationData.sourceFileName, compilationData.sourceContent)
 
   val result = KotlinCompilation().apply {
@@ -43,11 +49,11 @@ fun testCompilation(compilationData: CompilationData): Optional<CompilationResul
 
   assertThat(result.exitCode).isEqualTo(exitCodeFrom(compilationData.compilationStatus))
 
-  if (result.exitCode.equals(KotlinCompilation.ExitCode.OK)) {
+  if (result.exitCode == KotlinCompilation.ExitCode.OK) {
     testConditions(compilationData, result)
-    return Optional.of(CompilationResult(classesDirectory = result.outputDirectory.absolutePath))
+    return CompilationResult(classesDirectory = result.outputDirectory.absolutePath)
   }
-  return Optional.empty()
+  return null
 }
 
 private fun testConditions(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
@@ -56,16 +62,16 @@ private fun testConditions(compilationData: CompilationData, result: KotlinCompi
 }
 
 private fun testMetaFile(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
-  if (compilationData.generatedFileContent.isPresent) {
+  if (!compilationData.generatedFileContent.isNullOrEmpty()) {
     val actualGeneratedFileContent = Paths.get(result.outputDirectory.parent, "sources", "${compilationData.sourceFileName}.meta").toFile().readText()
     val actualGeneratedFileContentWithoutCommands = removeCommandsFrom(actualGeneratedFileContent)
-    val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent.get())
+    val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent)
 
     assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringNewLines(generatedFileContentWithoutCommands)
   }
 }
 
-fun removeCommandsFrom(actualGeneratedFileContent: String): String =
+private fun removeCommandsFrom(actualGeneratedFileContent: String): String =
   actualGeneratedFileContent.lines().filter { !it.startsWith("//meta") }.joinToString()
 
 private fun testGeneratedClasses(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
@@ -88,3 +94,12 @@ private fun exitCodeFrom(compilationStatus: CompilationStatus): KotlinCompilatio
     CompilationStatus.COMPILATION_ERROR -> KotlinCompilation.ExitCode.COMPILATION_ERROR
     CompilationStatus.SCRIPT_EXECUTION_ERROR -> KotlinCompilation.ExitCode.SCRIPT_EXECUTION_ERROR
   }
+
+private fun getClassLoaderForGeneratedClasses(classesDirectory: String?): ClassLoader =
+  URLClassLoader(arrayOf(File(classesDirectory).toURI().toURL()))
+
+fun invoke(invocationData: InvocationData): Any =
+  getClassLoaderForGeneratedClasses(invocationData.classesDirectory).loadClass(invocationData.className).getMethod(invocationData.methodName).invoke(null)
+
+fun getFieldFrom(result: Any, fieldName: String): Any =
+  result.javaClass.getField(fieldName).get(result)
