@@ -12,7 +12,7 @@ video: XavztYVMUqI
 {:.beginner}
 beginner
 
-[English](/docs/arrow/core/try)
+[English / английский](/docs/arrow/core/try)
 
 В Arrow [есть множество способов для обработки ошибок](http://arrow-kt.io/docs/patterns/error_handling/), что позволяет выбрать оптимальную стратегию для любой ситуации.
 
