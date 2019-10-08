@@ -1,5 +1,6 @@
 package kastree.ast.psi
 
+import kastree.ast.COMMAND_PREFIX
 import kastree.ast.ExtrasMap
 import kastree.ast.Node
 import org.jetbrains.kotlin.KtNodeTypes
@@ -62,7 +63,7 @@ open class Converter {
   }
 
   open fun convertCommands(v: KtElement): List<Node.Command> =
-    v.children.filterIsInstance<PsiComment>().map { Node.Command(name = it.text) }
+    v.children.filterIsInstance<PsiComment>().filter { it.text.startsWith(COMMAND_PREFIX) }.map { Node.Command(name = it.text) }
 
   open fun convertAnnotationSetTarget(v: KtAnnotationUseSiteTarget) = when (v.getAnnotationUseSiteTarget()) {
     AnnotationUseSiteTarget.FIELD -> Node.Modifier.AnnotationSet.Target.FIELD
