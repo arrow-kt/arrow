@@ -53,15 +53,15 @@ private fun testMetaFile(compilationData: CompilationData, result: KotlinCompila
   val actualGeneratedFileContentWithoutCommands = removeCommandsFrom(actualGeneratedFileContent)
   val generatedFileContentWithoutCommands = removeCommandsFrom(compilationData.generatedFileContent)
 
-  assertThat(actualGeneratedFileContentWithoutCommands).isEqualTo(generatedFileContentWithoutCommands)
+  assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringNewLines(generatedFileContentWithoutCommands)
 }
 
 fun removeCommandsFrom(actualGeneratedFileContent: String): String =
-  actualGeneratedFileContent.lines().filter { !it.startsWith("//") }.joinToString()
+  actualGeneratedFileContent.lines().filter { !it.startsWith("//meta") }.joinToString()
 
 private fun testGeneratedClasses(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
   val actualGeneratedClasses = result.generatedFiles.map { it.name }.filter { it.endsWith(".class") }
-  assertThat(actualGeneratedClasses).isEqualTo(compilationData.generatedClasses.map { "$it.class" })
+  assertThat(actualGeneratedClasses).containsExactlyInAnyOrder(*compilationData.generatedClasses.map { "$it.class" }.toTypedArray())
 }
 
 fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
