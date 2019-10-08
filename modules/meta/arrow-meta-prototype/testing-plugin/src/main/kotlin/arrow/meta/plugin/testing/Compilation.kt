@@ -65,7 +65,7 @@ private fun testGeneratedClasses(compilationData: CompilationData, result: Kotli
 }
 
 fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
-  fromClass.getResource("/$resourceName").readText()
+  fromClass.getResource(resourceName).readText()
 
 fun classpathOf(dependency: String): File {
   val regex = Regex(".*${dependency.replace(':', '-')}.*")
