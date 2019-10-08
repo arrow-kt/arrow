@@ -1,6 +1,7 @@
 package arrow.meta.dsl.ide.editor.intention
 
 import arrow.meta.dsl.platform.ideRegistry
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.editor.IntentionExtensionProvider
@@ -51,10 +52,8 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
   fun <K : KtElement> IdeMetaPlugin.addIntention(
     text: String = "",
     kClass: Class<K> = KtElement::class.java as Class<K>,
-    isApplicableTo: (element: K, caretOffset: Int) -> Boolean =
-      { _, _ -> false },
-    applyTo: (element: K, editor: Editor?) -> Unit =
-      { _, _ -> },
+    isApplicableTo: (element: K, caretOffset: Int) -> Boolean = Noop.boolean2False,
+    applyTo: (element: K, editor: Editor?) -> Unit = Noop.effect2,
     priority: PriorityAction.Priority = PriorityAction.Priority.LOW
   ): ExtensionPhase =
     addIntention(ktIntention(text, kClass, isApplicableTo, applyTo, priority))
@@ -72,10 +71,8 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
   fun <K : KtElement> IntentionExtensionProviderSyntax.ktIntention(
     text: String = "",
     kClass: Class<K> = KtElement::class.java as Class<K>,
-    isApplicableTo: (element: K, caretOffset: Int) -> Boolean =
-      { _, _ -> false },
-    applyTo: (element: K, editor: Editor?) -> Unit =
-      { _, _ -> },
+    isApplicableTo: (element: K, caretOffset: Int) -> Boolean = Noop.boolean2False,
+    applyTo: (element: K, editor: Editor?) -> Unit = Noop.effect2,
     priority: PriorityAction.Priority = PriorityAction.Priority.LOW
   ): SelfTargetingIntention<K> =
     object : SelfTargetingIntention<K>(kClass, text), PriorityAction {
@@ -94,10 +91,9 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
    * Solely for [QuickFixContributor]
    */
   fun IntentionExtensionProviderSyntax.kotlinIntention(
-    createAction: (diagnostic: Diagnostic) -> IntentionAction? = { null },
+    createAction: (diagnostic: Diagnostic) -> IntentionAction? = Noop.nullable1(),
     isApplicableForCodeFragment: Boolean = false,
-    doCreateActionsForAllProblems: (sameTypeDiagnostics: Collection<Diagnostic>) -> List<IntentionAction> =
-      { emptyList<IntentionAction>() }
+    doCreateActionsForAllProblems: (sameTypeDiagnostics: Collection<Diagnostic>) -> List<IntentionAction> = Noop.emptyList1()
   ): KotlinSingleIntentionActionFactory =
     object : KotlinSingleIntentionActionFactory() {
       override fun createAction(diagnostic: Diagnostic): IntentionAction? =

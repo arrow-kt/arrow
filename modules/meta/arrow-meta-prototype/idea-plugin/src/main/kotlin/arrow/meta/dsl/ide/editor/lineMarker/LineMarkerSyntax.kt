@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.lineMarker
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -33,7 +34,7 @@ interface LineMarkerSyntax {
   fun IdeMetaPlugin.addLineMarkerProvider(
     matchOn: (psi: PsiElement) -> Boolean,
     slowLineMarker: (psi: PsiElement) -> LineMarkerInfo<PsiElement>?,
-    lineMarkerInfo: (psi: PsiElement) -> LineMarkerInfo<PsiElement>? = { _ -> null }
+    lineMarkerInfo: (psi: PsiElement) -> LineMarkerInfo<PsiElement>? = Noop.nullable1()
   ): ExtensionPhase =
     extensionProvider(
       LineMarkerProviders.INSTANCE,

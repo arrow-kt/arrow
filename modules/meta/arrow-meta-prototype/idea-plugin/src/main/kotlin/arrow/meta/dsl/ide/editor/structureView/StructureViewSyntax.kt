@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.structureView
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.ide.structureView.StructureViewBuilder
@@ -33,7 +34,7 @@ interface StructureViewSyntax {
       { KotlinStructureViewElement(it).presentableText },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
-    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean = { false }
+    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean = Noop.boolean1False
   ): ExtensionPhase =
     extensionProvider(
       LanguageStructureViewBuilder.INSTANCE,
@@ -63,7 +64,7 @@ interface StructureViewSyntax {
       { KotlinStructureViewElement(it).presentableText },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
-    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean = { false }
+    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean = Noop.boolean1False
   ): ExtensionPhase =
     extensionProvider(
       LanguageStructureViewBuilder.INSTANCE,
@@ -113,8 +114,7 @@ interface StructureViewSyntax {
       { KotlinStructureViewElement(it, false) },
     isAlwaysShowsPlus: (element: StructureViewTreeElement?) -> Boolean =
       { it?.value.run { (this is KtClassOrObject && this !is KtEnumEntry) || this is KtFile } },
-    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean =
-      { false },
+    isAlwaysLeaf: (element: StructureViewTreeElement?) -> Boolean = Noop.boolean1False,
     putInfo: (info: MutableMap<String, String>) -> Unit
   ): StructureViewModel =
     object : StructureViewModelBase(psiFile, editor, treeElementBase(psiFile)), StructureViewModel.ElementInfoProvider, Queryable {

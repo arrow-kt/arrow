@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.inspection
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeHighlighting.HighlightDisplayLevel
@@ -76,7 +77,7 @@ interface InspectionSyntax : InspectionUtilitySyntax {
   fun <K : KtElement> IdeMetaPlugin.addApplicableInspection(
     defaultFixText: String,
     kClass: Class<K> = KtElement::class.java as Class<K>,
-    highlightingRange: (element: K) -> TextRange? = { null },
+    highlightingRange: (element: K) -> TextRange? = Noop.nullable1(),
     inspectionText: (element: K) -> String,
     applyTo: (element: K, project: Project, editor: Editor?) -> Unit,
     isApplicable: (element: K) -> Boolean,
@@ -116,7 +117,7 @@ interface InspectionSyntax : InspectionUtilitySyntax {
   fun <K : KtElement> InspectionSyntax.applicableInspection(
     defaultFixText: String,
     kClass: Class<K> = KtElement::class.java as Class<K>,
-    highlightingRange: (element: K) -> TextRange? = { null },
+    highlightingRange: (element: K) -> TextRange? = Noop.nullable1(),
     inspectionText: (element: K) -> String,
     applyTo: (element: K, project: Project, editor: Editor?) -> Unit,
     isApplicable: (element: K) -> Boolean,

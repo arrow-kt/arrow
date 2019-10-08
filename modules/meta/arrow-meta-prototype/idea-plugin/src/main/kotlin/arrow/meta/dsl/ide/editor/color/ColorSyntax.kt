@@ -37,7 +37,6 @@ interface ColorSyntax {
 
         override fun getDisplayName(): String = displayName
 
-
         override fun getDemoText(): String = demoText
       }
     )

@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.usage
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.find.findUsages.AbstractFindUsagesDialog
@@ -73,16 +74,13 @@ interface UsageSyntax {
    */
   fun UsageSyntax.findUsagesHandler(
     element: PsiElement,
-    processElementUsages: (element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions) -> Boolean =
-      { _, _, _ -> true },
+    processElementUsages: (element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions) -> Boolean = Noop.boolean3True,
     findReferencesToHighlight: (target: PsiElement, searchScope: SearchScope) -> MutableCollection<PsiReference> =
       { _, _ -> emptyList<PsiReference>().toMutableList() },
     primaryElements: Array<PsiElement> = PsiElement.EMPTY_ARRAY,
     secondaryElements: Array<PsiElement> = PsiElement.EMPTY_ARRAY,
-    findUsagesDialog: (isSingleFile: Boolean, toShowInNewTab: Boolean, mustOpenInNewTab: Boolean) -> AbstractFindUsagesDialog? =
-      { _, _, _ -> null },
-    processUsagesInText: (element: PsiElement, processor: Processor<UsageInfo>, searchScope: GlobalSearchScope) -> Boolean? =
-      { _, _, _ -> null }
+    findUsagesDialog: (isSingleFile: Boolean, toShowInNewTab: Boolean, mustOpenInNewTab: Boolean) -> AbstractFindUsagesDialog? = Noop.nullable3(),
+    processUsagesInText: (element: PsiElement, processor: Processor<UsageInfo>, searchScope: GlobalSearchScope) -> Boolean? = Noop.nullable3()
   ): FindUsagesHandler =
     object : FindUsagesHandler(element) {
       override fun processElementUsages(element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions): Boolean =

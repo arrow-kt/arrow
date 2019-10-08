@@ -1,6 +1,7 @@
 package arrow.meta.dsl.ide.editor.action
 
 import arrow.meta.dsl.platform.ideRegistry
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.editor.AnActionExtensionProvider
@@ -75,8 +76,8 @@ interface AnActionSyntax : AnActionExtensionProvider {
    */
   fun AnActionSyntax.addAnAction(
     actionPerformed: (e: AnActionEvent) -> Unit,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = Noop.effect1,
+    update: (e: AnActionEvent) -> Unit = Noop.effect1,
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
     useSmallerFontForTextInToolbar: Boolean = false,
@@ -110,8 +111,8 @@ interface AnActionSyntax : AnActionExtensionProvider {
   fun AnActionSyntax.addAnAction(
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = Noop.effect1,
+    update: (e: AnActionEvent) -> Unit = Noop.effect1,
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
     useSmallerFontForTextInToolbar: Boolean = false,
@@ -145,8 +146,8 @@ interface AnActionSyntax : AnActionExtensionProvider {
   fun AnActionSyntax.addAnAction(
     title: String,
     actionPerformed: (e: AnActionEvent) -> Unit,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = Noop.effect1,
+    update: (e: AnActionEvent) -> Unit = Noop.effect1,
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
     useSmallerFontForTextInToolbar: Boolean = false,
@@ -182,8 +183,8 @@ interface AnActionSyntax : AnActionExtensionProvider {
     description: String,
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
-    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = { _ -> },
-    update: (e: AnActionEvent) -> Unit = { _ -> },
+    beforeActionPerformedUpdate: (e: AnActionEvent) -> Unit = Noop.effect1,
+    update: (e: AnActionEvent) -> Unit = Noop.effect1,
     displayTextInToolbar: Boolean = false,
     setInjectedContext: (worksInInjected: Boolean) -> Boolean = { it },
     useSmallerFontForTextInToolbar: Boolean = false,

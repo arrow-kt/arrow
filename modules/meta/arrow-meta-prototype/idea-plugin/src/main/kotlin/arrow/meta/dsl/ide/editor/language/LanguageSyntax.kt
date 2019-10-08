@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.language
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeInsight.intention.IntentionAction
@@ -17,18 +18,12 @@ import com.intellij.lang.jvm.actions.JvmElementActionsFactory
 
 interface LanguageSyntax {
   fun IdeMetaPlugin.addJvmElementActionsFactory(
-    annotationActions: (target: JvmModifiersOwner, request: AnnotationRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() },
-    constructorActions: (targetClass: JvmClass, request: CreateConstructorRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() },
-    fieldActions: (targetClass: JvmClass, request: CreateFieldRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() },
-    methodActions: (targetClass: JvmClass, request: CreateMethodRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() },
-    changeModifierActions: (target: JvmModifiersOwner, request: ChangeModifierRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() },
-    changeParameterActions: (target: JvmMethod, request: ChangeParametersRequest) -> List<IntentionAction> =
-      { _, _ -> emptyList<IntentionAction>() }
+    annotationActions: (target: JvmModifiersOwner, request: AnnotationRequest) -> List<IntentionAction> = Noop.emptyList2(),
+    constructorActions: (targetClass: JvmClass, request: CreateConstructorRequest) -> List<IntentionAction> = Noop.emptyList2(),
+    fieldActions: (targetClass: JvmClass, request: CreateFieldRequest) -> List<IntentionAction> = Noop.emptyList2(),
+    methodActions: (targetClass: JvmClass, request: CreateMethodRequest) -> List<IntentionAction> = Noop.emptyList2(),
+    changeModifierActions: (target: JvmModifiersOwner, request: ChangeModifierRequest) -> List<IntentionAction> = Noop.emptyList2(),
+    changeParameterActions: (target: JvmMethod, request: ChangeParametersRequest) -> List<IntentionAction> = Noop.emptyList2()
   ): ExtensionPhase =
     extensionProvider(
       EP_NAME,

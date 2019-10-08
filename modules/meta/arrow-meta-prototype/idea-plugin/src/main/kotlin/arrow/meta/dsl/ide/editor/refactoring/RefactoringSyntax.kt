@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.refactoring
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.lang.ImportOptimizer
@@ -38,27 +39,21 @@ interface RefactoringSyntax {
     introduceFunctionalParameterHandler: RefactoringActionHandler? = null,
     pushDownHandler: RefactoringActionHandler? = null,
     introduceFunctionalVariableHandler: RefactoringActionHandler? = null,
-    isInplaceRenameAvailable: (element: PsiElement, context: PsiElement?) -> Boolean =
-      { _, _ -> false },
+    isInplaceRenameAvailable: (element: PsiElement, context: PsiElement?) -> Boolean = Noop.boolean2False,
     extractInterfaceHandler: RefactoringActionHandler? = null,
     introduceConstantHandler: RefactoringActionHandler? = null,
     introduceVariableHandler: RefactoringActionHandler? = null,
-    introduceVariableHandlerOnPsi: (element: PsiElement?) -> RefactoringActionHandler? =
-      { _ -> null },
+    introduceVariableHandlerOnPsi: (element: PsiElement?) -> RefactoringActionHandler? = Noop.nullable1(),
     extractModuleHandler: RefactoringActionHandler? = null,
-    isInplaceIntroduceAvailable: (element: PsiElement, context: PsiElement?) -> Boolean =
-      { _, _ -> false },
+    isInplaceIntroduceAvailable: (element: PsiElement, context: PsiElement?) -> Boolean = Noop.boolean2False,
     pullUpHandler: RefactoringActionHandler? = null,
-    isSafeDeleteAvailable: (element: PsiElement) -> Boolean =
-      { _ -> false },
+    isSafeDeleteAvailable: (element: PsiElement) -> Boolean = Noop.boolean1False,
     introduceFieldHandler: RefactoringActionHandler? = null,
-    isMemberInplaceRenameAvailable: (element: PsiElement, context: PsiElement?) -> Boolean =
-      { _, _ -> false },
+    isMemberInplaceRenameAvailable: (element: PsiElement, context: PsiElement?) -> Boolean = Noop.boolean2False,
     extractMethodHandler: RefactoringActionHandler? = null,
     changeSignatureHandler: ChangeSignatureHandler? = null,
     extractClassHandler: RefactoringActionHandler? = null,
-    isAvailable: (context: PsiElement) -> Boolean =
-      { _ -> true },
+    isAvailable: (context: PsiElement) -> Boolean = Noop.boolean1True,
     extractSuperClassHandler: RefactoringActionHandler? = null,
     introduceParameterHandler: RefactoringActionHandler? = null
   ): ExtensionPhase =

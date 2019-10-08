@@ -13,10 +13,15 @@ object Noop {
   fun <A> nullable4(): (Any?, Any?, Any?, Any?) -> A? = { _, _, _, _ -> null }
   fun <A> nullable5(): (Any?, Any?, Any?, Any?, Any?) -> A? = { _, _, _, _, _ -> null }
   fun <A> emptyCollection1(): (Any?) -> Collection<A> = { emptyList() }
+  fun <A> emptyList1(): (Any?) -> List<A> = { emptyList() }
   fun <A> emptyCollection2(): (Any?, Any?) -> Collection<A> = { _, _ -> emptyList() }
+  fun <A> emptyList2(): (Any?, Any?) -> List<A> = { _, _ -> emptyList() }
   fun <A> emptyCollection3(): (Any?, Any?, Any?) -> Collection<A> = { _, _, _ -> emptyList() }
   fun <A> emptyCollection4(): (Any?, Any?, Any?, Any?) -> Collection<A> = { _, _, _, _ -> emptyList() }
   fun <A> emptyCollection5(): (Any?, Any?, Any?, Any?, Any?) -> Collection<A> = { _, _, _, _, _ -> emptyList() }
   val boolean1True: (Any?) -> Boolean = { _ -> true }
+  val boolean1False: (Any?) -> Boolean = { _ -> false }
   val boolean2True: (Any?, Any?) -> Boolean = { _, _ -> true }
+  val boolean2False: (Any?, Any?) -> Boolean = { _, _ -> false }
+  val boolean3True: (Any?, Any?, Any?) -> Boolean = { _, _, _ -> true }
 }

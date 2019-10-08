@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.hints
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.codeInsight.lookup.LookupElement
@@ -54,7 +55,7 @@ interface HintingSyntax {
     parameterForLookUp: (item: LookupElement?, context: ParameterInfoContext?) -> Array<Any>?,
     couldShowInLookup: Boolean,
     findElementForUpdatingParameterInfo: (context: UpdateParameterInfoContext) -> Owner? =
-      { _ -> null },
+      Noop.nullable1(),
     findElementForParameterInfo: (context: CreateParameterInfoContext) -> Owner?
   ): ExtensionPhase =
     extensionProvider(
@@ -68,7 +69,6 @@ interface HintingSyntax {
 
         override fun updateUI(p: Type, context: ParameterInfoUIContext) =
           updateUI(p, context)
-
 
         override fun getParametersForLookup(item: LookupElement?, context: ParameterInfoContext?): Array<Any>? =
           parameterForLookUp(item, context)

@@ -1,5 +1,6 @@
 package arrow.meta.dsl.ide.editor.icon
 
+import arrow.meta.internal.Noop
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import com.intellij.ide.IconProvider
@@ -15,8 +16,7 @@ interface IconProviderSyntax {
    */
   fun IdeMetaPlugin.addIcon(
     icon: Icon? = null,
-    matchOn: (psiElement: PsiElement, flag: Int) -> Boolean =
-      { _, _ -> false }
+    matchOn: (psiElement: PsiElement, flag: Int) -> Boolean = Noop.boolean2False
   ): ExtensionPhase =
     extensionProvider(
       IconProvider.EXTENSION_POINT_NAME,
