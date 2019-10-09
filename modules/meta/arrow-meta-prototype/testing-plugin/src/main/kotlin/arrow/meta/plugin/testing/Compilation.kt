@@ -34,7 +34,7 @@ data class InvocationData(
   val methodName: String
 )
 
-fun testCompilation(compilationData: CompilationData): CompilationResult? {
+fun assertCompilation(compilationData: CompilationData): CompilationResult? {
   val kotlinSource = SourceFile.kotlin(compilationData.sourceFileName, compilationData.sourceContent)
 
   val result = KotlinCompilation().apply {

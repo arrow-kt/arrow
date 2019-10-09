@@ -3,7 +3,7 @@ package arrow.meta.plugins.higherkind
 import arrow.meta.plugin.testing.CompilationData
 import arrow.meta.plugin.testing.CompilationStatus
 import arrow.meta.plugin.testing.contentFromResource
-import arrow.meta.plugin.testing.testCompilation
+import arrow.meta.plugin.testing.assertCompilation
 import org.junit.Test
 
 class HigherkindTest {
@@ -11,7 +11,7 @@ class HigherkindTest {
   @Test
   fun `initial_test`() {
 
-    testCompilation(
+    assertCompilation(
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = contentFromResource(javaClass,"Example.kt.source"),

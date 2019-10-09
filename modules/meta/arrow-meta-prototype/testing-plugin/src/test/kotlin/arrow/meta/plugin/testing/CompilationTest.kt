@@ -7,7 +7,7 @@ class CompilationTest {
   @Test
   fun `metadebug consideration works as expected`() {
 
-    testCompilation(
+    assertCompilation(
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = contentFromResource(javaClass, "Example.kt.source"),
@@ -21,7 +21,7 @@ class CompilationTest {
   @Test
   fun `compilation errors are detected`() {
 
-    testCompilation(
+    assertCompilation(
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = "classs Error",
