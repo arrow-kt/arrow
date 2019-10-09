@@ -28,7 +28,7 @@ buildscript {
         jUnitVintageVersion = '5.4.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinPoetVersion = '1.1.0'
-        kotlinTestVersion = '3.3.1'
+        kotlinTestVersion = '3.3.3'
         kotlinVersion = '1.3.50'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinxCoroutinesVersion = '1.3.2'
