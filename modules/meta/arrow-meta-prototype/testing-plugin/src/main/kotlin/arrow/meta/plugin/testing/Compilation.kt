@@ -39,8 +39,15 @@ fun assertCompilation(compilationData: CompilationData): CompilationResult? {
 
   val result = KotlinCompilation().apply {
     sources = listOf(kotlinSource)
+    //
     // TODO: waiting for the arrow-annotations release which contains higherkind annotation
-    // classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
+    //    classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
+    //
+    // If you have an error with the alternative:
+    //
+    //    $ cd arrow/modules/meta/arrow-annotations/
+    //    $ gradle build -x ktlintMainSourceSetCheck
+    //
     classpaths = listOf(File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar"))
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
   }.compile()
