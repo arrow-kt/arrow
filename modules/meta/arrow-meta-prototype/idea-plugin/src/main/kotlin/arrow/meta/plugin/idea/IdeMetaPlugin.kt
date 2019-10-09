@@ -27,19 +27,5 @@ val IdeMetaPlugin.icon: Plugin
         },
         message = "KtThrow LineMarker Example"
       )
-      /*addInspection(
-        inspection = applicableInspection(
-          "TestInspection",
-          KtNamedFunction::class.java,
-          { f: KtNamedFunction -> f.textRange },
-          isApplicable = { f -> f.name == "foo" },
-          inspectionHighlightType = { _ -> ProblemHighlightType.ERROR },
-          inspectionText = { "WHAT" },
-          applyTo = { element, project, editor ->
-            element.addModifier(KtTokens.SUSPEND_KEYWORD)
-          }
-        ),
-        shortName = "Test"
-      )*/
     )
   }
