@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.psi.KtThrowExpression
  * Unrelated to [arrow.meta.plugins.dummy.dummy]
  */
 val IdeMetaPlugin.dummyIdePlugin: Plugin
-  get() = "ImpureLineMarker" {
+  get() = "DummyIdePlugin" {
     meta(
       addLineMarkerProvider(
         icon = KotlinIcons.SUSPEND_CALL,

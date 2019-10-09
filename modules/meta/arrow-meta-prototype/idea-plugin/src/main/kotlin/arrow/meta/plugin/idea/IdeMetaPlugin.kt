@@ -5,12 +5,18 @@ import arrow.meta.Plugin
 import arrow.meta.dsl.ide.IdeSyntax
 import arrow.meta.phases.CompilerContext
 import arrow.meta.plugin.idea.internal.registry.IdeInternalRegistry
-import arrow.meta.plugin.idea.plugins.dummy.dummyIdePlugin
+import arrow.meta.plugin.idea.plugins.comprehensions.comprehensionsIdePlugin
+import arrow.meta.plugin.idea.plugins.higherkinds.higherKindsIdePlugin
+import arrow.meta.plugin.idea.plugins.nothing.nothingIdePlugin
+import arrow.meta.plugin.idea.plugins.optics.opticsIdePlugin
 import kotlin.contracts.ExperimentalContracts
 
 class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
   @ExperimentalContracts
-  override fun intercept(ctx: CompilerContext): List<Plugin> {
-    return super.intercept(ctx) + dummyIdePlugin
-  }
+  override fun intercept(ctx: CompilerContext): List<Plugin> =
+    super.intercept(ctx) +
+      nothingIdePlugin  +
+       comprehensionsIdePlugin +
+       opticsIdePlugin +
+       higherKindsIdePlugin
 }
