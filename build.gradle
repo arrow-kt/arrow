@@ -25,7 +25,7 @@ buildscript {
         ktlint_gradle_version = '8.2.0'
         gradleVersionsPluginVersion = '0.21.0'
         jUnitVersion = '4.12'
-        jUnitVintageVersion = '5.4.0'
+        jUnitVintageVersion = '5.5.2'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinPoetVersion = '1.1.0'
         kotlinTestVersion = '3.3.3'
