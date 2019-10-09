@@ -2,16 +2,15 @@ package arrow.ank
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Invalid
 import arrow.core.ListK
 import arrow.core.Nel
 import arrow.core.NonEmptyList
-import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedNel
 import arrow.core.extensions.list.foldable.reduceLeftOption
 import arrow.core.extensions.list.semigroup.List.semigroup
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.getOrElse
 import arrow.core.toT
 import arrow.core.validNel
 import arrow.fx.typeclasses.Concurrent

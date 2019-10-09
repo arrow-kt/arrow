@@ -2,7 +2,7 @@ package arrow.extreme
 
 import arrow.higherkind
 
-// metadebug
+//metadebug
 
 @higherkind
 sealed class Option<out A>() {

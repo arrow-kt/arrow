@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.higherkind
 
-// metadebug
+//metadebug
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 

@@ -64,7 +64,7 @@ class ConstFunctor<A> : Functor<ConstPartialOf<A>> {
     fix().retag()
 }
 
-// metadebug
+//metadebug
 
 @extension
 class ConstApply<A> : Apply<ConstPartialOf<A>> {

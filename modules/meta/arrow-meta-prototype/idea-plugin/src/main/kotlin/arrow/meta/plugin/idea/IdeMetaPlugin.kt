@@ -1,28 +1,24 @@
 package arrow.meta.plugin.idea
 
 import arrow.meta.MetaPlugin
+import arrow.meta.Plugin
 import arrow.meta.dsl.ide.IdeSyntax
-import arrow.meta.phases.ExtensionPhase
+import arrow.meta.invoke
+import arrow.meta.phases.CompilerContext
 import arrow.meta.plugin.idea.internal.registry.IdeInternalRegistry
 import org.jetbrains.kotlin.idea.KotlinIcons
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtThrowExpression
+import kotlin.contracts.ExperimentalContracts
 
 class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
-  override fun intercept(): List<Pair<Name, List<ExtensionPhase>>> {
-    return super.intercept() + icon
+  @ExperimentalContracts
+  override fun intercept(ctx: CompilerContext): List<Plugin> {
+    return super.intercept(ctx) + icon
   }
 }
 
-// TODO: still WIP
-val IdeMetaPlugin.init: Pair<Name, List<ExtensionPhase>>
-  get() = Name.identifier("Initial Extension Registry") to
-    meta(
-      addLocalInspectionToolToIdeRegistry()
-    )
-
-val IdeMetaPlugin.icon: Pair<Name, List<ExtensionPhase>>
-  get() = Name.identifier("ImpureLineMarker") to
+val IdeMetaPlugin.icon: Plugin
+  get() = "ImpureLineMarker" {
     meta(
       addLineMarkerProvider(
         icon = KotlinIcons.SUSPEND_CALL,
@@ -46,3 +42,4 @@ val IdeMetaPlugin.icon: Pair<Name, List<ExtensionPhase>>
         shortName = "Test"
       )*/
     )
+  }

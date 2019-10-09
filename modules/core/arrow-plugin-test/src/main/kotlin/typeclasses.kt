@@ -3,7 +3,7 @@ package arrow.extreme
 import arrow.Kind
 import arrow.given
 
-// metadebug
+//metadebug
 
 interface Mappable<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>

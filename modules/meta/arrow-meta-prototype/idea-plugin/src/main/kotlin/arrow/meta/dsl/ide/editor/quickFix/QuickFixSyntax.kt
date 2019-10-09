@@ -47,8 +47,4 @@ interface QuickFixSyntax : QuickFixUtilitySyntax {
     element: K
   ): KotlinQuickFixAction<K> = TODO()
   // object : KotlinQuickFixAction<K>(element)
-
 }
-
-
-

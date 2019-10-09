@@ -20,7 +20,5 @@ interface LanguageInjectionSyntax {
 
   fun LanguageInjectionSyntax.elementToInjectIn(): PsiLanguageInjectionHost = TODO("Revisit at a later point")
   /*object : PsiLanguageInjectionHost, ContributedReferenceHost, KtExpression {
-
   }*/
-
 }

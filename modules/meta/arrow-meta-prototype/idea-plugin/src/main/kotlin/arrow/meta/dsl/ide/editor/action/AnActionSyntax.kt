@@ -14,7 +14,7 @@ import javax.swing.Icon
 // TODO: Check Default of actionId
 interface AnActionSyntax : AnActionExtensionProvider {
   fun IdeMetaPlugin.addAnAction(
-    actionId: String = "",
+    actionId: String,
     action: AnAction
   ): ExtensionPhase =
     ideRegistry {
@@ -107,7 +107,6 @@ interface AnActionSyntax : AnActionExtensionProvider {
         beforeActionPerformedUpdate(e)
     }
 
-
   fun AnActionSyntax.addAnAction(
     icon: Icon,
     actionPerformed: (e: AnActionEvent) -> Unit,
@@ -142,7 +141,6 @@ interface AnActionSyntax : AnActionExtensionProvider {
         beforeActionPerformedUpdate(e)
     }
 
-
   fun AnActionSyntax.addAnAction(
     title: String,
     actionPerformed: (e: AnActionEvent) -> Unit,
@@ -176,7 +174,6 @@ interface AnActionSyntax : AnActionExtensionProvider {
       override fun beforeActionPerformedUpdate(e: AnActionEvent) =
         beforeActionPerformedUpdate(e)
     }
-
 
   fun AnActionSyntax.addAnAction(
     title: String,

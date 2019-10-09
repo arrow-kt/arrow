@@ -38,7 +38,6 @@ interface IntentionExtensionProviderSyntax : IntentionExtensionProvider {
       }
     }
 
-
   fun IdeMetaPlugin.unregisterIntention(
     intention: IntentionAction
   ): ExtensionPhase =

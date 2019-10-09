@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.higherkind
 
-// metadebug
+//metadebug
 
 /**
  * Represents optional values. Instances of `Option`
