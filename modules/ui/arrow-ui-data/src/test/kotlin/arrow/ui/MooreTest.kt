@@ -9,7 +9,6 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class MooreTest : UnitSpec() {
 
   init {
