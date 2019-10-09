@@ -13,7 +13,6 @@ import arrow.core.extensions.option.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.traverseFilter.traverseFilter
-import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.generators.option
 import arrow.test.laws.FunctorFilterLaws
@@ -145,8 +144,8 @@ class OptionTest : UnitSpec() {
 
     "firstOption" {
       val l = listOf(1, 2, 3, 4, 5, 6)
-      l.firstOption() shouldBe Some(1)
-      l.firstOption { it > 2 } shouldBe Some(3)
+      l.firstOrNone() shouldBe Some(1)
+      l.firstOrNone { it > 2 } shouldBe Some(3)
     }
 
     "and" {

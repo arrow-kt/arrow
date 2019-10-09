@@ -1,6 +1,6 @@
 package arrow
 
-import arrow.core.Continuation
+import arrow.typeclasses.Continuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

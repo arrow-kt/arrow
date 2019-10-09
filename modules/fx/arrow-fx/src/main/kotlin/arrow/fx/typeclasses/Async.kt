@@ -150,7 +150,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     _delay_(Dispatchers.Default, { Thread.currentThread().name })
+   *     _later_(Dispatchers.Default, { Thread.currentThread().name })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
    *   //sampleEnd
@@ -168,6 +168,7 @@ interface Async<F> : MonadDefer<F> {
     }
 
   /**
+>>>>>>> Fix extension processor suspend fun args (#1555)
    * Delay a suspended effect.
    *
    * ```kotlin:ank:playground:extension
@@ -301,7 +302,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    later(this) { Unit }
+    effect(this) { Unit }
 
   /**
    * Task that never finishes evaluating.
@@ -319,7 +320,30 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> never(): Kind<F, A> =
-    async { }
+    async(mapUnit)
+
+  /**
+   * Helper function that provides an easy way to construct a suspend effect
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   suspend fun logAndIncrease(s: String): Int {
+   *      println(s)
+   *      return s.toInt() + 1
+   *   }
+   *
+   *   val result = _extensionFactory_.effect(Dispatchers.Default) { Thread.currentThread().name }.effectMap { s: String -> logAndIncrease(s) }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A, B> Kind<F, A>.effectMap(f: suspend (A) -> B): Kind<F, B> =
+    flatMap { a -> effect { f(a) } }
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }

@@ -7,13 +7,14 @@ import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.extensions.maybek.monad.flatMap
+import arrow.fx.rx2.extensions.maybek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-class MaybeKTests : UnitSpec() {
+class MaybeKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>> {
     override fun MaybeKOf<T>.eqv(b: MaybeKOf<T>): Boolean {
@@ -54,8 +55,20 @@ class MaybeKTests : UnitSpec() {
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false)
+      ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false),
+      MonadFilterLaws.laws(MaybeK.monadFilter(), { Maybe.just(it).k() }, EQ())
     )
+
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = MaybeK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
 
     "Multi-thread Maybes finish correctly" {
       val value: Maybe<Long> = MaybeK.fx {

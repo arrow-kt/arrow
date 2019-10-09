@@ -288,6 +288,11 @@ interface MVar<F, A> {
     fun <F, A> uncancelableOf(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> =
       UncancelableMVar(initial, AS)
 
+    /**
+     * Build a [MVarFactory] value for creating MVar types [F] without deciding the type of the MVar's value.
+     *
+     * @see MVarFactory
+     */
     fun <F> factoryUncancelable(AS: Async<F>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
@@ -297,8 +302,12 @@ interface MVar<F, A> {
         UncancelableMVar.empty(AS)
     }
 
+    /**
+     * Build a [MVarFactory] value for creating MVar types [F] without deciding the type of the MVar's value.
+     *
+     * @see MVarFactory
+     */
     fun <F> factoryCancelable(CF: Concurrent<F>) = object : MVarFactory<F> {
-
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         CancelableMVar(a, CF)
 
@@ -314,13 +323,13 @@ interface MVar<F, A> {
  *
  * ```kotlin:ank:playground
  * import arrow.fx.*
- * import arrow.fx.extensions.io.async.async
+ * import arrow.fx.extensions.io.concurrent.concurrent
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
- *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.just(5)
- *   val stringVar: IOOf<MVar<ForIO, String>> = mvarPartial.empty<String>()
+ *   val mvarFactory: MVarFactory<ForIO> = MVar.factoryCancelable(IO.concurrent())
+ *   val intVar: IOOf<MVar<ForIO, Int>> = mvarFactory.just(5)
+ *   val stringVar: IOOf<MVar<ForIO, String>> = mvarFactory.empty<String>()
  *   //sampleEnd
  * }
  * ```

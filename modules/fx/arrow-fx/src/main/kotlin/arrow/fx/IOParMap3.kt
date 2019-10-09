@@ -2,8 +2,13 @@ package arrow.fx
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Tuple3
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.applicativeError.handleError
 import arrow.core.nonFatalOrThrow
+import arrow.core.none
+import arrow.core.some
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import java.util.concurrent.atomic.AtomicBoolean
@@ -21,15 +26,15 @@ interface IOParMap3 {
     f: (A, B, C) -> D
   ): IO<D> = IO.Async { conn, cb ->
 
-    val state: AtomicReference<Tuple3<A?, B?, C?>?> = AtomicReference(null)
+    val state: AtomicReference<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicReference(none())
     val active = AtomicBoolean(true)
 
     val connA = IOConnection()
     val connB = IOConnection()
     val connC = IOConnection()
 
-    // Composite cancelable that cancels both.
-    // NOTE: conn.pop() happens when cb gets called!
+    // Composite cancelable that cancels all ops.
+    // NOTE: conn.pop() called when cb gets called below in complete.
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
     fun complete(a: A, b: B, c: C) {
@@ -42,10 +47,8 @@ interface IOParMap3 {
       cb(result)
     }
 
-    fun tryComplete(tuple: Tuple3<A?, B?, C?>?) = tuple?.let { (a, b, c) ->
-      if (a != null && b != null && c != null) complete(a, b, c)
-      else Unit
-    } ?: Unit
+    fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
+      result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
     fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
@@ -66,7 +69,9 @@ interface IOParMap3 {
         sendError(connB, connC, e)
       }, { a ->
         tryComplete(state.updateAndGet { current ->
-          current?.copy(a = a) ?: Tuple3(a, null, null)
+          current
+            .map { it.copy(a = a.some()) }
+            .handleError { Tuple3(a.some(), none(), none()) }
         })
       })
     }
@@ -76,7 +81,9 @@ interface IOParMap3 {
         sendError(connA, connC, e)
       }, { b ->
         tryComplete(state.updateAndGet { current ->
-          current?.copy(b = b) ?: Tuple3(null, b, null)
+          current
+            .map { it.copy(b = b.some()) }
+            .handleError { Tuple3(none(), b.some(), none()) }
         })
       })
     }
@@ -86,7 +93,9 @@ interface IOParMap3 {
         sendError(connA, connB, e)
       }, { c ->
         tryComplete(state.updateAndGet { current ->
-          current?.copy(c = c) ?: Tuple3(null, null, c)
+          current
+            .map { it.copy(c = c.some()) }
+            .handleError { Tuple3(none(), none(), c.some()) }
         })
       })
     }

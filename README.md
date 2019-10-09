@@ -4,7 +4,6 @@
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)]( http://stackoverflow.com/questions/tagged/arrow-kt )
 
 
@@ -38,118 +37,9 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 - [#Arrow on Kotlin Slack](https://kotlinlang.slack.com/)
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
-# Basic Setup
+# Setup
 
-Make sure to have the latest version of JDK 1.8 installed.
-
-Add this in your root `build.gradle` at the end of repositories.
-
-```groovy
-allprojects {
-    repositories {
-        mavenCentral()
-        jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } 
-        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
-    }
-}
-```
-
-# Next development version 0.10.0
-
-Add the dependencies into the project's `build.gradle`
-
-## Λrrow Core
-
-```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
-dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-## Λrrow Core + Λrrow Optics
-
-```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
-dependencies {
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-## Λrrow Core + Λrrow Fx 
-
-```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
-dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-## Λrrow Core + Λrrow Optics + Λrrow Fx
-
-```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
-dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-}
-```
-
-Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
-
-# Additional Setup
-
-For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
-the setup below is also required:
-
-Add the dependencies into the project's `build.gradle`
-
-```groovy
-apply plugin: 'kotlin-kapt' //optional
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
-
-def arrow_version = "0.10.0-SNAPSHOT"
-dependencies {
-    ...
-    kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
-    ...
-}
-```
-
-`gradle/generated-kotlin-sources.gradle`
-```groovy
-apply plugin: 'idea'
-
-idea {
-    module {
-        sourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-```
+Take a look at [Setup in the Arrow website](https://arrow-kt.io/docs/quickstart/setup/) or [Setup file](/modules/docs/arrow-docs/docs/docs/quickstart/setup) where you'll find the instructions to configure a project with `Gradle` or `Maven` to use `Arrow` library.
 
 # License
 
