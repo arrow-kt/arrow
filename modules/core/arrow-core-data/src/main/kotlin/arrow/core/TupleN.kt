@@ -3,7 +3,7 @@ package arrow.core
 //metadebug
 
 import arrow.higherkind
-import java.util.*
+import java.util.Collections
 import kotlin.collections.LinkedHashMap
 
 @higherkind

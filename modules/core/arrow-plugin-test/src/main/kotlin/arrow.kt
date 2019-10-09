@@ -1,6 +1,7 @@
 package arrow.extreme
 
 import arrow.higherkind
+import arrow.synthetic
 
 //metadebug
 
