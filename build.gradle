@@ -259,9 +259,11 @@ task publishAndRunIde {
      ":idea-plugin:clean",
      ":gradle-plugin:clean",
      ":compiler-plugin:clean",
+     ":testing-plugin:clean",
      ":idea-plugin:build",
      ":gradle-plugin:build",
      ":compiler-plugin:build",
+     ":testing-plugin:build",
      ":gradle-plugin:publishArrowPluginMarkerMavenPublicationToMavenLocal",
      ':gradle-plugin:publishPluginMavenPublicationToMavenLocal',
      ':idea-plugin:runIde'
