@@ -2,7 +2,7 @@ package arrow.meta.plugin.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
  * The project-level Gradle plugin behavior that is used specifying the plugin's configuration through the
