@@ -39,11 +39,9 @@ fun testCompilation(compilationData: CompilationData): CompilationResult? {
 
   val result = KotlinCompilation().apply {
     sources = listOf(kotlinSource)
-    classpaths = listOf(
-      // TODO: waiting for the next Arrow release
-      // classpathOf("arrow-annotations:x.x.x")
-      File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar")
-    )
+    // TODO: waiting for the arrow-annotations release which contains higherkind annotation
+    // classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
+    classpaths = listOf(File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar"))
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
   }.compile()
 
@@ -54,6 +52,20 @@ fun testCompilation(compilationData: CompilationData): CompilationResult? {
     return CompilationResult(classesDirectory = result.outputDirectory.absolutePath)
   }
   return null
+}
+
+fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
+  fromClass.getResource(resourceName).readText()
+
+fun invoke(invocationData: InvocationData): Any =
+  getClassLoaderForGeneratedClasses(invocationData.classesDirectory).loadClass(invocationData.className).getMethod(invocationData.methodName).invoke(null)
+
+fun getFieldFrom(result: Any, fieldName: String): Any =
+  result.javaClass.getField(fieldName).get(result)
+
+private fun classpathOf(dependency: String): File {
+  val regex = Regex(".*${dependency.replace(':', '-')}.*")
+  return ClassGraph().classpathFiles.first { classpath -> classpath.name.matches(regex) }
 }
 
 private fun testConditions(compilationData: CompilationData, result: KotlinCompilation.Result): Unit {
@@ -79,14 +91,6 @@ private fun testGeneratedClasses(compilationData: CompilationData, result: Kotli
   assertThat(actualGeneratedClasses).containsExactlyInAnyOrder(*compilationData.generatedClasses.map { "$it.class" }.toTypedArray())
 }
 
-fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
-  fromClass.getResource(resourceName).readText()
-
-fun classpathOf(dependency: String): File {
-  val regex = Regex(".*${dependency.replace(':', '-')}.*")
-  return ClassGraph().classpathFiles.first { classpath -> classpath.name.matches(regex) }
-}
-
 private fun exitCodeFrom(compilationStatus: CompilationStatus): KotlinCompilation.ExitCode =
   when (compilationStatus) {
     CompilationStatus.OK -> KotlinCompilation.ExitCode.OK
@@ -97,9 +101,3 @@ private fun exitCodeFrom(compilationStatus: CompilationStatus): KotlinCompilatio
 
 private fun getClassLoaderForGeneratedClasses(classesDirectory: String?): ClassLoader =
   URLClassLoader(arrayOf(File(classesDirectory).toURI().toURL()))
-
-fun invoke(invocationData: InvocationData): Any =
-  getClassLoaderForGeneratedClasses(invocationData.classesDirectory).loadClass(invocationData.className).getMethod(invocationData.methodName).invoke(null)
-
-fun getFieldFrom(result: Any, fieldName: String): Any =
-  result.javaClass.getField(fieldName).get(result)

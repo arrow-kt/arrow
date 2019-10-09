@@ -36,7 +36,7 @@ class ComprehensionsTest {
             }
           }
   
-          fun test1(): IO<Int> =
+          fun test(): IO<Int> =
             IO.fx {
               val a: Int by IO(1)
               val b: Int by IO(2)
@@ -44,20 +44,21 @@ class ComprehensionsTest {
             }
         """,
         generatedFileContent = null,
-        generatedClasses = arrayListOf("\$test1\$lambda-1\$0", "IO\$Companion", "IO", "SimpleCaseKt\$\$test1\$lambda-1\$lambda-0\$1", "SimpleCaseKt"),
+        generatedClasses = arrayListOf("SimpleCaseKt", "IO", "IO\$Companion", "SimpleCaseKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0"),
         compilationStatus = CompilationStatus.OK
       )
     )
 
     assertThat(compilationResult).isNotNull
 
-    val result = invoke(
+    val resultForTest = invoke(
       InvocationData(
         classesDirectory = compilationResult?.classesDirectory,
         className = "SimpleCaseKt",
-        methodName = "test1"
+        methodName = "test"
       )
     )
-    assertThat(getFieldFrom(result, "value")).isEqualTo(3)
+    assertThat(resultForTest::class.simpleName).isEqualTo("IO")
+    assertThat(getFieldFrom(resultForTest, "value")).isEqualTo(3)
   }
 }
