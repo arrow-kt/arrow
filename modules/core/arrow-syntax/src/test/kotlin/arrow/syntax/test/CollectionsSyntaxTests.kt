@@ -20,11 +20,8 @@ import arrow.syntax.collections.destructured
 import arrow.syntax.collections.prependTo
 import arrow.syntax.collections.tail
 import arrow.test.UnitSpec
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class CollectionsSyntaxTests : UnitSpec() {
 
   init {
