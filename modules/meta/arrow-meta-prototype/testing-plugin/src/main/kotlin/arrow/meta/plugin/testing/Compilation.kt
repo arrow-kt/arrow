@@ -43,12 +43,7 @@ fun assertCompilation(compilationData: CompilationData): CompilationResult? {
     // TODO: waiting for the arrow-annotations release which contains higherkind annotation
     //    classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
     //
-    // If you have an error with the alternative:
-    //
-    //    $ cd arrow/modules/meta/arrow-annotations/
-    //    $ gradle build -x ktlintMainSourceSetCheck
-    //
-    classpaths = listOf(File("../../arrow-annotations/build/libs/arrow-annotations-0.10.1-SNAPSHOT.jar"))
+    classpaths = listOf(classpathOf("arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"))
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
   }.compile()
 
