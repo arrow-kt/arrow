@@ -20,5 +20,5 @@ import arrow.typeclasses.MonadSyntax
 interface Fx<F> {
   fun monad(): Monad<F>
   fun <A> fx(f: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    monad().binding(f)
+    monad().fx.monad(f)
 }

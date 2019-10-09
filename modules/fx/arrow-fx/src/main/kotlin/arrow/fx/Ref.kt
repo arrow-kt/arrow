@@ -94,20 +94,10 @@ interface Ref<F, A> {
 
   companion object {
     /**
-     * Builds a [Ref] value for data types given a [MonadDefer] instance
-     * without deciding the type of the Ref's value.
-     *
-     * @see [invoke]
-     */
-    fun <F> factory(MD: MonadDefer<F>): RefFactory<F> = object : RefFactory<F> {
-      override fun <A> later(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
-    }
-
-    /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    operator fun <F, A> invoke(MD: MonadDefer<F>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
-      unsafe(f(), MD)
+    operator fun <F, A> invoke(MD: MonadDefer<F>, a: A): Kind<F, Ref<F, A>> = MD.later {
+      unsafe(a, MD)
     }
 
     /**
@@ -116,7 +106,16 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef<F, A>(AtomicReference(a), MD)
+    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(AtomicReference(a), MD)
+
+    /**
+     * Build a [RefFactory] value for creating Ref types [F] without deciding the type of the Ref's value.
+     *
+     * @see RefFactory
+     */
+    fun <F> factory(MD: MonadDefer<F>) = object : RefFactory<F> {
+      override fun <A> just(a: A): Kind<F, Ref<F, A>> = Ref(MD, a)
+    }
 
     /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
@@ -185,8 +184,38 @@ interface Ref<F, A> {
 }
 
 /**
- * Creates [Ref] for a kind [F] using a supplied function.
+ * Builds a [Ref] value for data types [F]
+ * without deciding the type of the Ref's value.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.extensions.io.monadDefer.monadDefer
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
+ *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
+ *   val stringVar: IOOf<Ref<ForIO, String>> = refFactory.just("Hello")
+ *   //sampleEnd
+ * }
+ * ```
  */
 interface RefFactory<F> {
-  fun <A> later(a: () -> A): Kind<F, Ref<F, A>>
+
+  /**
+   * Builds a [MVar] with a value of type [A].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.async.async
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.async())
+   *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  fun <A> just(a: A): Kind<F, Ref<F, A>>
 }

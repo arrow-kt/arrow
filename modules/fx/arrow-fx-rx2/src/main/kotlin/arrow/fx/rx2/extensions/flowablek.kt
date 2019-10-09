@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -48,9 +49,12 @@ import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
+import arrow.typeclasses.FunctorFilter
+import arrow.typeclasses.MonadFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -120,7 +124,7 @@ interface FlowableKApplicativeError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -131,7 +135,7 @@ interface FlowableKMonadError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -175,12 +179,12 @@ interface FlowableKEffect :
 
 interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
 
-  override fun <A> CoroutineContext.startFiber(kind: FlowableKOf<A>): FlowableK<Fiber<ForFlowableK, A>> =
-    asScheduler().let { scheduler ->
+  override fun <A> Kind<ForFlowableK, A>.fork(coroutineContext: CoroutineContext): FlowableK<Fiber<ForFlowableK, A>> =
+    coroutineContext.asScheduler().let { scheduler ->
       Flowable.create<Fiber<ForFlowableK, A>>({ emitter ->
         if (!emitter.isCancelled) {
           val s: ReplaySubject<A> = ReplaySubject.create<A>()
-          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onNext(Fiber(s.toFlowable(BS()).k(), FlowableK {
             conn.dispose()
           }))
@@ -214,10 +218,10 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
         sa.subscribe({
           emitter.onNext(RacePair.First(it, ffb))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RacePair.Second(ffa, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -342,6 +346,41 @@ interface FlowableKTimer : Timer<ForFlowableK> {
       .map { Unit })
 }
 
+@extension
+interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
+  override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+}
+
+@extension
+interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
+  override fun <A> empty(): FlowableK<A> =
+    Flowable.empty<A>().k()
+
+  override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.ap(ff: Kind<ForFlowableK, (A) -> B>): FlowableK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
+    FlowableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForFlowableK, A>.map2(fb: Kind<ForFlowableK, B>, f: (Tuple2<A, B>) -> Z): FlowableK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): FlowableK<A> =
+    FlowableK.just(a)
+}
 // TODO FlowableK does not yet have a Concurrent instance
 fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
-  FlowableK.async().fx.async(c).fix()
+  defer { FlowableK.async().fx.async(c).fix() }

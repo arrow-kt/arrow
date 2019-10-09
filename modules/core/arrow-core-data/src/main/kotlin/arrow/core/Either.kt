@@ -383,6 +383,20 @@ fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
 }
 
 /**
+ * Returns [Either.Right] if the value of type Any? is null, otherwise the specified A value wrapped into an
+ * [Either.Left].
+ *
+ * Example:
+ * ```
+ * null.rightIfNull { "left" }    // Right(b="Nothing?")
+ * "value".rightIfNull { "left" } // Left(a="left")
+ * ```
+ */
+fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
+  null -> Either.right(null)
+  else -> Either.left(default())
+}
+/**
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.
  */

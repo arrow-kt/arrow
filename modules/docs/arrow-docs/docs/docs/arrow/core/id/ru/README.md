@@ -12,7 +12,7 @@ video: DBvVd1pfLMo
 {:.beginner}
 beginner
 
-[English](/docs/apidocs/arrow-core-data/arrow.core/-id/)
+[English / английский](/docs/apidocs/arrow-core-data/arrow.core/-id/)
 
 Id (монада идентичности) должна рассматриваться, как монада, в которую вкладывается эффект отсутствия эффекта. Любое значение может являться значением `Id`.
 

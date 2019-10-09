@@ -245,7 +245,11 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   /**
    * View a [POptional] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
+  fun asSetter(): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
+    override fun modify(s: S, f: (A) -> B): T = this@POptional.modify(s, f)
+
+    override fun set(s: S, b: B): T = this@POptional.set(s, b)
+  }
 
   /**
    * View a [POptional] as a [Fold]
