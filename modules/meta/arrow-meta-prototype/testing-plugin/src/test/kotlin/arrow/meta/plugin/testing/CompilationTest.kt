@@ -7,13 +7,13 @@ class CompilationTest {
   @Test
   fun `metadebug consideration works as expected`() {
 
-    testCompilation(
+    assertCompilation(
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = contentFromResource(javaClass, "Example.kt.source"),
         generatedFileContent = contentFromResource(javaClass, "Example.kt.meta"),
         generatedClasses = arrayListOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"),
-        compilationResult = CompilationResult.OK
+        compilationStatus = CompilationStatus.OK
       )
     )
   }
@@ -21,13 +21,13 @@ class CompilationTest {
   @Test
   fun `compilation errors are detected`() {
 
-    testCompilation(
+    assertCompilation(
       CompilationData(
         sourceFileName = "Example.kt",
         sourceContent = "classs Error",
-        generatedFileContent = "",
+        generatedFileContent = null,
         generatedClasses = arrayListOf(),
-        compilationResult = CompilationResult.COMPILATION_ERROR
+        compilationStatus = CompilationStatus.COMPILATION_ERROR
       )
     )
   }
