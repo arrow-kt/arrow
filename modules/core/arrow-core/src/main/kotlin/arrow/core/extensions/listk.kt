@@ -7,6 +7,7 @@ import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
+import arrow.core.SequenceK
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
@@ -232,6 +233,22 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
 
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): ListK<A> =
     fix() + b.fix()
+
+  override fun <A> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
+    if (this.fix().isEmpty()) ListK.empty()
+    else map { Sequence { object : Iterator<A> {
+      override fun hasNext(): Boolean = true
+
+      override fun next(): A = it
+    } }.k() }.k()
+
+  override fun <A> Kind<ForListK, A>.many(): ListK<SequenceK<A>> =
+    if (this.fix().isEmpty()) listOf(emptySequence<A>().k()).k()
+    else map { Sequence { object : Iterator<A> {
+      override fun hasNext(): Boolean = true
+
+      override fun next(): A = it
+    } }.k() }.k()
 }
 
 @extension

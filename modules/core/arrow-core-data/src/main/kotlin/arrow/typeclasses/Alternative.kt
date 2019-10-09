@@ -1,7 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.ListK
+import arrow.core.SequenceK
 import arrow.core.k
 
 /**
@@ -18,7 +18,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results with at least 1 repetition.
    */
-  fun <A> Kind<F, A>.some(): Kind<F, ListK<A>> = map(this, many()) { (v, vs) -> (listOf(v) + vs).k() }
+  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = map(this, many()) { (v, vs) -> (sequenceOf(v) + vs).k() }
 
   /**
    * Repeats the computation until it fails. Does not requires it to succeed.
@@ -26,7 +26,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results.
    */
-  fun <A> Kind<F, A>.many(): Kind<F, ListK<A>> = some().orElse(just(emptyList<A>().k()))
+  fun <A> Kind<F, A>.many(): Kind<F, SequenceK<A>> = some().orElse(just(emptySequence<A>().k()))
 
   /**
    * Combines two computations.

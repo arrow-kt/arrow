@@ -61,6 +61,48 @@ Option.monadCombine().run {
 }
 ```
 
+#### Kind<F, A>.some
+
+`fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>>`
+
+Repeats the current computation, lazily collecting its results into a sequence, until it fails. It is required that the computation succeeds at least once.
+
+```kotlin:ank
+import arrow.core.Option
+import arrow.core.extensions.option.monadCombine.monadCombine
+
+Option.monadCombine().run { 
+  val x = Option.just(1)
+  x.some().map { it.take(5).toList() }
+}
+```
+
+```kotlin:ank
+import arrow.core.Option
+import arrow.core.extensions.option.monadCombine.monadCombine
+
+Option.monadCombine().run { 
+  val x = Option.empty<Int>()
+  x.some().map { it.take(5).toList() }
+}
+```
+
+#### Kind<F, A>.many
+
+`fun <A> Kind<F, A>.many(): Kind<F, SequenceK<A>>`
+
+Same function as some, but it does not require the computation to succeed.
+
+```kotlin:ank
+import arrow.core.Option
+import arrow.core.extensions.option.monadCombine.monadCombine
+
+Option.monadCombine().run { 
+  val x = Option.empty<Int>()
+  x.many().map { it.take(5).toList() }
+}
+```
+
 ### Laws
 
 Arrow provides `AlternativeLaws` in the form of test cases for internal verifications of lawful instances and third party apps creating their own `Alternative` instances.
