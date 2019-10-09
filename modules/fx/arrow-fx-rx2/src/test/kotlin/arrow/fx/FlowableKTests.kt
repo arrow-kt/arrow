@@ -17,7 +17,6 @@ import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
 import arrow.fx.rx2.extensions.flowablek.traverse.traverse
 import arrow.fx.rx2.extensions.fx
-import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
@@ -27,18 +26,15 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 class FlowableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
