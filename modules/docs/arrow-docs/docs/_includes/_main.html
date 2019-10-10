@@ -4,7 +4,7 @@
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
       {% if title != "arrow incubator" %}
-      <div id="{{ item.id }}" class="{{ item.id }} main-item feature">
+      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ site.baseurl }}{{ item.url }}">
 
         <div id="{{ item.id }}-header" class="item-header">
           <div id="icon-{{ item.id }}-content" class="icon-content">
@@ -15,8 +15,8 @@
           <h2 id="{{ item.id }}-title">{{ item.title }}</h2>
           <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
-        <a id="{{ item.id }}-button" class="feature-button {{ item.id }}-button" href="{{ site.baseurl }}{{ item.url }}" title="{{ item.title }}">Learn more</a>
-      </div>
+        <div id="{{ item.id }}-button" class="feature-button {{ item.id }}-button" title="{{ item.title }}">Learn more</div>
+      </a>
       {% endif %}
       {% endfor %}
     </div>
@@ -27,19 +27,22 @@
         <h2>Λrrow Incubator</h2>
         <ul id="incubator-list" class="incubator-list">
           {% for item in site.data.features.incubator %}
+          {% if item.title == 'Arrow Query Language' %}
+            {% assign aqlUrl = item.url %}
+          {% endif %}
           <li class="incubator-items">
             <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
           </li>
           {% endfor %}
         </ul>
       </div>
-      <div class="incubator-image">
+      <a class="incubator-image" href="{{ aqlUrl }}">
         <div id="incubator-base-animation" alt="Incubator"></div>
         <div id="incubator-core-animation" alt="Incubator"></div>
         <div id="incubator-fx-animation" alt="Incubator"></div>
         <div id="incubator-optics-animation" alt="Incubator"></div>
         <div id="incubator-meta-animation" alt="Incubator"></div>
         <div id="incubator-hover-animation" alt="Incubator"></div>
-      </div>
+      </a>
     </div>
 </main>

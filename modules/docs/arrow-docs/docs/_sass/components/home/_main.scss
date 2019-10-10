@@ -20,6 +20,11 @@
       width: $column-4;
       text-align: center;
 
+      &:hover {
+        text-decoration: none;
+        color: $white;
+      }
+
       .icon-content {
         display: flex;
         justify-content: center;
