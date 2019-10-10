@@ -12,8 +12,6 @@ video: q6HpChSq-xc
 {:.beginner}
 beginner
 
-[Russian / Перевод на русский](/docs/arrow/core/either/ru/)
-
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 
