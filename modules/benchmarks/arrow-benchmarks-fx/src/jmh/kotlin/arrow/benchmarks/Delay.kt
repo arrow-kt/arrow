@@ -37,4 +37,8 @@ open class Delay {
   @Benchmark
   fun scalaZIO(): Int =
     arrow.benchmarks.effects.scala.zio.`Delay$`.`MODULE$`.unsafeIODelayLoop(size, 0)
+
+  @Benchmark
+  fun kio(): Int =
+    arrow.benchmarks.effects.kio.Delay.unsafeIODelayLoop(size, 0)
 }

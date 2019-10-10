@@ -41,6 +41,10 @@ open class LeftBind {
   fun scalazZIO(): Int =
     arrow.benchmarks.effects.scala.zio.`LeftBind$`.`MODULE$`.unsafeIOLeftBindLoop(depth, size, 0)
 
+  @Benchmark
+  fun kio(): Int =
+    arrow.benchmarks.effects.kio.LeftBind.leftBind(depth, size, 0)
+
       // RxJava & Reactor are not stack-safe and overflow in the benchmark.
 
 //    fun monoLoop(i: Int): Mono<Int> =
