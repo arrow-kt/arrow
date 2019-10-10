@@ -1,7 +1,17 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.FunctionK
+import arrow.core.Id
+import arrow.core.ListK
+import arrow.core.NonEmptyList
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
@@ -9,6 +19,8 @@ import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
+import arrow.core.fix
+import arrow.core.value
 import arrow.free.Cofree.Companion.unfold
 import arrow.free.extensions.cofree.comonad.comonad
 import arrow.mtl.OptionT

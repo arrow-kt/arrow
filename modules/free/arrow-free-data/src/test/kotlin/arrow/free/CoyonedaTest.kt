@@ -1,8 +1,14 @@
 package arrow.free
 
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.option.functor.functor
+import arrow.core.fix
+import arrow.core.identity
 import arrow.free.extensions.coyoneda.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws

@@ -24,9 +24,7 @@ import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.value
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 class SumTest : UnitSpec() {
   init {
