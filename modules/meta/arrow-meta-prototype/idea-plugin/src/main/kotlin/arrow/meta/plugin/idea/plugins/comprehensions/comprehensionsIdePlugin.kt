@@ -3,6 +3,7 @@ package arrow.meta.plugin.idea.plugins.comprehensions
 import arrow.meta.Plugin
 import arrow.meta.invoke
 import arrow.meta.plugin.idea.IdeMetaPlugin
+import arrow.meta.plugin.idea.resources.ArrowIcons
 import arrow.meta.plugins.comprehensions.isBinding
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -13,7 +14,7 @@ val IdeMetaPlugin.comprehensionsIdePlugin: Plugin
   get() = "ComprehensionsIdePlugin" {
     meta(
       addLineMarkerProvider(
-        icon = TODO(),
+        icon = ArrowIcons.BIND_DARK,
         message = "Comprehensions !!",
         matchOn = { it.safeAs<KtExpression>()?.isBinding() == true }
       )
