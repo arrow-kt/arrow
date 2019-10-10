@@ -1,23 +1,18 @@
 package arrow.fx
 
-import arrow.fx.reactor.FluxK
-import arrow.fx.reactor.FluxKOf
-import arrow.fx.reactor.ForFluxK
-import arrow.fx.reactor.k
-import arrow.fx.reactor.extensions.fluxk.async.async
-import arrow.fx.reactor.extensions.fluxk.foldable.foldable
-import arrow.fx.reactor.extensions.fluxk.functor.functor
+import arrow.fx.reactor.ForMonoK
+import arrow.fx.reactor.MonoK
+import arrow.fx.reactor.MonoKOf
 import arrow.fx.reactor.extensions.fx
-import arrow.fx.reactor.extensions.fluxk.monad.flatMap
-import arrow.fx.reactor.extensions.fluxk.traverse.traverse
-import arrow.fx.reactor.extensions.fluxk.timer.timer
+import arrow.fx.reactor.extensions.monok.async.async
+import arrow.fx.reactor.extensions.monok.monad.flatMap
+import arrow.fx.reactor.extensions.monok.timer.timer
+import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TimerLaws
-import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -26,34 +21,34 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
-import reactor.test.expectError
-import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
+import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KotlinTestRunner::class)
-class FluxKTest : UnitSpec() {
+class MonoKTest : UnitSpec() {
 
-  fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =
-    flux.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
+  fun <T> assertThreadNot(mono: Mono<T>, name: String): Mono<T> =
+    mono.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
 
-  fun <T> EQ(): Eq<FluxKOf<T>> = object : Eq<FluxKOf<T>> {
-    override fun FluxKOf<T>.eqv(b: FluxKOf<T>): Boolean =
+  fun <T> EQ(): Eq<MonoKOf<T>> = object : Eq<MonoKOf<T>> {
+    override fun MonoKOf<T>.eqv(b: MonoKOf<T>): Boolean =
       try {
-        this.value().blockFirst() == b.value().blockFirst()
+        this.value().block() == b.value().block()
       } catch (throwable: Throwable) {
         val errA = try {
-          this.value().blockFirst()
+          this.value().block()
           throw IllegalArgumentException()
         } catch (err: Throwable) {
           err
         }
 
         val errB = try {
-          b.value().blockFirst()
+          b.value().block()
           throw IllegalStateException()
         } catch (err: Throwable) {
           err
@@ -64,17 +59,25 @@ class FluxKTest : UnitSpec() {
   }
 
   init {
-
     testLaws(
-      TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
-      AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
-      FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
-      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
+      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
 
-    "Multi-thread Fluxes finish correctly" {
-      val value: Flux<Int> = FluxK.fx {
-        val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().bind()
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = MonoK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
+    "Multi-thread Monos finish correctly" {
+      val value: Mono<Long> = MonoK.fx {
+        val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
 
@@ -83,16 +86,16 @@ class FluxKTest : UnitSpec() {
         .verifyComplete()
     }
 
-    "Multi-thread Fluxes should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
+    "Multi-thread Monos should run on their required threads" {
+      val originalThread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Flux<Long> = FluxK.fx {
-        val a = Flux.just(0L)
-          .delayElements(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
+      val value: Mono<Long> = MonoK.fx {
+        val a = Mono.just(0L)
+          .delayElement(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
           .k()
           .bind()
         threadRef = Thread.currentThread()
-        val b = Flux.just(a)
+        val b = Mono.just(a)
           .subscribeOn(Schedulers.newSingle("anotherThread"))
           .k()
           .bind()
@@ -109,14 +112,14 @@ class FluxKTest : UnitSpec() {
       assertThreadNot(value, nextThread)
     }
 
-    "Flux cancellation forces binding to cancel without completing too" {
-      val value: Flux<Long> = FluxK.fx {
-        val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
+    "Mono dispose forces binding to cancel without completing too" {
+      val value: Mono<Long> = MonoK.fx {
+        val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().bind()
         a
       }.value()
 
       val test = value.doOnSubscribe { subscription ->
-        Flux.just(0L).delayElements(Duration.ofSeconds(1))
+        Mono.just(0L).delayElement(Duration.ofSeconds(1))
           .subscribe { subscription.cancel() }
       }.test()
 
@@ -129,15 +132,15 @@ class FluxKTest : UnitSpec() {
         .hasNotDroppedErrors()
     }
 
-    "FluxK bracket cancellation should release resource with cancel exit status" {
+    "MonoK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
       val countDownLatch = CountDownLatch(1)
 
-      FluxK.just(Unit)
+      MonoK.just(Unit)
         .bracketCase(
-          use = { FluxK.async<Nothing> { _, _ -> } },
+          use = { MonoK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
-            FluxK {
+            MonoK {
               ec = exitCase
               countDownLatch.countDown()
             }
@@ -151,12 +154,12 @@ class FluxKTest : UnitSpec() {
       ec shouldBe ExitCase.Canceled
     }
 
-    "FluxK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
-        FluxK {
-          FluxK.async<Unit> { conn, _ ->
+    "MonoK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
+        MonoK {
+          MonoK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
-          }.flux.subscribe().dispose()
+          }.mono.subscribe().dispose()
         }.flatMap { latch.get() }
       }.value()
         .test()
@@ -164,11 +167,11 @@ class FluxKTest : UnitSpec() {
         .expectComplete()
     }
 
-    "FluxK async should be cancellable" {
-      Promise.uncancelable<ForFluxK, Unit>(FluxK.async())
+    "MonoK async should be cancellable" {
+      Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
         .flatMap { latch ->
-          FluxK {
-            FluxK.async<Unit> { _, _ -> }
+          MonoK {
+            MonoK.async<Unit> { _, _ -> }
               .value()
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -181,7 +184,7 @@ class FluxKTest : UnitSpec() {
     }
 
     "KindConnection can cancel upstream" {
-      FluxK.async<Unit> { connection, _ ->
+      MonoK.async<Unit> { connection, _ ->
         connection.cancel().value().subscribe()
       }.value()
         .test()

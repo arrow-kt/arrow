@@ -201,8 +201,9 @@ object Platform {
   private val underlying = Executor { it.run() }
 
   @PublishedApi
-  internal val _trampoline = ThreadLocal.withInitial {
-    TrampolineExecutor(underlying)
+  internal val _trampoline = object : ThreadLocal<TrampolineExecutor>() {
+    override fun initialValue(): TrampolineExecutor =
+      TrampolineExecutor(underlying)
   }
 
   @PublishedApi

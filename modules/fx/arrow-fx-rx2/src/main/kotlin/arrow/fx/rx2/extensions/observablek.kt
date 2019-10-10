@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -37,8 +38,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.Observable
@@ -48,6 +51,7 @@ import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as observableHandleErrorWith
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -117,7 +121,7 @@ interface ObservableKApplicativeError :
     ObservableK.raiseError(e)
 
   override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().observableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -128,7 +132,7 @@ interface ObservableKMonadError :
     ObservableK.raiseError(e)
 
   override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().observableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -273,11 +277,47 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 
 // TODO ObservableK does not yet have a Concurrent instance
 fun <A> ObservableK.Companion.fx(c: suspend AsyncSyntax<ForObservableK>.() -> A): ObservableK<A> =
-  ObservableK.async().fx.async(c).fix()
+  defer { ObservableK.async().fx.async(c).fix() }
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
     ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
+}
+
+@extension
+interface ObservableKFunctorFilter : FunctorFilter<ForObservableK> {
+  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+}
+
+@extension
+interface ObservableKMonadFilter : MonadFilter<ForObservableK> {
+  override fun <A> empty(): ObservableK<A> =
+    Observable.empty<A>().k()
+
+  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForObservableK, A>.ap(ff: Kind<ForObservableK, (A) -> B>): ObservableK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
+    ObservableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForObservableK, A>.map2(fb: Kind<ForObservableK, B>, f: (Tuple2<A, B>) -> Z): ObservableK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): ObservableK<A> =
+    ObservableK.just(a)
 }

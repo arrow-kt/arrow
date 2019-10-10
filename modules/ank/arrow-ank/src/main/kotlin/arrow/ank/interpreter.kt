@@ -84,7 +84,9 @@ sealed class SnippetParserState {
 
 val interpreter: AnkOps = object : AnkOps {
 
-  override suspend fun printConsole(msg: String): Unit = println(msg)
+  override suspend fun printConsole(msg: String): Unit {
+    println(msg)
+  }
 
   private fun Path.containsAnkSnippets(): Boolean =
     toFile().bufferedReader().use {

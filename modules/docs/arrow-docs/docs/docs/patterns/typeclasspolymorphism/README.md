@@ -9,7 +9,7 @@ permalink: /docs/patterns/polymorphic_programs/
 {:.advanced}
 advanced
 
-[Перевод на русский](/docs/patterns/polymorphic_programs/ru/)
+[Russian / Перевод на русский](/docs/patterns/polymorphic_programs/ru/)
 
 What if we could write apps without caring about the runtime data types used but just about **how the data is operated 
 on**? 

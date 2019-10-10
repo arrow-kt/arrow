@@ -20,6 +20,8 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Sefford/kor](https://github.com/Sefford/kor): A clean architecture implementation
 
+[lenguyenthanh/RxArrow](https://github.com/lenguyenthanh/RxArrow): A collection of RxJava extensions for Arrow's Data Types
+
 #### Android
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
