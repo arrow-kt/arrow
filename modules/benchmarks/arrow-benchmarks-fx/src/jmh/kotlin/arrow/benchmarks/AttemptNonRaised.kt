@@ -39,4 +39,8 @@ open class AttemptNonRaised {
   @Benchmark
   fun zio(): Any =
     arrow.benchmarks.effects.scala.zio.AttemptNonRaised.run(size)
+
+  @Benchmark
+  fun kio(): Int =
+    arrow.benchmarks.effects.kio.AttemptNonRaised.attemptNonRaised(size)
 }
