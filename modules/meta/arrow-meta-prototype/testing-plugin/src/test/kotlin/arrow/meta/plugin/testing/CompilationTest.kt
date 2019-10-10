@@ -1,35 +1,32 @@
 package arrow.meta.plugin.testing
 
+import arrow.meta.plugin.testing.Check.CompilationError
+import arrow.meta.plugin.testing.Check.GeneratedClasses
+import arrow.meta.plugin.testing.Check.GeneratedSourceCode
 import org.junit.Test
 
 class CompilationTest {
 
   @Test
   fun `metadebug consideration works as expected`() {
-
-    assertCompilation(
-      CompilationData(
-        sourceFileName = "Example.kt",
-        sourceContent = contentFromResource(javaClass, "Example.kt.source"),
-        generatedFileContent = contentFromResource(javaClass, "Example.kt.meta"),
-        generatedClasses = arrayListOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"),
-        compilationStatus = CompilationStatus.OK
-      )
-    )
+    assertThis(CompilationData(
+      sourceFilename = "Example.kt",
+      sourceCode = contentFromResource(javaClass, "Example.kt.source"),
+      checks = listOf(
+        GeneratedSourceCode(code = contentFromResource(javaClass, "Example.kt.meta")),
+        GeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"))
+      ),
+      compilationStatus = CompilationStatus.OK
+    ))
   }
 
   @Test
   fun `compilation errors are detected`() {
-
-    assertCompilation(
-      CompilationData(
-        sourceFileName = "Example.kt",
-        sourceContent = "classs Error",
-        generatedFileContent = null,
-        generatedClasses = arrayListOf(),
-        compilationStatus = CompilationStatus.COMPILATION_ERROR
-      )
-    )
+    assertThis(CompilationData(
+      sourceFilename = "Example.kt",
+      sourceCode = "classs Error",
+      checks = listOf(CompilationError(partialMessage = "Expecting a top level declaration")),
+      compilationStatus = CompilationStatus.COMPILATION_ERROR
+    ))
   }
-
 }

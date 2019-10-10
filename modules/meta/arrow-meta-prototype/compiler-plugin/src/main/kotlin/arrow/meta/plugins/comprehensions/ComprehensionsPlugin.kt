@@ -5,7 +5,6 @@ import arrow.meta.Plugin
 import arrow.meta.invoke
 import arrow.meta.phases.analysis.ElementScope
 import arrow.meta.quotes.Scope
-import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.Transform
 import arrow.meta.quotes.orEmpty
 import arrow.meta.quotes.quote
@@ -65,6 +64,8 @@ private fun ElementScope.toFlatMap(fxCall: KtDotQualifiedExpression): Scope<KtDo
 
 @ExperimentalContracts
 private fun ElementScope.toFlatMap(fxBlock: KtBlockExpression): Scope<KtDotQualifiedExpression> {
+  if (fxBlock.statements.size == 1)
+    return toFlatMap(listOf(fxBlock.statements[0])).dotQualifiedExpression
   val nextBind = fxBlock.statements.filterIsInstance<KtProperty>().first()
   val (beforeBind, afterBind) =
     fxBlock.statements.filterNot { it == nextBind }.partition { it.before(nextBind) }
@@ -127,10 +128,19 @@ fun KtCallExpression?.generateJust(value: String): String =
 // If it is found than we need to rewrite this block.
 // => We haven't checked if it's `flatMap` or other delegates. Can we find out???
 private fun KtBlockExpression.isFxBlock(): Boolean {
-  val result = statements.any { it is KtProperty && it.hasDelegate() } // Look for `val a by io`
-    // If the parent block is `fx` than we're a comprehension
-    && getParentOfType<KtCallExpression>(true)?.firstChild.safeAs<KtReferenceExpression>()?.text == "fx"
-
+  val result = (isSingleExpression() || containsPropertyWithDelegate())
+    && parentBlockIsfx()
   println("isFxBlock ${this.text}: $result")
   return result
 }
+
+// Look for `val a by io`
+private fun KtBlockExpression.containsPropertyWithDelegate(): Boolean =
+  statements.any { it is KtProperty && it.hasDelegate() }
+
+private fun KtBlockExpression.isSingleExpression(): Boolean =
+  statements.size == 1 && statements[0] is KtExpression
+
+// If the parent block is `fx` than we're a comprehension
+private fun KtBlockExpression.parentBlockIsfx(): Boolean =
+  getParentOfType<KtCallExpression>(true)?.firstChild.safeAs<KtReferenceExpression>()?.text == "fx"
