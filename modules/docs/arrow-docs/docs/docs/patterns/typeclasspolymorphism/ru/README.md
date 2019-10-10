@@ -15,7 +15,7 @@ advanced
 
 Представим, что у нас есть приложение, которое работает с типом `Observable` из библиотеки RxJava. Этот тип позволяет нам написать цепочки вызовов и манипуляций с данными, но в итоге не будет ли этот `Observable` просто контейнером с дополнительными свойствами?
 
-Та же история с типами вроде `Flowable`, `Deferred` (корутины), `Future`, `IO`, и множеством других.
+Та же история с типами вроде `Flowable`, `Future`, `IO`, и множеством других.
 
 Концептуально все эти типы представляют собой операцию (уже сделанную или планируемую к выполнению в будущем), которая поддерживает манипуляции вроде приведения внутреннего значения к другому типу (`map`), использование `flatMap` для создания цепочки операций схожего типа, объединение с другими инстансами этого же типа (`zip`), и т.п.
 
@@ -35,7 +35,7 @@ interface DataSource {
 }
 ```
 
-Здесь для простоты мы возвращаем `Observable`, но это может быть `Single`, `Maybe`, `Flowable`, `Deferred` - что угодно, подходящее для достижения цели.
+Здесь для простоты мы возвращаем `Observable`, но это может быть `Single`, `Maybe`, `Flowable` - что угодно, подходящее для достижения цели.
 
 Добавим пару моковых имплементаций источников данных, одну для **локального**, вторую для **дистанционного**.
 
@@ -472,73 +472,6 @@ UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
 Всё работает, как и ожидалось. 💪
-
-Давай попробуем использовать [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}), обертку для типа
-`kotlinx.coroutines.Deferred`:
-
-```kotlin
-object test {
-
-  @JvmStatic
-  fun main(args: Array<String>): Unit {
-    val user1 = User(UserId("user1"))
-    val user2 = User(UserId("user2"))
-    val user3 = User(UserId("unknown user"))
-
-    val deferredModule = Module(DeferredK.async())
-    deferredModule.run {
-      runBlocking {
-        try {
-          println(repository.allTasksByUser(user1).fix().deferred.await())
-          println(repository.allTasksByUser(user2).fix().deferred.await())
-          println(repository.allTasksByUser(user3).fix().deferred.await())
-        } catch (e: UserNotInRemoteStorage) {
-          println(e)
-        }
-      }
-    }
-  }
-}
-```
-
-Как известно, обработку исключений при использовании корутин приходится прописывать явно. Такие детали имплементации, как обработка исключения зависят от используемого типа данных, а поэтому и определяются на высшем уровне абстракции.
-
-Еще раз — тот же результат:
-
-```
-[Task(value=LocalTask assigned to user1)]
-[Task(value=Remote Task assigned to user2)]
-UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
-```
-
-В Arrow есть альтернативное API для более утонченного использования [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}). Оно берет заботу о `runBlocking` и отложенных операциях на себя:
-
-```kotlin
-object test {
-
-  @JvmStatic
-  fun main(args: Array<String>): Unit {
-    val user1 = User(UserId("user1"))
-    val user2 = User(UserId("user2"))
-    val user3 = User(UserId("unknown user"))
-
-    val deferredModuleAlt = Module(DeferredK.async())
-    deferredModuleAlt.run {
-      println(repository.allTasksByUser(user1).fix().unsafeAttemptSync())
-      println(repository.allTasksByUser(user2).fix().unsafeAttemptSync())
-      println(repository.allTasksByUser(user3).fix().unsafeAttemptSync())
-    }
-  }
-}
-```
-
-Пример выше оборачивает результат в [`Try`]({{ '/docs/arrow/core/try/ru' | relative_url }}) (т.е., может быть`Success` или  `Failure`).
-
-```
-Success(value=[Task(value=LocalTask assigned to user1)])
-Success(value=[Task(value=Remote Task assigned to user2)])
-Failure(exception=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
-```
 
 Напоследок, давай попробуем использовать такой известный в мире ФП тип данных, как [`IO`]({{ '/docs/effects/io' | relative_url }}).
 `IO` существует, чтобы изолировать in/out операции, которые привносят в код нежелательные эффекты, и тем самым делать эти операции чистыми.
