@@ -33,10 +33,7 @@ import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TraversalTest : UnitSpec() {
 
   init {
