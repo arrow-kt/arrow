@@ -40,7 +40,7 @@ tasks.withType(AbstractArchiveTask) {
 shadowJar {
     configurations = [project.configurations.compile]
     relocate 'org.jetbrains.kotlin.com.intellij', 'com.intellij'
-    //relocate 'org.jetbrains.kotlin.load', 'kotlin.reflect.jvm.internal.impl.load'
+    relocate 'org.jetbrains.kotlin.load', 'kotlin.reflect.jvm.internal.impl.load'
 }
 
 // TODO: Temporary configuration
