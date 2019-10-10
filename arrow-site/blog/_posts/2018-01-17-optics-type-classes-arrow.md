@@ -4,7 +4,7 @@ icon: /img/icon-podcast.svg
 header-image: https://speakerd.s3.amazonaws.com/presentations/4b938d99415a416c8f908ac5302a66cb/slide_0.jpg
 version: version 0.6.1
 category: articles
-tags: optics
+tags: [core, optics]
 event: Kotlin Brooklyn Meetup
 link: https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow
 ---

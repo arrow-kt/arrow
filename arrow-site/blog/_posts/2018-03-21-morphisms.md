@@ -4,7 +4,7 @@ icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/Eq8dv4H3RTE/maxresdefault.jpg
 version: version 0.6.1
 category: videos
-tags: core
+tags: [core]
 link: https://www.youtube.com/watch?v=Eq8dv4H3RTE
 event: Voxxed Days, Vienna
 ---

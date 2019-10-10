@@ -4,7 +4,7 @@ icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/CR5h2Wq1yPE/maxresdefault.jpg
 version: version 0.8.0
 category: videos
-tags: incubator
+tags: [core]
 link: https://www.youtube.com/watch?v=CR5h2Wq1yPE
 event: AndroidTO, Toronto
 ---

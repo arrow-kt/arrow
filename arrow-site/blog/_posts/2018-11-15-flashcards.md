@@ -3,7 +3,7 @@ title: Arrow Tiny Cards Flashcards
 icon: /img/icon-article.svg
 header-image: https://d17u0960v8a9bp.cloudfront.net/press/tinycards-iOS-icon.jpg
 category: article
-tags: [optics, fx, incubator]
+tags: [core, optics, fx, incubator]
 link: https://tiny.cards/collections/W1aS1cV/arrow-kt
 ---
 [Arrow-kt collection](https://tiny.cards/collections/W1aS1cV/arrow-kt): data types, type classes, effects, optics, generic, free, recursion schemes.

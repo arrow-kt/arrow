@@ -19,7 +19,7 @@
           {% endfor %}
         </ul>
         <div id="search-container">
-          <img src="/img/search-icon.svg" title="search">
+          <img src="/img/search-icon.svg" id="search-glass" title="search">
           <input type="text" id="search-input" placeholder="Search" />
           <ul id="results-container"></ul>
         </div>
@@ -57,6 +57,13 @@
           searchInput.addEventListener("change", function() {
             searchControl(searchInput);
           });
+
+          const searchGlass = document.getElementById("search-glass");
+
+          searchGlass.addEventListener("click", function() {
+            searchInput.focus();
+          });
+
         </script>
       </nav>
     </div>

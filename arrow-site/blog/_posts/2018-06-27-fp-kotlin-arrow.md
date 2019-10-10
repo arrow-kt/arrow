@@ -4,7 +4,7 @@ icon: /img/icon-podcast.svg
 header-image: https://image.slidesharecdn.com/fpkotlinsunnytech-180628144002/95/functional-programming-in-kotlin-with-arrow-sunnytech-2018-1-638.jpg
 version: version 0.7.2
 category: articles
-tags: fx
+tags: [core]
 link: https://www.slideshare.net/EmmanuelNhan/functional-programming-in-kotlin-with-arrow-sunnytech-2018
 event: Sunny Tech, Montpellier
 ---

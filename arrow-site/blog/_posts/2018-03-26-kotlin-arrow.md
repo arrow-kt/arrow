@@ -4,7 +4,7 @@ icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/tM2wEI-e80E/maxresdefault.jpg
 version: version 0.6.1
 category: videos
-tags: core
+tags: [core]
 link: https://www.youtube.com/watch?v=tM2wEI-e80E
 event: Kotlin Meetup, Sydney
 ---

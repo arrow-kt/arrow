@@ -4,7 +4,7 @@ icon: /img/icon-video.svg
 header-image: https://img.youtube.com/vi/qYgilPqMOp0/maxresdefault.jpg
 version: version 0.7.2
 category: videos
-tags: core
+tags: [core]
 link: https://www.youtube.com/watch?v=qYgilPqMOp0
 event: DroidJam India, Bangalore, India
 ---

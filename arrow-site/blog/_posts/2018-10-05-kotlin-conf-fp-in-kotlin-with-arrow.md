@@ -4,7 +4,7 @@ icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/VOZZTSuDMFE/maxresdefault.jpg
 version: version 0.8.2
 category: videos
-tags: fx
+tags: [core, fx]
 link: https://www.youtube.com/watch?v=VOZZTSuDMFE
 event: KotlinConf, Amsterdam
 ---
