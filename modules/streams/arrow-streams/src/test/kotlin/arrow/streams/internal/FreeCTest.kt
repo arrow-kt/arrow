@@ -33,9 +33,7 @@ import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -87,7 +85,6 @@ private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.
   r
 }.fix()
 
-@RunWith(KotlinTestRunner::class)
 class FreeCTest : UnitSpec() {
 
   init {
