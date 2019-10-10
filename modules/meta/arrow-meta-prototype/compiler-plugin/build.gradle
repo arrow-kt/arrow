@@ -8,8 +8,13 @@ dependencies {
     compileOnly "com.intellij:openapi:7.0.3"
 
     testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlin_test_version"
+    testImplementation "org.assertj:assertj-core:$assertj_version"
     testImplementation project(":testing-plugin")
     testRuntimeOnly project(":compiler-plugin")
+
+    // TODO temporary configuration
+    // Remove when having an arrow-annotations release from testing-plugin
+    testRuntimeOnly "com.github.arrow-kt.arrow:arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"
 }
 
 compileKotlin {
@@ -42,6 +47,7 @@ shadowJar {
 // A temporary version from a fork of
 // com.github.tschuchortdev:kotlin-compile-testing
 // is needed until it's published with the contribution
+// Remove when having only releases from Maven Central
 repositories {
     maven { url "https://jitpack.io" }
 }
