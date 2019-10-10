@@ -4,7 +4,7 @@ icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/qGef3sFAIxU/maxresdefault.jpg
 version: version 0.3.11
 category: videos
-tags: incubator
+tags: [core]
 link: https://www.youtube.com/watch?v=qGef3sFAIxU
 event: droidconSF, San Francisco
 ---

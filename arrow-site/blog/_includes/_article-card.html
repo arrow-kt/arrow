@@ -59,23 +59,30 @@
         {% if post.content && post.content != "" %}
           {{ post.content }}
         {% endif %}
-        {% for icon in site.data.menu.icon-filter %}
-            {% if post.tags contains icon.category %}
-              {% assign color = icon.category %}
-              {% assign line-color = '0' %}
-              {% if color == 'incubator' %}
-                {% assign line-color = {{incubator}} %}
-              {% elsif color == 'core' %}
+        {% assign line-color = '0' %}
+        {% assign span-title = '' %}
+        {% for tag in post.tags %}
+            {% case tag %}
+              {% when 'core' %}
                 {% assign line-color = {{core}} %}
-              {% elsif color == 'fx' %}
+                {% assign span-title = 'Arrow Core' %}
+              {% when 'incubator' %}
+                {% assign line-color = {{incubator}} %}
+                {% assign span-title = 'Arrow Incubator' %}
+              {% when 'fx' %}
                 {% assign line-color = {{fx}} %}
-              {% elsif color == 'optics' %}
-                  {% assign line-color = {{optics}} %}
-              {% else %}
+                {% assign span-title = 'Arrow Fx' %}
+              {% when 'optics' %}
+                {% assign line-color = {{optics}} %}
+                {% assign span-title = 'Arrow Optics' %}
+              {% when 'meta' %}
                 {% assign line-color = {{meta}} %}
-              {% endif %}
-            <span class="tag-post-foot" style="border-bottom: 2px solid {{line-color}};">{{icon.title}}</span>
-            {% endif %}
+                {% assign span-title = 'Arrow Meta' %}
+              {% else %}
+                {% assign span-title = {{tag}} %}
+                {% assign line-color = '0' %}
+            {% endcase %}
+            <span class="tag-post-foot" style="border-bottom: 2px solid {{line-color}};">{{span-title}}</span>
         {% endfor %}
     </div>
 </article>

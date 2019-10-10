@@ -4,7 +4,7 @@ icon: /img/icon-article.svg
 header-image: /img/blog-image-header.png
 version: version 0.7.3
 category: articles
-tags: optics
+tags: [core]
 link: https://github.com/dcampogiani/polyjokes
 ---
 [@dcampogiani](https://github.com/dcampogiani) is using a polymorphic approach to retrieve a random user and then a joke about him.
