@@ -44,4 +44,8 @@ open class AttemptRaisedError {
   @Benchmark
   fun zio(): Any =
     arrow.benchmarks.effects.scala.zio.AttemptRaisedError.run(size)
+
+  @Benchmark
+  fun kio(): Any =
+    arrow.benchmarks.effects.kio.AttemptRaisedError.attemptRaisedError(size)
 }

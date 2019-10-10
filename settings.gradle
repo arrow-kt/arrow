@@ -114,6 +114,7 @@ include {
 
         benchmarks {
             _ 'scala-benchmarks'
+            _ 'kio-benchmarks'
             _ 'benchmarks-fx'
         }
     }
