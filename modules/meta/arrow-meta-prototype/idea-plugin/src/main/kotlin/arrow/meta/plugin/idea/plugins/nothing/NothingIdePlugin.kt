@@ -11,7 +11,7 @@ val IdeMetaPlugin.nothingIdePlugin: Plugin
   get() = "NothingIdePlugin" {
     meta(
       addLineMarkerProvider(
-        icon = ArrowIcons.NOTHING_DARK,
+        icon = ArrowIcons.NOTHING_LIGHT,
         message = "Nothing is impure"
       ) { it.safeAs<KtUserType>()?.referencedName?.run { this == "Nothing" } == true }
     )

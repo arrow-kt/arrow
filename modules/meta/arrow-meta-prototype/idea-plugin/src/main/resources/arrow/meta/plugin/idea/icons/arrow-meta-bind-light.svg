@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>arrow-meta-bind-light</title>
+    <desc>Created with Sketch.</desc>
+    <g id="arrow-meta-bind-light" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g>
+            <rect id="bound" x="4.54747351e-13" y="0" width="12" height="12"></rect>
+            <path d="M12,5.63692308 L6.45538462,5.63692308 L3.48923077,2.38769231 L4.76307692,1.29230769 L7.30461538,4.11692308 L12,4.11692308 L12,5.63692308 Z M4.99692308,6.17230769 L1.27384615,10.3076923 L5.68434189e-14,9.21230769 L2.79384615,6.17230769 L5.68434189e-14,3.13230769 L1.27384615,2.03692308 L4.99692308,6.17230769 Z M12,8.21538462 L7.30461538,8.21538462 L4.76307692,11.0646154 L3.48923077,9.96923077 L6.45538462,6.70769231 L12,6.70769231 L12,8.21538462 Z" id="=" fill="#2B3940" opacity="0.5"></path>
+        </g>
+    </g>
+</svg>

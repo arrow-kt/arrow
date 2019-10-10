@@ -12,7 +12,7 @@ val IdeMetaPlugin.higherKindsIdePlugin: Plugin
   get() = "HigherKindsIdePlugin" {
     meta(
       addLineMarkerProvider(
-        icon = ArrowIcons.HKT_DARK,
+        icon = ArrowIcons.HKT_LIGHT,
         message = "HKT",
         matchOn = { it.safeAs<KtClass>()?.let(::isHigherKindedType) == true }
       )
