@@ -15,8 +15,8 @@ class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
   @ExperimentalContracts
   override fun intercept(ctx: CompilerContext): List<Plugin> =
     super.intercept(ctx) +
-      nothingIdePlugin  +
-       comprehensionsIdePlugin +
-       opticsIdePlugin +
-       higherKindsIdePlugin
+      nothingIdePlugin +
+      comprehensionsIdePlugin +
+      opticsIdePlugin +
+      higherKindsIdePlugin
 }
