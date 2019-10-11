@@ -6,11 +6,14 @@ options:
       - title: Index
         url: /docs/core/
 
-      - title: Libraries
-        url: /docs/quickstart/libraries/
+      - title: Setup
+        url: /docs/quickstart/setup/
 
       - title: Linting
         url: /docs/quickstart/linting/
+
+      - title: Libraries
+        url: /docs/quickstart/libraries/
 
       - title: Blogs & Presentations
         url: /blog/
@@ -54,85 +57,62 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/arrow/core/option/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-option/
 
       - title: Either
-        url: /docs/arrow/core/either/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-either/
 
       - title: Try
-        url: /docs/arrow/core/try/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-try/
 
       - title: Validated
-        url: /docs/arrow/data/validated/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-validated/
 
       - title: NonEmptyList
-        url: /docs/arrow/data/nonemptylist/
+        url: /docs/arrow/core/nonemptylist/
 
       - title: ListK
-        url: /docs/arrow/data/listk/
+        url: /docs/arrow/core/listk/
 
       - title: SequenceK
-        url: /docs/arrow/data/sequencek/
+        url: /docs/arrow/core/sequencek/
 
       - title: SetK
-        url: /docs/arrow/data/setk/
+        url: /docs/arrow/core/setk/
 
       - title: MapK
-        url: /docs/arrow/data/mapk/
+        url: /docs/arrow/core/mapk/
 
       - title: SortedMapK
-        url: /docs/arrow/data/sortedmapk/
+        url: /docs/arrow/core/sortedmapk/
 
       - title: Ior
-        url: /docs/arrow/data/ior/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-ior/
 
       - title: Id
         url: /docs/apidocs/arrow-core-data/arrow.core/-id/
 
-      - title: Reader
-        url: /docs/arrow/data/reader/
-
-      - title: Kleisli
-        url: /docs/arrow/data/kleisli/
-
-      - title: State
-        url: /docs/arrow/data/state/
-
-      - title: StateT
-        url: /docs/arrow/data/statet/
-
-      - title: Store
-        url: /docs/arrow/data/store/
-
-      - title: Moore
-        url: /docs/arrow/data/moore/
-
-      - title: Sum
-        url: /docs/arrow/data/sum/
-
-      - title: Day
-        url: /docs/arrow/data/day/
-
-      - title: WriterT
-        url: /docs/arrow/data/writert/
-
       - title: Eval
         url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
 
-      - title: OptionT
-        url: /docs/arrow/data/optiont/
-
-      - title: EitherT
-        url: /docs/arrow/data/eithert/
-
       - title: Function0
-        url: /docs/arrow/core/function0/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-function0/
 
       - title: Function1
-        url: /docs/arrow/core/function1/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-function1/
 
-      - title: Const
-        url: /docs/arrow/typeclasses/const/
+      - title: Store
+        url: /docs/arrow/ui/store/
+
+      - title: Moore
+        url: /docs/arrow/ui/moore/
+
+      - title: Sum
+        url: /docs/arrow/ui/sum/
+
+      - title: Day
+        url: /docs/arrow/ui/day/
+
 
   - title: Type Classes
 
@@ -246,6 +226,9 @@ options:
       - title: Decidable
         url: /docs/arrow/typeclasses/decidable/
 
+      - title: Const
+        url: /docs/arrow/typeclasses/const/
+
   - title: Integrations
 
     nested_options:
@@ -279,10 +262,10 @@ options:
         url: /docs/apidocs/arrow-core/
 
       - title: Core Extensions
-        url: /docs/apidocs/arrow-docs/
+        url: /docs/apidocs/arrow-core-data/
 
       - title: Docs
-        url: /docs/apidocs/arrow-core-data/
+        url: /docs/apidocs/arrow-docs/
 
       - title: Examples
         url: /docs/apidocs/arrow-examples/
@@ -319,7 +302,7 @@ options:
     nested_options:
 
       - title: Credits
-        url: /docs/legal/credits/
+        url: https://github.com/arrow-kt/arrow/graphs/contributors
 
       - title: Licenses
-        url: /docs/legal/licenses/
+        url: https://github.com/arrow-kt/arrow/blob/master/LICENSE

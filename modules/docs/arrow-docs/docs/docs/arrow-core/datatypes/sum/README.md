@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Sum
-permalink: /docs/arrow/data/sum/
+permalink: /docs/arrow/ui/sum/
 redirect_from:
   - /docs/datatypes/sum/
 ---
@@ -44,14 +44,4 @@ val overridenSum = sum.coflatmap(Store.comonad(), Store.comonad()) {
 }
 
 overridenSum.extract(Store.comonad(), Store.comonad())
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.ui.*
-import arrow.core.*
-
-DataType(Sum::class).tcMarkdownList()
 ```

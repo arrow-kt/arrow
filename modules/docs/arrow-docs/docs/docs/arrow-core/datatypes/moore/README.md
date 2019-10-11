@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Moore
-permalink: /docs/arrow/data/moore/
+permalink: /docs/arrow/ui/moore/
 redirect_from:
   - /docs/datatypes/moore/
 ---
@@ -46,14 +46,4 @@ routerMoore
       }
     }
     .extract()
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.ui.*
-import arrow.core.*
-
-DataType(Moore::class).tcMarkdownList()
 ```
