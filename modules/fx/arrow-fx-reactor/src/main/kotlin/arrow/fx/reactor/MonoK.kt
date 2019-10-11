@@ -18,7 +18,6 @@ class ForMonoK private constructor() {
   companion object
 }
 typealias MonoKOf<A> = arrow.Kind<ForMonoK, A>
-typealias MonoKKindedJ<A> = io.kindedj.Hk<ForMonoK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
@@ -26,10 +25,11 @@ inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> MonoKOf<A>.value(): Mono<A> =
-  this.fix().mono
+  this.fix().mono as Mono<A>
 
-data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
+data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
@@ -111,9 +111,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
         }
       } else sink.success(null)
     })
-
-  fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
-    mono.onErrorResume { t: Throwable -> function(t).mono }.k()
 
   fun continueOn(ctx: CoroutineContext): MonoK<A> =
     mono.publishOn(ctx.asScheduler()).k()
@@ -226,3 +223,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+
+fun <A> MonoK<A>.handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
+  value().onErrorResume { t: Throwable -> function(t).value() }.k()

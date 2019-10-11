@@ -27,15 +27,12 @@ import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
-import org.junit.runner.RunWith
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.EmptyCoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 
@@ -280,6 +277,17 @@ class IOTest : UnitSpec() {
         .continueOn(ctxB)
         .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxB } }
         .unsafeRunSync()
+    }
+
+    "fx should defer evaluation until run" {
+      var run = false
+      val program = IO.fx {
+        run = true
+      }
+
+      run shouldBe false
+      program.unsafeRunSync()
+      run shouldBe true
     }
 
     "fx can switch execution context state across not/bind" {

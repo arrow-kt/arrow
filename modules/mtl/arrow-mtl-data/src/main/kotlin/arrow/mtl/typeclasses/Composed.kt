@@ -342,6 +342,9 @@ fun <F, G> Applicative<F>.compose(GA: Applicative<G>): Applicative<Nested<F, G>>
 interface ComposedAlternative<F, G> : Alternative<Nested<F, G>>, ComposedApplicative<F, G>, ComposedMonoidK<F, G> {
   override fun F(): Alternative<F>
 
+  override fun <A> Kind<Nested<F, G>, A>.orElse(b: Kind<Nested<F, G>, A>): Kind<Nested<F, G>, A> =
+    F().run { unnest().orElse(b.unnest()) }.nest()
+
   companion object {
     operator fun <F, G> invoke(AF: Alternative<F>, AG: Applicative<G>):
       Alternative<Nested<F, G>> =

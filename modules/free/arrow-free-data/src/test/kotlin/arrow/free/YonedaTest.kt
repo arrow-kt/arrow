@@ -2,17 +2,14 @@ package arrow.free
 
 import arrow.core.ForId
 import arrow.core.Id
+import arrow.core.extensions.id.functor.functor
 import arrow.core.fix
 import arrow.free.extensions.yoneda.functor.functor
-import arrow.core.extensions.id.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class YonedaTest : UnitSpec() {
 
   val EQ = Eq<YonedaOf<ForId, Int>> { a, b ->

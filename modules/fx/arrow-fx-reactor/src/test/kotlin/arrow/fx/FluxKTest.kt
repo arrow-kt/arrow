@@ -3,42 +3,40 @@ package arrow.fx
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
-import arrow.fx.reactor.k
 import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.foldable.foldable
 import arrow.fx.reactor.extensions.fluxk.functor.functor
-import arrow.fx.reactor.extensions.fx
 import arrow.fx.reactor.extensions.fluxk.monad.flatMap
-import arrow.fx.reactor.extensions.fluxk.traverse.traverse
+import arrow.fx.reactor.extensions.fluxk.monadFilter.monadFilter
 import arrow.fx.reactor.extensions.fluxk.timer.timer
+import arrow.fx.reactor.extensions.fluxk.traverse.traverse
+import arrow.fx.reactor.extensions.fx
+import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
+import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.matchers.startWith
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.startsWith
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.runner.RunWith
-import reactor.test.expectError
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
+import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KotlinTestRunner::class)
 class FluxKTest : UnitSpec() {
 
   fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =
-    flux.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
+    flux.doOnNext { Thread.currentThread().name shouldNot startWith(name) }
 
   fun <T> EQ(): Eq<FluxKOf<T>> = object : Eq<FluxKOf<T>> {
     override fun FluxKOf<T>.eqv(b: FluxKOf<T>): Boolean =
@@ -69,8 +67,20 @@ class FluxKTest : UnitSpec() {
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
       AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
-      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
+      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ()),
+      MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQ())
     )
+
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = FluxK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
 
     "Multi-thread Fluxes finish correctly" {
       val value: Flux<Int> = FluxK.fx {

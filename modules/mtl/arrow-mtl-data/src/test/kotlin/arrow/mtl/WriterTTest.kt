@@ -39,10 +39,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.const
 import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class WriterTTest : UnitSpec() {
 
   private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->

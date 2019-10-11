@@ -5,11 +5,8 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.core.extensions.id.functor.functor
 import arrow.test.UnitSpec
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class StateTests : UnitSpec() {
 
   private val addOne = State<Int, Int> { n -> n * 2 toT n }
