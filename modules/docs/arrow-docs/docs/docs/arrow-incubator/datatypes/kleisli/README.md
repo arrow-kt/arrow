@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: Kleisli
 permalink: /docs/arrow/mtl/kleisli/
 redirect_from:

@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: Reader
 permalink: /docs/arrow/mtl/reader/
 redirect_from:

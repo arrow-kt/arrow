@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: EitherT
 permalink: /docs/arrow/mtl/eithert/
 redirect_from:

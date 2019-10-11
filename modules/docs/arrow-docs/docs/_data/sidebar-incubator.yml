@@ -83,7 +83,7 @@ options:
       - title: Fix
         url: /docs/recursion/fix/
 
-  - title: Type Classes
+  - title: Data Types
 
     nested_options:
 

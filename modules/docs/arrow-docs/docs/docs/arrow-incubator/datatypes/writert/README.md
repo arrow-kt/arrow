@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: WriterT
 permalink: /docs/arrow/mtl/writert/
 redirect_from:

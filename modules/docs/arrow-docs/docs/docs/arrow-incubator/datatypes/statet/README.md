@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: StateT
 permalink: /docs/arrow/mtl/statet/
 redirect_from:

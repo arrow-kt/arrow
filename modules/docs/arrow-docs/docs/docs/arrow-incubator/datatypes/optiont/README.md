@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: OptionT
 permalink: /docs/arrow/mtl/optiont/
 redirect_from:
