@@ -27,15 +27,12 @@ import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
-import org.junit.runner.RunWith
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.EmptyCoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 

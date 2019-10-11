@@ -21,11 +21,8 @@ import arrow.test.laws.ProfunctorLaws
 import arrow.typeclasses.conest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class AndThenTest : UnitSpec() {
 
   val ConestedEQ: Eq<Kind<Conested<ForAndThen, Int>, Int>> = Eq { a, b ->
