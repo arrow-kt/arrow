@@ -28,12 +28,9 @@ import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.should
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }

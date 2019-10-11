@@ -46,12 +46,9 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.const
 import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
 typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
 
-@RunWith(KotlinTestRunner::class)
 class OptionTTest : UnitSpec() {
 
   fun <A> EQ(): Eq<Kind<OptionTPartialOf<A>, Int>> = Eq { a, b ->
