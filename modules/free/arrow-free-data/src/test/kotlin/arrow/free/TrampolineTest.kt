@@ -1,11 +1,8 @@
 package arrow.free
 
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
 
-@RunWith(KotlinTestRunner::class)
 class TrampolineTest : UnitSpec() {
 
   init {

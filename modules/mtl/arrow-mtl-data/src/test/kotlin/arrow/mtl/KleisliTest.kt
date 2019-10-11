@@ -31,11 +31,8 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.const
 import arrow.typeclasses.counnest
 import arrow.typeclasses.value
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
     a.run(1) == b.run(1)

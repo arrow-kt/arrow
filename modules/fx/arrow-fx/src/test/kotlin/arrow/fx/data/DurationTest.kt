@@ -5,11 +5,8 @@ import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.timeUnit
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class DurationTest : UnitSpec() {
 
   init {

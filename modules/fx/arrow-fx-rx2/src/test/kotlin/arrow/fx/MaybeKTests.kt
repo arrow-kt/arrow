@@ -17,19 +17,16 @@ import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 class MaybeKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>> {

@@ -4,11 +4,8 @@ import arrow.test.UnitSpec
 import arrow.test.generators.byte
 import arrow.test.generators.short
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NumberMonoidTest : UnitSpec() {
   init {
 
