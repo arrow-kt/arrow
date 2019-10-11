@@ -1,9 +1,7 @@
 package arrow.meta.plugin.idea.phases.resolve
 
-import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.config.buildFolders
 import arrow.meta.plugin.idea.phases.config.currentProject
-import arrow.meta.plugins.higherkind.KindAwareTypeChecker
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktClassOrObject
 import com.intellij.openapi.Disposable
@@ -20,9 +18,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.PsiManagerImpl
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
-import org.jetbrains.kotlin.cfg.ClassMissingCase
-import org.jetbrains.kotlin.cfg.WhenMissingCase
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.daemon.common.findWithTransform
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -36,13 +31,8 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
-import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
-import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters2
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeAndGetResult
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -65,14 +55,12 @@ import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtPureClassOrObject
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.KtSuperTypeListEntry
-import org.jetbrains.kotlin.psi.KtWhenExpression
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileStubBuilder
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
@@ -86,7 +74,6 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.isError
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -95,8 +82,6 @@ import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
-
-private val metaPlugin = IdeMetaPlugin()
 
 private val registered = AtomicBoolean(false)
 
@@ -107,7 +92,6 @@ class MetaSyntheticPackageFragmentProvider :
   SyntheticResolveExtension,
   AsyncFileListener,
   AsyncFileListener.ChangeApplier,
-  DiagnosticSuppressor,
   Disposable {
 
   private val fileListenerInitialized: AtomicBoolean = AtomicBoolean(false)
@@ -117,55 +101,12 @@ class MetaSyntheticPackageFragmentProvider :
     if (!registered.getAndSet(true)) {
       val project = currentProject()
       if (project != null) {
-        val configuration = CompilerConfiguration()
-        metaPlugin.registerMetaComponents(this, configuration)
         println("registerIdeProjectComponents DONE")
         postInitialize()
       } else {
         registered.set(false)
       }
     }
-  }
-
-  override fun isSuppressed(diagnostic: Diagnostic): Boolean {
-    //println("isSupressed: ${diagnostic.factory.name}: \n ${diagnostic.psiElement.text}")
-    val result = diagnostic.suppressMetaDiagnostics()
-    diagnostic.logSuppression(result)
-    return result
-  }
-
-  private fun Diagnostic.suppressMetaDiagnostics(): Boolean =
-    suppressInvisibleMember() ||
-      suppressNoElseInWhen() ||
-      kindsTypeMismatch() ||
-      suppressUnusedParameter()
-
-  private fun Diagnostic.suppressInvisibleMember(): Boolean =
-    factory == Errors.INVISIBLE_MEMBER
-
-  private fun Diagnostic.kindsTypeMismatch(): Boolean =
-    factory == Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH && safeAs<DiagnosticWithParameters2<KtElement, KotlinType, KotlinType>>()?.let { diagnosticWithParameters ->
-      val a = diagnosticWithParameters.a
-      val b = diagnosticWithParameters.b
-      KotlinTypeChecker.DEFAULT.isSubtypeOf(a, b) //if this is the kind type checker then it will do the right thing otherwise this proceeds as usual with the regular type checker
-    } == true
-
-  private fun Diagnostic.suppressUnusedParameter(): Boolean =
-    factory == Errors.UNUSED_PARAMETER && safeAs<DiagnosticWithParameters1<KtParameter, VariableDescriptor>>()?.let { diagnosticWithParameters ->
-      diagnosticWithParameters.psiElement.defaultValue?.text == "given" //TODO move to typeclasses plugin
-    } == true
-
-  private fun Diagnostic.suppressNoElseInWhen(): Boolean {
-    val result = factory == Errors.NO_ELSE_IN_WHEN && safeAs<DiagnosticWithParameters1<KtWhenExpression, List<WhenMissingCase>>>()?.let { diagnosticWithParameters ->
-      val declaredCases = diagnosticWithParameters.psiElement.entries.flatMap { it.conditions.map { it.text } }.toSet()
-      val missingCases = diagnosticWithParameters.a.filterIsInstance<ClassMissingCase>().map { it.toString() }.toSet()
-      declaredCases.containsAll(missingCases)
-    } ?: false
-    return result
-  }
-
-  private fun Diagnostic.logSuppression(result: Boolean): Unit {
-    println("Suppressing ${factory.name} on: `${psiElement.text}`: $result")
   }
 
   @Synchronized
