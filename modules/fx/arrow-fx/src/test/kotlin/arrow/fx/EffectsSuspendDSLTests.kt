@@ -12,17 +12,14 @@ import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.test.UnitSpec
 import arrow.unsafe
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
-import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
-@RunWith(KotlinTestRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
 
   private val ctxA = newSingleThreadContext("A")

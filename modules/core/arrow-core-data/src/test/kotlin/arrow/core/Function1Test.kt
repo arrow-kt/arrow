@@ -22,10 +22,7 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class Function1Test : UnitSpec() {
   val ConestedEQ: Eq<Kind<Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
     a.counnest().invoke(1) == b.counnest().invoke(1)

@@ -23,12 +23,9 @@ import arrow.syntax.function.untripled
 import arrow.syntax.function.untupled
 import arrow.core.Tuple2
 import arrow.test.UnitSpec
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 import java.util.Random
 
-@RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
 
   val f = { prefix: String, numericPostfix: Int, values: List<String> ->
