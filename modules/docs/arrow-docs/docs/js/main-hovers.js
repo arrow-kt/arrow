@@ -46,7 +46,7 @@ const incubatorList = document.getElementById('incubator-list');
 // Features elements
 const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
 const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
-const buttonCategoryRow = document.querySelectorAll('.main-item a');
+const buttonCategoryRow = document.querySelectorAll('.feature-button');
 const arrayButtonCategoryRow = Array.from(buttonCategoryRow);
 const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
 const arrayCategoryIconWhite = Array.from(categoryIconWhite);
