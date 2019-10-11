@@ -22,6 +22,9 @@
         <component>
             <implementation-class>arrow.meta.plugin.idea.MetaPluginRegistrarComponent</implementation-class>
         </component>
+        <component>
+            <implementation-class>arrow.meta.plugin.idea.phases.resolve.FragmentProviderComponent</implementation-class>
+        </component>
     </project-components>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
