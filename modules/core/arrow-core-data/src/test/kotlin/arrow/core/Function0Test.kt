@@ -15,11 +15,8 @@ import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class Function0Test : UnitSpec() {
   val EQ1: Eq<Kind<ForFunction0, Int>> = Eq { a, b ->
     a() == b()

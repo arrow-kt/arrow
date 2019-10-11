@@ -35,10 +35,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class EitherTest : UnitSpec() {
   val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
     a.fix() == b.fix()

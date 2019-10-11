@@ -12,8 +12,6 @@ video: XavztYVMUqI
 {:.beginner}
 beginner
 
-[Russian / Перевод на русский](/docs/arrow/core/try/ru)
-
 Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation.
 
 For example, we have `Option` to model the absence of a value, or `Either` to model the return of a function as a type that may have been successful, or may have failed.
