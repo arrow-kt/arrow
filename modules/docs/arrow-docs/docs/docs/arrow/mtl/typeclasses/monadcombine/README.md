@@ -24,7 +24,12 @@ If [`Alternative`]({{ '/docs/arrow/typeclasses/alternative' }}) is for [`Applica
 This function takes "interesting" values from the inner G context and combines them into a flat F context.
 
 ```kotlin:ank
-import arrow.core.*
+import arrow.core.ListK
+import arrow.core.Option
+import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.option.applicative.just
+import arrow.core.extensions.option.foldable.foldable
+import arrow.core.k
 
 val f = listOf(1.just(), Option.empty(), 2.just()).k()
 ListK.monadCombine().run {
@@ -39,7 +44,13 @@ ListK.monadCombine().run {
 This function takes A and B values from inner Bifoldable G and returns them separated into two flat F contexts.
 
 ```kotlin:ank
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.ListK
+import arrow.core.extensions.either.bifoldable.bifoldable
+import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.k
+import arrow.core.left
+import arrow.core.right
 
 val f = listOf(1.right(), 2.left(), 3.right(), 4.left()).k()
 ListK.monadCombine().run {
