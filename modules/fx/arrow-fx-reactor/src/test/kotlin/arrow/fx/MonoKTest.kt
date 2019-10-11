@@ -14,13 +14,10 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.matchers.startWith
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.startsWith
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.runner.RunWith
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.test.expectError
@@ -29,11 +26,10 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KotlinTestRunner::class)
 class MonoKTest : UnitSpec() {
 
   fun <T> assertThreadNot(mono: Mono<T>, name: String): Mono<T> =
-    mono.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
+    mono.doOnNext { Thread.currentThread().name shouldNot startWith(name) }
 
   fun <T> EQ(): Eq<MonoKOf<T>> = object : Eq<MonoKOf<T>> {
     override fun MonoKOf<T>.eqv(b: MonoKOf<T>): Boolean =
@@ -63,6 +59,17 @@ class MonoKTest : UnitSpec() {
       AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
+
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = MonoK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
 
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = MonoK.fx {

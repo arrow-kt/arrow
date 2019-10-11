@@ -6,11 +6,14 @@ options:
       - title: Index
         url: /docs/
 
-      - title: Libraries
-        url: /docs/quickstart/libraries/
+      - title: Setup
+        url: /docs/quickstart/setup/
 
       - title: Linting
         url: /docs/quickstart/linting/
+
+      - title: Libraries
+        url: /docs/quickstart/libraries/
 
       - title: Blogs & Presentations
         url: /blog/

@@ -7,10 +7,7 @@ import arrow.test.generators.lessThan
 import arrow.validation.refinedTypes.numeric.validated.less.less
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class LessTest : UnitSpec() {
   init {
     val max = 100

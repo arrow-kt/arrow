@@ -13,24 +13,20 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
-class SingleKTests : UnitSpec() {
+class SingleKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
     override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
@@ -57,6 +53,17 @@ class SingleKTests : UnitSpec() {
       ConcurrentLaws.laws(CS, EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
+
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = SingleK.fx {
+        run = true
+      }.value()
+
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
 
     "Multi-thread Singles finish correctly" {
       val value: Single<Long> = SingleK.fx {

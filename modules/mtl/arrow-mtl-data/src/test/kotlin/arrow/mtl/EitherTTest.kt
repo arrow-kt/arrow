@@ -36,10 +36,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.const
 import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class EitherTTest : UnitSpec() {
 
   fun <A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->

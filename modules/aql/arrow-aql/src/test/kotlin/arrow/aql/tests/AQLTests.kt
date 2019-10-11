@@ -1,18 +1,18 @@
 package arrow.aql.tests
 
 import arrow.aql.Ord
+import arrow.aql.extensions.list.count.count
 import arrow.aql.extensions.list.from.join
 import arrow.aql.extensions.list.groupBy.groupBy
-import arrow.aql.extensions.list.select.query
 import arrow.aql.extensions.list.orderBy.orderBy
 import arrow.aql.extensions.list.orderBy.orderMap
 import arrow.aql.extensions.list.orderBy.value
+import arrow.aql.extensions.list.select.query
 import arrow.aql.extensions.list.sum.sum
 import arrow.aql.extensions.list.sum.value
 import arrow.aql.extensions.list.union.union
 import arrow.aql.extensions.list.where.where
 import arrow.aql.extensions.list.where.whereSelection
-import arrow.aql.extensions.list.count.count
 import arrow.aql.extensions.listk.select.select
 import arrow.aql.extensions.listk.select.selectAll
 import arrow.aql.extensions.listk.select.value
@@ -24,10 +24,7 @@ import arrow.core.Some
 import arrow.core.extensions.order
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class AQLTests : UnitSpec() {
 
   init {
