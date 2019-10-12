@@ -5,7 +5,6 @@ import arrow.core.Id
 import arrow.core.identity
 import arrow.core.value
 import arrow.typeclasses.Foldable
-import kotlin.math.max
 import kotlin.math.min
 
 interface Min<F> {
