@@ -1,7 +1,6 @@
 package arrow.aql.extensions
 
 import arrow.aql.Select
-import arrow.aql.Where
 import arrow.aql.From
 import arrow.aql.GroupBy
 import arrow.aql.Count

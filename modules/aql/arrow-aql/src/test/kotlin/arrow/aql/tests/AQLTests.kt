@@ -79,7 +79,6 @@ class AQLTests : UnitSpec() {
       }.value() shouldBe mapOf(30 to listOf(john), 32 to listOf(jane, jack))
     }
 
-
     "AQL is able to filter using `where` and then `groupBy`" {
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age }
