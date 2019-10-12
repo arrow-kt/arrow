@@ -1,13 +1,6 @@
 package arrow.aql.extensions
 
-import arrow.aql.Count
-import arrow.aql.From
-import arrow.aql.GroupBy
-import arrow.aql.OrderBy
-import arrow.aql.Select
-import arrow.aql.Sum
-import arrow.aql.Union
-import arrow.aql.Where
+import arrow.aql.*
 import arrow.core.ForOption
 import arrow.core.Option
 import arrow.extension
@@ -57,5 +50,10 @@ interface OptionOrderBy : OrderBy<ForOption> {
 
 @extension
 interface OptionUnion : Union<ForOption> {
+  override fun foldable(): Foldable<ForOption> = Option.foldable()
+}
+
+@extension
+interface OptionMax : Max<ForOption> {
   override fun foldable(): Foldable<ForOption> = Option.foldable()
 }

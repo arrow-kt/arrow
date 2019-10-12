@@ -1,12 +1,6 @@
 package arrow.aql.extensions
 
-import arrow.aql.Count
-import arrow.aql.From
-import arrow.aql.GroupBy
-import arrow.aql.OrderBy
-import arrow.aql.Select
-import arrow.aql.Sum
-import arrow.aql.Union
+import arrow.aql.*
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.extension
@@ -49,5 +43,10 @@ interface NonEmptyListOrderBy : OrderBy<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListUnion : Union<ForNonEmptyList> {
+  override fun foldable(): Foldable<ForNonEmptyList> = NonEmptyList.foldable()
+}
+
+@extension
+interface NonEmptyListMax : Max<ForNonEmptyList> {
   override fun foldable(): Foldable<ForNonEmptyList> = NonEmptyList.foldable()
 }

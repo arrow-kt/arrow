@@ -1,13 +1,6 @@
 package arrow.aql.extensions
 
-import arrow.aql.Count
-import arrow.aql.From
-import arrow.aql.GroupBy
-import arrow.aql.OrderBy
-import arrow.aql.Select
-import arrow.aql.Sum
-import arrow.aql.Union
-import arrow.aql.Where
+import arrow.aql.*
 import arrow.core.ForSequenceK
 import arrow.core.SequenceK
 import arrow.extension
@@ -57,5 +50,10 @@ interface SequenceOrderBy : OrderBy<ForSequenceK> {
 
 @extension
 interface SequenceUnion : Union<ForSequenceK> {
+  override fun foldable(): Foldable<ForSequenceK> = SequenceK.foldable()
+}
+
+@extension
+interface SequenceMax : Max<ForSequenceK> {
   override fun foldable(): Foldable<ForSequenceK> = SequenceK.foldable()
 }
