@@ -20,7 +20,7 @@ buildscript {
     ext {
         // Constants
         ankKotlinVersion = '1.3.11'
-        dokka_version = '0.9.18'
+        dokka_version = '0.10.0'
         ktlint_version = "0.34.2"
         ktlint_gradle_version = '8.2.0'
         gradleVersionsPluginVersion = '0.21.0'
@@ -99,24 +99,23 @@ subprojects { project ->
     dokka {
         outputFormat = 'jekyll'
         outputDirectory = pathApiDocs
+        configuration {
+            includes = ['README.md']
+            reportUndocumented = false
+            // Specifies the location of the project source code on the Web.
+            // If provided, Dokka generates "source" links for each declaration.
+            // Repeat for multiple mappings
+            sourceLink {
+                // Source directory
+                path = "src/main/kotlin"
 
-        includes = ['README.md']
-        reportUndocumented = false
+                // URL showing where the source code can be accessed through the web browser
+                url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
 
-        // Specifies the location of the project source code on the Web.
-        // If provided, Dokka generates "source" links for each declaration.
-        // Repeat for multiple mappings
-        linkMapping {
-            // Source directory
-            dir = "src/main/kotlin"
-
-            // URL showing where the source code can be accessed through the web browser
-            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
-
-            // Suffix which is used to append the line number to the URL. Use #L for GitHub
-            suffix = "#L"
+                // Suffix which is used to append the line number to the URL. Use #L for GitHub
+                lineSuffix = "#L"
+            }
         }
-
     }
 
     apply plugin: 'com.jfrog.bintray'
