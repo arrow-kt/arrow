@@ -4,6 +4,8 @@ import arrow.aql.Ord
 import arrow.aql.extensions.list.count.count
 import arrow.aql.extensions.list.from.join
 import arrow.aql.extensions.list.groupBy.groupBy
+import arrow.aql.extensions.list.max.max
+import arrow.aql.extensions.list.min.min
 import arrow.aql.extensions.list.orderBy.orderBy
 import arrow.aql.extensions.list.orderBy.orderMap
 import arrow.aql.extensions.list.orderBy.value
@@ -28,6 +30,13 @@ import io.kotlintest.shouldBe
 class AQLTests : UnitSpec() {
 
   init {
+
+    data class Student(val name: String, val age: Int)
+
+    val john = Student("John", 30)
+    val jane = Student("Jane", 32)
+    val jack = Student("Jack", 32)
+    val chris = Student("Chris", 40)
 
     "AQL is able to `select`" {
       listOf(1, 2, 3).query {
@@ -65,22 +74,11 @@ class AQLTests : UnitSpec() {
     }
 
     "AQL is able to `groupBy`" {
-      data class Student(val name: String, val age: Int)
-
-      val john = Student("John", 30)
-      val jane = Student("Jane", 32)
-      val jack = Student("Jack", 32)
       listOf(john, jane, jack).query {
         selectAll() groupBy { age }
       }.value() shouldBe mapOf(30 to listOf(john), 32 to listOf(jane, jack))
     }
 
-    data class Student(val name: String, val age: Int)
-
-    val john = Student("John", 30)
-    val jane = Student("Jane", 32)
-    val jack = Student("Jack", 32)
-    val chris = Student("Chris", 40)
 
     "AQL is able to filter using `where` and then `groupBy`" {
       listOf(john, jane, jack).query {
@@ -121,6 +119,18 @@ class AQLTests : UnitSpec() {
         "sales" to jack,
         "sales" to chris
       )
+    }
+
+    "AQL is able to `max`" {
+      listOf(john, jane, jack, chris).query {
+        selectAll() max { age.toLong() }
+      }.value() shouldBe 40L
+    }
+
+    "AQL is able to `min`" {
+      listOf(john, jane, jack, chris).query {
+        selectAll() min { age.toLong() }
+      }.value() shouldBe 30L
     }
   }
 }
