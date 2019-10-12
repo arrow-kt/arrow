@@ -57,3 +57,8 @@ interface OptionUnion : Union<ForOption> {
 interface OptionMax : Max<ForOption> {
   override fun foldable(): Foldable<ForOption> = Option.foldable()
 }
+
+@extension
+interface OptionMin : Min<ForOption> {
+  override fun foldable(): Foldable<ForOption> = Option.foldable()
+}

@@ -49,3 +49,8 @@ interface EitherUnion<L> : Union<EitherPartialOf<L>> {
 interface EitherMax<L> : Max<EitherPartialOf<L>> {
   override fun foldable(): Foldable<EitherPartialOf<L>> = Either.foldable()
 }
+
+@extension
+interface EitherMin<L> : Min<EitherPartialOf<L>> {
+  override fun foldable(): Foldable<EitherPartialOf<L>> = Either.foldable()
+}

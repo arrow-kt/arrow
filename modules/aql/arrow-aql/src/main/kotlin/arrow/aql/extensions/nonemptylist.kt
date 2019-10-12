@@ -50,3 +50,8 @@ interface NonEmptyListUnion : Union<ForNonEmptyList> {
 interface NonEmptyListMax : Max<ForNonEmptyList> {
   override fun foldable(): Foldable<ForNonEmptyList> = NonEmptyList.foldable()
 }
+
+@extension
+interface NonEmptyListMin : Min<ForNonEmptyList> {
+  override fun foldable(): Foldable<ForNonEmptyList> = NonEmptyList.foldable()
+}

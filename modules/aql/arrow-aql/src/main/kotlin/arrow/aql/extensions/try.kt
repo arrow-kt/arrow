@@ -78,3 +78,8 @@ interface TryUnion : Union<ForTry> {
 interface TryMax : Max<ForTry> {
   override fun foldable(): Foldable<ForTry> = Try.foldable()
 }
+
+@extension
+interface TryMin : Min<ForTry> {
+  override fun foldable(): Foldable<ForTry> = Try.foldable()
+}

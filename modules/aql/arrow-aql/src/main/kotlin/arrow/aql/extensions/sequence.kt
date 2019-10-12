@@ -57,3 +57,8 @@ interface SequenceUnion : Union<ForSequenceK> {
 interface SequenceMax : Max<ForSequenceK> {
   override fun foldable(): Foldable<ForSequenceK> = SequenceK.foldable()
 }
+
+@extension
+interface SequenceMin : Min<ForSequenceK> {
+  override fun foldable(): Foldable<ForSequenceK> = SequenceK.foldable()
+}

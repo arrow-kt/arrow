@@ -57,3 +57,8 @@ interface ListUnion : Union<ForListK> {
 interface ListMax : Max<ForListK> {
   override fun foldable(): Foldable<ForListK> = ListK.foldable()
 }
+
+@extension
+interface ListMin : Min<ForListK> {
+  override fun foldable(): Foldable<ForListK> = ListK.foldable()
+}
