@@ -1,9 +1,8 @@
 package arrow.extreme
 
 import arrow.higherkind
-import arrow.synthetic
 
-//metadebug
+// metadebug
 
 @higherkind
 sealed class Option<out A>() {
@@ -27,12 +26,10 @@ sealed class Option<out A>() {
   fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
     fold({ a -> f(a) }, { None })
 
-
   companion object {
     fun <A> just(a: A): Option<A> =
       Some(a)
   }
-
 }
 
 data class Some<out A>(val a: A) : Option<A>()
@@ -42,5 +39,3 @@ object None : Option<Nothing>()
 class Id<out A>(val value: A)
 
 val x: IdOf<Int> = Id(1)
-
-

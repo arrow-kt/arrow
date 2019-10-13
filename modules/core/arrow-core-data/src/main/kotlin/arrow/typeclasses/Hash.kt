@@ -29,7 +29,7 @@ interface Hash<in F> : Eq<F> {
    * }
    * ```
    */
-  fun F.hashed(): Int //TODO This can't be named the same as the TypeClass because in the current processor there are collisions, once we have meta then yes
+  fun F.hashed(): Int // TODO This can't be named the same as the TypeClass because in the current processor there are collisions, once we have meta then yes
 
   companion object {
 

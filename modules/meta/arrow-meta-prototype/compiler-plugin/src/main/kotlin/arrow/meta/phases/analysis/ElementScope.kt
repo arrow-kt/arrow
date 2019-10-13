@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtConstructorDelegationCall
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtExpression
@@ -68,7 +69,9 @@ interface ElementScope {
   val varKeyword: PsiElement
   
   val String.expression: Scope<KtExpression>
-  
+
+  val String.dotQualifiedExpression: Scope<KtDotQualifiedExpression>
+
   val String.expressionOrNull: Scope<KtExpression>
   
   val thisExpression: Scope<KtThisExpression>

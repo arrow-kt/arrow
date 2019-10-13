@@ -4,7 +4,10 @@ import arrow.meta.Meta
 import arrow.meta.Plugin
 import arrow.meta.invoke
 import arrow.meta.phases.analysis.ElementScope
+import arrow.meta.quotes.Scope
+import arrow.meta.quotes.ScopedList
 import arrow.meta.quotes.Transform
+import arrow.meta.quotes.orEmpty
 import arrow.meta.quotes.quote
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -25,18 +28,20 @@ val Meta.comprehensions: Plugin
   get() =
     "comprehensions" {
       meta(
-        quote(KtDotQualifiedExpression::containsFxBlock) { fxExpression ->
+        quote(KtDotQualifiedExpression::containsFxBlock) { fxExpression: KtDotQualifiedExpression ->
           println("fxBlock: ${fxExpression.text}")
           Transform.replace(
             replacing = fxExpression,
-            newDeclaration = toFlatMap(fxExpression).expression
+            newDeclaration = toFlatMap(fxExpression)
           )
         }
       )
     }
 
+
+// findDescendantOfType ?? Helper for matching on nested  code??
 private fun KtDotQualifiedExpression.containsFxBlock(): Boolean =
-  findDescendantOfType<KtBlockExpression> { it.isFxBlock() } != null
+  findDescendantOfType(KtBlockExpression::isFxBlock) != null
 
 @ExperimentalContracts
 private fun KtExpression?.containsNestedFxBlock(): Boolean {
@@ -46,33 +51,30 @@ private fun KtExpression?.containsNestedFxBlock(): Boolean {
   return this?.findDescendantOfType<KtBlockExpression> { it.isFxBlock() } != null
 }
 
-
-
 @ExperimentalContracts
-private fun ElementScope.delegationToFlatMap(ktExpression: KtExpression): String? =
-  ktExpression.findDescendantOfType<KtBlockExpression> { it.isFxBlock()}?.let {
+private fun ElementScope.delegationToFlatMap(ktExpression: KtExpression): Scope<KtDotQualifiedExpression> =
+  ktExpression.findDescendantOfType(KtBlockExpression::isFxBlock)?.let {
     toFlatMap(it)
-  }
+  }.orEmpty()
 
 @ExperimentalContracts
-private fun ElementScope.toFlatMap(fxCall: KtDotQualifiedExpression): String =
-  fxCall.findDescendantOfType<KtBlockExpression> { it.isFxBlock() }?.let {
+private fun ElementScope.toFlatMap(fxCall: KtDotQualifiedExpression): Scope<KtDotQualifiedExpression> =
+  fxCall.findDescendantOfType(KtBlockExpression::isFxBlock)?.let {
     toFlatMap(it)
-  } ?: ""
-
+  }.orEmpty()
 
 @ExperimentalContracts
-private fun ElementScope.toFlatMap(fxBlock: KtBlockExpression): String {
+private fun ElementScope.toFlatMap(fxBlock: KtBlockExpression): Scope<KtDotQualifiedExpression> {
   val nextBind = fxBlock.statements.filterIsInstance<KtProperty>().first()
   val (beforeBind, afterBind) =
     fxBlock.statements.filterNot { it == nextBind }.partition { it.before(nextBind) }
-  val flatMap = toFlatMap(nextBind, afterBind).expression.value
+  val flatMap = toFlatMap(nextBind, afterBind).value
   val newStatements = (beforeBind + flatMap).filterNotNull()
-  return newStatements.joinToString("\n") { it.text }
+  return newStatements.joinToString("\n") { it.text }.dotQualifiedExpression
 }
 
 @ExperimentalContracts
-private fun ElementScope.toFlatMap(bind: KtProperty, remaining: List<KtExpression>): String {
+private fun ElementScope.toFlatMap(bind: KtProperty, remaining: List<KtExpression>): Scope<KtExpression> {
   val target = bind.delegateExpression
   val targetSource = when {
     target.containsNestedFxBlock() -> delegationToFlatMap(target)
@@ -82,24 +84,23 @@ private fun ElementScope.toFlatMap(bind: KtProperty, remaining: List<KtExpressio
   val typeName = bind.typeReference?.let { ": ${it.text}" } ?: ""
   return """|${targetSource}.flatMap { $argName $typeName -> 
             |  ${toFlatMap(remaining)}  
-            |}"""
+            |}""".expression
 }
 
 @ExperimentalContracts
-private fun ElementScope.toFlatMap(remaining: List<KtExpression>): String =
+private tailrec fun ElementScope.toFlatMap(remaining: List<KtExpression>, prefix: String = ""): String =
   when {
     remaining.isEmpty() -> ""
     else -> {
       val head = remaining[0]
       val tail = remaining.drop(1)
       when {
-        head.isBinding() -> toFlatMap(head, tail)
-        remaining.size == 1 -> head.returningJust()
-        else -> head.text + "\n" + toFlatMap(tail)
+        head.isBinding() -> prefix + toFlatMap(head, tail)
+        remaining.size == 1 -> prefix + head.returningJust()
+        else -> toFlatMap(tail, head.text + "\n")
       }
     }
   }
-
 
 @ExperimentalContracts
 private fun KtExpression?.isBinding(): Boolean {
@@ -122,9 +123,14 @@ fun KtCallExpression?.generateJust(value: String): String =
   this?.parent?.firstChild?.text?.let { "$it.just($value)" }
     ?: "just($value)"
 
+// Predicate to detect if nested code has `delegates and the surrounding block is `fx`.
+// If it is found than we need to rewrite this block.
+// => We haven't checked if it's `flatMap` or other delegates. Can we find out???
 private fun KtBlockExpression.isFxBlock(): Boolean {
-  val result = statements.any { it is KtProperty && it.hasDelegate() } &&
-    getParentOfType<KtCallExpression>(true)?.firstChild.safeAs<KtReferenceExpression>()?.text == "fx"
+  val result = statements.any { it is KtProperty && it.hasDelegate() } // Look for `val a by io`
+    // If the parent block is `fx` than we're a comprehension
+    && getParentOfType<KtCallExpression>(true)?.firstChild.safeAs<KtReferenceExpression>()?.text == "fx"
+
   println("isFxBlock ${this.text}: $result")
   return result
 }

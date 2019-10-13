@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtConstructorDelegationCall
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.psi.KtExpression
@@ -76,6 +77,8 @@ class DefaultElementScope(project: Project) : ElementScope {
   override val String.expression: Scope<KtExpression>
     get() = Scope(delegate.createExpression(trimMargin()))
 
+  override val String.dotQualifiedExpression: Scope<KtDotQualifiedExpression>
+    get() = Scope(expression.value as KtDotQualifiedExpression)
   override val String.expressionOrNull: Scope<KtExpression>
     get() = Scope(delegate.createExpressionIfPossible(trimMargin()))
 

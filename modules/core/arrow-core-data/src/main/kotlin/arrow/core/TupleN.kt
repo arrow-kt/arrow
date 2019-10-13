@@ -1,6 +1,6 @@
 package arrow.core
 
-//metadebug
+// metadebug
 
 import arrow.higherkind
 import java.util.Collections

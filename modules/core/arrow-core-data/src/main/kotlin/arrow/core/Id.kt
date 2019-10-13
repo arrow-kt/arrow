@@ -43,7 +43,7 @@ fun <A> IdOf<A>.value(): A = fix().extract()
  * ```
  */
 
-//metadebug
+// metadebug
 
 @higherkind
 data class Id<out A>(private val value: A) {

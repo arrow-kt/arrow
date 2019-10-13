@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//metadebug
+// metadebug
 object Runner {
 
   @kotlin.jvm.JvmStatic
@@ -8,5 +8,4 @@ object Runner {
     println(test3().value)
     println(test3Should().value)
   }
-
 }

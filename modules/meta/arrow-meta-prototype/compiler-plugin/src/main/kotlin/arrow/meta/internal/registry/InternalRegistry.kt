@@ -183,11 +183,17 @@ interface InternalRegistry : ConfigSyntax {
       plugin.meta.invoke(ctx).forEach { currentPhase ->
         fun ExtensionPhase.registerPhase(): Unit {
           when (this) {
-            is ExtraImports -> registerExtraImports(project, this, ctx)
-            is PreprocessedVirtualFileFactory -> registerPreprocessedVirtualFileFactory(project, this, ctx)
-            is Config -> registerCompilerConfiguration(project, this, ctx)
-            is StorageComponentContainer -> registerStorageComponentContainer(project, this, ctx)
+            // Empty & Composite allow for composing ExtensionPhases
+            is ExtensionPhase.Empty -> Unit
+            is Composite -> phases.map(ExtensionPhase::registerPhase)
+
             is CollectAdditionalSources -> registerCollectAdditionalSources(project, this, ctx)
+            is Config -> registerCompilerConfiguration(project, this, ctx)
+
+            is ExtraImports -> registerExtraImports(project, this, ctx)
+
+            is PreprocessedVirtualFileFactory -> registerPreprocessedVirtualFileFactory(project, this, ctx)
+            is StorageComponentContainer -> registerStorageComponentContainer(project, this, ctx)
             is AnalysisHandler -> registerAnalysisHandler(project, this, ctx)
             is ClassBuilder -> registerClassBuilder(project, this, ctx)
             is Codegen -> registerCodegen(project, this, ctx)
@@ -197,8 +203,6 @@ interface InternalRegistry : ConfigSyntax {
             is IRGeneration -> registerIRGeneration(project, this, ctx)
             is SyntheticScopeProvider -> registerSyntheticScopeProvider(project, this, ctx)
             //is DiagnosticsSuppressor -> registerDiagnosticSuppressor(project, this, ctx)
-            is Composite -> phases.map(ExtensionPhase::registerPhase)
-            is ExtensionPhase.Empty -> Unit
             else -> messageCollector?.report(CompilerMessageSeverity.ERROR, "Unsupported extension phase: $this")
           }
         }

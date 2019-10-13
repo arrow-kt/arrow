@@ -9,5 +9,12 @@ open class Scope<out K : KtElement>(open val value: K?) {
     Name.identifier((value.map { it.text } + other).joinToString(", "))
 
   override fun toString(): String =
-    if (value != null) value?.text ?: "" else "" //java null snicking in
+    if (value != null) value?.text ?: "" else "" //
+
+  companion object{
+    fun <A> empty() = Scope(null)
+  }// java null snicking in
 }
+
+fun <K : KtElement> Scope<K>?.orEmpty(): Scope<K> =
+  this ?: Scope.empty<K>()

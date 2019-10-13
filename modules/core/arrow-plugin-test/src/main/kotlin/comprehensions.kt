@@ -1,6 +1,6 @@
 package arrow.extreme
 
-//metadebug
+// metadebug
 
 import kotlin.reflect.KProperty
 
@@ -24,8 +24,7 @@ fun test1(): IO<Int> =
     a + b
   }
 
-
-fun test2() = //full on inference
+fun test2() = // full on inference
   IO.fx {
     val a by IO(1)
     val b by IO(2)
@@ -62,7 +61,7 @@ fun test3Should(): IO<Int> =
     }
   }
 
-fun test4(): IO<Int> = //mixed properties and expressions
+fun test4(): IO<Int> = // mixed properties and expressions
   IO.fx {
     val a by IO(1)
     val t = a + 1
@@ -74,5 +73,5 @@ fun test4(): IO<Int> = //mixed properties and expressions
     y + f + g + t + n
   }
 
-fun test5(): IO<Int> = //simple TODO Should this fail at compile time due to lack of bindings to enforce efficiency recommending just or just lift the pure value?
+fun test5(): IO<Int> = // simple TODO Should this fail at compile time due to lack of bindings to enforce efficiency recommending just or just lift the pure value?
   IO.fx { 1 + 1 }

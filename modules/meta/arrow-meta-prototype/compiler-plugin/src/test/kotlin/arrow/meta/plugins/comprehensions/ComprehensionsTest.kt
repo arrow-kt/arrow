@@ -156,4 +156,43 @@ class ComprehensionsTest {
     assertThat(field).isEqualTo(10)
     assertThat(field::class).isEqualTo(Int::class)
   }
+
+  @Test
+  fun `Does not break other delegations`() {
+    val compilationResult: CompilationResult? = assertCompilation(
+      CompilationData(
+        sourceFileName = "SimpleCase.kt",
+        sourceContent = """
+          $IO_CLASS_4_TESTS
+
+          fun test(): IO<Int> =
+            IO.fx {
+              val a by IO(1)
+              val b: Int by lazy { 2 }
+              a + b
+            }
+          """,
+        generatedFileContent = null,
+        generatedClasses = arrayListOf(
+          "SimpleCaseKt", "IO", "IO\$Companion", "SimpleCaseKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0"),
+        compilationStatus = CompilationStatus.OK
+      )
+    )
+
+    assertThat(compilationResult).isNotNull
+
+    val resultForTest = invoke(
+      InvocationData(
+        classesDirectory = compilationResult?.classesDirectory,
+        className = "SimpleCaseKt",
+        methodName = "test"
+      )
+    )
+    assertThat(resultForTest::class.simpleName).isEqualTo("IO")
+
+    val field = getFieldFrom(resultForTest, "value")
+    assertThat(field).isEqualTo(2)
+    assertThat(field::class).isEqualTo(Int::class)
+  }
+
 }

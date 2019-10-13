@@ -1,6 +1,5 @@
 package arrow.typeclasses.internal
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.IdOf
 import arrow.core.ForId

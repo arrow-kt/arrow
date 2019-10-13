@@ -193,7 +193,7 @@ inline fun <reified K : KtElement, P : KtElement, S> processKtFile(
   val mutatingDocument = file.viewProvider.document
   val mutations = arrayListOf<Transform<K>>()
   if (mutatingDocument != null) {
-    val matches = file.dfs { element ->
+    val matches: List<KtElement> = file.dfs { element ->
       val result = K::class.java.isAssignableFrom(element.javaClass)
       result
     }

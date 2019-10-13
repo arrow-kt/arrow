@@ -12,12 +12,10 @@ import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
-import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.FileSpec
-import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
-//@AutoService(Processor::class)
+// @AutoService(Processor::class)
 class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTemplateGenerator {
 
   override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> =

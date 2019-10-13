@@ -1,6 +1,5 @@
 package arrow.core.extensions
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForFunction0
 import arrow.core.Function0

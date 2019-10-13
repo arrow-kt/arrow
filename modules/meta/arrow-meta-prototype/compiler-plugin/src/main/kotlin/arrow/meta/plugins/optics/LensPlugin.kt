@@ -16,12 +16,18 @@ import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
+import org.jetbrains.kotlin.resolve.source.toSourceElement
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 val Meta.lenses: Plugin
   get() =
     "lenses" {
       meta(
         classOrObject(::isProductType) { c ->
+
+          val location = c.toSourceElement().safeAs<KotlinSourceElement>()?.psi?.textRange
+
           validateMaxArityAllowed(this)
           Transform.replace(
             replacing = c,
@@ -48,6 +54,7 @@ val Meta.lenses: Plugin
 
 private fun CompilerContext.validateMaxArityAllowed(classScope: ClassScope) {
   if (classScope.`(valueParameters)`.value.size > 10)
+    // Question: error message file location
     messageCollector?.report(
       CompilerMessageSeverity.WARNING,
       "Iso cannot be generated for product type with ${classScope.`(valueParameters)`.value.size}. Maximum support is $maxArity"

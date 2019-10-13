@@ -14,7 +14,7 @@ interface Show<in A> {
    * @receiver object of type [A].
    * @returns a [String] representing [this@show].
    */
-  fun A.showed(): String //TODO until meta this can't be named the same as the class
+  fun A.showed(): String // TODO until meta this can't be named the same as the class
 
   companion object {
 

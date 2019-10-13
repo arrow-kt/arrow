@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.higherkind
 
-//metadebug
+// metadebug
 
 /**
  * Represents optional values. Instances of `Option`
@@ -10,7 +10,7 @@ import arrow.higherkind
  */
 @higherkind
 sealed class Option<out A> {
-  
+
   companion object {
 
     /**
@@ -56,7 +56,7 @@ sealed class Option<out A> {
    * @note Used only for performance instead of fold.
    */
   abstract fun isEmpty(): Boolean
-  
+
   /**
    * alias for [isDefined]
    */
