@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.util.ReturnsCheck
 val IdeMetaPlugin.dummyIdePlugin: Plugin
   get() = "DummyIdePlugin" {
     meta(
-      //addLocalInspectionToolToIdeRegistry(),
       addApplicableInspection(
         defaultFixText = "Impure",
         inspectionHighlightType = { ProblemHighlightType.ERROR },
