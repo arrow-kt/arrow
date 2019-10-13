@@ -87,7 +87,7 @@ class IOTest : UnitSpec() {
 
     "should throw immediate failure by raiseError" {
       try {
-        IO.raiseError<Int>(MyException()).unsafeRunSync()
+        IO.raiseError(MyException()).unsafeRunSync()
         fail("")
       } catch (myException: MyException) {
         // Success
@@ -142,7 +142,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with unsafeRunAsync" {
-      IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
+      IO.raiseError(MyException()).unsafeRunAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
@@ -155,7 +155,7 @@ class IOTest : UnitSpec() {
 
     "should return exceptions within main block with unsafeRunAsync" {
       val exception = MyException()
-      val ioa = IO<Throwable, Int> { throw exception }
+      val ioa = IO { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
@@ -164,7 +164,7 @@ class IOTest : UnitSpec() {
     "should not catch exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
-        val ioa = IO<Throwable, Int> { throw exception }
+        val ioa = IO { throw exception }
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
@@ -179,7 +179,7 @@ class IOTest : UnitSpec() {
     "should complete when running a pure value with runAsync" {
       val expected = 0
       just(expected).runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
+        either.fold({ fail("") }, { IO(IO.rethrow) { it shouldBe expected } })
       }
     }
 
@@ -191,11 +191,11 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with runAsync" {
-      IO.raiseError<Int>(MyException()).runAsync { either ->
+      IO.raiseError(MyException()).runAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
-              IO { }
+              IO(IO.rethrow) { }
             }
             else -> fail("Should only throw MyException")
           }
@@ -205,7 +205,7 @@ class IOTest : UnitSpec() {
 
     "should return exceptions within main block with runAsync" {
       val exception = MyException()
-      val ioa = IO<Throwable, Int> { throw exception }
+      val ioa = IO { throw exception }
       ioa.runAsync { either ->
         either.fold({ IO { it shouldBe exception } }, { fail("") })
       }
@@ -214,7 +214,7 @@ class IOTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = IO<Throwable, Int> { throw exception }
+        val ioa = IO { throw exception }
         ioa.runAsync { either ->
           either.fold({ throw it }, { fail("") })
         }.unsafeRunSync()
@@ -422,7 +422,7 @@ class IOTest : UnitSpec() {
     }
 
     "IOFrame should always be called when using IO.Bind" {
-      val ThrowableAsStringFrame = object : IOFrame<Any?, IOOf<Throwable, String>> {
+      val ThrowableAsStringFrame = object : IOFrame<Throwable, Any?, IOOf<Throwable, String>> {
         override fun invoke(a: Any?) = just(a.toString())
 
         override fun recover(e: Throwable) = just(e.message ?: "")
@@ -472,7 +472,7 @@ class IOTest : UnitSpec() {
 
     "Cancelable should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelable<Unit> {
+        IO.concurrent().cancelable {
           p.complete(Unit)
         }.fix()
           .unsafeRunAsyncCancellable { }

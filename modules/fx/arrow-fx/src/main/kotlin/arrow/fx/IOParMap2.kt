@@ -12,8 +12,8 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IOParMap2 {
 
-  fun <E, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<E, A>, fb: IOOf<E, B>, f: (A, B) -> C): IO<E, C> = IO.Async { conn, cb ->
-    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better preforming ParMap2)
+  fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<Throwable, A>, fb: IOOf<Throwable, B>, f: (A, B) -> C): IO<Throwable, C> = IO.Async { conn, cb ->
+    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicReference<Any?>(null)
 
     val connA = IOConnection()
@@ -30,7 +30,7 @@ interface IOParMap2 {
       })
     }
 
-    fun sendError(other: IOConnection, e: E) = when (state.getAndSet(e)) {
+    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
       else -> other.cancel().fix().unsafeRunAsync { r ->
         conn.pop()

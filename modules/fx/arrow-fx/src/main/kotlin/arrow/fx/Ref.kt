@@ -1,12 +1,9 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.Tuple2
-import arrow.core.invoke
+import arrow.core.*
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.later
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -99,16 +96,16 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F> factory(MD: MonadDefer<F>): RefFactory<F> = object : RefFactory<F> {
+    fun <F> factory(MD: MonadDefer<F, Throwable>): RefFactory<F> = object : RefFactory<F> {
       override fun <A> later(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
     }
 
     /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    operator fun <F, A> invoke(MD: MonadDefer<F>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
+    operator fun <F, A> invoke(MD: MonadDefer<F, Throwable>, f: () -> A): Kind<F, Ref<F, A>> = MD.later ({
       unsafe(f(), MD)
-    }
+    }, ::identity)
 
     /**
      * Like [invoke] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
@@ -116,12 +113,12 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef<F, A>(AtomicReference(a), MD)
+    fun <F, A> unsafe(a: A, MD: MonadDefer<F, Throwable>): Ref<F, A> = MonadDeferRef<F, A>(AtomicReference(a), MD)
 
     /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
      */
-    private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
+    private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F, Throwable>) : Ref<F, A> {
 
       override fun get(): Kind<F, A> = MD.later {
         ar.get()

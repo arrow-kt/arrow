@@ -11,25 +11,24 @@ import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForTake
-import arrow.fx.typeclasses.Concurrent
-import arrow.fx.typeclasses.Fiber
+import arrow.fx.typeclasses.*
 import arrow.fx.typeclasses.mapUnit
 import arrow.fx.typeclasses.rightUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
+internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F, Throwable>) : MVar<F, A>, Concurrent<F, Throwable> by CF {
 
   private val state = AtomicReference(initial)
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.later {
+    operator fun <F, A> invoke(initial: A, CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State(initial), CF)
     }
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.later {
+    fun <F, A> empty(CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State.empty<A>(), CF)
     }
 

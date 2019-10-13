@@ -7,7 +7,7 @@ import arrow.typeclasses.Applicative
 import kotlin.coroutines.CoroutineContext
 
 @Suppress("FunctionName", "DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE", "ObjectPropertyName")
-internal fun <F> Concurrent<F>.ParApplicative(ctx: CoroutineContext? = null): Applicative<F> = object : Concurrent<F> by this {
+internal fun <F, E> Concurrent<F, E>.ParApplicative(ctx: CoroutineContext? = null): Applicative<F> = object : Concurrent<F, E> by this {
 
   val _ctx = ctx ?: dispatchers().default()
 

@@ -12,7 +12,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-internal fun <F> Concurrent<F>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
+internal fun <F> Concurrent<F, Throwable>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
   val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
   later { cancelRef.cancel(false); Unit }
 }

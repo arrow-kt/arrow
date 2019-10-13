@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.identity
 import arrow.fx.internal.CancelablePromise
 import arrow.fx.internal.UncancelablePromise
 import arrow.fx.typeclasses.Async
@@ -212,8 +213,8 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    operator fun <F, A> invoke(CF: Concurrent<F>): Kind<F, Promise<F, A>> =
-      CF.later { CancelablePromise<F, A>(CF) }
+    operator fun <F, A> invoke(CF: Concurrent<F, Throwable>): Kind<F, Promise<F, A>> =
+      CF.later({ CancelablePromise(CF) }, ::identity)
 
     /**
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
@@ -230,7 +231,8 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> unsafeCancelable(CF: Concurrent<F>): Promise<F, A> = CancelablePromise(CF)
+    fun <F, A> unsafeCancelable(CF: Concurrent<F, Throwable>): Promise<F, A> =
+      CancelablePromise(CF)
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
@@ -247,8 +249,8 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> =
-      AS.later { UncancelablePromise<F, A>(AS) }
+    fun <F, A> uncancelable(AS: Async<F, Throwable>): Kind<F, Promise<F, A>> =
+      AS.later({ UncancelablePromise(AS) }, ::identity)
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
@@ -266,7 +268,8 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS)
+    fun <F, A> unsafeUncancelable(AS: Async<F, Throwable>): Promise<F, A> =
+      UncancelablePromise(AS)
   }
 
   object AlreadyFulfilled : Throwable(message = "Promise was already fulfilled")

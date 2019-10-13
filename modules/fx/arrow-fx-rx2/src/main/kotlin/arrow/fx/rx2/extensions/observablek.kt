@@ -141,13 +141,13 @@ interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMo
 }
 
 @extension
-interface ObservableKMonadDefer : MonadDefer<ForObservableK>, ObservableKBracket {
+interface ObservableKMonadDefer : MonadDefer<ForObservableK, Throwable>, ObservableKBracket {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
-interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
+interface ObservableKAsync : Async<ForObservableK, Throwable>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.async(fa)
 

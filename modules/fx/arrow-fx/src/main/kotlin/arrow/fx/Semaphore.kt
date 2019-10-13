@@ -202,7 +202,7 @@ interface Semaphore<F> {
      *   //sampleEnd
      * }
      */
-    operator fun <F> invoke(n: Long, CF: Concurrent<F>): Kind<F, Semaphore<F>> = CF.run {
+    operator fun <F> invoke(n: Long, CF: Concurrent<F, Throwable>): Kind<F, Semaphore<F>> = CF.run {
       assertNonNegative(n).flatMap {
         Ref<F, State<F>>(CF) { Right(n) }.map { ref ->
           DefaultSemaphore(ref, Promise(this), this)
@@ -224,7 +224,7 @@ interface Semaphore<F> {
      *   //sampleEnd
      * }
      */
-    fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
+    fun <F> uncancelable(n: Long, AS: Async<F, Throwable>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
         Ref<F, State<F>>(AS) { Right(n) }.map { ref ->
           DefaultSemaphore(ref, Promise.uncancelable(this), this)
@@ -246,8 +246,8 @@ private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<
 internal class DefaultSemaphore<F>(
   private val state: Ref<F, State<F>>,
   private val promise: Kind<F, Promise<F, Unit>>,
-  private val AS: Async<F>
-) : Semaphore<F>, Async<F> by AS {
+  private val AS: Async<F, Throwable>
+) : Semaphore<F>, Async<F, Throwable> by AS {
 
   override fun available(): Kind<F, Long> =
     state.get().map { state ->

@@ -11,22 +11,10 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
+import arrow.fx.*
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative
-import arrow.fx.CancelToken
-import arrow.fx.MVar
-import arrow.fx.Race2
-import arrow.fx.Race3
-import arrow.fx.Race4
-import arrow.fx.Race5
-import arrow.fx.Race6
-import arrow.fx.Race7
-import arrow.fx.Race8
-import arrow.fx.Race9
-import arrow.fx.RacePair
-import arrow.fx.RaceTriple
-import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Traverse
@@ -39,7 +27,7 @@ import kotlin.coroutines.startCoroutine
  *
  * Type class for async data types that are cancelable and can be started concurrently.
  */
-interface Concurrent<F> : Async<F> {
+interface Concurrent<F, E> : Async<F, E> {
 
   fun dispatchers(): Dispatchers<F>
 
@@ -59,9 +47,9 @@ interface Concurrent<F> : Async<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  override val fx: ConcurrentFx<F>
-    get() = object : ConcurrentFx<F> {
-      override val concurrent: Concurrent<F> = this@Concurrent
+  override val fx: ConcurrentFx<F, E>
+    get() = object : ConcurrentFx<F, E> {
+      override val concurrent: Concurrent<F, E> = this@Concurrent
     }
 
   /**
@@ -223,7 +211,7 @@ interface Concurrent<F> : Async<F> {
    * ```
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
-  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+  fun <A> Concurrent<F, Throwable>.cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
     cancelableF { cb ->
       val token = k(cb)
       later { token }
@@ -267,7 +255,7 @@ interface Concurrent<F> : Async<F> {
    *
    * @see cancelable for a simpler non-suspending version.
    */
-  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+  fun <A> Async<F, Throwable>.cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
       val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
       val cb1 = { r: Either<Throwable, A> ->
@@ -283,7 +271,7 @@ interface Concurrent<F> : Async<F> {
       }
 
       k(cb1).bracketCase(use = {
-        async<Unit> { cb ->
+        async { cb ->
           if (!state.compareAndSet(null, cb)) {
             cb(rightUnit)
           }
@@ -676,7 +664,7 @@ interface Concurrent<F> : Async<F> {
     g: Kind<F, G>
   ): Kind<F, Race6<out A, out B, out C, out D, out E, out G>> =
     raceN(
-      raceN(a, b, c),
+      raceN<A, B, C>(a, b, c),
       raceN(d, e, g)
     ).map { res ->
       res.fold({
@@ -788,15 +776,15 @@ interface Concurrent<F> : Async<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = ConcurrentContinuation<F, B>(this)
-    val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+  fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *, E>.() -> B, fe: (Throwable) -> E): Kind<F, B> {
+    val continuation = ConcurrentContinuation<F, B, E>(this, fe)
+    val wrapReturn: suspend ConcurrentContinuation<F, *, E>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
 
   override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    bindingConcurrent { c() }
+    bindingConcurrent ({ c() }, { TODO() it })
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
@@ -860,20 +848,20 @@ interface Concurrent<F> : Async<F> {
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
-        { raiseError(TimeoutException(duration.toString())) }
+        { TODO() raiseError(TimeoutException(duration.toString())) }
       )
     }
 }
 
-interface ConcurrentFx<F> : AsyncFx<F> {
-  val concurrent: Concurrent<F>
+interface ConcurrentFx<F, E> : AsyncFx<F, E> {
+  val concurrent: Concurrent<F, E>
 
-  override val async: Async<F>
+  override val async: Async<F, E>
     get() = concurrent
 
-  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = ConcurrentContinuation<F, A>(concurrent)
-    val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
+    val continuation = ConcurrentContinuation<F, A, E>(concurrent, fe)
+    val wrapReturn: suspend ConcurrentSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }

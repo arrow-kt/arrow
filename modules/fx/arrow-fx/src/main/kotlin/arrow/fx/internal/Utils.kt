@@ -11,6 +11,7 @@ import arrow.fx.IOOf
 import arrow.fx.KindConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
+import java.lang.Exception
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -152,7 +153,7 @@ object Platform {
 
   fun <E, A> unsafeResync(ioa: IO<E, A>, limit: Duration): Option<A> {
     val latch = OneShotLatch()
-    var ref: Either<Throwable, A>? = null
+    var ref: Either<E, A>? = null
     ioa.unsafeRunAsync { a ->
       ref = a
       latch.releaseShared(1)
@@ -166,7 +167,7 @@ object Platform {
 
     return when (val eitherRef = ref) {
       null -> None
-      is Either.Left -> throw eitherRef.a
+      is Either.Left -> None
       is Either.Right -> Some(eitherRef.b)
     }
   }

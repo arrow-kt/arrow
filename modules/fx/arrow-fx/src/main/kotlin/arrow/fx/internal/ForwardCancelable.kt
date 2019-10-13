@@ -23,7 +23,7 @@ class ForwardCancelable<E> {
   fun cancel(): CancelToken<IOPartialOf<E>> {
     fun loop(conn: IOConnection, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
       when (current) {
-        is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack)))
+        is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
 
         is Active -> {

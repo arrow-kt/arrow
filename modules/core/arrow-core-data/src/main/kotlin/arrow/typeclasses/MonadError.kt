@@ -22,6 +22,14 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
   fun <A> Kind<F, Either<E, A>>.rethrow(): Kind<F, A> =
     flatMap { it.fold({ e -> raiseError<A>(e) }, { a -> just(a) }) }
+
+  fun <A> Throwable.raiseNonFatal(fe: (Throwable) -> E): Kind<F, A> =
+    if (NonFatal(this)) raiseError(fe(this)) else throw this
+
+  override val fx: MonadErrorFx<F, E>
+    get() = object : MonadErrorFx<F, E> {
+      override val ME: MonadError<F, E> = this@MonadError
+    }
 }
 
 /**
@@ -148,8 +156,19 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
     if (NonFatal(this)) raiseError(this) else throw this
 }
 
-interface MonadThrowFx<F> : MonadFx<F> {
-  val ME: MonadThrow<F>
+interface MonadErrorFx<F, E> : MonadFx<F> {
+  val ME: MonadError<F, E>
+  override val M: Monad<F> get() = ME
+  fun <A> monadError(c: suspend MonadErrorSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
+    val continuation = MonadErrorContinuation<F, A, E>(ME, fe = fe)
+    val wrapReturn: suspend MonadErrorSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
+}
+
+interface MonadThrowFx<F> : MonadErrorFx<F, Throwable> {
+  override val ME: MonadThrow<F>
   override val M: Monad<F> get() = ME
   fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> {
     val continuation = MonadThrowContinuation<F, A>(ME)
@@ -158,3 +177,4 @@ interface MonadThrowFx<F> : MonadFx<F> {
     return continuation.returnedMonad()
   }
 }
+

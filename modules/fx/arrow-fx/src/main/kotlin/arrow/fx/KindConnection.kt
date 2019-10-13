@@ -256,7 +256,7 @@ sealed class KindConnection<F> {
      * }
      * ```
      **/
-    operator fun <F> invoke(MD: MonadDefer<F>, run: (CancelToken<F>) -> Unit): KindConnection<F> =
+    operator fun <F, E> invoke(MD: MonadDefer<F, E>, run: (CancelToken<F>) -> Unit): KindConnection<F> =
       DefaultKindConnection(MD, run)
 
     /**
@@ -292,7 +292,7 @@ sealed class KindConnection<F> {
   /**
    * Default [KindConnection] implementation.
    */
-  private class DefaultKindConnection<F>(private val MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
+  private class DefaultKindConnection<F, E>(private val MD: MonadDefer<F, E>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F, E> by MD {
     private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {

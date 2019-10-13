@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
+import arrow.fx.extensions.io.environment.environment
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.ArrayStack
@@ -45,8 +46,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, Any?, IO<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> return currentIO as IO<E, A> // FIXME check this
             else -> {
@@ -71,10 +71,10 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendAsync(currentIO, currentIO.handler, bFirst, bRest) as IO<E, A>
+          return suspendAsync(currentIO, bFirst, bRest) as IO<E, A>
         }
         is IO.Effect -> {
-          return suspendAsync(currentIO, currentIO.handler, bFirst, bRest) as IO<E, A>
+          return suspendAsync(currentIO, bFirst, bRest) as IO<E, A>
         }
         is IO.Bind<*, *, *> -> {
           if (bFirst != null) {
@@ -106,7 +106,7 @@ internal object IORunLoop {
         }
         is IO.ContextSwitch -> {
           val localCurrent = currentIO
-          return IO.Async(false, IO.rethrow) { conn, cb ->
+          return IO.Async(false) { conn, cb ->
             loop(localCurrent, conn, cb as Callback, null, bFirst, bRest, EmptyCoroutineContext)
           }
         }
@@ -139,10 +139,10 @@ internal object IORunLoop {
   private fun <E, A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<E, A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<E, A>
 
-  private fun suspendAsync(currentIO: IO<Any?, Any?>, handler: Handler, bFirst: BindF?, bRest: CallStack?): IO<Any?, Any?> =
+  private fun suspendAsync(currentIO: IO<Any?, Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?, Any?> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
     if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
-      IO.Async(false, handler) { conn, cb ->
+      IO.Async(false) { conn, cb ->
         loop(currentIO, conn, cb, null, bFirst, bRest, EmptyCoroutineContext)
       }
     } else {
@@ -179,8 +179,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, Any?, IO<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> {
               cb(Left(currentIO.exception))
@@ -365,7 +364,6 @@ internal object IORunLoop {
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
-    private var handler: Handler? = null
 
     private var contIndex: Int = 0
     private var trampolineAfter: Boolean = false
@@ -377,23 +375,22 @@ internal object IORunLoop {
       this.conn = conn
     }
 
-    private fun prepare(ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?, handler: Handler?) {
+    private fun prepare(ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
       this._context = ctx
-      this.handler = handler
       contIndex++
     }
 
     fun start(async: IO.Async<Any?, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
-      prepare(ctx, bFirst, bRest, async.handler)
+      prepare(ctx, bFirst, bRest)
       trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
     }
 
     fun start(effect: IO.Effect<Any?, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
-      prepare(effect.ctx ?: ctx, bFirst, bRest, effect.handler)
+      prepare(effect.ctx ?: ctx, bFirst, bRest)
       effect.effect.startCoroutine(this)
     }
 
@@ -431,7 +428,7 @@ internal object IORunLoop {
         canCall = false
         result.fold(
           { a -> IO.just(a) },
-          { e -> IO.RaiseError(handler!!(e)) }
+          { e -> IO.environment().handleAsyncError(e) }
         ).let { r ->
           if (shouldTrampoline) {
             this.value = r

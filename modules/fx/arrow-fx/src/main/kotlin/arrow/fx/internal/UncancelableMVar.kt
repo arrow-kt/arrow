@@ -1,22 +1,18 @@
 package arrow.fx.internal
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Right
-import arrow.core.Some
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.fx.MVar
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForTake
 import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.later
 import arrow.fx.typeclasses.rightUnit
 import arrow.fx.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
 // [MVar] implementation for [Async] data types.
-internal class UncancelableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F>) : MVar<F, A>, Async<F> by AS {
+internal class UncancelableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F, Throwable>) : MVar<F, A>, Async<F, Throwable> by AS {
 
   private val stateRef = AtomicReference<State<A>>(initial)
 
@@ -56,14 +52,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   private tailrec fun unsafeTryPut(a: A): Kind<F, Boolean> =
     when (val current = stateRef.get()) {
-      is State.WaitForTake -> justFalse
-      is State.WaitForPut -> {
+      is WaitForTake -> justFalse
+      is WaitForPut -> {
         val first: ((Either<Throwable, A>) -> Unit)? = current.takes.firstOrNull()
         val update: State<A> =
           if (current.takes.isEmpty()) State(a) else {
             val rest = current.takes.drop(1)
             if (rest.isEmpty()) State.empty()
-            else State.WaitForPut(emptyList(), rest)
+            else WaitForPut(emptyList(), rest)
           }
 
         if (!stateRef.compareAndSet(current, update)) unsafeTryPut(a) // retry
@@ -74,19 +70,19 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   private tailrec fun unsafePut(a: A, onPut: (Either<Throwable, Unit>) -> Unit): Kind<F, Unit> =
     when (val current = stateRef.get()) {
-      is State.WaitForTake -> {
-        val update = State.WaitForTake(current.value, current.puts + Tuple2(a, onPut))
+      is WaitForTake -> {
+        val update = WaitForTake(current.value, current.puts + Tuple2(a, onPut))
         if (!stateRef.compareAndSet(current, update)) unsafePut(a, onPut) // retry
         else unit()
       }
 
-      is State.WaitForPut -> {
+      is WaitForPut -> {
         val first: ((Either<Throwable, A>) -> Unit)? = current.takes.firstOrNull()
         val update: State<A> =
           if (current.takes.isEmpty()) State(a) else {
             val rest = current.takes.drop(1)
             if (rest.isEmpty()) State.empty()
-            else State.WaitForPut(emptyList(), rest)
+            else WaitForPut(emptyList(), rest)
           }
 
         if (!stateRef.compareAndSet(current, update)) unsafePut(a, onPut) // retry
@@ -96,14 +92,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   private tailrec fun unsafeTryTake(): Kind<F, Option<A>> =
     when (val current = stateRef.get()) {
-      is State.WaitForTake ->
+      is WaitForTake ->
         if (current.puts.isEmpty()) {
           if (stateRef.compareAndSet(current, State.empty())) just(Some(current.value)) // Signals completion of `take`
           else unsafeTryTake() // retry
         } else {
           val (ax, notify) = current.puts.first()
           val xs = current.puts.drop(1)
-          val update = State.WaitForTake(ax, xs)
+          val update = WaitForTake(ax, xs)
           if (stateRef.compareAndSet(current, update)) {
             asyncBoundary.map {
               notify(rightUnit) // Complete the `put` request waiting on a notification
@@ -112,12 +108,12 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
           } else unsafeTryTake() // retry
         }
 
-      is State.WaitForPut -> justNone
+      is WaitForPut -> justNone
     }
 
   private tailrec fun unsafeTake(onTake: (Either<Throwable, A>) -> Unit): Kind<F, Unit> =
     when (val current = stateRef.get()) {
-      is State.WaitForTake ->
+      is WaitForTake ->
         if (current.puts.isEmpty()) {
           if (stateRef.compareAndSet(current, State.empty())) {
             onTake(Right(current.value))
@@ -126,7 +122,7 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
         } else {
           val (ax, notify) = current.puts.first()
           val xs = current.puts.drop(1)
-          val update = State.WaitForTake(ax, xs)
+          val update = WaitForTake(ax, xs)
           if (stateRef.compareAndSet(current, update)) {
             asyncBoundary.map {
               try {
@@ -139,21 +135,21 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
           } else unsafeTake(onTake) // retry
         }
 
-      is State.WaitForPut ->
-        if (!stateRef.compareAndSet(current, State.WaitForPut(current.reads, current.takes + onTake))) unsafeTake(onTake)
+      is WaitForPut ->
+        if (!stateRef.compareAndSet(current, WaitForPut(current.reads, current.takes + onTake))) unsafeTake(onTake)
         else unit()
     }
 
   private tailrec fun unsafeRead(onRead: (Either<Throwable, A>) -> Unit): Unit =
     when (val current = stateRef.get()) {
-      is State.WaitForTake ->
+      is WaitForTake ->
         // A value is available, so complete `read` immediately without
         // changing the sate
         onRead(Right(current.value))
 
-      is State.WaitForPut ->
+      is WaitForPut ->
         // No value available, enqueue the callback
-        if (!stateRef.compareAndSet(current, State.WaitForPut(current.reads + onRead, current.takes))) unsafeRead(onRead) // retry
+        if (!stateRef.compareAndSet(current, WaitForPut(current.reads + onRead, current.takes))) unsafeRead(onRead) // retry
         else Unit
     }
 
@@ -180,14 +176,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
+    operator fun <F, A> invoke(initial: A, AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later( {
       UncancelableMVar(State(initial), AS)
-    }
+    }, ::identity)
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
+    fun <F, A> empty(AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later ({
       UncancelableMVar(State.empty<A>(), AS)
-    }
+    }, ::identity)
 
     /** Internal state of [MVar]. */
     private sealed class State<A> {

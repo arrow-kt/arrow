@@ -17,7 +17,7 @@ import arrow.fx.typeclasses.mapUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
+internal class CancelablePromise<F, A>(private val CF: Concurrent<F, Throwable>) : Promise<F, A>, Concurrent<F, Throwable> by CF {
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: Map<Token, (Either<Throwable, A>) -> Unit>) : State<A>()
@@ -25,16 +25,16 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
     data class Error<A>(val throwable: Throwable) : State<A>()
   }
 
-  private val state: AtomicReference<State<A>> = AtomicReference(State.Pending(emptyMap()))
+  private val state: AtomicReference<State<A>> = AtomicReference(Pending(emptyMap()))
 
   override fun get(): Kind<F, A> = defer {
     when (val current = state.get()) {
-      is State.Complete -> just(current.value)
-      is State.Pending -> cancelable { cb ->
+      is Complete -> just(current.value)
+      is Pending -> cancelable { cb ->
         val id = unsafeRegister(cb)
         later { unregister(id) }
       }
-      is State.Error -> raiseError(current.throwable)
+      is Error -> raiseError(current.throwable)
     }
   }
 
@@ -65,10 +65,10 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
     defer { unsafeTryError(throwable) }
 
   private tailrec fun unsafeTryComplete(a: A): Kind<F, Boolean> = when (val current = state.get()) {
-    is State.Complete -> just(false)
-    is State.Error -> just(false)
-    is State.Pending -> {
-      if (state.compareAndSet(current, State.Complete(a))) {
+    is Complete -> just(false)
+    is Error -> just(false)
+    is Pending -> {
+      if (state.compareAndSet(current, Complete(a))) {
         val joiners = current.joiners.values
         if (joiners.isNotEmpty()) joiners.callAll(Right(a)).map { true }
         else just(true)
@@ -77,10 +77,10 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
   }
 
   private tailrec fun unsafeTryError(error: Throwable): Kind<F, Boolean> = when (val current = state.get()) {
-    is State.Complete -> just(false)
-    is State.Error -> just(false)
-    is State.Pending -> {
-      if (state.compareAndSet(current, State.Error(error))) {
+    is Complete -> just(false)
+    is Error -> just(false)
+    is Pending -> {
+      if (state.compareAndSet(current, Error(error))) {
         val joiners = current.joiners.values
         if (joiners.isNotEmpty()) joiners.callAll(Left(error)).map { true }
         else just(true)
@@ -105,20 +105,20 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
   }
 
   private tailrec fun register(id: Token, cb: (Either<Throwable, A>) -> Unit): Either<Throwable, A>? = when (val current = state.get()) {
-    is State.Complete -> Right(current.value)
-    is State.Pending -> {
-      val updated = State.Pending(current.joiners + Pair(id, cb))
+    is Complete -> Right(current.value)
+    is Pending -> {
+      val updated = Pending(current.joiners + Pair(id, cb))
       if (state.compareAndSet(current, updated)) null
       else register(id, cb)
     }
-    is State.Error -> Left(current.throwable)
+    is Error -> Left(current.throwable)
   }
 
   private tailrec fun unregister(id: Token): Unit = when (val current = state.get()) {
-    is State.Complete -> Unit
-    is State.Error -> Unit
-    is State.Pending -> {
-      val updated = State.Pending(current.joiners - id)
+    is Complete -> Unit
+    is Error -> Unit
+    is Pending -> {
+      val updated = Pending(current.joiners - id)
       if (state.compareAndSet(current, updated)) Unit
       else unregister(id)
     }
