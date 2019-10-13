@@ -9,6 +9,9 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.async
+import arrow.fx.typeclasses.defer
+import arrow.fx.typeclasses.later
 import java.util.concurrent.atomic.AtomicReference
 
 internal class UncancelablePromise<F, A>(private val AS: Async<F, Throwable>) : Promise<F, A>, Async<F, Throwable> by AS {

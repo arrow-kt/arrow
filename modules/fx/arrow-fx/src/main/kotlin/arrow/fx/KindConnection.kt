@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.fx.internal.JavaCancellationException
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.throwPolicy
 import arrow.typeclasses.Applicative
 import java.util.concurrent.atomic.AtomicReference
 
@@ -295,7 +296,7 @@ sealed class KindConnection<F> {
   private class DefaultKindConnection<F, E>(private val MD: MonadDefer<F, E>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F, E> by MD {
     private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
-    override fun cancel(): CancelToken<F> = defer {
+    override fun cancel(): CancelToken<F> = defer(throwPolicy) {
       state.getAndSet(null).let { stack ->
         when {
           stack == null || stack.isEmpty() -> unit()
@@ -326,7 +327,7 @@ sealed class KindConnection<F> {
     override fun tryReactivate(): Boolean =
       state.compareAndSet(null, emptyList())
 
-    private fun List<CancelToken<F>>.cancelAll(): CancelToken<F> = defer {
+    private fun List<CancelToken<F>>.cancelAll(): CancelToken<F> = defer(throwPolicy) {
       // TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
       fold(unit()) { acc, f -> f.flatMap { acc } }
     }

@@ -103,9 +103,9 @@ interface Ref<F, A> {
     /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    operator fun <F, A> invoke(MD: MonadDefer<F, Throwable>, f: () -> A): Kind<F, Ref<F, A>> = MD.later ({
+    operator fun <F, A> invoke(MD: MonadDefer<F, Throwable>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
       unsafe(f(), MD)
-    }, ::identity)
+    }
 
     /**
      * Like [invoke] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].

@@ -1,19 +1,10 @@
 package arrow.fx.internal
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Right
-import arrow.core.Some
+import arrow.core.*
 import arrow.fx.Promise
-import arrow.fx.internal.CancelablePromise.State.Complete
-import arrow.fx.internal.CancelablePromise.State.Error
-import arrow.fx.internal.CancelablePromise.State.Pending
-import arrow.fx.typeclasses.Concurrent
-import arrow.fx.typeclasses.Fiber
-import arrow.fx.typeclasses.mapUnit
+import arrow.fx.internal.CancelablePromise.State.*
+import arrow.fx.typeclasses.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -27,7 +18,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F, Throwable>)
 
   private val state: AtomicReference<State<A>> = AtomicReference(Pending(emptyMap()))
 
-  override fun get(): Kind<F, A> = defer {
+  override fun get(): Kind<F, A> = defer(throwPolicy) {
     when (val current = state.get()) {
       is Complete -> just(current.value)
       is Pending -> cancelable { cb ->

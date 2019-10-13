@@ -21,7 +21,7 @@ class ForwardCancelable<E> {
   private val state = AtomicReference<State<E>>(init())
 
   fun cancel(): CancelToken<IOPartialOf<E>> {
-    fun loop(conn: IOConnection, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
+    fun loop(conn: IOConnection<E>, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
       when (current) {
         is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)

@@ -56,12 +56,12 @@ interface IORacePair {
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 
       // Cancelable connection for the left value
-      val connA = IOConnection()
+      val connA = IOConnection<Throwable>()
       connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<Throwable, A>()
 
       // Cancelable connection for the right value
-      val connB = IOConnection()
+      val connB = IOConnection<Throwable>()
       connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<Throwable, B>()
 

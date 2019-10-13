@@ -142,7 +142,7 @@ interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMo
 
 @extension
 interface ObservableKMonadDefer : MonadDefer<ForObservableK, Throwable>, ObservableKBracket {
-  override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
+  override fun <A> defer(fe: (Throwable) -> Throwable, fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 

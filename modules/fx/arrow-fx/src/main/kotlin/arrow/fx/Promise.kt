@@ -9,6 +9,7 @@ import arrow.fx.internal.CancelablePromise
 import arrow.fx.internal.UncancelablePromise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.later
 
 /**
  * When made, a [Promise] is empty. Until it is fulfilled, which can only happen once.
@@ -214,7 +215,7 @@ interface Promise<F, A> {
      * ```
      */
     operator fun <F, A> invoke(CF: Concurrent<F, Throwable>): Kind<F, Promise<F, A>> =
-      CF.later({ CancelablePromise(CF) }, ::identity)
+      CF.later { CancelablePromise(CF) }
 
     /**
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
@@ -250,7 +251,7 @@ interface Promise<F, A> {
      * ```
      */
     fun <F, A> uncancelable(AS: Async<F, Throwable>): Kind<F, Promise<F, A>> =
-      AS.later({ UncancelablePromise(AS) }, ::identity)
+      AS.later { UncancelablePromise(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].

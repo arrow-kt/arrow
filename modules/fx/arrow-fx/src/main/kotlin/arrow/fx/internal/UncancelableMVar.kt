@@ -5,10 +5,7 @@ import arrow.core.*
 import arrow.fx.MVar
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForTake
-import arrow.fx.typeclasses.Async
-import arrow.fx.typeclasses.later
-import arrow.fx.typeclasses.rightUnit
-import arrow.fx.typeclasses.unitCallback
+import arrow.fx.typeclasses.*
 import java.util.concurrent.atomic.AtomicReference
 
 // [MVar] implementation for [Async] data types.
@@ -176,14 +173,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later( {
+    operator fun <F, A> invoke(initial: A, AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later {
       UncancelableMVar(State(initial), AS)
-    }, ::identity)
+    }
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later ({
+    fun <F, A> empty(AS: Async<F, Throwable>): Kind<F, MVar<F, A>> = AS.later {
       UncancelableMVar(State.empty<A>(), AS)
-    }, ::identity)
+    }
 
     /** Internal state of [MVar]. */
     private sealed class State<A> {

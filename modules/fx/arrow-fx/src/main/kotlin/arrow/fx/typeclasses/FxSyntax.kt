@@ -7,7 +7,6 @@ import arrow.core.TryOf
 import arrow.core.identity
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.fix
-import arrow.fx.extensions.io.async.effect
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax

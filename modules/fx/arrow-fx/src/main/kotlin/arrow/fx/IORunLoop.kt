@@ -23,14 +23,14 @@ private typealias Handler = (Throwable) -> Any?
 internal object IORunLoop {
 
   fun <E, A> start(source: IOOf<E, A>, cb: (Either<E, A>) -> Unit): Unit =
-    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null, EmptyCoroutineContext)
+    loop(source, IOConnection.uncancelable as IOConnection<Any?>, cb as Callback, null, null, null, EmptyCoroutineContext)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <E, A> startCancelable(source: IOOf<E, A>, conn: IOConnection, cb: (Either<E, A>) -> Unit): Unit =
-    loop(source, conn, cb as Callback, null, null, null, EmptyCoroutineContext)
+  fun <E, A> startCancelable(source: IOOf<E, A>, conn: IOConnection<E>, cb: (Either<E, A>) -> Unit): Unit =
+    loop(source, conn as IOConnection<Any?>, cb as Callback, null, null, null, EmptyCoroutineContext)
 
   fun <E, A> step(source: IO<E, A>): IO<E, A> {
     var currentIO: Current? = source
@@ -107,7 +107,7 @@ internal object IORunLoop {
         is IO.ContextSwitch -> {
           val localCurrent = currentIO
           return IO.Async(false) { conn, cb ->
-            loop(localCurrent, conn, cb as Callback, null, bFirst, bRest, EmptyCoroutineContext)
+            loop(localCurrent, conn as IOConnection<Any?>, cb as Callback, null, bFirst, bRest, EmptyCoroutineContext)
           }
         }
         null -> {
@@ -151,7 +151,7 @@ internal object IORunLoop {
 
   private fun loop(
     source: Current,
-    cancelable: IOConnection,
+    cancelable: IOConnection<Any?>,
     cb: Callback,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
@@ -159,7 +159,7 @@ internal object IORunLoop {
     ctx: CoroutineContext
   ) {
     var currentIO: Current? = source
-    var conn: IOConnection = cancelable
+    var conn: IOConnection<Any?> = cancelable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -353,14 +353,14 @@ internal object IORunLoop {
    * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
    * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
    */
-  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback, Continuation<Any?> {
+  private data class RestartCallback(val connInit: IOConnection<Any?>, val cb: Callback) : Callback, Continuation<Any?> {
 
     // Nasty trick to re-use `Continuation` with different CC.
     private var _context: CoroutineContext = EmptyCoroutineContext
     override val context: CoroutineContext
       get() = _context
 
-    private var conn: IOConnection = connInit
+    private var conn: IOConnection<Any?> = connInit
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
@@ -371,7 +371,7 @@ internal object IORunLoop {
 
     private var value: IO<Any?, Any?>? = null
 
-    fun contextSwitch(conn: IOConnection) {
+    fun contextSwitch(conn: IOConnection<Any?>) {
       this.conn = conn
     }
 
@@ -449,8 +449,8 @@ internal object IORunLoop {
   }
 
   private class RestoreContext(
-    val old: IOConnection,
-    val restore: (Any?, Any?, IOConnection, IOConnection) -> IOConnection
+    val old: IOConnection<Any?>,
+    val restore: (Any?, Any?, IOConnection<Any?>, IOConnection<Any?>) -> IOConnection<Any?>
   ) : IOFrame<Any?, Any?, IO<Any?, Any?>> {
 
     override fun invoke(a: Any?): IO<Any?, Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)

@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-/** A asynchronous computation that might fail. **/
+/** An asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 
 /** An asynchronous computation that might fail. **/
@@ -82,10 +82,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fe: (Throwable) -> E, fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> later({ fa(cb) }, fe) }
-
-  fun <A> Async<F, Throwable>.async(fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> later({ fa(cb) }, ::identity) }
+    asyncF { cb -> later(fe, { fa(cb) }) }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -162,7 +159,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> later(ctx: CoroutineContext, f: () -> A, fe: (Throwable) -> E): Kind<F, A> =
+  fun <A> later(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> A): Kind<F, A> =
     defer(ctx) {
       try {
         just(f())
@@ -171,8 +168,8 @@ interface Async<F, E> : MonadDefer<F, E> {
       }
     }
 
-  fun <A> Async<F, Throwable>.later(ctx: CoroutineContext, f: () -> A, fe: (Throwable) -> E): Kind<F, A> =
-    later(ctx, f, ::identity)
+  fun <A> Async<F, Throwable>.later(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> A): Kind<F, A> =
+    later(ctx, ::identity, f)
 
   /**
    * Delay a suspended effect.
@@ -229,6 +226,8 @@ interface Async<F, E> : MonadDefer<F, E> {
   /**
    * Delay a computation on provided [CoroutineContext].
    *
+   * For a more grained control over the possible errors emitted, use [defer] with error handler.
+   *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    * ```kotlin:ank:playground:extension
@@ -247,7 +246,10 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    just(Unit).continueOn(ctx).flatMap { defer(f) }
+    defer(ctx, throwPolicy, f)
+
+  fun <A> defer(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> Kind<F, A>): Kind<F, A> =
+    just(Unit).continueOn(ctx).flatMap { defer(fe, f) }
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -308,8 +310,25 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    later({ Unit }) { throw it }
+    later(this, throwPolicy) { Unit }
 
+  /**
+   * Task that never finishes evaluating.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val i = _extensionFactory_.never<Int>()
+   *
+   *   println(i)
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  fun <F, A> Async<F, Throwable>.never(): Kind<F, A> =
+    async(throwPolicy) { }
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }
@@ -327,26 +346,11 @@ interface AsyncFx<F, E> : MonadErrorFx<F, E> {
   }
 }
 
-/**
- * Task that never finishes evaluating.
- *
- * ```kotlin:ank:playground:extension
- * _imports_
- *
- * fun main(args: Array<String>) {
- *   //sampleStart
- *   val i = _extensionFactory_.never<Int>()
- *
- *   println(i)
- *   //sampleEnd
- * }
- * ```
- */
-fun <F, A> Async<F, Throwable>.never(): Kind<F, A> =
-  async({ it }) { }
-
 fun <F, A> Async<F, Throwable>.effect(f: suspend () -> A): Kind<F, A> =
   effect(::identity, f)
 
 fun <F, A> Async<F, Throwable>.effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
   effect(ctx, ::identity, f)
+
+fun <F, A> Async<F, Throwable>.async(fa: Proc<A>): Kind<F, A> =
+  async(::identity, fa)
