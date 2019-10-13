@@ -13,15 +13,21 @@ import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.listk.monoid.monoid
+import arrow.core.extensions.listk.semigroup.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.listK
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 class ListKTest : UnitSpec() {
   val applicative = ListK.applicative()
@@ -33,6 +39,8 @@ class ListKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
+      SemigroupLaws.laws(ListK.semigroup(), listOf(1, 2, 3).k(), listOf(4, 5, 6).k(), listOf(7, 8, 9).k(), eq),
+      MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq())), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
