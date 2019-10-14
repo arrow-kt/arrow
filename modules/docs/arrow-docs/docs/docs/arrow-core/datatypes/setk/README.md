@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: SetK
-permalink: /docs/arrow/data/setk/
+permalink: /docs/arrow/core/setk/
 redirect_from:
   - /docs/datatypes/setk/
 video: xtnyCqeLI_4
@@ -59,13 +59,4 @@ numbers.combineK(SetK.empty())
 [`Foldable`](/docs/arrow/typeclasses/foldable/):
 ```kotlin:ank
 numbers.foldLeft(0) {sum, number -> sum + (number * number)}
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
-
-DataType(SetK::class).tcMarkdownList()
 ```

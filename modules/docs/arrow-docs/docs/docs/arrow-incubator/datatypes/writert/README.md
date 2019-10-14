@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: WriterT
-permalink: /docs/arrow/data/writert/
+permalink: /docs/arrow/mtl/writert/
 redirect_from:
   - /docs/datatypes/writert/
 ---
@@ -11,14 +11,5 @@ redirect_from:
 {:.advanced}
 advanced
 
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.mtl.*
-import arrow.core.*
-
-DataType(WriterT::class).tcMarkdownList()
-```
 
 TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).

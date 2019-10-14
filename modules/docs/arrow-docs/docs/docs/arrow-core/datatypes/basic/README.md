@@ -1,5 +1,5 @@
 ---
-layout: error
+layout: docs-core
 title: Basic Types
 permalink: /docs/datatypes/basic/
 ---

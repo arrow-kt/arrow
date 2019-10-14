@@ -42,7 +42,7 @@ import arrow.optics.extensions.*
 
 val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
-``` 
+```
 
 `Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
@@ -91,12 +91,3 @@ firstBar.get(Player(5).nel())
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
 | Getter | Getter | Getter | X | X | Getter | X | Fold | X |
-
-### Supported Type Classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.optics.*
-
-DataType(Getter::class).tcMarkdownList()
-```

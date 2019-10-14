@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: EitherT
-permalink: /docs/arrow/data/eithert/
+permalink: /docs/arrow/mtl/eithert/
 redirect_from:
   - /docs/datatypes/eithert/
 video: 1h4X8CrMjVs
@@ -252,15 +252,6 @@ import arrow.core.extensions.option.functor.functor
 EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```
 
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.DataType
-import arrow.reflect.tcMarkdownList
-import arrow.mtl.EitherT
-
-DataType(EitherT::class).tcMarkdownList()
-```
 
 Take a look at the [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 

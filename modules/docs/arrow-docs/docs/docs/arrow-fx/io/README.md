@@ -233,12 +233,3 @@ IO.fx {
 ## Common operators
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
-
-### Supported Type Classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.fx.*
-
-DataType(IO::class).tcMarkdownList()
-```

@@ -83,6 +83,31 @@ options:
       - title: Fix
         url: /docs/recursion/fix/
 
+  - title: Data Types
+
+    nested_options:
+
+      - title: Reader
+        url: /docs/arrow/mtl/reader/
+
+      - title: Kleisli
+        url: /docs/arrow/mtl/kleisli/
+
+      - title: State
+        url: /docs/arrow/mtl/state/
+
+      - title: StateT
+        url: /docs/arrow/mtl/statet/
+
+      - title: WriterT
+        url: /docs/arrow/mtl/writert/
+
+      - title: OptionT
+        url: /docs/arrow/mtl/optiont/
+
+      - title: EitherT
+        url: /docs/arrow/mtl/eithert/
+
   - title: Type Classes
 
     nested_options:

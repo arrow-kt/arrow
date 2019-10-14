@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Store
-permalink: /docs/arrow/data/store/
+permalink: /docs/arrow/ui/store/
 redirect_from:
   - /docs/datatypes/store/
 ---
@@ -50,14 +50,4 @@ And as a `Comonad` is also a `Functor` we have `map` which allows us to transfor
 ```kotlin:ank
 val upperCaseStore = store.map { it: String -> it.toUpperCase() }
 upperCaseStore.extract()
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.ui.*
-import arrow.core.*
-
-DataType(Store::class).tcMarkdownList()
 ```
