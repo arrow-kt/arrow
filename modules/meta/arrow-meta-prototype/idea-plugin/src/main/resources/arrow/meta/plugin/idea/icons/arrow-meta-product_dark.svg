@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>arrow-meta-product-dark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="arrow-meta-product-dark" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g>
+            <rect id="bound" x="0" y="0" width="12" height="12"></rect>
+            <g id="icon" opacity="0.5" transform="translate(2.000000, 0.500000)" stroke="#FFFFFF" stroke-width="1.6">
+                <path d="M0,0.5 L8,0.5" id="path"></path>
+                <path d="M2,1 L2,11" id="path"></path>
+                <path d="M6,1 L6,11" id="path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>arrow-meta-polymorphic-dark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="arrow-meta-polymorphic-dark" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g>
+            <rect id="bound" x="0" y="0" width="12" height="12"></rect>
+            <path d="M6.96011817,1 L11,10.9812012 L9.12407681,10.9812012 L8.04579025,7.89192708 L3.91728213,7.89192708 L2.86115214,10.9812012 L1,10.9812012 L5.03988183,1 L6.96011817,1 Z M5.99261448,2.32446289 C5.85967437,2.8290808 5.66519084,3.38087015 5.40915805,3.97984751 L5.40915805,3.97984751 L4.43426883,6.32446289 L7.58050222,6.32446289 L6.56868538,3.87523212 C6.51593137,3.75801542 6.44873359,3.59265812 6.36709093,3.3791574 L6.36709093,3.3791574 L6.16029578,2.82053762 C6.11432467,2.69243718 6.07581458,2.58166838 6.04476531,2.4882306 L6.04476531,2.4882306 Z" id="A" fill="#FFFFFF" opacity="0.5" transform="translate(6.000000, 5.990601) rotate(-180.000000) translate(-6.000000, -5.990601) "></path>
+        </g>
+    </g>
+</svg>
