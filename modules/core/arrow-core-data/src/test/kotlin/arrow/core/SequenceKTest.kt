@@ -11,7 +11,6 @@ import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
-import arrow.core.extensions.sequencek.semigroup.semigroup
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sequenceK
@@ -21,7 +20,6 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -56,7 +54,6 @@ class SequenceKTest : UnitSpec() {
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
-      SemigroupLaws.laws(SequenceK.semigroup(), sequenceOf(1, 2, 3).k(), sequenceOf(4, 5, 6).k(), sequenceOf(7, 8, 9).k(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
       MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq, this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),

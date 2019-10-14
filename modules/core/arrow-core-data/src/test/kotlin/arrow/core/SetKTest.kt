@@ -37,7 +37,6 @@ class SetKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
       // Investigate - StackOverflowError
-      // SemigroupLaws.laws(SetK.semigroup(), setOf(1, 2, 3).k(), setOf(4, 5, 6).k(), setOf(7, 8, 9).k(), EQ),
       // MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
       SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
       MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any(), this::bijection, associativeSemigroupalEq),
