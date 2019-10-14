@@ -3,7 +3,7 @@
 // -----------------------------------------------
 
 #site-main {
-  padding: 140px 0 0 0;
+  padding: 200px 0 0 0;
 
   .main-flex {
     display: flex;
@@ -142,7 +142,7 @@
 
   .incubator-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: ($base-point-grid * 3) 0;
 
     .incubator-text {
