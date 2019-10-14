@@ -46,8 +46,6 @@ const incubatorList = document.getElementById('incubator-list');
 // Features elements
 const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
 const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
-const buttonCategoryRow = document.querySelectorAll('.feature-button');
-const arrayButtonCategoryRow = Array.from(buttonCategoryRow);
 const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
 const arrayCategoryIconWhite = Array.from(categoryIconWhite);
 const categoryIconDark = document.getElementsByClassName('cat-icon-dark');
@@ -185,13 +183,11 @@ function commonHoverStyle(id, incubatorHover) {
   if (incubatorHover == false) {
     setOpacity(arrayCategoryIconWhite, id, 0.5);
     setOpacity(arrayHeaderCategoryRow, id, 0.5);
-    setOpacity(arrayButtonCategoryRow, id, 0.5);
     setCodeBlockHidden(arrayHomeCodeBlock, id);
 
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
     setOpacity(arrayHeaderCategoryRow, id, 1);
-    setOpacity(arrayButtonCategoryRow, id, 1);
     headerText.style.opacity = 1;
     hideCodeBlock(arrayHomeCodeBlock);
   }
@@ -312,7 +308,6 @@ function mobileMode() {
   arrayNavLinks.map(obj => addClassName(obj, 'hover-mode'));
   arrayFooterLinks.map(obj => addClassName(obj, 'hover-mode'));
   arrayHeaderCategoryRow.map(el => el.style.opacity = 1);
-  arrayButtonCategoryRow.map(el => el.style.opacity = 1);
   arrayCategoryIconColor.map(el => el.style.opacity = 1);
   arrayCategoryIconWhite.map(el => el.style.opacity = 0);
   arrayCategoryIconDark.map(el => el.style.opacity = 0);
