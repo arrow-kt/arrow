@@ -3,7 +3,7 @@ plugins {
 }
 
 repositories {
-    maven { url "http://www.msec.it/maven-repository/" }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
