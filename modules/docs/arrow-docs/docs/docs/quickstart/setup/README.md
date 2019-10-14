@@ -137,7 +137,6 @@ idea {
  
 #### Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
