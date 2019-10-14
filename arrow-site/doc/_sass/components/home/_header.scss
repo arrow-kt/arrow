@@ -59,9 +59,6 @@
                 border-radius: 0 0 4px 4px;
 
                 .CodeMirror {
-                    font-size: 13px;
-                    line-height: 1.6;
-
                     pre {
                         margin-bottom: 4px !important;
                     }
@@ -96,7 +93,7 @@
                 }
 
                 .executable-fragment-wrapper {
-                    margin-bottom: 0;    
+                    margin-bottom: 0;
                     .compiler-info {
                         color: #666;
                         position: relative
