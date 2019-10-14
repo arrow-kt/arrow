@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: SequenceK
-permalink: /docs/arrow/data/sequencek/
+permalink: /docs/arrow/core/sequencek/
 redirect_from:
   - /docs/datatypes/sequencek/
 ---
@@ -73,13 +73,4 @@ Folding a sequence,
 
 ```kotlin:ank
 sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
-
-DataType(SequenceK::class).tcMarkdownList()
 ```

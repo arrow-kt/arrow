@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: ListK
-permalink: /docs/arrow/data/listk/
+permalink: /docs/arrow/core/listk/
 redirect_from:
   - /docs/datatypes/listk/
 ---
@@ -79,13 +79,4 @@ import arrow.core.extensions.*
 import arrow.core.extensions.list.apply.*
 
 listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}))
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
-
-DataType(ListK::class).tcMarkdownList()
 ```

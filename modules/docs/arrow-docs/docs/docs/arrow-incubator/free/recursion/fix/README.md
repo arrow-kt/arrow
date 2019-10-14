@@ -24,12 +24,3 @@ data class Fix<out A>(val unfix: Kind<A, Eval<FixOf<A>>>) : FixOf<A>
 If Mu is `A` and Nu is `A?`, then fix is `A!`. Fix provides no information about whether
 or not a datatype is infinite, and is generally less safe that Mu or Nu. However, due
 to its simplicity, both Recursive and Corecursive instances for fix are very fast.
-
-### Supported Type Classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.recursion.data.*
-
-DataType(Fix::class).tcMarkdownList()
-```

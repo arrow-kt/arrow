@@ -24,12 +24,3 @@ Nu's constructor is isomorphic to ana.
 Nu warns that a datatype can be be infinite, and should be used for any algorithms
 that can work on infinite data (for example `map`). Due to it being a direct encoding
 of ana, Nu also has a very fast Corecursive instance.
-
-### Supported Type Classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.recursion.data.*
-
-DataType(Nu::class).tcMarkdownList()
-```

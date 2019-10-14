@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Day
-permalink: /docs/arrow/data/day/
+permalink: /docs/arrow/ui/day/
 redirect_from:
   - /docs/datatypes/day/
 ---
@@ -26,14 +26,4 @@ val renderHtml = { left: String, right: Int -> """
 }                                                      
 val day = Day(Id.just("Hello"), Id.just(0), renderHtml)
 day.extract(Id.comonad(), Id.comonad())
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.ui.*
-import arrow.core.*
-
-DataType(Day::class).tcMarkdownList()
 ```

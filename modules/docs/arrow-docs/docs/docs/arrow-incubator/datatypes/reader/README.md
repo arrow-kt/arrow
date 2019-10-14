@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: Reader
-permalink: /docs/arrow/data/reader/
+permalink: /docs/arrow/mtl/reader/
 redirect_from:
   - /docs/datatypes/reader/
 ---
@@ -11,14 +11,5 @@ redirect_from:
 {:.intermediate}
 intermediate
 
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.mtl.*
-import arrow.core.*
-
-DataType(ReaderT::class).tcMarkdownList()
-```
 
 TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).

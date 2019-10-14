@@ -64,7 +64,7 @@ The library provides instances of [`MonadError`]({{ '/docs/arrow/typeclasses/mon
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
   MS { getSongUrl() }
-  
+
 val songFlux: FluxKOf<Url> = getSongUrlAsync(FluxK.monadDefer())
 val songMono: MonoKOf<Url> = getSongUrlAsync(MonoK.monadDefer())
 ```
@@ -98,10 +98,10 @@ FluxK.monadThrow().fx.monadThrow {
   val (songUrl) = getSongUrlAsync()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
-    
+
   val end = DirectProcessor.create<Unit>()
   Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
-    
+
   val (tick) = musicPlayer.getCurrentTime()
   val percent = (tick / totalTime * 100).toInt()
   if (percent >= 100) {
@@ -121,13 +121,13 @@ Flux streams created with comprehensions like `fx.monadThrow` behave the same wa
 val disposable =
   songFlux.value()
     .subscribe({ println("Song $it") }, { System.err.println("Error $it") })
-    
+
 disposable.dispose()
 ```
 
 ### Stack safety
 
-While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types. 
+While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types.
 This is a limitation on reactor's side. See the corresponding github [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
 
 To overcome this limitation and run code in a stack safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
@@ -164,13 +164,4 @@ Try {
     }.bind()
   }.fix().mono.block()
 }
-```
-
-### Supported Type Classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.fx.reactor.*
-
-DataType(FluxK::class).tcMarkdownList()
 ```

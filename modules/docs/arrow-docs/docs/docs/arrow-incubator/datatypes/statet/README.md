@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: StateT
-permalink: /docs/arrow/data/statet/
+permalink: /docs/arrow/mtl/statet/
 redirect_from:
   - /docs/datatypes/statet/
 video: 1MJBXKaq0Hc
@@ -262,7 +262,7 @@ fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
       popS()
     }
   }.fix()
-  
+
 fun main() {
   val value = stackOperationsS().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
   println(value)
@@ -405,16 +405,6 @@ fun main() {
   //sampleEnd
   println(value)
 }
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.DataType
-import arrow.reflect.tcMarkdownList
-import arrow.mtl.StateT
-
-DataType(StateT::class).tcMarkdownList()
 ```
 
 Take a look at the [`EitherT` docs]({{ '/docs/arrow/data/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

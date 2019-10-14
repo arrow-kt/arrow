@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: OptionT
-permalink: /docs/arrow/data/optiont/
+permalink: /docs/arrow/mtl/optiont/
 redirect_from:
   - /docs/datatypes/optiont/
 video: EWfxL9yBUJo
@@ -219,15 +219,6 @@ fun getCountryCode(personId: Int): ObservableK<Option<String>> =
 
 Here we no longer have to deal with the `None` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the optional values. We have automatically `flatMapped` through the `ObservableK` and `Option` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
 
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.mtl.*
-import arrow.core.*
-
-DataType(OptionT::class).tcMarkdownList()
-```
 
 Take a look at the [`EitherT` docs]({{ '/docs/arrow/data/eithert' | relative_url }}) for an alternative version of this content with the `EitherT` monad transformer
 

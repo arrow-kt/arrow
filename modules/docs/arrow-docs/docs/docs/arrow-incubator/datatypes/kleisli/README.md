@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: Kleisli
-permalink: /docs/arrow/data/kleisli/
+permalink: /docs/arrow/mtl/kleisli/
 redirect_from:
   - /docs/datatypes/kleisli/
 video: vAdhMJWnBUI
@@ -108,14 +108,4 @@ or to replace the `Kleisli` result
 
 ```kotlin:ank
 optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.mtl.*
-import arrow.core.*
-
-DataType(Kleisli::class).tcMarkdownList()
 ```

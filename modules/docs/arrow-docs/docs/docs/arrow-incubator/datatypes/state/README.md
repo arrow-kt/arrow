@@ -1,7 +1,7 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: State
-permalink: /docs/arrow/data/state/
+permalink: /docs/arrow/mtl/state/
 redirect_from:
   - /docs/datatypes/state/
 video: GcXC0xARSXg
@@ -224,7 +224,7 @@ fun stackOperations() =
     val (c) = pop()
     c
   }
-  
+
 fun main() {
   val value =
     //sampleStart
@@ -328,16 +328,6 @@ fun main() {
   //sampleEnd
   println(value)
 }
-```
-
-### Supported type classes
-
-```kotlin:ank:replace
-import arrow.reflect.DataType
-import arrow.reflect.tcMarkdownList
-import arrow.mtl.StateT
-
-DataType(StateT::class).tcMarkdownList()
 ```
 
 ## Credits
