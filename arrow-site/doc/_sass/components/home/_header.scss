@@ -3,7 +3,7 @@
 // -----------------------------------------------
 
 #site-header {
-    padding: ($base-point-grid * 24) 0 ($base-point-grid * 7) 0;
+    padding: 0 0 ($base-point-grid * 5) 0;
     position: relative;
     z-index: 100;
 
@@ -183,7 +183,6 @@
             flex-direction: column;
 
             .header-text {
-
                 width: $column-12;
                 margin-right: 0;
 
@@ -205,7 +204,7 @@
 
 @include bp(medium) {
     #site-header {
-        padding: ($base-point-grid * 20) 0 0 0;
+        padding: ($base-point-grid * 8) 0 0 0;
 
         .header-flex {
             flex-direction: column;

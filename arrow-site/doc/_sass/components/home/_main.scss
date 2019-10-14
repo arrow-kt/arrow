@@ -3,11 +3,7 @@
 // -----------------------------------------------
 
 #site-main {
-  padding: ($base-point-grid * 5) 0;
-
-  .features {
-    margin-bottom: $base-point-grid * 11;
-  }
+  padding: 140px 0 0 0;
 
   .main-flex {
     display: flex;
@@ -216,11 +212,7 @@
 // -----------------------------------------------
 @include bp(medium) {
   #site-main {
-    padding: unset;
-
-    .features {
-      margin-bottom: 60px;
-    }
+    padding: 100px 0 0 0;
 
     .main-flex {
       flex-direction: column;
