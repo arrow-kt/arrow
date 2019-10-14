@@ -12,7 +12,7 @@ val IdeMetaPlugin.nothingIdePlugin: Plugin
     meta(
       addLineMarkerProvider(
         icon = ArrowIcons.NOTHING,
-        message = "Nothing is impure"
+        message = "Bottom Type"
       ) { it.safeAs<KtUserType>()?.referencedName?.run { this == "Nothing" } == true }
     )
   }
