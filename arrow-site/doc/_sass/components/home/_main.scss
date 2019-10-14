@@ -3,7 +3,11 @@
 // -----------------------------------------------
 
 #site-main {
-  padding: 200px 0 0 0;
+  padding: ($base-point-grid * 5) 0;
+
+  .features {
+    margin-bottom: $base-point-grid * 11;
+  }
 
   .main-flex {
     display: flex;
@@ -142,7 +146,7 @@
 
   .incubator-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: ($base-point-grid * 3) 0;
 
     .incubator-text {
@@ -212,7 +216,11 @@
 // -----------------------------------------------
 @include bp(medium) {
   #site-main {
-    padding: 100px 0 0 0;
+    padding: unset;
+
+    .features {
+      margin-bottom: 60px;
+    }
 
     .main-flex {
       flex-direction: column;
