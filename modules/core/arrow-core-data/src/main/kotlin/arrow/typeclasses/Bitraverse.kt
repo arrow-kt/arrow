@@ -39,7 +39,6 @@ import arrow.typeclasses.internal.IdBimonad
  * ## Bisequence
  *
  * `Bisequence` invert the original structure `F<G<A,B>>` to `G<F<A>,F<B>>`
- * `Bisequence` invert the original structure `F<G<A,B>>` to `G<F<A>,F<B>>`
  * ```kotlin:ank:playground
  * import arrow.core.*
  * import arrow.core.extensions.*

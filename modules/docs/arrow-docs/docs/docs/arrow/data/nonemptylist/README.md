@@ -15,32 +15,37 @@ beginner
 `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
 `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
 
-```groovy
-// gradle
-compile "io.arrow-kt:arrow-core-data:$arrow_version"
-```
-
-```kotlin:ank
-// namespace
-import arrow.core.*
-```
-
 ## of
 
 A `NonEmptyList` guarantees the list always has at least 1 element.
 
-```kotlin:ank:silent
-NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
-NonEmptyList.of(1, 2) // NonEmptyList<Int>
-//NonEmptyList.of() // does not compile
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+
+val value =
+//sampleStart
+ // NonEmptyList.of() // does not compile
+ NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
+//sampleEnd
+fun main() {
+ println(value)
+}
 ```
 
 ## head
 
-Unlike `List#[0]`, `NonEmptyList#head` it's a safe operation that guarantees no exception throwing.
+Unlike `List[0]`, `NonEmptyList.head` it's a safe operation that guarantees no exception throwing.
 
-```kotlin
-NonEmptyList.of(1, 2, 3, 4, 5).head
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+
+val value =
+//sampleStart
+ NonEmptyList.of(1, 2, 3, 4, 5).head
+//sampleEnd
+fun main() {
+ println(value)
+}
 ```
 
 ## foldLeft
@@ -49,33 +54,54 @@ When we fold over a `NonEmptyList`, we turn a `NonEmptyList< A >` into `B` by pr
 The first argument is a function that addresses the __seed value__, this can be any object of any type which will then become the resulting typed value.
 The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.
 
-```kotlin:ank
-fun sumNel(nel: NonEmptyList<Int>): Int =
-  nel.foldLeft(0) { acc, n -> acc + n }
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
 
-sumNel(NonEmptyList.of(1, 1, 1, 1))
+//sampleStart
+fun sumNel(nel: NonEmptyList<Int>): Int =
+ nel.foldLeft(0) { acc, n -> acc + n }
+val value = sumNel(NonEmptyList.of(1, 1, 1, 1))
+//sampleEnd
+fun main() {
+ println("value = $value")
+}
 ```
 
 ## map
 
 `map` allows us to transform `A` into `B` in `NonEmptyList< A >`
 
-```kotlin:ank
-NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+
+val value =
+//sampleStart
+ NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
+//sampleEnd
+fun main() {
+ println(value)
+}
 ```
 
 ## flatMap
 
 `flatMap` allows us to compute over the contents of multiple `NonEmptyList< * >` values
 
-```kotlin:ank
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+
+//sampleStart
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 
-nelOne.flatMap { one ->
-  nelTwo.map { two ->
-    one + two
-  }
+val value = nelOne.flatMap { one ->
+ nelTwo.map { two ->
+   one + two
+ }
+}
+//sampleEnd
+fun main() {
+ println("value = $value")
 }
 ```
 
@@ -83,29 +109,43 @@ nelOne.flatMap { one ->
 
 Λrrow allows imperative style comprehensions to make computing over `NonEmptyList` values easy.
 
-```kotlin:ank
-import arrow.typeclasses.*
-import arrow.core.extensions.*
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+import arrow.core.extensions.fx
 
+//sampleStart
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
-NonEmptyList.fx {
-  val (one) = nelOne
-  val (two) = nelTwo
-  val (three) = nelThree
-  one + two + three
+val value = NonEmptyList.fx {
+ val (one) = nelOne
+ val (two) = nelTwo
+ val (three) = nelThree
+ one + two + three
+}
+//sampleEnd
+fun main() {
+ println("value = $value")
 }
 ```
 
 Monad binding in `NonEmptyList` and other collection related data type can be used as generators
 
-```kotlin:ank
-NonEmptyList.fx {
-  val (x) = NonEmptyList.of(1, 2, 3)
-  val (y) = NonEmptyList.of(1, 2, 3)
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+import arrow.core.extensions.fx
+
+val value =
+//sampleStart
+ NonEmptyList.fx {
+   val (x) = NonEmptyList.of(1, 2, 3)
+   val (y) = NonEmptyList.of(1, 2, 3)
   x + y
+ }
+//sampleEnd
+fun main() {
+ println(value)
 }
 ```
 
@@ -113,11 +153,12 @@ NonEmptyList.fx {
 
 Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
 
-```kotlin:ank
-import arrow.core.*
-import java.util.*
+```kotlin:ank:playground
+import arrow.core.NonEmptyList
+import java.util.UUID
 import arrow.core.extensions.nonemptylist.apply.map
 
+//sampleStart
 data class Person(val id: UUID, val name: String, val year: Int)
 
 // Note each NonEmptyList is of a different type
@@ -125,8 +166,12 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-map(nelId, nelName, nelYear) { (id, name, year) ->
-  Person(id, name, year)
+val value = map(nelId, nelName, nelYear) { (id, name, year) ->
+ Person(id, name, year)
+}
+//sampleEnd
+fun main() {
+ println("value = $value")
 }
 ```
 
@@ -141,8 +186,9 @@ map(nelId, nelName, nelYear) { (id, name, year) ->
 ### Supported type classes
 
 ```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
+import arrow.reflect.DataType
+import arrow.reflect.tcMarkdownList
+import arrow.core.NonEmptyList
 
 DataType(NonEmptyList::class).tcMarkdownList()
 ```
