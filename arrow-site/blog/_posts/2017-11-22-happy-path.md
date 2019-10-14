@@ -2,7 +2,6 @@
 title: "Happy path: Kotlin + Actors + Arrow"
 icon: /img/icon-article.svg
 header-image: https://cdn-images-1.medium.com/max/600/1*kF_bpeNe0THMssFEa2enYA.jpeg
-version: version 0.3.11
 category: articles
 tag: [core]
 link: https://medium.com/@javipacheco/happy-path-kotlin-actors-arrow-proof-of-concept-322e9099d2ea

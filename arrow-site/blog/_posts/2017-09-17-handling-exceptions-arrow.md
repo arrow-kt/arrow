@@ -2,7 +2,6 @@
 title: Handling exceptions in Arrow
 icon: /img/icon-article.svg
 header-image: /img/blog-image-header.png
-version: version 0.3.11
 category: articles
 tags: [core]
 link: https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html

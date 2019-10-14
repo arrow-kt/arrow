@@ -2,7 +2,6 @@
 title: Functional Programming in Kotlin with Arrow
 icon: /img/icon-talk.svg
 header-image: https://img.youtube.com/vi/IL5XzaCMKpQ/maxresdefault.jpg
-version: version 0.3.11
 category: videos
 tags: [core]
 link: https://www.youtube.com/watch?v=IL5XzaCMKpQ

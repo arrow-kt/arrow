@@ -1,7 +1,6 @@
 ---
 title: "Webflux with Kotlin and Arrow"
 icon: /img/icon-article.svg
-version: version 0.8.2
 header-image: /img/blog-image-header.png
 category: articles
 tags: [core, fx]

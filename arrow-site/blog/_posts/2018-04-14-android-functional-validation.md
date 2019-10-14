@@ -2,7 +2,6 @@
 title: Android Functional Validation
 icon: /img/icon-video.svg
 header-image: https://i.vimeocdn.com/video/713283357_1280x720.jpg
-version: version 0.7.3
 category: tutorials
 tags: [core]
 link: https://player.vimeo.com/video/279931528
