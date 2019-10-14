@@ -31,7 +31,9 @@ interface Concurrent<F, E> : Async<F, E> {
 
   fun dispatchers(): Dispatchers<F>
 
-  fun timer(): Timer<F> = Timer(this)
+  fun Concurrent<F, Throwable>.timer(): Timer<F> = Timer(this)
+
+  fun timer(fe: (Throwable) -> E): Timer<F> = Timer(this, fe)
 
   fun parApplicative(): Applicative<F> = ParApplicative(null)
 
@@ -211,10 +213,13 @@ interface Concurrent<F, E> : Async<F, E> {
    * ```
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
-  fun <A> Concurrent<F, Throwable>.cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+//  fun <A> Concurrent<F, Throwable>.cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+//    cancelable(::identity, k)
+
+  fun <E, A> Concurrent<F, E>.cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
     cancelableF { cb ->
       val token = k(cb)
-      later { token }
+      later(throwPolicy) { token }
     }
 
   /**
@@ -255,10 +260,10 @@ interface Concurrent<F, E> : Async<F, E> {
    *
    * @see cancelable for a simpler non-suspending version.
    */
-  fun <A> Async<F, Throwable>.cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+  fun <A> cancelableF(k: ((Either<E, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
-      val cb1 = { r: Either<Throwable, A> ->
+      val state = AtomicReference<(Either<E, Unit>) -> Unit>(null)
+      val cb1 = { r: Either<E, A> ->
         try {
           cb(r)
         } finally {
@@ -271,7 +276,7 @@ interface Concurrent<F, E> : Async<F, E> {
       }
 
       k(cb1).bracketCase(use = {
-        async { cb ->
+        async(throwPolicy) { cb ->
           if (!state.compareAndSet(null, cb)) {
             cb(rightUnit)
           }
@@ -762,11 +767,6 @@ interface Concurrent<F, E> : Async<F, E> {
     }
 
   /**
-   * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
-   */
-  fun <A> mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)
-
-  /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
    * A coroutines is initiated and inside [ConcurrentCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
@@ -784,7 +784,7 @@ interface Concurrent<F, E> : Async<F, E> {
   }
 
   override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    bindingConcurrent ({ c() }, { TODO() it })
+    bindingConcurrent ({ c() }, { TODO() })
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
@@ -848,7 +848,9 @@ interface Concurrent<F, E> : Async<F, E> {
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
-        { TODO() raiseError(TimeoutException(duration.toString())) }
+        // TODO clarify: this should only be called by Concurrent<F, Throwable> but there's no clear way to define an extension in a per-type context
+        //  and leave an overloaded function with fe: (Throwable) -> E as extra param for Concurrent<F, E> instances
+        { raiseError(TimeoutException(duration.toString()) as E) }
       )
     }
 }
@@ -866,3 +868,8 @@ interface ConcurrentFx<F, E> : AsyncFx<F, E> {
     return continuation.returnedMonad()
   }
 }
+
+/**
+ * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
+ */
+fun <F, A> Concurrent<F, Throwable>.mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)

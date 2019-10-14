@@ -1,8 +1,15 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
 import arrow.core.Either.Left
+import arrow.core.Eval
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.andThen
+import arrow.core.identity
+import arrow.core.nonFatalOrThrow
+import arrow.core.right
 import arrow.fx.IO.Bind
 import arrow.fx.IO.Companion.async
 import arrow.fx.IO.Suspend
@@ -22,6 +29,8 @@ import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
+import arrow.fx.typeclasses.ProcE
+import arrow.fx.typeclasses.ProcEF
 import arrow.fx.typeclasses.mapUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
@@ -39,8 +48,8 @@ typealias IOPartialOf<E> = Kind<ForIO, E>
 inline fun <E, A> IOOf<E, A>.fix(): IO<E, A> =
   this as IO<E, A>
 
-typealias IOProc<E, A> = ((Either<E, A>) -> Unit) -> Unit
-typealias IOProcF<E, A> = ((Either<E, A>) -> Unit) -> IOOf<E, Unit>
+typealias IOProc<E, A> = ProcE<E, A>
+typealias IOProcF<E, A> = ProcEF<IOPartialOf<E>, E, A>
 
 @Suppress("StringLiteralDuplication")
 sealed class IO<out E, out A> : IOOf<E, A> {
@@ -131,7 +140,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     fun <E, A> cancelableF(fe: (Throwable) -> E, cb: ((Either<E, A>) -> Unit) -> IOOf<E, CancelToken<IOPartialOf<E>>>): IO<E, A> =
       Async(false) { conn: IOConnection<E>, cbb: (Either<E, A>) -> Unit ->
         val cancelable = ForwardCancelable<E>()
-        val conn2 =  IOConnection<E>()
+        val conn2 = IOConnection<E>()
         conn.push(cancelable.cancel())
         conn.push(conn2.cancel())
 
@@ -317,7 +326,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection<*>) -> IOConnection<*> = { IOConnection.uncancelable }
+      internal val makeUncancelable: (IOConnection<*>) -> IOConnection<*> = { IOConnection.uncancelable } //TODO solve how to combine
 
       internal val disableUncancelable: (Any?, Any?, IOConnection<Any?>, IOConnection<Any?>) -> IOConnection<Any?> =
         { _, _, old, _ -> old }
@@ -350,10 +359,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 }
 
 data class UncaughtError<E>(val e: E) {
-  fun asException() : Exception =
+  fun asException(): Exception =
     UncaughtErrorException("There was an unhandled error $e")
 
-  class UncaughtErrorException(s: String): Exception(s)
+  class UncaughtErrorException(s: String) : Exception(s)
 }
 
 // These have to go here to work around lack of supertype on generics

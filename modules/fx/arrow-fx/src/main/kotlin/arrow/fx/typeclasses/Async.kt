@@ -13,11 +13,17 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-/** An asynchronous computation that might fail. **/
-typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
+/** An asynchronous computation that might fail with a specific error type. **/
+typealias ProcEF<F, E, A> = ((Either<E, A>) -> Unit) -> Kind<F, Unit>
+
+/** An asynchronous computation that might fail with a specific error type. **/
+typealias ProcE<E, A> = ((Either<E, A>) -> Unit) -> Unit
 
 /** An asynchronous computation that might fail. **/
-typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias ProcF<F, A> = ProcEF<F, Throwable, A>
+
+/** An asynchronous computation that might fail. **/
+typealias Proc<A> = ProcE<Throwable, A>
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Async)
@@ -81,8 +87,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
-  fun <A> async(fe: (Throwable) -> E, fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> later(fe, { fa(cb) }) }
+  fun <A> async(fe: (Throwable) -> E, fa: ProcE<E, A>): Kind<F, A> =
+    asyncF { cb -> later(throwPolicy, { fa(cb) }) }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -113,7 +119,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see async for a simpler, non suspending version.
    */
-  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
+  fun <A> asyncF(k: ProcEF<F, E, A>): Kind<F, A>
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
@@ -193,7 +199,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    */
   fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
     async(fe) {
-      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, it))
+      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, fe, it))
     }
 
   /**
@@ -220,7 +226,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    */
   fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
     async(fe) {
-      f.startCoroutine(asyncContinuation(ctx, it))
+      f.startCoroutine(asyncContinuation(ctx, fe, it))
     }
 
   /**

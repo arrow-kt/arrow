@@ -8,18 +8,12 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.handleErrorWith as handleErrorW
 
-//fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
-fun <F> IOConnection<F>.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
+typealias IOConnection<E> = KindConnection<IOPartialOf<E>>
 
-//typealias IOConnection = IOConnectionE<Throwable>
-
-typealias IOConnection<F> = KindConnection<IOPartialOf<F>>
-//typealias IOConnection<E> = Tuple2<(Throwable) -> E, KindConnection<IOPartialOf<E>>>
-
-//fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
+fun <E> IOConnection<E>.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
-fun <F> IOConnection(dummy: Unit = Unit): IOConnection<F> = KindConnection(MD()) { it.fix().unsafeRunAsync { } }
+fun <E> IOConnection(dummy: Unit = Unit): IOConnection<E> = KindConnection(MD()) { it.fix().unsafeRunAsync { } }
 
 private val _uncancelable: IOConnection<Throwable> = KindConnection.uncancelable(MD())
 internal inline val KindConnection.Companion.uncancelable: IOConnection<Throwable>

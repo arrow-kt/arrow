@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
@@ -11,7 +12,6 @@ import arrow.fx.IOOf
 import arrow.fx.KindConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
-import java.lang.Exception
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -276,6 +276,12 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
 internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
+  asyncContinuation(ctx, ::identity, cc)
+
+/**
+ * @see [asyncContinuation]
+ */
+internal fun <E, A> asyncContinuation(ctx: CoroutineContext, fe: (Throwable) -> E, cc: (Either<E, A>) -> Unit): arrow.core.Continuation<A> =
   object : arrow.core.Continuation<A> {
     override val context: CoroutineContext = ctx
 
@@ -284,7 +290,7 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
     }
 
     override fun resumeWithException(exception: Throwable) {
-      cc(exception.left())
+      cc(fe(exception).left())
     }
   }
 

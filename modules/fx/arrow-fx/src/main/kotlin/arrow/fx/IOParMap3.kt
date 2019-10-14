@@ -24,9 +24,9 @@ interface IOParMap3 {
     val state: AtomicReference<Tuple3<A?, B?, C?>?> = AtomicReference(null)
     val active = AtomicBoolean(true)
 
-    val connA = IOConnection()
-    val connB = IOConnection()
-    val connC = IOConnection()
+    val connA = IOConnection<Throwable>()
+    val connB = IOConnection<Throwable>()
+    val connC = IOConnection<Throwable>()
 
     // Composite cancelable that cancels both.
     // NOTE: conn.pop() happens when cb gets called!
@@ -47,7 +47,7 @@ interface IOParMap3 {
       else Unit
     } ?: Unit
 
-    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
+    fun sendError(other: IOConnection<Throwable>, other2: IOConnection<Throwable>, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
         other.cancel().fix().unsafeRunAsync { r1 ->
           other2.cancel().fix().unsafeRunAsync { r2 ->

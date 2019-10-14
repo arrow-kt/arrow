@@ -56,15 +56,15 @@ interface IORaceTriple {
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 
-      val connA = IOConnection()
+      val connA = IOConnection<Throwable>()
       connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<Throwable, A>()
 
-      val connB = IOConnection()
+      val connB = IOConnection<Throwable>()
       connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<Throwable, B>()
 
-      val connC = IOConnection()
+      val connC = IOConnection<Throwable>()
       connC.push(upstreamCancelToken)
       val promiseC = UnsafePromise<Throwable, C>()
 

@@ -4,9 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.identity
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.later
+import arrow.fx.typeclasses.throwPolicy
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import kotlin.coroutines.Continuation
@@ -16,6 +18,11 @@ import kotlin.coroutines.startCoroutine
 internal fun <F> Concurrent<F, Throwable>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
   val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
   later { cancelRef.cancel(false); Unit }
+}
+
+internal fun <F, E> Concurrent<F, E>.ConcurrentSleep(duration: Duration, fe: (Throwable) -> E): Kind<F, Unit> = cancelable { cb ->
+  val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb, fe), duration.amount, duration.timeUnit)
+  later(throwPolicy) { cancelRef.cancel(false); Unit }
 }
 
 /**
@@ -36,14 +43,23 @@ internal val scheduler: ScheduledExecutorService by lazy {
  * As mentioned in [scheduler] no work should ever happen there.
  * So after sleeping we need to shift away to not keep that thread occupied.
  */
-internal class ShiftTick(
+internal class ShiftTick<E>(
   private val ctx: CoroutineContext,
-  private val cb: (Either<Throwable, Unit>) -> Unit
+  private val cb: (Either<E, Unit>) -> Unit,
+  private val fe: (Throwable) -> E
 ) : Runnable {
+
   override fun run() {
     suspend { Unit }.startCoroutine(Continuation(ctx) {
-      it.fold({ unit -> cb(Right(unit)) }, { e -> cb(Left(e)) })
+      it.fold({ unit -> cb(Right(unit)) }, { e -> cb(Left(fe(e))) })
     })
+  }
+
+  companion object {
+    operator fun invoke(
+      ctx: CoroutineContext,
+      cb: (Either<Throwable, Unit>) -> Unit
+    ) = ShiftTick(ctx, cb, ::identity)
   }
 }
 

@@ -6,6 +6,7 @@ import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
+import arrow.fx.typeclasses.throwPolicy
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -16,8 +17,8 @@ interface IOParMap2 {
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicReference<Any?>(null)
 
-    val connA = IOConnection()
-    val connB = IOConnection()
+    val connA = IOConnection<Throwable>()
+    val connB = IOConnection<Throwable>()
 
     conn.pushPair(connA, connB)
 
@@ -30,7 +31,7 @@ interface IOParMap2 {
       })
     }
 
-    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
+    fun sendError(other: IOConnection<Throwable>, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
       else -> other.cancel().fix().unsafeRunAsync { r ->
         conn.pop()
