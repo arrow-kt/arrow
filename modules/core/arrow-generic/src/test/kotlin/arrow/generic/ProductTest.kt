@@ -20,9 +20,7 @@ import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @product
 data class Person(val name: String, val age: Int, val related: Option<Person>) {
@@ -48,7 +46,6 @@ inline fun <reified F> Applicative<F>.testPersonApplicative() {
   }
 }
 
-@RunWith(KotlinTestRunner::class)
 class ProductTest : UnitSpec() {
 
   init {

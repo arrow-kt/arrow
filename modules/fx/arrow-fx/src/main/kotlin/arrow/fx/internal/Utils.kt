@@ -201,8 +201,9 @@ object Platform {
   private val underlying = Executor { it.run() }
 
   @PublishedApi
-  internal val _trampoline = ThreadLocal.withInitial {
-    TrampolineExecutor(underlying)
+  internal val _trampoline = object : ThreadLocal<TrampolineExecutor>() {
+    override fun initialValue(): TrampolineExecutor =
+      TrampolineExecutor(underlying)
   }
 
   @PublishedApi
@@ -271,11 +272,11 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
 }
 
 /**
- * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * [arrow.typeclasses.Continuation] to run coroutine on `ctx` and link result to callback [cc].
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
-internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
-  object : arrow.core.Continuation<A> {
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.typeclasses.Continuation<A> =
+  object : arrow.typeclasses.Continuation<A> {
     override val context: CoroutineContext = ctx
 
     override fun resume(value: A) {
@@ -289,7 +290,7 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
 
 /**
  * Utility to makes sure that the original [fa] is gets forked on [ctx].
- * @see IO.startFiber
+ * @see IO.fork
  * @see arrow.fx.racePair
  * @see arrow.fx.raceTriple
  *

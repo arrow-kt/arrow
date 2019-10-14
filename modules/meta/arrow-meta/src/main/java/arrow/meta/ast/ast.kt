@@ -48,7 +48,8 @@ sealed class TypeName : Tree() {
     val variance: Modifier? = null,
     val reified: Boolean = false,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val simpleName: String
       get() = name
@@ -101,7 +102,8 @@ sealed class TypeName : Tree() {
     val rawType: Classy,
     val typeArguments: List<TypeName> = emptyList(),
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val rawName: String
       get() = name.substringBefore("<")
@@ -117,7 +119,8 @@ sealed class TypeName : Tree() {
     val fqName: String,
     val pckg: PackageName,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val rawName: String
       get() = fqName
@@ -159,7 +162,8 @@ data class Parameter(
   val type: TypeName,
   val defaultValue: Code? = null,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  val modifiers: List<Modifier> = emptyList()
+) : Tree() {
   companion object
 }
 
@@ -184,7 +188,8 @@ data class Property(
   val jvmPropertySignature: String? = null,
   val jvmFieldSignature: String? = null,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  val modifiers: List<Modifier> = emptyList()
+) : Tree() {
   companion object
 }
 
@@ -254,7 +259,8 @@ data class Type(
   val properties: List<Property> = emptyList(),
   val declaredFunctions: List<Func> = emptyList(),
   val allFunctions: List<Func> = emptyList(),
-  val types: List<Type> = emptyList()) : Tree() {
+  val types: List<Type> = emptyList()
+) : Tree() {
 
   sealed class Shape {
     object Class : Shape()

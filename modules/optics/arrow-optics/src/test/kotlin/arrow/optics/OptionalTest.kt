@@ -38,10 +38,7 @@ import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class OptionalTest : UnitSpec() {
 
   init {
@@ -108,6 +105,13 @@ class OptionalTest : UnitSpec() {
       funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any()
     ))
+
+    "asSetter should set absent optional" {
+      forAll(genIncompleteUser, genToken) { user, token ->
+        val updatedUser = incompleteUserTokenOptional.asSetter().set(user, token)
+        incompleteUserTokenOptional.getOption(updatedUser).nonEmpty()
+      }
+    }
 
     with(ListK.head<Int>().asFold()) {
 

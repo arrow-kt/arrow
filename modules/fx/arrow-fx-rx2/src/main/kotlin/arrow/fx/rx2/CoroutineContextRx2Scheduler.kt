@@ -1,6 +1,6 @@
 package arrow.fx.rx2
 
-import arrow.core.Continuation
+import arrow.typeclasses.Continuation
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.EmptyDisposable

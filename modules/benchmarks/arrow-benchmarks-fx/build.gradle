@@ -1,8 +1,13 @@
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     compile project(":arrow-fx")
     compile project(":arrow-fx-rx2")
     compile project(":arrow-fx-reactor")
     compile project(":arrow-scala-benchmarks")
+    compile project(":arrow-kio-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compileOnly "org.openjdk.jmh:jmh-core:1.21"

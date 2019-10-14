@@ -18,7 +18,7 @@ import kotlin.coroutines.startCoroutine
  * `Kind<F, ?>` where `?` denotes a value being transformed.
  *
  * This is true for all type constructors that can support the [Monad] type class including and not limited to
- * [IO], [DeferredK], [ObservableK], [Option], [Either], [List], [Try] ...
+ * [IO], [ObservableK], [Option], [Either], [List], [Try] ...
  *
  * [The Monad Tutorial](https://arrow-kt.io/docs/patterns/monads/)
  *
@@ -43,9 +43,7 @@ interface Monad<F> : Selective<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     flatMap { a -> just(f(a)) }
 
-  /**
-   * @see [Applicative.ap]
-   */
+  /** @see [Apply.ap] */
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
     ff.flatMap { f -> this.map(f) }
 
@@ -98,13 +96,6 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
-
-  @Deprecated(
-    "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monad(c)")
-  )
-  fun <A> binding(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    fx.monad(c)
 }
 
 interface MonadFx<F> {

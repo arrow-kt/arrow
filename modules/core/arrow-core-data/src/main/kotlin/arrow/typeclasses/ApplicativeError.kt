@@ -28,6 +28,10 @@ interface ApplicativeError<F, E> : Applicative<F> {
   fun <A, EE> Either<EE, A>.fromEither(f: (EE) -> E): Kind<F, A> =
     fix().fold({ raiseError(f(it)) }, { just(it) })
 
+  @Deprecated(
+    "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+    ReplaceWith("Either<EE, A>.fromEither(f)")
+  )
   fun <A> TryOf<A>.fromTry(f: (Throwable) -> E): Kind<F, A> =
     fix().fold({ raiseError(f(it)) }, { just(it) })
 

@@ -21,10 +21,6 @@ jobs:
   - stage: build
     script:
     - ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
-  - stage: coverage-report
-    script:
-    - ./gradlew codeCoverageReport
-    - bash <(curl -s https://codecov.io/bash)
   - stage: deploy
     script:
     - ./deploy-scripts/deploy.sh

@@ -1,7 +1,11 @@
 package arrow.generic
 
 /**
- * An Heterogeneous list of values that preserves type information
+ * A heterogeneous list of values that preserves type information
+ *
+ * [HList] is a *singly linked list* where:
+ * - [HNil] is the empty list
+ * - [HCons] holds one payload value ([HCons.head]) and a reference to the rest of the list ([HCons.tail])
  */
 sealed class HList {
   abstract fun size(): Int
