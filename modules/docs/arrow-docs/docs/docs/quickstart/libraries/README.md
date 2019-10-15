@@ -220,7 +220,7 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-query-language:$arrow_version"
+    compile "io.arrow-kt:arrow-aql:$arrow_version"
 }
 ```
 
