@@ -216,10 +216,10 @@ interface Concurrent<F, E> : Async<F, E> {
 //  fun <A> Concurrent<F, Throwable>.cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
 //    cancelable(::identity, k)
 
-  fun <E, A> Concurrent<F, E>.cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+  fun <A> cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
     cancelableF { cb ->
       val token = k(cb)
-      later(throwPolicy) { token }
+      later() { token }
     }
 
   /**
@@ -276,7 +276,7 @@ interface Concurrent<F, E> : Async<F, E> {
       }
 
       k(cb1).bracketCase(use = {
-        async(throwPolicy) { cb ->
+        async<Unit> { cb ->
           if (!state.compareAndSet(null, cb)) {
             cb(rightUnit)
           }
@@ -784,14 +784,14 @@ interface Concurrent<F, E> : Async<F, E> {
   }
 
   override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    bindingConcurrent ({ c() }, { TODO() })
+    bindingConcurrent({ c() }, { TODO() })
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
    *
    * @see Timer
    **/
-  fun sleep(duration: Duration): Kind<F, Unit> = timer().sleep(duration)
+  fun sleep(duration: Duration): Kind<F, Unit> = timer(throwPolicy).sleep(duration)
 
   /**
    * Returns the result of [this] within the specified [duration] or the [default] value.
@@ -861,7 +861,7 @@ interface ConcurrentFx<F, E> : AsyncFx<F, E> {
   override val async: Async<F, E>
     get() = concurrent
 
-  fun <A> concurrent(c: suspend ConcurrentSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
+  fun <A> concurrent(fe: (Throwable) -> E, c: suspend ConcurrentSyntax<F, E>.() -> A): Kind<F, A> {
     val continuation = ConcurrentContinuation<F, A, E>(concurrent, fe)
     val wrapReturn: suspend ConcurrentSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)

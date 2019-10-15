@@ -5,6 +5,8 @@
 *.apk
 *.ap_
 
+.kotlintest
+
 # Files for the ART/Dalvik VM
 *.dex
 

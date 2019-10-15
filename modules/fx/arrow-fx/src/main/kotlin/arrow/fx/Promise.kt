@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.identity
 import arrow.fx.internal.CancelablePromise
 import arrow.fx.internal.UncancelablePromise
 import arrow.fx.typeclasses.Async
@@ -215,7 +214,7 @@ interface Promise<F, A> {
      * ```
      */
     operator fun <F, A> invoke(CF: Concurrent<F, Throwable>): Kind<F, Promise<F, A>> =
-      CF.later { CancelablePromise(CF) }
+      CF.later { CancelablePromise<F, A>(CF) }
 
     /**
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
@@ -251,7 +250,7 @@ interface Promise<F, A> {
      * ```
      */
     fun <F, A> uncancelable(AS: Async<F, Throwable>): Kind<F, Promise<F, A>> =
-      AS.later { UncancelablePromise(AS) }
+      AS.later { UncancelablePromise<F, A>(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].

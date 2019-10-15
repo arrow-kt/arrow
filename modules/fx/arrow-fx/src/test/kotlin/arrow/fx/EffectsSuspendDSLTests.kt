@@ -16,6 +16,7 @@ import arrow.fx.extensions.io.unsafeRun.unsafeRun
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.fx.typeclasses.effect
+import arrow.fx.typeclasses.throwPolicy
 import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -184,6 +185,16 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe true
     }
 
+    "suspend () -> A ≅ Kind<F, A> isomorphism" {
+      fxTest {
+        IO.fx {
+          val errorEffect = suspend { throw Exception() }.effect()
+          val errorIO = IO.raiseError(Exception())
+          errorEffect == errorIO
+        }
+      } shouldBe true
+    }
+
     "asyncCallback" {
       val result = 1
       fxTest {
@@ -340,9 +351,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
         const
 
       fun <F> Concurrent<F, Throwable>.program(): Kind<F, Int> =
-        fx.concurrent { !effect { sideEffect() } }
+        fx.concurrent(throwPolicy) { !effect { sideEffect() } }
 
-      fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
+      fun <F> UnsafeRun<F>.main(fx: Concurrent<F, Throwable>): Int =
         unsafe { runBlocking { fx.program() } }
 
       IO.unsafeRun().main(IO.concurrent()) shouldBe const

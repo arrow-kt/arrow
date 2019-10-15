@@ -6,7 +6,6 @@ import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
-import arrow.fx.typeclasses.throwPolicy
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 

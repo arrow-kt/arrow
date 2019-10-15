@@ -411,7 +411,7 @@ internal object IORunLoop {
         canCall = false
         when (either) {
           is Either.Left -> IO.RaiseError(either.a)
-          is Either.Right -> IO.Pure(either.b)
+          is Either.Right -> IO.Pure<Any?, Any?>(either.b)
         }.let { r ->
           if (shouldTrampoline) {
             this.value = r

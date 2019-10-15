@@ -23,9 +23,6 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
   fun <A> Kind<F, Either<E, A>>.rethrow(): Kind<F, A> =
     flatMap { it.fold({ e -> raiseError<A>(e) }, { a -> just(a) }) }
 
-  fun <A> Throwable.raiseNonFatal(fe: (Throwable) -> E): Kind<F, A> =
-    if (NonFatal(this)) raiseError(fe(this)) else throw this
-
   override val fx: MonadErrorFx<F, E>
     get() = object : MonadErrorFx<F, E> {
       override val ME: MonadError<F, E> = this@MonadError
@@ -177,4 +174,3 @@ interface MonadThrowFx<F> : MonadErrorFx<F, Throwable> {
     return continuation.returnedMonad()
   }
 }
-

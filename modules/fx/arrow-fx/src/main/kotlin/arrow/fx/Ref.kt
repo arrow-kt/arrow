@@ -96,14 +96,14 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F> factory(MD: MonadDefer<F, Throwable>): RefFactory<F> = object : RefFactory<F> {
+    fun <F, E> factory(MD: MonadDefer<F, E>): RefFactory<F> = object : RefFactory<F> {
       override fun <A> later(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
     }
 
     /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    operator fun <F, A> invoke(MD: MonadDefer<F, Throwable>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
+    operator fun <F, E, A> invoke(MD: MonadDefer<F, E>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
       unsafe(f(), MD)
     }
 
@@ -113,12 +113,12 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F, A> unsafe(a: A, MD: MonadDefer<F, Throwable>): Ref<F, A> = MonadDeferRef<F, A>(AtomicReference(a), MD)
+    fun <F, E, A> unsafe(a: A, MD: MonadDefer<F, E>): Ref<F, A> = MonadDeferRef<F, E, A>(AtomicReference(a), MD)
 
     /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
      */
-    private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F, Throwable>) : Ref<F, A> {
+    private class MonadDeferRef<F, E, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F, E>) : Ref<F, A> {
 
       override fun get(): Kind<F, A> = MD.later {
         ar.get()

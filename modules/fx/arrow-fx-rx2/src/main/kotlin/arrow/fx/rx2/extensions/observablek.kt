@@ -30,17 +30,15 @@ import arrow.fx.typeclasses.Effect
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
-import arrow.fx.typeclasses.AsyncFx
+import arrow.fx.typeclasses.ProcE
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
@@ -133,10 +131,7 @@ interface ObservableKMonadError :
 }
 
 @extension
-interface ObservableKMonadThrow : ObservableKMonadError
-
-@extension
-interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMonadThrow {
+interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMonadError {
   override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
@@ -149,7 +144,7 @@ interface ObservableKMonadDefer : MonadDefer<ForObservableK, Throwable>, Observa
 
 @extension
 interface ObservableKAsync : Async<ForObservableK, Throwable>, ObservableKMonadDefer {
-  override fun <A> async(fe: (Throwable) -> Throwable, fa: Proc<A>): Kind<ForObservableK, A>  =
+  override fun <A> async(fa: ProcE<Throwable, A>): Kind<ForObservableK, A> =
     ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
@@ -165,7 +160,13 @@ interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
     fix().runAsync(cb)
 }
 
-interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable>, ObservableKAsync {
+interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable> {
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): Kind<ForObservableK, A> =
+    ObservableK.cancelable(k)
+
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForObservableK, CancelToken<ForObservableK>>): Kind<ForObservableK, A> =
+    ObservableK.cancelableF(k)
+
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
     asScheduler().let { scheduler ->
       Observable.create<Fiber<ForObservableK, A>> { emitter ->
@@ -186,12 +187,6 @@ interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable>, Observa
     ObservableK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
       f(a, tuple.a, tuple.b)
     }).subscribeOn(asScheduler()))
-
-  override fun <A> Concurrent<ForObservableK, Throwable>.cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): Kind<ForObservableK, A>  =
-    ObservableK.cancelableF(k)
-
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
-    ObservableK.cancelable(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
     asScheduler().let { scheduler ->
@@ -248,7 +243,7 @@ interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable>, Observa
     }
 }
 
-fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK>): Concurrent<ForObservableK> = object : ObservableKConcurrent {
+fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK>): Concurrent<ForObservableK, Throwable> = object : ObservableKConcurrent {
   override fun dispatchers(): Dispatchers<ForObservableK> = dispatchers
 }
 

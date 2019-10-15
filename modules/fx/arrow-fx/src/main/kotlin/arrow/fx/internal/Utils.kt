@@ -1,5 +1,6 @@
 package arrow.fx.internal
 
+import arrow.core.Continuation
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
@@ -275,7 +276,7 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
  * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
-internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<E, A>) -> Unit): arrow.core.Continuation<A> =
   asyncContinuation(ctx, ::identity, cc)
 
 /**
@@ -291,6 +292,20 @@ internal fun <E, A> asyncContinuation(ctx: CoroutineContext, fe: (Throwable) -> 
 
     override fun resumeWithException(exception: Throwable) {
       cc(fe(exception).left())
+    }
+  }
+
+internal fun <E, A> asyncControlledContinuation(ctx: CoroutineContext, cc: (Either<E, A>) -> Unit): Continuation<Either<E, A>> =
+  object : arrow.core.Continuation<Either<E, A>> {
+    override val context: CoroutineContext = ctx
+
+    override fun resume(value: Either<E, A>) {
+      cc(value)
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+      // Throw exceptions in controlled environment
+      throw exception
     }
   }
 

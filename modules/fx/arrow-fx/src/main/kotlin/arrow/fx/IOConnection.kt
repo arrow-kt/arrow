@@ -8,15 +8,15 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.handleErrorWith as handleErrorW
 
-typealias IOConnection<E> = KindConnection<IOPartialOf<E>>
+typealias IOConnection = KindConnection<IOPartialOf<Throwable>>
 
 fun <E> IOConnection<E>.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun <E> IOConnection(dummy: Unit = Unit): IOConnection<E> = KindConnection(MD()) { it.fix().unsafeRunAsync { } }
 
-private val _uncancelable: IOConnection<Throwable> = KindConnection.uncancelable(MD())
-internal inline val KindConnection.Companion.uncancelable: IOConnection<Throwable>
+private val _uncancelable: IOConnection<Any?> = KindConnection.uncancelable(MD())
+internal inline val KindConnection.Companion.uncancelable: IOConnection<Any?>
   inline get() = _uncancelable
 
 private fun <E> MD() = object : MonadDefer<IOPartialOf<E>, E> {

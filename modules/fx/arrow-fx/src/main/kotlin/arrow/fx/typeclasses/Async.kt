@@ -7,23 +7,18 @@ import arrow.core.identity
 import arrow.documented
 import arrow.fx.extensions.io.async.async
 import arrow.fx.internal.asyncContinuation
+import arrow.fx.internal.asyncControlledContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadErrorFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-/** An asynchronous computation that might fail with a specific error type. **/
-typealias ProcEF<F, E, A> = ((Either<E, A>) -> Unit) -> Kind<F, Unit>
-
-/** An asynchronous computation that might fail with a specific error type. **/
-typealias ProcE<E, A> = ((Either<E, A>) -> Unit) -> Unit
+/** An asynchronous computation that might fail. **/
+typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 
 /** An asynchronous computation that might fail. **/
-typealias ProcF<F, A> = ProcEF<F, Throwable, A>
-
-/** An asynchronous computation that might fail. **/
-typealias Proc<A> = ProcE<Throwable, A>
+typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Async)
@@ -87,8 +82,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
-  fun <A> async(fe: (Throwable) -> E, fa: ProcE<E, A>): Kind<F, A> =
-    asyncF { cb -> later(throwPolicy, { fa(cb) }) }
+  fun <A> async(fa: Proc<A>): Kind<F, A> =
+    asyncF { cb -> later({ fa(cb) }) }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -119,7 +114,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see async for a simpler, non suspending version.
    */
-  fun <A> asyncF(k: ProcEF<F, E, A>): Kind<F, A>
+  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
@@ -165,17 +160,14 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> later(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> A): Kind<F, A> =
+  fun <A> later(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
     defer(ctx) {
       try {
         just(f())
       } catch (t: Throwable) {
-        t.raiseNonFatal(fe)
+        t.raiseNonFatal<A>()
       }
     }
-
-  fun <A> Async<F, Throwable>.later(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> A): Kind<F, A> =
-    later(ctx, ::identity, f)
 
   /**
    * Delay a suspended effect.
@@ -197,9 +189,9 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
-    async(fe) {
-      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, fe, it))
+  fun <A> effect(f: suspend () -> A): Kind<F, A> =
+    async {
+      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, it))
     }
 
   /**
@@ -224,9 +216,9 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
-    async(fe) {
-      f.startCoroutine(asyncContinuation(ctx, fe, it))
+  fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
+    async {
+      f.startCoroutine(asyncContinuation(ctx, it))
     }
 
   /**
@@ -252,10 +244,10 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    defer(ctx, throwPolicy, f)
+    defer(ctx, f)
 
   fun <A> defer(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> Kind<F, A>): Kind<F, A> =
-    just(Unit).continueOn(ctx).flatMap { defer(fe, f) }
+    just(Unit).continueOn(ctx).flatMap { defer(f) }
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -333,8 +325,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <F, A> Async<F, Throwable>.never(): Kind<F, A> =
-    async(throwPolicy) { }
+  fun <A> never(): Kind<F, A> =
+    async { }
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }
@@ -352,11 +344,5 @@ interface AsyncFx<F, E> : MonadErrorFx<F, E> {
   }
 }
 
-fun <F, A> Async<F, Throwable>.effect(f: suspend () -> A): Kind<F, A> =
-  effect(::identity, f)
-
-fun <F, A> Async<F, Throwable>.effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
-  effect(ctx, ::identity, f)
-
 fun <F, A> Async<F, Throwable>.async(fa: Proc<A>): Kind<F, A> =
-  async(::identity, fa)
+  async(fa)
