@@ -17,7 +17,7 @@ import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForFlowableK private constructor() {
@@ -252,7 +252,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForFlowableK>>?>(null)
+        val cancelOrToken = atomic<Either<Unit, CancelToken<ForFlowableK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

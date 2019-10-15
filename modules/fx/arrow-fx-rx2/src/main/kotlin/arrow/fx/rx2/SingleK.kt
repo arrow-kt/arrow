@@ -14,7 +14,7 @@ import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForSingleK private constructor() {
@@ -255,7 +255,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForSingleK>>?>(null)
+        val cancelOrToken = atomic<Either<Unit, CancelToken<ForSingleK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

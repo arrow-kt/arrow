@@ -11,8 +11,9 @@ import arrow.core.none
 import arrow.core.some
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.updateAndGet
 import kotlin.coroutines.CoroutineContext
 
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
@@ -26,8 +27,8 @@ interface IOParMap3 {
     f: (A, B, C) -> D
   ): IO<D> = IO.Async { conn, cb ->
 
-    val state: AtomicReference<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicReference(none())
-    val active = AtomicBoolean(true)
+    val state: AtomicRef<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = atomic(none())
+    val active = atomic(true)
 
     val connA = IOConnection()
     val connB = IOConnection()

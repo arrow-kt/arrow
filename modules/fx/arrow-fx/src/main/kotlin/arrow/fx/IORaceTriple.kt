@@ -10,7 +10,7 @@ import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.typeclasses.Fiber
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
@@ -52,7 +52,7 @@ interface IORaceTriple {
    */
   fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.Async { conn, cb ->
-      val active = AtomicBoolean(true)
+      val active = atomic(true)
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 

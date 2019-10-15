@@ -17,7 +17,7 @@ import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForMaybeK private constructor() {
@@ -279,7 +279,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForMaybeK>>?>(null)
+        val cancelOrToken = atomic<Either<Unit, CancelToken<ForMaybeK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

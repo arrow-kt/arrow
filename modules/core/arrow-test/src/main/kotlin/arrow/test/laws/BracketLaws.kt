@@ -10,7 +10,7 @@ import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 
 object BracketLaws {
 
@@ -105,13 +105,13 @@ object BracketLaws {
 
   fun <F> Bracket<F, Throwable>.bracketMustRunReleaseTask(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int(), Gen.int().applicativeError(this)) { i, fa ->
-      val msg: AtomicReference<Int> = AtomicReference(0)
+      val msg = atomic(0)
       just(i).bracket<Int, Int>(
-        release = { ii -> msg.set(ii); unit() },
+        release = { ii -> msg.value = ii; unit() },
         use = { throw Throwable("Expected failure!") }
       )
         .attempt()
-        .map { msg.get() }
+        .map { msg.value }
         .equalUnderTheLaw(just(i), EQ)
     }
 }

@@ -16,7 +16,7 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForObservableK private constructor() {
@@ -284,7 +284,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForObservableK>>?>(null)
+        val cancelOrToken = atomic<Either<Unit, CancelToken<ForObservableK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

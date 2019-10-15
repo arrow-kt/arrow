@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.psi.ClassFileViewProviderFactory
 import com.intellij.psi.PsiManager
+import kotlinx.atomicfu.atomic
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -42,12 +43,11 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.utils.Printer
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
 private val metaPlugin = IdeMetaPlugin()
 
-private val registered = AtomicBoolean(false)
+private val registered = atomic(false)
 
 class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, AsyncFileListener, AsyncFileListener.ChangeApplier, Disposable {
 
@@ -63,7 +63,7 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
         println("registerIdeProjectComponents DONE")
         postInitialize()
       } else {
-        registered.set(false)
+        registered.value = false
       }
     }
   }

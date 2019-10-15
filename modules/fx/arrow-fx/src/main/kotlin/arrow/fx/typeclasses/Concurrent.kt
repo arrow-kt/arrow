@@ -31,7 +31,7 @@ import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
@@ -274,15 +274,15 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
+      val state = atomic<((Either<Throwable, Unit>) -> Unit)?>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)
         } finally {
           if (!state.compareAndSet(null, mapUnit)) {
-            val cb2 = state.get()
+            val cb2 = state.value
             state.lazySet(null)
-            cb2(rightUnit)
+            cb2!!(rightUnit)
           }
         }
       }
