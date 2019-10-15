@@ -6,9 +6,6 @@ jdk:
 - oraclejdk8
 
 stages:
-- name: build
-- name: coverage-report
-  if: branch = master
 - name: deploy
   if: branch = master AND type != pull_request
 
@@ -18,9 +15,7 @@ env:
 
 jobs:
   include:
-  - stage: build
-    script:
-    - ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
   - stage: deploy
     script:
+    - ./gradlew clean build
     - ./deploy-scripts/deploy.sh
