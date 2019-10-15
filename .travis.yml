@@ -17,5 +17,5 @@ jobs:
   include:
   - stage: deploy
     script:
-    - ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+    - ./gradlew clean build
     - ./deploy-scripts/deploy.sh
