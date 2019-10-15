@@ -4,7 +4,8 @@ import arrow.meta.plugin.idea.phases.config.buildFolders
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktClassOrObject
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
@@ -56,8 +57,6 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
-private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
-
 class MetaSyntheticPackageFragmentProvider(val project: Project) :
   PackageFragmentProviderExtension,
   SyntheticResolveExtension,
@@ -70,7 +69,22 @@ class MetaSyntheticPackageFragmentProvider(val project: Project) :
         .firstOrNull()
       return first ?: throw IllegalStateException("fragment provider must not be null")
     }
+
+    fun measureTimeMillis(block: () -> Unit): Long {
+      val start = System.currentTimeMillis()
+      try {
+        block()
+      } finally {
+          return System.currentTimeMillis() - start
+      }
+    }
   }
+
+  /**
+   * For now, there's one cache per project. For example, refreshing the cache when a project
+   * is opened must not clear the data of another project.
+   */
+  private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
 
   override fun getPackageFragmentProvider(
     project: Project,
@@ -130,48 +144,64 @@ class MetaSyntheticPackageFragmentProvider(val project: Project) :
     descriptorCache.clear()
   }
 
+  /**
+   * Triggers a cache refresh. It's called in a background thread
+   * and only when indexing is not in progress.
+   * If indexing is in progress when this is called, then the refresh will be
+   * delayed until indexing finished.
+   */
+  internal fun computeCacheAsync() {
+    ApplicationManager.getApplication().executeOnPooledThread {
+      DumbService.getInstance(project).runReadActionInSmartMode {
+        computeCache()
+      }
+    }
+  }
+
   @Synchronized
-  internal fun computeCache() {
-    ReadAction.run<Exception> {
-      try {
-        LOG.info("initializing new PackageFragmentProvider")
-        descriptorCache.clear()
-        val localFileSystem = LocalFileSystem.getInstance()
-        val psiManager = project.getComponent(PsiManager::class.java)
-        val buildFolders = project.buildFolders()
+  private fun computeCache() {
+    assert(ApplicationManager.getApplication().isReadAccessAllowed)
+
+    measureTimeMillis {
+      LOG.debug("initializing new PackageFragmentProvider")
+      descriptorCache.clear()
+
+      val localFileSystem = LocalFileSystem.getInstance()
+      val psiManager = project.getComponent(PsiManager::class.java)
+      val buildFolders = project.buildFolders()
+      val classFiles = buildFolders.packagedClasses(localFileSystem, psiManager)
+
+      LOG.debug("build folders: $buildFolders")
+
+      if (classFiles.isNotEmpty()) {
         val cacheService = KotlinCacheService.getInstance(project)
-        val classFiles = buildFolders.packagedClasses(localFileSystem, psiManager)
-        if (classFiles.isNotEmpty()) {
-          val resolutionFacade = cacheService.getResolutionFacade(classFiles.map { it.second })
-          val resolvedDeclarations = classFiles.resolveClassesDeclarations(resolutionFacade)
-          resolvedDeclarations.forEach { (packageName, declarations) ->
-            val cachedDescriptors = descriptorCache[packageName] ?: emptyList()
-            val leftovers = cachedDescriptors.filterNot { it in declarations }
-            val newCachedPackageDescriptors = declarations + leftovers
-            val synthDescriptors = newCachedPackageDescriptors.filter { it.isMetaSynthetic() }
-            if (synthDescriptors.isNotEmpty()) {
-              synthDescriptors.forEach { synthDescriptor ->
-                try {
-                  if (synthDescriptor is LazyEntity) synthDescriptor.forceResolveAllContents()
-                } catch (e: IndexNotReadyException) {
-                  LOG.warn("Index wasn't ready to resolve: ${synthDescriptor.name}")
-                }
+        val resolutionFacade = cacheService.getResolutionFacade(classFiles.map { it.second })
+        val resolvedDeclarations = classFiles.resolveClassesDeclarations(resolutionFacade)
+        resolvedDeclarations.forEach { (packageName, declarations) ->
+          val cachedDescriptors = descriptorCache[packageName] ?: emptyList()
+          val leftovers = cachedDescriptors.filterNot { it in declarations }
+          val newCachedPackageDescriptors = declarations + leftovers
+          val synthDescriptors = newCachedPackageDescriptors.filter { it.isMetaSynthetic() }
+          if (synthDescriptors.isNotEmpty()) {
+            synthDescriptors.forEach { synthDescriptor ->
+              try {
+                if (synthDescriptor is LazyEntity) synthDescriptor.forceResolveAllContents()
+              } catch (e: IndexNotReadyException) {
+                LOG.warn("Index wasn't ready to resolve: ${synthDescriptor.name}")
               }
-              descriptorCache[packageName] = synthDescriptors
             }
+            descriptorCache[packageName] = synthDescriptors
           }
         }
-        LOG.info("build folders: $buildFolders")
-      } catch (e: Throwable) {
-        e.printStackTrace()
       }
 
-      LOG.info("cache is: ${descriptorCache.keys().toList()}")
       if (LOG.isDebugEnabled) {
         LOG.debug("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n ${descriptorCache.toList().joinToString {
           "${it.first} : ${it.second.size}"
         }}")
       }
+    }.let {
+      LOG.info("computeCache() took $it ms")
     }
   }
 
