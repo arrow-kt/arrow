@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>arrow-meta-optics-light</title>
+    <desc>Created with Sketch.</desc>
+    <g id="arrow-meta-optics-light" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-0.000000, 0.000000)">
+            <rect id="bound" x="0" y="0" width="12" height="12"></rect>
+            <g id="icon" transform="translate(0.750000, 0.750000)" opacity="0.5" stroke="#2B3940" stroke-width="1.6">
+                <circle id="path" cx="5.25" cy="5.25" r="5"></circle>
+                <path d="M5.25,7.25 C5.84529222,7.25 6.3798396,6.98992045 6.74621351,6.57719 C7.05964934,6.22409578 7.25,5.75927728 7.25,5.25 C7.25,5.05184681 7.22118306,4.86042418 7.16751134,4.67969428 C6.92199965,3.85297765 6.15641631,3.25 5.25,3.25 C5.03343814,3.25 4.82491549,3.28441991 4.62960424,3.34808753 C4.02344563,3.54568328 3.54453969,4.02499396 3.34750169,4.63140429 C3.28420879,4.82619651 3.25,5.03410331 3.25,5.25 C3.25,6.3545695 4.1454305,7.25 5.25,7.25 Z" id="path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

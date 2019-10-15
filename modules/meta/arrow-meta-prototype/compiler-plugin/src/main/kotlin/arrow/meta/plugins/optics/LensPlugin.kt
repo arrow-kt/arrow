@@ -98,7 +98,7 @@ val ScopedList<KtParameter>.tupled: String
 val ScopedList<KtParameter>.destructured: String
   get() = value.joinToString { it.name!! }
 
-private fun isProductType(ktClass: KtClass): Boolean =
+fun isProductType(ktClass: KtClass): Boolean =
   ktClass.isData() &&
     ktClass.primaryConstructorParameters.isNotEmpty() &&
     ktClass.primaryConstructorParameters.all { !it.isMutable } &&

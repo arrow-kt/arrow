@@ -21,7 +21,7 @@ interface LineMarkerSyntax {
   fun IdeMetaPlugin.addLineMarkerProvider(
     icon: Icon,
     message: String,
-    placed: GutterIconRenderer.Alignment = GutterIconRenderer.Alignment.LEFT,
+    placed: GutterIconRenderer.Alignment = GutterIconRenderer.Alignment.RIGHT,
     matchOn: (psi: PsiElement) -> Boolean
   ): ExtensionPhase =
     addLineMarkerProvider(

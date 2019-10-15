@@ -103,7 +103,7 @@ private tailrec fun ElementScope.toFlatMap(remaining: List<KtExpression>, prefix
   }
 
 @ExperimentalContracts
-private fun KtExpression?.isBinding(): Boolean {
+fun KtExpression?.isBinding(): Boolean {
   contract {
     returns() implies (this@isBinding is KtProperty)
     returns() implies (this@isBinding != null)

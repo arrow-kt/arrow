@@ -83,14 +83,14 @@ interface InspectionSyntax : InspectionUtilitySyntax {
     isApplicable: (element: K) -> Boolean,
     inspectionHighlightType: (element: K) -> ProblemHighlightType =
       { _ -> ProblemHighlightType.GENERIC_ERROR_OR_WARNING }
-  ): ExtensionPhase = // TODO("Adapt ExtensionProvider to Subtypes OR this is used solely for [QuickFixContributor]")
-    extensionProvider(
+  ): ExtensionPhase = TODO("Adapt ExtensionProvider to Subtypes OR this is used solely for [QuickFixContributor]")
+    /*extensionProvider(
       LocalInspectionEP.GLOBAL_INSPECTION,
       object : LocalInspectionEP() {
         override fun instantiateTool(): InspectionProfileEntry =
           applicableInspection(defaultFixText, kClass, highlightingRange, inspectionText, applyTo, isApplicable, inspectionHighlightType)
       }
-    )
+    )*/
 
   /*fun IdeMetaPlugin.addLocalInspection(
   ): ExtensionPhase =
