@@ -71,7 +71,7 @@
 
   .incubator-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     padding: ($base-point-grid * 3) 0;
 
     .incubator-text {
