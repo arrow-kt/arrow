@@ -3,11 +3,7 @@
 // -----------------------------------------------
 
 #site-main {
-  padding: ($base-point-grid * 5) 0;
-
-  .features {
-    margin-bottom: $base-point-grid * 11;
-  }
+  padding: 200px 0 0 0;
 
   .main-flex {
     display: flex;
@@ -70,88 +66,12 @@
         margin-bottom: $base-point-grid * 3;
         transition: opacity $base-duration ease, color $short-duration ease;
       }
-
-      .feature-button {
-        padding: 6px 21px;
-        display: inline-block;
-        font-weight: $font-semibold;
-        text-transform: uppercase;
-        color: var(--color-primary);
-        border: 2px solid var(--color-primary);
-        background: none;
-        letter-spacing: 1px;
-        line-height: 18px;
-        transition: background-color 250ms $base-timing, color $short-duration ease, border-color 250ms $base-timing;
-
-        &:visited {
-          color: var(--color-primary);
-        }
-
-        &:hover {
-          text-decoration: none;
-          color: $white;
-          border-style: none;
-        }
-
-        &:active {
-          color: $brand-secondary;
-          background: rgba(var(--color-primary), 0.9);
-        }
-      }
-
-      .core-button {
-        &:hover {
-          background-color: $core-color;
-          border: 2px solid $core-color;
-          box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        &:active {
-          background: rgba($core-color, 0.9);
-        }
-      }
-
-      .fx-button {
-        &:hover {
-          background-color: $fx-color;
-          border: 2px solid $fx-color;
-          box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        &:active {
-          background: rgba($fx-color, 0.9);
-        }
-      }
-
-      .optics-button {
-        &:hover {
-          background-color: $optics-color;
-          border: 2px solid $optics-color;
-          box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        &:active {
-          background: rgba($optics-color, 0.9);
-        }
-      }
-
-      .meta-button {
-        &:hover {
-          background-color: $meta-color;
-          border: 2px solid $meta-color;
-          box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        &:active {
-          background: rgba($meta-color, 0.9);
-        }
-      }
     }
   }
 
   .incubator-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: ($base-point-grid * 3) 0;
 
     .incubator-text {
@@ -221,7 +141,7 @@
 // -----------------------------------------------
 @include bp(medium) {
   #site-main {
-    padding: unset;
+    padding: 100px 0 0 0;
 
     .features {
       margin-bottom: 60px;

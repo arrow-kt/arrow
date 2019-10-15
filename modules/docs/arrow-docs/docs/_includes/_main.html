@@ -15,12 +15,12 @@
           <h2 id="{{ item.id }}-title">{{ item.title }}</h2>
           <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
-        <div id="{{ item.id }}-button" class="feature-button {{ item.id }}-button" title="{{ item.title }}">Learn more</div>
       </a>
       {% endif %}
       {% endfor %}
     </div>
   </div>
+  {% include _header.html %}
   <div class="wrapper">
     <div id="incubator" class="incubator-container feature">
       <div class="incubator-text">

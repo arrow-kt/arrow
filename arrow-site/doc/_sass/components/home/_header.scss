@@ -12,6 +12,7 @@
         align-items: center;
 
         .header-text {
+
             position: relative;
             width: 65%;
             margin-right: $base-point-grid * 10;
@@ -183,7 +184,6 @@
             flex-direction: column;
 
             .header-text {
-
                 width: $column-12;
                 margin-right: 0;
 
