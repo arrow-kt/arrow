@@ -3,17 +3,16 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
     compileOnly "com.intellij:openapi:7.0.3"
 
     testImplementation "io.kotlintest:kotlintest-runner-junit4:$kotlin_test_version"
-    testImplementation "org.assertj:assertj-core:$assertj_version"
     testImplementation project(":testing-plugin")
     testRuntimeOnly project(":compiler-plugin")
 
-    // TODO temporary configuration
-    // Remove when having an arrow-annotations release from testing-plugin
+    // TODO: waiting for an Arrow release in Maven Central
+    // testRuntimeOnly "io.arrow-kt:arrow-annotations:x.x.x"
     testRuntimeOnly "com.github.arrow-kt.arrow:arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"
 }
 
