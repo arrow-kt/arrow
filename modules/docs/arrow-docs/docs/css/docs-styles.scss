@@ -10,7 +10,6 @@
 // Vendors
 @import "vendors/highlight/color-brewer";
 
-
 // Base
 @import "base/reset";
 @import "base/base";
@@ -39,7 +38,5 @@
 @import "components/docs/navigation";
 @import "components/common/dropdown";
 @import "components/common/button";
-
-
 
 @include dropdown($dropdown-config...);
