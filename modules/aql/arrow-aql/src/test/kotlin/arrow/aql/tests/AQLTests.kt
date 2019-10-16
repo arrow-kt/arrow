@@ -18,11 +18,13 @@ import arrow.aql.extensions.list.where.whereSelection
 import arrow.aql.extensions.listk.select.select
 import arrow.aql.extensions.listk.select.selectAll
 import arrow.aql.extensions.listk.select.value
+import arrow.aql.extensions.list.min.value
 import arrow.aql.extensions.option.select.query
 import arrow.aql.extensions.option.select.select
 import arrow.aql.extensions.option.select.value
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.None
 import arrow.core.extensions.order
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
@@ -122,14 +124,26 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `max`" {
       listOf(john, jane, jack, chris).query {
-        selectAll() max { age.toLong() }
-      }.value() shouldBe 40L
+        selectAll().max(Long.order()) { age.toLong() }
+      }.value() shouldBe Some(40L)
+    }
+
+    "AQL `max` call in an empty List returns None" {
+      emptyList<Student>().query {
+        selectAll().max(Long.order()) { age.toLong() }
+      }.value() shouldBe None
     }
 
     "AQL is able to `min`" {
       listOf(john, jane, jack, chris).query {
-        selectAll() min { age.toLong() }
-      }.value() shouldBe 30L
+        selectAll().min(Long.order()) { age.toLong() }
+      }.value() shouldBe Some(30L)
+    }
+
+    "AQL `min` in an empty List returns None" {
+      emptyList<Student>().query {
+        selectAll().min(Long.order()) { age.toLong() }
+      }.value() shouldBe None
     }
   }
 }

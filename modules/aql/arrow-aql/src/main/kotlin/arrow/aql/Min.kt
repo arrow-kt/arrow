@@ -4,22 +4,27 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.identity
 import arrow.core.value
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.None
 import arrow.typeclasses.Foldable
-import kotlin.math.min
+import arrow.typeclasses.Order
 
 interface Min<F> {
 
   fun foldable(): Foldable<F>
 
-  infix fun <A, Z> Query<F, A, Z>.min(f: A.() -> Long): Query<ForId, Long, Long> =
-    foldable().run {
-      Query(
-        select = ::identity,
-        from = Id(from.foldLeft(Long.MAX_VALUE) { acc, a -> min(f(a), acc) })
-      )
-    }
+  fun <A, X, Z> Query<F, A, Z>.min(ord: Order<X>, f: A.() -> X): Query<ForId, Option<X>, Option<X>> =
+    Query(
+      select = ::identity,
+      from = Id(foldable().run {
+        from.foldLeft(None) { acc: Option<X>, a: A ->
+          acc.fold({ Some(f(a)) },
+            { Some(if (ord.run { it < (f(a)) }) it else f(a)) })
+        }
+      }))
 
-  fun Query<ForId, Long, Long>.value(): Long =
+  fun Query<ForId, Option<Long>, Option<Long>>.value(): Option<Long> =
     foldable().run {
       this@value.from.value()
     }
