@@ -13,14 +13,11 @@ fun assertThis(compilationData: CompilationData): Unit {
 
   val compilationResult = KotlinCompilation().apply {
     sources = listOf(SourceFile.kotlin(sourceFilename, compilationData.sourceCode))
-    //
-    // TODO: waiting for the arrow-annotations release which contains higherkind annotation
-    //    classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
-    //
-    classpaths = listOf(classpathOf("arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"))
+    classpaths = compilationData.dependencies.map { classpathOf(it) }
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
   }.compile()
 
+  assertThat(exitStatusFrom(compilationResult.exitCode)).isEqualTo(compilationData.compilationStatus)
   compilationData.checks.forEach {
     when (it) {
       is Check.CompilationError -> assertThat(compilationResult.messages).containsIgnoringCase(it.partialMessage)
@@ -28,14 +25,13 @@ fun assertThis(compilationData: CompilationData): Unit {
       is Check.GeneratedSourceCode -> {
         val actualGeneratedFileContent = getGeneratedFileContentFrom(compilationResult.outputDirectory, sourceFilename)
         val actualGeneratedFileContentWithoutCommands = removeCommands(actualGeneratedFileContent)
-        val generatedFileContentWithoutCommands = removeCommands(it.code)
+        val expectedGeneratedFileContentWithoutCommands = removeCommands(it.code)
 
-        assertThat(removeNewlines(actualGeneratedFileContentWithoutCommands)).
-          isEqualToIgnoringWhitespace(removeNewlines(generatedFileContentWithoutCommands))
+        assertThat(actualGeneratedFileContentWithoutCommands).
+          isEqualToIgnoringWhitespace(expectedGeneratedFileContentWithoutCommands)
       }
     }
   }
-  assertThat(exitStatusFrom(compilationResult.exitCode)).isEqualTo(compilationData.compilationStatus)
 }
 
 fun contentFromResource(fromClass: Class<Any>, resourceName: String): String =
@@ -63,10 +59,7 @@ private fun classpathOf(dependency: String): File {
 }
 
 private fun removeCommands(actualGeneratedFileContent: String): String =
-  actualGeneratedFileContent.lines().filter { !it.startsWith(META_PREFIX) }.joinToString()
-
-private fun removeNewlines(content: String): String =
-  content.replace("[,]+".toRegex(), "")
+  actualGeneratedFileContent.lines().filter { !it.trimStart().startsWith(META_PREFIX) }.joinToString(separator = "")
 
 private fun exitStatusFrom(exitCode: KotlinCompilation.ExitCode): CompilationStatus =
   when (exitCode) {

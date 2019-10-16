@@ -10,6 +10,11 @@ class CompilationTest {
   @Test
   fun `metadebug consideration works as expected`() {
     assertThis(CompilationData(
+      //
+      // TODO: waiting for the arrow-annotations release which contains higherkind annotation
+      //    classpaths = listOf(classpathOf("arrow-annotations:x.x.x"))
+      //
+      dependencies = listOf("arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"),
       sourceFilename = "Example.kt",
       sourceCode = contentFromResource(javaClass, "Example.kt.source"),
       checks = listOf(

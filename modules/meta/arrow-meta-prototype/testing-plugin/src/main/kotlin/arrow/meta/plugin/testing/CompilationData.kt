@@ -11,6 +11,7 @@ enum class CompilationStatus {
 }
 
 data class CompilationData(
+  val dependencies: List<String> = emptyList(),
   val sourceFilename: String,
   val sourceCode: String,
   val compilationStatus: CompilationStatus,
