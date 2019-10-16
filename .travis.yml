@@ -6,9 +6,8 @@ jdk:
 - oraclejdk8
 
 stages:
-- name: build
-- name: coverage-report
-  if: branch = master
+- name: unblock
+  if: type == pull_request
 - name: deploy
   if: branch = master AND type != pull_request
 
@@ -18,9 +17,9 @@ env:
 
 jobs:
   include:
-  - stage: build
-    script:
-    - ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+  - stage: unblock
+    script: echo "Unblock PR"
   - stage: deploy
     script:
+    - ./gradlew clean build
     - ./deploy-scripts/deploy.sh
