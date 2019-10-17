@@ -8,9 +8,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.startCoroutine
 
-private class UnsafeContinuation<A>(
+private class UnsafeContinuation<A> : Continuation<A> {
   val result: AtomicRef<A?> = atomic(null)
-) : Continuation<A> {
 
   override fun resume(value: A) {
     result.value = value
