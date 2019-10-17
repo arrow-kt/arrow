@@ -1,4 +1,4 @@
-package arrow.core.extensions
+package arrow.core.internal
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
@@ -23,8 +23,6 @@ class AtomicRefW<A>(a: A) {
 
   fun lazySet(a: A) = atomicRef.lazySet(a)
 
-  override fun hashCode(): Int = atomicRef.hashCode()
-  override fun equals(other: Any?): Boolean = atomicRef == other
   override fun toString(): String = atomicRef.toString()
 }
 
@@ -45,8 +43,6 @@ class AtomicBooleanW(a: Boolean) {
 
   fun lazySet(a: Boolean) = atomicRef.lazySet(a)
 
-  override fun hashCode(): Int = atomicRef.hashCode()
-  override fun equals(other: Any?): Boolean = atomicRef == other
   override fun toString(): String = atomicRef.toString()
 }
 
@@ -67,7 +63,5 @@ class AtomicIntW(a: Int) {
 
   fun lazySet(a: Int) = atomicRef.lazySet(a)
 
-  override fun hashCode(): Int = atomicRef.hashCode()
-  override fun equals(other: Any?): Boolean = atomicRef == other
   override fun toString(): String = atomicRef.toString()
 }

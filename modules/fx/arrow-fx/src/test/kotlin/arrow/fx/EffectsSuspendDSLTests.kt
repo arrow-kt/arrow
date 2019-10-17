@@ -3,7 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.extensions.AtomicIntW
+import arrow.core.internal.AtomicIntW
 import arrow.core.identity
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent

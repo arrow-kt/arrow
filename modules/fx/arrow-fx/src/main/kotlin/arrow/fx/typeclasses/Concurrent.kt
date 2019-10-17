@@ -7,7 +7,7 @@ import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.extensions.AtomicRefW
+import arrow.core.internal.AtomicRefW
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity

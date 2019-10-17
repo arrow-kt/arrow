@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.AtomicBooleanW
+import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO

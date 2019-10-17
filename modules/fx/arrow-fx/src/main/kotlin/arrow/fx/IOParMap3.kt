@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Tuple3
-import arrow.core.extensions.AtomicBooleanW
-import arrow.core.extensions.AtomicRefW
+import arrow.core.internal.AtomicBooleanW
+import arrow.core.internal.AtomicRefW
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.applicativeError.handleError
 import arrow.core.nonFatalOrThrow

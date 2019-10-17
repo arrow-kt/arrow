@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.extensions.AtomicIntW
+import arrow.core.internal.AtomicIntW
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError

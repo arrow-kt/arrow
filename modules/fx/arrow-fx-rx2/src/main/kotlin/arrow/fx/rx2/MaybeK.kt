@@ -6,7 +6,7 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.Right
-import arrow.core.extensions.AtomicRefW
+import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
 import arrow.fx.internal.Platform
