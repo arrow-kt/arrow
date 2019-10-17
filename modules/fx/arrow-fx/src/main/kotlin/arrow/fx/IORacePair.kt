@@ -3,7 +3,7 @@ package arrow.fx
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicBooleanW
 import arrow.fx.IO.Companion.defer
 import arrow.fx.IO.Companion.unit
 import arrow.fx.internal.IOFiber
@@ -51,7 +51,7 @@ interface IORacePair {
    */
   fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
     IO.Async { conn, cb ->
-      val active = Atomic(true)
+      val active = AtomicBooleanW(true)
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 

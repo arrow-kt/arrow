@@ -6,8 +6,7 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.Right
-import arrow.core.extensions.Atomic
-import arrow.core.extensions.option.foldable.fold
+import arrow.core.extensions.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
 import arrow.fx.internal.Platform
@@ -279,7 +278,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = Atomic<Either<Unit, CancelToken<ForMaybeK>>?>(null)
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForMaybeK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

@@ -7,7 +7,7 @@ import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicRefW
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
@@ -274,15 +274,15 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = Atomic<((Either<Throwable, Unit>) -> Unit)?>(null)
+      val state = AtomicRefW<((Either<Throwable, Unit>) -> Unit)?>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)
         } finally {
           if (!state.compareAndSet(null, mapUnit)) {
-            val cb2 = state.value
+            val cb2 = state.value!!
             state.lazySet(null)
-            cb2!!(rightUnit)
+            cb2(rightUnit)
           }
         }
       }

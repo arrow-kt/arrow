@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
@@ -130,7 +130,7 @@ object Platform {
   const val maxStackDepthSize = 127
 
   inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = Atomic(false)
+    val wasCalled = AtomicBooleanW(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
@@ -140,7 +140,7 @@ object Platform {
   }
 
   inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = Atomic(false)
+    val wasCalled = AtomicBooleanW(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {

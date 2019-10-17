@@ -3,7 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicIntW
 import arrow.core.identity
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -156,7 +156,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "bracketCase success" {
-      val msg = Atomic(0)
+      val msg = AtomicIntW(0)
       val const = 1
       fxTest {
         IO.fx {
@@ -171,7 +171,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     /** broken in master, release behavior is off */
     "bracketCase failure" {
-      val msg = Atomic(0)
+      val msg = AtomicIntW(0)
       val const = 1
       shouldThrow<TestError> {
         fxTest {

@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicIntW
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
@@ -105,7 +105,7 @@ object BracketLaws {
 
   fun <F> Bracket<F, Throwable>.bracketMustRunReleaseTask(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int(), Gen.int().applicativeError(this)) { i, fa ->
-      val msg = Atomic(0)
+      val msg: AtomicIntW = AtomicIntW(0)
       just(i).bracket<Int, Int>(
         release = { ii -> msg.value = ii; unit() },
         use = { throw Throwable("Expected failure!") }

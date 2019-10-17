@@ -5,7 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicBooleanW
 import arrow.core.invoke
 import arrow.fx.typeclasses.MonadDefer
 import kotlinx.atomicfu.AtomicRef
@@ -153,7 +153,7 @@ interface Ref<F, A> {
 
       override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD.later {
         val snapshot = ar.value
-        val hasBeenCalled = Atomic(false)
+        val hasBeenCalled = AtomicBooleanW(false)
         val setter = { a: A ->
           MD.later { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
         }

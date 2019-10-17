@@ -6,7 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
-import arrow.core.extensions.Atomic
+import arrow.core.extensions.AtomicRefW
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
@@ -284,7 +284,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
           just(just(Unit))
         }
 
-        val cancelOrToken = Atomic<Either<Unit, CancelToken<ForObservableK>>?>(null)
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForObservableK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({
