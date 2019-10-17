@@ -19,11 +19,12 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.core.combineK as setCombineK
+import kotlin.collections.plus as setPlus
 
 @extension
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
-    (this.plus(b)).k()
+    (this.setPlus(b)).k()
 }
 
 @extension

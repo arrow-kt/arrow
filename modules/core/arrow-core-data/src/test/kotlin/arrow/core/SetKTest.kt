@@ -7,6 +7,7 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
+import arrow.core.extensions.setk.monoid.monoid
 import arrow.core.extensions.setk.monoidK.monoidK
 import arrow.core.extensions.setk.monoidal.monoidal
 import arrow.core.extensions.setk.semigroupK.semigroupK
@@ -14,11 +15,13 @@ import arrow.core.extensions.setk.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.HashLaws
+import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 class SetKTest : UnitSpec() {
 
@@ -40,7 +43,8 @@ class SetKTest : UnitSpec() {
       MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any(), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
       FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
-      HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) }
+      HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) },
+      MonoidLaws.laws(SetK.monoid(), Gen.int().map { SetK.just(it) }, Eq.any())
     )
   }
 
