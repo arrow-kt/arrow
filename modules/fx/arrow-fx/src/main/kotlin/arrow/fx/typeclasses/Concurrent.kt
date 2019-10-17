@@ -7,6 +7,7 @@ import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.Atomic
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
@@ -31,7 +32,6 @@ import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
-import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
@@ -274,7 +274,7 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = atomic<((Either<Throwable, Unit>) -> Unit)?>(null)
+      val state = Atomic<((Either<Throwable, Unit>) -> Unit)?>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)

@@ -108,7 +108,7 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(atomic(a), MD)
+    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(a, MD)
 
     /**
      * Build a [RefFactory] value for creating Ref types [F] without deciding the type of the Ref's value.
@@ -122,7 +122,9 @@ interface Ref<F, A> {
     /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
      */
-    private class MonadDeferRef<F, A>(private val ar: AtomicRef<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
+    private class MonadDeferRef<F, A>(a: A, private val MD: MonadDefer<F>) : Ref<F, A> {
+
+      private val ar: AtomicRef<A> = atomic(a)
 
       override fun get(): Kind<F, A> = MD.later {
         ar.value

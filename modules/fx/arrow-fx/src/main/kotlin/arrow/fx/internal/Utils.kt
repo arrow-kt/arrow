@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.extensions.Atomic
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
@@ -11,7 +12,6 @@ import arrow.fx.IOOf
 import arrow.fx.KindConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
-import kotlinx.atomicfu.atomic
 import java.util.concurrent.Executor
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.CoroutineContext
@@ -130,7 +130,7 @@ object Platform {
   const val maxStackDepthSize = 127
 
   inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = atomic(false)
+    val wasCalled = Atomic(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
@@ -140,7 +140,7 @@ object Platform {
   }
 
   inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = atomic(false)
+    val wasCalled = Atomic(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
