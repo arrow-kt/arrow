@@ -20,7 +20,7 @@ interface Max<F> {
       from = Id(foldable().run {
         from.foldLeft(None) { acc: Option<X>, a: A ->
           acc.fold({ Some(f(a)) },
-            { Some(if (ord.run { it > (f(a)) }) it else f(a)) })
+            { Some(if (ord.run { it > f(a) }) it else f(a)) })
         }
       }))
 
