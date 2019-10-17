@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
+import arrow.core.extensions.Atomic
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
@@ -17,7 +18,6 @@ import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForFlowableK private constructor() {
@@ -252,7 +252,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = atomic<Either<Unit, CancelToken<ForFlowableK>>?>(null)
+        val cancelOrToken = Atomic<Either<Unit, CancelToken<ForFlowableK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

@@ -6,6 +6,7 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.Right
+import arrow.core.extensions.Atomic
 import arrow.core.extensions.option.foldable.fold
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
@@ -17,7 +18,6 @@ import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
-import kotlinx.atomicfu.atomic
 import kotlin.coroutines.CoroutineContext
 
 class ForMaybeK private constructor() {
@@ -279,7 +279,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = atomic<Either<Unit, CancelToken<ForMaybeK>>?>(null)
+        val cancelOrToken = Atomic<Either<Unit, CancelToken<ForMaybeK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({

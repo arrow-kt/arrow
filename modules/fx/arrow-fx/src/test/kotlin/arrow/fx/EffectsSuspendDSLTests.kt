@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.Atomic
 import arrow.core.identity
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -14,7 +15,6 @@ import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 
@@ -156,7 +156,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "bracketCase success" {
-      val msg = atomic(0)
+      val msg = Atomic(0)
       val const = 1
       fxTest {
         IO.fx {
@@ -171,7 +171,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     /** broken in master, release behavior is off */
     "bracketCase failure" {
-      val msg = atomic(0)
+      val msg = Atomic(0)
       val const = 1
       shouldThrow<TestError> {
         fxTest {

@@ -4,12 +4,12 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.NonFatal
+import arrow.core.extensions.Atomic
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
-import kotlinx.atomicfu.atomic
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import kotlin.coroutines.CoroutineContext
@@ -85,7 +85,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
    */
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     MonoK(Mono.create<B> { sink ->
-      val isCanceled = atomic(false)
+      val isCanceled = Atomic(false)
       sink.onCancel { isCanceled.value = true }
       val a: A? = mono.block()
       if (a != null) {
@@ -179,7 +179,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> async(fa: MonoKProc<A>): MonoK<A> =
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
-        val isCancelled = atomic(false) // Sink is missing isCancelled so we have to do book keeping.
+        val isCancelled = Atomic(false) // Sink is missing isCancelled so we have to do book keeping.
         conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
@@ -198,7 +198,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> asyncF(fa: MonoKProcF<A>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
-        val isCancelled = atomic(false) // Sink is missing isCancelled so we have to do book keeping.
+        val isCancelled = Atomic(false) // Sink is missing isCancelled so we have to do book keeping.
         conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
