@@ -13,8 +13,9 @@ val LOG = com.intellij.openapi.diagnostic.Logger.getInstance("#arrow.yourLogChan
 // LOG.error, LOG.warn, LOG.info, LOG.debug, LOG.trace are available 
 ```
 
-You can see the messages in IntelliJ's log file. The log file is available at `Help->Show Log in ...`. 
-debug and trace messages are not shown by default. To enable these, enter the full channel ID at 
+You can now see the messages in IntelliJ's log file. The log file is available at `Help->Show Log in ...`.
+ 
+`debug` and `trace` messages are not shown by default. To show them, enter the full channel ID at 
 `Help->Debug Log Settings`, for example
 ```
 #arrow.trace

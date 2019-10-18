@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-open class DiagnosticSuppressor : org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor {
+class DiagnosticSuppressor : org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor {
   override fun isSuppressed(diagnostic: Diagnostic): Boolean {
     LOG.debug("isSupressed: ${diagnostic.factory.name}: \n ${diagnostic.psiElement.text}")
     val result = diagnostic.suppressMetaDiagnostics()

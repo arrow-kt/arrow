@@ -27,12 +27,10 @@ class MetaPluginRegistrarComponent(val project: Project) : ProjectComponent {
   }
 
   override fun disposeComponent() {
-    // fixme: make sure that all registered components are disposed
+    // TODO: make sure that all registered components are disposed
   }
 
-  override fun projectClosed() {
-  }
+  override fun projectClosed() {}
 
-  override fun projectOpened() {
-  }
+  override fun projectOpened() {}
 }
