@@ -13,7 +13,6 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent
  *
  * fixme: Vfs events are application-wide, this component has project-scope
  *   Therefore vfs events of files in project A also clear the cache of project B
- * /
  */
 class FragmentProviderComponent(val project: Project) : ProjectComponent, AsyncFileListener, AsyncFileListener.ChangeApplier {
 

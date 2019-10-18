@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 open class DiagnosticSuppressor : org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor {
   override fun isSuppressed(diagnostic: Diagnostic): Boolean {
-    //println("isSupressed: ${diagnostic.factory.name}: \n ${diagnostic.psiElement.text}")
+    LOG.debug("isSupressed: ${diagnostic.factory.name}: \n ${diagnostic.psiElement.text}")
     val result = diagnostic.suppressMetaDiagnostics()
     diagnostic.logSuppression(result)
     return result
@@ -53,6 +53,6 @@ open class DiagnosticSuppressor : org.jetbrains.kotlin.resolve.diagnostics.Diagn
   }
 
   private fun Diagnostic.logSuppression(result: Boolean) {
-    println("Suppressing ${factory.name} on: `${psiElement.text}`: $result")
+    LOG.debug("Suppressing ${factory.name} on: `${psiElement.text}`: $result")
   }
 }

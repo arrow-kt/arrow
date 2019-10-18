@@ -17,14 +17,13 @@ class MetaPluginRegistrarComponent(val project: Project) : ProjectComponent {
   override fun getComponentName(): String = "arrow.meta.registrar"
 
   override fun initComponent() {
-    LOG.warn("initComponent()")
+    LOG.info("initComponent()")
 
     val start = System.currentTimeMillis()
-    // fixme use CompilerConfiguration.EMPTY ?
     val configuration = CompilerConfiguration()
     metaPlugin.registerMetaComponents(project, configuration)
 
-    LOG.warn("initComponent() took ${System.currentTimeMillis() - start}ms")
+    LOG.info("initComponent() took ${System.currentTimeMillis() - start}ms")
   }
 
   override fun disposeComponent() {
