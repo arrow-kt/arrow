@@ -3,10 +3,10 @@ package arrow.fx
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
@@ -14,7 +14,7 @@ interface IOParMap2 {
 
   fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> = IO.Async { conn, cb ->
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better preforming ParMap2)
-    val state = AtomicReference<Any?>(null)
+    val state = AtomicRefW<Any?>(null)
 
     val connA = IOConnection()
     val connB = IOConnection()

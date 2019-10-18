@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.internal.AtomicIntW
 import arrow.core.identity
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -16,7 +17,6 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
-import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
@@ -156,34 +156,34 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "bracketCase success" {
-      val msg: AtomicReference<Int> = AtomicReference(0)
+      val msg = AtomicIntW(0)
       val const = 1
       fxTest {
         IO.fx {
           !effect { const }.bracketCase(
-            release = { n, exit -> effect { msg.set(const) } },
+            release = { n, exit -> effect { msg.value = const } },
             use = { effect { it } }
           )
         }
       }
-      msg.get() shouldBe const
+      msg.value shouldBe const
     }
 
     /** broken in master, release behavior is off */
     "bracketCase failure" {
-      val msg: AtomicReference<Int> = AtomicReference(0)
+      val msg = AtomicIntW(0)
       val const = 1
       shouldThrow<TestError> {
         fxTest {
           IO.fx {
             !effect { const }.bracketCase(
-              release = { n, exit -> effect { msg.set(const) } },
+              release = { n, exit -> effect { msg.value = const } },
               use = { effect { throw TestError } }
             )
           }
         }
       }
-      msg.get() shouldBe const
+      msg.value shouldBe const
     }
 
     "fork" {
