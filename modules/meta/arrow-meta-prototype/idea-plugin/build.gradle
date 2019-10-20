@@ -26,6 +26,8 @@ jar {
     }
 }
 
+buildSearchableOptions.enabled = false
+
 intellij {
     version = "2019.2.1"
     pluginName = "Arrow plugin"
@@ -36,4 +38,8 @@ patchPluginXml {
     changeNotes """
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
+}
+
+runIde {
+    jvmArgs '-Xmx2G'
 }

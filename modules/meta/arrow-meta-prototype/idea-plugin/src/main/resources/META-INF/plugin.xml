@@ -18,11 +18,20 @@
     <depends>org.jetbrains.plugins.gradle</depends>
     <depends>org.jetbrains.kotlin</depends>
 
+    <project-components>
+        <component>
+            <implementation-class>arrow.meta.plugin.idea.MetaPluginRegistrarComponent</implementation-class>
+        </component>
+        <component>
+            <implementation-class>arrow.meta.plugin.idea.phases.resolve.FragmentProviderComponent</implementation-class>
+        </component>
+    </project-components>
+
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.gradle.ArrowGradleImportHandler"/>
         <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.phases.resolve.MetaSyntheticPackageFragmentProvider" />
 <!--        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.phases.resolve.MetaSyntheticPackageFragmentProvider" />-->
-        <diagnosticSuppressor implementation="arrow.meta.plugin.idea.phases.resolve.MetaSyntheticPackageFragmentProvider" />
+        <diagnosticSuppressor implementation="arrow.meta.plugin.idea.phases.resolve.DiagnosticSuppressor" />
     </extensions>
 
 </idea-plugin>

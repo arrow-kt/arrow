@@ -1,28 +1,21 @@
 package arrow.meta.plugin.idea.phases.resolve
 
-import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.phases.config.buildFolders
-import arrow.meta.plugin.idea.phases.config.currentProject
-import arrow.meta.plugins.higherkind.KindAwareTypeChecker
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktClassOrObject
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.PsiManagerImpl
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
-import org.jetbrains.kotlin.cfg.ClassMissingCase
-import org.jetbrains.kotlin.cfg.WhenMissingCase
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.daemon.common.findWithTransform
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
@@ -36,13 +29,8 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
-import org.jetbrains.kotlin.diagnostics.Diagnostic
-import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
-import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters2
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeAndGetResult
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -65,14 +53,12 @@ import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtPureClassOrObject
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.KtSuperTypeListEntry
-import org.jetbrains.kotlin.psi.KtWhenExpression
 import org.jetbrains.kotlin.psi.stubs.elements.KtFileStubBuilder
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
@@ -86,95 +72,42 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.isError
 import org.jetbrains.kotlin.utils.Printer
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.io.File
 import java.util.ArrayList
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
-private val metaPlugin = IdeMetaPlugin()
-
-private val registered = AtomicBoolean(false)
-
-private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
-
-class MetaSyntheticPackageFragmentProvider :
+class MetaSyntheticPackageFragmentProvider(val project: Project) :
   PackageFragmentProviderExtension,
   SyntheticResolveExtension,
-  AsyncFileListener,
-  AsyncFileListener.ChangeApplier,
-  DiagnosticSuppressor,
   Disposable {
 
-  private val fileListenerInitialized: AtomicBoolean = AtomicBoolean(false)
+  companion object {
+    fun getInstance(project: Project): MetaSyntheticPackageFragmentProvider {
+      val first = PackageFragmentProviderExtension.getInstances(project)
+        .filterIsInstance<MetaSyntheticPackageFragmentProvider>()
+        .firstOrNull()
+      return first ?: throw IllegalStateException("fragment provider must not be null")
+    }
 
-  @Synchronized
-  private fun Project.registerIdeStack(postInitialize: () -> Unit) {
-    if (!registered.getAndSet(true)) {
-      val project = currentProject()
-      if (project != null) {
-        val configuration = CompilerConfiguration()
-        metaPlugin.registerMetaComponents(this, configuration)
-        println("registerIdeProjectComponents DONE")
-        postInitialize()
-      } else {
-        registered.set(false)
+    fun measureTimeMillis(block: () -> Unit): Long {
+      val start = System.currentTimeMillis()
+      try {
+        block()
+      } finally {
+        return System.currentTimeMillis() - start
       }
     }
   }
 
-  override fun isSuppressed(diagnostic: Diagnostic): Boolean {
-    //println("isSupressed: ${diagnostic.factory.name}: \n ${diagnostic.psiElement.text}")
-    val result = diagnostic.suppressMetaDiagnostics()
-    diagnostic.logSuppression(result)
-    return result
-  }
-
-  private fun Diagnostic.suppressMetaDiagnostics(): Boolean =
-    suppressInvisibleMember() ||
-      suppressNoElseInWhen() ||
-      kindsTypeMismatch() ||
-      suppressUnusedParameter()
-
-  private fun Diagnostic.suppressInvisibleMember(): Boolean =
-    factory == Errors.INVISIBLE_MEMBER
-
-  private fun Diagnostic.kindsTypeMismatch(): Boolean =
-    factory == Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH && safeAs<DiagnosticWithParameters2<KtElement, KotlinType, KotlinType>>()?.let { diagnosticWithParameters ->
-      val a = diagnosticWithParameters.a
-      val b = diagnosticWithParameters.b
-      KotlinTypeChecker.DEFAULT.isSubtypeOf(a, b) //if this is the kind type checker then it will do the right thing otherwise this proceeds as usual with the regular type checker
-    } == true
-
-  private fun Diagnostic.suppressUnusedParameter(): Boolean =
-    factory == Errors.UNUSED_PARAMETER && safeAs<DiagnosticWithParameters1<KtParameter, VariableDescriptor>>()?.let { diagnosticWithParameters ->
-      diagnosticWithParameters.psiElement.defaultValue?.text == "given" //TODO move to typeclasses plugin
-    } == true
-
-  private fun Diagnostic.suppressNoElseInWhen(): Boolean {
-    val result = factory == Errors.NO_ELSE_IN_WHEN && safeAs<DiagnosticWithParameters1<KtWhenExpression, List<WhenMissingCase>>>()?.let { diagnosticWithParameters ->
-      val declaredCases = diagnosticWithParameters.psiElement.entries.flatMap { it.conditions.map { it.text } }.toSet()
-      val missingCases = diagnosticWithParameters.a.filterIsInstance<ClassMissingCase>().map { it.toString() }.toSet()
-      declaredCases.containsAll(missingCases)
-    } ?: false
-    return result
-  }
-
-  private fun Diagnostic.logSuppression(result: Boolean): Unit {
-    println("Suppressing ${factory.name} on: `${psiElement.text}`: $result")
-  }
-
-  @Synchronized
-  private fun initializeFileListener(project: Project) {
-    if (!fileListenerInitialized.getAndSet(true)) {
-      val virtualFileManager = project.getComponent(VirtualFileManager::class.java)
-      virtualFileManager.addAsyncFileListener(this, this)
-    }
-  }
+  /**
+   * For now, there's one cache per project. For example, refreshing the cache when a project
+   * is opened must not clear the data of another project.
+   */
+  private val descriptorCache: ConcurrentHashMap<FqName, List<DeclarationDescriptor>> = ConcurrentHashMap()
 
   override fun getPackageFragmentProvider(
     project: Project,
@@ -184,13 +117,6 @@ class MetaSyntheticPackageFragmentProvider :
     moduleInfo: ModuleInfo?,
     lookupTracker: LookupTracker
   ): PackageFragmentProvider? {
-    project.registerIdeStack {
-      initializeFileListener(project)
-      computeCache(project)
-    }
-//    println("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n ${descriptorCache.toList().joinToString {
-//      "${it.first} : ${it.second.size}"
-//    }}")
     return DescriptorCachePackageFragmentProvider(module)
   }
 
@@ -205,7 +131,6 @@ class MetaSyntheticPackageFragmentProvider :
   }
 
   inner class BuildCachePackageFragmentDescriptor(module: ModuleDescriptor, fqName: FqName) : PackageFragmentDescriptorImpl(module, fqName) {
-
     override fun getMemberScope(): MemberScope = scope
 
     private val scope = Scope()
@@ -238,34 +163,41 @@ class MetaSyntheticPackageFragmentProvider :
   }
 
   override fun dispose() {
-    println("MetaSyntheticPackageFragmentProvider.dispose")
+    LOG.info("MetaSyntheticPackageFragmentProvider.dispose")
     descriptorCache.clear()
   }
 
-  override fun beforeVfsChange() {
-    println("MetaSyntheticPackageFragmentProvider.beforeVfsChange")
-  }
-
-  override fun afterVfsChange() {
-    println("MetaSyntheticPackageFragmentProvider.afterVfsChange")
-    currentProject()?.let { computeCache(it) }
-  }
-
-  override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
-    return this
+  /**
+   * Triggers a cache refresh. It's called in a background thread
+   * and only when indexing is not in progress.
+   * If indexing is in progress when this is called, then the refresh will be
+   * delayed until indexing finished.
+   */
+  internal fun computeCacheAsync() {
+    ApplicationManager.getApplication().executeOnPooledThread {
+      DumbService.getInstance(project).runReadActionInSmartMode {
+        computeCache()
+      }
+    }
   }
 
   @Synchronized
-  private fun computeCache(project: Project): Unit {
-    try {
-      println("initializing new PackageFragmentProvider")
+  private fun computeCache() {
+    assert(ApplicationManager.getApplication().isReadAccessAllowed)
+
+    measureTimeMillis {
+      LOG.debug("initializing new PackageFragmentProvider")
       descriptorCache.clear()
+
       val localFileSystem = LocalFileSystem.getInstance()
       val psiManager = project.getComponent(PsiManager::class.java)
       val buildFolders = project.buildFolders()
-      val cacheService = KotlinCacheService.getInstance(project)
       val classFiles = buildFolders.packagedClasses(localFileSystem, psiManager)
+
+      LOG.debug("build folders: $buildFolders")
+
       if (classFiles.isNotEmpty()) {
+        val cacheService = KotlinCacheService.getInstance(project)
         val resolutionFacade = cacheService.getResolutionFacade(classFiles.map { it.second })
         val resolvedDeclarations = classFiles.resolveClassesDeclarations(resolutionFacade)
         resolvedDeclarations.forEach { (packageName, declarations) ->
@@ -278,18 +210,22 @@ class MetaSyntheticPackageFragmentProvider :
               try {
                 if (synthDescriptor is LazyEntity) synthDescriptor.forceResolveAllContents()
               } catch (e: IndexNotReadyException) {
-                println("Index wasn't ready to resolve: ${synthDescriptor.name}")
+                LOG.warn("Index wasn't ready to resolve: ${synthDescriptor.name}")
               }
             }
             descriptorCache[packageName] = synthDescriptors
           }
         }
       }
-      println("build folders: $buildFolders")
-    } catch (e: Throwable) {
-      e.printStackTrace()
+
+      if (LOG.isDebugEnabled) {
+        LOG.debug("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n ${descriptorCache.toList().joinToString {
+          "${it.first} : ${it.second.size}"
+        }}")
+      }
+    }.let {
+      LOG.info("computeCache() took $it ms")
     }
-    println("cache is: ${descriptorCache.keys().toList()}")
   }
 
   private fun List<LazyClassDescriptor>.toSynthetic(declarationProvider: DeclarationProvider): List<ClassDescriptor> =
@@ -362,7 +298,7 @@ class MetaSyntheticPackageFragmentProvider :
     flatMap { (packageName, file) ->
       file.analyzeAndGetResult().let {
         it.bindingContext.diagnostics.all().forEach { diagnostic ->
-          println("$file : $diagnostic")
+          LOG.debug("$file : $diagnostic")
         }
       }
       listOf(packageName to file.declarations.resolveDeclarations(resolutionFacade))
@@ -401,7 +337,7 @@ class MetaSyntheticPackageFragmentProvider :
     if (!thisDescriptor.isMetaSynthetic()) {
       result.replaceWithSynthetics(thisDescriptor.fqName, declarationProvider)
       descriptorCache[thisDescriptor.fqName]?.filterIsInstance<LazyClassDescriptor>()?.filter { !it.isMetaSynthetic() }?.let {
-        println("generatePackageSyntheticClasses: ${thisDescriptor.fqName}: $it, $name, result: $result")
+        LOG.debug("generatePackageSyntheticClasses: ${thisDescriptor.fqName}: $it, $name, result: $result")
         result.addAll(it.toSynthetic(declarationProvider))
       }
     }
@@ -440,7 +376,7 @@ class MetaSyntheticPackageFragmentProvider :
         result.replaceWithSynthetics(packageName, declarationProvider)
         descriptorCache[packageName]?.filterIsInstance<LazyClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val synthNestedClasses = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filter { it.isMetaSynthetic() }.filterIsInstance<LazyClassDescriptor>()
-          println("generateNestedSyntheticClasses: ${thisDescriptor.name}: $synthNestedClasses")
+          LOG.debug("generateNestedSyntheticClasses: ${thisDescriptor.name}: $synthNestedClasses")
           result.addAll(synthNestedClasses.toSynthetic(declarationProvider))
         }
       }
@@ -453,7 +389,7 @@ class MetaSyntheticPackageFragmentProvider :
         //result.replaceWithSynthetics(packageName)
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val synthMemberFunctions = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filter { it.isMetaSynthetic() }.filterIsInstance<SimpleFunctionDescriptor>()
-          println("generateSyntheticMethods: ${thisDescriptor.name}: $synthMemberFunctions")
+          LOG.debug("generateSyntheticMethods: ${thisDescriptor.name}: $synthMemberFunctions")
           result.addAll(synthMemberFunctions.toSynthetic())
         }
       }
@@ -465,7 +401,7 @@ class MetaSyntheticPackageFragmentProvider :
       thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.containingKtFile?.packageFqName?.let { packageName ->
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val syntMemberProperties = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filter { it.isMetaSynthetic() }.filterIsInstance<PropertyDescriptor>()
-          println("generateSyntheticProperties: ${thisDescriptor.name}: $syntMemberProperties")
+          LOG.debug("generateSyntheticProperties: ${thisDescriptor.name}: $syntMemberProperties")
           result.addAll(syntMemberProperties)
         }
       }
@@ -477,7 +413,7 @@ class MetaSyntheticPackageFragmentProvider :
       thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.containingKtFile?.packageFqName?.let { packageName ->
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val synthSecConstructors = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<ClassConstructorDescriptor>().filter { !it.isPrimary && it.isMetaSynthetic() }
-          println("generateSyntheticSecondaryConstructors: ${thisDescriptor.name}: $synthSecConstructors")
+          LOG.debug("generateSyntheticSecondaryConstructors: ${thisDescriptor.name}: $synthSecConstructors")
           result.addAll(synthSecConstructors)
         }
       }
@@ -489,7 +425,7 @@ class MetaSyntheticPackageFragmentProvider :
       thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.containingKtFile?.packageFqName?.let { packageName ->
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val name = classDescriptor.companionObjectDescriptor?.name
-          println("getSyntheticCompanionObjectNameIfNeeded: ${thisDescriptor.name}: $name")
+          LOG.debug("getSyntheticCompanionObjectNameIfNeeded: ${thisDescriptor.name}: $name")
           name
         }
       }
@@ -500,7 +436,7 @@ class MetaSyntheticPackageFragmentProvider :
       thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.containingKtFile?.packageFqName?.let { packageName ->
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val synthFunctionNames = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>().filter { it.isMetaSynthetic() }.map { it.name }
-          println("getSyntheticFunctionNames: ${thisDescriptor.name}: $synthFunctionNames")
+          LOG.debug("getSyntheticFunctionNames: ${thisDescriptor.name}: $synthFunctionNames")
           synthFunctionNames
         }
       } ?: emptyList()
@@ -512,7 +448,7 @@ class MetaSyntheticPackageFragmentProvider :
       thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.containingKtFile?.packageFqName?.let { packageName ->
         descriptorCache[packageName]?.filterIsInstance<ClassDescriptor>()?.find { it.fqNameSafe == thisDescriptor.fqNameSafe }?.let { classDescriptor ->
           val synthClassNames = classDescriptor.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<ClassDescriptor>().filter { it.isMetaSynthetic() }.map { it.name }
-          println("getSyntheticFunctionNames: ${thisDescriptor.name}: $synthClassNames")
+          LOG.debug("getSyntheticFunctionNames: ${thisDescriptor.name}: $synthClassNames")
           synthClassNames
         }
       } ?: emptyList()
@@ -527,7 +463,7 @@ class MetaSyntheticPackageFragmentProvider :
           }?.typeConstructor?.supertypes?.let { collection ->
             //supertypes.clear()
             val result = collection.filterNot { it.isError }
-            println("Found synth supertypes: $result")
+            LOG.debug("Found synth supertypes: $result")
             supertypes.addAll(result)
           }
         }
