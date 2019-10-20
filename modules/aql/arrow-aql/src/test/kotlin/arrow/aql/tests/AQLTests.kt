@@ -124,8 +124,14 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `max`" {
       listOf(john, jane, jack, chris).query {
-        selectAll().max(Long.order()) { age.toLong() }
-      }.value() shouldBe Some(40L)
+        selectAll().max(Int.order()) { age }
+      }.value() shouldBe Some(chris)
+    }
+
+    "AQL is able to `max` and return the select type" {
+      listOf(john, jane, jack, chris).query {
+        select { this.age }.max(Int.order()) { age }
+      }.value() shouldBe Some(40)
     }
 
     "AQL `max` call in an empty List returns None" {
@@ -137,7 +143,13 @@ class AQLTests : UnitSpec() {
     "AQL is able to `min`" {
       listOf(john, jane, jack, chris).query {
         selectAll().min(Long.order()) { age.toLong() }
-      }.value() shouldBe Some(30L)
+      }.value() shouldBe Some(john)
+    }
+
+    "AQL is able to `min` and return the select type" {
+      listOf(john, jane, jack, chris).query {
+        select { this.age }.min(Int.order()) { age }
+      }.value() shouldBe Some(30)
     }
 
     "AQL `min` in an empty List returns None" {

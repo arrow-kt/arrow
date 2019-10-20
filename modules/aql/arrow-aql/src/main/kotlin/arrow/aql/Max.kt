@@ -14,17 +14,17 @@ interface Max<F> {
 
   fun foldable(): Foldable<F>
 
-  fun <A, Y, Z> Query<F, A, Y>.max(ord: Order<Z>, f: A.() -> Z): Query<ForId, Option<Z>, Option<Z>> =
+  fun <A, Y, Z> Query<F, A, Y>.max(ord: Order<Z>, f: A.() -> Z): Query<ForId, Option<Y>, Option<Y>> =
     Query(
       select = ::identity,
       from = Id(foldable().run {
-        from.foldLeft(None) { acc: Option<Z>, a: A ->
-          acc.fold({ Some(f(a)) },
-            { Some(if (ord.run { it > f(a) }) it else f(a)) })
-        }
+        from.foldLeft(None) { acc: Option<A>, a: A ->
+          acc.fold({ Some(a) },
+            { Some(if (ord.run { f(it) > f(a) }) it else a) })
+        }.map(select)
       }))
 
-  fun <Z> Query<ForId, Option<Z>, Option<Z>>.value(): Option<Z> =
+  fun <A, Y> Query<ForId, Option<Y>, Option<Y>>.value(): Option<Y> =
     foldable().run {
       this@value.from.value()
     }
