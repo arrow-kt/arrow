@@ -24,8 +24,5 @@ interface Min<F> {
         }.map(select)
       }))
 
-  fun <Y> Query<ForId, Option<Y>, Option<Y>>.value(): Option<Y> =
-    foldable().run {
-      this@value.from.value()
-    }
+  fun <Y> Query<ForId, Option<Y>, Option<Y>>.value(): Option<Y> = this@value.from.value()
 }
