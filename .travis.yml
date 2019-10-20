@@ -6,8 +6,6 @@ jdk:
 - oraclejdk8
 
 stages:
-- name: unblock
-  if: type == pull_request
 - name: deploy
   if: branch = master AND type != pull_request
 
@@ -17,8 +15,6 @@ env:
 
 jobs:
   include:
-  - stage: unblock
-    script: echo "Unblock PR"
   - stage: deploy
     script:
     - ./gradlew clean build
