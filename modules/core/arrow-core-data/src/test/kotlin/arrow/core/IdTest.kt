@@ -19,7 +19,6 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -33,7 +32,6 @@ class IdTest : UnitSpec() {
 
   init {
     testLaws(
-      SemigroupLaws.laws(Id.semigroup(Int.semigroup()), Id(1), Id(2), Id(3), Id.eq(Int.eq())),
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
