@@ -1,13 +1,16 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import arrow.fx.internal.CancelablePromise
 import arrow.fx.internal.UncancelablePromise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Concurrent
+import arrow.core.Tuple2
+import arrow.core.Option
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.toT
+import arrow.core.getOrElse
 
 /**
  * When made, a [Promise] is empty. Until it is fulfilled, which can only happen once.
@@ -267,6 +270,36 @@ interface Promise<F, A> {
      * ```
      */
     fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS)
+
+    /**
+     * Acquires a resource and performs a state change atomically, and then
+     * guarantees that if the resource is acquired (and the state changed), a
+     * release action will be called.
+     *
+     * TODO: code sample
+     */
+    fun <F, A, B, C> bracket(
+      ref: Ref<F, A>,
+      use: (Promise<F, B>, A) -> Tuple2<Kind<F, C>, A>,
+      release: (C, Promise<F, B>) -> Kind<F, Unit>,
+      CF: Concurrent<F>
+    ): Kind<F, B> = CF.run {
+      fx.concurrent {
+        val releaseRef = !Ref<Option<Tuple2<C, Promise<F, B>>>>(None)
+        !fx.concurrent {
+
+          // creates a new promise for `use` and returns
+          val (fc, pb) = !ref.modify { a ->
+            val pb = unsafeCancelable<F, B>(this)
+            val (fc, a2) = use(pb, a)
+            a2 toT (fc toT pb)
+          }
+          val c = !fc
+          !(releaseRef.set(Some(c toT pb)).followedBy(just(pb))).uncancelable()
+          !pb.get()
+        }.guarantee(releaseRef.get().flatMap { it.map { (c, fb) -> release(c, fb) }.getOrElse { just(Unit) } })
+      }
+    }
   }
 
   object AlreadyFulfilled : Throwable(message = "Promise was already fulfilled")
