@@ -3,13 +3,10 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.identity
 import arrow.documented
 import arrow.fx.extensions.io.async.async
 import arrow.fx.internal.asyncContinuation
-import arrow.fx.internal.asyncControlledContinuation
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadErrorFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -83,7 +80,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> later({ fa(cb) }) }
+    asyncF { cb -> later { fa(cb) } }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -224,8 +221,6 @@ interface Async<F, E> : MonadDefer<F, E> {
   /**
    * Delay a computation on provided [CoroutineContext].
    *
-   * For a more grained control over the possible errors emitted, use [defer] with error handler.
-   *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    * ```kotlin:ank:playground:extension
@@ -244,9 +239,6 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    defer(ctx, f)
-
-  fun <A> defer(ctx: CoroutineContext, fe: (Throwable) -> E, f: () -> Kind<F, A>): Kind<F, A> =
     just(Unit).continueOn(ctx).flatMap { defer(f) }
 
   /**
@@ -255,8 +247,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    */
-  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<E, A>): Kind<F, A> =
-    defer(ctx) { f().fold({ raiseError<A>(it) }, { just(it) }) }
+  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
+    defer(ctx) { f().fold({ handleError<A>(it) }, { just(it) }) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -308,7 +300,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    later(this, throwPolicy) { Unit }
+    later(this) { Unit }
 
   /**
    * Task that never finishes evaluating.
@@ -333,16 +325,13 @@ internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
-interface AsyncFx<F, E> : MonadErrorFx<F, E> {
+interface AsyncFx<F, E> : MonadDeferFx<F, E> {
   val async: Async<F, E>
-  override val ME: MonadError<F, E> get() = async
-  fun <A> async(c: suspend AsyncSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
-    val continuation = AsyncContinuation<F, A, E>(async, fe)
+  override val ME: MonadDefer<F, E> get() = async
+  fun <A> async(c: suspend AsyncSyntax<F, E>.() -> A): Kind<F, A> {
+    val continuation = AsyncContinuation<F, A, E>(async)
     val wrapReturn: suspend AsyncSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
 }
-
-fun <F, A> Async<F, Throwable>.async(fa: Proc<A>): Kind<F, A> =
-  async(fa)

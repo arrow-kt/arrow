@@ -2,6 +2,7 @@
 
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
@@ -10,18 +11,21 @@ import arrow.fx.handleErrorWith as handleErrorW
 
 typealias IOConnection = KindConnection<IOPartialOf<Throwable>>
 
-fun <E> IOConnection<E>.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
+fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
-fun <E> IOConnection(dummy: Unit = Unit): IOConnection<E> = KindConnection(MD()) { it.fix().unsafeRunAsync { } }
+fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD()) { it.fix().unsafeRunAsync { } }
 
-private val _uncancelable: IOConnection<Any?> = KindConnection.uncancelable(MD())
-internal inline val KindConnection.Companion.uncancelable: IOConnection<Any?>
+private val _uncancelable: IOConnection = KindConnection.uncancelable(MD())
+internal inline val KindConnection.Companion.uncancelable: IOConnection
   inline get() = _uncancelable
 
 private fun <E> MD() = object : MonadDefer<IOPartialOf<E>, E> {
-  override fun <A> defer(fe: (Throwable) -> E, fa: () -> IOOf<E, A>): IO<E, A> =
-    IO.defer(fe, fa)
+  override fun <A> handleError(t: Throwable): Kind<IOPartialOf<E>, A> =
+    IO.handleError(t)
+
+  override fun <A> defer(fa: () -> IOOf<E, A>): IO<E, A> =
+    IO.defer(fa)
 
   override fun <A> raiseError(e: E): IO<E, A> =
     IO.raiseError(e)

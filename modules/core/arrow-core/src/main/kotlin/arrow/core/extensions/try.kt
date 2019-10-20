@@ -13,7 +13,23 @@ import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonadThrowFx
+import arrow.typeclasses.MonadThrowSyntax
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
@@ -51,9 +67,6 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
 
 @extension
 interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
-  override val fx: MonadErrorFx<ForTry, Throwable>
-    get() = TryFxMonadThrow
-
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 

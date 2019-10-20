@@ -11,24 +11,25 @@ import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForTake
-import arrow.fx.typeclasses.*
+import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import arrow.fx.typeclasses.rightUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F, Throwable>) : MVar<F, A>, Concurrent<F, Throwable> by CF {
+internal class CancelableMVar<F, E, A> private constructor(initial: State<A>, private val CF: Concurrent<F, E>) : MVar<F, A>, Concurrent<F, E> by CF {
 
   private val state = AtomicReference(initial)
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> = CF.later {
+    operator fun <F, E, A> invoke(initial: A, CF: Concurrent<F, E>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State(initial), CF)
     }
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> = CF.later {
+    fun <F, E, A> empty(CF: Concurrent<F, E>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State.empty<A>(), CF)
     }
 
@@ -65,7 +66,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   override fun tryPut(a: A): Kind<F, Boolean> =
-    defer(throwPolicy) { unsafeTryPut(a) }
+    defer { unsafeTryPut(a) }
 
   override fun take(): Kind<F, A> =
     tryTake().flatMap {
@@ -73,7 +74,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   override fun tryTake(): Kind<F, Option<A>> =
-    defer(throwPolicy) { unsafeTryTake() }
+    defer { unsafeTryTake() }
 
   override fun read(): Kind<F, A> =
     cancelable(::unsafeRead)

@@ -7,21 +7,15 @@ import arrow.core.Right
 import arrow.core.identity
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
-import arrow.fx.typeclasses.throwPolicy
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-internal fun <F> Concurrent<F, Throwable>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
+internal fun <F, E> Concurrent<F, E>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
   val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
   later { cancelRef.cancel(false); Unit }
-}
-
-internal fun <F, E> Concurrent<F, E>.ConcurrentSleep(duration: Duration, fe: (Throwable) -> E): Kind<F, Unit> = cancelable { cb ->
-  val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb, fe), duration.amount, duration.timeUnit)
-  later() { cancelRef.cancel(false); Unit }
 }
 
 /**

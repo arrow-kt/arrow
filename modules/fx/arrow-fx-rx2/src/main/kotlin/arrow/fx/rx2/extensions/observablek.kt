@@ -32,7 +32,7 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
-import arrow.fx.typeclasses.ProcE
+import arrow.fx.typeclasses.Proc
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -138,13 +138,13 @@ interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMo
 
 @extension
 interface ObservableKMonadDefer : MonadDefer<ForObservableK, Throwable>, ObservableKBracket {
-  override fun <A> defer(fe: (Throwable) -> Throwable, fa: () -> ObservableKOf<A>): ObservableK<A> =
+  override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
 interface ObservableKAsync : Async<ForObservableK, Throwable>, ObservableKMonadDefer {
-  override fun <A> async(fa: ProcE<Throwable, A>): Kind<ForObservableK, A> =
+  override fun <A> async(fa: Proc<A>): Kind<ForObservableK, A> =
     ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =

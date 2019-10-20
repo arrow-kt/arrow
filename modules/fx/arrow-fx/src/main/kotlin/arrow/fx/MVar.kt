@@ -217,7 +217,7 @@ interface MVar<F, A> {
      * }
      * ```
      */
-    fun <F, A> empty(CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> =
+    fun <F, E, A> empty(CF: Concurrent<F, E>): Kind<F, MVar<F, A>> =
       CancelableMVar.empty(CF)
 
     /**
@@ -234,7 +234,7 @@ interface MVar<F, A> {
      * }
      * ```
      */
-    fun <F, A> cancelable(initial: A, CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> =
+    fun <F, E, A> cancelable(initial: A, CF: Concurrent<F, E>): Kind<F, MVar<F, A>> =
       CancelableMVar(initial, CF)
 
     /**
@@ -251,7 +251,7 @@ interface MVar<F, A> {
      * }
      * ```
      */
-    operator fun <F, A> invoke(initial: A, CF: Concurrent<F, Throwable>): Kind<F, MVar<F, A>> =
+    operator fun <F, E, A> invoke(initial: A, CF: Concurrent<F, E>): Kind<F, MVar<F, A>> =
       CancelableMVar(initial, CF)
 
     /**
@@ -268,7 +268,7 @@ interface MVar<F, A> {
      * }
      * ```
      */
-    fun <F, A> uncancelableEmpty(AS: Async<F, Throwable>): Kind<F, MVar<F, A>> =
+    fun <F, E, A> uncancelableEmpty(AS: Async<F, E>): Kind<F, MVar<F, A>> =
       UncancelableMVar.empty(AS)
 
     /**
@@ -285,10 +285,10 @@ interface MVar<F, A> {
      * }
      * ```
      */
-    fun <F, A> uncancelableOf(initial: A, AS: Async<F, Throwable>): Kind<F, MVar<F, A>> =
+    fun <F, E, A> uncancelableOf(initial: A, AS: Async<F, E>): Kind<F, MVar<F, A>> =
       UncancelableMVar(initial, AS)
 
-    fun <F> factoryUncancelable(AS: Async<F, Throwable>) = object : MVarFactory<F> {
+    fun <F, E> factoryUncancelable(AS: Async<F, E>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         UncancelableMVar(a, AS)
@@ -297,7 +297,7 @@ interface MVar<F, A> {
         UncancelableMVar.empty(AS)
     }
 
-    fun <F> factoryCancelable(CF: Concurrent<F, Throwable>) = object : MVarFactory<F> {
+    fun <F, E> factoryCancelable(CF: Concurrent<F, E>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         CancelableMVar(a, CF)

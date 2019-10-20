@@ -4,7 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.fx.Ref
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import kotlin.coroutines.startCoroutine
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.MonadDefer)
@@ -42,4 +45,20 @@ interface MonadDefer<F, E> : MonadError<F, E>, Bracket<F, E> {
    * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
    */
   fun <A> ref(f: () -> A): Kind<F, Ref<F, A>> = Ref(this, f)
+
+  override val fx: MonadDeferFx<F, E>
+    get() = object : MonadDeferFx<F, E> {
+      override val ME: MonadDefer<F, E> = this@MonadDefer
+    }
+}
+
+interface MonadDeferFx<F, E> : MonadFx<F> {
+  val ME: MonadDefer<F, E>
+  override val M: Monad<F> get() = ME
+  fun <A> monadError(c: suspend MonadDeferSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
+    val continuation = MonadDeferContinuation<F, A, E>(ME, fe = fe)
+    val wrapReturn: suspend MonadDeferSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 }

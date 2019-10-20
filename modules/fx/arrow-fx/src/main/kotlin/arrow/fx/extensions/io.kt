@@ -21,8 +21,8 @@ import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.typeclasses.ProcE
-import arrow.fx.typeclasses.ProcEF
+import arrow.fx.typeclasses.Proc
+import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -145,16 +145,16 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, E>, IOMonadError<E> {
 
 @extension
 interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>, E>, IOBracket<E> {
-  override fun <A> defer(fe: (Throwable) -> E, fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
-    IO.defer(fe, fa)
+  override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
+    IO.defer(fa)
 }
 
 @extension
 interface IOAsync<E> : Async<IOPartialOf<E>, E>, IOMonadDefer<E> {
-  override fun <A> async(fa: ProcE<E, A>): Kind<IOPartialOf<E>, A> =
+  override fun <A> async(fa: Proc<A>): Kind<IOPartialOf<E>, A> =
     IO.async(fa)
 
-  override fun <A> asyncF(k: ProcEF<IOPartialOf<E>, E, A>): IO<E, A> =
+  override fun <A> asyncF(k: ProcF<IOPartialOf<E>, A>): IO<E, A> =
     IO.asyncF(k)
 
   override fun <A> IOOf<E, A>.continueOn(ctx: CoroutineContext): IO<E, A> =
