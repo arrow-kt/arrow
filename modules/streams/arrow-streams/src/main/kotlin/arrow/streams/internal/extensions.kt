@@ -1,13 +1,30 @@
 @file:Suppress("UnusedImports")
+
 package arrow.streams.internal
 
-import arrow.*
-import arrow.core.*
-import arrow.effects.typeclasses.*
-import arrow.typeclasses.*
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.FunctionK
+import arrow.core.Option
+import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.MonadDefer
+import arrow.extension
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.undocumented
+import kotlin.Boolean
+import kotlin.Suppress
+import kotlin.Throwable
+import kotlin.Unit
+import kotlin.run
 import arrow.streams.internal.ap as apply
-import arrow.streams.internal.handleErrorWith as handleErrorW
 import arrow.streams.internal.bracketCase as bracketC
+import arrow.streams.internal.handleErrorWith as handleErrorW
 
 @extension
 @undocumented
@@ -24,7 +41,6 @@ interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
 
   override fun <A, B> FreeCOf<F, A>.ap(ff: FreeCOf<F, (A) -> B>): FreeCOf<F, B> =
     apply(ff)
-
 }
 
 @extension
@@ -54,7 +70,6 @@ interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwab
 
   override fun <A, B> FreeCOf<F, A>.ap(ff: FreeCOf<F, (A) -> B>): FreeCOf<F, B> =
     apply(ff)
-
 }
 
 @extension
@@ -74,7 +89,6 @@ interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> FreeCOf<F, Either<A, B>>): FreeCOf<F, B> =
     FreeC.tailRecM(a) { f(it).fix() }
-
 }
 
 @extension

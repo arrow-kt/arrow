@@ -1,14 +1,13 @@
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(":arrow-core-extensions")
-    compile project(":arrow-extras-extensions")
-    compile project(":arrow-effects-io-extensions")
+    compile project(":arrow-core")
+    compile project(":arrow-fx")
 
-    compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-compiler:$ankKotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$ankKotlinVersion"
     kapt project(':arrow-meta')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'

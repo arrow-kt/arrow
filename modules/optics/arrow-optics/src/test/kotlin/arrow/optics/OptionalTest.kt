@@ -1,24 +1,44 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.getOrElse
+import arrow.core.identity
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
-import arrow.data.*
-import arrow.data.extensions.list.foldable.nonEmpty
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.list.foldable.nonEmpty
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.ListK
+import arrow.mtl.State
+import arrow.core.k
+import arrow.mtl.map
+import arrow.mtl.run
+import arrow.optics.mtl.assign
+import arrow.optics.mtl.assignOld
+import arrow.optics.mtl.assign_
+import arrow.optics.mtl.extract
+import arrow.optics.mtl.extractMap
+import arrow.optics.mtl.toState
+import arrow.optics.mtl.update
+import arrow.optics.mtl.updateOld
+import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.`try`
+import arrow.test.generators.functionAToB
+import arrow.test.generators.tuple2
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class OptionalTest : UnitSpec() {
 
   init {
@@ -85,6 +105,13 @@ class OptionalTest : UnitSpec() {
       funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any()
     ))
+
+    "asSetter should set absent optional" {
+      forAll(genIncompleteUser, genToken) { user, token ->
+        val updatedUser = incompleteUserTokenOptional.asSetter().set(user, token)
+        incompleteUserTokenOptional.getOption(updatedUser).nonEmpty()
+      }
+    }
 
     with(ListK.head<Int>().asFold()) {
 
@@ -191,7 +218,7 @@ class OptionalTest : UnitSpec() {
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        ListK.head<Int>().all(list) { predicate } == if(list.isEmpty()) true else predicate
+        ListK.head<Int>().all(list) { predicate } == if (list.isEmpty()) true else predicate
       }
     }
 
@@ -281,6 +308,5 @@ class OptionalTest : UnitSpec() {
           }.run(x)
       }
     }
-
   }
 }

@@ -26,7 +26,8 @@ interface KotlinMetatadataEncoder {
     current: ClassOrPackageDataWrapper.Class,
     typeTable: TypeTable,
     processorUtils: ProcessorUtils,
-    acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> =
+    acc: List<ClassOrPackageDataWrapper>
+  ): List<ClassOrPackageDataWrapper> =
     processorUtils.run {
       val interfaces = current.classProto.supertypes(typeTable).asSequence().map {
         it.extractFullName(current)
@@ -184,7 +185,6 @@ interface KotlinMetatadataEncoder {
       modifiers = listOf(modality?.asModifier()).requireNoNulls(),
       jvmMethodSignature = jvmMethodSignature.toString()
     )
-
 }
 
 private val supportedFlags: List<Pair<Flags.BooleanFlagField, Modifier>> =

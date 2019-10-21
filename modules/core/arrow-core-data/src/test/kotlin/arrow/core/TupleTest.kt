@@ -1,7 +1,7 @@
 package arrow.core
 
 /* FIXME(paco) this code sends gradle into an infinite loop, and turns IntelliJ into a memory churner
-import arrow.data.extensions.eq
+import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.tuple2.comonad.comonad
 import arrow.core.extensions.tuple2.eq.eq
@@ -38,6 +38,7 @@ class TupleTest : UnitSpec() {
                     MonadLaws.laws(Tuple2.monad(Int.monoid()), Eq.any()),
                     ComonadLaws.laws(Tuple2.comonad(), { 0 toT it }, Eq.any()),
                     TraverseLaws.laws(Tuple2.traverse(), Tuple2.functor(), { 0 toT it }, Eq.any()),
+                    BitraverseLaws.laws(Tuple2.bitraverse(), { Right(it) }, Eq.any()),
                     EqLaws.laws(Tuple2.eq(Int.eq(), Int.eq())) { Tuple2(it, it) },
                     ShowLaws.laws(Tuple2.show(), Tuple2.eq(Int.eq(), Int.eq())) { Tuple2(it, it) },
                     EqLaws.laws(Tuple3.eq(Int.eq(), Int.eq(), Int.eq())) { Tuple3(it, it, it) },

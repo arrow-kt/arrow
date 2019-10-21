@@ -6,12 +6,10 @@ import arrow.aql.box.functorFilter.functorFilter
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.undocumented
-
-//import arrow.higherkind
 
 class ForBox private constructor() {
   companion object
@@ -22,7 +20,7 @@ typealias BoxOf<A> = arrow.Kind<ForBox, A>
 inline fun <A> BoxOf<A>.fix(): Box<A> =
   this as Box<A>
 
-//@higherkind
+// @higherkind
 sealed class Box<out A> : BoxOf<A> {
 
   object Empty : Box<Nothing>()
@@ -32,7 +30,6 @@ sealed class Box<out A> : BoxOf<A> {
   companion object {
     fun <A> empty(): Box<A> = Empty
   }
-
 }
 
 @extension
@@ -52,7 +49,7 @@ interface BoxSelect : Select<ForBox> {
 
 @extension
 interface BoxFunctorFilter : FunctorFilter<ForBox>, BoxFunctor {
-  override fun <A, B> BoxOf<A>.mapFilter(f: (A) -> Option<B>): Box<B> =
+  override fun <A, B> BoxOf<A>.filterMap(f: (A) -> Option<B>): Box<B> =
     when (val box = fix()) {
       Box.Empty -> Box.empty()
       is Box.Full -> f(box.value).fold(

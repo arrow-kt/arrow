@@ -1,3 +1,18 @@
+{% for item in site.data.doc-versions.docVersions %}
+  {% if item.url == site.data.commons.stable_version %}
+    {% assign stable_version = item %}
+  {% endif %}
+  {% if item.url == site.data.commons.next_version %}
+    {% assign next_version = item %}
+  {% endif %}
+{% endfor %}
+
+{% for item in site.data.doc-versions.docVersions %}
+  {% if item.url == stable_version.previous %}
+    {% assign previous_version = item %}
+  {% endif %}
+{% endfor %}
+
 <head>
     <meta charset="UTF-8">
     <title>{{site.data.commons.name}}</title>
@@ -19,6 +34,11 @@
     <meta name="twitter:creator" content="@arrow_kt">
     <meta name="twitter:image" content="http://arrow-kt.io/img/twitter-card.png"/>
 
+    <!-- Arrow versions metadata -->
+    <meta name="previous-version" data-title="{{ previous-version.title }}" data-url="{{ previous-version.url }}" />
+    <meta name="stable-version" data-title="{{ stable-version.title }}" data-url="{{ stable-version.url }}" />
+    <meta name="next-version" data-title="{{ next-version.title }}" data-url="{{ next-version.url }}" />
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"
           type="text/css">
@@ -31,11 +51,14 @@
     <!-- Arrow main css -->
     <link rel="stylesheet" type="text/css" href="{{ '/css/arrow.css' | relative_url }}">
 
+    <!-- Code to manage version information -->
+    <script src="{{ '/js/docVersions.js' | relative_url }}" defer></script>
+
     <!-- Diagrams support -->
     <script src="{{ '/js/dagre.min.js' | relative_url }}"></script>
     <script src="{{ '/js/lodash.min.js' | relative_url }}"></script>
     <script src="{{ '/js/nomnoml.js' | relative_url }}"></script>
-    <script src="{{ '/js/diagrams.js' | relative_url }}"></script>
+    <script src="{{ '/js/diagrams.js' | relative_url }}" async></script>
 
     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
         {% include _google-tag-manager.html %}

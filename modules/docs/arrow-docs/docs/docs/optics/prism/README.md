@@ -79,11 +79,11 @@ liftF(networkResult)
 
 ```kotlin:ank
 val doubleToInt: Prism<Double, Int> = Prism(
-        partialFunction = case(
-                { double: Double -> double.toInt().toDouble() == double }
-                      toT Double::toInt
-        ),
-        reverseGet = Int::toDouble
+  getOption = { double: Double ->
+    val i = double.toInt()
+    if (i.toDouble() == double) Some(i) else None
+  },
+  reverseGet = Int::toDouble
 )
 ```
 
@@ -94,13 +94,11 @@ Nesting pattern matching blocks are tedious. We would prefer to define them sepe
 Let's imagine from our previous example we want to retrieve an `Int` from the network. We get a `Success` OR a `Failure` from the network. In case of a `Success` we want to safely cast the `String` to an `Int`.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
-        partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.isSuccess() }
-                toT { success -> success.content.toInt() }
-        ),
-        reverseGet = NetworkResult::Success compose Int::toString
+  getOption = { success -> success.content.toIntOrNull().toOption() },
+  reverseGet = NetworkResult::Success compose Int::toString
 )
 
 val networkInt: Prism<NetworkResult, Int> = networkSuccessPrism compose successToInt

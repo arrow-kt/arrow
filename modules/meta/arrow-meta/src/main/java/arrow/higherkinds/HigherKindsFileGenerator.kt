@@ -19,7 +19,8 @@ data class HigherKind(
   val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
   val kindName: Name = target.classElement.simpleName
   val alias: String = if (tparams.size == 1) "arrow.Kind" else "arrow.Kind${tparams.size}"
-  val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "io.kindedj.HkJ${tparams.size}"
+  private val hkjsPackage = "arrow"
+  val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "$hkjsPackage.HkJ${tparams.size}"
   val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
   val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
     separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
@@ -42,7 +43,9 @@ class HigherKindsFileGenerator(
   fun generate() {
     higherKinds.forEachIndexed { _, hk ->
       val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
-      val source: String = elementsToGenerate.joinToString(prefix = "package ${hk.`package`}\n\n", separator = "\n", postfix = "\n")
+      val source: String = elementsToGenerate.joinToString(
+        prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
+        separator = "\n", postfix = "\n")
       val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
       file.writeText(source)
     }
@@ -84,5 +87,4 @@ class HigherKindsFileGenerator(
 
   private fun genKindMarker(hk: HigherKind): String =
     "class ${hk.markerName} private constructor() { companion object }"
-
 }

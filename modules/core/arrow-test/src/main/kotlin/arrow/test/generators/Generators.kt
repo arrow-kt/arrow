@@ -1,10 +1,37 @@
 package arrow.test.generators
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.extensions.option.functor.map
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Failure
+import arrow.core.ForOption
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Success
+import arrow.core.Try
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.fix
+import arrow.core.toOption
 import arrow.core.extensions.option.functor.functor
-import arrow.data.*
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.core.NonEmptyList
+import arrow.core.SequenceK
+import arrow.core.SetK
+import arrow.core.SortedMapK
+import arrow.core.Validated
+import arrow.core.k
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
@@ -13,6 +40,12 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
+
+fun Gen.Companion.short(): Gen<Short> =
+  Gen.choose(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).map { it.toShort() }
+
+fun Gen.Companion.byte(): Gen<Byte> =
+  Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
 
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }

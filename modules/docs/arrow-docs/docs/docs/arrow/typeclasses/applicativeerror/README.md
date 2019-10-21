@@ -11,7 +11,7 @@ redirect_from:
 {:.intermediate}
 intermediate
 
-ApplicativeError is the typeclase used to explicitly represent errors during independent computations.
+`ApplicativeError` is the typeclass used to explicitly represent errors during independent computations.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
@@ -38,15 +38,15 @@ Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.core.extensions.`try`.applicativeError.*
 
 Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicativeError.*
+import arrow.fx.*
+import arrow.fx.extensions.io.applicativeError.*
 
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
@@ -58,7 +58,7 @@ This method requires a function that creates a new datatype from an error, `(E) 
 If [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype.
 
 ```kotlin:ank
-val eitherAE = Either.applicativeError<Throwable>()
+import arrow.core.handleErrorWith
 
 val success: Either<Throwable, Int> = Either.Right(1)
 
@@ -127,6 +127,8 @@ Constructor function. It takes two function parameters. The first is a generator
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
+val eitherAE = Either.applicativeError<Throwable>()
+
 eitherAE.catch(::identity) { 1 }
 ```
 
@@ -148,7 +150,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

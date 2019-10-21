@@ -1,8 +1,8 @@
 package arrow.integrations.retrofit.adapter
 
 import arrow.Kind
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.MonadDefer
+import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.MonadDefer
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 import retrofit2.Call
@@ -26,7 +26,7 @@ fun <F, A> Call<A>.runAsync(AC: Async<F>): Kind<F, Response<A>> =
     enqueue(ResponseCallback(callback))
   }
 
-fun <F, A> Call<A>.runSyncDeferred(defer: MonadDefer<F>): Kind<F, Response<A>> = defer.delay { execute() }
+fun <F, A> Call<A>.runSyncDeferred(defer: MonadDefer<F>): Kind<F, Response<A>> = defer.later { execute() }
 
 fun <F, A> Call<A>.runSyncCatch(monadError: MonadError<F, Throwable>): Kind<F, Response<A>> =
   monadError.run {

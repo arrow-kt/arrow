@@ -65,7 +65,7 @@ Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monad_comprehensio
 ```kotlin
 val SC = IO.monadDefer()
 
-val result = SC.binding {
+val result = SC.fx.monad {
   println("Print: now")
   val (result) = just(1)
   result + 1
@@ -73,7 +73,7 @@ val result = SC.binding {
 
 //Print: now
 
-val lazyResult = SC.binding {
+val lazyResult = SC.fx.monad {
   SC.lazy().bind()
   println("Print: lazy")
   val (result) = eagerIO()
@@ -88,7 +88,7 @@ lazyResult
 //Print: lazy
 ```
 
-#### deferUnsafe
+#### laterOrRaise
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
 The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
@@ -96,12 +96,12 @@ This function is assumed to never throw any internal exceptions.
 
 ```kotlin
 IO.async()
-  .deferUnsafe { throw RuntimeException() }
+  .laterOrRaise { throw RuntimeException() }
   .unsafeRunSync()
 // ERROR!! The program crashes
 ```
 
-> deferUnsafe() exists for performance purposes when throwing can be avoided.
+> laterOrRaise() exists for performance purposes when throwing can be avoided.
 
 ### Laws
 
@@ -111,9 +111,9 @@ Arrow provides `MonadDeferLaws` in the form of test cases for internal verificat
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(MonadDefer::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.effects.typeclasses.MonadDefer)
+ank_macro_hierarchy(arrow.fx.typeclasses.MonadDefer)

@@ -1,8 +1,8 @@
 package arrow.optics
 
-import arrow.data.MapK
-import arrow.data.SetK
-import arrow.data.k
+import arrow.core.MapK
+import arrow.core.SetK
+import arrow.core.k
 
 /**
  * [Iso] that defines the equality between a Unit value [Map] and a [Set] with its keys

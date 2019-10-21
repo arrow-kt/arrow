@@ -25,7 +25,7 @@ val player = Player(75)
 healthGetter.get(player)
 ```
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 
 fun <T> nonEmptyListHead() = Getter<NonEmptyList<T>, T> {
     it.head
@@ -47,6 +47,9 @@ val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>
 `Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
 ```kotlin:ank
+import arrow.optics.mtl.*
+import arrow.mtl.*
+
 val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
 
 reader
@@ -62,7 +65,8 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
 There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.optics.mtl.*
+import arrow.mtl.*
 
 val inspectHealth = healthGetter.extract()
 inspectHealth.run(player)

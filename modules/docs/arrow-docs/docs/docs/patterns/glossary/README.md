@@ -33,8 +33,8 @@ and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A
 
 Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
 
-```kotlin:ank:silent
-import arrow.effects.*
+```kotlin:ank
+import arrow.fx.*
 
 IO { 0 }
  .flatMap { IO { it * 2 } }
@@ -105,13 +105,11 @@ Note that classes must have companion objects for this to work. All typeclass in
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.data.*
 import arrow.core.extensions.*
-import arrow.data.extensions.*
 import arrow.typeclasses.*
 import arrow.core.extensions.option.functor.*
 import arrow.core.extensions.either.monadError.*
-import arrow.data.extensions.listk.traverse.*
+import arrow.core.extensions.listk.traverse.*
 ```
 
 ```kotlin:ank:silent
@@ -123,7 +121,7 @@ Option.functor()
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.mapk.semigroup.*
+import arrow.core.extensions.mapk.semigroup.*
 
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
@@ -147,9 +145,9 @@ When creating an instance with the `@extension` annotation, the processor genera
 
 ```kotlin:ank:silent
 import arrow.core.Option
-import arrow.core.extensions.option.monad.binding
+import arrow.core.extensions.fx
 
-binding {
+Option.fx {
   val (a) = Option(1)
   val (b) = Option(a + 1)
   a + b
@@ -157,7 +155,7 @@ binding {
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.option.applicative.map
+import arrow.core.extensions.option.apply.map
 
 map(Option(1), Option(2), Option(3)) { (one, two, three) ->
   one + two + three
@@ -165,16 +163,16 @@ map(Option(1), Option(2), Option(3)) { (one, two, three) ->
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.list.traverse.sequence
 import arrow.core.extensions.option.applicative.applicative
 
 listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monad.binding
+import arrow.core.extensions.fx
 
-binding {
+Try.fx {
   val (a) = Try { 1 }
   val (b) = Try { a + 1 }
   a + b
@@ -182,7 +180,7 @@ binding {
 ```
 
 ```kotlin:ank:silent
-import arrow.core.extensions.`try`.applicative.map
+import arrow.core.extensions.`try`.apply.map
 
 map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
   one + two + three
@@ -190,7 +188,7 @@ map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.list.traverse.sequence
 import arrow.core.extensions.either.applicative.applicative
 
 listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
@@ -398,7 +396,7 @@ To learn more about this `Typeclassless` technique you should head to the [`Depe
 
 ### Side-effects and Effects
 
-A side-effect is statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
+A side-effect is a statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
 
 When talking about side-effects, we generally see functions that have the signature `(...) -> Unit`, meaning that unless the function doesn't do anything, there's at least one side-effect. Side-effects can also happen in the middle of another function, which is an undesirable behavior in Functional Programming.
 

@@ -31,9 +31,9 @@ Let's define a typeclass for the behavior of equality between two objects, and w
 
 ```kotlin
 interface Eq<T> {
-   fun T.eqv(b: T)
+   fun T.eqv(b: T): Boolean
 
-   fun T.neqv(b: T) =
+   fun T.neqv(b: T): Boolean =
     !eqv(b)
 }
 ```
@@ -136,6 +136,8 @@ We will list them by their hierarchy.
 
 - [`Semigroupal`]({{ '/docs/arrow/typeclasses/semigroupal/' | relative_url }}) - abstraction over the cartesian product
 
+- [`Monoidal`]({{ '/docs/arrow/typeclasses/monoidal/' | relative_url }}) - adds an identity element to a semigroupal
+
 ##### Semiring
 
 - [`Semiring`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
@@ -166,6 +168,8 @@ We will list them by their hierarchy.
 
 - [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
 
+- [`Bitraverse`]({{ '/docs/apidocs/arrow-typeclasses/arrow.typeclasses/-bitraverse/' | relative_url }}) - For those structures which are `Bifoldable` adds the functionality of `Traverse` in each side of the datatype
+
 - [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 
 - [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
@@ -184,13 +188,13 @@ Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
 The Monad Template Library module gives more specialized version of existing typeclasses
 
-- [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
+- [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
 
-- [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
+- [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
 
-- [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
+- [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
 
-- [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
+- [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
 - [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
 

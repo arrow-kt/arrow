@@ -452,7 +452,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.asKotlin]
    */
   override fun TypeName.TypeVariable.asKotlin(): TypeName.TypeVariable =
-    copy(name = name.asKotlin())
+    copy(name = name.asKotlin(), bounds = bounds.map { it.asKotlin() })
 
   /**
    * @see [MetaApi.asKotlin]
@@ -474,7 +474,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.asKotlin]
    */
   override fun TypeName.Classy.asKotlin(): TypeName.Classy =
-    copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
+    if (simpleName == "Iterable") copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName("kotlin.collections"))
+    else copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
 
   /**
    * @see [MetaApi.asPlatform]
@@ -532,6 +533,16 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     )
 
   /**
+   * @see [MetaApi.PublishedApi]
+   */
+  override fun PublishedApi(): Annotation =
+    Annotation(
+      type = TypeName.typeNameOf(PublishedApi::class),
+      members = listOf(Code.empty),
+      useSiteTarget = null
+    )
+
+  /**
    * @see [MetaApi.SuppressAnnotation]
    */
   override fun SuppressAnnotation(vararg names: String): Annotation =
@@ -565,6 +576,19 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
         else -> dataTypeDownKinded
       }
     }
+
+  override fun TypeName.widenTypeArgs(): TypeName =
+    when (val unconstrained = removeConstrains()) {
+      is TypeName.TypeVariable ->
+        if (unconstrained.bounds.isNotEmpty()) unconstrained.bounds[0]
+        else TypeName.AnyNullable
+      is TypeName.WildcardType -> unconstrained
+      is TypeName.FunctionLiteral -> unconstrained
+      is TypeName.ParameterizedType -> unconstrained.copy(
+        typeArguments = unconstrained.typeArguments.map { it.widenTypeArgs() }
+      )
+      is TypeName.Classy -> unconstrained
+    }.asKotlin()
 
   /**
    * Returns a Pair matching a type as wrapper and the type it wraps
@@ -606,7 +630,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
               if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<"))
                 TypeName.TypeVariable(dataTypeTypeArg.name.substringBefore("PartialOf<").substringAfter("<"))
               else dataTypeTypeArg
-            //profunctor and other cases are parametric to Kind2 values or Conested
+            // profunctor and other cases are parametric to Kind2 values or Conested
             val projectedCompanion = dataTypeName.projectedCompanion
             val dataTypeDownKinded = dataTypeName.downKind
             val dataType = dataTypeDownKinded.type

@@ -13,10 +13,10 @@ Arrow Fx benefits from the `!effect` application and direct syntax for asynchron
 Performing effects while switching execution contexts a la carte is trivial.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 import kotlinx.coroutines.newSingleThreadContext
 
 //sampleStart
@@ -25,10 +25,10 @@ val contextA = newSingleThreadContext("A")
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = fx {
+val program = IO.fx {
   continueOn(contextA)
   !effect { printThreadName() }
-  continueOn(NonBlocking)
+  continueOn(dispatchers().default())
   !effect { printThreadName() }
 }
 //sampleEnd
@@ -44,20 +44,20 @@ In addition to `continueOn`, Arrow Fx allows users to override the executions co
 A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data type starting concurrently that can be either `join`ed or `cancel`ed.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = fx {
-  val fiberA = !NonBlocking.startFiber(effect { threadName() })
-  val fiberB = !NonBlocking.startFiber(effect { threadName() })
+val program = IO.fx {
+  val fiberA = !effect { threadName() }.fork(dispatchers().default())
+  val fiberB = !effect { threadName() }.fork(dispatchers().default())
   val threadA = !fiberA.join()
-  val threadB = !fiberA.join()
+  val threadB = !fiberB.join()
   !effect { println(threadA) }
   !effect { println(threadB) }
 }
@@ -69,7 +69,7 @@ fun main() { // The edge of our world
 
 When we spawn fibers, we can obtain their deferred non-blocking result using `join()` and destructuring the effect.
 
-`NonBlocking` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
+`dispatchers().default()` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
 
 Note that, because we are using `Fiber` and a Dispatcher that may not create new threads in all cases here, there is no guarantee that the printed thread names will be different.
 
@@ -85,23 +85,23 @@ Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSeque
 Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
   
 data class ThreadInfo(
-  val threadA : String, 
+  val threadA: String,
   val threadB: String
 )
 
-val program = fx {
+val program = IO.fx {
   val (threadA: String, threadB: String) = 
-    !NonBlocking.parMapN(
+    !dispatchers().default().parMapN(
       effect { threadName() },
       effect { threadName() },
       ::ThreadInfo
@@ -120,25 +120,20 @@ fun main() { // The edge of our world
 `parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user-provided function over each effect result and then gather all the transformed results in a `List<B>`.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 
 //sampleStart
-suspend fun threadName(): String =
-  Thread.currentThread().name
+suspend fun threadName(i: Int): String =
+  "$i on ${Thread.currentThread().name}"
 
-val program = fx {
-  val result: List<String> = !NonBlocking.parTraverse(
-    listOf(
-        effect { threadName() },
-        effect { threadName() },
-        effect { threadName() }
-    )
-  ) {
-      "running on: $it" 
-    }
+val program = IO.fx {
+  val result: List<String> = !
+  listOf(1, 2, 3).parTraverse { i ->
+    effect { threadName(i) }
+  }
   !effect { println(result) }
 }
 //sampleEnd
@@ -152,48 +147,27 @@ fun main() { // The edge of our world
 `parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel and then gathers all the transformed results and returns them in a `List<B>`.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = fx {
-  val result: List<String> = !NonBlocking.parSequence(
-    listOf(
-      effect { threadName() },
-      effect { threadName() },
-      effect { threadName() }
-    )
-  )
+val program = IO.fx {
+  val result: List<String> = !listOf(
+    effect { threadName() },
+    effect { threadName() },
+    effect { threadName() }
+  ).parSequence()
   
   !effect { println(result) }
 }
 //sampleEnd
 fun main() { // The edge of our world
   unsafe { runBlocking { program } }
-}
-```
-
-## Cancellation
-
-All concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that in addition to returning a value, returns a disposable handler that can interrupt the operation.
-
-```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fxCancellable
-//sampleStart
-val (_, disposable) = fxCancellable {
-  !effect { println("BOOM!") }
-}
-//sampleEnd
-fun main() { // The edge of our world
-  println(disposable)
 }
 ```
 
@@ -212,15 +186,15 @@ Since Arrow Fx uses this lazy behavior by default, we don't have to resort to sp
 The value `program` below is pure and referentially transparent because `fx` returns a lazy computation:
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = fx {
+val program = IO.fx {
   !effect { printThreadName() }
 }
 
@@ -241,7 +215,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async { printThreadName() }
+  GlobalScope.async { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }
@@ -261,7 +235,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async(start = CoroutineStart.LAZY) { printThreadName() }
+  GlobalScope.async(start = CoroutineStart.LAZY) { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }
