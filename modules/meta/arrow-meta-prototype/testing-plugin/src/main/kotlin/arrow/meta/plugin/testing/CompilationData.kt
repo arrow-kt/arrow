@@ -32,13 +32,3 @@ sealed class Check {
     val filenamesWithoutExt: List<String>
   ): Check()
 }
-
-data class Field(
-  val name: String,
-  val value: Any
-)
-
-data class Result(
-  val simpleClassName: String,
-  val field: Field
-)
