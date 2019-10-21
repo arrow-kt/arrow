@@ -1,6 +1,12 @@
 package arrow.meta.plugin.testing
 
+import arrow.meta.plugin.testing.Check.ExpectedCompilationError
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
+import arrow.meta.plugin.testing.Check.ExpectedExecutionResult
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
+import org.assertj.core.api.AbstractStringAssert
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.ListAssert
 import java.io.File
 import java.net.URLClassLoader
 
@@ -19,23 +25,31 @@ fun assertThis(compilationData: CompilationData): Unit {
   assertThat(compilationResult.actualStatus).isEqualTo(compilationData.expectedStatus)
   compilationData.checks.forEach {
     when (it) {
-      is Check.ExpectedCompilationError ->
-        assertThat(compilationResult.log).containsIgnoringCase(it.partialMessage)
-      is Check.ExpectedGeneratedClasses ->
-        assertThat(compilationResult.actualGeneratedClasses).containsExactlyInAnyOrder(*it.filenamesWithoutExt.toTypedArray())
-      is Check.ExpectedExecutionResult -> {
-        assertThat(Regex(EXPRESSION_PATTERN).matches(it.expression)).`as`("\"${it.expression}\" doesn't match with $EXPRESSION_PATTERN").isTrue()
-        assertThat(call(it.expression, compilationResult.classesDirectory)).isEqualTo(it.output)
-      }
-      is Check.ExpectedGeneratedSourceCode -> {
-        val actualGeneratedFileContent = compilationResult.actualGeneratedFilePath.toFile().readText()
-        val actualGeneratedFileContentWithoutCommands = removeCommands(actualGeneratedFileContent)
-        val expectedGeneratedFileContentWithoutCommands = removeCommands(it.code)
-
-        assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringWhitespace(expectedGeneratedFileContentWithoutCommands)
-      }
+      is ExpectedCompilationError -> checkCompilationResult(compilationResult, it)
+      is ExpectedGeneratedClasses -> checkExpectedGeneratedClasses(compilationResult, it)
+      is ExpectedExecutionResult -> checkExpectedExecutionResult(compilationResult, it)
+      is ExpectedGeneratedSourceCode -> checkExpectedGeneratedSourceCode(compilationResult, it)
     }
   }
+}
+
+private fun checkCompilationResult(compilationResult: CompilationResult, expectedCompilationError: ExpectedCompilationError): AbstractStringAssert<*>? =
+  assertThat(compilationResult.log).containsIgnoringCase(expectedCompilationError.partialMessage)
+
+private fun checkExpectedGeneratedClasses(compilationResult: CompilationResult, expectedGeneratedClasses: ExpectedGeneratedClasses): ListAssert<String>? =
+  assertThat(compilationResult.actualGeneratedClasses).containsExactlyInAnyOrder(*expectedGeneratedClasses.filenamesWithoutExt.toTypedArray())
+
+private fun checkExpectedExecutionResult(compilationResult: CompilationResult, expectedExecutionResult: ExpectedExecutionResult) {
+  assertThat(expectedExecutionResult.expression).matches(EXPRESSION_PATTERN)
+  assertThat(call(expectedExecutionResult.expression, compilationResult.classesDirectory)).isEqualTo(expectedExecutionResult.output)
+}
+
+private fun checkExpectedGeneratedSourceCode(compilationResult: CompilationResult, expectedGeneratedSourceCode: ExpectedGeneratedSourceCode) {
+  val actualGeneratedFileContent = compilationResult.actualGeneratedFilePath.toFile().readText()
+  val actualGeneratedFileContentWithoutCommands = removeCommands(actualGeneratedFileContent)
+  val expectedGeneratedFileContentWithoutCommands = removeCommands(expectedGeneratedSourceCode.code)
+
+  assertThat(actualGeneratedFileContentWithoutCommands).isEqualToIgnoringWhitespace(expectedGeneratedFileContentWithoutCommands)
 }
 
 private fun removeCommands(actualGeneratedFileContent: String): String =
