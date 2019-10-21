@@ -1,8 +1,8 @@
 package arrow.meta.plugins.comprehensions
 
-import arrow.meta.plugin.testing.Check.GeneratedSourceCode
-import arrow.meta.plugin.testing.Check.GeneratedClasses
-import arrow.meta.plugin.testing.Check.CompilationError
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
+import arrow.meta.plugin.testing.Check.ExpectedCompilationError
 import arrow.meta.plugin.testing.CompilationData
 import arrow.meta.plugin.testing.CompilationStatus
 import arrow.meta.plugin.testing.assertThis
@@ -48,7 +48,7 @@ class ComprehensionsTest {
         |   
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
           |
           | fun test(): IO<Int> =
@@ -59,11 +59,11 @@ class ComprehensionsTest {
           |   }
           |   
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf(
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0")
         )
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -83,7 +83,7 @@ class ComprehensionsTest {
         |   
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
           |
           | fun test(): IO<Int> =
@@ -94,11 +94,11 @@ class ComprehensionsTest {
           |   }
           |   
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf(
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0")
         )
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -126,7 +126,7 @@ class ComprehensionsTest {
         |   
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
           |
           | fun test(): IO<Int> = 
@@ -145,13 +145,13 @@ class ComprehensionsTest {
           |   }
           |   
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf(
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$2",
           "ExampleKt\$\$test\$lambda-5\$lambda-3\$4", "ExampleKt\$\$test\$lambda-5\$lambda-3\$lambda-2\$3",
           "ExampleKt\$\$test\$lambda-5\$lambda-4\$5", "\$test\$lambda-1\$0", "\$test\$lambda-5\$1")
         )
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -176,7 +176,7 @@ class ComprehensionsTest {
         |   
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
           |
           | fun test(): IO<Int> =
@@ -194,13 +194,13 @@ class ComprehensionsTest {
           |   }
           |   
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf(
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-3\$lambda-2\$3",
           "ExampleKt\$\$test\$lambda-3\$lambda-2\$lambda-1\$2",
           "ExampleKt\$\$test\$lambda-3\$lambda-2\$lambda-1\$lambda-0\$1", "\$test\$lambda-3\$0")
         )
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -216,16 +216,16 @@ class ComprehensionsTest {
         |
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
           |
           | fun test(): IO<Int> =
           |   IO.just(1 + 1)
           |   
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "IO", "IO\$Companion"))
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "IO", "IO\$Companion"))
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -241,10 +241,10 @@ class ComprehensionsTest {
         |
         |""".trimMargin(),
       checks = listOf(
-        CompilationError(partialMessage = "Unresolved reference: a"),
-        GeneratedClasses(filenamesWithoutExt = emptyList())
+        ExpectedCompilationError(partialMessage = "Unresolved reference: a"),
+        ExpectedGeneratedClasses(filenamesWithoutExt = emptyList())
       ),
-      compilationStatus = CompilationStatus.COMPILATION_ERROR
+      expectedStatus = CompilationStatus.COMPILATION_ERROR
     ))
   }
 

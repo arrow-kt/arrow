@@ -1,8 +1,8 @@
 package arrow.meta.plugin.testing
 
-import arrow.meta.plugin.testing.Check.CompilationError
-import arrow.meta.plugin.testing.Check.GeneratedClasses
-import arrow.meta.plugin.testing.Check.GeneratedSourceCode
+import arrow.meta.plugin.testing.Check.ExpectedCompilationError
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
 import org.junit.Test
 
 class CompilationTest {
@@ -18,10 +18,10 @@ class CompilationTest {
       sourceFilename = "Example.kt",
       sourceCode = contentFromResource(javaClass, "Example.kt.source"),
       checks = listOf(
-        GeneratedSourceCode(code = contentFromResource(javaClass, "Example.kt.meta")),
-        GeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"))
+        ExpectedGeneratedSourceCode(code = contentFromResource(javaClass, "Example.kt.meta")),
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"))
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 
@@ -30,8 +30,8 @@ class CompilationTest {
     assertThis(CompilationData(
       sourceFilename = "Example.kt",
       sourceCode = "classs Error",
-      checks = listOf(CompilationError(partialMessage = "Expecting a top level declaration")),
-      compilationStatus = CompilationStatus.COMPILATION_ERROR
+      checks = listOf(ExpectedCompilationError(partialMessage = "Expecting a top level declaration")),
+      expectedStatus = CompilationStatus.COMPILATION_ERROR
     ))
   }
 }

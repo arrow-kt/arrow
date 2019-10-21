@@ -1,7 +1,7 @@
 package arrow.meta.plugins.typeclasses
 
-import arrow.meta.plugin.testing.Check.GeneratedSourceCode
-import arrow.meta.plugin.testing.Check.GeneratedClasses
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
+import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
 import arrow.meta.plugin.testing.CompilationData
 import arrow.meta.plugin.testing.CompilationStatus
 import arrow.meta.plugin.testing.assertThis
@@ -42,7 +42,7 @@ class TypeClassesTest {
         | }
         |""".trimMargin(),
       checks = listOf(
-        GeneratedSourceCode(code = """
+        ExpectedGeneratedSourceCode(code = """
           | import arrow.Kind
           | import arrow.given
           | import arrow.core.Some
@@ -66,11 +66,11 @@ class TypeClassesTest {
           |   }
           | }
           |""".trimMargin()),
-        GeneratedClasses(filenamesWithoutExt = listOf(
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "Mappable\$DefaultImpls", "Mappable", "Test\$\$addOne\$lambda-1\$lambda-0\$0", "Test"
         ))
       ),
-      compilationStatus = CompilationStatus.OK
+      expectedStatus = CompilationStatus.OK
     ))
   }
 }
