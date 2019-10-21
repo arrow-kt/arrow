@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.higherkind
 import arrow.recursion.data.Fix
-import arrow.recursion.data.ForFix
 import arrow.typeclasses.Functor
 
 @higherkind

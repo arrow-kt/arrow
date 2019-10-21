@@ -1,7 +1,6 @@
 package arrow.recursion.extensions
 
 import arrow.Kind
-import arrow.core.Eval
 import arrow.extension
 import arrow.recursion.Algebra
 import arrow.recursion.data.Mu
@@ -10,7 +9,6 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.Functor
-
 
 @extension
 interface MuBirecursive<F> : Birecursive<Mu<F>, F> {
@@ -28,7 +26,6 @@ interface MuBirecursive<F> : Birecursive<Mu<F>, F> {
   }
 
   override fun <A> Mu<F>.cata(alg: Algebra<F, A>): A = unMu(alg)
-
 }
 
 @extension

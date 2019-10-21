@@ -1,8 +1,12 @@
 package arrow.recursion.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.ForOption
+import arrow.core.Option
 import arrow.core.extensions.option.functor.functor
+import arrow.core.fix
+import arrow.core.none
+import arrow.core.some
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive

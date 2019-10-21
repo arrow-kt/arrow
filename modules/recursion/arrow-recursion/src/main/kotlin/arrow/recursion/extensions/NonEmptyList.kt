@@ -2,7 +2,12 @@ package arrow.recursion.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.getOrElse
+import arrow.core.none
+import arrow.core.some
 import arrow.extension
 import arrow.recursion.extensions.nonemptylistf.functor.functor
 import arrow.recursion.pattern.ForNonEmptyListF
@@ -12,7 +17,11 @@ import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import arrow.undocumented
 
 @extension
@@ -69,4 +78,3 @@ interface NonEmptyListRecursive<A> : Recursive<NonEmptyList<A>, NonEmptyListFPar
 
 @extension
 interface NonEmptyListCorecursive<A> : Corecursive<NonEmptyList<A>, NonEmptyListFPartialOf<A>>, NonEmptyListBirecursive<A>
-

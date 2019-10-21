@@ -1,6 +1,10 @@
 package arrow.recursion
 
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.none
+import arrow.core.some
 import arrow.recursion.extensions.nonemptylist.birecursive.birecursive
 import arrow.recursion.extensions.nonemptylistf.traverse.traverse
 import arrow.recursion.pattern.NonEmptyListF

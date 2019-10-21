@@ -1,15 +1,31 @@
 package arrow.recursion.typeclasses
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.extensions.tuple2.applicative.applicative
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.FunctionK
+import arrow.core.Tuple2
+import arrow.core.andThen
+import arrow.core.compose
 import arrow.core.extensions.tuple2.functor.functor
 import arrow.core.extensions.tuple2.traverse.traverse
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.toT
 import arrow.free.Cofree
-import arrow.recursion.*
+import arrow.recursion.Algebra
+import arrow.recursion.AlgebraM
+import arrow.recursion.CVAlgebra
+import arrow.recursion.CVAlgebraM
+import arrow.recursion.Coalgebra
+import arrow.recursion.RAlgebra
+import arrow.recursion.RAlgebraM
+import arrow.recursion.hylo
+import arrow.recursion.hyloC
+import arrow.recursion.hyloM
+import arrow.recursion.hyloMC
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
 
 /**

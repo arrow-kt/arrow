@@ -12,7 +12,9 @@ import arrow.recursion.data.fix
 import arrow.recursion.pattern.FreeF
 import arrow.recursion.pattern.FreeR
 import arrow.recursion.pattern.fix
-import arrow.typeclasses.*
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
 
 typealias Algebra<F, A> = (Kind<F, A>) -> A
 typealias AlgebraM<F, M, A> = (Kind<F, A>) -> Kind<M, A>

@@ -3,7 +3,6 @@ package arrow.test.laws
 import arrow.core.Eval
 import arrow.core.ForEval
 import arrow.core.extensions.eval.monad.monad
-import arrow.core.extensions.monoid
 import arrow.core.value
 import arrow.recursion.Algebra
 import arrow.recursion.AlgebraM
@@ -61,7 +60,6 @@ object RecursiveLaws {
       t.cataM(TF, Eval.monad(), alg).value()
       true
     }
-
 
   fun <T, F> Recursive<T, F>.paraMEvalIsStackSafe(TF: Traverse<F>, largeGenT: Gen<T>, alg: AlgebraM<F, ForEval, Int>) =
     forFew(5, largeGenT) { t ->

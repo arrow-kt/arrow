@@ -1,6 +1,5 @@
 package arrow.test.laws
 
-import arrow.Kind
 import arrow.core.Eval
 import arrow.core.ForEval
 import arrow.core.extensions.eval.monad.map
@@ -9,12 +8,8 @@ import arrow.core.right
 import arrow.core.value
 import arrow.recursion.Coalgebra
 import arrow.recursion.CoalgebraM
-import arrow.recursion.data.Fix
-import arrow.recursion.data.ForFix
 import arrow.recursion.hylo
 import arrow.recursion.pattern.FreeF
-import arrow.recursion.pattern.FreeFPartialOf
-import arrow.recursion.pattern.FreeR
 import arrow.recursion.typeclasses.Corecursive
 import arrow.typeclasses.Traverse
 import io.kotlintest.properties.Gen

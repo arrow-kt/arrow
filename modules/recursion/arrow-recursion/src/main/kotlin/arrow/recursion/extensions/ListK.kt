@@ -15,7 +15,11 @@ import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
 import arrow.undocumented
 
 @extension
@@ -75,4 +79,3 @@ interface ListKRecursive<A> : Recursive<ListK<A>, ListFPartialOf<A>>, ListKBirec
 
 @extension
 interface ListKCorecursive<A> : Corecursive<ListK<A>, ListFPartialOf<A>>, ListKBirecursive<A>
-

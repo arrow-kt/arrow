@@ -7,7 +7,6 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
 import arrow.core.extensions.either.foldable.foldable
-import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
