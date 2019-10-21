@@ -79,8 +79,6 @@ interface ElementScope {
   val thisExpression: Scope<KtThisExpression>
   
   val String.thisExpression: Scope<KtThisExpression>
-
-  val String.binaryExpression: Scope<KtBinaryExpression>
   
   val String.callArguments: Scope<KtValueArgumentList>
   
