@@ -155,7 +155,7 @@ interface Recursive<T, F> {
    *  }
    *
    *  Int.recursive().run {
-   *    10.paraM(Option.traverse(), Eval.monad(), Int.monoid(), printAsListAlg).value().also(::println)
+   *    10.paraM(Option.traverse(), Eval.monad(), printAsListAlg).value().also(::println)
    *  }
    * }
    * ```
@@ -163,12 +163,11 @@ interface Recursive<T, F> {
   fun <M, A> T.paraM(
     TF: Traverse<F>,
     MM: Monad<M>,
-    MT: Monoid<T>,
     alg: RAlgebraM<F, M, T, A>
   ): Kind<M, A> =
     hyloMC({
       alg(FF().run { it.map { it.fix() } })
-    }, project() andThen { FF().run { it.map { it toT it } } } andThen MM::just, TF, Tuple2.traverse(), Tuple2.applicative(MT), MM)
+    }, project() andThen { FF().run { it.map { it toT it } } } andThen MM::just, TF, Tuple2.traverse(), MM)
 
   /**
    * Fold over any datatype using that datatypes base functor.

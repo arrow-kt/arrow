@@ -11,7 +11,7 @@ redirect_from:
 {:.intermediate}
 intermediate
 
-ApplicativeError is the typeclase used to explicitly represent errors during independent computations.
+`ApplicativeError` is the typeclass used to explicitly represent errors during independent computations.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
@@ -38,15 +38,15 @@ Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.core.extensions.`try`.applicativeError.*
 
 Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicativeError.*
+import arrow.fx.*
+import arrow.fx.extensions.io.applicativeError.*
 
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
@@ -150,7 +150,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

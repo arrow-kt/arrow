@@ -1,7 +1,8 @@
 package arrow.core
 
-import arrow.*
-import java.util.*
+import arrow.higherkind
+import java.util.Collections
+import java.util.LinkedHashMap
 
 @higherkind
 data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
@@ -140,12 +141,13 @@ private const val INT_MAX_POWER_OF_TWO: Int = Int.MAX_VALUE / 2 + 1
 
 infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
 
-fun <K, V> Tuple2<K, V>.toPair() : Pair<K, V> = Pair(this.a, this.b)
+fun <A, B> Tuple2<A, B>.toPair(): Pair<A, B> = Pair(this.a, this.b)
 
-fun <K, V> Pair<K, V>.toTuple2() : Tuple2<K, V> = Tuple2(this.first, this.second)
+fun <A, B> Pair<A, B>.toTuple2(): Tuple2<A, B> = Tuple2(this.first, this.second)
 
-fun <K, V> mapOf(vararg tuples: Tuple2<K, V>): Map<K, V> =
-  if (tuples.isNotEmpty()) tuples.toMap(LinkedHashMap(mapCapacity(tuples.size))) else emptyMap()
+fun <A, B, C> Tuple3<A, B, C>.toTriple(): Triple<A, B, C> = Triple(this.a, this.b, this.c)
+
+fun <A, B, C> Triple<A, B, C>.toTuple3(): Tuple3<A, B, C> = Tuple3(this.first, this.second, this.third)
 
 fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {
   if (this is Collection) {

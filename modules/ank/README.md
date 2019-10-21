@@ -186,7 +186,6 @@ Example:
 ````
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(Option::class).tcMarkdownList()
@@ -199,7 +198,7 @@ Output:
 | Module | Type classes |
 | --- | --- |
 |__arrow.aql__|[Count](link), [From](link), [GroupBy](link), [OrderBy](link), [Select](link), [Sum](link), [Union](link), [Where](link)|
-|__arrow.mtl.typeclasses__|[FunctorFilter](link), [MonadCombine](link), [MonadFilter](link), [TraverseFilter](link)|
+|__arrow.mtl.typeclasses__|[MonadReader](link), [MonadState](link), [MonadWriter](link)|
 |__arrow.optics.typeclasses__|[Each](link)|
 |__arrow.typeclasses__|[ApplicativeError](link), [Applicative](link), [Eq](link), [Foldable](link), [Functor](link), [MonadError](link), [Monad](link), [Monoid](link), [MonoidK](link), [Semigroup](link), [SemigroupK](link), [Show](link), [Traverse](link)|
 ````
@@ -209,9 +208,9 @@ Which renders as:
 | Module | Type classes |
 | --- | --- |
 |__arrow.aql__|[Count](link), [From](link), [GroupBy](link), [OrderBy](link), [Select](link), [Sum](link), [Union](link), [Where](link)|
-|__arrow.mtl.typeclasses__|[FunctorFilter](link), [MonadCombine](link), [MonadFilter](link), [TraverseFilter](link)|
+|__arrow.mtl.typeclasses__|[MonadReader](link), [MonadState](link), [MonadWriter](link)|
 |__arrow.optics.typeclasses__|[Each](link)|
-|__arrow.typeclasses__|[ApplicativeError](link), [Applicative](link), [Eq](link), [Foldable](link), [Functor](link), [MonadError](link), [Monad](link), [Monoid](link), [MonoidK](link), [Semigroup](link), [SemigroupK](link), [Show](link), [Traverse](link)|
+|__arrow.typeclasses__|[ApplicativeError](link), [Applicative](link), [Eq](link), [Foldable](link), [Functor](link), [MonadError](link), [Monad](link), [Monoid](link), [MonoidK](link), [Semigroup](link), [SemigroupK](link), [Show](link), [Traverse](link), [FunctorFilter](link), [MonadCombine](link), [MonadFilter](link), [TraverseFilter](link)|
 
 ### `:outFile(<file>)`
 
@@ -220,7 +219,7 @@ Example:
 ````
 ```kotlin:ank:outFile(diagram.nomnol)
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(MonadDefer::class).hierarchyGraph()
 ```

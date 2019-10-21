@@ -6,6 +6,12 @@ options:
       - title: Index
         url: /docs/
 
+      - title: Setup
+        url: /docs/quickstart/setup/
+
+      - title: Linting
+        url: /docs/quickstart/linting/
+
       - title: Libraries
         url: /docs/quickstart/libraries/
 
@@ -37,15 +43,6 @@ options:
 
       - title: Core Data Types
         url: /docs/apidocs/arrow-core-data/
-
-      - title: Core Extensions
-        url: /docs/apidocs/arrow-core-extensions/
-
-      - title: Core Extra Data Types
-        url: /docs/apidocs/arrow-extras/
-
-      - title: Core Extra Extensions
-        url: /docs/apidocs/arrow-extras-extensions/
 
       - title: Effects
         url: /docs/apidocs/arrow-effects-data/
@@ -95,6 +92,7 @@ options:
       - title: Validation
         url: /docs/apidocs/arrow-validation/
 
+
   - title: Patterns
 
     nested_options:
@@ -131,19 +129,19 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/arrow/core/option/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-option/
 
       - title: Either
-        url: /docs/arrow/core/either/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-either/
 
       - title: Try
-        url: /docs/arrow/core/try/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-try/
 
       - title: Validated
-        url: /docs/arrow/data/validated/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-validated/
 
       - title: NonEmptyList
-        url: /docs/arrow/data/nonemptylist/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-non-empty-list/
 
       - title: ListK
         url: /docs/arrow/data/listk/
@@ -164,7 +162,7 @@ options:
         url: /docs/arrow/data/ior/
 
       - title: Id
-        url: /docs/arrow/core/id/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-id/
 
       - title: Reader
         url: /docs/arrow/data/reader/
@@ -196,11 +194,8 @@ options:
       - title: Trampoline
         url: /docs/arrow/free/trampoline/
 
-      - title: Coproduct
-        url: /docs/arrow/data/coproduct/
-
       - title: Eval
-        url: /docs/arrow/core/eval/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
 
       - title: OptionT
         url: /docs/arrow/data/optiont/
@@ -257,6 +252,9 @@ options:
       - title: Bifoldable
         url: /docs/arrow/typeclasses/bifoldable/
 
+      - title: Bitraverse
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-bitraverse/
+
       - title: Traverse
         url: /docs/arrow/typeclasses/traverse/
 
@@ -264,13 +262,13 @@ options:
         url: /docs/arrow/typeclasses/reducible/
 
       - title: TraverseFilter
-        url: /docs/arrow/mtl/typeclasses/traversefilter/
+        url: /docs/arrow/typeclasses/traversefilter/
 
       - title: Functor
         url: /docs/arrow/typeclasses/functor/
 
       - title: FunctorFilter
-        url: /docs/arrow/mtl/typeclasses/functorfilter/
+        url: /docs/arrow/typeclasses/functorfilter/
 
       - title: Applicative
         url: /docs/arrow/typeclasses/applicative/
@@ -291,7 +289,7 @@ options:
         url: /docs/arrow/effects/typeclasses/bracket/
 
       - title: MonadFilter
-        url: /docs/arrow/mtl/typeclasses/monadfilter/
+        url: /docs/arrow/typeclasses/monadfilter/
 
       - title: MonadReader
         url: /docs/arrow/mtl/typeclasses/monadreader/
@@ -303,7 +301,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadstate/
 
       - title: MonadCombine
-        url: /docs/arrow/mtl/typeclasses/monadcombine/
+        url: /docs/arrow/typeclasses/monadcombine/
 
       - title: Comonad
         url: /docs/arrow/typeclasses/comonad/
@@ -365,7 +363,7 @@ options:
         url: /docs/effects/fiber/
 
       - title: Resource
-        url: /docs/apidocs/arrow-effects-data/resource
+        url: /docs/apidocs/arrow-effects-data/arrow.fx/-resource/
 
   - title: Optics
 
@@ -449,9 +447,6 @@ options:
 
   - title: Generic
     nested_options:
-
-      - title: Coproduct
-        url: /docs/generic/coproduct/
 
       - title: Product
         url: /docs/generic/product/

@@ -3,28 +3,31 @@ package arrow.optics.instances
 import arrow.core.Option
 import arrow.core.extensions.eq
 import arrow.core.extensions.option.eq.eq
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.NonEmptyList
-import arrow.data.SequenceK
-import arrow.data.extensions.listk.eq.eq
-import arrow.data.extensions.sequencek.eq.eq
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.core.NonEmptyList
+import arrow.core.SequenceK
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.ListFilterIndex
-import arrow.optics.extensions.MapFilterIndex
+import arrow.optics.extensions.filterMapIndex
 import arrow.optics.extensions.filterIndex
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
 import arrow.optics.extensions.sequencek.filterIndex.filterIndex
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.char
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
+import arrow.test.generators.listK
+import arrow.test.generators.mapK
+import arrow.test.generators.nonEmptyList
+import arrow.test.generators.sequenceK
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class FilterIndexInstanceTest : UnitSpec() {
 
   init {
@@ -79,7 +82,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = MapFilterIndex<Char, Int>().filter { true },
+      traversal = filterMapIndex<Char, Int>().filter { true },
       aGen = Gen.map(Gen.char(), Gen.intSmall()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
@@ -97,7 +100,5 @@ class FilterIndexInstanceTest : UnitSpec() {
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
     ))
-
   }
-
 }

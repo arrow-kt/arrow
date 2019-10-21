@@ -2,22 +2,21 @@ package arrow.optics
 
 import arrow.core.ListExtensions
 import arrow.core.Option
+import arrow.core.k
 import arrow.core.extensions.option.monoid.monoid
-import arrow.data.ListK
-import arrow.data.NonEmptyList
-import arrow.data.extensions.listk.monoid.monoid
-import arrow.data.extensions.nonemptylist.semigroup.semigroup
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.NonEmptyList
+import arrow.core.extensions.listk.monoid.monoid
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.nonEmptyList
+import arrow.test.generators.option
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ListTest : UnitSpec() {
 
   init {
@@ -59,7 +58,5 @@ class ListTest : UnitSpec() {
       EQB = Eq.any(),
       bMonoid = ListK.monoid())
     )
-
   }
-
 }

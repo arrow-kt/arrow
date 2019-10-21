@@ -33,7 +33,7 @@ object RecursiveLaws {
     algM: AlgebraM<F, ForEval, Int>
   ): List<Law> = laws(RR, smallGenT, alg) + listOf(
     Law("cataM with eval is stacksafe") { RR.cataMEvalIsStackSafe(TF, largeGenT, algM) },
-    // Law("paraM with eval is stacksafe") { RR.paraMEvalIsStackSafe(TF, largeGenT, algM) },
+    Law("paraM with eval is stacksafe") { RR.paraMEvalIsStackSafe(TF, largeGenT, algM) },
     Law("histoM with eval is stacksafe") { RR.histoMEvalIsStackSafe(TF, largeGenT, algM) }
   )
 
@@ -62,7 +62,7 @@ object RecursiveLaws {
       true
     }
 
-  /*
+
   fun <T, F> Recursive<T, F>.paraMEvalIsStackSafe(TF: Traverse<F>, largeGenT: Gen<T>, alg: AlgebraM<F, ForEval, Int>) =
     forFew(5, largeGenT) { t ->
       t.paraM<ForEval, Int>(TF, Eval.monad()) {
@@ -70,7 +70,6 @@ object RecursiveLaws {
       }.value()
       true
     }
-  */
 
   fun <T, F> Recursive<T, F>.histoMEvalIsStackSafe(TF: Traverse<F>, largeGenT: Gen<T>, alg: AlgebraM<F, ForEval, Int>) =
     forFew(5, largeGenT) { t ->

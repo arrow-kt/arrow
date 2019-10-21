@@ -17,7 +17,7 @@ It can be created from Kotlin Sequence type with a convenient `k()` function.
 
 ```kotlin:ank
 import arrow.*
-import arrow.data.*
+import arrow.core.*
 
 sequenceOf(1, 2, 3).k()
 ```
@@ -44,8 +44,8 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
-import arrow.data.extensions.*
-import arrow.data.extensions.sequence.applicative.ap
+import arrow.core.extensions.*
+import arrow.core.extensions.sequence.apply.ap
 
 sequenceOf(1, 2, 3)
  .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}))
@@ -56,13 +56,13 @@ SequenceK is a [`Monad`](/docs/arrow/typeclasses/monad/) too. For example, it ca
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.data.extensions.*
-import arrow.data.extensions.sequence.monad.binding
+import arrow.core.extensions.*
+import arrow.core.extensions.fx
 
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-binding {
+SequenceK.fx {
   val (p) = positive
   val (pe) = positiveEven
   p + pe
@@ -79,7 +79,6 @@ sequenceOf('a', 'b', 'c', 'd', 'e').k().foldLeft("") { x, y -> x + y }
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(SequenceK::class).tcMarkdownList()

@@ -20,21 +20,22 @@ buildscript {
     ext {
         // Constants
         ankKotlinVersion = '1.3.11'
-        daggerVersion = '2.21'
-        detekt_version = '1.0.0-RC12'
-        dokka_version = '0.9.18'
+        dokka_version = '0.10.0'
+        ktlint_version = "0.34.2"
+        ktlint_gradle_version = '8.2.0'
         gradleVersionsPluginVersion = '0.21.0'
         jUnitVersion = '4.12'
-        jUnitVintageVersion = '5.4.0'
+        jUnitVintageVersion = '5.5.2'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinPoetVersion = '1.1.0'
-        kotlinTestVersion = '3.3.1'
-        kotlinVersion = '1.3.21'
+        kotlinTestVersion = '3.3.3'
+        kotlinVersion = '1.3.50'
         kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinxCoroutinesVersion = '1.1.1'
+        kotlinxCoroutinesVersion = '1.3.2'
         projectReactorVersion = '3.2.6.RELEASE'
         retrofitVersion = '2.5.0'
-        rxJavaVersion = '2.2.7'
+        rxJavaVersion = '2.2.13'
+        atomicfuVersion = '0.13.2'
     }
 
     repositories {
@@ -55,7 +56,10 @@ buildscript {
         classpath 'org.ajoberstar:gradle-git-publish:2.0.0'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
+        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.7"
+        classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_gradle_version"
+        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicfuVersion"
     }
 }
 
@@ -84,61 +88,37 @@ subprojects { project ->
     version = VERSION_NAME
 
     apply plugin: 'kotlin'
-    apply plugin: 'jacoco'
     apply plugin: 'org.jetbrains.dokka'
-    apply plugin: 'io.gitlab.arturbosch.detekt'
+    apply plugin: "org.jlleitschuh.gradle.ktlint"
+    apply plugin: 'kotlinx-atomicfu'
+
+    ktlint {
+        version = ktlint_version
+    }
 
     archivesBaseName = POM_ARTIFACT_ID
-
-    jacoco {
-        toolVersion '0.8.2'
-    }
 
     //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
     dokka {
         outputFormat = 'jekyll'
         outputDirectory = pathApiDocs
+        configuration {
+            includes = ['README.md']
+            reportUndocumented = false
+            // Specifies the location of the project source code on the Web.
+            // If provided, Dokka generates "source" links for each declaration.
+            // Repeat for multiple mappings
+            sourceLink {
+                // Source directory
+                path = "src/main/kotlin"
 
-        includes = ['README.md']
-        reportUndocumented = false
+                // URL showing where the source code can be accessed through the web browser
+                url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
 
-        // Specifies the location of the project source code on the Web.
-        // If provided, Dokka generates "source" links for each declaration.
-        // Repeat for multiple mappings
-        linkMapping {
-            // Source directory
-            dir = "src/main/kotlin"
-
-            // URL showing where the source code can be accessed through the web browser
-            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
-
-            // Suffix which is used to append the line number to the URL. Use #L for GitHub
-            suffix = "#L"
+                // Suffix which is used to append the line number to the URL. Use #L for GitHub
+                lineSuffix = "#L"
+            }
         }
-
-    }
-
-    detekt {
-        toolVersion = detekt_version
-        input = files("src/main/java", "src/main/kotlin", "src/test/kotlin")
-        parallel = true
-        config = files("${rootProject.projectDir}/detekt.yml")
-    }
-
-    task codeCoverageReport(type: JacocoReport) {
-        reports {
-            xml.enabled true
-            xml.destination file("${buildDir}/reports/jacoco/report.xml")
-            html.enabled true
-            csv.enabled false
-        }
-
-        classDirectories = fileTree(
-                dir: 'build/classes/kotlin/main',
-        )
-
-        sourceDirectories = files('src/main/kotlin')
-        executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
     }
 
     apply plugin: 'com.jfrog.bintray'

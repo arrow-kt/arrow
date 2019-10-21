@@ -11,10 +11,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class IntBirecursive : UnitSpec() {
   init {
 
@@ -43,14 +40,13 @@ class IntBirecursive : UnitSpec() {
   }
 }
 
-@RunWith(KotlinTestRunner::class)
 class LongBirecursive : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(
         Option.traverse(),
         Long.birecursive(),
-        Gen.long().filter { it in 0..100 }, Gen.constant(5000L),
+        Gen.intSmall().filter { it in 0..100 }.map { it.toLong() }, Gen.constant(5000L),
         {
           it.fold(Int.monoid())
         },

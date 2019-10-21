@@ -24,15 +24,15 @@ object CorecursiveLaws {
   fun <T, F> laws(CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>): List<Law> =
     listOf(
       Law("Ana == hylo + embed") { CR.anaEqualsHyloAndEmbed(coalg) },
-      Law("Apo + coalgebra instead of r-coalgebra == ana") { CR.apoEqualsAnaWithNormalCoalgebra(coalg) }
-      // Law("Futu + coalgebra instead of cv-coalgebra == ana") { CR.futuEqualsAnaWithNormalCoalgebra(coalg) }
+      Law("Apo + coalgebra instead of r-coalgebra == ana") { CR.apoEqualsAnaWithNormalCoalgebra(coalg) },
+      Law("Futu + coalgebra instead of cv-coalgebra == ana") { CR.futuEqualsAnaWithNormalCoalgebra(coalg) }
     )
 
   fun <T, F> laws(TF: Traverse<F>, CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>, coalgM: CoalgebraM<F, ForEval, Int>): List<Law> =
     laws(CR, coalg) + listOf(
       Law("anaM with eval is stacksafe") { CR.anaMIsStackSafeWithEval(TF, coalgM) },
-      Law("apoM with eval is stackSafe") { CR.apoMIsStackSafeWithEval(TF, coalgM) }
-      // Law("futuM with eval is stackSafe) { CR.futuMIsStackSafeWithEval(TF, coalgM) }
+      Law("apoM with eval is stackSafe") { CR.apoMIsStackSafeWithEval(TF, coalgM) },
+      Law("futuM with eval is stackSafe") { CR.futuMIsStackSafeWithEval(TF, coalgM) }
     )
 
   fun <T, F> Corecursive<T, F>.anaEqualsHyloAndEmbed(coalg: Coalgebra<F, Int>) =
@@ -47,14 +47,12 @@ object CorecursiveLaws {
       } == i.ana(coalg)
     }
 
-  /* TODO This crashes the kotlin compiler...
   fun <T, F> Corecursive<T, F>.futuEqualsAnaWithNormalCoalgebra(coalg: Coalgebra<F, Int>) =
     forFew(5, Gen.int().filter { it in 0..100 }) { i ->
       i.futu {
         FF().run { coalg(it).map { FreeF.pure<F, Int>(it) } }
       } == i.ana(coalg)
     }
-    */
 
   fun <T, F> Corecursive<T, F>.anaMIsStackSafeWithEval(TF: Traverse<F>, coalg: CoalgebraM<F, ForEval, Int>) =
     5000.anaM(TF, Eval.monad(), coalg).value()
@@ -64,10 +62,8 @@ object CorecursiveLaws {
       FF().run { coalg(it).map { it.map { it.right() } } }
     }.value()
 
-  /* Also crashes compiler wtf
   fun <T, F> Corecursive<T, F>.futuMIsStackSafeWithEval(TF: Traverse<F>, coalg: CoalgebraM<F, ForEval, Int>) =
     5000.futuM(TF, Eval.monad()) {
       FF().run { coalg(it).map { it.map { FreeF.pure<F, Int>(it) } } }
     }
-    */
 }

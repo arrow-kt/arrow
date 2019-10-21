@@ -7,10 +7,7 @@ import arrow.test.generators.lessThan
 import arrow.validation.refinedTypes.numeric.validated.nonNegative.nonNegative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NonNegativeTest : UnitSpec() {
   init {
 
@@ -25,6 +22,5 @@ class NonNegativeTest : UnitSpec() {
         x.nonNegative(Int.order()).isInvalid
       }
     }
-
   }
 }

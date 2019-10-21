@@ -1,6 +1,7 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
 
 @optics
 data class Pos(val x: Int, val y: Int) {
@@ -39,7 +40,7 @@ data class Employee(val name: String, val company: Company) {
 
 @optics
 sealed class Shape {
-  companion object {}
+  companion object
 
   @optics
   data class Circle(val radius: Double) : Shape() {
@@ -50,12 +51,12 @@ sealed class Shape {
   data class Rectangle(val width: Double, val height: Double) : Shape() {
     companion object
   }
-
 }
 
 @optics data class HealthPack(val amountLeft: Int) {
   companion object
 }
+
 object OutOfPacks
 
 @optics data class Inventory(val item: Either<OutOfPacks, HealthPack>) {

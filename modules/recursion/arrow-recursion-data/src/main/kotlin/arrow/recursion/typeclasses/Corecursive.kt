@@ -102,7 +102,7 @@ interface Corecursive<T, F> {
   fun <M, A> A.apoM(TF: Traverse<F>, MM: Monad<M>, coalg: RCoalgebraM<F, M, T, A>): Kind<M, T> =
     hyloMC({
       FF().run { MM.just(it.map { it.fix().fold(::identity, ::identity) }.embedT()) }
-    }, coalg, TF, Either.traverse(), Either.applicative(), MM)
+    }, coalg, TF, Either.traverse(), MM)
 
   fun <A> A.futu(coalg: CVCoalgebra<F, A>): T =
     FreeF.pure<F, A>(this).hylo(
@@ -116,7 +116,6 @@ interface Corecursive<T, F> {
       FF()
     )
 
-  /* Causes compiler error (futu did as well at some point but works again for some weird reason)
   fun <M, A> A.futuM(TF: Traverse<F>, MM: Monad<M>, coalg: CVCoalgebraM<F, M, A>): Kind<M, T> =
     FreeF.pure<F, A>(this).hyloM(embed() andThen MM::just, {
       when (val fa = it.unfix.fix()) {
@@ -124,7 +123,6 @@ interface Corecursive<T, F> {
         is FreeF.Impure -> MM.just(TF.run { fa.fa.map { it.value().fix() } })
       }
     }, TF, MM)
-  */
 
   fun <A> A.postPro(trans: FunctionK<F, F>, coalg: Coalgebra<F, A>): T =
     hylo(embed(), coalg andThen trans::invoke, FF())

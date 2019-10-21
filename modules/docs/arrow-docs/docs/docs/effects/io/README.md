@@ -142,7 +142,7 @@ IO.raiseError<Int>(RuntimeException("Boom!"))
 
 Generally used to wrap existing blocking functions. Creates an `IO` that invokes one lambda function when run.
 
-Note that this function is evaluated every time`IO`is run.
+Note that this function is evaluated every time `IO` is run.
 
 ```kotlin
 IO { 1 }
@@ -155,12 +155,29 @@ IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### suspend
+### effect
+
+Similar to `invoke`, accepting `suspend` functions. Creates an `IO` that invokes one suspend lambda function when run.
+
+Note that this function is evaluated every time `IO` is run.
+
+```kotlin
+IO.effect { requestSuspend(1) }
+  .unsafeRunSync()
+```
+
+```kotlin
+IO.effect { throw RuntimeException("Boom!") }
+  .attempt()
+  .unsafeRunSync()
+```
+
+### defer
 
 Used to defer the evaluation of an existing `IO`.
 
 ```kotlin
-IO.suspend { IO.just(1) }
+IO.defer { IO.just(1) }
   .attempt()
   .unsafeRunSync()
 ```
@@ -196,10 +213,10 @@ IO.async<Int> { callback ->
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.effects.*
-import arrow.effects.extensions.io.monad.binding
+import arrow.fx.*
+import arrow.fx.extensions.fx
 
-binding {
+IO.fx {
   val (file) = getFile("/tmp/file.txt")
   val (lines) = file.readLines()
   val average =
@@ -213,30 +230,15 @@ binding {
 }.attempt().unsafeRunSync()
 ```
 
-## Syntax
-
-### A#liftIO
-
-Puts the value `A` inside an `IO<A>` using `just`.
-
-```kotlin:ank
-import arrow.effects.*
-
-1.liftIO()
-  .attempt()
-  .unsafeRunSync()
-```
-
 ## Common operators
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
-
 
 ### Supported Type Classes
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.fx.*
 
 DataType(IO::class).tcMarkdownList()
 ```

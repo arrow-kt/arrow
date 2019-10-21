@@ -17,7 +17,7 @@ It can be created from Kotlin List type with a convenient `k()` function.
 
 ```kotlin:ank
 import arrow.*
-import arrow.data.*
+import arrow.core.*
 
 listOf(1, 2, 3).k()
 ```
@@ -33,7 +33,7 @@ For instance, it has `combineK` from the [`SemigroupK`](/docs/arrow/typeclasses/
 It can be used to cheaply combine two lists:
 
 ```kotlin:ank
-import arrow.data.extensions.list.semigroupK.*
+import arrow.core.extensions.list.semigroupK.*
 
 val hello = listOf('h', 'e', 'l', 'l', 'o')
 val commaSpace = listOf(',', ' ')
@@ -48,9 +48,8 @@ Traversing a list creates a new container [`Kind<F, A>`](/docs/patterns/glossary
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.extensions.*
 import arrow.core.extensions.option.applicative.*
-import arrow.data.extensions.list.traverse.*
+import arrow.core.extensions.list.traverse.*
 
 val numbers = listOf(Math.random(), Math.random(), Math.random())
 numbers.traverse(Option.applicative(), { if (it > 0.5) Some(it) else None })
@@ -76,8 +75,8 @@ listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
 Or you can apply a list of transformations using `ap` from [`Applicative`](/docs/arrow/typeclasses/applicative/).
 
 ```kotlin:ank
-import arrow.data.extensions.*
-import arrow.data.extensions.list.applicative.*
+import arrow.core.extensions.*
+import arrow.core.extensions.list.apply.*
 
 listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}))
 ```
@@ -86,7 +85,6 @@ listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}))
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(ListK::class).tcMarkdownList()

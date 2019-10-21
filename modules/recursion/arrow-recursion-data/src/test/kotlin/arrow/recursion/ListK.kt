@@ -1,8 +1,8 @@
 package arrow.recursion
 
 import arrow.core.Eval
-import arrow.data.ListK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.k
 import arrow.recursion.extensions.listf.traverse.traverse
 import arrow.recursion.extensions.listk.birecursive.birecursive
 import arrow.recursion.pattern.ListF
@@ -11,10 +11,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.listK
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ListKBirecursive : UnitSpec() {
   init {
     testLaws(

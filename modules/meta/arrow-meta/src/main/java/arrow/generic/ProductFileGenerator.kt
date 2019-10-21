@@ -23,7 +23,7 @@ class ProductFileGenerator(
 
   fun generate() {
     buildProduct(annotatedList)
-    //buildInstances(annotatedList)
+    // buildInstances(annotatedList)
   }
 
   private fun buildProduct(products: Collection<AnnotatedGeneric>) =
@@ -161,14 +161,13 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}Eq.defaultInstance
                 |""".trimMargin()
 
-  //TODO instance imports are hardcoded
+  // TODO instance imports are hardcoded
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
-            |package ${product.classData.`package`.escapedClassName}
+            |${if (product.classData.`package`.escapedClassName != "`unnamed package`") "package ${product.classData.`package`.escapedClassName}" else ""}
             |
             |import arrow.typeclasses.*
             |import arrow.core.*
             |import arrow.core.extensions.*
-            |import arrow.data.extensions.*
             |import arrow.core.extensions.option.monoid.monoid
             |import arrow.core.extensions.option.semigroup.semigroup
             |
@@ -408,4 +407,3 @@ class ProductFileGenerator(
                 |""".trimMargin()
     else ""
 }
-

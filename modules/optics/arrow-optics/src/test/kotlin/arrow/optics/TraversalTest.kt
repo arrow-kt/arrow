@@ -6,9 +6,24 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
 import arrow.core.toOption
 import arrow.core.toT
-import arrow.data.*
-import arrow.data.extensions.listk.eq.eq
-import arrow.data.extensions.listk.traverse.traverse
+import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.mtl.State
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.fix
+import arrow.core.k
+import arrow.mtl.map
+import arrow.mtl.run
+import arrow.optics.mtl.assign
+import arrow.optics.mtl.assignOld
+import arrow.optics.mtl.assign_
+import arrow.optics.mtl.extract
+import arrow.optics.mtl.extractMap
+import arrow.optics.mtl.toState
+import arrow.optics.mtl.update
+import arrow.optics.mtl.updateOld
+import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.listK
@@ -18,10 +33,7 @@ import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TraversalTest : UnitSpec() {
 
   init {
@@ -217,9 +229,6 @@ class TraversalTest : UnitSpec() {
             }.run(ints)
         }
       }
-
     }
-
   }
-
 }

@@ -139,11 +139,11 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
-import arrow.data.extensions.option.monad.binding
+import arrow.core.extensions.*
+import arrow.core.extensions.option.monad.binding
 
 fun attackOption(): Option<Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm()
     val (target) = aim()
     val (impact) = launch(target, nuke)
@@ -199,10 +199,10 @@ Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` 
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 fun attackTry(): Try<Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm()
     val (target) = aim()
     val (impact) = launch(target, nuke)
@@ -261,7 +261,7 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 import arrow.core.extensions.either.monad.binding
 
 fun attackEither(): Either<NukeException, Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm()
     val (target) = aim()
     val (impact) = launch(target, nuke)
@@ -316,7 +316,7 @@ We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
 fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm<F>()
     val (target) = aim<F>()
     val (impact) = launch<F>(target, nuke)
@@ -338,7 +338,7 @@ val result1 = Either.monadError<NukeException>.attack1()
 result1.fix()
 ```
 
-Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
+Note that `MonadThrow` also has a function `fx.monadThrow` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
 fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): Impacted {
@@ -346,7 +346,7 @@ fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): I
 }
 
 fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
-  bindingCatch {
+  fx.monadThrow {
     val (nuke) = arm<F>()
     val (target) = aim<F>()
     val impact = launchImpure<F>(target, nuke)
@@ -364,7 +364,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

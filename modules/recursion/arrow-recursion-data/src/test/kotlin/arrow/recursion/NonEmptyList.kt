@@ -1,10 +1,6 @@
 package arrow.recursion
 
-import arrow.core.Eval
-import arrow.core.none
-import arrow.core.some
-import arrow.data.Nel
-import arrow.data.NonEmptyList
+import arrow.core.*
 import arrow.recursion.extensions.nonemptylist.birecursive.birecursive
 import arrow.recursion.extensions.nonemptylistf.traverse.traverse
 import arrow.recursion.pattern.NonEmptyListF
@@ -12,10 +8,7 @@ import arrow.recursion.pattern.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NonEmptyListBirecursive : UnitSpec() {
   init {
     testLaws(

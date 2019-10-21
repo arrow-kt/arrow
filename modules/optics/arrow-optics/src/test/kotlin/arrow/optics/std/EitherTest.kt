@@ -1,19 +1,18 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.data.Invalid
-import arrow.data.Valid
-import arrow.data.Validated
+import arrow.core.Invalid
+import arrow.core.Valid
+import arrow.core.Validated
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.validated
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class EitherTest : UnitSpec() {
 
   init {
@@ -31,11 +30,10 @@ class EitherTest : UnitSpec() {
           is Valid -> {
             when (b) {
               is Invalid -> b
-              is Valid -> Valid((a + b.a))
+              is Valid -> arrow.core.Valid((a + b.a))
             }
           }
         }
-
     }
     testLaws(IsoLaws.laws(
       iso = Either.toValidated(),
@@ -47,5 +45,4 @@ class EitherTest : UnitSpec() {
       bMonoid = VAL_MONOID
     ))
   }
-
 }

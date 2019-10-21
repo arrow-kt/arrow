@@ -5,6 +5,9 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.free.Cofree
+import arrow.mtl.typeclasses.compose
+import arrow.mtl.typeclasses.nest
+import arrow.mtl.typeclasses.unnest
 import arrow.recursion.data.fix
 import arrow.recursion.pattern.FreeF
 import arrow.recursion.pattern.FreeR
@@ -155,13 +158,12 @@ fun <F, W, M, A, B> A.hyloMC(
   coalg: (A) -> Kind<M, Kind<F, Kind<W, A>>>,
   TF: Traverse<F>,
   TW: Traverse<W>,
-  AW: Applicative<W>,
   MM: Monad<M>
 ): Kind<M, B> = hyloM({
   alg(it.unnest())
 }, {
   MM.run { coalg(it).map { it.nest() } }
-}, TF.compose(TW, AW), MM)
+}, TF.compose(TW), MM)
 
 fun <F, A, B> A.chrono(
   alg: CVAlgebra<F, B>,

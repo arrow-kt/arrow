@@ -43,30 +43,33 @@ include {
 
         core {
             _ 'core-data'
-            _ 'core-extensions'
-            _ 'extras-data'
-            _ 'extras-extensions'
+            _ 'core'
             _ 'generic'
             _ 'kindedj'
-            _ 'mtl'
             _ 'syntax'
             _ 'test'
-            _ 'typeclasses'
+        }
+
+        mtl {
+            _ 'mtl'
+            _ 'mtl-data'
+        }
+
+        ui {
+            _ 'ui'
+            _ 'ui-data'
         }
 
         free {
             _ 'free-data'
-            _ 'free-extensions'
+            _ 'free'
         }
 
-        effects {
-            _ 'effects-data'
-            _ 'effects-extensions'
-            _ 'effects-io-extensions'
-            _ 'effects-rx2-data'
-            _ 'effects-rx2-extensions'
-            _ 'effects-reactor-data'
-            _ 'effects-reactor-extensions'
+        fx {
+            _ 'fx'
+            _ 'fx-mtl'
+            _ 'fx-rx2'
+            _ 'fx-reactor'
         }
 
         integrations {
@@ -75,7 +78,7 @@ include {
 
         recursion {
             _ 'recursion-data'
-            _ 'recursion-extensions'
+            _ 'recursion'
         }
 
         docs {
@@ -85,16 +88,7 @@ include {
 
         optics {
             _ 'optics'
-        }
-
-        dagger {
-            _ 'dagger'
-            _ 'dagger-effects'
-            _ 'dagger-effects-rx2'
-        }
-
-        shadow {
-            _ 'shadow'
+            _ 'optics-mtl'
         }
 
         streams {
@@ -107,7 +101,7 @@ include {
         }
 
         aql {
-            _ 'query-language'
+            _ 'aql'
         }
 
         reflect {
@@ -116,6 +110,12 @@ include {
 
         validation {
             _ 'validation'
+        }
+
+        benchmarks {
+            _ 'scala-benchmarks'
+            _ 'kio-benchmarks'
+            _ 'benchmarks-fx'
         }
     }
 }
