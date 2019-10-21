@@ -39,12 +39,12 @@ private fun checkCompilationResult(compilationResult: CompilationResult, expecte
 private fun checkExpectedGeneratedClasses(compilationResult: CompilationResult, expectedGeneratedClasses: ExpectedGeneratedClasses): ListAssert<String>? =
   assertThat(compilationResult.actualGeneratedClasses).containsExactlyInAnyOrder(*expectedGeneratedClasses.filenamesWithoutExt.toTypedArray())
 
-private fun checkExpectedExecutionResult(compilationResult: CompilationResult, expectedExecutionResult: ExpectedExecutionResult) {
+private fun checkExpectedExecutionResult(compilationResult: CompilationResult, expectedExecutionResult: ExpectedExecutionResult): Unit {
   assertThat(expectedExecutionResult.expression).matches(EXPRESSION_PATTERN)
   assertThat(call(expectedExecutionResult.expression, compilationResult.classesDirectory)).isEqualTo(expectedExecutionResult.output)
 }
 
-private fun checkExpectedGeneratedSourceCode(compilationResult: CompilationResult, expectedGeneratedSourceCode: ExpectedGeneratedSourceCode) {
+private fun checkExpectedGeneratedSourceCode(compilationResult: CompilationResult, expectedGeneratedSourceCode: ExpectedGeneratedSourceCode): Unit {
   val actualGeneratedFileContent = compilationResult.actualGeneratedFilePath.toFile().readText()
   val actualGeneratedFileContentWithoutCommands = removeCommands(actualGeneratedFileContent)
   val expectedGeneratedFileContentWithoutCommands = removeCommands(expectedGeneratedSourceCode.code)
