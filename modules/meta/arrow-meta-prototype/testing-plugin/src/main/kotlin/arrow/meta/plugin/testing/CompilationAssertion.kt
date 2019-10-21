@@ -7,7 +7,7 @@ import java.net.URLClassLoader
 private const val META_PREFIX = "//meta"
 private const val EXPRESSION_PATTERN = "^[^:]+::[^(]+\\(\\)(\\.\\S+)?\$"
 
-private data class Expression(
+private data class ExpressionParts(
   val classname: String,
   val method: String,
   val property: String? = null
@@ -41,22 +41,22 @@ fun assertThis(compilationData: CompilationData): Unit {
 private fun removeCommands(actualGeneratedFileContent: String): String =
   actualGeneratedFileContent.lines().filter { !it.trimStart().startsWith(META_PREFIX) }.joinToString(separator = "")
 
-private fun eval(call: String): Expression {
-  val mainParts = call.split("::")
+private fun eval(expression: String): ExpressionParts {
+  val mainParts = expression.split("::")
   val secondaryParts = mainParts[1].split("()")
   return when {
-    secondaryParts.size > 1 -> Expression(classname = mainParts[0], method = secondaryParts[0], property = secondaryParts[1].removePrefix("."))
-    else -> Expression(classname = mainParts[0], method = secondaryParts[0])
+    secondaryParts.size > 1 -> ExpressionParts(classname = mainParts[0], method = secondaryParts[0], property = secondaryParts[1].removePrefix("."))
+    else -> ExpressionParts(classname = mainParts[0], method = secondaryParts[0])
   }
 }
 
-private fun call(call: String, classesDirectory: File): String {
+private fun call(expression: String, classesDirectory: File): String {
   val classLoader = URLClassLoader(arrayOf(classesDirectory.toURI().toURL()))
-  val expression = eval(call)
+  val expressionParts = eval(expression)
 
-  val resultForTest = classLoader.loadClass(expression.classname).getMethod(expression.method).invoke(null)
+  val resultForMethodCall = classLoader.loadClass(expressionParts.classname).getMethod(expressionParts.method).invoke(null)
   return when {
-      expression.property.isNullOrBlank() -> resultForTest.toString()
-      else -> resultForTest.javaClass.getField(expression.property).get(resultForTest).toString()
+      expressionParts.property.isNullOrBlank() -> resultForMethodCall.toString()
+      else -> resultForMethodCall.javaClass.getField(expressionParts.property).get(resultForMethodCall).toString()
   }
 }
