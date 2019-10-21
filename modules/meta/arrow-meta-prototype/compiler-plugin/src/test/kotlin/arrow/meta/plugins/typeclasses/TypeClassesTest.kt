@@ -1,5 +1,6 @@
 package arrow.meta.plugins.typeclasses
 
+import arrow.meta.plugin.testing.Check.ExpectedExecutionResult
 import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
 import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
 import arrow.meta.plugin.testing.CompilationData
@@ -41,6 +42,7 @@ class TypeClassesTest {
         |   }
         | }
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           | import arrow.Kind
@@ -69,8 +71,8 @@ class TypeClassesTest {
         ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "Mappable\$DefaultImpls", "Mappable", "Test\$\$addOne\$lambda-1\$lambda-0\$0", "Test"
         ))
-      ),
-      expectedStatus = CompilationStatus.OK
+//        ExpectedExecutionResult(call = "ExampleKt::foo()", output = "?")
+      )
     ))
   }
 }

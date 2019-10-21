@@ -17,11 +17,11 @@ class CompilationTest {
       dependencies = listOf("arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"),
       sourceFilename = "Example.kt",
       sourceCode = contentFromResource(javaClass, "Example.kt.source"),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = contentFromResource(javaClass, "Example.kt.meta")),
         ExpectedGeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "ForId2", "Id2", "ForId2\$Companion"))
-      ),
-      expectedStatus = CompilationStatus.OK
+      )
     ))
   }
 
@@ -30,8 +30,10 @@ class CompilationTest {
     assertThis(CompilationData(
       sourceFilename = "Example.kt",
       sourceCode = "classs Error",
-      checks = listOf(ExpectedCompilationError(partialMessage = "Expecting a top level declaration")),
-      expectedStatus = CompilationStatus.COMPILATION_ERROR
+      expectedStatus = CompilationStatus.COMPILATION_ERROR,
+      checks = listOf(
+        ExpectedCompilationError(partialMessage = "Expecting a top level declaration")
+      )
     ))
   }
 }

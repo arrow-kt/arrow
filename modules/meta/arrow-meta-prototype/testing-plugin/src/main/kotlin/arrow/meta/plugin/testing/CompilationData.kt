@@ -11,15 +11,20 @@ sealed class Check {
 
   data class ExpectedCompilationError(
     val partialMessage: String
-  ): Check()
+  ) : Check()
 
   data class ExpectedGeneratedSourceCode(
     val code: String
-  ): Check()
+  ) : Check()
 
   data class ExpectedGeneratedClasses(
     val filenamesWithoutExt: List<String>
-  ): Check()
+  ) : Check()
+
+  data class ExpectedExecutionResult(
+    val expression: String,
+    val output: String
+  ) : Check()
 }
 
 data class CompilationData(

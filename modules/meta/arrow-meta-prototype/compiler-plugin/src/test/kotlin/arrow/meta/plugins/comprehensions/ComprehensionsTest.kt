@@ -3,6 +3,7 @@ package arrow.meta.plugins.comprehensions
 import arrow.meta.plugin.testing.Check.ExpectedGeneratedSourceCode
 import arrow.meta.plugin.testing.Check.ExpectedGeneratedClasses
 import arrow.meta.plugin.testing.Check.ExpectedCompilationError
+import arrow.meta.plugin.testing.Check.ExpectedExecutionResult
 import arrow.meta.plugin.testing.CompilationData
 import arrow.meta.plugin.testing.CompilationStatus
 import arrow.meta.plugin.testing.assertThis
@@ -47,6 +48,7 @@ class ComprehensionsTest {
         |   }
         |   
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
@@ -61,9 +63,9 @@ class ComprehensionsTest {
           |""".trimMargin()),
         ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0")
-        )
-      ),
-      expectedStatus = CompilationStatus.OK
+        ),
+        ExpectedExecutionResult(expression = "ExampleKt::test().value", output = "3")
+      )
     ))
   }
 
@@ -82,6 +84,7 @@ class ComprehensionsTest {
         |   }
         |   
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
@@ -96,9 +99,9 @@ class ComprehensionsTest {
           |""".trimMargin()),
         ExpectedGeneratedClasses(filenamesWithoutExt = listOf(
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$1", "\$test\$lambda-1\$0")
-        )
-      ),
-      expectedStatus = CompilationStatus.OK
+        ),
+        ExpectedExecutionResult(expression = "ExampleKt::test().value", output = "3")
+      )
     ))
   }
 
@@ -125,6 +128,7 @@ class ComprehensionsTest {
         |   }
         |   
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
@@ -149,9 +153,9 @@ class ComprehensionsTest {
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-1\$lambda-0\$2",
           "ExampleKt\$\$test\$lambda-5\$lambda-3\$4", "ExampleKt\$\$test\$lambda-5\$lambda-3\$lambda-2\$3",
           "ExampleKt\$\$test\$lambda-5\$lambda-4\$5", "\$test\$lambda-1\$0", "\$test\$lambda-5\$1")
-        )
-      ),
-      expectedStatus = CompilationStatus.OK
+        ),
+        ExpectedExecutionResult(expression = "ExampleKt::test().value", output = "10")
+      )
     ))
   }
 
@@ -175,6 +179,7 @@ class ComprehensionsTest {
         |   }
         |   
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
@@ -198,9 +203,9 @@ class ComprehensionsTest {
           "ExampleKt", "IO", "IO\$Companion", "ExampleKt\$\$test\$lambda-3\$lambda-2\$3",
           "ExampleKt\$\$test\$lambda-3\$lambda-2\$lambda-1\$2",
           "ExampleKt\$\$test\$lambda-3\$lambda-2\$lambda-1\$lambda-0\$1", "\$test\$lambda-3\$0")
-        )
-      ),
-      expectedStatus = CompilationStatus.OK
+        ),
+        ExpectedExecutionResult(expression = "ExampleKt::test().value", output = "14")
+      )
     ))
   }
 
@@ -215,6 +220,7 @@ class ComprehensionsTest {
         |   IO.fx { 1 + 1 }
         |
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.OK,
       checks = listOf(
         ExpectedGeneratedSourceCode(code = """
           |${contentFromResource(javaClass, "Example.kt.meta")}
@@ -223,9 +229,9 @@ class ComprehensionsTest {
           |   IO.just(1 + 1)
           |   
           |""".trimMargin()),
-        ExpectedGeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "IO", "IO\$Companion"))
-      ),
-      expectedStatus = CompilationStatus.OK
+        ExpectedGeneratedClasses(filenamesWithoutExt = listOf("ExampleKt", "IO", "IO\$Companion")),
+        ExpectedExecutionResult(expression = "ExampleKt::test().value", output = "2")
+      )
     ))
   }
 
@@ -240,11 +246,11 @@ class ComprehensionsTest {
         |   IO.fx { a + 1 }
         |
         |""".trimMargin(),
+      expectedStatus = CompilationStatus.COMPILATION_ERROR,
       checks = listOf(
         ExpectedCompilationError(partialMessage = "Unresolved reference: a"),
         ExpectedGeneratedClasses(filenamesWithoutExt = emptyList())
-      ),
-      expectedStatus = CompilationStatus.COMPILATION_ERROR
+      )
     ))
   }
 

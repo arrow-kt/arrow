@@ -13,7 +13,8 @@ internal data class CompilationResult(
   val actualGeneratedClasses: List<String>,
   val actualStatus: CompilationStatus,
   val log: String,
-  val sourcesDirectory: Path
+  val actualGeneratedFilePath: Path,
+  val classesDirectory: File
 )
 
 internal fun compile(compilationData: CompilationData): CompilationResult =
@@ -21,14 +22,15 @@ internal fun compile(compilationData: CompilationData): CompilationResult =
     sources = listOf(SourceFile.kotlin(compilationData.sourceFilename, compilationData.sourceCode))
     classpaths = compilationData.dependencies.map { classpathOf(it) }
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
-  }.compile())
+  }.compile(), compilationData.sourceFilename)
 
-private fun compilationResultFrom(internalResult: KotlinCompilation.Result) =
+private fun compilationResultFrom(internalResult: KotlinCompilation.Result, sourceFilename: String) =
   CompilationResult(
     actualGeneratedClasses = classFilenamesFrom(internalResult.generatedFiles),
     actualStatus = exitStatusFrom(internalResult.exitCode),
     log = internalResult.messages,
-    sourcesDirectory = Paths.get(internalResult.outputDirectory.parent, "sources")
+    actualGeneratedFilePath = Paths.get(internalResult.outputDirectory.parent, "sources", "$sourceFilename.meta"),
+    classesDirectory = internalResult.outputDirectory
   )
 
 private fun exitStatusFrom(exitCode: KotlinCompilation.ExitCode): CompilationStatus =
