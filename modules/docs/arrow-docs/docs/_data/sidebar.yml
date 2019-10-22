@@ -129,19 +129,19 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/arrow/core/option/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-option/
 
       - title: Either
-        url: /docs/arrow/core/either/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-either/
 
       - title: Try
-        url: /docs/arrow/core/try/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-try/
 
       - title: Validated
-        url: /docs/arrow/data/validated/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-validated/
 
       - title: NonEmptyList
-        url: /docs/arrow/data/nonemptylist/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-non-empty-list/
 
       - title: ListK
         url: /docs/arrow/data/listk/

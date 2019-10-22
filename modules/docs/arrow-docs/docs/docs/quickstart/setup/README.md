@@ -86,6 +86,8 @@ dependencies {
 }
 ```
 
+##### Other libraries
+
 Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
 #### Additional Setup
@@ -137,7 +139,6 @@ idea {
  
 #### Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>

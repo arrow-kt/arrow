@@ -4,7 +4,8 @@ import arrow.Kind
 import arrow.fx.internal.JavaCancellationException
 import arrow.fx.typeclasses.MonadDefer
 import arrow.typeclasses.Applicative
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
 
 typealias CancelToken<F> = Kind<F, Unit>
 
@@ -293,7 +294,7 @@ sealed class KindConnection<F> {
    * Default [KindConnection] implementation.
    */
   private class DefaultKindConnection<F>(private val MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
-    private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
+    private val state: AtomicRef<List<CancelToken<F>>?> = atomic(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {
       state.getAndSet(null).let { stack ->
@@ -304,9 +305,9 @@ sealed class KindConnection<F> {
       }
     }
 
-    override fun isCanceled(): Boolean = state.get() == null
+    override fun isCanceled(): Boolean = state.value == null
 
-    override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.get()) {
+    override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.value) {
       null -> run(token) // If connection is already cancelled cancel token immediately.
       else -> if (!state.compareAndSet(list, listOf(token) + list)) push(token) else Unit
     }
@@ -315,7 +316,7 @@ sealed class KindConnection<F> {
       push(token.toList().cancelAll())
 
     override tailrec fun pop(): CancelToken<F> {
-      val state = state.get()
+      val state = state.value
       return when {
         state == null || state.isEmpty() -> unit()
         else -> if (!this.state.compareAndSet(state, state.drop(1))) pop()
@@ -339,6 +340,6 @@ sealed class KindConnection<F> {
       this@map.map(f)
     }
 
-    override fun toString(): String = "KindConnection(state = ${state.get()})"
+    override fun toString(): String = "KindConnection(state = ${state.value})"
   }
 }
