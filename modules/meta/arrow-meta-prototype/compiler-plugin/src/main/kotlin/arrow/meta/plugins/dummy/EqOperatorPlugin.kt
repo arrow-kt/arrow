@@ -3,13 +3,15 @@ package arrow.meta.plugins.dummy
 import arrow.meta.Meta
 import arrow.meta.Plugin
 import arrow.meta.invoke
-import arrow.meta.plugins.typeclasses.findExtension
+import arrow.meta.phases.codegen.ir.IrUtils
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
@@ -28,60 +30,47 @@ val Meta.eq: Plugin
            * 1. Find the type of the descriptor's arguments to use in new IrSimpleType
            * 2. Create IrSimpleType for Arrow.Eq
            * 3. Get the EQ descriptor from the external symbol table. Create a new descriptor with new IrType "Eq<A>"
+           *    ^^ Wait, why is the EQ descriptor needed
            * 4. Replace descriptor of the current IrCall with new descriptor
            */
           if (it.descriptor.fqNameSafe == FqName("kotlin.ir.expressions.IrStatementOrigin.$EQEQ")) {
-            val type : IrType = it.descriptor.
-            val typee: KotlinType = it.descriptor.typeParameters.first().defaultType // making a terrible assumption the types match
-            val irType = it.getValueArgument(0)?.type
+            val kotlinType: KotlinType = it.descriptor.typeParameters.first().defaultType // making a terrible assumption the types match
+            // ^ can be used for the meta dsl
+            val irType: IrType? = it.getValueArgument(0)?.type
+            val eqDescriptor : FunctionDescriptor = it.descriptor
 
-            // create IrSimpleType for Arrow.Eq
-            IrSimpleTypeImpl(
-              classifier = irType.symbol,
-              hasQuestionMark = false,
-              arguments = arguments.map {
-                when (it) {
-                  is IrTypeProjection -> makeTypeProjection(
-                    it.type.remapTypeParameters(source, target, shift),
-                    it.variance
-                  )
-                  else -> it
-                }
-              },
-              annotations = emptyList()
-            )
 
-            val result = compilerContext.findExtension(it.getValueArgument(0).type)
+            val newEqDescriptor: FunctionDescriptor = it.descriptor.newCopyBuilder()
+              .setDescriptor(       // create IrSimpleType for Arrow.Eq - Eq<A>
+              IrSimpleTypeImpl(
+                classifier = irType?.classifier.symbol, // can you downcast irType to irSimpleType?
+                hasQuestionMark = false,
+                arguments = arguments.map {
+                  // need more serious consideration for what the arguments are for here
+                },
+                annotations = emptyList()
+              ).descriptor
+            ).build()
+
+            val result = compilerContext.findExtension(kotlinType)
 
             // change IrCall
-            return IrCallImpl(
-              startOffset = UNDEFINED_OFFSET,
-              endOffset = UNDEFINED_OFFSET,
-              type = irMemberAccessExpression.descriptor.returnType,
-              symbol = irMemberAccessExpression.descriptor.symbole,
-              descriptor = irFunctionSymbol.owner.descriptor, // resulting descriptor
-              typeArgumentsCount = irFunctionSymbol.owner.descriptor.typeParameters.size,
-              valueArgumentsCount = irFunctionSymbol.owner.descriptor.valueParameters.size
-            )
+            return irCall( it.descriptor, newEqDescriptor)
           }
-          else irMemberAccessExpression
-
-          if (1 == 2) {
-            // fun EQEQ value parameter 1 value parameter 2
-          }
-        } // alter resolution at the bytecode level via IR
+          else it
+        }
       )
     }
 }
 
-fun FunctionDescriptor.irCall(): IrCall {
-  val irFunctionSymbol: IrFunctionSymbol = backendContext.ir.symbols.externalSymbolTable.referenceFunction(this)
+fun IrUtils.irCall(oldEqDescriptor: FunctionDescriptor, newEqDescriptor: FunctionDescriptor): IrCall {
+  val irFunctionSymbol: IrFunctionSymbol = backendContext.ir.symbols.externalSymbolTable.referenceFunction(oldEqDescriptor)
   return IrCallImpl(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
     type = irFunctionSymbol.owner.returnType,
     symbol = irFunctionSymbol,
-    descriptor = irFunctionSymbol.owner.descriptor,
+    descriptor = newEqDescriptor,
     typeArgumentsCount = irFunctionSymbol.owner.descriptor.typeParameters.size,
     valueArgumentsCount = irFunctionSymbol.owner.descriptor.valueParameters.size
   )
