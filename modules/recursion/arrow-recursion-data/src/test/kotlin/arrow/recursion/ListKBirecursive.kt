@@ -42,7 +42,7 @@ class ListKBirecursive : UnitSpec() {
           Eval.later {
             when (it) {
               0 -> ListF.NilF<Int, Int>()
-              else -> ListF.ConsF<Int, Int>(it, it - 1)
+              else -> ListF.ConsF(it, it - 1)
             }
           }
         }
