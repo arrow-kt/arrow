@@ -7,16 +7,12 @@ import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
-import arrow.core.identity
-import arrow.core.none
 import arrow.core.some
 import arrow.core.value
 import arrow.free.Free
-import arrow.recursion.data.Fix
 import arrow.recursion.extensions.free.birecursive.birecursive
 import arrow.recursion.extensions.freef.traverse.traverse
 import arrow.recursion.pattern.FreeF
-import arrow.recursion.pattern.FreeR
 import arrow.recursion.pattern.fix
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall

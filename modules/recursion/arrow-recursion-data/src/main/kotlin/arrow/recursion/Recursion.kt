@@ -49,7 +49,6 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  * class ForTree private constructor()
  * typealias TreeOf<A, B> = Kind<TreePartialOf<A>, B>
  * typealias TreePartialOf<A> = Kind<ForTree, A>
- *
  * fun <A, R> TreeOf<A, R>.fix(): Tree<A, R> = this as Tree<A, R>
  *
  * // A simple binary tree
