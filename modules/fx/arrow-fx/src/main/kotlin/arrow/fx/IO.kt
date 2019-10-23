@@ -62,7 +62,14 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     fun <E, A> defer(f: () -> IOOf<E, A>): IO<E, A> =
       Suspend(f)
 
-    fun <E, A> effect(ctx: CoroutineContext? = null, fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
+    fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
+      Effect(null, f).mapError(fe)
+
+    // Specialization
+    fun <A> effect(f: suspend () -> A): IO<Throwable, A> =
+      Effect(null, f)
+
+    fun <E, A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
       Effect(ctx, f).mapError(fe)
 
     // Specialization

@@ -141,22 +141,22 @@ interface IOMonadError<E> : MonadError<IOPartialOf<E>, E>, IOApplicativeError<E>
 }
 
 @extension
-interface IOBracket<E> : Bracket<IOPartialOf<E>, E>, IOMonadError<E> {
-  override fun <A, B> IOOf<E, A>.bracketCase(release: (A, ExitCase<E>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+interface IOBracket : Bracket<IOPartialOf<Throwable>, Throwable>, IOMonadError<Throwable> {
+  override fun <A, B> IOOf<Throwable, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Throwable, Unit>, use: (A) -> IOOf<Throwable, B>): IO<Throwable, B> =
     fix().ioBracketCase(release, use)
 
-  override fun <A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+  override fun <A, B> IOOf<Throwable, A>.bracket(release: (A) -> IOOf<Throwable, Unit>, use: (A) -> IOOf<Throwable, B>): IO<Throwable, B> =
     fix().ioBracket(release, use)
 
-  override fun <A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> =
+  override fun <A> IOOf<Throwable, A>.guarantee(finalizer: IOOf<Throwable, Unit>): IO<Throwable, A> =
     fix().ioGuarantee(finalizer)
 
-  override fun <A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase<E>) -> IOOf<E, Unit>): IO<E, A> =
+  override fun <A> IOOf<Throwable, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Throwable, Unit>): IO<Throwable, A> =
     fix().ioGuaranteeCase(finalizer)
 }
 
 @extension
-interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>, E>, IOBracket<E> {
+interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>, E> {
   override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
     IO.defer(fa)
 
@@ -175,21 +175,11 @@ interface IOAsync<E> : Async<IOPartialOf<E>, E>, IOMonadDefer<E> {
   override fun <A> IOOf<E, A>.continueOn(ctx: CoroutineContext): IO<E, A> =
     fix().continueOn(ctx)
 
-  override fun <A> effect(f: suspend () -> A): Kind<IOPartialOf<E>, A> {
-    return super.effect(f)
-  }
+  override fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> =
+    IO.effect(fe, f)
 
-  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
-    return super.effect(ctx, f)
-  }
-
-  override fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
-    return super.effect(fe, f)
-  }
-
-  override fun <E, A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
-    return super.effect(ctx, fe, f)
-  }
+  override fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> =
+    IO.effect(ctx, fe, f)
 
   override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
     IO.defer(fa)
@@ -197,7 +187,7 @@ interface IOAsync<E> : Async<IOPartialOf<E>, E>, IOMonadDefer<E> {
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent<E> : Concurrent<IOPartialOf<E>, E>, IOAsync<E> {
-  override fun <A> CoroutineContext.startFiber(kind: IOOf<E, A>): IO<Throwable, Fiber<IOPartialOf<E>, A>> =
+  override fun <A> CoroutineContext.startFiber(kind: IOOf<E, A>): IO<E, Fiber<IOPartialOf<E>, A>> =
     kind.fix().startFiber(this, ::identity)
 
   override fun <A> cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): Kind<IOPartialOf<Throwable>, A> =

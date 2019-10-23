@@ -86,8 +86,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
-  fun <E, A> async(fa: ProcE<E, A>): Kind<F, A> =
-    asyncF<E, A> { cb -> later { fa(cb) } }
+  fun <A> async(fa: ProcE<E, A>): Kind<F, A> =
+    asyncF { cb -> later { fa(cb) } }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -118,8 +118,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see async for a simpler, non suspending version.
    */
-  // TODO maybe we should fix this to a Kind2<F, E, A>?
-  fun <E, A> asyncF(k: ProcEF<F, E, A>): Kind<F, A>
+  fun <A> asyncF(k: ProcEF<F, E, A>): Kind<F, A>
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
@@ -194,10 +193,10 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> effect(f: suspend () -> A): Kind<F, A> =
-    effect(EmptyCoroutineContext, f)
+//  fun <A> effect(f: suspend () -> A): Kind<F, A> =
+//    effect(EmptyCoroutineContext, f)
 
-  fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+  fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
     effect(EmptyCoroutineContext, fe, f)
 
   /**
@@ -222,11 +221,11 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-  fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
-    effect(ctx, ::identity, f)
+//  fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
+//    effect(ctx, ::identity, f)
 
-  fun <E, A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
-    async<E, A> { cb ->
+  fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+    async { cb ->
       f.startCoroutine(asyncContinuation(ctx) { cb(it.mapLeft(fe)) })
     }
 
@@ -331,7 +330,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> never(): Kind<F, A> =
-    async<Nothing, A> { }
+    async { }
 }
 
 internal val mapToUnit: (Any?) -> Unit = { Unit }
