@@ -8,9 +8,9 @@ redirect_from:
 
 ## Day
 
-When building user interfaces it is common to have two screens side by side evolving their states independently. In order to implement this behavior we can use `Day`.
+When building user interfaces, it is common to have two screens side by side evolving their states independently. In order to implement this behavior, we can use `Day`.
 
-`Day` is a [`comonadic`]({{ '/docs/arrow/typeclasses/comonad' | relative_url }}) data structure which holds two `Comonads` and a rendering function for both states.
+`Day` is a [`comonadic`]({{ '/docs/arrow/typeclasses/comonad' | relative_url }}) data structure that holds two `Comonads` and a rendering function for both states.
 
 ```kotlin:ank
 import arrow.core.*
