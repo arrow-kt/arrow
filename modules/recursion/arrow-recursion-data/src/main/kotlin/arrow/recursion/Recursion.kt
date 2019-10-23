@@ -49,7 +49,6 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  * class ForTree private constructor()
  * typealias TreeOf<A, B> = Kind<TreePartialOf<A>, B>
  * typealias TreePartialOf<A> = Kind<ForTree, A>
- * fun <A, R> TreeOf<A, R>.fix(): Tree<A, R> = this as Tree<A, R>
  *
  * // A simple binary tree
  * sealed class Tree<A, B> : TreeOf<A, B> {
@@ -59,7 +58,7 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  *
  *  companion object {
  *    fun <A> functor(): Functor<TreePartialOf<A>> = object : Functor<TreePartialOf<A>> {
- *      override fun <C, B> Kind<TreePartialOf<A>, C>.map(f: (C) -> B): Kind<TreePartialOf<A>, B> = when (val t = fix()) {
+ *      override fun <C, B> Kind<TreePartialOf<A>, C>.map(f: (C) -> B): Kind<TreePartialOf<A>, B> = when (val t = this as Tree<A, C>) {
  *        is Empty -> Empty()
  *        is Leaf -> Leaf(t.a)
  *        is Branch -> Branch(f(t.l), f(t.r))
@@ -87,7 +86,7 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  *    }
  *  }
  *  val fold: Algebra<TreePartialOf<Int>, List<Int>> = {
- *    it.fix().let { t ->
+ *    (it as Tree<Int, List<Int>>).let { t ->
  *      when (t) {
  *        is Tree.Empty -> emptyList()
  *        is Tree.Leaf -> listOf(t.a)
