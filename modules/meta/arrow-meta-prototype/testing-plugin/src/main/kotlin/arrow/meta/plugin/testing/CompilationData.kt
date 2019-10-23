@@ -1,43 +1,42 @@
 package arrow.meta.plugin.testing
 
-const val META_PREFIX = "//meta"
+import java.io.File
 
 enum class CompilationStatus {
   OK,
   INTERNAL_ERROR,
   COMPILATION_ERROR,
   SCRIPT_EXECUTION_ERROR
-
 }
-
-data class CompilationData(
-  val sourceFilename: String,
-  val sourceCode: String,
-  val compilationStatus: CompilationStatus,
-  val checks: List<Check>
-)
 
 sealed class Check {
 
-  data class CompilationError(
+  data class ExpectedCompilationError(
     val partialMessage: String
-  ): Check()
+  ) : Check()
 
-  data class GeneratedSourceCode(
+  data class ExpectedGeneratedSourceCode(
     val code: String
-  ): Check()
-
-  data class GeneratedClasses(
-    val filenamesWithoutExt: List<String>
-  ): Check()
+  ) : Check()
 }
 
-data class Field(
-  val name: String,
-  val value: Any
+data class PartialCompilationData(
+  val dependencies: List<String> = emptyList(),
+  val sourceCode: String
+)
+
+data class CompilationData(
+  val dependencies: List<String> = emptyList(),
+  val sourceCode: String,
+  val expectedStatus: CompilationStatus,
+  val checks: List<Check> = emptyList()
 )
 
 data class Result(
-  val simpleClassName: String,
-  val field: Field
+  val classesDirectory: File
+)
+
+data class ExecutionEnv(
+  val classesDirectory: File,
+  val expression: String
 )

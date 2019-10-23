@@ -25,7 +25,7 @@ dependencies {
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit_vintage_version"
     testRuntimeOnly project(":compiler-plugin")
 
-    // TODO: waiting for an Arrow release in Maven Central
+    // TODO: waiting for Arrow release in Maven Central
     // testRuntimeOnly "io.arrow-kt:arrow-annotations:x.x.x"
     testRuntimeOnly "com.github.arrow-kt.arrow:arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"
 }

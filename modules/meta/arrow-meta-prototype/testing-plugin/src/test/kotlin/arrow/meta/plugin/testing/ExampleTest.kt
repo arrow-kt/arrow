@@ -1,9 +1,8 @@
-package arrow.meta.plugins.higherkind
+package arrow.meta.plugin.testing
 
-import arrow.meta.plugin.testing.CompilationTest
 import org.junit.Test
 
-class HigherkindTest : CompilationTest {
+class ExampleTest : CompilationTest {
 
   //
   // TODO: waiting for the arrow-annotations release which contains higherkind annotation
@@ -11,7 +10,7 @@ class HigherkindTest : CompilationTest {
   //
 
   @Test
-  fun `initial_test`() {
+  fun `accepts dependencies and the generated meta file to check the compilation result`() {
     """
     | import arrow.higherkind
     | 
@@ -27,17 +26,23 @@ class HigherkindTest : CompilationTest {
       | 
       | //meta: <date>
       | 
-      |   @arrow.synthetic class ForId2 private constructor() { companion object }
+      | @arrow.synthetic class ForId2 private constructor() { companion object }
       | @arrow.synthetic typealias Id2Of<A> = arrow.Kind<ForId2, A>
       | @arrow.synthetic typealias Id2KindedJ<A> = arrow.HkJ<ForId2, A>
       | @arrow.synthetic fun <A> Id2Of<A>.fix(): Id2<A> =
-      |   this as Id2<A>
-      | @arrow.synthetic @higherkind /* empty? */class Id2 <out A> public constructor (val value: A) : Id2Of<A> {
-      | 
-      | }
+      | this as Id2<A>
+      | @arrow.synthetic @higherkind /* empty? */class Id2 <out A> public constructor (val value: A) : Id2Of<A> {}
       | 
       | val x: Id2Of<Int> = Id2(1)
       | 
       """
+  }
+
+  @Test
+  fun `emits error diagnostic when compilation fails`() {
+    """
+    | classsss Error
+    | 
+    """ emitErrorDiagnostic "Expecting a top level declaration"
   }
 }

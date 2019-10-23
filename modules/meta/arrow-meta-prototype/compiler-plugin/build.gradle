@@ -14,6 +14,7 @@ dependencies {
     // TODO: waiting for an Arrow release in Maven Central
     // testRuntimeOnly "io.arrow-kt:arrow-annotations:x.x.x"
     testRuntimeOnly "com.github.arrow-kt.arrow:arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"
+    testRuntimeOnly "io.arrow-kt:arrow-core-data:0.10.1"
 }
 
 compileKotlin {
