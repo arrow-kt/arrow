@@ -185,27 +185,23 @@ private fun IrUtils.mapValueParameterExtensions(expression: IrFunctionAccessExpr
   } else null
 
 private fun IrUtils.extensionCall(valueParameterDescriptor: ValueParameterDescriptor): IrFunctionAccessExpression? =
-  when (val extension = compilerContext.findExtension(valueParameterDescriptor)) {
+  when (val extension = compilerContext.findExtension(valueParameterDescriptor.type)) {
     is FunctionDescriptor -> extension.irCall()
     is ClassDescriptor -> extension.irConstructorCall()
     is PropertyDescriptor -> extension.irGetterCall()
     else -> null
   }
 
-private fun CompilerContext.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
-  val extensionType = valueParameterDescriptor.type
-  val typeClass = extensionType.typeClassDescriptor() // info about Eq<A>
-  val dataType = extensionType.dataTypeDescriptor() // info about Int (the data type)
-  val typeClassPackage = typeClass.packageFragmentDescriptor() // info about the package of Eq (the container)
-  val dataTypePackage = dataType.packageFragmentDescriptor() // info about the package to indicate what's in the package
-  // ^ tells you what will be used
-  val internalPackages = modulePackages() // look in the local package, grabs the object to allow us to look
+fun CompilerContext.findExtension(extensionType: KotlinType): DeclarationDescriptor? {
+  val typeClass = extensionType.typeClassDescriptor()
+  val dataType = extensionType.dataTypeDescriptor()
+  val typeClassPackage = typeClass.packageFragmentDescriptor()
+  val dataTypePackage = dataType.packageFragmentDescriptor()
+  val internalPackages = modulePackages()
   val internalExtensions = internalPackages.extensions(extensionType)
   return if (dataTypePackage != null &&
     typeClassPackage != null) {
     if (
-      // look for instances of those calls in the packages - for reporting possible internal conflicts
-      // internalPackage extensions help keeps extensions from being exported; LOOKUP Set Coherence Problem
       internalPackages.extensionsAreInternal(typeClassPackage, dataTypePackage, internalExtensions)) {
       reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
     }

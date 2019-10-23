@@ -1,6 +1,5 @@
 package arrow.meta.plugins.higherkind
 
-import arrow.extension
 import arrow.meta.plugin.testing.Check.GeneratedSourceCode
 import arrow.meta.plugin.testing.Check.GeneratedClasses
 import arrow.meta.plugin.testing.CompilationData
@@ -25,9 +24,3 @@ class HigherkindTest {
   }
 
 }
-
-object Id
-
-@extension fun IdEq() : Eq<Id> = TODO()
-
-val x = Id == Id
