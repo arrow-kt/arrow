@@ -194,15 +194,18 @@ private fun IrUtils.extensionCall(valueParameterDescriptor: ValueParameterDescri
 
 private fun CompilerContext.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
   val extensionType = valueParameterDescriptor.type
-  val typeClass = extensionType.typeClassDescriptor()
-  val dataType = extensionType.dataTypeDescriptor()
-  val typeClassPackage = typeClass.packageFragmentDescriptor()
-  val dataTypePackage = dataType.packageFragmentDescriptor()
-  val internalPackages = modulePackages()
+  val typeClass = extensionType.typeClassDescriptor() // info about Eq<A>
+  val dataType = extensionType.dataTypeDescriptor() // info about Int (the data type)
+  val typeClassPackage = typeClass.packageFragmentDescriptor() // info about the package of Eq (the container)
+  val dataTypePackage = dataType.packageFragmentDescriptor() // info about the package to indicate what's in the package
+  // ^ tells you what will be used
+  val internalPackages = modulePackages() // look in the local package, grabs the object to allow us to look
   val internalExtensions = internalPackages.extensions(extensionType)
   return if (dataTypePackage != null &&
     typeClassPackage != null) {
     if (
+      // look for instances of those calls in the packages - for reporting possible internal conflicts
+      // internalPackage extensions help keeps extensions from being exported; LOOKUP Set Coherence Problem
       internalPackages.extensionsAreInternal(typeClassPackage, dataTypePackage, internalExtensions)) {
       reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
     }
@@ -229,6 +232,7 @@ private fun List<PackageFragmentDescriptor>.extensions(extensionType: KotlinType
 private fun CompilerContext.modulePackages(): List<PackageFragmentDescriptor> =
   files.toSet().flatMap { module.getPackage(it.packageFqName).fragments }
 
+// implements the algorithm
 private fun KotlinType.resolveExtensions(
   internalExtensions: List<DeclarationDescriptor>,
   typeClassPackage: PackageFragmentDescriptor,
@@ -288,8 +292,11 @@ private fun CompilerContext.reportAmbiguousExtensions(
   )
 }
 
+// the algorithm; you have the package, the data package, the type class etc.
+// in this case, it matches the type and checks for the subtype
+// create system of proofs
 private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinType): List<DeclarationDescriptor> =
-  getMemberScope()
+  getMemberScope() // in memory collection of objects
     .getContributedDescriptors()
     .filter {
       it.annotations.findAnnotation(ExtensionAnnotation) != null &&

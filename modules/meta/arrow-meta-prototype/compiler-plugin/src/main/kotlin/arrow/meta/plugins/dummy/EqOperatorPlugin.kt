@@ -5,6 +5,7 @@ import arrow.meta.Plugin
 import arrow.meta.invoke
 import arrow.meta.phases.codegen.ir.IrUtils
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi2ir.findFirstFunction
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.replace
@@ -38,6 +40,7 @@ val Meta.eq: Plugin
          *    ^^ Wait, why is the EQ descriptor needed
          * 4. Replace descriptor of the current IrCall with new descriptor
          */
+        // replaces whatever part in the ircall
         irFunctionAccess {
           if (it.descriptor.name.asString().contains(EQEQ)) {
             it.descriptor.safeAs<IrSimpleBuiltinOperatorDescriptorImpl>()?.let { operator ->
@@ -46,15 +49,17 @@ val Meta.eq: Plugin
               val module = it.descriptor.module
               val eqClassDescriptor = module.resolveClassByFqName(FqName("arrow.typeclasses.Eq"), NoLookupLocation.FROM_BACKEND)
               val extensionType = eqClassDescriptor?.defaultType?.replace(newArguments = listOf(eqTypeArg.asTypeProjection()))
-              val typeClassFactory = extensionType?.let { type ->
+              val typeClassFactory: DeclarationDescriptor = extensionType?.let { type ->
                 findExtension(type)
-              }
-              val call = when (val extension = typeClassFactory) {
-                is FunctionDescriptor -> extension.irCall()
-                is ClassDescriptor -> extension.irConstructorCall()
+              } // <-- Eq<Int>.constructor
+              val call: IrCallImpl = when (val extension = typeClassFactory) {
+                is FunctionDescriptor -> extension
+                is ClassDescriptor -> extension.unsubstitutedMemberScope.findFirstFunction("eqv").irCall()
                 is PropertyDescriptor -> extension.irGetterCall()
                 else -> null
               }
+              // 1. take the original descriptor and grab the value arguments
+              // 2.
               // eqInt . eqv(a, b)
               // eqInt.run { a.eqv(b) }
               println("call: $call")
