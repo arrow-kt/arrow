@@ -27,7 +27,7 @@ Use the list below to learn more about Λrrow's main features.
 ## Curated external links
 
 - [Projects and Examples]({{ '/docs/quickstart/projects/' | relative_url }})
-- [Blogs and Presentations]({{ '/docs/quickstart/blogs/' | relative_url }})
+- [Media](https://media.arrow-kt.io)
 
 ## Setup
 
