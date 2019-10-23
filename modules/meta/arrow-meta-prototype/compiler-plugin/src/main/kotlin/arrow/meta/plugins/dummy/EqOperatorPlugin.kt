@@ -35,12 +35,11 @@ import org.jetbrains.kotlin.resolve.lazy.descriptors.findPackageFragmentForFile
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.replace
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
-import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 const val EQEQ = "EQEQ"
 
-val Meta.eq: Plugin
+val Meta.eqOper: Plugin
   get() =
     "Eq" {
       meta(

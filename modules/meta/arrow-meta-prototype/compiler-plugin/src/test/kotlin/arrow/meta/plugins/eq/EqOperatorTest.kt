@@ -47,7 +47,7 @@ class EqOperatorTest {
   private fun compileSourceCode(sourceCode: String) {
     KotlinCompilation().apply {
       sources = listOf(SourceFile.kotlin("Example.kt", sourceCode))
-      classpaths = listOf(classpathOf("arrow-annotations:rr-meta-prototype-integration-SNAPSHOT"))
+      classpaths = listOf(classpathOf("arrow-meta-prototype:rr-meta-prototype-integration-SNAPSHOT"))
       pluginClasspaths = listOf(classpathOf("compiler-plugin"))
     }.compile()
   }
