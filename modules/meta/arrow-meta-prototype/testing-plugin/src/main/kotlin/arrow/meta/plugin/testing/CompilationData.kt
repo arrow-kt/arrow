@@ -1,5 +1,7 @@
 package arrow.meta.plugin.testing
 
+import java.io.File
+
 enum class CompilationStatus {
   OK,
   INTERNAL_ERROR,
@@ -16,21 +18,25 @@ sealed class Check {
   data class ExpectedGeneratedSourceCode(
     val code: String
   ) : Check()
-
-  data class ExpectedGeneratedClasses(
-    val filenamesWithoutExt: List<String>
-  ) : Check()
-
-  data class ExpectedExecutionResult(
-    val expression: String,
-    val output: String
-  ) : Check()
 }
+
+data class PartialCompilationData(
+  val dependencies: List<String> = emptyList(),
+  val sourceCode: String
+)
 
 data class CompilationData(
   val dependencies: List<String> = emptyList(),
-  val sourceFilename: String,
   val sourceCode: String,
   val expectedStatus: CompilationStatus,
-  val checks: List<Check>
+  val checks: List<Check> = emptyList()
+)
+
+data class Result(
+  val classesDirectory: File
+)
+
+data class ExecutionEnv(
+  val classesDirectory: File,
+  val expression: String
 )

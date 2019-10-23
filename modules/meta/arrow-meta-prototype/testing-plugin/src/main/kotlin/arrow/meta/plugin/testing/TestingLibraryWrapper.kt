@@ -7,10 +7,9 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
-private const val CLASS_EXTENSION = ".class"
+private const val DEFAULT_FILENAME = "Example.kt"
 
 internal data class CompilationResult(
-  val actualGeneratedClasses: List<String>,
   val actualStatus: CompilationStatus,
   val log: String,
   val actualGeneratedFilePath: Path,
@@ -19,17 +18,16 @@ internal data class CompilationResult(
 
 internal fun compile(compilationData: CompilationData): CompilationResult =
   compilationResultFrom(KotlinCompilation().apply {
-    sources = listOf(SourceFile.kotlin(compilationData.sourceFilename, compilationData.sourceCode))
+    sources = listOf(SourceFile.kotlin("Example.kt", compilationData.sourceCode))
     classpaths = compilationData.dependencies.map { classpathOf(it) }
     pluginClasspaths = listOf(classpathOf("compiler-plugin"))
-  }.compile(), compilationData.sourceFilename)
+  }.compile())
 
-private fun compilationResultFrom(internalResult: KotlinCompilation.Result, sourceFilename: String) =
+private fun compilationResultFrom(internalResult: KotlinCompilation.Result): CompilationResult =
   CompilationResult(
-    actualGeneratedClasses = classFilenamesFrom(internalResult.generatedFiles),
     actualStatus = exitStatusFrom(internalResult.exitCode),
     log = internalResult.messages,
-    actualGeneratedFilePath = Paths.get(internalResult.outputDirectory.parent, "sources", "$sourceFilename.meta"),
+    actualGeneratedFilePath = Paths.get(internalResult.outputDirectory.parent, "sources", "$DEFAULT_FILENAME.meta"),
     classesDirectory = internalResult.outputDirectory
   )
 
@@ -45,6 +43,3 @@ private fun classpathOf(dependency: String): File {
   val regex = Regex(".*${dependency.replace(':', '-')}.*")
   return ClassGraph().classpathFiles.first { classpath -> classpath.name.matches(regex) }
 }
-
-private fun classFilenamesFrom(generatedFiles: Collection<File>): List<String> =
-  generatedFiles.map { it.name }.filter { it.endsWith(CLASS_EXTENSION) }.map { it.removeSuffix(CLASS_EXTENSION) }
