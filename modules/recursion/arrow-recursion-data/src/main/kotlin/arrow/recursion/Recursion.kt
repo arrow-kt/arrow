@@ -40,82 +40,66 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  * An implementation of merge-sort:
  * ```kotlin:ank:playground
  * import arrow.Kind
- * import arrow.core.Eval
- * import arrow.data.ListK
- * import arrow.data.k
  * import arrow.recursion.Algebra
  * import arrow.recursion.Coalgebra
- * import arrow.recursion.data.Fix
  * import arrow.recursion.hylo
  * import arrow.typeclasses.Functor
- * import kotlin.math.ceil
- * import kotlin.math.floor
  *
- * // @higherkind boilerplate. Not needed outside of docs when using kapt.
- * class ForBinaryTreeF private constructor()
- * typealias BinaryTreeFPartialOf<A> = Kind<ForBinaryTreeF, A>
- * typealias BinaryTreeOf<A, R> = Kind<BinaryTreeFPartialOf<A>, R>
+ * // boilerplate that @higherkind generates
+ * class ForTree private constructor()
+ * typealias TreeOf<A, B> = Kind<TreePartialOf<A>, B>
+ * typealias TreePartialOf<A> = Kind<ForTree, A>
  *
- * fun <A, R> BinaryTreeOf<A, R>.fix(): BinaryTreeF<A, R> = this as BinaryTreeF<A, R>
+ * fun <A, R> TreeOf<A, R>.fix(): Tree<A, R> = this as Tree<A, R>
  *
- * sealed class BinaryTreeF<A, R> : BinaryTreeOf<A, R> {
- *  class Empty<A, R> : BinaryTreeF<A, R>()
- *  class Leaf<A, R>(val a: A) : BinaryTreeF<A, R>()
- *  class Node<A, R>(val left: R, val right: R) : BinaryTreeF<A, R>()
- *
- *  fun <B> map(f: (R) -> B): BinaryTreeF<A, B> = when (this) {
- *    is Empty -> Empty()
- *    is Leaf -> Leaf(a)
- *    is Node -> Node(f(left), f(right))
- *  }
+ * // A simple binary tree
+ * sealed class Tree<A, B> : TreeOf<A, B> {
+ *  class Empty<A, B> : Tree<A, B>()
+ *  class Leaf<A, B>(val a: A) : Tree<A, B>()
+ *  class Branch<A, B>(val l: B, val r: B) : Tree<A, B>()
  *
  *  companion object {
- *    fun <A> functor() = object : Functor<BinaryTreeFPartialOf<A>> {
- *      override fun <B, C> Kind<BinaryTreeFPartialOf<A>, B>.map(f: (B) -> C): Kind<BinaryTreeFPartialOf<A>, C> =
- *        (this as BinaryTreeF<A, B>).map(f)
+ *    fun <A> functor(): Functor<TreePartialOf<A>> = object : Functor<TreePartialOf<A>> {
+ *      override fun <C, B> Kind<TreePartialOf<A>, C>.map(f: (C) -> B): Kind<TreePartialOf<A>, B> = when (val t = fix()) {
+ *        is Empty -> Empty()
+ *        is Leaf -> Leaf(t.a)
+ *        is Branch -> Branch(f(t.l), f(t.r))
+ *      }
  *    }
- *
- *    fun <A> empty(): BinaryTree<A> = Fix(Empty())
- *    fun <A> leaf(a: A): BinaryTree<A> = Fix(Leaf(a))
- *    fun <A> node(left: BinaryTree<A>, right: BinaryTree<A>): BinaryTree<A> = Fix(Node(Eval.now(left), Eval.now(right)))
  *  }
  * }
  *
- * typealias BinaryTree<A> = Fix<BinaryTreeFPartialOf<A>>
- *
- * infix fun ListK<Int>.merge(other: ListK<Int>): ListK<Int> = when {
+ * infix fun List<Int>.merge(other: List<Int>): List<Int> = when {
  *  this.isEmpty() -> other
  *  other.isEmpty() -> this
  *  else ->
- *    if (first() > other.first()) (ListK.just(other.first()) + (this merge other.drop(1).k())).k()
- *    else (ListK.just(first()) + (this.drop(1).k() merge other)).k()
- *  }
+ *    if (first() > other.first()) (listOf(other.first()) + (this merge other.drop(1)))
+ *    else (listOf(first()) + (this.drop(1) merge other))
+ * }
  *
  * fun main() {
- *   //sampleStart
- *  val unfold: Coalgebra<BinaryTreeFPartialOf<Int>, ListK<Int>> = {
+ *  val unfold: Coalgebra<TreePartialOf<Int>, List<Int>> = {
  *    when {
- *      it.isEmpty() -> BinaryTreeF.Empty()
- *      it.size == 1 -> BinaryTreeF.Leaf(it.first())
- *      else -> BinaryTreeF.Node(
- *        it.take(floor(it.size / 2.0).toInt()).k(),
- *        it.takeLast(ceil(it.size / 2.0).toInt()).k()
- *      )
+ *      it.isEmpty() -> Tree.Empty()
+ *      it.size == 1 -> Tree.Leaf(it.first())
+ *      else -> (it.size / 2).let { half ->
+ *        Tree.Branch<Int, List<Int>>(it.take(half), it.drop(half))
+ *      }
+ *    }
+ *  }
+ *  val fold: Algebra<TreePartialOf<Int>, List<Int>> = {
+ *    it.fix().let { t ->
+ *      when (t) {
+ *        is Tree.Empty -> emptyList()
+ *        is Tree.Leaf -> listOf(t.a)
+ *        is Tree.Branch -> t.l merge t.r
+ *      }
  *    }
  *  }
  *
- *  val fold: Algebra<BinaryTreeFPartialOf<Int>, ListK<Int>> = {
- *    when (val fa = it.fix()) {
- *      is BinaryTreeF.Empty -> ListK.empty()
- *      is BinaryTreeF.Leaf -> ListK.just(fa.a)
- *      is BinaryTreeF.Node -> fa.left.k() merge fa.right.k()
- *    }
- *  }
- *
- *  (0..100).shuffled().also(::println).k().hylo(fold, unfold, BinaryTreeF.functor())
- *    .toList().also(::println)
- *  //sampleEnd
+ *  (0..1000).shuffled().also(::println).hylo(fold, unfold, Tree.functor()).also(::println)
  * }
+ *
  * ```
  *
  * Note: Not stack-safe. Use [hyloM] with a stack-safe monad, like [Eval]
@@ -129,6 +113,9 @@ fun <F, A, B> A.hylo(
   return h(this)
 }
 
+/**
+ * Hylomorphism over a composed functor
+ */
 fun <F, W, A, B> A.hyloC(
   alg: (Kind<F, Kind<W, B>>) -> B,
   coalg: (A) -> Kind<F, Kind<W, A>>,
@@ -140,6 +127,10 @@ fun <F, W, A, B> A.hyloC(
   coalg(it).nest()
 }, FF.compose(WF))
 
+/**
+ * Monadic hylomorphism, can be used to gain stacksafety when using a stack safe monad, but it requires a
+ *  traverse instance and not just a functor.
+ */
 fun <F, M, A, B> A.hyloM(
   alg: AlgebraM<F, M, B>,
   coalg: CoalgebraM<F, M, A>,
@@ -155,6 +146,9 @@ fun <F, M, A, B> A.hyloM(
   }
 }, coalg, MM, TF)
 
+/**
+ * Monadic hylomorphism over composed traversables
+ */
 fun <F, W, M, A, B> A.hyloMC(
   alg: (Kind<F, Kind<W, B>>) -> Kind<M, B>,
   coalg: (A) -> Kind<M, Kind<F, Kind<W, A>>>,
@@ -167,6 +161,9 @@ fun <F, W, M, A, B> A.hyloMC(
   MM.run { coalg(it).map { it.nest() } }
 }, TF.compose(TW), MM)
 
+/**
+ * Combination of futu and histo
+ */
 fun <F, A, B> A.chrono(
   alg: CVAlgebra<F, B>,
   coalg: CVCoalgebra<F, A>,
@@ -182,6 +179,9 @@ fun <F, A, B> A.chrono(
       }
     }, FF).head
 
+/**
+ * Monadic version of chrono
+ */
 fun <F, M, A, B> A.chronoM(
   alg: CVAlgebraM<F, M, B>,
   coalg: CVCoalgebraM<F, M, A>,
@@ -204,6 +204,11 @@ fun <F, M, A, B> A.chronoM(
       ).map { it.head }
   }
 
+/**
+ * Combination of ana + histo
+ *
+ * Useful to build up a recursive data structure and fold it with the implicit result caching histo provides.
+ */
 fun <F, A, B> A.dyna(
   alg: CVAlgebra<F, B>,
   coalg: Coalgebra<F, A>,
@@ -213,6 +218,9 @@ fun <F, A, B> A.dyna(
     Cofree(FF, alg(it), Eval.now(it))
   }, coalg, FF).head
 
+/**
+ * Monadic version of dyna
+ */
 fun <F, M, A, B> A.dynaM(
   alg: CVAlgebraM<F, M, B>,
   coalg: CoalgebraM<F, M, A>,

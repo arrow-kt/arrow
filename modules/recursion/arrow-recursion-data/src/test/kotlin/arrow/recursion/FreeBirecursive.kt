@@ -29,13 +29,13 @@ class FreeBirecursive : UnitSpec() {
       BirecursiveLaws.laws(
         FreeF.traverse<ForOption, Int>(Option.traverse()),
         Free.birecursive<ForOption, Int>(Option.functor()),
-        Gen.intSmall().filter { it < 100 }.filter { it >= 0 }.map { it.unfoldFree() },
+        Gen.intSmall().filter { it in 0..100 }.map { it.unfoldFree() },
         Gen.constant(5000).map { it.unfoldFree() },
         {
           it.fix().let { f ->
             when (f) {
               is FreeF.Pure -> f.e
-              is FreeF.Impure -> f.fa.fix().fold({ 0 }, ::identity)
+              is FreeF.Impure -> f.fa.fix().fold({ 1 }, { it + 1 })
             }
           }
         },
@@ -44,19 +44,19 @@ class FreeBirecursive : UnitSpec() {
             it.fix().let { f ->
               when (f) {
                 is FreeF.Pure -> f.e
-                is FreeF.Impure -> f.fa.fix().fold({ 0 }, ::identity)
+                is FreeF.Impure -> f.fa.fix().fold({ 1 }, { it + 1 })
               }
             }
           }
         },
         {
           if (it > 0) FreeF.Impure((it - 1).some())
-          else FreeF.Pure(0)
+          else FreeF.Pure(1)
         },
         {
           Eval.now(
             if (it > 0) FreeF.Impure((it - 1).some())
-            else FreeF.Pure(0)
+            else FreeF.Pure(1)
           )
         }
       )
@@ -67,7 +67,7 @@ class FreeBirecursive : UnitSpec() {
 fun Int.unfoldFree(): Free<ForOption, Int> = Free.birecursive<ForOption, Int>(Option.functor()).run {
   this@unfoldFree.anaM(FreeF.traverse(Option.traverse()), Eval.monad()) {
     Eval.now(
-      if (it == 0) FreeF.Pure(0)
+      if (it == 0) FreeF.Pure(1)
       else FreeF.Impure((it - 1).some())
     )
   }.value()

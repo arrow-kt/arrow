@@ -52,8 +52,8 @@ interface Recursive<T, F> {
    *
    * ```kotlin:ank:playground
    * import arrow.Kind
-   * import arrow.data.ListK
-   * import arrow.data.k
+   * import arrow.core.ListK
+   * import arrow.core.k
    * import arrow.recursion.Algebra
    * import arrow.recursion.extensions.listk.recursive.recursive
    * import arrow.recursion.pattern.ListF
@@ -85,16 +85,18 @@ interface Recursive<T, F> {
    *
    * ```kotlin:ank:playground
    * import arrow.Kind
-   * import arrow.core.*
+   * import arrow.core.Eval
+   * import arrow.core.ForEval
+   * import arrow.core.ListK
    * import arrow.core.extensions.eval.monad.monad
-   * import arrow.data.ListK
-   * import arrow.data.k
+   * import arrow.core.k
+   * import arrow.core.value
    * import arrow.recursion.AlgebraM
+   * import arrow.recursion.extensions.listf.traverse.traverse
    * import arrow.recursion.extensions.listk.recursive.recursive
    * import arrow.recursion.pattern.ListF
    * import arrow.recursion.pattern.ListFPartialOf
    * import arrow.recursion.pattern.fix
-   * import arrow.recursion.extensions.listf.traverse.traverse
    *
    * fun main() {
    *  val sumAlgebra: AlgebraM<ListFPartialOf<Int>, ForEval, Int> = { list: Kind<ListFPartialOf<Int>, Int> ->
@@ -154,10 +156,14 @@ interface Recursive<T, F> {
    * Can be used to get a stack-safe version of [para] when the monad itself is stack-safe.
    *
    * ```kotlin:ank:playground
-   * import arrow.core.*
+   * import arrow.core.Eval
+   * import arrow.core.ForEval
+   * import arrow.core.ForOption
+   * import arrow.core.Option
    * import arrow.core.extensions.eval.monad.monad
-   * import arrow.core.extensions.monoid
    * import arrow.core.extensions.option.traverse.traverse
+   * import arrow.core.fix
+   * import arrow.core.value
    * import arrow.recursion.RAlgebraM
    * import arrow.recursion.extensions.recursive
    *
@@ -189,6 +195,11 @@ interface Recursive<T, F> {
    * Fold over any datatype using that datatypes base functor.
    * Also gives access to all previous folds inside Cofree.
    *
+   * You can thing of histo as sort of providing a shape-shifting cache. This is demonstrated below with a fibonacci implementation
+   *  that does the minimum of work needed by using this cache.
+   * Since the shape is always determined by the Functor F the cache with Option takes the form of an ordinary list, but with
+   *  different functors you get different shapes (Lists will make a Tree structure for example)
+   *
    * ```kotlin:ank:playground
    * import arrow.core.ForOption
    * import arrow.core.fix
@@ -200,12 +211,15 @@ interface Recursive<T, F> {
    *  // fib 1 = 1
    *  // fib n = fib (n - 1) + fib (n - 2)
    *  val fibAlg: CVAlgebra<ForOption, Int> = { opt ->
-   *    opt.fix().fold(ifEmpty = { 0 }, ifSome = { nMinus1 ->
-   *      nMinus1.tail.value().fix().fold(ifEmpty = { 1 }, ifSome = { nMinus2 ->
-   *        println("(${nMinus1.head} + ${nMinus2.head})")
-   *        nMinus1.head + nMinus2.head
+   *    opt.fix()
+   *      .fold(ifEmpty = { 0 }, ifSome = { nMinus1 ->
+   *        nMinus1.tail.value().fix()
+   *          .fold(ifEmpty = { 1 }, ifSome = { nMinus2 ->
+   *            // we had to calculate something, so print it for showing purposes
+   *            println("(${nMinus1.head} + ${nMinus2.head})")
+   *            nMinus1.head + nMinus2.head
+   *          })
    *      })
-   *    })
    *  }
    *
    *  Int.recursive().run {
@@ -232,11 +246,16 @@ interface Recursive<T, F> {
    * The following example is shows stack-safety but since the 5000's fibonacci-number is higher than
    *  Long.MAX_VALUE the result is bullshit.
    * ```kotlin:ank:playground
-   * import arrow.recursion.CVAlgebraM
-   * import arrow.recursion.extensions.recursive
-   * import arrow.core.*
+   * import arrow.core.Eval
+   * import arrow.core.ForEval
+   * import arrow.core.ForOption
+   * import arrow.core.Option
    * import arrow.core.extensions.eval.monad.monad
    * import arrow.core.extensions.option.traverse.traverse
+   * import arrow.core.fix
+   * import arrow.core.value
+   * import arrow.recursion.CVAlgebraM
+   * import arrow.recursion.extensions.recursive
    *
    * fun main() {
    *  // fib 0 = 0
@@ -268,9 +287,15 @@ interface Recursive<T, F> {
       ).map { it.head }
     }
 
+  /**
+   * Fold over a structure with a normal algebra, but applies a natural transformation (FunctionK) before the fold
+   */
   fun <A> T.prepro(trans: FunctionK<F, F>, alg: Algebra<F, A>): A =
     hylo(alg compose trans::invoke, project(), FF())
 
+  /**
+   * Refold, but with the ability to short circuit during construction
+   */
   fun <A, B> B.elgot(alg: Algebra<F, A>, f: (B) -> Either<A, Kind<F, B>>): A {
     fun h(b: B): A =
       f(b).fold(::identity) { FF().run { alg(it.map(::h)) } }
@@ -278,6 +303,9 @@ interface Recursive<T, F> {
     return h(this)
   }
 
+  /**
+   * Monadic version of elgot
+   */
   fun <M, A, B> B.elgotM(TF: Traverse<F>, MM: Monad<M>, alg: AlgebraM<F, M, A>, f: (B) -> Either<A, Kind<F, B>>): Kind<M, A> {
     fun h(b: B): Kind<M, A> =
       f(b).fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } }
