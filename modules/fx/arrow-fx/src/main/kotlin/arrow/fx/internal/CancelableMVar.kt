@@ -13,7 +13,7 @@ import arrow.fx.internal.CancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForTake
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Fiber
-import arrow.fx.typeclasses.mapUnit
+import arrow.fx.typeclasses.mapToUnit
 import arrow.fx.typeclasses.rightUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
@@ -230,7 +230,7 @@ internal class CancelableMVar<F, E, A> private constructor(initial: State<A>, pr
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
       val task = EmptyCoroutineContext.startFiber(later { cb(value) })
       acc?.flatMap { task } ?: task
-    }?.map(mapUnit) ?: unit()
+    }?.map(mapToUnit) ?: unit()
 
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = CF.run {
     this@ap.ap(ff)

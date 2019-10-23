@@ -16,12 +16,12 @@ import java.util.concurrent.atomic.AtomicReference
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
  * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
-class ForwardCancelable<E> {
+class ForwardCancelable {
 
-  private val state = AtomicReference<State<E>>(init())
+  private val state = AtomicReference<State<Throwable>>(init())
 
-  fun cancel(): CancelToken<IOPartialOf<E>> {
-    fun loop(conn: IOConnection<E>, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
+  fun cancel(): CancelToken<IOPartialOf<Throwable>> {
+    fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
       when (current) {
         is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
@@ -37,7 +37,7 @@ class ForwardCancelable<E> {
     return IO.Async { conn, cb -> loop(conn, cb) }
   }
 
-  fun complete(value: CancelToken<IOPartialOf<E>>): Unit = state.get().let { current ->
+  fun complete(value: CancelToken<IOPartialOf<Throwable>>): Unit = state.get().let { current ->
     when (current) {
       is Active -> {
         value.fix().unsafeRunAsync {}
@@ -71,7 +71,7 @@ class ForwardCancelable<E> {
      */
     private sealed class State<E> {
       data class Empty<E>(val stack: List<(Either<E, Unit>) -> Unit>) : State<E>()
-      data class Active<E>(val token: CancelToken<IOPartialOf<E>>) : State<E>()
+      data class Active<E>(val token: CancelToken<IOPartialOf<Throwable>>) : State<E>()
     }
 
     private val init: State<Any?> = Empty(listOf())
@@ -79,7 +79,7 @@ class ForwardCancelable<E> {
     private fun <E> init(): State<E> = init as State<E>
     private fun <E> finished(): State<E> = finished as State<E>
 
-    private fun <E> execute(token: CancelToken<IOPartialOf<E>>, stack: List<(Either<E, Unit>) -> Unit>): Unit =
+    private fun execute(token: CancelToken<IOPartialOf<Throwable>>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->

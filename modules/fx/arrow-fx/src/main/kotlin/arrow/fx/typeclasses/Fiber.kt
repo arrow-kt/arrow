@@ -45,38 +45,3 @@ interface Fiber<F, out A> {
     }
   }
 }
-
-interface Fiber2<F, out E, out A> {
-
-  /**
-   * Returns a new task that will await for the completion of the
-   * underlying [Fiber], (asynchronously) blocking the current run-loop
-   * until that result is available.
-   */
-  fun join(): Kind2<F,E,  A>
-
-  /**
-   * Triggers the cancellation of the [Fiber].
-   *
-   * @returns a task that trigger the cancellation upon evaluation.
-   */
-  fun cancel(): CancelToken<F>
-
-  operator fun component1(): Kind2<F, E, A> = join()
-  operator fun component2(): CancelToken<F> = cancel()
-
-  companion object {
-
-    /**
-     * [Fiber] constructor.
-     *
-     * @param join task that will trigger the cancellation.
-     * @param cancel task that will await for the completion of the underlying Fiber.
-     */
-    operator fun <F, E, A> invoke(join: Kind2<F, E, A>, cancel: CancelToken<F>): Fiber2<F,E,  A> = object : Fiber2<F, E, A> {
-      override fun join(): Kind2<F, E, A> = join
-      override fun cancel(): CancelToken<F> = cancel
-      override fun toString(): String = "Fiber(join= ${join()}, cancel= ${cancel()})"
-    }
-  }
-}

@@ -2,9 +2,9 @@ package arrow.fx
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
-import arrow.fx.extensions.io.environment.environment
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.ArrayStack
@@ -17,7 +17,6 @@ private typealias Current = IOOf<Any?, Any?>
 private typealias BindF = (Any?) -> IO<Any?, Any?>
 private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Any?, Any?>) -> Unit
-private typealias Handler = (Throwable) -> Any?
 
 @Suppress("UNCHECKED_CAST", "ReturnCount", "ComplexMethod")
 internal object IORunLoop {
@@ -52,14 +51,14 @@ internal object IORunLoop {
             null -> return currentIO as IO<E, A> // FIXME check this
             else -> {
               val exception: Any? = currentIO.exception
-              currentIO = executeSafe(errorHandler) { errorHandler.recover(exception) }
+              currentIO = executeSafe { errorHandler.recover(exception) }
               bFirst = null
             }
           }
         }
         is IO.Suspend -> {
           val thunk: () -> IOOf<Any?, Any?> = currentIO.thunk
-          currentIO = executeSafe { thunk() }
+          currentIO = executeSafe(thunk)
         }
         is IO.Delay -> {
           try {
@@ -67,7 +66,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = IO.RaiseError(currentIO.handler(t.nonFatalOrThrow()))
+            currentIO = IO.RaiseError(t.nonFatalOrThrow())
           }
         }
         is IO.Async -> {
@@ -92,7 +91,7 @@ internal object IORunLoop {
           val localCont = currentIO.cont
 
           currentIO = IO.Bind(localCont) { a ->
-            IO.Effect<Any?, Any?>(currentCC) { a }
+            IO.Effect<Any?>(currentCC) { a }
           }
         }
         is IO.Map<*, *, *> -> {
@@ -111,9 +110,7 @@ internal object IORunLoop {
             loop(localCurrent, conn, cb as Callback, null, bFirst, bRest, EmptyCoroutineContext)
           }
         }
-        is IO.UnhandledError -> TODO()
-        is IO.ErrorHandled -> TODO()
-        is IO.MapError<*,*,*> -> TODO()
+        is IO.MapError<*, *, *> -> TODO()
         null -> {
           currentIO = IO.RaiseError(IORunLoopStepOnNull)
         }
@@ -131,7 +128,7 @@ internal object IORunLoop {
         if (nextBind == null) {
           return sanitizedCurrentIO(currentIO, result)
         } else {
-          currentIO = executeSafe(IO.rethrow /* erroring in operators just rethrows */) { nextBind(result) }
+          currentIO = executeSafe { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
@@ -192,7 +189,7 @@ internal object IORunLoop {
             }
             else -> {
               val exception: Any? = currentIO.exception
-              currentIO = executeSafe(errorHandler) { errorHandler.recover(exception) }
+              currentIO = executeSafe { errorHandler.recover(exception) }
               bFirst = null
             }
           }
@@ -207,7 +204,11 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = IO.RaiseError(currentIO.handler(t.nonFatalOrThrow()))
+            if (NonFatal(t)) {
+              currentIO = IO.RaiseError(t)
+            } else {
+              throw t
+            }
           }
         }
         is IO.Async -> {
@@ -248,7 +249,7 @@ internal object IORunLoop {
           bFirst = { c: Any? -> IO.just(c) }
 
           currentIO = IO.Bind(localCont) { a ->
-            IO.Effect<Any?, Any?>(currentCC) { a }
+            IO.Effect<Any?>(currentCC) { a }
           }
         }
         is IO.Map<*, *, *> -> {
@@ -276,11 +277,11 @@ internal object IORunLoop {
           }
         }
         null -> {
-          currentIO = IO.RaiseError(IORunLoopOnNull /* FIXME */)
+          currentIO = IO.RaiseError(IORunLoopOnNull)
         }
         else -> {
           // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
-          currentIO = IO.RaiseError(IORunLoopMissingLoop /* FIXME */)
+          currentIO = IO.RaiseError(IORunLoopMissingLoop)
         }
       }
 
@@ -293,7 +294,7 @@ internal object IORunLoop {
           cb(Right(result))
           return
         } else {
-          currentIO = executeSafe(IO.rethrow /* erroring in operators just rethrows */) { nextBind(result) }
+          currentIO = executeSafe { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
@@ -302,11 +303,15 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private inline fun executeSafe(crossinline fe: Handler, crossinline f: () -> IOOf<Any?, Any?>): IO<Any?, Any?> =
+  private inline fun executeSafe(crossinline f: () -> IOOf<Any?, Any?>): IO<Any?, Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
-      IO.RaiseError(fe(e.nonFatalOrThrow()))
+      if (NonFatal(e)) {
+        IO.RaiseError(e)
+      } else {
+        throw e
+      }
     }
 
   /**
@@ -394,7 +399,7 @@ internal object IORunLoop {
       async.k(conn, this)
     }
 
-    fun start(effect: IO.Effect<Any?, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+    fun start(effect: IO.Effect<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       prepare(effect.ctx ?: ctx, bFirst, bRest)
       effect.effect.startCoroutine(this)
     }
@@ -433,7 +438,7 @@ internal object IORunLoop {
         canCall = false
         result.fold(
           { a -> IO.just(a) },
-          { e -> IO.environment().handleAsyncError(e) }
+          { e -> IO.RaiseError(e) }
         ).let { r ->
           if (shouldTrampoline) {
             this.value = r

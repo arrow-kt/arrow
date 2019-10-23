@@ -49,19 +49,19 @@ interface IORacePair {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
-  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<Throwable, A>, ioB: IOOf<Throwable, B>): IO<Throwable, RacePair<IOPartialOf<Throwable>, A, B>> =
+  fun <E, A, B> racePair(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<Throwable, B>): IO<Throwable, RacePair<IOPartialOf<Throwable>, A, B>> =
     IO.Async { conn, cb ->
       val active = AtomicBoolean(true)
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 
       // Cancelable connection for the left value
-      val connA = IOConnection<Throwable>()
+      val connA = IOConnection()
       connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<Throwable, A>()
 
       // Cancelable connection for the right value
-      val connB = IOConnection<Throwable>()
+      val connB = IOConnection()
       connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<Throwable, B>()
 

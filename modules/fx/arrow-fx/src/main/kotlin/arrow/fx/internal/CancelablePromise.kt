@@ -83,7 +83,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F, Throwable>)
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
       val task = EmptyCoroutineContext.startFiber(later { cb(value) })
       acc?.flatMap { task } ?: task
-    }?.map(mapUnit) ?: unit()
+    }?.map(mapToUnit) ?: unit()
 
   private fun unsafeRegister(cb: (Either<Throwable, A>) -> Unit): Token {
     val id = Token()

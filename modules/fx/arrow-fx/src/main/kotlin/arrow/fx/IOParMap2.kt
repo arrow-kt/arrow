@@ -16,8 +16,8 @@ interface IOParMap2 {
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicReference<Any?>(null)
 
-    val connA = IOConnection<Throwable>()
-    val connB = IOConnection<Throwable>()
+    val connA = IOConnection()
+    val connB = IOConnection()
 
     conn.pushPair(connA, connB)
 
@@ -30,7 +30,7 @@ interface IOParMap2 {
       })
     }
 
-    fun sendError(other: IOConnection<Throwable>, e: Throwable) = when (state.getAndSet(e)) {
+    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
       else -> other.cancel().fix().unsafeRunAsync { r ->
         conn.pop()

@@ -1,16 +1,13 @@
 package arrow.fx.internal
 
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOPartialOf
 import arrow.fx.typeclasses.Fiber
-import arrow.fx.typeclasses.Fiber2
-import arrow.fx.typeclasses.throwPolicy
 
-internal fun <E, A> IOFiber(promise: UnsafePromise<E, A>, conn: IOConnection): Fiber2<ForIO, E, A> {
-  val join: IO<E, A> = IO.Async(false) { conn2, cb ->
-    conn2.push(IO(throwPolicy) { promise.remove(cb) })
+internal fun <A> IOFiber(promise: UnsafePromise<Throwable, A>, conn: IOConnection): Fiber<IOPartialOf<Throwable>, A> {
+  val join: IO<Throwable, A> = IO.Async(false) { conn2, cb ->
+    conn2.push(IO { promise.remove(cb) })
 
     promise.get { a ->
       cb(a)
@@ -19,5 +16,5 @@ internal fun <E, A> IOFiber(promise: UnsafePromise<E, A>, conn: IOConnection): F
     }
   }
 
-  return Fiber2<ForIO, E, A>(join, conn.cancel())
+  return Fiber<IOPartialOf<Throwable>, A>(join, conn.cancel())
 }

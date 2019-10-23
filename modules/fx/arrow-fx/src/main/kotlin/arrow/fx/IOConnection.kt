@@ -4,6 +4,7 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.fx.extensions.io.monadDefer.monadDefer
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
@@ -21,11 +22,8 @@ internal inline val KindConnection.Companion.uncancelable: IOConnection
   inline get() = _uncancelable
 
 private fun <E> MD() = object : MonadDefer<IOPartialOf<E>, E> {
-  override fun <A> handleError(t: Throwable): Kind<IOPartialOf<E>, A> =
-    IO.handleError(t)
-
   override fun <A> defer(fa: () -> IOOf<E, A>): IO<E, A> =
-    IO.defer(fa)
+    IO.monadDefer().defer(fa)
 
   override fun <A> raiseError(e: E): IO<E, A> =
     IO.raiseError(e)

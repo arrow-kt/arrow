@@ -18,14 +18,12 @@ interface MonadDefer<F, E> : MonadError<F, E>, Bracket<F, E> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
-  fun <A> handleError(t: Throwable): Kind<F, A>
-
   fun <A> later(f: () -> A): Kind<F, A> =
     defer {
       try {
         just(f())
       } catch (t: Throwable) {
-        t.raiseNonFatal<A>()
+        t.raiseThrowableNonFatal<A>()
       }
     }
 
@@ -35,11 +33,12 @@ interface MonadDefer<F, E> : MonadError<F, E>, Bracket<F, E> {
   fun lazy(): Kind<F, Unit> =
     later { }
 
-  fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
-    if (NonFatal(this)) handleError(this) else throw this
+  fun <A> Throwable.raiseThrowableNonFatal(): Kind<F, A> =
+    @Suppress("UNCHECKED_CAST")
+    if (NonFatal(this)) raiseError(this as E) else throw this
 
-  fun <A> laterOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
-    defer { f().fold({ handleError<A>(it) }, { just(it) }) }
+  fun <A> laterOrRaise(f: () -> Either<E, A>): Kind<F, A> =
+    defer { f().fold(::raiseError, ::just) }
 
   /**
    * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
@@ -55,8 +54,8 @@ interface MonadDefer<F, E> : MonadError<F, E>, Bracket<F, E> {
 interface MonadDeferFx<F, E> : MonadFx<F> {
   val ME: MonadDefer<F, E>
   override val M: Monad<F> get() = ME
-  fun <A> monadError(c: suspend MonadDeferSyntax<F, E>.() -> A, fe: (Throwable) -> E): Kind<F, A> {
-    val continuation = MonadDeferContinuation<F, A, E>(ME, fe = fe)
+  fun <A> monadError(c: suspend MonadDeferSyntax<F, E>.() -> A): Kind<F, A> {
+    val continuation = MonadDeferContinuation<F, A, E>(ME)
     val wrapReturn: suspend MonadDeferSyntax<F, E>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()

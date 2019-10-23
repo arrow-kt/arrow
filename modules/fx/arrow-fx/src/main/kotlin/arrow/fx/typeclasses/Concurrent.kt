@@ -11,9 +11,6 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
-import arrow.fx.internal.parMap2
-import arrow.fx.internal.parMap3
-import arrow.typeclasses.Applicative
 import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.Race2
@@ -28,6 +25,9 @@ import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
+import arrow.fx.internal.parMap2
+import arrow.fx.internal.parMap3
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
@@ -274,7 +274,7 @@ interface Concurrent<F, E> : Async<F, E> {
         try {
           cb(r)
         } finally {
-          if (!state.compareAndSet(null, mapUnit)) {
+          if (!state.compareAndSet(null, mapToUnit)) {
             val cb2 = state.get()
             state.lazySet(null)
             cb2(rightUnit)
@@ -848,7 +848,7 @@ interface Concurrent<F, E> : Async<F, E> {
    *   //sampleStart
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
    *     val world = sleep(1.seconds).flatMap { effect { println("Hello World!") } }
-   *     return world.waitFor(3.seconds)
+   *     return world.waitFor(3.seconds, ::identity)
    *   }
    *   //sampleEnd
    *   IO.concurrent().timedOutWorld()
@@ -856,11 +856,12 @@ interface Concurrent<F, E> : Async<F, E> {
    * }
    * ```
    **/
-  fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
+  // TODO review extra default param
+  fun <A> Kind<F, A>.waitFor(duration: Duration, default: E): Kind<F, A> =
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
-        { handleError(TimeoutException(duration.toString())) }
+        { raiseError(default) }
       )
     }
 }

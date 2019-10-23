@@ -4,11 +4,21 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-import arrow.fx.*
+import arrow.fx.CancelToken
+import arrow.fx.IO
 import arrow.fx.IODispatchers
+import arrow.fx.IOOf
+import arrow.fx.IOPartialOf
+import arrow.fx.OnCancel
+import arrow.fx.RacePair
+import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.fix
 import arrow.fx.flatMap
+import arrow.fx.runAsyncCancellable
+import arrow.fx.startFiber
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
@@ -22,6 +32,8 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
+import arrow.fx.typeclasses.ProcE
+import arrow.fx.typeclasses.ProcEF
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
@@ -147,35 +159,48 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, E>, IOMonadError<E> {
 interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>, E>, IOBracket<E> {
   override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
     IO.defer(fa)
+
+  override fun <A> later(f: () -> A): Kind<IOPartialOf<E>, A> =
+    IO.later(f)
 }
 
 @extension
 interface IOAsync<E> : Async<IOPartialOf<E>, E>, IOMonadDefer<E> {
-  override fun <A> async(fa: Proc<A>): Kind<IOPartialOf<E>, A> =
+  override fun <A> async(fa: ProcE<E, A>): Kind<IOPartialOf<E>, A> =
     IO.async(fa)
 
-  override fun <A> asyncF(k: ProcF<IOPartialOf<E>, A>): IO<E, A> =
+  override fun <A> asyncF(k: ProcEF<IOPartialOf<E>, E, A>): Kind<IOPartialOf<E>, A> =
     IO.asyncF(k)
 
   override fun <A> IOOf<E, A>.continueOn(ctx: CoroutineContext): IO<E, A> =
     fix().continueOn(ctx)
 
-  override fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
-    IO.effect(ctx, fe, f)
+  override fun <A> effect(f: suspend () -> A): Kind<IOPartialOf<E>, A> {
+    return super.effect(f)
+  }
 
-  override fun <A> defer(fe: (Throwable) -> E, fa: () -> Kind<IOPartialOf<E>, A>): IO<E, A> =
-    IO.defer(fe, fa)
+  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
+    return super.effect(ctx, f)
+  }
 
-  override fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
-    IO.effect(fe, f)
+  override fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
+    return super.effect(fe, f)
+  }
+
+  override fun <E, A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> {
+    return super.effect(ctx, fe, f)
+  }
+
+  override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
+    IO.defer(fa)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
-interface IOConcurrent : Concurrent<IOPartialOf<Throwable>, Throwable>, IOAsync<Throwable> {
-  override fun <A> CoroutineContext.startFiber(kind: IOOf<Throwable, A>): IO<Throwable, Fiber<IOPartialOf<Throwable>, A>> =
+interface IOConcurrent<E> : Concurrent<IOPartialOf<E>, E>, IOAsync<E> {
+  override fun <A> CoroutineContext.startFiber(kind: IOOf<E, A>): IO<Throwable, Fiber<IOPartialOf<E>, A>> =
     kind.fix().startFiber(this, ::identity)
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): Kind<IOPartialOf<Throwable>, A> =
+  override fun <A> cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): Kind<IOPartialOf<Throwable>, A> =
     IO.cancelable(k)
 
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<IOPartialOf<Throwable>, CancelToken<IOPartialOf<Throwable>>>): Kind<IOPartialOf<Throwable>, A> =

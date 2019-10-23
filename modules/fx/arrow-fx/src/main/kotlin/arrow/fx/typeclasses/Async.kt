@@ -3,6 +3,7 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.identity
 import arrow.documented
 import arrow.fx.extensions.io.async.async
 import arrow.fx.internal.asyncContinuation
@@ -11,11 +12,17 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-/** An asynchronous computation that might fail. **/
-typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
+/** An asynchronous computation that might fail with a specific error type. **/
+typealias ProcEF<F, E, A> = ((Either<E, A>) -> Unit) -> Kind<F, Unit>
 
-/** An asynchronous computation that might fail. **/
-typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+/** An asynchronous computation that might fail with a specific error type. **/
+typealias ProcE<E, A> = ((Either<E, A>) -> Unit) -> Unit
+
+///** An asynchronous computation that might fail. **/
+//typealias ProcF<F, A> = ProcEF<F, Throwable, A>
+//
+///** An asynchronous computation that might fail. **/
+//typealias Proc<A> = ProcE<Throwable, A>
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Async)
@@ -79,8 +86,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
-  fun <A> async(fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> later { fa(cb) } }
+  fun <E, A> async(fa: ProcE<E, A>): Kind<F, A> =
+    asyncF<E, A> { cb -> later { fa(cb) } }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -111,7 +118,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * @see async for a simpler, non suspending version.
    */
-  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
+  // TODO maybe we should fix this to a Kind2<F, E, A>?
+  fun <E, A> asyncF(k: ProcEF<F, E, A>): Kind<F, A>
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
@@ -162,7 +170,7 @@ interface Async<F, E> : MonadDefer<F, E> {
       try {
         just(f())
       } catch (t: Throwable) {
-        t.raiseNonFatal<A>()
+        t.raiseThrowableNonFatal<A>()
       }
     }
 
@@ -187,9 +195,10 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> effect(f: suspend () -> A): Kind<F, A> =
-    async {
-      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, it))
-    }
+    effect(EmptyCoroutineContext, f)
+
+  fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+    effect(EmptyCoroutineContext, fe, f)
 
   /**
    * Delay a suspended effect on provided [CoroutineContext].
@@ -214,9 +223,13 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
-    async {
-      f.startCoroutine(asyncContinuation(ctx, it))
+    effect(ctx, ::identity, f)
+
+  fun <E, A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+    async<E, A> { cb ->
+      f.startCoroutine(asyncContinuation(ctx) { cb(it.mapLeft(fe)) })
     }
+
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -247,8 +260,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    */
-  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
-    defer(ctx) { f().fold({ handleError<A>(it) }, { just(it) }) }
+  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<E, A>): Kind<F, A> =
+    defer(ctx) { f().fold(::raiseError, ::just) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -300,7 +313,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    later(this) { Unit }
+    later(this, mapUnit)
 
   /**
    * Task that never finishes evaluating.
@@ -318,10 +331,11 @@ interface Async<F, E> : MonadDefer<F, E> {
    * ```
    */
   fun <A> never(): Kind<F, A> =
-    async { }
+    async<Nothing, A> { }
 }
 
-internal val mapUnit: (Any?) -> Unit = { Unit }
+internal val mapToUnit: (Any?) -> Unit = { Unit }
+internal val mapUnit: () -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
