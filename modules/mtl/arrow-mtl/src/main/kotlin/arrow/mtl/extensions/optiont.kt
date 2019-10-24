@@ -7,7 +7,6 @@ import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.option.traverseFilter.traverseFilter
@@ -129,7 +128,7 @@ fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eva
 }
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { value().traverseC(f, GA) }
+  val fa = ComposedTraverse(FF, Option.traverse()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
@@ -259,7 +258,7 @@ fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<OptionTParti
   OptionT.monad(M).fx.monad(c).fix()
 
 fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value(), f, GA)
+  val fa = ComposedTraverseFilter(FF, Option.traverseFilter()).traverseFilterC(value(), f, GA)
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { nested -> OptionT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
