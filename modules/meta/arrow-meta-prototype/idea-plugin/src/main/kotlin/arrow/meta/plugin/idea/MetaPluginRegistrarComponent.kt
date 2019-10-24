@@ -16,7 +16,7 @@ class MetaPluginRegistrarComponent(val project: Project) : ProjectComponent {
 
   override fun getComponentName(): String = "arrow.meta.registrar"
 
-  override fun initComponent() {
+  override fun initComponent(): Unit {
     LOG.info("initComponent()")
 
     val start = System.currentTimeMillis()
@@ -26,11 +26,11 @@ class MetaPluginRegistrarComponent(val project: Project) : ProjectComponent {
     LOG.info("initComponent() took ${System.currentTimeMillis() - start}ms")
   }
 
-  override fun disposeComponent() {
+  override fun disposeComponent(): Unit {
     // TODO: make sure that all registered components are disposed
   }
 
-  override fun projectClosed() {}
+  override fun projectClosed(): Unit {}
 
-  override fun projectOpened() {}
+  override fun projectOpened(): Unit {}
 }

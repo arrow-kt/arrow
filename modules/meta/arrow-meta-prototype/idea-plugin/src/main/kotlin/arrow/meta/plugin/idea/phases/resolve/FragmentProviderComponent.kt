@@ -25,7 +25,9 @@ class FragmentProviderComponent(val project: Project) : ProjectComponent, AsyncF
 
   override fun projectOpened() {
     LOG.debug("Initializing cache of MetaSyntheticPackageFragmentProvider")
-    MetaSyntheticPackageFragmentProvider.getInstance(project).computeCacheAsync()
+    MetaSyntheticPackageFragmentProvider.getInstance(project)?.run {
+      computeCacheAsync()
+    } ?: LOG.error("Could not get MetaSyntheticPackageFragmentProvider instance, while opening the project")
   }
 
   override fun prepareChange(events: MutableList<out VFileEvent>) = this
@@ -36,6 +38,8 @@ class FragmentProviderComponent(val project: Project) : ProjectComponent, AsyncF
 
   override fun afterVfsChange() {
     LOG.debug("MetaSyntheticPackageFragmentProvider.afterVfsChange")
-    MetaSyntheticPackageFragmentProvider.getInstance(project).computeCacheAsync()
+    MetaSyntheticPackageFragmentProvider.getInstance(project)?.run {
+      computeCacheAsync()
+    } ?: LOG.error("Could not get MetaSyntheticPackageFragmentProvider instance, afterVfsChanges")
   }
 }

@@ -86,12 +86,10 @@ class MetaSyntheticPackageFragmentProvider(val project: Project) :
   Disposable {
 
   companion object {
-    fun getInstance(project: Project): MetaSyntheticPackageFragmentProvider {
-      val first = PackageFragmentProviderExtension.getInstances(project)
+    fun getInstance(project: Project): MetaSyntheticPackageFragmentProvider? =
+      PackageFragmentProviderExtension.getInstances(project)
         .filterIsInstance<MetaSyntheticPackageFragmentProvider>()
         .firstOrNull()
-      return first ?: throw IllegalStateException("fragment provider must not be null")
-    }
 
     fun measureTimeMillis(block: () -> Unit): Long {
       val start = System.currentTimeMillis()
@@ -116,9 +114,8 @@ class MetaSyntheticPackageFragmentProvider(val project: Project) :
     trace: BindingTrace,
     moduleInfo: ModuleInfo?,
     lookupTracker: LookupTracker
-  ): PackageFragmentProvider? {
-    return DescriptorCachePackageFragmentProvider(module)
-  }
+  ): PackageFragmentProvider =
+    DescriptorCachePackageFragmentProvider(module)
 
   inner class DescriptorCachePackageFragmentProvider(val module: ModuleDescriptor) : PackageFragmentProvider {
     override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> =
