@@ -124,22 +124,19 @@ interface MaybeKMonadError :
 }
 
 @extension
-interface MaybeKMonadThrow : MonadThrow<ForMaybeK>, MaybeKMonadError
-
-@extension
-interface MaybeKBracket : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
+interface MaybeKBracket : Bracket<ForMaybeK, Throwable>, MaybeKMonadError {
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface MaybeKMonadDefer : MonadDefer<ForMaybeK>, MaybeKBracket {
+interface MaybeKMonadDefer : MonadDefer<ForMaybeK, Throwable>, MaybeKBracket {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
 @extension
-interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
+interface MaybeKAsync : Async<ForMaybeK, Throwable>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async(fa)
 
@@ -158,7 +155,7 @@ interface MaybeKEffect :
     fix().runAsync(cb)
 }
 
-interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
+interface MaybeKConcurrent : Concurrent<ForMaybeK, Throwable>, MaybeKAsync {
   override fun <A> CoroutineContext.startFiber(kind: MaybeKOf<A>): MaybeK<Fiber<ForMaybeK, A>> =
     asScheduler().let { scheduler ->
       Maybe.create<Fiber<ForMaybeK, A>> { emitter ->
@@ -231,7 +228,7 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
     }
 }
 
-fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK>): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
+fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK>): Concurrent<ForMaybeK, Throwable> = object : MaybeKConcurrent {
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
 }
 
@@ -243,5 +240,5 @@ interface MaybeKTimer : Timer<ForMaybeK> {
 }
 
 // TODO MaybeK does not yet have a Concurrent instance
-fun <A> MaybeK.Companion.fx(c: suspend AsyncSyntax<ForMaybeK>.() -> A): MaybeK<A> =
+fun <A> MaybeK.Companion.fx(c: suspend AsyncSyntax<ForMaybeK, Throwable>.() -> A): MaybeK<A> =
   MaybeK.async().fx.async(c).fix()

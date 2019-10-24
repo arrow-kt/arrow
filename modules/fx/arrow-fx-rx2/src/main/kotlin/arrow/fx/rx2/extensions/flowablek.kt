@@ -24,8 +24,6 @@ import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.Effect
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.typeclasses.Proc
-import arrow.fx.typeclasses.ProcF
 import arrow.fx.Timer
 import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Concurrent
@@ -37,7 +35,6 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -48,6 +45,8 @@ import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
+import arrow.fx.typeclasses.ProcE
+import arrow.fx.typeclasses.ProcEF
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
@@ -135,16 +134,13 @@ interface FlowableKMonadError :
 }
 
 @extension
-interface FlowableKMonadThrow : MonadThrow<ForFlowableK>, FlowableKMonadError
-
-@extension
-interface FlowableKBracket : Bracket<ForFlowableK, Throwable>, FlowableKMonadThrow {
+interface FlowableKBracket : Bracket<ForFlowableK, Throwable>, FlowableKMonadError {
   override fun <A, B> FlowableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, use: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface FlowableKMonadDefer : MonadDefer<ForFlowableK>, FlowableKBracket {
+interface FlowableKMonadDefer : MonadDefer<ForFlowableK, Throwable>, FlowableKBracket {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.defer(fa)
 
@@ -153,12 +149,12 @@ interface FlowableKMonadDefer : MonadDefer<ForFlowableK>, FlowableKBracket {
 
 @extension
 interface FlowableKAsync :
-  Async<ForFlowableK>,
+  Async<ForFlowableK, Throwable>,
   FlowableKMonadDefer {
-  override fun <A> async(fa: Proc<A>): FlowableK<A> =
+  override fun <A> async(fa: ProcE<Throwable, A>): FlowableK<A> =
     FlowableK.async(fa, BS())
 
-  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
+  override fun <A> asyncF(k: ProcEF<ForFlowableK, Throwable, A>): FlowableKOf<A> =
     FlowableK.asyncF(k, BS())
 
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
@@ -173,7 +169,7 @@ interface FlowableKEffect :
     fix().runAsync(cb)
 }
 
-interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
+interface FlowableKConcurrent : Concurrent<ForFlowableK, Throwable>, FlowableKAsync {
 
   override fun <A> CoroutineContext.startFiber(kind: FlowableKOf<A>): FlowableK<Fiber<ForFlowableK, A>> =
     asScheduler().let { scheduler ->
@@ -247,7 +243,7 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
     }
 }
 
-fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
+fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK, Throwable> = object : FlowableKConcurrent {
   override fun dispatchers(): Dispatchers<ForFlowableK> = dispatchers
 }
 
@@ -343,5 +339,5 @@ interface FlowableKTimer : Timer<ForFlowableK> {
 }
 
 // TODO FlowableK does not yet have a Concurrent instance
-fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
+fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK, Throwable>.() -> A): FlowableK<A> =
   FlowableK.async().fx.async(c).fix()

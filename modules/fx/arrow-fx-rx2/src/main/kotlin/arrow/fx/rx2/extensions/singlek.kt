@@ -2,6 +2,7 @@ package arrow.fx.rx2.extensions
 
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -28,13 +29,11 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -101,23 +100,20 @@ interface SingleKMonadError :
 }
 
 @extension
-interface SingleKMonadThrow : MonadThrow<ForSingleK>, SingleKMonadError
-
-@extension
-interface SingleKBracket : Bracket<ForSingleK, Throwable>, SingleKMonadThrow {
+interface SingleKBracket : Bracket<ForSingleK, Throwable>, SingleKMonadError {
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface SingleKMonadDefer : MonadDefer<ForSingleK>, SingleKBracket {
+interface SingleKMonadDefer : MonadDefer<ForSingleK, Throwable>, SingleKBracket {
   override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
     SingleK.defer(fa)
 }
 
 @extension
 interface SingleKAsync :
-  Async<ForSingleK>,
+  Async<ForSingleK, Throwable>,
   SingleKMonadDefer {
   override fun <A> async(fa: Proc<A>): SingleK<A> =
     SingleK.async(fa)
@@ -137,7 +133,7 @@ interface SingleKEffect :
     fix().runAsync(cb)
 }
 
-interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
+interface SingleKConcurrent : Concurrent<ForSingleK, Throwable>, SingleKAsync {
   override fun <A> CoroutineContext.startFiber(kind: SingleKOf<A>): SingleK<Fiber<ForSingleK, A>> =
     asScheduler().let { scheduler ->
       Single.create<Fiber<ForSingleK, A>> { emitter ->
@@ -210,7 +206,7 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
     }
 }
 
-fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK>): Concurrent<ForSingleK> = object : SingleKConcurrent {
+fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK>): Concurrent<ForSingleK, Throwable> = object : SingleKConcurrent {
   override fun dispatchers(): Dispatchers<ForSingleK> = dispatchers
 }
 
@@ -228,5 +224,5 @@ interface SingleKTimer : Timer<ForSingleK> {
 }
 
 // TODO SingleK does not yet have a Concurrent instance
-fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK>.() -> A): SingleK<A> =
+fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK, Throwable>.() -> A): SingleK<A> =
   SingleK.async().fx.async(c).fix()

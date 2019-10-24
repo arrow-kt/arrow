@@ -144,7 +144,7 @@ interface ObservableKMonadDefer : MonadDefer<ForObservableK, Throwable>, Observa
 
 @extension
 interface ObservableKAsync : Async<ForObservableK, Throwable>, ObservableKMonadDefer {
-  override fun <A> async(fa: Proc<A>): Kind<ForObservableK, A> =
+  override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
@@ -161,7 +161,7 @@ interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
 }
 
 interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable> {
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): Kind<ForObservableK, A> =
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
     ObservableK.cancelable(k)
 
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForObservableK, CancelToken<ForObservableK>>): Kind<ForObservableK, A> =
@@ -200,14 +200,10 @@ interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable> {
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
         sa.subscribe({
           emitter.onNext(RacePair.First(it, ffb))
-        }, { e ->
-          emitter.tryOnError(e)
-        }, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RacePair.Second(ffa, it))
-        }, { e ->
-          emitter.tryOnError(e)
-        }, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -226,19 +222,13 @@ interface ObservableKConcurrent : Concurrent<ForObservableK, Throwable> {
         val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
         sa.subscribe({
           emitter.onNext(RaceTriple.First(it, ffb, ffc))
-        }, { e ->
-          emitter.tryOnError(e)
-        }, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RaceTriple.Second(ffa, it, ffc))
-        }, { e ->
-          emitter.tryOnError(e)
-        }, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sc.subscribe({
           emitter.onNext(RaceTriple.Third(ffa, ffb, it))
-        }, { e ->
-          emitter.tryOnError(e)
-        }, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
@@ -277,9 +267,8 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
     fix().switchMap { f(it).fix() }
 }
 
-// TODO ObservableK does not yet have a Concurrent instance
 fun <A> ObservableK.Companion.fx(c: suspend AsyncSyntax<ForObservableK, Throwable>.() -> A): ObservableK<A> =
-  ObservableK.async().fx.async(c).fix()
+  ObservableK.concurrent().fx.async(c).fix()
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {

@@ -223,7 +223,7 @@ interface Concurrent<F, E> : Async<F, E> {
    * ```
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
-  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+  fun <A> cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
     cancelableF { cb ->
       val token = k(cb)
       later { token }
@@ -267,10 +267,10 @@ interface Concurrent<F, E> : Async<F, E> {
    *
    * @see cancelable for a simpler non-suspending version.
    */
-  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+  fun <A> cancelableF(k: ((Either<E, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
-      val cb1 = { r: Either<Throwable, A> ->
+      val state = AtomicReference<(Either<E, Unit>) -> Unit>(null)
+      val cb1 = { r: Either<E, A> ->
         try {
           cb(r)
         } finally {

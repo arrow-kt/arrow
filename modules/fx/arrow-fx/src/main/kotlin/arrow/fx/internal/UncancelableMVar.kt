@@ -1,11 +1,18 @@
 package arrow.fx.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.fx.MVar
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForTake
-import arrow.fx.typeclasses.*
+import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.rightUnit
+import arrow.fx.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
 // [MVar] implementation for [Async] data types.

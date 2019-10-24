@@ -2,7 +2,6 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.identity
 import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.IO
@@ -31,10 +30,8 @@ import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcE
 import arrow.fx.typeclasses.ProcEF
-import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -156,44 +153,49 @@ interface IOBracket : Bracket<IOPartialOf<Throwable>, Throwable>, IOMonadError<T
 }
 
 @extension
-interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>, E> {
-  override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
+interface IOMonadDefer : MonadDefer<IOPartialOf<Throwable>, Throwable>, IOBracket {
+  override fun <A> defer(fa: () -> Kind<IOPartialOf<Throwable>, A>): Kind<IOPartialOf<Throwable>, A> =
     IO.defer(fa)
 
-  override fun <A> later(f: () -> A): Kind<IOPartialOf<E>, A> =
+  override fun <A> later(f: () -> A): Kind<IOPartialOf<Throwable>, A> =
     IO.later(f)
 }
 
 @extension
-interface IOAsync<E> : Async<IOPartialOf<E>, E>, IOMonadDefer<E> {
-  override fun <A> async(fa: ProcE<E, A>): Kind<IOPartialOf<E>, A> =
+interface IOAsync : Async<IOPartialOf<Throwable>, Throwable>, IOMonadDefer {
+  override fun <A> async(fa: ProcE<Throwable, A>): Kind<IOPartialOf<Throwable>, A> =
     IO.async(fa)
 
-  override fun <A> asyncF(k: ProcEF<IOPartialOf<E>, E, A>): Kind<IOPartialOf<E>, A> =
+  override fun <A> asyncF(k: ProcEF<IOPartialOf<Throwable>, Throwable, A>): Kind<IOPartialOf<Throwable>, A> =
     IO.asyncF(k)
 
-  override fun <A> IOOf<E, A>.continueOn(ctx: CoroutineContext): IO<E, A> =
+  override fun <A> IOOf<Throwable, A>.continueOn(ctx: CoroutineContext): IO<Throwable, A> =
     fix().continueOn(ctx)
 
-  override fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> =
-    IO.effect(fe, f)
-
-  override fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<IOPartialOf<E>, A> =
-    IO.effect(ctx, fe, f)
-
-  override fun <A> defer(fa: () -> Kind<IOPartialOf<E>, A>): Kind<IOPartialOf<E>, A> =
+  override fun <A> defer(fa: () -> Kind<IOPartialOf<Throwable>, A>): Kind<IOPartialOf<Throwable>, A> =
     IO.defer(fa)
+
+  override fun <A> Async<IOPartialOf<Throwable>, Throwable>.effect(f: suspend () -> A): Kind<IOPartialOf<Throwable>, A> =
+    IO.effect(f)
+
+  override fun <A> Async<IOPartialOf<Throwable>, Throwable>.effect(ctx: CoroutineContext, f: suspend () -> A): Kind<IOPartialOf<Throwable>, A> =
+    IO.effect(ctx, f)
+}
+
+@extension
+interface IOAsync2 : Async<IOPartialOf<Throwable>, Throwable> {
+
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
-interface IOConcurrent<E> : Concurrent<IOPartialOf<E>, E>, IOAsync<E> {
-  override fun <A> CoroutineContext.startFiber(kind: IOOf<E, A>): IO<E, Fiber<IOPartialOf<E>, A>> =
-    kind.fix().startFiber(this, ::identity)
+interface IOConcurrent : Concurrent<IOPartialOf<Throwable>, Throwable>, IOAsync {
+  override fun <A> CoroutineContext.startFiber(kind: IOOf<Throwable, A>): IO<Throwable, Fiber<IOPartialOf<Throwable>, A>> =
+    kind.fix().startFiber(this)
 
-  override fun <A> cancelable(k: ((Either<E, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): Kind<IOPartialOf<Throwable>, A> =
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): IO<Throwable, A> =
     IO.cancelable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<IOPartialOf<Throwable>, CancelToken<IOPartialOf<Throwable>>>): Kind<IOPartialOf<Throwable>, A> =
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<Throwable, CancelToken<IOPartialOf<Throwable>>>): IO<Throwable, A> =
     IO.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: IOOf<Throwable, A>, fb: IOOf<Throwable, B>): IO<Throwable, RacePair<IOPartialOf<Throwable>, A, B>> =
@@ -217,7 +219,7 @@ fun IO.Companion.timer(CF: Concurrent<IOPartialOf<Throwable>, Throwable>): Timer
   Timer(CF)
 
 @extension
-interface IOEffect : Effect<IOPartialOf<Throwable>>, IOAsync<Throwable> {
+interface IOEffect : Effect<IOPartialOf<Throwable>>, IOAsync {
   override fun <A> IOOf<Throwable, A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Throwable, Unit>): IO<Throwable, Unit> =
     fix().runAsync(cb)
 }
@@ -289,4 +291,4 @@ fun IO.Companion.timer(): Timer<IOPartialOf<Throwable>> = Timer(IO.concurrent())
 interface IODefaultConcurrentEffect : ConcurrentEffect<IOPartialOf<Throwable>>, IOConcurrentEffect, IODefaultConcurrent
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<Throwable>, Throwable>.() -> A): IO<Throwable, A> =
-  IO.concurrent().fx.concurrent(::identity, c).fix()
+  IO.concurrent().fx.concurrent(c).fix()

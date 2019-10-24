@@ -3,7 +3,6 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.identity
 import arrow.documented
 import arrow.fx.extensions.io.async.async
 import arrow.fx.internal.asyncContinuation
@@ -18,17 +17,17 @@ typealias ProcEF<F, E, A> = ((Either<E, A>) -> Unit) -> Kind<F, Unit>
 /** An asynchronous computation that might fail with a specific error type. **/
 typealias ProcE<E, A> = ((Either<E, A>) -> Unit) -> Unit
 
-///** An asynchronous computation that might fail. **/
-//typealias ProcF<F, A> = ProcEF<F, Throwable, A>
-//
-///** An asynchronous computation that might fail. **/
-//typealias Proc<A> = ProcE<Throwable, A>
+/** An asynchronous computation that might fail. **/
+typealias ProcF<F, A> = ProcEF<F, Throwable, A>
+
+/** An asynchronous computation that might fail. **/
+typealias Proc<A> = ProcE<Throwable, A>
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Async)
  *
  * [Async] models how a data type runs an asynchronous computation that may fail.
- * Defined by the [Proc] signature, which is the consumption of a callback.
+ * Defined by the [ProcE] signature, which is the consumption of a callback.
  **/
 @documented
 interface Async<F, E> : MonadDefer<F, E> {
@@ -54,7 +53,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * This combinator can be used to wrap callbacks or other similar impure code.
    *
-   * @param fa an asynchronous computation that might fail typed as [Proc].
+   * @param fa an asynchronous computation that might fail typed as [ProcE].
    *
    * ```kotlin:ank:playground:extension
    * _imports_
@@ -67,7 +66,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fun <F> Async<F>.getUsernames(): Kind<F, List<String>> =
+   *   fun <F> Async<F, Throwable>.getUsernames(): Kind<F, List<String>> =
    *     async { cb: (Either<Throwable, List<String>>) -> Unit ->
    *       GithubService.getUsernames { names, throwable ->
    *         when {
@@ -101,7 +100,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fun <F> Async<F>.makeCompleteAndGetPromiseInAsync() =
+   *   fun <F> Async<F, Throwable>.makeCompleteAndGetPromiseInAsync() =
    *     asyncF<String> { cb: (Either<Throwable, String>) -> Unit ->
    *       Promise.uncancelable<F, String>(this).flatMap { promise ->
    *         promise.complete("Hello World!").flatMap {
@@ -131,7 +130,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fun <F> Async<F>.runOnDefaultDispatcher(): Kind<F, String> =
+   *   fun <F> Async<F, Throwable>.runOnDefaultDispatcher(): Kind<F, String> =
    *     _just_(Unit)._continueOn_(Dispatchers.Default).flatMap {
    *       _later_({ Thread.currentThread().name })
    *     }
@@ -155,7 +154,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *   fun <F> Async<F, Throwable>.invokeOnDefaultDispatcher(): Kind<F, String> =
    *     _later_(Dispatchers.Default, { Thread.currentThread().name })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
@@ -184,7 +183,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *   //sampleStart
    *   suspend fun helloWorld(): Unit = println("Hello World!")
    *
-   *   fun <F> Async<F>.delayASuspendedEffect(): Kind<F, String> =
+   *   fun <F> Async<F, Throwable>.delayASuspendedEffect(): Kind<F, String> =
    *     _effect_ { helloWorld() }
    *
    *   val result = _extensionFactory_.delayASuspendedEffect()
@@ -193,11 +192,8 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-//  fun <A> effect(f: suspend () -> A): Kind<F, A> =
-//    effect(EmptyCoroutineContext, f)
-
-  fun <A> effect(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
-    effect(EmptyCoroutineContext, fe, f)
+  fun <A> Async<F, Throwable>.effect(f: suspend () -> A): Kind<F, A> =
+    effect(EmptyCoroutineContext, f)
 
   /**
    * Delay a suspended effect on provided [CoroutineContext].
@@ -212,7 +208,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *   //sampleStart
    *   suspend fun getThreadSuspended(): String = Thread.currentThread().name
    *
-   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *   fun <F> Async<F, Throwable>.invokeOnDefaultDispatcher(): Kind<F, String> =
    *     _effect_(Dispatchers.Default, { getThreadSuspended() })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
@@ -221,14 +217,10 @@ interface Async<F, E> : MonadDefer<F, E> {
    * }
    * ```
    */
-//  fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
-//    effect(ctx, ::identity, f)
-
-  fun <A> effect(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+  fun <A> Async<F, Throwable>.effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
     async { cb ->
-      f.startCoroutine(asyncContinuation(ctx) { cb(it.mapLeft(fe)) })
+      f.startCoroutine(asyncContinuation(ctx, cb))
     }
-
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -241,7 +233,7 @@ interface Async<F, E> : MonadDefer<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *   fun <F> Async<F, Throwable>.invokeOnDefaultDispatcher(): Kind<F, String> =
    *     _defer_(Dispatchers.Default, { effect { Thread.currentThread().name } })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher().fix().unsafeRunSync()
