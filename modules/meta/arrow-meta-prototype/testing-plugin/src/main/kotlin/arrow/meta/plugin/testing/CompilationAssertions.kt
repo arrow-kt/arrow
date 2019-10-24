@@ -64,7 +64,7 @@ private fun call(expression: String, classesDirectory: File): String {
 
   val resultForMethodCall = classLoader.loadClass(DEFAULT_CLASSNAME).getMethod(expressionParts.method).invoke(null)
   return when {
-      expressionParts.property.isNullOrBlank() -> resultForMethodCall.toString()
-      else -> resultForMethodCall.javaClass.getField(expressionParts.property).get(resultForMethodCall).toString()
+    expressionParts.property.isNullOrBlank() -> resultForMethodCall.toString()
+    else -> resultForMethodCall.javaClass.getField(expressionParts.property).get(resultForMethodCall).toString()
   }
 }

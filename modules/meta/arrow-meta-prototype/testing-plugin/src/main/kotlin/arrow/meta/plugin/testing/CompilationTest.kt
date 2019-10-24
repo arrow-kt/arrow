@@ -36,8 +36,8 @@ interface CompilationTest {
 
   infix fun Result.andExpression(expression: String): ExecutionEnv =
     ExecutionEnv(
-      classesDirectory= this.classesDirectory,
-      expression= expression
+      classesDirectory = this.classesDirectory,
+      expression = expression
     )
 
   infix fun ExecutionEnv.evalTo(result: String): Unit =
