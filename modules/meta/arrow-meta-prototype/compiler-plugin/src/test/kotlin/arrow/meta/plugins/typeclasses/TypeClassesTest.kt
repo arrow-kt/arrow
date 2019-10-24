@@ -57,25 +57,26 @@ class TypeClassesTest : CompilationTest {
       | 
       | @extension
       | object OptionMappable : Mappable<ForOption> {
-      |     override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Kind<ForOption, B> = when(val o: Option<A> = this.fix()) {
-      |         is Some -> Some(f(o.t))
-      |         None -> None
+      |   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Kind<ForOption, B> =
+      |     when(val o: Option<A> = this.fix()) {
+      |       is Some -> Some(f(o.t))
+      |       None -> None
       |     }
       | }
       | 
       | interface Mappable<F> {
-      |     fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
+      |   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
       | }
       | 
       | object Test {
-      |     fun <F> Kind<F, Int>. addOne (M: Mappable<F> = given)  : Kind<F, Int> =
-      |   M.run { map { it + 1 } }
+      |   fun <F> Kind<F, Int>.addOne(M: Mappable<F> = given): Kind<F, Int> =
+      |     M.run { map { it + 1 } }
       | }
       | 
-      | fun foo() : Option<Int> {
-      |     Test.run {
-      |         return Some(1).addOne()
-      |     }
+      | fun foo(): Option<Int> {
+      |   Test.run {
+      |     return Some(1).addOne()
+      |   }
       | }
       |""" andExpression "foo()" evalTo "Some(2)"
   }
