@@ -7,7 +7,6 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
 import arrow.core.extensions.either.foldable.foldable
-import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
@@ -255,7 +254,7 @@ fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (
 }
 
 fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
-  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).run { value().traverseC(f, GA) }
+  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse<A>()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<F, A, C> = { nested -> EitherT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
