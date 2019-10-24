@@ -19,6 +19,15 @@ interface CompilationTest {
       checks = listOf(ExpectedGeneratedSourceCode(code = result.trimMargin())))
     )
 
+  infix fun PartialCompilationData.emitErrorDiagnostic(partialMessage: String): Unit {
+    assertThis(CompilationData(
+      dependencies = dependencies,
+      sourceCode = sourceCode,
+      expectedStatus = CompilationStatus.COMPILATION_ERROR,
+      checks = listOf(ExpectedCompilationError(partialMessage = partialMessage)))
+    )
+  }
+
   infix fun String.compilesTo(result: String): Result =
     assertThis(CompilationData(
       sourceCode = trimMargin(),
