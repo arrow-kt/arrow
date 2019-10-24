@@ -9,7 +9,8 @@ import arrow.meta.plugin.idea.plugins.comprehensions.comprehensionsIdePlugin
 import arrow.meta.plugin.idea.plugins.higherkinds.higherKindsIdePlugin
 import arrow.meta.plugin.idea.plugins.initial.initialIdeSetUp
 import arrow.meta.plugin.idea.plugins.nothing.nothingIdePlugin
-import arrow.meta.plugin.idea.plugins.optics.opticsIdePlugin
+import arrow.meta.plugin.idea.plugins.optics.lensesIdePlugin
+import arrow.meta.plugin.idea.plugins.typeclasses.typeclassesIdePlugin
 import kotlin.contracts.ExperimentalContracts
 
 class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
@@ -17,8 +18,9 @@ class IdeMetaPlugin : MetaPlugin(), IdeInternalRegistry, IdeSyntax {
   override fun intercept(ctx: CompilerContext): List<Plugin> =
     super.intercept(ctx) +
       initialIdeSetUp +
-      nothingIdePlugin +
+      higherKindsIdePlugin +
+      typeclassesIdePlugin +
       comprehensionsIdePlugin +
-      opticsIdePlugin +
-      higherKindsIdePlugin
+      lensesIdePlugin +
+      nothingIdePlugin
 }

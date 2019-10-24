@@ -8,8 +8,8 @@ import arrow.meta.plugins.optics.isProductType
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-val IdeMetaPlugin.opticsIdePlugin: Plugin
-  get() = "OpticsIdePlugin" {
+val IdeMetaPlugin.lensesIdePlugin: Plugin
+  get() = "LensesIdePlugin" {
     meta(
       addLineMarkerProvider(
         icon = ArrowIcons.OPTICS,
