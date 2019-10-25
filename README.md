@@ -138,7 +138,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only fo
 def arrow_version = "0.10.2"
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
     ...
 }
 ```
