@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
+import arrow.fx.IO
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
@@ -13,7 +14,6 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.runBlocking
 
 object ApplicativeErrorLaws {
 
@@ -72,8 +72,8 @@ object ApplicativeErrorLaws {
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorEffectCatch(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
-      runBlocking {
-        effectCatch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
-      }
+      IO.effect {
+        effectCatch { either.fold({ throw it }, ::identity) }
+      }.unsafeRunSync().equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
     }
 }
