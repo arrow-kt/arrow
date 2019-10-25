@@ -13,6 +13,7 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlinx.coroutines.runBlocking
 
 object ApplicativeErrorLaws {
 
@@ -25,7 +26,8 @@ object ApplicativeErrorLaws {
       Law("Applicative Error Laws: attempt for error") { AE.applicativeErrorAttemptError(EQ_EITHER) },
       Law("Applicative Error Laws: attempt for success") { AE.applicativeErrorAttemptSuccess(EQ_EITHER) },
       Law("Applicative Error Laws: attempt lift from Either consistent with pure") { AE.applicativeErrorAttemptFromEitherConsistentWithPure(EQ_EITHER) },
-      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) }
+      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) },
+      Law("Applicative Error Laws: effectCatch captures errors") { AE.applicativeErrorEffectCatch(EQERR) }
     )
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandle(EQ: Eq<Kind<F, Int>>): Unit =
@@ -66,5 +68,12 @@ object ApplicativeErrorLaws {
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
       catch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
+    }
+
+  fun <F> ApplicativeError<F, Throwable>.applicativeErrorEffectCatch(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
+      runBlocking {
+        effectCatch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
+      }
     }
 }
