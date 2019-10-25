@@ -74,8 +74,8 @@ apply plugin: 'kotlin-kapt'
 
 def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -87,8 +87,8 @@ apply plugin: 'kotlin-kapt'
 
 def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -100,8 +100,8 @@ apply plugin: 'kotlin-kapt'
 
 def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -113,9 +113,9 @@ apply plugin: 'kotlin-kapt'
 
 def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
