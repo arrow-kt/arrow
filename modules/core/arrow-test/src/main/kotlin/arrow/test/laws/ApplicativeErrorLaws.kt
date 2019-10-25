@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
+import arrow.fx.IO
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
@@ -25,7 +26,8 @@ object ApplicativeErrorLaws {
       Law("Applicative Error Laws: attempt for error") { AE.applicativeErrorAttemptError(EQ_EITHER) },
       Law("Applicative Error Laws: attempt for success") { AE.applicativeErrorAttemptSuccess(EQ_EITHER) },
       Law("Applicative Error Laws: attempt lift from Either consistent with pure") { AE.applicativeErrorAttemptFromEitherConsistentWithPure(EQ_EITHER) },
-      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) }
+      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) },
+      Law("Applicative Error Laws: effectCatch captures errors") { AE.applicativeErrorEffectCatch(EQERR) }
     )
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandle(EQ: Eq<Kind<F, Int>>): Unit =
@@ -66,5 +68,12 @@ object ApplicativeErrorLaws {
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
       catch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
+    }
+
+  fun <F> ApplicativeError<F, Throwable>.applicativeErrorEffectCatch(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
+      IO.effect {
+        effectCatch { either.fold({ throw it }, ::identity) }
+      }.unsafeRunSync().equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
     }
 }
