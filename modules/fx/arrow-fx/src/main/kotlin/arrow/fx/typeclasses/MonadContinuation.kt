@@ -18,7 +18,7 @@ open class MonadDeferContinuation<F, A, E>(ME: MonadDefer<F, E>, override val co
 
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    returnedMonad = handleThrowable(exception)
+    returnedMonad = exception.raiseThrowableNonFatal()
   }
 
   override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> = fx.monad(c)

@@ -7,7 +7,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
 @RestrictsSuspension
-interface ConcurrentSyntax<F, E> : Concurrent<F, E>, AsyncSyntax<F, E>, FxSyntax<F, E>
+interface ConcurrentSyntax<F, E> : Concurrent<F, Throwable>, AsyncSyntax<F, Throwable>, FxSyntax<F>
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class ConcurrentContinuation<F, A, E>(private val CF: Concurrent<F, E>, override val context: CoroutineContext = EmptyCoroutineContext) :

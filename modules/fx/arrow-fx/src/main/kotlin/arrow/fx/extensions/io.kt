@@ -182,11 +182,6 @@ interface IOAsync : Async<IOPartialOf<Throwable>, Throwable>, IOMonadDefer {
     IO.effect(ctx, f)
 }
 
-@extension
-interface IOAsync2 : Async<IOPartialOf<Throwable>, Throwable> {
-
-}
-
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<IOPartialOf<Throwable>, Throwable>, IOAsync {
   override fun <A> CoroutineContext.startFiber(kind: IOOf<Throwable, A>): IO<Throwable, Fiber<IOPartialOf<Throwable>, A>> =

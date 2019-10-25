@@ -36,8 +36,11 @@ interface Timer<F> {
   fun sleep(duration: Duration): Kind<F, Unit>
 
   companion object {
-    operator fun <F, E> invoke(CF: Concurrent<F, E>): Timer<F> = object : Timer<F> {
+    operator fun <F> invoke(CF: Concurrent<F, Throwable>): Timer<F> = object : Timer<F> {
       override fun sleep(duration: Duration): Kind<F, Unit> = CF.ConcurrentSleep(duration)
+    }
+    operator fun <F, E> invoke(CF: Concurrent<F, E>, fe: (Throwable) -> E): Timer<F> = object : Timer<F> {
+      override fun sleep(duration: Duration): Kind<F, Unit> = CF.ConcurrentSleep(duration, fe)
     }
   }
 }

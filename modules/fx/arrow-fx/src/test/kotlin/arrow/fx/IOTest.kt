@@ -322,7 +322,7 @@ class IOTest : UnitSpec() {
     "parallel execution with single threaded context makes all IOs start at the same time" {
       val order = mutableListOf<Long>()
 
-      fun makePar(num: Long) =
+      fun makePar(num: Long): IO<Throwable, Long> =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 100)

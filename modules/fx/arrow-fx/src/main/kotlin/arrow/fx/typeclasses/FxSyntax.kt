@@ -12,7 +12,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 
-interface FxSyntax<F, E> : Concurrent<F, E>, BindSyntax<F> {
+interface FxSyntax<F> : Concurrent<F, Throwable>, BindSyntax<F> {
 
   suspend fun <A> effectIdentity(a: A): A = a
 
@@ -32,16 +32,17 @@ interface FxSyntax<F, E> : Concurrent<F, E>, BindSyntax<F> {
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
     parTraverse(effects, ::identity)
 
-  fun <A> ensure(fa: suspend () -> A, error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
+  fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
     run<Monad<F>, Kind<F, A>> { fa.effect().ensure(error, predicate) }
 
-  private fun <A> asyncOp(fb: Async<F, E>.() -> Kind<F, A>): Kind<F, A> =
-    run<Async<F, E>, Kind<F, A>> { fb(this) }
+  private fun <A> asyncOp(fb: Async<F, Throwable>.() -> Kind<F, A>): Kind<F, A> =
+    run<Async<F, Throwable>, Kind<F, A>> { fb(this) }
 
   fun <A> CoroutineContext.effect(dummy: Unit = Unit, f: suspend () -> A): Kind<F, A> =
     asyncOp { defer(this@effect) { f.effect() } }
 
-  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
+  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> =
+    effect(this)
 
   fun <A, B> (suspend (A) -> B).effect(): (Kind<F, A>) -> Kind<F, B> = { fa ->
     fa.flatMap { a ->
@@ -79,27 +80,27 @@ interface FxSyntax<F, E> : Concurrent<F, E>, BindSyntax<F> {
     effect { this(a, b, c) }
   }
 
-  suspend fun <A> handleError(fa: suspend () -> A, recover: suspend (E) -> A): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { fa.effect().handleErrorWith(recover.flatLiftM()) }
+  suspend fun <A> handleError(fa: suspend () -> A, recover: suspend (Throwable) -> A): Kind<F, A> =
+    run<ApplicativeError<F, Throwable>, Kind<F, A>> { fa.effect().handleErrorWith(recover.flatLiftM()) }
 
-  suspend fun <A> OptionOf<A>.getOrRaiseError(f: () -> E): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromOption(f) }
+  suspend fun <A> OptionOf<A>.getOrRaiseError(f: () -> Throwable): Kind<F, A> =
+    run<ApplicativeError<F, Throwable>, Kind<F, A>> { this@getOrRaiseError.fromOption(f) }
 
-  suspend fun <A, B> Either<B, A>.getOrRaiseError(f: (B) -> E): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromEither(f) }
+  suspend fun <A, B> Either<B, A>.getOrRaiseError(f: (B) -> Throwable): Kind<F, A> =
+    run<ApplicativeError<F, Throwable>, Kind<F, A>> { this@getOrRaiseError.fromEither(f) }
 
-  suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> E): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }
+  suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> Throwable): Kind<F, A> =
+    run<ApplicativeError<F, Throwable>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }
 
-  suspend fun <A> attempt(fa: suspend () -> A): Kind<F, Either<E, A>> =
-    run<ApplicativeError<F, E>, Kind<F, Either<E, A>>> { fa.effect().attempt() }
+  suspend fun <A> attempt(fa: suspend () -> A): Kind<F, Either<Throwable, A>> =
+    run<ApplicativeError<F, Throwable>, Kind<F, Either<Throwable, A>>> { fa.effect().attempt() }
 
-  private fun <A> bracketing(fb: Bracket<F, E>.() -> Kind<F, A>): Kind<F, A> =
-    run<Bracket<F, E>, Kind<F, A>> { fb(this) }
+  private fun <A> bracketing(fb: Bracket<F, Throwable>.() -> Kind<F, A>): Kind<F, A> =
+    run<Bracket<F, Throwable>, Kind<F, A>> { fb(this) }
 
   fun <A, B> bracketCase(
     f: suspend () -> A,
-    release: suspend (A, ExitCase<E>) -> Unit,
+    release: suspend (A, ExitCase<Throwable>) -> Unit,
     use: suspend (A) -> B
   ): Kind<F, B> =
     bracketing { f.effect().bracketCase(release.flatLiftM(), use.flatLiftM()) }
@@ -122,7 +123,7 @@ interface FxSyntax<F, E> : Concurrent<F, E>, BindSyntax<F> {
 
   fun <A> Kind<F, A>.guaranteeCase(
     unit: Unit = Unit,
-    finalizer: suspend (ExitCase<E>) -> Unit
+    finalizer: suspend (ExitCase<Throwable>) -> Unit
   ): Kind<F, A> =
     bracketing { guaranteeCase(finalizer.flatLiftM()) }
 

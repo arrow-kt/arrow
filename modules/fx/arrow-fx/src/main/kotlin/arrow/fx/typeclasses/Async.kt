@@ -328,7 +328,7 @@ interface Async<F, E> : MonadDefer<F, E> {
 internal val mapToUnit: (Any?) -> Unit = { Unit }
 internal val mapUnit: () -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
-internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
+internal val unitCallback = { cb: (Either<Nothing, Unit>) -> Unit -> cb(rightUnit) }
 
 interface AsyncFx<F, E> : MonadDeferFx<F, E> {
   val async: Async<F, E>

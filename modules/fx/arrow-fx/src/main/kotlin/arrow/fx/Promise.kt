@@ -8,7 +8,6 @@ import arrow.fx.internal.CancelablePromise
 import arrow.fx.internal.UncancelablePromise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Concurrent
-import arrow.fx.typeclasses.later
 
 /**
  * When made, a [Promise] is empty. Until it is fulfilled, which can only happen once.

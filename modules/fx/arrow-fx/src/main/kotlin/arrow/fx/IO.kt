@@ -447,5 +447,5 @@ fun <A> IOOf<Throwable, A>.startFiber(ctx: CoroutineContext): IO<Throwable, Fibe
   cb(Either.Right(IOFiber(promise, conn)))
 }
 
-//fun <E, A> IOOf<E, A>.startFiber(ctx: CoroutineContext, fe: (Throwable) -> E): IO<E, Fiber<IOPartialOf<E>, A>> =
+// fun <E, A> IOOf<E, A>.startFiber(ctx: CoroutineContext, fe: (Throwable) -> E): IO<E, Fiber<IOPartialOf<E>, A>> =
 //  TODO()

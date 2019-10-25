@@ -43,7 +43,7 @@ interface Concurrent<F, E> : Async<F, E> {
 
   fun dispatchers(): Dispatchers<F>
 
-  fun timer(): Timer<F> = Timer(this)
+  fun timer(): Timer<F> = Timer<F>(this)
 
   fun parApplicative(): Applicative<F> = ParApplicative(null)
 

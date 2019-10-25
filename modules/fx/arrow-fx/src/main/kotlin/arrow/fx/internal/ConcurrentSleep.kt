@@ -13,8 +13,13 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-internal fun <F, E> Concurrent<F, E>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
+internal fun <F> Concurrent<F, Throwable>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
   val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
+  later { cancelRef.cancel(false); Unit }
+}
+
+internal fun <F, E> Concurrent<F, E>.ConcurrentSleep(duration: Duration, fe: (Throwable) -> E): Kind<F, Unit> = cancelable { cb ->
+  val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb, fe), duration.amount, duration.timeUnit)
   later { cancelRef.cancel(false); Unit }
 }
 
@@ -53,6 +58,12 @@ internal class ShiftTick<E>(
       ctx: CoroutineContext,
       cb: (Either<Throwable, Unit>) -> Unit
     ) = ShiftTick(ctx, cb, ::identity)
+
+    operator fun <E> invoke(
+      ctx: CoroutineContext,
+      cb: (Either<E, Unit>) -> Unit,
+      fe: (Throwable) -> E
+    ) = ShiftTick(ctx, cb, fe)
   }
 }
 

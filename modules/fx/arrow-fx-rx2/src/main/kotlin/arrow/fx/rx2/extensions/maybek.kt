@@ -34,7 +34,6 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
 import io.reactivex.Maybe
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
