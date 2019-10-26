@@ -2,6 +2,7 @@ package arrow.recursion
 
 import arrow.core.Eval
 import arrow.core.Option
+import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.foldable.fold
 import arrow.core.extensions.option.foldable.foldRight
@@ -19,7 +20,9 @@ class IntBirecursive : UnitSpec() {
       BirecursiveLaws.laws(
         Option.traverse(),
         Int.birecursive(),
-        Gen.intSmall().filter { it in 0..100 }, Gen.constant(5000),
+        Gen.intSmall().filter { it in 0..100 },
+        Gen.constant(5000),
+        Int.eq(),
         {
           it.fold(Int.monoid())
         },
@@ -45,7 +48,9 @@ class LongBirecursive : UnitSpec() {
       BirecursiveLaws.laws(
         Option.traverse(),
         Long.birecursive(),
-        Gen.intSmall().filter { it in 0..100 }.map { it.toLong() }, Gen.constant(5000L),
+        Gen.intSmall().filter { it in 0..100 }.map { it.toLong() },
+        Gen.constant(5000L),
+        Long.eq(),
         {
           it.fold(Int.monoid())
         },
