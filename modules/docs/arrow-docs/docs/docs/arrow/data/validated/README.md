@@ -21,15 +21,19 @@ Or perhaps you're reading from a configuration file. One could imagine the confi
 you're using returns a `Try`, or maybe a `Either`. Your parsing may look something like:
 
 ```kotlin:ank
-data class ConnectionParams(val url: String, val port: Int)
-```
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.flatMap
 
-```kotlin
-fun <A> config(key: String): Either<String, A> = TODO()
+//sampleStart
+data class ConnectionParams(val url: String, val port: Int)
+
+fun <A> config(key: String): Either<String, A> = Left(key)
 
 config<String>("url").flatMap { url ->
-    config<Int>("port").map { ConnectionParams(url, it) }
+ config<Int>("port").map { ConnectionParams(url, it) }
 }
+//sampleEnd
 ```
 
 You run your program and it says key "url" not found, turns out the key was "endpoint". So
@@ -54,29 +58,29 @@ As our running example, we will look at config parsing. Our config will be repre
 for `String` and `Int` for brevity.
 
 ```kotlin:ank
-import arrow.*
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
 
+//sampleStart
 abstract class Read<A> {
 
-    abstract fun read(s: String): Option<A>
+abstract fun read(s: String): Option<A>
 
-    companion object {
+ companion object {
 
-        val stringRead: Read<String> =
-            object: Read<String>() {
-                override fun read(s: String): Option<String> = Option(s)
-            }
+  val stringRead: Read<String> =
+   object: Read<String>() {
+    override fun read(s: String): Option<String> = Option(s)
+   }
 
-        val intRead: Read<Int> =
-            object: Read<Int>() {
-                override fun read(s: String): Option<Int> =
-                    if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
-            }
-
-    }
-
+  val intRead: Read<Int> =
+   object: Read<Int>() {
+    override fun read(s: String): Option<Int> =
+     if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+   }
+ }
 }
+//sampleEnd
 ```
 
 Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
@@ -84,8 +88,8 @@ the field is missing, or it is not well-formed with regards to the expected type
 
 ```kotlin:ank
 sealed class ConfigError {
-    data class MissingConfig(val field: String): ConfigError()
-    data class ParseConfig(val field: String): ConfigError()
+ data class MissingConfig(val field: String): ConfigError()
+ data class ParseConfig(val field: String): ConfigError()
 }
 ```
 
@@ -94,52 +98,54 @@ It would look like the following, which Arrow provides in `arrow.Validated`:
 
 ```kotlin
 @higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
-
-    data class Valid<out A>(val a: A) : Validated<Nothing, A>()
-
-    data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
-
+ data class Valid<out A>(val a: A) : Validated<Nothing, A>()
+ data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
 }
 ```
 
 Now we are ready to write our parser.
 
 ```kotlin:ank
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Validated
+import arrow.core.valid
+import arrow.core.invalid
 
+//sampleStart
 data class Config(val map: Map<String, String>) {
-
-    fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
-        val v = Option.fromNullable(map[key])
-        return when(v) {
-            is Some -> {
-                val s = read.read(v.t)
-                when(s) {
-                    is Some -> s.t.valid()
-                    is None -> ConfigError.ParseConfig(key).invalid()
-                }
-            }
-            is None -> Validated.Invalid(ConfigError.MissingConfig(key))
-        }
+ fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
+  val v = Option.fromNullable(map[key])
+  return when (v) {
+   is Some ->
+    when (val s = read.read(v.t)) {
+     is Some -> s.t.valid()
+     is None -> ConfigError.ParseConfig(key).invalid()
     }
-
+   is None -> Validated.Invalid(ConfigError.MissingConfig(key))
+  }
+ }
 }
+//sampleEnd
 ```
 
 Everything is in place to write the parallel validator. Recall that we can only do parallel
 validation if each piece is independent. How do we enforce the data is independent? By
 asking for all of it up front. Let's start with two pieces of data.
 
-```kotlin
-fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
-    return when {
-        v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
-        v1 is Validated.Valid && v2 is Validated.Invalid -> v2
-        v1 is Validated.Invalid && v2 is Validated.Valid -> v1
-        v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
-        else -> TODO()
-    }
-}
+```kotlin:ank
+import arrow.core.Validated
+//sampleStart
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
+  v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+  v1 is Validated.Valid && v2 is Validated.Invalid -> v2
+  v1 is Validated.Invalid && v2 is Validated.Valid -> v1
+  v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
+  else -> TODO()
+ }
+//sampleEnd
 ```
 
 We've run into a problem. In the case where both have errors, We want to report both. we
@@ -154,47 +160,162 @@ type alias `ValidatedNel<E, A>` is provided.
 Time to parse.
 
 ```kotlin:ank
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+//sampleStart
 fun <E, A, B, C> parallelValidate
-        (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> {
-    return when {
-        v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
-        v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
-        v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
-        v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
-        else -> throw IllegalStateException("Not possible value")
-    }
-}
+  (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
+ when {
+  v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+  v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
+  v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
+  v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
+  else -> throw IllegalStateException("Not possible value")
+ }
+//sampleEnd
 ```
 
 Kotlin says that our match is not exhaustive and we have to add `else`.
 
 When no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
 
-```kotlin:ank
-val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
+```kotlin:ank:playground
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Validated
+import arrow.core.valid
+import arrow.core.invalid
 
-val valid = parallelValidate(
-        config.parse(Read.stringRead, "url"),
-        config.parse(Read.intRead, "port")
-) { url, port ->
-    ConnectionParams(url, port)
+data class ConnectionParams(val url: String, val port: Int)
+
+abstract class Read<A> {
+ abstract fun read(s: String): Option<A>
+
+ companion object {
+
+  val stringRead: Read<String> =
+   object : Read<String>() {
+    override fun read(s: String): Option<String> = Option(s)
+   }
+
+  val intRead: Read<Int> =
+   object : Read<Int>() {
+    override fun read(s: String): Option<Int> =
+     if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+   }
+ }
 }
-valid
+
+sealed class ConfigError {
+ data class MissingConfig(val field: String) : ConfigError()
+ data class ParseConfig(val field: String) : ConfigError()
+}
+
+data class Config(val map: Map<String, String>) {
+ fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
+  val v = Option.fromNullable(map[key])
+  return when (v) {
+   is Some ->
+    when (val s = read.read(v.t)) {
+     is Some -> s.t.valid()
+     is None -> ConfigError.ParseConfig(key).invalid()
+    }
+   is None -> Validated.Invalid(ConfigError.MissingConfig(key))
+  }
+ }
+}
+
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
+  v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+  v1 is Validated.Valid && v2 is Validated.Invalid -> v2
+  v1 is Validated.Invalid && v2 is Validated.Valid -> v1
+  v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
+  else -> TODO()
+ }
+//sampleStart
+ val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
+
+ val valid = parallelValidate(
+ config.parse(Read.stringRead, "url"),
+ config.parse(Read.intRead, "port")
+ ) { url, port -> ConnectionParams(url, port) }
+//sampleEnd
+fun main() {
+ println("valid = $valid")
+}
 ```
 
 But what happens when having one or more errors? They are accumulated in a `NonEmptyList` wrapped in
 an `Invalid` instance.
 
-```kotlin:ank
+```kotlin:ank:playground
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Validated
+import arrow.core.valid
+import arrow.core.invalid
+
+data class ConnectionParams(val url: String, val port: Int)
+
+abstract class Read<A> {
+ abstract fun read(s: String): Option<A>
+
+ companion object {
+
+  val stringRead: Read<String> =
+   object : Read<String>() {
+    override fun read(s: String): Option<String> = Option(s)
+   }
+
+  val intRead: Read<Int> =
+   object : Read<Int>() {
+    override fun read(s: String): Option<Int> =
+     if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+   }
+ }
+}
+
+sealed class ConfigError {
+ data class MissingConfig(val field: String) : ConfigError()
+ data class ParseConfig(val field: String) : ConfigError()
+}
+
+data class Config(val map: Map<String, String>) {
+ fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
+  val v = Option.fromNullable(map[key])
+  return when (v) {
+   is Some ->
+    when (val s = read.read(v.t)) {
+     is Some -> s.t.valid()
+     is None -> ConfigError.ParseConfig(key).invalid()
+    }
+   is None -> Validated.Invalid(ConfigError.MissingConfig(key))
+  }
+ }
+}
+
+fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> =
+ when {
+  v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
+  v1 is Validated.Valid && v2 is Validated.Invalid -> v2
+  v1 is Validated.Invalid && v2 is Validated.Valid -> v1
+  v1 is Validated.Invalid && v2 is Validated.Invalid -> TODO()
+  else -> TODO()
+ }
+//sampleStart
 val config = Config(mapOf("url" to "127.0.0.1", "port" to "not a number"))
 
 val valid = parallelValidate(
-        config.parse(Read.stringRead, "url"),
-        config.parse(Read.intRead, "port")
-) { url, port ->
-    ConnectionParams(url, port)
+ config.parse(Read.stringRead, "url"),
+ config.parse(Read.intRead, "port")
+ ) { url, port -> ConnectionParams(url, port) }
+ //sampleEnd
+fun main() {
+ println("valid = $valid")
 }
-valid
 ```
 
 ## Sequential Validation
@@ -203,38 +324,95 @@ If you do want error accumulation but occasionally run into places where sequent
 then Validated provides `withEither` method to allow you to temporarily turn a Validated
 instance into an Either instance and apply it to a function.
 
-```kotlin:ank
+```kotlin:ank:playground
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.right
+import arrow.core.Some
+import arrow.core.Validated
+import arrow.core.valid
+import arrow.core.invalid
+
+abstract class Read<A> {
+ abstract fun read(s: String): Option<A>
+
+ companion object {
+
+  val stringRead: Read<String> =
+   object : Read<String>() {
+    override fun read(s: String): Option<String> = Option(s)
+   }
+
+  val intRead: Read<Int> =
+   object : Read<Int>() {
+    override fun read(s: String): Option<Int> =
+     if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+   }
+ }
+}
+
+data class Config(val map: Map<String, String>) {
+ fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
+  val v = Option.fromNullable(map[key])
+  return when (v) {
+   is Some ->
+    when (val s = read.read(v.t)) {
+     is Some -> s.t.valid()
+     is None -> ConfigError.ParseConfig(key).invalid()
+    }
+   is None -> Validated.Invalid(ConfigError.MissingConfig(key))
+  }
+ }
+}
+sealed class ConfigError {
+ data class MissingConfig(val field: String) : ConfigError()
+ data class ParseConfig(val field: String) : ConfigError()
+}
+
+//sampleStart
 fun positive(field: String, i: Int): Either<ConfigError, Int> {
-    return if (i >= 0) i.right()
-    else ConfigError.ParseConfig(field).left()
+ return if (i >= 0) i.right()
+ else ConfigError.ParseConfig(field).left()
 }
 
 val config = Config(mapOf("house_number" to "-42"))
 
-
 val houseNumber = config.parse(Read.intRead, "house_number").withEither { either ->
-    either.flatMap { positive("house_number", it) }
+ either.flatMap { positive("house_number", it) }
+}
+//sampleEnd
+fun main() {
+ println(houseNumber)
 }
 
-houseNumber
 ```
 
 ## Alternative validation strategies to Validated: using `ApplicativeError`
 
 We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
 
-```kotlin:ank:silent
-import arrow.*
-import arrow.core.*
-import arrow.typeclasses.*
-import arrow.core.extensions.validated.applicativeError.*
-import arrow.core.extensions.either.applicativeError.*
-import arrow.core.extensions.nonemptylist.semigroup.*
+```kotlin:ank
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.EitherPartialOf
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
+import arrow.core.nel
+import arrow.typeclasses.ApplicativeError
+import arrow.core.extensions.validated.applicativeError.applicativeError
+import arrow.core.extensions.either.applicativeError.applicativeError
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
 
+//sampleStart
 sealed class ValidationError(val msg: String) {
-  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
-  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
-  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+ data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+ data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+ data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
 }
 
 data class FormField(val label: String, val value: String)
@@ -242,31 +420,31 @@ data class Email(val value: String)
 
 sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
 
-  private fun FormField.contains(needle: String): Kind<F, FormField> =
-    if (value.contains(needle, false)) just(this)
-    else raiseError(ValidationError.DoesNotContain(needle).nel())
+ private fun FormField.contains(needle: String): Kind<F, FormField> =
+  if (value.contains(needle, false)) just(this)
+  else raiseError(ValidationError.DoesNotContain(needle).nel())
 
-  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
-    if (value.length <= maxLength) just(this)
-    else raiseError(ValidationError.MaxLength(maxLength).nel())
+ private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
+  if (value.length <= maxLength) just(this)
+  else raiseError(ValidationError.MaxLength(maxLength).nel())
 
-  fun FormField.validateEmail(): Kind<F, Email> =
-    map(contains("@"), maxLength(250), {
-      Email(value)
-    }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
+ fun FormField.validateEmail(): Kind<F, Email> =
+  map(contains("@"), maxLength(250), {
+   Email(value)
+  }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
 
-  object ErrorAccumulationStrategy :
-    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
+ object ErrorAccumulationStrategy :
+   Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
 
-  object FailFastStrategy :
-    Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
+ object FailFastStrategy :
+  Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
 
-  companion object {
-    infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
-    infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
-  }
-
+ companion object {
+  infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
+  infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
+ }
 }
+//sampleEnd
 ```
 
 `Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
@@ -275,32 +453,143 @@ Once we have such abstract algebra defined we can simply materialize it to data 
 
 *Error accumulation*
 
-```kotlin:ank
-Rules accumulateErrors {
-  listOf(
-    FormField("Invalid Email Domain Label", "nowhere.com"),
-    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
-    FormField("Valid Email Label", "getlost@nowhere.com")
-  ).map { it.validateEmail() }
+```kotlin:ank:playground
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.EitherPartialOf
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
+import arrow.core.nel
+import arrow.typeclasses.ApplicativeError
+import arrow.core.extensions.validated.applicativeError.applicativeError
+import arrow.core.extensions.either.applicativeError.applicativeError
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+
+sealed class ValidationError(val msg: String) {
+ data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+ data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+ data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+}
+
+data class FormField(val label: String, val value: String)
+data class Email(val value: String)
+
+sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+
+ private fun FormField.contains(needle: String): Kind<F, FormField> =
+  if (value.contains(needle, false)) just(this)
+  else raiseError(ValidationError.DoesNotContain(needle).nel())
+
+ private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
+  if (value.length <= maxLength) just(this)
+  else raiseError(ValidationError.MaxLength(maxLength).nel())
+
+ fun FormField.validateEmail(): Kind<F, Email> =
+  map(contains("@"), maxLength(250), {
+   Email(value)
+  }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
+
+ object ErrorAccumulationStrategy :
+   Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
+
+ object FailFastStrategy :
+  Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
+
+ companion object {
+  infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
+  infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
+ }
+}
+
+val value =
+//sampleStart
+ Rules accumulateErrors {
+   listOf(
+     FormField("Invalid Email Domain Label", "nowhere.com"),
+     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
+     FormField("Valid Email Label", "getlost@nowhere.com")
+   ).map { it.validateEmail() }
+   }
+//sampleEnd
+fun main() {
+ println(value)
 }
 ```
 *Fail Fast*
 
-```kotlin:ank
-Rules failFast {
-  listOf(
-    FormField("Invalid Email Domain Label", "nowhere.com"),
-    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
-    FormField("Valid Email Label", "getlost@nowhere.com")
-  ).map { it.validateEmail() }
+```kotlin:ank:playground
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.EitherPartialOf
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
+import arrow.core.nel
+import arrow.typeclasses.ApplicativeError
+import arrow.core.extensions.validated.applicativeError.applicativeError
+import arrow.core.extensions.either.applicativeError.applicativeError
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+
+sealed class ValidationError(val msg: String) {
+ data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
+ data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
+ data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
+}
+
+data class FormField(val label: String, val value: String)
+data class Email(val value: String)
+
+sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
+
+ private fun FormField.contains(needle: String): Kind<F, FormField> =
+  if (value.contains(needle, false)) just(this)
+  else raiseError(ValidationError.DoesNotContain(needle).nel())
+
+ private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
+  if (value.length <= maxLength) just(this)
+  else raiseError(ValidationError.MaxLength(maxLength).nel())
+
+ fun FormField.validateEmail(): Kind<F, Email> =
+  map(contains("@"), maxLength(250), {
+   Email(value)
+  }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
+
+ object ErrorAccumulationStrategy :
+   Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
+
+ object FailFastStrategy :
+  Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
+
+ companion object {
+  infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
+  infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
+ }
+}
+
+val value =
+//sampleStart
+ Rules failFast {
+   listOf(
+     FormField("Invalid Email Domain Label", "nowhere.com"),
+     FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
+     FormField("Valid Email Label", "getlost@nowhere.com")
+   ).map { it.validateEmail() }
+ }
+//sampleEnd
+fun main() {
+ println(value)
 }
 ```
 
 ### Supported type classes
 
 ```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
+import arrow.reflect.DataType
+import arrow.reflect.tcMarkdownList
+import arrow.core.Validated
 
 DataType(Validated::class).tcMarkdownList()
 ```

@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Tuple3
+import arrow.core.internal.AtomicBooleanW
+import arrow.core.internal.AtomicRefW
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.applicativeError.handleError
 import arrow.core.nonFatalOrThrow
@@ -11,8 +13,6 @@ import arrow.core.none
 import arrow.core.some
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
@@ -26,8 +26,8 @@ interface IOParMap3 {
     f: (A, B, C) -> D
   ): IO<D> = IO.Async { conn, cb ->
 
-    val state: AtomicReference<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicReference(none())
-    val active = AtomicBoolean(true)
+    val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
+    val active = AtomicBooleanW(true)
 
     val connA = IOConnection()
     val connB = IOConnection()

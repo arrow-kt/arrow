@@ -35,6 +35,7 @@ buildscript {
         projectReactorVersion = '3.2.6.RELEASE'
         retrofitVersion = '2.5.0'
         rxJavaVersion = '2.2.13'
+        atomicfuVersion = '0.13.2'
     }
 
     repositories {
@@ -58,6 +59,7 @@ buildscript {
         classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.7"
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_gradle_version"
+        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicfuVersion"
     }
 }
 
@@ -88,6 +90,7 @@ subprojects { project ->
     apply plugin: 'kotlin'
     apply plugin: 'org.jetbrains.dokka'
     apply plugin: "org.jlleitschuh.gradle.ktlint"
+    apply plugin: 'kotlinx-atomicfu'
 
     ktlint {
         version = ktlint_version

@@ -4,11 +4,11 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple3
-import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.some
+import arrow.core.toT
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
@@ -16,7 +16,6 @@ import arrow.test.generators.option
 import arrow.test.generators.tuple3
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -133,7 +132,6 @@ class ProductTest : UnitSpec() {
 
     testLaws(
       EqLaws.laws(Person.eq(), getPersonWithAge),
-      SemigroupLaws.laws(Person.semigroup(), getPersonWithAge(1), getPersonWithAge(2), getPersonWithAge(3), Person.eq()),
       MonoidLaws.laws(Person.monoid(), genPerson(), Person.eq())
     )
   }

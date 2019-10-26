@@ -1,14 +1,13 @@
 package arrow.core
 
 import arrow.Kind2
-import arrow.core.extensions.monoid
 import arrow.core.extensions.functor
+import arrow.core.extensions.monoid
 import arrow.core.extensions.show
 import arrow.core.extensions.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -26,11 +25,6 @@ class SortedMapKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
-      SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
-        sortedMapOf("key" to 1).k(),
-        sortedMapOf("key" to 2).k(),
-        sortedMapOf("key" to 3).k(),
-        EQ),
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),
         SortedMapK.functor<String>(),

@@ -14,7 +14,7 @@ intermediate
 ### Install 
 
 ```groovy
-compile 'io.arrow-kt:arrow-generic:$arrow_version'
+implementation "io.arrow-kt:arrow-generic:$arrow_version"
 ```
 
 ### Features

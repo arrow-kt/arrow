@@ -81,8 +81,6 @@ interface ComposedTraverse<F, G> :
 
   fun GT(): Traverse<G>
 
-  fun GA(): Applicative<G>
-
   override fun FF(): Foldable<F> = FT()
 
   override fun GF(): Foldable<G> = GT()
@@ -97,20 +95,17 @@ interface ComposedTraverse<F, G> :
   companion object {
     operator fun <F, G> invoke(
       FF: Traverse<F>,
-      GF: Traverse<G>,
-      GA: Applicative<G>
+      GF: Traverse<G>
     ): ComposedTraverse<F, G> =
       object : ComposedTraverse<F, G> {
         override fun FT(): Traverse<F> = FF
 
         override fun GT(): Traverse<G> = GF
-
-        override fun GA(): Applicative<G> = GA
       }
   }
 }
 
-fun <F, G> Traverse<F>.compose(GT: Traverse<G>, GA: Applicative<G>): Traverse<Nested<F, G>> = ComposedTraverse(this, GT, GA)
+fun <F, G> Traverse<F>.compose(GT: Traverse<G>): Traverse<Nested<F, G>> = ComposedTraverse(this, GT)
 
 interface ComposedSemigroupK<F, G> : SemigroupK<Nested<F, G>> {
 

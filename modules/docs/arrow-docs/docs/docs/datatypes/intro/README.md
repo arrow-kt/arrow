@@ -47,9 +47,9 @@ so they are always required.
 
 - [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
-- [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
 - [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
@@ -61,7 +61,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### General use
 
-- [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
+- [`NonEmptyList`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-non-empty-list/' | relative_url }}) - a homogeneous list that has at least 1 value
 
 - [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
@@ -69,9 +69,9 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### Error handling
 
-- [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
+- [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
 
-- [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Validated`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 
 ##### Reader/Writer/State
 
