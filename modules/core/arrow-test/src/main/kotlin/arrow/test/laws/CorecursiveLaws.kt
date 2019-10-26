@@ -1,13 +1,9 @@
 package arrow.test.laws
 
-import arrow.Kind
 import arrow.core.Eval
 import arrow.core.ForEval
-import arrow.core.SequenceK
-import arrow.core.extensions.eq
 import arrow.core.extensions.eval.monad.map
 import arrow.core.extensions.eval.monad.monad
-import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.right
 import arrow.core.value
 import arrow.recursion.Coalgebra
