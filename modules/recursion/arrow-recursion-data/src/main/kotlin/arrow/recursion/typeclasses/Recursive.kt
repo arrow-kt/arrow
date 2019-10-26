@@ -292,24 +292,4 @@ interface Recursive<T, F> {
    */
   fun <A> T.prepro(trans: FunctionK<F, F>, alg: Algebra<F, A>): A =
     hylo(alg compose trans::invoke, project(), FF())
-
-  /**
-   * Refold, but with the ability to short circuit during construction
-   */
-  fun <A, B> B.elgot(alg: Algebra<F, A>, f: (B) -> Either<A, Kind<F, B>>): A {
-    fun h(b: B): A =
-      f(b).fold(::identity) { FF().run { alg(it.map(::h)) } }
-
-    return h(this)
-  }
-
-  /**
-   * Monadic version of elgot
-   */
-  fun <M, A, B> B.elgotM(TF: Traverse<F>, MM: Monad<M>, alg: AlgebraM<F, M, A>, f: (B) -> Either<A, Kind<F, B>>): Kind<M, A> {
-    fun h(b: B): Kind<M, A> =
-      f(b).fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } }
-
-    return h(this)
-  }
 }
