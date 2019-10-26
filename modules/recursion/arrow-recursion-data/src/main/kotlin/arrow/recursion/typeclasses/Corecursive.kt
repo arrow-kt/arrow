@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.FunctionK
-import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.traverse.traverse
