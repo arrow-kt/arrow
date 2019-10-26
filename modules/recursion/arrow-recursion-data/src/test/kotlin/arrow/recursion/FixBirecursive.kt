@@ -4,9 +4,7 @@ import arrow.core.Eval
 import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.extensions.eq
 import arrow.core.extensions.eval.monad.monad
-import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
