@@ -87,7 +87,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }})
+- [`ListK`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-list-k/' | relative_url }})
 
 - [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }})
 
