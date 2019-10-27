@@ -245,10 +245,10 @@ fun <F, A, B> B.elgot(alg: Algebra<F, A>, f: (B) -> Either<A, Kind<F, B>>, FF: F
 /**
  * Monadic version of elgot
  */
-fun <F, M, A, B> B.elgotM(alg: AlgebraM<F, M, A>, f: (B) -> Either<A, Kind<F, B>>, TF: Traverse<F>, MM: Monad<M>): Kind<M, A> {
-  fun h(b: B): Kind<M, A> =
-    f(b).fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } }
-
+fun <F, M, A, B> B.elgotM(alg: AlgebraM<F, M, A>, f: (B) -> Kind<M, Either<A, Kind<F, B>>>, TF: Traverse<F>, MM: Monad<M>): Kind<M, A> {
+  fun h(b: B): Kind<M, A> = MM.run {
+    f(b).flatMap { it.fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } } }
+  }
   return h(this)
 }
 
