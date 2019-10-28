@@ -62,7 +62,7 @@ buildscript {
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_gradle_version"
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicfuVersion"
-        classpath 'ru.vyarus:gradle-animalsniffer-plugin:1.5.0'
+        classpath 'ru.vyarus:gradle-animalsniffer-plugin:1.4.6'
     }
 }
 dependencies {
