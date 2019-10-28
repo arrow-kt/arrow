@@ -22,8 +22,6 @@ class AtomicRefW<A>(a: A) {
   fun compareAndSet(expect: A, update: A) = atomicRef.compareAndSet(expect, update)
 
   fun lazySet(a: A) = atomicRef.lazySet(a)
-
-  override fun toString(): String = atomicRef.toString()
 }
 
 class AtomicBooleanW(a: Boolean) {
@@ -42,8 +40,6 @@ class AtomicBooleanW(a: Boolean) {
   fun compareAndSet(expect: Boolean, update: Boolean) = atomicRef.compareAndSet(expect, update)
 
   fun lazySet(a: Boolean) = atomicRef.lazySet(a)
-
-  override fun toString(): String = atomicRef.toString()
 }
 
 class AtomicIntW(a: Int) {
@@ -57,11 +53,21 @@ class AtomicIntW(a: Int) {
 
   fun getAndSet(a: Int) = atomicRef.getAndSet(a)
 
+  fun getAndAdd(delta: Int) = atomicRef.getAndAdd(delta)
+
+  fun addAndGet(delta: Int) = atomicRef.addAndGet(delta)
+
+  fun getAndIncrement() = atomicRef.getAndIncrement()
+
+  fun getAndDecrement() = atomicRef.getAndDecrement()
+
+  fun incrementAndGet() = atomicRef.incrementAndGet()
+
+  fun decrementAndGet() = atomicRef.decrementAndGet()
+
   fun updateAndGet(function: (Int) -> Int) = atomicRef.updateAndGet(function)
 
   fun compareAndSet(expect: Int, update: Int) = atomicRef.compareAndSet(expect, update)
 
   fun lazySet(a: Int) = atomicRef.lazySet(a)
-
-  override fun toString(): String = atomicRef.toString()
 }
