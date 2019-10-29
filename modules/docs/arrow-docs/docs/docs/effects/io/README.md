@@ -184,7 +184,7 @@ IO.defer { IO.just(1) }
 
 ### async
 
-Mainly used to integrate with existing frameworks that have asynchronous calls.
+Mainly used to integrate with existing frameworks that have asynchronous calls. If the frameworks allow cancelation, use `cancelable` instead.
 
 It requires a function that provides a callback parameter and it expects for the user to start an operation using the other framework.
 The callback parameter has to be invoked with an `Either<Throwable, A>` once the other framework has completed its execution.
@@ -205,6 +205,20 @@ IO.async<Int> { callback ->
   .attempt()
   .unsafeRunSync()
 ```
+
+## cancelable
+
+Same as async, it's used to integrate with existing frameworks. The unique difference is that the `cancelable` block requires returning an `IO` that'll be executed whe the whole `IO` operation is canceled.
+
+```kotlin
+IO.cancelable<Int> { callback ->
+    val subscription = subscribe { callback(1.right()) }
+    IO { subscription.cancel() }
+}
+  .attempt()
+  .unsafeRunSync()
+```
+
 
 ## Effect Comprehensions
 
