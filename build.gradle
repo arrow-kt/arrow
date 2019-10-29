@@ -83,9 +83,10 @@ allprojects {
 }
 
 configure(allprojects
-        - project("arrow-fx")
-        - project("arrow-fx-reactor")
-        - project("arrow-integrations-retrofit-adapter")
+        - project("arrow-kio-benchmarks")
+        - project("arrow-meta")
+        - project("arrow-ank-gradle")
+        - project("arrow-ank")
 ) {
     apply plugin: 'java'
     apply plugin: 'ru.vyarus.animalsniffer'
