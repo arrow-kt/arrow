@@ -68,6 +68,19 @@ IO<Int> { throw RuntimeException("Boom!") }
   }
 ```
 
+### unsafeRunAsyncCancellable
+
+Same as `unsafeRunAsync` except it returns a cancellation token. Upon invokation the cancellation token stops the current run for the `IO`. 
+
+```
+val cancel = myExpensiveIO
+  .unsafeRunAsyncCancellable { result ->
+    result.fold({ println("Error") }, { println(it.toString()) })
+  }
+  
+cancel()
+```
+
 ### unsafeRunTimed
 
 To be used with SEVERE CAUTION, it runs `IO` synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
@@ -211,12 +224,14 @@ IO.async<Int> { callback ->
 Same as `async`, it's used to integrate with existing frameworks. The unique difference is that the `cancelable` block requires returning an `IO` that'll be executed whe the whole `IO` operation is canceled.
 
 ```kotlin
-IO.cancelable<Int> { callback ->
+val cancel = IO.cancelable<Int> { callback ->
     val subscription = myObservable.subscribe { callback(it.right()) }
     IO { subscription.cancel() }
 }
   .attempt()
-  .unsafeRunSync()
+  .unsafeRunAsyncCancellable { }
+  
+cancel() // stops both the local IO and myObservable
 ```
 
 
