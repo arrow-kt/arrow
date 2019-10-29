@@ -208,11 +208,11 @@ IO.async<Int> { callback ->
 
 ## cancelable
 
-Same as async, it's used to integrate with existing frameworks. The unique difference is that the `cancelable` block requires returning an `IO` that'll be executed whe the whole `IO` operation is canceled.
+Same as `async`, it's used to integrate with existing frameworks. The unique difference is that the `cancelable` block requires returning an `IO` that'll be executed whe the whole `IO` operation is canceled.
 
 ```kotlin
 IO.cancelable<Int> { callback ->
-    val subscription = subscribe { callback(1.right()) }
+    val subscription = myObservable.subscribe { callback(it.right()) }
     IO { subscription.cancel() }
 }
   .attempt()
