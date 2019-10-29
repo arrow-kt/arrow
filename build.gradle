@@ -82,7 +82,15 @@ allprojects {
     }
 }
 
-configure(allprojects - project("arrow-meta") - project("arrow-ank-gradle") - project("arrow-kio-benchmarks")) {
+configure(allprojects
+        - project("arrow-meta")
+        - project("arrow-ank-gradle")
+        - project("arrow-ank")
+        - project("arrow-kio-benchmarks")
+        - project("arrow-fx")
+        - project("arrow-fx-reactor")
+        - project("arrow-integrations-retrofit-adapter")
+) {
     apply plugin: 'java'
     apply plugin: 'ru.vyarus.animalsniffer'
     dependencies {
@@ -90,7 +98,6 @@ configure(allprojects - project("arrow-meta") - project("arrow-ank-gradle") - pr
     }
 }
 
-def animalSnifferWhitelist = ["project ':arrow-ank-gradle'", "project ':arrow-meta'", "project ':arrow-kio-benchmarks'"]
 subprojects { project ->
 
     group = GROUP
