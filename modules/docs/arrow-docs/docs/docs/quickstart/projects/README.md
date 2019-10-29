@@ -22,6 +22,10 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [lenguyenthanh/RxArrow](https://github.com/lenguyenthanh/RxArrow): A collection of RxJava extensions for Arrow's Data Types
 
+[sksamuel/avro4k](https://github.com/sksamuel/avro4k): Avro format for kotlinx.serialization that has support for Arrow's data types
+
+[sksamuel/hoplite](https://github.com/sksamuel/hoplite): A purely functional config library in the vein of Scala's pureconfig built on Arrow.
+
 #### Android
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
