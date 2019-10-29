@@ -83,10 +83,6 @@ allprojects {
 }
 
 configure(allprojects
-        - project("arrow-meta")
-        - project("arrow-ank-gradle")
-        - project("arrow-ank")
-        - project("arrow-kio-benchmarks")
         - project("arrow-fx")
         - project("arrow-fx-reactor")
         - project("arrow-integrations-retrofit-adapter")
