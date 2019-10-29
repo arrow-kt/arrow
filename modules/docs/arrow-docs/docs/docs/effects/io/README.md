@@ -81,6 +81,8 @@ val cancel = myExpensiveIO
 cancel()
 ```
 
+It is important to know that cancelation can only be applied across operator boundaries, i.e. a blocking operation like `Thread.sleep` cannot be cancelled. Use helpers like `IO.sleep` instead!
+
 ### unsafeRunTimed
 
 To be used with SEVERE CAUTION, it runs `IO` synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
@@ -234,6 +236,16 @@ val cancel = IO.cancelable<Int> { callback ->
 cancel() // stops both the local IO and myObservable
 ```
 
+## sleep
+
+Sleeps for a given duration without blocking a thread.
+
+```kotlin
+val result =
+  IO.sleep(3.seconds).flatMap {
+    IO.effect { println("Hello World!") }
+  }.unsafeRunSync()
+```
 
 ## Effect Comprehensions
 
