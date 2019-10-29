@@ -26,13 +26,6 @@ workflows:
             #!/usr/bin/env bash
             set -ex
             ./gradlew :arrow-docs:runAnk
-    - script:
-        title: check
-        inputs:
-          - content: |-
-              #!/usr/bin/env bash
-              set -ex
-              ./gradlew check
   deploy:
     envs:
     - _JAVA_OPTIONS: -Xms512m -Xmx3584m
