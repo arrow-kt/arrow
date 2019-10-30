@@ -87,6 +87,7 @@ configure(allprojects
         - project("arrow-meta")
         - project("arrow-ank-gradle")
         - project("arrow-ank")
+        - project("arrow-fx-reactor")
 ) {
     apply plugin: 'java'
     apply plugin: 'ru.vyarus.animalsniffer'
