@@ -91,7 +91,7 @@ configure(allprojects
     apply plugin: 'java'
     apply plugin: 'ru.vyarus.animalsniffer'
     dependencies {
-        signature 'net.sf.androidscents.signature:android-api-level-14:4.0_r4@signature'
+        signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
     }
 }
 
