@@ -13,7 +13,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
 
-class SequenceKBirecursive : UnitSpec() {
+class SequenceKBirecursiveTest : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(

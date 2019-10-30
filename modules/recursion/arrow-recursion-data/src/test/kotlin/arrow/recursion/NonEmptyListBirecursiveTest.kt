@@ -15,7 +15,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
 
-class NonEmptyListBirecursive : UnitSpec() {
+class NonEmptyListBirecursiveTest : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(

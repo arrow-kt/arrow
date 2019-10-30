@@ -14,7 +14,7 @@ import arrow.test.generators.listK
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
 
-class ListKBirecursive : UnitSpec() {
+class ListKBirecursiveTest : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(
