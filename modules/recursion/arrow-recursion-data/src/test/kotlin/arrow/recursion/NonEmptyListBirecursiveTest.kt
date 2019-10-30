@@ -3,6 +3,8 @@ package arrow.recursion
 import arrow.core.Eval
 import arrow.core.Nel
 import arrow.core.NonEmptyList
+import arrow.core.extensions.eq
+import arrow.core.extensions.nonemptylist.eq.eq
 import arrow.core.none
 import arrow.core.some
 import arrow.recursion.extensions.nonemptylist.birecursive.birecursive
@@ -13,7 +15,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
 
-class NonEmptyListBirecursive : UnitSpec() {
+class NonEmptyListBirecursiveTest : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(
@@ -21,6 +23,7 @@ class NonEmptyListBirecursive : UnitSpec() {
         NonEmptyList.birecursive(),
         Gen.list(Gen.int()).filter { it.isNotEmpty() }.map { Nel.fromListUnsafe(it) },
         Gen.constant(Nel.fromListUnsafe((0..5000).toList())),
+        Nel.eq(Int.eq()),
         {
           it.fix().tail.fold({ 0 }, { it + 1 })
         },

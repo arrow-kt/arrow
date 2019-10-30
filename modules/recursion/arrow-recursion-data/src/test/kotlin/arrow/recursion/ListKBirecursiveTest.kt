@@ -2,6 +2,8 @@ package arrow.recursion
 
 import arrow.core.Eval
 import arrow.core.ListK
+import arrow.core.extensions.eq
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.k
 import arrow.recursion.extensions.listf.traverse.traverse
 import arrow.recursion.extensions.listk.birecursive.birecursive
@@ -12,7 +14,7 @@ import arrow.test.generators.listK
 import arrow.test.laws.BirecursiveLaws
 import io.kotlintest.properties.Gen
 
-class ListKBirecursive : UnitSpec() {
+class ListKBirecursiveTest : UnitSpec() {
   init {
     testLaws(
       BirecursiveLaws.laws(
@@ -20,6 +22,7 @@ class ListKBirecursive : UnitSpec() {
         ListK.birecursive(),
         Gen.listK(Gen.int()),
         Gen.constant((0..5000).toList().k()),
+        ListK.eq(Int.eq()),
         {
           when (val fa = it.fix()) {
             is ListF.NilF -> 0

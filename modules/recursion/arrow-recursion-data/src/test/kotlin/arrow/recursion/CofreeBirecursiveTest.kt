@@ -20,6 +20,7 @@ import arrow.recursion.pattern.CofreeF
 import arrow.recursion.pattern.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class CofreeBirecursive : UnitSpec() {
@@ -30,6 +31,7 @@ class CofreeBirecursive : UnitSpec() {
         Cofree.birecursive<ForOption, Int>(Option.functor()),
         Gen.list(Gen.int()).filter { it.isNotEmpty() }.map { Nel.fromListUnsafe(it) }.map { it.toCofree() },
         Gen.constant((0..5000).toList()).map { Nel.fromListUnsafe(it) }.map { it.toCofree() },
+        Eq.any(),
         {
           it.fix().let { co ->
             co.head + co.tail.fix().fold({ 0 }, ::identity)

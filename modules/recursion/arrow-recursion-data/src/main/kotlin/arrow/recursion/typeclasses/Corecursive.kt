@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.FunctionK
-import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.traverse.traverse
@@ -163,33 +162,4 @@ interface Corecursive<T, F> {
    */
   fun <A> A.postPro(trans: FunctionK<F, F>, coalg: Coalgebra<F, A>): T =
     hylo(embed(), coalg andThen trans::invoke, FF())
-
-  /**
-   * Refold but may short circuit at any time during deconstruction
-   */
-  fun <A> A.coelgot(f: (Tuple2<A, Eval<Kind<F, T>>>) -> T, coalg: Coalgebra<F, A>): T {
-    fun h(a: A): T =
-      FF().run {
-        f(
-          Tuple2(a, Eval.later { coalg(a).map(::h) })
-        )
-      }
-    return h(this)
-  }
-
-  /**
-   * Monadic version of coelgot
-   */
-  fun <M, A> A.coelgotM(TF: Traverse<F>, MM: Monad<M>, f: (Tuple2<A, Eval<Kind<M, Kind<F, T>>>>) -> Kind<M, T>, coalg: CoalgebraM<F, M, A>): Kind<M, T> {
-    fun h(a: A): Kind<M, T> =
-      TF.run {
-        MM.run {
-          f(
-            Tuple2(a, Eval.later { coalg(a).flatMap { it.map(::h).sequence(MM) } })
-          )
-        }
-      }
-
-    return h(this)
-  }
 }

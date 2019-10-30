@@ -15,6 +15,7 @@ import arrow.recursion.data.Fix
 import arrow.recursion.extensions.fix.birecursive.birecursive
 import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
 class FixBirecursive : UnitSpec() {
@@ -25,6 +26,7 @@ class FixBirecursive : UnitSpec() {
         Fix.birecursive(Option.functor()),
         Gen.list(Gen.int()).map { it.toFix() },
         Gen.constant((0..5000).toList()).map { it.toFix() },
+        Eq.any(),
         {
           it.fix().fold({ 0 }, { it + 1 })
         },
