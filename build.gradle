@@ -60,11 +60,11 @@ buildscript {
         classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_gradle_version"
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicfuVersion"
+        classpath 'ru.vyarus:gradle-animalsniffer-plugin:1.4.6'
     }
 }
 
 def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
-
 allprojects {
     apply plugin: 'base'
 
@@ -79,6 +79,20 @@ allprojects {
         maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
+    }
+}
+
+configure(allprojects
+        - project("arrow-kio-benchmarks")
+        - project("arrow-meta")
+        - project("arrow-ank-gradle")
+        - project("arrow-ank")
+        - project("arrow-fx-reactor")
+) {
+    apply plugin: 'java'
+    apply plugin: 'ru.vyarus.animalsniffer'
+    dependencies {
+        signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
     }
 }
 
@@ -218,10 +232,10 @@ dependencyUpdates {
         final disallowedQualifiers = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'eap']
         final isDisallowed = { dependency -> { qualifier -> dependency.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ } }
         final dependencies = result.current.dependencies
-            .plus(result.outdated.dependencies)
-            .plus(result.exceeded.dependencies)
-            .plus(result.unresolved.dependencies)
-            .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+                .plus(result.outdated.dependencies)
+                .plus(result.exceeded.dependencies)
+                .plus(result.unresolved.dependencies)
+                .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
 
         def plainTextReporter = new PlainTextReporter(project, revision, gradleReleaseChannel)
         plainTextReporter.write(System.out, result)
@@ -233,8 +247,8 @@ dependencyUpdates {
             final title = "\nError: Kotlin and Coroutines must depends on release version!"
             final message = dependencies
                     .inject(title) { acc, dependency ->
-                "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
-            }
+                        "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+                    }
 
             throw new GradleException(message)
         }
