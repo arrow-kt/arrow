@@ -21,3 +21,4 @@ jobs:
         java -version
         ./gradlew -v
         ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+        ./gradlew check
