@@ -11,42 +11,43 @@ import arrow.recursion.CoalgebraM
 import arrow.recursion.hylo
 import arrow.recursion.pattern.FreeF
 import arrow.recursion.typeclasses.Corecursive
+import arrow.typeclasses.Eq
 import arrow.typeclasses.Traverse
 import io.kotlintest.properties.Gen
 
 object CorecursiveLaws {
 
-  fun <T, F> laws(CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>): List<Law> =
+  fun <T, F> laws(CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>, eqT: Eq<T>): List<Law> =
     listOf(
-      Law("Ana == hylo + embed") { CR.anaEqualsHyloAndEmbed(coalg) },
-      Law("Apo + coalgebra instead of r-coalgebra == ana") { CR.apoEqualsAnaWithNormalCoalgebra(coalg) },
-      Law("Futu + coalgebra instead of cv-coalgebra == ana") { CR.futuEqualsAnaWithNormalCoalgebra(coalg) }
+      Law("Ana == hylo + embed") { CR.anaEqualsHyloAndEmbed(coalg, eqT) },
+      Law("Apo + coalgebra instead of r-coalgebra == ana") { CR.apoEqualsAnaWithNormalCoalgebra(coalg, eqT) },
+      Law("Futu + coalgebra instead of cv-coalgebra == ana") { CR.futuEqualsAnaWithNormalCoalgebra(coalg, eqT) }
     )
 
-  fun <T, F> laws(TF: Traverse<F>, CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>, coalgM: CoalgebraM<F, ForEval, Int>): List<Law> =
-    laws(CR, coalg) + listOf(
+  fun <T, F> laws(TF: Traverse<F>, CR: Corecursive<T, F>, coalg: Coalgebra<F, Int>, coalgM: CoalgebraM<F, ForEval, Int>, eqT: Eq<T>): List<Law> =
+    laws(CR, coalg, eqT) + listOf(
       Law("anaM with eval is stacksafe") { CR.anaMIsStackSafeWithEval(TF, coalgM) },
       Law("apoM with eval is stackSafe") { CR.apoMIsStackSafeWithEval(TF, coalgM) },
       Law("futuM with eval is stackSafe") { CR.futuMIsStackSafeWithEval(TF, coalgM) }
     )
 
-  fun <T, F> Corecursive<T, F>.anaEqualsHyloAndEmbed(coalg: Coalgebra<F, Int>) =
+  fun <T, F> Corecursive<T, F>.anaEqualsHyloAndEmbed(coalg: Coalgebra<F, Int>, eqT: Eq<T>) =
     forFew(5, Gen.int().filter { it in 0..100 }) { i ->
-      i.ana(coalg) == i.hylo(embed(), coalg, FF())
+      i.ana(coalg).equalUnderTheLaw(i.hylo(embed(), coalg, FF()), eqT)
     }
 
-  fun <T, F> Corecursive<T, F>.apoEqualsAnaWithNormalCoalgebra(coalg: Coalgebra<F, Int>) =
+  fun <T, F> Corecursive<T, F>.apoEqualsAnaWithNormalCoalgebra(coalg: Coalgebra<F, Int>, eqT: Eq<T>) =
     forFew(5, Gen.int().filter { it in 0..100 }) { i ->
       i.apo {
         FF().run { coalg(it).map { it.right() } }
-      } == i.ana(coalg)
+      }.equalUnderTheLaw(i.ana(coalg), eqT)
     }
 
-  fun <T, F> Corecursive<T, F>.futuEqualsAnaWithNormalCoalgebra(coalg: Coalgebra<F, Int>) =
+  fun <T, F> Corecursive<T, F>.futuEqualsAnaWithNormalCoalgebra(coalg: Coalgebra<F, Int>, eqT: Eq<T>) =
     forFew(5, Gen.int().filter { it in 0..100 }) { i ->
       i.futu {
         FF().run { coalg(it).map { FreeF.pure<F, Int>(it) } }
-      } == i.ana(coalg)
+      }.equalUnderTheLaw(i.ana(coalg), eqT)
     }
 
   fun <T, F> Corecursive<T, F>.anaMIsStackSafeWithEval(TF: Traverse<F>, coalg: CoalgebraM<F, ForEval, Int>) =

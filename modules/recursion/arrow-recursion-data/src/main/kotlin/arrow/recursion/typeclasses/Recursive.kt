@@ -1,7 +1,6 @@
 package arrow.recursion.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.FunctionK
 import arrow.core.Tuple2
@@ -10,11 +9,9 @@ import arrow.core.compose
 import arrow.core.extensions.tuple2.functor.functor
 import arrow.core.extensions.tuple2.traverse.traverse
 import arrow.core.fix
-import arrow.core.identity
 import arrow.core.toT
 import arrow.free.Cofree
 import arrow.recursion.Algebra
-import arrow.recursion.AlgebraM
 import arrow.recursion.CVAlgebra
 import arrow.recursion.CVAlgebraM
 import arrow.recursion.Coalgebra
@@ -292,24 +289,4 @@ interface Recursive<T, F> {
    */
   fun <A> T.prepro(trans: FunctionK<F, F>, alg: Algebra<F, A>): A =
     hylo(alg compose trans::invoke, project(), FF())
-
-  /**
-   * Refold, but with the ability to short circuit during construction
-   */
-  fun <A, B> B.elgot(alg: Algebra<F, A>, f: (B) -> Either<A, Kind<F, B>>): A {
-    fun h(b: B): A =
-      f(b).fold(::identity) { FF().run { alg(it.map(::h)) } }
-
-    return h(this)
-  }
-
-  /**
-   * Monadic version of elgot
-   */
-  fun <M, A, B> B.elgotM(TF: Traverse<F>, MM: Monad<M>, alg: AlgebraM<F, M, A>, f: (B) -> Either<A, Kind<F, B>>): Kind<M, A> {
-    fun h(b: B): Kind<M, A> =
-      f(b).fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } }
-
-    return h(this)
-  }
 }

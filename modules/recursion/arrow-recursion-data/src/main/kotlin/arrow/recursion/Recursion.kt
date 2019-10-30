@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.free.Cofree
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.nest
@@ -230,3 +231,52 @@ fun <F, M, A, B> A.dynaM(
       alg(it).map { res -> Cofree(TF, res, Eval.now(it)) }
     }, coalg, TF, MM).map { it.head }
   }
+
+/**
+ * Refold, but with the ability to short circuit during construction
+ */
+fun <F, A, B> B.elgot(alg: Algebra<F, A>, f: (B) -> Either<A, Kind<F, B>>, FF: Functor<F>): A {
+  fun h(b: B): A =
+    f(b).fold(::identity) { FF.run { alg(it.map(::h)) } }
+
+  return h(this)
+}
+
+/**
+ * Monadic version of elgot
+ */
+fun <F, M, A, B> B.elgotM(alg: AlgebraM<F, M, A>, f: (B) -> Kind<M, Either<A, Kind<F, B>>>, TF: Traverse<F>, MM: Monad<M>): Kind<M, A> {
+  fun h(b: B): Kind<M, A> = MM.run {
+    f(b).flatMap { it.fold(MM::just) { MM.run { TF.run { it.traverse(MM, ::h).flatMap(alg) } } } }
+  }
+  return h(this)
+}
+
+/**
+ * Refold but may short circuit at any time during deconstruction
+ */
+fun <F, A, B> A.coelgot(f: (Tuple2<A, Eval<Kind<F, B>>>) -> B, coalg: Coalgebra<F, A>, FF: Functor<F>): B {
+  fun h(a: A): B =
+    FF.run {
+      f(
+        Tuple2(a, Eval.later { coalg(a).map(::h) })
+      )
+    }
+  return h(this)
+}
+
+/**
+ * Monadic version of coelgot
+ */
+fun <F, M, A, B> A.coelgotM(f: (Tuple2<A, Eval<Kind<M, Kind<F, B>>>>) -> Kind<M, B>, coalg: CoalgebraM<F, M, A>, TF: Traverse<F>, MM: Monad<M>): Kind<M, B> {
+  fun h(a: A): Kind<M, B> =
+    TF.run {
+      MM.run {
+        f(
+          Tuple2(a, Eval.later { coalg(a).flatMap { it.map(::h).sequence(MM) } })
+        )
+      }
+    }
+
+  return h(this)
+}
