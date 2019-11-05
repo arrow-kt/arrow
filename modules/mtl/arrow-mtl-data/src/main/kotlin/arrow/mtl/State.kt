@@ -43,19 +43,19 @@ typealias State<S, A> = StateT<S, ForId, A>
 
 /**
  * Constructor for State.
- * State<S, A> is an alias for IndexedStateT<ForId, S, S, A>
+ * State<S, A> is an alias for StateT<S, ForId, A>
  *
  * @param run the stateful function to wrap with [State].
  */
 fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = StateT(Id(run.andThen { Id(it) }))
 
 /**
- * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
+ * Syntax for constructing a `StateT<S, ForId, A>` from a function `(S) -> Tuple2<S, A>`
  */
 fun <S, A> StateFun<S, A>.toState(): State<S, A> = State(IdBimonad, this)
 
 /**
- * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
+ * Syntax for constructing a `StateT<S, ForId, A>` from a function `(S) -> Tuple2<S, A>`
  */
 fun <S, A> StateFunOf<S, A>.toState(): State<S, A> = State(this)
 
@@ -65,28 +65,28 @@ fun <S, T, P1, R> State<S, T>.map(sx: State<S, P1>, f: (T, P1) -> R): State<S, R
 fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad) { t -> StateApi.just<S, R>(f(t)) }.fix()
 
 /**
- * Alias for [StateT.run] `StateT<ForId, S, A>`
+ * Alias for [StateT.run] `StateT<S, ForId, A>`
  *
  * @param initial state to start stateful computation.
  */
 fun <S, A> StateT<S, ForId, A>.run(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
 
 /**
- * Alias for [StateT.runA] `StateT<ForId, S, A>`
+ * Alias for [StateT.runA] `StateT<S, ForId, A>`
  *
  * @param initial state to start stateful computation.
  */
 fun <S, A> StateT<S, ForId, A>.runA(initial: S): A = run(initial).b
 
 /**
- * Alias for [StateT.runS] `StateT<ForId, S, A>`
+ * Alias for [StateT.runS] `StateT<S, ForId, A>`
  *
  * @param initial state to start stateful computation.
  */
 fun <S, A> StateT<S, ForId, A>.runS(initial: S): S = run(initial).a
 
 /**
- * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.
+ * Alias for StateId to make working with `StateT<S, ForId, A>` more elegant.
  */
 fun State() = StateApi
 

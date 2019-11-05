@@ -198,19 +198,19 @@ This is a commonly encountered problem, especially in the context of async servi
 Monad Transformers enable you to combine two monads into a super monad. In this case, we're going to use `EitherT`
 from Arrow to express the effect of potential known controled biz error inside our async computations.
 
-`EitherT` has the form of `EitherT<F, L, A>`.
+`EitherT` has the form of `EitherT<L, F, A>`.
 
-This means that for any monad `F` surrounding an `Either<L, A>` we can obtain an `EitherT<F, L, A>`.
-So our specialization `EitherT<ForObservableK, BizError, A>` is the EitherT transformer around values that are of `ObservableK<Either<BizError, A>>`.
+This means that for any monad `F` surrounding an `Either<L, A>` we can obtain an `EitherT<L, F, A>`.
+So our specialization `EitherT<BizError, ForObservableK, A>` is the EitherT transformer around values that are of `ObservableK<Either<BizError, A>>`.
 
-We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
+We can now lift any value to a `EitherT<BizError, F, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.fx.rx2.ForObservableK
 import arrow.mtl.EitherT
 import arrow.fx.rx2.extensions.observablek.applicative.applicative
 
-val eitherTVal = EitherT.just<ForObservableK, BizError, Int>(ObservableK.applicative(), 1)
+val eitherTVal = EitherT.just<BizError, ForObservableK, Int>(ObservableK.applicative(), 1)
 eitherTVal
 ```
 
@@ -230,7 +230,7 @@ import arrow.fx.rx2.fix
 import arrow.mtl.extensions.eithert.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).fx.monad {
+  EitherT.monad<BizError, ForObservableK>(ObservableK.monad()).fx.monad {
     val (person) = EitherT(findPerson(personId))
     val address = !EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
@@ -244,7 +244,7 @@ Here we no longer have to deal with the `Left` cases, and the binding to the val
 
 ## Additional syntax
 
-As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
+As `EitherT<A, F ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
 
 ```kotlin:ank
 import arrow.core.extensions.option.functor.functor

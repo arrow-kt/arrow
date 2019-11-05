@@ -35,7 +35,7 @@ fun <S, F, A> StateTOf<S, F, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S
 
 /**
  * `StateT<S, F, A>` is a stateful computation within a context `F` yielding
- * a value of type `A`. i.e. StateT<EitherPartialOf<E>, S, A> = Either<E, State<S, A>>
+ * a value of type `A`. i.e. StateT<S, EitherPartialOf<E>, A> = Either<E, State<S, A>>
  *
  * @param F the context that wraps the stateful computation.
  * @param S the state we are preforming computation upon.
@@ -112,7 +112,7 @@ class StateT<S, F, A>(
     }
 
     /**
-     * Modify the state with an [Applicative] function [f] `(S) -> Kind<S, F>` and return [Unit].
+     * Modify the state with an [Applicative] function [f] `(S) -> Kind<F, S>` and return [Unit].
      *
      * @param AF [Applicative] for the context [F].
      * @param f the modify function to apply.
@@ -130,7 +130,7 @@ class StateT<S, F, A>(
       StateT(AF.just { _ -> AF.just(Tuple2(s, Unit)) })
 
     /**
-     * Set the state to a value [s] of type `Kind<S, F>` and return [Unit].
+     * Set the state to a value [s] of type `Kind<F, S>` and return [Unit].
      *
      * @param AF [Applicative] for the context [F].
      * @param s value to set.

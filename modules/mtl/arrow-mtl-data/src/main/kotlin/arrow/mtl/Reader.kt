@@ -35,7 +35,7 @@ typealias ReaderPartialOf<D> = ReaderTPartialOf<D, ForId>
 
 /**
  * [Reader] represents a computation that has a dependency on [D].
- * `Reader<D, A>` is an alias for `ReaderT<ForId, D, A>` and `Kleisli<ForId, D, A>`.
+ * `Reader<D, A>` is an alias for `ReaderT<ForId, D, A>` and `Kleisli<D, ForId, A>`.
  *
  * @param D the dependency or environment we depend on.
  * @param A resulting type of the computation.

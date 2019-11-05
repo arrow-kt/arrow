@@ -220,7 +220,7 @@ So what we want is a return type that represents `Either` a `StackError` or a ce
 import arrow.core.ForId
 import arrow.mtl.StateT
 
-fun _popS(): Either<StackError, StateT<ForId, Stack, String>> = TODO()
+fun _popS(): Either<StackError, StateT<Stack, ForId, String>> = TODO()
 ```
 
 The only thing we can do is handle this with `StateT`. We want to wrap `State` with `Either`.
@@ -245,18 +245,18 @@ sealed class StackError {
   object StackEmpty : StackError()
 }
 //sampleStart
-fun popS() = StateT<EitherPartialOf<StackError>, Stack, String>(Either.monad()) { stack: Stack ->
+fun popS() = StateT<Stack, EitherPartialOf<StackError>, String>(Either.monad()) { stack: Stack ->
   if (stack.isEmpty()) StackEmpty.left()
   else stack.first().let {
     stack.drop(1) toT it
   }.right()
 }
 
-fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit>(Either.monad()) { stack: Stack ->
+fun pushS(s: String) = StateT<Stack, EitherPartialOf<StackError>, Unit>(Either.monad()) { stack: Stack ->
   (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 
-fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
+fun stackOperationsS(): StateT<Stack, EitherPartialOf<StackError>, String> =
   pushS("a").flatMap(Either.monad()) { _ ->
     popS().flatMap(Either.monad()) { _ ->
       popS()
@@ -288,18 +288,18 @@ sealed class StackError {
   object StackEmpty : StackError()
 }
 
-fun popS() = StateT<EitherPartialOf<StackError>, Stack, String>(Either.monad()) { stack: Stack ->
+fun popS() = StateT<Stack, EitherPartialOf<StackError>, String>(Either.monad()) { stack: Stack ->
   if (stack.isEmpty()) StackEmpty.left()
   else stack.first().let {
     stack.drop(1) toT it
   }.right()
 }
 
-fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit>(Either.monad()) { stack: Stack ->
+fun pushS(s: String) = StateT<Stack, EitherPartialOf<StackError>, Unit>(Either.monad()) { stack: Stack ->
   (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 
-fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
+fun stackOperationsS(): StateT<Stack, EitherPartialOf<StackError>, String> =
   pushS("a").flatMap(Either.monad()) { _ ->
     popS().flatMap(Either.monad()) { _ ->
       popS()
@@ -335,19 +335,19 @@ sealed class StackError {
   object StackEmpty : StackError()
 }
 
-fun popS() = StateT<EitherPartialOf<StackError>, Stack, String>(Either.monad()) { stack: Stack ->
+fun popS() = StateT<Stack, EitherPartialOf<StackError>, String>(Either.monad()) { stack: Stack ->
   if (stack.isEmpty()) StackEmpty.left()
   else stack.first().let {
     stack.drop(1) toT it
   }.right()
 }
 
-fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit>(Either.monad()) { stack: Stack ->
+fun pushS(s: String) = StateT<Stack, EitherPartialOf<StackError>, Unit>(Either.monad()) { stack: Stack ->
   (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 //sampleStart
 fun stackOperationsS2() =
-  StateT.fx<EitherPartialOf<StackError>, Stack, String>(Either.monadError<StackError>()) {
+  StateT.fx<Stack, EitherPartialOf<StackError>, String>(Either.monadError<StackError>()) {
     !pushS("a")
     !popS()
     val (string) = popS()
@@ -379,19 +379,19 @@ sealed class StackError {
   object StackEmpty : StackError()
 }
 
-fun popS() = StateT<EitherPartialOf<StackError>, Stack, String>(Either.monad()) { stack: Stack ->
+fun popS() = StateT<Stack, EitherPartialOf<StackError>, String>(Either.monad()) { stack: Stack ->
   if (stack.isEmpty()) StackEmpty.left()
   else stack.first().let {
     stack.drop(1) toT it
   }.right()
 }
 
-fun pushS(s: String) = StateT<EitherPartialOf<StackError>, Stack, Unit>(Either.monad()) { stack: Stack ->
+fun pushS(s: String) = StateT<Stack, EitherPartialOf<StackError>, Unit>(Either.monad()) { stack: Stack ->
   (listOf(s, *stack.toTypedArray()) toT Unit).right()
 }
 //sampleStart
 fun stackOperationsS2() =
-  StateT.fx<EitherPartialOf<StackError>, Stack, String>(Either.monadError<StackError>()) {
+  StateT.fx<Stack, EitherPartialOf<StackError>, String>(Either.monadError<StackError>()) {
     !pushS("a")
     !popS()
     val (string) = popS()
