@@ -16,6 +16,8 @@ import arrow.fx.extensions.io.async.async
 import arrow.fx.mtl.writert.async.async
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
+import arrow.core.extensions.option.alternative.alternative
+import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.mtl.extensions.writert.applicative.applicative
@@ -23,11 +25,13 @@ import arrow.mtl.extensions.writert.divisible.divisible
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.core.extensions.option.monadFilter.monadFilter
+import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
+import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
@@ -53,6 +57,12 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
+      AlternativeLaws.laws(
+        WriterT.alternative(Int.monoid(), Option.alternative()),
+        { i -> WriterT.just(Option.applicative(), Int.monoid(), i) },
+        { i -> WriterT.just(Option.applicative(), Int.monoid(), { j: Int -> i + j }) },
+        Eq { a, b -> a.value() == b.value() }
+      ),
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         { WriterT(it.const()) },
