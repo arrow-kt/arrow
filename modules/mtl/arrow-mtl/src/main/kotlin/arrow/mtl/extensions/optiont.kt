@@ -28,6 +28,7 @@ import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
 import arrow.mtl.value
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -261,4 +262,19 @@ fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: 
   val fa = ComposedTraverseFilter(FF, Option.traverseFilter()).traverseFilterC(value(), f, GA)
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { nested -> OptionT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
+}
+
+@extension
+interface OptionTAlternative<F> : Alternative<OptionTPartialOf<F>>, OptionTApplicative<F> {
+  override fun AF(): Applicative<F> = MF()
+  fun MF(): Monad<F>
+  override fun <A> empty(): Kind<OptionTPartialOf<F>, A> = OptionT.none(AF())
+  override fun <A> Kind<OptionTPartialOf<F>, A>.orElse(b: Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, A> =
+    OptionT(
+      MF().fx.monad {
+        val l = !value()
+        if (l.isEmpty()) !b.value()
+        else l
+      }
+    )
 }

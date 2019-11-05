@@ -39,6 +39,8 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.Monoid
 import arrow.undocumented
 
 @extension
@@ -241,6 +243,32 @@ interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, Ei
           }, { b ->
             b.right().right()
           })
+        })
+      }
+    )
+}
+
+@extension
+interface EitherTAlternative<F, L> : Alternative<EitherTPartialOf<F, L>>, EitherTApplicative<F, L> {
+  override fun AF(): Applicative<F> = MF()
+  fun MF(): Monad<F>
+  fun ME(): Monoid<L>
+
+  override fun <A> empty(): Kind<EitherTPartialOf<F, L>, A> = EitherT(MF().just(ME().empty().left()))
+
+  override fun <A> Kind<EitherTPartialOf<F, L>, A>.orElse(b: Kind<EitherTPartialOf<F, L>, A>): Kind<EitherTPartialOf<F, L>, A> =
+    EitherT(
+      MF().fx.monad {
+        val l = !value()
+        l.fold({ ll ->
+          val r = !b.value()
+          r.fold({
+            ME().run { (ll + it).left() }
+          }, {
+            it.right()
+          })
+        }, {
+          it.right()
         })
       }
     )
