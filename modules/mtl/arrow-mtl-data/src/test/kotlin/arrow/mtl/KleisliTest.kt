@@ -3,8 +3,10 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForId
+import arrow.core.ForOption
 import arrow.core.ForTry
 import arrow.core.Id
+import arrow.core.Option
 import arrow.core.Try
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -15,10 +17,14 @@ import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.alternative.alternative
+import arrow.core.some
+import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
+import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
@@ -53,6 +59,12 @@ class KleisliTest : UnitSpec() {
   init {
 
     testLaws(
+      AlternativeLaws.laws(
+        Kleisli.alternative<ForOption, Int>(Option.alternative()),
+        { i -> Kleisli { i.some() } },
+        { i -> Kleisli { { j: Int -> i + j }.some() } },
+        Eq { a, b -> a.fix().run(0) == b.fix().run(0) }
+      ),
       BracketLaws.laws(
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQ = IOEQ(),

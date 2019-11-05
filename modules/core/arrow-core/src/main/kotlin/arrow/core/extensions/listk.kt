@@ -14,6 +14,7 @@ import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
 import arrow.extension
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
@@ -203,7 +204,7 @@ fun <A> ListK.Companion.fx(c: suspend MonadSyntax<ForListK>.() -> A): ListK<A> =
   ListK.monad().fx.monad(c).fix()
 
 @extension
-interface ListKMonadCombine : MonadCombine<ForListK> {
+interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
@@ -227,12 +228,6 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
-
-  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().listCombineK(y)
-
-  override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): ListK<A> =
-    fix() + b.fix()
 
   override fun <A> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) ListK.empty()
@@ -276,4 +271,11 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
+}
+
+@extension
+interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
+  override fun <A> empty(): Kind<ForListK, A> = emptyList<A>().k()
+  override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): Kind<ForListK, A> =
+    (this.fix() + b.fix()).k()
 }
