@@ -36,6 +36,8 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented
@@ -91,12 +93,22 @@ interface StateTMonad<S, F> : Monad<StateTPartialOf<S, F>>, StateTApplicative<S,
 @undocumented
 interface StateTSemigroupK<S, F> : SemigroupK<StateTPartialOf<S, F>> {
 
-  fun FF(): Monad<F>
+  fun MF(): Monad<F>
 
   fun SS(): SemigroupK<F>
 
   override fun <A> StateTOf<S, F, A>.combineK(y: StateTOf<S, F, A>): StateT<S, F, A> =
-    fix().combineK(FF(), SS(), y)
+    fix().combineK(MF(), SS(), y)
+}
+
+@extension
+@undocumented
+interface StateTMonoidK<S, F> : MonoidK<StateTPartialOf<S, F>>, StateTSemigroupK<S, F> {
+  override fun MF(): Monad<F>
+  fun MO(): MonoidK<F>
+  override fun SS(): SemigroupK<F> = MO()
+
+  override fun <A> empty(): Kind<StateTPartialOf<S, F>, A> = StateT.liftF(MF(), MO().empty<A>())
 }
 
 @extension
@@ -238,15 +250,14 @@ interface StateTMonadState<S, F> : MonadState<StateTPartialOf<S, F>, S>, StateTM
 }
 
 @extension
-interface StateTMonadCombine<S, F> : MonadCombine<StateTPartialOf<S, F>>, StateTMonad<S, F>, StateTSemigroupK<S, F> {
+interface StateTMonadCombine<S, F> : MonadCombine<StateTPartialOf<S, F>>, StateTMonad<S, F>, StateTMonoidK<S, F> {
 
   fun MC(): MonadCombine<F>
 
   override fun MF(): Monad<F> = MC()
 
   override fun FF(): Monad<F> = MC()
-
-  override fun SS(): SemigroupK<F> = MC()
+  override fun MO(): MonoidK<F> = MC()
 
   override fun <A> empty(): Kind<StateTPartialOf<S, F>, A> = liftT(MC().empty())
 
@@ -254,9 +265,31 @@ interface StateTMonadCombine<S, F> : MonadCombine<StateTPartialOf<S, F>>, StateT
     StateT(just { s: S -> ma.map { a: A -> s toT a } })
   }
 
+  override fun <A> StateTOf<S, F, A>.combineK(y: StateTOf<S, F, A>): StateT<S, F, A> =
+    fix().combineK(MF(), MO(), y)
+
   override fun <A> Kind<StateTPartialOf<S, F>, A>.orElse(b: Kind<StateTPartialOf<S, F>, A>): Kind<StateTPartialOf<S, F>, A> {
     val x = this.fix()
     val y = b.fix()
     return MC().run { StateT(just { s: S -> x.run(this, s).orElse(y.run(this, s)) }) }
   }
+}
+
+@extension
+interface StateTAlternative<S, F> : Alternative<StateTPartialOf<S, F>>, StateTMonoidK<S, F>, StateTApplicative<S, F> {
+  override fun MF(): Monad<F>
+  override fun MO(): MonoidK<F> = AF()
+  fun AF(): Alternative<F>
+
+  override fun <A> empty(): Kind<StateTPartialOf<S, F>, A> = StateT.liftF(AF(), AF().empty<A>())
+
+  override fun <A> Kind<StateTPartialOf<S, F>, A>.orElse(b: Kind<StateTPartialOf<S, F>, A>): Kind<StateTPartialOf<S, F>, A> =
+    StateT(AF()) { s ->
+      AF().run {
+        runM(MF(), s).orElse(b.runM(MF(), s))
+      }
+    }
+
+  override fun <A> StateTOf<S, F, A>.combineK(y: StateTOf<S, F, A>): StateT<S, F, A> =
+    orElse(y).fix()
 }

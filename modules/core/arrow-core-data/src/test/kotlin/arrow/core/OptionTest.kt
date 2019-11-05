@@ -7,16 +7,18 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
+import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.show.show
-import arrow.core.extensions.tuple2.eq.eq
-import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.option
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
@@ -44,6 +46,7 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
+      MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`

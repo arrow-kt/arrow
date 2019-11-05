@@ -30,6 +30,7 @@ import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Alternative
 
 @extension
 @undocumented
@@ -231,4 +232,24 @@ interface WriterTMonadWriter<W, F> : MonadWriter<WriterTPartialOf<W, F>, W>, Wri
   override fun <A> writer(aw: Tuple2<W, A>): WriterT<W, F, A> = WriterT.put2(MF(), aw.b, aw.a)
 
   override fun tell(w: W): Kind<WriterTPartialOf<W, F>, Unit> = WriterT.tell2(MF(), w)
+}
+
+@extension
+interface WriterTAlternative<W, F> : Alternative<WriterTPartialOf<W, F>>, WriterTApplicative<W, F>, WriterTMonoidK<W, F> {
+  override fun AF(): Applicative<F> = AL()
+  override fun MF(): MonoidK<F> = AL()
+  override fun MM(): Monoid<W>
+  fun AL(): Alternative<F>
+
+  override fun <A> empty(): WriterT<W, F, A> = WriterT(AL().empty())
+
+  override fun <A> Kind<WriterTPartialOf<W, F>, A>.orElse(b: Kind<WriterTPartialOf<W, F>, A>): Kind<WriterTPartialOf<W, F>, A> =
+    WriterT(
+      AL().run {
+        value().orElse(b.value())
+      }
+    )
+
+  override fun <A> Kind<WriterTPartialOf<W, F>, A>.combineK(y: Kind<WriterTPartialOf<W, F>, A>): WriterT<W, F, A> =
+    orElse(y).fix()
 }

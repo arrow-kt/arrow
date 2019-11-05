@@ -39,6 +39,8 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.Monoid
 import arrow.undocumented
 
 @extension
@@ -246,7 +248,33 @@ interface EitherTDecidableInstance<L, F> : Decidable<EitherTPartialOf<L, F>>, Ei
     )
 }
 
-fun <A, F, B, C> EitherTOf<A, F, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
+@extension
+interface EitherTAlternative<L, F> : Alternative<EitherTPartialOf<L, F>>, EitherTApplicative<L, F> {
+  override fun AF(): Applicative<F> = MF()
+  fun MF(): Monad<F>
+  fun ME(): Monoid<L>
+
+  override fun <A> empty(): Kind<EitherTPartialOf<L, F>, A> = EitherT(MF().just(ME().empty().left()))
+
+  override fun <A> Kind<EitherTPartialOf<L, F>, A>.orElse(b: Kind<EitherTPartialOf<L, F>, A>): Kind<EitherTPartialOf<L, F>, A> =
+    EitherT(
+      MF().fx.monad {
+        val l = !value()
+        l.fold({ ll ->
+          val r = !b.value()
+          r.fold({
+            ME().run { (ll + it).left() }
+          }, {
+            it.right()
+          })
+        }, {
+          it.right()
+        })
+      }
+    )
+}
+
+fun <F, A, B, C> EitherTOf<A, F, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
   FF.compose(Either.foldable<A>()).foldLC(value(), b, f)
 
 fun <A, F, B, C> EitherTOf<A, F, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {

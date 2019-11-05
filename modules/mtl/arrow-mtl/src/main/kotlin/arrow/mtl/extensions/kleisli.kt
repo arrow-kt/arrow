@@ -33,6 +33,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.undocumented
+import arrow.typeclasses.Alternative
 
 @extension
 interface KleisliFunctor<D, F> : Functor<KleisliPartialOf<D, F>> {
@@ -183,6 +184,16 @@ interface KleisliMonadError<D, F, E> : MonadError<KleisliPartialOf<D, F>, E>, Kl
 @undocumented
 interface KleisliMonadThrow<D, F> : MonadThrow<KleisliPartialOf<D, F>>, KleisliMonadError<D, F, Throwable> {
   override fun ME(): MonadError<F, Throwable>
+}
+
+@extension
+interface KleisliAlternative<D, F> : Alternative<KleisliPartialOf<D, F>>, KleisliApplicative<D, F> {
+  override fun AF(): Applicative<F> = AL()
+  fun AL(): Alternative<F>
+
+  override fun <A> empty(): Kind<KleisliPartialOf<D, F>, A> = Kleisli { AL().empty() }
+  override fun <A> Kind<KleisliPartialOf<D, F>, A>.orElse(b: Kind<KleisliPartialOf<D, F>, A>): Kind<KleisliPartialOf<D, F>, A> =
+    Kleisli { d -> AL().run { run(d).orElse(b.run(d)) } }
 }
 
 @extension
