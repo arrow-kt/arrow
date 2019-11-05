@@ -42,11 +42,11 @@ import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
+  private fun IOEQ(): Eq<Kind<WriterTPartialOf<Int, ForIO>, Int>> = Eq { a, b ->
     a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
-  private fun IOEitherEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun IOEitherEQ(): Eq<Kind<WriterTPartialOf<Int, ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
     a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
@@ -54,13 +54,13 @@ class WriterTTest : UnitSpec() {
 
     testLaws(
       DivisibleLaws.laws(
-        WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        WriterT.divisible<Int, ConstPartialOf<Int>>(Const.divisible(Int.monoid())),
         { WriterT(it.const()) },
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
       MonoidKLaws.laws(
-        WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
+        WriterT.monoidK<Int, ForListK>(ListK.monoidK()),
         WriterT.applicative(ListK.monad(), Int.monoid()),
         Eq { a, b -> a.value() == b.value() }),
 
@@ -86,8 +86,8 @@ class WriterTTest : UnitSpec() {
       MonadFilterLaws.laws(
         WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
         { WriterT(Option(Tuple2(it, it))) },
-        object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
-          override fun Kind<WriterTPartialOf<ForOption, Int>, Int>.eqv(b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =
+        object : Eq<Kind<WriterTPartialOf<Int, ForOption>, Int>> {
+          override fun Kind<WriterTPartialOf<Int, ForOption>, Int>.eqv(b: Kind<WriterTPartialOf<Int, ForOption>, Int>): Boolean =
             value().fix().let { optionA: Option<Tuple2<Int, Int>> ->
               val optionB = b.value().fix()
               optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })

@@ -126,13 +126,13 @@ class OptionTTest : UnitSpec() {
       forAll { a: Int, b: String ->
         OptionT
           .fromOption(NELM, Some(a))
-          .toLeft(NELM) { b } == EitherT.left<ForNonEmptyList, Int, String>(NELM, a)
+          .toLeft(NELM) { b } == EitherT.left<Int, ForNonEmptyList, String>(NELM, a)
       }
     }
 
     "toLeft for None should build a correct EitherT" {
       forAll { b: String ->
-        OptionT.fromOption<ForNonEmptyList, Int>(NELM, None).toLeft(NELM) { b } == EitherT.right<ForNonEmptyList, Int, String>(NELM, b)
+        OptionT.fromOption<ForNonEmptyList, Int>(NELM, None).toLeft(NELM) { b } == EitherT.right<Int, ForNonEmptyList, String>(NELM, b)
       }
     }
 
@@ -140,13 +140,13 @@ class OptionTTest : UnitSpec() {
       forAll { a: Int, b: String ->
         OptionT
           .fromOption(NELM, Some(b))
-          .toRight(NELM) { a } == EitherT.right<ForNonEmptyList, Int, String>(NELM, b)
+          .toRight(NELM) { a } == EitherT.right<Int, ForNonEmptyList, String>(NELM, b)
       }
     }
 
     "toRight for None should build a correct EitherT" {
       forAll { a: Int ->
-        OptionT.fromOption<ForNonEmptyList, String>(NELM, None).toRight(NELM) { a } == EitherT.left<ForNonEmptyList, Int, String>(NELM, a)
+        OptionT.fromOption<ForNonEmptyList, String>(NELM, None).toRight(NELM) { a } == EitherT.left<Int, ForNonEmptyList, String>(NELM, a)
       }
     }
   }

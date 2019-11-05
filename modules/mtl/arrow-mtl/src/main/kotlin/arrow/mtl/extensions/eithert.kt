@@ -43,122 +43,122 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface EitherTFunctor<F, L> : Functor<EitherTPartialOf<F, L>> {
+interface EitherTFunctor<L, F> : Functor<EitherTPartialOf<L, F>> {
 
   fun FF(): Functor<F>
 
-  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.map(f: (A) -> B): EitherT<L, F, B> =
     fix().map(FF(), f)
 }
 
 @extension
 @undocumented
-interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+interface EitherTApply<L, F> : Apply<EitherTPartialOf<L, F>>, EitherTFunctor<L, F> {
 
   fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 
-  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.map(f: (A) -> B): EitherT<L, F, B> =
     fix().map(AF(), f)
 
-  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.ap(ff: EitherTOf<L, F, (A) -> B>): EitherT<L, F, B> =
     fix().ap(AF(), ff)
 }
 
 @extension
 @undocumented
-interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+interface EitherTApplicative<L, F> : Applicative<EitherTPartialOf<L, F>>, EitherTFunctor<L, F> {
 
   fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 
-  override fun <A> just(a: A): EitherT<F, L, A> =
+  override fun <A> just(a: A): EitherT<L, F, A> =
     EitherT.just(AF(), a)
 
-  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.map(f: (A) -> B): EitherT<L, F, B> =
     fix().map(AF(), f)
 
-  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.ap(ff: EitherTOf<L, F, (A) -> B>): EitherT<L, F, B> =
     fix().ap(AF(), ff)
 }
 
 @extension
 @undocumented
-interface EitherTMonad<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicative<F, L> {
+interface EitherTMonad<L, F> : Monad<EitherTPartialOf<L, F>>, EitherTApplicative<L, F> {
 
   fun MF(): Monad<F>
 
   override fun AF(): Applicative<F> = MF()
 
-  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.map(f: (A) -> B): EitherT<L, F, B> =
     fix().map(MF(), f)
 
-  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.ap(ff: EitherTOf<L, F, (A) -> B>): EitherT<L, F, B> =
     fix().ap(MF(), ff)
 
-  override fun <A, B> EitherTOf<F, L, A>.flatMap(f: (A) -> EitherTOf<F, L, B>): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.flatMap(f: (A) -> EitherTOf<L, F, B>): EitherT<L, F, B> =
     fix().flatMap(MF(), f)
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<L, F, Either<A, B>>): EitherT<L, F, B> =
     EitherT.tailRecM(MF(), a, f)
 }
 
 @extension
 @undocumented
-interface EitherTApplicativeError<F, L> : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicative<F, L> {
+interface EitherTApplicativeError<L, F> : ApplicativeError<EitherTPartialOf<L, F>, L>, EitherTApplicative<L, F> {
 
   fun AE(): ApplicativeError<F, L>
 
   override fun AF(): Applicative<F> = AE()
 
-  override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
+  override fun <A> EitherTOf<L, F, A>.handleErrorWith(f: (L) -> EitherTOf<L, F, A>): EitherT<L, F, A> = AE().run {
     EitherT(value().handleErrorWith { l -> f(l).value() })
   }
 
-  override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
+  override fun <A> raiseError(e: L): EitherT<L, F, A> = AE().run {
     EitherT.liftF(this, raiseError(e))
   }
 }
 
 @extension
 @undocumented
-interface EitherTMonadError<F, L> : MonadError<EitherTPartialOf<F, L>, L>, EitherTApplicativeError<F, L>, EitherTMonad<F, L> {
+interface EitherTMonadError<L, F> : MonadError<EitherTPartialOf<L, F>, L>, EitherTApplicativeError<L, F>, EitherTMonad<L, F> {
   override fun MF(): Monad<F>
   override fun AE(): ApplicativeError<F, L>
   override fun AF(): Applicative<F> = MF()
 }
 
-fun <F, L> EitherT.Companion.monadError(ME: MonadError<F, L>): MonadError<EitherTPartialOf<F, L>, L> =
-  object : EitherTMonadError<F, L> {
+fun <L, F> EitherT.Companion.monadError(ME: MonadError<F, L>): MonadError<EitherTPartialOf<L, F>, L> =
+  object : EitherTMonadError<L, F> {
     override fun MF(): Monad<F> = ME
     override fun AE(): ApplicativeError<F, L> = ME
   }
 
 @extension
 @undocumented
-interface EitherTMonadThrow<F> : MonadThrow<EitherTPartialOf<F, Throwable>>, EitherTMonadError<F, Throwable> {
+interface EitherTMonadThrow<F> : MonadThrow<EitherTPartialOf<Throwable, F>>, EitherTMonadError<Throwable, F> {
   override fun MF(): Monad<F>
   override fun AE(): ApplicativeError<F, Throwable>
 }
 
 @extension
 @undocumented
-interface EitherTFoldable<F, L> : Foldable<EitherTPartialOf<F, L>> {
+interface EitherTFoldable<L, F> : Foldable<EitherTPartialOf<L, F>> {
 
   fun FFF(): Foldable<F>
 
-  override fun <B, C> EitherTOf<F, L, B>.foldLeft(b: C, f: (C, B) -> C): C =
+  override fun <B, C> EitherTOf<L, F, B>.foldLeft(b: C, f: (C, B) -> C): C =
     fix().foldLeft(FFF(), b, f)
 
-  override fun <B, C> EitherTOf<F, L, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  override fun <B, C> EitherTOf<L, F, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().foldRight(FFF(), lb, f)
 }
 
 @extension
 @undocumented
-interface EitherTTraverse<F, L> : Traverse<EitherTPartialOf<F, L>>, EitherTFunctor<F, L>, EitherTFoldable<F, L> {
+interface EitherTTraverse<L, F> : Traverse<EitherTPartialOf<L, F>>, EitherTFunctor<L, F>, EitherTFoldable<L, F> {
 
   fun TF(): Traverse<F>
 
@@ -166,28 +166,28 @@ interface EitherTTraverse<F, L> : Traverse<EitherTPartialOf<F, L>>, EitherTFunct
 
   override fun FFF(): Foldable<F> = TF()
 
-  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+  override fun <A, B> EitherTOf<L, F, A>.map(f: (A) -> B): EitherT<L, F, B> =
     fix().map(TF(), f)
 
-  override fun <G, B, C> EitherTOf<F, L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, L, C>> =
+  override fun <G, B, C> EitherTOf<L, F, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<L, F, C>> =
     fix().traverse(TF(), AP, f)
 }
 
 @extension
 @undocumented
-interface EitherTSemigroupK<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
+interface EitherTSemigroupK<L, F> : SemigroupK<EitherTPartialOf<L, F>> {
   fun MF(): Monad<F>
 
-  override fun <A> EitherTOf<F, L, A>.combineK(y: EitherTOf<F, L, A>): EitherT<F, L, A> =
+  override fun <A> EitherTOf<L, F, A>.combineK(y: EitherTOf<L, F, A>): EitherT<L, F, A> =
     fix().combineK(MF(), y)
 }
 
 @extension
 @undocumented
-interface EitherTContravariant<F, L> : Contravariant<EitherTPartialOf<F, L>> {
+interface EitherTContravariant<L, F> : Contravariant<EitherTPartialOf<L, F>> {
   fun CF(): Contravariant<F>
 
-  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.contramap(f: (B) -> A): Kind<EitherTPartialOf<F, L>, B> =
+  override fun <A, B> Kind<EitherTPartialOf<L, F>, A>.contramap(f: (B) -> A): Kind<EitherTPartialOf<L, F>, B> =
     EitherT(
       CF().run { value().contramap<Either<L, A>, Either<L, B>> { it.map(f) } }
     )
@@ -195,11 +195,11 @@ interface EitherTContravariant<F, L> : Contravariant<EitherTPartialOf<F, L>> {
 
 @extension
 @undocumented
-interface EitherTDivide<F, L> : Divide<EitherTPartialOf<F, L>>, EitherTContravariant<F, L> {
+interface EitherTDivide<L, F> : Divide<EitherTPartialOf<L, F>>, EitherTContravariant<L, F> {
   fun DF(): Divide<F>
   override fun CF(): Contravariant<F> = DF()
 
-  override fun <A, B, Z> divide(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Tuple2<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+  override fun <A, B, Z> divide(fa: Kind<EitherTPartialOf<L, F>, A>, fb: Kind<EitherTPartialOf<L, F>, B>, f: (Z) -> Tuple2<A, B>): Kind<EitherTPartialOf<L, F>, Z> =
     EitherT(
       DF().divide(fa.value(), fb.value()) { either ->
         either.fold({ it.left() toT it.left() }, {
@@ -212,12 +212,12 @@ interface EitherTDivide<F, L> : Divide<EitherTPartialOf<F, L>>, EitherTContravar
 
 @extension
 @undocumented
-interface EitherTDivisibleInstance<F, L> : Divisible<EitherTPartialOf<F, L>>, EitherTDivide<F, L> {
+interface EitherTDivisibleInstance<L, F> : Divisible<EitherTPartialOf<L, F>>, EitherTDivide<L, F> {
 
   fun DFF(): Divisible<F>
   override fun DF(): Divide<F> = DFF()
 
-  override fun <A> conquer(): Kind<EitherTPartialOf<F, L>, A> =
+  override fun <A> conquer(): Kind<EitherTPartialOf<L, F>, A> =
     EitherT(
       DFF().conquer()
     )
@@ -225,12 +225,12 @@ interface EitherTDivisibleInstance<F, L> : Divisible<EitherTPartialOf<F, L>>, Ei
 
 @extension
 @undocumented
-interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, EitherTDivisibleInstance<F, L> {
+interface EitherTDecidableInstance<L, F> : Decidable<EitherTPartialOf<L, F>>, EitherTDivisibleInstance<L, F> {
 
   fun DFFF(): Decidable<F>
   override fun DFF(): Divisible<F> = DFFF()
 
-  override fun <A, B, Z> choose(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Either<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+  override fun <A, B, Z> choose(fa: Kind<EitherTPartialOf<L, F>, A>, fb: Kind<EitherTPartialOf<L, F>, B>, f: (Z) -> Either<A, B>): Kind<EitherTPartialOf<L, F>, Z> =
     EitherT(
       DFFF().choose(fa.value(), fb.value()) { either ->
         either.map(f).fold({ left ->
@@ -246,46 +246,46 @@ interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, Ei
     )
 }
 
-fun <F, A, B, C> EitherTOf<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
+fun <A, F, B, C> EitherTOf<A, F, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
   FF.compose(Either.foldable<A>()).foldLC(value(), b, f)
 
-fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
+fun <A, F, B, C> EitherTOf<A, F, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
   value().foldRC(lb, f)
 }
 
-fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
+fun <A, F, B, G, C> EitherTOf<A, F, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<A, F, C>> {
   val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse<A>()).run { value().traverseC(f, GA) }
-  val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<F, A, C> = { nested -> EitherT(FF.run { nested.unnest().map { it.fix() } }) }
+  val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<A, F, C> = { nested -> EitherT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
 
-fun <F, G, A, B> EitherTOf<F, A, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<F, A, B>> =
+fun <A, F, G, B> EitherTOf<A, F, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<A, F, B>> =
   traverse(FF, GA, ::identity)
 
-fun <F, L> EitherT.Companion.applicativeError(MF: Monad<F>): ApplicativeError<EitherTPartialOf<F, L>, L> =
-  object : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicative<F, L> {
+fun <L, F> EitherT.Companion.applicativeError(MF: Monad<F>): ApplicativeError<EitherTPartialOf<L, F>, L> =
+  object : ApplicativeError<EitherTPartialOf<L, F>, L>, EitherTApplicative<L, F> {
 
     override fun AF(): Applicative<F> = MF
 
-    override fun <A> raiseError(e: L): EitherTOf<F, L, A> =
+    override fun <A> raiseError(e: L): EitherTOf<L, F, A> =
       EitherT(MF.just(Left(e)))
 
-    override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> =
+    override fun <A> EitherTOf<L, F, A>.handleErrorWith(f: (L) -> EitherTOf<L, F, A>): EitherT<L, F, A> =
       handleErrorWith(this, f, MF)
   }
 
-fun <F, L> EitherT.Companion.monadError(MF: Monad<F>): MonadError<EitherTPartialOf<F, L>, L> =
-  object : MonadError<EitherTPartialOf<F, L>, L>, EitherTMonad<F, L> {
+fun <L, F> EitherT.Companion.monadError(MF: Monad<F>): MonadError<EitherTPartialOf<L, F>, L> =
+  object : MonadError<EitherTPartialOf<L, F>, L>, EitherTMonad<L, F> {
     override fun MF(): Monad<F> = MF
 
-    override fun <A> raiseError(e: L): EitherTOf<F, L, A> =
+    override fun <A> raiseError(e: L): EitherTOf<L, F, A> =
       EitherT(MF.just(Left(e)))
 
-    override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> =
+    override fun <A> EitherTOf<L, F, A>.handleErrorWith(f: (L) -> EitherTOf<L, F, A>): EitherT<L, F, A> =
       handleErrorWith(this, f, MF())
   }
 
-private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTOf<F, L, A>, MF: Monad<F>): EitherT<F, L, A> =
+private fun <L, F, A> handleErrorWith(fa: EitherTOf<L, F, A>, f: (L) -> EitherTOf<L, F, A>, MF: Monad<F>): EitherT<L, F, A> =
   MF.run {
     EitherT(fa.value().flatMap {
       when (it) {
@@ -295,5 +295,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
+fun <R, F> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<Throwable, F>>.() -> R): EitherT<Throwable, F, R> =
   EitherT.monadThrow(M, M).fx.monadThrow(c).fix()

@@ -39,7 +39,7 @@ import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->
+  fun <A> EQ(): Eq<Kind<EitherTPartialOf<Throwable, ForIO>, A>> = Eq { a, b ->
     a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
   }
 
@@ -47,15 +47,15 @@ class EitherTTest : UnitSpec() {
 
     testLaws(
       DivisibleLaws.laws(
-        EitherT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        EitherT.divisible<Int, ConstPartialOf<Int>>(Const.divisible(Int.monoid())),
         { EitherT(it.const()) },
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
       AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
+      TraverseLaws.laws(EitherT.traverse<Int, ForId>(Id.traverse()), EitherT.functor<Int, ForId>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
       SemigroupKLaws.laws(
-        EitherT.semigroupK<ForId, Int>(Id.monad()),
-        EitherT.applicative<ForId, Int>(Id.monad()),
+        EitherT.semigroupK<Int, ForId>(Id.monad()),
+        EitherT.applicative<Int, ForId>(Id.monad()),
         Eq.any())
     )
 

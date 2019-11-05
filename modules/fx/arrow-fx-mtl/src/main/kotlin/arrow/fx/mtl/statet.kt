@@ -25,19 +25,19 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, StateTMonadThrow<F, S> {
+interface StateTBracket<S, F> : Bracket<StateTPartialOf<S, F>, Throwable>, StateTMonadThrow<S, F> {
 
   fun MD(): MonadDefer<F>
 
   override fun ME(): MonadError<F, Throwable> = MD()
 
-  override fun <A, B> StateTOf<F, S, A>.bracketCase(
-    release: (A, ExitCase<Throwable>) -> StateTOf<F, S, Unit>,
-    use: (A) -> StateTOf<F, S, B>
-  ): StateT<F, S, B> = MD().run {
+  override fun <A, B> StateTOf<S, F, A>.bracketCase(
+    release: (A, ExitCase<Throwable>) -> StateTOf<S, F, Unit>,
+    use: (A) -> StateTOf<S, F, B>
+  ): StateT<S, F, B> = MD().run {
 
-    StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref(this, None)).flatMap { ref ->
-      StateT<F, S, B>(this) { startS ->
+    StateT.liftF<S, F, Ref<F, Option<S>>>(this, Ref(this, None)).flatMap { ref ->
+      StateT<S, F, B>(this) { startS ->
         runM(this, startS).bracketCase(use = { (s, a) ->
           use(a).runM(this, s).flatMap { sa ->
             ref.set(Some(sa.a)).map { sa }
@@ -60,35 +60,35 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
 
 @extension
 @undocumented
-interface StateTMonadDefer<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBracket<F, S> {
+interface StateTMonadDefer<S, F> : MonadDefer<StateTPartialOf<S, F>>, StateTBracket<S, F> {
 
   override fun MD(): MonadDefer<F>
 
-  override fun <A> defer(fa: () -> StateTOf<F, S, A>): StateT<F, S, A> = MD().run {
+  override fun <A> defer(fa: () -> StateTOf<S, F, A>): StateT<S, F, A> = MD().run {
     StateT(this) { s -> defer { fa().runM(this, s) } }
   }
 }
 
 @extension
 @undocumented
-interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDefer<F, S> {
+interface StateTAsyncInstane<S, F> : Async<StateTPartialOf<S, F>>, StateTMonadDefer<S, F> {
 
   fun AS(): Async<F>
 
   override fun MD(): MonadDefer<F> = AS()
 
-  override fun <A> async(fa: Proc<A>): StateT<F, S, A> = AS().run {
+  override fun <A> async(fa: Proc<A>): StateT<S, F, A> = AS().run {
     StateT.liftF(this, async(fa))
   }
 
-  override fun <A> asyncF(k: ProcF<StateTPartialOf<F, S>, A>): StateT<F, S, A> = AS().run {
+  override fun <A> asyncF(k: ProcF<StateTPartialOf<S, F>, A>): StateT<S, F, A> = AS().run {
     StateT.invoke(this) { s ->
       asyncF<A> { cb -> k(cb).fix().runA(this, s) }
         .map { Tuple2(s, it) }
     }
   }
 
-  override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {
+  override fun <A> StateTOf<S, F, A>.continueOn(ctx: CoroutineContext): StateT<S, F, A> = AS().run {
     StateT(this) { s -> runM(this, s).continueOn(ctx) }
   }
 }

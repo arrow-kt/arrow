@@ -30,25 +30,25 @@ import arrow.typeclasses.Eq
 
 class StateTTests : UnitSpec() {
 
-  val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
+  val M: StateTMonadState<Int, ForTry> = StateT.monadState(Try.monad())
 
-  val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
+  val EQ: Eq<StateTOf<Int, ForTry, Int>> = Eq { a, b ->
     a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)
   }
 
-  val EQ_UNIT: Eq<StateTOf<ForTry, Int, Unit>> = Eq { a, b ->
+  val EQ_UNIT: Eq<StateTOf<Int, ForTry, Unit>> = Eq { a, b ->
     a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)
   }
 
-  val EQ_LIST: Eq<Kind<StateTPartialOf<ForListK, Int>, Int>> = Eq { a, b ->
+  val EQ_LIST: Eq<Kind<StateTPartialOf<Int, ForListK>, Int>> = Eq { a, b ->
     a.runM(ListK.monad(), 1) == b.runM(ListK.monad(), 1)
   }
 
-  private fun IOEQ(): Eq<StateTOf<ForIO, Int, Int>> = Eq { a, b ->
+  private fun IOEQ(): Eq<StateTOf<Int, ForIO, Int>> = Eq { a, b ->
     a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
   }
 
-  private fun IOEitherEQ(): Eq<StateTOf<ForIO, Int, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun IOEitherEQ(): Eq<StateTOf<Int, ForIO, Either<Throwable, Int>>> = Eq { a, b ->
     a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
   }
 
@@ -56,12 +56,12 @@ class StateTTests : UnitSpec() {
 
     testLaws(
       MonadStateLaws.laws(M, EQ, EQ_UNIT),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEitherEQ()),
+      AsyncLaws.laws<StateTPartialOf<Int, ForIO>>(StateT.async(IO.async()), IOEQ(), IOEitherEQ()),
       SemigroupKLaws.laws(
-        StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
-        StateT.applicative<ForListK, Int>(ListK.monad()),
+        StateT.semigroupK<Int, ForListK>(ListK.monad(), ListK.semigroupK()),
+        StateT.applicative<Int, ForListK>(ListK.monad()),
         EQ_LIST),
-      MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
+      MonadCombineLaws.laws(StateT.monadCombine<Int, ForListK>(ListK.monadCombine()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },
         { StateT.liftF(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
         EQ_LIST)

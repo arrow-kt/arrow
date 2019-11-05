@@ -128,9 +128,9 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
 
   fun <B> subflatMap(FF: Functor<F>, f: (A) -> OptionOf<B>): OptionT<F, B> = transform(FF) { it.flatMap(f) }
 
-  fun <R> toLeft(FF: Functor<F>, default: () -> R): EitherT<F, A, R> =
+  fun <R> toLeft(FF: Functor<F>, default: () -> R): EitherT<A, F, R> =
     EitherT(cata(FF, { Right(default()) }, { Left(it) }))
 
-  fun <L> toRight(FF: Functor<F>, default: () -> L): EitherT<F, L, A> =
+  fun <L> toRight(FF: Functor<F>, default: () -> L): EitherT<L, F, A> =
     EitherT(cata(FF, { Left(default()) }, { Right(it) }))
 }

@@ -24,14 +24,14 @@ typealias ForReader = ForReaderT
  *
  * @see ReaderTKind
  */
-typealias ReaderOf<D, A> = ReaderTOf<ForId, D, A>
+typealias ReaderOf<D, A> = ReaderTOf<D, ForId, A>
 
 /**
  * Alias to partially apply type parameter [D] to [Reader].
  *
  * @see ReaderTKindPartial
  */
-typealias ReaderPartialOf<D> = ReaderTPartialOf<ForId, D>
+typealias ReaderPartialOf<D> = ReaderTPartialOf<D, ForId>
 
 /**
  * [Reader] represents a computation that has a dependency on [D].
@@ -41,7 +41,7 @@ typealias ReaderPartialOf<D> = ReaderTPartialOf<ForId, D>
  * @param A resulting type of the computation.
  * @see ReaderT
  */
-typealias Reader<D, A> = ReaderT<ForId, D, A>
+typealias Reader<D, A> = ReaderT<D, ForId, A>
 
 /**
  * Constructor for [Reader].

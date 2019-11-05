@@ -11,12 +11,12 @@ import arrow.typeclasses.internal.IdBimonad
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.
  */
-typealias StateFun<S, A> = StateTFun<ForId, S, A>
+typealias StateFun<S, A> = StateTFun<S, ForId, A>
 
 /**
  * Alias that represents wrapped stateful computation in context `Id`.
  */
-typealias StateFunOf<S, A> = StateTFunOf<ForId, S, A>
+typealias StateFunOf<S, A> = StateTFunOf<S, ForId, A>
 
 /**
  * Alias for StateHK
@@ -26,12 +26,12 @@ typealias ForState = ForStateT
 /**
  * Alias for StateKind
  */
-typealias StateOf<S, A> = StateTOf<ForId, S, A>
+typealias StateOf<S, A> = StateTOf<S, ForId, A>
 
 /**
  * Alias to partially apply type parameters [S] to [State]
  */
-typealias StatePartialOf<S> = StateTPartialOf<ForId, S>
+typealias StatePartialOf<S> = StateTPartialOf<S, ForId>
 
 /**
  * `State<S, A>` is a stateful computation that yields a value of type `A`.
@@ -39,7 +39,7 @@ typealias StatePartialOf<S> = StateTPartialOf<ForId, S>
  * @param S the state we are preforming computation upon.
  * @param A current value of computation.
  */
-typealias State<S, A> = StateT<ForId, S, A>
+typealias State<S, A> = StateT<S, ForId, A>
 
 /**
  * Constructor for State.
@@ -69,21 +69,21 @@ fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad) { t
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
+fun <S, A> StateT<S, ForId, A>.run(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
 
 /**
  * Alias for [StateT.runA] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.runA(initial: S): A = run(initial).b
+fun <S, A> StateT<S, ForId, A>.runA(initial: S): A = run(initial).b
 
 /**
  * Alias for [StateT.runS] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = run(initial).a
+fun <S, A> StateT<S, ForId, A>.runS(initial: S): S = run(initial).a
 
 /**
  * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.
