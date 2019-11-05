@@ -22,4 +22,9 @@ interface Applicative<F> : Apply<F> {
   fun <A> Kind<F, A>.replicate(n: Int): Kind<F, List<A>> =
     if (n <= 0) just(emptyList())
     else map(this, replicate(n - 1)) { (a, xs) -> listOf(a) + xs }
+
+  fun <A> Kind<F, A>.replicate(n: Int, MA: Monoid<A>): Kind<F, A> = MA.run {
+    if (n <= 0) just(empty())
+    else map(this@replicate, replicate(n, MA)) { (a, xs) -> a + xs }
+  }
 }
