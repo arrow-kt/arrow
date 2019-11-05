@@ -62,7 +62,7 @@ class KleisliTest : UnitSpec() {
 
     testLaws(
       AlternativeLaws.laws(
-        Kleisli.alternative<ForOption, Int>(Option.alternative()),
+        Kleisli.alternative<Int, ForOption>(Option.alternative()),
         { i -> Kleisli { i.some() } },
         { i -> Kleisli { { j: Int -> i + j }.some() } },
         Eq { a, b -> a.fix().run(0) == b.fix().run(0) }
