@@ -10,11 +10,11 @@ permalink: /docs/datatypes/intro/
 beginner
 
 A datatype is a an abstraction that encapsulates one reusable coding pattern.
-These solutions have a canonical implementation that is generalised for all possible uses.
+These solutions have a canonical implementation that is generalized for all possible uses.
 
 A datatype is implemented by a data class, or a sealed hierarchy of data classes and objects.
-These datatypes are generalised by having one or several generic parameters,
-and to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) they implement the interface [`Kind`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
+These datatypes are generalized by having one or several generic parameters,
+and, to become a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}), they implement the interface [`Kind`]({{ '/docs/patterns/glossary/' | relative_url }}) for these generic parameters.
 Datatypes work over themselves, never directly over the values defined by its generic parameters.
 
 #### Example
@@ -22,23 +22,23 @@ Datatypes work over themselves, never directly over the values defined by its ge
 `Option<A>` is a datatype that represents absence.
 It has one generic parameter `A`, representing the type of the values that `Option` may contain.
 `Option` can be specialized for any type `A` because this type does not affect its behavior.
-`Option` behaves the same for `Int`, `String` or `DomainUserClass`.
-To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A` it implements `OptionOf<A>`, which is a typealias of `Kind<ForOption, A>`.
+`Option` behaves the same for `Int`, `String`, or `DomainUserClass`.
+To indicate that `Option` is a [type constructor]({{ '/docs/patterns/glossary/' | relative_url }}) for all values of `A`, it implements `OptionOf<A>`, which is a typealias of `Kind<ForOption, A>`.
 
-The implementation of `Option<A>` is a sealed class with two subtypes: an object `None` and a data class `Some<A>`.
+The implementation of `Option<A>` is a sealed class with two subtypes: An object `None` and a data class `Some<A>`.
 `Some<A>` represents presence of the value and thus it has one field containing it, and `None` represents absence.
 
 All operations over `Option` have to take into account absence or presence,
 so there is a function `fold()` that takes a continuation function per case, `() -> B` and `(A) -> B`.
 The implementation of `fold()` is a simple `when` that checks whether `this` is a `None` or a `Some<A>`, and it applies the appropriate continuation function.
 
-All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int` or absence is up to the functions passed by the user.
+All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int`, or absence is up to the functions passed by the user.
 
 Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt) and [other datatypes](https://github.com/arrow-kt/arrow/tree/master/modules/core/arrow-core-data/src/main/kotlin/arrow/core) to discover their behavior!
 
 ### Datatypes in Arrow
 
-We will list all the datatypes available in arrow by the module they belong to, and a short description of the coding pattern they abstract.
+We will list all the datatypes available in Arrow by the module they belong to, and a short description of the coding pattern they abstract.
 
 #### Core
 
@@ -57,13 +57,13 @@ so they are always required.
 
 #### Data
 
-Data contains the bulk of the datatypes provided by Arrow. We can separate them onto several categories.
+Data contains the bulk of the datatypes provided by Arrow. We can separate them into several categories.
 
 ##### General use
 
 - [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
 
-- [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
+- [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: One, two, or both
 
 - [`Const`]({{ '/docs/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 
@@ -124,17 +124,17 @@ TODO
 
 - [`Coreader`]
 
-- [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+- [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype that holds an initial state and a function for extracting a representation of it.
 
-- [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+- [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype that holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
-- [`Sum`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+- [`Sum`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype that holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
-- [`Day`]({{ '/docs/arrow/data/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
+- [`Day`]({{ '/docs/arrow/data/day/' | relative_url }}) - a datatype that holds two comonads which evolve independently.
 
 #### Effects
 
-All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions.
+All effects are different implementations of the same abstraction: Lazy execution of code that can move to other threads and cause exceptions.
 They are more general than the other datatypes as they combine the abstractions of several of them.
 
 - [`IO`]({{ '/docs/effects/io/' | relative_url }})
