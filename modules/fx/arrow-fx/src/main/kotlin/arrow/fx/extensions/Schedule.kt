@@ -1,12 +1,17 @@
-package arrow.effects.extensions
+package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.effects.ForSchedule
-import arrow.effects.SchedulePartialOf
-import arrow.effects.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.fx.ForSchedule
+import arrow.fx.SchedulePartialOf
+import arrow.fx.fix
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 
 @extension
 interface ScheduleFunctor<F, State, Input> : Functor<SchedulePartialOf<F, State, Input>> {
