@@ -22,7 +22,7 @@ import arrow.core.*
 listOf(1, 2, 3).k()
 ```
 
-For most use cases you will never use `ListK` directly but `List` directly with the extension functions that Arrow projects over it.
+For most use cases, you will never use `ListK` directly, but rather `List` directly with the extension functions that Arrow projects over it.
 
 ListK implements operators from many useful typeclasses.
 
@@ -64,7 +64,7 @@ val requests = listOf(Some(Math.random()), andAnother(), andAnother())
 requests.sequence(Option.applicative())
 ```
 
-If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [`Foldable`](/docs/arrow/typeclasses/foldable).
+If you want to aggregate the elements of a list into any other value, you can use `foldLeft` and `foldRight` from [`Foldable`](/docs/arrow/typeclasses/foldable).
 
 Folding a list into a new value, `String` in this case, starting with an initial value and a combine function:
 
