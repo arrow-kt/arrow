@@ -12,9 +12,9 @@ video: vAdhMJWnBUI
 {:.intermediate}
 intermediate
 
-Kleisli enables composition of functions that return a monadic value, for instance, an `Option<Int>` or an `Either<String, Int>`, without having functions take an `Option` or `Either` as a parameter.
+Kleisli enables the composition of functions that return a monadic value, for instance, an `Option<Int>` or an `Either<String, Int>`, without having functions take an `Option` or `Either` as a parameter.
 
-For example, we have the function `String.toInt()` which can throw a `NumberFormatException` and we want to do a safe conversion like this:
+For example, we have the function `String.toInt()` that can throw a `NumberFormatException`, and we want to do a safe conversion like this:
 
 ```kotlin:ank:silent
 import arrow.core.*
@@ -29,7 +29,7 @@ fun String.safeToInt(): Option<Int> {
 }
 ```
 
-Then when we use the function we have an `Option<Int>`
+Then, when we use the function, we have an `Option<Int>`
 
 ```kotlin:ank
 "a".safeToInt()
@@ -41,14 +41,14 @@ Then when we use the function we have an `Option<Int>`
 ## Functions
 
 #### Local
-This function allows doing a conversion inside the Kleisli to the original input value before the Kleisli will be executed, creating a Kleisli with the input type of the conversion
+This function allows conversions inside the Kleisli to the original input value before the Kleisli will be executed, creating a Kleisli with the input type of the conversion
 
 ```kotlin:ank
 optionIntKleisli.local { optStr :Option<String> -> optStr.getOrElse { "0" } }.run(None)
 ```
 
 #### Ap
-The `ap` function transform the `Kleisli` into another `Kleisli` with a function as a output value.
+The `ap` function transforms the `Kleisli` into another `Kleisli` with a function as a output value.
 
 ```kotlin:ank
 import arrow.mtl.fix
@@ -65,7 +65,7 @@ optionIntKleisli.ap(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
 ```
 
 #### Map
-The `map` function transform the `Kleisli` output value.
+The `map` function transforms the `Kleisli` output value.
 
 ```kotlin:ank
 optionIntKleisli.map(Option.applicative()) { output -> output + 1 }.fix().run("1")
