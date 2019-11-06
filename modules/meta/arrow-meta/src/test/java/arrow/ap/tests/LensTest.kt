@@ -38,7 +38,5 @@ class LensTest : APTest("arrow.ap.objects.lens") {
       destFile = "LensSecondaryConstructor.kt",
       processor = OpticsProcessor()
     ))
-
   }
-
 }

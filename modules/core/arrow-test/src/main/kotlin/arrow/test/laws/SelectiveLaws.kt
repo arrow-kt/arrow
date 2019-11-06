@@ -1,7 +1,12 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Right
+import arrow.core.Tuple2
+import arrow.core.identity
+import arrow.core.right
+import arrow.core.toT
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
@@ -42,7 +47,6 @@ object SelectiveLaws {
       fe.select(sequenceRight(f, g)).equalUnderTheLaw(sequenceRight(fe.select(f), fe.select(g)), EQ)
     }
 
-
   fun <F> Selective<F>.associativity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int(),
       Gen.functionAToB<Int, Int>(Gen.int()),
@@ -76,5 +80,4 @@ object SelectiveLaws {
       if (bool) just(bool).ifS(just(lInt), just(rInt)).equalUnderTheLaw(just(lInt), EQ)
       else just(bool).ifS(just(lInt), just(rInt)).equalUnderTheLaw(just(rInt), EQ)
     }
-
 }

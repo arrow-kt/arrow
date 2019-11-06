@@ -2,9 +2,8 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(":arrow-core-extensions")
-    compile project(":arrow-extras-extensions")
-    compile project(":arrow-effects-io-extensions")
+    compile project(":arrow-core")
+    compile project(":arrow-fx")
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$ankKotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$ankKotlinVersion"

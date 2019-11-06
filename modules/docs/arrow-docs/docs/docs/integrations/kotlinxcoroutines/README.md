@@ -9,10 +9,10 @@ As of Arrow 0.9.0 we have deprecated support for `Deferred` from `kotlinx.corout
 But, we have not given up support for suspend functions! If you would like to use `suspend fun` you can do so using [`arrow-fx`]({{ '/docs/effects/fx/' | relative_url }}):
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -21,7 +21,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }

@@ -1,9 +1,9 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.data.ListK
-import arrow.data.NonEmptyList
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.ListK
+import arrow.core.NonEmptyList
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.optics.extensions.nonemptylist.each.each
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
@@ -15,10 +15,7 @@ import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NonEmptyListInstanceTest : UnitSpec() {
 
   init {
@@ -57,6 +54,5 @@ class NonEmptyListInstanceTest : UnitSpec() {
         EQA = Eq.any()
       )
     )
-
   }
 }

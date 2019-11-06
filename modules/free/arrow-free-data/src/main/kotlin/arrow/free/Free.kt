@@ -3,9 +3,12 @@ package arrow.free
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
 fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
@@ -21,11 +24,12 @@ sealed class Free<S, out A> : FreeOf<S, A> {
 
     fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = just<S, Unit>(Unit).flatMap { _ -> value() }
 
+    fun <S, A> roll(value: Kind<S, Kind<FreePartialOf<S>, A>>): Free<S, A> = liftF(value).flatMap { it.fix() }
+
     internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
       object : FunctionK<F, FreePartialOf<F>> {
         override fun <A> invoke(fa: Kind<F, A>): Free<F, A> =
           liftF(fa)
-
       }
 
     internal fun <F> applicativeF(applicative: Applicative<FreePartialOf<F>>): Applicative<FreePartialOf<F>> =
@@ -53,6 +57,38 @@ sealed class Free<S, out A> : FreeOf<S, A> {
     override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
       FlatMapped(c.transform(::identity, fs)) { c.flatMap { fm(it) }.transform(f, fs) }
   }
+
+  /**
+   * A combination of step and fold
+   */
+  @Suppress("UNCHECKED_CAST")
+  inline fun <B, C> foldStep(
+    onPure: (A) -> B,
+    onSuspend: (Kind<S, A>) -> B,
+    onFlatMapped: (Kind<S, C>, (C) -> Free<S, A>) -> B
+  ): B {
+    return when (val x = this.step()) {
+      is Pure<S, A> -> onPure(x.a)
+      is Suspend<S, A> -> onSuspend(x.a)
+      is FlatMapped<S, A, *> -> onFlatMapped(x.c as Kind<S, C>, x.fm as (C) -> Free<S, A>)
+    }
+  }
+
+  /**
+   * Evaluate a single layer of the free monad
+   */
+  @Suppress("UNCHECKED_CAST")
+  fun resume(SF: Functor<S>): Either<Kind<S, Free<S, A>>, A> = when (this) {
+    is Pure<S, A> -> Right(a)
+    is Suspend<S, A> -> Left(SF.run { map { Pure<S, A>(it) } } as Kind<S, Free<S, A>>)
+    is FlatMapped<S, A, *> -> when (c) {
+      is Pure -> (fm as (A) -> Free<S, A>)(c.a as A).resume(SF)
+      is Suspend -> Left(SF.run { map { fm } }) as Either<Kind<S, Free<S, A>>, A>
+      is FlatMapped<S, *, *> -> c.flatMap { (fm as (A) -> Free<S, A>)(it as A).flatMap(fm as (A) -> Free<S, A>) }.resume(SF)
+    }
+  }
+
+  fun run(M: Monad<S>): Kind<S, A> = this.foldMap(FunctionK.id(), M)
 
   override fun toString(): String = "Free(...) : toString is not stack-safe"
 }
@@ -82,8 +118,7 @@ tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
 @Suppress("UNCHECKED_CAST")
 fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   MM.tailRecM(this@foldMap) {
-    val x = it.step()
-    when (x) {
+    when (val x = it.step()) {
       is Free.Pure<S, A> -> MM.just(Either.Right(x.a))
       is Free.Suspend<S, A> -> MM.run { f(x.a).map { Either.Right(it) } }
       is Free.FlatMapped<S, A, *> -> {
@@ -96,7 +131,5 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   }
 
 fun <S, A> A.free(): Free<S, A> = Free.just<S, A>(this)
-
-fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
 
 fun <F, A> FreeOf<F, A>.runK(M: Monad<F>): Kind<F, A> = this.fix().foldMap(FunctionK.id(), M)

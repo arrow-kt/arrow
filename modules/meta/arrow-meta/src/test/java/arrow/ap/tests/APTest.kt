@@ -52,7 +52,6 @@ abstract class APTest(
             .failed()
           assertThat(compilation)
             .hadErrorContaining(error)
-
         } else {
 
           assertThat(compilation)
@@ -65,7 +64,6 @@ abstract class APTest(
           val actual = File(actualFileLocation(targetDir)).listFiles()[0].readText()
 
           actual.replace("\r\n", "\n") shouldBe expected.replace("\r\n", "\n")
-
         }
       }
     }

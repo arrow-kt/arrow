@@ -17,7 +17,7 @@ If for a structure `S` the optionally focus `A` can be indexed by `I` then `Inde
 We can use that `Optional` to safely operate on that focus `S` i.e. operating on items in a `List` based on the index position.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.optics.typeclasses.*
 import arrow.optics.extensions.listk.index.*
 

@@ -7,8 +7,6 @@ trigger_map:
   workflow: deploy
 - push_branch: "*"
   workflow: build
-- pull_request_target_branch: "*"
-  workflow: build
 workflows:
   build:
     envs:

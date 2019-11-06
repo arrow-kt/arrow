@@ -31,6 +31,6 @@ class CallKindAdapterFactory : CallAdapter.Factory() {
 }
 
 private fun parseTypeName(type: Type) =
-  type.typeName
+  type.toString()
     .split(".")
     .last()

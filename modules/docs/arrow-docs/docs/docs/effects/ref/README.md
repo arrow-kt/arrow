@@ -18,10 +18,10 @@ There are several ways to construct a `Ref`, the easiest the `of` factory method
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
 ```kotlin:ank:silent
-import arrow.effects.*
-import arrow.effects.extensions.io.monadDefer.monadDefer
+import arrow.fx.*
+import arrow.fx.extensions.io.monadDefer.monadDefer
 
-val ioRef: IO<Ref<ForIO, Int>> = Ref.of(1, IO.monadDefer()).fix()
+val ioRef: IO<Ref<ForIO, Int>> = Ref(IO.monadDefer(), 1).fix()
 ```
 
 In case you want the side-effect to execute immediately and return the `Ref` instance you can use the `unsafe` function.
@@ -33,13 +33,13 @@ val unsafe: Ref<ForIO, Int> = Ref.unsafe(1, IO.monadDefer())
 As you can see above this fixed `Ref` to the type `Int` and initialised it with the value `1`.
 
 In the case you want to create a `Ref` for `F` but not fix the value type yet you can use the `Ref` constructor.
-This returns an interface `PartiallyAppliedRef` with a single method `of` to construct an actual `Ref`.
+This returns an interface `RefFactory` with a single method `later` to construct an actual `Ref`.
 
 ```kotlin:ank:silent
-val ref: PartiallyAppliedRef<ForIO> = Ref(IO.monadDefer())
+val ref: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
 
-val ref1: IO<Ref<ForIO, String>> = ref.of("Hello, World!").fix()
-val ref2: IO<Ref<ForIO, Int>> = ref.of(2).fix()
+val ref1: IO<Ref<ForIO, String>> = ref.just("Hello, World!").fix()
+val ref2: IO<Ref<ForIO, Int>> = ref.just(2).fix()
 ```
 
 ## Working with Ref
@@ -58,8 +58,8 @@ ioRef.flatMap { ref ->
 ```
 ```kotlin:ank
 import arrow.core.toT
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.map
+import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.extensions.io.monad.map
 
 ioRef.flatMap { ref ->
   ref.getAndSet(5).flatMap { old ->

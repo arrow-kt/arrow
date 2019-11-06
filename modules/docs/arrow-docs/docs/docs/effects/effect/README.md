@@ -20,9 +20,9 @@ TODO. Meanwhile you can find a short description in the [intro to typeclasses]({
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(Effect::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.effects.typeclasses.Effect)
+ank_macro_hierarchy(arrow.fx.typeclasses.Effect)

@@ -1,16 +1,19 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.data.ListK
-import arrow.data.NonEmptyList
-import arrow.data.k
 import arrow.core.ListExtensions
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.identity
+import arrow.core.ListK
+import arrow.core.NonEmptyList
+import arrow.core.k
 
 /**
  * [Optional] to safely operate on the head of a list
  */
 fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
-  partialFunction = case(List<A>::isNotEmpty toT List<A>::first),
+  getOption = { Option.fromNullable(it.firstOrNull()) },
   set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
 )
 
@@ -18,7 +21,7 @@ fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
  * [Optional] to safely operate on the tail of a list
  */
 fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
-  partialFunction = case(List<A>::isNotEmpty toT { list: List<A> -> list.drop(1) }),
+  getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
   set = { list, newTail ->
     list.firstOrNull()?.let {
       listOf(it) + newTail

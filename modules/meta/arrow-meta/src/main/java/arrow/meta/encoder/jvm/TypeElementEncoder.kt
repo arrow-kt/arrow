@@ -3,23 +3,42 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
-import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Parameter
+import arrow.meta.ast.Property
+import arrow.meta.ast.Tree
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
-import me.eugeniomarletti.kotlin.metadata.*
+import me.eugeniomarletti.kotlin.metadata.getterModality
+import me.eugeniomarletti.kotlin.metadata.getterVisibility
+import me.eugeniomarletti.kotlin.metadata.isDelegated
+import me.eugeniomarletti.kotlin.metadata.isPrimary
+import me.eugeniomarletti.kotlin.metadata.isSuspend
+import me.eugeniomarletti.kotlin.metadata.isVar
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
+import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
-import javax.lang.model.element.*
+import me.eugeniomarletti.kotlin.metadata.visibility
+import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.PackageElement
+import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
@@ -41,7 +60,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     when (this) {
       is PackageElement -> Either.Right(PackageName(qualifiedName.toString()))
       else -> Either.Left(
-        EncodingError.UnsupportedElementType("Unsupported ${this}, as ($kind) to PackageName", this)
+        EncodingError.UnsupportedElementType("Unsupported $this, as ($kind) to PackageName", this)
       )
     }
 
@@ -158,30 +177,30 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     } else this
 
   private fun Func.fixSuspendedParameters(): Func =
-      copy(
-        parameters = parameters.map { p ->
-          val t = p.type
-          val result = if (t is TypeName.ParameterizedType) t.asSuspendedContinuation()
-          else t
-          p.copy(type = result)
-        }
-      )
-
-  fun TypeName.ParameterizedType.isSimpleContinuation(): Boolean =
-    (rawType.fqName == Function1::class.qualifiedName && typeArguments.size == 2 && {
-      val maybeContinuation = typeArguments[0]
-      when {
-        maybeContinuation is TypeName.WildcardType &&
-          maybeContinuation.lowerBounds.isNotEmpty() -> {
-          val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
-          lowerBoundsContinuation is TypeName.ParameterizedType &&
-            lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
-        }
-        else -> false
+    copy(
+      parameters = parameters.map { p ->
+        val t = p.type
+        val result = if (t is TypeName.ParameterizedType) t.asSuspendedContinuation()
+        else t
+        p.copy(type = result)
       }
-    }())
+    )
 
-  fun TypeName.ParameterizedType.isReceiverContinuation(): Boolean =
+  fun TypeName.ParameterizedType.isContinuation(): Boolean =
+    (rawType.fqName == Function1::class.qualifiedName || rawType.fqName == Function2::class.qualifiedName && typeArguments.size >= 2) && continuationType() != null
+
+  fun TypeName.ParameterizedType.continuationType(): TypeName.ParameterizedType? {
+    val wildcard = typeArguments.filterIsInstance<TypeName.WildcardType>().find {
+      it.lowerBounds.isNotEmpty() && {
+        val lowerBoundsContinuation = it.lowerBounds[0]
+        lowerBoundsContinuation is TypeName.ParameterizedType &&
+          lowerBoundsContinuation.isContinuationType()
+      }()
+    }
+    return wildcard?.lowerBounds?.get(0) as? TypeName.ParameterizedType
+  }
+
+  fun TypeName.ParameterizedType.isMonadContinuation(): Boolean =
     rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 && {
       val maybeContinuation = typeArguments[1]
       when {
@@ -189,15 +208,18 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           maybeContinuation.lowerBounds.isNotEmpty() -> {
           val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
           lowerBoundsContinuation is TypeName.ParameterizedType &&
-            lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
+            lowerBoundsContinuation.isContinuationType()
         }
         else -> false
       }
-    }()
+    }() && (name.contains("Monad.*Continuation".toRegex()) || name.contains("Concurrent.*Continuation".toRegex()))
+
+  fun TypeName.ParameterizedType.isContinuationType() =
+    rawType.fqName == Continuation::class.qualifiedName
 
   private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName =
     when {
-      isReceiverContinuation() -> TypeName.FunctionLiteral(
+      isMonadContinuation() -> TypeName.FunctionLiteral(
         modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
         receiverType = typeArguments[0],
         parameters = emptyList(),
@@ -207,16 +229,16 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           it.typeArguments[0]
         } ?: TypeName.Unit
       )
-      isSimpleContinuation() -> TypeName.FunctionLiteral(
-        receiverType = null,
-        modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
-        parameters = emptyList(),
-        returnType = (typeArguments[0] as? TypeName.WildcardType)?.let {
-          it.lowerBounds[0] as? TypeName.ParameterizedType
-        }?.let {
-          it.typeArguments[0]
-        } ?: TypeName.Unit
-      )
+      isContinuation() -> {
+        val continuation = continuationType()
+        val params = typeArguments.filterIsInstance<TypeName.WildcardType>().takeWhile { it.lowerBounds[0] != continuation }
+        TypeName.FunctionLiteral(
+          receiverType = null,
+          modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
+          parameters = params,
+          returnType = continuation?.typeArguments?.get(0) ?: TypeName.Unit
+        )
+      }
       else -> this
     }
 
@@ -253,7 +275,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
     return if (
       "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
-      if (isReceiverContinuation() || isSimpleContinuation()) asSuspendedContinuation()
+      if (isMonadContinuation() || isContinuation()) asSuspendedContinuation()
       else TypeName.FunctionLiteral(
         receiverType = typeArguments[0],
         parameters = typeArguments.drop(1).dropLast(1),
@@ -319,7 +341,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
             } else function
           result.fixSuspendedParameters()
         } catch (e: IllegalArgumentException) {
-          //some public final functions can't be seen as overridden
+          // some public final functions can't be seen as overridden
           templateFunction?.second?.toMeta(templateFunction.first, member)
         }
       }.toList()
@@ -423,5 +445,4 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })
-
 }

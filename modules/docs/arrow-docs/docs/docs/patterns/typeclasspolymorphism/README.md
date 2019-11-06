@@ -9,8 +9,6 @@ permalink: /docs/patterns/polymorphic_programs/
 {:.advanced}
 advanced
 
-[Перевод на русский](/docs/patterns/polymorphic_programs/ru/)
-
 What if we could write apps without caring about the runtime data types used but just about **how the data is operated 
 on**? 
 
@@ -18,7 +16,7 @@ Let's say we have an application working with RxJava's `Observable`. We'll end u
 based on that given data type. But at the end of the day, and for the sake of simplicity, wouldn't  `Observable` be just 
 like a "container" with some extra powers?
 
-And same story for other "containers" like `Flowable`, `Deferred` (coroutines), `Future`, `IO`, and many more.
+And same story for other "containers" like `Flowable`, `Future`, `IO`, and many more.
 
 Conceptually, all those types represent an operation (already done or pending to be done), which could support things 
 like mapping over the inner value, flatMapping to chain other operations of the same type, zipping it with other 
@@ -45,8 +43,8 @@ interface DataSource {
 }
 ```
 
-We'll return `Observable` here for simplicity, but it could be `Single`, `Maybe`, `Flowable`, `Deferred`, or anything 
-else depending on our needs.
+We'll return `Observable` here for simplicity, but it could be `Single`, `Maybe`, `Flowable`, or anything else depending 
+on our needs.
 
 Let's add a couple of mock implementations for it, a **local** and a **remote** one.
 
@@ -551,75 +549,6 @@ UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
 Everything working as expected. 💪
-
-Let's try the [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}) wrapper for the 
-`kotlinx.coroutines.Deferred` type:
-
-```kotlin
-object test {
-
-  @JvmStatic
-  fun main(args: Array<String>): Unit {
-    val user1 = User(UserId("user1"))
-    val user2 = User(UserId("user2"))
-    val user3 = User(UserId("unknown user"))
-
-    val deferredModule = Module(DeferredK.async())
-    deferredModule.run {
-      runBlocking {
-        try {
-          println(repository.allTasksByUser(user1).fix().deferred.await())
-          println(repository.allTasksByUser(user2).fix().deferred.await())
-          println(repository.allTasksByUser(user3).fix().deferred.await())
-        } catch (e: UserNotInRemoteStorage) {
-          println(e)
-        }
-      }
-    }
-  }
-}
-```
-
-As you know, you're in charge to catch exceptions on coroutines. As you can see, implementation details as this catch, 
-or the observable subscriptions from previous examples, are implementation details related to the given data types being 
-used for each case, so those must live here, in the program's edge.
-
-Same result one more time:
-
-```
-[Task(value=LocalTask assigned to user1)]
-[Task(value=Remote Task assigned to user2)]
-UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
-```
-
-There's also an alternative api provided by Arrow a bit more fancier for [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}). It takes care of runBlocking and awaiting on the operations for you:
-
-```kotlin
-object test {
-
-  @JvmStatic
-  fun main(args: Array<String>): Unit {
-    val user1 = User(UserId("user1"))
-    val user2 = User(UserId("user2"))
-    val user3 = User(UserId("unknown user"))
-
-    val deferredModuleAlt = Module(DeferredK.async())
-    deferredModuleAlt.run {
-      println(repository.allTasksByUser(user1).fix().unsafeAttemptSync())
-      println(repository.allTasksByUser(user2).fix().unsafeAttemptSync())
-      println(repository.allTasksByUser(user3).fix().unsafeAttemptSync())
-    }
-  }
-}
-```
-
-This one wraps the result into [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) (which can be `Success` or `Failure`).
-
-```
-Success(value=[Task(value=LocalTask assigned to user1)])
-Success(value=[Task(value=Remote Task assigned to user2)])
-Failure(exception=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
-```
 
 Finally, let's use a more fancy data type related to Functional Programming: [`IO`]({{ '/docs/effects/io' | relative_url }}). 
 `IO` exists to wrap an in/out operation that causes side effects and make it pure.

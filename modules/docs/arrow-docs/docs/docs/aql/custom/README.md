@@ -84,12 +84,12 @@ println(result)
 In order to activate [`where`]() statement we need to provide an instance for the `FunctorFilter` type class and the `Where` type class:
 
 ```kotlin
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.aql.box.functor.functorFilter
 
 @extension
 interface BoxFunctorFilter : FunctorFilter<ForBox>, BoxFunctor {
-  override fun <A, B> BoxOf<A>.mapFilter(f: (A) -> Option<B>): Box<B> =
+  override fun <A, B> BoxOf<A>.filterMap(f: (A) -> Option<B>): Box<B> =
     when (val box = fix()) {
       Box.Empty -> Box.empty()
       is Box.Full -> f(box.value).fold(

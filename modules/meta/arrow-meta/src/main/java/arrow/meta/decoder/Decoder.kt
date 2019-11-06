@@ -116,7 +116,11 @@ interface TypeDecoder : MetaDecoder<Type> {
     val builderWithReceiver =
       if (receiverType != null) builder.receiver(receiverType.lyrics())
       else builder
-    return builderWithReceiver.build()
+    val builderwithInitializer =
+      if (initializer != null) builderWithReceiver.initializer(initializer.lyrics())
+      else builderWithReceiver
+
+    return builderwithInitializer.build()
   }
 
   fun Func.lyrics(): FunSpec {
@@ -270,5 +274,4 @@ interface TypeDecoder : MetaDecoder<Type> {
       is Parameter -> lyrics()
       else -> this
     }
-
 }

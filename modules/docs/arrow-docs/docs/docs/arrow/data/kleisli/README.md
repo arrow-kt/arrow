@@ -18,7 +18,7 @@ For example, we have the function `String.toInt()` which can throw a `NumberForm
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.data.Kleisli
+import arrow.mtl.Kleisli
 
 val optionIntKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None
@@ -51,7 +51,7 @@ optionIntKleisli.local { optStr :Option<String> -> optStr.getOrElse { "0" } }.ru
 The `ap` function transform the `Kleisli` into another `Kleisli` with a function as a output value.
 
 ```kotlin:ank
-import arrow.data.fix
+import arrow.mtl.fix
 import arrow.core.extensions.option.applicative.*
 import arrow.core.extensions.option.monad.*
 
@@ -75,7 +75,7 @@ optionIntKleisli.map(Option.applicative()) { output -> output + 1 }.fix().run("1
 `flatMap` is useful to map the `Kleisli` output into another kleisli
 
 ```kotlin:ank
-import arrow.data.fix
+import arrow.mtl.fix
 
 val optionDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toDouble()) else None
@@ -89,7 +89,7 @@ optionIntKleisli.flatMap(Option.monad(), { optionDoubleKleisli }).fix().run("1")
 You can use `andThen` to compose with another kleisli
 
 ```kotlin:ank
-import arrow.data.fix
+import arrow.mtl.fix
 
 val optionFromOptionKleisli = Kleisli { number: Int ->
    Some(number+1)
@@ -114,7 +114,7 @@ optionIntKleisli.andThen(Option.monad(), Some(0)).fix().run("1")
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(Kleisli::class).tcMarkdownList()

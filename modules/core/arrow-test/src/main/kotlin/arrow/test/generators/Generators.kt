@@ -1,24 +1,41 @@
 package arrow.test.generators
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.extensions.option.functor.map
-import arrow.core.extensions.option.functor.functor
-import arrow.data.*
-import arrow.recursion.Algebra
-import arrow.recursion.Coalgebra
-import arrow.recursion.typeclasses.Corecursive
-import arrow.recursion.typeclasses.Recursive
+import arrow.core.Either
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.SequenceK
+import arrow.core.SetK
+import arrow.core.SortedMapK
+import arrow.core.Success
+import arrow.core.Try
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.Validated
+import arrow.core.k
+import arrow.core.toOption
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
 fun Gen.Companion.short(): Gen<Short> =
-        Gen.choose(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).map { it.toShort() }
+  Gen.choose(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).map { it.toShort() }
 
 fun Gen.Companion.byte(): Gen<Byte> =
-        Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
+  Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
 
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }
@@ -128,22 +145,3 @@ fun Gen.Companion.char(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
 fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
-
-// For generating recursive data structures with recursion schemes
-
-typealias NatPattern = ForOption
-typealias GNat<T> = Kind<T, NatPattern>
-
-fun toGNatCoalgebra(): Coalgebra<NatPattern, Int> = Coalgebra {
-  if (it == 0) None else Some(it - 1)
-}
-
-fun fromGNatAlgebra(): Algebra<NatPattern, Eval<Int>> = Algebra {
-  it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
-}
-
-inline fun <reified T> Corecursive<T>.toGNat(i: Int): GNat<T> =
-  Option.functor().ana(i, toGNatCoalgebra())
-
-inline fun <reified T> Recursive<T>.toInt(i: GNat<T>): Int =
-  Option.functor().cata(i, fromGNatAlgebra())

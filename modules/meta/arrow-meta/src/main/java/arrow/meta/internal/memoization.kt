@@ -33,5 +33,4 @@ object Platform {
         map.putIfAbsent(k, v) ?: v
     }
   }
-
 }

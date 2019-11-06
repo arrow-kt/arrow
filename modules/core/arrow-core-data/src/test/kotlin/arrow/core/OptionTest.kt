@@ -7,25 +7,29 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
+import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.show.show
+import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.mtl.extensions.option.monadFilter.monadFilter
-import arrow.mtl.extensions.option.traverseFilter.traverseFilter
-import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.generators.option
-import arrow.test.laws.*
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
@@ -33,18 +37,19 @@ class OptionTest : UnitSpec() {
 
   val associativeSemigroupalEq = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
     override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
-        return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
-          this@eqv.fix().eqv(b.fix())
-        }
+      return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+        this@eqv.fix().eqv(b.fix())
       }
+    }
   }
 
   init {
 
     testLaws(
+      MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
-      //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
+      // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
@@ -78,6 +83,19 @@ class OptionTest : UnitSpec() {
     "map" {
       some.map(String::toUpperCase) shouldBe Some("KOTLIN")
       none.map(String::toUpperCase) shouldBe None
+    }
+
+    "map2" {
+      forAll { a: Int ->
+        val op: Option<Int> = a.some()
+        some.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == Some("kotlin$a")
+        none.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == None
+      }
+    }
+
+    "mapNotNull" {
+      some.mapNotNull { it.toIntOrNull() } shouldBe None
+      some.mapNotNull { it.toUpperCase() } shouldBe Some("KOTLIN")
     }
 
     "fold" {
@@ -126,8 +144,8 @@ class OptionTest : UnitSpec() {
 
     "firstOption" {
       val l = listOf(1, 2, 3, 4, 5, 6)
-      l.firstOption() shouldBe Some(1)
-      l.firstOption { it > 2 } shouldBe Some(3)
+      l.firstOrNone() shouldBe Some(1)
+      l.firstOrNone { it > 2 } shouldBe Some(3)
     }
 
     "and" {
@@ -137,7 +155,6 @@ class OptionTest : UnitSpec() {
       x and None shouldBe None
       None and x shouldBe None
       None and None shouldBe None
-
     }
 
     "or" {
@@ -148,12 +165,10 @@ class OptionTest : UnitSpec() {
       None or x shouldBe Some(2)
       None or None shouldBe None
     }
-
   }
 
   private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
     val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
     return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
   }
-
 }

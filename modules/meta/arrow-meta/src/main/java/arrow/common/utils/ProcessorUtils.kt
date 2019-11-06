@@ -74,16 +74,16 @@ interface ProcessorUtils : KotlinMetadataUtils {
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
-  fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
+  fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement): ProtoBuf.Function? =
     getFunctionOrNull(methodElement, nameResolver, functionList)
-      ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
 
   private fun kindedRex() = "(?i)Kind<(.)>".toRegex()
 
   fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
   fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
-    typeTable: TypeTable): List<ClassOrPackageDataWrapper> {
+    typeTable: TypeTable
+  ): List<ClassOrPackageDataWrapper> {
     val interfaces = this.classProto.supertypes(typeTable).map {
       it.extractFullName(this)
     }.filter {
@@ -96,7 +96,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
       parentInterface as ClassOrPackageDataWrapper.Class
     }
   }
-
 }
 
 private val ProtoBuf.ConstructorOrBuilder.isPrimary: Boolean get() = !isSecondary
@@ -105,11 +104,11 @@ private val ProtoBuf.ConstructorOrBuilder.isSecondary: Boolean get() = Flags.IS_
 fun String.removeBackticks() = replace("`", "")
 
 fun String.toCamelCase(): String =
-        when {
-            length <= 1 -> toLowerCase()
+  when {
+    length <= 1 -> toLowerCase()
 
-            else -> first().toLowerCase() + substring(1)
-        }
+    else -> first().toLowerCase() + substring(1)
+  }
 
 fun knownError(message: String, element: Element? = null): Nothing =
   throw KnownException(message, element)

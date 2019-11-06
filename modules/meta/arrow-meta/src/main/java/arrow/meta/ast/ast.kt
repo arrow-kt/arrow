@@ -18,19 +18,22 @@ data class Code(val value: String) {
 }
 
 data class PackageName(
-  val value: String) : Tree() {
+  val value: String
+) : Tree() {
   companion object
 }
 
 data class TypeAlias(
   val name: String,
-  val value: TypeName) : Tree() {
+  val value: TypeName
+) : Tree() {
   companion object
 }
 
 data class Import(
   val qualifiedName: String,
-  val alias: String? = null) : Tree() {
+  val alias: String? = null
+) : Tree() {
   companion object
 }
 
@@ -45,7 +48,8 @@ sealed class TypeName : Tree() {
     val variance: Modifier? = null,
     val reified: Boolean = false,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val simpleName: String
       get() = name
@@ -61,7 +65,8 @@ sealed class TypeName : Tree() {
     val upperBounds: List<TypeName>,
     val lowerBounds: List<TypeName>,
     val nullable: Boolean,
-    val annotations: List<Annotation>) : TypeName() {
+    val annotations: List<Annotation>
+  ) : TypeName() {
 
     override val simpleName: String
       get() = name
@@ -97,7 +102,8 @@ sealed class TypeName : Tree() {
     val rawType: Classy,
     val typeArguments: List<TypeName> = emptyList(),
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val rawName: String
       get() = name.substringBefore("<")
@@ -113,7 +119,8 @@ sealed class TypeName : Tree() {
     val fqName: String,
     val pckg: PackageName,
     val nullable: Boolean = false,
-    val annotations: List<Annotation> = emptyList()) : TypeName() {
+    val annotations: List<Annotation> = emptyList()
+  ) : TypeName() {
 
     override val rawName: String
       get() = fqName
@@ -133,6 +140,7 @@ sealed class TypeName : Tree() {
 
   companion object {
     val Unit: TypeName = TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
+    val AnyNullable: TypeName = TypeName.TypeVariable("Any?")
   }
 }
 
@@ -154,31 +162,34 @@ data class Parameter(
   val type: TypeName,
   val defaultValue: Code? = null,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  val modifiers: List<Modifier> = emptyList()
+) : Tree() {
   companion object
 }
 
 data class Annotation(
   val type: TypeName,
   val members: List<Code>,
-  val useSiteTarget: UseSiteTarget?) : Tree() {
+  val useSiteTarget: UseSiteTarget?
+) : Tree() {
   companion object
 }
 
 data class Property(
   val name: String,
   val type: TypeName,
-  val mutable: Boolean,
+  val mutable: Boolean = false,
   val kdoc: Code? = null,
   val initializer: Code? = null,
   val delegated: Boolean = false,
-  val getter: Func,
-  val setter: Func?,
+  val getter: Func? = null,
+  val setter: Func? = null,
   val receiverType: TypeName? = null,
-  val jvmPropertySignature: String,
-  val jvmFieldSignature: String?,
+  val jvmPropertySignature: String? = null,
+  val jvmFieldSignature: String? = null,
   val annotations: List<Annotation> = emptyList(),
-  val modifiers: List<Modifier> = emptyList()) : Tree() {
+  val modifiers: List<Modifier> = emptyList()
+) : Tree() {
   companion object
 }
 
@@ -192,7 +203,8 @@ data class Func(
   val modifiers: List<Modifier> = emptyList(),
   val typeVariables: List<TypeName.TypeVariable> = emptyList(),
   val parameters: List<Parameter> = emptyList(),
-  val jvmMethodSignature: String = "") : Tree() {
+  val jvmMethodSignature: String = ""
+) : Tree() {
   companion object
 }
 
@@ -247,7 +259,8 @@ data class Type(
   val properties: List<Property> = emptyList(),
   val declaredFunctions: List<Func> = emptyList(),
   val allFunctions: List<Func> = emptyList(),
-  val types: List<Type> = emptyList()) : Tree() {
+  val types: List<Type> = emptyList()
+) : Tree() {
 
   sealed class Shape {
     object Class : Shape()
@@ -257,5 +270,4 @@ data class Type(
   }
 
   companion object
-
 }
