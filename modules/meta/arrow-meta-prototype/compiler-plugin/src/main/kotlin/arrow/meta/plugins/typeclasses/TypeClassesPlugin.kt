@@ -82,7 +82,7 @@ val Meta.typeClasses: Plugin
               |""".function
             println("result: $result")
             Transform.replace(func,
-                result
+              result
             )
           }
         ),

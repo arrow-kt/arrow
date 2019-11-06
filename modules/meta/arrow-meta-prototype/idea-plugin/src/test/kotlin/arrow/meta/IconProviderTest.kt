@@ -1,6 +1,7 @@
 package arrow.meta
 
 import arrow.meta.dsl.platform.cli
+import arrow.meta.plugin.idea.test.KotlinIdeBaseTest
 import com.intellij.openapi.util.Iconable
 import org.jetbrains.kotlin.nj2k.postProcessing.type
 import org.jetbrains.kotlin.psi.KtProperty
