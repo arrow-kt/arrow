@@ -15,10 +15,10 @@ beginner
 
 [Перевод на русский](/docs/arrow/core/option/ru)
 
-If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you were not expecting it and thus not dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
-Kotlin tries to solve the problem by getting rid of `null` values altogether and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
+If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
+Kotlin tries to solve the problem by getting rid of `null` values altogether, and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
 
-Arrow models the absence of values through the `Option` datatype similar to how Scala, Haskell and other FP languages handle optional values.
+Arrow models the absence of values through the `Option` datatype similar to how Scala, Haskell, and other FP languages handle optional values.
 
 `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
 
@@ -35,14 +35,14 @@ val emptyValue: Option<String> = None
 emptyValue
 ```
 
-Let's write a function that may or not give us a string, thus returning `Option<String>`:
+Let's write a function that may or may not give us a string, thus returning `Option<String>`:
 
 ```kotlin:ank:silent
 fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
    if (flag) Some("Found value") else None
 ```
 
-Using `getOrElse` we can provide a default value `"No value"` when the optional argument `None` does not exist:
+Using `getOrElse`, we can provide a default value `"No value"` when the optional argument `None` does not exist:
 
 ```kotlin:ank:silent
 val value1 = maybeItWillReturnSomething(true)
@@ -170,7 +170,7 @@ fun foo() {
 }
 ```
 
-Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
+Arrow contains `Option` instances for many useful typeclasses that allow you to use and transform optional values
 
 [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
