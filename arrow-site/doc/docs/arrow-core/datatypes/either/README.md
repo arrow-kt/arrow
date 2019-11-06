@@ -17,10 +17,10 @@ beginner
 In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
 For instance, querying a service may result in a connection issue, or some unexpected JSON response.
 
-To communicate these errors it has become common practice to throw exceptions; however,
+To communicate these errors, it has become common practice to throw exceptions; however,
 exceptions are not tracked in any way, shape, or form by the compiler. To see what
 kind of exceptions (if any) a function may throw, we have to dig through the source code.
-Then to handle these exceptions, we have to make sure we catch them at the call site. This
+Then, to handle these exceptions, we have to make sure we catch them at the call site. This
 all becomes even more unwieldy when we try to compose exception-throwing procedures.
 
 ```kotlin:ank
@@ -34,9 +34,9 @@ val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
 magic
 ```
 
-Assume we happily throw exceptions in our code. Looking at the types of the above functions, any of them could throw any number of exceptions -- we do not know. When we compose, exceptions from any of the constituent
+Assume we happily throw exceptions in our code. Looking at the types of functions above, any could throw a number of exceptions -- we do not know. When we compose, exceptions from any of the constituent
 functions can be thrown. Moreover, they may throw the same kind of exception
-(e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where an exception came from.
+(e.g., `IllegalArgumentException`) and, thus, it gets tricky tracking exactly where an exception came from.
 
 How then do we communicate an error? By making it explicit in the data type we return.
 
@@ -45,7 +45,7 @@ How then do we communicate an error? By making it explicit in the data type we r
 In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
 upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
 
-By convention the right hand side of an `Either` is used to hold successful values.
+By convention, the right side of an `Either` is used to hold successful values.
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
@@ -61,7 +61,7 @@ Because `Either` is right-biased, it is possible to define a Monad instance for 
 Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
 we fix the left type parameter and leave the right one free.
 
-So the map and flatMap methods are right-biased:
+So, the map and flatMap methods are right-biased:
 
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
@@ -117,7 +117,7 @@ fun magic(s: String): Either<Exception, String> =
 
 ```
 
-These calls to `parse` returns a `Left` and `Right` value
+These calls to `parse` return a `Left` and `Right` value
 
 ```kotlin:ank
 parse("Not a number")
@@ -141,12 +141,12 @@ magic("1")
 magic("Not a number")
 ```
 
-In the following exercise we pattern-match on every case the `Either` returned by `magic` can be in.
-Note the `when` clause in the `Left` - the compiler will complain if we leave that out because it knows that
+In the following exercise, we pattern-match on every case in which the `Either` returned by `magic` can be.
+Note the `when` clause in the `Left` - the compiler will complain if we leave that out because it knows that,
 given the type `Either[Exception, String]`, there can be inhabitants of `Left` that are not
 `NumberFormatException` or `IllegalArgumentException`. You should also notice that we are using
-[SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing to `Left` and `Right`
-value.
+[SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing `Left` and `Right`
+values.
 
 ```kotlin:ank
 val x = magic("2")
@@ -187,9 +187,9 @@ fun magic(s: String): Either<Error, String> =
 ```
 
 For our little module, we enumerate any and all errors that can occur. Then, instead of using
-exception classes as error values, we use one of the enumerated cases. Now when we pattern match,
-we are able to comphrensively handle failure without resulting to an `else` branch; moreover
-since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
+exception classes as error values, we use one of the enumerated cases. Now, when we pattern match,
+we are able to comphrensively handle failure without resulting in an `else` branch; moreover,
+since Error is sealed, no outside code can add additional subtypes that we might fail to handle.
 
 ```kotlin
 val x = magic("2")
@@ -204,7 +204,7 @@ when(x) {
 
 ## Syntax
 
-Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
+Either can also map over the `left` value with `mapLeft`, which is similar to map, but applies on left instances.
 
 ```kotlin:ank
 val r : Either<Int, Int> = Either.Right(7)
@@ -269,10 +269,10 @@ y.fold({ 1 }, { it + 3 })
 ```
 
 The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
-the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
+the value of `Left`. This can be useful when mapping to a single result type is required like `fold()`, but without
 the need to handle `Either.Right` case.
 
-As an example we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
+As an example, we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
 
 ```kotlin:ank
 val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
@@ -304,7 +304,7 @@ Right(null).leftIfNull({ -1 })
 ```
 
 Another useful operation when working with null is `rightIfNotNull`.
-If the value is null it will be transformed to the specified `Either.Left` and if its not null the type will
+If the value is null, it will be transformed to the specified `Either.Left` and, if it's not null, the type will
 be wrapped to `Either.Right`.
 
 Example:
