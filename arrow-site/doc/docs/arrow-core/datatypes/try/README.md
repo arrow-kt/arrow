@@ -20,11 +20,11 @@ For example, we have `Option` to model the absence of a value, or `Either` to mo
 
 On the other hand, we have `Try`, which represents a computation that can result in an `A` result (as long as the computation is successful) or in an exception if something has gone wrong.
 
-That is, there are only two possible implementations of `Try`: a `Try` instance where the operation has been successful, which is represented as `Success<A>`; or a `Try` instance where the computation has failed with a `Throwable`, which is represented as `Failure`.
+That is, there are only two possible implementations of `Try`: A `Try` instance where the operation has been successful, which is represented as `Success<A>`; or a `Try` instance where the computation has failed with a `Throwable`, which is represented as `Failure`.
 
-With just this explanation you might think that we are talking about an `Either<Throwable, A>`, and you are not wrong. `Try` can be implemented in terms of `Either`, but its use cases are very different.
+With just this explanation, you might think that we are talking about an `Either<Throwable, A>`, and you are not wrong. `Try` can be implemented in terms of `Either`, but its use cases are very different.
 
-If we know that an operation could result in a failure, for example, because it is code from a library over which we have no control, or better yet, some method from the language itself. We can use `Try` as a substitute for the well-known `try-catch`, allowing us to rise to all its goodness.
+If we know that an operation could result in a failure (e.g., because it is code from a library over which we have no control, or better yet, some method from the language itself), we can use `Try` as a substitute for the well-known `try-catch`, allowing us to rise to all its goodness.
 
 The following example represents the typical case when consuming Java code, where domain errors are represented with exceptions.  
 
@@ -72,7 +72,7 @@ val lotteryTry = Try { getLotteryNumbers() }
 lotteryTry
 ```
 
-By using `getOrDefault` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
+By using `getOrDefault`, we can give a default value to return when the computation fails, similar to what we can also do with `Option` when there is no value:
 
 ```kotlin:ank
 lotteryTry.getOrDefault { emptyList() }
@@ -98,7 +98,7 @@ lotteryTry.filter {
 }
 ```
 
-We can also use `handleError` which allow us to recover from a particular error (we receive the error and have to return a new value):
+We can also use `handleError`, which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
 lotteryTry.handleError { exception ->
@@ -106,7 +106,7 @@ lotteryTry.handleError { exception ->
 }
 ```
 
-Or if you have another different computation that can also fail, you can use `handleErrorWith` to recover from an error (as you do with `handleError`, but in this case, returning a new `Try`):
+Or, if you have another different computation that can also fail, you can use `handleErrorWith` to recover from an error (as you do with `handleError`, but in this case, returning a new `Try`):
 
 ```kotlin:ank
 enum class Source {
@@ -124,7 +124,7 @@ Try { getLotteryNumbers(Source.NETWORK) }.handleErrorWith {
 }
 ```
 
-When you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
+When you want to handle both cases of the computation, you can use `fold`. With `fold`, we provide two functions: One for transforming a failure into a new value, and one to transform the success value into a new one:
 
 ```kotlin:ank
 lotteryTry.fold(
@@ -150,9 +150,9 @@ Try {
 // Left(a=DomainError$NoConnectionError@3ada9e37)
 ```
 
-As the codebase grows, it is easy to recognize, that this pattern reoccurs everywhere when `Try` to `Either` conversion is being used.
+As the codebase grows, it is easy to recognize that this pattern reoccurs everywhere when `Try` to `Either` conversion is being used.
 
-To help this problem, `Try` has a convenient `toEither` implementation, which takes an `onLeft: (Throwable) -> B` parameter. If the result of the conversion from `Try` to `Either` fails, the supplied `onLeft` argument is called to supply domain specific value for the left (error) branch. Using this version, the code can be simplified to the one below:
+To help mitigate this problem, `Try` has a convenient `toEither` implementation, which takes an `onLeft: (Throwable) -> B` parameter. If the result of the conversion from `Try` to `Either` fails, the supplied `onLeft` argument is called to supply domain-specific value for the left (error) branch. Using this version, the code can be simplified to the one below:
 
 ```kotlin
 Try {
@@ -163,7 +163,7 @@ Try {
 // Left(a=DomainError$NoConnectionError@574caa3f)
 ```
 
-Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
+Lastly, Arrow contains `Try` instances for many useful typeclasses that allow you to use and transform fallibale values:
 
 [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
