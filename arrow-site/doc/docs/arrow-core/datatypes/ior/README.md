@@ -22,7 +22,7 @@ You can see this in the function signature of `map`:
 fun <D> map(f: (B) -> D): Ior<A, D>
 ```
 
-We can create `Ior` values using `Ior.Left`, `Ior.Right` and `Ior.Both`:
+We can create `Ior` values using `Ior.Left`, `Ior.Right`, and `Ior.Both`:
 
 ```kotlin:ank
 import arrow.*
@@ -39,7 +39,7 @@ Ior.Left("Error")
 Ior.Both("Warning", 41)
 ```
 
-Arrow also offers extension functions for `Ior`, the `leftIor`, `rightIor` and `bothIor`:
+Arrow also offers extension functions for `Ior`, the `leftIor`, `rightIor`, and `bothIor`:
 
 ```kotlin:ank
 3.rightIor()
@@ -56,8 +56,8 @@ Arrow also offers extension functions for `Ior`, the `leftIor`, `rightIor` and `
 
 When we look at the `Monad` or `Applicative` instances of `Ior`, we can see that they actually require a `Semigroup` instance on the left side.
 This is because `Ior` will actually accumulate failures on the left side, very similarly to how the [`Validated`](/docs/arrow/data/validated) data type does.
-This means we can accumulate data on the left side while also being able to short-circuit upon the first right-side-only value.
-For example, we might want to accumulate warnings together with a valid result and only halt the computation on a "hard error"
+This means we can accumulate data on the left side, while also being able to short-circuit upon the first right-side-only value.
+For example, we might want to accumulate warnings together with a valid result, and only halt the computation on a "hard error."
 Here's an example of how we are able to do that:
 
 ```kotlin
@@ -124,7 +124,7 @@ Ior.leftNel<String, Int>("Error")
 Ior.bothNel("Warning", 41)
 ```
 
-We can also convert our `Ior` to `Either`, `Validated` or `Option`.
+We can also convert our `Ior` to `Either`, `Validated`, or `Option`.
 All of these conversions will discard the left side value if both are available:
 
 ```kotlin:ank
