@@ -12,7 +12,7 @@ video: TC6IzE61OyE
 {:.beginner}
 beginner
 
-`NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
+`NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that have at least one value.
 `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
 
 ```groovy
@@ -37,7 +37,7 @@ NonEmptyList.of(1, 2) // NonEmptyList<Int>
 
 ## head
 
-Unlike `List#[0]`, `NonEmptyList#head` it's a safe operation that guarantees no exception throwing.
+Unlike `List#[0]`, `NonEmptyList#head` is a safe operation that guarantees no exception throwing.
 
 ```kotlin
 NonEmptyList.of(1, 2, 3, 4, 5).head
@@ -134,7 +134,7 @@ map(nelId, nelName, nelYear) { (id, name, year) ->
 
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
 - We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
-- `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
+- `foldLeft`, `map`, `flatMap`, and others are used to compute over the internal contents of a `NonEmptyList` value.
 - `fx { ... } comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
 
