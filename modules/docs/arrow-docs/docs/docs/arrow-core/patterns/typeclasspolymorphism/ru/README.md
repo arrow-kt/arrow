@@ -44,7 +44,7 @@ class LocalDataSource : DataSource {
   private val localCache: Map<User, List<Task>> =
     mapOf(User(UserId("user1")) to listOf(Task("LocalTask assigned to user1")))
 
-  override fun allTasksByUser(user: User): Observable<List<Task>> = 
+  override fun allTasksByUser(user: User): Observable<List<Task>> =
     Observable.create { emitter ->
       val cachedUser = localCache[user]
       if (cachedUser != null) {
@@ -59,7 +59,7 @@ class RemoteDataSource : DataSource {
   private val internetStorage: Map<User, List<Task>> =
     mapOf(User(UserId("user2")) to listOf(Task("Remote Task assigned to user2")))
 
-  override fun allTasksByUser(user: User): Observable<List<Task>> = 
+  override fun allTasksByUser(user: User): Observable<List<Task>> =
     Observable.create { emitter ->
       val networkUser = internetStorage[user]
       if (networkUser != null) {
@@ -76,7 +76,7 @@ class RemoteDataSource : DataSource {
 Т.к. у нас два источника данных, нам надо как-то их координировать. Давай создадим `репозиторий`:
 
 ```kotlin
-class TaskRepository(private val localDS: DataSource, 
+class TaskRepository(private val localDS: DataSource,
                      private val remoteDS: RemoteDataSource) {
 
   fun allTasksByUser(user: User): Observable<List<Task>> =
@@ -149,7 +149,7 @@ interface DataSource<F> {
 ```
 
 Всё вроде бы похоже, но есть два важных отличия:
- 
+
  * Появилось зависимость на обобщенный тип (generic) `F`.
  * Тип, возвращаемый функцией теперь `Kind<F, List<Task>>`.
 
@@ -178,13 +178,13 @@ interface DataSource<F> {
 
 Функция `DataSource` **возвращает высокий тип**: `Kind<F, List<Task>>`. Он транслируется в `F<List<Task>>`, где `F` остается обобщенным.
 
-Мы фиксируем в сигнатуре только`List<Task>`. Другими словами, нам всё равно, какой будет использован контейнер типа `F`, до тех пор, пока он содержит в себе `List<Task>`. Мы можем **передавать в функцию разные контейнеры данных**. Уже понятней? Идем дальше. 
+Мы фиксируем в сигнатуре только`List<Task>`. Другими словами, нам всё равно, какой будет использован контейнер типа `F`, до тех пор, пока он содержит в себе `List<Task>`. Мы можем **передавать в функцию разные контейнеры данных**. Уже понятней? Идем дальше.
 
-Давай взглянем на имплементированные таким образом `DataSource`, но на этот раз на каждый по отдельности. Сначала на локальный: 
+Давай взглянем на имплементированные таким образом `DataSource`, но на этот раз на каждый по отдельности. Сначала на локальный:
 
 ```kotlin
 class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, ApplicativeError<F, Throwable> by A {
-      
+
     private val localCache: Map<User, List<Task>> =
       mapOf(User(UserId("user1")) to listOf(Task("LocalTask assigned to user1")))
 
@@ -245,7 +245,7 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 Посмотрим на нашу абстрактную имплементацию `LocalDataSource<F>`.
 
 ```kotlin
-class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : 
+class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) :
     DataSource<F>, ApplicativeError<F, Throwable> by A {
 
     private val localCache: Map<User, List<Task>> =
@@ -358,7 +358,7 @@ fun allTasksByUser(user: User): Kind<F, List<Task>> =
 class Module<F>(A: Async<F>) {
   private val localDataSource: LocalDataSource<F> = LocalDataSource(A)
   private val remoteDataSource: RemoteDataSource<F> = RemoteDataSource(A)
-  val repository: TaskRepository<F> = 
+  val repository: TaskRepository<F> =
       TaskRepository(localDataSource, remoteDataSource, A)
 }
 ```
@@ -430,7 +430,7 @@ fun main(args: Array<String>): Unit {
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-Что насчет [`ObservableK`]({{ '/docs/integrations/rx2/' | relative_url }}) / [`FlowableK`]({{ '/docs/integrations/rx2/' | relative_url }})? 
+Что насчет [`ObservableK`]({{ '/docs/integrations/rx2/' | relative_url }}) / [`FlowableK`]({{ '/docs/integrations/rx2/' | relative_url }})?
 Давай попробуем:
 
 ```kotlin
@@ -572,7 +572,7 @@ Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 
 Но концептуально результат будет тем же.
 
-Всё, с тестированием покончено. Как ты видишь, мы смогли переиспользовать один и тот же участок кода, передавая в него различные типы данных, что сделало нашу программу полностью независимой от использования конкретного типа данных. 
+Всё, с тестированием покончено. Как ты видишь, мы смогли переиспользовать один и тот же участок кода, передавая в него различные типы данных, что сделало нашу программу полностью независимой от использования конкретного типа данных.
 
 [Код полностью полиморфического приложения можно найти на гитхабе](https://gist.github.com/JorgeCastilloPrz/c0a4604b9a5dedc89be82b13cfcc1315).
 
@@ -586,17 +586,17 @@ Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 
 * Композирование твоей программы с помощью алгебр (операций), основанных на абстракциях, позволяет сохранить твою кодовую базу детерминированной и свободной от эффектов (чистой). Если хочется узнать больше о чистоте кода и тому, как это помогает избежать ошибок или неожиданного поведения [можно взглянуть на этот пост](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf).
 
-* В продолжение сказанного, все сторонние эффекты твоей программы контролируются на высшем уровне абстракции. Эффекты, вызванные деталями имплементации приходят в исполнение программы из единой точки системы (вне высшего уровня программы всё остается чистым). 
+* В продолжение сказанного, все сторонние эффекты твоей программы контролируются на высшем уровне абстракции. Эффекты, вызванные деталями имплементации приходят в исполнение программы из единой точки системы (вне высшего уровня программы всё остается чистым).
 
 * Если ты решишь работать с [классами типа]({{ '/docs/typeclasses/intro' | relative_url }}), то итогом этого станет унифицированное API для всех возможных типов данных. Воспроизводимость способствует глубокому пониманию изначальных концептов (воспроизводимость в данном случае это использование операций вроде `map`, `flatMap`, `fold`, во всех случаях вне зависимости от решаемой проблемы). Естественно, тут многое зависит от билиотек, которые позволяют писать функциональные программы средствами Kotlin, и Arrow - одна из них.
 
-* Эти паттерны **убирают нужду в конкретном фреймворке для реализации DI (инъекции зависимостей)**, т.к., поддерживают все концепци DI "из коробки". За тобой оставется свобода предоставления деталей имплементации чуть позже, эти же детали могут быть заменены с большей прозрачностью, и до этого момента твоя программа не привязана ни к каким деталям сторонним эффектам. Этот подход можно рассматривать как собственно говоря DI, т.к., он основан на предоставлении абстракций, детали имплементации которых предоставляются из верхнего уровня абстракции. 
+* Эти паттерны **убирают нужду в конкретном фреймворке для реализации DI (инъекции зависимостей)**, т.к., поддерживают все концепци DI "из коробки". За тобой оставется свобода предоставления деталей имплементации чуть позже, эти же детали могут быть заменены с большей прозрачностью, и до этого момента твоя программа не привязана ни к каким деталям сторонним эффектам. Этот подход можно рассматривать как собственно говоря DI, т.к., он основан на предоставлении абстракций, детали имплементации которых предоставляются из верхнего уровня абстракции.
 
 * В качестве заключения, я бы предложил использовать подход, более подходящий под конкретную задачу. ФП не решит всех твоих проблем, т.к., не существует серебрянной пули, но оно является проверенным временем подходом с кучей преимуществ.
 
 ### Дополнительно
 
-Если хочется ближе ознакомиться с **классами типа**, это можно сделать [в документации по ним]({{ '/docs/typeclasses/intro' | relative_url }}). 
+Если хочется ближе ознакомиться с **классами типа**, это можно сделать [в документации по ним]({{ '/docs/typeclasses/intro' | relative_url }}).
 Я буду рад, если после прочтения статьи у тебя уложиться в голове, что **они используются, как контракты для композиции полиморфических программ, основанных на абстракции**.
 
 Если есть сомнения, незамедлительно связывайся со мной. Наиболее быстрый способ связи - через мой Twitter: [@JorgeCastilloPR](https://www.twitter.com/JorgeCastilloPR).

@@ -132,3 +132,4 @@ reports/
 target/
 
 .bash_profile
+**/.kotlintest/

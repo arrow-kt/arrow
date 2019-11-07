@@ -34,7 +34,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     testCompile("junit:junit:$jUnitVersion")
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    compile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     compile "io.projectreactor:reactor-core:$projectReactorVersion"

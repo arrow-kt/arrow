@@ -55,4 +55,10 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
     catch(::identity, f)
+
+  suspend fun <A> effectCatch(fe: (Throwable) -> E, f: suspend () -> A): Kind<F, A> =
+    try { just(f()) } catch (t: Throwable) { raiseError(fe(t)) }
+
+  suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(f: suspend () -> A): Kind<F, A> =
+    try { just(f()) } catch (t: Throwable) { raiseError(t) }
 }

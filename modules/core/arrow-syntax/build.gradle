@@ -5,7 +5,7 @@ dependencies {
     compile project(':arrow-annotations')
     compile project(':arrow-core')
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }
 

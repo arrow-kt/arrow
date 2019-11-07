@@ -3,6 +3,7 @@ package arrow.fx.rx2
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
 import arrow.fx.internal.Platform
@@ -14,14 +15,12 @@ import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 class ForSingleK private constructor() {
   companion object
 }
 typealias SingleKOf<A> = arrow.Kind<ForSingleK, A>
-typealias SingleKKindedJ<A> = io.kindedj.Hk<ForSingleK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
@@ -29,9 +28,10 @@ inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
-fun <A> SingleKOf<A>.value(): Single<A> = fix().single
+@Suppress("UNCHECKED_CAST")
+fun <A> SingleKOf<A>.value(): Single<A> = fix().single as Single<A>
 
-data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
+data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
 
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
@@ -109,9 +109,6 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           .value().subscribe(emitter::onSuccess) {}
       emitter.setCancellable { dispose.dispose() }
     }.k()
-
-  fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
-    single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()
@@ -258,7 +255,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForSingleK>>?>(null)
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForSingleK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({
@@ -325,3 +322,6 @@ fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
  */
 fun <A> SingleKOf<A>.unsafeRunSync(): A =
   value().blockingGet()
+
+fun <A> SingleK<A>.handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
+  value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

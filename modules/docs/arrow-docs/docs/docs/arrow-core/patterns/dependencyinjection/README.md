@@ -227,7 +227,7 @@ class Parser {
 }
 
 // TEDIOUS AND NOT IDIOMATIC
-ForOption extensions { 
+ForOption.run { 
   Parser().run { parseInt("123") }
 }
 ```

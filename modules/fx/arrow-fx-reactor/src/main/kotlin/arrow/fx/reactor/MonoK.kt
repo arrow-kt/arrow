@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.NonFatal
+import arrow.core.internal.AtomicBooleanW
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -11,14 +12,12 @@ import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 class ForMonoK private constructor() {
   companion object
 }
 typealias MonoKOf<A> = arrow.Kind<ForMonoK, A>
-typealias MonoKKindedJ<A> = io.kindedj.Hk<ForMonoK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
@@ -26,10 +25,11 @@ inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> MonoKOf<A>.value(): Mono<A> =
-  this.fix().mono
+  this.fix().mono as Mono<A>
 
-data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
+data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
@@ -85,11 +85,11 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
    */
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     MonoK(Mono.create<B> { sink ->
-      val isCanceled = AtomicBoolean(false)
-      sink.onCancel { isCanceled.set(true) }
+      val isCanceled = AtomicBooleanW(false)
+      sink.onCancel { isCanceled.value = true }
       val a: A? = mono.block()
       if (a != null) {
-        if (isCanceled.get()) release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error)
+        if (isCanceled.value) release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error)
         else try {
           sink.onDispose(use(a).fix()
             .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
@@ -111,9 +111,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
         }
       } else sink.success(null)
     })
-
-  fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
-    mono.onErrorResume { t: Throwable -> function(t).mono }.k()
 
   fun continueOn(ctx: CoroutineContext): MonoK<A> =
     mono.publishOn(ctx.asScheduler()).k()
@@ -182,8 +179,8 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> async(fa: MonoKProc<A>): MonoK<A> =
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
-        val isCancelled = AtomicBoolean(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
+        val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
+        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -201,8 +198,8 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> asyncF(fa: MonoKProcF<A>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
-        val isCancelled = AtomicBoolean(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
+        val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
+        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -226,3 +223,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+
+fun <A> MonoK<A>.handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
+  value().onErrorResume { t: Throwable -> function(t).value() }.k()

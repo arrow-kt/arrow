@@ -23,7 +23,7 @@ import arrow.core.combineK as setCombineK
 @extension
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
-    (this.plus(b)).k()
+    this.fix().setCombineK(b)
 }
 
 @extension

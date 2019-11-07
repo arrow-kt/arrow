@@ -12,11 +12,13 @@ advanced
 Recursion schemes are an abstraction for structured recursion that ensure runtime safety and provide
 powerful abstractions for recursive datatypes.
 
+##### Everything below, while still serving as a good introduction, is somewhat outdated. Check the api docs for recursion for more accurate information on how to use it.
+
 #### Arbitrary recursion
 
 The traditional definition of a linked list uses arbitrary recursion.
 
-```kotlin:ank:silent
+```
 // The generic type parameter is omitted for simplicity
 sealed class IntList {
   object Nil : IntList()
@@ -27,7 +29,7 @@ sealed class IntList {
 Here, `Nil` is the empty list and `Cons` is an element plus another list. Instances of this can be created
 by chaining `Cons` constructors.
 
-```kotlin:ank
+```
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
@@ -39,7 +41,7 @@ IntList.Cons(3, IntList.Cons(2, IntList.Cons(1, IntList.Nil)))
 However, it would be nicer to have a function to do this for us. We can use arbitrary recursion to do this.
 We'll call the function `downFrom`.
 
-```kotlin:ank
+```
 fun downFrom(i: Int): IntList =
   if (i <= 0) IntList.Nil
   else IntList.Cons(i, downFrom(i - 1))
@@ -50,7 +52,7 @@ downFrom(3)
 We can also use arbitrary recursion to do computation with this data structure. For example, we might want
 to multiply every element in the list.
 
-```kotlin:ank
+```
 fun multiply(list: IntList): Int =
   when (list) {
     is IntList.Cons -> list.head * multiply(list.tail)
@@ -70,7 +72,7 @@ is stack safe.
 `fold` is a familiar function to most functional programmers, and is used whenever a collection needs to be
 collapsed into a single element. The `multiply` function above can be implemented much more simply using `fold`.
 
-```kotlin:ank
+```
 fun <A> fold(list: IntList, onNil: A, onCons: (Int, A) -> A): A =
   when (list) {
     is IntList.Cons -> onCons(list.head, fold(list.tail, onNil, onCons))
@@ -84,7 +86,7 @@ fun multiply(list: IntList): Int = fold(list, 1) { a, b -> a * b }
 collection (you may recognize it as the `generateT` functions in the kotlin standard library). The
 `downFrom` function can be implemented much more simply using `unfold`.
 
-```kotlin:ank
+```
 fun <A> unfold(init: A, produce: (A) -> Option<Tuple2<Int, A>>): IntList =
   produce(init).fold(
     { IntList.Nil },
@@ -108,14 +110,14 @@ and any functions implemented with them would also become stack safe.
 Lists are not the only data structure that can be folded and unfolded. Binary trees can also use this
 pattern.
 
-```kotlin:ank:silent
+```
 sealed class IntTree {
   data class Leaf(val value: Int) : IntTree()
   data class Node(val left: IntTree, val right: IntTree) : IntTree()
 }
 ```
 
-```kotlin:ank
+```
 fun <A> fold(tree: IntTree, onLeaf: (Int) -> A, onNode: (A, A) -> A): A =
   when (tree) {
     is IntTree.Leaf -> onLeaf(tree.value)
@@ -138,7 +140,7 @@ Arrow's recursion schemes allow us to solve this problem.
 The solution to this initially seems a bit strange. First, we must define a type's pattern, where
 the recursive type is replaced with a type parameter.
 
-```kotlin:ank:silent
+```
 @higherkind sealed class IntListPattern<out A> : IntListPatternOf<A> { 
   object NilPattern : IntListPattern<Nothing>()
   @higherkind data class ConsPattern<out A>(val head: Int, val tail: A) : IntListPattern<A>()
@@ -159,7 +161,7 @@ typealias IntList = IntListPattern<IntListPattern<IntListPattern<...>>>
 Of course, this is not possible in Kotlin. However, we can use the `Fix` datatype (a type level recursion scheme)
 to emulate this.
 
-```kotlin:ank
+```
 import arrow.recursion.data.*
 
 typealias IntFixList = Fix<ForIntListPattern>
@@ -168,7 +170,7 @@ typealias IntFixList = Fix<ForIntListPattern>
 So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance for 
 `IntListPattern`, allowing us to traverse into the structure.
 
-```kotlin:ank:silent
+```
 interface IntListPatternFunctor : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()
@@ -189,7 +191,7 @@ The [Recursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass prov
 [Corecursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `ana`, which are very
 similar to fold and unfold.
 
-```kotlin:ank:silent
+```
 typealias Algebra<F, A> = (Kind<F, A>) -> A     // fold
 typealias Coalgebra<F, A> = (A) -> Kind<F, A>   // unfold
 
@@ -199,7 +201,7 @@ fun <F, A> Functor<F>.ana(a: A, coalg: Coalgebra<F, A>): Fix<F> = TODO()
 
 We can use them to rewrite our `multiply` and `downFrom` functions.
 
-```kotlin:ank
+```
 import arrow.recursion.extensions.fix.recursive.*
 
 // We extract these functions out for later use
@@ -231,7 +233,7 @@ So far, we've generalized `fold` and `unfold` into `cata` and `ana` which are re
 destroying and creating any recursive structure. By combining these, we can create a recursion scheme for
 general recursion.
 
-```kotlin:ank
+```
 fun factorial(i: Int): Int = IntListPattern.functor().hylo(multiply, downFrom, i)
 ```
 

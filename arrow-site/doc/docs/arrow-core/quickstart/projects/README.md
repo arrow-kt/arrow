@@ -20,6 +20,12 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Sefford/kor](https://github.com/Sefford/kor): A clean architecture implementation
 
+[lenguyenthanh/RxArrow](https://github.com/lenguyenthanh/RxArrow): A collection of RxJava extensions for Arrow's Data Types
+
+[sksamuel/avro4k](https://github.com/sksamuel/avro4k): Avro format for kotlinx.serialization that has support for Arrow's data types
+
+[sksamuel/hoplite](https://github.com/sksamuel/hoplite): A purely functional config library in the vein of Scala's pureconfig built on Arrow.
+
 #### Android
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
@@ -40,6 +46,8 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [josdirksen/arrow-flux](https://github.com/josdirksen/arrow-flux): This project contains a sample service using Spring WebFlux as the web framework, Arrow to add some functional components and uses a reactive mongoDB driver, to make the complete flow reactive.
 
-#### Katas
+#### Katas and exercises
 
 [pedrovgs/KotlinKatas](https://github.com/pedrovgs/KotlinKatas): Kotlin training repository used to learn Kotlin and Functional Programming by solving some common katas using just purely functional programming powered by Arrow.
+
+[arrow-kt/frdomain.kt](https://github.com/arrow-kt/frdomain.kt): Arrow port of the additional code samples (Chapter 6) from [Functional and Reactive Domain Modeling](https://www.manning.com/books/functional-and-reactive-domain-modeling).

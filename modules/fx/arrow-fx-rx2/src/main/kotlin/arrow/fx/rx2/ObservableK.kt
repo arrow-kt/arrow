@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
+import arrow.core.internal.AtomicRefW
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.fx.CancelToken
@@ -16,14 +17,12 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 class ForObservableK private constructor() {
   companion object
 }
 typealias ObservableKOf<A> = arrow.Kind<ForObservableK, A>
-typealias ObservableKKindedJ<A> = io.kindedj.Hk<ForObservableK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> ObservableKOf<A>.fix(): ObservableK<A> =
@@ -31,10 +30,11 @@ inline fun <A> ObservableKOf<A>.fix(): ObservableK<A> =
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> ObservableKOf<A>.value(): Observable<A> =
-  fix().observable
+  fix().observable as Observable<A>
 
-data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
+data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf<A> {
 
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
@@ -137,9 +137,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
-
-  fun handleErrorWith(function: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
-    value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): ObservableK<A> =
     observable.observeOn(ctx.asScheduler()).k()
@@ -287,7 +284,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForObservableK>>?>(null)
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForObservableK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({
@@ -316,3 +313,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
 fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)
+
+fun <A> ObservableKOf<A>.handleErrorWith(function: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
+  value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

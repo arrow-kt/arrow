@@ -12,12 +12,9 @@ import arrow.test.generators.functionAToB
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class RefTest : UnitSpec() {
 
   init {

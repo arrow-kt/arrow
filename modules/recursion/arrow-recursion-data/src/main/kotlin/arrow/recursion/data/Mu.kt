@@ -1,6 +1,5 @@
 package arrow.recursion.data
 
-import arrow.core.Eval
 import arrow.higherkind
 import arrow.recursion.Algebra
 
@@ -9,8 +8,8 @@ import arrow.recursion.Algebra
  * This type is the type level encoding of cata.
  */
 @higherkind
-abstract class Mu<out F> : MuOf<F> {
-  abstract fun <A> unMu(fa: Algebra<F, Eval<A>>): Eval<A>
+interface Mu<F> : MuOf<F> {
+  fun <A> unMu(alg: Algebra<F, A>): A
 
   companion object
 }

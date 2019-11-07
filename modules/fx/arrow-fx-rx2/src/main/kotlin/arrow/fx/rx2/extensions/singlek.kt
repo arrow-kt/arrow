@@ -43,6 +43,7 @@ import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as singleHandleErrorWith
 
 @extension
 interface SingleKFunctor : Functor<ForSingleK> {
@@ -88,7 +89,7 @@ interface SingleKApplicativeError :
     SingleK.raiseError(e)
 
   override fun <A> SingleKOf<A>.handleErrorWith(f: (Throwable) -> SingleKOf<A>): SingleK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().singleHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -99,7 +100,7 @@ interface SingleKMonadError :
     SingleK.raiseError(e)
 
   override fun <A> SingleKOf<A>.handleErrorWith(f: (Throwable) -> SingleKOf<A>): SingleK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().singleHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -231,4 +232,4 @@ interface SingleKTimer : Timer<ForSingleK> {
 
 // TODO SingleK does not yet have a Concurrent instance
 fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK>.() -> A): SingleK<A> =
-  SingleK.async().fx.async(c).fix()
+  defer { SingleK.async().fx.async(c).fix() }

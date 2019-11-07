@@ -16,10 +16,7 @@ import arrow.test.generators.sequenceK
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class SequenceKInstanceTest : UnitSpec() {
 
   init {

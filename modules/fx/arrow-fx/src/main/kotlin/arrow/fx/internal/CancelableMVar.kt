@@ -15,12 +15,12 @@ import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import arrow.fx.typeclasses.rightUnit
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.atomic
 import kotlin.coroutines.EmptyCoroutineContext
 
 internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
 
-  private val state = AtomicReference(initial)
+  private val state = atomic(initial)
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
@@ -47,14 +47,14 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   }
 
   override fun isEmpty(): Kind<F, Boolean> = later {
-    when (state.get()) {
+    when (state.value) {
       is WaitForPut -> true
       is WaitForTake -> false
     }
   }
 
   override fun isNotEmpty(): Kind<F, Boolean> = later {
-    when (state.get()) {
+    when (state.value) {
       is WaitForPut -> false
       is WaitForTake -> true
     }
@@ -80,7 +80,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     cancelable(::unsafeRead)
 
   private tailrec fun unsafeTryPut(a: A): Kind<F, Boolean> =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> just(false)
       is State.WaitForPut -> {
         val first = current.takes.values.firstOrNull()
@@ -99,7 +99,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafePut(a: A, onPut: (Either<Nothing, Unit>) -> Unit): Kind<F, CancelToken<F>> =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> {
         val id = Token()
         val newMap = current.listeners + Pair(id, Tuple2(a, onPut))
@@ -127,7 +127,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeCancelPut(id: Token): Unit =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> {
         val update = current.copy(listeners = current.listeners - id)
         if (state.compareAndSet(current, update)) Unit
@@ -137,7 +137,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeTryTake(): Kind<F, Option<A>> =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> {
         if (current.listeners.isEmpty()) {
           if (state.compareAndSet(current, State.empty())) just(Some(current.value))
@@ -153,7 +153,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeTake(onTake: (Either<Nothing, A>) -> Unit): Kind<F, CancelToken<F>> =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> {
         if (current.listeners.isEmpty()) {
           if (state.compareAndSet(current, State.empty())) {
@@ -182,7 +182,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeCancelTake(id: Token): Unit =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForPut -> {
         val newMap = current.takes - id
         val update = State.WaitForPut(current.reads, newMap)
@@ -193,7 +193,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeRead(onRead: (Either<Nothing, A>) -> Unit): Kind<F, Unit> =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForTake -> {
         onRead(Right(current.value))
         unit()
@@ -207,7 +207,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
 
   private tailrec fun unsafeCancelRead(id: Token): Unit =
-    when (val current = state.get()) {
+    when (val current = state.value) {
       is State.WaitForPut -> {
         val newMap = current.reads - id
         val update = State.WaitForPut(newMap, current.takes)

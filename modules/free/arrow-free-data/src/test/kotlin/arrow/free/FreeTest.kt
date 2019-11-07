@@ -26,9 +26,7 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -44,7 +42,6 @@ sealed class Ops<out A> : OpsOf<A> {
   }
 }
 
-@RunWith(KotlinTestRunner::class)
 class FreeTest : UnitSpec() {
 
   private val program = Ops.fx.monad {
