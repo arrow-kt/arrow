@@ -2,6 +2,7 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
 import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -277,3 +278,17 @@ interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffec
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
   defer { IO.concurrent().fx.concurrent(c).fix() }
+
+/**
+ * converts this Either to an IO. The resulting IO will evaluate to this Eithers
+ * Right value or alternatively to the result of applying the specified function to this Left value.
+ */
+fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
+  fold({ IO.raiseError(f(it)) }, { IO.just(it) })
+
+/**
+ * converts this Either to an IO. The resulting IO will evaluate to this Eithers
+ * Right value or Left exception.
+ */
+fun <A> Either<Throwable, A>.toIO(): IO<A> =
+  toIO(::identity)
