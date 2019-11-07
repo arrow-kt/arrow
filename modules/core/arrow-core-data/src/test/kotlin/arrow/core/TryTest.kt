@@ -6,20 +6,17 @@ import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.hash.hash
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.`try`.monoid.monoid
-import arrow.core.extensions.`try`.semigroup.semigroup
 import arrow.core.extensions.`try`.show.show
 import arrow.core.extensions.`try`.traverse.traverse
 import arrow.core.extensions.combine
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
-import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -28,12 +25,9 @@ import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.should
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }
@@ -44,7 +38,6 @@ class TryTest : UnitSpec() {
     val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
     testLaws(
-      SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),

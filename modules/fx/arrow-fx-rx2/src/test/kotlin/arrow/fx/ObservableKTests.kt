@@ -21,19 +21,16 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 class ObservableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {

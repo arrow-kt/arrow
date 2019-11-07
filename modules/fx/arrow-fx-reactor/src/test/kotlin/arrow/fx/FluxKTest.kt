@@ -21,13 +21,10 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.matchers.startWith
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.startsWith
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
 import reactor.test.expectError
@@ -36,11 +33,10 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KotlinTestRunner::class)
 class FluxKTest : UnitSpec() {
 
   fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =
-    flux.doOnNext { assertThat(Thread.currentThread().name, not(startsWith(name))) }
+    flux.doOnNext { Thread.currentThread().name shouldNot startWith(name) }
 
   fun <T> EQ(): Eq<FluxKOf<T>> = object : Eq<FluxKOf<T>> {
     override fun FluxKOf<T>.eqv(b: FluxKOf<T>): Boolean =

@@ -1,9 +1,8 @@
 package arrow
 
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import kotlin.annotation.AnnotationTarget.CLASS
+// metadebug
 
-@Retention(RUNTIME)
-@Target(CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
 @MustBeDocumented
 annotation class higherkind

@@ -21,11 +21,8 @@ import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {

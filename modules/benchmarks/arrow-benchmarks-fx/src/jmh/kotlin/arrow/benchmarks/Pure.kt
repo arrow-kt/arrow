@@ -37,4 +37,8 @@ open class Pure {
   @Benchmark
   fun scalazZio(): Int =
     arrow.benchmarks.effects.scala.zio.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
+
+  @Benchmark
+  fun kio(): Int =
+    arrow.benchmarks.effects.kio.Pure.unsafeKIOPureLoop(size, 0)
 }

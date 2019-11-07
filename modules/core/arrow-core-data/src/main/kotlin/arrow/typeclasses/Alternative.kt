@@ -46,4 +46,6 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @returns a combination of both computations.
    */
   fun <A> Kind<F, A>.orElse(b: Kind<F, A>): Kind<F, A>
+
+  override fun <A> Kind<F, A>.combineK(y: Kind<F, A>): Kind<F, A> = orElse(y)
 }

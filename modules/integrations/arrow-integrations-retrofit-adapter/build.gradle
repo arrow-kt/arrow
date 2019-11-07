@@ -11,7 +11,7 @@ dependencies {
     testCompileOnly project(':arrow-meta')
     testCompile project(':arrow-test')
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testCompile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     testCompile 'com.squareup.okhttp3:mockwebserver:3.13.1'
     testCompile project(':arrow-fx-rx2')

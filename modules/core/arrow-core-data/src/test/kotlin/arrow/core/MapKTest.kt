@@ -19,15 +19,11 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class MapKTest : UnitSpec() {
 
   val EQ: Eq<Kind2<ForMapK, String, Int>> = object : Eq<Kind2<ForMapK, String, Int>> {
@@ -45,11 +41,6 @@ class MapKTest : UnitSpec() {
       FoldableLaws.laws(MapK.foldable(), { a: Int -> mapOf("key" to a).k() }, Eq.any()),
       EqLaws.laws(EQ) { mapOf(it.toString() to it).k() },
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
-      SemigroupLaws.laws(MapK.monoid<String, Int>(Int.semigroup()),
-        mapOf("key" to 1).k(),
-        mapOf("key" to 2).k(),
-        mapOf("key" to 3).k(),
-        EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() }
     )
   }

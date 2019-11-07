@@ -11,7 +11,7 @@ import arrow.fx.IOOf
 import arrow.fx.IORunLoop
 import arrow.fx.fix
 import arrow.fx.typeclasses.ExitCase
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.atomicfu.atomic
 
 internal object IOBracket {
 
@@ -111,7 +111,7 @@ internal object IOBracket {
 
     // Guard used for thread-safety, to ensure the idempotency
     // of the release; otherwise `release` can be called twice
-    private val waitsForResult = AtomicBoolean(true)
+    private val waitsForResult = atomic(true)
 
     abstract fun release(c: ExitCase<Throwable>): CancelToken<ForIO>
 

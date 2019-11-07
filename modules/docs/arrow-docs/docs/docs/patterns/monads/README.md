@@ -232,7 +232,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 Let me do one further trick and format the same code in an unusual way:
 
 ```kotlin
-fun allCitiesToVisit(Speaker speaker): List<City> {
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()           .flatMap { x -> x

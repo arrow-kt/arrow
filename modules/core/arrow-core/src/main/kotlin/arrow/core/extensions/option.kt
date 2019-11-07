@@ -19,6 +19,7 @@ import arrow.core.identity
 import arrow.core.k
 import arrow.core.orElse
 import arrow.extension
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -311,7 +312,7 @@ fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A
   Option.monad().fx.monad(c).fix()
 
 @extension
-interface OptionMonadCombine : MonadCombine<ForOption> {
+interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
@@ -335,15 +336,6 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
-
-  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
-    orElse { y.fix() }
-
-  override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Option<A> =
-    when (val a = fix()) {
-      is None -> b.fix()
-      is Some -> a
-    }
 
   override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
     fix().fold(
@@ -424,4 +416,12 @@ interface OptionMonadFilter : MonadFilter<ForOption> {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
+}
+
+@extension
+interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
+  override fun <A> empty(): Kind<ForOption, A> = None
+  override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
+    if (fix().isEmpty()) b
+    else this
 }

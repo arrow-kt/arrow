@@ -8,7 +8,7 @@ permalink: /docs/quickstart/setup/
 
 ### Next development version
 
-If you want to try the last features, replace `0.10.1` by `0.10.2-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.10.2` by `0.10.3-SNAPSHOT` in the following guideline.
 
 ### JDK
 
@@ -38,10 +38,10 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.1"
+def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -51,10 +51,10 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.1"
+def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -64,10 +64,10 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.1"
+def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
@@ -77,14 +77,16 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.1"
+def arrow_version = "0.10.2"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
+
+##### Other libraries
 
 Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
@@ -99,7 +101,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.1"
+def arrow_version = "0.10.2"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
@@ -137,12 +139,11 @@ idea {
  
 #### Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-     <arrow.version>0.10.1</arrow.version>
+     <arrow.version>0.10.2</arrow.version>
 </properties>
 ```
 

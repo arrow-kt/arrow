@@ -5,10 +5,13 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.internal.AtomicBooleanW
 import arrow.core.invoke
 import arrow.fx.typeclasses.MonadDefer
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.getAndUpdate
+import kotlinx.atomicfu.updateAndGet
 
 /**
  * An asynchronous, concurrent mutable reference.
@@ -106,7 +109,7 @@ interface Ref<F, A> {
      *
      * @see [invoke]
      */
-    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(AtomicReference(a), MD)
+    fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(a, MD)
 
     /**
      * Build a [RefFactory] value for creating Ref types [F] without deciding the type of the Ref's value.
@@ -120,14 +123,16 @@ interface Ref<F, A> {
     /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
      */
-    private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
+    private class MonadDeferRef<F, A>(a: A, private val MD: MonadDefer<F>) : Ref<F, A> {
+
+      private val ar: AtomicRef<A> = atomic(a)
 
       override fun get(): Kind<F, A> = MD.later {
-        ar.get()
+        ar.value
       }
 
       override fun set(a: A): Kind<F, Unit> = MD.later {
-        ar.set(a)
+        ar.value = a
       }
 
       override fun getAndSet(a: A): Kind<F, A> = MD.later {
@@ -147,8 +152,8 @@ interface Ref<F, A> {
       }
 
       override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD.later {
-        val snapshot = ar.get()
-        val hasBeenCalled = AtomicBoolean(false)
+        val snapshot = ar.value
+        val hasBeenCalled = AtomicBooleanW(false)
         val setter = { a: A ->
           MD.later { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
         }
@@ -161,7 +166,7 @@ interface Ref<F, A> {
       }
 
       override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD.later {
-        val a = ar.get()
+        val a = ar.value
         val (u, b) = f(a)
         if (ar.compareAndSet(a, u)) Some(b)
         else None
@@ -172,7 +177,7 @@ interface Ref<F, A> {
 
       override fun <B> modify(f: (A) -> Tuple2<A, B>): Kind<F, B> {
         tailrec fun go(): B {
-          val a = ar.get()
+          val a = ar.value
           val (u, b) = f(a)
           return if (!ar.compareAndSet(a, u)) go() else b
         }

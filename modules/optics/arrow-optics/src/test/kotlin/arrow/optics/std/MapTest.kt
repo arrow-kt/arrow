@@ -10,10 +10,7 @@ import arrow.test.generators.mapK
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class MapTest : UnitSpec() {
 
   init {

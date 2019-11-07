@@ -15,13 +15,10 @@ import arrow.test.UnitSpec
 import arrow.test.generators.throwable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
-import org.junit.runner.RunWith
 import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 class PromiseTest : UnitSpec() {
 
   init {

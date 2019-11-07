@@ -12,11 +12,8 @@ import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class EvalTest : UnitSpec() {
   val EQ1: Eq<Kind<ForEval, Int>> = Eq { a, b ->
     a.value() == b.value()

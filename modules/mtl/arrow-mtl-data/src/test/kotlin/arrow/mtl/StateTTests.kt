@@ -27,10 +27,7 @@ import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class StateTTests : UnitSpec() {
 
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())

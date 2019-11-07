@@ -10,10 +10,7 @@ import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ConstTest : UnitSpec() {
   init {
     Int.monoid().run {

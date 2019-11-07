@@ -4,7 +4,7 @@ dependencies {
     compile project(':arrow-fx')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testCompile project(':arrow-test')
     testCompile project(':arrow-fx')
 

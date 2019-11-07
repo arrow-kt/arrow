@@ -16,14 +16,11 @@ import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import io.kotlintest.fail
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ProcCallBackTest : UnitSpec() {
 
   private fun server(): MockWebServer = MockWebServer().apply {
