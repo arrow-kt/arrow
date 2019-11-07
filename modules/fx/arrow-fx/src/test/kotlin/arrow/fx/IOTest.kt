@@ -16,6 +16,7 @@ import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
+import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase
@@ -605,11 +606,40 @@ class IOTest : UnitSpec() {
       IO.concurrent().parMap3(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
+
+    "can go from Either to IO directly when Left type is a Throwable" {
+
+      val exception = RuntimeException()
+      val left = Either.left(exception)
+      val right = Either.right("rightValue")
+
+      left.toIO()
+        .attempt().unsafeRunSync() shouldBe Left(exception)
+
+      right.toIO()
+        .unsafeRunSync() shouldBe "rightValue"
+    }
+
+    "can go from Either to IO by mapping the Left value to a Throwable" {
+
+      val exception = RuntimeException()
+      val left = Either.left("boom")
+      val right = Either.right("rightValue")
+
+      right
+        .toIO { exception }
+        .unsafeRunSync() shouldBe "rightValue"
+
+      left
+        .toIO { exception }
+        .attempt().unsafeRunSync() shouldBe Left(exception)
+    }
   }
 }
 
 /** Represents a unique identifier context using object equality. */
 internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
+
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
