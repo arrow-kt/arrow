@@ -10,8 +10,8 @@ redirect_from:
 
 {:.intermediate}
 intermediate
-TODO: Turn it to Ref instead of Promise
-In functional programming it is very common to encode "behaviors" as data types - common behaviors include `Option` for possibly missing values, `Either` and `Validated` for possible errors, and [`Promise`]({{ '/docs/effects/promise/' | relative_url }}) for asynchronous computations, which has the same purpose as a `Future`, only pure and lazy.
+
+In functional programming it is very common to encode "behaviors" as data types - common behaviors include `Option` for possibly missing values, `Either` and `Validated` for possible errors, and [`Ref`]({{ '/docs/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
 
 These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single `String` into an `Int`, validating a login, or asynchronously fetching website information for a user.
 
