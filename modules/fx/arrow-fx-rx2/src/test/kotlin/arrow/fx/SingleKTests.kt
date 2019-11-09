@@ -1,6 +1,5 @@
 package arrow.fx
 
-import arrow.core.Either
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
@@ -34,8 +33,8 @@ class SingleKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
     override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
-      val res1: Either<Throwable, T> = attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
-      val res2: Either<Throwable, T> = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
+      val res1 = attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
+      val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
       return res1.fold({ t1 ->
         res2.fold({ t2 ->
           (t1::class.java == t2::class.java)
@@ -84,7 +83,7 @@ class SingleKTests : RxJavaSpec() {
           .let { true }
       }
     }
-    //
+
     "Multi-thread Singles should run on their required threads" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
         val originalThread: Thread = Thread.currentThread()
