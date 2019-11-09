@@ -69,7 +69,7 @@ apResult
 ``` 
 `ap2` acts like `map2` to `map`
 
-In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,Z>`
+In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,B>`
 
 ```kotlin:ank
 val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
