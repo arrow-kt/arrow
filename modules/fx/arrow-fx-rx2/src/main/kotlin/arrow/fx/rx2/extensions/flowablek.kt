@@ -46,8 +46,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.functions.BiFunction
 import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.rx2.extensions.flowablek.dispatchers.dispatchers
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.MonadFilter
@@ -251,8 +253,14 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
     }
 }
 
-fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
+fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK> = FlowableK.dispatchers()): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
   override fun dispatchers(): Dispatchers<ForFlowableK> = dispatchers
+}
+
+@extension
+interface FlowableKDispatchers : Dispatchers<ForFlowableK> {
+  override fun default(): CoroutineContext =
+    ComputationScheduler
 }
 
 @extension
@@ -381,6 +389,5 @@ interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
   override fun <A> just(a: A): FlowableK<A> =
     FlowableK.just(a)
 }
-// TODO FlowableK does not yet have a Concurrent instance
-fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
-  defer { FlowableK.async().fx.async(c).fix() }
+fun <A> FlowableK.Companion.fx(c: suspend ConcurrentSyntax<ForFlowableK>.() -> A): FlowableK<A> =
+  defer { FlowableK.concurrent().fx.concurrent(c).fix() }
