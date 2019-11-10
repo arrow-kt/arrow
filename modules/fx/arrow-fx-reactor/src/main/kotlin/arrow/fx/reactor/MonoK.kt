@@ -13,6 +13,9 @@ import arrow.fx.typeclasses.ExitCase
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ForMonoK private constructor() {
   companion object
@@ -30,6 +33,11 @@ fun <A> MonoKOf<A>.value(): Mono<A> =
   this.fix().mono as Mono<A>
 
 data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
+
+  suspend fun suspended(): A? = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
+  }
+
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
