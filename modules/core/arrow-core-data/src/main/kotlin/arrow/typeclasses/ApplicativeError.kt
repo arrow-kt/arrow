@@ -47,7 +47,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
     }
 
   @Deprecated(
-    "catch will be deleted soon as it promotes eager execution of effects",
+    "ApplicativeError#catch will be changed to a suspend fun in future versions",
     ReplaceWith("effectCatch(recover, f)")
   )
   fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> =
@@ -58,7 +58,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
     }
 
   @Deprecated(
-    "catch will be deleted soon as it promotes eager execution of effects",
+    "ApplicativeError#catch will be changed to a suspend fun in future versions",
     ReplaceWith("effectCatch(f)")
   )
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
