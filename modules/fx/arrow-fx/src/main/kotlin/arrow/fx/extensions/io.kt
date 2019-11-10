@@ -31,7 +31,6 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeCancellableRun
-import arrow.fx.typeclasses.UnsafeConcurrentRun
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
