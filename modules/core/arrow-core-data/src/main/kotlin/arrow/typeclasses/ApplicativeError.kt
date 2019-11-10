@@ -46,6 +46,10 @@ interface ApplicativeError<F, E> : Applicative<F> {
       just(Left(it))
     }
 
+  @Deprecated(
+    "catch will be deleted soon as it promotes eager execution of effects",
+    ReplaceWith("effectCatch(recover, f)")
+  )
   fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> =
     try {
       just(f())
@@ -53,6 +57,10 @@ interface ApplicativeError<F, E> : Applicative<F> {
       raiseError(recover(t.nonFatalOrThrow()))
     }
 
+  @Deprecated(
+    "catch will be deleted soon as it promotes eager execution of effects",
+    ReplaceWith("effectCatch(f)")
+  )
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
     catch(::identity, f)
 
