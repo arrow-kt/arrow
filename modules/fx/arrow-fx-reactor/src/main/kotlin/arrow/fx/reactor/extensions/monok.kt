@@ -1,5 +1,6 @@
 package arrow.fx.reactor.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
@@ -20,12 +21,16 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.reactor.unsafeRunAsync
+import arrow.fx.reactor.unsafeRunSync
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
@@ -128,6 +133,18 @@ interface MonoKTimer : Timer<ForMonoK> {
   override fun sleep(duration: Duration): MonoK<Unit> =
     MonoK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
       .map { Unit })
+}
+
+@extension
+interface ForMonoKUnsafeRun : UnsafeRun<ForMonoK> {
+
+  fun <A> FA(): Function1<A?, A>
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMonoK, A>): A =
+    FA<A>().invoke(fa().fix().unsafeRunSync())
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForMonoK, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
 }
 
 // TODO FluxK does not yet have a Concurrent instance
