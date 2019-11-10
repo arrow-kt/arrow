@@ -10,6 +10,6 @@ interface UnsafeRun<F> {
   suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<F, A>, cb: (Either<Throwable, A>) -> Unit): Unit
 }
 
-interface UnsafeCancellableRun<F>: UnsafeRun<F> {
+interface UnsafeCancellableRun<F> : UnsafeRun<F> {
   suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<F, A>, cb: (Either<Throwable, A>) -> Unit): Disposable
 }
