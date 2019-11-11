@@ -3,6 +3,7 @@ package arrow.fx.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
+import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -11,26 +12,26 @@ import arrow.fx.IOOf
 import arrow.fx.OnCancel
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.fix
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Effect
+import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.Timer
-import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.dispatchers.dispatchers
-import arrow.fx.typeclasses.ConcurrentSyntax
-import arrow.fx.typeclasses.Environment
+import arrow.fx.typeclasses.UnsafeCancellableRun
 import arrow.fx.typeclasses.UnsafeRun
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -42,8 +43,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.fx.handleErrorWith as ioHandleErrorWith
 import arrow.fx.handleError as ioHandleError
+import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -247,6 +248,17 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
+}
+
+@extension
+interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+
+  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
 }
 
 @extension

@@ -30,13 +30,17 @@ import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.fx.rx2.extensions.singlek.dispatchers.dispatchers
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -235,6 +239,15 @@ interface SingleKTimer : Timer<ForSingleK> {
   override fun sleep(duration: Duration): SingleK<Unit> =
     SingleK(Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
+}
+
+@extension
+interface SingleKUnsafeRun : UnsafeRun<ForSingleK> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForSingleK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForSingleK, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
 }
 
 fun <A> SingleK.Companion.fx(c: suspend ConcurrentSyntax<ForSingleK>.() -> A): SingleK<A> =
