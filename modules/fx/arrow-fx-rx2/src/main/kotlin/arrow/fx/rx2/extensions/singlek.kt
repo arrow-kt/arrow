@@ -226,6 +226,9 @@ fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK> = SingleK.
 interface SingleKDispatchers : Dispatchers<ForSingleK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension

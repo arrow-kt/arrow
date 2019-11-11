@@ -18,7 +18,6 @@ import arrow.fx.rx2.extensions.flowablek.timer.timer
 import arrow.fx.rx2.extensions.flowablek.traverse.traverse
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
@@ -28,12 +27,9 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.shouldBe
 import io.reactivex.Flowable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class FlowableKTests : RxJavaSpec() {
 
@@ -53,13 +49,9 @@ class FlowableKTests : RxJavaSpec() {
     }
   }
 
-  val CO = FlowableK.concurrent(object : Dispatchers<ForFlowableK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
-
   init {
     testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
