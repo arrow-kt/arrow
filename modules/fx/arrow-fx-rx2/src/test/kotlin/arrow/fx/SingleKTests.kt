@@ -11,7 +11,6 @@ import arrow.fx.rx2.extensions.singlek.monad.flatMap
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
@@ -22,10 +21,8 @@ import io.kotlintest.shouldBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class SingleKTests : RxJavaSpec() {
 
@@ -47,13 +44,9 @@ class SingleKTests : RxJavaSpec() {
     }
   }
 
-  val CS = SingleK.concurrent(object : Dispatchers<ForSingleK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
-
   init {
     testLaws(
-      ConcurrentLaws.laws(CS, EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
 

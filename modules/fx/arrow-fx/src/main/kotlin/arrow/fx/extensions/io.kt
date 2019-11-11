@@ -265,6 +265,9 @@ interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
+
+  override fun io(): CoroutineContext =
+    IODispatchers.IOPool
 }
 
 @extension

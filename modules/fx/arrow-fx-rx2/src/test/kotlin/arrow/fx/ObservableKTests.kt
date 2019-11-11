@@ -14,7 +14,6 @@ import arrow.fx.rx2.extensions.observablek.timer.timer
 import arrow.fx.rx2.extensions.observablek.traverse.traverse
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
@@ -24,12 +23,9 @@ import arrow.typeclasses.Eq
 import io.kotlintest.shouldBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
-import kotlin.coroutines.CoroutineContext
 
 class ObservableKTests : RxJavaSpec() {
 
@@ -49,14 +45,10 @@ class ObservableKTests : RxJavaSpec() {
     }
   }
 
-  val CO = ObservableK.concurrent(object : Dispatchers<ForObservableK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
-
   init {
     testLaws(
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
-      ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(ObservableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
       MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQ())
     )
