@@ -9,9 +9,9 @@ permalink: /docs/quickstart/libraries/
 Arrow is a modular set of libraries that build on top of each other to provide increasingly higher level features.
 
 One of our design principles is to keep each library as lean as possible to avoid pulling unnecessary dependencies,
-specially to support Android development where app size affects performance. You're free to pick and choose only those libraries that your project needs!
+specifically to support Android development where app size affects performance. You're free to pick and choose only those libraries that your project needs!
 
-In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
+In this doc, we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 ### arrow-core
 
@@ -32,7 +32,7 @@ Multiple extensions functions to work better with function objects and collectio
 
 Dependencies: arrow-core
 
-For function objects the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
+For function objects, the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
 
 For collections, arrow-syntax provides `firstOption`, tail, basic list traversal, and tuple addition.
 
@@ -55,7 +55,7 @@ Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relativ
 beginner
 
 This library focuses on expanding the helpers provided by typeclasses to existing constructs, like the system collections.
-You can also find more advanced constructs for pure functional programming like the `RWS` datatypes, or transformers.
+You can also find more advanced constructs for pure functional programming like the `RWS` datatypes or transformers.
 
 Dependencies: arrow-typeclasses
 
@@ -85,7 +85,7 @@ Typeclasses: [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' |
 
 ## Extension libraries
 
-These libraries are hosted inside the arrow repository building on the core, to provide higher level constructs to deal with concepts rather than code abstraction.
+These libraries are hosted inside the Arrow repository building on the core to provide higher level constructs to deal with concepts rather than code abstraction.
 
 ### arrow-optics
 
@@ -96,7 +96,7 @@ Optics is the functional way of handling immutable data and collections in a way
 
 It can be used alongside annotation processing to generate [simple DSLs]({{ '/docs/optics/dsl/' | relative_url }}) that read like imperative code.
 
-For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
+For all the new typeclasses, it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
 Datatypes: [`Fold`]({{ '/docs/optics/fold/' | relative_url }}), [`Getter`]({{ '/docs/optics/getter/' | relative_url }}), [`Iso`]({{ '/docs/optics/iso/' | relative_url }}), [`Lens`]({{ '/docs/optics/lens/' | relative_url }}), [`Optional`]({{ '/docs/optics/optional/' | relative_url }}), [`Prism`]({{ '/docs/optics/prism/' | relative_url }}), [`Setter`]({{ '/docs/optics/setter/' | relative_url }}), [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }})
 
@@ -107,7 +107,7 @@ Typeclasses: [`At`]({{ '/docs/optics/at/' | relative_url }}), [`Each`]({{ '/docs
 {:.intermediate}
 intermediate
 
-The effects library abstracts over concurrency frameworks using typeclasses. Additionally it provides its own concurrency primitive, called IO.
+The effects library abstracts over concurrency frameworks using typeclasses. Additionally, it provides its own concurrency primitive called IO.
 
 Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 
@@ -149,14 +149,14 @@ Typeclasses: [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}
 {:.advanced}
 advanced
 
-The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes, through the use of typeclasses.
+The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
 
 ### arrow-free
 
 {:.advanced}
 advanced
 
-The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpreting domain specific languages from inside your program, including a configurable runner and flexible algebras.
+The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpreting domain-specific languages from inside your program, including a configurable runner and flexible algebras.
 This allows optimization of operations like operator fusion or parallelism, while remaining on your business domain.
 
 Datatypes: [`Free`]({{ '/docs/free/free/' | relative_url }}), [`FreeApplicative`]({{ '/docs/free/freeapplicative/' | relative_url }}), [`Cofree`]({{ '/docs/free/cofree/' | relative_url }}), [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }}), [`Coyoneda`]({{ '/docs/free/coyoneda/' | relative_url }})
