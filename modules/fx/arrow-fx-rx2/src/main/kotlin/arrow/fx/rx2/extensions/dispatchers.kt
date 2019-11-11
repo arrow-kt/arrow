@@ -10,7 +10,7 @@ import kotlin.coroutines.CoroutineContext
 internal val ComputationScheduler: CoroutineContext =
   Schedulers.computation().asCoroutineContext()
 
-internal val IOScheduler: CoroutineContext=
+internal val IOScheduler: CoroutineContext =
   Schedulers.io().asCoroutineContext()
 
 fun Scheduler.asCoroutineContext(): CoroutineContext =
