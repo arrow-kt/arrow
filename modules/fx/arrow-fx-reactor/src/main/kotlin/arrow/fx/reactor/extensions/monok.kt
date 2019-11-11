@@ -1,11 +1,11 @@
 package arrow.fx.reactor.extensions
 
 import arrow.core.Either
+import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
-import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.monok.async.async
 import arrow.fx.reactor.fix
 import arrow.fx.typeclasses.Async
@@ -19,7 +19,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
