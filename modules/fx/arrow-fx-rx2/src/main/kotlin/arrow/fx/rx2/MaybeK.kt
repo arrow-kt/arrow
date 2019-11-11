@@ -18,6 +18,9 @@ import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ForMaybeK private constructor() {
   companion object
@@ -34,6 +37,10 @@ fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe as Maybe<A>
 
 data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
+
+  suspend fun suspended(): A? = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
+  }
 
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()

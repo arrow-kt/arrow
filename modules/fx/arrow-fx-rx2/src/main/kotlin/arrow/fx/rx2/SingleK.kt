@@ -16,6 +16,9 @@ import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ForSingleK private constructor() {
   companion object
@@ -32,6 +35,10 @@ fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 fun <A> SingleKOf<A>.value(): Single<A> = fix().single as Single<A>
 
 data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
+
+  suspend fun suspended(): A = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException)
+  }
 
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
