@@ -2,7 +2,9 @@ package arrow.fx
 
 import arrow.undocumented
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
@@ -13,6 +15,14 @@ import kotlin.coroutines.CoroutineContext
 object IODispatchers {
   // FIXME use ForkJoinPool.commonPool() in Java 8
   val CommonPool: CoroutineContext = ForkJoinPool().asCoroutineContext()
+
+  private val ioCtr = AtomicInteger(0)
+  val IOPool = Executors.newCachedThreadPool { r ->
+    Thread(r).apply {
+      name = "io-arrow-kt-worker-${ioCtr.getAndIncrement()}"
+      isDaemon = true
+    }
+  }.asCoroutineContext()
 }
 
 fun ExecutorService.asCoroutineContext(): CoroutineContext =

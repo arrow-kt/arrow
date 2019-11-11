@@ -246,6 +246,9 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
 interface ObservableKDispatchers : Dispatchers<ForObservableK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK> = ObservableK.dispatchers()): Concurrent<ForObservableK> = object : ObservableKConcurrent {
