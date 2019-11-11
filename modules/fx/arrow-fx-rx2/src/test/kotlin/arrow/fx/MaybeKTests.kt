@@ -11,7 +11,6 @@ import arrow.fx.rx2.extensions.maybek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
@@ -22,10 +21,8 @@ import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class MaybeKTests : RxJavaSpec() {
 
@@ -45,14 +42,10 @@ class MaybeKTests : RxJavaSpec() {
     }
   }
 
-  val CM = MaybeK.concurrent(object : Dispatchers<ForMaybeK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
-
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(MaybeK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
       MonadFilterLaws.laws(MaybeK.monadFilter(), { Maybe.just(it).k() }, EQ())
     )
 

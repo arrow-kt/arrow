@@ -245,6 +245,9 @@ fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dis
 interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension

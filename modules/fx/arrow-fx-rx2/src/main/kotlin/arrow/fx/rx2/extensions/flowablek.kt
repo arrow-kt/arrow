@@ -260,6 +260,9 @@ fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK> = Flow
 interface FlowableKDispatchers : Dispatchers<ForFlowableK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension
