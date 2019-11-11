@@ -2,6 +2,7 @@ package arrow.fx.typeclasses
 
 import arrow.Kind
 import arrow.fx.CancelToken
+import arrow.higherkind
 
 /**
  * [Fiber] represents the pure result of an [Async] data type
@@ -10,7 +11,7 @@ import arrow.fx.CancelToken
  * You can think of fibers as being lightweight threads, a Fiber being a
  * concurrency primitive for doing cooperative multi-tasking.
  */
-interface Fiber<F, out A> {
+@higherkind interface Fiber<F, out A> : FiberOf<F, A> {
 
   /**
    * Returns a new task that will await for the completion of the
