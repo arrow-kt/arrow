@@ -34,7 +34,7 @@ Use the list below to learn more about Λrrow's main features.
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-In your project's root `build.gradle` append the jcenter repository to your list of repositories.
+In your project's root `build.gradle`, append the jcenter repository to your list of repositories.
 
 ```groovy
 allprojects {
@@ -51,18 +51,18 @@ allprojects {
 
 Starting in 0.9.1, Arrow follows the following convention for artifact publication.
 
-The arrow modules are Core, Effects, Optics, Recursion, etc.
+The Arrow modules are Core, Effects, Optics, Recursion, etc.
 
 An Arrow module is composed of data types and type classes.
 Arrow modules are exported and published with the following semantics.
 
-If we take for example `arrow-core`.
+If we take `arrow-core`, for example.
 
-Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
+Arrow core contains the basic arrow type classes and data types and it's composed of three main artifacts that may be used a la carte:
 
 Recomended for most use cases:
 
-- `arrow-core` (Depends on data and extensions modules and exports both)
+- `arrow-core` (Depends on data and extensions modules, and exports both)
 
 Trimmed down versions:
 
@@ -113,7 +113,7 @@ dependencies {
 
 # Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow,
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -158,7 +158,7 @@ idea {
 # Maven
 ## Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
+Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
@@ -167,7 +167,7 @@ Add to your pom.xml file the following properties:
 </properties>
 ```
 
-Add the dependencies that you want to use
+Add the dependencies that you want to use:
 ```
         <dependency>
             <groupId>io.arrow-kt</groupId>
@@ -204,7 +204,7 @@ Add the dependencies that you want to use
 
 ## Enabling kapt
 
-Enable annotaton processing using kotlin plugin
+Enable annotaton processing using Kotlin plugin:
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
