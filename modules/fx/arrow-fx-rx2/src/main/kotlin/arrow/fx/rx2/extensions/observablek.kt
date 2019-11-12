@@ -20,7 +20,6 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
-import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
@@ -34,6 +33,8 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.rx2.extensions.observablek.dispatchers.dispatchers
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -241,7 +242,16 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
     }
 }
 
-fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK>): Concurrent<ForObservableK> = object : ObservableKConcurrent {
+@extension
+interface ObservableKDispatchers : Dispatchers<ForObservableK> {
+  override fun default(): CoroutineContext =
+    ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
+}
+
+fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK> = ObservableK.dispatchers()): Concurrent<ForObservableK> = object : ObservableKConcurrent {
   override fun dispatchers(): Dispatchers<ForObservableK> = dispatchers
 }
 
@@ -275,9 +285,8 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
     fix().switchMap { f(it).fix() }
 }
 
-// TODO ObservableK does not yet have a Concurrent instance
-fun <A> ObservableK.Companion.fx(c: suspend AsyncSyntax<ForObservableK>.() -> A): ObservableK<A> =
-  defer { ObservableK.async().fx.async(c).fix() }
+fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() -> A): ObservableK<A> =
+  defer { ObservableK.concurrent().fx.concurrent(c).fix() }
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {
