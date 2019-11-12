@@ -1,16 +1,16 @@
 package arrow.recursion.extensions
 
 import arrow.Kind
+import arrow.core.Const
+import arrow.core.ConstPartialOf
 import arrow.core.Id
 import arrow.core.extensions.const.functor.functor
+import arrow.core.value
 import arrow.extension
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Functor
-import arrow.typeclasses.value
 
 @extension
 interface IdBirecursive<A> : Birecursive<Id<A>, ConstPartialOf<Id<A>>> {
