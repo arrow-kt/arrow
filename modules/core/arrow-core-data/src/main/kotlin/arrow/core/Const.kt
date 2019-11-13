@@ -1,9 +1,9 @@
-package arrow.typeclasses
+package arrow.core
 
 import arrow.Kind
-import arrow.core.Option
-import arrow.core.identity
 import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Semigroup
 
 fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 

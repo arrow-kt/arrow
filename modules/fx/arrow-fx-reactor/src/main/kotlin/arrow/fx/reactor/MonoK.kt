@@ -13,6 +13,9 @@ import arrow.fx.typeclasses.ExitCase
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ForMonoK private constructor() {
   companion object
@@ -30,6 +33,11 @@ fun <A> MonoKOf<A>.value(): Mono<A> =
   this.fix().mono as Mono<A>
 
 data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
+
+  suspend fun suspended(): A? = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
+  }
+
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
@@ -223,6 +231,47 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     }
   }
 }
+
+/**
+ * Runs the [MonoK] asynchronously and then runs the cb.
+ * Catches all errors that may be thrown in await. Errors from cb will still throw as expected.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.fx.reactor.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   MonoK.just(1).unsafeRunAsync { either: Either<Throwable, Int> ->
+ *     either.fold({ t: Throwable ->
+ *       println(t)
+ *     }, { i: Int ->
+ *       println("Finished with $i")
+ *     })
+ *   }
+ *   //sampleEnd
+ * }
+ * ```
+ */
+fun <A> MonoKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  value().subscribe({ cb(arrow.core.Right(it)) }, { cb(arrow.core.Left(it)) }).let { }
+
+/**
+ * Runs this [MonoKOf] with [Mono.block]. Does not handle errors at all, rethrowing them if they happen.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.reactor.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result: MonoK<String> = MonoK.raiseError<String>(Exception("BOOM"))
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <A> MonoKOf<A>.unsafeRunSync(): A? =
+  value().block()
 
 fun <A> MonoK<A>.handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
   value().onErrorResume { t: Throwable -> function(t).value() }.k()

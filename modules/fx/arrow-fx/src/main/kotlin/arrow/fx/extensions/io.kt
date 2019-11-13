@@ -2,6 +2,8 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
+import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -10,26 +12,26 @@ import arrow.fx.IOOf
 import arrow.fx.OnCancel
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.fix
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Effect
+import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.Timer
-import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.dispatchers.dispatchers
-import arrow.fx.typeclasses.ConcurrentSyntax
-import arrow.fx.typeclasses.Environment
+import arrow.fx.typeclasses.UnsafeCancellableRun
 import arrow.fx.typeclasses.UnsafeRun
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -41,8 +43,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.fx.handleErrorWith as ioHandleErrorWith
 import arrow.fx.handleError as ioHandleError
+import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -249,9 +251,23 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 }
 
 @extension
+interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+
+  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
+}
+
+@extension
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
+
+  override fun io(): CoroutineContext =
+    IODispatchers.IOPool
 }
 
 @extension
@@ -277,3 +293,17 @@ interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffec
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
   defer { IO.concurrent().fx.concurrent(c).fix() }
+
+/**
+ * converts this Either to an IO. The resulting IO will evaluate to this Eithers
+ * Right value or alternatively to the result of applying the specified function to this Left value.
+ */
+fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
+  fold({ IO.raiseError(f(it)) }, { IO.just(it) })
+
+/**
+ * converts this Either to an IO. The resulting IO will evaluate to this Eithers
+ * Right value or Left exception.
+ */
+fun <A> Either<Throwable, A>.toIO(): IO<A> =
+  toIO(::identity)

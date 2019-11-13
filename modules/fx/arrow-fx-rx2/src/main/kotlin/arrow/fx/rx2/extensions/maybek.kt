@@ -18,7 +18,6 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
-import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
@@ -30,6 +29,8 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -236,8 +237,17 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
     }
 }
 
-fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK>): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
+fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dispatchers()): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
+}
+
+@extension
+interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
+  override fun default(): CoroutineContext =
+    ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension
@@ -283,6 +293,5 @@ interface MaybeKMonadFilter : MonadFilter<ForMaybeK> {
     MaybeK.just(a)
 }
 
-// TODO MaybeK does not yet have a Concurrent instance
-fun <A> MaybeK.Companion.fx(c: suspend AsyncSyntax<ForMaybeK>.() -> A): MaybeK<A> =
-  defer { MaybeK.async().fx.async(c).fix() }
+fun <A> MaybeK.Companion.fx(c: suspend ConcurrentSyntax<ForMaybeK>.() -> A): MaybeK<A> =
+  defer { MaybeK.concurrent().fx.concurrent(c).fix() }
