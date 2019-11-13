@@ -19,7 +19,7 @@ Its core operation, `bimap`, closely resembles `map`, except it lifts two functi
 fun Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 ```
 
-`bimap` takes two unary functions and a binary type constructor as a receiver such as `Tuple2(1, 3)` or `Left(5)` and applies whichever function it can -- both if it can!
+`bimap` takes two unary functions and a binary type constructor as a receiver, such as `Tuple2(1, 3)` or `Left(5)`, and applies whichever function it can -- both if possible!
 
 ```kotlin:ank
 import arrow.*
@@ -43,13 +43,13 @@ import arrow.core.extensions.tuple2.bifunctor.*
 greet(Tuple2.bifunctor(), Tuple2("there", "Kenobi")) // Tuple2("Hello there", "General Kenobi")
 ```
 
-So, `bimap` is `map` but for binary type constructors where you want the ability to lift two functions at once.
+So, `bimap` is `map`, but for binary type constructors where you want the ability to lift two functions at once.
 
 ### Main Combinators
 
 #### Kind2<F, A, B>#bimap
 
-Transforms the inner contents of a binary type constructor
+Transforms the inner contents of a binary type constructor.
 
 `fun Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>`
 
@@ -60,7 +60,7 @@ tuple2Bifunctor.run { Tuple2(4, 4).bimap({ it + 1 }, { it - 1 }) }
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Bifunctor` see the [Source][bifunctor_source]{:target="_blank"}
+For a full list of other useful combinators available in `Bifunctor`, see the [Source][bifunctor_source]{:target="_blank"}
 
 ### Laws
 
