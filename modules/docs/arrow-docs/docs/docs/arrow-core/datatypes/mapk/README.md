@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: MapK
-permalink: /docs/arrow/core/mapk/
+permalink: /docs/arrow/data/mapk/
 redirect_from:
   - /docs/datatypes/mapk/
 ---
@@ -11,6 +11,14 @@ redirect_from:
 {:.beginner}
 beginner
 
+### Supported type classes
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.core.*
+
+DataType(MapK::class).tcMarkdownList()
+```
 
 `MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }})
 and to work with `Map` in more functional way.
@@ -45,7 +53,7 @@ val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secon
 }
 ```
 
-`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`]({{ '/docs/arrow/core/eval/#eval' | relative_url }}) type.
+`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`](https://arrow-kt.io/docs/arrow/core/eval/#eval) type.
 
 `ap` function is used when you want to apply map of transformations from `Map<K, (A)-> B>` to `Map<K,A>`, for example:
 
@@ -61,7 +69,7 @@ apResult
 ```
 `ap2` acts like `map2` to `map`
 
-In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,Z>`
+In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,B>`
 
 ```kotlin:ank
 val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()

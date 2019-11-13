@@ -42,7 +42,7 @@ These instances are available in the module `arrow-instances`.
 
 ### Boolean
 
-Note that because Boolean doesn't have a companion object you'll find these in `BooleanInstances`.
+Note that, because Boolean doesn't have a companion object, you'll find these in `BooleanInstances`.
 
 - [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
