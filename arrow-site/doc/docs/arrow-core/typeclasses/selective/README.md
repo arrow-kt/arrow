@@ -37,7 +37,7 @@ Some<Either<Int, String>>(Right("2"))
 
 #### Kind<F, Either<A, B>>#branch
 
-Applies an effectful computation to either side of the branch
+Applies an effectful computation to either side of the branch.
 
 ```kotlin:ank
 import arrow.core.extensions.option.selective.branch
