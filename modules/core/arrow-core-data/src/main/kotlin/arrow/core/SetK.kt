@@ -15,6 +15,9 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
     return Eval.defer { loop(this) }
   }
 
+  fun <B> map(f: (A) -> B): SetK<B> =
+    set.mapTo(mutableSetOf(), f).k()
+
   override fun equals(other: Any?): Boolean =
     when (other) {
       is SetK<*> -> this.set == other.set

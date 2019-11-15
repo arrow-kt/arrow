@@ -10,6 +10,7 @@ import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
@@ -98,4 +99,10 @@ interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
   override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface SetKFunctor : Functor<ForSetK> {
+  override fun <A, B> Kind<ForSetK, A>.map(f: (A) -> B): Kind<ForSetK, B> =
+    fix().map(f)
 }
