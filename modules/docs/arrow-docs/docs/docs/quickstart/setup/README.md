@@ -20,7 +20,6 @@ Arrow supports Android out of the box starting on API 21 and up.
 
 We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
 
-
 ### Gradle
 
 #### Basic Setup
