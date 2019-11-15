@@ -4,10 +4,15 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForNonEmptyList
+import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyListOf
+import arrow.core.Option
+import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
+import arrow.core.some
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -20,10 +25,12 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Reducible
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import kotlin.math.max
 import arrow.core.combineK as nelCombineK
 
 @extension
@@ -183,3 +190,28 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
 
 fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
   NonEmptyList.monad().fx.monad(c).fix()
+
+@extension
+interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFunctor {
+  override fun <A, B> align(
+    left: Kind<ForNonEmptyList, A>,
+    right: Kind<ForNonEmptyList, B>
+  ): Kind<ForNonEmptyList, Ior<A, B>> {
+
+    val l = left.fix()
+    val r = right.fix()
+
+    fun <T> maybeGet(list: NonEmptyList<T>, idx: Int) =
+      if (idx >= list.size) Option.empty() else list.all[idx].some()
+
+    val maxSize = max(l.size, r.size)
+
+    val list = (0..maxSize).map {
+      maybeGet(l, it) toT maybeGet(r, it)
+    }.filterMap {
+      Ior.fromOptions(it.a, it.b)
+    }
+
+    return NonEmptyList.fromListUnsafe(list)
+  }
+}

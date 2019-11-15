@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForSequenceK
+import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
@@ -13,6 +14,7 @@ import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
 import arrow.core.k
+import arrow.core.some
 import arrow.extension
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -29,6 +31,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
@@ -244,19 +247,27 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
 
   override fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
     if (this.fix().isEmpty()) SequenceK.empty()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 
   override fun <A> Kind<ForSequenceK, A>.many(): SequenceK<SequenceK<A>> =
     if (this.fix().isEmpty()) sequenceOf(emptySequence<A>().k()).k()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 }
 
 fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
@@ -267,4 +278,23 @@ interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative
   override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
   override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
     (this.fix() + b.fix()).k()
+}
+
+@extension
+interface SequenceKListSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
+  override fun <A, B> align(left: Kind<ForSequenceK, A>, right: Kind<ForSequenceK, B>): Kind<ForSequenceK, Ior<A, B>> =
+    object : Sequence<Ior<A, B>> {
+      override fun iterator(): Iterator<Ior<A, B>> = object : Iterator<Ior<A, B>> {
+
+        val leftIterator = left.fix().iterator()
+        val rightIterator = right.fix().iterator()
+
+        override fun hasNext(): Boolean = leftIterator.hasNext() || rightIterator.hasNext()
+
+        fun <X> Iterator<X>.tryNext(): Option<X> = if (hasNext()) next().some() else Option.empty()
+
+        override fun next(): Ior<A, B> =
+          Ior.fromOptions(leftIterator.tryNext(), rightIterator.tryNext()).toList().first()
+      }
+    }.k()
 }

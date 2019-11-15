@@ -29,8 +29,10 @@ import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Semialign
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
+import arrow.core.Ior
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -204,3 +206,9 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
 
 fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
   Id.monad().fx.monad(c).fix()
+
+@extension
+interface IdSemialign : Semialign<ForId>, IdFunctor {
+  override fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<ForId, A>, b: Kind<ForId, B>): Kind<ForId, C> =
+    Id.just(fa(Ior.Both(a.fix().extract(), b.fix().extract())))
+}

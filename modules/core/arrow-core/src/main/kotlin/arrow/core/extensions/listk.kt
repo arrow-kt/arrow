@@ -4,15 +4,19 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForListK
+import arrow.core.Ior
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
+import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
+import arrow.core.some
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -29,11 +33,13 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import kotlin.math.max
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
@@ -278,4 +284,26 @@ interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
   override fun <A> empty(): Kind<ForListK, A> = emptyList<A>().k()
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): Kind<ForListK, A> =
     (this.fix() + b.fix()).k()
+}
+
+@extension
+interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
+  override fun <A, B> align(
+    left: Kind<ForListK, A>,
+    right: Kind<ForListK, B>
+  ): Kind<ForListK, Ior<A, B>> {
+    val l = left.fix()
+    val r = right.fix()
+
+    fun <T> maybeGet(list: List<T>, idx: Int) =
+      if (idx >= list.size) Option.empty() else list[idx].some()
+
+    val maxSize = max(l.size, r.size)
+
+    return (0..maxSize).map {
+      maybeGet(l, it) toT maybeGet(r, it)
+    }.filterMap {
+      Ior.fromOptions(it.a, it.b)
+    }.k()
+  }
 }
