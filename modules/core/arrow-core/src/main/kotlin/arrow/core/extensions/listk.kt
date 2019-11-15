@@ -10,13 +10,12 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
-import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
-import arrow.core.some
-import arrow.core.toT
+import arrow.core.leftIor
+import arrow.core.rightIor
 import arrow.extension
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -39,7 +38,6 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import kotlin.math.max
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
@@ -237,19 +235,27 @@ interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
 
   override fun <A> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) ListK.empty()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 
   override fun <A> Kind<ForListK, A>.many(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) listOf(emptySequence<A>().k()).k()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 }
 
 @extension
@@ -292,18 +298,15 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
     left: Kind<ForListK, A>,
     right: Kind<ForListK, B>
   ): Kind<ForListK, Ior<A, B>> {
-    val l = left.fix()
-    val r = right.fix()
+    // from arrow-syntax
+    fun <T> List<T>.tail(): List<T> = this.drop(1)
 
-    fun <T> maybeGet(list: List<T>, idx: Int) =
-      if (idx >= list.size) Option.empty() else list[idx].some()
+    fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+      ls.isEmpty() -> rs.map { it.rightIor() }
+      rs.isEmpty() -> ls.map { it.leftIor() }
+      else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.tail(), rs.tail()))
+    }
 
-    val maxSize = max(l.size, r.size)
-
-    return (0..maxSize).map {
-      maybeGet(l, it) toT maybeGet(r, it)
-    }.filterMap {
-      Ior.fromOptions(it.a, it.b)
-    }.k()
+    return alignRec(left.fix(), right.fix()).k()
   }
 }

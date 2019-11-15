@@ -7,12 +7,10 @@ import arrow.core.ForNonEmptyList
 import arrow.core.Ior
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyListOf
-import arrow.core.Option
-import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
-import arrow.core.some
-import arrow.core.toT
+import arrow.core.leftIor
+import arrow.core.rightIor
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -30,7 +28,6 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import kotlin.math.max
 import arrow.core.combineK as nelCombineK
 
 @extension
@@ -198,20 +195,15 @@ interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFuncto
     right: Kind<ForNonEmptyList, B>
   ): Kind<ForNonEmptyList, Ior<A, B>> {
 
-    val l = left.fix()
-    val r = right.fix()
+    // from arrow-syntax
+    fun <T> List<T>.tail(): List<T> = this.drop(1)
 
-    fun <T> maybeGet(list: NonEmptyList<T>, idx: Int) =
-      if (idx >= list.size) Option.empty() else list.all[idx].some()
-
-    val maxSize = max(l.size, r.size)
-
-    val list = (0..maxSize).map {
-      maybeGet(l, it) toT maybeGet(r, it)
-    }.filterMap {
-      Ior.fromOptions(it.a, it.b)
+    fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+      ls.isEmpty() -> rs.map { it.rightIor() }
+      rs.isEmpty() -> ls.map { it.leftIor() }
+      else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.tail(), rs.tail())
     }
 
-    return NonEmptyList.fromListUnsafe(list)
+    return NonEmptyList.fromListUnsafe(alignRec(left.fix().all, right.fix().all))
   }
 }
