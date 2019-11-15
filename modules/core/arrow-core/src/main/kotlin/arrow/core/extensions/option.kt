@@ -438,18 +438,6 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
 
 @extension
 interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
-
   override fun <A, B> align(left: Kind<ForOption, A>, right: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
-    when (val l = left.fix()) {
-      is None ->
-        when (val r = right.fix()) {
-          is None -> None
-          is Some -> Option.just(Ior.Right(r.t))
-        }
-      is Some ->
-        when (val r = right.fix()) {
-          is None -> Option.just(Ior.Left(l.t))
-          is Some -> Option.just(Ior.Both(l.t, r.t))
-        }
-    }
+    Ior.fromOptions(left.fix(), right.fix())
 }
