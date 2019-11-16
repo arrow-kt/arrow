@@ -78,8 +78,12 @@ class ListKTest : UnitSpec() {
 
       forAll(Gen.listK(Gen.bool()), Gen.listK(Gen.bool())) { a, b ->
         ListK.semialign().run {
-          align(a, b).fix().drop(min(a.size, b.size)).none {
-            it.isBoth
+          align(a, b).fix().drop(min(a.size, b.size)).all {
+            if (a.size < b.size) {
+              it.isRight
+            } else {
+              it.isLeft
+            }
           }
         }
       }
