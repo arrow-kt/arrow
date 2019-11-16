@@ -29,7 +29,10 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
+import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import kotlin.math.max
 
 class SequenceKTest : UnitSpec() {
 
@@ -65,12 +68,42 @@ class SequenceKTest : UnitSpec() {
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
-      SemialignLaws.laws(SequenceK.semialign(),
+      SemialignLaws.foldablelaws(SequenceK.semialign(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
         { SequenceK.eq(it) as Eq<Kind<ForSequenceK, *>> },
         SequenceK.foldable()
       )
     )
+
+    "can align sequences" {
+      forAll(Gen.sequenceK(Gen.int()), Gen.sequenceK(Gen.string())) { a, b ->
+        SequenceK.semialign().run {
+          align(a, b).fix().toList().size == max(a.toList().size, b.toList().size)
+        }
+      }
+    }
+
+    "align empty seqeuences" {
+      val a = emptyList<String>().asSequence().k()
+
+      SequenceK.semialign().run {
+        align(a, a).fix().sequence.shouldBeEmpty()
+      }
+    }
+
+    "align infinite sequences" {
+      val seq1 = generateSequence("A") { it }.k()
+
+      val seq2 = generateSequence(0) { it + 1 }.k()
+
+      SequenceK.semialign().run {
+        forAll(10, Gen.positiveIntegers().filter { it < 10_000 }) { idx: Int ->
+          val element = align(seq1, seq2).fix().drop(idx).first()
+
+          element == Ior.Both("A", idx)
+        }
+      }
+    }
   }
 
   private fun bijection(from: Kind<ForSequenceK, Tuple2<Tuple2<Int, Int>, Int>>): SequenceK<Tuple2<Int, Tuple2<Int, Int>>> =

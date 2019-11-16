@@ -48,7 +48,7 @@ class NonEmptyListTest : UnitSpec() {
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) },
-      SemialignLaws.laws(NonEmptyList.semialign(),
+      SemialignLaws.foldablelaws(NonEmptyList.semialign(),
         Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>,
         { NonEmptyList.eq(it) as Eq<Kind<ForNonEmptyList, *>> },
         NonEmptyList.foldable()

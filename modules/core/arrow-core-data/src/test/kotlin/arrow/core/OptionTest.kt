@@ -58,7 +58,7 @@ class OptionTest : UnitSpec() {
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
-      SemialignLaws.laws(Option.semialign(),
+      SemialignLaws.foldablelaws(Option.semialign(),
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
         { Option.eq(it) as Eq<Kind<ForOption, *>> },
         Option.foldable()

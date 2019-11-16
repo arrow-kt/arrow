@@ -54,7 +54,7 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
-      SemialignLaws.laws(ListK.semialign(),
+      SemialignLaws.foldablelaws(ListK.semialign(),
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
         { ListK.eq(it) as Eq<Kind<ForListK, *>> },
         ListK.foldable()

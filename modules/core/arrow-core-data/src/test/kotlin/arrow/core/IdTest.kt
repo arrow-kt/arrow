@@ -40,7 +40,7 @@ class IdTest : UnitSpec() {
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
       BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), ::Id, Eq.any(), EQ, Eq.any()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) },
-      SemialignLaws.laws(Id.semialign(),
+      SemialignLaws.foldablelaws(Id.semialign(),
         Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
         { Id.eq(it) as Eq<Kind<ForId, *>> },
         Id.foldable()

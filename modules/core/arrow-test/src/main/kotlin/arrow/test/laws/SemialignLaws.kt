@@ -27,21 +27,31 @@ object SemialignLaws {
   fun <F> laws(
     SA: Semialign<F>,
     gen: Gen<Kind<F, Int>>,
-    buildEq: (Eq<*>) -> Eq<Kind<F, *>>,
-    FOLD: Foldable<F>
+    buildEq: (Eq<*>) -> Eq<Kind<F, *>>
   ): List<Law> = listOf(
+    Law("Semialign Laws: idempotency") { SA.semialignIdempotency(gen, buildEq(iorEq1)) },
     Law("Semialign Laws: commutativity") { SA.semialignCommutativity(gen, buildEq(iorEq1)) },
     Law("Semialign Laws: associativity") { SA.semialignAssociativity(gen, buildEq(iorEq2)) },
     Law("Semialign Laws: with") { SA.semialignWith(gen, buildEq(String.eq())) },
-    Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(gen, buildEq(Ior.eq(String.eq(), String.eq()))) },
-    Law("Semialign Laws: alignedness") { SA.semialignAlignedness(gen, FOLD) }
+    Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(gen, buildEq(Ior.eq(String.eq(), String.eq()))) }
   )
+
+  fun <F> foldablelaws(
+    SA: Semialign<F>,
+    gen: Gen<Kind<F, Int>>,
+    buildEq: (Eq<*>) -> Eq<Kind<F, *>>,
+    FOLD: Foldable<F>
+  ): List<Law> = laws(SA, gen, buildEq) +
+    listOf(
+      Law("Semialign Laws: alignedness") { SA.semialignAlignedness(gen, FOLD) }
+    )
 
   // Laws ported from https://hackage.haskell.org/package/semialign-1.1/docs/Data-Semialign.html
 
-  fun <F> Semialign<F>.semialignIdempotency() {
-    TODO()
-  }
+  fun <F, A> Semialign<F>.semialignIdempotency(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, Ior<A, A>>>) =
+    forAll(G) { a ->
+      align(a, a).equalUnderTheLaw(a.map { Ior.Both(it, it) }, EQ)
+    }
 
   fun <F, A> Semialign<F>.semialignCommutativity(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, Ior<A, A>>>) =
     forAll(G, G) { a: Kind<F, A>, b: Kind<F, A> ->
