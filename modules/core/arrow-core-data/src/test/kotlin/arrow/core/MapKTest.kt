@@ -57,7 +57,9 @@ class MapKTest : UnitSpec() {
     "can align maps" {
       forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
         MapK.semialign<String>().run {
-          align(a, b).fix().size == max(a.size, b.size)
+          val aligned = align(a, b).fix()
+
+          aligned.size == (a.keys + b.keys).size
         }
       }
 
