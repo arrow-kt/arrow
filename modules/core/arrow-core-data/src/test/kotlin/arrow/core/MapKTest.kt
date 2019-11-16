@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -9,6 +10,7 @@ import arrow.core.extensions.mapk.functor.functor
 import arrow.core.extensions.mapk.functorFilter.functorFilter
 import arrow.core.extensions.mapk.hash.hash
 import arrow.core.extensions.mapk.monoid.monoid
+import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
 import arrow.core.extensions.semigroup
@@ -19,10 +21,13 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import kotlin.math.max
 
 class MapKTest : UnitSpec() {
 
@@ -41,7 +46,29 @@ class MapKTest : UnitSpec() {
       FoldableLaws.laws(MapK.foldable(), { a: Int -> mapOf("key" to a).k() }, Eq.any()),
       EqLaws.laws(EQ) { mapOf(it.toString() to it).k() },
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
-      HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() }
+      HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
+      SemialignLaws.laws(MapK.semialign(),
+        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        { MapK.eq(String.eq(), it) as Eq<Kind<MapKPartialOf<String>, *>> },
+        MapK.foldable<String>()
+      )
     )
+
+    "can align maps" {
+      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
+        MapK.semialign<String>().run {
+          align(a, b).fix().size == max(a.size, b.size)
+        }
+      }
+
+      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
+        MapK.semialign<String>().run {
+          val aligned = align(a, b).fix()
+          a.keys.intersect(b.keys).all {
+            aligned[it]?.isBoth ?: false
+          }
+        }
+      }
+    }
   }
 }
