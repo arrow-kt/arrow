@@ -112,14 +112,10 @@ object SemialignLaws {
   }
 }
 
-// http://hackage.haskell.org/package/these-0.8/docs/src/Data.These.Combinators.html#justHere
-
-fun <A, B> Ior<A, B>.justLeft(): Option<A> =
+private fun <A, B> Ior<A, B>.justLeft(): Option<A> =
   fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
-// http://hackage.haskell.org/package/these-1.0.1/docs/src/Data.These.html#line-289
-
-fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
+private fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
   when (this) {
     is Ior.Left -> when (val inner = this.value) {
       is Ior.Left -> Ior.Left(inner.value)
@@ -133,48 +129,3 @@ fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
       is Ior.Both -> Ior.Both(inner.leftValue, Ior.Both(inner.rightValue, this.rightValue))
     }
   }
-
-fun <A, B, C> Ior<A, Ior<B, C>>.unassoc(): Ior<Ior<A, B>, C> =
-  when (this) {
-    is Ior.Left -> Ior.Left(Ior.Left(this.value))
-    is Ior.Right -> when (val inner = this.value) {
-      is Ior.Left -> Ior.Left(Ior.Right(inner.value))
-      is Ior.Right -> Ior.Right(inner.value)
-      is Ior.Both -> Ior.Both(Ior.Right(inner.leftValue), inner.rightValue)
-    }
-    is Ior.Both -> when (val inner = this.rightValue) {
-      is Ior.Left -> Ior.Left(Ior.Both(this.leftValue, inner.value))
-      is Ior.Right -> Ior.Both(Ior.Left(this.leftValue), inner.value)
-      is Ior.Both -> Ior.Both(Ior.Both(this.leftValue, inner.leftValue), inner.rightValue)
-    }
-  }
-
-fun <A, B, C> Either<Either<A, B>, C>.assoc(): Either<A, Either<B, C>> =
-  when (this) {
-    is Either.Left -> when (val inner = this.a) {
-      is Either.Left -> Either.Left(inner.a)
-      is Either.Right -> Either.Right(Either.left(inner.b))
-    }
-    is Either.Right -> Either.Right(Either.Right(this.b))
-  }
-
-fun <A, B, C> Either<A, Either<B, C>>.unassoc(): Either<Either<A, B>, C> =
-  when (this) {
-    is Either.Left -> Either.Left(Either.Left(this.a))
-    is Either.Right -> when (val inner = this.b) {
-      is Either.Left -> Either.Left(Either.Right(inner.a))
-      is Either.Right -> Either.Right(inner.b)
-    }
-  }
-
-fun <A, B, C> Tuple2<Tuple2<A, B>, C>.assoc(): Tuple2<A, Tuple2<B, C>> =
-  this.a.a toT (this.a.b toT this.b)
-
-fun <A, B, C> Tuple2<A, Tuple2<B, C>>.unassoc(): Tuple2<Tuple2<A, B>, C> =
-  (this.a toT this.b.a) toT this.b.b
-
-fun <A, T> Const<Const<A, T>, T>.assoc(): Const<A, T> =
-  this.value()
-
-fun <A, T> Const<A, T>.unassoc(): Const<Const<A, T>, A> =
-  Const.just(this)
