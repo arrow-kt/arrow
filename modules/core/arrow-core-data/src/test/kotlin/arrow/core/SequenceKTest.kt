@@ -93,8 +93,15 @@ class SequenceKTest : UnitSpec() {
 
       forAll(Gen.sequenceK(Gen.int()), Gen.sequenceK(Gen.string())) { a, b ->
         SequenceK.semialign().run {
-          align(a, b).fix().drop(min(a.toList().size, b.toList().size)).none {
-            it.isBoth
+          val ls = a.toList()
+          val rs = b.toList()
+
+          align(a, b).fix().drop(min(ls.size, rs.size)).all {
+            if (ls.size < rs.size) {
+              it.isRight
+            } else {
+              it.isLeft
+            }
           }
         }
       }
