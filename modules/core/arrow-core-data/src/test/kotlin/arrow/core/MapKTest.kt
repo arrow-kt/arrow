@@ -27,7 +27,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlin.math.max
 
 class MapKTest : UnitSpec() {
 
