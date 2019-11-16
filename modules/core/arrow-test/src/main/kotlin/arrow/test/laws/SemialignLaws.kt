@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Ior
+import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -12,6 +13,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.list.monadFilter.filterMap
+import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.toT
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -95,9 +97,7 @@ object SemialignLaws {
   ) = forAll(G, G) { a: Kind<F, A>, b: Kind<F, A> ->
 
     fun <E> toList(es: Kind<F, E>): List<E> = FOLD.run {
-      es.foldLeft(emptyList()) { acc, e ->
-        acc + e
-      }
+      es.foldMap(ListK.monoid()) {ListK.just(it)}
     }
 
     val left: List<A> = toList(a)
