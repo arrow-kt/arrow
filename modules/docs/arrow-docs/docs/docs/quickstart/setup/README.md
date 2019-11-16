@@ -14,6 +14,12 @@ If you want to try the last features, replace `0.10.3` by `0.10.4-SNAPSHOT` in t
 
 Make sure to have the latest version of JDK 1.8 installed.
 
+### Android
+
+Arrow supports Android out of the box starting on API 21 and up.
+
+We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
+
 ### Gradle
 
 #### Basic Setup
