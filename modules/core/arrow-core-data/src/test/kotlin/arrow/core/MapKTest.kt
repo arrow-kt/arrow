@@ -54,6 +54,7 @@ class MapKTest : UnitSpec() {
     )
 
     "can align maps" {
+      // aligned keySet is union of a's and b's keys
       forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
         MapK.semialign<String>().run {
           val aligned = align(a, b).fix()
@@ -62,11 +63,32 @@ class MapKTest : UnitSpec() {
         }
       }
 
+      // aligned map contains Both for all entries existing in a and b
       forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
         MapK.semialign<String>().run {
           val aligned = align(a, b).fix()
           a.keys.intersect(b.keys).all {
             aligned[it]?.isBoth ?: false
+          }
+        }
+      }
+
+      // aligned map contains Left for all entries existing only in a
+      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
+        MapK.semialign<String>().run {
+          val aligned = align(a, b).fix()
+          (a.keys - b.keys).all { key ->
+            aligned[key]?.let { it.isLeft } ?: false
+          }
+        }
+      }
+
+      // aligned map contains Right for all entries existing only in b
+      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
+        MapK.semialign<String>().run {
+          val aligned = align(a, b).fix()
+          (b.keys - a.keys).all { key ->
+            aligned[key]?.let { it.isRight } ?: false
           }
         }
       }

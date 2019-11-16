@@ -33,6 +33,7 @@ import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.max
+import kotlin.math.min
 
 class SequenceKTest : UnitSpec() {
 
@@ -81,9 +82,25 @@ class SequenceKTest : UnitSpec() {
           align(a, b).fix().toList().size == max(a.toList().size, b.toList().size)
         }
       }
+
+      forAll(Gen.sequenceK(Gen.int()), Gen.sequenceK(Gen.string())) { a, b ->
+        SequenceK.semialign().run {
+          align(a, b).fix().take(min(a.toList().size, b.toList().size)).all {
+            it.isBoth
+          }
+        }
+      }
+
+      forAll(Gen.sequenceK(Gen.int()), Gen.sequenceK(Gen.string())) { a, b ->
+        SequenceK.semialign().run {
+          align(a, b).fix().drop(min(a.toList().size, b.toList().size)).none {
+            it.isBoth
+          }
+        }
+      }
     }
 
-    "align empty seqeuences" {
+    "align empty sequences" {
       val a = emptyList<String>().asSequence().k()
 
       SequenceK.semialign().run {
