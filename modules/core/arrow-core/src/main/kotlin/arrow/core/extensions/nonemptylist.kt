@@ -193,13 +193,12 @@ interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFuncto
   override fun <A, B> align(
     left: Kind<ForNonEmptyList, A>,
     right: Kind<ForNonEmptyList, B>
-  ): Kind<ForNonEmptyList, Ior<A, B>> {
-    fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
-      ls.isEmpty() -> rs.map { it.rightIor() }
-      rs.isEmpty() -> ls.map { it.leftIor() }
-      else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
-    }
+  ): Kind<ForNonEmptyList, Ior<A, B>> =
+    NonEmptyList.fromListUnsafe(alignRec(left.fix().all, right.fix().all))
 
-    return NonEmptyList.fromListUnsafe(alignRec(left.fix().all, right.fix().all))
+  private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+    ls.isEmpty() -> rs.map { it.rightIor() }
+    rs.isEmpty() -> ls.map { it.leftIor() }
+    else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
   }
 }

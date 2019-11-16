@@ -297,13 +297,11 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
   override fun <A, B> align(
     left: Kind<ForListK, A>,
     right: Kind<ForListK, B>
-  ): Kind<ForListK, Ior<A, B>> {
-    fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
-      ls.isEmpty() -> rs.map { it.rightIor() }
-      rs.isEmpty() -> ls.map { it.leftIor() }
-      else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
-    }
+  ): Kind<ForListK, Ior<A, B>> = alignRec(left.fix(), right.fix()).k()
 
-    return alignRec(left.fix(), right.fix()).k()
+  private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+    ls.isEmpty() -> rs.map { it.rightIor() }
+    rs.isEmpty() -> ls.map { it.leftIor() }
+    else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
   }
 }
