@@ -26,7 +26,7 @@ class SortedMapKTest : UnitSpec() {
   init {
 
     testLaws(
-      EqLaws.laws(SortedMapK.eq(String.eq(), Int.eq())) { sortedMapOf("$it" to it).k()},
+      EqLaws.laws(SortedMapK.eq(String.eq(), Int.eq())) { sortedMapOf("$it" to it).k() },
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
