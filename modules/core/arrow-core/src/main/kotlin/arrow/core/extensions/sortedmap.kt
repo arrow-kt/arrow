@@ -98,7 +98,7 @@ interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
 }
 
 @extension
-interface SortedMapKHash<K: Comparable<K>, A>: Hash<SortedMapK<K, A>>, SortedMapKEq<K, A> {
+interface SortedMapKHash<K : Comparable<K>, A> : Hash<SortedMapK<K, A>>, SortedMapKEq<K, A> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
 
