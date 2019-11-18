@@ -2,13 +2,17 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKOf
 import arrow.core.SortedMapKPartialOf
+import arrow.core.extensions.setk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.updated
+import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
@@ -74,3 +78,19 @@ interface SortedMapKShow<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
 
 fun <A : Comparable<A>, B> SortedMapK.Companion.show(): SortedMapKShow<A, B> =
   object : SortedMapKShow<A, B> {}
+
+@extension
+interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
+  fun EQK(): Eq<K>
+
+  fun EQA(): Eq<A>
+
+  override fun SortedMapK<K, A>.eqv(b: SortedMapK<K, A>): Boolean =
+    if (SetK.eq(EQK()).run { keys.k().eqv(b.keys.k()) }) {
+      keys.map { key ->
+        b[key]?.let {
+          EQA().run { getValue(key).eqv(it) }
+        } ?: false
+      }.fold(true) { b1, b2 -> b1 && b2 }
+    } else false
+}
