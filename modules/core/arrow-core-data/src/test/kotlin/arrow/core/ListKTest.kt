@@ -5,6 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq1.eq1
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -26,6 +27,7 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 
 class ListKTest : UnitSpec() {
   val applicative = ListK.applicative()
@@ -49,6 +51,16 @@ class ListKTest : UnitSpec() {
         eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
+
+    "eq1" {
+      val liftedEq = ListK.eq1().eq1(Int.eq())
+
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+        ListK.eq(Int.eq()).run {
+          a.eqv(b)
+        } == liftedEq(a, b)
+      }
+    }
   }
 
   private fun bijection(from: Kind<ForListK, Tuple2<Tuple2<Int, Int>, Int>>): ListK<Tuple2<Int, Tuple2<Int, Int>>> =

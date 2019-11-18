@@ -5,10 +5,12 @@ import arrow.core.Eval
 import arrow.core.ForSetK
 import arrow.core.SetK
 import arrow.core.Tuple2
+import arrow.core.extensions.setk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq1
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -97,5 +99,14 @@ interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
 
   override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
+  }
+}
+
+@extension
+interface SetKEq1 : Eq1<ForSetK> {
+  override fun <A> liftEq(eq: (A, A) -> Boolean): (Kind<ForSetK, A>, Kind<ForSetK, A>) -> Boolean = { ls, rs ->
+    SetK.eq(Eq(eq)).run {
+      ls.fix().eqv(rs.fix())
+    }
   }
 }

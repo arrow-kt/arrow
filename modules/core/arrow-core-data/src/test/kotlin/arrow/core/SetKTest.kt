@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.setk.eq.eq
+import arrow.core.extensions.setk.eq1.eq1
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.extensions.setk.monoid.monoid
@@ -23,6 +24,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 
 class SetKTest : UnitSpec() {
 
@@ -47,6 +49,16 @@ class SetKTest : UnitSpec() {
       FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) }
     )
+
+    "eq1" {
+      val liftedEq = SetK.eq1().eq1(Int.eq())
+
+      forAll(Gen.genSetK(Gen.int()), Gen.genSetK(Gen.int())) { a, b ->
+        SetK.eq(Int.eq()).run {
+          a.eqv(b) == liftedEq(a, b)
+        }
+      }
+    }
   }
 
   private fun bijection(from: Kind<ForSetK, Tuple2<Tuple2<Int, Int>, Int>>): SetK<Tuple2<Int, Tuple2<Int, Int>>> =

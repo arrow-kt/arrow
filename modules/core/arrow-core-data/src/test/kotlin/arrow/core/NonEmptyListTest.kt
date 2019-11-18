@@ -7,6 +7,7 @@ import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.bimonad.bimonad
 import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
+import arrow.core.extensions.nonemptylist.eq1.eq1
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
@@ -14,6 +15,7 @@ import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.nonEmptyList
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.SemigroupKLaws
@@ -21,6 +23,8 @@ import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 
 class NonEmptyListTest : UnitSpec() {
   init {
@@ -41,5 +45,15 @@ class NonEmptyListTest : UnitSpec() {
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) }
     )
+
+    "eq1" {
+      val liftedEq = NonEmptyList.eq1().eq1(Int.eq())
+
+      forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
+        NonEmptyList.eq(Int.eq()).run {
+          a.eqv(b) == liftedEq(a, b)
+        }
+      }
+    }
   }
 }

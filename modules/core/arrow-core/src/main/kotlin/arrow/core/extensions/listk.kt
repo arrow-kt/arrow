@@ -9,6 +9,7 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
@@ -18,6 +19,7 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq1
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -278,4 +280,13 @@ interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
   override fun <A> empty(): Kind<ForListK, A> = emptyList<A>().k()
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): Kind<ForListK, A> =
     (this.fix() + b.fix()).k()
+}
+
+@extension
+interface ListKEq1 : Eq1<ForListK> {
+  override fun <A> liftEq(eq: (A, A) -> Boolean): (Kind<ForListK, A>, Kind<ForListK, A>) -> Boolean = { ls, rs ->
+    ListK.eq(Eq(eq)).run {
+      ls.fix().eqv(rs.fix())
+    }
+  }
 }
