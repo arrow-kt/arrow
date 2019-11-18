@@ -10,7 +10,7 @@ import arrow.core.fix
 import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq1
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -103,10 +103,11 @@ interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
 }
 
 @extension
-interface SetKEq1 : Eq1<ForSetK> {
-  override fun <A> liftEq(eq: (A, A) -> Boolean): (Kind<ForSetK, A>, Kind<ForSetK, A>) -> Boolean = { ls, rs ->
-    SetK.eq(Eq(eq)).run {
-      ls.fix().eqv(rs.fix())
+interface SetKEqK : EqK<ForSetK> {
+  override fun <A> Kind<ForSetK, A>.eqK(other: Kind<ForSetK, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      SetK.eq(EQ).run {
+        it.first.eqv(it.second)
+      }
     }
-  }
 }

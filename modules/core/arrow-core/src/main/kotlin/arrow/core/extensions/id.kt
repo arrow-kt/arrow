@@ -18,7 +18,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq1
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -207,8 +207,9 @@ fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
   Id.monad().fx.monad(c).fix()
 
 @extension
-interface IdEq1 : Eq1<ForId> {
-  override fun <A> liftEq(eq: (A, A) -> Boolean): (Kind<ForId, A>, Kind<ForId, A>) -> Boolean = { ls, rs ->
-    eq(ls.fix().extract(), rs.fix().extract())
-  }
+interface IdEqK : EqK<ForId> {
+  override fun <A> Kind<ForId, A>.eqK(other: Kind<ForId, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      EQ.run { it.first.extract().eqv(it.second.extract()) }
+    }
 }

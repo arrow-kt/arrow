@@ -6,7 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.option.eq1.eq1
+import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadFilter.monadFilter
@@ -169,20 +169,25 @@ class OptionTest : UnitSpec() {
 
     "eq1" {
       val none = Option.empty<Int>()
-      val liftedEq = Option.eq1().eq1(Int.eq())
 
-      liftedEq(none, none) shouldBe true
+      Option.eqK().run { none.eqK(none, Int.eq()) } shouldBe true
 
       forAll(Gen.int()) { a ->
-        !liftedEq(Some(a), none)
+        Option.eqK().run {
+          !Some(a).eqK(none, Int.eq())
+        }
       }
 
       forAll(Gen.int()) { a ->
-        !liftedEq(none, Some(a))
+        Option.eqK().run {
+          !none.eqK(Some(a), Int.eq())
+        }
       }
 
       forAll(Gen.int(), Gen.int()) { a, b ->
-        liftedEq(Some(a), Some(b)) == Int.eq().run {
+        Option.eqK().run {
+          Some(a).eqK(Some(b), Int.eq())
+        } == Int.eq().run {
           a.eqv(b)
         }
       }

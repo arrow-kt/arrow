@@ -17,7 +17,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq1
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -189,10 +189,9 @@ fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> 
   NonEmptyList.monad().fx.monad(c).fix()
 
 @extension
-interface NonEmptyListEq1 : Eq1<ForNonEmptyList> {
-  override fun <A> liftEq(eq: (A, A) -> Boolean): (Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, A>) -> Boolean = { ls, rs ->
-    ListK.eq(Eq(eq)).run {
-      ls.fix().all.k().eqv(rs.fix().all.k())
+interface NonEmptyListEqK : EqK<ForNonEmptyList> {
+  override fun <A> Kind<ForNonEmptyList, A>.eqK(other: Kind<ForNonEmptyList, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      ListK.eq(EQ).run { it.first.all.k().eqv(it.second.all.k()) }
     }
-  }
 }

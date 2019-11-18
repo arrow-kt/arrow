@@ -5,7 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.listk.eq1.eq1
+import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -53,12 +53,10 @@ class ListKTest : UnitSpec() {
     )
 
     "eq1" {
-      val liftedEq = ListK.eq1().eq1(Int.eq())
-
       forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
         ListK.eq(Int.eq()).run {
           a.eqv(b)
-        } == liftedEq(a, b)
+        } == ListK.eqK().run { a.eqK(b, Int.eq()) }
       }
     }
   }

@@ -7,7 +7,7 @@ import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.bimonad.bimonad
 import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
-import arrow.core.extensions.nonemptylist.eq1.eq1
+import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
@@ -47,12 +47,10 @@ class NonEmptyListTest : UnitSpec() {
     )
 
     "eq1" {
-      val liftedEq = NonEmptyList.eq1().eq1(Int.eq())
-
       forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
         NonEmptyList.eq(Int.eq()).run {
-          a.eqv(b) == liftedEq(a, b)
-        }
+          a.eqv(b)
+        } == NonEmptyList.eqK().run { a.eqK(b, Int.eq()) }
       }
     }
   }

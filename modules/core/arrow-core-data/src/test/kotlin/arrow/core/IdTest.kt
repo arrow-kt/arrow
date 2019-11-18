@@ -7,7 +7,7 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.eq.eq
-import arrow.core.extensions.id.eq1.eq1
+import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.monoid.monoid
@@ -62,9 +62,10 @@ class IdTest : UnitSpec() {
 
     "eq1" {
       forAll { a: Int, b: Int ->
-        val liftedEq = Id.eq1().eq1(Int.eq())
-
-        Int.eq().run { a.eqv(b) } == liftedEq(Id.just(a), Id.just(b))
+        Int.eq().run { a.eqv(b) } ==
+          Id.eqK().run {
+            Id.just(a).eqK(Id.just(b), Int.eq())
+          }
       }
     }
   }

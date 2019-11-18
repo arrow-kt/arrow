@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.setk.eq.eq
-import arrow.core.extensions.setk.eq1.eq1
+import arrow.core.extensions.setk.eqK.eqK
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.extensions.setk.monoid.monoid
@@ -51,12 +51,10 @@ class SetKTest : UnitSpec() {
     )
 
     "eq1" {
-      val liftedEq = SetK.eq1().eq1(Int.eq())
-
       forAll(Gen.genSetK(Gen.int()), Gen.genSetK(Gen.int())) { a, b ->
         SetK.eq(Int.eq()).run {
-          a.eqv(b) == liftedEq(a, b)
-        }
+          a.eqv(b)
+        } == SetK.eqK().run { a.eqK(b, Int.eq()) }
       }
     }
   }
