@@ -80,7 +80,7 @@ fun <A : Comparable<A>, B> SortedMapK.Companion.show(): SortedMapKShow<A, B> =
   object : SortedMapKShow<A, B> {}
 
 @extension
-interface SortedMapKEq<K: Comparable<K>, A> : Eq<SortedMapK<K, A>> {
+interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
   fun EQK(): Eq<K>
 
   fun EQA(): Eq<A>
