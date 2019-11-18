@@ -29,7 +29,7 @@ synchronously or asynchronously.
 
 Let's say we want to work with a file. Let's use a mock `File` API to avoid messing with the real one here.
 
-These methods would allow to open a File, close it and also read it's content as a string.
+These methods allow us to open a file, close it, and also read its content as a string.
 
 ```kotlin:ank:silent
 import arrow.fx.IO
@@ -91,11 +91,11 @@ Note that the result is still an `IO.Async` operation, which means it's still de
 
 ### Polymorphic example
 
-We've mentioned that `Bracket` is agnostic of whether the `use` lambda is computed synchronously or asynchronously.
+We've mentioned that `Bracket` is agnostic to whether the `use` lambda is computed synchronously or asynchronously.
 That's because it's able to run over any data type `F` that can support synchronous and asynchronous
 computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}) or [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}).
 
-It basically targets what in Functional Programming is known as a "Higher Kind".
+It basically targets what is known as a "Higher Kind" in Functional Programming.
 
 There's a complete [section about this pattern]({{ '/docs/patterns/polymorphic_programs' | relative_url }}) in the
 docs.
@@ -122,8 +122,8 @@ class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
 }
 ```
 
-This is basically the same program from previous examples, but defined over any `F` data type that there is an instance
-of `Bracket` for. In other words, this program is constrained by the capabilities that `Bracket` can provide.
+This is basically the same program from previous examples, but defined over any `F` data type for which there is an instance
+of `Bracket`. In other words, this program is constrained by the capabilities that `Bracket` can provide.
 
 We are also fixing the error type from `Bracket<F, E>` to be `Throwable`.
 
@@ -166,7 +166,7 @@ println(safeComputation)
 }
 ```
 
-Let's now run the same exact program also for `ObservableK`:
+Now let's also run the exact same program for `ObservableK`:
 
 ```kotlin:ank:playground
 import arrow.fx.rx2.ObservableK
@@ -212,7 +212,7 @@ This is the style you'd usually use in a Functional Program.
 
 #### Kind<F, A>#bracket
 
-Requires passing `release` and `use` lambdas. It ensures acquiring, using and releasing the resource at the end.
+Requires passing `release` and `use` lambdas. It ensures acquiring, using, and releasing the resource at the end.
 
 `fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
@@ -243,11 +243,11 @@ println(safeComputation)
 
 #### Kind<F, A>#bracketCase
 
-It's a generalized version of `bracket()` which uses `ExitCase` to distinguish between different exit cases when
-releasing the acquired resource. `ExitCase` can take the values `Completed`, `Canceled`, or `Error(e)`.  So depending
+It's a generalized version of `bracket()` that uses `ExitCase` to distinguish between different exit cases when
+releasing the acquired resource. `ExitCase` can take the values `Completed`, `Canceled`, or `Error(e)`.  So, depending
 how the `use` execution finalizes, the corresponding `ExitCase` value will be passed to the `release` lambda.
 
-Requires passing `release` and `use` lambdas. It ensures acquiring, using and releasing the resource at the end.
+It requires passing `release` and `use` lambdas. It ensures acquiring, using, and releasing the resource at the end.
 
 `fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
@@ -288,7 +288,7 @@ println(safeComputation)
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Bracket` see the [Source][bracket_source]{:target="_blank"}
+For a full list of other useful combinators available in `Bracket`, see the [Source][bracket_source]{:target="_blank"}
 
 ### Laws
 
@@ -298,9 +298,9 @@ verification of lawful instances and third party apps creating their own Bracket
 #### Creating your own `Bracket` instances
 
 Arrow already provides Bracket instances for most common datatypes both in Arrow and the Kotlin stdlib.
-Oftentimes you may find the need to provide your own for unsupported datatypes.
+Oftentimes, you may find the need to provide your own for unsupported datatypes.
 
-You may create or automatically derive instances of `Bracket` for your own datatypes which you will be able to use in
+You may create or automatically derive instances of `Bracket` for your own datatypes, which you will be able to use in
 the context of abstract polymorphic code.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
