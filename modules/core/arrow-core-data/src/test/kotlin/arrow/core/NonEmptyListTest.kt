@@ -17,6 +17,7 @@ import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
 import arrow.test.laws.BimonadLaws
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
@@ -24,7 +25,6 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
 
 class NonEmptyListTest : UnitSpec() {
   init {
@@ -43,15 +43,14 @@ class NonEmptyListTest : UnitSpec() {
       BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any(), EQ2, Eq.any()),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
-      HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) }
-    )
-
-    "eq1" {
-      forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { a, b ->
-        NonEmptyList.eq(Int.eq()).run {
-          a.eqv(b)
-        } == NonEmptyList.eqK().run { a.eqK(b, Int.eq()) }
+      HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) },
+      EqKLaws.laws(
+        NonEmptyList.eqK(),
+        NonEmptyList.eq(Int.eq()) as Eq<Kind<ForNonEmptyList, Int>>,
+        Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>
+      ) {
+        Nel.just(it)
       }
-    }
+    )
   }
 }

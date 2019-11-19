@@ -17,6 +17,7 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
@@ -27,7 +28,6 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
 
 class ListKTest : UnitSpec() {
   val applicative = ListK.applicative()
@@ -49,16 +49,15 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
-      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
-    )
-
-    "eq1" {
-      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
-        ListK.eq(Int.eq()).run {
-          a.eqv(b)
-        } == ListK.eqK().run { a.eqK(b, Int.eq()) }
+      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
+      EqKLaws.laws(
+        ListK.eqK(),
+        ListK.eq(Int.eq()) as Eq<Kind<ForListK, Int>>,
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>
+      ) {
+        ListK.just(it)
       }
-    }
+    )
   }
 
   private fun bijection(from: Kind<ForListK, Tuple2<Tuple2<Int, Int>, Int>>): ListK<Tuple2<Int, Tuple2<Int, Int>>> =
