@@ -24,6 +24,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -437,7 +438,28 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
 }
 
 @extension
+interface OptionEqK : EqK<ForOption> {
+  override fun <A> Kind<ForOption, A>.eqK(other: Kind<ForOption, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let { (a, b) ->
+      when (a) {
+        is None -> {
+          when (b) {
+            is None -> true
+            is Some -> false
+          }
+        }
+        is Some -> {
+          when (b) {
+            is None -> false
+            is Some -> EQ.run { a.t.eqv(b.t) }
+          }
+        }
+      }
+    }
+}
+
+@extension
 interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
-  override fun <A, B> align(left: Kind<ForOption, A>, right: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
-    Ior.fromOptions(left.fix(), right.fix())
+  override fun <A, B> align(a: Kind<ForOption, A>, b: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
+    Ior.fromOptions(a.fix(), b.fix())
 }

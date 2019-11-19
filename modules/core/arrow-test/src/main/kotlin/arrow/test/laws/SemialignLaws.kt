@@ -12,6 +12,7 @@ import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Semialign
 import io.kotlintest.properties.Gen
@@ -25,21 +26,26 @@ object SemialignLaws {
   fun <F> laws(
     SA: Semialign<F>,
     gen: Gen<Kind<F, Int>>,
-    buildEq: (Eq<*>) -> Eq<Kind<F, *>>
+    EQK: EqK<F>
   ): List<Law> = listOf(
-    Law("Semialign Laws: idempotency") { SA.semialignIdempotency(gen, buildEq(iorEq1)) },
-    Law("Semialign Laws: commutativity") { SA.semialignCommutativity(gen, buildEq(iorEq1)) },
-    Law("Semialign Laws: associativity") { SA.semialignAssociativity(gen, buildEq(iorEq2)) },
-    Law("Semialign Laws: with") { SA.semialignWith(gen, buildEq(String.eq())) },
-    Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(gen, buildEq(Ior.eq(String.eq(), String.eq()))) }
+    Law("Semialign Laws: idempotency") { SA.semialignIdempotency(gen, buildEq(EQK, iorEq1)) },
+    Law("Semialign Laws: commutativity") { SA.semialignCommutativity(gen, buildEq(EQK, iorEq1)) },
+    Law("Semialign Laws: associativity") { SA.semialignAssociativity(gen, buildEq(EQK, iorEq2)) },
+    Law("Semialign Laws: with") { SA.semialignWith(gen, buildEq(EQK, String.eq())) },
+    Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(gen, buildEq(EQK, Ior.eq(String.eq(), String.eq()))) }
   )
+
+  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
+    Eq { a, b ->
+      EQK.run { a.eqK(b, EQ) }
+    }
 
   fun <F> foldablelaws(
     SA: Semialign<F>,
     gen: Gen<Kind<F, Int>>,
-    buildEq: (Eq<*>) -> Eq<Kind<F, *>>,
+    EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = laws(SA, gen, buildEq) +
+  ): List<Law> = laws(SA, gen, EQK) +
     listOf(
       Law("Semialign Laws: alignedness") { SA.semialignAlignedness(gen, FOLD) }
     )

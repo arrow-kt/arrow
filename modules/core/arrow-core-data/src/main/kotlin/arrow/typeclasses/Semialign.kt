@@ -30,7 +30,7 @@ interface Semialign<F> : Functor<F> {
    * }
    * ```
    */
-  fun <A, B> align(left: Kind<F, A>, right: Kind<F, B>): Kind<F, Ior<A, B>> = alignWith(::identity, left, right)
+  fun <A, B> align(a: Kind<F, A>, b: Kind<F, B>): Kind<F, Ior<A, B>> = alignWith(::identity, a, b)
 
   /**
    * Combines two structures by taking the union of their shapes and combining the elements with the given function.

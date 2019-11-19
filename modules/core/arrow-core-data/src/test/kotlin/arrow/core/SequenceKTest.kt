@@ -28,6 +28,7 @@ import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
@@ -59,6 +60,11 @@ class SequenceKTest : UnitSpec() {
         fix().toList().toString()
     }
 
+    val EQK = object : EqK<ForSequenceK> {
+      override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
+        SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
+    }
+
     testLaws(
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
@@ -71,7 +77,7 @@ class SequenceKTest : UnitSpec() {
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       SemialignLaws.foldablelaws(SequenceK.semialign(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        { SequenceK.eq(it) as Eq<Kind<ForSequenceK, *>> },
+        EQK,
         SequenceK.foldable()
       )
     )

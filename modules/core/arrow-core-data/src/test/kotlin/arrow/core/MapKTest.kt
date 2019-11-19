@@ -25,6 +25,7 @@ import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -35,10 +36,15 @@ class MapKTest : UnitSpec() {
       fix()["key"] == b.fix()["key"]
   }
 
+  val EQK = object : EqK<MapKPartialOf<String>> {
+    override fun <A> Kind<MapKPartialOf<String>, A>.eqK(other: Kind<MapKPartialOf<String>, A>, EQ: Eq<A>): Boolean =
+      MapK.eq(String.eq(), EQ).run { this@eqK.fix().eqv(other.fix()) }
+  }
+
   init {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
-    testLaws(
+    val testLaws = testLaws(
       ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
       TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
@@ -48,8 +54,8 @@ class MapKTest : UnitSpec() {
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
       SemialignLaws.foldablelaws(MapK.semialign(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        { MapK.eq(String.eq(), it) as Eq<Kind<MapKPartialOf<String>, *>> },
-        MapK.foldable<String>()
+        EQK,
+        MapK.foldable()
       )
     )
 

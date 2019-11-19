@@ -5,7 +5,9 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
+
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -18,6 +20,7 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
@@ -54,9 +57,16 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
+      EqKLaws.laws(
+        ListK.eqK(),
+        ListK.eq(Int.eq()) as Eq<Kind<ForListK, Int>>,
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>
+      ) {
+        ListK.just(it)
+      },
       SemialignLaws.foldablelaws(ListK.semialign(),
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
-        { ListK.eq(it) as Eq<Kind<ForListK, *>> },
+        ListK.eqK(),
         ListK.foldable()
       )
     )

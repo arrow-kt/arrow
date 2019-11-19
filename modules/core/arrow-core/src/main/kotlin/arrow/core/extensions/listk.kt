@@ -10,6 +10,7 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
@@ -21,6 +22,7 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -293,11 +295,21 @@ interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
 }
 
 @extension
+interface ListKEqK : EqK<ForListK> {
+  override fun <A> Kind<ForListK, A>.eqK(other: Kind<ForListK, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      ListK.eq(EQ).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+@extension
 interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
   override fun <A, B> align(
-    left: Kind<ForListK, A>,
-    right: Kind<ForListK, B>
-  ): Kind<ForListK, Ior<A, B>> = alignRec(left.fix(), right.fix()).k()
+    a: Kind<ForListK, A>,
+    b: Kind<ForListK, B>
+  ): Kind<ForListK, Ior<A, B>> = alignRec(a.fix(), b.fix()).k()
 
   private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
     ls.isEmpty() -> rs.map { it.rightIor() }
