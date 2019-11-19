@@ -24,7 +24,7 @@ val instance = Cons(listFirst)
 instance
 ```
 
-It defines two functions `cons` and `uncons`.
+It defines two functions: `cons` and `uncons`.
 
 `cons` prepends an element `A` to a structure `S`.
 
