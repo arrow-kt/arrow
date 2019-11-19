@@ -7,6 +7,7 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapKOf
 import arrow.core.SortedMapKPartialOf
 import arrow.core.extensions.setk.eq.eq
+import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.updated
@@ -15,6 +16,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
@@ -93,4 +95,19 @@ interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
         } ?: false
       }.fold(true) { b1, b2 -> b1 && b2 }
     } else false
+}
+
+@extension
+interface SortedMapKHash<K : Comparable<K>, A> : Hash<SortedMapK<K, A>>, SortedMapKEq<K, A> {
+  fun HK(): Hash<K>
+  fun HA(): Hash<A>
+
+  override fun EQK(): Eq<K> = HK()
+  override fun EQA(): Eq<A> = HA()
+
+  // Somewhat mirrors HashMap.Node.hashCode in that the combinator there between key and value is xor
+  override fun SortedMapK<K, A>.hash(): Int =
+    SetK.hash(HK()).run { keys.k().hash() } xor foldLeft(1) { hash, a ->
+      31 * hash + HA().run { a.hash() }
+    }
 }

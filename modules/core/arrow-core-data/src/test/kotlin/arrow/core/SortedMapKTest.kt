@@ -1,15 +1,15 @@
 package arrow.core
 
 import arrow.Kind2
-import arrow.core.extensions.eq
 import arrow.core.extensions.functor
+import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.show
-import arrow.core.extensions.sortedmapk.eq.eq
+import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
-import arrow.test.laws.EqLaws
+import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
@@ -24,9 +24,8 @@ class SortedMapKTest : UnitSpec() {
   }
 
   init {
-
     testLaws(
-      EqLaws.laws(SortedMapK.eq(String.eq(), Int.eq())) { sortedMapOf("$it" to it).k() },
+      HashLaws.laws(SortedMapK.hash(String.hash(), Int.hash()), EQ) { sortedMapOf("key" to it).k() },
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
