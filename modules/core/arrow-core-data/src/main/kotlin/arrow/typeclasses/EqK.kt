@@ -19,7 +19,7 @@ interface EqK<F> {
    *
    * fun main(args: Array<String>) {
    *    // sampleStart
-   *    val result = Option.eqK().run { Some("hello").eqK(Some("kotlin"), Int.eq()) }
+   *    val result = Option.eqK().run { Some("hello").eqK(Some("kotlin"), String.eq()) }
    *    // sampleEnd
    *    println(result)
    * }
