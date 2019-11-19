@@ -225,6 +225,9 @@ options:
       - title: Eq
         url: /docs/arrow/typeclasses/eq/
 
+      - title: EqK
+        url: /docs/arrow/typeclasses/eqk/
+
       - title: Hash
         url: /docs/arrow/typeclasses/hash/
 
