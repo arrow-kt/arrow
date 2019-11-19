@@ -22,6 +22,7 @@ Compares two instances of `A` in the context of `F` using the provided `Eq<A>`. 
 ```kotlin:ank
 import arrow.core.extensions.*
 import arrow.core.extensions.option.eqK.eqK
+import arrow.core.*
 
 // lift String Eq to Option
 Option.eqK().run {
