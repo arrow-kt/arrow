@@ -25,6 +25,10 @@ Combines two structures by taking the union of their shapes and using Ior to hol
 `fun <A, B> align(left: Kind<F, A>, right: Kind<F, B>): Kind<F, Ior<A, B>>`
 
 ```kotlin:ank
+import arrow.core.extensions.*
+import arrow.core.extensions.listk.semialign.semialign
+import arrow.core.*
+
 ListK.semialign().run {
     align(listOf("A", "B").k(), listOf(1, 2, 3).k())
 }
@@ -37,6 +41,10 @@ combines two structures by taking the union of their shapes and combining the el
 `fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<F, A>, b: Kind<F, B>): Kind<F, C>`
 
 ```kotlin:ank
+import arrow.core.extensions.*
+import arrow.core.extensions.listk.semialign.semialign
+import arrow.core.*
+
 ListK.semialign().run {
    alignWith({"$it"}, listOf("A", "B").k(), listOf(1, 2, 3).k())
 }
