@@ -24,6 +24,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -424,4 +425,25 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
   override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
     if (fix().isEmpty()) b
     else this
+}
+
+@extension
+interface OptionEqK : EqK<ForOption> {
+  override fun <A> Kind<ForOption, A>.eqK(other: Kind<ForOption, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let { (a, b) ->
+      when (a) {
+        is None -> {
+          when (b) {
+            is None -> true
+            is Some -> false
+          }
+        }
+        is Some -> {
+          when (b) {
+            is None -> false
+            is Some -> EQ.run { a.t.eqv(b.t) }
+          }
+        }
+      }
+    }
 }

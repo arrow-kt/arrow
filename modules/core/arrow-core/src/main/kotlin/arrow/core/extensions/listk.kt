@@ -9,6 +9,9 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
+import arrow.core.extensions.list.eq.eqv
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq.eqv
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
@@ -18,6 +21,7 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -231,19 +235,27 @@ interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
 
   override fun <A> Kind<ForListK, A>.some(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) ListK.empty()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 
   override fun <A> Kind<ForListK, A>.many(): ListK<SequenceK<A>> =
     if (this.fix().isEmpty()) listOf(emptySequence<A>().k()).k()
-    else map { Sequence { object : Iterator<A> {
-      override fun hasNext(): Boolean = true
+    else map {
+      Sequence {
+        object : Iterator<A> {
+          override fun hasNext(): Boolean = true
 
-      override fun next(): A = it
-    } }.k() }.k()
+          override fun next(): A = it
+        }
+      }.k()
+    }.k()
 }
 
 @extension
@@ -278,4 +290,14 @@ interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
   override fun <A> empty(): Kind<ForListK, A> = emptyList<A>().k()
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): Kind<ForListK, A> =
     (this.fix() + b.fix()).k()
+}
+
+@extension
+interface ListKEqK : EqK<ForListK> {
+  override fun <A> Kind<ForListK, A>.eqK(other: Kind<ForListK, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      ListK.eq(EQ).run {
+        it.first.eqv(it.second)
+      }
+    }
 }

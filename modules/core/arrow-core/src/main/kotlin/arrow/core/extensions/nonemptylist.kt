@@ -4,16 +4,20 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForNonEmptyList
+import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyListOf
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
+import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -183,3 +187,11 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
 
 fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
   NonEmptyList.monad().fx.monad(c).fix()
+
+@extension
+interface NonEmptyListEqK : EqK<ForNonEmptyList> {
+  override fun <A> Kind<ForNonEmptyList, A>.eqK(other: Kind<ForNonEmptyList, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      ListK.eq(EQ).run { it.first.all.k().eqv(it.second.all.k()) }
+    }
+}
