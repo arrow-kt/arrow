@@ -2,11 +2,13 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Ior
 import arrow.core.MapK
 import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
@@ -14,6 +16,9 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.sequence
+import arrow.core.toMap
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.updated
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -24,6 +29,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -126,4 +132,20 @@ interface MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
     SetK.hash(HK()).run { keys.k().hash() } xor foldLeft(1) { hash, a ->
       31 * hash + HA().run { a.hash() }
     }
+}
+
+@extension
+interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
+  override fun <A, B> align(
+    left: Kind<MapKPartialOf<K>, A>,
+    right: Kind<MapKPartialOf<K>, B>
+  ): Kind<MapKPartialOf<K>, Ior<A, B>> {
+    val l = left.fix()
+    val r = right.fix()
+    val keys = l.keys + r.keys
+
+    return keys.map { key ->
+      Ior.fromOptions(l[key].toOption(), r[key].toOption()).map { key toT it }
+    }.flattenOption().toMap().k()
+  }
 }

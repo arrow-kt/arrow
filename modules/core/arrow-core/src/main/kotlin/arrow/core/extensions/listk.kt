@@ -4,18 +4,19 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForListK
+import arrow.core.Ior
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
-import arrow.core.extensions.list.eq.eqv
 import arrow.core.extensions.listk.eq.eq
-import arrow.core.extensions.listk.eq.eqv
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
+import arrow.core.leftIor
+import arrow.core.rightIor
 import arrow.extension
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -33,6 +34,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
@@ -300,4 +302,18 @@ interface ListKEqK : EqK<ForListK> {
         it.first.eqv(it.second)
       }
     }
+}
+
+@extension
+interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
+  override fun <A, B> align(
+    a: Kind<ForListK, A>,
+    b: Kind<ForListK, B>
+  ): Kind<ForListK, Ior<A, B>> = alignRec(a.fix(), b.fix()).k()
+
+  private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+    ls.isEmpty() -> rs.map { it.rightIor() }
+    rs.isEmpty() -> ls.map { it.leftIor() }
+    else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
+  }
 }
