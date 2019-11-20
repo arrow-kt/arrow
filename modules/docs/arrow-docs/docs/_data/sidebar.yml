@@ -330,7 +330,6 @@ options:
       - title: Alternative
         url: /docs/arrow/typeclasses/alternative/
 
-
       - title: Divide
         url: /docs/arrow/typeclasses/divide/
 
@@ -339,6 +338,9 @@ options:
 
       - title: Decidable
         url: /docs/arrow/typeclasses/decidable/
+
+      - title: Semialign
+        url: /docs/arrow/typeclasses/semialign/
 
   - title: Effects
 

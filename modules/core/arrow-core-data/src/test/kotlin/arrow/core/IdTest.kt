@@ -8,9 +8,11 @@ import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
+import arrow.core.extensions.id.foldable.foldable
 import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.monoid.monoid
+import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
 import arrow.core.extensions.id.traverse.traverse
@@ -21,6 +23,7 @@ import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -45,7 +48,12 @@ class IdTest : UnitSpec() {
         Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>
       ) {
         Id.just(it)
-      }
+      },
+      SemialignLaws.foldablelaws(Id.semialign(),
+        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
+        Id.eqK(),
+        Id.foldable()
+      )
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {
@@ -70,9 +78,10 @@ class IdTest : UnitSpec() {
   }
 }
 
-private fun <F> Gen.Companion.id(gen: Gen<F>): Gen<Id<F>> =
-  object : Gen<Id<F>> {
-    override fun constants(): Iterable<Id<F>> = gen.constants().map { Id.just(it) }
+fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
+  override fun constants(): Iterable<Id<T>> =
+    gen.constants().map { Id.just(it) }
 
-    override fun random(): Sequence<Id<F>> = gen.random().map { Id.just(it) }
-  }
+  override fun random(): Sequence<Id<T>> =
+    gen.random().map { Id.just(it) }
+}

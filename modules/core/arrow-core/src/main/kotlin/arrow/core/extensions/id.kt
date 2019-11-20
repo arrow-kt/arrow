@@ -30,8 +30,10 @@ import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Semialign
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
+import arrow.core.Ior
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -212,4 +214,10 @@ interface IdEqK : EqK<ForId> {
     (this.fix() to other.fix()).let {
       EQ.run { it.first.extract().eqv(it.second.extract()) }
     }
+}
+
+@extension
+interface IdSemialign : Semialign<ForId>, IdFunctor {
+  override fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<ForId, A>, b: Kind<ForId, B>): Kind<ForId, C> =
+    Id.just(fa(Ior.Both(a.fix().extract(), b.fix().extract())))
 }

@@ -7,11 +7,13 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
+import arrow.core.extensions.option.semialign.semialign
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.tuple2.eq.eq
@@ -24,6 +26,7 @@ import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
@@ -63,7 +66,12 @@ class OptionTest : UnitSpec() {
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>
       ) {
         Option.just(it)
-      }
+      },
+      SemialignLaws.foldablelaws(Option.semialign(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK(),
+        Option.foldable()
+      )
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
