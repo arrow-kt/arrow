@@ -54,10 +54,10 @@ ListK.semialign().run {
 
 Arrow provides [`SemialignLaws`][functor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Semialign instances.
 
-#### Creating your own `Functor` instances
+#### Creating your own `Semialign` instances
 
 Arrow already provides Semialign instances for common datatypes (e.g. Option, ListK, SetK). See their implementations
-and accomanying testcases for reference.
+and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
