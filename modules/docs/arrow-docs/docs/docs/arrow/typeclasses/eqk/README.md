@@ -37,4 +37,13 @@ See the existing EqK instances implementations and accompanying tests for refere
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `EqK` instances for custom datatypes.
 
+### Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.EqK
+
+TypeClass(EqK::class).dtMarkdownList()
+```
+
 ank_macro_hierarchy(arrow.typeclasses.EqK)
