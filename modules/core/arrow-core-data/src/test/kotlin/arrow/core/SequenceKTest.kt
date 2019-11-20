@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.sequencek.align.align
 import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.foldable.foldable
@@ -17,6 +18,7 @@ import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sequenceK
+import arrow.test.laws.AlignLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -24,7 +26,6 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -75,7 +76,7 @@ class SequenceKTest : UnitSpec() {
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
-      SemialignLaws.foldablelaws(SequenceK.semialign(),
+      AlignLaws.foldablelaws(SequenceK.align(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
         EQK,
         SequenceK.foldable()

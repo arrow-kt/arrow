@@ -16,6 +16,7 @@ import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -281,13 +282,13 @@ interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative
 }
 
 @extension
-interface SequenceKListSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
-  override fun <A, B> align(left: Kind<ForSequenceK, A>, right: Kind<ForSequenceK, B>): Kind<ForSequenceK, Ior<A, B>> =
+interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
+  override fun <A, B> align(a: Kind<ForSequenceK, A>, b: Kind<ForSequenceK, B>): Kind<ForSequenceK, Ior<A, B>> =
     object : Sequence<Ior<A, B>> {
       override fun iterator(): Iterator<Ior<A, B>> = object : Iterator<Ior<A, B>> {
 
-        val leftIterator = left.fix().iterator()
-        val rightIterator = right.fix().iterator()
+        val leftIterator = a.fix().iterator()
+        val rightIterator = b.fix().iterator()
 
         override fun hasNext(): Boolean = leftIterator.hasNext() || rightIterator.hasNext()
 
@@ -297,4 +298,9 @@ interface SequenceKListSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
           Ior.fromOptions(leftIterator.tryNext(), rightIterator.tryNext()).toList().first()
       }
     }.k()
+}
+
+@extension
+interface SequenceKAlign : Align<ForSequenceK>, SequenceKSemialign {
+  override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
 }
