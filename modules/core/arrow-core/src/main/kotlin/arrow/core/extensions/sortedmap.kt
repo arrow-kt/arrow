@@ -2,14 +2,17 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Ior
 import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKOf
 import arrow.core.SortedMapKPartialOf
+import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
 import arrow.core.k
+import arrow.core.toOption
 import arrow.core.updated
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -18,6 +21,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -111,3 +115,21 @@ interface SortedMapKHash<K : Comparable<K>, A> : Hash<SortedMapK<K, A>>, SortedM
       31 * hash + HA().run { a.hash() }
     }
 }
+
+interface SortedMapKSemialign<K : Comparable<K>> : Semialign<SortedMapKPartialOf<K>>, SortedMapKFunctor<K> {
+  override fun <A, B> align(
+    a: Kind<SortedMapKPartialOf<K>, A>,
+    b: Kind<SortedMapKPartialOf<K>, B>
+  ): Kind<SortedMapKPartialOf<K>, Ior<A, B>> {
+    val l = a.fix()
+    val r = b.fix()
+    val keys = l.keys + r.keys
+
+    return keys.map { key ->
+      Ior.fromOptions(l[key].toOption(), r[key].toOption()).map { key to it }
+    }.flattenOption().toMap().toSortedMap().k()
+  }
+}
+
+fun <K : Comparable<K>> SortedMapK.Companion.semialign(): SortedMapKSemialign<K> =
+  object : SortedMapKSemialign<K> {}
