@@ -51,6 +51,8 @@ import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
 import arrow.typeclasses.Semialign
 import arrow.core.Ior
+import arrow.core.toT
+import arrow.typeclasses.Zip
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -462,4 +464,16 @@ interface OptionEqK : EqK<ForOption> {
 interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
   override fun <A, B> align(a: Kind<ForOption, A>, b: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
     Ior.fromOptions(a.fix(), b.fix())
+}
+
+@extension
+interface OptionZip : Zip<ForOption>, OptionSemialign {
+  override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
+    when (val l = this.fix()) {
+      is None -> None
+      is Some -> when (val r = other.fix()) {
+        is None -> None
+        is Some -> Option.just(l.t toT r.t)
+      }
+    }
 }
