@@ -54,15 +54,24 @@ ListK.semialign().run {
 
 Arrow provides [`SemialignLaws`][functor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Semialign instances.
 
-#### Creating your own `Functor` instances
+#### Creating your own `Semialign` instances
 
-Arrow already provides Semialign instances for common datatypes (e.g. Option, ListK, SetK). See their implementations
-and accomanying testcases for reference.
+Arrow already provides Semialign instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
+and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
 Additionally all instances of [`Semialign`]({{ '/docs/arrow/typeclasses/semialign' | relative_url }}) implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
+
+### Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Semialign
+
+TypeClass(Semialign::class).dtMarkdownList()
+```
 
 ank_macro_hierarchy(arrow.typeclasses.Semialign)
 
