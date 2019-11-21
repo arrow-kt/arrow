@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
@@ -20,13 +21,13 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
+import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
@@ -64,7 +65,7 @@ class ListKTest : UnitSpec() {
       ) {
         ListK.just(it)
       },
-      SemialignLaws.foldablelaws(ListK.semialign(),
+      AlignLaws.foldablelaws(ListK.align(),
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
         ListK.eqK(),
         ListK.foldable()

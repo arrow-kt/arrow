@@ -21,6 +21,7 @@ import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.updated
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
@@ -148,4 +149,9 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
       Ior.fromOptions(l[key].toOption(), r[key].toOption()).map { key toT it }
     }.flattenOption().toMap().k()
   }
+}
+
+@extension
+interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
 }
