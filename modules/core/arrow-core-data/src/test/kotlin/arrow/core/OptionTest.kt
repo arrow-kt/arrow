@@ -16,6 +16,7 @@ import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.semialign.semialign
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.option
@@ -29,6 +30,7 @@ import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -71,6 +73,10 @@ class OptionTest : UnitSpec() {
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
         Option.eqK(),
         Option.foldable()
+      ),
+      UnalignLaws.laws(Option.unalign(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK()
       )
     )
 
