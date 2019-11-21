@@ -54,6 +54,7 @@ import arrow.core.Ior
 import arrow.core.some
 import arrow.core.toT
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Align
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -465,6 +466,11 @@ interface OptionEqK : EqK<ForOption> {
 interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
   override fun <A, B> align(a: Kind<ForOption, A>, b: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
     Ior.fromOptions(a.fix(), b.fix())
+}
+
+@extension
+interface OptionAlign : Align<ForOption>, OptionSemialign {
+  override fun <A> empty(): Kind<ForOption, A> = Option.empty()
 }
 
 @extension
