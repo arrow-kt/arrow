@@ -145,7 +145,7 @@ fun <K : Comparable<K>> SortedMapK.Companion.align(): SortedMapKAlign<K> =
   object : SortedMapKAlign<K> {}
 
 @extension
-interface SortedMapKEqK<K: Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
+interface SortedMapKEqK<K : Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
   fun EQK(): Eq<K>
 
   override fun <A> Kind<SortedMapKPartialOf<K>, A>.eqK(other: Kind<SortedMapKPartialOf<K>, A>, EQ: Eq<A>): Boolean =
