@@ -19,6 +19,7 @@ import arrow.core.leftIor
 import arrow.core.rightIor
 import arrow.core.toT
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -319,6 +320,11 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
     rs.isEmpty() -> ls.map { it.leftIor() }
     else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
   }
+}
+
+@extension
+interface ListKAlign : Align<ForListK>, ListKSemialign {
+  override fun <A> empty(): Kind<ForListK, A> = ListK.empty()
 }
 
 @extension

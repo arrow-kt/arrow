@@ -35,7 +35,7 @@ object ZipLaws {
     GEN: LiftGen<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.foldablelaws(ZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GEN, EQK)
+  ) = SemialignLaws.laws(ZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GEN, EQK)
 
   private fun <F> zipLaws(
     ZIP: Zip<F>,

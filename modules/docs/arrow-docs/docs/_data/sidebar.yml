@@ -342,6 +342,9 @@ options:
       - title: Semialign
         url: /docs/arrow/typeclasses/semialign/
 
+      - title: Align
+        url: /docs/arrow/typeclasses/align/
+
   - title: Effects
 
     nested_options:

@@ -7,7 +7,6 @@ import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
-
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
