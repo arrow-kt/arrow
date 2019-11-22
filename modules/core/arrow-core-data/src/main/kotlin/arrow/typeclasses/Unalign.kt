@@ -44,7 +44,7 @@ interface Unalign<F> : Semialign<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.unalign().run {
-   *    unalignWith(it.leftIor()}, listOf(1, 2, 3).k())
+   *    unalignWith({it.leftIor()}, listOf(1, 2, 3).k())
    *   }
    *   //sampleEnd
    *   println(result)

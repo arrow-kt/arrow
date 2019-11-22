@@ -42,7 +42,7 @@ import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.*
 
 ListK.unalign().run {
-    unalignWith(it.leftIor()}, listOf(1, 2, 3).k())
+    unalignWith({it.leftIor()}, listOf(1, 2, 3).k())
 }
 ```
 
