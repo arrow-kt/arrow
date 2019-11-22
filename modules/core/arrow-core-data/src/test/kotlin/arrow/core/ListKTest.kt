@@ -67,7 +67,7 @@ class ListKTest : UnitSpec() {
       ) {
         ListK.just(it)
       },
-      AlignLaws.foldablelaws(ListK.align(),
+      AlignLaws.laws(ListK.align(),
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
         ListK.eqK(),
         ListK.foldable()

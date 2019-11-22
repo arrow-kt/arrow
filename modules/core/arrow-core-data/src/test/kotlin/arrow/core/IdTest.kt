@@ -49,7 +49,7 @@ class IdTest : UnitSpec() {
       ) {
         Id.just(it)
       },
-      SemialignLaws.foldablelaws(Id.semialign(),
+      SemialignLaws.laws(Id.semialign(),
         Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
         Id.eqK(),
         Id.foldable()

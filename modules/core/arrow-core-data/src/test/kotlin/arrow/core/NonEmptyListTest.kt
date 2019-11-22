@@ -57,7 +57,7 @@ class NonEmptyListTest : UnitSpec() {
       ) {
         Nel.just(it)
       },
-      SemialignLaws.foldablelaws(NonEmptyList.semialign(),
+      SemialignLaws.laws(NonEmptyList.semialign(),
         Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>,
         NonEmptyList.eqK(),
         NonEmptyList.foldable()
