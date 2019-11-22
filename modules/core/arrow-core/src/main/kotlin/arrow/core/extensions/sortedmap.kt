@@ -15,6 +15,7 @@ import arrow.core.k
 import arrow.core.toOption
 import arrow.core.updated
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -133,3 +134,10 @@ interface SortedMapKSemialign<K : Comparable<K>> : Semialign<SortedMapKPartialOf
 
 fun <K : Comparable<K>> SortedMapK.Companion.semialign(): SortedMapKSemialign<K> =
   object : SortedMapKSemialign<K> {}
+
+interface SortedMapKAlign<K : Comparable<K>> : Align<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
+  override fun <A> empty(): Kind<SortedMapKPartialOf<K>, A> = emptyMap<K, A>().toSortedMap().k()
+}
+
+fun <K : Comparable<K>> SortedMapK.Companion.align(): SortedMapKAlign<K> =
+  object : SortedMapKAlign<K> {}

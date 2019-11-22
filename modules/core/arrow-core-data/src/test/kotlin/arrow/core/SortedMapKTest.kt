@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.core.extensions.align
 import arrow.core.extensions.eq
 import arrow.core.extensions.foldable
 import arrow.core.extensions.functor
@@ -14,9 +15,9 @@ import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
+import arrow.test.laws.AlignLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -46,7 +47,7 @@ class SortedMapKTest : UnitSpec() {
         SortedMapK.functor<String>(),
         { a: Int -> sortedMapOf("key" to a).k() },
         EQ),
-      SemialignLaws.laws(SortedMapK.semialign<String>(),
+      AlignLaws.laws(SortedMapK.align<String>(),
         Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
         EQK,
         SortedMapK.foldable<String>()
