@@ -10,6 +10,7 @@ import arrow.core.SortedMapKPartialOf
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
+import arrow.core.extensions.sortedmapk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.toOption
@@ -18,6 +19,7 @@ import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -141,3 +143,11 @@ interface SortedMapKAlign<K : Comparable<K>> : Align<SortedMapKPartialOf<K>>, So
 
 fun <K : Comparable<K>> SortedMapK.Companion.align(): SortedMapKAlign<K> =
   object : SortedMapKAlign<K> {}
+
+@extension
+interface SortedMapKEqK<K: Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
+  fun EQK(): Eq<K>
+
+  override fun <A> Kind<SortedMapKPartialOf<K>, A>.eqK(other: Kind<SortedMapKPartialOf<K>, A>, EQ: Eq<A>): Boolean =
+    SortedMapK.eq(EQK(), EQ).run { this@eqK.fix().eqv(other.fix()) }
+}

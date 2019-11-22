@@ -10,7 +10,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semialign
 import arrow.core.extensions.show
-import arrow.core.extensions.sortedmapk.eq.eq
+import arrow.core.extensions.sortedmapk.eqK.eqK
 import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
 import arrow.test.UnitSpec
@@ -21,7 +21,6 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -30,11 +29,6 @@ class SortedMapKTest : UnitSpec() {
   val EQ: Eq<Kind2<ForSortedMapK, String, Int>> = object : Eq<Kind2<ForSortedMapK, String, Int>> {
     override fun Kind2<ForSortedMapK, String, Int>.eqv(b: Kind2<ForSortedMapK, String, Int>): Boolean =
       fix()["key"] == b.fix()["key"]
-  }
-
-  val EQK = object : EqK<SortedMapKPartialOf<String>> {
-    override fun <A> Kind<SortedMapKPartialOf<String>, A>.eqK(other: Kind<SortedMapKPartialOf<String>, A>, EQ: Eq<A>): Boolean =
-      SortedMapK.eq(String.eq(), EQ).run { this@eqK.fix().eqv(other.fix()) }
   }
 
   init {
@@ -49,7 +43,7 @@ class SortedMapKTest : UnitSpec() {
         EQ),
       AlignLaws.laws(SortedMapK.align<String>(),
         Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
-        EQK,
+        SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       ))
 
