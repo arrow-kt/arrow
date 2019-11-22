@@ -40,7 +40,7 @@ object SemialignLaws {
       EQK.run { a.eqK(b, EQ) }
     }
 
-  fun <F> foldablelaws(
+  fun <F> laws(
     SA: Semialign<F>,
     gen: Gen<Kind<F, Int>>,
     EQK: EqK<F>,
