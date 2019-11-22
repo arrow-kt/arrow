@@ -16,6 +16,7 @@ import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
+import arrow.core.extensions.sequencek.unalign.unalign
 import arrow.test.UnitSpec
 import arrow.test.generators.sequenceK
 import arrow.test.laws.AlignLaws
@@ -28,6 +29,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
@@ -80,6 +82,10 @@ class SequenceKTest : UnitSpec() {
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
         EQK,
         SequenceK.foldable()
+      ),
+      UnalignLaws.laws(SequenceK.unalign(),
+        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
+        EQK
       )
     )
 

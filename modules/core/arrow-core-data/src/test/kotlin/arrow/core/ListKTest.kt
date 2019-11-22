@@ -18,6 +18,7 @@ import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
@@ -31,6 +32,7 @@ import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -69,6 +71,10 @@ class ListKTest : UnitSpec() {
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
         ListK.eqK(),
         ListK.foldable()
+      ),
+      UnalignLaws.laws(ListK.unalign(),
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.eqK()
       )
     )
 

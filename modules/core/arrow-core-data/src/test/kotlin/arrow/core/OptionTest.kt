@@ -188,6 +188,12 @@ class OptionTest : UnitSpec() {
       None or x shouldBe Some(2)
       None or None shouldBe None
     }
+
+    "toLeftOption" {
+      1.leftIor().toLeftOption() shouldBe Some(1)
+      2.rightIor().toLeftOption() shouldBe None
+      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
+    }
   }
 
   private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {

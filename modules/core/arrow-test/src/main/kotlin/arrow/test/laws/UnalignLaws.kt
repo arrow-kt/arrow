@@ -26,8 +26,8 @@ object UnalignLaws {
     val tuple2Eq = Tuple2.eq(intEq, intEq)
 
     return listOf(
-      Law("Unalign Laws: split union shape into its components 1") { UA.law1(gen, tuple2Eq) },
-      Law("Unalign Laws: split union shape into its components 2") {
+      Law("Unalign Laws: split union shape into its components #1") { UA.law1(gen, tuple2Eq) },
+      Law("Unalign Laws: split union shape into its components #2") {
         UA.law2(iorGen(UA, gen, gen), iorIntEq)
       }
     )

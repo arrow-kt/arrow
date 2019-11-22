@@ -6,8 +6,11 @@ import arrow.core.Ior
 import arrow.core.MapK
 import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.setk.eq.eq
@@ -34,6 +37,7 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unalign
 import arrow.undocumented
 
 @extension
@@ -154,4 +158,20 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
 @extension
 interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
+}
+
+@extension
+interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    ior.fix().let { map ->
+      map.mapMaybe { it.toLeftOption() } toT map.mapMaybe { it.toOption() }
+    }
+
+  private fun <K, A, B> MapK<K, A>.mapMaybe(fa: (A) -> Option<B>): MapK<K, B> =
+    entries.mapNotNull {
+      when (val v = fa(it.value)) {
+        is Some -> it.key to v.t
+        is None -> null
+      }
+    }.toMap().k()
 }

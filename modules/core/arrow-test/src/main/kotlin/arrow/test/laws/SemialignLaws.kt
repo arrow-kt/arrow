@@ -3,9 +3,6 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Ior
 import arrow.core.ListK
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.list.functorFilter.flattenOption
@@ -105,17 +102,14 @@ object SemialignLaws {
     val left: List<A> = toList(a)
 
     // toListOf (folded . here) (align x y)
-    val middle: List<A> = toList(align(a, b).map { it.justLeft() }).flattenOption()
+    val middle: List<A> = toList(align(a, b).map { it.toLeftOption() }).flattenOption()
 
     // mapMaybe justHere (toList (align x y))
-    val right: List<A> = toList(align(a, b)).filterMap { it.justLeft() }
+    val right: List<A> = toList(align(a, b)).filterMap { it.toLeftOption() }
 
     left == right && left == middle
   }
 }
-
-private fun <A, B> Ior<A, B>.justLeft(): Option<A> =
-  fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
 private fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
   when (this) {
