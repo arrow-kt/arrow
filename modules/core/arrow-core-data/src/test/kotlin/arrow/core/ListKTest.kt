@@ -17,8 +17,10 @@ import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.extensions.listk.zip.zip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.liftGen
 import arrow.test.generators.listK
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
@@ -26,10 +28,10 @@ import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -64,8 +66,8 @@ class ListKTest : UnitSpec() {
       ) {
         ListK.just(it)
       },
-      SemialignLaws.foldablelaws(ListK.semialign(),
-        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+      ZipLaws.laws(ListK.zip(),
+        ListK.liftGen(),
         ListK.eqK(),
         ListK.foldable()
       )

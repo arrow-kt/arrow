@@ -8,11 +8,13 @@ import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
+import arrow.core.getOption
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.sequence
@@ -33,6 +35,7 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Zip
 import arrow.undocumented
 
 @extension
@@ -148,4 +151,16 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
       Ior.fromOptions(l[key].toOption(), r[key].toOption()).map { key toT it }
     }.flattenOption().toMap().k()
   }
+}
+
+@extension
+interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.zip(other: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      val keys = (ls.keys.intersect(rs.keys))
+
+      val values = keys.map { key -> ls.getOption(key).flatMap { l -> rs.getOption(key).map { key to (l toT it) } } }.flattenOption()
+
+      return values.toMap().k()
+    }
 }

@@ -16,16 +16,18 @@ import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
+import arrow.core.extensions.nonemptylist.zip.zip
 import arrow.test.UnitSpec
+import arrow.test.generators.liftGen
 import arrow.test.generators.nonEmptyList
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -57,8 +59,8 @@ class NonEmptyListTest : UnitSpec() {
       ) {
         Nel.just(it)
       },
-      SemialignLaws.foldablelaws(NonEmptyList.semialign(),
-        Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>,
+      ZipLaws.laws(NonEmptyList.zip(),
+        NonEmptyList.liftGen(),
         NonEmptyList.eqK(),
         NonEmptyList.foldable()
       )

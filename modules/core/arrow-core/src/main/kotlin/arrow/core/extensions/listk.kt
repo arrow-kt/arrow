@@ -17,6 +17,7 @@ import arrow.core.fix
 import arrow.core.k
 import arrow.core.leftIor
 import arrow.core.rightIor
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -40,8 +41,10 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Zip
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
+import kotlin.collections.zip as listZip
 
 @extension
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
@@ -61,7 +64,7 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
   fun EQ(): Eq<A>
 
   override fun ListKOf<A>.eqv(b: ListKOf<A>): Boolean =
-    if (fix().size == b.fix().size) fix().zip(b.fix()) { aa, bb ->
+    if (fix().size == b.fix().size) fix().listZip(b.fix()) { aa, bb ->
       EQ().run { aa.eqv(bb) }
     }.fold(true) { acc, bool ->
       acc && bool
@@ -316,4 +319,10 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
     rs.isEmpty() -> ls.map { it.leftIor() }
     else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
   }
+}
+
+@extension
+interface ListKZip : Zip<ForListK>, ListKSemialign {
+  override fun <A, B> Kind<ForListK, A>.zip(other: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
+    this.fix().listZip(other.fix()).map { it.first toT it.second }.k()
 }

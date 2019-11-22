@@ -13,17 +13,19 @@ import arrow.core.extensions.mapk.monoid.monoid
 import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
+import arrow.core.extensions.mapk.zip.zip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.LiftGen
 import arrow.test.generators.mapK
 import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -52,8 +54,11 @@ class MapKTest : UnitSpec() {
       EqLaws.laws(EQ) { mapOf(it.toString() to it).k() },
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
-      SemialignLaws.foldablelaws(MapK.semialign(),
-        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+      ZipLaws.laws(MapK.zip(),
+        object : LiftGen<MapKPartialOf<String>> {
+          override fun <A> liftGen(gen: Gen<A>): Gen<Kind<MapKPartialOf<String>, A>> =
+            Gen.mapK(Gen.string(), gen) as Gen<Kind<MapKPartialOf<String>, A>>
+        },
         EQK,
         MapK.foldable()
       )

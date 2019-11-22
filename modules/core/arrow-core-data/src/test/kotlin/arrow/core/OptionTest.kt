@@ -68,7 +68,7 @@ class OptionTest : UnitSpec() {
       ) {
         Option.just(it)
       },
-      ZipLaws.foldablelaws(Option.zip(),
+      ZipLaws.laws(Option.zip(),
         Option.liftGen(),
         Option.eqK(),
         Option.foldable())

@@ -19,25 +19,25 @@ import io.kotlintest.properties.forAll
 
 object ZipLaws {
 
-  val intTupleEq = Tuple2.eq(Int.eq(), Int.eq())
+  private val intTupleEq = Tuple2.eq(Int.eq(), Int.eq())
 
-  val iorIntIntTupleEq = Ior.eq(Int.eq(), intTupleEq)
+  private val iorIntIntTupleEq = Ior.eq(Int.eq(), intTupleEq)
 
   fun <F> laws(
     ZIP: Zip<F>,
     GEN: LiftGen<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(ZIP, buildGen(GEN, Gen.int()), EQK) + lawsOnly(ZIP, GEN, EQK)
+    SemialignLaws.laws(ZIP, buildGen(GEN, Gen.int()), EQK) + zipLaws(ZIP, GEN, EQK)
 
-  fun <F> foldablelaws(
+  fun <F> laws(
     ZIP: Zip<F>,
     GEN: LiftGen<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.foldablelaws(ZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + lawsOnly(ZIP, GEN, EQK)
+  ) = SemialignLaws.foldablelaws(ZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GEN, EQK)
 
-  private fun <F> lawsOnly(
+  private fun <F> zipLaws(
     ZIP: Zip<F>,
     GEN: LiftGen<F>,
     EQK: EqK<F>

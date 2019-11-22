@@ -8,9 +8,12 @@ import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
+import arrow.core.Ior
+import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.toT
 import arrow.core.value
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -27,13 +30,13 @@ import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Semialign
+import arrow.typeclasses.Zip
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
-import arrow.core.Ior
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -220,4 +223,10 @@ interface IdEqK : EqK<ForId> {
 interface IdSemialign : Semialign<ForId>, IdFunctor {
   override fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<ForId, A>, b: Kind<ForId, B>): Kind<ForId, C> =
     Id.just(fa(Ior.Both(a.fix().extract(), b.fix().extract())))
+}
+
+@extension
+interface IdZip : Zip<ForId>, IdSemialign {
+  override fun <A, B> Kind<ForId, A>.zip(other: Kind<ForId, B>): Kind<ForId, Tuple2<A, B>> =
+    Id.just(this.fix().extract() toT other.fix().extract())
 }

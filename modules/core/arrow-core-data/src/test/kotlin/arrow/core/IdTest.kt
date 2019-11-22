@@ -16,9 +16,11 @@ import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
 import arrow.core.extensions.id.traverse.traverse
+import arrow.core.extensions.id.zip.zip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.liftGen
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
@@ -26,6 +28,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -51,6 +54,11 @@ class IdTest : UnitSpec() {
       },
       SemialignLaws.foldablelaws(Id.semialign(),
         Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
+        Id.eqK(),
+        Id.foldable()
+      ),
+      ZipLaws.laws(Id.zip(),
+        Id.liftGen(),
         Id.eqK(),
         Id.foldable()
       )
