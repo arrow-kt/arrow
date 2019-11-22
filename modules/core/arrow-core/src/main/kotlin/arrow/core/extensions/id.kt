@@ -34,6 +34,8 @@ import arrow.typeclasses.Semialign
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
 import arrow.core.Ior
+import arrow.typeclasses.Align
+import arrow.typeclasses.Crosswalk
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -220,4 +222,14 @@ interface IdEqK : EqK<ForId> {
 interface IdSemialign : Semialign<ForId>, IdFunctor {
   override fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<ForId, A>, b: Kind<ForId, B>): Kind<ForId, C> =
     Id.just(fa(Ior.Both(a.fix().extract(), b.fix().extract())))
+}
+
+@extension
+interface IdCrosswalk : Crosswalk<ForId>, IdFunctor, IdFoldable {
+  override fun <F, A, B> crosswalk(
+    ALIGN: Align<F>,
+    fa: (A) -> Kind<F, B>,
+    a: Kind<ForId, A>
+  ): Kind<F, Kind<ForId, B>> =
+    ALIGN.run { fa(a.fix().extract()).map { Id.just(it) } }
 }

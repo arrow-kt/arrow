@@ -3,9 +3,11 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.foldable.foldable
@@ -20,6 +22,7 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.option
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
@@ -71,6 +74,10 @@ class OptionTest : UnitSpec() {
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
         Option.eqK(),
         Option.foldable()
+      ),
+      CrosswalkLaws.laws(Option.crosswalk(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK()
       )
     )
 

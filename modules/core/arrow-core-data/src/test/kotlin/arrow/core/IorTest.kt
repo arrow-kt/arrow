@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -13,6 +14,8 @@ import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.Ior.Right
+import arrow.core.extensions.ior.crosswalk.crosswalk
+import arrow.core.extensions.ior.eqK.eqK
 import arrow.test.UnitSpec
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.HashLaws
@@ -20,9 +23,11 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
@@ -44,7 +49,8 @@ class IorTest : UnitSpec() {
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
-      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any())
+      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
+      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Ior.eqK(Int.eq()))
     )
 
     "bimap() should allow modify both value" {
@@ -140,3 +146,16 @@ class IorTest : UnitSpec() {
     }
   }
 }
+
+private fun <A> Gen.Companion.ior(gen: Gen<A>) =
+  object : Gen<Kind<ForIor, A>> {
+    override fun constants(): Iterable<Kind<ForIor, A>> =
+      gen.constants().map {
+        Ior.Both(it, it) as Kind<ForIor, A>
+      }
+
+    override fun random(): Sequence<Kind<ForIor, A>> =
+      gen.random().map {
+        Ior.Both(it, it) as Kind<ForIor, A>
+      }
+  }

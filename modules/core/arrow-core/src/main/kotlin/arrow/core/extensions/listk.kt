@@ -22,6 +22,7 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -322,4 +323,16 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
 @extension
 interface ListKAlign : Align<ForListK>, ListKSemialign {
   override fun <A> empty(): Kind<ForListK, A> = ListK.empty()
+}
+
+@extension
+interface ListKCrosswalk: Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForListK, A>): Kind<F, Kind<ForListK, B>> {
+
+    val list = a.fix()
+    val cons: (Ior<A, B>)
+
+
+    return super.crosswalk(ALIGN, fa, a)
+  }
 }

@@ -51,7 +51,9 @@ import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
 import arrow.typeclasses.Semialign
 import arrow.core.Ior
+import arrow.core.some
 import arrow.typeclasses.Align
+import arrow.typeclasses.Crosswalk
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -468,4 +470,13 @@ interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
 @extension
 interface OptionAlign : Align<ForOption>, OptionSemialign {
   override fun <A> empty(): Kind<ForOption, A> = Option.empty()
+}
+
+@extension
+interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForOption, A>): Kind<F, Kind<ForOption, B>> =
+    when (val e = a.fix()) {
+      is None -> ALIGN.run { empty<B>().map { Option.empty<B>() } }
+      is Some -> ALIGN.run { fa(e.t).map { Option.just(it) } }
+    }
 }
