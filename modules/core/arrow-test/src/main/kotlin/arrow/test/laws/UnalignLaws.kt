@@ -27,7 +27,7 @@ object UnalignLaws {
     gen: Gen<Kind<F, Int>>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = SemialignLaws.foldablelaws(UA, gen, EQK, FOLD) + unalignLaws(UA, gen, EQK)
+  ): List<Law> = SemialignLaws.laws(UA, gen, EQK, FOLD) + unalignLaws(UA, gen, EQK)
 
   private fun <F> unalignLaws(
     UA: Unalign<F>,
