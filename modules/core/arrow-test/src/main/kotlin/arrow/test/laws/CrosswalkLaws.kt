@@ -24,6 +24,9 @@ object CrosswalkLaws {
 
     return listOf(
       Law("Crosswalk laws: law #1") {
+        CW.law1(ListK.align(), gen, ListK.eq(eq))
+      },
+      Law("Crosswalk laws: law #2") {
         CW.law2(ListK.align(), gen, ListK.eq(eq))
       }
     )
@@ -39,12 +42,11 @@ object CrosswalkLaws {
     G: Gen<Kind<T, A>>,
     EQ: Eq<Kind<F, Kind<T, B>>>
   ) = forAll(G) { a: Kind<T, A> ->
-    val constNil: (A) -> Kind<F, B> = { _: A -> ALIGN.empty<B>() }
-    val ls: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta: Kind<T, A> -> crosswalk(ALIGN, constNil, ta) }
-     // val rs: (Kind<T, A>) -> Kind<F, Kind<T, B>> = constNil
+    val constNil: (A) -> Kind<F, B> = { _: A -> ALIGN.empty() }
+    val ls: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta -> crosswalk(ALIGN, constNil, ta) }
+    val rs: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta -> ALIGN.run { empty<B>().map { b -> ta.map { b } } } }
 
-    ls(a).equalUnderTheLaw(ls(a), EQ)
-    true
+    ls(a).equalUnderTheLaw(rs(a), EQ)
   }
 
   fun <T, F, A> Crosswalk<T>.law2(

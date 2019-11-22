@@ -5,6 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
+import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
@@ -22,6 +23,7 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -34,6 +36,7 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.sourceRef
 import kotlin.math.max
 import kotlin.math.min
 
@@ -69,6 +72,10 @@ class ListKTest : UnitSpec() {
         Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
         ListK.eqK(),
         ListK.foldable()
+      ),
+      CrosswalkLaws.laws(ListK.crosswalk(),
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.eqK()
       )
     )
 

@@ -327,12 +327,34 @@ interface ListKAlign : Align<ForListK>, ListKSemialign {
 
 @extension
 interface ListKCrosswalk: Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
-  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForListK, A>): Kind<F, Kind<ForListK, B>> {
+  override fun <F, A, B> crosswalk(
+    ALIGN: Align<F>,
+    fa: (A) -> Kind<F, B>,
+    a: Kind<ForListK, A>
+  ): Kind<F, Kind<ForListK, B>> {
 
     val list = a.fix()
-    val cons: (Ior<A, B>)
 
+    val cons = { ior: Ior<B, Kind<ForListK, B>> ->
+      when(ior) {
+        is Ior.Left -> ListK.just(ior.value)
+        is Ior.Right -> ior.value
+        is Ior.Both -> ListK.just(ior.leftValue) + ior.rightValue.fix()
+      }
+    }
 
-    return super.crosswalk(ALIGN, fa, a)
+    return  ALIGN.run {
+      if (list.isEmpty()) {
+        empty<B>().map { ListK.just(it) }
+      } else {
+        val head = list.first()
+        val tail = list.drop(1).k()
+
+        val ls: Kind<F, B> = fa(head)
+        val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, fa, tail)
+
+        alignWith(cons, ls, rs)
+      }
+    }
   }
 }
