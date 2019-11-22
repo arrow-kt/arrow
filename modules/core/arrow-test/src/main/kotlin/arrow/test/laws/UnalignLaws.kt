@@ -9,6 +9,7 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Unalign
 import io.kotlintest.properties.Gen
@@ -19,8 +20,20 @@ object UnalignLaws {
     UA: Unalign<F>,
     gen: Gen<Kind<F, Int>>,
     EQK: EqK<F>
-  ): List<Law> {
+  ): List<Law> = SemialignLaws.laws(UA, gen, EQK) + unalignLaws(UA, gen, EQK)
 
+  fun <F> laws(
+    UA: Unalign<F>,
+    gen: Gen<Kind<F, Int>>,
+    EQK: EqK<F>,
+    FOLD: Foldable<F>
+  ): List<Law> = SemialignLaws.foldablelaws(UA, gen, EQK, FOLD) + unalignLaws(UA, gen, EQK)
+
+  private fun <F> unalignLaws(
+    UA: Unalign<F>,
+    gen: Gen<Kind<F, Int>>,
+    EQK: EqK<F>
+  ): List<Law> {
     val iorIntEq = buildEq(EQK, Ior.eq(Int.eq(), Int.eq()))
     val intEq = buildEq(EQK, Int.eq())
     val tuple2Eq = Tuple2.eq(intEq, intEq)
