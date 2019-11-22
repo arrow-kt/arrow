@@ -53,7 +53,7 @@ class MapKTest : UnitSpec() {
       EqLaws.laws(EQ) { mapOf(it.toString() to it).k() },
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
-      AlignLaws.foldablelaws(MapK.align<String>(),
+      AlignLaws.laws(MapK.align(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
         EQK,
         MapK.foldable()

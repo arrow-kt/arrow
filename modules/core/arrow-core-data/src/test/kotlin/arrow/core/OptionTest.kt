@@ -67,7 +67,7 @@ class OptionTest : UnitSpec() {
       ) {
         Option.just(it)
       },
-      AlignLaws.foldablelaws(Option.align(),
+      AlignLaws.laws(Option.align(),
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
         Option.eqK(),
         Option.foldable()

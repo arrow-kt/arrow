@@ -46,7 +46,7 @@ class SortedMapKTest : UnitSpec() {
         SortedMapK.functor<String>(),
         { a: Int -> sortedMapOf("key" to a).k() },
         EQ),
-      SemialignLaws.foldablelaws(SortedMapK.semialign<String>(),
+      SemialignLaws.laws(SortedMapK.semialign<String>(),
         Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
         EQK,
         SortedMapK.foldable<String>()

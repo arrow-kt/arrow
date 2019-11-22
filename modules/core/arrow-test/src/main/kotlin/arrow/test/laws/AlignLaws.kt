@@ -26,12 +26,12 @@ object AlignLaws {
         Law("Align Laws: align left empty") { A.alignLeftEmpty(gen, buildEq(EQK, iorEq)) }
       )
 
-  fun <F> foldablelaws(
+  fun <F> laws(
     A: Align<F>,
     gen: Gen<Kind<F, Int>>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = SemialignLaws.foldablelaws(A, gen, EQK, FOLD) +
+  ): List<Law> = SemialignLaws.laws(A, gen, EQK, FOLD) +
     laws(A, gen, EQK)
 
   private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =

@@ -76,7 +76,7 @@ class SequenceKTest : UnitSpec() {
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
-      AlignLaws.foldablelaws(SequenceK.align(),
+      AlignLaws.laws(SequenceK.align(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
         EQK,
         SequenceK.foldable()
