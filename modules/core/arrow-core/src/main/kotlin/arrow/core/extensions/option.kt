@@ -6,6 +6,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
+import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
@@ -19,10 +20,12 @@ import arrow.core.identity
 import arrow.core.k
 import arrow.core.orElse
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -39,6 +42,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
 import arrow.typeclasses.Selective
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
@@ -49,11 +53,6 @@ import arrow.typeclasses.TraverseFilter
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
-import arrow.typeclasses.Semialign
-import arrow.core.Ior
-import arrow.core.some
-import arrow.typeclasses.Align
-import arrow.typeclasses.Crosswalk
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {

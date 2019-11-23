@@ -10,6 +10,7 @@ import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.Tuple2
 import arrow.core.extensions.sequence.foldable.isEmpty
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
@@ -20,7 +21,9 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -303,4 +306,38 @@ interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
 @extension
 interface SequenceKAlign : Align<ForSequenceK>, SequenceKSemialign {
   override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
+}
+
+@extension
+interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, SequenceKFoldable {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForSequenceK, A>): Kind<F, Kind<ForSequenceK, B>> {
+    val cons = { ior: Ior<B, Kind<ForSequenceK, B>> ->
+      when (ior) {
+        is Ior.Left -> SequenceK.just(ior.value)
+        is Ior.Right -> ior.value
+        is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
+      }
+    }
+
+    fun crosswalkSequence(iterator: Iterator<A>): Kind<F, Kind<ForSequenceK, B>> =
+      if (iterator.hasNext()) {
+        val head = iterator.next()
+        val ls = fa(head)
+        val rs = crosswalkSequence(iterator)
+
+        ALIGN.run {
+          alignWith(cons, ls, rs)
+        }
+      } else {
+        ALIGN.run { empty<B>().map { SequenceK.empty<B>() } }
+      }
+
+    return crosswalkSequence(a.fix().sequence.iterator())
+  }
+}
+
+@extension
+interface SequenceKEqK : EqK<ForSequenceK> {
+  override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
+    SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
 }

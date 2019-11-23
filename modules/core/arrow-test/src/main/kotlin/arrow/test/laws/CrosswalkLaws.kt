@@ -1,11 +1,9 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.eq.eq
-import arrow.core.identity
 import arrow.typeclasses.Align
 import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq

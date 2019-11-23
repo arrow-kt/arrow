@@ -9,7 +9,6 @@ import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
-
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -36,7 +35,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.sourceRef
 import kotlin.math.max
 import kotlin.math.min
 
