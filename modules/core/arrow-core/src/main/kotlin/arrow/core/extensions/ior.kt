@@ -8,7 +8,6 @@ import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
-import arrow.core.Left
 import arrow.core.ap
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
@@ -182,9 +181,9 @@ fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialO
 interface IorEqK<L> : EqK<IorPartialOf<L>> {
   fun EQL(): Eq<L>
 
-  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQR: Eq<A>): Boolean =
+  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let { (ls, rs) ->
-      Ior.eq(EQL(), EQR).run { ls.eqv(rs) }
+      Ior.eq(EQL(), EQ).run { ls.eqv(rs) }
     }
 }
 

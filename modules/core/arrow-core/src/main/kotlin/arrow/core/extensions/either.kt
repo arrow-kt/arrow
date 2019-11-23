@@ -11,6 +11,7 @@ import arrow.core.Eval
 import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.core.left
@@ -25,6 +26,7 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -250,4 +252,15 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
 }
 
 fun Either.Companion.bicrosswalk() = object : EitherBicrosswalk {
+}
+
+@extension
+interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
+
+  fun EQL(): Eq<L>
+
+  override fun <A> Kind<EitherPartialOf<L>, A>.eqK(other: Kind<EitherPartialOf<L>, A>, EQ: Eq<A>): Boolean =
+    Either.eq(EQL(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
 }

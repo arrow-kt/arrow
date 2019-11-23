@@ -36,13 +36,9 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class EitherTest : UnitSpec() {
-  val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
-    a.fix() == b.fix()
-  }
+  val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
 
-  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq { a, b ->
-    a.fix() == b.fix()
-  }
+  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq.any()
 
   init {
 

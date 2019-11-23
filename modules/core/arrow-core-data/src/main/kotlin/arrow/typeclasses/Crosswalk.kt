@@ -3,11 +3,6 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.identity
 
-/**
- * Crosswalk is to Align as Traversable is to Applicative.
- *
- * https://teh.id.au/posts/2017/03/29/these-align-crosswalk/
- */
 interface Crosswalk<T> : Functor<T>, Foldable<T> {
   /**
    *  {: data-executable='true'}
@@ -15,9 +10,10 @@ interface Crosswalk<T> : Functor<T>, Foldable<T> {
    *  ```kotlin:ank
    * import arrow.core.extensions.*
    * import arrow.core.extensions.listk.crosswalk.crosswalk
+   * import arrow.core.extensions.listk.align.align
    * import arrow.core.*
    *
-   * Listk.crosswalk().run {
+   * ListK.crosswalk().run {
    *    crosswalk(ListK.align(), {it.split(":").k()}, listOf("1:2:3:4:5", "6:7:8:9:10", "11:12").k())
    * }
    * ```
@@ -31,14 +27,15 @@ interface Crosswalk<T> : Functor<T>, Foldable<T> {
    * ```kotlin:ank
    * import arrow.core.extensions.*
    * import arrow.core.extensions.listk.crosswalk.crosswalk
+   * import arrow.core.extensions.listk.align.align
    * import arrow.core.*
    *
    * ListK.crosswalk().run {
-   *    val lists = listOf(listOf(listOf(1, 2, 3, 4, 5).k(),
-   *                              listOf(6, 7, 8, 9, 10).k(),
-   *                              listOf(11, 12).k())
+   *    val lists = listOf(listOf(1, 2, 3, 4, 5).k(),
+   *                       listOf(6, 7, 8, 9, 10).k(),
+   *                       listOf(11, 12).k())
    *
-   *    sequenceL(ListK.align(), lists)
+   *    sequenceL(ListK.align(), lists.k())
    * }
    * ```
    */

@@ -345,6 +345,12 @@ options:
       - title: Align
         url: /docs/arrow/typeclasses/align/
 
+      - title: Crosswalk
+        url: /docs/arrow/typeclasses/crosswalk/
+
+      - title: Bicrosswalk
+        url: /docs/arrow/typeclasses/bicrosswalk/
+
   - title: Effects
 
     nested_options:
