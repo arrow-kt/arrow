@@ -343,18 +343,16 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
       }
     }
 
-    return ALIGN.run {
-      if (list.isEmpty()) {
-        empty<B>().map { ListK.just(it) }
-      } else {
-        val head = list.first()
-        val tail = list.drop(1).k()
+    return if (list.isEmpty()) {
+      ALIGN.run { empty<B>().map { ListK.empty<B>() } }
+    } else {
+      val head = list.first()
+      val tail = list.drop(1).k()
 
-        val ls: Kind<F, B> = fa(head)
-        val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, fa, tail)
+      val ls: Kind<F, B> = fa(head)
+      val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, fa, tail)
 
-        alignWith(cons, ls, rs)
-      }
+      ALIGN.run { alignWith(cons, ls, rs) }
     }
   }
 }
