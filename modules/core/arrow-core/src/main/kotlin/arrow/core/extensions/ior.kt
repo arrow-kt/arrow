@@ -8,16 +8,19 @@ import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
+import arrow.core.Left
 import arrow.core.ap
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix
 import arrow.core.flatMap
+import arrow.core.leftIor
 import arrow.core.rightIor
 import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -195,3 +198,25 @@ interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldab
     }
   }
 }
+
+interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
+  override fun <F, A, B, C, D> bicrosswalk(
+    ALIGN: Align<F>,
+    fa: (A) -> Kind<F, C>,
+    fb: (B) -> Kind<F, D>,
+    tab: Kind2<ForIor, A, B>
+  ): Kind<F, Kind2<ForIor, C, D>> =
+    when (val e = tab.fix()) {
+      is Ior.Left -> ALIGN.run {
+        fa(e.value).map { it.leftIor() }
+      }
+      is Ior.Right -> ALIGN.run {
+        fb(e.value).map { it.rightIor() }
+      }
+      is Ior.Both -> ALIGN.run {
+        align(fa(e.leftValue), fb(e.rightValue))
+      }
+    }
+}
+
+fun Ior.Companion.bicrosswalk() = object : IorBicrosswalk {}

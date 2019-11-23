@@ -3,6 +3,7 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.EitherOf
 import arrow.core.EitherPartialOf
@@ -12,10 +13,14 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
+import arrow.core.left
+import arrow.core.right
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
@@ -226,3 +231,23 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
+
+interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBifoldable {
+  override fun <F, A, B, C, D> bicrosswalk(
+    ALIGN: Align<F>,
+    fa: (A) -> Kind<F, C>,
+    fb: (B) -> Kind<F, D>,
+    tab: Kind2<ForEither, A, B>
+  ): Kind<F, Kind2<ForEither, C, D>> =
+    when (val e = tab.fix()) {
+      is Either.Left -> ALIGN.run {
+        fa(e.a).map { it.left() }
+      }
+      is Either.Right -> ALIGN.run {
+        fb(e.b).map { it.right() }
+      }
+    }
+}
+
+fun Either.Companion.bicrosswalk() = object : EitherBicrosswalk {
+}

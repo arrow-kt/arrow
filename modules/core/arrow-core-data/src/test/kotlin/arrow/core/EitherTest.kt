@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.core.extensions.bicrosswalk
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.either.applicativeError.handleErrorWith
@@ -20,6 +21,7 @@ import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.either
 import arrow.test.generators.intSmall
+import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.HashLaws
@@ -52,7 +54,8 @@ class EitherTest : UnitSpec() {
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
-      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
+      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) },
+      BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, EQ2)
     )
 
     "empty should return a Right of the empty of the inner type" {

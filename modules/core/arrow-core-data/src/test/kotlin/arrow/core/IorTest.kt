@@ -2,28 +2,30 @@ package arrow.core
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.core.Ior.Right
+import arrow.core.extensions.bicrosswalk
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.semigroup
 import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bifunctor.bifunctor
+import arrow.core.extensions.ior.bitraverse.bitraverse
+import arrow.core.extensions.ior.crosswalk.crosswalk
 import arrow.core.extensions.ior.eq.eq
+import arrow.core.extensions.ior.eqK.eqK
 import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
-import arrow.core.extensions.ior.bitraverse.bitraverse
-import arrow.core.Ior.Right
-import arrow.core.extensions.ior.crosswalk.crosswalk
-import arrow.core.extensions.ior.eqK.eqK
+import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BitraverseLaws
-import arrow.test.laws.CrosswalkLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
@@ -50,7 +52,8 @@ class IorTest : UnitSpec() {
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
-      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Ior.eqK(Int.eq()))
+      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Ior.eqK(Int.eq())),
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, EQ2)
     )
 
     "bimap() should allow modify both value" {
