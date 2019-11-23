@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.ListK
 import arrow.core.extensions.listk.align.align
+import arrow.core.extensions.listk.align.empty
 import arrow.core.extensions.listk.eq.eq
 import arrow.typeclasses.Align
 import arrow.typeclasses.Crosswalk
@@ -40,9 +41,9 @@ object CrosswalkLaws {
     G: Gen<Kind<T, A>>,
     EQ: Eq<Kind<F, Kind<T, B>>>
   ) = forAll(G) { a: Kind<T, A> ->
-    val constNil: (A) -> Kind<F, B> = { _: A -> ALIGN.empty() }
-    val ls: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta -> crosswalk(ALIGN, constNil, ta) }
-    val rs: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta -> ALIGN.run { empty<B>().map { b -> ta.map { b } } } }
+
+    val ls: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ta -> crosswalk(ALIGN, { ALIGN.empty<B>()}, ta) }
+    val rs: (Kind<T, A>) -> Kind<F, Kind<T, B>> = { ALIGN.empty() }
 
     ls(a).equalUnderTheLaw(rs(a), EQ)
   }
