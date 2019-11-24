@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.setk.eq.eq
+import arrow.core.extensions.setk.eqK.eqK
 import arrow.core.extensions.setk.foldable.foldable
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.extensions.setk.monoid.monoid
@@ -14,6 +15,7 @@ import arrow.core.extensions.setk.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genSetK
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidKLaws
@@ -45,7 +47,14 @@ class SetKTest : UnitSpec() {
       MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any(), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
       FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
-      HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) }
+      HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) },
+      EqKLaws.laws(
+        SetK.eqK(),
+        SetK.eq(Int.eq()) as Eq<Kind<ForSetK, Int>>,
+        Gen.genSetK(Gen.int()) as Gen<Kind<ForSetK, Int>>
+      ) {
+        SetK.just(it)
+      }
     )
   }
 

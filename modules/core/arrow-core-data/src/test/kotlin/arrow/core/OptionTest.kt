@@ -4,8 +4,11 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadFilter.monadFilter
@@ -16,6 +19,8 @@ import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.option
+import arrow.test.laws.AlignLaws
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -54,7 +59,19 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq)
+      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
+      EqKLaws.laws(
+        Option.eqK(),
+        Option.eq(Int.eq()) as Eq<Kind<ForOption, Int>>,
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>
+      ) {
+        Option.just(it)
+      },
+      AlignLaws.laws(Option.align(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK(),
+        Option.foldable()
+      )
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

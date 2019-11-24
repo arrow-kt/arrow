@@ -24,6 +24,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -48,6 +49,9 @@ import arrow.typeclasses.TraverseFilter
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
+import arrow.typeclasses.Semialign
+import arrow.core.Ior
+import arrow.typeclasses.Align
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -340,21 +344,29 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
   override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
     fix().fold(
       { Option.empty() },
-      { Sequence { object : Iterator<A> {
-        override fun hasNext(): Boolean = true
+      {
+        Sequence {
+          object : Iterator<A> {
+            override fun hasNext(): Boolean = true
 
-        override fun next(): A = it
-      } }.k().just().fix() }
+            override fun next(): A = it
+          }
+        }.k().just().fix()
+      }
     )
 
   override fun <A> Kind<ForOption, A>.many(): Option<SequenceK<A>> =
     fix().fold(
       { emptySequence<A>().k().just().fix() },
-      { Sequence { object : Iterator<A> {
-        override fun hasNext(): Boolean = true
+      {
+        Sequence {
+          object : Iterator<A> {
+            override fun hasNext(): Boolean = true
 
-        override fun next(): A = it
-      } }.k().just().fix() }
+            override fun next(): A = it
+          }
+        }.k().just().fix()
+      }
     )
 }
 
@@ -424,4 +436,36 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
   override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
     if (fix().isEmpty()) b
     else this
+}
+
+@extension
+interface OptionEqK : EqK<ForOption> {
+  override fun <A> Kind<ForOption, A>.eqK(other: Kind<ForOption, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let { (a, b) ->
+      when (a) {
+        is None -> {
+          when (b) {
+            is None -> true
+            is Some -> false
+          }
+        }
+        is Some -> {
+          when (b) {
+            is None -> false
+            is Some -> EQ.run { a.t.eqv(b.t) }
+          }
+        }
+      }
+    }
+}
+
+@extension
+interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
+  override fun <A, B> align(a: Kind<ForOption, A>, b: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
+    Ior.fromOptions(a.fix(), b.fix())
+}
+
+@extension
+interface OptionAlign : Align<ForOption>, OptionSemialign {
+  override fun <A> empty(): Kind<ForOption, A> = Option.empty()
 }
