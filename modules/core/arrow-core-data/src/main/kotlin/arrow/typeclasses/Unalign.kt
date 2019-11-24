@@ -5,7 +5,7 @@ import arrow.core.Ior
 import arrow.core.Tuple2
 
 /**
- * Unalign extends Semialign thereby supporting an inverse function to align: It splits an union shape
+ * Unalign extends Semialign thereby supporting an inverse function to align: It splits a union shape
  * into a tuple representing the component parts.
  */
 interface Unalign<F> : Semialign<F> {
