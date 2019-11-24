@@ -45,10 +45,12 @@ interface Zip<F> : Semialign<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.zip().run {
-   *    listOf("A", "B").k().zipWith({"- $it -"}, listOf(1, 2, 3).k())
+   *    listOf("A", "B").k().zipWith({a, b -> "$a # $b"}, listOf(1, 2, 3).k())
    *   }
    *   //sampleEnd
    *   println(result)
+   * }
+   * ```
    */
   fun <A, B, C> Kind<F, A>.zipWith(f: (A, B) -> C, other: Kind<F, B>): Kind<F, C> =
     zip(other).map { f(it.a, it.b) }
