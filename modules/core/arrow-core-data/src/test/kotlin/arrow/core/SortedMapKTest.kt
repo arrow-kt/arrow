@@ -13,6 +13,7 @@ import arrow.core.extensions.show
 import arrow.core.extensions.sortedmapk.eqK.eqK
 import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
+import arrow.core.extensions.unalign
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.AlignLaws
@@ -20,6 +21,7 @@ import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -45,7 +47,13 @@ class SortedMapKTest : UnitSpec() {
         Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
-      ))
+      ),
+      UnalignLaws.laws(SortedMapK.unalign<String>(),
+        Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
+        SortedMapK.eqK(String.eq()),
+        SortedMapK.foldable<String>()
+      )
+    )
 
     "can align maps" {
       val gen = Gen.sortedMapK(Gen.string(), Gen.bool())

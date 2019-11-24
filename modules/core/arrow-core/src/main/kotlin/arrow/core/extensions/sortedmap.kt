@@ -7,13 +7,16 @@ import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKOf
 import arrow.core.SortedMapKPartialOf
+import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
+import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.extensions.sortedmapk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.updated
 import arrow.extension
 import arrow.typeclasses.Align
@@ -28,6 +31,7 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unalign
 
 interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
@@ -151,3 +155,17 @@ interface SortedMapKEqK<K : Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
   override fun <A> Kind<SortedMapKPartialOf<K>, A>.eqK(other: Kind<SortedMapKPartialOf<K>, A>, EQ: Eq<A>): Boolean =
     SortedMapK.eq(EQK(), EQ).run { this@eqK.fix().eqv(other.fix()) }
 }
+
+interface SortedMapKUnalign<K : Comparable<K>> : Unalign<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
+  override fun <A, B> unalign(ior: Kind<SortedMapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<SortedMapKPartialOf<K>, A>, Kind<SortedMapKPartialOf<K>, B>> =
+    ior.fix().let { map ->
+      map.entries.foldLeft(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        v.fold(
+          { a -> ls.plus(k to a) toT rs },
+          { b -> ls toT rs.plus(k to b) },
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+      }.bimap({ it.toSortedMap().k() }, { it.toSortedMap().k() })
+    }
+}
+
+fun <K : Comparable<K>> SortedMapK.Companion.unalign() = object : SortedMapKUnalign<K> {}
