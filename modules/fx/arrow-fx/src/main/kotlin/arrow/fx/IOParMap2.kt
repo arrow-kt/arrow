@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 interface IOParMap2 {
 
   fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> = IO.Async { conn, cb ->
-    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better preforming ParMap2)
+    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicRefW<Any?>(null)
 
     val connA = IOConnection()

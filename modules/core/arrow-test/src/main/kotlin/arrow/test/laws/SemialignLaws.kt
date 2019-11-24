@@ -3,9 +3,6 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Ior
 import arrow.core.ListK
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
 import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.list.functorFilter.flattenOption
@@ -76,7 +73,7 @@ object SemialignLaws {
 
   fun <F, A> Semialign<F>.semialignWith(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, String>>) =
     forAll(G, G) { a: Kind<F, A>, b: Kind<F, A> ->
-      val left = alignWith({ "$it" }, a, b)
+      val left = alignWith(a, b) { "$it" }
       val right = align(a, b).map { "$it" }
 
       left.equalUnderTheLaw(right, EQ)
@@ -105,17 +102,14 @@ object SemialignLaws {
     val left: List<A> = toList(a)
 
     // toListOf (folded . here) (align x y)
-    val middle: List<A> = toList(align(a, b).map { it.justLeft() }).flattenOption()
+    val middle: List<A> = toList(align(a, b).map { it.toLeftOption() }).flattenOption()
 
     // mapMaybe justHere (toList (align x y))
-    val right: List<A> = toList(align(a, b)).filterMap { it.justLeft() }
+    val right: List<A> = toList(align(a, b)).filterMap { it.toLeftOption() }
 
     left == right && left == middle
   }
 }
-
-private fun <A, B> Ior<A, B>.justLeft(): Option<A> =
-  fold({ Some(it) }, { None }, { a, _ -> Some(a) })
 
 private fun <A, B, C> Ior<Ior<A, B>, C>.assoc(): Ior<A, Ior<B, C>> =
   when (this) {
