@@ -8,8 +8,10 @@ import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
@@ -34,6 +36,7 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unalign
 import arrow.undocumented
 
 @extension
@@ -154,4 +157,17 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
 @extension
 interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
+}
+
+@extension
+interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    ior.fix().let { map ->
+      map.entries.foldLeft(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        v.fold(
+          { a -> ls.plus(k to a) toT rs },
+          { b -> ls toT rs.plus(k to b) },
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+      }.bimap({ it.k() }, { it.k() })
+    }
 }

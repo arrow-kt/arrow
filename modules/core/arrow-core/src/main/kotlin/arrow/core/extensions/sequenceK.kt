@@ -11,11 +11,13 @@ import arrow.core.SequenceKOf
 import arrow.core.Tuple2
 import arrow.core.extensions.sequence.foldable.isEmpty
 import arrow.core.extensions.sequencek.eq.eq
+import arrow.core.extensions.sequence.monadFilter.filterMap
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
@@ -41,6 +43,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unalign
 import arrow.core.combineK as sequenceCombineK
 
 @extension
@@ -306,6 +309,17 @@ interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
 @extension
 interface SequenceKAlign : Align<ForSequenceK>, SequenceKSemialign {
   override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
+}
+
+@extension
+interface SequenceKUnalign : Unalign<ForSequenceK>, SequenceKSemialign {
+  override fun <A, B> unalign(ior: Kind<ForSequenceK, Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
+    ior.fix().let { seq ->
+      val ls = seq.sequence.filterMap { it.toLeftOption() }.k()
+      val rs = seq.sequence.filterMap { it.toOption() }.k()
+
+      ls toT rs
+    }
 }
 
 @extension

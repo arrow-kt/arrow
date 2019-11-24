@@ -38,7 +38,7 @@ ListK.semialign().run {
 
 combines two structures by taking the union of their shapes and combining the elements with the given function.
 
-`fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<F, A>, b: Kind<F, B>): Kind<F, C>`
+`fun <A, B, C> alignWith(a: Kind<F, A>, b: Kind<F, B>, fa: (Ior<A, B>) -> C): Kind<F, C>`
 
 ```kotlin:ank
 import arrow.core.extensions.*
@@ -46,7 +46,9 @@ import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.*
 
 ListK.semialign().run {
-   alignWith({"$it"}, listOf("A", "B").k(), listOf(1, 2, 3).k())
+    alignWith(listOf("A", "B").k(), listOf(1, 2, 3).k()) {
+        "$it"
+    }
 }
 ```
 
