@@ -11,16 +11,14 @@ redirect_from:
 {:.beginner}
 beginner
 
-The `Unlign` typeclass extends the `Semialign` typeclass with an inverse function to align: It splits an union shape
+The `Unlign` typeclass extends the `Semialign` typeclass with an inverse function to align: It splits a union shape
 into a tuple representing the component parts.
 
 ### Main Combinators
 
 #### unalign(ior: Kind<F, Ior<A, B>>): Tuple2<Kind<F, A>, Kind<F, B>>
 
-splits an union into its component parts.
-
-`fun <A> empty(): Kind<F, A>`
+splits a union into its component parts.
 
 ```kotlin:ank
 import arrow.core.extensions.*
@@ -32,7 +30,7 @@ ListK.unalign().run {
 }
 ```
 
-#### unalignWith(fa: (C) -> Ior<A, B>, c: Kind<F, C>): Tuple2<Kind<F, A>, Kind<F, B>>
+#### unalignWith(c: Kind<F, C>, fa: (C) -> Ior<A, B>): Tuple2<Kind<F, A>, Kind<F, B>>
 
 after applying the given function, splits the resulting union shaped structure into its components parts
 
@@ -42,7 +40,9 @@ import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.*
 
 ListK.unalign().run {
-    unalignWith({it.leftIor()}, listOf(1, 2, 3).k())
+    unalignWith(listOf(1, 2, 3).k()) {
+        it.leftIor()
+    }
 }
 ```
 
@@ -57,7 +57,7 @@ and accomanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Unalign`]({{ '/docs/arrow/typeclasses/align' | relative_url }}) implement the `Semialign` typeclass directly
+Additionally all instances of [`Unalign`]({{ '/docs/arrow/typeclasses/unalign' | relative_url }}) implement the `Semialign` typeclass directly
 since they are all subtypes of `Semialign`
 
 ### Data types
@@ -69,7 +69,7 @@ import arrow.typeclasses.Unalign
 TypeClass(Unalign::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Align)
+ank_macro_hierarchy(arrow.typeclasses.Unalign)
 
 [functor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Unalign.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/UnalignLaws.kt

@@ -44,13 +44,15 @@ interface Unalign<F> : Semialign<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.unalign().run {
-   *    unalignWith({it.leftIor()}, listOf(1, 2, 3).k())
+   *      unalignWith(listOf(1, 2, 3).k()) {
+   *        it.leftIor()
+   *      }
    *   }
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A, B, C> unalignWith(fa: (C) -> Ior<A, B>, c: Kind<F, C>): Tuple2<Kind<F, A>, Kind<F, B>> =
+  fun <A, B, C> unalignWith(c: Kind<F, C>, fa: (C) -> Ior<A, B>): Tuple2<Kind<F, A>, Kind<F, B>> =
     unalign(c.map(fa))
 }

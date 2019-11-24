@@ -73,7 +73,7 @@ object SemialignLaws {
 
   fun <F, A> Semialign<F>.semialignWith(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, String>>) =
     forAll(G, G) { a: Kind<F, A>, b: Kind<F, A> ->
-      val left = alignWith({ "$it" }, a, b)
+      val left = alignWith(a, b) { "$it" }
       val right = align(a, b).map { "$it" }
 
       left.equalUnderTheLaw(right, EQ)

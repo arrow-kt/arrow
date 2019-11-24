@@ -39,9 +39,9 @@ object UnalignLaws {
     val tuple2Eq = Tuple2.eq(intEq, intEq)
 
     return listOf(
-      Law("Unalign Laws: split union shape into its components #1") { UA.law1(gen, tuple2Eq) },
-      Law("Unalign Laws: split union shape into its components #2") {
-        UA.law2(iorGen(UA, gen, gen), iorIntEq)
+      Law("Unalign Laws: unalign inverts align") { UA.unalignInvertsAlign(gen, tuple2Eq) },
+      Law("Unalign Laws: align inverts unalign") {
+        UA.alignInvertsUnalign(iorGen(UA, gen, gen), iorIntEq)
       }
     )
   }
@@ -51,16 +51,16 @@ object UnalignLaws {
       EQK.run { a.eqK(b, EQ) }
     }
 
-  fun <F, A> Unalign<F>.law1(G: Gen<Kind<F, A>>, EQ: Eq<Tuple2<Kind<F, A>, Kind<F, A>>>) =
-    forAll(G, G) { a, b ->
-      unalign(align(a, b)).equalUnderTheLaw(a toT b, EQ)
-    }
-
-  fun <F, A, B> Unalign<F>.law2(G: Gen<Kind<F, Ior<A, B>>>, EQ: Eq<Kind<F, Ior<A, B>>>) =
+  fun <F, A, B> Unalign<F>.alignInvertsUnalign(G: Gen<Kind<F, Ior<A, B>>>, EQ: Eq<Kind<F, Ior<A, B>>>) =
     forAll(G) { xs ->
       val alignTuple: (Tuple2<Kind<F, A>, Kind<F, B>>) -> Kind<F, Ior<A, B>> =
         { (a, b) -> align(a, b) }
       alignTuple(unalign(xs)).equalUnderTheLaw(xs, EQ)
+    }
+
+  fun <F, A> Unalign<F>.unalignInvertsAlign(G: Gen<Kind<F, A>>, EQ: Eq<Tuple2<Kind<F, A>, Kind<F, A>>>) =
+    forAll(G, G) { a, b ->
+      unalign(align(a, b)).equalUnderTheLaw(a toT b, EQ)
     }
 }
 

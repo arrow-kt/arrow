@@ -330,6 +330,12 @@ interface ListKAlign : Align<ForListK>, ListKSemialign {
 interface ListKUnalign : Unalign<ForListK>, ListKSemialign {
   override fun <A, B> unalign(ior: Kind<ForListK, Ior<A, B>>): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
     ior.fix().let { list ->
-      list.filterMap { it.toLeftOption() } toT list.filterMap { it.toOption() }
+      list.fold(emptyList<A>() toT emptyList<B>()) { (l, r), x ->
+        x.fold(
+          { l.listPlus(it) toT r },
+          { l toT r.listPlus(it) },
+          { a, b -> l.listPlus(a) toT r.listPlus(b) }
+        )
+      }.bimap({ it.k() }, { it.k() })
     }
 }

@@ -6,13 +6,12 @@ import arrow.core.Ior
 import arrow.core.MapK
 import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
-import arrow.core.None
 import arrow.core.Option
 import arrow.core.SetK
-import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
@@ -164,14 +163,11 @@ interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
 interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
     ior.fix().let { map ->
-      map.mapMaybe { it.toLeftOption() } toT map.mapMaybe { it.toOption() }
+      map.entries.foldLeft(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        v.fold(
+          { a -> ls.plus(k to a) toT rs },
+          { b -> ls toT rs.plus(k to b) },
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+      }.bimap({ it.k() }, { it.k() })
     }
-
-  private fun <K, A, B> MapK<K, A>.mapMaybe(fa: (A) -> Option<B>): MapK<K, B> =
-    entries.mapNotNull {
-      when (val v = fa(it.value)) {
-        is Some -> it.key to v.t
-        is None -> null
-      }
-    }.toMap().k()
 }

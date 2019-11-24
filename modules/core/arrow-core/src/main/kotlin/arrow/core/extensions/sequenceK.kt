@@ -310,12 +310,11 @@ interface SequenceKAlign : Align<ForSequenceK>, SequenceKSemialign {
 
 @extension
 interface SequenceKUnalign : Unalign<ForSequenceK>, SequenceKSemialign {
-  override fun <A, B> unalign(ior: Kind<ForSequenceK, Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> {
-    return ior.fix().let { seq ->
+  override fun <A, B> unalign(ior: Kind<ForSequenceK, Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
+    ior.fix().let { seq ->
       val ls = seq.sequence.filterMap { it.toLeftOption() }.k()
       val rs = seq.sequence.filterMap { it.toOption() }.k()
 
       ls toT rs
     }
-  }
 }
