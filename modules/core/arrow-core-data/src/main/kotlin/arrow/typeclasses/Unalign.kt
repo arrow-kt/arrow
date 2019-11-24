@@ -10,7 +10,7 @@ import arrow.core.Tuple2
  */
 interface Unalign<F> : Semialign<F> {
   /**
-   * splits an union into its component parts.
+   * splits a union into its component parts.
    *
    * {: data-executable='true'}
    *
