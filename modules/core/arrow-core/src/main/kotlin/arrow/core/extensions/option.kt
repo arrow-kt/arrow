@@ -54,6 +54,7 @@ import arrow.core.Ior
 import arrow.core.toT
 import arrow.typeclasses.Zip
 import arrow.typeclasses.Align
+import arrow.typeclasses.Repeat
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -482,4 +483,10 @@ interface OptionZip : Zip<ForOption>, OptionSemialign {
         is Some -> Option.just(l.t toT r.t)
       }
     }
+}
+
+@extension
+interface OptionRepeat : Repeat<ForOption>, OptionZip {
+  override fun <A> repeat(a: A): Kind<ForOption, A> =
+    Option.just(a)
 }
