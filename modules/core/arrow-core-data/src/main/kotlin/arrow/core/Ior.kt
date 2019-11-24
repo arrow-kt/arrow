@@ -1,6 +1,8 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Ior.Left
+import arrow.core.Ior.Right
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -268,6 +270,20 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * ```
    */
   fun toOption(): Option<B> = fold({ None }, { Some(it) }, { _, b -> Some(b) })
+
+  /**
+   * Returns a [Some] containing the [Left] value or `A` if this is [Left] or [Both]
+   * and [None] if this is a [Right].
+   *
+   * Example:
+   * ```
+   * Right(12).toLeftOption() // Result: None
+   * Left(12).toLeftOption()  // Result: Some(12)
+   * Both(12, "power").toLeftOption()  // Result: Some(12)
+   * ```
+   */
+  fun toLeftOption(): Option<A> =
+    fold({ Option.just(it) }, { Option.empty() }, { a, _ -> Option.just(a) })
 
   /**
    * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]

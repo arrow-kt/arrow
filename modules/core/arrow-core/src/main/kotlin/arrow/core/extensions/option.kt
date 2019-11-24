@@ -51,6 +51,9 @@ import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
 import arrow.typeclasses.Semialign
 import arrow.core.Ior
+import arrow.core.some
+import arrow.core.toT
+import arrow.typeclasses.Unalign
 import arrow.typeclasses.Align
 
 @extension
@@ -468,4 +471,17 @@ interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
 @extension
 interface OptionAlign : Align<ForOption>, OptionSemialign {
   override fun <A> empty(): Kind<ForOption, A> = Option.empty()
+}
+
+@extension
+interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
+  override fun <A, B> unalign(ior: Kind<ForOption, Ior<A, B>>): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
+    when (val a = ior.fix()) {
+      is None -> None toT None
+      is Some -> when (val b = a.t) {
+        is Ior.Left -> b.value.some() toT None
+        is Ior.Right -> None toT b.value.some()
+        is Ior.Both -> b.leftValue.some() toT b.rightValue.some()
+      }
+    }
 }
