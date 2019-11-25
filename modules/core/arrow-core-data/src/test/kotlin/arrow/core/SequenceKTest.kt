@@ -17,6 +17,7 @@ import arrow.core.extensions.sequencek.monoidal.monoidal
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
+import arrow.core.extensions.sequencek.zip.zip
 import arrow.test.UnitSpec
 import arrow.test.generators.liftGen
 import arrow.test.generators.sequenceK
