@@ -17,6 +17,7 @@ import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
 import arrow.core.extensions.id.traverse.traverse
+import arrow.core.extensions.id.unzip.unzip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
@@ -29,6 +30,7 @@ import arrow.test.laws.RepeatLaws
 import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -61,7 +63,12 @@ class IdTest : UnitSpec() {
         Id.liftGen(),
         Id.eqK(),
         Id.foldable()
-      )
+      ),
+      UnzipLaws.laws(Id.unzip(),
+        Id.liftGen(),
+        Id.eqK(),
+        Id.foldable()
+        )
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {

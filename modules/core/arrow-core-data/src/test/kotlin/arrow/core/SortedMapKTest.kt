@@ -14,7 +14,10 @@ import arrow.core.extensions.sortedmapk.eqK.eqK
 import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
 import arrow.core.extensions.unalign
+import arrow.core.extensions.unzip
 import arrow.test.UnitSpec
+import arrow.test.generators.LiftGen
+import arrow.test.generators.mapK
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.HashLaws
@@ -22,6 +25,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -50,6 +54,14 @@ class SortedMapKTest : UnitSpec() {
       ),
       UnalignLaws.laws(SortedMapK.unalign<String>(),
         Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
+        SortedMapK.eqK(String.eq()),
+        SortedMapK.foldable<String>()
+      ),
+      UnzipLaws.laws(SortedMapK.unzip<String>(),
+        object : LiftGen<SortedMapKPartialOf<String>> {
+          override fun <A> liftGen(gen: Gen<A>): Gen<Kind<SortedMapKPartialOf<String>, A>> =
+            Gen.sortedMapK(Gen.string(), gen) as Gen<Kind<SortedMapKPartialOf<String>, A>>
+        },
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       )

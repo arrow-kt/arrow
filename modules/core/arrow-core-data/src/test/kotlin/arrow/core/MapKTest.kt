@@ -15,7 +15,7 @@ import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
 import arrow.core.extensions.mapk.unalign.unalign
-import arrow.core.extensions.mapk.zip.zip
+import arrow.core.extensions.mapk.unzip.unzip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.LiftGen
@@ -29,7 +29,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
-import arrow.test.laws.ZipLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -64,7 +64,7 @@ class MapKTest : UnitSpec() {
       UnalignLaws.laws(MapK.unalign(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
         EQK),
-      ZipLaws.laws(MapK.zip(),
+      UnzipLaws.laws(MapK.unzip(),
         object : LiftGen<MapKPartialOf<String>> {
           override fun <A> liftGen(gen: Gen<A>): Gen<Kind<MapKPartialOf<String>, A>> =
             Gen.mapK(Gen.string(), gen) as Gen<Kind<MapKPartialOf<String>, A>>

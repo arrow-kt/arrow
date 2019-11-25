@@ -53,6 +53,7 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
@@ -504,4 +505,11 @@ interface OptionZip : Zip<ForOption>, OptionSemialign {
 interface OptionRepeat : Repeat<ForOption>, OptionZip {
   override fun <A> repeat(a: A): Kind<ForOption, A> =
     Option.just(a)
+}
+
+@extension
+interface OptionUnzip : Unzip<ForOption>, OptionZip {
+  override fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
+    fix().fold({ Option.empty<A>() toT Option.empty() },
+      { it.a.some() toT it.b.some() })
 }

@@ -18,6 +18,7 @@ import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
+import arrow.core.extensions.sequencek.unzip.unzip
 import arrow.test.UnitSpec
 import arrow.test.generators.liftGen
 import arrow.test.generators.sequenceK
@@ -33,6 +34,7 @@ import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
@@ -92,6 +94,11 @@ class SequenceKTest : UnitSpec() {
         SequenceK.foldable()
       ),
       RepeatLaws.laws(SequenceK.repeat(),
+        SequenceK.liftGen(),
+        EQK,
+        SequenceK.foldable()
+      ),
+      UnzipLaws.laws(SequenceK.unzip(),
         SequenceK.liftGen(),
         EQK,
         SequenceK.foldable()

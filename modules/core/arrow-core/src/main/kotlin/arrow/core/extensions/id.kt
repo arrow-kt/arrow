@@ -35,6 +35,7 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
@@ -235,4 +236,12 @@ interface IdZip : Zip<ForId>, IdSemialign {
 @extension
 interface IdRepeat : Repeat<ForId>, IdZip {
   override fun <A> repeat(a: A): Kind<ForId, A> = Id.just(a)
+}
+
+@extension
+interface IdUnzip : Unzip<ForId>, IdZip {
+  override fun <A, B> Kind<ForId, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForId, A>, Kind<ForId, B>> =
+    this.fix().extract().let { (a, b) ->
+      Id.just(a) toT Id.just(b)
+    }
 }

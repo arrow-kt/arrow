@@ -35,6 +35,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.combineK as nelCombineK
 
@@ -225,4 +226,14 @@ interface NonEmptyListZip : Zip<ForNonEmptyList>, NonEmptyListSemialign {
     (this.fix() to other.fix()).let { nel ->
       Nel.fromListUnsafe(nel.first.all.zip(nel.second.all).map { it.first toT it.second })
     }
+}
+
+@extension
+interface NonEmptyListUnzip : Unzip<ForNonEmptyList>, NonEmptyListZip {
+  override fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, B>> =
+    this.fix().all.let { list ->
+      list.fold(emptyList<A>() toT emptyList<B>()) { (ls, rs), x ->
+        ls + x.a toT rs + x.b
+      }
+    }.bimap({ Nel.fromListUnsafe(it) }, { Nel.fromListUnsafe(it) })
 }

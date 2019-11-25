@@ -18,6 +18,7 @@ import arrow.core.extensions.option.repeat.repeat
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
+import arrow.core.extensions.option.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.liftGen
@@ -34,6 +35,7 @@ import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -82,6 +84,11 @@ class OptionTest : UnitSpec() {
         Option.eqK()
       ),
       RepeatLaws.laws(Option.repeat(),
+        Option.liftGen(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      UnzipLaws.laws(Option.unzip(),
         Option.liftGen(),
         Option.eqK(),
         Option.foldable()

@@ -39,6 +39,7 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.undocumented
 
 @extension
@@ -184,4 +185,14 @@ interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
 
       return values.toMap().k()
     }
+}
+
+@extension
+interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    this.fix().let { map ->
+      map.entries.fold(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        ls.plus(k to v.a) toT rs.plus(k to v.b)
+      }
+    }.bimap({ it.k() }, { it.k() })
 }

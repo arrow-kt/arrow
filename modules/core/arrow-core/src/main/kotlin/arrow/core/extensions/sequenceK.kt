@@ -42,6 +42,7 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.combineK as sequenceCombineK
 
@@ -348,4 +349,12 @@ interface SequenceKRepeat : Repeat<ForSequenceK>, SequenceKZip {
         override fun next(): A = a
       }
     }.k()
+}
+
+@extension
+interface SequenceKUnzip : Unzip<ForSequenceK>, SequenceKZip {
+  override fun <A, B> Kind<ForSequenceK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
+    this.fix().let { seq ->
+      (seq.map { it.a }.k() toT seq.map { it.b }.k())
+    }
 }

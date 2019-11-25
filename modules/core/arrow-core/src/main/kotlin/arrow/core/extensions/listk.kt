@@ -43,6 +43,7 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
@@ -346,4 +347,14 @@ interface ListKUnalign : Unalign<ForListK>, ListKSemialign {
 interface ListKZip : Zip<ForListK>, ListKSemialign {
   override fun <A, B> Kind<ForListK, A>.zip(other: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
     this.fix().listZip(other.fix()).map { it.first toT it.second }.k()
+}
+
+@extension
+interface ListKUnzip : Unzip<ForListK>, ListKZip {
+  override fun <A, B> Kind<ForListK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
+    this.fix().let { list ->
+      list.fold(emptyList<A>() toT emptyList<B>()) { (l, r), x ->
+        l.listPlus(x.a) toT r.listPlus(x.b)
+      }
+    }.bimap({ it.k() }, { it.k() })
 }
