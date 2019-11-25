@@ -29,7 +29,7 @@ typealias StateTFunOf<F, S, A> = Kind<F, StateTFun<F, S, A>>
  * Run the stateful computation within the context `F`.
  *
  * @param MF [Monad] for the context [F]
- * @param s initial state to run stateful computation
+ * @param initial state to start stateful computation
  */
 fun <F, S, A> StateTOf<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = fix().run(MF, initial)
 
@@ -38,7 +38,7 @@ fun <F, S, A> StateTOf<F, S, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S
  * a value of type `A`. i.e. StateT<EitherPartialOf<E>, S, A> = Either<E, State<S, A>>
  *
  * @param F the context that wraps the stateful computation.
- * @param S the state we are preforming computation upon.
+ * @param S the state we are performing computation upon.
  * @param A current value of computation.
  * @param runF the stateful computation that is wrapped and managed by `StateT`
  */
