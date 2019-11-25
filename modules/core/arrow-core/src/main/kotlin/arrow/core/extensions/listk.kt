@@ -42,6 +42,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unalign
 import arrow.typeclasses.Zip
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
@@ -325,6 +326,20 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
 @extension
 interface ListKAlign : Align<ForListK>, ListKSemialign {
   override fun <A> empty(): Kind<ForListK, A> = ListK.empty()
+}
+
+@extension
+interface ListKUnalign : Unalign<ForListK>, ListKSemialign {
+  override fun <A, B> unalign(ior: Kind<ForListK, Ior<A, B>>): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
+    ior.fix().let { list ->
+      list.fold(emptyList<A>() toT emptyList<B>()) { (l, r), x ->
+        x.fold(
+          { l.listPlus(it) toT r },
+          { l toT r.listPlus(it) },
+          { a, b -> l.listPlus(a) toT r.listPlus(b) }
+        )
+      }.bimap({ it.k() }, { it.k() })
+    }
 }
 
 @extension

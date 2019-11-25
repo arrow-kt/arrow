@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
@@ -16,10 +17,12 @@ import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.repeat.repeat
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.liftGen
 import arrow.test.generators.option
+import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
@@ -30,6 +33,7 @@ import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -68,10 +72,20 @@ class OptionTest : UnitSpec() {
       ) {
         Option.just(it)
       },
+      AlignLaws.laws(Option.align(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK(),
+        Option.foldable()
+      ),
+      UnalignLaws.laws(Option.unalign(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK()
+      ),
       RepeatLaws.laws(Option.repeat(),
         Option.liftGen(),
         Option.eqK(),
-        Option.foldable())
+        Option.foldable()
+      )
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
@@ -181,6 +195,12 @@ class OptionTest : UnitSpec() {
       x or None shouldBe Some(2)
       None or x shouldBe Some(2)
       None or None shouldBe None
+    }
+
+    "toLeftOption" {
+      1.leftIor().toLeftOption() shouldBe Some(1)
+      2.rightIor().toLeftOption() shouldBe None
+      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
     }
   }
 

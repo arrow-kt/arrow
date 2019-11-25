@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.mapk.align.align
 import arrow.core.extensions.mapk.eq.eq
 import arrow.core.extensions.mapk.foldable.foldable
 import arrow.core.extensions.mapk.functor.functor
@@ -13,11 +14,13 @@ import arrow.core.extensions.mapk.monoid.monoid
 import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
+import arrow.core.extensions.mapk.unalign.unalign
 import arrow.core.extensions.mapk.zip.zip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.LiftGen
 import arrow.test.generators.mapK
+import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -25,6 +28,7 @@ import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -54,6 +58,12 @@ class MapKTest : UnitSpec() {
       EqLaws.laws(EQ) { mapOf(it.toString() to it).k() },
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
+      AlignLaws.laws(MapK.align(),
+        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        EQK, MapK.foldable()),
+      UnalignLaws.laws(MapK.unalign(),
+        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        EQK),
       ZipLaws.laws(MapK.zip(),
         object : LiftGen<MapKPartialOf<String>> {
           override fun <A> liftGen(gen: Gen<A>): Gen<Kind<MapKPartialOf<String>, A>> =

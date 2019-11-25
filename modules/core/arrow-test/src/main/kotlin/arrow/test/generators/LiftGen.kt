@@ -5,10 +5,12 @@ import arrow.core.ForId
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
+import arrow.core.ForSequenceK
 import arrow.core.Id
 import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.Option
+import arrow.core.SequenceK
 import io.kotlintest.properties.Gen
 
 interface LiftGen<F> {
@@ -36,6 +38,11 @@ fun ListK.Companion.liftGen() = object : LiftGen<ForListK> {
 fun NonEmptyList.Companion.liftGen() = object : LiftGen<ForNonEmptyList> {
   override fun <A> liftGen(gen: Gen<A>): Gen<Kind<ForNonEmptyList, A>> =
     Gen.nonEmptyList(gen) as Gen<Kind<ForNonEmptyList, A>>
+}
+
+fun SequenceK.Companion.liftGen() = object : LiftGen<ForSequenceK> {
+  override fun <A> liftGen(gen: Gen<A>): Gen<Kind<ForSequenceK, A>> =
+    Gen.sequenceK(gen) as Gen<Kind<ForSequenceK, A>>
 }
 
 fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {

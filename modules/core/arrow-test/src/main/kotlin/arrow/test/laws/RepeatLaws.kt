@@ -35,16 +35,19 @@ object RepeatLaws {
       liftGen(gen)
     }
 
-  private fun <F> repeatLaws(RP: Repeat<F>,
-                             GEN: LiftGen<F>,
-                             EQK: EqK<F>): List<Law> = listOf(
-    Law("RepeatLaws: zip with rhs repeat is neutral to the lhs") {
-      RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
-    },
-    Law("RepeatLaws: zip with lhs repeat is neutral to the rhs") {
-      RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
-    }
-  )
+  private fun <F> repeatLaws(
+    RP: Repeat<F>,
+    GEN: LiftGen<F>,
+    EQK: EqK<F>
+  ): List<Law> =
+    listOf(
+      Law("RepeatLaws: zip with rhs repeat is neutral to the lhs") {
+        RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
+      },
+      Law("RepeatLaws: zip with lhs repeat is neutral to the rhs") {
+        RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
+      }
+    )
 
   fun <F, A> Repeat<F>.zipWithRhsRepeatIsNeutralToTheLhs(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>) =
     forAll(G) { a: Kind<F, A> ->
