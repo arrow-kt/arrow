@@ -57,7 +57,7 @@ class MapKTest : UnitSpec() {
       ),
       UnalignLaws.laws(MapK.unalign(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        EQK)
+        MapK.eqK(String.eq()))
     )
 
     "can align maps" {
