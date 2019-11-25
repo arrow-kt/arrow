@@ -14,10 +14,10 @@ import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
+import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
-import arrow.core.extensions.sequencek.zip.zip
 import arrow.test.UnitSpec
 import arrow.test.generators.liftGen
 import arrow.test.generators.sequenceK
@@ -29,10 +29,10 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
-import arrow.test.laws.ZipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
@@ -91,7 +91,7 @@ class SequenceKTest : UnitSpec() {
         EQK,
         SequenceK.foldable()
       ),
-      ZipLaws.laws(SequenceK.zip(),
+      RepeatLaws.laws(SequenceK.repeat(),
         SequenceK.liftGen(),
         EQK,
         SequenceK.foldable()

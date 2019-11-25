@@ -34,6 +34,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Repeat
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -333,6 +334,18 @@ interface SequenceKZip : Zip<ForSequenceK>, SequenceKSemialign {
           leftIterator.hasNext() && rightIterator.hasNext()
 
         override fun next(): Tuple2<A, B> = leftIterator.next() toT rightIterator.next()
+      }
+    }.k()
+}
+
+@extension
+interface SequenceKRepeat : Repeat<ForSequenceK>, SequenceKZip {
+  override fun <A> repeat(a: A): Kind<ForSequenceK, A> =
+    object : Sequence<A> {
+      override fun iterator(): Iterator<A> = object : Iterator<A> {
+        override fun hasNext(): Boolean = true
+
+        override fun next(): A = a
       }
     }.k()
 }

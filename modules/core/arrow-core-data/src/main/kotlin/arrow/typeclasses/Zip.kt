@@ -29,7 +29,7 @@ interface Zip<F> : Semialign<F> {
    * ```
    */
   fun <A, B> Kind<F, A>.zip(other: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    zipWith({ a: A, b: B -> Tuple2(a, b) }, other)
+    zipWith(other) { a: A, b: B -> Tuple2(a, b) }
 
   /**
    * Combines to structures by taking the intersection of their shapes
@@ -45,13 +45,15 @@ interface Zip<F> : Semialign<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.zip().run {
-   *    listOf("A", "B").k().zipWith({a, b -> "$a # $b"}, listOf(1, 2, 3).k())
+   *    listOf("A", "B").k().zipWith(listOf(1, 2, 3).k()) {
+   *      a, b -> "$a # $b"
+   *    }
    *   }
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A, B, C> Kind<F, A>.zipWith(f: (A, B) -> C, other: Kind<F, B>): Kind<F, C> =
+  fun <A, B, C> Kind<F, A>.zipWith(other: Kind<F, B>, f: (A, B) -> C): Kind<F, C> =
     zip(other).map { f(it.a, it.b) }
 }

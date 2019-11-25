@@ -37,7 +37,7 @@ ListK.zip().run {
 Combines to structures by taking the intersection of their shapes
 and combining the elements with the given function.
 
-`fun <A, B, C> Kind<F, A>.zipWith(f: (A, B) -> C, other: Kind<F, B>): Kind<F, C>`
+`fun <A, B, C> Kind<F, A>.zipWith(other: Kind<F, B>, f: (A, B) -> C): Kind<F, C>`
 
 ```kotlin:ank
 import arrow.core.extensions.*
@@ -45,7 +45,9 @@ import arrow.core.extensions.listk.zip.zip
 import arrow.core.*
 
 ListK.zip().run {
-   listOf("A", "B").k().zipWith({a, b -> "$a # $b"}, listOf(1, 2, 3).k())
+    listOf("A", "B").k().zipWith(listOf(1, 2, 3).k()) {
+        a, b -> "$a # $b"
+    }
 }
 ```
 

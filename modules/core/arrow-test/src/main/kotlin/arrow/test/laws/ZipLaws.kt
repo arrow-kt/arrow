@@ -106,7 +106,7 @@ object ZipLaws {
   fun <F, A> Zip<F>.zipWith(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, String>>) =
     forAll(G, G) { x, y ->
       val f = { a: A, b: A -> "f($a,$b)" }
-      val ls = x.zipWith(f, y)
+      val ls = x.zipWith(y, f)
       val rs = x.zip(y).map { f(it.a, it.b) }
 
       ls.equalUnderTheLaw(rs, EQ)
