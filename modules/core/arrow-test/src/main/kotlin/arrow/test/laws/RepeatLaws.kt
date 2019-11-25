@@ -41,10 +41,10 @@ object RepeatLaws {
     EQK: EqK<F>
   ): List<Law> =
     listOf(
-      Law("RepeatLaws: zip with rhs repeat is neutral to the lhs") {
+      Law("RepeatLaws: zip with RHS repeat is neutral to the LHS") {
         RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
       },
-      Law("RepeatLaws: zip with lhs repeat is neutral to the rhs") {
+      Law("RepeatLaws: zip with LHS repeat is neutral to the RHS") {
         RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
       }
     )
