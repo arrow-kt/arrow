@@ -17,7 +17,6 @@ import arrow.core.extensions.unalign
 import arrow.core.extensions.unzip
 import arrow.test.UnitSpec
 import arrow.test.generators.LiftGen
-import arrow.test.generators.mapK
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.HashLaws
