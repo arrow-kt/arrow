@@ -6,6 +6,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.mapk.align.align
 import arrow.core.extensions.mapk.eq.eq
+import arrow.core.extensions.mapk.eqK.eqK
 import arrow.core.extensions.mapk.foldable.foldable
 import arrow.core.extensions.mapk.functor.functor
 import arrow.core.extensions.mapk.functorFilter.functorFilter
@@ -31,7 +32,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -40,11 +40,6 @@ class MapKTest : UnitSpec() {
   val EQ: Eq<Kind2<ForMapK, String, Int>> = object : Eq<Kind2<ForMapK, String, Int>> {
     override fun Kind2<ForMapK, String, Int>.eqv(b: Kind2<ForMapK, String, Int>): Boolean =
       fix()["key"] == b.fix()["key"]
-  }
-
-  val EQK = object : EqK<MapKPartialOf<String>> {
-    override fun <A> Kind<MapKPartialOf<String>, A>.eqK(other: Kind<MapKPartialOf<String>, A>, EQ: Eq<A>): Boolean =
-      MapK.eq(String.eq(), EQ).run { this@eqK.fix().eqv(other.fix()) }
   }
 
   init {
@@ -60,16 +55,18 @@ class MapKTest : UnitSpec() {
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
       AlignLaws.laws(MapK.align(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        EQK, MapK.foldable()),
+        MapK.eqK(String.eq()),
+        MapK.foldable()
+      ),
       UnalignLaws.laws(MapK.unalign(),
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        EQK),
+        MapK.eqK(String.eq())),
       UnzipLaws.laws(MapK.unzip(),
         object : LiftGen<MapKPartialOf<String>> {
           override fun <A> liftGen(gen: Gen<A>): Gen<Kind<MapKPartialOf<String>, A>> =
             Gen.mapK(Gen.string(), gen) as Gen<Kind<MapKPartialOf<String>, A>>
         },
-        EQK,
+        MapK.eqK(String.eq()),
         MapK.foldable()
       )
     )
