@@ -15,6 +15,7 @@ import arrow.core.extensions.mapk.monoid.monoid
 import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
+import arrow.core.extensions.mapk.unalign.unalign
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.mapK
@@ -26,6 +27,7 @@ import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -52,7 +54,10 @@ class MapKTest : UnitSpec() {
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
         MapK.eqK(String.eq()),
         MapK.foldable()
-      )
+      ),
+      UnalignLaws.laws(MapK.unalign(),
+        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        EQK)
     )
 
     "can align maps" {

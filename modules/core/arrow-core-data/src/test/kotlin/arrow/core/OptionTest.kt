@@ -16,6 +16,7 @@ import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.option
@@ -29,6 +30,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -71,6 +73,10 @@ class OptionTest : UnitSpec() {
         Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
         Option.eqK(),
         Option.foldable()
+      ),
+      UnalignLaws.laws(Option.unalign(),
+        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.eqK()
       )
     )
 
@@ -181,6 +187,12 @@ class OptionTest : UnitSpec() {
       x or None shouldBe Some(2)
       None or x shouldBe Some(2)
       None or None shouldBe None
+    }
+
+    "toLeftOption" {
+      1.leftIor().toLeftOption() shouldBe Some(1)
+      2.rightIor().toLeftOption() shouldBe None
+      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
     }
   }
 

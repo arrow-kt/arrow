@@ -218,6 +218,6 @@ interface IdEqK : EqK<ForId> {
 
 @extension
 interface IdSemialign : Semialign<ForId>, IdFunctor {
-  override fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<ForId, A>, b: Kind<ForId, B>): Kind<ForId, C> =
+  override fun <A, B, C> alignWith(a: Kind<ForId, A>, b: Kind<ForId, B>, fa: (Ior<A, B>) -> C): Kind<ForId, C> =
     Id.just(fa(Ior.Both(a.fix().extract(), b.fix().extract())))
 }

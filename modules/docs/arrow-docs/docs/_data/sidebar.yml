@@ -345,6 +345,9 @@ options:
       - title: Align
         url: /docs/arrow/typeclasses/align/
 
+      - title: Unalign
+        url: /docs/arrow/typeclasses/unalign/
+
   - title: Effects
 
     nested_options:
