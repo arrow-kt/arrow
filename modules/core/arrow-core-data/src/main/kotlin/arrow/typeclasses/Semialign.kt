@@ -30,7 +30,7 @@ interface Semialign<F> : Functor<F> {
    * }
    * ```
    */
-  fun <A, B> align(a: Kind<F, A>, b: Kind<F, B>): Kind<F, Ior<A, B>> = alignWith(::identity, a, b)
+  fun <A, B> align(a: Kind<F, A>, b: Kind<F, B>): Kind<F, Ior<A, B>> = alignWith(a, b, ::identity)
 
   /**
    * Combines two structures by taking the union of their shapes and combining the elements with the given function.
@@ -45,12 +45,14 @@ interface Semialign<F> : Functor<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.semialign().run {
-   *    alignWith({"$it"}, listOf("A", "B").k(), listOf(1, 2, 3).k())
+   *    alignWith(listOf("A", "B").k(), listOf(1, 2, 3).k()) {
+   *      "$it"
+   *    }
    *   }
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A, B, C> alignWith(fa: (Ior<A, B>) -> C, a: Kind<F, A>, b: Kind<F, B>): Kind<F, C> = align(a, b).map(fa)
+  fun <A, B, C> alignWith(a: Kind<F, A>, b: Kind<F, B>, fa: (Ior<A, B>) -> C): Kind<F, C> = align(a, b).map(fa)
 }
