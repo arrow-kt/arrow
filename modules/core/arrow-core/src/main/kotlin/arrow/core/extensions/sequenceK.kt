@@ -262,6 +262,16 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
 
   override fun <A> just(a: A): SequenceK<A> =
     SequenceK.just(a)
+}
+
+fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
+  SequenceK.monad().fx.monad(c).fix()
+
+@extension
+interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative {
+  override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
+  override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
+    (this.fix() + b.fix()).k()
 
   override fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
     if (this.fix().isEmpty()) SequenceK.empty()
@@ -286,16 +296,6 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
         }
       }.k()
     }.k()
-}
-
-fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
-  SequenceK.monad().fx.monad(c).fix()
-
-@extension
-interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative {
-  override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
-  override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
-    (this.fix() + b.fix()).k()
 }
 
 @extension
