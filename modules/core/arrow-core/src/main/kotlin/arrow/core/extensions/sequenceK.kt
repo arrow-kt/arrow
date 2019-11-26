@@ -80,7 +80,7 @@ interface SequenceKEq<A> : Eq<SequenceK<A>> {
    * This only evaluates up to the first element that differs or to the first element at the index where the other
    *  sequence is empty
    */
-  override fun SequenceK<A>.eqv(b: SequenceK<A>): Boolean = object: SequenceKSemialign {}.run {
+  override fun SequenceK<A>.eqv(b: SequenceK<A>): Boolean = object : SequenceKSemialign {}.run {
     alignWith(this@eqv, b) { ior ->
       ior.fold({ false }, { false }, { l, r -> EQ().run { l.eqv(r) } })
     }.firstOption { it.not() }.isEmpty()
