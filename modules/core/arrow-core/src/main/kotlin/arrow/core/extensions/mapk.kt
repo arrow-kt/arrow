@@ -10,6 +10,7 @@ import arrow.core.Option
 import arrow.core.SetK
 import arrow.core.Tuple2
 import arrow.core.extensions.list.functorFilter.flattenOption
+import arrow.core.extensions.mapk.eq.eq
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
@@ -27,6 +28,7 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -169,5 +171,16 @@ interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
           { b -> ls toT rs.plus(k to b) },
           { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
       }.bimap({ it.k() }, { it.k() })
+    }
+}
+
+@extension
+interface MapKEqK<K> : EqK<MapKPartialOf<K>> {
+
+  fun EQK(): Eq<K>
+
+  override fun <A> Kind<MapKPartialOf<K>, A>.eqK(other: Kind<MapKPartialOf<K>, A>, EQ: Eq<A>): Boolean =
+    MapK.eq(EQK(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
     }
 }
