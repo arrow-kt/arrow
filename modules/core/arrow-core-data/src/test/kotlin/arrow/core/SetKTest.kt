@@ -51,11 +51,8 @@ class SetKTest : UnitSpec() {
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) },
       EqKLaws.laws(
         SetK.eqK(),
-        SetK.eq(Int.eq()) as Eq<Kind<ForSetK, Int>>,
         SetK.genK()
-      ) {
-        SetK.just(it)
-      }
+      )
     )
   }
 

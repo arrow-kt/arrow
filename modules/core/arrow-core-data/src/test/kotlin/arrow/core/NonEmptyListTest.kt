@@ -54,11 +54,8 @@ class NonEmptyListTest : UnitSpec() {
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) },
       EqKLaws.laws(
         NonEmptyList.eqK(),
-        NonEmptyList.eq(Int.eq()) as Eq<Kind<ForNonEmptyList, Int>>,
         NonEmptyList.genK()
-      ) {
-        Nel.just(it)
-      },
+      ),
       UnzipLaws.laws(NonEmptyList.unzip(),
         NonEmptyList.genK(),
         NonEmptyList.eqK(),

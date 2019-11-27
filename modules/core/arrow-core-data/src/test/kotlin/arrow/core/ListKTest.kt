@@ -64,11 +64,8 @@ class ListKTest : UnitSpec() {
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
       EqKLaws.laws(
         ListK.eqK(),
-        ListK.eq(Int.eq()) as Eq<Kind<ForListK, Int>>,
         ListK.genK()
-      ) {
-        ListK.just(it)
-      },
+      ),
       AlignLaws.laws(ListK.align(),
         ListK.genK(),
         ListK.eqK(),

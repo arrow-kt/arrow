@@ -69,11 +69,8 @@ class OptionTest : UnitSpec() {
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
       EqKLaws.laws(
         Option.eqK(),
-        Option.eq(Int.eq()) as Eq<Kind<ForOption, Int>>,
         Option.genK()
-      ) {
-        Option.just(it)
-      },
+      ),
       AlignLaws.laws(Option.align(),
         Option.genK(),
         Option.eqK(),

@@ -49,11 +49,8 @@ class IdTest : UnitSpec() {
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) },
       EqKLaws.laws(
         Id.eqK(),
-        Id.eq(Int.eq()) as Eq<Kind<ForId, Int>>,
         Id.genK()
-      ) {
-        Id.just(it)
-      },
+      ),
       SemialignLaws.laws(Id.semialign(),
         Id.genK(),
         Id.eqK(),
