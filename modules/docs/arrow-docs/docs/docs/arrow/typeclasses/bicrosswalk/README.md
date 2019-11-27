@@ -6,7 +6,7 @@ redirect_from:
   - /docs/typeclasses/bicrosswalk/
 ---
 
-## Align
+## Bicrosswalk
 
 {:.beginner}
 beginner
