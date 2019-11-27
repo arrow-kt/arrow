@@ -57,7 +57,7 @@ Arrow provides [`ZipLaws`][functor_laws_source]{:target="_blank"} in the form of
 
 #### Creating your own `Zip` instances
 
-Arrow already provides Align instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
+Arrow already provides Zip instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
 and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
