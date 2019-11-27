@@ -1,12 +1,10 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.Kind2
 import arrow.core.Ior.Right
-import arrow.core.extensions.bicrosswalk
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.ior.applicative.applicative
+import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
 import arrow.core.extensions.ior.bifunctor.bifunctor
 import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.extensions.ior.crosswalk.crosswalk
@@ -17,7 +15,11 @@ import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.semigroup
+import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.extensions.sequencek.apply.apply
+import arrow.core.extensions.sequencek.monadFilter.filterMap
 import arrow.test.UnitSpec
+import arrow.test.generators.option
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
@@ -41,19 +43,15 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
-    val EQ2: Eq<Kind2<ForIor, Int, Int>> = Eq { a, b ->
-      a.fix() == b.fix()
-    }
-
     testLaws(
-      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
+      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ as Eq<IorOf<Int, Int>>),
       ShowLaws.laws(Ior.show(), EQ) { Right(it) },
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
-      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Eq.any())
+      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int(), Gen.int()), Ior.eqK(Int.eq())),
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()), Eq.any())
     )
 
     "bimap() should allow modify both value" {
@@ -150,15 +148,19 @@ class IorTest : UnitSpec() {
   }
 }
 
-private fun <A> Gen.Companion.ior(gen: Gen<A>) =
-  object : Gen<Kind<ForIor, A>> {
-    override fun constants(): Iterable<Kind<ForIor, A>> =
-      gen.constants().map {
-        Ior.Both(it, it) as Kind<ForIor, A>
+private fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>) =
+  object : Gen<IorOf<A, B>> {
+    override fun constants(): Iterable<IorOf<A, B>> =
+      (genA.constants().asSequence().k() to genB.constants().asSequence().k()).let { (ls, rs) ->
+        SequenceK.apply().run { ls.product(rs) }.filterMap {
+          Ior.fromOptions(Option.fromNullable(it.a), Option.fromNullable(it.b))
+        }.asIterable()
       }
 
-    override fun random(): Sequence<Kind<ForIor, A>> =
-      gen.random().map {
-        Ior.Both(it, it) as Kind<ForIor, A>
+    override fun random(): Sequence<IorOf<A, B>> =
+      (Gen.option(genA).random() to Gen.option(genB).random()).let { (ls, rs) ->
+        ls.zip(rs).filterMap {
+          Ior.fromOptions(it.first, it.second)
+        }
       }
   }

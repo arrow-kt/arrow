@@ -198,6 +198,7 @@ interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldab
   }
 }
 
+@extension
 interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,
@@ -217,5 +218,3 @@ interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
       }
     }
 }
-
-fun Ior.Companion.bicrosswalk() = object : IorBicrosswalk {}

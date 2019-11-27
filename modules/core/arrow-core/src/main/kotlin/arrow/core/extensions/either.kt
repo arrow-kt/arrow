@@ -234,6 +234,7 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
 
+@extension
 interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,
@@ -249,9 +250,6 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
         fb(e.b).map { it.right() }
       }
     }
-}
-
-fun Either.Companion.bicrosswalk() = object : EitherBicrosswalk {
 }
 
 @extension
