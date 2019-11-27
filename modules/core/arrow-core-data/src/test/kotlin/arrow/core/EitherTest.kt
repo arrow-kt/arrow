@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.Kind2
 import arrow.core.extensions.bicrosswalk
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
@@ -38,20 +37,18 @@ import io.kotlintest.properties.forAll
 class EitherTest : UnitSpec() {
   val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
 
-  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq.any()
-
   init {
 
     testLaws(
-      BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
+      BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, Eq.any()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
       MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
-      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) },
-      BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, EQ2)
+      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), Eq.any()) { Right(it) },
+      BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, Eq.any())
     )
 
     "empty should return a Right of the empty of the inner type" {

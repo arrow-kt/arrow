@@ -15,8 +15,8 @@ import arrow.core.extensions.sequence.foldable.firstOption
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.extensions.sequence.foldable.foldRight
 import arrow.core.extensions.sequence.foldable.isEmpty
-import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
@@ -338,15 +338,7 @@ interface SequenceKUnalign : Unalign<ForSequenceK>, SequenceKSemialign {
 
 @extension
 interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, SequenceKFoldable {
-  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForSequenceK, A>): Kind<F, Kind<ForSequenceK, B>> {
-    val cons = { ior: Ior<B, Kind<ForSequenceK, B>> ->
-      when (ior) {
-        is Ior.Left -> SequenceK.just(ior.value)
-        is Ior.Right -> ior.value
-        is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
-      }
-    }
-
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForSequenceK, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForSequenceK, B>> {
     fun crosswalkSequence(iterator: Iterator<A>): Kind<F, Kind<ForSequenceK, B>> =
       if (iterator.hasNext()) {
         val head = iterator.next()
@@ -354,7 +346,13 @@ interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, Sequen
         val rs = crosswalkSequence(iterator)
 
         ALIGN.run {
-          alignWith(cons, ls, rs)
+          alignWith(ls, rs) { ior: Ior<B, Kind<ForSequenceK, B>> ->
+              when (ior) {
+                is Ior.Left -> SequenceK.just(ior.value)
+                is Ior.Right -> ior.value
+                is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
+              }
+          }
         }
       } else {
         ALIGN.run { empty<B>().map { SequenceK.empty<B>() } }

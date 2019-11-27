@@ -345,30 +345,28 @@ interface ListKUnalign : Unalign<ForListK>, ListKSemialign {
 interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
   override fun <F, A, B> crosswalk(
     ALIGN: Align<F>,
-    fa: (A) -> Kind<F, B>,
-    a: Kind<ForListK, A>
-  ): Kind<F, Kind<ForListK, B>> {
+    a: Kind<ForListK, A>,
+    fa: (A) -> Kind<F, B>
+  ): Kind<F, Kind<ForListK, B>> =
+    a.fix().let { list ->
+      if (list.isEmpty()) {
+        ALIGN.run { empty<B>().map { ListK.empty<B>() } }
+      } else {
+        val head = list.first()
+        val tail = list.drop(1).k()
 
-    val list = a.fix()
+        val ls: Kind<F, B> = fa(head)
+        val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, tail, fa)
 
-    val cons = { ior: Ior<B, Kind<ForListK, B>> ->
-      when (ior) {
-        is Ior.Left -> ListK.just(ior.value)
-        is Ior.Right -> ior.value
-        is Ior.Both -> ListK.just(ior.leftValue) + ior.rightValue.fix()
+        ALIGN.run {
+          alignWith(ls, rs) { ior: Ior<B, Kind<ForListK, B>> ->
+            when (ior) {
+              is Ior.Left -> ListK.just(ior.value)
+              is Ior.Right -> ior.value
+              is Ior.Both -> ListK.just(ior.leftValue) + ior.rightValue.fix()
+            }
+          }
+        }
       }
     }
-
-    return if (list.isEmpty()) {
-      ALIGN.run { empty<B>().map { ListK.empty<B>() } }
-    } else {
-      val head = list.first()
-      val tail = list.drop(1).k()
-
-      val ls: Kind<F, B> = fa(head)
-      val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, fa, tail)
-
-      ALIGN.run { alignWith(cons, ls, rs) }
-    }
-  }
 }

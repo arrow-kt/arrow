@@ -82,7 +82,7 @@ class SequenceKTest : UnitSpec() {
       ),
       UnalignLaws.laws(SequenceK.unalign(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        EQK
+        SequenceK.eqK()
       ),
       CrosswalkLaws.laws(SequenceK.crosswalk(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,

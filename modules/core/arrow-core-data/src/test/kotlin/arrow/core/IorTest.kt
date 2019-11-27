@@ -53,7 +53,7 @@ class IorTest : UnitSpec() {
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
       CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, EQ2)
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Eq.any())
     )
 
     "bimap() should allow modify both value" {

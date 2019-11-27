@@ -8,15 +8,18 @@ import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
+import arrow.core.Ior
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.value
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -27,15 +30,12 @@ import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Semialign
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
-import arrow.core.Ior
-import arrow.typeclasses.Align
-import arrow.typeclasses.Crosswalk
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -228,8 +228,8 @@ interface IdSemialign : Semialign<ForId>, IdFunctor {
 interface IdCrosswalk : Crosswalk<ForId>, IdFunctor, IdFoldable {
   override fun <F, A, B> crosswalk(
     ALIGN: Align<F>,
-    fa: (A) -> Kind<F, B>,
-    a: Kind<ForId, A>
+    a: Kind<ForId, A>,
+    fa: (A) -> Kind<F, B>
   ): Kind<F, Kind<ForId, B>> =
     ALIGN.run { fa(a.fix().extract()).map { Id.just(it) } }
 }

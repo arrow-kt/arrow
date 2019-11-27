@@ -14,11 +14,13 @@ interface Crosswalk<T> : Functor<T>, Foldable<T> {
    * import arrow.core.*
    *
    * ListK.crosswalk().run {
-   *    crosswalk(ListK.align(), {it.split(":").k()}, listOf("1:2:3:4:5", "6:7:8:9:10", "11:12").k())
+   *    crosswalk(ListK.align(), listOf("1:2:3:4:5", "6:7:8:9:10", "11:12").k()) {
+   *      it.split(":").k()
+   *    }
    * }
    * ```
    */
-  fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<T, A>): Kind<F, Kind<T, B>> =
+  fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<T, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<T, B>> =
     sequenceL(ALIGN, a.map(fa))
 
   /**
@@ -40,5 +42,5 @@ interface Crosswalk<T> : Functor<T>, Foldable<T> {
    * ```
    */
   fun <F, A> sequenceL(ALIGN: Align<F>, tfa: Kind<T, Kind<F, A>>): Kind<F, Kind<T, A>> =
-    crosswalk(ALIGN, ::identity, tfa)
+    crosswalk(ALIGN, tfa, ::identity)
 }

@@ -18,15 +18,15 @@ interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
    *
    * Either.bicrosswalk().run {
    *   val either = Either.Right("arrow")
-   *   bicrosswalk(ListK.align(), {ListK.just("fa($it)")}, {ListK.just("fb($it)")}, either)
+   *   bicrosswalk(ListK.align(), either, {ListK.just("fa($it)")}) {ListK.just("fb($it)")}
    * }
    * ```
    */
   fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,
+    tab: Kind2<T, A, B>,
     fa: (A) -> Kind<F, C>,
-    fb: (B) -> Kind<F, D>,
-    tab: Kind2<T, A, B>
+    fb: (B) -> Kind<F, D>
   ): Kind<F, Kind2<T, C, D>> =
     bisequenceL(ALIGN, tab.bimap(fa, fb))
 
@@ -41,7 +41,7 @@ interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
    *
    * Either.bicrosswalk().run {
    *   val either: Either<ListK<Int>, ListK<String>> = Either.Right(listOf("hello", "arrow").k())
-   *   bisequencek(ListK.align(), either)
+   *   bisequenceL(ListK.align(), either)
    * }
    * ```
    */
@@ -49,5 +49,5 @@ interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
     ALIGN: Align<F>,
     tab: Kind2<T, Kind<F, A>, Kind<F, B>>
   ): Kind<F, Kind2<T, A, B>> =
-    bicrosswalk(ALIGN, ::identity, ::identity, tab)
+    bicrosswalk(ALIGN, tab, ::identity, ::identity)
 }

@@ -28,7 +28,7 @@ import arrow.core.*
 
 Either.bicrosswalk().run {
     val either = Either.Right("arrow")
-    bicrosswalk(ListK.align(), {ListK.just("fa($it)")}, {ListK.just("fb($it)")}, either)
+    bicrosswalk(ListK.align(), either, {ListK.just("fa($it)")}) {ListK.just("fb($it)")}
 }
 ```
 
@@ -44,7 +44,7 @@ import arrow.core.*
 
 Either.bicrosswalk().run {
     val either: Either<ListK<Int>, ListK<String>> = Either.Right(listOf("hello", "arrow").k())
-    bisequencek(ListK.align(), either)
+    bisequenceL(ListK.align(), either)
 }
 ```
 

@@ -237,9 +237,9 @@ fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> 
 interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,
+    tab: Kind2<ForEither, A, B>,
     fa: (A) -> Kind<F, C>,
-    fb: (B) -> Kind<F, D>,
-    tab: Kind2<ForEither, A, B>
+    fb: (B) -> Kind<F, D>
   ): Kind<F, Kind2<ForEither, C, D>> =
     when (val e = tab.fix()) {
       is Either.Left -> ALIGN.run {

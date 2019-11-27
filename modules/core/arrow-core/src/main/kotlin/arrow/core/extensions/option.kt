@@ -19,6 +19,8 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.orElse
+import arrow.core.some
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
@@ -50,18 +52,10 @@ import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
+import arrow.typeclasses.Unalign
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
-import arrow.typeclasses.Semialign
-import arrow.core.Ior
-import arrow.typeclasses.Align
-import arrow.typeclasses.Semialign
-import arrow.core.Ior
-import arrow.core.some
-import arrow.core.toT
-import arrow.typeclasses.Unalign
-import arrow.typeclasses.Align
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -495,7 +489,7 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
 
 @extension
 interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable {
-  override fun <F, A, B> crosswalk(ALIGN: Align<F>, fa: (A) -> Kind<F, B>, a: Kind<ForOption, A>): Kind<F, Kind<ForOption, B>> =
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForOption, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForOption, B>> =
     when (val e = a.fix()) {
       is None -> ALIGN.run { empty<B>().map { Option.empty<B>() } }
       is Some -> ALIGN.run { fa(e.t).map { Option.just(it) } }
