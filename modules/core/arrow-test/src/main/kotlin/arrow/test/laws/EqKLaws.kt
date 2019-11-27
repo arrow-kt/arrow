@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -12,13 +13,13 @@ object EqKLaws {
   fun <F> laws(
     EQK: EqK<F>,
     EQ: Eq<Kind<F, Int>>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     cf: (Int) -> Kind<F, Int>
   ): List<Law> = listOf(
     Law("EqK Laws: reflexivity") { EQK.eqkReflexivity(cf) },
     Law("EqK Laws: symmetry") { EQK.eqKSymmetry(cf) },
     Law("EqK Laws: transitivity") { EQK.eqKTransitivity(cf) },
-    Law("EqK Laws: eqK == eq") { EQK.eqKCanSubstituteEq(gen, EQ) }
+    Law("EqK Laws: eqK == eq") { EQK.eqKCanSubstituteEq(GENK.genK(Gen.int()), EQ) }
   )
 
   fun <F> EqK<F>.eqkReflexivity(cf: (Int) -> Kind<F, Int>) = forAll { int: Int ->

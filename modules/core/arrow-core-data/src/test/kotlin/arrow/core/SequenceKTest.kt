@@ -84,12 +84,12 @@ class SequenceKTest : UnitSpec() {
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       AlignLaws.laws(SequenceK.align(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
+        SequenceK.genK(),
         EQK,
         SequenceK.foldable()
       ),
       UnalignLaws.laws(SequenceK.unalign(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
+        SequenceK.genK(),
         EQK,
         SequenceK.foldable()
       ),

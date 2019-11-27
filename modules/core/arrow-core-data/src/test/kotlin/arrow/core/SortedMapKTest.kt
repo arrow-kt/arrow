@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.align
 import arrow.core.extensions.eq
@@ -47,12 +46,12 @@ class SortedMapKTest : UnitSpec() {
         { a: Int -> sortedMapOf("key" to a).k() },
         EQ),
       AlignLaws.laws(SortedMapK.align<String>(),
-        Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
+        SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       ),
       UnalignLaws.laws(SortedMapK.unalign<String>(),
-        Gen.sortedMapK(Gen.string(), Gen.int()) as Gen<Kind<SortedMapKPartialOf<String>, Int>>,
+        SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       ),

@@ -55,7 +55,7 @@ class NonEmptyListTest : UnitSpec() {
       EqKLaws.laws(
         NonEmptyList.eqK(),
         NonEmptyList.eq(Int.eq()) as Eq<Kind<ForNonEmptyList, Int>>,
-        Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>
+        NonEmptyList.genK()
       ) {
         Nel.just(it)
       },

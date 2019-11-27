@@ -50,12 +50,12 @@ class IdTest : UnitSpec() {
       EqKLaws.laws(
         Id.eqK(),
         Id.eq(Int.eq()) as Eq<Kind<ForId, Int>>,
-        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>
+        Id.genK()
       ) {
         Id.just(it)
       },
       SemialignLaws.laws(Id.semialign(),
-        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
+        Id.genK(),
         Id.eqK(),
         Id.foldable()
       ),
@@ -68,7 +68,7 @@ class IdTest : UnitSpec() {
         Id.genK(),
         Id.eqK(),
         Id.foldable()
-        )
+      )
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {
@@ -91,12 +91,4 @@ class IdTest : UnitSpec() {
       }
     }
   }
-}
-
-fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
-  override fun constants(): Iterable<Id<T>> =
-    gen.constants().map { Id.just(it) }
-
-  override fun random(): Sequence<Id<T>> =
-    gen.random().map { Id.just(it) }
 }

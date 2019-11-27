@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -54,13 +53,14 @@ class MapKTest : UnitSpec() {
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
       AlignLaws.laws(MapK.align(),
-        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        MapK.genK(Gen.string()),
         MapK.eqK(String.eq()),
         MapK.foldable()
       ),
       UnalignLaws.laws(MapK.unalign(),
-        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        MapK.eqK(String.eq())),
+        MapK.genK(Gen.string()),
+        MapK.eqK(String.eq()),
+        MapK.foldable()),
       UnzipLaws.laws(MapK.unzip(),
         MapK.genK(Gen.string()),
         MapK.eqK(String.eq()),

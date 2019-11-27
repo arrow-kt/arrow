@@ -15,6 +15,7 @@ import arrow.core.extensions.setk.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genSetK
+import arrow.test.generators.setk.genK.genK
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.HashLaws
@@ -51,7 +52,7 @@ class SetKTest : UnitSpec() {
       EqKLaws.laws(
         SetK.eqK(),
         SetK.eq(Int.eq()) as Eq<Kind<ForSetK, Int>>,
-        Gen.genSetK(Gen.int()) as Gen<Kind<ForSetK, Int>>
+        SetK.genK()
       ) {
         SetK.just(it)
       }

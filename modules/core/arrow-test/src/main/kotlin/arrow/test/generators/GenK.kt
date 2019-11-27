@@ -6,6 +6,7 @@ import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
 import arrow.core.ForSequenceK
+import arrow.core.ForSetK
 import arrow.core.MapKPartialOf
 import arrow.core.SortedMapKPartialOf
 import arrow.extension
@@ -64,4 +65,10 @@ interface SortedMapKGenK<K : Comparable<K>> : GenK<SortedMapKPartialOf<K>> {
 
   override fun <A> genK(gen: Gen<A>): Gen<Kind<SortedMapKPartialOf<K>, A>> =
     Gen.sortedMapK(kGen(), gen) as Gen<Kind<SortedMapKPartialOf<K>, A>>
+}
+
+@extension
+interface SetKGenK : GenK<ForSetK> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSetK, A>> =
+    Gen.genSetK(gen) as Gen<Kind<ForSetK, A>>
 }

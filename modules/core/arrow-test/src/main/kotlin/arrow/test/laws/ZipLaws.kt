@@ -28,49 +28,39 @@ object ZipLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(ZIP, buildGen(GENK, Gen.int()), EQK) + zipLaws(ZIP, GENK, EQK)
+    SemialignLaws.laws(ZIP, GENK, EQK) + zipLaws(ZIP, GENK, EQK)
 
   fun <F> laws(
     ZIP: Zip<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.laws(ZIP, buildGen(GENK, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GENK, EQK)
+  ) = SemialignLaws.laws(ZIP, GENK, EQK, FOLD) + zipLaws(ZIP, GENK, EQK)
 
   private fun <F> zipLaws(
     ZIP: Zip<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> {
-    val intGen = buildGen(GENK, Gen.int())
-    val tupleGen = buildGen(GENK, Gen.tuple2(Gen.int(), Gen.int()))
+    val intGen = GENK.genK(Gen.int())
+    val tupleGen = GENK.genK(Gen.tuple2(Gen.int(), Gen.int()))
 
     return listOf(
-      Law("Zip Laws: Idempotency") { ZIP.idempotency(intGen, buildEq(EQK, intTupleEq)) },
-      Law("Zip Laws: Commutativity") { ZIP.commutativity(intGen, buildEq(EQK, intTupleEq)) },
-      Law("Zip Laws: Associativity") { ZIP.associativity(intGen, buildEq(EQK, Tuple2.eq(Int.eq(), intTupleEq))) },
-      Law("Zip Laws: Absorption #1") { ZIP.absorption1(intGen, buildEq(EQK, Int.eq())) },
-      Law("Zip Laws: Absorption #2") { ZIP.absorption2(intGen, buildEq(EQK, iorIntIntTupleEq)) },
-      Law("Zip Laws: With") { ZIP.zipWith(intGen, buildEq(EQK, String.eq())) },
-      Law("Zip Laws: Functoriality") { ZIP.functoriality(intGen, buildEq(EQK, Tuple2.eq(String.eq(), String.eq()))) },
-      Law("Zip Laws: Zippyness #1") { ZIP.zippyness1(intGen, buildEq(EQK, Int.eq())) },
-      Law("Zip Laws: Zippyness #2") { ZIP.zippyness2(intGen, buildEq(EQK, Int.eq())) },
-      Law("Zip Laws: Zippyness #3") { ZIP.zippyness3(tupleGen, buildEq(EQK, intTupleEq)) },
-      Law("Zip Laws: Distributivity #1") { ZIP.distributivity1(intGen, buildEq(EQK, Ior.eq(intTupleEq, Int.eq()))) },
-      Law("Zip Laws: Distributivity #2") { ZIP.distributivity2(intGen, buildEq(EQK, Ior.eq(intTupleEq, intTupleEq))) },
-      Law("Zip Laws: Distributivity #3") { ZIP.distributivity3(intGen, buildEq(EQK, Tuple2.eq(Ior.eq(Int.eq(), Int.eq()), Int.eq()))) }
+      Law("Zip Laws: Idempotency") { ZIP.idempotency(intGen, EQK.liftEq(intTupleEq)) },
+      Law("Zip Laws: Commutativity") { ZIP.commutativity(intGen, EQK.liftEq(intTupleEq)) },
+      Law("Zip Laws: Associativity") { ZIP.associativity(intGen, EQK.liftEq(Tuple2.eq(Int.eq(), intTupleEq))) },
+      Law("Zip Laws: Absorption #1") { ZIP.absorption1(intGen, EQK.liftEq(Int.eq())) },
+      Law("Zip Laws: Absorption #2") { ZIP.absorption2(intGen, EQK.liftEq(iorIntIntTupleEq)) },
+      Law("Zip Laws: With") { ZIP.zipWith(intGen, EQK.liftEq(String.eq())) },
+      Law("Zip Laws: Functoriality") { ZIP.functoriality(intGen, EQK.liftEq(Tuple2.eq(String.eq(), String.eq()))) },
+      Law("Zip Laws: Zippyness #1") { ZIP.zippyness1(intGen, EQK.liftEq(Int.eq())) },
+      Law("Zip Laws: Zippyness #2") { ZIP.zippyness2(intGen, EQK.liftEq(Int.eq())) },
+      Law("Zip Laws: Zippyness #3") { ZIP.zippyness3(tupleGen, EQK.liftEq(intTupleEq)) },
+      Law("Zip Laws: Distributivity #1") { ZIP.distributivity1(intGen, EQK.liftEq(Ior.eq(intTupleEq, Int.eq()))) },
+      Law("Zip Laws: Distributivity #2") { ZIP.distributivity2(intGen, EQK.liftEq(Ior.eq(intTupleEq, intTupleEq))) },
+      Law("Zip Laws: Distributivity #3") { ZIP.distributivity3(intGen, EQK.liftEq(Tuple2.eq(Ior.eq(Int.eq(), Int.eq()), Int.eq()))) }
     )
   }
-
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
-
-  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
-    LG.run {
-      genK(gen)
-    }
 
   fun <F, A> Zip<F>.idempotency(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, Tuple2<A, A>>>) =
     forAll(G) { x ->

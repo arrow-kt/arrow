@@ -70,18 +70,19 @@ class OptionTest : UnitSpec() {
       EqKLaws.laws(
         Option.eqK(),
         Option.eq(Int.eq()) as Eq<Kind<ForOption, Int>>,
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>
+        Option.genK()
       ) {
         Option.just(it)
       },
       AlignLaws.laws(Option.align(),
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
       UnalignLaws.laws(Option.unalign(),
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
-        Option.eqK()
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
       ),
       RepeatLaws.laws(Option.repeat(),
         Option.genK(),

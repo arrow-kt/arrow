@@ -20,14 +20,14 @@ object UnzipLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(UNZIP, buildGen(GENK, Gen.int()), EQK) + unzipLaws(UNZIP, GENK, EQK)
+    SemialignLaws.laws(UNZIP, GENK, EQK) + unzipLaws(UNZIP, GENK, EQK)
 
   fun <F> laws(
     UNZIP: Unzip<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.laws(UNZIP, buildGen(GENK, Gen.int()), EQK, FOLD) + unzipLaws(UNZIP, GENK, EQK)
+  ) = SemialignLaws.laws(UNZIP, GENK, EQK, FOLD) + unzipLaws(UNZIP, GENK, EQK)
 
   private fun <F> unzipLaws(
     UNZIP: Unzip<F>,
@@ -36,29 +36,19 @@ object UnzipLaws {
   ): List<Law> = listOf(
     Law("zip is inverse of unzip") {
       UNZIP.zipIsInverseOfUnzip(
-        buildGen(GENK, Gen.tuple2(Gen.int(), Gen.int())),
-        buildEq(EQK, Tuple2.eq(Int.eq(), Int.eq()))
+        GENK.genK(Gen.tuple2(Gen.int(), Gen.int())),
+        EQK.liftEq(Tuple2.eq(Int.eq(), Int.eq()))
       )
     },
     Law("unzip is inverse of zip") {
-      val intEq = buildEq(EQK, Int.eq())
+      val intEq = EQK.liftEq(Int.eq())
 
       UNZIP.unipIsInverseOfZip(
-        buildGen(GENK, Gen.int()),
+        GENK.genK(Gen.int()),
         Tuple2.eq(intEq, intEq)
       )
     }
   )
-
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
-
-  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
-    LG.run {
-      genK(gen)
-    }
 
   fun <F, A, B> Unzip<F>.zipIsInverseOfUnzip(
     G: Gen<Kind<F, Tuple2<A, B>>>,

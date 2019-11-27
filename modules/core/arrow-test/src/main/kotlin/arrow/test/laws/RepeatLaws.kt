@@ -25,16 +25,6 @@ object RepeatLaws {
     FOLD: Foldable<F>
   ) = ZipLaws.laws(RP, GENK, EQK, FOLD) + repeatLaws(RP, GENK, EQK)
 
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
-
-  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
-    LG.run {
-      genK(gen)
-    }
-
   private fun <F> repeatLaws(
     RP: Repeat<F>,
     GENK: GenK<F>,
@@ -42,10 +32,10 @@ object RepeatLaws {
   ): List<Law> =
     listOf(
       Law("RepeatLaws: zip with RHS repeat is neutral to the LHS") {
-        RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GENK, Gen.int()), buildEq(EQK, Int.eq()))
+        RP.zipWithRhsRepeatIsNeutralToTheLhs(GENK.genK(Gen.int()), EQK.liftEq(Int.eq()))
       },
       Law("RepeatLaws: zip with LHS repeat is neutral to the RHS") {
-        RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GENK, Gen.int()), buildEq(EQK, Int.eq()))
+        RP.zipWithLhsRepeatIsNeutralToTheRhs(GENK.genK(Gen.int()), EQK.liftEq(Int.eq()))
       }
     )
 
