@@ -21,8 +21,8 @@ import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.genK
 import arrow.test.generators.listK
+import arrow.test.generators.listk.genK.genK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws

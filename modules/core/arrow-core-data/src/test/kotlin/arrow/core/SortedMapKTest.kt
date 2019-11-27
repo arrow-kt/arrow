@@ -16,8 +16,8 @@ import arrow.core.extensions.traverse
 import arrow.core.extensions.unalign
 import arrow.core.extensions.unzip
 import arrow.test.UnitSpec
-import arrow.test.generators.genK
 import arrow.test.generators.sortedMapK
+import arrow.test.generators.sortedmapk.genK.genK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws

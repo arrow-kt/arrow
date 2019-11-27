@@ -18,8 +18,8 @@ import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.nonemptylist.unzip.unzip
 import arrow.test.UnitSpec
-import arrow.test.generators.genK
 import arrow.test.generators.nonEmptyList
+import arrow.test.generators.nonemptylist.genK.genK
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
