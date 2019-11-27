@@ -12,7 +12,7 @@ interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
    * ```kotlin:ank
    *
    * import arrow.core.extensions.*
-   * arrow.core.extensions.either.bicrosswalk.bicrosswalk
+   * import arrow.core.extensions.either.bicrosswalk.bicrosswalk
    * import arrow.core.extensions.listk.align.align
    * import arrow.core.*
    *
@@ -35,7 +35,7 @@ interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * arrow.core.extensions.either.bicrosswalk.bicrosswalk
+   * import arrow.core.extensions.either.bicrosswalk.bicrosswalk
    * import arrow.core.extensions.listk.align.align
    * import arrow.core.*
    *
