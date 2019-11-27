@@ -22,7 +22,7 @@ structure through an alignable functor.
 
 ```kotlin:ank
 import arrow.core.extensions.*
-import arrow.core.extensions.bicrosswalk
+import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.listk.align.align
 import arrow.core.*
 
@@ -38,7 +38,7 @@ Either.bicrosswalk().run {
 
 ```kotlin:ank
 import arrow.core.extensions.*
-import arrow.core.extensions.bicrosswalk
+import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.listk.align.align
 import arrow.core.*
 
