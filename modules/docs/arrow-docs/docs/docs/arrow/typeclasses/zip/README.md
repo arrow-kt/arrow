@@ -35,7 +35,7 @@ ListK.zip().run {
 #### zipWith
 
 Combines to structures by taking the intersection of their shapes
-and combining the elements with the given function.
+and then combines the elements with the given function.
 
 `fun <A, B, C> Kind<F, A>.zipWith(other: Kind<F, B>, f: (A, B) -> C): Kind<F, C>`
 
