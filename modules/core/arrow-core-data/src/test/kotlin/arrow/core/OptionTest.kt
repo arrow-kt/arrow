@@ -21,7 +21,7 @@ import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.option.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.liftGen
+import arrow.test.generators.genK
 import arrow.test.generators.option
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
@@ -84,12 +84,12 @@ class OptionTest : UnitSpec() {
         Option.eqK()
       ),
       RepeatLaws.laws(Option.repeat(),
-        Option.liftGen(),
+        Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
       UnzipLaws.laws(Option.unzip(),
-        Option.liftGen(),
+        Option.genK(),
         Option.eqK(),
         Option.foldable()
       )

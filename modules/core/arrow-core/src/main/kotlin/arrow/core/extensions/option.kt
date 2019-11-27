@@ -13,6 +13,7 @@ import arrow.core.OptionOf
 import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.extensions.option.apply.apply
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
@@ -492,13 +493,7 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
 @extension
 interface OptionZip : Zip<ForOption>, OptionSemialign {
   override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    when (val l = this.fix()) {
-      is None -> None
-      is Some -> when (val r = other.fix()) {
-        is None -> None
-        is Some -> Option.just(l.t toT r.t)
-      }
-    }
+    Option.apply().tupled(this, other)
 }
 
 @extension

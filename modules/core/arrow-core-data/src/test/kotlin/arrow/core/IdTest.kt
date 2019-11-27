@@ -21,7 +21,7 @@ import arrow.core.extensions.id.unzip.unzip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.generators.liftGen
+import arrow.test.generators.genK
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
@@ -60,12 +60,12 @@ class IdTest : UnitSpec() {
         Id.foldable()
       ),
       RepeatLaws.laws(Id.repeat(),
-        Id.liftGen(),
+        Id.genK(),
         Id.eqK(),
         Id.foldable()
       ),
       UnzipLaws.laws(Id.unzip(),
-        Id.liftGen(),
+        Id.genK(),
         Id.eqK(),
         Id.foldable()
         )

@@ -16,7 +16,7 @@ import arrow.core.extensions.traverse
 import arrow.core.extensions.unalign
 import arrow.core.extensions.unzip
 import arrow.test.UnitSpec
-import arrow.test.generators.LiftGen
+import arrow.test.generators.genK
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.HashLaws
@@ -57,10 +57,7 @@ class SortedMapKTest : UnitSpec() {
         SortedMapK.foldable<String>()
       ),
       UnzipLaws.laws(SortedMapK.unzip<String>(),
-        object : LiftGen<SortedMapKPartialOf<String>> {
-          override fun <A> liftGen(gen: Gen<A>): Gen<Kind<SortedMapKPartialOf<String>, A>> =
-            Gen.sortedMapK(Gen.string(), gen) as Gen<Kind<SortedMapKPartialOf<String>, A>>
-        },
+        SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       )

@@ -21,7 +21,7 @@ import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.liftGen
+import arrow.test.generators.genK
 import arrow.test.generators.listK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
@@ -80,7 +80,7 @@ class ListKTest : UnitSpec() {
         ListK.foldable()
       ),
       UnzipLaws.laws(ListK.unzip(),
-        ListK.liftGen(),
+        ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
       )

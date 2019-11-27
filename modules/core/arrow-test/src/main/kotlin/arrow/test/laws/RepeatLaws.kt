@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.test.generators.LiftGen
+import arrow.test.generators.GenK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -13,39 +13,39 @@ import io.kotlintest.properties.forAll
 object RepeatLaws {
   fun <F> laws(
     RP: Repeat<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    ZipLaws.laws(RP, GEN, EQK) + repeatLaws(RP, GEN, EQK)
+    ZipLaws.laws(RP, GENK, EQK) + repeatLaws(RP, GENK, EQK)
 
   fun <F> laws(
     RP: Repeat<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = ZipLaws.laws(RP, GEN, EQK, FOLD) + repeatLaws(RP, GEN, EQK)
+  ) = ZipLaws.laws(RP, GENK, EQK, FOLD) + repeatLaws(RP, GENK, EQK)
 
   private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
     Eq { a, b ->
       EQK.run { a.eqK(b, EQ) }
     }
 
-  private fun <F, A> buildGen(LG: LiftGen<F>, gen: Gen<A>) =
+  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
     LG.run {
-      liftGen(gen)
+      genK(gen)
     }
 
   private fun <F> repeatLaws(
     RP: Repeat<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
     listOf(
       Law("RepeatLaws: zip with RHS repeat is neutral to the LHS") {
-        RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
+        RP.zipWithRhsRepeatIsNeutralToTheLhs(buildGen(GENK, Gen.int()), buildEq(EQK, Int.eq()))
       },
       Law("RepeatLaws: zip with LHS repeat is neutral to the RHS") {
-        RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GEN, Gen.int()), buildEq(EQK, Int.eq()))
+        RP.zipWithLhsRepeatIsNeutralToTheRhs(buildGen(GENK, Gen.int()), buildEq(EQK, Int.eq()))
       }
     )
 

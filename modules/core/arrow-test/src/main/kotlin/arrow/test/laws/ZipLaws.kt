@@ -8,7 +8,7 @@ import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.leftIor
 import arrow.core.toT
-import arrow.test.generators.LiftGen
+import arrow.test.generators.GenK
 import arrow.test.generators.tuple2
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -25,25 +25,25 @@ object ZipLaws {
 
   fun <F> laws(
     ZIP: Zip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(ZIP, buildGen(GEN, Gen.int()), EQK) + zipLaws(ZIP, GEN, EQK)
+    SemialignLaws.laws(ZIP, buildGen(GENK, Gen.int()), EQK) + zipLaws(ZIP, GENK, EQK)
 
   fun <F> laws(
     ZIP: Zip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.laws(ZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GEN, EQK)
+  ) = SemialignLaws.laws(ZIP, buildGen(GENK, Gen.int()), EQK, FOLD) + zipLaws(ZIP, GENK, EQK)
 
   private fun <F> zipLaws(
     ZIP: Zip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> {
-    val intGen = buildGen(GEN, Gen.int())
-    val tupleGen = buildGen(GEN, Gen.tuple2(Gen.int(), Gen.int()))
+    val intGen = buildGen(GENK, Gen.int())
+    val tupleGen = buildGen(GENK, Gen.tuple2(Gen.int(), Gen.int()))
 
     return listOf(
       Law("Zip Laws: Idempotency") { ZIP.idempotency(intGen, buildEq(EQK, intTupleEq)) },
@@ -67,9 +67,9 @@ object ZipLaws {
       EQK.run { a.eqK(b, EQ) }
     }
 
-  private fun <F, A> buildGen(LG: LiftGen<F>, gen: Gen<A>) =
+  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
     LG.run {
-      liftGen(gen)
+      genK(gen)
     }
 
   fun <F, A> Zip<F>.idempotency(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, Tuple2<A, A>>>) =

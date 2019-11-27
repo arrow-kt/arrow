@@ -19,7 +19,7 @@ import arrow.core.extensions.mapk.unalign.unalign
 import arrow.core.extensions.mapk.unzip.unzip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.generators.LiftGen
+import arrow.test.generators.genK
 import arrow.test.generators.mapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
@@ -62,10 +62,7 @@ class MapKTest : UnitSpec() {
         Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
         MapK.eqK(String.eq())),
       UnzipLaws.laws(MapK.unzip(),
-        object : LiftGen<MapKPartialOf<String>> {
-          override fun <A> liftGen(gen: Gen<A>): Gen<Kind<MapKPartialOf<String>, A>> =
-            Gen.mapK(Gen.string(), gen) as Gen<Kind<MapKPartialOf<String>, A>>
-        },
+        MapK.genK(Gen.string()),
         MapK.eqK(String.eq()),
         MapK.foldable()
       )

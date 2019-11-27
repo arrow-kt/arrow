@@ -20,7 +20,7 @@ import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
 import arrow.core.extensions.sequencek.unzip.unzip
 import arrow.test.UnitSpec
-import arrow.test.generators.liftGen
+import arrow.test.generators.genK
 import arrow.test.generators.sequenceK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -94,12 +94,12 @@ class SequenceKTest : UnitSpec() {
         SequenceK.foldable()
       ),
       RepeatLaws.laws(SequenceK.repeat(),
-        SequenceK.liftGen(),
+        SequenceK.genK(),
         EQK,
         SequenceK.foldable()
       ),
       UnzipLaws.laws(SequenceK.unzip(),
-        SequenceK.liftGen(),
+        SequenceK.genK(),
         EQK,
         SequenceK.foldable()
       )

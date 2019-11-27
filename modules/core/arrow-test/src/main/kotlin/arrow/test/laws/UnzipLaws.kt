@@ -5,7 +5,7 @@ import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
-import arrow.test.generators.LiftGen
+import arrow.test.generators.GenK
 import arrow.test.generators.tuple2
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -17,26 +17,26 @@ import io.kotlintest.properties.forAll
 object UnzipLaws {
   fun <F> laws(
     UNZIP: Unzip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(UNZIP, buildGen(GEN, Gen.int()), EQK) + unzipLaws(UNZIP, GEN, EQK)
+    SemialignLaws.laws(UNZIP, buildGen(GENK, Gen.int()), EQK) + unzipLaws(UNZIP, GENK, EQK)
 
   fun <F> laws(
     UNZIP: Unzip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ) = SemialignLaws.laws(UNZIP, buildGen(GEN, Gen.int()), EQK, FOLD) + unzipLaws(UNZIP, GEN, EQK)
+  ) = SemialignLaws.laws(UNZIP, buildGen(GENK, Gen.int()), EQK, FOLD) + unzipLaws(UNZIP, GENK, EQK)
 
   private fun <F> unzipLaws(
     UNZIP: Unzip<F>,
-    GEN: LiftGen<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> = listOf(
     Law("zip is inverse of unzip") {
       UNZIP.zipIsInverseOfUnzip(
-        buildGen(GEN, Gen.tuple2(Gen.int(), Gen.int())),
+        buildGen(GENK, Gen.tuple2(Gen.int(), Gen.int())),
         buildEq(EQK, Tuple2.eq(Int.eq(), Int.eq()))
       )
     },
@@ -44,7 +44,7 @@ object UnzipLaws {
       val intEq = buildEq(EQK, Int.eq())
 
       UNZIP.unipIsInverseOfZip(
-        buildGen(GEN, Gen.int()),
+        buildGen(GENK, Gen.int()),
         Tuple2.eq(intEq, intEq)
       )
     }
@@ -55,9 +55,9 @@ object UnzipLaws {
       EQK.run { a.eqK(b, EQ) }
     }
 
-  private fun <F, A> buildGen(LG: LiftGen<F>, gen: Gen<A>) =
+  private fun <F, A> buildGen(LG: GenK<F>, gen: Gen<A>) =
     LG.run {
-      liftGen(gen)
+      genK(gen)
     }
 
   fun <F, A, B> Unzip<F>.zipIsInverseOfUnzip(

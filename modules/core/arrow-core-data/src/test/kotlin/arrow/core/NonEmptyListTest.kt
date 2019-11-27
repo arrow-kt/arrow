@@ -18,7 +18,7 @@ import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.nonemptylist.unzip.unzip
 import arrow.test.UnitSpec
-import arrow.test.generators.liftGen
+import arrow.test.generators.genK
 import arrow.test.generators.nonEmptyList
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
@@ -60,7 +60,7 @@ class NonEmptyListTest : UnitSpec() {
         Nel.just(it)
       },
       UnzipLaws.laws(NonEmptyList.unzip(),
-        NonEmptyList.liftGen(),
+        NonEmptyList.genK(),
         NonEmptyList.eqK(),
         NonEmptyList.foldable()
       )
