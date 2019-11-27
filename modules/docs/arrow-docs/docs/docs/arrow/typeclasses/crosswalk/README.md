@@ -74,7 +74,7 @@ import arrow.typeclasses.Crosswalk
 TypeClass(Crosswalk::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Align)
+ank_macro_hierarchy(arrow.typeclasses.Crosswalk)
 
 [functor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Crosswalk.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/CrosswalkLaws.kt
