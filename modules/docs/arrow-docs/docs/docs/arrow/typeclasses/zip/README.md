@@ -17,7 +17,7 @@ The `Zip` typeclass extends the `Semialign` typeclass with an function that take
 
 #### zip
 
-Combines to structures by taking the intersection of their shapes 
+Combines two structures by taking the intersection of their shapes 
 and using `Tuple2` to hold the elements.
 
 `fun <A, B> Kind<F, A>.zip(other: Kind<F, B>): Kind<F, Tuple2<A, B>>`
