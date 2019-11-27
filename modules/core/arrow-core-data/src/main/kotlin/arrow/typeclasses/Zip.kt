@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Tuple2
 
 /**
- * Zip is a typeclass that extends Functor by providing a zip operation that takes the intersection of non-uniform shapes.
+ * Zip is a typeclass that extends a Functor by providing a zip operation that takes the intersection of non-uniform shapes.
  */
 interface Zip<F> : Semialign<F> {
   /**
