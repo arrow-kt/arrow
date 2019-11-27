@@ -6,7 +6,7 @@ redirect_from:
   - /docs/typeclasses/crosswalk/
 ---
 
-## Align
+## Crosswalk
 
 {:.beginner}
 beginner
