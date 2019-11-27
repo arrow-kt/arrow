@@ -11,7 +11,7 @@ redirect_from:
 {:.beginner}
 beginner
 
-The `Zip` typeclass extends the `Semialign` typeclass with an function that takes the intersection of non-uniform shapes.
+The `Zip` typeclass extends the `Semialign` typeclass with a function that takes the intersection of non-uniform shapes.
 
 ### Main Combinators
 
