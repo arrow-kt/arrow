@@ -5,17 +5,24 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForSequenceK
 import arrow.core.Ior
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.Tuple2
+import arrow.core.extensions.eval.applicative.applicative
+import arrow.core.extensions.sequence.foldable.firstOption
+import arrow.core.extensions.sequence.foldable.foldLeft
+import arrow.core.extensions.sequence.foldable.foldRight
 import arrow.core.extensions.sequence.foldable.isEmpty
 import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
+import arrow.core.toOption
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
@@ -60,9 +67,7 @@ interface SequenceKMonoidal : Monoidal<ForSequenceK>, SequenceKSemigroupal {
 }
 
 @extension
-interface SequenceKMonoid<A> : Monoid<SequenceK<A>> {
-  override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
-
+interface SequenceKMonoid<A> : Monoid<SequenceK<A>>, SequenceKSemigroup<A> {
   override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }
 
@@ -71,10 +76,15 @@ interface SequenceKEq<A> : Eq<SequenceK<A>> {
 
   fun EQ(): Eq<A>
 
-  override fun SequenceK<A>.eqv(b: SequenceK<A>): Boolean =
-    zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
-      acc && bool
-    }
+  /**
+   * This only evaluates up to the first element that differs or to the first element at the index where the other
+   *  sequence is empty
+   */
+  override fun SequenceK<A>.eqv(b: SequenceK<A>): Boolean = object : SequenceKSemialign {}.run {
+    alignWith(this@eqv, b) { ior ->
+      ior.fold({ false }, { false }, { l, r -> EQ().run { l.eqv(r) } })
+    }.firstOption { it.not() }.isEmpty()
+  }
 }
 
 @extension
@@ -144,21 +154,28 @@ interface SequenceKFoldable : Foldable<ForSequenceK> {
 
   override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
+
+  // overrides for laziness
+  override fun <A, B> Kind<ForSequenceK, A>.reduceLeftToOption(f: (A) -> B, g: (B, A) -> B): Option<B> =
+    fix().firstOption().map { fix().drop(1).foldLeft(f(it), g) }
+
+  override fun <A, B> Kind<ForSequenceK, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+    fix().firstOption().traverse(Eval.applicative()) { fix().drop(1).foldRight(Eval.now(f(it)), g) }.fix()
+
+  override fun <A> Kind<ForSequenceK, A>.get(idx: Long): Option<A> =
+    if (idx < 0) None
+    else fix().drop(idx.toInt()).firstOption()
+
+  override fun <A> Kind<ForSequenceK, A>.firstOption(): Option<A> = fix().firstOrNull().toOption()
+
+  override fun <A> Kind<ForSequenceK, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
+    fix().firstOrNull(predicate).toOption()
 }
 
 @extension
-interface SequenceKTraverse : Traverse<ForSequenceK> {
-  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
-
+interface SequenceKTraverse : Traverse<ForSequenceK>, SequenceKFoldable {
   override fun <G, A, B> Kind<ForSequenceK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     fix().traverse(AP, f)
-
-  override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
-    fix().foldLeft(b, f)
-
-  override fun <A, B> Kind<ForSequenceK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().foldRight(lb, f)
 }
 
 @extension
@@ -188,12 +205,9 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
 }
 
 @extension
-interface SequenceKFunctorFilter : FunctorFilter<ForSequenceK> {
+interface SequenceKFunctorFilter : FunctorFilter<ForSequenceK>, SequenceKFunctor {
   override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
 }
 
 @extension
@@ -248,6 +262,16 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
 
   override fun <A> just(a: A): SequenceK<A> =
     SequenceK.just(a)
+}
+
+fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
+  SequenceK.monad().fx.monad(c).fix()
+
+@extension
+interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative {
+  override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
+  override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
+    (this.fix() + b.fix()).k()
 
   override fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
     if (this.fix().isEmpty()) SequenceK.empty()
@@ -274,16 +298,6 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
     }.k()
 }
 
-fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
-  SequenceK.monad().fx.monad(c).fix()
-
-@extension
-interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative {
-  override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
-  override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
-    (this.fix() + b.fix()).k()
-}
-
 @extension
 interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
   override fun <A, B> align(a: Kind<ForSequenceK, A>, b: Kind<ForSequenceK, B>): Kind<ForSequenceK, Ior<A, B>> =
@@ -298,7 +312,7 @@ interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
         fun <X> Iterator<X>.tryNext(): Option<X> = if (hasNext()) next().some() else Option.empty()
 
         override fun next(): Ior<A, B> =
-          Ior.fromOptions(leftIterator.tryNext(), rightIterator.tryNext()).toList().first()
+          Ior.fromOptions(leftIterator.tryNext(), rightIterator.tryNext()).orNull()!!
       }
     }.k()
 }

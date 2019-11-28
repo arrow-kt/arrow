@@ -23,6 +23,12 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { loop(this) }
   }
 
+  /**
+   * Note: This will always evaluate the entire sequence because it uses applicative internally which
+   *  takes only strict arguments. This will fail on infinite sequences. If you need this to work on
+   *  infinite sequences your best bet is to define a new traverse instance together with a lazy version of
+   *  ap from Applicative for whatever applicative you want to use.
+   */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() } }
@@ -36,7 +42,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     }
 
   fun <B> filterMap(f: (A) -> Option<B>): SequenceK<B> =
-    map(f).foldLeft(empty(), { acc: SequenceK<B>, o: Option<B> -> o.fold({ acc }, { b: B -> acc + b }).k() })
+    map(f).filter { it.isDefined() }.map { it.orNull()!! }.k()
 
   fun toList(): List<A> = this.fix().sequence.toList()
 
