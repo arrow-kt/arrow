@@ -41,6 +41,7 @@ jobs:
         set -ex
         sudo pip install awscli
         aws --version
+        sudo apt-get update
         sudo apt-get install ruby-dev
         sudo gem install bundler --force
         sudo gem update --system
