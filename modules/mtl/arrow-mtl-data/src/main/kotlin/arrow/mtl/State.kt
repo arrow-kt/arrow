@@ -36,7 +36,7 @@ typealias StatePartialOf<S> = StateTPartialOf<ForId, S>
 /**
  * `State<S, A>` is a stateful computation that yields a value of type `A`.
  *
- * @param S the state we are preforming computation upon.
+ * @param S the state we are performing computation upon.
  * @param A current value of computation.
  */
 typealias State<S, A> = StateT<ForId, S, A>

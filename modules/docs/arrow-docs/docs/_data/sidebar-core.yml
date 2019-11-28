@@ -127,6 +127,9 @@ options:
       - title: Eq
         url: /docs/arrow/typeclasses/eq/
 
+      - title: EqK
+        url: /docs/arrow/typeclasses/eqk/
+
       - title: Hash
         url: /docs/arrow/typeclasses/hash/
 
@@ -228,6 +231,15 @@ options:
 
       - title: Const
         url: /docs/arrow/typeclasses/const/
+
+      - title: Semialign
+        url: /docs/arrow/typeclasses/semialign/
+
+      - title: Align
+        url: /docs/arrow/typeclasses/align/
+
+      - title: Unalign
+        url: /docs/arrow/typeclasses/unalign/
 
   - title: Integrations
 

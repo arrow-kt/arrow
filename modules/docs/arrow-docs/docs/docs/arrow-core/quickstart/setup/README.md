@@ -8,11 +8,17 @@ permalink: /docs/quickstart/setup/
 
 ### Next development version
 
-If you want to try the last features, replace `0.10.0` by `0.10.1-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.10.3` by `0.10.4-SNAPSHOT` in the following guideline.
 
 ### JDK
 
 Make sure to have the latest version of JDK 1.8 installed.
+
+### Android
+
+Arrow supports Android out of the box starting on API 21 and up.
+
+We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
 
 ### Gradle
 
@@ -38,7 +44,7 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.0"
+def arrow_version = "0.10.3"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -51,7 +57,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.0"
+def arrow_version = "0.10.3"
 dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -64,7 +70,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.0"
+def arrow_version = "0.10.3"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -77,7 +83,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.0"
+def arrow_version = "0.10.3"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-optics:$arrow_version"
@@ -99,7 +105,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.0"
+def arrow_version = "0.10.3"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
@@ -142,7 +148,7 @@ Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-     <arrow.version>0.10.0</arrow.version>
+     <arrow.version>0.10.3</arrow.version>
 </properties>
 ```
 

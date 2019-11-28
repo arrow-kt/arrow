@@ -3,19 +3,27 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eqK.eqK
+import arrow.core.extensions.listk.foldable.foldable
+
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.monoidal.monoidal
+import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
+import arrow.test.laws.AlignLaws
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
@@ -24,8 +32,12 @@ import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnalignLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import kotlin.math.max
+import kotlin.math.min
 
 class ListKTest : UnitSpec() {
   val applicative = ListK.applicative()
@@ -47,8 +59,52 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
-      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
+      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
+      EqKLaws.laws(
+        ListK.eqK(),
+        ListK.eq(Int.eq()) as Eq<Kind<ForListK, Int>>,
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>
+      ) {
+        ListK.just(it)
+      },
+      AlignLaws.laws(ListK.align(),
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.eqK(),
+        ListK.foldable()
+      ),
+      UnalignLaws.laws(ListK.unalign(),
+        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.eqK()
+      )
     )
+
+    "can align lists with different lengths" {
+      forAll(Gen.listK(Gen.bool()), Gen.listK(Gen.bool())) { a, b ->
+        ListK.semialign().run {
+          align(a, b).fix().size == max(a.size, b.size)
+        }
+      }
+
+      forAll(Gen.listK(Gen.bool()), Gen.listK(Gen.bool())) { a, b ->
+        ListK.semialign().run {
+          align(a, b).fix().take(min(a.size, b.size)).all {
+            it.isBoth
+          }
+        }
+      }
+
+      forAll(Gen.listK(Gen.bool()), Gen.listK(Gen.bool())) { a, b ->
+        ListK.semialign().run {
+          align(a, b).fix().drop(min(a.size, b.size)).all {
+            if (a.size < b.size) {
+              it.isRight
+            } else {
+              it.isLeft
+            }
+          }
+        }
+      }
+    }
   }
 
   private fun bijection(from: Kind<ForListK, Tuple2<Tuple2<Int, Int>, Int>>): ListK<Tuple2<Int, Tuple2<Int, Int>>> =
