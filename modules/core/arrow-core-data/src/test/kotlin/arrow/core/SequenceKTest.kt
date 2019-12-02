@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.extensions.alignSequenceWith
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.sequencek.align.align
@@ -30,6 +31,7 @@ import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
@@ -139,6 +141,20 @@ class SequenceKTest : UnitSpec() {
 
           element == Ior.Both("A", idx)
         }
+      }
+    }
+
+    "alignSequenceWitb" {
+      val genA = Gen.sequenceK(Gen.int())
+      val genB = Gen.sequenceK(Gen.string())
+      forAll(genA, genB) { a, b ->
+
+        val aligned = a.alignSequenceWith(b) {
+          it
+        }
+
+        a.equalUnderTheLaw(aligned.filterMap { it.toLeftOption() }, SequenceK.eq(Int.eq())) &&
+          b.equalUnderTheLaw(aligned.filterMap { it.toOption() }, SequenceK.eq(String.eq()))
       }
     }
   }

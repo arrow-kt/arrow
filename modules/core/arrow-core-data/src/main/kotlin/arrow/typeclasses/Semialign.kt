@@ -60,7 +60,7 @@ interface Semialign<F> : Functor<F> {
   fun <A, B, C> alignWith(a: Kind<F, A>, b: Kind<F, B>, fa: (Ior<A, B>) -> C): Kind<F, C> = align(a, b).map(fa)
 
   /**
-   * aligns two structures and combine with the given Semigroup
+   * aligns two structures and combine them with the given Semigroups '+'
    */
   fun <A> Kind<F, A>.salign(
     SG: Semigroup<A>,

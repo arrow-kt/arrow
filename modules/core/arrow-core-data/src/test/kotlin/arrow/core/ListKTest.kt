@@ -19,6 +19,10 @@ import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
+import arrow.core.extensions.lpadZip
+import arrow.core.extensions.lpadZipWith
+import arrow.core.extensions.rpadZip
+import arrow.core.extensions.rpadZipWith
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
@@ -33,6 +37,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -103,6 +108,54 @@ class ListKTest : UnitSpec() {
             }
           }
         }
+      }
+    }
+
+    "lpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result = ListK.semialign().run {
+          a.lpadZip(b)
+        }
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "lpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result = ListK.semialign().run {
+          a.lpadZipWith(b) { a, b ->
+            a toT b
+          }
+        }
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result = ListK.semialign().run {
+          a.rpadZip(b)
+        }
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result = ListK.semialign().run {
+          a.rpadZipWith(b) { a, b ->
+            a toT b
+          }
+        }
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
       }
     }
   }

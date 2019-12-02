@@ -11,8 +11,9 @@ import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.functorFilter.flattenOption
 import arrow.core.extensions.listk.monad.monad
-import arrow.core.extensions.listk.semigroup.plus
+import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.leftIor
@@ -43,7 +44,6 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
-import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
 @extension
@@ -320,6 +320,44 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
     else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
   }
 }
+
+/**
+ * Left-padded zipWith.
+ */
+fun <A, B, C> ListK<A>.lpadZipWith(
+  other: ListK<B>,
+  fab: (Option<A>, B) -> C
+): ListK<C> =
+  ListK.semialign().run {
+    this@lpadZipWith.padZipWith(other) { a, b -> b.map { fab(a, it) } }.flattenOption()
+  }
+
+/**
+ * Left-padded zip.
+ */
+fun <A, B> ListK<A>.lpadZip(
+  other: ListK<B>
+): ListK<Tuple2<Option<A>, B>> =
+  this.lpadZipWith(other) { a, b -> a toT b }
+
+/**
+ * Right-padded zipWith.
+ */
+fun <A, B, C> ListK<A>.rpadZipWith(
+  other: ListK<B>,
+  fa: (A, Option<B>) -> C
+): ListK<C> =
+  other.lpadZipWith(this) { a, b -> fa(b, a) }
+
+/**
+ * Right-padded zip.
+ */
+fun <A, B> ListK<A>.rpadZip(
+  other: ListK<B>
+): ListK<Tuple2<A, Option<B>>> =
+  this.rpadZipWith(other) { a, b ->
+    a toT b
+  }
 
 @extension
 interface ListKAlign : Align<ForListK>, ListKSemialign {
