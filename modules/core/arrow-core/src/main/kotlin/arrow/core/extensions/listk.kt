@@ -14,6 +14,7 @@ import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.functorFilter.flattenOption
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semialign.semialign
+import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.leftIor
@@ -44,6 +45,7 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
 @extension
