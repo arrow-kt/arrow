@@ -93,6 +93,22 @@ class QueueTest : UnitSpec() {
         }
       }
 
+      "$label - offering to a 0 capacity queue in deficit honours blocking strategy" {
+          IO.fx {
+            val q = !queue(0)
+            val first = !q.take().fork(ctx)  // flip from initial Surplus state to Deficit
+            !q.offer(1)                      // then clear previous taker while staying in Deficit
+            !first.join()
+            val start = !effect { System.currentTimeMillis() }
+            val wontComplete = q.offer(2)
+            val received = !wontComplete.map { Some(it) }
+              .waitFor(100.milliseconds, default = just(None))
+            val elapsed = !effect { System.currentTimeMillis() - start }
+            !effect { received shouldBe None }
+            !effect { (elapsed >= 100) shouldBe true }
+          }.unsafeRunSync()
+      }
+
       "$label - multiple take calls on an empty queue complete when until as many offer calls made to queue" {
         forAll(Gen.tuple3(Gen.int(), Gen.int(), Gen.int())) { t ->
           IO.fx {

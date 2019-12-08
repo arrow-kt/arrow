@@ -18,41 +18,18 @@ import arrow.typeclasses.ApplicativeError
  *
  * ported from Scala ZIO Queue implementation
  */
-class Queue<F, A> private constructor(private val capacity: Int, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
+class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A>, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
   Concurrent<F> by CF {
 
   fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
 
-  private sealed class State<F, out A> {
-    abstract fun size(): Kind<F, Int>
-
-    internal data class Deficit<F, A>(val takers: IQueue<Promise<F, A>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
-      override fun size(): Kind<F, Int> = AP.just(-takers.length())
-    }
-
-    internal data class Surplus<F, A>(val queue: IQueue<A>, val putters: IQueue<Tuple2<A, Promise<F, Unit>>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
-      override fun size(): Kind<F, Int> = AP.just(queue.length() + putters.length())
-    }
-
-    internal data class Shutdown<F>(val AE: ApplicativeError<F, Throwable>) : State<F, Nothing>() {
-      override fun size(): Kind<F, Int> = AE.raiseError(QueueShutdown)
-    }
-  }
-
   fun offer(a: A): Kind<F, Unit> {
     val use: (Promise<F, Unit>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
       state.fold(
-        ifSurplus = { surplus ->
-          surplus.run {
-            if (queue.length() < capacity && putters.isEmpty())
-              p.complete(Unit) toT copy(queue = queue.enqueue(a))
-            else
-              unit() toT copy(putters = putters.enqueue(a toT p))
-          }
-        },
+        ifSurplus = { surplus -> strategy.handleSurplus(p, surplus, a) },
         ifDeficit = { deficit ->
           deficit.takers.dequeueOption().fold(
-            { p.complete(Unit) toT State.Surplus(IQueue.empty<A>().enqueue(a), IQueue.empty(), CF, deficit.shutdownHook) },
+            { strategy.handleSurplus(p, State.Surplus(IQueue.empty(), IQueue.empty(), CF, deficit.shutdownHook), a) },
             { (taker, takers) ->
               taker.complete(a).followedBy(p.complete(Unit)) toT deficit.copy(takers = takers)
             }
@@ -165,7 +142,7 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
      */
     fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
       Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
-        Queue(capacity, it, this)
+        Queue(SurplusStrategy.Blocking(capacity, this), it, this)
       }
     }
   }
@@ -198,6 +175,36 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
         ifShutdown = ::identity
       )
     }
+
+  private sealed class State<F, out A> {
+    abstract fun size(): Kind<F, Int>
+
+    internal data class Deficit<F, A>(val takers: IQueue<Promise<F, A>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
+      override fun size(): Kind<F, Int> = AP.just(-takers.length())
+    }
+
+    internal data class Surplus<F, A>(val queue: IQueue<A>, val putters: IQueue<Tuple2<A, Promise<F, Unit>>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
+      override fun size(): Kind<F, Int> = AP.just(queue.length() + putters.length())
+    }
+
+    internal data class Shutdown<F>(val AE: ApplicativeError<F, Throwable>) : State<F, Nothing>() {
+      override fun size(): Kind<F, Int> = AE.raiseError(QueueShutdown)
+    }
+  }
+
+  private sealed class SurplusStrategy<F, A> {
+    abstract fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>>
+
+    internal data class Blocking<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {
+      override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
+        surplus.run {
+          if (queue.length() < capacity && putters.isEmpty())
+            p.complete(Unit) toT copy(queue = queue.enqueue(a))
+          else
+            AP.unit() toT copy(putters = putters.enqueue(a toT p))
+        }
+    }
+  }
 }
 
 object QueueShutdown : RuntimeException() {
