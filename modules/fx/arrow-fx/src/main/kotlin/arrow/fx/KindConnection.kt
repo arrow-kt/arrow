@@ -25,6 +25,8 @@ object ConnectionCancellationException : JavaCancellationException("User cancell
  *
  * The cancellation functions are maintained in a stack and executed in a FIFO order.
  */
+@Deprecated(message = "Cancelling operations through KindConnection will not be supported anymore." +
+  "In case you need to cancel multiple processes can do so by using cancelable and composing cancel operations using parMapN")
 sealed class KindConnection<F> {
 
   /**
