@@ -2,12 +2,11 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.fx.internal.JavaCancellationException
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.MonadDefer
 import arrow.typeclasses.Applicative
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-
-typealias CancelToken<F> = Kind<F, Unit>
 
 enum class OnCancel { ThrowCancellationException, Silent;
 
