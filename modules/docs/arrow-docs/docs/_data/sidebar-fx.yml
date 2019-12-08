@@ -41,6 +41,9 @@ options:
       - title: Resource
         url: /docs/apidocs/arrow-fx/arrow.fx/-resource/
 
+      - title: Queue
+        url: /docs/effects/queue/
+
   - title: Type Classes
 
     nested_options:
