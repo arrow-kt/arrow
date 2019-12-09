@@ -1,13 +1,9 @@
 package arrow.fx.rx2
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
-
-typealias MaybeKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-typealias MaybeKProcF<A> = ((Either<Throwable, A>) -> Unit) -> Kind<ForMaybeK, Unit>
 
 /**
  * Connection for [MaybeK].

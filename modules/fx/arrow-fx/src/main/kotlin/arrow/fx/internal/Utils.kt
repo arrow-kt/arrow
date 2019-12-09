@@ -8,8 +8,8 @@ import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
+import arrow.fx.IOConnection
 import arrow.fx.IOOf
-import arrow.fx.KindConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
@@ -139,7 +139,7 @@ object Platform {
     }
   }
 
-  inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
+  internal inline fun <A> onceOnly(conn: IOConnection, crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBooleanW(false)
 
     return { a ->

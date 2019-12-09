@@ -5,9 +5,6 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-typealias ObservableKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-typealias ObservableKProcF<A> = ((Either<Throwable, A>) -> Unit) -> ObservableKOf<Unit>
-
 /**
  * Connection for [ObservableK].
  *

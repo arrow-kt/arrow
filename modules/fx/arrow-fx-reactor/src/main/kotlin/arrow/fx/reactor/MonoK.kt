@@ -1,13 +1,16 @@
 package arrow.fx.reactor
 
 import arrow.core.Either
-import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.internal.AtomicBooleanW
+import arrow.core.internal.AtomicRefW
+import arrow.core.nonFatalOrThrow
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import reactor.core.publisher.Mono
@@ -155,35 +158,9 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
-    /**
-     * Creates a [MonoK] that'll run [MonoKProc].
-     *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.fx.reactor.MonoK
-     * import arrow.fx.reactor.MonoKConnection
-     * import arrow.fx.reactor.value
-     *
-     * class Resource {
-     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
-     *   fun close(): Unit = Unit
-     * }
-     *
-     * fun main(args: Array<String>) {
-     *   //sampleStart
-     *   val result = MonoK.async { conn: MonoKConnection, cb: (Either<Throwable, String>) -> Unit ->
-     *     val resource = Resource()
-     *     conn.push(MonoK { resource.close() })
-     *     resource.asyncRead { value -> cb(value.right()) }
-     *   }
-     *   //sampleEnd
-     *   result.value().subscribe(::println)
-     * }
-     * ```
-     */
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelable instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated async")
     fun <A> async(fa: MonoKProc<A>): MonoK<A> =
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
@@ -203,6 +180,47 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
         }
       }.k()
 
+    /**
+     * Constructor for wrapping uncancelable async operations.
+     * It's safe to wrap unsafe operations in this constructor
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.fx.reactor.MonoK
+     * import arrow.fx.reactor.MonoKConnection
+     * import arrow.fx.reactor.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = MonoK.async { cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): MonoK<A> =
+      Mono.create<A> { sink ->
+          fa { either: Either<Throwable, A> ->
+            either.fold({
+              sink.error(it)
+            }, {
+              sink.success(it)
+            })
+          }
+      }.k()
+
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelableF instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated asyncF")
     fun <A> asyncF(fa: MonoKProcF<A>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
@@ -220,6 +238,90 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
             sink.success(it)
           })
         }.fix().mono.subscribe({}, sink::error)
+      }.k()
+
+    fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>): MonoK<A> =
+      Mono.create { sink: MonoSink<A> ->
+        fa { either: Either<Throwable, A> ->
+          either.fold({
+            sink.error(it)
+          }, {
+            sink.success(it)
+          })
+        }.fix().mono.subscribe({}, sink::error)
+      }.k()
+
+    /**
+     * Creates a [MonoK] that'll wraps/runs a cancelable operation.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.fx.rx2.*
+     *
+     * typealias Disposable = () -> Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Disposable {
+     *     f("Some value of a resource")
+     *     return { Unit }
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = SingleK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     val disposable = nw.async { result -> cb(Right(result)) }
+     *     SingleK { disposable.invoke() }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println, ::println)
+     * }
+     * ```
+     */
+    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMonoK>): MonoK<A> =
+      Mono.create { sink: MonoSink<A> ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold(sink::error, sink::success)
+        }
+
+        val token = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(Unit)
+        }
+
+        sink.onDispose { token.value().subscribe({}, sink::error) }
+      }.k()
+
+    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<CancelToken<ForMonoK>>): MonoK<A> =
+      Mono.create { sink: MonoSink<A> ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold(sink::error, sink::success)
+        }
+
+        val fa2 = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(just(Unit))
+        }
+
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForMonoK>>?>(null)
+        val disp = fa2.value().subscribe({ token ->
+          val cancel = cancelOrToken.getAndSet(Right(token))
+          cancel?.fold({
+            token.value().subscribe({}, sink::error)
+          }, { Unit })
+        }, sink::error)
+
+        sink.onDispose {
+          disp.dispose()
+          val token = cancelOrToken.getAndSet(Left(Unit))
+          token?.fold({}, {
+            it.value().subscribe({}, sink::error)
+          })
+        }
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {

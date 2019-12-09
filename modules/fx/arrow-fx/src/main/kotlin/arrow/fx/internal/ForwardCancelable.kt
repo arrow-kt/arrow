@@ -2,7 +2,7 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
-import arrow.fx.CancelToken
+
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
@@ -10,13 +10,14 @@ import arrow.fx.IORunLoop
 import arrow.fx.fix
 import arrow.fx.internal.ForwardCancelable.Companion.State.Active
 import arrow.fx.internal.ForwardCancelable.Companion.State.Empty
+import arrow.fx.typeclasses.CancelToken
 import kotlinx.atomicfu.atomic
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
  * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
-class ForwardCancelable {
+internal class ForwardCancelable {
 
   private val state = atomic<State>(init)
 

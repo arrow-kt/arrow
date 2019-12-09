@@ -5,9 +5,6 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-typealias SingleKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-typealias SingleKProcF<A> = ((Either<Throwable, A>) -> Unit) -> SingleKOf<Unit>
-
 /**
  * Connection for [SingleK].
  *

@@ -23,6 +23,7 @@ import arrow.fx.internal.Platform.unsafeResync
 import arrow.fx.internal.ShiftTick
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.internal.scheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
@@ -1041,7 +1042,7 @@ sealed class IO<out A> : IOOf<A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
+      internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
 
       internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }

@@ -7,10 +7,11 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.fx.CancelToken
+
 import arrow.fx.MVar
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.CancelableMVar.Companion.State.WaitForTake
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
