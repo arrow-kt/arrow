@@ -198,9 +198,8 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = FluxK.async { cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
-     *     conn.push(FluxK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd

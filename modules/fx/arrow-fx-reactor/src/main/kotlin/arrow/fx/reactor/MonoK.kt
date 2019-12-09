@@ -200,7 +200,6 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      *   //sampleStart
      *   val result = MonoK.async { cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
-     *     conn.push(MonoK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
