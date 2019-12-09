@@ -3,6 +3,7 @@
 // -----------------------------------------------
 
 #wrapper {
+    background: #ecf0fc;
     padding-left: 250px;
     transition: padding 0.4s ease-in-out;
     &.toggled {
@@ -68,6 +69,7 @@
     #wrapper.toggled {
         #sidebar-wrapper {
             left: 0;
+            top: 0;
             width: 100%;
 
             .sidebar-toggle {
@@ -81,9 +83,24 @@
                 }
             }
         }
+
+        #doc-wrapper {
+          height: 100vh;
+          overflow: hidden;
+        }
+
+    }
+
+    #topWarning ~ #wrapper.toggled #doc-wrapper {
+      height: calc(100vh - 43px);
     }
 }
 
 #doc-wrapper {
+    min-height: 100vh;
     width: 100%;
+}
+
+#topWarning ~ #wrapper #doc-wrapper {
+    min-height: calc(100vh - 43px);
 }

@@ -1,9 +1,18 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.toT
 
 /**
- * [PLens] to focus into the first value of a [arrow.Tuple2]
+ * [PLens] to focus into the first value of a [arrow.core.Tuple2]
  */
 fun <A, B, R> Tuple2.Companion.pFirst(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
   get = { it.a },
@@ -11,12 +20,12 @@ fun <A, B, R> Tuple2.Companion.pFirst(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R>
 )
 
 /**
- * [Lens] to focus into the first value of a [arrow.Tuple2]
+ * [Lens] to focus into the first value of a [arrow.core.Tuple2]
  */
 fun <A, B> Tuple2.Companion.first(): Lens<Tuple2<A, B>, A> = pFirst()
 
 /**
- * [PLens] to focus into the second value of a [arrow.Tuple2]
+ * [PLens] to focus into the second value of a [arrow.core.Tuple2]
  */
 fun <A, B, R> Tuple2.Companion.pSecond(): PLens<Tuple2<A, B>, Tuple2<A, R>, B, R> = PLens(
   get = { it.b },
@@ -24,12 +33,12 @@ fun <A, B, R> Tuple2.Companion.pSecond(): PLens<Tuple2<A, B>, Tuple2<A, R>, B, R
 )
 
 /**
- * [Lens] to focus into the second value of a [arrow.Tuple2]
+ * [Lens] to focus into the second value of a [arrow.core.Tuple2]
  */
 fun <A, B> Tuple2.Companion.second(): Lens<Tuple2<A, B>, B> = pSecond()
 
 /**
- * [PTraversal] to focus into the first and second value of a [arrow.Tuple2]
+ * [PTraversal] to focus into the first and second value of a [arrow.core.Tuple2]
  */
 fun <A, B> Tuple2.Companion.pTraversal(): PTraversal<Tuple2<A, A>, Tuple2<B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -38,12 +47,12 @@ fun <A, B> Tuple2.Companion.pTraversal(): PTraversal<Tuple2<A, A>, Tuple2<B, B>,
 )
 
 /**
- * [Traversal] to focus into the first and second value of a [arrow.Tuple2]
+ * [Traversal] to focus into the first and second value of a [arrow.core.Tuple2]
  */
 fun <A> Tuple2.Companion.traversal(): Traversal<Tuple2<A, A>, A> = pTraversal()
 
 /**
- * [PLens] to focus into the first value of a [arrow.Tuple3]
+ * [PLens] to focus into the first value of a [arrow.core.Tuple3]
  */
 fun <A, B, C, R> Tuple3.Companion.pFirst(): PLens<Tuple3<A, B, C>, Tuple3<R, B, C>, A, R> = PLens(
   get = { it.a },
@@ -51,12 +60,12 @@ fun <A, B, C, R> Tuple3.Companion.pFirst(): PLens<Tuple3<A, B, C>, Tuple3<R, B, 
 )
 
 /**
- * [Lens] to focus into the first value of a [arrow.Tuple3]
+ * [Lens] to focus into the first value of a [arrow.core.Tuple3]
  */
 fun <A, B, C> Tuple3.Companion.first(): Lens<Tuple3<A, B, C>, A> = pFirst()
 
 /**
- * [PLens] to focus into the second value of a [arrow.Tuple3]
+ * [PLens] to focus into the second value of a [arrow.core.Tuple3]
  */
 fun <A, B, C, R> Tuple3.Companion.pSecond(): PLens<Tuple3<A, B, C>, Tuple3<A, R, C>, B, R> = PLens(
   get = { it.b },
@@ -64,12 +73,12 @@ fun <A, B, C, R> Tuple3.Companion.pSecond(): PLens<Tuple3<A, B, C>, Tuple3<A, R,
 )
 
 /**
- * [Lens] to focus into the second value of a [arrow.Tuple3]
+ * [Lens] to focus into the second value of a [arrow.core.Tuple3]
  */
 fun <A, B, C> Tuple3.Companion.second(): Lens<Tuple3<A, B, C>, B> = pSecond()
 
 /**
- * [PLens] to focus into the third value of a [arrow.Tuple3]
+ * [PLens] to focus into the third value of a [arrow.core.Tuple3]
  */
 fun <A, B, C, R> Tuple3.Companion.pThird(): PLens<Tuple3<A, B, C>, Tuple3<A, B, R>, C, R> = PLens(
   get = { it.c },
@@ -77,12 +86,12 @@ fun <A, B, C, R> Tuple3.Companion.pThird(): PLens<Tuple3<A, B, C>, Tuple3<A, B, 
 )
 
 /**
- * [Lens] to focus into the third value of a [arrow.Tuple3]
+ * [Lens] to focus into the third value of a [arrow.core.Tuple3]
  */
 fun <A, B, C> Tuple3.Companion.third(): Lens<Tuple3<A, B, C>, C> = pThird()
 
 /**
- * [PTraversal] to focus into the first, second and third value of a [arrow.Tuple3]
+ * [PTraversal] to focus into the first, second and third value of a [arrow.core.Tuple3]
  */
 fun <A, B> Tuple3.Companion.pTraversal(): PTraversal<Tuple3<A, A, A>, Tuple3<B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -92,12 +101,12 @@ fun <A, B> Tuple3.Companion.pTraversal(): PTraversal<Tuple3<A, A, A>, Tuple3<B, 
 )
 
 /**
- * [Traversal] to focus into the first, second and third value of a [arrow.Tuple3]
+ * [Traversal] to focus into the first, second and third value of a [arrow.core.Tuple3]
  */
 fun <A> Tuple3.Companion.traversal(): Traversal<Tuple3<A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third and fourth value of a [arrow.Tuple4]
+ * [PTraversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
  */
 fun <A, B> Tuple4.Companion.pTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -108,12 +117,12 @@ fun <A, B> Tuple4.Companion.pTraversal(): PTraversal<Tuple4<A, A, A, A>, Tuple4<
 )
 
 /**
- * [Traversal] to focus into the first, second, third and fourth value of a [arrow.Tuple4]
+ * [Traversal] to focus into the first, second, third and fourth value of a [arrow.core.Tuple4]
  */
 fun <A> Tuple4.Companion.traversal(): Traversal<Tuple4<A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.Tuple5]
+ * [PTraversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
  */
 fun <A, B> Tuple5.Companion.pTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tuple5<B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -125,12 +134,12 @@ fun <A, B> Tuple5.Companion.pTraversal(): PTraversal<Tuple5<A, A, A, A, A>, Tupl
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth and fifth value of a [arrow.Tuple5]
+ * [Traversal] to focus into the first, second, third, fourth and fifth value of a [arrow.core.Tuple5]
  */
 fun <A> Tuple5.Companion.traversal(): Traversal<Tuple5<A, A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.Tuple6]
+ * [PTraversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
  */
 fun <A, B> Tuple6.Companion.pTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, Tuple6<B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -143,12 +152,12 @@ fun <A, B> Tuple6.Companion.pTraversal(): PTraversal<Tuple6<A, A, A, A, A, A>, T
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.Tuple6]
+ * [Traversal] to focus into the first, second, third, fourth, fifth and sixth value of a [arrow.core.Tuple6]
  */
 fun <A> Tuple6.Companion.traversal(): Traversal<Tuple6<A, A, A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.Tuple7]
+ * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
  */
 fun <A, B> Tuple7.Companion.pTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>, Tuple7<B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -162,12 +171,12 @@ fun <A, B> Tuple7.Companion.pTraversal(): PTraversal<Tuple7<A, A, A, A, A, A, A>
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.Tuple7]
+ * [Traversal] to focus into the first, second, third, fourth, fifth, sixth and seventh value of a [arrow.core.Tuple7]
  */
 fun <A> Tuple7.Companion.traversal(): Traversal<Tuple7<A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.Tuple8]
+ * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
  */
 fun <A, B> Tuple8.Companion.pTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A, A>, Tuple8<B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -182,12 +191,12 @@ fun <A, B> Tuple8.Companion.pTraversal(): PTraversal<Tuple8<A, A, A, A, A, A, A,
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.Tuple8]
+ * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh and eight value of a [arrow.core.Tuple8]
  */
 fun <A> Tuple8.Companion.traversal(): Traversal<Tuple8<A, A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.Tuple9]
+ * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
  */
 fun <A, B> Tuple9.Companion.pTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A, A, A>, Tuple9<B, B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -203,12 +212,12 @@ fun <A, B> Tuple9.Companion.pTraversal(): PTraversal<Tuple9<A, A, A, A, A, A, A,
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.Tuple9]
+ * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight and ninth value of a [arrow.core.Tuple9]
  */
 fun <A> Tuple9.Companion.traversal(): Traversal<Tuple9<A, A, A, A, A, A, A, A, A>, A> = pTraversal()
 
 /**
- * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.Tuple10]
+ * [PTraversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
  */
 fun <A, B> Tuple10.Companion.pTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, Tuple10<B, B, B, B, B, B, B, B, B, B>, A, B> = PTraversal(
   get1 = { it.a },
@@ -225,6 +234,6 @@ fun <A, B> Tuple10.Companion.pTraversal(): PTraversal<Tuple10<A, A, A, A, A, A, 
 )
 
 /**
- * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.Tuple10]
+ * [Traversal] to focus into the first, second, third, fourth, fifth, sixth, seventh, eight, ninth and tenth value of a [arrow.core.Tuple10]
  */
 fun <A> Tuple10.Companion.traversal(): Traversal<Tuple10<A, A, A, A, A, A, A, A, A, A>, A> = pTraversal()

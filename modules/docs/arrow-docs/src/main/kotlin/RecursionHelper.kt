@@ -113,8 +113,7 @@ fun <B, A : B> Kind<ForIntListPattern, A>.widen(): IntListPattern<B> = IntListPa
   widen<B, A>() as IntListPattern<B>
 }
 
-fun IntListPattern.Companion.functor(): IntListPatternFunctor = object : IntListPatternFunctor{
-
+fun IntListPattern.Companion.functor(): IntListPatternFunctor = object : IntListPatternFunctor {
 }
 
 sealed class IntTree

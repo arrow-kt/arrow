@@ -49,7 +49,5 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
       destFile = "IsoSecondaryConstructor.kt",
       processor = OpticsProcessor()
     ))
-
   }
-
 }

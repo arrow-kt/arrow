@@ -58,5 +58,4 @@ interface LabeledProductTypeClass<C> {
    * produce a type class instance for `F`.
    */
   fun <F, G> project(instance: () -> Kind<C, G>, to: (F) -> G, from: (G) -> F): Kind<C, F>
-
 }

@@ -1,22 +1,32 @@
 package arrow.free
 
-import arrow.core.*
-import arrow.data.NonEmptyList
-import arrow.data.fix
+import arrow.core.ForId
+import arrow.core.FunctionK
+import arrow.core.Id
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.extensions.id.foldable.foldable
+import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.id.traverse.traverse
+import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.option.monad.monad
+import arrow.core.value
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
+import arrow.free.extensions.free.foldable.foldable
+import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
+import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
-import arrow.core.extensions.id.monad.monad
-import arrow.data.extensions.nonemptylist.monad.monad
-import arrow.core.extensions.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
+import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -32,18 +42,17 @@ sealed class Ops<out A> : OpsOf<A> {
   }
 }
 
-@RunWith(KotlinTestRunner::class)
 class FreeTest : UnitSpec() {
 
-  private val program = Ops.binding {
+  private val program = Ops.fx.monad {
     val (added) = Ops.add(10, 10)
-    val subtracted = bind { Ops.subtract(added, 50) }
+    val subtracted = !Ops.subtract(added, 50)
     subtracted
   }.fix()
 
-  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.binding {
+  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.fx.monad {
     val (v) = Ops.add(n, 1)
-    val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
+    val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v)
     r
   }.fix()
 
@@ -56,13 +65,21 @@ class FreeTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ) { Ops.value(it) },
       MonadLaws.laws(Ops, EQ),
-      MonadLaws.laws(Free.monad(), EQ)
+      MonadLaws.laws(Free.monad(), EQ),
+      FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Free.eq(Id.monad(), FunctionK.id()))
     )
 
-    "Can interpret an ADT as Free operations" {
-      program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)
-      program.foldMap(idInterpreter, IdMonad).fix() shouldBe Id(-30)
-      program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).fix() shouldBe NonEmptyList.of(-30)
+    "Can interpret an ADT as Free operations to Option" {
+      program.foldMap(optionInterpreter, Option.monad()) shouldBe Some(-30)
+    }
+
+    "Can interpret an ADT as Free operations to Id" {
+      program.foldMap(idInterpreter, IdMonad) shouldBe Id(-30)
+    }
+
+    "Can interpret an ADT as Free operations to NonEmptyList" {
+      program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()) shouldBe NonEmptyList.of(-30)
     }
 
     "foldMap is stack safe" {
@@ -70,6 +87,5 @@ class FreeTest : UnitSpec() {
       val hugeProg = stackSafeTestProgram(0, n)
       hugeProg.foldMap(idInterpreter, IdMonad).value() shouldBe n
     }
-
   }
 }

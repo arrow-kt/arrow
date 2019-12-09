@@ -7,11 +7,11 @@ import arrow.core.Tuple4
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.maybe
-import arrow.data.ListK
-import arrow.data.Nel
-import arrow.data.fix
-import arrow.data.k
-import arrow.data.extensions.listk.traverse.traverse
+import arrow.core.ListK
+import arrow.core.Nel
+import arrow.core.fix
+import arrow.core.k
+import arrow.core.extensions.listk.traverse.traverse
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Traverse
 

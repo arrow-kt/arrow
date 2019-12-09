@@ -1,31 +1,33 @@
 package arrow.core
 
-import arrow.core.extensions.*
-import arrow.core.extensions.`try`.applicative.map
+import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.hash.hash
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.`try`.monoid.monoid
-import arrow.core.extensions.`try`.semigroup.semigroup
 import arrow.core.extensions.`try`.show.show
 import arrow.core.extensions.`try`.traverse.traverse
-import arrow.mtl.extensions.`try`.functorFilter.functorFilter
+import arrow.core.extensions.combine
+import arrow.core.extensions.eq
+import arrow.core.extensions.hash
+import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
-import arrow.test.laws.*
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.should
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }
@@ -36,12 +38,10 @@ class TryTest : UnitSpec() {
     val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
     testLaws(
-      SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
-      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any())) { Try.just(it) }
     )
 
@@ -59,15 +59,15 @@ class TryTest : UnitSpec() {
       val throwable1 = Exception("foo")
       val throwable2 = Exception("bar")
 
-      Try.raise(throwable1) shouldBe Try.raise(throwable1).combine(String.monoid(), Try.raise(throwable2))
+      Try.raiseError(throwable1) shouldBe Try.raiseError(throwable1).combine(String.monoid(), Try.raiseError(throwable2))
     }
 
     "combine a Success and a Failure should return Failure" {
       val throwable = Exception("foo")
       val string = "String"
 
-      Try.raise(throwable) shouldBe Try.raise(throwable).combine(String.monoid(), Try.just(string))
-      Try.raise(throwable) shouldBe Try.just(string).combine(String.monoid(), Try.raise(throwable))
+      Try.raiseError(throwable) shouldBe Try.raiseError(throwable).combine(String.monoid(), Try.just(string))
+      Try.raiseError(throwable) shouldBe Try.just(string).combine(String.monoid(), Try.raiseError(throwable))
     }
 
     "invoke of any should be success" {
@@ -134,15 +134,15 @@ class TryTest : UnitSpec() {
       failure1.orNull() shouldBe null
     }
 
-    "recoverWith should modify Failure entity" {
-      Success(1).recoverWith { Failure(Exception()) } shouldBe Success(1)
-      Success(1).recoverWith { Success(2) } shouldBe Success(1)
-      Failure(Exception()).recoverWith { Success(2) } shouldBe Success(2)
+    "handleErrorWith should modify Failure entity" {
+      Success(1).handleErrorWith { Failure(Exception()) } shouldBe Success(1)
+      Success(1).handleErrorWith { Success(2) } shouldBe Success(1)
+      Failure(Exception()).handleErrorWith { Success(2) } shouldBe Success(2)
     }
 
-    "recover should modify Failure value" {
-      Success(1).recover { 2 } shouldBe Success(1)
-      Failure(Exception()).recover { 2 } shouldBe Success(2)
+    "handleError should modify Failure value" {
+      Success(1).handleError { 2 } shouldBe Success(1)
+      Failure(Exception()).handleError { 2 } shouldBe Success(2)
     }
 
     "toEither with onLeft should return Either.Right with correct right value if Try is Success" {
@@ -241,6 +241,5 @@ class TryTest : UnitSpec() {
       (Try { failure }.flatten().isFailure()) shouldBe true
       (Try<Try<Int>> { throw RuntimeException("") }.flatten().isFailure()) shouldBe true
     }
-
   }
 }

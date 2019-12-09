@@ -30,5 +30,4 @@ object ContravariantLaws {
         ) { fa: Kind<F, Int>, f, g ->
             fa.contramap(f).contramap(g).equalUnderTheLaw(fa.contramap(f compose g), EQ)
         }
-
 }

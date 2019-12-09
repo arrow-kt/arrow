@@ -68,6 +68,21 @@ IO<Int> { throw RuntimeException("Boom!") }
   }
 ```
 
+### unsafeRunAsyncCancellable
+
+Same as `unsafeRunAsync` except it returns a cancellation token. Upon invokation the cancellation token stops the current run for the `IO`. 
+
+```
+val cancel = myExpensiveIO
+  .unsafeRunAsyncCancellable { result ->
+    result.fold({ println("Error") }, { println(it.toString()) })
+  }
+  
+cancel()
+```
+
+It is important to know that cancelation can only be applied across operator boundaries, i.e. a blocking operation like `Thread.sleep` cannot be cancelled. Use helpers like `IO.sleep` instead!
+
 ### unsafeRunTimed
 
 To be used with SEVERE CAUTION, it runs `IO` synchronously and returns an `Option<A>` blocking the current thread. It requires a timeout parameter.
@@ -142,7 +157,7 @@ IO.raiseError<Int>(RuntimeException("Boom!"))
 
 Generally used to wrap existing blocking functions. Creates an `IO` that invokes one lambda function when run.
 
-Note that this function is evaluated every time`IO`is run.
+Note that this function is evaluated every time `IO` is run.
 
 ```kotlin
 IO { 1 }
@@ -155,19 +170,36 @@ IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### suspend
+### effect
+
+Similar to `invoke`, accepting `suspend` functions. Creates an `IO` that invokes one suspend lambda function when run.
+
+Note that this function is evaluated every time `IO` is run.
+
+```kotlin
+IO.effect { requestSuspend(1) }
+  .unsafeRunSync()
+```
+
+```kotlin
+IO.effect { throw RuntimeException("Boom!") }
+  .attempt()
+  .unsafeRunSync()
+```
+
+### defer
 
 Used to defer the evaluation of an existing `IO`.
 
 ```kotlin
-IO.suspend { IO.just(1) }
+IO.defer { IO.just(1) }
   .attempt()
   .unsafeRunSync()
 ```
 
 ### async
 
-Mainly used to integrate with existing frameworks that have asynchronous calls.
+Mainly used to integrate with existing frameworks that have asynchronous calls. If the frameworks allow cancelation, use `cancelable` instead.
 
 It requires a function that provides a callback parameter and it expects for the user to start an operation using the other framework.
 The callback parameter has to be invoked with an `Either<Throwable, A>` once the other framework has completed its execution.
@@ -189,6 +221,32 @@ IO.async<Int> { callback ->
   .unsafeRunSync()
 ```
 
+## cancelable
+
+Same as `async`, it's used to integrate with existing frameworks. The unique difference is that the `cancelable` block requires returning an `IO` that'll be executed whe the whole `IO` operation is canceled.
+
+```kotlin
+val cancel = IO.cancelable<Int> { callback ->
+    val subscription = myObservable.subscribe { callback(it.right()) }
+    IO { subscription.cancel() }
+}
+  .attempt()
+  .unsafeRunAsyncCancellable { }
+  
+cancel() // stops both the local IO and myObservable
+```
+
+## sleep
+
+Sleeps for a given duration without blocking a thread.
+
+```kotlin
+val result =
+  IO.sleep(3.seconds).flatMap {
+    IO.effect { println("Hello World!") }
+  }.unsafeRunSync()
+```
+
 ## Effect Comprehensions
 
 `IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
@@ -196,10 +254,10 @@ IO.async<Int> { callback ->
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.effects.*
-import arrow.effects.extensions.io.monad.binding
+import arrow.fx.*
+import arrow.fx.extensions.fx
 
-binding {
+IO.fx {
   val (file) = getFile("/tmp/file.txt")
   val (lines) = file.readLines()
   val average =
@@ -213,30 +271,15 @@ binding {
 }.attempt().unsafeRunSync()
 ```
 
-## Syntax
-
-### A#liftIO
-
-Puts the value `A` inside an `IO<A>` using `just`.
-
-```kotlin:ank
-import arrow.effects.*
-
-1.liftIO()
-  .attempt()
-  .unsafeRunSync()
-```
-
 ## Common operators
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
-
 
 ### Supported Type Classes
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.fx.*
 
 DataType(IO::class).tcMarkdownList()
 ```

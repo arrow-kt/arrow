@@ -9,12 +9,12 @@ permalink: /docs/generic/product/
 {:.intermediate}
 intermediate
 
-`arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists; and Coproduct types like sealed classes.
+`arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists.
 
 ### Install 
 
 ```groovy
-compile 'io.arrow-kt:arrow-generic:$arrow_version'
+implementation "io.arrow-kt:arrow-generic:$arrow_version"
 ```
 
 ### Features
@@ -136,8 +136,8 @@ Try.applicative().run {
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicative.applicative
+import arrow.fx.*
+import arrow.fx.extensions.io.applicative.applicative
 
 val asyncBalance: IO<Int> = IO { 1000 }
 val asyncAvailable: IO<Int> = IO { 900 }

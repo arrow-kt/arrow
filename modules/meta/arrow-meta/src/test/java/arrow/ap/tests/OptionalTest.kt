@@ -38,7 +38,5 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
       destFile = "OptionalSecondaryConstructor.kt",
       processor = OpticsProcessor()
     ))
-
   }
-
 }

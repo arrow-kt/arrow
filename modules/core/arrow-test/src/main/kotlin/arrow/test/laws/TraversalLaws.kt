@@ -4,7 +4,7 @@ import arrow.core.Option
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toOption
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.optics.Traversal
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen

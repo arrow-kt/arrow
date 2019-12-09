@@ -33,7 +33,7 @@ The largest quality of life improvement when using Flux streams in Arrow is the 
 To wrap any existing Flux in its Arrow Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 import reactor.core.publisher.*
 
 val flux = Flux.just(1, 2, 3, 4, 5).k()
@@ -69,7 +69,7 @@ val songFlux: FluxKOf<Url> = getSongUrlAsync(FluxK.monadDefer())
 val songMono: MonoKOf<Url> = getSongUrlAsync(MonoK.monadDefer())
 ```
 
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+`MonadThrow` can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `fx.monadThrow`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -87,14 +87,14 @@ getSongUrlAsync()
   }
 ```
 
-When rewritten using `bindingCatch` it becomes:
+When rewritten using `fx.monadThrow` it becomes:
 
 ```kotlin
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 import arrow.typeclasses.*
-import arrow.effects.reactor.extensions.flux.monadThrow.bindingCatch
+import arrow.fx.reactor.extensions.fluxk.monadThrow.monadThrow
 
-bindingCatch {
+FluxK.monadThrow().fx.monadThrow {
   val (songUrl) = getSongUrlAsync()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -115,7 +115,7 @@ Note that any unexpected exception, like `AritmeticException` when `totalTime` i
 
 ### Subscription and cancellation
 
-Flux streams created with comprehensions like `bindingCatch` behave the same way regular flux streams do, including cancellation by disposing the subscription.
+Flux streams created with comprehensions like `fx.monadThrow` behave the same way regular flux streams do, including cancellation by disposing the subscription.
 
 ```kotlin
 val disposable =
@@ -124,48 +124,26 @@ val disposable =
     
 disposable.dispose()
 ```
-Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides an alternative to `bindingCatch` called `bindingCancellable` returning a `arrow.Disposable`.
-Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
-
-```kotlin
-
-val (flux, disposable) =
-  bindingCancellable {
-    val userProfile = Flux.create { getUserProfile("123") }
-    val friendProfiles = userProfile.friends().map { friend ->
-        bindDefer { getProfile(friend.id) }
-    }
-    listOf(userProfile) + friendProfiles
-  }
-
-flux.value()
-    .subscribe({ println("User $it") }, { System.err.println("Boom! caused by $it") })
-    
-disposable()
-// Boom! caused by BindingCancellationException
-```
 
 ### Stack safety
 
 While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types. 
 This is a limitation on reactor's side. See the corresponding github [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
 
-To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+To overcome this limitation and run code in a stack safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
 ```kotlin:ank:playground
 import arrow.Kind
-import arrow.effects.reactor.MonoK
-import arrow.effects.reactor.ForMonoK
-import arrow.effects.reactor.fix
-import arrow.effects.reactor.extensions.monok.monad.monad
-import arrow.effects.reactor.extensions.monok.applicativeError.attempt
-import arrow.free.bindingStackSafe
-import arrow.free.run
+import arrow.fx.reactor.MonoK
+import arrow.fx.reactor.ForMonoK
+import arrow.fx.reactor.fix
+import arrow.fx.reactor.extensions.monok.monad.monad
+import arrow.free.stackSafe
 
 fun main() {
   //sampleStart
   // This will not result in a stack overflow
-  val result = MonoK.monad().bindingStackSafe {
+  val result = MonoK.monad().fx.stackSafe {
     (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
@@ -180,7 +158,7 @@ import arrow.core.Try
 
 // This will result in a stack overflow
 Try {
-  MonoK.monad().binding {
+  MonoK.monad().fx.monad {
     (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
@@ -192,7 +170,7 @@ Try {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 
 DataType(FluxK::class).tcMarkdownList()
 ```

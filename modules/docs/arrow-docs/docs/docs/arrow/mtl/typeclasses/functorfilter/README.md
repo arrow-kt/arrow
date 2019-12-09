@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: FunctorFilter
-permalink: /docs/arrow/mtl/typeclasses/functorfilter/
+permalink: /docs/arrow/typeclasses/functorfilter/
 redirect_from:
   - /docs/typeclasses/functorfilter/
 ---
@@ -15,11 +15,11 @@ advanced
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 
 TypeClass(FunctorFilter::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.mtl.typeclasses.FunctorFilter)
+ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

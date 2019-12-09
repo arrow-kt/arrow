@@ -29,6 +29,32 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  * Eval instances whose computation involves calling .value on another
  * Eval instance -- this can defeat the trampolining and lead to stack
  * overflows.
+ *
+ * Example of stack safety:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Eval
+ *
+ * //sampleStart
+ * fun even(n: Int): Eval<Boolean> =
+ *   Eval.always { n == 0 }.flatMap {
+ *     if(it == true) Eval.now(true)
+ *     else odd(n - 1)
+ *   }
+ *
+ * fun odd(n: Int): Eval<Boolean> =
+ *   Eval.always { n == 0 }.flatMap {
+ *     if(it == true) Eval.now(false)
+ *     else even(n - 1)
+ *   }
+ *
+ * // if not wrapped in eval this type of computation would blow the stack and result in a StackOverflowError
+ * fun main() {
+ *   println(odd(100000).value())
+ * }
+ * //sampleEnd
+ * ```
+ *
  */
 @higherkind
 sealed class Eval<out A> : EvalOf<A> {
@@ -45,10 +71,64 @@ sealed class Eval<out A> : EvalOf<A> {
 
     fun <A> just(a: A): Eval<A> = now(a)
 
+    /**
+     * Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
+     *
+     * @param a is an already computed value of type [A]
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     *
+     * fun main() {
+     * //sampleStart
+     *   val eager = Eval.now(1).map { it + 1 }
+     *   println(eager.value())
+     * //sampleEnd
+     * }
+     * ```
+     *
+     * It will return 2.
+     */
     fun <A> now(a: A) = Now(a)
 
+    /**
+     * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked memoizing the computed value.
+     *
+     * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     *
+     * fun main() {
+     * //sampleStart
+     *   val lazyEvaled = Eval.later { "expensive computation" }
+     *   println(lazyEvaled.value())
+     * //sampleEnd
+     * }
+     * ```
+     *
+     * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
+     */
     fun <A> later(f: () -> A) = Later(f)
 
+    /**
+     * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked recomputing each time `.value()` is invoked.
+     *
+     * @param f is a function or computation that will be called every time `.value()` is invoked.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     *
+     * fun main() {
+     * //sampleStart
+     *   val alwaysEvaled = Eval.always { "expensive computation" }
+     *   println(alwaysEvaled.value())
+     * //sampleEnd
+     * }
+     * ```
+     *
+     * "expensive computation" is computed every time `value()` is invoked.
+     */
     fun <A> always(f: () -> A) = Always(f)
 
     fun <A> defer(f: () -> Eval<A>): Eval<A> = Defer(f)
@@ -79,7 +159,7 @@ sealed class Eval<out A> : EvalOf<A> {
         else -> fa
       }
 
-    //Enforce tailrec call to collapse inside compute loop
+    // Enforce tailrec call to collapse inside compute loop
     private fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
 
     @Suppress("UNCHECKED_CAST")
@@ -270,4 +350,10 @@ sealed class Eval<out A> : EvalOf<A> {
       evaluate(eval).also { result = Some(it) }
     }
   }
+}
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+  fun loop(): Eval<B> =
+    Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
+  return loop()
 }

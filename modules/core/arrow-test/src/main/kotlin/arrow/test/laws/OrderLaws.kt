@@ -4,7 +4,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import java.util.*
+import java.util.Random
 
 object OrderLaws {
 

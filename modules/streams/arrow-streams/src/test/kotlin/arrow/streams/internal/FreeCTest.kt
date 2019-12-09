@@ -1,14 +1,28 @@
 package arrow.streams.internal
 
 import arrow.Kind
-import arrow.core.*
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.fix
-import arrow.effects.extensions.io.monadError.monadError
+import arrow.core.Either
+import arrow.core.EitherPartialOf
+import arrow.core.Failure
+import arrow.core.ForTry
+import arrow.core.FunctionK
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Success
+import arrow.core.Try
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.fix
+import arrow.fx.extensions.io.monadError.monadError
 import arrow.higherkind
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.either.monadError.monadError
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.right
+import arrow.core.some
 import arrow.streams.internal.freec.eq.eq
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
@@ -17,11 +31,9 @@ import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -61,19 +73,18 @@ val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> 
   }
 }
 
-private val program = Ops.binding {
+private val program = Ops.fx.monad {
   val (added) = Ops.add(10, 10)
-  val subtracted = bind { Ops.subtract(added, 50) }
+  val subtracted = !Ops.subtract(added, 50)
   subtracted
 }.fix()
 
-private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.binding {
+private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.fx.monad {
   val (v) = Ops.add(n, 1)
-  val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else FreeC.just(v) }
+  val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else FreeC.just(v)
   r
 }.fix()
 
-@RunWith(KotlinTestRunner::class)
 class FreeCTest : UnitSpec() {
 
   init {
@@ -117,7 +128,7 @@ class FreeCTest : UnitSpec() {
       forAll(Gen.string(), Gen.throwable()) { s, t ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .map(::identity)
-          .flatMap<String> { throw  t }
+          .flatMap<String> { throw t }
           .run(Either.monadError()) == Left(t)
       }
     }
@@ -143,7 +154,7 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a deferred value"{
+    "Running a deferred value" {
       forAll(Gen.string()) { s ->
         FreeC.defer { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
           .run(Either.monadError()) == Right(Some(s))
@@ -158,7 +169,7 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "flatMap"{
+    "flatMap" {
       forAll(Gen.string(), Gen.functionAToB<String, String>(Gen.string())) { s, f ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .flatMap { FreeC.just<EitherPartialOf<Throwable>, String>(f(it)) }
@@ -166,7 +177,7 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "asHandler"{
+    "asHandler" {
       forAll(Gen.string(), Gen.throwable()) { s, t ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .asHandler(t)
@@ -174,14 +185,14 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "translate just value"{
+    "translate just value" {
       forAll(Gen.string()) { s ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .foldMap(EitherToTry, Try.monadError()) == Success(Some(s))
       }
     }
 
-    "translate fail value"{
+    "translate fail value" {
       forAll(Gen.throwable()) { t ->
         FreeC.raiseError<EitherPartialOf<Throwable>, String>(t)
           .foldMap(EitherToTry, Try.monadError()) == Failure(t)
@@ -212,7 +223,7 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "translate liftF value"{
+    "translate liftF value" {
       forAll(Gen.string()) { s ->
         FreeC.liftF<EitherPartialOf<Throwable>, String>(s.right())
           .foldMap(EitherToTry, Try.monadError()) == Success(Some(s))
@@ -223,7 +234,6 @@ class FreeCTest : UnitSpec() {
       forAll(Gen.string()) { s ->
         FreeC.FlatMapped(FreeC.just("")) { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
           .run(Either.monadError()) == Right(Some(s))
-
       }
     }
 
@@ -233,7 +243,6 @@ class FreeCTest : UnitSpec() {
           .foldMap(EitherToTry, Try.monadError()) == Success(Some(s))
       }
     }
-
   }
 }
 

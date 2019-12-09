@@ -1,9 +1,18 @@
 package arrow.optics.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
-import arrow.optics.*
+import arrow.core.MapInstances
+import arrow.core.Option
+import arrow.core.Predicate
+import arrow.core.left
+import arrow.core.right
+import arrow.core.getOption
+import arrow.core.k
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.PLens
+import arrow.optics.POptional
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
@@ -75,12 +84,12 @@ interface MapEach<K, V> : Each<Map<K, V>, V> {
   }
 }
 
-fun <K, V> MapInstances.filterIndex(): FilterIndex<Map<K, V>, K, V> = MapFilterIndex()
+fun <K, V> MapInstances.filterIndex(): FilterIndex<Map<K, V>, K, V> = filterMapIndex()
 
 /**
  * [FilterIndex] instance definition for [Map].
  */
-interface MapFilterIndex<K, V> : FilterIndex<Map<K, V>, K, V> {
+interface filterMapIndex<K, V> : FilterIndex<Map<K, V>, K, V> {
   override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
     override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
       s.toList().k().traverse(FA) { (k, v) ->
@@ -97,7 +106,7 @@ interface MapFilterIndex<K, V> : FilterIndex<Map<K, V>, K, V> {
      *
      * @return [Index] instance for [String]
      */
-    operator fun <K, V> invoke() = object : MapFilterIndex<K, V> {}
+    operator fun <K, V> invoke() = object : filterMapIndex<K, V> {}
   }
 }
 

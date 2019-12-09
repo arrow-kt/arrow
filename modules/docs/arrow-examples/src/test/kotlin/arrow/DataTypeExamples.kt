@@ -1,11 +1,28 @@
 package arrow
 
-import arrow.Problem.*
-import arrow.core.*
+import arrow.Problem.invalidInt
+import arrow.Problem.noReciprocal
+import arrow.Problem.somethingExploded
+import arrow.Problem.somethingWentWRong
+import arrow.core.Either
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Success
+import arrow.core.Try
+import arrow.core.TryException
+import arrow.core.Tuple3
+import arrow.core.getOrElse
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.fx
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.fx.fx
+import arrow.core.flatMap
+import arrow.core.handleError
+import arrow.core.handleErrorWith
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe
@@ -16,7 +33,7 @@ import kotlin.reflect.KClass
 class DataTypeExamples : FreeSpec() { init {
 
   /**
-   * Option http://arrow-kt.io/docs/arrow/core/option/
+   * Option http://arrow-kt.io/docs/apidocs/arrow-core-data/arrow.core/-option/
    ***/
   "Option: Some or None?" - {
     val someValue: Option<Int> = Some(42)
@@ -59,12 +76,11 @@ class DataTypeExamples : FreeSpec() { init {
       // Computing over independent values
       val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
       tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
-
     }
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = fx {
+      val six = Option.fx {
         val (a) = Option(1)
         val (b) = Option(1 + a)
         val (c) = Option(1 + b)
@@ -72,7 +88,7 @@ class DataTypeExamples : FreeSpec() { init {
       }
       six shouldBe Some(6)
 
-      val none = fx {
+      val none = Option.fx {
         val (a) = Option(1)
         val (b) = noneValue
         val (c) = Option(1 + b)
@@ -80,10 +96,9 @@ class DataTypeExamples : FreeSpec() { init {
       }
       none shouldBe None
     }
-
   }
 
-  // http://arrow-kt.io/docs/arrow/core/try/
+  // http://arrow-kt.io/docs/apidocs/arrow-core-data/arrow.core/-try/
   "Try and recover" - {
 
     "Old school" {
@@ -102,7 +117,6 @@ class DataTypeExamples : FreeSpec() { init {
       gain shouldBe aFailureOfType(AuthorizationException::class)
 
       gain.getOrElse { 0 } shouldBe 0
-
     }
 
     "filter" {
@@ -114,9 +128,9 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Recover" {
       val gain = Try { playLottery(99) }
-      gain.recover { 0 } shouldBe Try.Success(0)
+      gain.handleError { 0 } shouldBe Try.Success(0)
 
-      gain.recoverWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
+      gain.handleErrorWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
     }
 
     "Fold" {
@@ -145,11 +159,10 @@ class DataTypeExamples : FreeSpec() { init {
         Try { "nope".toInt() }
       )
       tryHarder shouldBe aFailureOfType(NumberFormatException::class)
-
     }
   }
 
-  // Either http://arrow.io/docs/arrow/core/either/
+  // Either http://arrow.io/docs/apidocs/arrow-core-data/arrow.core/-either/
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
@@ -178,7 +191,6 @@ class DataTypeExamples : FreeSpec() { init {
       either.getOrElse { 0 } shouldBe 0
       either.map { it + 1 } shouldBe either
       either.flatMap { Left(somethingExploded) } shouldBe either
-
     }
 
     "Either rather than exception" {

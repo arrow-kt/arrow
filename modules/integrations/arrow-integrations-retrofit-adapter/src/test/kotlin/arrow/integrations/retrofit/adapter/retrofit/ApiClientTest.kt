@@ -15,5 +15,4 @@ interface ApiClientTest {
 
   @POST("testIOResponsePOST")
   fun testIOResponsePost(): CallK<Unit>
-
 }

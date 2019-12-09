@@ -37,32 +37,42 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         .readLines().joinToString("\n") {
           val line = it.substringAfter(" * ")
           if (line.trim() == "*") ""
-          else line
+          else line.replace(" ", "·")
         } + "\n"
     } catch (e: Exception) {
       null
     }
 
   private fun processElementDoc(e: Element) {
-    val doc = elementUtils.getDocComment(e)
-    val kDocLocation = e.kDocLocation()
-    if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
-      @Suppress("SwallowedException")
-      try {
-        val path = kDocLocation.toPath()
+    try {
+      val doc = elementUtils.getDocComment(e)
+      val kDocLocation = e.kDocLocation()
+      if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
         @Suppress("SwallowedException")
-        try { Files.createDirectories(path.parent) } catch (e : IOException) {
+        try {
+          val path = kDocLocation.toPath()
+          @Suppress("SwallowedException")
+          try {
+            Files.createDirectories(path.parent)
+          } catch (e: IOException) {
+          }
+          @Suppress("SwallowedException")
+          try {
+            Files.delete(path)
+          } catch (e: IOException) {
+          }
+          @Suppress("SwallowedException")
+          try {
+            Files.createFile(path)
+          } catch (e: IOException) {
+          }
+          kDocLocation.writeText(doc)
+        } catch (x: IOException) {
+          logW("Failed to generate kdoc file location: $kDocLocation", e)
         }
-        @Suppress("SwallowedException")
-        try { Files.delete(path) } catch (e : IOException) {
-        }
-        @Suppress("SwallowedException")
-        try { Files.createFile(path) } catch (e : IOException) {
-        }
-        kDocLocation.writeText(doc)
-      } catch (x: IOException) {
-        logW("Failed to generate kdoc file location: $kDocLocation", e)
       }
+    } catch (e: Exception) {
+      logE(e.localizedMessage)
     }
   }
 
@@ -73,7 +83,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         val name = (it.enclosingElement as TypeElement).qualifiedName.toString()
 
         val extensionName = (it.enclosingElement.kotlinMetadata?.asClassOrPackageDataWrapper(it.enclosingElement as TypeElement) as? ClassOrPackageDataWrapper.Class)?.let { classData ->
-          val n = classData.getFunction(it).toMeta(classData, it).receiverType?.simpleName
+          val n = classData.getFunction(it)?.toMeta(classData, it)?.receiverType?.simpleName
           if (n == classData.simpleName) "" else "$n-"
         } ?: ""
 
@@ -104,7 +114,6 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
   }
 
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
-
 }
 
 private val userDir get() = System.getProperty("user.dir")

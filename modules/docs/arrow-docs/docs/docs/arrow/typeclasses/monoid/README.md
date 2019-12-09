@@ -49,8 +49,8 @@ The advantage of using these type class provided methods, rather than the specif
 This is also true if we define our own instances. As an example, let's use `Foldable`'s `foldMap`, which maps over values accumulating the results, using the available `Monoid` for the type mapped onto.
 
 ```kotlin:ank
-import arrow.data.*
-import arrow.data.extensions.list.foldable.foldMap
+import arrow.core.*
+import arrow.core.extensions.list.foldable.foldMap
 
 listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
 ```

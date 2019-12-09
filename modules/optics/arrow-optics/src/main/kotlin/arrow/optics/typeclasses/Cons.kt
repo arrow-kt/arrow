@@ -1,7 +1,12 @@
 package arrow.optics.typeclasses
 
-import arrow.core.*
-import arrow.optics.*
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.optics.Iso
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.first
+import arrow.optics.second
 
 /**
  * ank_macro_hierarchy(arrow.optics.typeclasses.Cons)
@@ -59,7 +64,5 @@ interface Cons<S, A> {
     operator fun <S, A> invoke(prism: Prism<S, Tuple2<A, S>>): Cons<S, A> = object : Cons<S, A> {
       override fun cons(): Prism<S, Tuple2<A, S>> = prism
     }
-
   }
-
 }

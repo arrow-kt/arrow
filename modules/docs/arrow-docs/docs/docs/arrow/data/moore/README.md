@@ -18,7 +18,7 @@ For creating a `Moore` machine we need its initial state and a `handle` function
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
+import arrow.ui.*
 
 fun handleRoute(route: String): Moore<String, Id<String>> = when (route) {
   "About" -> Moore(Id("About"), ::handleRoute)
@@ -52,7 +52,7 @@ routerMoore
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.ui.*
 import arrow.core.*
 
 DataType(Moore::class).tcMarkdownList()

@@ -1,7 +1,8 @@
 package com.example.domain
 
-import arrow.data.*
-import arrow.optics.*
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.optics.optics
 
 @optics
 data class Street(val number: Int, val name: String) {

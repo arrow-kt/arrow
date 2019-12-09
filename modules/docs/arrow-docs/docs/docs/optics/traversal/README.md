@@ -23,8 +23,8 @@ You can get a `Traversal` for any existing `Traverse`.
 import arrow.*
 import arrow.optics.*
 import arrow.core.*
-import arrow.data.*
-import arrow.data.extensions.listk.traverse.*
+import arrow.mtl.*
+import arrow.core.extensions.listk.traverse.*
 import arrow.core.extensions.`try`.applicative.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable(ListK.traverse())
@@ -65,6 +65,8 @@ There are also some convenience methods to make working with [State]({{ '/docs/a
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank
+import arrow.optics.mtl.*
+
 data class Enemy(val health: Int)
 val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
 

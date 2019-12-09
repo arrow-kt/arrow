@@ -61,7 +61,7 @@ liftedAddFive(point)
 We can do the same with a Functor mapping
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.core.extensions.`try`.functor.*
 
 pointIsoTuple.modifyF(Try.functor(), point) {

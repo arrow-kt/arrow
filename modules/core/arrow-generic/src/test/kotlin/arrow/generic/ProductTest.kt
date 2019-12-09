@@ -1,9 +1,14 @@
 package arrow.generic
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple3
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.some
+import arrow.core.toT
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
@@ -11,13 +16,10 @@ import arrow.test.generators.option
 import arrow.test.generators.tuple3
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @product
 data class Person(val name: String, val age: Int, val related: Option<Person>) {
@@ -43,7 +45,6 @@ inline fun <reified F> Applicative<F>.testPersonApplicative() {
   }
 }
 
-@RunWith(KotlinTestRunner::class)
 class ProductTest : UnitSpec() {
 
   init {
@@ -127,11 +128,10 @@ class ProductTest : UnitSpec() {
       emptyPerson() shouldBe Person("", 0, None)
     }
 
-    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None)}
+    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None) }
 
     testLaws(
       EqLaws.laws(Person.eq(), getPersonWithAge),
-      SemigroupLaws.laws(Person.semigroup(), getPersonWithAge(1), getPersonWithAge(2), getPersonWithAge(3), Person.eq()),
       MonoidLaws.laws(Person.monoid(), genPerson(), Person.eq())
     )
   }

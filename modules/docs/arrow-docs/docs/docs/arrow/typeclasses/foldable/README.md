@@ -25,10 +25,10 @@ For the following examples we are going to use some common imports
 ```kotlin:ank:silent
 import arrow.Kind
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.k
 import arrow.core.extensions.monoid
-import arrow.data.extensions.listk.foldable.foldable
+import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.option.foldable.foldable
 import arrow.typeclasses.Foldable
 ```
@@ -67,7 +67,7 @@ Right associative lazy fold on `F` using the provided function.
 
 This method evaluates `lb` lazily, and returns a lazy value to support laziness in a stack-safe way avoiding StackOverflows.
 
-For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/arrow/core/eval' | relative_url }}).
+For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}).
 
 ```kotlin:ank:silent
 fun <F> concatenateStringFromRight(strKind: Kind<F, String>, FO: Foldable<F>): String =
@@ -513,7 +513,7 @@ import arrow.core.extensions.either.foldable.foldable
 
 fun foldableGet(strKind: EitherOf<String, String>): Option<String> =
   with(Either.foldable<String>()) {
-    strKind.get(Either.monad(), 0)
+    strKind.get(0)
   }
 
 val rightStr = Either.right("abc") as Either<String, String>

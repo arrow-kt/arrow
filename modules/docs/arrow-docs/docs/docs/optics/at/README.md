@@ -20,7 +20,6 @@ A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index a
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
 import arrow.optics.typeclasses.*
 import arrow.optics.extensions.mapk.at.*
 

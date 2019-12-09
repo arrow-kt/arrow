@@ -6,9 +6,9 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.semigroup
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.core.extensions.listk.eq.eq
 import arrow.optics.extensions.at
 import arrow.optics.extensions.each
 import arrow.optics.extensions.filterIndex
@@ -18,16 +18,17 @@ import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.index.index
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.char
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
+import arrow.test.generators.mapK
+import arrow.test.generators.option
 import arrow.test.laws.LensLaws
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class MapInstanceTest : UnitSpec() {
 
   init {
@@ -125,6 +126,5 @@ class MapInstanceTest : UnitSpec() {
         MB = Option.monoid(Int.semigroup())
       )
     )
-
   }
 }

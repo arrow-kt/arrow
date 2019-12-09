@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
@@ -9,10 +9,7 @@ import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NonEmptyListTest : UnitSpec() {
 
   init {
@@ -41,7 +38,5 @@ class NonEmptyListTest : UnitSpec() {
         override fun List<String>.combine(b: List<String>): List<String> = this + b
       }
     ))
-
   }
-
 }

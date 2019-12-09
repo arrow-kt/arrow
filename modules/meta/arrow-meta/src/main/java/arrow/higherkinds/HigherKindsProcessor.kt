@@ -43,5 +43,4 @@ class HigherKindsProcessor : AbstractProcessor() {
     val proto = getClassOrPackageDataWrapper(element)
     return AnnotatedHigherKind(element, proto)
   }
-
 }

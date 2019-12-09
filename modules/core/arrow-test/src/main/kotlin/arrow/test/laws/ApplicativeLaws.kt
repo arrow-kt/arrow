@@ -1,7 +1,9 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.test.generators.*
+import arrow.test.generators.applicative
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen

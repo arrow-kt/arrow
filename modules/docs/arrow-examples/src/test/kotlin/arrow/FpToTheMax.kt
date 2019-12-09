@@ -1,15 +1,21 @@
 package arrow
 
-import arrow.core.*
-import arrow.core.extensions.id.monad.monad
-import arrow.data.*
-import arrow.data.extensions.statet.monad.monad
-import arrow.effects.IO
-import arrow.effects.extensions.io.monadDefer.monadDefer
-import arrow.effects.fix
-import arrow.effects.typeclasses.MonadDefer
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.toT
+import arrow.mtl.State
+import arrow.mtl.StatePartialOf
+import arrow.mtl.StateApi
+import arrow.fx.IO
+import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.fix
+import arrow.fx.typeclasses.MonadDefer
+import arrow.mtl.extensions.monad
+import arrow.mtl.fix
+import arrow.mtl.run
 import arrow.typeclasses.Monad
-import java.util.*
+import java.util.Random
 
 /**
  * This sample is a simple translation in Kotlin (using arrow, of course) of this talk: https://youtu.be/sxudIMiOo68
@@ -22,8 +28,8 @@ interface Console<F> {
 }
 
 class ConsoleImpl<F>(val delay: MonadDefer<F>) : Console<F> {
-  override fun putStrLn(s: String): Kind<F, Unit> = delay.delay { println(s) }
-  override fun getStrLn(): Kind<F, String> = delay.delay { readLine().orEmpty() }
+  override fun putStrLn(s: String): Kind<F, Unit> = delay.later { println(s) }
+  override fun getStrLn(): Kind<F, String> = delay.later { readLine().orEmpty() }
 }
 
 interface FRandom<F> {
@@ -31,7 +37,7 @@ interface FRandom<F> {
 }
 
 class FRandomImpl<F>(val delay: MonadDefer<F>) : FRandom<F> {
-  override fun nextInt(upper: Int): Kind<F, Int> = delay.delay { ORandom.nextInt(upper) }
+  override fun nextInt(upper: Int): Kind<F, Int> = delay.later { ORandom.nextInt(upper) }
 }
 
 class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Monad<F> by M, Console<F> by C, FRandom<F> by R
@@ -41,7 +47,6 @@ data class TestData(val input: List<String>, val output: List<String>, val nums:
   fun getStrLn(): Tuple2<TestData, String> = copy(input = input.drop(1)) toT input[0]
   fun nextInt(@Suppress("UNUSED_PARAMETER") upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
 }
-
 
 typealias ForTestIO = StatePartialOf<TestData>
 
@@ -57,12 +62,11 @@ class TestIOConsole : Console<ForTestIO> {
   override fun getStrLn(): Kind<ForTestIO, String> = TestIO { it.getStrLn() }
 }
 
-
 object FpToTheMax {
 
   fun parseInt(s: String): Option<Int> = Try { s.toInt() }.toOption()
 
-  fun <F> MonadAndConsoleRandom<F>.checkContinue(name: String): Kind<F, Boolean> = binding {
+  fun <F> MonadAndConsoleRandom<F>.checkContinue(name: String): Kind<F, Boolean> = fx.monad {
     val (_) = putStrLn("Do you want to continue, $name?")
     val (input) = getStrLn().map { it.toLowerCase() }
     when (input) {
@@ -72,7 +76,7 @@ object FpToTheMax {
     }.bind()
   }
 
-  fun <F> MonadAndConsoleRandom<F>.gameLoop(name: String): Kind<F, Unit> = binding {
+  fun <F> MonadAndConsoleRandom<F>.gameLoop(name: String): Kind<F, Unit> = fx.monad {
     val (num) = nextInt(5).map { it + 1 }
     putStrLn("Dear $name, please guess a number from 1 to 5:").bind()
     val (input) = getStrLn()
@@ -84,7 +88,7 @@ object FpToTheMax {
     (if (cont) gameLoop(name) else just(Unit)).bind()
   }
 
-  fun <F> MonadAndConsoleRandom<F>.fMain(): Kind<F, Unit> = binding {
+  fun <F> MonadAndConsoleRandom<F>.fMain(): Kind<F, Unit> = fx.monad {
     putStrLn("What is your name?").bind()
     val (name) = getStrLn()
     putStrLn("Hello $name, welcome to the game").bind()
@@ -101,13 +105,10 @@ object FpToTheMax {
   }
 
   fun test(): List<String> = run {
-    val testData: TestData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
+    val testData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
 
-    val m: Monad<ForTestIO> = StateT.monad(Id.monad())
-    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(m, TestIOConsole(), TestIORandom())
+    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(StateApi.monad(), TestIOConsole(), TestIORandom())
 
     module.fMain().fix().run(testData).a.output
   }
-
 }
-

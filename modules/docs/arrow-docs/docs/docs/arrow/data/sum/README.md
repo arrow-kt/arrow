@@ -17,8 +17,8 @@ A common pattern used when building user interfaces is showing two tabs and allo
 For creating a Sum we need two comonadic datatypes which `extract` result type is the same. We will also need an initial side, by default it is Left.
 
 ```kotlin:ank
-import arrow.data.*
-import arrow.data.extensions.store.comonad.*
+import arrow.ui.*
+import arrow.ui.extensions.store.comonad.*
 
 val counterStore = Store(0) { "Counter value: $it" }
 val nameStore = Store("Cotel") { "Hey $it!" }
@@ -50,7 +50,7 @@ overridenSum.extract(Store.comonad(), Store.comonad())
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.ui.*
 import arrow.core.*
 
 DataType(Sum::class).tcMarkdownList()

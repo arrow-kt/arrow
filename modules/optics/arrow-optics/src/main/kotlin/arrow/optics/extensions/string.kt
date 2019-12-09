@@ -1,15 +1,23 @@
 package arrow.optics.extensions
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
-import arrow.data.*
-import arrow.typeclasses.*
-import arrow.optics.*
+import arrow.core.ListK
+import arrow.core.k
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Traversal
+import arrow.optics.toListK
+import arrow.optics.typeclasses.Cons
+import arrow.optics.typeclasses.Each
+import arrow.optics.typeclasses.FilterIndex
+import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.listk.index.index
-import arrow.optics.typeclasses.*
+import arrow.typeclasses.Applicative
 
 /**
  * [Traversal] for [String] that focuses in each [Char] of the source [String].
@@ -45,7 +53,7 @@ interface StringEach : Each<String, Char> {
      *
      * @return [FilterIndex] instance for [String]
      */
-    operator fun invoke(): Each<String, Char> = object : StringEach{}
+    operator fun invoke(): Each<String, Char> = object : StringEach {}
   }
 }
 
@@ -72,7 +80,7 @@ interface StringFilterIndex : FilterIndex<String, Int, Char> {
      *
      * @return [FilterIndex] instance for [String]
      */
-    operator fun invoke(): FilterIndex<String, Int, Char> = object : StringFilterIndex{}
+    operator fun invoke(): FilterIndex<String, Int, Char> = object : StringFilterIndex {}
   }
 }
 
@@ -101,9 +109,8 @@ interface StringIndex : Index<String, Int, Char> {
      *
      * @return [Index] instance for [String]
      */
-    operator fun invoke(): Index<String, Int, Char> = object : StringIndex{}
+    operator fun invoke(): Index<String, Int, Char> = object : StringIndex {}
   }
-
 }
 
 /**
@@ -124,9 +131,8 @@ interface StringCons : Cons<String, Char> {
      *
      * @return [Cons] instance for [String]
      */
-    operator fun invoke(): Cons<String, Char> = object : StringCons{}
+    operator fun invoke(): Cons<String, Char> = object : StringCons {}
   }
-
 }
 
 /**
@@ -147,8 +153,6 @@ interface StringSnoc : Snoc<String, Char> {
      *
      * @return [Cons] instance for [String]
      */
-    operator fun invoke(): Snoc<String, Char> = object : StringSnoc{}
+    operator fun invoke(): Snoc<String, Char> = object : StringSnoc {}
   }
-
 }
-

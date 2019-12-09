@@ -91,7 +91,7 @@
         .masthead-button {
             display: inline-block;
             margin-top: ($base-point-grid * 3);
-            padding: ($base-point-grid * 2) ($base-point-grid * 5);
+            padding: ($base-point-grid) ($base-point-grid * 4);
             font-size: 0.875rem;
             font-weight: $font-semibold;
             text-transform: uppercase;
@@ -105,8 +105,24 @@
             &:focus,
             &:hover {
                 text-decoration: none;
-                background: rgba($brand-tertiary, 0.6);
+                background: rgba($brand-tertiary, 0.3);
             }
+
+            span {
+              display: block;
+            }
+
+            @include bp(small) {
+              padding: ($base-point-grid) ($base-point-grid * 2);
+            }
+        }
+
+        .secondary-button {
+          background: rgba($brand-tertiary, 0.6);
+        }
+
+        .secondary-doc-version-text {
+          font-size: 0.700rem;
         }
 
         .masthead-stars {
@@ -118,6 +134,20 @@
               color: $white;
               text-decoration: none;
             }
+        }
+
+        .masthead-doc-version {
+          margin-top: ($base-point-grid * 3);
+
+          transform-style: preserve-3d;
+
+          ul {
+            transform: translateZ(76px);
+          }
+
+          li {
+              display: inline-block;
+          }
         }
     }
 }

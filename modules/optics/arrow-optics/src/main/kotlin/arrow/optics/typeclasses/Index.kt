@@ -1,6 +1,12 @@
 package arrow.optics.typeclasses
 
-import arrow.optics.*
+import arrow.optics.Fold
+import arrow.optics.Iso
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Setter
+import arrow.optics.Traversal
 
 /**
  * ank_macro_hierarchy(arrow.optics.typeclasses.Index)
@@ -159,7 +165,5 @@ interface Index<S, I, A> {
     fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> = object : Index<S, I, B> {
       override fun index(i: I): Optional<S, B> = iso compose ID.index(i)
     }
-
   }
-
 }

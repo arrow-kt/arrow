@@ -1,3 +1,4 @@
+apply plugin: 'kotlin-kapt'
 apply plugin: 'idea'
 
 idea {
@@ -22,12 +23,12 @@ idea {
 }
 
 dependencies {
-    compile project(':arrow-extras-extensions')
-    compile project(':arrow-effects-extensions')
-    compile project(':arrow-effects-rx2-extensions')
+    compile project(':arrow-fx')
+    compile project(':arrow-fx-rx2')
     compile project(':arrow-optics')
+    compile project(':arrow-ui')
     compile project(':arrow-validation')
-
+    compile project(':arrow-mtl')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
@@ -35,10 +36,8 @@ dependencies {
 
     testCompile project(':arrow-test')
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
-
-apply plugin: 'kotlin-kapt'

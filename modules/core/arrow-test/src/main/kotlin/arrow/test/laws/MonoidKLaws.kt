@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.data.extensions.list.foldable.fold
+import arrow.core.extensions.list.foldable.fold
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonoidK
@@ -32,7 +32,7 @@ object MonoidKLaws {
       fa.combineK(empty<Int>()).equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> MonoidK<F>.monoidKFold(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonoidK<F>.monoidKFold(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) {
       val mo = this
       forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
           listOf(fa).fold(mo.algebra()).equalUnderTheLaw(fa, EQ)

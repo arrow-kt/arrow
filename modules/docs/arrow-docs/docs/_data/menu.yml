@@ -1,8 +1,4 @@
 nav:
-    - title: Documentation
-      url: /docs
-      icon: "fa-book"
-
     - title: Blog
       url: /blog
       icon: "fa-rss"

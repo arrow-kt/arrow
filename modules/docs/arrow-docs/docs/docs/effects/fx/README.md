@@ -74,8 +74,7 @@ Applying and composing suspended side effects is allowed in the presence of othe
 
 In the example below, `sayHello` and `sayGoodBye` are valid inside `greet` because they are all suspended functions.
 
-```kotlin:ank:playground
-//sampleStart
+```kotlin
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
@@ -86,7 +85,6 @@ suspend fun greet(): Unit {
   sayHello() // this is ok because
   sayGoodBye() // `greet` is also `suspend`
 }
-//sampleEnd  
 ```
 
 #### `fx` composition
@@ -98,8 +96,8 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 `effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user-declared side effect into an `IO<A>` value.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.IO
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -108,7 +106,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     val pureHello = effect { sayHello() }
     val pureGoodBye = effect { sayGoodBye() }
   }
@@ -127,8 +125,8 @@ We apply side effects with the operator `!`. Once you purify a side effect with 
 Note that running `greet()` in the previous example does not perform any effects because it returns a wrapped lazy value. Since invoking this function does not produce effects, we can be confident that `greet` is pure and referentially transparent despite referring to the effects application.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.IO
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -137,7 +135,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
@@ -150,8 +148,8 @@ fun main() {
 An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect` also results in a compilation error. 
 
 ```kotlin:ank:fail
-import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.IO
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -160,7 +158,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     sayHello()
     sayGoodBye()
   }
@@ -174,14 +172,14 @@ Arrow enforces usage to be explicit about effects application.
 Composition using regular datatypes such as `IO` is still possible within `fx` blocks the same way as `effect` blocks. In addition to `!` you can also use the extension function `bind()` to execute them.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.IO
+import arrow.fx.extensions.fx
 //sampleStart
 fun sayInIO(s: String): IO<Unit> =
   IO { println(s) }
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     sayInIO("Hello World").bind()
   }
 //sampleEnd 
@@ -202,10 +200,10 @@ Arrow restricts the ability to run programs to extensions of the `UnsafeRun` typ
 Usage of `unsafe` is reserved for the end of the world and may be the only impure execution of a well-typed functional program.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -214,7 +212,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }

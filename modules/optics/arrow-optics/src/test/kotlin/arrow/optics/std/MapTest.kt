@@ -1,17 +1,16 @@
 package arrow.optics
 
-import arrow.data.MapK
-import arrow.data.SetK
-import arrow.data.extensions.setk.monoid.monoid
+import arrow.core.MapK
+import arrow.core.SetK
+import arrow.core.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.genSetK
+import arrow.test.generators.mapK
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class MapTest : UnitSpec() {
 
   init {
@@ -26,5 +25,4 @@ class MapTest : UnitSpec() {
       bMonoid = SetK.monoid()
     ))
   }
-
 }

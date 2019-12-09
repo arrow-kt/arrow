@@ -17,26 +17,36 @@ We can also code against `Fx` assuming it would be provided at some point in the
 In the following example, the program is declared polymorphic and then made concrete to Arrow IO at the edge.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.Kind
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.io.unsafeRun.unsafeRun
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.fx
+import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.UnsafeRun
+
 //sampleStart
 /* a side effect */
-suspend fun printThreadName(): Unit =
+val const = 1
+suspend fun sideEffect(): Int {
   println(Thread.currentThread().name)
+  return const
+}
 
-/* for all `F` that provide an `Fx` extension define a program function
-fun <F> Fx<F>.program(): Kind<F, Int> =
-  fx { !effect { sideEffect() } }
+/* for all `F` that provide an `Fx` extension define a program function */
+fun <F> Concurrent<F>.program(): Kind<F, Int> =
+  fx.concurrent { !effect { sideEffect() } }
 
-/* for all `F` that provide an `UnsafeRun` extension define a main function
-fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
+/* for all `F` that provide an `UnsafeRun` extension define a main function */
+fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
   unsafe { runBlocking { fx.program() } }
 
 /* Run program in the IO monad */
-fun main() =
-  IO.unsafeRun().main(IO.fx()) 
+fun main(args: Array<String>) {
+    IO.unsafeRun().main(IO.concurrent())
+}
 //sampleEnd
 ```
 
@@ -58,12 +68,12 @@ The Arrow library already provides the ability to compute imperatively over all 
 
 *Fx over `Option`*
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.core.Option
-import arrow.core.extensions.option.fx.fx
+import arrow.core.extensions.fx
 
 //sampleStart
-val result = fx {
+val result = Option.fx {
   val (one) = Option(1)
   val (two) = Option(one + one)
   two
@@ -78,11 +88,11 @@ fun main() {
 *Fx over `Try`*
 ```kotlin:ank:playground
 import arrow.core.Try
-import arrow.core.extensions.`try`.fx.fx
+import arrow.core.extensions.fx
 
 //sampleStart
 val result = 
-  fx {
+  Try.fx {
     val (one) = Try { 1 }
     val (two) = Try { one + one }
     two
@@ -148,93 +158,8 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 | Applicative.tupled  | `tupled(just(1), just(2))` | `1 toT 2` |
 | Monad.flatMap       | `IO.just(1).flatMap { n -> IO { n + 1 } }` | `1 + 1` |
 | Monad.flatten       | `IO.just(IO.just(1))}.flatten()` | `1` |
-| MonadDefer.delay    | `IO.delay { 1 }` | `effect { 1 }` |
+| MonadDefer.later    | `IO.later { 1 }` | `effect { 1 }` |
 | MonadDefer.defer    | `IO.defer { IO { 1 } }` | `effect { 1 }` |
+| Async.effect        | `IO.effect { 1 }` | `effect { 1 }` |
 
 This is, in general, true for effectful data types that are commutative.
-
-### Non-commutative monads
-
-Note that implicit CPS style with non-blocking direct binding has a disadvantage. You cannot apply substitution based on referential transparency for non-commutative monads where the order of effects matter.
-
-Arrow Fx is aware of this but still allows users to use `fx` on non-commutative monads such as `List`, providing safe `fx` builders that guarantee suspended effects are applied in order in different arguments before they are composed.
-Altering the order of effects when using the safe builders for non-commutative monads does not alter the results because it enforces effect order prior to composition.
-
-```kotlin:ank:playground
-import arrow.core.identity
-import arrow.core.toT
-import arrow.data.extensions.list.fx.fx
-
-//sampleStart
-val result1 = fx(listOf(1, 2), listOf(true, false), ::identity)
-val result2 = fx(listOf(true, false), listOf(1, 2), ::identity)
-//sampleEnd
-
-fun main() {
-  println(result1)
-  println(result2)
-}
-```
-
-Arrow identifies non-blocking binding in these non-commutative monads as unsafe and as an effect worth tracking!
-For consistency, if you want to shoot yourself in the foot, performing free environmental effect application for these non-commutative types requires the user to give explicit permission to activate the unsafe `fx` block.
-
-```kotlin:ank:playground
-import arrow.unsafe
-import arrow.core.toT
-import arrow.data.extensions.list.fx.fx
-
-//sampleStart
-val result1 = unsafe { 
-  fx {
-    val (a) = listOf(1, 2)
-    val (b) = listOf(true, false)
-    a toT b
-  }
-}
-
-val result2 = unsafe { 
-  fx {
-    val (b) = listOf(true, false)
-    listOf(1, 2) toT b
-  }
-}
-//sampleEnd
-
-fun main() {
-  println(result1)
-  println(result2)
-}
-```
-
-The previous program shows how applying substitution alters the order of effects and affects the outcome.
-
-The same program expressed in a commutative monad which is the case of `IO`, shows how both programs yield the same deterministic result even after changing the order of effects:
-
-```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
-import arrow.core.toT
-
-//sampleStart
-val result1 = 
-  fx {
-    val a = !effect { 1 }
-    val b = !effect { 2 }
-    a toT b
-  }
-
-val result2 = 
-  fx {
-    val b = !effect { 2 }
-    !effect { 1 } toT b
-  }
-//sampleEnd
-
-fun main() {
-  println(result1)
-  println(result2)
-}
-```

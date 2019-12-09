@@ -5,6 +5,6 @@ import arrow.optics.optics
 
 @optics([OpticsTarget.LENS])
 data class LensSecondaryConstructor(val field: String) {
-  constructor(number: Int): this(number.toString())
+  constructor(number: Int) : this(number.toString())
   companion object
 }

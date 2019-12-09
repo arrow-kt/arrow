@@ -1,9 +1,17 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.ForOption
+import arrow.core.Option
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
 import arrow.core.extensions.option.functor.functor
+import arrow.core.getOrElse
+import arrow.mtl.State
+import arrow.mtl.run
+import arrow.optics.mtl.assign_
+import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.option
@@ -11,10 +19,7 @@ import arrow.test.laws.SetterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class SetterTest : UnitSpec() {
 
   init {
@@ -79,6 +84,5 @@ class SetterTest : UnitSpec() {
           }.run(generatedToken)
       }
     }
-
   }
 }

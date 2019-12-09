@@ -18,8 +18,8 @@ Examples of that can run code asynchronously are typically datatypes that can su
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.effects.*
-import arrow.effects.extensions.io.async.*
+import arrow.fx.*
+import arrow.fx.extensions.io.async.*
 
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit ->
@@ -87,9 +87,23 @@ Behind the scenes `continueOn()` starts a new coroutine and passes the rest of t
 
 The function `continueOn()` is also available inside [`Monad Comprehensions`]({{ '/docs/patterns/monad_comprehensions' | relative_url }}).
 
+#### effect
+
+Similar to `MonadDefer`'s `later`, this constructor takes a single suspended function and optionally the `CoroutineContext` it has to be run on.
+
+```kotlin
+IO.async().run {
+  // In current thread
+  effect(CommonPool) {
+    // In CommonPool
+    requestSuspend(createUserFromId(123))
+  }
+}
+```
+
 #### invoke with CoroutineContext
 
-Similar to `MonadDefer`'s `invoke`, this constructor it takes a single generator function and the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `later`, this constructor takes a single generator function and the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
@@ -103,7 +117,7 @@ IO.async().run {
 
 #### defer with CoroutineContext
 
-Similar to `MonadDefer`'s `defer`, this constructor it takes a single function returning a `Kind<F, A>` and the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `defer`, this constructor takes a single function returning a `Kind<F, A>` and the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
@@ -143,9 +157,9 @@ Arrow provides `AsyncLaws` in the form of test cases for internal verification o
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(Async::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.effects.typeclasses.Async)
+ank_macro_hierarchy(arrow.fx.typeclasses.Async)

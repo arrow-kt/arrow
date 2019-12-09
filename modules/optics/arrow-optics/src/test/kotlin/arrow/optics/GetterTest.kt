@@ -1,16 +1,27 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.core.extensions.monoid
-import arrow.data.*
+import arrow.core.toT
+import arrow.mtl.State
+import arrow.core.k
+import arrow.mtl.map
+import arrow.mtl.run
+import arrow.mtl.runId
+import arrow.optics.mtl.ask
+import arrow.optics.mtl.asks
+import arrow.optics.mtl.extract
+import arrow.optics.mtl.extractMap
+import arrow.optics.mtl.toReader
+import arrow.optics.mtl.toState
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class GetterTest : UnitSpec() {
 
   init {
@@ -167,7 +178,5 @@ class GetterTest : UnitSpec() {
         tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
       }
     }
-
   }
-
 }

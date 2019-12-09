@@ -13,12 +13,12 @@ When dealing with errors in a purely functional way we try as much as we can to 
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
 
 In the following example we are going to model a basic program and go over the different options we have for dealing with errors in Arrow.
-The program simulates the typical game scenario where we have to shoot a target and series of preconditions need to be met in order actually shot and hit it.
+The program simulates the typical game scenario where we have to shoot a target and series of preconditions need to be met in order to shoot and hit it.
 
 ### Requirements
 
 - Arm a Nuke launcher
-- Aim toward a Target
+- Aim towards a Target
 - Launch a Nuke and impact the Target
 
 ### Requirements
@@ -86,7 +86,7 @@ try {
 }
 ```
 
-Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attempts to gather all stack information to present you with a meaningful stacktrace.
+Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attempts to gather all the stack information to present you with a meaningful stacktrace.
 
 ```java
 public class Throwable {
@@ -101,7 +101,7 @@ public class Throwable {
 
 Constructing an exception may be as costly as your current Thread stack size and it's also platform dependent since `fillInStackTrace` calls into native code.
 
-More info in the cost of instantiating Throwables and throwing exceptions in generals can be found in the links below.
+More info on the cost of instantiating Throwables and throwing exceptions in generals can be found in the links below.
 
 > [The Hidden Performance costs of instantiating Throwables](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)
 > * New: Creating a new Throwable each time
@@ -117,7 +117,7 @@ Exceptions may be considered generally a poor choice in Functional Programming w
 
 ### How do we model exceptional cases then?
 
-Arrow provide proper datatypes and typeclasses to represent exceptional cases.
+Arrow provides proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
@@ -134,16 +134,16 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/arrow/core/option) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+It's easy to work with [`Option`](/docs/arrow/core/option) if your language supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/arrow/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
-import arrow.data.extensions.option.monad.binding
+import arrow.core.extensions.*
+import arrow.core.extensions.option.monad.binding
 
 fun attackOption(): Option<Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm()
     val (target) = aim()
     val (impact) = launch(target, nuke)
@@ -199,17 +199,15 @@ Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` 
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 fun attackTry(): Try<Impacted> =
-  ForTry extensions {
-    binding {
-      val (nuke) = arm()
-      val (target) = aim()
-      val (impact) = launch(target, nuke)
-      impact
-   }.fix()
-  }
+  fx.monad {
+    val (nuke) = arm()
+    val (target) = aim()
+    val (impact) = launch(target, nuke)
+    impact
+  }.fix()
 
 attackTry()
 //Failure(RuntimeException("SystemOffline"))
@@ -263,7 +261,7 @@ All values on the left side assume to be `Right` biased and whenever a `Left` va
 import arrow.core.extensions.either.monad.binding
 
 fun attackEither(): Either<NukeException, Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm()
     val (target) = aim()
     val (impact) = launch(target, nuke)
@@ -318,7 +316,7 @@ We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
 fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
-  binding {
+  fx.monad {
     val (nuke) = arm<F>()
     val (target) = aim<F>()
     val (impact) = launch<F>(target, nuke)
@@ -340,7 +338,7 @@ val result1 = Either.monadError<NukeException>.attack1()
 result1.fix()
 ```
 
-Note that `MonadError` also has a function `bindingCatch` that automatically captures and wraps exceptions in its binding block.
+Note that `MonadThrow` also has a function `fx.monadThrow` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
 fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): Impacted {
@@ -348,7 +346,7 @@ fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): I
 }
 
 fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
-  bindingCatch {
+  fx.monadThrow {
     val (nuke) = arm<F>()
     val (target) = aim<F>()
     val impact = launchImpure<F>(target, nuke)
@@ -366,7 +364,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

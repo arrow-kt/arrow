@@ -1,6 +1,9 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.left
+import arrow.core.right
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -14,18 +17,13 @@ val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
 val genSum: Gen<SumType> =
   Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
 
-val sumPrism: Prism<SumType, String> = Prism(
-  {
-    when (it) {
-      is SumType.A -> Right(it.string)
-      else         -> Left(it)
-    }
-  },
+val sumPrism: Prism<SumType, String> = Prism<SumType, String>(
+  { Option.fromNullable((it as? SumType.A)?.string) },
   SumType::A
 )
 
 val stringPrism: Prism<String, List<Char>> = Prism(
-  { Right(it.toList()) },
+  { Some(it.toList()) },
   { it.joinToString(separator = "") }
 )
 
@@ -60,11 +58,15 @@ internal data class Token(val value: String) {
   }
 }
 
-internal val genToken : Gen<Token> = Gen.string().map { Token(it) }
+internal val genToken: Gen<Token> = Gen.string().map { Token(it) }
 
 internal data class User(val token: Token)
 
-internal val genUser : Gen<User> = genToken.map { User(it) }
+internal val genUser: Gen<User> = genToken.map { User(it) }
+
+internal data class IncompleteUser(val token: Token?)
+
+internal val genIncompleteUser: Gen<IncompleteUser> = Gen.constant(IncompleteUser(null))
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 
@@ -73,7 +75,12 @@ internal val userLens: Lens<User, Token> = Lens(
   { user: User, token: Token -> user.copy(token = token) }
 )
 
+internal val incompleteUserTokenOptional: Optional<IncompleteUser, Token> = Optional(
+  getOrModify = { user -> user.token?.right() ?: user.left() },
+  set = { user, token -> user.copy(token = token) }
+)
+
 internal val defaultHead: Optional<Int, Int> = Optional(
-  { it.right() },
+  { Some(it) },
   { s, _ -> s }
 )

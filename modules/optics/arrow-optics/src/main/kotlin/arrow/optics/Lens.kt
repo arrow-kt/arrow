@@ -1,8 +1,13 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.identity
+import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -43,7 +48,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asLens()
+    fun <S> id() = PIso.id<S>().asLens()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
@@ -98,7 +103,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
     { (s, c) -> get(s) toT c },
-    { (s, _) , (b, c) -> set(s, b) toT c }
+    { (s, _), (b, c) -> set(s, b) toT c }
   )
 
   /**
@@ -106,7 +111,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
     { (c, s) -> c toT get(s) },
-    { (_, s) , (c, b) -> c toT set(s, b) }
+    { (_, s), (c, b) -> c toT set(s, b) }
   )
 
   /**
@@ -226,74 +231,4 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    * Verify if the focus of a [PLens] satisfies the predicate
    */
   fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
-
-  /**
-   * Extracts the value viewed through the [get] function.
-   */
-  fun ask(): Reader<S, A> = Reader(::get)
-
-  /**
-   * Transforms a [PLens] into a [Reader]. Alias for [ask].
-   */
-  fun toReader(): Reader<S, A> = ask()
-
-  /**
-   * Extracts the value viewed through the [get] and applies [f] to it.
-   *
-   * @param f function to apply to the focus.
-   */
-  fun <C> asks(f: (A) -> C): Reader<S, C> = ask().map(f)
-
-  /**
-   * Extracts the focus [A] viewed through the [PLens].
-   */
-  fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
-
-  /**
-   * Transforms a [PLens] into a [State].
-   * Alias for [extract].
-   */
-  fun toState(): State<S, A> = extract()
-
-  /**
-   * Extracts and maps the focus [A] viewed through the [PLens] and applies [f] to it.
-   */
-  fun <C> extractMap(f: (A) -> C): State<S, C> = extract().map(f)
-
 }
-
-/**
- * Update the focus [A] viewed through the [Lens] and returns its *new* value.
- */
-fun <S, A> Lens<S, A>.update(f: (A) -> A): State<S, A> = State { s ->
-  val b = f(get(s))
-  Tuple2(set(s, b), b)
-}
-
-/**
- * Update the focus [A] viewed through the [Lens] and returns its *old* value.
- */
-fun <S, A> Lens<S, A>.updateOld(f: (A) -> A): State<S, A> = State { s ->
-  Tuple2(modify(s, f), get(s))
-}
-
-/**
- * Modify the focus [A] viewed through the [Lens] and ignores both values.
- */
-fun <S, A> Lens<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), Unit) }
-
-/**
- * Assign the focus [A] viewed through the [Lens] and returns its *new* value.
- */
-fun <S, A> Lens<S, A>.assign(a: A): State<S, A> = update { _ -> a }
-
-/**
- * Assign the value focus [A] through the [Lens] and returns its *old* value.
- */
-fun <S, A> Lens<S, A>.assignOld(a: A): State<S, A> = updateOld { _ -> a }
-
-/**
- * Assign the focus [A] viewed through the [Lens] and ignores both values.
- */
-fun <S, A> Lens<S, A>.assign_(a: A): State<S, Unit> = update_ { _ -> a }

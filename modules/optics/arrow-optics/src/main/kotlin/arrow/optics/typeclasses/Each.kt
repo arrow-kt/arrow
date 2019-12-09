@@ -106,5 +106,4 @@ interface Each<S, A> {
       override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
     }
   }
-
 }

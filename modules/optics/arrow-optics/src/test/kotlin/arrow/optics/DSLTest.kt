@@ -1,9 +1,9 @@
 package arrow.optics
 
 import arrow.core.None
-import arrow.data.ListK
-import arrow.data.MapK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.MapK
+import arrow.core.k
 import arrow.optics.dsl.at
 import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.mapk.at.at
@@ -107,7 +107,5 @@ class BoundedTest : UnitSpec() {
         Db.content.every.modify(db, String::toUpperCase)
       } shouldBe (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
     }
-
   }
-
 }

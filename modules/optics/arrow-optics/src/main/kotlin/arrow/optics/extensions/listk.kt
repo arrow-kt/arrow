@@ -1,11 +1,25 @@
 package arrow.optics.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.identity
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toOption
+import arrow.core.toT
+import arrow.core.ListK
+import arrow.core.k
+import arrow.core.fix
 import arrow.extension
 import arrow.core.extensions.option.applicative.applicative
-import arrow.optics.*
+import arrow.optics.Optional
+import arrow.optics.POptional
+import arrow.optics.PPrism
+import arrow.optics.Prism
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
@@ -84,5 +98,4 @@ interface ListKSnoc<A> : Snoc<ListK<A>, A> {
     override fun reverseGet(b: Tuple2<ListK<A>, A>): ListK<A> =
       ListK(b.a + b.b)
   }
-
 }

@@ -93,6 +93,4 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
         transformList.forEach { it.writeTo(generatedDir) }
       }
   }
-
 }
-

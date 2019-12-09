@@ -232,7 +232,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 Let me do one further trick and format the same code in an unusual way:
 
 ```kotlin
-fun allCitiesToVisit(Speaker speaker): List<City> {
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()           .flatMap { x -> x
@@ -368,8 +368,8 @@ The name of this pattern is **Monad**.
 In Arrow terms, a Monad is an interface with two operations: a constructor `just`, and `flatMap`.
 
 ```kotlin
-interface Monad<F>: Applicative<F>, Functor<F> {
-    fun <A> just (instance: A): Kind<F, A>
+interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
+    fun <A> just (instance: A): Kind<F, A> // this comes from [Applicative] interface
 
     fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>) : Kind<F, B>
 }
@@ -624,7 +624,7 @@ This specialization can be accessed using the function `binding` on any Monad, a
 
 ```kotlin
 fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
-    M.binding {
+    M.fx.monad {
         val (speaker) = repository.loadSpeaker()
         val (talk) = speaker.nextTalk()
         val (conference) = talk.getConference()

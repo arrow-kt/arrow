@@ -75,7 +75,7 @@ The DSL also has special support for [Each]({{ '/docs/optics/each' | relative_ur
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.optics.extensions.listk.each.*
 
 val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))

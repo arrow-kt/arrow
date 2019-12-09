@@ -1,9 +1,9 @@
 package arrow.optics
 
-import arrow.data.SetK
-import arrow.data.k
+import arrow.core.SetK
 import arrow.core.SetExtensions
 import arrow.core.identity
+import arrow.core.k
 
 /**
  * [PIso] that defines the equality between a [Set] and a [SetK]

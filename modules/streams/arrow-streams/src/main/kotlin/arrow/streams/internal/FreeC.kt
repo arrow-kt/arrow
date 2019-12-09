@@ -1,13 +1,22 @@
 package arrow.streams.internal
 
 import arrow.Kind
-import arrow.core.*
-import arrow.effects.typeclasses.ExitCase
+import arrow.core.Either
+import arrow.core.FunctionK
+import arrow.core.NonFatal
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.flatMap
+import arrow.core.orElse
+import arrow.core.some
+import arrow.fx.typeclasses.ExitCase
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
 
-//TODO temporary here until moved instances to separate module
+// TODO temporary here until moved instances to separate module
 class ForFreeC private constructor() {
   companion object
 }
@@ -127,7 +136,6 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
         override fun <A> invoke(fa: Kind<F, A>): FreeC<F, A> =
           liftF(fa)
       }
-
   }
 
   /**
@@ -161,9 +169,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
       fun <A> fromEither(either: Either<Throwable, A>): Result<A> =
         either.fold({ FreeC.Fail<Any?, A>(it) }, { FreeC.Pure<Any?, A>(it) })
-
     }
-
   }
 
   @PublishedApi internal data class Pure<F, R>(val r: R) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
@@ -305,7 +311,7 @@ fun <M, S, A> FreeCOf<S, A>.foldMap(f: FunctionK<S, M>, MM: MonadError<M, Throwa
       val folded = c.foldMap(f, MM)
       MM.run {
         folded.map { cc ->
-          cc.fold({ Right(None) }, //this means that the `FreeC` instance was interrupted.
+          cc.fold({ Right(None) }, // this means that the `FreeC` instance was interrupted.
             { a -> Either.Left(g(Result.just(a))) })
         }
       }
@@ -321,7 +327,7 @@ tailrec fun <S, A> FreeC<S, A>.step(): FreeC<S, A> =
     val c = this.fx.fx as FreeC<S, A>
     val f = this.fx.f as (Result<A>) -> FreeC<S, A>
 
-    //We use `FlatMapped` here instead of `flatMap` because it needs to execute for `Result<A>` and not just `A`.
+    // We use `FlatMapped` here instead of `flatMap` because it needs to execute for `Result<A>` and not just `A`.
     FreeC.FlatMapped(c) { cc ->
       FreeC.FlatMapped(f(cc)) { rr ->
         g(rr)
@@ -413,12 +419,10 @@ interface ViewL<F, out R> {
         }
       }
     }
-
   }
-
 }
 
-//Wacky emulated sealed trait... :/
+// Wacky emulated sealed trait... :/
 @Suppress("UNCHECKED_CAST")
 inline fun <F, R, A> FreeC<F, R>.fold(
   pure: (R) -> A,

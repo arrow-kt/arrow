@@ -19,9 +19,9 @@ import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import com.squareup.kotlinpoet.WildcardTypeName
 
 /**
  * Provides ways to go from a [Tree] to [Code] for the purposes of code gen and reporting
@@ -99,7 +99,9 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   fun Annotation.lyrics(): AnnotationSpec {
-    val className = if (type is TypeName.Classy) ClassName(type.pckg.value, type.simpleName) else ClassName.bestGuess(type.toString())
+    val className =
+      if (type is TypeName.Classy) ClassName(type.pckg.value, type.simpleName)
+      else ClassName.bestGuess(type.toString())
     val builder = AnnotationSpec.builder(className).useSiteTarget(useSiteTarget?.lyrics())
     return members.fold(builder) { b, member ->
       b.addMember(member.lyrics())
@@ -114,7 +116,11 @@ interface TypeDecoder : MetaDecoder<Type> {
     val builderWithReceiver =
       if (receiverType != null) builder.receiver(receiverType.lyrics())
       else builder
-    return builderWithReceiver.build()
+    val builderwithInitializer =
+      if (initializer != null) builderWithReceiver.initializer(initializer.lyrics())
+      else builderWithReceiver
+
+    return builderwithInitializer.build()
   }
 
   fun Func.lyrics(): FunSpec {
@@ -170,19 +176,19 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   fun TypeName.TypeVariable.lyrics(): TypeVariableName {
-    val name = TypeVariableName(name, variance?.lyrics())
-      .withBounds(bounds.map { it.lyrics() })
-      .reified(reified)
-    return if (nullable) name.asNullable()
-    else name.asNonNullable()
+    val bounds = bounds.map { it.lyrics() }
+
+    return (if (bounds.isNotEmpty()) TypeVariableName(this.name, *bounds.toTypedArray(), variance = variance?.lyrics())
+    else TypeVariableName(this.name, variance?.lyrics())
+      .copy(reified = reified, nullable = nullable))
   }
 
   fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
     when {
-      name == "*" -> WildcardTypeName.STAR
+      name == "*" -> STAR
       lowerBounds.isNotEmpty() -> lowerBounds[0].lyrics()
       upperBounds.isNotEmpty() -> upperBounds[0].lyrics()
-      else -> WildcardTypeName.STAR
+      else -> STAR
     }
 
   private fun String.removeVariance(): String =
@@ -194,16 +200,12 @@ interface TypeDecoder : MetaDecoder<Type> {
       className.parameterizedBy(*typeArguments.map { it.lyrics() }.toTypedArray())
     }
 
-  fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName {
-    val lambdaName = LambdaTypeName.get(
+  fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName =
+    LambdaTypeName.get(
       receiver = receiverType?.lyrics(),
       parameters = *parameters.map { it.lyrics() }.toTypedArray(),
-      returnType = returnType.lyrics())
-    return if (modifiers.contains(Modifier.Suspend))
-      lambdaName.asSuspending()
-    else
-      lambdaName
-  }
+      returnType = returnType.lyrics()
+    ).copy(suspending = modifiers.contains(Modifier.Suspend))
 
   fun TypeName.Classy.lyrics(): ClassName =
     ClassName(packageName = pckg.value, simpleName = simpleName)
@@ -218,7 +220,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   operator fun Code.Companion.invoke(f: () -> String): Code =
-    Code(CodeBlock.of(f().trimMargin()).toString())
+    Code(f().trimMargin())
 
   operator fun TypeName?.unaryPlus(): Code =
     if (this != null) Code(CodeBlock.of("%T", this.lyrics()).toString())
@@ -239,7 +241,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
-    else Code(list.joinToString(", ") {
+    else Code(list.joinToString(",·") {
       f(it).toString()
     })
   }
@@ -259,9 +261,9 @@ interface TypeDecoder : MetaDecoder<Type> {
   }
 
   fun <A : Any> List<A>.joinToCode(separator: String): Code =
-    if (isEmpty()) Code(CodeBlock.of("").toString())
+    if (isEmpty()) Code("")
     else {
-      val code = joinToString(", ") { separator }
+      val code = joinToString(",·") { separator }
       val args = map { it.resolveDynamicArg() }.toTypedArray()
       Code((if (args.isEmpty()) CodeBlock.of(code) else CodeBlock.of(code, *args)).toString())
     }
@@ -272,5 +274,4 @@ interface TypeDecoder : MetaDecoder<Type> {
       is Parameter -> lyrics()
       else -> this
     }
-
 }

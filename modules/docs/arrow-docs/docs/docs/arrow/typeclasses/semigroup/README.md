@@ -40,9 +40,9 @@ Int.semigroup().run { 1.combine(2) }
 ```
 
 ```kotlin:ank   
-import arrow.data.*
-import arrow.data.extensions.*
-import arrow.data.extensions.listk.semigroup.*
+import arrow.core.*
+import arrow.core.extensions.*
+import arrow.core.extensions.listk.semigroup.*
 
 ListK.semigroup<Int>().run {
   listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k())

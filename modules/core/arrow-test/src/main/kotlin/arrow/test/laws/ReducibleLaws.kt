@@ -4,7 +4,9 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.extensions.monoid
-import arrow.test.generators.*
+import arrow.test.generators.functionAAToA
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Reducible
 import io.kotlintest.properties.Gen

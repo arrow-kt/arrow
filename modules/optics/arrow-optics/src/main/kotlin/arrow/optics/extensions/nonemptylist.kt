@@ -1,8 +1,10 @@
 package arrow.optics.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
+import arrow.core.NonEmptyList
 import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional
