@@ -12,10 +12,11 @@
 {% assign previous_version = item %}
 {% endif %}
 {% endfor %}
+{% assign title_module = "Λrrow " | append: cat_id_cap %}
 
 <head>
   <meta charset="UTF-8">
-  <title>{{site.name}}</title>
+  <title>{{ title_module }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="{{site.description}}">
   <meta name="keywords" content="{{site.keywords}}">
@@ -35,7 +36,7 @@
   <meta name="twitter:image" content="" />
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="{{ '/img/favicon.png' | relative_url }}">
+  <link rel="shortcut icon" type="image/png" href="{{ '/img/favicon.png' | relative_url }}">
 
   <!-- Arrow versions metadata -->
   <meta name="previous-version" data-title="{{ previous-version.title }}" data-url="{{ previous-version.url }}" />

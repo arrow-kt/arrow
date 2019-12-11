@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
+{% assign cat_id = "core" %}
+{% assign cat_id_cap = cat_id | capitalize %}
 {% include _head-docs.html %}
 
 <body id="doc-body">
   <div id="wrapper">
-    {% assign cat_id = "core" %}
     {% include _sidebar-wrapper.html %}
     <div class="doc-content-core">
       {% include _doc-wrapper.html %}
