@@ -2,7 +2,6 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
@@ -10,6 +9,7 @@ import arrow.fx.IOFrame
 import arrow.fx.IOOf
 import arrow.fx.IORunLoop
 import arrow.fx.fix
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
 import kotlinx.atomicfu.atomic
 

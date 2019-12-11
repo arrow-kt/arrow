@@ -1,5 +1,6 @@
 package arrow.fx.rx2
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
@@ -8,9 +9,9 @@ import arrow.core.Predicate
 import arrow.core.Right
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
+
 import arrow.fx.internal.Platform
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.ExitCase.Canceled
 import arrow.fx.typeclasses.ExitCase.Completed
@@ -21,6 +22,9 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+
+typealias MaybeKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias MaybeKProcF<A> = ((Either<Throwable, A>) -> Unit) -> Kind<ForMaybeK, Unit>
 
 class ForMaybeK private constructor() {
   companion object
