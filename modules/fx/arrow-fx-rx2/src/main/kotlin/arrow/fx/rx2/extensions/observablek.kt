@@ -5,11 +5,10 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.fx.CancelToken
+
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
@@ -33,7 +32,9 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.observablek.dispatchers.dispatchers
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

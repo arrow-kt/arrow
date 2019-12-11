@@ -9,10 +9,11 @@ import arrow.core.Tuple2
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.identity
 import arrow.core.k
-import arrow.fx.CancelToken
+
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError

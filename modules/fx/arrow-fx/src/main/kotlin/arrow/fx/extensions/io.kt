@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-import arrow.fx.CancelToken
+
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
@@ -18,6 +18,7 @@ import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.fix
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
 import arrow.fx.typeclasses.ConcurrentSyntax
