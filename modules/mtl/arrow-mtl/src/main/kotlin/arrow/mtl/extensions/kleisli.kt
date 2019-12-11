@@ -9,7 +9,6 @@ import arrow.core.Tuple2
 import arrow.mtl.ReaderApi
 import arrow.mtl.ReaderPartialOf
 import arrow.mtl.ForKleisli
-import arrow.core.Ior
 import arrow.mtl.KleisliOf
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
