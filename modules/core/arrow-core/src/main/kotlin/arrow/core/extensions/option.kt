@@ -6,19 +6,24 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
+import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
 import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.extensions.option.apply.apply
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.orElse
+import arrow.core.some
+import arrow.core.toT
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -38,7 +43,9 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Repeat
 import arrow.typeclasses.Selective
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
@@ -46,15 +53,12 @@ import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
+import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
+import arrow.typeclasses.Zip
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
-import arrow.typeclasses.Semialign
-import arrow.core.Ior
-import arrow.core.some
-import arrow.core.toT
-import arrow.typeclasses.Unalign
-import arrow.typeclasses.Align
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -484,4 +488,23 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
         is Ior.Both -> b.leftValue.some() toT b.rightValue.some()
       }
     }
+}
+
+@extension
+interface OptionZip : Zip<ForOption>, OptionSemialign {
+  override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
+    Option.apply().tupled(this, other)
+}
+
+@extension
+interface OptionRepeat : Repeat<ForOption>, OptionZip {
+  override fun <A> repeat(a: A): Kind<ForOption, A> =
+    Option.just(a)
+}
+
+@extension
+interface OptionUnzip : Unzip<ForOption>, OptionZip {
+  override fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
+    fix().fold({ Option.empty<A>() toT Option.empty() },
+      { it.a.some() toT it.b.some() })
 }

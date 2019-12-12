@@ -8,7 +8,6 @@ import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
-
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -19,8 +18,10 @@ import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
+import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.listK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
@@ -33,6 +34,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -62,19 +64,22 @@ class ListKTest : UnitSpec() {
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
       EqKLaws.laws(
         ListK.eqK(),
-        ListK.eq(Int.eq()) as Eq<Kind<ForListK, Int>>,
-        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>
-      ) {
-        ListK.just(it)
-      },
+        ListK.genK()
+      ),
       AlignLaws.laws(ListK.align(),
-        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
       ),
       UnalignLaws.laws(ListK.unalign(),
-        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
-        ListK.eqK()
+        ListK.genK(),
+        ListK.eqK(),
+        ListK.foldable()
+      ),
+      UnzipLaws.laws(ListK.unzip(),
+        ListK.genK(),
+        ListK.eqK(),
+        ListK.foldable()
       )
     )
 

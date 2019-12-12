@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Failure
+import arrow.core.Id
 import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.MapK
@@ -150,3 +151,11 @@ fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { 
 
 fun Gen.Companion.unit(): Gen<Unit> =
   create { Unit }
+
+fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
+  override fun constants(): Iterable<Id<T>> =
+    gen.constants().map { Id.just(it) }
+
+  override fun random(): Sequence<Id<T>> =
+    gen.random().map { Id.just(it) }
+}
