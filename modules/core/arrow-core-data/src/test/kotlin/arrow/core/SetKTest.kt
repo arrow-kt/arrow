@@ -14,6 +14,7 @@ import arrow.core.extensions.setk.semigroupK.semigroupK
 import arrow.core.extensions.setk.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.genSetK
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FoldableLaws
@@ -50,11 +51,8 @@ class SetKTest : UnitSpec() {
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) },
       EqKLaws.laws(
         SetK.eqK(),
-        SetK.eq(Int.eq()) as Eq<Kind<ForSetK, Int>>,
-        Gen.genSetK(Gen.int()) as Gen<Kind<ForSetK, Int>>
-      ) {
-        SetK.just(it)
-      }
+        SetK.genK()
+      )
     )
   }
 

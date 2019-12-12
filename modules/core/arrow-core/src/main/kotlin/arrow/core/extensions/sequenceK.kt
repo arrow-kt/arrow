@@ -44,6 +44,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Repeat
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -51,6 +52,8 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
+import arrow.typeclasses.Zip
 import arrow.core.combineK as sequenceCombineK
 
 @extension
@@ -337,6 +340,43 @@ interface SequenceKUnalign : Unalign<ForSequenceK>, SequenceKSemialign {
 }
 
 @extension
+interface SequenceKZip : Zip<ForSequenceK>, SequenceKSemialign {
+  override fun <A, B> Kind<ForSequenceK, A>.zip(other: Kind<ForSequenceK, B>): Kind<ForSequenceK, Tuple2<A, B>> =
+    object : Sequence<Tuple2<A, B>> {
+      override fun iterator(): Iterator<Tuple2<A, B>> = object : Iterator<Tuple2<A, B>> {
+
+        val leftIterator = this@zip.fix().iterator()
+        val rightIterator = other.fix().iterator()
+
+        override fun hasNext(): Boolean =
+          leftIterator.hasNext() && rightIterator.hasNext()
+
+        override fun next(): Tuple2<A, B> = leftIterator.next() toT rightIterator.next()
+      }
+    }.k()
+}
+
+@extension
+interface SequenceKRepeat : Repeat<ForSequenceK>, SequenceKZip {
+  override fun <A> repeat(a: A): Kind<ForSequenceK, A> =
+    object : Sequence<A> {
+      override fun iterator(): Iterator<A> = object : Iterator<A> {
+        override fun hasNext(): Boolean = true
+
+        override fun next(): A = a
+      }
+    }.k()
+}
+
+@extension
+interface SequenceKUnzip : Unzip<ForSequenceK>, SequenceKZip {
+  override fun <A, B> Kind<ForSequenceK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
+    this.fix().let { seq ->
+      (seq.map { it.a }.k() toT seq.map { it.b }.k())
+    }
+}
+
+@extension
 interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, SequenceKFoldable {
   override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForSequenceK, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForSequenceK, B>> {
     fun crosswalkSequence(iterator: Iterator<A>): Kind<F, Kind<ForSequenceK, B>> =
@@ -347,11 +387,11 @@ interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, Sequen
 
         ALIGN.run {
           alignWith(ls, rs) { ior: Ior<B, Kind<ForSequenceK, B>> ->
-              when (ior) {
-                is Ior.Left -> SequenceK.just(ior.value)
-                is Ior.Right -> ior.value
-                is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
-              }
+            when (ior) {
+              is Ior.Left -> SequenceK.just(ior.value)
+              is Ior.Right -> ior.value
+              is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
+            }
           }
         }
       } else {

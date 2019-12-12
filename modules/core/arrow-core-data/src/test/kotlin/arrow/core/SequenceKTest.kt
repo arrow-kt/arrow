@@ -16,10 +16,13 @@ import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
+import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
+import arrow.core.extensions.sequencek.unzip.unzip
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.sequenceK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.CrosswalkLaws
@@ -30,9 +33,11 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
@@ -76,13 +81,24 @@ class SequenceKTest : UnitSpec() {
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       AlignLaws.laws(SequenceK.align(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        SequenceK.eqK(),
+        SequenceK.genK(),
+        EQK,
         SequenceK.foldable()
       ),
       UnalignLaws.laws(SequenceK.unalign(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        SequenceK.eqK()
+        SequenceK.genK(),
+        EQK,
+        SequenceK.foldable()
+      ),
+      RepeatLaws.laws(SequenceK.repeat(),
+        SequenceK.genK(),
+        EQK,
+        SequenceK.foldable()
+      ),
+      UnzipLaws.laws(SequenceK.unzip(),
+        SequenceK.genK(),
+        EQK,
+        SequenceK.foldable()
       ),
       CrosswalkLaws.laws(SequenceK.crosswalk(),
         Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,

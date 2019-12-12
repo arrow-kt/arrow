@@ -16,6 +16,7 @@ import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
+import arrow.core.getOption
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.sequence
@@ -38,7 +39,9 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.undocumented
 
 @extension
@@ -172,6 +175,28 @@ interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
           { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
       }.bimap({ it.k() }, { it.k() })
     }
+}
+
+@extension
+interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.zip(other: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      val keys = (ls.keys.intersect(rs.keys))
+
+      val values = keys.map { key -> ls.getOption(key).flatMap { l -> rs.getOption(key).map { key to (l toT it) } } }.flattenOption()
+
+      return values.toMap().k()
+    }
+}
+
+@extension
+interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    this.fix().let { map ->
+      map.entries.fold(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        ls.plus(k to v.a) toT rs.plus(k to v.b)
+      }
+    }.bimap({ it.k() }, { it.k() })
 }
 
 @extension

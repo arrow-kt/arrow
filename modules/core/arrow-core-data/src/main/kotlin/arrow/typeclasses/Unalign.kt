@@ -22,7 +22,7 @@ interface Unalign<F> : Semialign<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.unalign().run {
-   *    unalign(listOf(1.leftIor(), 2.rightIor(), (1 toT 2).bothIor()).k())
+   *    unalign(listOf(("A" toT 1).bothIor(), ("B" toT 2).bothIor(), "C".leftIor()).k())
    *   }
    *   //sampleEnd
    *   println(result)

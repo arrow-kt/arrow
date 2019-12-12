@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.fx.CancelToken
+
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.rx2.FlowableK
@@ -44,10 +44,11 @@ import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.functions.BiFunction
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.flowablek.dispatchers.dispatchers
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.typeclasses.FunctorFilter

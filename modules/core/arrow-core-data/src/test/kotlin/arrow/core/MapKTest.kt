@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -16,8 +15,10 @@ import arrow.core.extensions.mapk.semialign.semialign
 import arrow.core.extensions.mapk.show.show
 import arrow.core.extensions.mapk.traverse.traverse
 import arrow.core.extensions.mapk.unalign.unalign
+import arrow.core.extensions.mapk.unzip.unzip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.mapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
@@ -28,6 +29,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -51,13 +53,19 @@ class MapKTest : UnitSpec() {
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() },
       AlignLaws.laws(MapK.align(),
-        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
+        MapK.genK(Gen.string()),
         MapK.eqK(String.eq()),
         MapK.foldable()
       ),
       UnalignLaws.laws(MapK.unalign(),
-        Gen.mapK(Gen.string(), Gen.int()) as Gen<Kind<MapKPartialOf<String>, Int>>,
-        MapK.eqK(String.eq()))
+        MapK.genK(Gen.string()),
+        MapK.eqK(String.eq()),
+        MapK.foldable()),
+      UnzipLaws.laws(MapK.unzip(),
+        MapK.genK(Gen.string()),
+        MapK.eqK(String.eq()),
+        MapK.foldable()
+      )
     )
 
     "can align maps" {

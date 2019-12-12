@@ -15,7 +15,6 @@ import arrow.core.k
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative
-import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Race2
@@ -34,6 +33,8 @@ import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
+
+typealias CancelToken<F> = Kind<F, Unit>
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Concurrent)
