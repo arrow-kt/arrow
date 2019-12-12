@@ -14,11 +14,14 @@ import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
+import arrow.core.extensions.option.repeat.repeat
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
+import arrow.core.extensions.option.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.option
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
@@ -28,9 +31,11 @@ import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -64,19 +69,27 @@ class OptionTest : UnitSpec() {
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
       EqKLaws.laws(
         Option.eqK(),
-        Option.eq(Int.eq()) as Eq<Kind<ForOption, Int>>,
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>
-      ) {
-        Option.just(it)
-      },
+        Option.genK()
+      ),
       AlignLaws.laws(Option.align(),
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
       UnalignLaws.laws(Option.unalign(),
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
-        Option.eqK()
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      RepeatLaws.laws(Option.repeat(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      UnzipLaws.laws(Option.unzip(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
       )
     )
 

@@ -6,14 +6,17 @@ import arrow.core.Eval
 import arrow.core.ForNonEmptyList
 import arrow.core.Ior
 import arrow.core.ListK
+import arrow.core.Nel
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyListOf
+import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.leftIor
 import arrow.core.rightIor
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -32,6 +35,8 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Unzip
+import arrow.typeclasses.Zip
 import arrow.core.combineK as nelCombineK
 
 @extension
@@ -213,4 +218,22 @@ interface NonEmptyListSemialign : Semialign<ForNonEmptyList>, NonEmptyListFuncto
     rs.isEmpty() -> ls.map { it.leftIor() }
     else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
   }
+}
+
+@extension
+interface NonEmptyListZip : Zip<ForNonEmptyList>, NonEmptyListSemialign {
+  override fun <A, B> Kind<ForNonEmptyList, A>.zip(other: Kind<ForNonEmptyList, B>): Kind<ForNonEmptyList, Tuple2<A, B>> =
+    (this.fix() to other.fix()).let { nel ->
+      Nel.fromListUnsafe(nel.first.all.zip(nel.second.all).map { it.first toT it.second })
+    }
+}
+
+@extension
+interface NonEmptyListUnzip : Unzip<ForNonEmptyList>, NonEmptyListZip {
+  override fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, B>> =
+    this.fix().all.let { list ->
+      list.fold(emptyList<A>() toT emptyList<B>()) { (ls, rs), x ->
+        ls + x.a toT rs + x.b
+      }
+    }.bimap({ Nel.fromListUnsafe(it) }, { Nel.fromListUnsafe(it) })
 }

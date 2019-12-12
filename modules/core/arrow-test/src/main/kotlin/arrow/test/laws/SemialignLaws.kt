@@ -8,6 +8,7 @@ import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.list.functorFilter.flattenOption
 import arrow.core.extensions.list.monadFilter.filterMap
 import arrow.core.extensions.listk.monoid.monoid
+import arrow.test.generators.GenK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -22,29 +23,28 @@ object SemialignLaws {
 
   fun <F> laws(
     SA: Semialign<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> = listOf(
-    Law("Semialign Laws: idempotency") { SA.semialignIdempotency(gen, buildEq(EQK, iorEq1)) },
-    Law("Semialign Laws: commutativity") { SA.semialignCommutativity(gen, buildEq(EQK, iorEq1)) },
-    Law("Semialign Laws: associativity") { SA.semialignAssociativity(gen, buildEq(EQK, iorEq2)) },
-    Law("Semialign Laws: with") { SA.semialignWith(gen, buildEq(EQK, String.eq())) },
-    Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(gen, buildEq(EQK, Ior.eq(String.eq(), String.eq()))) }
-  )
+  ): List<Law> {
+    val intGen = GENK.genK(Gen.int())
 
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
+    return listOf(
+      Law("Semialign Laws: idempotency") { SA.semialignIdempotency(intGen, EQK.liftEq(iorEq1)) },
+      Law("Semialign Laws: commutativity") { SA.semialignCommutativity(intGen, EQK.liftEq(iorEq1)) },
+      Law("Semialign Laws: associativity") { SA.semialignAssociativity(intGen, EQK.liftEq(iorEq2)) },
+      Law("Semialign Laws: with") { SA.semialignWith(intGen, EQK.liftEq(String.eq())) },
+      Law("Semialign Laws: functoriality") { SA.semialignFunctoriality(intGen, EQK.liftEq(Ior.eq(String.eq(), String.eq()))) }
+    )
+  }
 
   fun <F> laws(
     SA: Semialign<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = laws(SA, gen, EQK) +
+  ): List<Law> = laws(SA, GENK, EQK) +
     listOf(
-      Law("Semialign Laws: alignedness") { SA.semialignAlignedness(gen, FOLD) }
+      Law("Semialign Laws: alignedness") { SA.semialignAlignedness(GENK.genK(Gen.int()), FOLD) }
     )
 
   // Laws ported from https://hackage.haskell.org/package/semialign-1.1/docs/Data-Semialign.html

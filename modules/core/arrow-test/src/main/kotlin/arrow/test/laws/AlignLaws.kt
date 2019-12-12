@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Ior
 import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
+import arrow.test.generators.GenK
 import arrow.typeclasses.Align
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -17,27 +18,27 @@ object AlignLaws {
 
   fun <F> laws(
     A: Align<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    SemialignLaws.laws(A, gen, EQK) +
-      listOf(
-        Law("Align Laws: align right empty") { A.alignRightEmpty(gen, buildEq(EQK, iorEq)) },
-        Law("Align Laws: align left empty") { A.alignLeftEmpty(gen, buildEq(EQK, iorEq)) }
-      )
+    SemialignLaws.laws(A, GENK, EQK) + alignLaws(A, GENK, EQK)
 
   fun <F> laws(
     A: Align<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = SemialignLaws.laws(A, gen, EQK, FOLD) +
-    laws(A, gen, EQK)
+  ): List<Law> = SemialignLaws.laws(A, GENK, EQK, FOLD) +
+    alignLaws(A, GENK, EQK)
 
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
+  private fun <F> alignLaws(
+    A: Align<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ) = listOf(
+    Law("Align Laws: align right empty") { A.alignRightEmpty(GENK.genK(Gen.int()), EQK.liftEq(iorEq)) },
+    Law("Align Laws: align left empty") { A.alignLeftEmpty(GENK.genK(Gen.int()), EQK.liftEq(iorEq)) }
+  )
 
   fun <F, A> Align<F>.alignRightEmpty(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, Ior<A, A>>>) =
     forAll(G) { a ->

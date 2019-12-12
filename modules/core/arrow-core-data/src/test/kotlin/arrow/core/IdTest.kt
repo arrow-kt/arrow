@@ -12,20 +12,25 @@ import arrow.core.extensions.id.foldable.foldable
 import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.monoid.monoid
+import arrow.core.extensions.id.repeat.repeat
 import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
 import arrow.core.extensions.id.traverse.traverse
+import arrow.core.extensions.id.unzip.unzip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.SemialignLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -44,13 +49,20 @@ class IdTest : UnitSpec() {
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) },
       EqKLaws.laws(
         Id.eqK(),
-        Id.eq(Int.eq()) as Eq<Kind<ForId, Int>>,
-        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>
-      ) {
-        Id.just(it)
-      },
+        Id.genK()
+      ),
       SemialignLaws.laws(Id.semialign(),
-        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
+        Id.genK(),
+        Id.eqK(),
+        Id.foldable()
+      ),
+      RepeatLaws.laws(Id.repeat(),
+        Id.genK(),
+        Id.eqK(),
+        Id.foldable()
+      ),
+      UnzipLaws.laws(Id.unzip(),
+        Id.genK(),
         Id.eqK(),
         Id.foldable()
       )
@@ -76,12 +88,4 @@ class IdTest : UnitSpec() {
       }
     }
   }
-}
-
-fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
-  override fun constants(): Iterable<Id<T>> =
-    gen.constants().map { Id.just(it) }
-
-  override fun random(): Sequence<Id<T>> =
-    gen.random().map { Id.just(it) }
 }
