@@ -348,6 +348,12 @@ options:
       - title: Unalign
         url: /docs/arrow/typeclasses/unalign/
 
+      - title: Zip
+        url: /docs/arrow/typeclasses/zip/
+
+      - title: Repeat
+        url: /docs/arrow/typeclasses/repeat/
+
   - title: Effects
 
     nested_options:

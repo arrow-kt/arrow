@@ -8,9 +8,12 @@ import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.internal.AtomicRefW
+import arrow.core.nonFatalOrThrow
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
@@ -181,9 +184,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     /**
      * Creates a [FluxK] that'll run [FluxKProc].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
      * import arrow.fx.reactor.FluxK
@@ -197,9 +198,8 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = FluxK.async { cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
-     *     conn.push(FluxK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
@@ -207,6 +207,9 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
      * }
      * ```
      */
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelable instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated async")
     fun <A> async(fa: FluxKProc<A>): FluxK<A> =
       Flux.create<A> { sink ->
         val conn = FluxKConnection()
@@ -225,6 +228,21 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         }
       }.k()
 
+    fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): FluxK<A> =
+      Flux.create<A> { sink ->
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }
+      }.k()
+
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelableF instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated asyncF")
     fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
       Flux.create { sink: FluxSink<A> ->
         val conn = FluxKConnection()
@@ -241,6 +259,66 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
             sink.complete()
           })
         }.fix().flux.subscribe({}, sink::error)
+      }.k()
+
+    fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>): FluxK<A> =
+      Flux.create { sink: FluxSink<A> ->
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }.fix().flux.subscribe({}, sink::error)
+      }.k()
+
+    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val token = fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            sink.error(e)
+          }, { a ->
+            sink.next(a)
+            sink.complete()
+          })
+        }
+        sink.onDispose { token.value().subscribe({}, sink::error) }
+      }.k()
+
+    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            sink.error(e)
+          }, { a ->
+            sink.next(a)
+            sink.complete()
+          })
+        }
+
+        val fa2 = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(just(Unit))
+        }
+
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForFluxK>>?>(null)
+        val disp = fa2.value().subscribe({ token ->
+          val cancel = cancelOrToken.getAndSet(Right(token))
+          cancel?.fold({
+            token.value().subscribe({}, sink::error)
+          }, { Unit })
+        }, sink::error)
+
+        sink.onDispose {
+          disp.dispose()
+          val token = cancelOrToken.getAndSet(Left(Unit))
+          token?.fold({}, {
+            it.value().subscribe({}, sink::error)
+          })
+        }
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {

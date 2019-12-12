@@ -16,16 +16,18 @@ import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
+import arrow.core.extensions.nonemptylist.unzip.unzip
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.nonEmptyList
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
-import arrow.test.laws.SemialignLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -52,13 +54,10 @@ class NonEmptyListTest : UnitSpec() {
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) },
       EqKLaws.laws(
         NonEmptyList.eqK(),
-        NonEmptyList.eq(Int.eq()) as Eq<Kind<ForNonEmptyList, Int>>,
-        Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>
-      ) {
-        Nel.just(it)
-      },
-      SemialignLaws.laws(NonEmptyList.semialign(),
-        Gen.nonEmptyList(Gen.int()) as Gen<Kind<ForNonEmptyList, Int>>,
+        NonEmptyList.genK()
+      ),
+      UnzipLaws.laws(NonEmptyList.unzip(),
+        NonEmptyList.genK(),
         NonEmptyList.eqK(),
         NonEmptyList.foldable()
       )

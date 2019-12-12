@@ -2,12 +2,11 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.fx.internal.JavaCancellationException
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.MonadDefer
 import arrow.typeclasses.Applicative
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-
-typealias CancelToken<F> = Kind<F, Unit>
 
 enum class OnCancel { ThrowCancellationException, Silent;
 
@@ -26,6 +25,8 @@ object ConnectionCancellationException : JavaCancellationException("User cancell
  *
  * The cancellation functions are maintained in a stack and executed in a FIFO order.
  */
+@Deprecated(message = "Cancelling operations through KindConnection will not be supported anymore." +
+  "In case you need to cancel multiple processes can do so by using cancelable and composing cancel operations using parMapN")
 sealed class KindConnection<F> {
 
   /**

@@ -14,6 +14,7 @@ import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.extensions.sortedmapk.eq.eq
 import arrow.core.fix
+import arrow.core.getOption
 import arrow.core.k
 import arrow.core.toOption
 import arrow.core.toT
@@ -32,6 +33,8 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
+import arrow.typeclasses.Zip
 
 interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
@@ -169,3 +172,27 @@ interface SortedMapKUnalign<K : Comparable<K>> : Unalign<SortedMapKPartialOf<K>>
 }
 
 fun <K : Comparable<K>> SortedMapK.Companion.unalign() = object : SortedMapKUnalign<K> {}
+
+interface SortedMapKZip<K : Comparable<K>> : Zip<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
+  override fun <A, B> Kind<SortedMapKPartialOf<K>, A>.zip(other: Kind<SortedMapKPartialOf<K>, B>): Kind<SortedMapKPartialOf<K>, Tuple2<A, B>> =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      val keys = (ls.keys.intersect(rs.keys))
+
+      val values = keys.map { key -> ls.getOption(key).flatMap { l -> rs.getOption(key).map { key to (l toT it) } } }.flattenOption()
+
+      return values.toMap().toSortedMap().k()
+    }
+}
+
+fun <K : Comparable<K>> SortedMapK.Companion.zip() = object : SortedMapKZip<K> {}
+
+interface SortedMapKUnzip<K : Comparable<K>> : Unzip<SortedMapKPartialOf<K>>, SortedMapKZip<K> {
+  override fun <A, B> Kind<SortedMapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<SortedMapKPartialOf<K>, A>, Kind<SortedMapKPartialOf<K>, B>> =
+    this.fix().let { map ->
+      map.entries.fold(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        ls.plus(k to v.a) toT rs.plus(k to v.b)
+      }
+    }.bimap({ it.toSortedMap().k() }, { it.toSortedMap().k() })
+}
+
+fun <K : Comparable<K>> SortedMapK.Companion.unzip() = object : SortedMapKUnzip<K> {}

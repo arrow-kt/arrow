@@ -7,6 +7,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
+import arrow.test.generators.GenK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -18,38 +19,34 @@ import io.kotlintest.properties.forAll
 object UnalignLaws {
   fun <F> laws(
     UA: Unalign<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> = SemialignLaws.laws(UA, gen, EQK) + unalignLaws(UA, gen, EQK)
+  ): List<Law> = SemialignLaws.laws(UA, GENK, EQK) + unalignLaws(UA, GENK, EQK)
 
   fun <F> laws(
     UA: Unalign<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     FOLD: Foldable<F>
-  ): List<Law> = SemialignLaws.laws(UA, gen, EQK, FOLD) + unalignLaws(UA, gen, EQK)
+  ): List<Law> = SemialignLaws.laws(UA, GENK, EQK, FOLD) + unalignLaws(UA, GENK, EQK)
 
   private fun <F> unalignLaws(
     UA: Unalign<F>,
-    gen: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> {
-    val iorIntEq = buildEq(EQK, Ior.eq(Int.eq(), Int.eq()))
-    val intEq = buildEq(EQK, Int.eq())
+    val iorIntEq = EQK.liftEq(Ior.eq(Int.eq(), Int.eq()))
+    val intEq = EQK.liftEq(Int.eq())
     val tuple2Eq = Tuple2.eq(intEq, intEq)
+    val intGen = GENK.genK(Gen.int())
 
     return listOf(
-      Law("Unalign Laws: unalign inverts align") { UA.unalignInvertsAlign(gen, tuple2Eq) },
+      Law("Unalign Laws: unalign inverts align") { UA.unalignInvertsAlign(intGen, tuple2Eq) },
       Law("Unalign Laws: align inverts unalign") {
-        UA.alignInvertsUnalign(iorGen(UA, gen, gen), iorIntEq)
+        UA.alignInvertsUnalign(iorGen(UA, intGen, intGen), iorIntEq)
       }
     )
   }
-
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
 
   fun <F, A, B> Unalign<F>.alignInvertsUnalign(G: Gen<Kind<F, Ior<A, B>>>, EQ: Eq<Kind<F, Ior<A, B>>>) =
     forAll(G) { xs ->
