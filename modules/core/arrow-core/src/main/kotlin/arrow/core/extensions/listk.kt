@@ -14,6 +14,7 @@ import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.k
 import arrow.core.leftIor
 import arrow.core.rightIor
@@ -378,12 +379,11 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
         val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, tail, fa)
 
         ALIGN.run {
-          alignWith(ls, rs) { ior: Ior<B, Kind<ForListK, B>> ->
-            when (ior) {
-              is Ior.Left -> ListK.just(ior.value)
-              is Ior.Right -> ior.value
-              is Ior.Both -> ListK.just(ior.leftValue) + ior.rightValue.fix()
-            }
+          alignWith(ls, rs) { ior ->
+            ior.fold(
+              { ListK.just(it) },
+              ::identity,
+              { l, r -> ListK.just(l) + r.fix() })
           }
         }
       }

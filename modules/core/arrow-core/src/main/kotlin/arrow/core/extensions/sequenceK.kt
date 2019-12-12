@@ -21,6 +21,7 @@ import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.k
 import arrow.core.some
 import arrow.core.toOption
@@ -386,12 +387,10 @@ interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, Sequen
         val rs = crosswalkSequence(iterator)
 
         ALIGN.run {
-          alignWith(ls, rs) { ior: Ior<B, Kind<ForSequenceK, B>> ->
-            when (ior) {
-              is Ior.Left -> SequenceK.just(ior.value)
-              is Ior.Right -> ior.value
-              is Ior.Both -> (SequenceK.just(ior.leftValue) + ior.rightValue.fix().sequence).k()
-            }
+          alignWith(ls, rs) { ior ->
+            ior.fold({ SequenceK.just(it) },
+              ::identity,
+              { l, r -> (SequenceK.just(l) + r.fix().sequence).k() })
           }
         }
       } else {
