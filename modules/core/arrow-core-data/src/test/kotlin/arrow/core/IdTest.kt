@@ -69,7 +69,7 @@ class IdTest : UnitSpec() {
         Id.foldable()
       ),
       CrosswalkLaws.laws(Id.crosswalk(),
-        Gen.id(Gen.int()) as Gen<Kind<ForId, Int>>,
+        Id.genK(),
         Id.eqK())
     )
 

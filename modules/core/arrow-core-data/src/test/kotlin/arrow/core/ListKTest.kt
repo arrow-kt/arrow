@@ -84,7 +84,7 @@ class ListKTest : UnitSpec() {
         ListK.foldable()
       ),
       CrosswalkLaws.laws(ListK.crosswalk(),
-        Gen.listK(Gen.int()) as Gen<Kind<ForListK, Int>>,
+        ListK.genK(),
         ListK.eqK()
       )
     )

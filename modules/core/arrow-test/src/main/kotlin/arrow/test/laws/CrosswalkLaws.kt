@@ -7,6 +7,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.k
+import arrow.test.generators.GenK
 import arrow.typeclasses.Align
 import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
@@ -19,11 +20,9 @@ object CrosswalkLaws {
 
   fun <T> laws(
     CW: Crosswalk<T>,
-    gen: Gen<Kind<T, Int>>,
+    GENK: GenK<T>,
     EQK: EqK<T>
   ): List<Law> {
-
-    val eq = buildEq(EQK, Eq.any())
 
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {
       override fun constants(): Iterable<(Int) -> ListK<String>> = listOf(
@@ -35,18 +34,13 @@ object CrosswalkLaws {
 
     return listOf(
       Law("Crosswalk laws: crosswalk an empty structure == an empty structure") {
-        CW.crosswalkEmptyIsEmpty(ListK.align(), gen, ListK.eq(eq))
+        CW.crosswalkEmptyIsEmpty(ListK.align(), GENK.genK(Gen.int()), ListK.eq(EQK.liftEq(Eq.any())))
       },
       Law("Crosswalk laws: crosswalk function == fmap function andThen sequenceL") {
-        CW.crosswalkFunctionEqualsComposeSequenceAndFunction(ListK.align(), gen, funGen, ListK.eq(buildEq(EQK, String.eq())))
+        CW.crosswalkFunctionEqualsComposeSequenceAndFunction(ListK.align(), GENK.genK(Gen.int()), funGen, ListK.eq(EQK.liftEq(String.eq())))
       }
     )
   }
-
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
 
   fun <T, F, A, B> Crosswalk<T>.crosswalkEmptyIsEmpty(
     ALIGN: Align<F>,

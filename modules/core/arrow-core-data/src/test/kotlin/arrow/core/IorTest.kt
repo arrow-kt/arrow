@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -19,6 +20,7 @@ import arrow.core.extensions.sequence.monadFilter.filterMap
 import arrow.core.extensions.sequencek.apply.apply
 import arrow.core.extensions.sequencek.monadFilter.filterMap
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.option
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
@@ -50,7 +52,7 @@ class IorTest : UnitSpec() {
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
-      CrosswalkLaws.laws(Ior.crosswalk(), Gen.ior(Gen.int(), Gen.int()), Ior.eqK(Int.eq())),
+      CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()), Eq.any())
     )
 
@@ -147,6 +149,12 @@ class IorTest : UnitSpec() {
     }
   }
 }
+
+fun <A> Ior.Companion.genK(kgen: Gen<A>) =
+  object : GenK<IorPartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
+      Gen.ior(kgen, gen)
+  }
 
 private fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>) =
   object : Gen<IorOf<A, B>> {

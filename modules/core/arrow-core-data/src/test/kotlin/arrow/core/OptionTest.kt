@@ -3,7 +3,6 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
@@ -95,7 +94,7 @@ class OptionTest : UnitSpec() {
         Option.foldable()
       ),
       CrosswalkLaws.laws(Option.crosswalk(),
-        Gen.option(Gen.int()) as Gen<Kind<ForOption, Int>>,
+        Option.genK(),
         Option.eqK()
       )
     )

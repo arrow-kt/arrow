@@ -82,26 +82,26 @@ class SequenceKTest : UnitSpec() {
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       AlignLaws.laws(SequenceK.align(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       UnalignLaws.laws(SequenceK.unalign(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       RepeatLaws.laws(SequenceK.repeat(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       UnzipLaws.laws(SequenceK.unzip(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       CrosswalkLaws.laws(SequenceK.crosswalk(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
+        SequenceK.genK(),
         SequenceK.eqK()
       )
     )
