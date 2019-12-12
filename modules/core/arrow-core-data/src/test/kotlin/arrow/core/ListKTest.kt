@@ -8,7 +8,6 @@ import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
-
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -19,10 +18,6 @@ import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
-import arrow.core.extensions.lpadZip
-import arrow.core.extensions.lpadZipWith
-import arrow.core.extensions.rpadZip
-import arrow.core.extensions.rpadZipWith
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.listK
@@ -114,9 +109,8 @@ class ListKTest : UnitSpec() {
     "lpadzip" {
       forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
 
-        val result = ListK.semialign().run {
+        val result =
           a.lpadZip(b)
-        }
 
         result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
       }
@@ -125,11 +119,10 @@ class ListKTest : UnitSpec() {
     "lpadzipwith" {
       forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
 
-        val result = ListK.semialign().run {
+        val result =
           a.lpadZipWith(b) { a, b ->
             a toT b
           }
-        }
 
         result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
       }
@@ -138,9 +131,8 @@ class ListKTest : UnitSpec() {
     "rpadzip" {
       forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
 
-        val result = ListK.semialign().run {
+        val result =
           a.rpadZip(b)
-        }
 
         result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
       }
@@ -149,11 +141,10 @@ class ListKTest : UnitSpec() {
     "rpadzipwith" {
       forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
 
-        val result = ListK.semialign().run {
+        val result =
           a.rpadZipWith(b) { a, b ->
             a toT b
           }
-        }
 
         result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
       }

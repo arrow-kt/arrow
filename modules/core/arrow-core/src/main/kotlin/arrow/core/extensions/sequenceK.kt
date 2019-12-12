@@ -19,7 +19,6 @@ import arrow.core.extensions.sequence.monadFilter.filterMap
 import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
-import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
@@ -317,11 +316,6 @@ interface SequenceKSemialign : Semialign<ForSequenceK>, SequenceKFunctor {
       }
     }.k()
 }
-
-fun <A, B, C> SequenceK<A>.alignSequenceWith(other: SequenceK<B>, fab: (Ior<A, B>) -> C): SequenceK<C> =
-  SequenceK.semialign().run {
-    alignWith(this@alignSequenceWith, other, fab)
-  }.fix()
 
 @extension
 interface SequenceKAlign : Align<ForSequenceK>, SequenceKSemialign {
