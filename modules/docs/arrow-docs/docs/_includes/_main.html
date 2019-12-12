@@ -4,7 +4,7 @@
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
       {% if title != "arrow incubator" %}
-      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ site.baseurl }}{{ item.url }}">
+      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url | relative_url }}">
 
         <div id="{{ item.id }}-header" class="item-header">
           <div id="icon-{{ item.id }}-content" class="icon-content">
@@ -28,7 +28,7 @@
         <ul id="incubator-list" class="incubator-list">
           {% for item in site.data.features.incubator %}
           {% if item.title == 'Arrow Query Language' %}
-            {% assign aqlUrl = item.url %}
+          {% assign aqlUrl = item.url %}
           {% endif %}
           <li class="incubator-items">
             <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
