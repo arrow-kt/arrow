@@ -17,6 +17,9 @@ The `Repeat` typeclass extends the `Zip` typeclass with a way to repeat the stru
 
 #### repeat
 
+Provides a structure that can be used to zip with. The structure repeats the provided value and is
+potentially infinite.
+
 `fun <A> repeat(a: A): Kind<F, A>`
 
 ```kotlin:ank

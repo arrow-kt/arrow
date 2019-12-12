@@ -21,7 +21,7 @@ import arrow.core.extensions.id.unzip.unzip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.generators.id.genK.genK
+import arrow.test.generators.genK
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws

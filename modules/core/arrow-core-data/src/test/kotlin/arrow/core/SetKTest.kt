@@ -14,8 +14,8 @@ import arrow.core.extensions.setk.semigroupK.semigroupK
 import arrow.core.extensions.setk.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.genSetK
-import arrow.test.generators.setk.genK.genK
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.HashLaws

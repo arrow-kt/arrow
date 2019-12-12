@@ -18,8 +18,8 @@ import arrow.core.extensions.mapk.unalign.unalign
 import arrow.core.extensions.mapk.unzip.unzip
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.mapK
-import arrow.test.generators.mapk.genK.genK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws

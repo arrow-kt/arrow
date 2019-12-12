@@ -21,8 +21,8 @@ import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.option.unzip.unzip
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.option
-import arrow.test.generators.option.genK.genK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
