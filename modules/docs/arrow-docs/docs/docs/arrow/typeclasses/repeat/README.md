@@ -11,7 +11,7 @@ redirect_from:
 {:.beginner}
 beginner
 
-The `Repeat` typeclass extends the `Zip` typeclass with an repeat structure.
+The `Repeat` typeclass extends the `Zip` typeclass with a way to repeat the structure.
 
 ### Main Combinators
 
