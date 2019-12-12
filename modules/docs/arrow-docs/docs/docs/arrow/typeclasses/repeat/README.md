@@ -6,7 +6,7 @@ redirect_from:
   - /docs/typeclasses/repeat/
 ---
 
-## Zip
+## Repeat
 
 {:.beginner}
 beginner
@@ -16,9 +16,6 @@ The `Repeat` typeclass extends the `Zip` typeclass with a way to repeat the stru
 ### Main Combinators
 
 #### repeat
-
-Provides an structure that can be used to zip with. The structure contains the provided value and is
-potentially infinite.
 
 `fun <A> repeat(a: A): Kind<F, A>`
 
@@ -39,7 +36,7 @@ Arrow provides [`RepeatLaws`][functor_laws_source]{:target="_blank"} in the form
 
 #### Creating your own `Repeat` instances
 
-Arrow already provides Align instances for common datatypes (e.g. Option, SequenceK). See their implementations
+Arrow already provides Repeat instances for common datatypes (e.g. Option, SequenceK). See their implementations
 and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
