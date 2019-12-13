@@ -16,7 +16,7 @@ import io.kotlintest.properties.forAll
 
 object FunctorFilterLaws {
   fun <F> laws(FFF: FunctorFilter<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    FunctorLaws.laws(FFF, cf, EQ) + listOf(
+    FunctorLaws.laws(FFF, Gen.int().map(cf), EQ) + listOf(
       Law("Functor Filter: filterMap composition") { FFF.filterMapComposition(cf, EQ) },
       Law("Functor Filter: filterMap map consistency") { FFF.filterMapMapConsistency(cf, EQ) },
       Law("Functor Filter: flattenOption filterMap consistency") { FFF.flattenOptionConsistentWithfilterMap(cf, EQ) },

@@ -12,34 +12,20 @@ import io.kotlintest.properties.forAll
 
 object FunctorLaws {
 
-  fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> {
-    val G = Gen.int().map {
-      AP.just(it)
-    }
-
-    return InvariantLaws.laws(AP, G, EQ) + listOf(
-      Law("Functor Laws: Covariant Identity") { AP.covariantIdentity(AP::just, EQ) },
-      Law("Functor Laws: Covariant Composition") { AP.covariantComposition(AP::just, EQ) }
+  fun <F> laws(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    InvariantLaws.laws(FF, G, EQ) + listOf(
+      Law("Functor Laws: Covariant Identity") { FF.covariantIdentity(G, EQ) },
+      Law("Functor Laws: Covariant Composition") { FF.covariantComposition(G, EQ) }
     )
-  }
 
-  fun <F> laws(FF: Functor<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> {
-    val G = Gen.int().map(f)
-
-    return InvariantLaws.laws(FF, G, EQ) + listOf(
-      Law("Functor Laws: Covariant Identity") { FF.covariantIdentity(f, EQ) },
-      Law("Functor Laws: Covariant Composition") { FF.covariantComposition(f, EQ) }
-    )
-  }
-
-  fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
+  fun <F> Functor<F>.covariantIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(G) { fa: Kind<F, Int> ->
       fa.map(::identity).equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> Functor<F>.covariantComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Functor<F>.covariantComposition(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(
-      Gen.int().map(ff),
+      G,
       Gen.functionAToB<Int, Int>(Gen.int()),
       Gen.functionAToB<Int, Int>(Gen.int())
     ) { fa: Kind<F, Int>, f, g ->

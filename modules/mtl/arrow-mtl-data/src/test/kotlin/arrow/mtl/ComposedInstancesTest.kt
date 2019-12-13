@@ -103,7 +103,7 @@ class ComposedInstancesTest : UnitSpec() {
     )
 
     testLaws(
-      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),
+      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQ_OPTION_NEL),
       ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQ_OPTION_NEL),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), cf, Eq.any()),
       TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),

@@ -1,5 +1,7 @@
 package arrow.free
 
+import arrow.Kind
+import arrow.Kind2
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.Id
@@ -13,6 +15,7 @@ import arrow.free.extensions.coyoneda.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
@@ -23,7 +26,10 @@ class CoyonedaTest : UnitSpec() {
 
   init {
 
-    testLaws(FunctorLaws.laws(Coyoneda.functor(), { _ -> Coyoneda(Id(0)) { it } }, EQ))
+    val f: (Int) -> Coyoneda<ForId, Int, Int> = { _ -> Coyoneda(Id(0)) { it } }
+    val g: Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, Int>> = Gen.int().map(f) as Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, Int>>
+
+    testLaws(FunctorLaws.laws(Coyoneda.functor(), g, EQ))
 
     "map should be stack-safe" {
       val loops = 10000
