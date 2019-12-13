@@ -48,7 +48,7 @@ class FreeApplicativeTest : UnitSpec() {
     val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(Id.monad(), idApInterpreter)
 
     testLaws(
-      EqLaws.laws(EQ, Gen.opsAp(Gen.int())),
+      EqLaws.laws(EQ, Gen.opsAp()),
       ApplicativeLaws.laws(OpsAp, EQ),
       ApplicativeLaws.laws(FreeApplicative.applicative(), EQ)
     )
@@ -72,7 +72,17 @@ class FreeApplicativeTest : UnitSpec() {
   }
 }
 
-private fun Gen.Companion.opsAp(gen: Gen<Int>) =
-  gen.map {
-    OpsAp.value(it)
-  }
+private fun Gen.Companion.opsAp() =
+  oneOf(valueGen, addGen, subtractGen)
+
+private val valueGen = Gen.bind(Gen.int()) {
+  OpsAp.value(it)
+}
+
+private val addGen = Gen.bind(Gen.int(), Gen.int()) { a, b ->
+  OpsAp.add(a, b)
+}
+
+private val subtractGen = Gen.bind(Gen.int(), Gen.int()) { a, b ->
+  OpsAp.subtract(a, b)
+}
