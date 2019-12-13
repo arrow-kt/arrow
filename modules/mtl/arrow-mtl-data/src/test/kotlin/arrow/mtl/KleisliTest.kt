@@ -37,6 +37,7 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class KleisliTest : UnitSpec() {
@@ -71,7 +72,7 @@ class KleisliTest : UnitSpec() {
         EQ_EITHER = IOEitherEQ(),
         EQERR = IOEQ()
       ),
-      ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
+      ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         { Kleisli { it.const() } },

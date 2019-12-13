@@ -14,7 +14,7 @@ object DivideLaws {
     DF: Divide<F>,
     cf: (Int) -> Kind<F, Int>,
     EQ: Eq<Kind<F, Int>>
-  ): List<Law> = ContravariantLaws.laws(DF, cf, EQ) + listOf(
+  ): List<Law> = ContravariantLaws.laws(DF, Gen.int().map(cf), EQ) + listOf(
     Law("Divide laws: Associative") { DF.associative(cf, EQ) }
   )
 

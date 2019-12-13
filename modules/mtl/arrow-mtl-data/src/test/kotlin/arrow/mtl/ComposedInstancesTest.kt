@@ -58,6 +58,7 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
+import io.kotlintest.properties.Gen
 
 class ComposedInstancesTest : UnitSpec() {
   init {
@@ -94,11 +95,11 @@ class ComposedInstancesTest : UnitSpec() {
     val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL)
+      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQ_OPTION_NEL)
     )
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), cf2, EQ_OPTION_FN1)
+      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), Gen.int().map(cf2), EQ_OPTION_FN1)
     )
 
     testLaws(

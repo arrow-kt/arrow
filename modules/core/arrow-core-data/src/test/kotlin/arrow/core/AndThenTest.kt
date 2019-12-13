@@ -33,12 +33,14 @@ class AndThenTest : UnitSpec() {
     a(1) == b(1)
   }
 
+  val gen = Gen.int().map { AndThen.just<Int, Int>(it).conest() }
+
   init {
 
     testLaws(
       MonadLaws.laws(AndThen.monad(), EQ),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant(), { AndThen.just<Int, Int>(it).conest() }, ConestedEQ),
+      ContravariantLaws.laws(AndThen.contravariant(), gen, ConestedEQ),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
     )
