@@ -1,6 +1,7 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Failure
@@ -179,4 +180,9 @@ fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>): Gen<Ior<A, B>> =
           Ior.fromOptions(it.first, it.second)
         }
       }
+  }
+
+fun <A, B> Gen.Companion.genConst(gen: Gen<A>): Gen<Const<A, B>> =
+  gen.map {
+    Const<A, B>(it)
   }
