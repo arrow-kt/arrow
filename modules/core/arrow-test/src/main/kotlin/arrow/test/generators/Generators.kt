@@ -2,7 +2,9 @@ package arrow.test.generators
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Endo
 import arrow.core.Failure
+import arrow.core.Id
 import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.MapK
@@ -107,6 +109,7 @@ fun Gen.Companion.intPredicate(): Gen<(Int) -> Boolean> =
     )
   }
 
+fun <A> Gen.Companion.endo(gen: Gen<A>): Gen<Endo<A>> = gen.map { a: A -> Endo<A> { a } }
 fun <B> Gen.Companion.option(gen: Gen<B>): Gen<Option<B>> =
   gen.orNull().map { it.toOption() }
 
@@ -145,3 +148,14 @@ fun Gen.Companion.char(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
 
 fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
+
+fun Gen.Companion.unit(): Gen<Unit> =
+  create { Unit }
+
+fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
+  override fun constants(): Iterable<Id<T>> =
+    gen.constants().map { Id.just(it) }
+
+  override fun random(): Sequence<Id<T>> =
+    gen.random().map { Id.just(it) }
+}

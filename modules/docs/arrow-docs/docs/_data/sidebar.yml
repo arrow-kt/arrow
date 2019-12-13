@@ -225,6 +225,9 @@ options:
       - title: Eq
         url: /docs/arrow/typeclasses/eq/
 
+      - title: EqK
+        url: /docs/arrow/typeclasses/eqk/
+
       - title: Hash
         url: /docs/arrow/typeclasses/hash/
 
@@ -327,7 +330,6 @@ options:
       - title: Alternative
         url: /docs/arrow/typeclasses/alternative/
 
-
       - title: Divide
         url: /docs/arrow/typeclasses/divide/
 
@@ -336,6 +338,21 @@ options:
 
       - title: Decidable
         url: /docs/arrow/typeclasses/decidable/
+
+      - title: Semialign
+        url: /docs/arrow/typeclasses/semialign/
+
+      - title: Align
+        url: /docs/arrow/typeclasses/align/
+
+      - title: Unalign
+        url: /docs/arrow/typeclasses/unalign/
+
+      - title: Zip
+        url: /docs/arrow/typeclasses/zip/
+
+      - title: Repeat
+        url: /docs/arrow/typeclasses/repeat/
 
   - title: Effects
 

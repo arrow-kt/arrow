@@ -1,15 +1,17 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.core.Const
+import arrow.core.ConstOf
+import arrow.core.ConstPartialOf
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.fix
+import arrow.core.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstOf
-import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
@@ -23,10 +25,8 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
-import arrow.typeclasses.fix
-import arrow.typeclasses.value
-import arrow.typeclasses.ap as constAp
-import arrow.typeclasses.combine as combineAp
+import arrow.core.ap as constAp
+import arrow.core.combine as combineAp
 
 @extension
 interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {

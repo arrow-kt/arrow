@@ -1,16 +1,16 @@
 package arrow.optics
 
 import arrow.Kind
+import arrow.core.Const
 import arrow.core.Either
+import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.monoid
 import arrow.core.extensions.listk.monoid.monoid
+import arrow.core.extensions.monoid
 import arrow.core.identity
-import arrow.core.ListK
 import arrow.higherkind
-import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
 

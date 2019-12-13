@@ -1,16 +1,15 @@
 package arrow.test.laws
 
+import arrow.core.Const
 import arrow.core.Id
 import arrow.core.compose
-import arrow.core.identity
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.functor.functor
+import arrow.core.identity
 import arrow.core.value
 import arrow.optics.Iso
-import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

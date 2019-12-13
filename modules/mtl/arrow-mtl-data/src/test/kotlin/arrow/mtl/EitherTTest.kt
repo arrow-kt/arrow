@@ -1,12 +1,15 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.Const
+import arrow.core.ConstPartialOf
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
+import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
@@ -15,6 +18,7 @@ import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.functor.functor
 import arrow.core.fix
+import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
@@ -33,11 +37,7 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
-import arrow.typeclasses.const
-import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {

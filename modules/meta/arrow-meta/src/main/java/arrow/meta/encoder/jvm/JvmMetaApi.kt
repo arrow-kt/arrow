@@ -356,7 +356,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       val tail = when (witness) {
         is TypeName.ParameterizedType -> witness.typeArguments + typeArguments.drop(1)
         is TypeName.WildcardType -> {
-          if (witness.name == "arrow.typeclasses.Const") {
+          if (witness.name == "arrow.core.Const") {
             val head = typeArguments[0]
             val missingTypeArgs = typeArguments.drop(1)
             head.nestedTypeVariables + missingTypeArgs

@@ -1,15 +1,16 @@
-package arrow.typeclasses
+package arrow.core
 
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq
 import arrow.core.extensions.const.show.show
-import arrow.core.extensions.monoid
 import arrow.core.extensions.const.traverseFilter.traverseFilter
+import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.Eq
 
 class ConstTest : UnitSpec() {
   init {

@@ -9,9 +9,9 @@ import arrow.core.Right
 import arrow.core.internal.AtomicRefW
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
+
 import arrow.fx.internal.Platform
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
@@ -19,6 +19,9 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
+
+typealias FlowableKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias FlowableKProcF<A> = ((Either<Throwable, A>) -> Unit) -> FlowableKOf<Unit>
 
 class ForFlowableK private constructor() {
   companion object
