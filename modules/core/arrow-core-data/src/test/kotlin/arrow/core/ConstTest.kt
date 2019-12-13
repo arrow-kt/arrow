@@ -11,6 +11,7 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 class ConstTest : UnitSpec() {
   init {
@@ -18,9 +19,14 @@ class ConstTest : UnitSpec() {
       testLaws(
         TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(this), { Const(it) }, Eq.any()),
         ApplicativeLaws.laws(Const.applicative(this), Eq.any()),
-        EqLaws.laws(Const.eq<Int, Int>(Eq.any())) { Const(it) },
-        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any())) { Const(it) }
+        EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.const(Gen.int())),
+        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.const(Gen.int()))
       )
     }
   }
 }
+
+private fun <A> Gen.Companion.const(gen: Gen<A>): Gen<Const<A, A>> =
+  gen.map {
+    Const<A, A>(it)
+  }

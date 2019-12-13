@@ -39,10 +39,10 @@ class TryTest : UnitSpec() {
 
     testLaws(
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
-      ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
+      ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
-      HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any())) { Try.just(it) }
+      HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
     )
 
     "empty should return a Success of the empty of the inner type" {

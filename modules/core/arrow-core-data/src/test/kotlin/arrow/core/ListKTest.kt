@@ -51,7 +51,7 @@ class ListKTest : UnitSpec() {
 
     testLaws(
       MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, eq),
-      ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
+      ShowLaws.laws(ListK.show(), eq, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq())), this::bijection, associativeSemigroupalEq),
@@ -61,7 +61,7 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
-      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
+      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq()), Gen.listK(Gen.int())),
       EqKLaws.laws(
         ListK.eqK(),
         ListK.genK()

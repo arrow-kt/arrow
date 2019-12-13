@@ -19,6 +19,7 @@ import arrow.free.extensions.freeapplicative.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
@@ -47,7 +48,7 @@ class FreeApplicativeTest : UnitSpec() {
     val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(Id.monad(), idApInterpreter)
 
     testLaws(
-      EqLaws.laws(EQ) { OpsAp.value(it) },
+      EqLaws.laws(EQ, Gen.opsAp(Gen.int())),
       ApplicativeLaws.laws(OpsAp, EQ),
       ApplicativeLaws.laws(FreeApplicative.applicative(), EQ)
     )
@@ -70,3 +71,8 @@ class FreeApplicativeTest : UnitSpec() {
     }
   }
 }
+
+private fun Gen.Companion.opsAp(gen: Gen<Int>) =
+  gen.map {
+    OpsAp.value(it)
+  }

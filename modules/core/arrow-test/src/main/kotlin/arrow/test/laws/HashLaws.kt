@@ -7,23 +7,23 @@ import io.kotlintest.properties.forAll
 
 object HashLaws {
 
-  fun <F> laws(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F): List<Law> =
-    EqLaws.laws(EQ, cf) + listOf(
-      Law("Hash Laws: Equality implies equal hash") { equalHash(HF, EQ, cf) },
-      Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, cf) }
+  fun <F> laws(HF: Hash<F>, EQ: Eq<F>, G: Gen<F>): List<Law> =
+    EqLaws.laws(EQ, G) + listOf(
+      Law("Hash Laws: Equality implies equal hash") { equalHash(HF, EQ, G) },
+      Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, G) }
     )
 
-  fun <F> equalHash(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F) {
-    forAll(Gen.int()) { f ->
-      val a = cf(f)
-      val b = cf(f)
-      EQ.run { a.eqv(b) } && HF.run { a.hash() == b.hash() }
+  private fun <F> equalHash(HF: Hash<F>, EQ: Eq<F>, G: Gen<F>) {
+    forAll(G, G) { a, b ->
+      if (EQ.run { a.eqv(b) })
+        HF.run { a.hash() == b.hash() }
+      else
+        true
     }
   }
 
-  fun <F> equalHashM(HF: Hash<F>, cf: (Int) -> F) {
-    forAll(Gen.int()) { f ->
-      val a = cf(f)
+  private fun <F> equalHashM(HF: Hash<F>, G: Gen<F>) {
+    forAll(G) { a ->
       HF.run { a.hash() == a.hash() }
     }
   }

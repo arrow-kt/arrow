@@ -24,6 +24,7 @@ import arrow.ui.extensions.sum.comonad.comonad
 import arrow.ui.extensions.sum.divisible.divisible
 import arrow.ui.extensions.sum.eq.eq
 import arrow.ui.extensions.sum.hash.hash
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class SumTest : UnitSpec() {
@@ -49,7 +50,7 @@ class SumTest : UnitSpec() {
         }
       ),
       ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ),
-      HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), cf)
+      HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), genSum())
     )
 
     val abSum = Sum.left(Id.just("A"), Id.just("B"))
@@ -84,3 +85,8 @@ class SumTest : UnitSpec() {
     }
   }
 }
+
+private fun genSum(): Gen<Sum<ForId, ForId, Int>> =
+  Gen.int().map {
+    Sum.left(Id.just(it), Id.just(it))
+  }
