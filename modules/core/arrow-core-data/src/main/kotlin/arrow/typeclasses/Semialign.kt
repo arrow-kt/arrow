@@ -79,11 +79,11 @@ interface Semialign<F> : Functor<F> {
     other: Kind<F, B>
   ): Kind<F, Tuple2<Option<A>, Option<B>>> =
     alignWith(this, other) { ior ->
-      when (val e = ior.bimap({ Option.just(it) }, { Option.just(it) })) {
-        is Ior.Right -> Option.empty<A>() toT e.value
-        is Ior.Left -> e.value toT Option.empty()
-        is Ior.Both -> e.leftValue toT e.rightValue
-      }
+      ior.bimap({ Option.just(it) }, { Option.just(it) }).fold(
+        { it toT Option.empty<B>() },
+        { Option.empty<A>() toT it },
+        ::Tuple2
+      )
     }
 
   /**
