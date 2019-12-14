@@ -5,12 +5,14 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForSequenceK
 import arrow.core.Ior
+import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.Tuple2
 import arrow.core.extensions.eval.applicative.applicative
+import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.sequence.foldable.firstOption
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.extensions.sequence.foldable.foldRight
@@ -21,7 +23,6 @@ import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
-import arrow.core.identity
 import arrow.core.k
 import arrow.core.some
 import arrow.core.toOption
@@ -379,26 +380,16 @@ interface SequenceKUnzip : Unzip<ForSequenceK>, SequenceKZip {
 
 @extension
 interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, SequenceKFoldable {
-  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForSequenceK, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForSequenceK, B>> {
-    fun crosswalkSequence(iterator: Iterator<A>): Kind<F, Kind<ForSequenceK, B>> =
-      if (iterator.hasNext()) {
-        val head = iterator.next()
-        val ls = fa(head)
-        val rs = crosswalkSequence(iterator)
-
-        ALIGN.run {
-          alignWith(ls, rs) { ior ->
-            ior.fold({ SequenceK.just(it) },
-              ::identity,
-              { l, r -> (SequenceK.just(l) + r.fix().sequence).k() })
-          }
-        }
-      } else {
-        ALIGN.run { empty<B>().map { SequenceK.empty<B>() } }
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForSequenceK, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForSequenceK, B>> =
+    a.fix().sequence.toList().k().let { list ->
+      ListK.crosswalk().run {
+        crosswalk(ALIGN, list, fa)
       }
-
-    return crosswalkSequence(a.fix().sequence.iterator())
-  }
+    }.let { list ->
+      ALIGN.run {
+        list.map { it.fix().asSequence().k() }
+      }
+    }
 }
 
 @extension

@@ -369,17 +369,9 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
     fa: (A) -> Kind<F, B>
   ): Kind<F, Kind<ForListK, B>> =
     a.fix().let { list ->
-      if (list.isEmpty()) {
-        ALIGN.run { empty<B>().map { ListK.empty<B>() } }
-      } else {
-        val head = list.first()
-        val tail = list.drop(1).k()
-
-        val ls: Kind<F, B> = fa(head)
-        val rs: Kind<F, Kind<ForListK, B>> = crosswalk(ALIGN, tail, fa)
-
+      list.foldLeft(ALIGN.run { empty<ListK<B>>() }) { xs, x ->
         ALIGN.run {
-          alignWith(ls, rs) { ior ->
+          alignWith(fa(x), xs) { ior ->
             ior.fold(
               { ListK.just(it) },
               ::identity,
