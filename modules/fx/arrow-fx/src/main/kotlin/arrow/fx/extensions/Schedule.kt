@@ -5,18 +5,14 @@ import arrow.Kind2
 import arrow.extension
 import arrow.fx.ForSchedule
 import arrow.fx.Schedule
-import arrow.fx.ScheduleOf
 import arrow.fx.SchedulePartialOf
 import arrow.fx.fix
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Category
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Profunctor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
