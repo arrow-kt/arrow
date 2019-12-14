@@ -17,13 +17,9 @@ import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.semigroup
-import arrow.core.extensions.sequence.monadFilter.filterMap
-import arrow.core.extensions.sequencek.apply.apply
-import arrow.core.extensions.sequencek.monadFilter.filterMap
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.ior
-import arrow.test.generators.GenK
-import arrow.test.generators.option
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
@@ -58,7 +54,7 @@ class IorTest : UnitSpec() {
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()), Eq.any())
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Eq.any())
     )
 
     "bimap() should allow modify both value" {
@@ -155,25 +151,3 @@ class IorTest : UnitSpec() {
   }
 }
 
-fun <A> Ior.Companion.genK(kgen: Gen<A>) =
-  object : GenK<IorPartialOf<A>> {
-    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
-      Gen.ior(kgen, gen)
-  }
-
-private fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>) =
-  object : Gen<IorOf<A, B>> {
-    override fun constants(): Iterable<IorOf<A, B>> =
-      (genA.constants().asSequence().k() to genB.constants().asSequence().k()).let { (ls, rs) ->
-        SequenceK.apply().run { ls.product(rs) }.filterMap {
-          Ior.fromOptions(Option.fromNullable(it.a), Option.fromNullable(it.b))
-        }.asIterable()
-      }
-
-    override fun random(): Sequence<IorOf<A, B>> =
-      (Gen.option(genA).random() to Gen.option(genB).random()).let { (ls, rs) ->
-        ls.zip(rs).filterMap {
-          Ior.fromOptions(it.first, it.second)
-        }
-      }
-  }
