@@ -5,6 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
+import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
@@ -24,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.listK
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -35,6 +37,7 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -51,7 +54,7 @@ class ListKTest : UnitSpec() {
 
     testLaws(
       MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, eq),
-      ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
+      ShowLaws.laws(ListK.show(), eq, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq())), this::bijection, associativeSemigroupalEq),
@@ -61,7 +64,7 @@ class ListKTest : UnitSpec() {
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
         eq),
-      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() },
+      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq()), Gen.listK(Gen.int())),
       EqKLaws.laws(
         ListK.eqK(),
         ListK.genK()
@@ -80,6 +83,10 @@ class ListKTest : UnitSpec() {
         ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
+      ),
+      CrosswalkLaws.laws(ListK.crosswalk(),
+        ListK.genK(),
+        ListK.eqK()
       )
     )
 
@@ -108,6 +115,50 @@ class ListKTest : UnitSpec() {
             }
           }
         }
+      }
+    }
+
+    "lpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.lpadZip(b)
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "lpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.lpadZipWith(b) { a, b ->
+            a toT b
+          }
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.rpadZip(b)
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.rpadZipWith(b) { a, b ->
+            a toT b
+          }
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
       }
     }
   }

@@ -9,6 +9,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semialign
 import arrow.core.extensions.show
+import arrow.core.extensions.sortedmapk.eq.eq
 import arrow.core.extensions.sortedmapk.eqK.eqK
 import arrow.core.extensions.sortedmapk.hash.hash
 import arrow.core.extensions.traverse
@@ -37,8 +38,8 @@ class SortedMapKTest : UnitSpec() {
 
   init {
     testLaws(
-      HashLaws.laws(SortedMapK.hash(String.hash(), Int.hash()), EQ) { sortedMapOf("key" to it).k() },
-      ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
+      HashLaws.laws(SortedMapK.hash(String.hash(), Int.hash()), SortedMapK.eq(String.eq(), Int.eq()), Gen.sortedMapK(Gen.string(), Gen.int())),
+      ShowLaws.laws(SortedMapK.show(), SortedMapK.eq(String.eq(), Int.eq()), Gen.sortedMapK(Gen.string(), Gen.int())),
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),

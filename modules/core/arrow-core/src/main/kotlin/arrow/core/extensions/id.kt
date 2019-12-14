@@ -16,10 +16,12 @@ import arrow.core.identity
 import arrow.core.toT
 import arrow.core.value
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -244,4 +246,14 @@ interface IdUnzip : Unzip<ForId>, IdZip {
     this.fix().extract().let { (a, b) ->
       Id.just(a) toT Id.just(b)
     }
+}
+
+@extension
+interface IdCrosswalk : Crosswalk<ForId>, IdFunctor, IdFoldable {
+  override fun <F, A, B> crosswalk(
+    ALIGN: Align<F>,
+    a: Kind<ForId, A>,
+    fa: (A) -> Kind<F, B>
+  ): Kind<F, Kind<ForId, B>> =
+    ALIGN.run { fa(a.fix().extract()).map { Id.just(it) } }
 }

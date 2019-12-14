@@ -6,6 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
+import arrow.core.extensions.id.crosswalk.crosswalk
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.foldable.foldable
@@ -22,7 +23,9 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
+import arrow.test.generators.id
 import arrow.test.laws.BimonadLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
@@ -43,10 +46,10 @@ class IdTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
-      ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
+      ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
       BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), ::Id, Eq.any(), EQ, Eq.any()),
-      HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) },
+      HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(
         Id.eqK(),
         Id.genK()
@@ -65,7 +68,10 @@ class IdTest : UnitSpec() {
         Id.genK(),
         Id.eqK(),
         Id.foldable()
-      )
+      ),
+      CrosswalkLaws.laws(Id.crosswalk(),
+        Id.genK(),
+        Id.eqK())
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {

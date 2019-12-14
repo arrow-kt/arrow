@@ -6,6 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.foldable.foldable
@@ -24,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.option
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
@@ -59,13 +61,13 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
-      ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
+      ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
       EqKLaws.laws(
         Option.eqK(),
@@ -90,6 +92,10 @@ class OptionTest : UnitSpec() {
         Option.genK(),
         Option.eqK(),
         Option.foldable()
+      ),
+      CrosswalkLaws.laws(Option.crosswalk(),
+        Option.genK(),
+        Option.eqK()
       )
     )
 
