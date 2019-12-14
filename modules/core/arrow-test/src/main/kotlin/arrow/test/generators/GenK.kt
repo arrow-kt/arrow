@@ -8,6 +8,8 @@ import arrow.core.ForOption
 import arrow.core.ForSequenceK
 import arrow.core.ForSetK
 import arrow.core.Id
+import arrow.core.Ior
+import arrow.core.IorPartialOf
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.MapKPartialOf
@@ -67,3 +69,9 @@ fun SetK.Companion.genK() = object : GenK<ForSetK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSetK, A>> =
     Gen.genSetK(gen) as Gen<Kind<ForSetK, A>>
 }
+
+fun <A> Ior.Companion.genK(kgen: Gen<A>) =
+  object : GenK<IorPartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
+      Gen.ior(kgen, gen) as Gen<Kind<IorPartialOf<A>, B>>
+  }

@@ -6,6 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.foldable.foldable
@@ -24,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.option
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
@@ -90,6 +92,10 @@ class OptionTest : UnitSpec() {
         Option.genK(),
         Option.eqK(),
         Option.foldable()
+      ),
+      CrosswalkLaws.laws(Option.crosswalk(),
+        Option.genK(),
+        Option.eqK()
       )
     )
 

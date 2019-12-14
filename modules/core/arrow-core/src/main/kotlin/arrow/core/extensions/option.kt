@@ -28,6 +28,7 @@ import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -507,4 +508,13 @@ interface OptionUnzip : Unzip<ForOption>, OptionZip {
   override fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
     fix().fold({ Option.empty<A>() toT Option.empty() },
       { it.a.some() toT it.b.some() })
+}
+
+@extension
+interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForOption, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForOption, B>> =
+    when (val e = a.fix()) {
+      is None -> ALIGN.run { empty<B>().map { Option.empty<B>() } }
+      is Some -> ALIGN.run { fa(e.t).map { Option.just(it) } }
+    }
 }
