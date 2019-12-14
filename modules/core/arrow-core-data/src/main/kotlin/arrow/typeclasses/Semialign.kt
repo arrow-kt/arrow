@@ -5,6 +5,7 @@ import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.identity
+import arrow.core.some
 import arrow.core.toT
 
 /**
@@ -79,10 +80,10 @@ interface Semialign<F> : Functor<F> {
     other: Kind<F, B>
   ): Kind<F, Tuple2<Option<A>, Option<B>>> =
     alignWith(this, other) { ior ->
-      ior.bimap({ Option.just(it) }, { Option.just(it) }).fold(
-        { it toT Option.empty<B>() },
-        { Option.empty<A>() toT it },
-        ::Tuple2
+      ior.fold(
+        { it.some() toT Option.empty<B>() },
+        { Option.empty<A>() toT it.some() },
+        { a, b -> a.some() toT b.some() }
       )
     }
 
