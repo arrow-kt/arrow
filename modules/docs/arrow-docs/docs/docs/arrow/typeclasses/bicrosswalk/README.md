@@ -8,8 +8,8 @@ redirect_from:
 
 ## Bicrosswalk
 
-{:.beginner}
-beginner
+{:.intermediate}
+intermediate
 
 The `Bicrosswalk` typeclass extends the `Bifunctor` and `Bifoldable` typeclass with the possibility to traverse the
 structure through an alignable functor.

@@ -8,8 +8,8 @@ redirect_from:
 
 ## Crosswalk
 
-{:.beginner}
-beginner
+{:.intermediate}
+intermediate
 
 The `Crosswalk` typeclass extends the `Functor` and `Foldable` typeclass with the possibility to traverse the
 structure through an alignable functor.
