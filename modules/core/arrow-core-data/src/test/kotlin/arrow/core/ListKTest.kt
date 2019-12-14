@@ -5,6 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
+import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
@@ -24,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.listK
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -80,6 +82,10 @@ class ListKTest : UnitSpec() {
         ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
+      ),
+      CrosswalkLaws.laws(ListK.crosswalk(),
+        ListK.genK(),
+        ListK.eqK()
       )
     )
 

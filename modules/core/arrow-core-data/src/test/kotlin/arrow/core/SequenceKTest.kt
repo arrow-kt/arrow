@@ -5,7 +5,9 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.sequencek.align.align
 import arrow.core.extensions.sequencek.applicative.applicative
+import arrow.core.extensions.sequencek.crosswalk.crosswalk
 import arrow.core.extensions.sequencek.eq.eq
+import arrow.core.extensions.sequencek.eqK.eqK
 import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
@@ -23,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.sequenceK
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -36,7 +39,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
@@ -68,11 +70,6 @@ class SequenceKTest : UnitSpec() {
         fix().toList().toString()
     }
 
-    val EQK = object : EqK<ForSequenceK> {
-      override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
-        SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
-    }
-
     testLaws(
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
       ShowLaws.laws(show, eq, Gen.sequenceK(Gen.int())),
@@ -85,23 +82,27 @@ class SequenceKTest : UnitSpec() {
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
       AlignLaws.laws(SequenceK.align(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       UnalignLaws.laws(SequenceK.unalign(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       RepeatLaws.laws(SequenceK.repeat(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       UnzipLaws.laws(SequenceK.unzip(),
         SequenceK.genK(),
-        EQK,
+        SequenceK.eqK(),
         SequenceK.foldable()
+      ),
+      CrosswalkLaws.laws(SequenceK.crosswalk(),
+        SequenceK.genK(),
+        SequenceK.eqK()
       )
     )
 

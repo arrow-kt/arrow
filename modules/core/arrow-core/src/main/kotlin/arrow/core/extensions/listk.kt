@@ -14,6 +14,7 @@ import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.k
 import arrow.core.leftIor
 import arrow.core.rightIor
@@ -23,6 +24,7 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -357,4 +359,25 @@ interface ListKUnzip : Unzip<ForListK>, ListKZip {
         l.listPlus(x.a) toT r.listPlus(x.b)
       }
     }.bimap({ it.k() }, { it.k() })
+}
+
+@extension
+interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
+  override fun <F, A, B> crosswalk(
+    ALIGN: Align<F>,
+    a: Kind<ForListK, A>,
+    fa: (A) -> Kind<F, B>
+  ): Kind<F, Kind<ForListK, B>> =
+    a.fix().let { list ->
+      list.foldLeft(ALIGN.run { empty<ListK<B>>() }) { xs, x ->
+        ALIGN.run {
+          alignWith(fa(x), xs) { ior ->
+            ior.fold(
+              { ListK.just(it) },
+              ::identity,
+              { l, r -> ListK.just(l) + r.fix() })
+          }
+        }
+      }
+    }
 }

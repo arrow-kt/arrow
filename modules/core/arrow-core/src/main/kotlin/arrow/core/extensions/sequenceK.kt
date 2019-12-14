@@ -5,17 +5,20 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForSequenceK
 import arrow.core.Ior
+import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.Tuple2
 import arrow.core.extensions.eval.applicative.applicative
+import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.sequence.foldable.firstOption
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.extensions.sequence.foldable.foldRight
 import arrow.core.extensions.sequence.foldable.isEmpty
 import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.foldable.firstOption
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
@@ -29,7 +32,9 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -371,4 +376,24 @@ interface SequenceKUnzip : Unzip<ForSequenceK>, SequenceKZip {
     this.fix().let { seq ->
       (seq.map { it.a }.k() toT seq.map { it.b }.k())
     }
+}
+
+@extension
+interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, SequenceKFoldable {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForSequenceK, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForSequenceK, B>> =
+    a.fix().sequence.toList().k().let { list ->
+      ListK.crosswalk().run {
+        crosswalk(ALIGN, list, fa)
+      }
+    }.let { list ->
+      ALIGN.run {
+        list.map { it.fix().asSequence().k() }
+      }
+    }
+}
+
+@extension
+interface SequenceKEqK : EqK<ForSequenceK> {
+  override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
+    SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
 }
