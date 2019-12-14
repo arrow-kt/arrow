@@ -59,7 +59,7 @@ and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Bicrosswalk`]({{ '/docs/arrow/typeclasses/bicrosswalk' | relative_url }}) implement the `Bifucntor` and `Bifoldable` typeclass directly.
+Additionally all instances of [`Bicrosswalk`]({{ '/docs/arrow/typeclasses/bicrosswalk' | relative_url }}) implement the `Bifunctor` and `Bifoldable` typeclass directly.
 
 ### Data types
 
