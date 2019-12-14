@@ -1,10 +1,12 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Failure
 import arrow.core.Id
+import arrow.core.Ior
 import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.MapK
@@ -26,6 +28,9 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.Validated
+import arrow.core.extensions.sequence.functorFilter.filterMap
+import arrow.core.extensions.sequencek.apply.apply
+import arrow.core.extensions.sequencek.functorFilter.filterMap
 import arrow.core.k
 import arrow.core.toOption
 import arrow.typeclasses.Applicative
@@ -159,3 +164,25 @@ fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
   override fun random(): Sequence<Id<T>> =
     gen.random().map { Id.just(it) }
 }
+
+fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>): Gen<Ior<A, B>> =
+  object : Gen<Ior<A, B>> {
+    override fun constants(): Iterable<Ior<A, B>> =
+      (genA.orNull().constants().asSequence().k() to genB.orNull().constants().asSequence().k()).let { (ls, rs) ->
+        SequenceK.apply().run { ls.product(rs) }.filterMap {
+          Ior.fromOptions(Option.fromNullable(it.a), Option.fromNullable(it.b))
+        }.asIterable()
+      }
+
+    override fun random(): Sequence<Ior<A, B>> =
+      (Gen.option(genA).random() to Gen.option(genB).random()).let { (ls, rs) ->
+        ls.zip(rs).filterMap {
+          Ior.fromOptions(it.first, it.second)
+        }
+      }
+  }
+
+fun <A, B> Gen.Companion.genConst(gen: Gen<A>): Gen<Const<A, B>> =
+  gen.map {
+    Const<A, B>(it)
+  }

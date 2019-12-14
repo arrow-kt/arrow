@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
@@ -20,6 +21,7 @@ import arrow.core.extensions.sequence.monadFilter.filterMap
 import arrow.core.extensions.sequencek.apply.apply
 import arrow.core.extensions.sequencek.monadFilter.filterMap
 import arrow.test.UnitSpec
+import arrow.test.generators.ior
 import arrow.test.generators.GenK
 import arrow.test.generators.option
 import arrow.test.laws.BicrosswalkLaws
@@ -31,7 +33,6 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -45,12 +46,16 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
+    val EQ2: Eq<Kind2<ForIor, Int, Int>> = Eq { a, b ->
+      a.fix() == b.fix()
+    }
+
     testLaws(
-      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ as Eq<IorOf<Int, Int>>),
-      ShowLaws.laws(Ior.show(), EQ) { Right(it) },
+      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
+      ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
-      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
+      HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()), Eq.any())

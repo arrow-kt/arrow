@@ -26,6 +26,7 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 @higherkind
@@ -63,7 +64,7 @@ class FreeTest : UnitSpec() {
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
     testLaws(
-      EqLaws.laws(EQ) { Ops.value(it) },
+      EqLaws.laws(EQ, Gen.ops(Gen.int())),
       MonadLaws.laws(Ops, EQ),
       MonadLaws.laws(Free.monad(), EQ),
       FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
@@ -89,3 +90,6 @@ class FreeTest : UnitSpec() {
     }
   }
 }
+
+private fun Gen.Companion.ops(gen: Gen<Int>) =
+  gen.map { Ops.value(it) }
