@@ -29,7 +29,6 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -47,12 +46,12 @@ class EitherTest : UnitSpec() {
     testLaws(
       BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
-      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
+      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
       MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
-      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
+      HashLaws.laws(Either.hash(String.hash(), Int.hash()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int()))
     )
 
     "empty should return a Right of the empty of the inner type" {

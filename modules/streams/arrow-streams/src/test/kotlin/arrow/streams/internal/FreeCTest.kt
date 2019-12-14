@@ -49,6 +49,8 @@ sealed class Ops<out A> : OpsOf<A> {
   }
 }
 
+private fun genOps() = Gen.int().map { Ops.value(it) }
+
 @Suppress("UNCHECKED_CAST")
 val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : FunctionK<ForOps, EitherPartialOf<Throwable>> {
   override fun <A> invoke(fa: Kind<ForOps, A>): Either<Throwable, A> {
@@ -92,7 +94,7 @@ class FreeCTest : UnitSpec() {
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { Ops.value(it) },
+      EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
         SC = Ops,
         EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
