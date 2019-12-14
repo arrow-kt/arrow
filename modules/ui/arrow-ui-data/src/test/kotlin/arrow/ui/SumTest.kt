@@ -32,7 +32,8 @@ import io.kotlintest.shouldBe
 class SumTest : UnitSpec() {
   init {
 
-    val cf = { x: Int -> Sum.left(Id.just(x), Id.just(x)) }
+    val cf1 = { x: Int -> Sum.left(Id.just(x), Id.just(x)) }
+    val g1 = Gen.int().map(cf1) as Gen<Kind<Kind<Kind<ForSum, ForId>, ForId>, Int>>
 
     val EQ: Eq<Kind<SumPartialOf<ForId, ForId>, Int>> = Eq { a, b ->
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
@@ -41,13 +42,13 @@ class SumTest : UnitSpec() {
     val IDEQ = Eq<Kind<ForId, Int>> { a, b -> Id.eq(Int.eq()).run { a.fix().eqv(b.fix()) } }
     val IDH = Hash<Kind<ForId, Int>> { Id.hash(Int.hash()).run { it.fix().hash() } }
 
-    val cf1: (Int) -> Sum<Kind<ForConst, Int>, Kind<ForConst, Int>, Int> = { Sum.left(Const.just(it), Const.just(it)) }
-    val g = Gen.int().map(cf1) as Gen<Kind<SumPartialOf<ConstPartialOf<Int>, ConstPartialOf<Int>>, Int>>
+    val cf2: (Int) -> Sum<Kind<ForConst, Int>, Kind<ForConst, Int>, Int> = { Sum.left(Const.just(it), Const.just(it)) }
+    val g2 = Gen.int().map(cf2) as Gen<Kind<SumPartialOf<ConstPartialOf<Int>, ConstPartialOf<Int>>, Int>>
 
     testLaws(
       DivisibleLaws.laws(
         Sum.divisible(Const.divisible(Int.monoid()), Const.divisible(Int.monoid())),
-        g,
+        g2,
         Eq { a, b ->
           (a.fix() to b.fix()).let {
             when (it.first.side) {
@@ -63,7 +64,7 @@ class SumTest : UnitSpec() {
           }
         }
       ),
-      ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ),
+      ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), g1, EQ),
       HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), genSum())
     )
 

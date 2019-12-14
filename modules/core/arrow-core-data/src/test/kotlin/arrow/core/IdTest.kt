@@ -46,7 +46,7 @@ class IdTest : UnitSpec() {
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
-      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), ::Id, Eq.any(), EQ, Eq.any()),
+      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.genK().genK(Gen.int()), Eq.any(), EQ, Eq.any()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(
         Id.eqK(),

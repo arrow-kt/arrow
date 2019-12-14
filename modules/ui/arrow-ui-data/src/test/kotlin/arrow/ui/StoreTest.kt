@@ -1,9 +1,11 @@
 package arrow.ui
 
-import arrow.ui.extensions.store.comonad.comonad
+import arrow.Kind
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.ui.extensions.store.comonad.comonad
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class StoreTest : UnitSpec() {
@@ -11,6 +13,7 @@ class StoreTest : UnitSpec() {
   init {
 
     val intStore = { x: Int -> Store(x) { it } }
+    val g = Gen.int().map(intStore) as Gen<Kind<Kind<ForStore, Int>, Int>>
 
     val EQ = object : Eq<StoreOf<Int, Int>> {
       override fun StoreOf<Int, Int>.eqv(b: StoreOf<Int, Int>): Boolean =
@@ -18,7 +21,7 @@ class StoreTest : UnitSpec() {
     }
 
     testLaws(
-      ComonadLaws.laws(Store.comonad(), intStore, EQ)
+      ComonadLaws.laws(Store.comonad(), g, EQ)
     )
 
     val greetingStore = { name: String -> Store(name) { "Hi $it!" } }

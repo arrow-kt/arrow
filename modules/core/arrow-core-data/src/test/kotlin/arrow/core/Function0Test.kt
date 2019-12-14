@@ -26,9 +26,11 @@ class Function0Test : UnitSpec() {
   }
 
   init {
+    val g = Gen.constant({ it: Int -> it }.k()) as Gen<Kind<ForFunction0, Int>>
+
     testLaws(
       MonoidLaws.laws(Function0.monoid(Int.monoid()), Gen.constant({ 1 }.k()), EQ1),
-      BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), { { it }.k() }, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), g, EQ1, EQ2, Eq.any())
     )
 
     "Semigroup of Function0<A> is Function0<Semigroup<A>>" {

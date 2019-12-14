@@ -1,10 +1,11 @@
 package arrow.ui
 
 import arrow.core.Id
-import arrow.ui.extensions.moore.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.ui.extensions.moore.comonad.comonad
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class MooreTest : UnitSpec() {
@@ -13,13 +14,14 @@ class MooreTest : UnitSpec() {
 
     fun handle(x: Int): Moore<Int, Int> = Moore(x, ::handle)
     val intMoore: (Int) -> MooreOf<Int, Int> = { x: Int -> Moore(x, ::handle) }
+    val g = Gen.int().map(intMoore)
 
     val EQ = Eq<MooreOf<Int, Int>> { a, b ->
       a.fix().extract() == b.fix().extract()
     }
 
     testLaws(
-      ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
+      ComonadLaws.laws(Moore.comonad(), g, EQ)
     )
 
     fun handleRoute(route: String): Moore<String, Id<String>> = when (route) {

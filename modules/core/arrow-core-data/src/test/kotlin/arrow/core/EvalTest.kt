@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.Eval.Now
 import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad
 import arrow.core.extensions.eval.monad.monad
@@ -25,8 +24,10 @@ class EvalTest : UnitSpec() {
 
   init {
 
+    val g = Gen.int().map { Eval.now(it) } as Gen<Kind<ForEval, Int>>
+
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), ::Now, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), g, EQ1, EQ2, Eq.any())
     )
 
     "should map wrapped value" {

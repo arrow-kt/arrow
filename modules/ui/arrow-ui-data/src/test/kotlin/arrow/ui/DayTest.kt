@@ -1,11 +1,10 @@
 package arrow.ui
 
+import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.Tuple2Of
-import arrow.ui.extensions.day.applicative.applicative
-import arrow.ui.extensions.day.comonad.comonad
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.fix
@@ -13,12 +12,16 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.ui.extensions.day.applicative.applicative
+import arrow.ui.extensions.day.comonad.comonad
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class DayTest : UnitSpec() {
   init {
 
     val cf = { x: Int -> Day(Id(x), Id(0)) { xx, yy -> xx + yy } }
+    val g = Gen.int().map(cf) as Gen<Kind<Kind<Kind<ForDay, ForId>, ForId>, Int>>
 
     val EQ: Eq<DayOf<ForId, ForId, Int>> = Eq { a, b ->
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
@@ -26,7 +29,7 @@ class DayTest : UnitSpec() {
 
     testLaws(
       ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQ),
-      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), cf, EQ)
+      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQ)
     )
 
     val get: (Int, Int) -> Tuple2<Int, Int> = { left, right -> Tuple2(left, right) }

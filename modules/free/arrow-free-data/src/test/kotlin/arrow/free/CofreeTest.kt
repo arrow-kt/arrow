@@ -32,19 +32,23 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class CofreeTest : UnitSpec() {
 
   init {
 
-    testLaws(ComonadLaws.laws(Cofree.comonad(), {
+    val cf: (Int) -> Cofree<ForOption, Int> = {
       val sideEffect = SideEffect()
       unfold(Option.functor(), sideEffect.counter) {
         sideEffect.increment()
         if (it % 2 == 0) None else Some(it + 1)
       }
-    }, Eq { a, b ->
+    }
+    val g = Gen.int().map(cf) as Gen<Kind<Kind<ForCofree, ForOption>, Int>>
+
+    testLaws(ComonadLaws.laws(Cofree.comonad(), g, Eq { a, b ->
       a.fix().run().fix() == b.fix().run().fix()
     }))
 

@@ -14,13 +14,13 @@ object BimonadLaws {
     BF: Bimonad<F>,
     M: Monad<F>,
     CM: Comonad<F>,
-    f: (Int) -> Kind<F, Int>,
+    G: Gen<Kind<F, Int>>,
     EQ1: Eq<Kind<F, Int>>,
     EQ2: Eq<Kind<F, Kind<F, Int>>>,
     EQ3: Eq<Int>
   ): List<Law> =
     MonadLaws.laws(M, EQ1) +
-      ComonadLaws.laws(CM, f, EQ1) +
+      ComonadLaws.laws(CM, G, EQ1) +
       listOf(
         Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ3) },
         Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
