@@ -16,8 +16,6 @@ import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
-import arrow.core.leftIor
-import arrow.core.rightIor
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
@@ -317,13 +315,7 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
   override fun <A, B> align(
     a: Kind<ForListK, A>,
     b: Kind<ForListK, B>
-  ): Kind<ForListK, Ior<A, B>> = alignRec(a.fix(), b.fix()).k()
-
-  private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
-    ls.isEmpty() -> rs.map { it.rightIor() }
-    rs.isEmpty() -> ls.map { it.leftIor() }
-    else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
-  }
+  ): Kind<ForListK, Ior<A, B>> = ListK.align(a.fix(), b.fix())
 }
 
 @extension

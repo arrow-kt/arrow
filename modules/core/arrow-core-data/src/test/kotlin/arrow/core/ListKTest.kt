@@ -37,6 +37,7 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -114,6 +115,50 @@ class ListKTest : UnitSpec() {
             }
           }
         }
+      }
+    }
+
+    "lpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.lpadZip(b)
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "lpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.lpadZipWith(b) { a, b ->
+            a toT b
+          }
+
+        result.map { it.b }.equalUnderTheLaw(b, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzip" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.rpadZip(b)
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
+      }
+    }
+
+    "rpadzipwith" {
+      forAll(Gen.listK(Gen.int()), Gen.listK(Gen.int())) { a, b ->
+
+        val result =
+          a.rpadZipWith(b) { a, b ->
+            a toT b
+          }
+
+        result.map { it.a }.equalUnderTheLaw(a, ListK.eq(Int.eq()))
       }
     }
   }
