@@ -180,11 +180,10 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     other: ListK<B>
   ): ListK<Tuple2<Option<A>, Option<B>>> =
     alignWith(this, other) { ior ->
-      ior.bimap({ Option.just(it) }, { Option.just(it) })
-        .fold(
-          { it toT Option.empty<B>() },
-          { Option.empty<A>() toT it },
-          { a, b -> a toT b })
+      ior.fold(
+        { it.some() toT Option.empty<B>() },
+        { Option.empty<A>() toT it.some() },
+        { a, b -> a.some() toT b.some() })
     }
 
   /**
@@ -203,7 +202,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     other: ListK<B>,
     fab: (Option<A>, B) -> C
   ): ListK<C> =
-      padZipWith(other) { a, b -> b.map { fab(a, it) } }.filterMap(::identity)
+    padZipWith(other) { a, b -> b.map { fab(a, it) } }.filterMap(::identity)
 
   /**
    * Left-padded zip.
