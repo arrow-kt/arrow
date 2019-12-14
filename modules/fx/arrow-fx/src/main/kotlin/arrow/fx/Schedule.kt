@@ -414,7 +414,6 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
           }
         }
       }
-
   }
 
   /**
@@ -628,10 +627,9 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     }
 
     fun <M, Input, Output> withMonad(MM: Monad<M>, f: ScheduleFor<M>.() -> Schedule<M, Input, Output>): Schedule<M, Input, Output> =
-      object: ScheduleFor<M> {
+      object : ScheduleFor<M> {
         override fun MM(): Monad<M> = MM
       }.f()
-
   }
 }
 
