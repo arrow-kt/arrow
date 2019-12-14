@@ -128,10 +128,8 @@ class ProductTest : UnitSpec() {
       emptyPerson() shouldBe Person("", 0, None)
     }
 
-    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None) }
-
     testLaws(
-      EqLaws.laws(Person.eq(), getPersonWithAge),
+      EqLaws.laws(Person.eq(), genPerson()),
       MonoidLaws.laws(Person.monoid(), genPerson(), Person.eq())
     )
   }

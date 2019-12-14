@@ -75,14 +75,14 @@ class SequenceKTest : UnitSpec() {
 
     testLaws(
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
-      ShowLaws.laws(show, eq) { sequenceOf(it).k() },
+      ShowLaws.laws(show, eq, Gen.sequenceK(Gen.int())),
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
       MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq, this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
-      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
+      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
       AlignLaws.laws(SequenceK.align(),
         SequenceK.genK(),
         EQK,

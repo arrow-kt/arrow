@@ -59,13 +59,13 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
-      ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
+      ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
       EqKLaws.laws(
         Option.eqK(),
