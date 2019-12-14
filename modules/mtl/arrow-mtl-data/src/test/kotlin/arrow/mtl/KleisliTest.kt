@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.Either
+import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTry
@@ -59,6 +60,9 @@ class KleisliTest : UnitSpec() {
 
   init {
 
+    val cf: (Int) -> Kleisli<Kind<ForConst, Int>, Int, Int> = { Kleisli { it.const() } }
+    val g = Gen.int().map(cf) as Gen<Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, Int>>
+
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
@@ -75,7 +79,7 @@ class KleisliTest : UnitSpec() {
       ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        { Kleisli { it.const() } },
+        g,
         Eq { a, b -> a.run(1).value() == b.run(1).value() }
       ),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())

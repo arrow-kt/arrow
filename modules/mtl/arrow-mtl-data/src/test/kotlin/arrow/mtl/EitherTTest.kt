@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.Either
+import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Left
@@ -38,6 +39,7 @@ import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {
@@ -48,10 +50,13 @@ class EitherTTest : UnitSpec() {
 
   init {
 
+    val cf: (Int) -> EitherT<Kind<ForConst, Int>, Int, Int> = { EitherT(it.const()) }
+    val g = Gen.int().map(cf) as Gen<Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, Int>>
+
     testLaws(
       DivisibleLaws.laws(
         EitherT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        { EitherT(it.const()) },
+        g,
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
       AlternativeLaws.laws(

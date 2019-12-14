@@ -3,6 +3,7 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
+import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
@@ -44,6 +45,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
@@ -81,6 +83,9 @@ class OptionTTest : UnitSpec() {
           })
       }
 
+    val cf: (Int) -> OptionT<Kind<ForConst, Int>, Int> = { OptionT(it.const()) }
+    val g = Gen.int().map(cf) as Gen<Kind<Kind<ForOptionT, Kind<ForConst, Int>>, Int>>
+
     testLaws(
       AsyncLaws.laws(OptionT.async(IO.async()), IOEQ(), IOEitherEQ()),
 
@@ -116,7 +121,7 @@ class OptionTTest : UnitSpec() {
         OptionT.divisible(
           Const.divisible(Int.monoid())
         ),
-        { OptionT(it.const()) },
+        g,
         Eq { a, b -> a.value().value() == b.value().value() }
       )
     )

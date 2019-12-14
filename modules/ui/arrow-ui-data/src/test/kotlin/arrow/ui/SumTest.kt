@@ -2,6 +2,8 @@ package arrow.ui
 
 import arrow.Kind
 import arrow.core.Const
+import arrow.core.ConstPartialOf
+import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.const.divisible.divisible
@@ -39,14 +41,26 @@ class SumTest : UnitSpec() {
     val IDEQ = Eq<Kind<ForId, Int>> { a, b -> Id.eq(Int.eq()).run { a.fix().eqv(b.fix()) } }
     val IDH = Hash<Kind<ForId, Int>> { Id.hash(Int.hash()).run { it.fix().hash() } }
 
+    val cf1: (Int) -> Sum<Kind<ForConst, Int>, Kind<ForConst, Int>, Int> = { Sum.left(Const.just(it), Const.just(it)) }
+    val g = Gen.int().map(cf1) as Gen<Kind<SumPartialOf<ConstPartialOf<Int>, ConstPartialOf<Int>>, Int>>
+
     testLaws(
       DivisibleLaws.laws(
         Sum.divisible(Const.divisible(Int.monoid()), Const.divisible(Int.monoid())),
-        { Sum.left(Const.just(it), Const.just(it)) },
+        g,
         Eq { a, b ->
-          a.fix().side == b.fix().side &&
-            a.fix().left.value() == b.fix().left.value() &&
-            a.fix().right.value() == b.fix().right.value()
+          (a.fix() to b.fix()).let {
+            when (it.first.side) {
+              is Sum.Side.Left -> when (it.second.side) {
+                is Sum.Side.Left -> it.first.left.value() == it.second.left.value()
+                else -> false
+              }
+              is Sum.Side.Right -> when (it.second.side) {
+                is Sum.Side.Right -> it.first.right.value() == it.second.right.value()
+                else -> false
+              }
+            }
+          }
         }
       ),
       ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ),

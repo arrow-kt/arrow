@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.Either
+import arrow.core.ForConst
 import arrow.core.ForListK
 import arrow.core.ForOption
 import arrow.core.ListK
@@ -56,6 +57,9 @@ class WriterTTest : UnitSpec() {
 
   init {
 
+    val cf: (Int) -> WriterT<Kind<ForConst, Int>, Int, Int> = { WriterT(it.const()) }
+    val g = Gen.int().map(cf) as Gen<Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, Int>>
+
     testLaws(
       AlternativeLaws.laws(
         WriterT.alternative(Int.monoid(), Option.alternative()),
@@ -65,7 +69,7 @@ class WriterTTest : UnitSpec() {
       ),
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        { WriterT(it.const()) },
+        g,
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),

@@ -12,23 +12,24 @@ object DivideLaws {
 
   fun <F> laws(
     DF: Divide<F>,
-    cf: (Int) -> Kind<F, Int>,
+    G: Gen<Kind<F, Int>>,
     EQ: Eq<Kind<F, Int>>
-  ): List<Law> = ContravariantLaws.laws(DF, Gen.int().map(cf), EQ) + listOf(
-    Law("Divide laws: Associative") { DF.associative(cf, EQ) }
+  ): List<Law> = ContravariantLaws.laws(DF, G, EQ) + listOf(
+    Law("Divide laws: Associative") { DF.associative(G, EQ) }
   )
 
   fun <A> delta(a: A): Tuple2<A, A> = a toT a
 
   fun <F> Divide<F>.associative(
-    cf: (Int) -> Kind<F, Int>,
+    G: Gen<Kind<F, Int>>,
     EQ: Eq<Kind<F, Int>>
   ): Unit =
-    forAll(Gen.int().map(cf)) { fa ->
+    forAll(G) { fa ->
       val a = divide<Int, Int, Int>(
         fa,
         divide(fa, fa) { delta(it) }
       ) { delta(it) }
+
       val b = divide<Int, Int, Int>(
         divide(fa, fa) { delta(it) },
         fa
