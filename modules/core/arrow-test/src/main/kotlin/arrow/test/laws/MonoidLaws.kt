@@ -20,6 +20,6 @@ object MonoidLaws {
 
   fun <F> Monoid<F>.monoidRightIdentity(GEN: Gen<F>, EQ: Eq<F>): Unit =
     forAll(GEN) { a ->
-    a.combine(empty()).equalUnderTheLaw(a, EQ)
-  }
+      a.combine(empty()).equalUnderTheLaw(a, EQ)
+    }
 }

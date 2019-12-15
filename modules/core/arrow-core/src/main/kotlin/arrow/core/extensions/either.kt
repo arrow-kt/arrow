@@ -262,13 +262,3 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
     }
 }
 
-@extension
-interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
-
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<EitherPartialOf<L>, A>.eqK(other: Kind<EitherPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    Either.eq(EQL(), EQ).run {
-      this@eqK.fix().eqv(other.fix())
-    }
-}

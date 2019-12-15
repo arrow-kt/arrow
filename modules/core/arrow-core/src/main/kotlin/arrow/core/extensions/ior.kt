@@ -19,8 +19,8 @@ import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bicrosswalk
+import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Crosswalk
@@ -186,16 +186,6 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()
-
-@extension
-interface IorEqK<L> : EqK<IorPartialOf<L>> {
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let { (ls, rs) ->
-      Ior.eq(EQL(), EQ).run { ls.eqv(rs) }
-    }
-}
 
 @extension
 interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldable<L> {
