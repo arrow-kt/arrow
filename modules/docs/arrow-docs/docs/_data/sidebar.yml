@@ -354,6 +354,12 @@ options:
       - title: Repeat
         url: /docs/arrow/typeclasses/repeat/
 
+      - title: Crosswalk
+        url: /docs/arrow/typeclasses/crosswalk/
+
+      - title: Bicrosswalk
+        url: /docs/arrow/typeclasses/bicrosswalk/
+
   - title: Effects
 
     nested_options:

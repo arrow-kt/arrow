@@ -74,16 +74,16 @@ fun SetK.Companion.genK() = object : GenK<ForSetK> {
     Gen.genSetK(gen) as Gen<Kind<ForSetK, A>>
 }
 
+fun <A> Ior.Companion.genK(kgen: Gen<A>) =
+  object : GenK<IorPartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
+      Gen.ior(kgen, gen) as Gen<Kind<IorPartialOf<A>, B>>
+  }
+
 fun <A> Either.Companion.genK(genA: Gen<A>) =
   object : GenK<EitherPartialOf<A>> {
     override fun <B> genK(gen: Gen<B>): Gen<Kind<EitherPartialOf<A>, B>> =
       Gen.either(genA, gen) as Gen<Kind<EitherPartialOf<A>, B>>
-  }
-
-fun <A> Ior.Companion.genK(genA: Gen<A>) =
-  object : GenK<IorPartialOf<A>> {
-    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
-      Gen.ior(genA, gen) as Gen<Kind<IorPartialOf<A>, B>>
   }
 
 fun <E> Validated.Companion.genK(genE: Gen<E>) =
