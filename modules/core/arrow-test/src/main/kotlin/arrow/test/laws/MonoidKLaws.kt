@@ -25,7 +25,6 @@ object MonoidKLaws {
       Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
       Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) })
 
-
   fun <F> MonoidK<F>.monoidKLeftIdentity(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(GEN) { fa: Kind<F, Int> ->
       empty<Int>().combineK(fa).equalUnderTheLaw(fa, EQ)
