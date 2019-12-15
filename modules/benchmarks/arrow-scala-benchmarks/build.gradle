@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.scala-lang:scala-library:2.12.8'
-    implementation 'org.typelevel:cats-effect_2.12:1.2.0'
-    implementation 'org.scalaz:scalaz-zio_2.12:1.0-RC4'
+    api 'org.scala-lang:scala-library:2.13.1'
+    api 'org.typelevel:cats-effect_2.13:2.0.0'
+    api 'dev.zio:zio_2.13:1.0.0-RC17'
 }
