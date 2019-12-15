@@ -99,7 +99,7 @@ class OptionTTest : UnitSpec() {
       FunctorFilterLaws.laws(
         ComposedFunctorFilter(OptionT.functorFilter(Id.monad()),
           OptionT.functorFilter(NonEmptyList.monad())),
-        { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() },
+        Gen.int().map { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() },
         EQ_OPTIONT_ID_NEL),
 
       MonoidKLaws.laws(
@@ -109,7 +109,7 @@ class OptionTTest : UnitSpec() {
 
       FunctorFilterLaws.laws(
         OptionT.functorFilter(Option.monad()),
-        { OptionT(Some(Some(it))) },
+        Gen.int().map { OptionT(Some(Some(it))) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
         EQ()),
 
       TraverseFilterLaws.laws(

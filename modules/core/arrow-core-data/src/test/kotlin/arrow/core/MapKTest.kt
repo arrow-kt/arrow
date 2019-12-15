@@ -50,7 +50,7 @@ class MapKTest : UnitSpec() {
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
       FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.string())),
       EqLaws.laws(MapK.eq(String.eq(), Int.eq()), Gen.mapK(Gen.string(), Gen.int())),
-      FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
+      FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
       AlignLaws.laws(MapK.align(),
         MapK.genK(Gen.string()),

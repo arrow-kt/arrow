@@ -7,8 +7,9 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
-import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.extensions.ior.bifunctor.bifunctor
+import arrow.core.extensions.ior.bitraverse.bitraverse
+import arrow.core.extensions.ior.crosswalk.crosswalk
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.eqK.eqK
 import arrow.core.extensions.ior.hash.hash
@@ -20,8 +21,9 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.ior
 import arrow.test.laws.BicrosswalkLaws
-import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws

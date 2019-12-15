@@ -1,17 +1,17 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.typeclasses.MonadFilter
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
+import arrow.typeclasses.MonadFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadFilterLaws {
 
   fun <F> laws(MF: MonadFilter<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, cf, EQ) + listOf(
+    MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, Gen.int().map(cf), EQ) + listOf(
       Law("MonadFilter Laws: Left Empty") { MF.monadFilterLeftEmpty(EQ) },
       Law("MonadFilter Laws: Right Empty") { MF.monadFilterRightEmpty(EQ) },
       Law("MonadFilter Laws: Consistency") { MF.monadFilterConsistency(cf, EQ) },
