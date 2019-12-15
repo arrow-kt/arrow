@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
@@ -11,17 +12,21 @@ import arrow.fx.reactor.extensions.fluxk.monadFilter.monadFilter
 import arrow.fx.reactor.extensions.fluxk.timer.timer
 import arrow.fx.reactor.extensions.fluxk.traverse.traverse
 import arrow.fx.reactor.extensions.fx
+import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.matchers.startWith
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
@@ -61,13 +66,25 @@ class FluxKTest : UnitSpec() {
       }
   }
 
+  fun GENK() = object : GenK<ForFluxK> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForFluxK, A>> =
+      Gen.list(gen).map { Flux.fromIterable(it).k() }
+  }
+
+  fun EQK(): EqK<ForFluxK> = object : EqK<ForFluxK> {
+    override fun <A> Kind<ForFluxK, A>.eqK(other: Kind<ForFluxK, A>, EQ: Eq<A>): Boolean =
+      EQ<A>().run {
+        this@eqK.fix<A>().eqv(other.fix())
+      }
+  }
+
   init {
 
     testLaws(
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
       AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
-      FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
-      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ()),
+      FoldableLaws.laws(FluxK.foldable(), GENK()),
+      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), GENK(), EQK()),
       MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQ())
     )
 

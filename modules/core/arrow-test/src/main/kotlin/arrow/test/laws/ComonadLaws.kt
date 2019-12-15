@@ -61,7 +61,7 @@ object ComonadLaws {
     }
   }
 
-  // TODO: better understand this test as it fails when Nel has length > 1
+  // TODO ab: better understand this test as it fails when Nel has length > 1
   fun <F> Comonad<F>.cobinding(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(G) { fa: Kind<F, Int> ->
       val comonad = fx.comonad {

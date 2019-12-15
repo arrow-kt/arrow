@@ -10,6 +10,7 @@ import arrow.core.Eval
 import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.extension
@@ -20,6 +21,7 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -199,6 +201,16 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
       is Either.Right -> EQR().run { this@eqv.b.eqv(b.b) }
     }
   }
+}
+
+@extension
+interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<EitherPartialOf<L>, R>.eqK(other: Kind<EitherPartialOf<L>, R>, EQ: Eq<R>): Boolean =
+    Either.eq(EQL(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
 }
 
 @extension

@@ -48,10 +48,10 @@ class NonEmptyListTest : UnitSpec() {
       ShowLaws.laws(NonEmptyList.show(), EQ1, Gen.nonEmptyList(Gen.int())),
       SemigroupKLaws.laws(
         NonEmptyList.semigroupK(),
-        NonEmptyList.applicative(),
-        Eq.any()),
+        NonEmptyList.genK(),
+        NonEmptyList.eqK()),
       BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), g, Eq.any(), EQ2, Eq.any()),
-      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
+      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),
       EqKLaws.laws(

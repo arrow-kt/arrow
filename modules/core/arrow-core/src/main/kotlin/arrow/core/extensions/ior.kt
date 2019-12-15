@@ -9,16 +9,19 @@ import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
 import arrow.core.ap
+import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix
 import arrow.core.flatMap
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
 import arrow.typeclasses.Bifoldable
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Bitraverse
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
@@ -26,7 +29,6 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bitraverse
 import arrow.undocumented
 
 @extension
@@ -142,6 +144,16 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
       is Ior.Right -> EQR().run { value.eqv(b.value) }
     }
   }
+}
+
+@extension
+interface IorEqK<A> : EqK<IorPartialOf<A>> {
+  fun EQA(): Eq<A>
+
+  override fun <B> Kind<IorPartialOf<A>, B>.eqK(other: Kind<IorPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+    Ior.eq(EQA(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
 }
 
 @extension

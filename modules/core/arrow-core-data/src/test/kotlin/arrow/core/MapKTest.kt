@@ -46,9 +46,9 @@ class MapKTest : UnitSpec() {
 
     val testLaws = testLaws(
       ShowLaws.laws(MapK.show(), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
-      TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
+      TraverseLaws.laws(MapK.traverse(), MapK.functor(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
-      FoldableLaws.laws(MapK.foldable(), { a: Int -> mapOf("key" to a).k() }, Eq.any()),
+      FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.string())),
       EqLaws.laws(MapK.eq(String.eq(), Int.eq()), Gen.mapK(Gen.string(), Gen.int())),
       FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),

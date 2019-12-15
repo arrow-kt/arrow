@@ -33,6 +33,7 @@ import arrow.mtl.extensions.eithert.functor.functor
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.intSmall
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
@@ -48,10 +49,17 @@ class EitherTTest : UnitSpec() {
     a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
   }
 
+  fun GEN() =
+    Gen.constant(
+      EitherT.applicative<ForId, Int>(Id.monad()))
+
   init {
 
     val cf: (Int) -> EitherT<Kind<ForConst, Int>, Int, Int> = { EitherT(it.const()) }
     val g = Gen.int().map(cf) as Gen<Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, Int>>
+
+    val cfId: (Int) -> EitherT<ForId, Nothing, Int> = { EitherT(Id(Right(it))) }
+    val genId = Gen.intSmall().map(cfId) as Gen<Kind<EitherTPartialOf<ForId, Int>, Int>>
 
     testLaws(
       DivisibleLaws.laws(
@@ -68,10 +76,10 @@ class EitherTTest : UnitSpec() {
         }
       ),
       AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
+      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), genId, Eq.any()),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),
-        EitherT.applicative<ForId, Int>(Id.monad()),
+        GEN() as Gen<Kind<EitherTPartialOf<ForId, Int>, Int>>,
         Eq.any())
     )
 

@@ -1,5 +1,6 @@
 package arrow.free
 
+import arrow.Kind
 import arrow.core.ForId
 import arrow.core.FunctionK
 import arrow.core.Id
@@ -25,7 +26,6 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
@@ -63,12 +63,18 @@ class FreeTest : UnitSpec() {
 
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
+    val cf: (Int) -> Free<ForId, Int> = { it.free() }
+
+    val EQ1 = Free.eq<ForId, ForId, Int>(Id.monad(), FunctionK.id())
+
+    val G = Gen.int().map(cf) as Gen<Kind<FreePartialOf<ForId>, Int>>
+
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
       MonadLaws.laws(Ops, EQ),
       MonadLaws.laws(Free.monad(), EQ),
-      FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Free.eq(Id.monad(), FunctionK.id()))
+      FoldableLaws.laws(Free.foldable(Id.foldable()), G),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), G, EQ1)
     )
 
     "Can interpret an ADT as Free operations to Option" {

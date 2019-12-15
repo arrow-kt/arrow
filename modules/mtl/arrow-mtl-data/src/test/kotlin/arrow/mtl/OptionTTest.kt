@@ -6,6 +6,7 @@ import arrow.core.Either
 import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
+import arrow.core.ForOption
 import arrow.core.Id
 import arrow.core.NonEmptyList
 import arrow.core.None
@@ -37,6 +38,7 @@ import arrow.mtl.typeclasses.NestedType
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
+import arrow.test.generators.intSmall
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -91,7 +93,7 @@ class OptionTTest : UnitSpec() {
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
-        OptionT.applicative(Option.monad()),
+        Gen.int().map { OptionT.applicative(Option.monad()).just(it) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
         EQ()),
 
       FunctorFilterLaws.laws(
@@ -113,7 +115,7 @@ class OptionTTest : UnitSpec() {
       TraverseFilterLaws.laws(
         OptionT.traverseFilter(Option.traverseFilter()),
         OptionT.applicative(Option.monad()),
-        { OptionT(Some(Some(it))) },
+        Gen.intSmall().map { OptionT(Some(Some(it))) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
         EQ(),
         EQ_NESTED()),
 

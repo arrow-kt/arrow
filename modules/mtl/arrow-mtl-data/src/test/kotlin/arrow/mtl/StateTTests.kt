@@ -2,12 +2,13 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.ForTry
-import arrow.core.Try
 import arrow.core.ForListK
+import arrow.core.ForTry
 import arrow.core.ListK
+import arrow.core.Try
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.listk.monad.monad
+import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -16,7 +17,6 @@ import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
-import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
@@ -27,6 +27,7 @@ import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 class StateTTests : UnitSpec() {
 
@@ -59,7 +60,7 @@ class StateTTests : UnitSpec() {
       AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEitherEQ()),
       SemigroupKLaws.laws(
         StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
-        StateT.applicative<ForListK, Int>(ListK.monad()),
+        Gen.int().map { StateT.applicative<ForListK, Int>(ListK.monad()).just(it) } as Gen<Kind<StateTPartialOf<ForListK, Int>, Int>>,
         EQ_LIST),
       MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },

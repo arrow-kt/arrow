@@ -39,7 +39,7 @@ class TupleTest : UnitSpec() {
     testLaws(
       MonoidLaws.laws(
         M = Tuple2.monoid(Int.monoid(), String.monoid()),
-        A = Gen.tuple2(Gen.int(), Gen.string()),
+        GEN = Gen.tuple2(Gen.int(), Gen.string()),
         EQ = Eq.any()
       )
     )

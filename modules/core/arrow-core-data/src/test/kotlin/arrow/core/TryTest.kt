@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
@@ -41,7 +42,7 @@ class TryTest : UnitSpec() {
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
+      TraverseLaws.laws(Try.traverse(), Try.functor(), Gen.int().map { Success(it) } as Gen<Kind<ForTry, Int>>, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
     )
 

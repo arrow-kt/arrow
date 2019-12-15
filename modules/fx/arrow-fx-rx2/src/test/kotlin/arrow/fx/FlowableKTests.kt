@@ -1,10 +1,10 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Try
 import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.FlowableKOf
 import arrow.fx.rx2.ForFlowableK
-import arrow.fx.rx2.k
 import arrow.fx.rx2.extensions.asyncDrop
 import arrow.fx.rx2.extensions.asyncError
 import arrow.fx.rx2.extensions.asyncLatest
@@ -17,14 +17,19 @@ import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
 import arrow.fx.rx2.extensions.flowablek.traverse.traverse
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.fix
+import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
@@ -47,6 +52,23 @@ class FlowableKTests : RxJavaSpec() {
         })
       })
     }
+  }
+
+  fun EQK() = object : EqK<ForFlowableK> {
+    override fun <A> Kind<ForFlowableK, A>.eqK(other: Kind<ForFlowableK, A>, EQ: Eq<A>): Boolean =
+      EQ<A>().run {
+        this@eqK.fix().eqv(other.fix())
+      }
+  }
+
+  fun <A> GEN(gen: Gen<A>): Gen<FlowableK<A>> =
+    Gen.list(gen).map {
+      Flowable.fromIterable(it).k()
+    }
+
+  fun GENK() = object : GenK<ForFlowableK> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForFlowableK, A>> =
+      GEN(gen) as Gen<Kind<ForFlowableK, A>>
   }
 
   init {
@@ -76,7 +98,7 @@ class FlowableKTests : RxJavaSpec() {
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
-    testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
+    testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), GENK(), EQK()))
 
     testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQ()))
 

@@ -1,17 +1,19 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.ForListK
+import arrow.core.ForNonEmptyList
+import arrow.core.ListK
+import arrow.core.NonEmptyList
 import arrow.core.Tuple2
+import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.core.ListK
-import arrow.core.ForNonEmptyList
-import arrow.core.ForListK
-import arrow.core.NonEmptyList
-import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.fix
 import arrow.test.UnitSpec
+import arrow.test.generators.intSmall
 import arrow.test.laws.ReducibleLaws
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class ReducibleTests : UnitSpec() {
@@ -25,7 +27,8 @@ class ReducibleTests : UnitSpec() {
 
     testLaws(ReducibleLaws.laws(
       nonEmptyReducible,
-      { n: Int -> NonEmptyList(n, listOf()) },
+      // TODO ab: check if Gen.nel can be used here.
+      Gen.intSmall().map { NonEmptyList(it, listOf()) } as Gen<Kind<ForNonEmptyList, Int>>,
       Eq.any(),
       Eq.any(),
       Eq.any()))

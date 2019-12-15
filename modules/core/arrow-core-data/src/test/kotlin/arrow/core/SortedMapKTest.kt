@@ -44,8 +44,9 @@ class SortedMapKTest : UnitSpec() {
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),
         SortedMapK.functor<String>(),
-        { a: Int -> sortedMapOf("key" to a).k() },
-        EQ),
+        SortedMapK.genK(Gen.string()),
+        SortedMapK.eqK(String.eq())
+      ),
       AlignLaws.laws(SortedMapK.align<String>(),
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),

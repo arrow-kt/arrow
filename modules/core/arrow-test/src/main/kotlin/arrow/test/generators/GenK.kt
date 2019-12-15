@@ -1,6 +1,8 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.core.Either
+import arrow.core.EitherPartialOf
 import arrow.core.ForId
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
@@ -8,6 +10,8 @@ import arrow.core.ForOption
 import arrow.core.ForSequenceK
 import arrow.core.ForSetK
 import arrow.core.Id
+import arrow.core.Ior
+import arrow.core.IorPartialOf
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.MapKPartialOf
@@ -17,6 +21,8 @@ import arrow.core.SequenceK
 import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {
@@ -67,3 +73,21 @@ fun SetK.Companion.genK() = object : GenK<ForSetK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSetK, A>> =
     Gen.genSetK(gen) as Gen<Kind<ForSetK, A>>
 }
+
+fun <A> Either.Companion.genK(genA: Gen<A>) =
+  object : GenK<EitherPartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<EitherPartialOf<A>, B>> =
+      Gen.either(genA, gen) as Gen<Kind<EitherPartialOf<A>, B>>
+  }
+
+fun <A> Ior.Companion.genK(genA: Gen<A>) =
+  object : GenK<IorPartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<IorPartialOf<A>, B>> =
+      Gen.ior(genA, gen) as Gen<Kind<IorPartialOf<A>, B>>
+  }
+
+fun <E> Validated.Companion.genK(genE: Gen<E>) =
+  object : GenK<ValidatedPartialOf<E>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ValidatedPartialOf<E>, A>> =
+      Gen.validated(genE, gen) as Gen<Kind<ValidatedPartialOf<E>, A>>
+  }

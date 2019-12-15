@@ -1,26 +1,27 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.Kind2
+import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.semigroup
 import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bifunctor.bifunctor
+import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
-import arrow.core.extensions.ior.bitraverse.bitraverse
-import arrow.core.Ior.Right
+import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.ior
 import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
@@ -43,7 +44,11 @@ class IorTest : UnitSpec() {
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
-      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
+      TraverseLaws.laws(Ior.traverse(),
+        Ior.applicative(Int.semigroup()),
+        Gen.ior(Gen.int(), Gen.int()).filter { it is Right } as Gen<Kind<IorPartialOf<Int>, Int>>,
+        Ior.eq(Int.eq(), Int.eq()) as Eq<Kind<IorPartialOf<Int>, Int>>
+      ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any())
     )
