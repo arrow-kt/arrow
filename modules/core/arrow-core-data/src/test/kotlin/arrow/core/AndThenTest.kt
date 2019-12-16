@@ -1,31 +1,32 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.extensions.monoid
 import arrow.core.extensions.andthen.category.category
 import arrow.core.extensions.andthen.contravariant.contravariant
 import arrow.core.extensions.andthen.monad.monad
 import arrow.core.extensions.andthen.monoid.monoid
 import arrow.core.extensions.andthen.profunctor.profunctor
 import arrow.core.extensions.list.foldable.foldLeft
+import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.counnest
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 class AndThenTest : UnitSpec() {
 
-  val ConestedEQ: Eq<Kind<Conested<ForAndThen, Int>, Int>> = Eq { a, b ->
+  val conestedEQ: Eq<Kind<Conested<ForAndThen, Int>, Int>> = Eq { a, b ->
     a.counnest().invoke(1) == b.counnest().invoke(1)
   }
 
@@ -33,14 +34,23 @@ class AndThenTest : UnitSpec() {
     a(1) == b(1)
   }
 
-  val gen = Gen.int().map { AndThen.just<Int, Int>(it).conest() }
+  fun <A> EQK() = object : EqK<AndThenPartialOf<A>> {
+    override fun <B> Kind<AndThenPartialOf<A>, B>.eqK(other: Kind<AndThenPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+      (this.fix() to other.fix()).let { (ls, rs) ->
+        EQ.run {
+          ls(1).eqv(rs(1))
+        }
+      }
+  }
+
+  val GEN = Gen.int().map { AndThen.just<Int, Int>(it).conest() }
 
   init {
 
     testLaws(
-      MonadLaws.laws(AndThen.monad(), EQ),
+      MonadLaws.laws(AndThen.monad(), EQK<AndThenPartialOf<Int>>()),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant(), gen, ConestedEQ),
+      ContravariantLaws.laws(AndThen.contravariant(), GEN, conestedEQ),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
     )

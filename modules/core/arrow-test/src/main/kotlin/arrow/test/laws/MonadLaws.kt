@@ -3,20 +3,24 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.mtl.Kleisli
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadLaws {
 
-  fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    SelectiveLaws.laws(M, EQ) +
+  fun <F> laws(M: Monad<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return SelectiveLaws.laws(M, EQK) +
       listOf(
         Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
         Law("Monad Laws: right identity") { M.rightIdentity(EQ) },
@@ -27,6 +31,7 @@ object MonadLaws {
         Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) },
         Law("Monad Laws: selectM == select when Selective has a monad instance") { M.selectEQSelectM(EQ) }
       )
+  }
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->

@@ -69,9 +69,9 @@ class ObservableKTests : RxJavaSpec() {
   init {
     testLaws(
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), GENK(), EQK()),
-      ConcurrentLaws.laws(ObservableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(ObservableK.concurrent(), EQK(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
-      MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQ())
+      MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQK())
     )
 
     "fx should defer evaluation until subscribed" {

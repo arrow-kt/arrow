@@ -18,10 +18,12 @@ import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.applicative.applicative
+import arrow.core.extensions.nonemptylist.eq.eq
 import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
@@ -58,6 +60,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
@@ -88,6 +91,17 @@ class ComposedInstancesTest : UnitSpec() {
       a.biunnest().fix() == b.biunnest().fix()
     }
 
+    val EQK = object : EqK<Nested<ForOption, ForNonEmptyList>> {
+      override fun <A> Kind<Nested<ForOption, ForNonEmptyList>, A>.eqK(other: Kind<Nested<ForOption, ForNonEmptyList>, A>, EQ: Eq<A>): Boolean {
+        val ls = this.unnest().fix().map { it.fix() }
+        val rs = other.unnest().fix().map { it.fix() }
+
+        return Option.eq(NonEmptyList.eq(EQ)).run {
+          ls.eqv(rs)
+        }
+      }
+    }
+
     val cf: (Int) -> Kind<Nested<ForOption, ForNonEmptyList>, Int> = { Some(it.nel()).nest() }
 
     val G = Gen.intSmall().map(cf)
@@ -112,7 +126,7 @@ class ComposedInstancesTest : UnitSpec() {
 
     testLaws(
       FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQ_OPTION_NEL),
-      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQ_OPTION_NEL),
+      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GK),
       TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), G, EQ_OPTION_NEL),
       SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), Gen.int().map { ComposedApplicative(ListK.applicative(), Option.applicative()).just(it) }, EQ_LK_OPTION),

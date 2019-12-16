@@ -1,18 +1,22 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.extensions.eq
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object ApplicativeLaws {
 
-  fun <F> laws(A: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQ) + listOf(
+  fun <F> laws(A: Applicative<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQ) + listOf(
       Law("Applicative Laws: ap identity") { A.apIdentity(EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
       Law("Applicative Laws: interchange") { A.interchange(EQ) },
@@ -20,10 +24,11 @@ object ApplicativeLaws {
       Law("Applicative Laws: cartesian builder map") { A.cartesianBuilderMap(EQ) },
       Law("Applicative Laws: cartesian builder tupled") { A.cartesianBuilderTupled(EQ) }
     )
+  }
 
   fun <F> Applicative<F>.apIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int().applicative(this)) { fa: Kind<F, Int> ->
-      fa.ap(just({ n: Int -> n })).equalUnderTheLaw(fa, EQ)
+      fa.ap(just { n: Int -> n }).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Applicative<F>.homomorphism(EQ: Eq<Kind<F, Int>>): Unit =
@@ -33,7 +38,7 @@ object ApplicativeLaws {
 
   fun <F> Applicative<F>.interchange(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Int>(Gen.int()).applicative(this), Gen.int()) { fa: Kind<F, (Int) -> Int>, a: Int ->
-      just(a).ap(fa).equalUnderTheLaw(fa.ap(just({ x: (Int) -> Int -> x(a) })), EQ)
+      just(a).ap(fa).equalUnderTheLaw(fa.ap(just { x: (Int) -> Int -> x(a) }), EQ)
     }
 
   fun <F> Applicative<F>.mapDerived(EQ: Eq<Kind<F, Int>>): Unit =

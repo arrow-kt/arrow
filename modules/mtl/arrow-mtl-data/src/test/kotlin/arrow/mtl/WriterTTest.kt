@@ -12,13 +12,17 @@ import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
+import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.fix
 import arrow.core.value
 import arrow.fx.ForIO
@@ -43,16 +47,27 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  fun ioEQK() = object : EqK<WriterTPartialOf<ForIO, Int>> {
+    override fun <A> Kind<WriterTPartialOf<ForIO, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForIO, Int>, A>, EQ: Eq<A>): Boolean =
+      (this.fix().value().attempt().unsafeRunSync() to other.fix().value().attempt().unsafeRunSync()).let {
+        Either.eq(Eq.any(), Tuple2.eq(Int.eq(), EQ)).run {
+          it.first.eqv(it.second)
+        }
+      }
   }
 
-  private fun IOEitherEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  fun optionEQK() = object : EqK<WriterTPartialOf<ForOption, Int>> {
+    override fun <A> Kind<WriterTPartialOf<ForOption, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForOption, Int>, A>, EQ: Eq<A>): Boolean =
+      (this.fix().value().fix() to other.fix().value().fix()).let { (optionA, optionB) ->
+        Option.eq(Tuple2.eq(Int.eq(), EQ)).run {
+          optionA.eqv(optionB)
+        }
+      }
   }
 
   init {
@@ -64,15 +79,15 @@ class WriterTTest : UnitSpec() {
       AlternativeLaws.laws(
         WriterT.alternative(Int.monoid(), Option.alternative()),
         { i -> WriterT.just(Option.applicative(), Int.monoid(), i) },
-        { i -> WriterT.just(Option.applicative(), Int.monoid(), { j: Int -> i + j }) },
-        Eq { a, b -> a.value() == b.value() }
+        { i -> WriterT.just(Option.applicative(), Int.monoid()) { j: Int -> i + j } },
+        optionEQK()
       ),
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         g,
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
-      AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
+      AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), ioEQK()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
         WriterT.applicative(ListK.monad(), Int.monoid()),
@@ -83,30 +98,14 @@ class WriterTTest : UnitSpec() {
         Int.monoid(),
         Gen.intSmall(),
         Gen.tuple2(Gen.intSmall(), Gen.intSmall()),
-        Eq { a, b ->
-          a.value().fix().let { optionA: Option<Tuple2<Int, Int>> ->
-            val optionB = b.value().fix()
-            optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
-          }
-        },
-        Eq { a, b ->
-          a.value().fix().let { optionA: Option<Tuple2<Int, Tuple2<Int, Int>>> ->
-            val optionB = b.value().fix()
-            optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Tuple2<Int, Int>> -> optionB.fold({ false }, { value == it }) })
-          }
-        }
+        optionEQK(), Int.eq()
       ),
 
       MonadFilterLaws.laws(
         WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
         { WriterT(Option(Tuple2(it, it))) },
-        object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
-          override fun Kind<WriterTPartialOf<ForOption, Int>, Int>.eqv(b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =
-            value().fix().let { optionA: Option<Tuple2<Int, Int>> ->
-              val optionB = b.value().fix()
-              optionA.fold({ optionB.fold({ true }, { false }) }, { value: Tuple2<Int, Int> -> optionB.fold({ false }, { value == it }) })
-            }
-        })
+        optionEQK()
+      )
     )
   }
 }

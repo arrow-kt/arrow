@@ -73,34 +73,34 @@ class FlowableKTests : RxJavaSpec() {
 
   init {
     testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), GENK(), EQK()))
 
-    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQ()))
+    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQK()))
 
     "fx should defer evaluation until subscribed" {
       var run = false

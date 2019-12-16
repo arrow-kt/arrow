@@ -82,10 +82,10 @@ class FluxKTest : UnitSpec() {
 
     testLaws(
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
-      AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(FluxK.async(), EQK(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), GENK()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), GENK(), EQK()),
-      MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQ())
+      MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQK())
     )
 
     "fx should defer evaluation until subscribed" {

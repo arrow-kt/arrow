@@ -1,22 +1,27 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.extensions.eq
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.MonadFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadFilterLaws {
 
-  fun <F> laws(MF: MonadFilter<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, Gen.int().map(cf), EQ) + listOf(
+  fun <F> laws(MF: MonadFilter<F>, cf: (Int) -> Kind<F, Int>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq()
+    )
+    return MonadLaws.laws(MF, EQK) + FunctorFilterLaws.laws(MF, Gen.int().map(cf), EQK) + listOf(
       Law("MonadFilter Laws: Left Empty") { MF.monadFilterLeftEmpty(EQ) },
       Law("MonadFilter Laws: Right Empty") { MF.monadFilterRightEmpty(EQ) },
       Law("MonadFilter Laws: Consistency") { MF.monadFilterConsistency(cf, EQ) },
       Law("MonadFilter Laws: Comprehension Guards") { MF.monadFilterEmptyComprehensions(EQ) },
       Law("MonadFilter Laws: Comprehension bindWithFilter Guards") { MF.monadFilterBindWithFilterComprehensions(EQ) })
+  }
 
   fun <F> MonadFilter<F>.monadFilterLeftEmpty(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this))) { f: (Int) -> Kind<F, Int> ->

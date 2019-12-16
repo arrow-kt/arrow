@@ -26,7 +26,7 @@ object BimonadLaws {
 
     val GEN = GENK.genK(Gen.int())
 
-    return MonadLaws.laws(M, EQ1) +
+    return MonadLaws.laws(M, EQK) +
       ComonadLaws.laws(CM, GEN, EQ1) +
       listOf(
         Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(Gen.int(), EQ3) },

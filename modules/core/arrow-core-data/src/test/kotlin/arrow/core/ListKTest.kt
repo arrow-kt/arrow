@@ -4,11 +4,11 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.align.align
-import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
+import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -45,29 +45,28 @@ import kotlin.math.max
 import kotlin.math.min
 
 class ListKTest : UnitSpec() {
-  val applicative = ListK.applicative()
 
   init {
 
-    val eq: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
+    val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
     val associativeSemigroupalEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
     val aShortListK = Gen.listK(Gen.int()).filter { it.size < 10 } as Gen<Kind<ForListK, Int>>
 
     testLaws(
-      MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, eq),
-      ShowLaws.laws(ListK.show(), eq, Gen.listK(Gen.int())),
+      MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, ListK.eqK()),
+      ShowLaws.laws(ListK.show(), EQ, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), ListK.genK(), ListK.eqK()),
       MonoidalLaws.laws(ListK.monoidal(),
         aShortListK,
         ListK.eq(Tuple2.eq(Int.eq(), Int.eq())),
         this::bijection, associativeSemigroupalEq),
-      MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
-      TraverseLaws.laws(ListK.traverse(), applicative, ListK.genK(), ListK.eqK()),
+      MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
+      TraverseLaws.laws(ListK.traverse(), ListK.functor(), ListK.genK(), ListK.eqK()),
       MonadCombineLaws.laws(ListK.monadCombine(),
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
-        eq),
+        ListK.eqK()),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq()), Gen.listK(Gen.int())),
       EqKLaws.laws(
         ListK.eqK(),

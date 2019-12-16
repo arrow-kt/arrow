@@ -1,13 +1,14 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.Either
+import arrow.core.extensions.eq
 import arrow.test.generators.applicative
 import arrow.test.generators.applicativeError
 import arrow.test.generators.fatalThrowable
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.MonadError
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -16,15 +17,18 @@ import io.kotlintest.shouldThrowAny
 
 object MonadErrorLaws {
 
-  fun <F> laws(M: MonadError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
-    MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
-      Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQERR) },
-      Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQERR) },
-      Law("Monad Error Laws: NonFatal is caught") { M.monadErrorCatchesNonFatalThrowables(EQERR) },
-      Law("Monad Error Laws: Fatal errors are thrown") { M.monadErrorThrowsFatalThrowables(EQERR) },
-      Law("Monad Error Laws: redeemWith is derived from flatMap & HandleErrorWith") { M.monadErrorDerivesRedeemWith(EQERR) },
-      Law("Monad Error Laws: redeemWith pure is flatMap") { M.monadErrorRedeemWithPureIsFlatMap(EQERR) }
+  fun <F> laws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return MonadLaws.laws(M, EQK) + ApplicativeErrorLaws.laws(M, EQK) + listOf(
+      Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQ) },
+      Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQ) },
+      Law("Monad Error Laws: NonFatal is caught") { M.monadErrorCatchesNonFatalThrowables(EQ) },
+      Law("Monad Error Laws: Fatal errors are thrown") { M.monadErrorThrowsFatalThrowables(EQ) },
+      Law("Monad Error Laws: redeemWith is derived from flatMap & HandleErrorWith") { M.monadErrorDerivesRedeemWith(EQ) },
+      Law("Monad Error Laws: redeemWith pure is flatMap") { M.monadErrorRedeemWithPureIsFlatMap(EQ) }
     )
+  }
 
   fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicativeError(this)), Gen.throwable()) { f: (Int) -> Kind<F, Int>, e: Throwable ->

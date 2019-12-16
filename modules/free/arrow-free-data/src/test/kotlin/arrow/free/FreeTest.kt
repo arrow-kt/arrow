@@ -26,6 +26,8 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
@@ -69,10 +71,19 @@ class FreeTest : UnitSpec() {
 
     val G = Gen.int().map(cf) as Gen<Kind<FreePartialOf<ForId>, Int>>
 
+    val EQK = object : EqK<FreePartialOf<ForOps>> {
+      override fun <A> Kind<FreePartialOf<ForOps>, A>.eqK(other: Kind<FreePartialOf<ForOps>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          Free.eq<ForOps, ForId, A>(IdMonad, idInterpreter).run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
+
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
-      MonadLaws.laws(Ops, EQ),
-      MonadLaws.laws(Free.monad(), EQ),
+      MonadLaws.laws(Ops, EQK),
+      MonadLaws.laws(Free.monad(), EQK),
       FoldableLaws.laws(Free.foldable(Id.foldable()), G),
       TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), G, EQ1)
     )

@@ -17,12 +17,14 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class Function1Test : UnitSpec() {
+
   val ConestedEQ: Eq<Kind<Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
     a.counnest().invoke(1) == b.counnest().invoke(1)
   }
@@ -31,12 +33,21 @@ class Function1Test : UnitSpec() {
     a(1) == b(1)
   }
 
+  fun <A> EQK(a: A) = object : EqK<Function1PartialOf<A>> {
+    override fun <B> Kind<Function1PartialOf<A>, B>.eqK(other: Kind<Function1PartialOf<A>, B>, EQ: Eq<B>): Boolean =
+      (this.fix() to other.fix()).let { (ls, rs) ->
+        EQ.run {
+          ls(a).eqv(rs(a))
+        }
+      }
+  }
+
   init {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
       DivisibleLaws.laws(Function1.divisible(Int.monoid()), Gen.int().map { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
-      MonadLaws.laws(Function1.monad(), EQ),
+      MonadLaws.laws(Function1.monad(), EQK(5150)),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
 

@@ -20,15 +20,18 @@ import io.kotlintest.properties.forAll
 object FunctorFilterLaws {
 
   fun <F> laws(FFF: FunctorFilter<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(FFF, GENK.genK(Gen.int()), EQK.liftEq(Int.eq()))
+    laws(FFF, GENK.genK(Gen.int()), EQK)
 
-  fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    FunctorLaws.laws(FFF, GEN, EQ) + listOf(
+  fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return FunctorLaws.laws(FFF, GEN, EQ) + listOf(
       Law("Functor Filter: filterMap composition") { FFF.filterMapComposition(GEN, EQ) },
       Law("Functor Filter: filterMap map consistency") { FFF.filterMapMapConsistency(GEN, EQ) },
       Law("Functor Filter: flattenOption filterMap consistency") { FFF.flattenOptionConsistentWithfilterMap(GEN, EQ) },
       Law("Functor Filter: filter filterMap consistency") { FFF.filterConsistentWithfilterMap(GEN, EQ) }
     )
+  }
 
   fun <F> FunctorFilter<F>.filterMapComposition(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(

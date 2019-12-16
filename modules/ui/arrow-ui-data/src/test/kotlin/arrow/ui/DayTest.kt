@@ -12,6 +12,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.ui.extensions.day.applicative.applicative
 import arrow.ui.extensions.day.comonad.comonad
 import io.kotlintest.properties.Gen
@@ -27,8 +28,17 @@ class DayTest : UnitSpec() {
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
     }
 
+    val EQK = object : EqK<DayPartialOf<ForId, ForId>> {
+      override fun <A> Kind<DayPartialOf<ForId, ForId>, A>.eqK(other: Kind<DayPartialOf<ForId, ForId>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          EQ.run {
+            it.first.extract(Id.comonad(), Id.comonad()).eqv(it.second.extract(Id.comonad(), Id.comonad()))
+          }
+        }
+    }
+
     testLaws(
-      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQ),
+      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQK),
       ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQ)
     )
 

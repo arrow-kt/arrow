@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.eq
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
@@ -13,6 +14,7 @@ import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext
@@ -24,11 +26,12 @@ object AsyncLaws {
 
   fun <F> laws(
     AC: Async<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQK: EqK<F>,
     testStackSafety: Boolean = true
-  ): List<Law> =
-    MonadDeferLaws.laws(AC, EQ, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
+  ): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return MonadDeferLaws.laws(AC, EQK, testStackSafety = testStackSafety) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
@@ -39,6 +42,7 @@ object AsyncLaws {
       Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
       Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
     )
+  }
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->

@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
@@ -16,6 +17,7 @@ import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.reactivex.Single
@@ -44,9 +46,16 @@ class SingleKTests : RxJavaSpec() {
     }
   }
 
+  fun EQK() = object : EqK<ForSingleK> {
+    override fun <A> Kind<ForSingleK, A>.eqK(other: Kind<ForSingleK, A>, EQ: Eq<A>): Boolean =
+      EQ<A>().run {
+        this@eqK.eqv(other)
+      }
+  }
+
   init {
     testLaws(
-      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(SingleK.concurrent(), EQK(), testStackSafety = false),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
 

@@ -5,6 +5,7 @@ import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq
 import arrow.core.extensions.const.show.show
 import arrow.core.extensions.const.traverseFilter.traverseFilter
+import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genConst
@@ -13,9 +14,18 @@ import arrow.test.laws.EqLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
 class ConstTest : UnitSpec() {
+
+  fun <A> EQK(EQA: Eq<A>): EqK<ConstPartialOf<A>> = object : EqK<ConstPartialOf<A>> {
+    override fun <B> Kind<ConstPartialOf<A>, B>.eqK(other: Kind<ConstPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+      Const.eq<A, B>(EQA).run {
+        this@eqK.fix().eqv(other.fix())
+      }
+  }
+
   init {
     Int.monoid().run {
       testLaws(
@@ -23,7 +33,7 @@ class ConstTest : UnitSpec() {
           Const.applicative(this),
           Gen.genConst<Int, Int>(Gen.int()) as Gen<Kind<ConstPartialOf<Int>, Int>>,
           Eq.any()),
-        ApplicativeLaws.laws(Const.applicative(this), Eq.any()),
+        ApplicativeLaws.laws(Const.applicative(this), EQK(Int.eq())),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
         ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
       )

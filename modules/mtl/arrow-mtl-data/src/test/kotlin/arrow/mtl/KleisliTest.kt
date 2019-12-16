@@ -17,6 +17,8 @@ import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
+import arrow.core.extensions.option.eq.eq
+import arrow.core.fix
 import arrow.core.some
 import arrow.core.value
 import arrow.fx.ForIO
@@ -36,6 +38,7 @@ import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
@@ -63,18 +66,39 @@ class KleisliTest : UnitSpec() {
     val cf: (Int) -> Kleisli<Kind<ForConst, Int>, Int, Int> = { Kleisli { it.const() } }
     val g = Gen.int().map(cf) as Gen<Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, Int>>
 
+    val optionEQK = object : EqK<KleisliPartialOf<ForOption, Int>> {
+      override fun <A> Kind<KleisliPartialOf<ForOption, Int>, A>.eqK(other: Kind<KleisliPartialOf<ForOption, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.fix().run(0).fix() to other.fix().run(0).fix()).let {
+          Option.eq(EQ).run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
+
+    val ioEQK = object : EqK<KleisliPartialOf<ForIO, Int>> {
+      override fun <A> Kind<KleisliPartialOf<ForIO, Int>, A>.eqK(other: Kind<KleisliPartialOf<ForIO, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          it.first.run(1).attempt().unsafeRunSync() == it.second.run(1).attempt().unsafeRunSync()
+        }
+    }
+
+    val tryEQK = object : EqK<KleisliPartialOf<ForTry, Int>> {
+      override fun <A> Kind<KleisliPartialOf<ForTry, Int>, A>.eqK(other: Kind<KleisliPartialOf<ForTry, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          it.first.run(1) == it.second.run(1)
+        }
+    }
+
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
         { i -> Kleisli { i.some() } },
         { i -> Kleisli { { j: Int -> i + j }.some() } },
-        Eq { a, b -> a.fix().run(0) == b.fix().run(0) }
+        optionEQK
       ),
       BracketLaws.laws(
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
-        EQ = IOEQ(),
-        EQ_EITHER = IOEitherEQ(),
-        EQERR = IOEQ()
+        ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       DivisibleLaws.laws(
@@ -82,7 +106,7 @@ class KleisliTest : UnitSpec() {
         g,
         Eq { a, b -> a.run(1).value() == b.run(1).value() }
       ),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), tryEQK)
     )
 
     "andThen should continue sequence" {

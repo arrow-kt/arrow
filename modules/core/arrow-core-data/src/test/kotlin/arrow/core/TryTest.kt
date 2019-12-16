@@ -21,6 +21,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Hash
 import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
@@ -34,14 +35,23 @@ class TryTest : UnitSpec() {
   val success = Try { "10".toInt() }
   val failure = Try { "NaN".toInt() }
 
-  init {
+  val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
-    val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
+  val EQK = object : EqK<ForTry> {
+    override fun <A> Kind<ForTry, A>.eqK(other: Kind<ForTry, A>, EQ: Eq<A>): Boolean =
+      (this.fix() to other.fix()).let {
+        Try.eq(EQ, Eq.any()).run {
+          it.first.eqv(it.second)
+        }
+      }
+  }
+
+  init {
 
     testLaws(
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
-      MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+      MonadErrorLaws.laws(Try.monadError(), EQK),
       TraverseLaws.laws(Try.traverse(), Try.functor(), Gen.int().map { Success(it) } as Gen<Kind<ForTry, Int>>, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
     )

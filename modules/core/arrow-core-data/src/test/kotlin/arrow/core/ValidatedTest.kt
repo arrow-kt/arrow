@@ -24,6 +24,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -35,6 +36,15 @@ class ValidatedTest : UnitSpec() {
 
     val EQ = Validated.eq(String.eq(), Int.eq())
 
+    fun <E> EQK(EQE: Eq<E>) = object : EqK<ValidatedPartialOf<E>> {
+      override fun <A> Kind<ValidatedPartialOf<E>, A>.eqK(other: Kind<ValidatedPartialOf<E>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          Validated.eq(EQE, EQ).run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
+
     val VAL_AP = Validated.applicative(String.monoid())
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
@@ -42,7 +52,7 @@ class ValidatedTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
-      SelectiveLaws.laws(Validated.selective(String.semigroup()), Eq.any()),
+      SelectiveLaws.laws(Validated.selective(String.semigroup()), EQK(String.eq())),
       TraverseLaws.laws(Validated.traverse(), Validated.functor(), Gen.intSmall().map { Valid(it) } as Gen<Kind<ValidatedPartialOf<Nothing>, Int>>, Eq.any()),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),

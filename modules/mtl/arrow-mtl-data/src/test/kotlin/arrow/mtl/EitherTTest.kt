@@ -40,12 +40,13 @@ import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->
+  fun <A> ioEQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->
     a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
   }
 
@@ -61,6 +62,21 @@ class EitherTTest : UnitSpec() {
     val cfId: (Int) -> EitherT<ForId, Nothing, Int> = { EitherT(Id(Right(it))) }
     val genId = Gen.intSmall().map(cfId) as Gen<Kind<EitherTPartialOf<ForId, Int>, Int>>
 
+    val idEQK = object : EqK<EitherTPartialOf<ForId, Int>> {
+      override fun <A> Kind<EitherTPartialOf<ForId, Int>, A>.eqK(other: Kind<EitherTPartialOf<ForId, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.fix().value().fix() to other.fix().value().fix()).let {
+          Eq.any().run { it.first.eqv(it.second) }
+        }
+    }
+
+    val ioEQK = object : EqK<EitherTPartialOf<ForIO, Throwable>> {
+      override fun <A> Kind<EitherTPartialOf<ForIO, Throwable>, A>.eqK(other: Kind<EitherTPartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          ioEQ<A>().run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
     testLaws(
       DivisibleLaws.laws(
         EitherT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
@@ -71,11 +87,9 @@ class EitherTTest : UnitSpec() {
         EitherT.alternative(Id.monad(), Int.monoid()),
         { EitherT.just(Id.applicative(), it) },
         { i -> EitherT.just(Id.applicative(), { j: Int -> i + j }) },
-        Eq { a, b ->
-          a.value().fix() == b.value().fix()
-        }
+        idEQK
       ),
-      AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
+      AsyncLaws.laws(EitherT.async(IO.async()), ioEQK),
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), genId, Eq.any()),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),

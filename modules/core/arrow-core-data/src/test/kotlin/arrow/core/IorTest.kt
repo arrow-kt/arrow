@@ -49,7 +49,7 @@ class IorTest : UnitSpec() {
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
-      MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
+      MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
       TraverseLaws.laws(Ior.traverse(),
         Ior.applicative(Int.semigroup()),
         Gen.ior(Gen.int(), Gen.int()).filter { it is Right } as Gen<Kind<IorPartialOf<Int>, Int>>,
