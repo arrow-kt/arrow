@@ -325,9 +325,6 @@ interface Apply<F> : Functor<F> {
   fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
     map(this, fb) { (_, right) -> right }
 
-  fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
-    map(this, fb.value()) { (_, right) -> right }
-
   /**
    * Given two actions, it performs them sequentially.
    * Discards the result of the second action.
@@ -336,7 +333,4 @@ interface Apply<F> : Functor<F> {
    */
   fun <A, B> Kind<F, A>.apIgnore(fb: Kind<F, B>): Kind<F, A> =
     map(this, fb) { (left, _) -> left }
-
-  fun <A, B> Kind<F, A>.apIgnoreEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
-    map(this, fb.value()) { (left, _) -> left }
 }

@@ -50,6 +50,15 @@ interface Monad<F> : Selective<F> {
   fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
     flatMap(::identity)
 
+  override fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
+    flatMap { fb }
+
+  override fun <A, B> Kind<F, A>.apIgnore(fb: Kind<F, B>): Kind<F, A> =
+    fb.flatMap { this }
+
+  fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
+    flatMap { fb.value() }
+
   @Deprecated(
     "effectM is being renamed to flatTap",
     ReplaceWith("flatTap(f)")

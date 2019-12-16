@@ -98,16 +98,15 @@ Computation happens when `.value()` is invoked.
 Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value() }
 ```
 
-#### Kind<F, A>#followedBy / followedByEval
+#### Kind<F, A>#followedBy
 
 Sequences actions, discarding the value of the first argument.
-The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 Option.applicative().run { Some(1).followedBy(Some(2)) }
 ```
 
-#### Kind<F, A>#apIgnore / apIgnoreEval
+#### Kind<F, A>#apIgnore
 
 This is a reverse for `followedBy`. Sequences actions but discarding the value of the second argument.
 
