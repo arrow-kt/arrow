@@ -21,15 +21,15 @@ import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.bracket.bracket
-import arrow.fx.mtl.kleisli.bracket.bracket
+import arrow.fx.extensions.io.async.async
+import arrow.fx.mtl.async
 import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.BracketLaws
+import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
@@ -65,11 +65,10 @@ class KleisliTest : UnitSpec() {
         { i -> Kleisli { { j: Int -> i + j }.some() } },
         Eq { a, b -> a.fix().run(0) == b.fix().run(0) }
       ),
-      BracketLaws.laws(
-        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
+      AsyncLaws.laws(
+        Kleisli.async<ForIO, Int>(IO.async()),
         EQ = IOEQ(),
-        EQ_EITHER = IOEitherEQ(),
-        EQERR = IOEQ()
+        EQ_EITHER = IOEitherEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       DivisibleLaws.laws(
