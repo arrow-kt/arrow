@@ -9,16 +9,24 @@ import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
 import arrow.core.ap
+import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix
 import arrow.core.flatMap
+import arrow.core.leftIor
+import arrow.core.rightIor
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
+import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Bifoldable
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Bitraverse
+import arrow.typeclasses.Crosswalk
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
@@ -26,7 +34,6 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bitraverse
 import arrow.undocumented
 
 @extension
@@ -169,3 +176,45 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()
+
+@extension
+interface IorEqK<L> : EqK<IorPartialOf<L>> {
+  fun EQL(): Eq<L>
+
+  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      Ior.eq(EQL(), EQ).run { ls.eqv(rs) }
+    }
+}
+
+@extension
+interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldable<L> {
+  override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<IorPartialOf<L>, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<IorPartialOf<L>, B>> {
+    return when (val ior = a.fix()) {
+      is Ior.Left -> ALIGN.run { empty<Kind<IorPartialOf<L>, B>>() }
+      is Ior.Both -> ALIGN.run { fa(ior.rightValue).map { Ior.Both(ior.leftValue, it) } }
+      is Ior.Right -> ALIGN.run { fa(ior.value).map { it.rightIor() } }
+    }
+  }
+}
+
+@extension
+interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
+  override fun <F, A, B, C, D> bicrosswalk(
+    ALIGN: Align<F>,
+    tab: Kind2<ForIor, A, B>,
+    fa: (A) -> Kind<F, C>,
+    fb: (B) -> Kind<F, D>
+  ): Kind<F, Kind2<ForIor, C, D>> =
+    when (val e = tab.fix()) {
+      is Ior.Left -> ALIGN.run {
+        fa(e.value).map { it.leftIor() }
+      }
+      is Ior.Right -> ALIGN.run {
+        fb(e.value).map { it.rightIor() }
+      }
+      is Ior.Both -> ALIGN.run {
+        align(fa(e.leftValue), fb(e.rightValue))
+      }
+    }
+}

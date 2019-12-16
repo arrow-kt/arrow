@@ -6,6 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
+import arrow.core.extensions.id.crosswalk.crosswalk
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.foldable.foldable
@@ -24,6 +25,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.id
 import arrow.test.laws.BimonadLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonoidLaws
@@ -66,7 +68,10 @@ class IdTest : UnitSpec() {
         Id.genK(),
         Id.eqK(),
         Id.foldable()
-      )
+      ),
+      CrosswalkLaws.laws(Id.crosswalk(),
+        Id.genK(),
+        Id.eqK())
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {

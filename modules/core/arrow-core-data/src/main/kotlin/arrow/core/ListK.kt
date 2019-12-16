@@ -173,6 +173,64 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
 
   override fun hashCode(): Int = list.hashCode()
 
+  /**
+   * Align two Lists as in zip, but filling in blanks with None.
+   */
+  fun <B> padZip(
+    other: ListK<B>
+  ): ListK<Tuple2<Option<A>, Option<B>>> =
+    alignWith(this, other) { ior ->
+      ior.fold(
+        { it.some() toT Option.empty<B>() },
+        { Option.empty<A>() toT it.some() },
+        { a, b -> a.some() toT b.some() })
+    }
+
+  /**
+   * Align two Lists as in zipWith, but filling in blanks with None.
+   */
+  fun <B, C> padZipWith(
+    other: ListK<B>,
+    fa: (Option<A>, Option<B>) -> C
+  ): ListK<C> =
+    padZip(other).map { fa(it.a, it.b) }
+
+  /**
+   * Left-padded zipWith.
+   */
+  fun <B, C> lpadZipWith(
+    other: ListK<B>,
+    fab: (Option<A>, B) -> C
+  ): ListK<C> =
+    padZipWith(other) { a, b -> b.map { fab(a, it) } }.filterMap(::identity)
+
+  /**
+   * Left-padded zip.
+   */
+  fun <B> lpadZip(
+    other: ListK<B>
+  ): ListK<Tuple2<Option<A>, B>> =
+    this.lpadZipWith(other) { a, b -> a toT b }
+
+  /**
+   * Right-padded zipWith.
+   */
+  fun <B, C> rpadZipWith(
+    other: ListK<B>,
+    fa: (A, Option<B>) -> C
+  ): ListK<C> =
+    other.lpadZipWith(this) { a, b -> fa(b, a) }
+
+  /**
+   * Right-padded zip.
+   */
+  fun <B> rpadZip(
+    other: ListK<B>
+  ): ListK<Tuple2<A, Option<B>>> =
+    this.rpadZipWith(other) { a, b ->
+      a toT b
+    }
+
   companion object {
 
     fun <A> just(a: A): ListK<A> = listOf(a).k()
@@ -201,6 +259,16 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())
       return ListK(buf)
+    }
+
+    fun <A, B, C> alignWith(a: ListK<A>, b: ListK<B>, fa: (Ior<A, B>) -> C): ListK<C> = align(a, b).map(fa)
+
+    fun <A, B> align(a: ListK<A>, b: ListK<B>): ListK<Ior<A, B>> = alignRec(a, b).k()
+
+    private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
+      ls.isEmpty() -> rs.map { it.rightIor() }
+      rs.isEmpty() -> ls.map { it.leftIor() }
+      else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
     }
   }
 }
