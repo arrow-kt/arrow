@@ -90,8 +90,6 @@ fun <F, R> Kleisli.Companion.async(AS: Async<F>): Async<KleisliPartialOf<F, R>> 
     override fun ASF(): Async<F> = AS
   }
 
-@extension
-@undocumented
 interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliAsync<F, R> {
 
   fun CF(): Concurrent<F>

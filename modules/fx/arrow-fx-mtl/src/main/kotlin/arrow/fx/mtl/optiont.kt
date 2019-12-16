@@ -94,8 +94,6 @@ interface OptionTAsync<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefer<F> {
   }
 }
 
-@extension
-@undocumented
 interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F> {
   fun CF(): Concurrent<F>
   override fun AS(): Async<F> = CF()

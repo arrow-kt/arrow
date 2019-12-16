@@ -107,8 +107,6 @@ interface EitherTAsync<F, L> : Async<EitherTPartialOf<F, L>>, EitherTMonadDefer<
   }
 }
 
-@extension
-@undocumented
 interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTAsync<F, L> {
 
   fun CF(): Concurrent<F>

@@ -92,8 +92,6 @@ interface WriterTAsync<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDefer<
   }
 }
 
-@extension
-@undocumented
 interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTAsync<F, W> {
 
   fun CF(): Concurrent<F>
