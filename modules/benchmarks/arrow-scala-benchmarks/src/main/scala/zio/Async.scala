@@ -1,7 +1,7 @@
 package arrow.benchmarks.effects.scala.zio
 
-import scalaz.zio._
-import scalaz.zio.internal.Executor
+import zio._
+import zio.internal.Executor
 
 import scala.concurrent.ExecutionContext
 
