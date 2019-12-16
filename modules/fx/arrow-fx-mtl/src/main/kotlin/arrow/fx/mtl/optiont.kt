@@ -1,5 +1,6 @@
 package arrow.fx.mtl
 
+import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -107,37 +108,41 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>): OptionT<F, RacePair<OptionTPartialOf<F>, A, B>> = CF().run {
-    OptionT(racePair(fa.value(), fb.value()).flatMap {
-      when (it) {
-        is RacePair.First -> when (val winner = it.winner) {
-          None -> it.fiberB.cancel().map { None }
-          is Some -> just(Some(RacePair.First(winner.t, fiberT(it.fiberB))))
-        }
-        is RacePair.Second -> when (val winner = it.winner) {
-          is None -> it.fiberA.cancel().map { None }
-          is Some -> just(Some(RacePair.Second(fiberT(it.fiberA), winner.t)))
+    val racePair: Kind<F, Option<RacePair<OptionTPartialOf<F>, A, B>>> =
+      racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Option<A>, Option<B>> ->
+        when (res) {
+          is RacePair.First -> when (val winner = res.winner) {
+            None -> res.fiberB.cancel().map { None }
+            is Some -> just(Some(RacePair.First(winner.t, fiberT(res.fiberB))))
+          }
+          is RacePair.Second -> when (val winner = res.winner) {
+            is None -> res.fiberA.cancel().map { None }
+            is Some -> just(Some(RacePair.Second(fiberT(res.fiberA), winner.t)))
+          }
         }
       }
-    })
+    OptionT(racePair)
   }
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>, fc: OptionTOf<F, C>): OptionT<F, RaceTriple<OptionTPartialOf<F>, A, B, C>> = CF().run {
-    OptionT(raceTriple(fa.value(), fb.value(), fc.value()).flatMap {
-      when (it) {
-        is RaceTriple.First -> when (val winner = it.winner) {
-          None -> tupled(it.fiberB.cancel(), it.fiberC.cancel()).map { None }
-          is Some -> just(Some(RaceTriple.First(winner.t, fiberT(it.fiberB), fiberT(it.fiberC))))
-        }
-        is RaceTriple.Second -> when (val winner = it.winner) {
-          is None -> tupled(it.fiberA.cancel(), it.fiberC.cancel()).map { None }
-          is Some -> just(Some(RaceTriple.Second(fiberT(it.fiberA), winner.t, fiberT(it.fiberC))))
-        }
-        is RaceTriple.Third -> when (val winner = it.winner) {
-          is None -> it.fiberA.cancel().map { None }
-          is Some -> just(Some(RaceTriple.Third(fiberT(it.fiberA), fiberT(it.fiberB), winner.t)))
+    val raceTriple: Kind<F, Option<RaceTriple<OptionTPartialOf<F>, A, B, C>>> =
+      raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Option<A>, Option<B>, Option<C>> ->
+        when (res) {
+          is RaceTriple.First -> when (val winner = res.winner) {
+            None -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { None }
+            is Some -> just(Some(RaceTriple.First(winner.t, fiberT(res.fiberB), fiberT(res.fiberC))))
+          }
+          is RaceTriple.Second -> when (val winner = res.winner) {
+            is None -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { None }
+            is Some -> just(Some(RaceTriple.Second(fiberT(res.fiberA), winner.t, fiberT(res.fiberC))))
+          }
+          is RaceTriple.Third -> when (val winner = res.winner) {
+            is None -> res.fiberA.cancel().map { None }
+            is Some -> just(Some(RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), winner.t)))
+          }
         }
       }
-    })
+    OptionT(raceTriple)
   }
 
   fun <A> fiberT(fiber: Fiber<F, Option<A>>): Fiber<OptionTPartialOf<F>, A> = CF().run {

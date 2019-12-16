@@ -1,5 +1,6 @@
 package arrow.fx.mtl
 
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.fx.Ref
 import arrow.mtl.WriterT
@@ -105,28 +106,31 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
     CF().dispatchers() as Dispatchers<WriterTPartialOf<F, W>>
 
   override fun <A> WriterTOf<F, W, A>.fork(ctx: CoroutineContext): WriterT<F, W, Fiber<WriterTPartialOf<F, W>, A>> = CF().run {
-    WriterT(value().fork(ctx).map {
-      Tuple2(MM().empty(), fiberT(it))
-    })
+    val fork: Kind<F, Tuple2<W, Fiber<WriterTPartialOf<F, W>, A>>> = value().fork(ctx).map { fiber: Fiber<F, Tuple2<W, A>> ->
+      Tuple2(MM().empty(), fiberT(fiber))
+    }
+    WriterT(fork)
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>): WriterT<F, W, RacePair<WriterTPartialOf<F, W>, A, B>> = CF().run {
-    WriterT(racePair(fa.value(), fb.value()).map {
-      when (it) {
-        is RacePair.First -> Tuple2(it.winner.a, RacePair.First(it.winner.b, fiberT(it.fiberB)))
-        is RacePair.Second -> Tuple2(it.winner.a, RacePair.Second(fiberT(it.fiberA), it.winner.b))
+    val racePair: Kind<F, Tuple2<W, RacePair<WriterTPartialOf<F, W>, A, B>>> = racePair(fa.value(), fb.value()).map { res: RacePair<F, Tuple2<W, A>, Tuple2<W, B>> ->
+      when (res) {
+        is RacePair.First -> Tuple2(res.winner.a, RacePair.First(res.winner.b, fiberT(res.fiberB)))
+        is RacePair.Second -> Tuple2(res.winner.a, RacePair.Second(fiberT(res.fiberA), res.winner.b))
       }
-    })
+    }
+    WriterT(racePair)
   }
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, fc: WriterTOf<F, W, C>): WriterT<F, W, RaceTriple<WriterTPartialOf<F, W>, A, B, C>> = CF().run {
-    WriterT(raceTriple(fa.value(), fb.value(), fc.value()).map {
-      when (it) {
-        is RaceTriple.First -> Tuple2(it.winner.a, RaceTriple.First(it.winner.b, fiberT(it.fiberB), fiberT(it.fiberC)))
-        is RaceTriple.Second -> Tuple2(it.winner.a, RaceTriple.Second(fiberT(it.fiberA), it.winner.b, fiberT(it.fiberC)))
-        is RaceTriple.Third -> Tuple2(it.winner.a, RaceTriple.Third(fiberT(it.fiberA), fiberT(it.fiberB), it.winner.b))
+    val raceTriple: Kind<F, Tuple2<W, RaceTriple<WriterTPartialOf<F, W>, A, B, C>>> = raceTriple(fa.value(), fb.value(), fc.value()).map { res: RaceTriple<F, Tuple2<W, A>, Tuple2<W, B>, Tuple2<W, C>> ->
+      when (res) {
+        is RaceTriple.First -> Tuple2(res.winner.a, RaceTriple.First(res.winner.b, fiberT(res.fiberB), fiberT(res.fiberC)))
+        is RaceTriple.Second -> Tuple2(res.winner.a, RaceTriple.Second(fiberT(res.fiberA), res.winner.b, fiberT(res.fiberC)))
+        is RaceTriple.Third -> Tuple2(res.winner.a, RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), res.winner.b))
       }
-    })
+    }
+    WriterT(raceTriple)
   }
 
   fun <A> fiberT(fiber: Fiber<F, Tuple2<W, A>>): Fiber<WriterTPartialOf<F, W>, A> =

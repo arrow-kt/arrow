@@ -18,7 +18,6 @@ import arrow.fx.RaceTriple
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Fiber
-import arrow.mtl.fix
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -102,15 +101,15 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
     CF().dispatchers() as Dispatchers<KleisliPartialOf<F, R>>
 
   override fun <A> KleisliOf<F, R, A>.fork(ctx: CoroutineContext): Kleisli<F, R, Fiber<KleisliPartialOf<F, R>, A>> = CF().run {
-    Kleisli { r -> fix().run(r).fork(ctx).map(::fiberT) }
+    Kleisli { r -> run(r).fork(ctx).map(::fiberT) }
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>): Kleisli<F, R, RacePair<KleisliPartialOf<F, R>, A, B>> = CF().run {
     Kleisli { r ->
-      racePair(fa.run(r), fb.run(r)).map {
-        when (it) {
-          is RacePair.First -> RacePair.First(it.winner, fiberT(it.fiberB))
-          is RacePair.Second -> RacePair.Second(fiberT(it.fiberA), it.winner)
+      racePair(fa.run(r), fb.run(r)).map { res: RacePair<F, A, B> ->
+        when (res) {
+          is RacePair.First -> RacePair.First(res.winner, fiberT(res.fiberB))
+          is RacePair.Second -> RacePair.Second(fiberT(res.fiberA), res.winner)
         }
       }
     }
@@ -118,15 +117,16 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, fc: KleisliOf<F, R, C>): Kleisli<F, R, RaceTriple<KleisliPartialOf<F, R>, A, B, C>> = CF().run {
     Kleisli { r ->
-      raceTriple(fa.run(r), fb.run(r), fc.run(r)).map {
-        when (it) {
-          is RaceTriple.First -> RaceTriple.First(it.winner, fiberT(it.fiberB), fiberT(it.fiberC))
-          is RaceTriple.Second -> RaceTriple.Second(fiberT(it.fiberA), it.winner, fiberT(it.fiberC))
-          is RaceTriple.Third -> RaceTriple.Third(fiberT(it.fiberA), fiberT(it.fiberB), it.winner)
+      raceTriple(fa.run(r), fb.run(r), fc.run(r)).map { res: RaceTriple<F, A, B, C> ->
+        when (res) {
+          is RaceTriple.First -> RaceTriple.First(res.winner, fiberT(res.fiberB), fiberT(res.fiberC))
+          is RaceTriple.Second -> RaceTriple.Second(fiberT(res.fiberA), res.winner, fiberT(res.fiberC))
+          is RaceTriple.Third -> RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), res.winner)
         }
       }
     }
   }
+
   fun <A> fiberT(fiber: Fiber<F, A>): Fiber<KleisliPartialOf<F, R>, A> =
     Fiber(Kleisli.liftF(fiber.join()), Kleisli.liftF(fiber.cancel()))
 }

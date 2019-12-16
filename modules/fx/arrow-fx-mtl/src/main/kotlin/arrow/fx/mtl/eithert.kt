@@ -1,5 +1,6 @@
 package arrow.fx.mtl
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
@@ -122,18 +123,20 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>): EitherT<F, L, RacePair<EitherTPartialOf<F, L>, A, B>> = CF().run {
-    EitherT(racePair(fa.value(), fb.value()).flatMap { racePair: RacePair<F, Either<L, A>, Either<L, B>> ->
-      when (racePair) {
-        is RacePair.First -> when (val winner = racePair.winner) {
-          is Either.Left -> racePair.fiberB.cancel().map { Left(winner.a) }
-          is Either.Right -> just(Right(RacePair.First(winner.b, fiberT(racePair.fiberB))))
-        }
-        is RacePair.Second -> when (val winner = racePair.winner) {
-          is Either.Left -> racePair.fiberA.cancel().map { Left(winner.a) }
-          is Either.Right -> just(Right(RacePair.Second(fiberT(racePair.fiberA), winner.b)))
+    val racePair: Kind<F, Either<L, RacePair<EitherTPartialOf<F, L>, A, B>>> =
+      racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Either<L, A>, Either<L, B>> ->
+        when (res) {
+          is RacePair.First -> when (val winner = res.winner) {
+            is Either.Left -> res.fiberB.cancel().map { Left(winner.a) }
+            is Either.Right -> just(Right(RacePair.First(winner.b, fiberT(res.fiberB))))
+          }
+          is RacePair.Second -> when (val winner = res.winner) {
+            is Either.Left -> res.fiberA.cancel().map { Left(winner.a) }
+            is Either.Right -> just(Right(RacePair.Second(fiberT(res.fiberA), winner.b)))
+          }
         }
       }
-    })
+    EitherT(racePair)
   }
 
   override fun <A, B, C> CoroutineContext.raceTriple(
@@ -141,22 +144,24 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
     fb: EitherTOf<F, L, B>,
     fc: EitherTOf<F, L, C>
   ): EitherT<F, L, RaceTriple<EitherTPartialOf<F, L>, A, B, C>> = CF().run {
-    EitherT(raceTriple(fa.value(), fb.value(), fc.value()).flatMap { raceTriple: RaceTriple<F, Either<L, A>, Either<L, B>, Either<L, C>> ->
-      when (raceTriple) {
-        is RaceTriple.First -> when (val winner = raceTriple.winner) {
-          is Either.Left -> tupled(raceTriple.fiberB.cancel(), raceTriple.fiberC.cancel()).map { Left(winner.a) }
-          is Either.Right -> just(Right(RaceTriple.First(winner.b, fiberT(raceTriple.fiberB), fiberT(raceTriple.fiberC))))
-        }
-        is RaceTriple.Second -> when (val winner = raceTriple.winner) {
-          is Either.Left -> tupled(raceTriple.fiberA.cancel(), raceTriple.fiberC.cancel()).map { Left(winner.a) }
-          is Either.Right -> just(Right(RaceTriple.Second(fiberT(raceTriple.fiberA), winner.b, fiberT(raceTriple.fiberC))))
-        }
-        is RaceTriple.Third -> when (val winner = raceTriple.winner) {
-          is Either.Left -> tupled(raceTriple.fiberA.cancel(), raceTriple.fiberB.cancel()).map { Left(winner.a) }
-          is Either.Right -> just(Right(RaceTriple.Third(fiberT(raceTriple.fiberA), fiberT(raceTriple.fiberB), winner.b)))
+    val raceTriple: Kind<F, Either<L, RaceTriple<EitherTPartialOf<F, L>, A, B, C>>> =
+      raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Either<L, A>, Either<L, B>, Either<L, C>> ->
+        when (res) {
+          is RaceTriple.First -> when (val winner = res.winner) {
+            is Either.Left -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Right -> just(Right(RaceTriple.First(winner.b, fiberT(res.fiberB), fiberT(res.fiberC))))
+          }
+          is RaceTriple.Second -> when (val winner = res.winner) {
+            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Right -> just(Right(RaceTriple.Second(fiberT(res.fiberA), winner.b, fiberT(res.fiberC))))
+          }
+          is RaceTriple.Third -> when (val winner = res.winner) {
+            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberB.cancel()).map { Left(winner.a) }
+            is Either.Right -> just(Right(RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), winner.b)))
+          }
         }
       }
-    })
+    EitherT(raceTriple)
   }
 
   fun <A> fiberT(fiber: Fiber<F, Either<L, A>>): Fiber<EitherTPartialOf<F, L>, A> =
