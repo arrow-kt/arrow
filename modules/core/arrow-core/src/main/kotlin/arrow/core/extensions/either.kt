@@ -261,4 +261,3 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
       }
     }
 }
-
