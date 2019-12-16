@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.nonemptylist.applicative.applicative
@@ -28,7 +27,6 @@ import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnzipLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.max
@@ -38,11 +36,6 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     val EQ1 = NonEmptyList.eq(Int.eq())
-    val EQ2: Eq<Kind<ForNonEmptyList, Kind<ForNonEmptyList, Int>>> = Eq { a, b ->
-      a == b
-    }
-
-    val g: Gen<Kind<ForNonEmptyList, Int>> = Gen.int().map { Nel.just(it) }
 
     testLaws(
       ShowLaws.laws(NonEmptyList.show(), EQ1, Gen.nonEmptyList(Gen.int())),
@@ -50,7 +43,7 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.semigroupK(),
         NonEmptyList.genK(),
         NonEmptyList.eqK()),
-      BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), g, Eq.any(), EQ2, Eq.any()),
+      BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), NonEmptyList.genK(), NonEmptyList.eqK()),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),

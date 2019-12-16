@@ -1,9 +1,12 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -14,36 +17,41 @@ object BimonadLaws {
     BF: Bimonad<F>,
     M: Monad<F>,
     CM: Comonad<F>,
-    G: Gen<Kind<F, Int>>,
-    EQ1: Eq<Kind<F, Int>>,
-    EQ2: Eq<Kind<F, Kind<F, Int>>>,
-    EQ3: Eq<Int>
-  ): List<Law> =
-    MonadLaws.laws(M, EQ1) +
-      ComonadLaws.laws(CM, G, EQ1) +
-      listOf(
-        Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ3) },
-        Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
-        Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(EQ3) }
-      )
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ): List<Law> {
+    val EQ1 = EQK.liftEq(Int.eq())
+    val EQ2 = EQK.liftEq(EQ1)
+    val EQ3 = Int.eq()
 
-  fun <F> Bimonad<F>.extractIsIdentity(EQ: Eq<Int>): Unit =
+    val GEN = GENK.genK(Gen.int())
+
+    return MonadLaws.laws(M, EQ1) +
+      ComonadLaws.laws(CM, GEN, EQ1) +
+      listOf(
+        Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(Gen.int(), EQ3) },
+        Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(Gen.int(), EQ2) },
+        Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(Gen.int(), EQ3) }
+      )
+  }
+
+  fun <F, A> Bimonad<F>.extractIsIdentity(G: Gen<A>, EQ: Eq<A>): Unit =
     forAll(
-      Gen.int()
+      G
     ) { a ->
       just(a).extract().equalUnderTheLaw(a, EQ)
     }
 
-  fun <F> Bimonad<F>.extractFlatMap(EQ: Eq<Int>): Unit =
+  fun <F, A> Bimonad<F>.extractFlatMap(G: Gen<A>, EQ: Eq<A>): Unit =
     forAll(
-      Gen.int()
-    ) { ffa ->
-      just(just(ffa)).flatten().extract().equalUnderTheLaw(just(just(ffa)).map { it.extract() }.extract(), EQ)
+      G
+    ) { a ->
+      just(just(a)).flatten().extract().equalUnderTheLaw(just(just(a)).map { it.extract() }.extract(), EQ)
     }
 
-  fun <F> Bimonad<F>.coflatMapComposition(EQ: Eq<Kind<F, Kind<F, Int>>>): Unit =
+  fun <F, A> Bimonad<F>.coflatMapComposition(G: Gen<A>, EQ: Eq<Kind<F, Kind<F, A>>>): Unit =
     forAll(
-      Gen.int()
+      G
     ) { a ->
       just(a).coflatMap { it }.equalUnderTheLaw(just(a).map { just(it) }, EQ) &&
         just(a).coflatMap { it }.equalUnderTheLaw(just(a).duplicate(), EQ)
