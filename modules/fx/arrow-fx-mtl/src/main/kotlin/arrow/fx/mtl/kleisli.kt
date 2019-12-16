@@ -128,3 +128,8 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
   fun <A> fiberT(fiber: Fiber<F, A>): Fiber<KleisliPartialOf<F, R>, A> =
     Fiber(Kleisli.liftF(fiber.join()), Kleisli.liftF(fiber.cancel()))
 }
+
+fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPartialOf<F, R>> =
+  object : KleisliConcurrent<F, R> {
+    override fun CF(): Concurrent<F> = CF
+  }

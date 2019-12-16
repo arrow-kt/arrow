@@ -134,3 +134,9 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
   fun <A> fiberT(fiber: Fiber<F, Tuple2<W, A>>): Fiber<WriterTPartialOf<F, W>, A> =
     Fiber(WriterT(fiber.join()), WriterT.liftF(fiber.cancel(), MM(), CF()))
 }
+
+fun <F, W> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concurrent<WriterTPartialOf<F, W>> =
+  object : WriterTConcurrent<F, W> {
+    override fun CF(): Concurrent<F> = CF
+    override fun MM(): Monoid<W> = MM
+  }

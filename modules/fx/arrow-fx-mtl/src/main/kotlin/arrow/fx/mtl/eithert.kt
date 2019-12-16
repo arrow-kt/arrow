@@ -165,3 +165,8 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
   fun <A> fiberT(fiber: Fiber<F, Either<L, A>>): Fiber<EitherTPartialOf<F, L>, A> =
     Fiber(EitherT(fiber.join()), EitherT.liftF(ASF(), fiber.cancel()))
 }
+
+fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPartialOf<F, L>> =
+  object : EitherTConcurrent<F, L> {
+    override fun CF(): Concurrent<F> = CF
+  }

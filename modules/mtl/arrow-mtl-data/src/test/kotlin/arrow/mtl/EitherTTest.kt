@@ -23,7 +23,7 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.mtl.eithert.concurrent.concurrent
+import arrow.fx.mtl.concurrent
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.applicative.applicative

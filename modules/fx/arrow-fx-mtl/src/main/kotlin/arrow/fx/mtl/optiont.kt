@@ -147,3 +147,8 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
     Fiber(OptionT(fiber.join()), OptionT.liftF(this, fiber.cancel()))
   }
 }
+
+fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTPartialOf<F>> =
+  object : OptionTConcurrent<F> {
+    override fun CF(): Concurrent<F> = CF
+  }
