@@ -6,8 +6,6 @@ permalink: /docs/optics/each/
 
 ## Each
 
-{:.beginner}
-beginner
 
 `Each` provides a [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }}) that can focus into a structure `S` to see all its foci `A`.
 

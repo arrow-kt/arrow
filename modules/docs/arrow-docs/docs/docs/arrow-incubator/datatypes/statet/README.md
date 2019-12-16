@@ -9,8 +9,8 @@ video: 1MJBXKaq0Hc
 
 ## StateT
 
-{:.advanced}
-advanced
+
+
 
 `StateT` also known as the `State` monad transformer allows to compute inside the context when `State` is nested in a different monad.
 

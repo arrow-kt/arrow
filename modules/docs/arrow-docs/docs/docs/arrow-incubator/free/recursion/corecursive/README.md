@@ -6,8 +6,8 @@ permalink: /docs/recursion/corecursive/
 
 ## Corecursive
 
-{:.advanced}
-advanced
+
+
 
 The corecursive typeclass abstracts out the ability to corecursively unfold a structure.
 See [Intro to Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}) for

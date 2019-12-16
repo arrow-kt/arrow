@@ -6,8 +6,6 @@ permalink: /docs/optics/setter/
 
 ## Setter
 
-{:.beginner}
-beginner
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 

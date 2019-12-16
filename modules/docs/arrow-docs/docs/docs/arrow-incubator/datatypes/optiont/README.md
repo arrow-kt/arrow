@@ -9,8 +9,8 @@ video: EWfxL9yBUJo
 
 ## OptionT
 
-{:.advanced}
-advanced
+
+
 
 `OptionT` also known as the `Option` monad transformer allows to compute inside the context when `Option` is nested in a different monad.
 

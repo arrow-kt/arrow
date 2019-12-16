@@ -6,8 +6,6 @@ permalink: /docs/optics/index/
 
 ## Index
 
-{:.beginner}
-beginner
 
 `Index` provides an [Optional]({{ '/docs/optics/optional' | relative_url }}) for a structure `S` to focus in optional `A` at a given index `I`.
 

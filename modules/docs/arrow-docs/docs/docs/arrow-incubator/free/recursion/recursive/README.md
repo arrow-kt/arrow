@@ -6,8 +6,8 @@ permalink: /docs/recursion/recursive/
 
 ## Recursive
 
-{:.advanced}
-advanced
+
+
 
 The recursive typeclass abstracts out the ability to recursively fold a structure.
 See [Intro to Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}) for

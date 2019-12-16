@@ -8,8 +8,8 @@ redirect_from:
 
 ## Foldable
 
-{:.intermediate}
-intermediate
+
+
 
 The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, aggregates their values `A`.
 

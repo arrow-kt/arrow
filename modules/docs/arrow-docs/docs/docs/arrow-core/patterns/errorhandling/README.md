@@ -6,8 +6,8 @@ permalink: /docs/patterns/error_handling/
 
 ## Functional Error Handling
 
-{:.beginner}
-beginner
+
+
 
 When dealing with errors in a purely functional way we try as much as we can to avoid exceptions.
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.

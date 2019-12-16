@@ -10,8 +10,8 @@ video: 1h4X8CrMjVs
 
 ## EitherT
 
-{:.advanced}
-advanced
+
+
 
 `EitherT` also known as the `Either` monad transformer allows to compute inside the context when `Either` is nested in a different monad.
 

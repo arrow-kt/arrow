@@ -6,8 +6,6 @@ permalink: /docs/optics/snoc/
 
 ## Snoc
 
-{:.beginner}
-beginner
 
 `Snoc` provides a [Prism]({{ '/docs/optics/prism' | relative_url }}) between `S` and its init `A` and last element `S`.
 `Snoc` can be seen as the reverse of [Cons]({{ '/docs/optics/cons' | relative_url }}), it provides a way to attach or detach elements on the end side of a structure.

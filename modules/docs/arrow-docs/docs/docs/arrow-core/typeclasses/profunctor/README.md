@@ -8,8 +8,8 @@ redirect_from:
 
 ## Profunctor
 
-{:.intermediate}
-intermediate
+
+
 
 Before reading this typeclass we recommend you to understand [Contravariance](https://typeclasses.com/contravariance) first. But for making things easier we will consider `Contravariance` as the ability to _flip composition_.
 

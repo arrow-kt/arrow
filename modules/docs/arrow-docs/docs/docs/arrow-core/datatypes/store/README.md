@@ -8,9 +8,9 @@ redirect_from:
 
 ## Store
 
-{:.intermediate}
 
-intermediate
+
+
 
 `Store` is a data structure that holds a state and a function for extracting a representation of it.
 

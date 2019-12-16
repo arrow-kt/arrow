@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: docs-core
 title: Repeat
 permalink: /docs/arrow/typeclasses/repeat/
 redirect_from:
@@ -8,8 +8,8 @@ redirect_from:
 
 ## Repeat
 
-{:.beginner}
-beginner
+
+
 
 The `Repeat` typeclass extends the `Zip` typeclass with a way to repeat the structure.
 

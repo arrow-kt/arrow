@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: docs-core
 title: Zip
 permalink: /docs/arrow/typeclasses/zip/
 redirect_from:
@@ -8,8 +8,8 @@ redirect_from:
 
 ## Zip
 
-{:.beginner}
-beginner
+
+
 
 The `Zip` typeclass extends the `Semialign` typeclass with a function that takes the intersection of non-uniform shapes.
 
@@ -17,7 +17,7 @@ The `Zip` typeclass extends the `Semialign` typeclass with a function that takes
 
 #### zip
 
-Combines two structures by taking the intersection of their shapes 
+Combines two structures by taking the intersection of their shapes
 and using `Tuple2` to hold the elements.
 
 `fun <A, B> Kind<F, A>.zip(other: Kind<F, B>): Kind<F, Tuple2<A, B>>`

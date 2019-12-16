@@ -8,8 +8,8 @@ redirect_from:
 
 ## Monad
 
-{:.intermediate}
-intermediate
+
+
 
 `Monad` is a typeclass that abstracts over sequential execution of code.
 This doc focuses on the methods provided by the typeclass.

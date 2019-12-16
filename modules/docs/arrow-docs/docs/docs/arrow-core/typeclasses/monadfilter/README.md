@@ -8,8 +8,8 @@ redirect_from:
 
 ## MonadFilter
 
-{:.advanced}
-advanced
+
+
 
 `MonadFilter` is a type class that abstracts away the option of interrupting computation if a given predicate is not satisfied.
 

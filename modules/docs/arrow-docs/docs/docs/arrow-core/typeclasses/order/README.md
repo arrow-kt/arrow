@@ -8,8 +8,8 @@ redirect_from:
 
 ## Order
 
-{:.beginner}
-beginner
+
+
 
 The `Order` typeclass abstracts the ability to compare two instances of any object and determine their total order.
 Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id field-, or any combination of the above.

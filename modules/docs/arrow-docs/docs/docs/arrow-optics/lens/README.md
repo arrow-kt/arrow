@@ -6,8 +6,6 @@ permalink: /docs/optics/lens/
 
 ## Lens
 
-{:.beginner}
-beginner
 
 Optics are essentially abstractions to update immutable data structures in an elegant way.
 A `Lens` (aka functional reference) is an optic that can focus into a structure and `get`, `modify` or `set` its focus (target). They're mostly used for `product types` such as a `data class` or a `TupleN`.

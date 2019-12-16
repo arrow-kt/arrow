@@ -8,8 +8,8 @@ redirect_from:
 
 ## MonadReader
 
-{:.advanced}
-advanced
+
+
 
 ### Data types
 

@@ -6,8 +6,6 @@ permalink: /docs/optics/optional/
 
 ## Optional
 
-{:.beginner}
-beginner
 
 An `Optional` is an optic that allows to see into a structure and getting, setting or modifying an optional focus.
 It combines the properties of a `Lens` (getting, setting and modifying) with the properties of a `Prism` (an optional focus).

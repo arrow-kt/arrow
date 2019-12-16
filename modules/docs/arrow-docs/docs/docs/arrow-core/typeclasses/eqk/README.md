@@ -8,8 +8,8 @@ redirect_from:
 
 ## EqK
 
-{:.beginner}
-beginner
+
+
 
 The `EqK` typeclass abstracts the ability to lift the Eq class to unary type constructors.
 

@@ -8,8 +8,8 @@ redirect_from:
 
 ## Reducible
 
-{:.intermediate}
-intermediate
+
+
 
 ### Data types
 

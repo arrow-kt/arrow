@@ -241,6 +241,18 @@ options:
       - title: Unalign
         url: /docs/arrow/typeclasses/unalign/
 
+      - title: Zip
+        url: /docs/arrow/typeclasses/zip/
+
+      - title: Repeat
+        url: /docs/arrow/typeclasses/repeat/
+
+      - title: Crosswalk
+        url: /docs/arrow/typeclasses/crosswalk/
+
+      - title: Bicrosswalk
+        url: /docs/arrow/typeclasses/bicrosswalk/
+
   - title: Integrations
 
     nested_options:

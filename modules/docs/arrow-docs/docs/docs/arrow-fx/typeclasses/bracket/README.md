@@ -9,8 +9,8 @@ video: EUqg3fSahhk
 
 ## Bracket
 
-{:.intermediate}
-intermediate
+
+
 
 The `Bracket` Type class abstracts the ability to safely **acquire**, **use**, and then **release** a resource.
 

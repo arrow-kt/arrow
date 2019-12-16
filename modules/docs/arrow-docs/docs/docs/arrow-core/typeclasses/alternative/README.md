@@ -8,8 +8,8 @@ redirect_from:
 
 ## Alternative
 
-{:.intermediate}
-intermediate
+
+
 
 We use [`Option`]({{ '/docs/arrow/core/option' }}) to indicate a computation can fail somehow (that is, it can have either zero results or one result), and we use lists for computations that can have many possible results (ranging from zero to arbitrarily many results). In both of these cases, one useful operation is combining all possible results from multiple computations into a single computation. The `Alternative` type class captures this combination.
 

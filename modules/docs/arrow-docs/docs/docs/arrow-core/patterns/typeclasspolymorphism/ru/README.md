@@ -6,8 +6,8 @@ permalink: /docs/patterns/polymorphic_programs/ru/
 
 ## Как писать полиморфические программы
 
-{:.advanced}
-advanced
+
+
 
 [English](/docs/patterns/polymorphic_programs/)
 

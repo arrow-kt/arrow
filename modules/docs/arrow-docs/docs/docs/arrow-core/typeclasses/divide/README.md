@@ -8,8 +8,8 @@ redirect_from:
 
 ## Divide
 
-{:.beginner}
-beginner
+
+
 
 `Divide` is a typeclass that models the divide part of divide and conquer.
 `Divide` basically states: Given a `Kind<F, A>` and a `Kind<F, B>` and a way to turn `C` into a tuple of `A` and `B` it provides you a `Kind<F, C>`

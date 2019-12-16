@@ -6,8 +6,8 @@ permalink: /docs/effects/async/
 
 ## Async
 
-{:.intermediate}
-intermediate
+
+
 
 Being able to run code in a different context of execution (i.e. thread) than the current one implies that, even if it's part of a sequence, the code will have to be asynchronous.
 Running asynchronous code always requires a callback after completion on error capable of returning to the current thread.

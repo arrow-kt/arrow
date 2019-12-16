@@ -6,8 +6,6 @@ permalink: /docs/optics/traversal/
 
 ## Traversal
 
-{:.beginner}
-beginner
 
 A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
 

@@ -6,8 +6,6 @@ permalink: /docs/effects/fiber/
 
 ## Fiber
 
-{:.advanced}
-advanced
 
 A `Fiber` is a concurrency primitive for describing parallel operations or multi-tasking.
 Concurrently started tasks can either be joined or canceled and this are the only two operators available on `Fiber`.
@@ -69,5 +67,3 @@ fun <A, B, C> parallelMap2(first: IO<A>,
           }, release = { (_, cancelB) -> cancelB })
         }, release = { (_, cancelA) -> cancelA })
 ```
-
-
