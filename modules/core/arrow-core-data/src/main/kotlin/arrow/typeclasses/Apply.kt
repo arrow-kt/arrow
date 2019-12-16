@@ -315,4 +315,28 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, J>> =
     a.product(b).product(c).product(d).product(e).product(f).product(g)
       .product(h).product(i).product(j)
+
+  /**
+   * Given two actions, it performs them sequentially.
+   * Ignores the result of the first action.
+   *
+   * This is equivalent to *> in Haskell.
+   */
+  fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
+    map(this, fb) { (_, right) -> right }
+
+  fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
+    map(this, fb.value()) { (_, right) -> right }
+
+  /**
+   * Given two actions, it performs them sequentially.
+   * Discards the result of the second action.
+   *
+   * This is equivalent to <* in Haskell.
+   */
+  fun <A, B> Kind<F, A>.apIgnore(fb: Kind<F, B>): Kind<F, A> =
+    map(this, fb) { (left, _) -> left }
+
+  fun <A, B> Kind<F, A>.apIgnoreEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
+    map(this, fb.value()) { (left, _) -> left }
 }
