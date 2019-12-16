@@ -6,8 +6,8 @@ permalink: /docs/recursion/mu/
 
 ## Mu
 
-{:.advanced}
-advanced
+
+
 
 The Mu datatype is the simplest way to model recursion via a direct encoding of the
 cata function.

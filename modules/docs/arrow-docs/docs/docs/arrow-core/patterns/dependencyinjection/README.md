@@ -11,8 +11,8 @@ If what you want is the example of the video to follow along, you can find it in
 
 ## Dependency Injection using the `Typeclassless` technique
 
-{:.intermediate}
-intermediate
+
+
 
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.

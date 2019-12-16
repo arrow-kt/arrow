@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: docs-core
 title: Crosswalk
 permalink: /docs/arrow/typeclasses/crosswalk/
 redirect_from:
@@ -8,8 +8,8 @@ redirect_from:
 
 ## Crosswalk
 
-{:.intermediate}
-intermediate
+
+
 
 The `Crosswalk` typeclass extends the `Functor` and `Foldable` typeclass with the possibility to traverse the
 structure through an alignable functor.
@@ -47,7 +47,7 @@ ListK.crosswalk().run {
     val lists = listOf(listOf(1, 2, 3, 4, 5).k(),
                        listOf(6, 7, 8, 9, 10).k(),
                        listOf(11, 12).k())
-   
+
     sequenceL(ListK.align(), lists.k())
 }
 ```

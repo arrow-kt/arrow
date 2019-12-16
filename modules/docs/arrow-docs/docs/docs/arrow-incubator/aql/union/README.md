@@ -4,8 +4,8 @@ title: union
 permalink: /docs/aql/union/
 ---
 
-{:.beginner}
-beginner
+
+
 
 ## union
 
@@ -36,8 +36,6 @@ println(result)
 }
 ```
 
-{:.intermediate}
-intermediate
 
 `Union` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
 
@@ -60,7 +58,7 @@ import arrow.aql.*
 TypeClass(Union::class).dtMarkdownList()
 ```
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

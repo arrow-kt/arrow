@@ -8,8 +8,8 @@ redirect_from:
 
 ## Selective
 
-{:.intermediate}
-intermediate
+
+
 
 `Selective` is a typeclass to represent a composition of two independent effectful computations.
 

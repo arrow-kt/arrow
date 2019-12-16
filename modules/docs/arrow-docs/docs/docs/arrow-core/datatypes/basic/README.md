@@ -6,8 +6,8 @@ permalink: /docs/datatypes/basic/
 
 ## Basic Types
 
-{:.beginner}
-beginner
+
+
 
 Arrow provides [typeclass]({{ '/docs/patterns/glossary/' | relative_url }}) instances for several platform types.
 These instances are available in the module `arrow-instances`.

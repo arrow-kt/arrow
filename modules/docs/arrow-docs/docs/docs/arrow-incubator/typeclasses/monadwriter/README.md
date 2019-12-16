@@ -8,8 +8,8 @@ redirect_from:
 
 ## MonadWriter
 
-{:.advanced}
-advanced
+
+
 
 ### Data types
 

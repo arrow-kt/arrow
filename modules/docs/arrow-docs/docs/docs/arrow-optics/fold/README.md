@@ -6,8 +6,6 @@ permalink: /docs/optics/fold/
 
 ## Fold
 
-{:.beginner}
-beginner
 
 Note: Don't confuse with the collection aggregate operation [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce).
 

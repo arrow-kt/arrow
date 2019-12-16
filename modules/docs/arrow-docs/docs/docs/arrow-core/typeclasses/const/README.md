@@ -8,8 +8,8 @@ redirect_from:
 
 ## Const
 
-{:.intermediate}
-intermediate
+
+
 
 ### Supported type classes
 

@@ -6,8 +6,8 @@ permalink: /docs/integrations/kindedj/
 
 ## KindedJ
 
-{:.advanced}
-advanced
+
+
 
 [KindedJ](https://github.com/KindedJ/KindedJ/) is a project to create an interop layer between multiple libraries that emulate [higher kinds]({{ '/docs/patterns/glossary' | relative_url }}) in the JVM
 using lightweight higher kind polymorphisms. You can read more about this emulation in [KindedJ's Readme](https://github.com/KindedJ/KindedJ/blob/master/README.md).

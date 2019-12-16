@@ -7,8 +7,8 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-{:.beginner}
-beginner
+
+
 
 Typeclasses are interfaces that define a set of extension functions associated to one type. You may see them referred as "extension interfaces".
 

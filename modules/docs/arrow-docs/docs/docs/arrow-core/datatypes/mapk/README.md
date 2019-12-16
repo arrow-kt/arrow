@@ -8,8 +8,8 @@ redirect_from:
 
 ## MapK
 
-{:.beginner}
-beginner
+
+
 
 ### Supported type classes
 

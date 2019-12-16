@@ -8,8 +8,8 @@ redirect_from:
 
 ## MonadCombine
 
-{:.advanced}
-advanced
+
+
 
 If [`Alternative`]({{ '/docs/arrow/typeclasses/alternative' }}) is for [`Applicative` functors]({{ '/docs/arrow/typeclasses/applicative' }}) that also have a [`Monoid`]({{ '/docs/arrow/typeclasses/monoid' }}) structure, `MonadCombine` is for [`Monads`]({{ '/docs/arrow/typeclasses/monad' }}) with monoid capabilities.
 

@@ -6,8 +6,8 @@ permalink: /docs/patterns/free_algebras/
 
 ## Free Algebras
 
-{:.advanced}
-advanced
+
+
 
 TODO
 

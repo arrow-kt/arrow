@@ -6,8 +6,6 @@ permalink: /docs/optics/iso/
 
 ## Iso
 
-{:.beginner}
-beginner
 
 An `Iso` is a lossless invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
 

@@ -8,8 +8,8 @@ redirect_from:
 
 ## Unalign
 
-{:.beginner}
-beginner
+
+
 
 The `Unlign` typeclass extends the `Semialign` typeclass with an inverse function to align: It splits a union shape
 into a tuple representing the component parts.

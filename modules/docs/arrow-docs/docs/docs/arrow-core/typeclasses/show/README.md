@@ -8,8 +8,8 @@ redirect_from:
 
 ## Show
 
-{:.beginner}
-beginner
+
+
 
 The `Show` typeclass abstracts the ability to obtain a `String` representation of any object.
 

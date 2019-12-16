@@ -8,8 +8,8 @@ redirect_from:
 
 ## Align
 
-{:.beginner}
-beginner
+
+
 
 The `Align` typeclass extends the `Semialign` typeclass with a value empty(), which acts as a unit in regards to align.
 

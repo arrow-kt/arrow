@@ -4,8 +4,8 @@ title: orderBy
 permalink: /docs/aql/orderby/
 ---
 
-{:.beginner}
-beginner
+
+
 
 ## orderBy
 
@@ -23,7 +23,7 @@ import arrow.aql.Ord
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = 
+val result =
   listOf(1, 2, 3).query {
     select { this * 10 } orderBy Ord.Asc(Int.order())
   }
@@ -53,7 +53,7 @@ val jack = Student("Jack", 32)
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = 
+val result =
   listOf(john, jane, jack).query {
      selectAll() groupBy { age } orderMap Ord.Desc(Int.order())
   }
@@ -62,8 +62,6 @@ println(result)
 }
 ```
 
-{:.intermediate}
-intermediate
 
 `orderBy` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type. The contained data inside the data type should also provide an instance for `Order` as in the examples above `Int.order() : Order<Int>`
 
@@ -86,7 +84,7 @@ import arrow.aql.*
 TypeClass(OrderBy::class).dtMarkdownList()
 ```
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

@@ -8,8 +8,8 @@ redirect_from:
 
 ## SequenceK
 
-{:.beginner}
-beginner
+
+
 
 SequenceK implements lazy lists representing lazily-evaluated ordered sequence of homogenous values.
 

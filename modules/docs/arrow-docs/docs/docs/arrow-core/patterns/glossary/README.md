@@ -6,8 +6,8 @@ permalink: /docs/patterns/glossary/
 
 ## Functional Programming Glossary
 
-{:.beginner}
-beginner
+
+
 
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
@@ -42,7 +42,7 @@ IO { 0 }
 ```
 
 You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
- 
+
 ### Typeclasses
 
 Typeclasses are interface abstractions that define a set of extension functions associated to one type.
@@ -220,7 +220,7 @@ This incorrect representation has a large number of issues when working with par
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
 These types are named the same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
-You have seen these types used in the Syntax section above! 
+You have seen these types used in the Syntax section above!
 
 ```kotlin:ank:silent
 class ForOption private constructor() { companion object {} }
@@ -288,7 +288,7 @@ interface ListKFunctor : Functor<ForListK> {
 
 This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@extension` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
 The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
-These extensions functions may be imported a la carte when working with concrete data types. 
+These extensions functions may be imported a la carte when working with concrete data types.
 
 ```kotlin:ank:silent
 @extension

@@ -8,8 +8,8 @@ redirect_from:
 
 ## Semialign
 
-{:.beginner}
-beginner
+
+
 
 The `Semialign` typeclass lets us combine two structures of type `Kind<F, A>` and `Kind<F, B>`
 into a single type `Kind<F, Ior<A,B>>`.

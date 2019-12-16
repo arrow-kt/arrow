@@ -8,8 +8,8 @@ redirect_from:
 
 ## Bifunctor
 
-{:.intermediate}
-intermediate
+
+
 
 `Bifunctor` is a lot like [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}). It offers a nice solution for those times when you don’t want to ignore the leftmost type argument of a binary type constructor, such as `Either` or `Tuple2`.
 

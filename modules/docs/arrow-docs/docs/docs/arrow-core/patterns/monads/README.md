@@ -6,8 +6,8 @@ permalink: /docs/patterns/monads/
 
 ## Monads explained in Kotlin (again)
 
-{:.intermediate}
-intermediate
+
+
 
 ### Credits
 

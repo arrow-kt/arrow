@@ -6,8 +6,8 @@ permalink: /docs/effects/monaddefer/
 
 ## MonadDefer
 
-{:.intermediate}
-intermediate
+
+
 
 `MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension the effects would otherwise run immediately.
 

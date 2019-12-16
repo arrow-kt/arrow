@@ -9,9 +9,6 @@ video: GcXC0xARSXg
 
 ## State
 
-{:.intermediate}
-
-intermediate
 
 `State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
 

@@ -8,8 +8,8 @@ redirect_from:
 
 ## Bifoldable
 
-{:.intermediate}
-intermediate
+
+
 
 ### Data types
 

@@ -6,8 +6,8 @@ permalink: /docs/patterns/polymorphic_programs/
 
 ## How to write polymorphic programs
 
-{:.advanced}
-advanced
+
+
 
 What if we could write apps without caring about the runtime data types used but just about **how the data is operated 
 on**? 

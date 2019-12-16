@@ -6,12 +6,10 @@ permalink: /docs/generic/product/
 
 ## Arrow Generic
 
-{:.intermediate}
-intermediate
 
 `arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists.
 
-### Install 
+### Install
 
 ```groovy
 implementation "io.arrow-kt:arrow-generic:$arrow_version"
@@ -101,7 +99,7 @@ import arrow.core.extensions.option.applicative.applicative
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = Option(900)
 
-Option.applicative().run { 
+Option.applicative().run {
   mapToAccount(maybeBalance, maybeAvailable)
 }
 ```
@@ -111,7 +109,7 @@ val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = None
 
 Option.applicative().run {  
-  mapToAccount(maybeBalance, maybeAvailable) 
+  mapToAccount(maybeBalance, maybeAvailable)
 }
 ```
 
@@ -121,7 +119,7 @@ import arrow.core.extensions.`try`.applicative.applicative
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { 900 }
 
-Try.applicative().run { 
+Try.applicative().run {
   mapToAccount(tryBalance, tryAvailable)
 }
 ```
@@ -130,7 +128,7 @@ Try.applicative().run {
 val tryBalance: Try<Int> = Try { 1000 }
 val tryAvailable: Try<Int> = Try { throw RuntimeException("BOOM") }
 
-Try.applicative().run { 
+Try.applicative().run {
   mapToAccount(tryBalance, tryAvailable)
 }
 ```
@@ -149,7 +147,7 @@ IO.applicative().run {
 
 #### Typeclass instances
 
-##### Semigroup 
+##### Semigroup
 
 Combine and reduce a data class based on it's internal properties reduction and combination properties as defined by their `Semigroup` instance.
 
@@ -159,7 +157,7 @@ with(Account.semigroup()) {
 }
 ```
 
-##### Monoid 
+##### Monoid
 
 Extends `Semigroup` by providing the concept of absent or empty value. It derives it's empty value based on the empty value of each one of it's contained properties.
 
@@ -171,7 +169,7 @@ emptyAccount()
 Account.monoid().empty()
 ```
 
-##### Eq 
+##### Eq
 
 Structural equality in terms of `Eq`, a type class that represents equality.
 
@@ -187,7 +185,7 @@ with(Account.eq()) {
 }
 ```
 
-##### Show 
+##### Show
 
 `toString` as a type class: `Show`
 
@@ -236,7 +234,7 @@ data class Car(val mod: Int, val speed: Speed) {
 }
 ```
 
-The reason the code compiles now is that Arrow was able to complete the instance for `Car` once we proved we had one for `Speed`. 
+The reason the code compiles now is that Arrow was able to complete the instance for `Car` once we proved we had one for `Speed`.
 
 Now that `Speed` is also flagged as `@product` its `Semigroup`, `Monoid`, `Show` and `Eq` instances are available and visible in `Car`
 

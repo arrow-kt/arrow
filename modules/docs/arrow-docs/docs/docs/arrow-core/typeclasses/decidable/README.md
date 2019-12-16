@@ -8,8 +8,8 @@ redirect_from:
 
 ## Decidable
 
-{:.beginner}
-beginner
+
+
  
 The `Decidable` is a typeclass modeling contravariant decision. `Decidable` is the contravariant version of `Alternative`.
 `Decidable` basically states: Given a `Kind<F, A>` and a `Kind<F, B>` and a way to turn `C` into either `A` or `B` it gives you a `Kind<F, C>`

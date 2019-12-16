@@ -4,8 +4,8 @@ title: sum
 permalink: /docs/aql/sum/
 ---
 
-{:.beginner}
-beginner
+
+
 
 ## sum
 
@@ -29,7 +29,7 @@ val jack = Student("Jack", 32)
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = 
+val result =
   listOf(john, jane, jack).query {
     selectAll() where { age > 30 } sum { age.toLong() }
   }.value()
@@ -38,8 +38,6 @@ println(result)
 }
 ```
 
-{:.intermediate}
-intermediate
 
 `sum` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
 
@@ -62,7 +60,7 @@ import arrow.aql.*
 TypeClass(Sum::class).dtMarkdownList()
 ```
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

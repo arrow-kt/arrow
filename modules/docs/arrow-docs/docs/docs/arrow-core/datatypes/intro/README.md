@@ -6,8 +6,8 @@ permalink: /docs/datatypes/intro/
 
 ## Datatypes
 
-{:.beginner}
-beginner
+
+
 
 A datatype is a an abstraction that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.

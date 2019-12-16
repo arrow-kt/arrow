@@ -6,8 +6,8 @@ permalink: /docs/effects/promise/
 
 ## Promise
 
-{:.intermediate}
-intermediate
+
+
 
 When made, a `Promise` is empty. Until it is fulfilled, which can only happen once.
 A `Promise` guarantees (promises) `A` at some point in the future within the context of `F`.

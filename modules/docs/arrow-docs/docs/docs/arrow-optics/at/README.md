@@ -6,8 +6,8 @@ permalink: /docs/optics/at/
 
 ## At
 
-{:.beginner}
-beginner
+
+
 
 `At` provides a [Lens]({{ '/docs/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
 
