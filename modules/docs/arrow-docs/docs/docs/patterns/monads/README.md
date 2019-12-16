@@ -675,7 +675,7 @@ monadicValue.flatMap { x -> just(x) } == monadicValue
 // Given
 val m: Kind<F, T>
 val f: (T) -> Kind<F, U>
-val g: (T) -> Kind<F, V>
+val g: (U) -> Kind<F, V>
 
 // Then (== means both parts are equivalent)
 m.flatMap(f).flatMap(g) == m.flatMap { a -> f(a).flatMap(g) }
