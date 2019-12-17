@@ -11,7 +11,6 @@ import arrow.core.Function1
 import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.function1.contravariant.contravariant
 import arrow.core.extensions.listk.monoidK.monoidK
@@ -47,6 +46,7 @@ import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
+import arrow.test.generators.functionAToB
 import arrow.test.generators.option
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.BifunctorLaws
@@ -89,6 +89,13 @@ class ComposedInstancesTest : UnitSpec() {
       }
     }
 
+    fun <A> GENK_OPTION_FN1(genA: Gen<A>) = object : GenK<Nested<ForOption, Conested<ForFunction1, A>>> {
+      override fun <B> genK(gen: Gen<B>): Gen<Kind<Nested<ForOption, Conested<ForFunction1, A>>, B>> =
+        Gen.functionAToB<B, A>(genA).map { it.k().conest() }.orNull().map {
+          Option.fromNullable(it).nest()
+        }
+    }
+
     val EQ_TUPLE2: Eq<Kind2<Nested<ForTuple2, ForTuple2>, Int, Int>> = Eq { a, b ->
       a.biunnest().fix() == b.biunnest().fix()
     }
@@ -108,10 +115,6 @@ class ComposedInstancesTest : UnitSpec() {
       override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForOption, ForNonEmptyList>, A>> = gen.map { it.nel() }.orNull().map { Option.fromNullable(it).nest() }
     }
 
-    val cf2: (Int) -> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, Int> = { x: Int ->
-      Some({ y: Int -> x + y }.k<Int, Int>().conest()).nest()
-    }
-
     val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
 
     testLaws(
@@ -119,7 +122,7 @@ class ComposedInstancesTest : UnitSpec() {
     )
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), Gen.int().map(cf2), EQK_OPTION_FN1)
+      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), GENK_OPTION_FN1(Gen.int()), EQK_OPTION_FN1)
     )
 
     testLaws(
