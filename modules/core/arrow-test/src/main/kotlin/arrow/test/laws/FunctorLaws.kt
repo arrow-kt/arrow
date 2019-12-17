@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.andThen
 import arrow.core.extensions.eq
 import arrow.core.identity
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -13,6 +14,10 @@ import io.kotlintest.properties.forAll
 
 object FunctorLaws {
 
+  fun <F> laws(FF: Functor<F>, G: GenK<F>, EQK: EqK<F>): List<Law> =
+    laws(FF, G.genK(Gen.int()), EQK)
+
+  @Deprecated("should be internal")
   fun <F> laws(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 

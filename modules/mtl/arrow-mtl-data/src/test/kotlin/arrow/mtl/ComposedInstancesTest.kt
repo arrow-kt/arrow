@@ -14,7 +14,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.function1.contravariant.contravariant
-import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.applicative.applicative
@@ -48,7 +47,7 @@ import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
-import arrow.test.generators.intSmall
+import arrow.test.generators.option
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.FoldableLaws
@@ -66,6 +65,10 @@ import io.kotlintest.properties.Gen
 
 class ComposedInstancesTest : UnitSpec() {
   init {
+
+    val GENK_LK_OPTION = object : GenK<Nested<ForListK, ForOption>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForListK, ForOption>, A>> = Gen.option(gen).map { ListK.just(it).nest() }
+    }
 
     val EQK_LK_OPTION = object : EqK<Nested<ForListK, ForOption>> {
       override fun <A> Kind<Nested<ForListK, ForOption>, A>.eqK(other: Kind<Nested<ForListK, ForOption>, A>, EQ: Eq<A>): Boolean =
@@ -101,22 +104,18 @@ class ComposedInstancesTest : UnitSpec() {
       }
     }
 
-    val cf: (Int) -> Kind<Nested<ForOption, ForNonEmptyList>, Int> = { Some(it.nel()).nest() }
-
-    val G = Gen.intSmall().map(cf)
-
-    val GK = object : GenK<Nested<ForOption, ForNonEmptyList>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForOption, ForNonEmptyList>, A>> = gen.map { Some(it.nel()).nest() }
+    val GENK_OPTION_NEL = object : GenK<Nested<ForOption, ForNonEmptyList>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForOption, ForNonEmptyList>, A>> = gen.map { it.nel() }.orNull().map { Option.fromNullable(it).nest() }
     }
 
     val cf2: (Int) -> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, Int> = { x: Int ->
-      Some({ y: Int -> x + y }.k().conest()).nest()
+      Some({ y: Int -> x + y }.k<Int, Int>().conest()).nest()
     }
 
     val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQK_OPTION_NEL)
+      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), GENK_OPTION_NEL, EQK_OPTION_NEL)
     )
 
     testLaws(
@@ -124,12 +123,12 @@ class ComposedInstancesTest : UnitSpec() {
     )
 
     testLaws(
-      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQK_OPTION_NEL),
+      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), GENK_OPTION_NEL, EQK_OPTION_NEL),
       ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK_OPTION_NEL),
-      FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GK),
-      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), G, EQK_OPTION_NEL),
-      SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), Gen.int().map { ComposedApplicative(ListK.applicative(), Option.applicative()).just(it) }, EQK_LK_OPTION),
-      MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQK_LK_OPTION),
+      FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GENK_OPTION_NEL),
+      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), GENK_OPTION_NEL, EQK_OPTION_NEL),
+      SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), GENK_LK_OPTION, EQK_LK_OPTION),
+      MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), GENK_LK_OPTION, EQK_LK_OPTION),
       BifunctorLaws.laws(ComposedBifunctor(Tuple2.bifunctor(), Tuple2.bifunctor()), bifunctorCf, EQ_TUPLE2)
     )
   }
