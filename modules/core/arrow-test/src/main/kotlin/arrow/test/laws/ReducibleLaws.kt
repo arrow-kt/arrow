@@ -3,7 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
+import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.eq.eq
 import arrow.test.generators.functionAAToA
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
@@ -14,8 +16,13 @@ import io.kotlintest.properties.forAll
 
 object ReducibleLaws {
 
-  fun <F> laws(RF: Reducible<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Int>, EQOptionInt: Eq<Option<Int>>, EQLong: Eq<Long>): List<Law> =
-    FoldableLaws.laws(RF, G) +
+  fun <F> laws(RF: Reducible<F>, G: Gen<Kind<F, Int>>): List<Law> {
+
+    val EQ = Int.eq()
+    val EQOptionInt = Option.eq(Int.eq())
+    val EQLong = Long.eq()
+
+    return FoldableLaws.laws(RF, G) +
       listOf(
         Law("Reducible Laws: reduceLeftTo consistent with reduceMap") { RF.reduceLeftToConsistentWithReduceMap(G, EQ) },
         Law("Reducible Laws: reduceRightTo consistent with reduceMap") { RF.reduceRightToConsistentWithReduceMap(G, EQ) },
@@ -24,6 +31,7 @@ object ReducibleLaws {
         Law("Reducible Laws: reduce reduce left consistent") { RF.reduceReduceLeftConsistent(G, EQ) },
         Law("Reducible Laws: size consistent") { RF.sizeConsistent(G, EQLong) }
       )
+  }
 
   fun <F> Reducible<F>.reduceLeftToConsistentWithReduceMap(cf: Gen<Kind<F, Int>>, EQ: Eq<Int>) =
     forAll(Gen.functionAToB<Int, Int>(Gen.intSmall()), cf) { f: (Int) -> Int, fa: Kind<F, Int> ->

@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.crosswalk.crosswalk
@@ -43,7 +42,7 @@ class IdTest : UnitSpec() {
     testLaws(
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
-      TraverseLaws.laws(Id.traverse(), Id.applicative(), Id.genK(), Id.eqK()),
+      TraverseLaws.laws(Id.traverse(), Id.genK(), Id.eqK()),
       BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.genK(), Id.eqK()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(

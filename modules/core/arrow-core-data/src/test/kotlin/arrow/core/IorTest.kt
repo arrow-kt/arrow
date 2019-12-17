@@ -5,7 +5,6 @@ import arrow.Kind2
 import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
 import arrow.core.extensions.ior.bifunctor.bifunctor
 import arrow.core.extensions.ior.bitraverse.bitraverse
@@ -51,7 +50,6 @@ class IorTest : UnitSpec() {
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
       TraverseLaws.laws(Ior.traverse(),
-        Ior.applicative(Int.semigroup()),
         Gen.ior(Gen.int(), Gen.int()).filter { it is Right } as Gen<Kind<IorPartialOf<Int>, Int>>,
         Ior.eqK(Int.eq())
       ),

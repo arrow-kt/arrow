@@ -5,7 +5,6 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.sequencek.align.align
-import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.crosswalk.crosswalk
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.eqK.eqK
@@ -85,10 +84,10 @@ class SequenceKTest : UnitSpec() {
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, EQK()),
       ShowLaws.laws(show, EQ, Gen.sequenceK(Gen.int())),
       MonadLaws.laws(SequenceK.monad(), EQK()),
-      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), EQK()),
+      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), EQK()),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection, associativeSemigroupalEq),
-      TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), SequenceK.genK(), SequenceK.eqK()),
+      TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
       AlignLaws.laws(SequenceK.align(),

@@ -28,10 +28,8 @@ class ReducibleTests : UnitSpec() {
     testLaws(ReducibleLaws.laws(
       nonEmptyReducible,
       // TODO ab: check if Gen.nel can be used here.
-      Gen.intSmall().map { NonEmptyList(it, listOf()) } as Gen<Kind<ForNonEmptyList, Int>>,
-      Eq.any(),
-      Eq.any(),
-      Eq.any()))
+      Gen.intSmall().map { NonEmptyList(it, listOf()) } as Gen<Kind<ForNonEmptyList, Int>>
+    ))
 
     with(nonEmptyReducible) {
       with(Int.semigroup()) {

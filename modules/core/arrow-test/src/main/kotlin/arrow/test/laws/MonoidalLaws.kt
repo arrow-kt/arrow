@@ -16,18 +16,19 @@ object MonoidalLaws {
   fun <F> laws(
     MDAL: Monoidal<F>,
     GENK: GenK<F>,
-    EQ: EqK<F>,
+    EQK: EqK<F>,
     BIJECTION: (Kind<F, Tuple2<Tuple2<Int, Int>, Int>>) -> (Kind<F, Tuple2<Int, Tuple2<Int, Int>>>),
     ASSOCIATIVE_SEMIGROUPAL_EQ: Eq<Kind<F, Tuple2<Int, Tuple2<Int, Int>>>>
   ): List<Law> =
     laws(
       MDAL,
       GENK.genK(Gen.int()),
-      EQ.liftEq(Tuple2.eq(Int.eq(), Int.eq())),
+      EQK.liftEq(Tuple2.eq(Int.eq(), Int.eq())),
       BIJECTION,
       ASSOCIATIVE_SEMIGROUPAL_EQ
     )
 
+  @Deprecated("should be internal")
   fun <F> laws(
     MDAL: Monoidal<F>,
     GEN: Gen<Kind<F, Int>>,

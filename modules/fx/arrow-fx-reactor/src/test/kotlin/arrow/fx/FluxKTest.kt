@@ -6,7 +6,6 @@ import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
 import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.foldable.foldable
-import arrow.fx.reactor.extensions.fluxk.functor.functor
 import arrow.fx.reactor.extensions.fluxk.monad.flatMap
 import arrow.fx.reactor.extensions.fluxk.monadFilter.monadFilter
 import arrow.fx.reactor.extensions.fluxk.timer.timer
@@ -84,7 +83,7 @@ class FluxKTest : UnitSpec() {
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
       AsyncLaws.laws(FluxK.async(), EQK(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), GENK()),
-      TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), GENK(), EQK()),
+      TraverseLaws.laws(FluxK.traverse(), GENK(), EQK()),
       MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQK())
     )
 

@@ -8,7 +8,6 @@ import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.extensions.validated.eqK.eqK
-import arrow.core.extensions.validated.functor.functor
 import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
@@ -55,7 +54,7 @@ class ValidatedTest : UnitSpec() {
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), EQK(String.eq())),
-      TraverseLaws.laws(Validated.traverse(), Validated.functor(), Gen.intSmall().map { Valid(it) } as Gen<Kind<ValidatedPartialOf<Nothing>, Int>>, EQK(nohtingEq)),
+      TraverseLaws.laws(Validated.traverse(), Gen.intSmall().map { Valid(it) } as Gen<Kind<ValidatedPartialOf<Nothing>, Int>>, EQK(nohtingEq)),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),

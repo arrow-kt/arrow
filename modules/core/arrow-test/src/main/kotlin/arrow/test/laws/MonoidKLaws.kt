@@ -16,10 +16,11 @@ object MonoidKLaws {
   fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, GENK.genK(Gen.int()), EQK)
 
+  @Deprecated("remove")
   fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, Gen.int().map { AP.just(it) }, EQK)
 
-  fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  private fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
     return SemigroupKLaws.laws(SGK, GEN, EQK) + listOf(

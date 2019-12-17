@@ -13,8 +13,8 @@ import io.kotlintest.properties.forAll
 object MonadFilterLaws {
 
   fun <F> laws(MF: MonadFilter<F>, cf: (Int) -> Kind<F, Int>, EQK: EqK<F>): List<Law> {
-    val EQ = EQK.liftEq(Int.eq()
-    )
+    val EQ = EQK.liftEq(Int.eq())
+
     return MonadLaws.laws(MF, EQK) + FunctorFilterLaws.laws(MF, Gen.int().map(cf), EQK) + listOf(
       Law("MonadFilter Laws: Left Empty") { MF.monadFilterLeftEmpty(EQ) },
       Law("MonadFilter Laws: Right Empty") { MF.monadFilterRightEmpty(EQ) },

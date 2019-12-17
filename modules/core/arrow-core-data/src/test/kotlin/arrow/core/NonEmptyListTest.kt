@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.bimonad.bimonad
 import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
@@ -44,7 +43,7 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.genK(),
         NonEmptyList.eqK()),
       BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), NonEmptyList.genK(), NonEmptyList.eqK()),
-      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), NonEmptyList.genK(), NonEmptyList.eqK()),
+      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),
       EqKLaws.laws(

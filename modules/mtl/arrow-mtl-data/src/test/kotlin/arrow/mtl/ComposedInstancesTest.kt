@@ -127,7 +127,7 @@ class ComposedInstancesTest : UnitSpec() {
       FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQK_OPTION_NEL),
       ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK_OPTION_NEL),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GK),
-      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), G, EQK_OPTION_NEL),
+      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), G, EQK_OPTION_NEL),
       SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), Gen.int().map { ComposedApplicative(ListK.applicative(), Option.applicative()).just(it) }, EQK_LK_OPTION),
       MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQK_LK_OPTION),
       BifunctorLaws.laws(ComposedBifunctor(Tuple2.bifunctor(), Tuple2.bifunctor()), bifunctorCf, EQ_TUPLE2)

@@ -17,7 +17,6 @@ import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
 import arrow.free.extensions.free.foldable.foldable
-import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
 import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
@@ -94,7 +93,7 @@ class FreeTest : UnitSpec() {
       MonadLaws.laws(Ops, opsEQK),
       MonadLaws.laws(Free.monad(), opsEQK),
       FoldableLaws.laws(Free.foldable(Id.foldable()), G),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), G, idEQK)
+      TraverseLaws.laws(Free.traverse(Id.traverse()), G, idEQK)
     )
 
     "Can interpret an ADT as Free operations to Option" {

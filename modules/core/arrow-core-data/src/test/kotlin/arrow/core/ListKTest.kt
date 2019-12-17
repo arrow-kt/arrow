@@ -8,7 +8,6 @@ import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
-import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -62,7 +61,7 @@ class ListKTest : UnitSpec() {
         ListK.eq(Tuple2.eq(Int.eq(), Int.eq())),
         this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
-      TraverseLaws.laws(ListK.traverse(), ListK.functor(), ListK.genK(), ListK.eqK()),
+      TraverseLaws.laws(ListK.traverse(), ListK.genK(), ListK.eqK()),
       MonadCombineLaws.laws(ListK.monadCombine(),
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },

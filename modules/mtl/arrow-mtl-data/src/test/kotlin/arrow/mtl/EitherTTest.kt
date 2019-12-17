@@ -13,7 +13,6 @@ import arrow.core.Right
 import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.applicative.applicative
-import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
@@ -29,7 +28,6 @@ import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.applicative.applicative
 import arrow.mtl.extensions.eithert.divisible.divisible
-import arrow.mtl.extensions.eithert.functor.functor
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
@@ -97,7 +95,7 @@ class EitherTTest : UnitSpec() {
         idEQK
       ),
       AsyncLaws.laws(EitherT.async(IO.async()), ioEQK),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), genId, idEQK),
+      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), genId, idEQK),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),
         GEN() as Gen<Kind<EitherTPartialOf<ForId, Int>, Int>>,

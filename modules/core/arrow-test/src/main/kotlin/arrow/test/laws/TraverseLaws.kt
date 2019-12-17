@@ -55,15 +55,16 @@ object TraverseLaws {
       )
   */
 
-  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(TF, FF, GENK.genK(Gen.intSmall()), EQK)
+  fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
+    laws(TF, GENK.genK(Gen.intSmall()), EQK)
 
-  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  @Deprecated("should be internal")
+  fun <F> laws(TF: Traverse<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
     return FoldableLaws.laws(TF, GEN) +
-      FunctorLaws.laws(FF, GEN, EQK) + listOf(
-      Law("Traverse Laws: Identity") { TF.identityTraverse(FF, GEN, EQ) },
+      FunctorLaws.laws(TF, GEN, EQK) + listOf(
+      Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
       Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
       Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
       Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) }

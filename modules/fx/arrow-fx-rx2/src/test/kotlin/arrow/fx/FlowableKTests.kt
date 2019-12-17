@@ -11,7 +11,6 @@ import arrow.fx.rx2.extensions.asyncLatest
 import arrow.fx.rx2.extensions.asyncMissing
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.flowablek.async.async
-import arrow.fx.rx2.extensions.flowablek.functor.functor
 import arrow.fx.rx2.extensions.flowablek.monad.flatMap
 import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
@@ -98,7 +97,7 @@ class FlowableKTests : RxJavaSpec() {
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
-    testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), GENK(), EQK()))
+    testLaws(TraverseLaws.laws(FlowableK.traverse(), GENK(), EQK()))
 
     testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQK()))
 
