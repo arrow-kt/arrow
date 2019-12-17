@@ -109,38 +109,37 @@ interface EitherTMonad<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicative
 
 @extension
 @undocumented
-interface EitherTApplicativeError<F, L> : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicative<F, L> {
+interface EitherTApplicativeError<F, L, E> : ApplicativeError<EitherTPartialOf<F, L>, E>, EitherTApplicative<F, L> {
 
-  fun AE(): ApplicativeError<F, L>
+  fun AE(): ApplicativeError<F, E>
 
   override fun AF(): Applicative<F> = AE()
 
-  override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
-    EitherT(value().handleErrorWith { l -> f(l).value() })
-  }
+  override fun <A> raiseError(e: E): EitherT<F, L, A> =
+    EitherT.liftF(AE(), AE().raiseError(e))
 
-  override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
-    EitherT.liftF(this, raiseError(e))
+  override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (E) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
+    EitherT(value().handleErrorWith { l -> f(l).value() })
   }
 }
 
 @extension
 @undocumented
-interface EitherTMonadError<F, L> : MonadError<EitherTPartialOf<F, L>, L>, EitherTApplicativeError<F, L>, EitherTMonad<F, L> {
+interface EitherTMonadError<F, L, E> : MonadError<EitherTPartialOf<F, L>, E>, EitherTApplicativeError<F, L, E>, EitherTMonad<F, L> {
   override fun MF(): Monad<F>
-  override fun AE(): ApplicativeError<F, L>
+  override fun AE(): ApplicativeError<F, E>
   override fun AF(): Applicative<F> = MF()
 }
 
-fun <F, L> EitherT.Companion.monadError(ME: MonadError<F, L>): MonadError<EitherTPartialOf<F, L>, L> =
-  object : EitherTMonadError<F, L> {
+fun <F, L, E> EitherT.Companion.monadError(ME: MonadError<F, E>): MonadError<EitherTPartialOf<F, L>, E> =
+  object : EitherTMonadError<F, L, E> {
     override fun MF(): Monad<F> = ME
-    override fun AE(): ApplicativeError<F, L> = ME
+    override fun AE(): ApplicativeError<F, E> = ME
   }
 
 @extension
 @undocumented
-interface EitherTMonadThrow<F> : MonadThrow<EitherTPartialOf<F, Throwable>>, EitherTMonadError<F, Throwable> {
+interface EitherTMonadThrow<F, L> : MonadThrow<EitherTPartialOf<F, L>>, EitherTMonadError<F, L, Throwable> {
   override fun MF(): Monad<F>
   override fun AE(): ApplicativeError<F, Throwable>
 }
@@ -323,5 +322,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
-  EitherT.monadThrow(M, M).fx.monadThrow(c).fix()
+fun <F, L, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, L>>.() -> R): EitherT<F, L, R> =
+  EitherT.monadThrow<F, L>(M, M).fx.monadThrow(c).fix()

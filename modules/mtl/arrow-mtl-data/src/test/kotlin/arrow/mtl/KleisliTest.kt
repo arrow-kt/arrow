@@ -21,8 +21,8 @@ import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.bracket.bracket
-import arrow.fx.mtl.kleisli.bracket.bracket
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
@@ -31,7 +31,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.BracketLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
@@ -49,6 +49,10 @@ class KleisliTest : UnitSpec() {
     override fun <A> Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>.eqK(other: Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>, EQ: Eq<A>): Boolean {
       return this.counnest().run(1) == other.counnest().run(1)
     }
+  }
+
+  private fun <A> IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, A>> = Eq { a, b ->
+    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
   }
 
   init {
@@ -96,9 +100,11 @@ class KleisliTest : UnitSpec() {
         { i -> Kleisli { { j: Int -> i + j }.some() } },
         optionEQK
       ),
-      BracketLaws.laws(
-        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
-        ioEQK
+      ConcurrentLaws.laws(
+        Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
+        IOEQ(),
+        IOEQ(),
+        IOEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, conestTryEQK()),
       DivisibleLaws.laws(

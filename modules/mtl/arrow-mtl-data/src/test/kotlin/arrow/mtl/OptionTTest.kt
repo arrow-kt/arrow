@@ -2,7 +2,6 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
@@ -27,6 +26,9 @@ import arrow.core.toT
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.mtl.concurrent
 import arrow.fx.extensions.io.async.async
 import arrow.fx.fix
 import arrow.fx.mtl.optiont.async.async
@@ -47,7 +49,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.generators.option
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.MonoidKLaws
@@ -97,7 +99,7 @@ class OptionTTest : UnitSpec() {
     }
 
     testLaws(
-      AsyncLaws.laws(OptionT.async(IO.async()), optiontEQK),
+      ConcurrentLaws.laws(OptionT.concurrent(IO.concurrent()), IOEQ(), IOEQ(), IOEQ()),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
