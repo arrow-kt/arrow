@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -9,6 +10,15 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object DivisibleLaws {
+
+  fun <F> laws(
+    DF: Divisible<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ): List<Law> =
+    laws(DF, GENK.genK(Gen.int()), EQK)
+
+  @Deprecated("should be internal, use the GENK one")
   fun <F> laws(
     DF: Divisible<F>,
     G: Gen<Kind<F, Int>>,

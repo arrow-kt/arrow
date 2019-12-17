@@ -1,6 +1,8 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.core.Const
+import arrow.core.ConstPartialOf
 import arrow.core.Either
 import arrow.core.EitherPartialOf
 import arrow.core.ForId
@@ -23,6 +25,8 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
+import arrow.mtl.EitherT
+import arrow.mtl.EitherTPartialOf
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {
@@ -90,4 +94,19 @@ fun <E> Validated.Companion.genK(genE: Gen<E>) =
   object : GenK<ValidatedPartialOf<E>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<ValidatedPartialOf<E>, A>> =
       Gen.validated(genE, gen) as Gen<Kind<ValidatedPartialOf<E>, A>>
+  }
+
+fun <A> Const.Companion.genK(genA: Gen<A>) = object : GenK<ConstPartialOf<A>> {
+  override fun <T> genK(gen: Gen<T>): Gen<Kind<ConstPartialOf<A>, T>> =
+    genA.map {
+      Const<A, T>(it)
+    }
+}
+
+fun <F, L> EitherT.Companion.genK(genkF: GenK<F>, genL: Gen<L>) =
+  object : GenK<EitherTPartialOf<F, L>> {
+    override fun <R> genK(gen: Gen<R>): Gen<Kind<EitherTPartialOf<F, L>, R>> =
+      genkF.genK(Gen.either(genL, gen)).map {
+        EitherT(it)
+      }
   }
