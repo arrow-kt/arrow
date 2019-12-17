@@ -3,14 +3,12 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
-import arrow.core.const
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
@@ -30,6 +28,8 @@ import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
@@ -53,8 +53,11 @@ class KleisliTest : UnitSpec() {
 
   init {
 
-    val cf: (Int) -> Kleisli<Kind<ForConst, Int>, Int, Int> = { Kleisli { it.const() } }
-    val g = Gen.int().map(cf) as Gen<Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, Int>>
+    fun <F, D> genk(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
+        Kleisli { _: D -> k }
+      }
+    }
 
     val optionEQK = object : EqK<KleisliPartialOf<ForOption, Int>> {
       override fun <A> Kind<KleisliPartialOf<ForOption, Int>, A>.eqK(other: Kind<KleisliPartialOf<ForOption, Int>, A>, EQ: Eq<A>): Boolean =
@@ -100,7 +103,7 @@ class KleisliTest : UnitSpec() {
       ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, conestTryEQK()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        g,
+        genk<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
         constEQK
       ),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), tryEQK)
