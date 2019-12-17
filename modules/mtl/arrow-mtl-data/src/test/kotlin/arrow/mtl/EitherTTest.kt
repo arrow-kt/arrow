@@ -4,25 +4,26 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.Either
+import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.extensions.const.divisible.divisible
+import arrow.core.extensions.const.eqK.eqK
+import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.eq
 import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.functor.functor
-import arrow.core.fix
-import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.mtl.concurrent
-import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.divisible.divisible
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
@@ -41,32 +42,12 @@ import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {
 
-  fun <E, A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, E>, A>> = Eq { a, b ->
-    a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
-  }
-
   init {
-    val idEQK = object : EqK<EitherTPartialOf<ForId, Int>> {
-      override fun <A> Kind<EitherTPartialOf<ForId, Int>, A>.eqK(other: Kind<EitherTPartialOf<ForId, Int>, A>, EQ: Eq<A>): Boolean =
-        (this.fix().value().fix() to other.fix().value().fix()).let {
-          Eq.any().run { it.first.eqv(it.second) }
-        }
-    }
+    val idEQK: EqK<Kind<Kind<ForEitherT, ForId>, Int>> = EitherT.eqK(Id.eqK(), Int.eq())
 
-    val ioEQK = object : EqK<EitherTPartialOf<ForIO, Throwable>> {
-      override fun <A> Kind<EitherTPartialOf<ForIO, Throwable>, A>.eqK(other: Kind<EitherTPartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
-        (this.fix() to other.fix()).let {
-          ioEQ<A>().run {
-            it.first.eqv(it.second)
-          }
-        }
-    }
+    val ioEQK: EqK<Kind<Kind<ForEitherT, ForIO>, String>> = EitherT.eqK(IO.eqK(), Eq.any())
 
-    val constEQK = object : EqK<EitherTPartialOf<ConstPartialOf<Int>, Int>> {
-      override fun <A> Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, A>.eqK(other: Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, A>, EQ: Eq<A>): Boolean {
-        return this.value().value() == other.value().value()
-      }
-    }
+    val constEQK: EqK<Kind<Kind<ForEitherT, Kind<ForConst, Int>>, Int>> = EitherT.eqK(Const.eqK(Int.eq()), Int.eq())
 
     testLaws(
       DivisibleLaws.laws(
@@ -80,7 +61,7 @@ class EitherTTest : UnitSpec() {
         { i -> EitherT.just(Id.applicative(), { j: Int -> i + j }) },
         idEQK
       ),
-      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()), EQ(), EQ(), EQ()),
+      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()), ioEQK),
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()),
         EitherT.genK(Id.genK(), Gen.int()),
         idEQK),
@@ -101,4 +82,16 @@ class EitherTTest : UnitSpec() {
       }
     }
   }
+}
+
+fun <F, L> EitherT.Companion.eqK(
+  EQKF: EqK<F>,
+  EQL: Eq<L>
+) = object : EqK<EitherTPartialOf<F, L>> {
+  override fun <R> Kind<EitherTPartialOf<F, L>, R>.eqK(other: Kind<EitherTPartialOf<F, L>, R>, EQ: Eq<R>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF.liftEq(Either.eq(EQL, EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
+    }
 }

@@ -51,12 +51,7 @@ class KleisliTest : UnitSpec() {
     }
   }
 
-  private fun <A> IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, A>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
-  }
-
   init {
-
     fun <F, D> genk(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
       override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
         Kleisli { _: D -> k }
@@ -102,9 +97,7 @@ class KleisliTest : UnitSpec() {
       ),
       ConcurrentLaws.laws(
         Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
-        IOEQ(),
-        IOEQ(),
-        IOEQ()
+        ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, conestTryEQK()),
       DivisibleLaws.laws(

@@ -1,9 +1,8 @@
 package arrow.mtl
 
 import arrow.Kind
-import arrow.core.ForTry
 import arrow.core.ForListK
-
+import arrow.core.ForTry
 import arrow.core.ListK
 import arrow.core.Try
 import arrow.core.extensions.`try`.monad.monad
@@ -46,10 +45,6 @@ class StateTTests : UnitSpec() {
       this.fix().runM(IO.monad(), 1).attempt().unsafeRunSync() == other.fix().runM(IO.monad(), 1).attempt().unsafeRunSync()
   }
 
-  private fun <A> IOEQ(): Eq<StateTOf<ForIO, Int, A>> = Eq { a, b ->
-    a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
-  }
-
   val tryEQK = object : EqK<StateTPartialOf<ForTry, Int>> {
     override fun <A> Kind<StateTPartialOf<ForTry, Int>, A>.eqK(other: Kind<StateTPartialOf<ForTry, Int>, A>, EQ: Eq<A>): Boolean =
       this.fix().runM(Try.monad(), 1) == other.fix().runM(Try.monad(), 1)
@@ -57,12 +52,11 @@ class StateTTests : UnitSpec() {
 
   init {
     testLaws(
-      MonadStateLaws.laws(M, EQ, EQ_UNIT),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEQ()),
-
       MonadStateLaws.laws(M, tryEQK),
       AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioEQK),
 
+      MonadStateLaws.laws(M, tryEQK),
+      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioEQK),
 
       SemigroupKLaws.laws(
         StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),

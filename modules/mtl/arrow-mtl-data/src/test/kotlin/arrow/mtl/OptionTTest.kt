@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
+import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
@@ -26,12 +27,9 @@ import arrow.core.toT
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.mtl.concurrent
-import arrow.fx.extensions.io.async.async
 import arrow.fx.fix
-import arrow.fx.mtl.optiont.async.async
+import arrow.fx.mtl.concurrent
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
@@ -67,7 +65,7 @@ class OptionTTest : UnitSpec() {
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
-  val optiontEQK = OptionT.eqK(IO.eqK())
+  val ioEQK = OptionT.eqK(IO.eqK())
 
   init {
 
@@ -99,7 +97,7 @@ class OptionTTest : UnitSpec() {
     }
 
     testLaws(
-      ConcurrentLaws.laws(OptionT.concurrent(IO.concurrent()), IOEQ(), IOEQ(), IOEQ()),
+      ConcurrentLaws.laws(OptionT.concurrent(IO.concurrent()), ioEQK),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
