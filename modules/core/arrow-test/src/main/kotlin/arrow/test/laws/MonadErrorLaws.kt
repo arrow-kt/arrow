@@ -36,13 +36,11 @@ object MonadErrorLaws {
 
   fun <F> laws(
     M: MonadError<F, Throwable>,
-    FF: Functor<F>,
-    AP: Applicative<F>,
     EQERR: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     EQ: Eq<Kind<F, Int>> = EQERR
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, EQ) +
+    MonadLaws.laws(M, EQ) +
       ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) +
       monadErrorLaws(M, EQERR)
 

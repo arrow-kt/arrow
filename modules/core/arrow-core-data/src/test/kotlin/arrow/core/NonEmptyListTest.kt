@@ -55,6 +55,7 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.comonad(),
         NonEmptyList.functor(),
         NonEmptyList.applicative(),
+        NonEmptyList.monad(),
         { NonEmptyList.of(it) },
         Eq.any(), EQ2, Eq.any()
       ),

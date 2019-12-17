@@ -27,6 +27,7 @@ import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.writert.async.async
 import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.applicative.applicative
@@ -76,6 +77,7 @@ class WriterTTest : UnitSpec() {
         WriterT.async(IO.async(), Int.monoid()),
         WriterT.functor<ForIO, Int>(IO.functor()),
         WriterT.applicative(IO.applicative(), Int.monoid()),
+        WriterT.monad(IO.monad(), Int.monoid()),
         IOEQ(),
         IOEitherEQ()
       ),
@@ -90,6 +92,7 @@ class WriterTTest : UnitSpec() {
         Int.monoid(),
         WriterT.functor<ForOption, Int>(Option.functor()),
         WriterT.applicative(Option.applicative(), Int.monoid()),
+        WriterT.monad(Option.monad(), Int.monoid()),
         Gen.intSmall(),
         Gen.tuple2(Gen.intSmall(), Gen.intSmall()),
         Eq { a, b ->
@@ -110,6 +113,7 @@ class WriterTTest : UnitSpec() {
         WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
         WriterT.functor<ForOption, Int>(Option.functor()),
         WriterT.applicative(Option.applicative(), Int.monoid()),
+        WriterT.monad(Option.monad(), Int.monoid()),
         { WriterT(Option(Tuple2(it, it))) },
         object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
           override fun Kind<WriterTPartialOf<ForOption, Int>, Int>.eqv(b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =

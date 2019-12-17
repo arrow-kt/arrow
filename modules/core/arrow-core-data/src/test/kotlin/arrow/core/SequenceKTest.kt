@@ -12,6 +12,7 @@ import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functor.functor
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
+import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
@@ -70,7 +71,7 @@ class SequenceKTest : UnitSpec() {
     }
 
     testLaws(
-      MonadCombineLaws.laws(SequenceK.monadCombine(), SequenceK.functor(), SequenceK.applicative(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
+      MonadCombineLaws.laws(SequenceK.monadCombine(), SequenceK.functor(), SequenceK.applicative(), SequenceK.monad(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
       ShowLaws.laws(show, eq, Gen.sequenceK(Gen.int())),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),

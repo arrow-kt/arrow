@@ -66,8 +66,8 @@ class FreeTest : UnitSpec() {
 
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
-      MonadLaws.laws(Ops, Ops, Ops, EQ),
-      MonadLaws.laws(Free.monad(), Free.functor(), Free.applicative(), EQ),
+      MonadLaws.laws(Ops, EQ),
+      MonadLaws.laws(Free.monad(), Free.functor(), Free.applicative(), Free.monad(), EQ),
       FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
       TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Free.eq(Id.monad(), FunctionK.id()))
     )

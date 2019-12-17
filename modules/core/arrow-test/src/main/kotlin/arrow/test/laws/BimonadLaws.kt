@@ -31,14 +31,12 @@ object BimonadLaws {
     BF: Bimonad<F>,
     M: Monad<F>,
     CM: Comonad<F>,
-    FF: Functor<F>,
-    AP: Applicative<F>,
     f: (Int) -> Kind<F, Int>,
     EQ1: Eq<Kind<F, Int>>,
     EQ2: Eq<Kind<F, Kind<F, Int>>>,
     EQ3: Eq<Int>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, EQ1) +
+    MonadLaws.laws(M, EQ1) +
       ComonadLaws.laws(CM, f, EQ1) +
       bimonadLaws(BF, EQ2, EQ3)
 

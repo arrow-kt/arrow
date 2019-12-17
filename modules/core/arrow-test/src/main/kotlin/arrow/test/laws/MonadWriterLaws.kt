@@ -36,14 +36,12 @@ object MonadWriterLaws {
     MF: Monad<F>,
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
-    FF: Functor<F>,
-    AP: Applicative<F>,
     genW: Gen<W>,
     genTupleWA: Gen<Tuple2<W, Int>>,
     EqInt: Eq<Kind<F, Int>>,
     EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, EqInt) + monadWriterLaws(MW, MOW, genW, genTupleWA, EqInt, EqTupleWA)
+    MonadLaws.laws(MF, EqInt) + monadWriterLaws(MW, MOW, genW, genTupleWA, EqInt, EqTupleWA)
 
   fun <F, W> laws(
     MF: Monad<F>,

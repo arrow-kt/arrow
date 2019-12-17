@@ -25,12 +25,10 @@ object MonadStateLaws {
 
   fun <F> laws(
     M: MonadState<F, Int>,
-    FF: Functor<F>,
-    AP: Applicative<F>,
     EQ: Eq<Kind<F, Int>>,
     EQUnit: Eq<Kind<F, Unit>>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, EQ) + monadStateLaws(M, EQ, EQUnit)
+    MonadLaws.laws(M, EQ) + monadStateLaws(M, EQ, EQUnit)
 
   fun <F> laws(
     M: MonadState<F, Int>,

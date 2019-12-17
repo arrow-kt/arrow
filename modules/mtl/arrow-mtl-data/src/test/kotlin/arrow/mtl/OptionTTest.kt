@@ -25,6 +25,7 @@ import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.optiont.async.async
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
@@ -32,6 +33,7 @@ import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
 import arrow.mtl.extensions.optiont.functor.functor
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
+import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
@@ -89,6 +91,7 @@ class OptionTTest : UnitSpec() {
         OptionT.async(IO.async()),
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.applicative()),
+        OptionT.monad(IO.monad()),
         IOEQ(),
         IOEitherEQ()
       ),

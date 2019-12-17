@@ -23,12 +23,14 @@ import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.bracket.bracket
 import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.kleisli.bracket.bracket
 import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.functor.functor
+import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.BracketLaws
@@ -70,6 +72,7 @@ class KleisliTest : UnitSpec() {
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         Kleisli.functor<ForIO, Int>(IO.functor()),
         Kleisli.applicative<ForIO, Int>(IO.applicative()),
+        Kleisli.monad<ForIO, Int>(IO.monad()),
         EQ = IOEQ(),
         EQ_EITHER = IOEitherEQ(),
         EQERR = IOEQ()

@@ -28,7 +28,7 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), ::Now, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), ::Now, EQ1, EQ2, Eq.any())
     )
 
     "should map wrapped value" {

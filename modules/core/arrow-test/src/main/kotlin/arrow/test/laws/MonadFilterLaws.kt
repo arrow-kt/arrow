@@ -32,12 +32,10 @@ object MonadFilterLaws {
 
   fun <F> laws(
     MF: MonadFilter<F>,
-    FF: Functor<F>,
-    AP: Applicative<F>,
     cf: (Int) -> Kind<F, Int>,
     EQ: Eq<Kind<F, Int>>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, EQ) +
+    MonadLaws.laws(MF, EQ) +
       FunctorFilterLaws.laws(MF, cf, EQ) +
       monadFilterLaws(MF, cf, EQ)
 

@@ -23,6 +23,7 @@ import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.functor.functor
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.functor.functor
+import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.statet.semigroupK.semigroupK
@@ -64,6 +65,7 @@ class StateTTests : UnitSpec() {
         M,
         StateT.functor<ForTry, Int>(Try.functor()),
         StateT.applicative<ForTry, Int>(Try.monad()),
+        StateT.monad<ForTry, Int>(Try.monad()),
         EQ,
         EQ_UNIT
       ),
@@ -71,6 +73,7 @@ class StateTTests : UnitSpec() {
         StateT.async(IO.async()),
         StateT.functor(IO.functor()),
         StateT.applicative(IO.monad()),
+        StateT.monad(IO.monad()),
         IOEQ(),
         IOEitherEQ()
       ),
@@ -82,6 +85,7 @@ class StateTTests : UnitSpec() {
         StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
         StateT.functor<ForListK, Int>(ListK.functor()),
         StateT.applicative<ForListK, Int>(ListK.monad()),
+        StateT.monad<ForListK, Int>(ListK.monad()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },
         { StateT.liftF(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
         EQ_LIST)

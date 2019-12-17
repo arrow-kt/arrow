@@ -11,6 +11,7 @@ import arrow.fx.rx2.extensions.maybek.applicative.applicative
 import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.extensions.maybek.functor.functor
 import arrow.fx.rx2.extensions.maybek.monad.flatMap
+import arrow.fx.rx2.extensions.maybek.monad.monad
 import arrow.fx.rx2.extensions.maybek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.k
@@ -49,8 +50,8 @@ class MaybeKTests : RxJavaSpec() {
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      ConcurrentLaws.laws(MaybeK.concurrent(), MaybeK.functor(), MaybeK.applicative(), EQ(), EQ(), EQ(), testStackSafety = false),
-      MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), { Maybe.just(it).k() }, EQ())
+      ConcurrentLaws.laws(MaybeK.concurrent(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), EQ(), EQ(), EQ(), testStackSafety = false),
+      MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), { Maybe.just(it).k() }, EQ())
     )
 
     "fx should defer evaluation until subscribed" {

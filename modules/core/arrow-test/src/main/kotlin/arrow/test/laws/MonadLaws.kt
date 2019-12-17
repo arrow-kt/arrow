@@ -18,7 +18,7 @@ import io.kotlintest.properties.forAll
 
 object MonadLaws {
 
-  fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     SelectiveLaws.laws(M, EQ) +
       listOf(
         Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
@@ -27,14 +27,15 @@ object MonadLaws {
         Law("Monad Laws: kleisli right identity") { M.kleisliRightIdentity(EQ) },
         Law("Monad Laws: map / flatMap coherence") { M.mapFlatMapCoherence(EQ) },
         Law("Monad Laws: monad comprehensions") { M.monadComprehensions(EQ) },
-        Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) },
-        Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
-        Law("Monad Laws: monad instance should preserve behavior of Applicative") { M.preservesApplicative(AP, EQ) }
+        Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) }
       )
 
   fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Applicative<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    laws(M, FF, AP, EQ) +
+    laws(M, EQ) + listOf(
+      Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
+      Law("Monad Laws: monad instance should preserve behavior of Applicative") { M.preservesApplicative(AP, EQ) },
       Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }
+    )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
@@ -83,7 +84,7 @@ object MonadLaws {
   fun <F> Monad<F>.preservesSelective(SL: Selective<F>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.int(), Gen.int())) { either ->
       val f = just<(Int) -> Int>(::identity)
-      SL.run{ just(either).select(f) }.equalUnderTheLaw(just(either).select(f), EQ)
+      SL.run { just(either).select(f) }.equalUnderTheLaw(just(either).select(f), EQ)
     }
 
   fun <F> Monad<F>.preservesFunctor(FF: Functor<F>, EQ: Eq<Kind<F, Int>>): Unit =
