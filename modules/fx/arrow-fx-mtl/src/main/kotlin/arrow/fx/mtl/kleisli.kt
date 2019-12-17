@@ -1,6 +1,5 @@
 package arrow.fx.mtl
 
-import arrow.Kind
 import arrow.mtl.Kleisli
 import arrow.mtl.KleisliOf
 import arrow.mtl.KleisliPartialOf

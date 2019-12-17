@@ -51,7 +51,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param MF [Monad] for the context [F].
    */
   fun <B> flatMap(MF: Monad<F>, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> = MF.run {
-    shift(MF) { d ->
+    Kleisli { d ->
       run(d).flatMap { a ->
         f(a).run(d)
       }
@@ -65,7 +65,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param MF [Monad] for the context [F].
    */
   fun <B> zip(MF: Monad<F>, o: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> = MF.run {
-    shift(MF) { d ->
+    Kleisli { d ->
       run(d).flatMap { a ->
         o.fix().map(MF) { b -> Tuple2(a, b) }.run(d)
       }
@@ -96,7 +96,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param MF [Monad] for the context [F].
    */
   fun <B> andThen(MF: Monad<F>, f: (A) -> Kind<F, B>): Kleisli<F, D, B> = MF.run {
-    shift(MF) { d -> run(d).flatMap(f) }
+    Kleisli { d: D -> run(d).flatMap(f) }
   }
 
   /**
@@ -223,24 +223,3 @@ typealias ReaderT<F, D, A> = Kleisli<F, D, A>
  * @receiver [ReaderTFun] a function that represents computation dependent on [D] with the result in context [F].
  */
 fun <F, D, A> ((D) -> Kind<F, A>).readerT(): ReaderT<F, D, A> = ReaderT(this)
-
-/**
- * Internal API — shifts the execution of `run` in the `F` context.
- *
- * Used to build Kleisli values for `F[_]` data types that implement `Monad`,
- * in which case it is safer to trigger the `F[_]` context earlier.
- *
- * The requirement is for `FlatMap` as this will get used in operations
- * that invoke `F.flatMap` (e.g. in `Kleisli#flatMap`). However we are
- * doing discrimination based on inheritance and if we detect an
- * `Applicative`, then we use it to trigger the `F[_]` context earlier.
- *
- * Triggering the `F[_]` context earlier is important to avoid stack
- * safety issues for `F` monads that have a stack safe `flatMap`
- * implementation. For example `Eval` or `IO`. Without this the `Monad`
- * instance is stack unsafe, even if the underlying `F` is stack safe
- * in `flatMap`.
- */
-private fun <F, A, B> shift(MM: Monad<F>, run: (A) -> Kind<F, B>): Kleisli<F, A, B> = MM.run {
-  Kleisli { r -> just(r).flatMap(run) }
-}
