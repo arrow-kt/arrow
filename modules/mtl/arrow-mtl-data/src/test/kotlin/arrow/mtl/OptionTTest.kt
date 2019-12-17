@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
+import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
@@ -11,6 +12,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
@@ -25,9 +27,10 @@ import arrow.core.toT
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
+import arrow.fx.fix
 import arrow.fx.mtl.optiont.async.async
+import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.applicative.applicative
@@ -62,18 +65,7 @@ class OptionTTest : UnitSpec() {
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
-  fun <A> IOEQ(): Eq<Kind<OptionTPartialOf<ForIO>, A>> = Eq { a, b ->
-    a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
-  }
-
-  fun ioEQK() = object : EqK<OptionTPartialOf<ForIO>> {
-    override fun <A> Kind<OptionTPartialOf<ForIO>, A>.eqK(other: Kind<OptionTPartialOf<ForIO>, A>, EQ: Eq<A>): Boolean =
-      (this.fix() to other.fix()).let {
-        IOEQ<A>().run {
-          it.first.eqv(it.second)
-        }
-      }
-  }
+  val optiontEQK = OptionT.eqK(IO.eqK())
 
   init {
 
@@ -105,7 +97,7 @@ class OptionTTest : UnitSpec() {
     }
 
     testLaws(
-      AsyncLaws.laws(OptionT.async(IO.async()), ioEQK()),
+      AsyncLaws.laws(OptionT.async(IO.async()), optiontEQK),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
@@ -182,4 +174,16 @@ fun <F> OptionT.Companion.genk(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, 
   override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind<ForOptionT, F>, A>> = genkF.genK(Gen.option(gen)).map {
     OptionT(it)
   }
+}
+
+fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
+  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      val ls = it.first.attempt().unsafeRunTimed(timeout)
+      val rs = it.second.attempt().unsafeRunTimed(timeout)
+
+      Option.eq(Either.eq(Eq.any(), EQ)).run {
+        ls.eqv(rs)
+      }
+    }
 }

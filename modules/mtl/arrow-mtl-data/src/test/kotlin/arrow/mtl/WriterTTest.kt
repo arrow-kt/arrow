@@ -3,29 +3,24 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.Either
 import arrow.core.ForListK
-import arrow.core.ForOption
 import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.const.divisible.divisible
-import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
+import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.core.fix
-import arrow.core.value
-import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.mtl.writert.async.async
 import arrow.mtl.extensions.writert.alternative.alternative
@@ -52,33 +47,13 @@ import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  fun ioEQK() = object : EqK<WriterTPartialOf<ForIO, Int>> {
-    override fun <A> Kind<WriterTPartialOf<ForIO, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForIO, Int>, A>, EQ: Eq<A>): Boolean =
-      (this.fix().value().attempt().unsafeRunSync() to other.fix().value().attempt().unsafeRunSync()).let {
-        Either.eq(Eq.any(), Tuple2.eq(Int.eq(), EQ)).run {
-          it.first.eqv(it.second)
-        }
-      }
-  }
+  fun ioEQK() = WriterT.eqK(IO.eqK(), Int.eq())
 
-  fun optionEQK() = object : EqK<WriterTPartialOf<ForOption, Int>> {
-    override fun <A> Kind<WriterTPartialOf<ForOption, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForOption, Int>, A>, EQ: Eq<A>): Boolean =
-      (this.fix().value().fix() to other.fix().value().fix()).let { (optionA, optionB) ->
-        Option.eq(Tuple2.eq(Int.eq(), EQ)).run {
-          optionA.eqv(optionB)
-        }
-      }
-  }
+  fun optionEQK() = WriterT.eqK(Option.eqK(), Int.eq())
 
-  fun constEQK() = object : EqK<WriterTPartialOf<ConstPartialOf<Int>, Int>> {
-    override fun <A> Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, A>.eqK(other: Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, A>, EQ: Eq<A>): Boolean =
-      this.value().value() == other.value().value()
-  }
+  fun constEQK() = WriterT.eqK(Const.eqK(Int.eq()), Int.eq())
 
-  fun listEQK() = object : EqK<WriterTPartialOf<ForListK, Int>> {
-    override fun <A> Kind<WriterTPartialOf<ForListK, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForListK, Int>, A>, EQ: Eq<A>): Boolean =
-      this.value() == other.value()
-  }
+  fun listEQK() = WriterT.eqK(ListK.eqK(), Int.eq())
 
   init {
 
@@ -120,11 +95,18 @@ class WriterTTest : UnitSpec() {
 }
 
 private fun <F, W> WriterT.Companion.genK(
-  genkF: GenK<F>,
-  genW: Gen<W>
+  GENKF: GenK<F>,
+  GENW: Gen<W>
 ) = object : GenK<WriterTPartialOf<F, W>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
-    genkF.genK(Gen.tuple2(genW, gen)).map {
-      WriterT(it)
+    GENKF.genK(Gen.tuple2(GENW, gen)).map(::WriterT)
+}
+
+fun <F, W> WriterT.Companion.eqK(EQKF: EqK<F>, EQW: Eq<W>) = object : EqK<WriterTPartialOf<F, W>> {
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.eqK(other: Kind<WriterTPartialOf<F, W>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF.liftEq(Tuple2.eq(EQW, EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
     }
 }
