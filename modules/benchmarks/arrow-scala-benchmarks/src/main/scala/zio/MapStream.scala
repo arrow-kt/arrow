@@ -1,6 +1,6 @@
 package arrow.benchmarks.effects.scala.zio
 
-import scalaz.zio.Task
+import zio.Task
 
 object MapStream {
 
