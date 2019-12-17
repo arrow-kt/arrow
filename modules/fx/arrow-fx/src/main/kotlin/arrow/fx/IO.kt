@@ -573,7 +573,9 @@ sealed class IO<out A> : IOOf<A> {
    * **BEWARE** this does **not** support cancelation since Kotlin has no cancelation support for `suspend` on the language level.
    */
   suspend fun suspended(): A = suspendCoroutine { cont ->
-    IORunLoop.start(this) {
+    val connection = cont.context[IOContext]?.connection
+
+    IORunLoop.startCancelable(this, connection ?: IOConnection.uncancelable) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }

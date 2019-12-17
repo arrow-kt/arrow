@@ -1,14 +1,21 @@
 @file:Suppress("UnusedImports")
+
 package arrow.fx
 
 import arrow.core.Either
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 import arrow.fx.handleErrorWith as handleErrorW
 
 fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 typealias IOConnection = KindConnection<ForIO>
+
+internal class IOContext(val connection: IOConnection) : AbstractCoroutineContextElement(IOContext) {
+  companion object Key : CoroutineContext.Key<IOContext>
+}
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
