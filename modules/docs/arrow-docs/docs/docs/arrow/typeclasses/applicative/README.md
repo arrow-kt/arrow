@@ -106,12 +106,12 @@ Sequences actions, discarding the value of the first argument.
 Option.applicative().run { Some(1).followedBy(Some(2)) }
 ```
 
-#### Kind<F, A>#apIgnore
+#### Kind<F, A>#apTap
 
 This is a reverse for `followedBy`. Sequences actions but discarding the value of the second argument.
 
 ```kotlin:ank
-Option.applicative().run { Some(1).apIgnore(Some(2)) } 
+Option.applicative().run { Some(1).apTap(Some(2)) } 
 ```
 
 ### Apply

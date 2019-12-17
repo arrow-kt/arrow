@@ -331,6 +331,6 @@ interface Apply<F> : Functor<F> {
    *
    * This is equivalent to <* in Haskell.
    */
-  fun <A, B> Kind<F, A>.apIgnore(fb: Kind<F, B>): Kind<F, A> =
+  fun <A, B> Kind<F, A>.apTap(fb: Kind<F, B>): Kind<F, A> =
     map(this, fb) { (left, _) -> left }
 }

@@ -53,8 +53,8 @@ interface Monad<F> : Selective<F> {
   override fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
     flatMap { fb }
 
-  override fun <A, B> Kind<F, A>.apIgnore(fb: Kind<F, B>): Kind<F, A> =
-    fb.flatMap { this }
+  override fun <A, B> Kind<F, A>.apTap(fb: Kind<F, B>): Kind<F, A> =
+    flatTap { fb }
 
   fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
     flatMap { fb.value() }
