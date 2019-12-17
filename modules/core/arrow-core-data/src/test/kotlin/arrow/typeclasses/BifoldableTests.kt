@@ -1,16 +1,14 @@
 package arrow.typeclasses
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForEither
-import arrow.core.Right
 import arrow.core.fix
-import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.compose
 import arrow.test.UnitSpec
+import arrow.test.generators.either
 import arrow.test.generators.intSmall
 import arrow.test.laws.BifoldableLaws
 import io.kotlintest.properties.Gen
@@ -35,10 +33,9 @@ class BifoldableTests : UnitSpec() {
 
     val eitherComposeEither = eitherBifoldable.compose(eitherBifoldable)
 
-    val g = Gen.intSmall().map {
-      Right(Right(it)).binest()
-    } as Gen<Kind<Kind<Nested<ForEither, ForEither>, Int>, Int>>
+    val eitherGen = Gen.either(Gen.intSmall(), Gen.intSmall())
+    val nestedEitherGen = Gen.either(eitherGen, eitherGen).map { it.binest() }
 
-    testLaws(BifoldableLaws.laws(eitherComposeEither, g, Eq.any()))
+    testLaws(BifoldableLaws.laws(eitherComposeEither, nestedEitherGen, Eq.any()))
   }
 }
