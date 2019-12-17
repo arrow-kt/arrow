@@ -76,8 +76,8 @@ class ComposedInstancesTest : UnitSpec() {
     }
 
     val EQK_OPTION_FN1 = object : EqK<Nested<ForOption, Conested<ForFunction1, Int>>> {
-      override fun <A> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>.eqK(other: Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>, EQ: Eq<A>): Boolean {
-        return this.unnest().fix().fold(
+      override fun <A> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>.eqK(other: Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>, EQ: Eq<A>): Boolean =
+        this.unnest().fix().fold(
           { other.unnest().fix().isEmpty() },
           { fnA ->
             other.unnest().fix().fold(
@@ -86,7 +86,6 @@ class ComposedInstancesTest : UnitSpec() {
             )
           }
         )
-      }
     }
 
     fun <A> GENK_OPTION_FN1(genA: Gen<A>) = object : GenK<Nested<ForOption, Conested<ForFunction1, A>>> {

@@ -4,14 +4,20 @@ import arrow.Kind
 import arrow.core.ForListK
 import arrow.core.ForTry
 import arrow.core.ListK
+import arrow.core.Option
 import arrow.core.Try
+import arrow.core.Tuple2
 import arrow.core.extensions.`try`.monad.monad
+import arrow.core.extensions.eq
+import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.semigroupK.semigroupK
+import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.tuple2.eq.eq
+import arrow.core.fix
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
@@ -21,51 +27,73 @@ import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.statet.semigroupK.semigroupK
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.tuple2
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 
 class StateTTests : UnitSpec() {
 
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
-  val listkEQK = object : EqK<StateTPartialOf<ForListK, Int>> {
-    override fun <A> Kind<StateTPartialOf<ForListK, Int>, A>.eqK(other: Kind<StateTPartialOf<ForListK, Int>, A>, EQ: Eq<A>): Boolean =
-      (this.runM(ListK.monad(), 1) to other.runM(ListK.monad(), 1)).let {
-        Eq.any().run { it.first.eqv(it.second) }
+  fun <F, S> eqk(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
+    override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
+      (this.fix() to other.fix()).let {
+        val ls = it.first.runM(M, s)
+        val rs = it.second.runM(M, s)
+
+        EQKF.liftEq(Tuple2.eq(EQS, EQ)).run {
+          ls.eqv(rs)
+        }
       }
   }
 
-  val ioEQK = object : EqK<StateTPartialOf<ForIO, Int>> {
-    override fun <A> Kind<StateTPartialOf<ForIO, Int>, A>.eqK(other: Kind<StateTPartialOf<ForIO, Int>, A>, EQ: Eq<A>): Boolean =
-      this.fix().runM(IO.monad(), 1).attempt().unsafeRunSync() == other.fix().runM(IO.monad(), 1).attempt().unsafeRunSync()
+  val listkStateEQK = eqk(ListK.eqK(), Int.eq(), ListK.monad(), 1)
+
+  val ioStateEQK = eqk(IO.eqK(), Int.eq(), IO.monad(), 1)
+
+  val tryEQK = object : EqK<ForTry> {
+    override fun <A> Kind<ForTry, A>.eqK(other: Kind<ForTry, A>, EQ: Eq<A>): Boolean =
+      (this.fix() to other.fix()).let {
+        Option.eq(EQ).run {
+          it.first.toOption().eqv(it.second.toOption())
+        }
+      }
   }
 
-  val tryEQK = object : EqK<StateTPartialOf<ForTry, Int>> {
-    override fun <A> Kind<StateTPartialOf<ForTry, Int>, A>.eqK(other: Kind<StateTPartialOf<ForTry, Int>, A>, EQ: Eq<A>): Boolean =
-      this.fix().runM(Try.monad(), 1) == other.fix().runM(Try.monad(), 1)
+  val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = eqk(tryEQK, Int.eq(), Try.monad(), 1)
+
+  fun <F, S> genk(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
+      genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
+        val stateTFun: StateTFun<F, S, A> = { _: S -> state }
+        stateTFun
+      }).map {
+        StateT(it)
+      }
   }
 
   init {
     testLaws(
-      MonadStateLaws.laws(M, tryEQK),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioEQK),
-
-      MonadStateLaws.laws(M, tryEQK),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioEQK),
+      MonadStateLaws.laws(M, tryStateEqK),
+      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioStateEQK),
 
       SemigroupKLaws.laws(
         StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
         Gen.int().map { StateT.applicative<ForListK, Int>(ListK.monad()).just(it) } as Gen<Kind<StateTPartialOf<ForListK, Int>, Int>>,
-        listkEQK),
+        // question: this gen seems to work in principle but is too slow + GC exception
+        // genk(ListK.genK(), Gen.int()),
+        listkStateEQK),
       MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },
         { StateT.liftF(ListK.monad(), ListK.just { s: Int -> s * 2 }) },
-        listkEQK)
+        listkStateEQK)
     )
   }
 }
