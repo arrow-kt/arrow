@@ -4,13 +4,11 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.Either
-import arrow.core.ForConst
 import arrow.core.ForListK
 import arrow.core.ForOption
 import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
@@ -38,6 +36,8 @@ import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
@@ -82,9 +82,6 @@ class WriterTTest : UnitSpec() {
 
   init {
 
-    val cf: (Int) -> WriterT<Kind<ForConst, Int>, Int, Int> = { WriterT(it.const()) }
-    val g = Gen.int().map(cf) as Gen<Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, Int>>
-
     testLaws(
       AlternativeLaws.laws(
         WriterT.alternative(Int.monoid(), Option.alternative()),
@@ -94,7 +91,7 @@ class WriterTTest : UnitSpec() {
       ),
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        g,
+        WriterT.genK(Const.genK(Gen.int()), Gen.int()),
         constEQK()
       ),
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), ioEQK()),
@@ -120,4 +117,14 @@ class WriterTTest : UnitSpec() {
       )
     )
   }
+}
+
+private fun <F, W> WriterT.Companion.genK(
+  genkF: GenK<F>,
+  genW: Gen<W>
+) = object : GenK<WriterTPartialOf<F, W>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
+    genkF.genK(Gen.tuple2(genW, gen)).map {
+      WriterT(it)
+    }
 }

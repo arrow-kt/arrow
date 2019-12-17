@@ -2,7 +2,6 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
@@ -11,7 +10,6 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
@@ -40,7 +38,10 @@ import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.generators.intSmall
+import arrow.test.generators.option
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -101,9 +102,6 @@ class OptionTTest : UnitSpec() {
         }
     }
 
-    val cf: (Int) -> OptionT<Kind<ForConst, Int>, Int> = { OptionT(it.const()) }
-    val g = Gen.int().map(cf) as Gen<Kind<Kind<ForOptionT, Kind<ForConst, Int>>, Int>>
-
     testLaws(
       AsyncLaws.laws(OptionT.async(IO.async()), ioEQK()),
 
@@ -143,7 +141,7 @@ class OptionTTest : UnitSpec() {
         OptionT.divisible(
           Const.divisible(Int.monoid())
         ),
-        g,
+        OptionT.genk(Const.genK(Gen.int())),
         EQK()
       )
     )
@@ -179,5 +177,11 @@ class OptionTTest : UnitSpec() {
         OptionT.fromOption<ForNonEmptyList, String>(NELM, None).toRight(NELM) { a } == EitherT.left<ForNonEmptyList, Int, String>(NELM, a)
       }
     }
+  }
+}
+
+fun <F> OptionT.Companion.genk(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, F>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind<ForOptionT, F>, A>> = genkF.genK(Gen.option(gen)).map {
+    OptionT(it)
   }
 }
