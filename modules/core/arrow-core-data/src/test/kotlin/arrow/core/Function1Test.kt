@@ -25,8 +25,10 @@ import io.kotlintest.properties.forAll
 
 class Function1Test : UnitSpec() {
 
-  val ConestedEQ: Eq<Kind<Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
-    a.counnest().invoke(1) == b.counnest().invoke(1)
+  val conestedEQK = object : EqK<Conested<ForFunction1, Int>> {
+    override fun <A> Kind<Conested<ForFunction1, Int>, A>.eqK(other: Kind<Conested<ForFunction1, Int>, A>, EQ: Eq<A>): Boolean {
+      return this.counnest().invoke(1) == other.counnest().invoke(1)
+    }
   }
 
   val EQ: Eq<Function1Of<Int, Int>> = Eq { a, b ->
@@ -45,7 +47,7 @@ class Function1Test : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
-      DivisibleLaws.laws(Function1.divisible(Int.monoid()), Gen.int().map { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
+      DivisibleLaws.laws(Function1.divisible(Int.monoid()), Gen.int().map { Function1.just<Int, Int>(it).conest() }, conestedEQK),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQK(5150)),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)

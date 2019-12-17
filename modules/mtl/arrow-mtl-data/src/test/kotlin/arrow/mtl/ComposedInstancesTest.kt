@@ -42,7 +42,6 @@ import arrow.mtl.typeclasses.ComposedMonoidK
 import arrow.mtl.typeclasses.ComposedSemigroupK
 import arrow.mtl.typeclasses.ComposedTraverse
 import arrow.mtl.typeclasses.Nested
-import arrow.mtl.typeclasses.NestedType
 import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.biunnest
 import arrow.mtl.typeclasses.nest
@@ -67,31 +66,31 @@ import io.kotlintest.properties.Gen
 
 class ComposedInstancesTest : UnitSpec() {
   init {
-    val EQ_OPTION_NEL: Eq<NestedType<ForOption, ForNonEmptyList, Int>> = Eq { a, b ->
-      a.unnest().fix() == b.unnest().fix()
+
+    val EQK_LK_OPTION = object : EqK<Nested<ForListK, ForOption>> {
+      override fun <A> Kind<Nested<ForListK, ForOption>, A>.eqK(other: Kind<Nested<ForListK, ForOption>, A>, EQ: Eq<A>): Boolean =
+        this.unnest().fix() == other.unnest().fix()
     }
 
-    val EQ_LK_OPTION: Eq<NestedType<ForListK, ForOption, Int>> = Eq { a, b ->
-      a.unnest().fix() == b.unnest().fix()
-    }
-
-    val EQ_OPTION_FN1: Eq<NestedType<ForOption, Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
-      a.unnest().fix().fold(
-        { b.unnest().fix().isEmpty() },
-        { fnA ->
-          b.unnest().fix().fold(
-            { false },
-            { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
-          )
-        }
-      )
+    val EQK_OPTION_FN1 = object : EqK<Nested<ForOption, Conested<ForFunction1, Int>>> {
+      override fun <A> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>.eqK(other: Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>, EQ: Eq<A>): Boolean {
+        return this.unnest().fix().fold(
+          { other.unnest().fix().isEmpty() },
+          { fnA ->
+            other.unnest().fix().fold(
+              { false },
+              { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
+            )
+          }
+        )
+      }
     }
 
     val EQ_TUPLE2: Eq<Kind2<Nested<ForTuple2, ForTuple2>, Int, Int>> = Eq { a, b ->
       a.biunnest().fix() == b.biunnest().fix()
     }
 
-    val EQK = object : EqK<Nested<ForOption, ForNonEmptyList>> {
+    val EQK_OPTION_NEL = object : EqK<Nested<ForOption, ForNonEmptyList>> {
       override fun <A> Kind<Nested<ForOption, ForNonEmptyList>, A>.eqK(other: Kind<Nested<ForOption, ForNonEmptyList>, A>, EQ: Eq<A>): Boolean {
         val ls = this.unnest().fix().map { it.fix() }
         val rs = other.unnest().fix().map { it.fix() }
@@ -117,20 +116,20 @@ class ComposedInstancesTest : UnitSpec() {
     val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQ_OPTION_NEL)
+      InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQK_OPTION_NEL)
     )
 
     testLaws(
-      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), Gen.int().map(cf2), EQ_OPTION_FN1)
+      InvariantLaws.laws(ComposedInvariantContravariant(Option.functor(), Function1.contravariant<Int>()), Gen.int().map(cf2), EQK_OPTION_FN1)
     )
 
     testLaws(
-      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQ_OPTION_NEL),
-      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK),
+      FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), Gen.int().map(cf), EQK_OPTION_NEL),
+      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK_OPTION_NEL),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GK),
-      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), G, EQ_OPTION_NEL),
-      SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), Gen.int().map { ComposedApplicative(ListK.applicative(), Option.applicative()).just(it) }, EQ_LK_OPTION),
-      MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQ_LK_OPTION),
+      TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), G, EQK_OPTION_NEL),
+      SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), Gen.int().map { ComposedApplicative(ListK.applicative(), Option.applicative()).just(it) }, EQK_LK_OPTION),
+      MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), ComposedApplicative(ListK.applicative(), Option.applicative()), EQK_LK_OPTION),
       BifunctorLaws.laws(ComposedBifunctor(Tuple2.bifunctor(), Tuple2.bifunctor()), bifunctorCf, EQ_TUPLE2)
     )
   }

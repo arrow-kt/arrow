@@ -2,7 +2,6 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.Either
 import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
@@ -38,7 +37,6 @@ import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
 import arrow.mtl.typeclasses.Nested
-import arrow.mtl.typeclasses.NestedType
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
@@ -59,23 +57,11 @@ typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
 
 class OptionTTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<OptionTPartialOf<A>, Int>> = Eq { a, b ->
-    a.value() == b.value()
-  }
-
   fun <A> EQK() = object : EqK<OptionTPartialOf<A>> {
     override fun <B> Kind<OptionTPartialOf<A>, B>.eqK(other: Kind<OptionTPartialOf<A>, B>, EQ: Eq<B>): Boolean =
       (this.fix() to other.fix()).let {
         it.first == it.second
       }
-  }
-
-  fun <A> EQ_NESTED(): Eq<Kind<OptionTPartialOf<A>, Kind<OptionTPartialOf<A>, Int>>> = Eq { a, b ->
-    a.value() == b.value()
-  }
-
-  private fun IOEitherEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
@@ -95,21 +81,9 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>, Int>> =
-      Eq { a, b ->
-        a.unnest().value().value().fold(
-          { b.unnest().value().value().isEmpty() },
-          { optionA: OptionTNel ->
-            b.unnest().value().value().fix().fold(
-              { false },
-              { it.value() == optionA.value() })
-          })
-      }
-
-    val EQK_1 = object : EqK<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>> {
+    val nestedEQK = object : EqK<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>> {
       override fun <A> Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>.eqK(other: Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>, EQ: Eq<A>): Boolean =
-        (this.unnest().fix() toT other.unnest().fix()).let {
-          (a, b) ->
+        (this.unnest().fix() toT other.unnest().fix()).let { (a, b) ->
 
           a.value().value().fix().fold(
             { b.value().value().isEmpty() },
@@ -137,19 +111,19 @@ class OptionTTest : UnitSpec() {
         OptionT.semigroupK(Option.monad()),
         Gen.int().map
         { OptionT.applicative(Option.monad()).just(it) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
-        EQ()),
+        EQK()),
 
       FunctorFilterLaws.laws(
         ComposedFunctorFilter(OptionT.functorFilter(Id.monad()),
           OptionT.functorFilter(NonEmptyList.monad())),
         Gen.int().map
         { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() },
-        EQK_1),
+        nestedEQK),
 
       MonoidKLaws.laws(
         OptionT.monoidK(Option.monad()),
         OptionT.applicative(Option.monad()),
-        EQ()),
+        EQK()),
 
       FunctorFilterLaws.laws(
         OptionT.functorFilter(Option.monad()),
@@ -162,16 +136,15 @@ class OptionTTest : UnitSpec() {
         OptionT.applicative(Option.monad()),
         Gen.intSmall().map
         { OptionT(Some(Some(it))) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
-        EQ(),
-        EQ_NESTED()),
+        EQK()
+      ),
 
       DivisibleLaws.laws(
         OptionT.divisible(
           Const.divisible(Int.monoid())
         ),
         g,
-        Eq
-        { a, b -> a.value().value() == b.value().value() }
+        EQK()
       )
     )
 

@@ -85,7 +85,7 @@ class SequenceKTest : UnitSpec() {
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, EQK()),
       ShowLaws.laws(show, EQ, Gen.sequenceK(Gen.int())),
       MonadLaws.laws(SequenceK.monad(), EQK()),
-      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), EQ),
+      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), EQK()),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), SequenceK.genK(), SequenceK.eqK()),

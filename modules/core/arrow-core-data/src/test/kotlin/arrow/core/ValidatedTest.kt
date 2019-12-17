@@ -36,6 +36,8 @@ class ValidatedTest : UnitSpec() {
 
     val EQ = Validated.eq(String.eq(), Int.eq())
 
+    val nohtingEq: Eq<Nothing> = Eq.any()
+
     fun <E> EQK(EQE: Eq<E>) = object : EqK<ValidatedPartialOf<E>> {
       override fun <A> Kind<ValidatedPartialOf<E>, A>.eqK(other: Kind<ValidatedPartialOf<E>, A>, EQ: Eq<A>): Boolean =
         (this.fix() to other.fix()).let {
@@ -53,7 +55,7 @@ class ValidatedTest : UnitSpec() {
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), EQK(String.eq())),
-      TraverseLaws.laws(Validated.traverse(), Validated.functor(), Gen.intSmall().map { Valid(it) } as Gen<Kind<ValidatedPartialOf<Nothing>, Int>>, Eq.any()),
+      TraverseLaws.laws(Validated.traverse(), Validated.functor(), Gen.intSmall().map { Valid(it) } as Gen<Kind<ValidatedPartialOf<Nothing>, Int>>, EQK(nohtingEq)),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),

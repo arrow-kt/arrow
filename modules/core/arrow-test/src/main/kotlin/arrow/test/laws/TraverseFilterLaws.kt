@@ -3,11 +3,13 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.None
 import arrow.core.Some
+import arrow.core.extensions.eq
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.TraverseFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -19,14 +21,17 @@ object TraverseFilterLaws {
     TF: TraverseFilter<F>,
     GA: Applicative<F>,
     GEN: Gen<Kind<F, Int>>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_NESTED: Eq<Kind<F, Kind<F, Int>>> = Eq.any()
-  ): List<Law> =
-    TraverseLaws.laws(TF, GA, GEN, EQ) +
+    EQK: EqK<F>
+  ): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+    val EQ_NESTED = EQK.liftEq(EQ)
+
+    return TraverseLaws.laws(TF, GA, GEN, EQK) +
       listOf(
         Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GA, EQ_NESTED) },
         Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GA, EQ_NESTED) }
       )
+  }
 
   fun <F> TraverseFilter<F>.identityTraverseFilter(GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =
     forAll(Gen.intSmall().applicative(GA)) { fa: Kind<F, Int> ->

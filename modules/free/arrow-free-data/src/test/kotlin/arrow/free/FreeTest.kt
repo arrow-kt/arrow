@@ -71,7 +71,7 @@ class FreeTest : UnitSpec() {
 
     val G = Gen.int().map(cf) as Gen<Kind<FreePartialOf<ForId>, Int>>
 
-    val EQK = object : EqK<FreePartialOf<ForOps>> {
+    val opsEQK = object : EqK<FreePartialOf<ForOps>> {
       override fun <A> Kind<FreePartialOf<ForOps>, A>.eqK(other: Kind<FreePartialOf<ForOps>, A>, EQ: Eq<A>): Boolean =
         (this.fix() to other.fix()).let {
           Free.eq<ForOps, ForId, A>(IdMonad, idInterpreter).run {
@@ -80,12 +80,21 @@ class FreeTest : UnitSpec() {
         }
     }
 
+    val idEQK = object : EqK<FreePartialOf<ForId>> {
+      override fun <A> Kind<FreePartialOf<ForId>, A>.eqK(other: Kind<FreePartialOf<ForId>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          Free.eq<ForId, ForId, A>(Id.monad(), FunctionK.id()).run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
+
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
-      MonadLaws.laws(Ops, EQK),
-      MonadLaws.laws(Free.monad(), EQK),
+      MonadLaws.laws(Ops, opsEQK),
+      MonadLaws.laws(Free.monad(), opsEQK),
       FoldableLaws.laws(Free.foldable(Id.foldable()), G),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), G, EQ1)
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), G, idEQK)
     )
 
     "Can interpret an ADT as Free operations to Option" {

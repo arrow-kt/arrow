@@ -2,9 +2,11 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Tuple2
+import arrow.core.extensions.eq
 import arrow.core.toT
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -13,9 +15,9 @@ object DivideLaws {
   fun <F> laws(
     DF: Divide<F>,
     G: Gen<Kind<F, Int>>,
-    EQ: Eq<Kind<F, Int>>
-  ): List<Law> = ContravariantLaws.laws(DF, G, EQ) + listOf(
-    Law("Divide laws: Associative") { DF.associative(G, EQ) }
+    EQK: EqK<F>
+  ): List<Law> = ContravariantLaws.laws(DF, G, EQK) + listOf(
+    Law("Divide laws: Associative") { DF.associative(G, EQK.liftEq(Int.eq())) }
   )
 
   fun <A> delta(a: A): Tuple2<A, A> = a toT a

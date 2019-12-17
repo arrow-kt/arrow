@@ -28,7 +28,7 @@ object SemialignLaws {
   ): List<Law> {
     val intGen = GENK.genK(Gen.int())
 
-    return FunctorLaws.laws(SA, intGen, EQK.liftEq(Int.eq())) + listOf(
+    return FunctorLaws.laws(SA, intGen, EQK) + listOf(
       Law("Semialign Laws: idempotency") { SA.semialignIdempotency(intGen, EQK.liftEq(iorEq1)) },
       Law("Semialign Laws: commutativity") { SA.semialignCommutativity(intGen, EQK.liftEq(iorEq1)) },
       Law("Semialign Laws: associativity") { SA.semialignAssociativity(intGen, EQK.liftEq(iorEq2)) },

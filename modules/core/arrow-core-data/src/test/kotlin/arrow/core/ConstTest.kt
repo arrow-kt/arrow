@@ -32,7 +32,7 @@ class ConstTest : UnitSpec() {
         TraverseFilterLaws.laws(Const.traverseFilter(),
           Const.applicative(this),
           Gen.genConst<Int, Int>(Gen.int()) as Gen<Kind<ConstPartialOf<Int>, Int>>,
-          Eq.any()),
+          EQK(Int.eq())),
         ApplicativeLaws.laws(Const.applicative(this), EQK(Int.eq())),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
         ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))

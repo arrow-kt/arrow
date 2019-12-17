@@ -19,7 +19,7 @@ object AlternativeLaws {
   ): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return ApplicativeLaws.laws(AF, EQK) + MonoidKLaws.laws(AF, AF, EQ) + listOf(
+    return ApplicativeLaws.laws(AF, EQK) + MonoidKLaws.laws(AF, AF, EQK) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
       Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) },

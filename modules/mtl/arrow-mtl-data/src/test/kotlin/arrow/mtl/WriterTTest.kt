@@ -70,6 +70,16 @@ class WriterTTest : UnitSpec() {
       }
   }
 
+  fun constEQK() = object : EqK<WriterTPartialOf<ConstPartialOf<Int>, Int>> {
+    override fun <A> Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, A>.eqK(other: Kind<WriterTPartialOf<ConstPartialOf<Int>, Int>, A>, EQ: Eq<A>): Boolean =
+      this.value().value() == other.value().value()
+  }
+
+  fun listEQK() = object : EqK<WriterTPartialOf<ForListK, Int>> {
+    override fun <A> Kind<WriterTPartialOf<ForListK, Int>, A>.eqK(other: Kind<WriterTPartialOf<ForListK, Int>, A>, EQ: Eq<A>): Boolean =
+      this.value() == other.value()
+  }
+
   init {
 
     val cf: (Int) -> WriterT<Kind<ForConst, Int>, Int, Int> = { WriterT(it.const()) }
@@ -85,20 +95,22 @@ class WriterTTest : UnitSpec() {
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         g,
-        Eq { a, b -> a.value().value() == b.value().value() }
+        constEQK()
       ),
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), ioEQK()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
         WriterT.applicative(ListK.monad(), Int.monoid()),
-        Eq { a, b -> a.value() == b.value() }),
+        listEQK()
+      ),
 
       MonadWriterLaws.laws(WriterT.monad(Option.monad(), Int.monoid()),
         WriterT.monadWriter(Option.monad(), Int.monoid()),
         Int.monoid(),
         Gen.intSmall(),
         Gen.tuple2(Gen.intSmall(), Gen.intSmall()),
-        optionEQK(), Int.eq()
+        optionEQK(),
+        Int.eq()
       ),
 
       MonadFilterLaws.laws(

@@ -25,7 +25,7 @@ object FunctorFilterLaws {
   fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(FFF, GEN, EQ) + listOf(
+    return FunctorLaws.laws(FFF, GEN, EQK) + listOf(
       Law("Functor Filter: filterMap composition") { FFF.filterMapComposition(GEN, EQ) },
       Law("Functor Filter: filterMap map consistency") { FFF.filterMapMapConsistency(GEN, EQ) },
       Law("Functor Filter: flattenOption filterMap consistency") { FFF.flattenOptionConsistentWithfilterMap(GEN, EQ) },

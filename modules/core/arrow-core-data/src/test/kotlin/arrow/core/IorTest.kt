@@ -53,7 +53,7 @@ class IorTest : UnitSpec() {
       TraverseLaws.laws(Ior.traverse(),
         Ior.applicative(Int.semigroup()),
         Gen.ior(Gen.int(), Gen.int()).filter { it is Right } as Gen<Kind<IorPartialOf<Int>, Int>>,
-        Ior.eq(Int.eq(), Int.eq()) as Eq<Kind<IorPartialOf<Int>, Int>>
+        Ior.eqK(Int.eq())
       ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),

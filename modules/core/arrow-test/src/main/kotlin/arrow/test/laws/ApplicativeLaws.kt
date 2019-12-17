@@ -16,7 +16,7 @@ object ApplicativeLaws {
   fun <F> laws(A: Applicative<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQ) + listOf(
+    return FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQK) + listOf(
       Law("Applicative Laws: ap identity") { A.apIdentity(EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
       Law("Applicative Laws: interchange") { A.interchange(EQ) },

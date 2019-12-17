@@ -32,6 +32,7 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
@@ -48,9 +49,13 @@ class CofreeTest : UnitSpec() {
     }
     val g = Gen.int().map(cf) as Gen<Kind<Kind<ForCofree, ForOption>, Int>>
 
-    testLaws(ComonadLaws.laws(Cofree.comonad(), g, Eq { a, b ->
-      a.fix().run().fix() == b.fix().run().fix()
-    }))
+    val eqk = object : EqK<CofreePartialOf<ForOption>> {
+      override fun <A> Kind<CofreePartialOf<ForOption>, A>.eqK(other: Kind<CofreePartialOf<ForOption>, A>, EQ: Eq<A>): Boolean {
+        return this.fix().run() == other.fix().run().fix()
+      }
+    }
+
+    testLaws(ComonadLaws.laws(Cofree.comonad(), g, eqk))
 
     "tailForced should evaluate and return" {
       val sideEffect = SideEffect()

@@ -3,7 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.Either
 import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForOption
@@ -45,20 +44,11 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class KleisliTest : UnitSpec() {
-  private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
-    a.run(1) == b.run(1)
-  }
 
-  private fun <A> ConestTryEQ(): Eq<Kind<Conested<Kind<ForKleisli, ForTry>, A>, Int>> = Eq { a, b ->
-    a.counnest().run(1) == b.counnest().run(1)
-  }
-
-  private fun IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
-  }
-
-  private fun IOEitherEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
+  private fun conestTryEQK() = object : EqK<Conested<Kind<ForKleisli, ForTry>, Int>> {
+    override fun <A> Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>.eqK(other: Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>, EQ: Eq<A>): Boolean {
+      return this.counnest().run(1) == other.counnest().run(1)
+    }
   }
 
   init {
@@ -89,6 +79,13 @@ class KleisliTest : UnitSpec() {
         }
     }
 
+    val constEQK = object : EqK<KleisliPartialOf<ConstPartialOf<Int>, Int>> {
+      override fun <A> Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, A>.eqK(other: Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let { (a, b) ->
+          a.run(1).value() == b.run(1).value()
+        }
+    }
+
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
@@ -100,11 +97,11 @@ class KleisliTest : UnitSpec() {
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         ioEQK
       ),
-      ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
+      ContravariantLaws.laws(Kleisli.contravariant(), Gen.int().map { Kleisli { x: Int -> Try.just(x) }.conest() }, conestTryEQK()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         g,
-        Eq { a, b -> a.run(1).value() == b.run(1).value() }
+        constEQK
       ),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), tryEQK)
     )

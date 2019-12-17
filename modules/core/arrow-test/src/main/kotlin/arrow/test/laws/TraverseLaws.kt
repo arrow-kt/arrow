@@ -56,16 +56,19 @@ object TraverseLaws {
   */
 
   fun <F> laws(TF: Traverse<F>, FF: Functor<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(TF, FF, GENK.genK(Gen.intSmall()), EQK.liftEq(Int.eq()))
+    laws(TF, FF, GENK.genK(Gen.intSmall()), EQK)
 
-  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    FoldableLaws.laws(TF, GEN) +
-      FunctorLaws.laws(FF, GEN, EQ) + listOf(
+  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return FoldableLaws.laws(TF, GEN) +
+      FunctorLaws.laws(FF, GEN, EQK) + listOf(
       Law("Traverse Laws: Identity") { TF.identityTraverse(FF, GEN, EQ) },
       Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
       Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
       Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) }
     )
+  }
 
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
     val idApp = this

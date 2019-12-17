@@ -77,11 +77,18 @@ class EitherTTest : UnitSpec() {
           }
         }
     }
+
+    val constEQK = object : EqK<EitherTPartialOf<ConstPartialOf<Int>, Int>> {
+      override fun <A> Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, A>.eqK(other: Kind<EitherTPartialOf<ConstPartialOf<Int>, Int>, A>, EQ: Eq<A>): Boolean {
+        return this.value().value() == other.value().value()
+      }
+    }
+
     testLaws(
       DivisibleLaws.laws(
         EitherT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         g,
-        Eq { a, b -> a.value().value() == b.value().value() }
+        constEQK
       ),
       AlternativeLaws.laws(
         EitherT.alternative(Id.monad(), Int.monoid()),
@@ -90,11 +97,12 @@ class EitherTTest : UnitSpec() {
         idEQK
       ),
       AsyncLaws.laws(EitherT.async(IO.async()), ioEQK),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), genId, Eq.any()),
+      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), genId, idEQK),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),
         GEN() as Gen<Kind<EitherTPartialOf<ForId, Int>, Int>>,
-        Eq.any())
+        idEQK
+      )
     )
 
     "mapLeft should alter left instance only" {

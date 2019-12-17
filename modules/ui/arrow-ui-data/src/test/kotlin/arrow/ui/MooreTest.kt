@@ -1,9 +1,11 @@
 package arrow.ui
 
+import arrow.Kind
 import arrow.core.Id
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.ui.extensions.moore.comonad.comonad
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
@@ -16,8 +18,10 @@ class MooreTest : UnitSpec() {
     val intMoore: (Int) -> MooreOf<Int, Int> = { x: Int -> Moore(x, ::handle) }
     val g = Gen.int().map(intMoore)
 
-    val EQ = Eq<MooreOf<Int, Int>> { a, b ->
-      a.fix().extract() == b.fix().extract()
+    val EQ = object : EqK<MoorePartialOf<Int>> {
+      override fun <A> Kind<MoorePartialOf<Int>, A>.eqK(other: Kind<MoorePartialOf<Int>, A>, EQ: Eq<A>): Boolean {
+        return this.fix().extract() == other.fix().extract()
+      }
     }
 
     testLaws(

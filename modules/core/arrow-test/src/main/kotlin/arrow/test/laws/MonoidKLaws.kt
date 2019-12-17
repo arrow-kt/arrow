@@ -14,16 +14,19 @@ import io.kotlintest.properties.forAll
 object MonoidKLaws {
 
   fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(SGK, GENK.genK(Gen.int()), EQK.liftEq(Int.eq()))
+    laws(SGK, GENK.genK(Gen.int()), EQK)
 
-  fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    laws(SGK, Gen.int().map { AP.just(it) }, EQ)
+  fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
+    laws(SGK, Gen.int().map { AP.just(it) }, EQK)
 
-  fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    SemigroupKLaws.laws(SGK, GEN, EQ) + listOf(
+  fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return SemigroupKLaws.laws(SGK, GEN, EQK) + listOf(
       Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(GEN, EQ) },
       Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
       Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) })
+  }
 
   fun <F> MonoidK<F>.monoidKLeftIdentity(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(GEN) { fa: Kind<F, Int> ->

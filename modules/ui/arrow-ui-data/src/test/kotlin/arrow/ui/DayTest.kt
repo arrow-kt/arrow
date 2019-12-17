@@ -39,7 +39,7 @@ class DayTest : UnitSpec() {
 
     testLaws(
       ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQK),
-      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQ)
+      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQK)
     )
 
     val get: (Int, Int) -> Tuple2<Int, Int> = { left, right -> Tuple2(left, right) }
