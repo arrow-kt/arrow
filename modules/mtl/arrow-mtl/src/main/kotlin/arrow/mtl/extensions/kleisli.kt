@@ -164,10 +164,6 @@ interface KleisliApplicativeError<F, D, E> : ApplicativeError<KleisliPartialOf<F
 
   override fun <A> raiseError(e: E): Kleisli<F, D, A> =
     Kleisli.raiseError(AE(), e)
-
-  override fun <A> KleisliOf<F, D, A>.attempt(): Kleisli<F, D, Either<E, A>> = AE().run {
-    Kleisli { r -> run(r).attempt() }
-  }
 }
 
 @extension
