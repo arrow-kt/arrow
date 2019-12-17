@@ -21,8 +21,10 @@ import arrow.core.fix
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.mtl.eithert.async.async
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.eithert.alternative.alternative
@@ -62,7 +64,7 @@ class EitherTTest : UnitSpec() {
           a.value().fix() == b.value().fix()
         }
       ),
-      AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
+      AsyncLaws.laws(EitherT.async(IO.async()), EitherT.functor<ForIO, Throwable>(IO.functor()), EitherT.applicative<ForIO, Throwable>(IO.applicative()), EQ(), EQ()),
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),

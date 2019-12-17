@@ -7,7 +7,9 @@ import arrow.test.generators.applicativeError
 import arrow.test.generators.fatalThrowable
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadError
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -16,8 +18,15 @@ import io.kotlintest.shouldThrowAny
 
 object MonadErrorLaws {
 
-  fun <F> laws(M: MonadError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
-    MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
+  fun <F> laws(
+    M: MonadError<F, Throwable>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
+    EQERR: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQ: Eq<Kind<F, Int>> = EQERR
+  ): List<Law> =
+    MonadLaws.laws(M, FF, AP, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQERR) },
       Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQERR) },
       Law("Monad Error Laws: NonFatal is caught") { M.monadErrorCatchesNonFatalThrowables(EQERR) },

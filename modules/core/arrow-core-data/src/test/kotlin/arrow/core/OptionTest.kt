@@ -10,6 +10,7 @@ import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.foldable.foldable
+import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadFilter.monadFilter
@@ -60,13 +61,12 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
+      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
-      MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
       EqKLaws.laws(

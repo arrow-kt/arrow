@@ -10,7 +10,9 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -19,12 +21,14 @@ object MonadDeferLaws {
 
   fun <F> laws(
     SC: MonadDefer<F>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     EQERR: Eq<Kind<F, Int>> = EQ,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) + listOf(
+    BracketLaws.laws(SC, FF, AP, EQ, EQ_EITHER, EQERR) + listOf(
       Law("MonadDefer laws: later constant equals pure") { SC.delayConstantEqualsPure(EQ) },
       Law("MonadDefer laws: later throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
       Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },

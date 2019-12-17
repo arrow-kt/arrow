@@ -20,12 +20,16 @@ import arrow.core.some
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.bracket.bracket
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.mtl.kleisli.bracket.bracket
 import arrow.mtl.extensions.kleisli.alternative.alternative
+import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
+import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
@@ -67,6 +71,8 @@ class KleisliTest : UnitSpec() {
       ),
       BracketLaws.laws(
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
+        Kleisli.functor<ForIO, Int>(IO.functor()),
+        Kleisli.applicative<ForIO, Int>(IO.applicative()),
         EQ = IOEQ(),
         EQ_EITHER = IOEitherEQ(),
         EQERR = IOEQ()
@@ -76,8 +82,7 @@ class KleisliTest : UnitSpec() {
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         { Kleisli { it.const() } },
         Eq { a, b -> a.run(1).value() == b.run(1).value() }
-      ),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())
+      )
     )
 
     "andThen should continue sequence" {

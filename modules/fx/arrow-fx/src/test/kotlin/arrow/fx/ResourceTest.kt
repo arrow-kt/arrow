@@ -7,6 +7,7 @@ import arrow.core.extensions.list.traverse.traverse
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.bracket.bracket
 import arrow.fx.extensions.resource.applicative.applicative
+import arrow.fx.extensions.resource.functor.functor
 import arrow.fx.extensions.resource.monad.monad
 import arrow.fx.extensions.resource.monoid.monoid
 import arrow.fx.typeclasses.seconds
@@ -28,7 +29,7 @@ class ResourceTest : UnitSpec() {
     }
 
     testLaws(
-      MonadLaws.laws(Resource.monad(IO.bracket()), EQ),
+      MonadLaws.laws(Resource.monad(IO.bracket()), Resource.functor(IO.bracket()), Resource.applicative(IO.bracket()), EQ),
       MonoidLaws.laws(Resource.monoid(Int.monoid(), IO.bracket()), Gen.int().map { Resource.just(it, IO.bracket()) }, EQ)
     )
 

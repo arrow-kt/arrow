@@ -1,9 +1,11 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -14,12 +16,14 @@ object BimonadLaws {
     BF: Bimonad<F>,
     M: Monad<F>,
     CM: Comonad<F>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
     f: (Int) -> Kind<F, Int>,
     EQ1: Eq<Kind<F, Int>>,
     EQ2: Eq<Kind<F, Kind<F, Int>>>,
     EQ3: Eq<Int>
   ): List<Law> =
-    MonadLaws.laws(M, EQ1) +
+    MonadLaws.laws(M, FF, AP, EQ1) +
       ComonadLaws.laws(CM, f, EQ1) +
       listOf(
         Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ3) },

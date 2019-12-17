@@ -21,13 +21,16 @@ import arrow.core.fix
 import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.mtl.optiont.async.async
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
+import arrow.mtl.extensions.optiont.functor.functor
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
@@ -82,7 +85,13 @@ class OptionTTest : UnitSpec() {
       }
 
     testLaws(
-      AsyncLaws.laws(OptionT.async(IO.async()), IOEQ(), IOEitherEQ()),
+      AsyncLaws.laws(
+        OptionT.async(IO.async()),
+        OptionT.functor(IO.functor()),
+        OptionT.applicative(IO.applicative()),
+        IOEQ(),
+        IOEitherEQ()
+      ),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),

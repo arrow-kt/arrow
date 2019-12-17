@@ -4,7 +4,9 @@ import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
 import arrow.fx.reactor.extensions.fx
+import arrow.fx.reactor.extensions.monok.applicative.applicative
 import arrow.fx.reactor.extensions.monok.async.async
+import arrow.fx.reactor.extensions.monok.functor.functor
 import arrow.fx.reactor.extensions.monok.monad.flatMap
 import arrow.fx.reactor.extensions.monok.timer.timer
 import arrow.fx.reactor.k
@@ -56,7 +58,7 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
 

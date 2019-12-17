@@ -19,7 +19,9 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -31,13 +33,15 @@ object ConcurrentLaws {
 
   fun <F> laws(
     CF: Concurrent<F>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     EQ_UNIT: Eq<Kind<F, Unit>>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
-    AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
+    AsyncLaws.laws(CF, FF, AP, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },

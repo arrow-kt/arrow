@@ -12,7 +12,9 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext
@@ -24,11 +26,13 @@ object AsyncLaws {
 
   fun <F> laws(
     AC: Async<F>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, EQ, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
+    MonadDeferLaws.laws(AC, FF, AP, EQ, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },

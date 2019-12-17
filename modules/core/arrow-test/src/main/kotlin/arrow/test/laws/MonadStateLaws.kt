@@ -3,14 +3,16 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadState
 import arrow.test.generators.intSmall
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadStateLaws {
 
-  fun <F> laws(M: MonadState<F, Int>, EQ: Eq<Kind<F, Int>>, EQUnit: Eq<Kind<F, Unit>>): List<Law> =
-    MonadLaws.laws(M, EQ) + listOf(
+  fun <F> laws(M: MonadState<F, Int>, FF: Functor<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>, EQUnit: Eq<Kind<F, Unit>>): List<Law> =
+    MonadLaws.laws(M, FF, AP, EQ) + listOf(
       Law("Monad State Laws: idempotence") { M.monadStateGetIdempotent(EQ) },
       Law("Monad State Laws: set twice eq to set once the last element") { M.monadStateSetTwice(EQUnit) },
       Law("Monad State Laws: set get") { M.monadStateSetGet(EQ) },

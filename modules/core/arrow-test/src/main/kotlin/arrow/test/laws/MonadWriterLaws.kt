@@ -3,7 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.mtl.typeclasses.MonadWriter
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
@@ -15,12 +17,14 @@ object MonadWriterLaws {
     MF: Monad<F>,
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
+    FF: Functor<F>,
+    AP: Applicative<F>,
     genW: Gen<W>,
     genTupleWA: Gen<Tuple2<W, Int>>,
     EqInt: Eq<Kind<F, Int>>,
     EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>
   ): List<Law> =
-    MonadLaws.laws(MF, EqInt) + listOf(
+    MonadLaws.laws(MF, FF, AP, EqInt) + listOf(
       Law("Monad Writer Laws: writer just") { MW.monadWriterWriterJust(MOW, EqInt) },
       Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW) },
       Law("Monad Writer Laws: listen just") { MW.monadWriterListenJust(MOW, EqTupleWA) },
