@@ -21,7 +21,6 @@ import arrow.test.laws.AsyncLaws.continueOn
 import arrow.test.laws.AsyncLaws.continueOnComprehension
 import arrow.test.laws.AsyncLaws.effectCanCallSuspend
 import arrow.test.laws.AsyncLaws.effectEquivalence
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

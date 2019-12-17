@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.test.laws.BimonadLaws.coflatMapComposition
 import arrow.test.laws.BimonadLaws.extractFlatMap
 import arrow.test.laws.BimonadLaws.extractIsIdentity
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad

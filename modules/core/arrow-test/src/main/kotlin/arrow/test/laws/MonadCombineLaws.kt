@@ -1,7 +1,6 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.Eq

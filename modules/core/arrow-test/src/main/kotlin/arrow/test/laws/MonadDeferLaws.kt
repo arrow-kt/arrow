@@ -25,7 +25,6 @@ import arrow.test.laws.MonadDeferLaws.stackSafetyOnRepeatedMaps
 import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedAttempts
 import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedLeftBinds
 import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedRightBinds
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

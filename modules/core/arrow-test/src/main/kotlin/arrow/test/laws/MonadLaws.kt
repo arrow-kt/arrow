@@ -8,7 +8,6 @@ import arrow.mtl.Kleisli
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

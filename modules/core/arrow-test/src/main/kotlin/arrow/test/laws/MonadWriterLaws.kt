@@ -7,7 +7,6 @@ import arrow.test.laws.MonadWriterLaws.monadWriterListenJust
 import arrow.test.laws.MonadWriterLaws.monadWriterListenWriter
 import arrow.test.laws.MonadWriterLaws.monadWriterTellFusion
 import arrow.test.laws.MonadWriterLaws.monadWriterWriterJust
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

@@ -13,7 +13,6 @@ import arrow.test.laws.MonadErrorLaws.monadErrorEnsureConsistency
 import arrow.test.laws.MonadErrorLaws.monadErrorLeftZero
 import arrow.test.laws.MonadErrorLaws.monadErrorRedeemWithPureIsFlatMap
 import arrow.test.laws.MonadErrorLaws.monadErrorThrowsFatalThrowables
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

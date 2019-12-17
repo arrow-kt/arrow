@@ -7,7 +7,6 @@ import arrow.test.laws.MonadStateLaws.monadStateGetIdempotent
 import arrow.test.laws.MonadStateLaws.monadStateGetSet
 import arrow.test.laws.MonadStateLaws.monadStateSetGet
 import arrow.test.laws.MonadStateLaws.monadStateSetTwice
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

@@ -55,7 +55,6 @@ import arrow.test.laws.ConcurrentLaws.releaseBracketIsNotCancelable
 import arrow.test.laws.ConcurrentLaws.startCancelIsUnit
 import arrow.test.laws.ConcurrentLaws.startJoinIsIdentity
 import arrow.test.laws.ConcurrentLaws.uncancelableMirrorsSource
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

@@ -18,7 +18,6 @@ import arrow.test.laws.BracketLaws.bracketPropagatesTransformerEffects
 import arrow.test.laws.BracketLaws.guaranteeCaseIsDerivedFromBracketCase
 import arrow.test.laws.BracketLaws.guaranteeIsDerivedFromBracket
 import arrow.test.laws.BracketLaws.uncancelablePreventsCanceledCase
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

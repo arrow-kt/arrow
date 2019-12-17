@@ -9,7 +9,6 @@ import arrow.test.laws.MonadFilterLaws.monadFilterConsistency
 import arrow.test.laws.MonadFilterLaws.monadFilterEmptyComprehensions
 import arrow.test.laws.MonadFilterLaws.monadFilterLeftEmpty
 import arrow.test.laws.MonadFilterLaws.monadFilterRightEmpty
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
