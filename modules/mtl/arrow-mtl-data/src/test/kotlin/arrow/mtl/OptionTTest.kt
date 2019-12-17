@@ -4,18 +4,20 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
-import arrow.core.ForOption
 import arrow.core.Id
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.const.divisible.divisible
+import arrow.core.extensions.const.eqK.eqK
+import arrow.core.extensions.eq
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.nonemptylist.eq.eq
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.fix
@@ -30,6 +32,7 @@ import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
+import arrow.mtl.extensions.optiont.eqK.eqK
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
@@ -40,7 +43,6 @@ import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
-import arrow.test.generators.intSmall
 import arrow.test.generators.option
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
@@ -57,13 +59,6 @@ import io.kotlintest.properties.forAll
 typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
 
 class OptionTTest : UnitSpec() {
-
-  fun <A> EQK() = object : EqK<OptionTPartialOf<A>> {
-    override fun <B> Kind<OptionTPartialOf<A>, B>.eqK(other: Kind<OptionTPartialOf<A>, B>, EQ: Eq<B>): Boolean =
-      (this.fix() to other.fix()).let {
-        it.first == it.second
-      }
-  }
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
@@ -102,39 +97,42 @@ class OptionTTest : UnitSpec() {
         }
     }
 
+    fun nestedGenk() = object : GenK<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>> =
+        gen.map {
+          OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest()
+        }
+    }
+
     testLaws(
       AsyncLaws.laws(OptionT.async(IO.async()), ioEQK()),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
-        Gen.int().map
-        { OptionT.applicative(Option.monad()).just(it) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
-        EQK()),
+        OptionT.genk(Option.genK()),
+        OptionT.eqK(Option.eqK())),
 
       FunctorFilterLaws.laws(
         ComposedFunctorFilter(OptionT.functorFilter(Id.monad()),
           OptionT.functorFilter(NonEmptyList.monad())),
-        Gen.int().map
-        { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() },
+        nestedGenk(),
         nestedEQK),
 
       MonoidKLaws.laws(
         OptionT.monoidK(Option.monad()),
-        OptionT.applicative(Option.monad()),
-        EQK()),
+        OptionT.genk(Option.genK()),
+        OptionT.eqK(Option.eqK())),
 
       FunctorFilterLaws.laws(
         OptionT.functorFilter(Option.monad()),
-        Gen.int().map
-        { OptionT(Some(Some(it))) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
-        EQK()),
+        OptionT.genk(Option.genK()),
+        OptionT.eqK(Option.eqK())),
 
       TraverseFilterLaws.laws(
         OptionT.traverseFilter(Option.traverseFilter()),
         OptionT.applicative(Option.monad()),
-        Gen.intSmall().map
-        { OptionT(Some(Some(it))) } as Gen<Kind<OptionTPartialOf<ForOption>, Int>>,
-        EQK()
+        OptionT.genk(Option.genK()),
+        OptionT.eqK(Option.eqK())
       ),
 
       DivisibleLaws.laws(
@@ -142,7 +140,7 @@ class OptionTTest : UnitSpec() {
           Const.divisible(Int.monoid())
         ),
         OptionT.genk(Const.genK(Gen.int())),
-        EQK()
+        OptionT.eqK(Const.eqK(Int.eq()))
       )
     )
 

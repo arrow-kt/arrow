@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
@@ -15,6 +16,15 @@ import io.kotlintest.properties.forAll
 
 object TraverseFilterLaws {
 
+  fun <F> laws(
+    TF: TraverseFilter<F>,
+    GA: Applicative<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ): List<Law> =
+    laws(TF, GA, GENK.genK(Gen.int()), EQK)
+
+  @Deprecated("should be internal, use GENK one")
   // FIXME(paco): TraverseLaws cannot receive AP::just due to a crash caused by the inliner. Check in TraverseLaws why.
   fun <F> laws(
     TF: TraverseFilter<F>,
