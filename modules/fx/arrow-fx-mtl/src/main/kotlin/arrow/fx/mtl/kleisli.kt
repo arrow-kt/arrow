@@ -30,22 +30,22 @@ interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliM
 
   override fun ME(): MonadError<F, E> = BF()
 
-  override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
-    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>,
-    use: (A) -> Kind<KleisliPartialOf<F, R>, B>
-  ): Kleisli<F, R, B> =
-    BF().run {
-      Kleisli { r ->
-        this@bracketCase.run(r).bracketCase({ a, br ->
-          release(a, br).run(r)
-        }) { a ->
-          use(a).run(r)
-        }
+  override fun <A, B> KleisliOf<F, R, A>.bracketCase(
+    release: (A, ExitCase<E>) -> KleisliOf<F, R, Unit>,
+    use: (A) -> KleisliOf<F, R, B>
+  ): Kleisli<F, R, B> = BF().run {
+    Kleisli { r ->
+      this@bracketCase.run(r).bracketCase({ a, br ->
+        release(a, br).run(r)
+      }) { a ->
+        use(a).run(r)
       }
     }
+  }
 
-  override fun <A> Kind<KleisliPartialOf<F, R>, A>.uncancelable(): Kleisli<F, R, A> =
-    Kleisli { r -> BF().run { this@uncancelable.run(r).uncancelable() } }
+  override fun <A> KleisliOf<F, R, A>.uncancelable(): Kleisli<F, R, A> = BF().run {
+    Kleisli { r -> this@uncancelable.run(r).uncancelable() }
+  }
 }
 
 @extension
@@ -58,6 +58,18 @@ interface KleisliMonadDefer<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliB
 
   override fun <A> defer(fa: () -> KleisliOf<F, R, A>): Kleisli<F, R, A> = MDF().run {
     Kleisli { r -> defer { fa().run(r) } }
+  }
+
+  override fun <A> KleisliOf<F, R, A>.handleErrorWith(f: (Throwable) -> KleisliOf<F, R, A>): Kleisli<F, R, A> = MDF().run {
+    Kleisli { d -> defer { run(d).handleErrorWith { e -> f(e).run(d) } } }
+  }
+
+  override fun <A, B> KleisliOf<F, R, A>.flatMap(f: (A) -> KleisliOf<F, R, B>): Kleisli<F, R, B> = MDF().run {
+    Kleisli { d -> defer { run(d).flatMap { a -> f(a).run(d) } } }
+  }
+
+  override fun <A> KleisliOf<F, R, A>.uncancelable(): Kleisli<F, R, A> = MDF().run {
+    Kleisli { d -> defer { run(d).uncancelable() } }
   }
 }
 
