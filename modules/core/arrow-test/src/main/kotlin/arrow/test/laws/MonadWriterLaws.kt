@@ -8,6 +8,7 @@ import arrow.test.laws.MonadWriterLaws.monadWriterListenWriter
 import arrow.test.laws.MonadWriterLaws.monadWriterTellFusion
 import arrow.test.laws.MonadWriterLaws.monadWriterWriterJust
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -48,7 +49,7 @@ object MonadWriterLaws {
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     genW: Gen<W>,
     genTupleWA: Gen<Tuple2<W, Int>>,

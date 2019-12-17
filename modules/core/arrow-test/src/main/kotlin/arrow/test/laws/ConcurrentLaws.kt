@@ -56,6 +56,7 @@ import arrow.test.laws.ConcurrentLaws.startCancelIsUnit
 import arrow.test.laws.ConcurrentLaws.startJoinIsIdentity
 import arrow.test.laws.ConcurrentLaws.uncancelableMirrorsSource
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -126,7 +127,7 @@ object ConcurrentLaws {
   fun <F> laws(
     CF: Concurrent<F>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,

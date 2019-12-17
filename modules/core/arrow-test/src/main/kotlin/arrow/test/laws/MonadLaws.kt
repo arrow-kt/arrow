@@ -9,6 +9,7 @@ import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -30,10 +31,10 @@ object MonadLaws {
         Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) }
       )
 
-  fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Applicative<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Apply<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     laws(M, EQ) + listOf(
       Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
-      Law("Monad Laws: monad instance should preserve behavior of Applicative") { M.preservesApplicative(AP, EQ) },
+      Law("Monad Laws: monad instance should preserve behavior of Apply") { M.preservesApply(AP, EQ) },
       Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }
     )
 
@@ -92,7 +93,7 @@ object MonadLaws {
       FF.run { just(num).map(f) }.equalUnderTheLaw(just(num).map(f), EQ)
     }
 
-  fun <F> Monad<F>.preservesApplicative(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Monad<F>.preservesApply(AP: Apply<F>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { num, f ->
       val ff = just(f)
       AP.run { just(num).ap(ff) }.equalUnderTheLaw(just(num).ap(ff), EQ)

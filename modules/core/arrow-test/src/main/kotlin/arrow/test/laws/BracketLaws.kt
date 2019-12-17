@@ -19,6 +19,7 @@ import arrow.test.laws.BracketLaws.guaranteeCaseIsDerivedFromBracketCase
 import arrow.test.laws.BracketLaws.guaranteeIsDerivedFromBracket
 import arrow.test.laws.BracketLaws.uncancelablePreventsCanceledCase
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -55,7 +56,7 @@ object BracketLaws {
   fun <F> laws(
     BF: Bracket<F, Throwable>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,

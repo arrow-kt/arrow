@@ -10,6 +10,7 @@ import arrow.test.laws.MonadFilterLaws.monadFilterEmptyComprehensions
 import arrow.test.laws.MonadFilterLaws.monadFilterLeftEmpty
 import arrow.test.laws.MonadFilterLaws.monadFilterRightEmpty
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -42,7 +43,7 @@ object MonadFilterLaws {
   fun <F> laws(
     MF: MonadFilter<F>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     cf: (Int) -> Kind<F, Int>,
     EQ: Eq<Kind<F, Int>>

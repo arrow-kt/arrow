@@ -26,6 +26,7 @@ import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedAttempts
 import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedLeftBinds
 import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedRightBinds
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -76,7 +77,7 @@ object MonadDeferLaws {
   fun <F> laws(
     SC: MonadDefer<F>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,

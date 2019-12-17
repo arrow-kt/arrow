@@ -22,6 +22,7 @@ import arrow.test.laws.AsyncLaws.continueOnComprehension
 import arrow.test.laws.AsyncLaws.effectCanCallSuspend
 import arrow.test.laws.AsyncLaws.effectEquivalence
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -58,7 +59,7 @@ object AsyncLaws {
   fun <F> laws(
     AC: Async<F>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,

@@ -14,6 +14,7 @@ import arrow.test.laws.MonadErrorLaws.monadErrorLeftZero
 import arrow.test.laws.MonadErrorLaws.monadErrorRedeemWithPureIsFlatMap
 import arrow.test.laws.MonadErrorLaws.monadErrorThrowsFatalThrowables
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadError
@@ -47,7 +48,7 @@ object MonadErrorLaws {
   fun <F> laws(
     M: MonadError<F, Throwable>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQERR: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,

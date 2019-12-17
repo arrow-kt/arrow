@@ -8,6 +8,7 @@ import arrow.test.laws.MonadStateLaws.monadStateGetSet
 import arrow.test.laws.MonadStateLaws.monadStateSetGet
 import arrow.test.laws.MonadStateLaws.monadStateSetTwice
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
@@ -33,7 +34,7 @@ object MonadStateLaws {
   fun <F> laws(
     M: MonadState<F, Int>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     EQ: Eq<Kind<F, Int>>,
     EQUnit: Eq<Kind<F, Unit>>

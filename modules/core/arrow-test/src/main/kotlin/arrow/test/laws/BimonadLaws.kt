@@ -5,6 +5,7 @@ import arrow.test.laws.BimonadLaws.coflatMapComposition
 import arrow.test.laws.BimonadLaws.extractFlatMap
 import arrow.test.laws.BimonadLaws.extractIsIdentity
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
@@ -45,7 +46,7 @@ object BimonadLaws {
     M: Monad<F>,
     CM: Comonad<F>,
     FF: Functor<F>,
-    AP: Applicative<F>,
+    AP: Apply<F>,
     SL: Selective<F>,
     f: (Int) -> Kind<F, Int>,
     EQ1: Eq<Kind<F, Int>>,
