@@ -22,9 +22,9 @@ can be found for examples [in JavaScript](https://github.com/hemanth/functional-
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/arrow/core/option' | relative_url }}),
-branching in code with [`Either`]({{ '/docs/arrow/core/either' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/arrow/core/try' | relative_url }}),
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
+branching in code with [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
+catching exceptions with [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
@@ -199,12 +199,12 @@ listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/arrow/data/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
+[`ListK<A>`]({{ '/docs/arrow/core/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/arrow/core/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
 For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.

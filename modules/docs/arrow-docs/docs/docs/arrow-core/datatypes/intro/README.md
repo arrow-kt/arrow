@@ -45,11 +45,11 @@ We will list all the datatypes available in arrow by the module they belong to, 
 Core contains the datatypes that are also used by the public API of several [typeclasses]({{ '/docs/patterns/glossary/' | relative_url }}),
 so they are always required.
 
-- [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
+- [`Id`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
-- [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
 - [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
@@ -69,7 +69,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### Error handling
 
-- [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
+- [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
 
 - [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 
@@ -77,7 +77,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
 
-- [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
+- [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
 - [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
 
@@ -87,7 +87,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }})
+- [`ListK`]({{ '/docs/arrow/core/listk/' | relative_url }})
 
 - [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }})
 
@@ -97,7 +97,7 @@ These types wrap over some of Kotlin's collections and functions to give them ca
 
 - [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }})
 
-- [`Function0`]({{ '/docs/arrow/core/function0/' | relative_url }})
+- [`Function0`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-function0/' | relative_url }})
 
 - [`Function1`]({{ '/docs/arrow/core/function1/' | relative_url }})
 

@@ -42,7 +42,7 @@ val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
 ```
 
-`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
+`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*

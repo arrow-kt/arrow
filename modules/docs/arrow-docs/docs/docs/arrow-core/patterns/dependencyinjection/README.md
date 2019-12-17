@@ -5,7 +5,7 @@ permalink: /docs/patterns/dependency_injection/
 video: CR5h2Wq1yPE
 ---
 
-If you would like to know about using the [`Reader`]({{ '/docs/arrow/data/reader' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
 If what you want is the example of the video to follow along, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
@@ -84,15 +84,15 @@ And we can call it on the typeclass instances:
 import arrow.core.extensions.*
 import arrow.core.extensions.option.functor.functor
 
-Option.functor().run { 
-  multiplyBy2(Option(1)) 
+Option.functor().run {
+  multiplyBy2(Option(1))
 }
 ```
 
 ```kotlin:ank
 import arrow.core.extensions.`try`.functor.functor
 
-Try.functor().run { 
+Try.functor().run {
   multiplyBy2(Try.just(1))
 }
 ```
@@ -227,7 +227,7 @@ class Parser {
 }
 
 // TEDIOUS AND NOT IDIOMATIC
-ForOption.run { 
+ForOption.run {
   Parser().run { parseInt("123") }
 }
 ```
@@ -499,10 +499,10 @@ class SettingsActivity: Activity {
   override fun onResume() {
     val id = deps.createId("1234")
 
-    user.text = 
+    user.text =
       id.fix().map { it.toString() }.getOrElse { "" }
 
-    friends.text = 
+    friends.text =
       deps.getUserFriends(id).fix().getOrElse { emptyList() }.joinToString()
   }
 }

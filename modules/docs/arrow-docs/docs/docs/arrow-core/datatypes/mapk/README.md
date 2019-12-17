@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: MapK
-permalink: /docs/arrow/data/mapk/
+permalink: /docs/arrow/core/mapk/
 redirect_from:
   - /docs/datatypes/mapk/
 ---
@@ -53,7 +53,7 @@ val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secon
 }
 ```
 
-`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`](https://arrow-kt.io/docs/arrow/core/eval/#eval) type.
+`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval/' | relative_url }}) type.
 
 `ap` function is used when you want to apply map of transformations from `Map<K, (A)-> B>` to `Map<K,A>`, for example:
 

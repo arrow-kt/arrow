@@ -121,7 +121,7 @@ Arrow provides proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
-We use [`Option`](/docs/arrow/core/option) to model the potential absence of a value
+We use [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) to model the potential absence of a value
 
 When using `Option` our previous example may look like:
 
@@ -134,7 +134,7 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/arrow/core/option) if your language supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+It's easy to work with [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) if your language supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/arrow/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
@@ -162,7 +162,7 @@ In the next example we are going to use `Try` to deal with potentially thrown ex
 
 ### Try
 
-We use [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
+We use [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
 
 How would our example look like implemented with `Try`?
 
@@ -223,7 +223,7 @@ We should redefine our functions to express that their result is not just a `Nuk
 
 ### Either
 
-When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
+When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
 
@@ -267,7 +267,7 @@ fun attackEither(): Either<NukeException, Impacted> =
     val (impact) = launch(target, nuke)
     impact
   }
-  
+
 attackEither()
 //Left(MissedByMeters(5))
 ```
@@ -395,10 +395,10 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 
   object ErrorAccumulationStrategy :
     Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
-  
+
   object FailFastStrategy :
     Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
-  
+
   companion object {
     infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
     infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
@@ -428,7 +428,7 @@ Rules accumulateErrors {
 Rules failFast {
   listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
-    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
     FormField("Valid Email Label", "getlost@nowhere.com")
   ).map { it.validateEmail() }
 }
