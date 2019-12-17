@@ -15,6 +15,7 @@ import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.monoid.monoid
 import arrow.core.extensions.id.repeat.repeat
+import arrow.core.extensions.id.selective.selective
 import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
@@ -49,7 +50,7 @@ class IdTest : UnitSpec() {
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
-      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.functor(), Id.applicative(), ::Id, Eq.any(), EQ, Eq.any()),
+      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.functor(), Id.applicative(), Id.selective(), ::Id, Eq.any(), EQ, Eq.any()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(
         Id.eqK(),

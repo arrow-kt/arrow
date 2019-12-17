@@ -16,6 +16,7 @@ import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.repeat.repeat
+import arrow.core.extensions.option.selective.selective
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
@@ -59,7 +60,7 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
+      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), Option.selective(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
