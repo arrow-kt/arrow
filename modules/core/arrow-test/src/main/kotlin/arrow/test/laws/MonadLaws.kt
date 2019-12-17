@@ -1,12 +1,9 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.ap
-import arrow.core.extensions.either.functor.functor
-import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.mtl.Kleisli
 import arrow.test.generators.applicative

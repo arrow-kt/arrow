@@ -1,6 +1,5 @@
 package arrow.fx
 
-import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf

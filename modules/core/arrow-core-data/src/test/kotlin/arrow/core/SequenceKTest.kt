@@ -12,7 +12,6 @@ import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functor.functor
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
-import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
@@ -30,7 +29,6 @@ import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws

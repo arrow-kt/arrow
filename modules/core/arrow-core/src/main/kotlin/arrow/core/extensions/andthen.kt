@@ -22,7 +22,6 @@ import arrow.typeclasses.Profunctor
 import arrow.typeclasses.counnest
 import arrow.typeclasses.conest
 import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Selective
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {

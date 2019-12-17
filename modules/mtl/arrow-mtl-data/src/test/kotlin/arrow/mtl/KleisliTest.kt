@@ -11,7 +11,6 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.const
-import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
@@ -30,13 +29,11 @@ import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.functor.functor
-import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
-import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest

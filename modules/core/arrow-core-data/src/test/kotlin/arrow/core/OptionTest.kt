@@ -13,7 +13,6 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
-import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.repeat.repeat
@@ -31,7 +30,6 @@ import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
-import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.RepeatLaws
