@@ -1,28 +1,35 @@
 package arrow.fx.rx2
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.Right
+import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
+
 import arrow.fx.internal.Platform
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.ExitCase.Canceled
 import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
+typealias MaybeKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias MaybeKProcF<A> = ((Either<Throwable, A>) -> Unit) -> Kind<ForMaybeK, Unit>
 
 class ForMaybeK private constructor() {
   companion object
 }
 typealias MaybeKOf<A> = arrow.Kind<ForMaybeK, A>
-typealias MaybeKKindedJ<A> = io.kindedj.Hk<ForMaybeK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> MaybeKOf<A>.fix(): MaybeK<A> =
@@ -30,9 +37,14 @@ inline fun <A> MaybeKOf<A>.fix(): MaybeK<A> =
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
-fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe
+@Suppress("UNCHECKED_CAST")
+fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe as Maybe<A>
 
-data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
+data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
+
+  suspend fun suspended(): A? = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
+  }
 
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()
@@ -130,9 +142,6 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
-  fun handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
-    maybe.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
-
   fun continueOn(ctx: CoroutineContext): MaybeK<A> =
     maybe.observeOn(ctx.asScheduler()).k()
 
@@ -145,6 +154,11 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
       is Maybe<*> -> this.maybe == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): MaybeK<B> =
+    maybe.flatMap { a ->
+      f(a).fold({ Maybe.empty<B>() }, { b -> Maybe.just(b) })
+    }.k()
 
   override fun hashCode(): Int = maybe.hashCode()
 
@@ -275,7 +289,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
           just(just(Unit))
         }
 
-        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForMaybeK>>?>(null)
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForMaybeK>>?>(null)
         val disp = fa2.value().subscribe({ token ->
           val cancel = cancelOrToken.getAndSet(Right(token))
           cancel?.fold({
@@ -301,3 +315,6 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     }
   }
 }
+
+fun <A> MaybeK<A>.handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
+  value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

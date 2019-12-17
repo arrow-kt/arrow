@@ -109,8 +109,7 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> =
-    { fa: Kind<F, A> -> fa.map(f) }
+  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> = { fa: Kind<F, A> -> fa.map(f) }
 
   /**
    * Discards the [A] value inside [F] signaling this container may be pointing to a noop

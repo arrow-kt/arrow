@@ -12,6 +12,7 @@ import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.test.UnitSpec
+import arrow.test.generators.validated
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
@@ -21,11 +22,9 @@ import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {
@@ -37,8 +36,8 @@ class ValidatedTest : UnitSpec() {
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
     testLaws(
-      EqLaws.laws(EQ) { Valid(it) },
-      ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
+      EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
+      ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Eq.any()),
       TraverseLaws.laws(Validated.traverse(), Validated.functor(), ::Valid, Eq.any()),
       SemigroupKLaws.laws(

@@ -1,14 +1,14 @@
 docVersions:
 
-    - title: "v0.8.2"
-      url: https://0-8-2.arrow-kt.io/
-      previous: https://0-8-0.arrow-kt.io/
-
     - title: "v0.9.0"
-      url: https://arrow-kt.io/
+      url: https://0-9-0.arrow-kt.io/
       previous: https://0-8-2.arrow-kt.io/
 
-    - title: "v0.10.0"
+    - title: "v0.10.3"
+      url: https://arrow-kt.io/
+      previous: https://0-9-0.arrow-kt.io/
+
+    - title: "v0.10.4-SNAPSHOT"
       url: https://next.arrow-kt.io/
       previous: https://arrow-kt.io/
 

@@ -6,9 +6,9 @@ import arrow.core.Some
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
 import arrow.core.toT
-import arrow.core.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -84,7 +84,9 @@ sealed class SnippetParserState {
 
 val interpreter: AnkOps = object : AnkOps {
 
-  override suspend fun printConsole(msg: String): Unit = println(msg)
+  override suspend fun printConsole(msg: String): Unit {
+    println(msg)
+  }
 
   private fun Path.containsAnkSnippets(): Boolean =
     toFile().bufferedReader().use {
@@ -130,8 +132,8 @@ val interpreter: AnkOps = object : AnkOps {
     val result: Tuple3<SnippetParserState, Sequence<String>, Sequence<Snippet>> =
       content
         .fold(
-          Tuple3(SnippetParserState.Searching, emptySequence(), emptySequence())
-        ) { (state, lines, snippets), line ->
+          Tuple3(SnippetParserState.Searching as SnippetParserState, emptySequence(), emptySequence())
+        ) { (state: SnippetParserState, lines, snippets), line ->
           when (state) {
             is SnippetParserState.Searching -> {
               val startMatch = fenceRegexStart.matchEntire(line)
@@ -223,7 +225,8 @@ val interpreter: AnkOps = object : AnkOps {
           if (snippet.isPlayground)
             snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```")
           else
-            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```") },
+            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```")
+        },
         {
           when {
             // these are extensions declared in type classes that should be removed since the extension generator

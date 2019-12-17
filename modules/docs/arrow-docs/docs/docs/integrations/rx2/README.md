@@ -200,7 +200,6 @@ import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.ForFlowableK
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.extensions.flowablek.monad.monad
-import arrow.free.run
 import arrow.free.stackSafe
 
 fun main() {

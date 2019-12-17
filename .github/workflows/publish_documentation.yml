@@ -1,0 +1,58 @@
+name: Publish Documentation
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  publish_documentation:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        architecture: x64
+    - name: Dokka
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+      run: |
+        set -ex
+        ./gradlew dokka
+    - name: Run Ank
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+      run: |
+        set -ex
+        ./gradlew :arrow-docs:runAnk
+    - name: Deploy
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+        BUNDLE_GEMFILE: modules/docs/arrow-docs/Gemfile
+        JEKYLL_ENV: production
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      run: |
+        set -ex
+        sudo pip install awscli
+        aws --version
+        sudo apt-get update
+        sudo apt-get install ruby-dev
+        sudo gem install bundler --force
+        sudo gem update --system
+        gem --version
+        echo "$( gem list | grep bundler )"
+        bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+        MAYOR_MINOR_VERSION=$(grep -e "^VERSION_NAME=.*$" gradle.properties | cut -d= -f2 | cut -d. -f1-2)
+        echo $MAYOR_MINOR_VERSION
+        # bundle exec jekyll build --baseurl /$MAYOR_MINOR_VERSION -s docs -d docs/build/_site
+        bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
+        echo "Publish in S3..."
+        # Waiting for AWS configuration to active this part:
+        # aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET/$MAYOR_MINOR_VERSION > aws_sync_jekyll.log
+        aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET > aws_sync_jekyll.log

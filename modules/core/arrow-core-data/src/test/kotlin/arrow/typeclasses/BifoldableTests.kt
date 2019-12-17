@@ -6,12 +6,11 @@ import arrow.core.Eval
 import arrow.core.ForEither
 import arrow.core.Right
 import arrow.core.fix
+import arrow.mtl.typeclasses.binest
+import arrow.mtl.typeclasses.compose
 import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class BifoldableTests : UnitSpec() {
   init {
 

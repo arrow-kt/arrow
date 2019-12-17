@@ -18,7 +18,7 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
 
   fun tailForced(): CofreeEval<S, A> = tail.value()
 
-  inline fun <B> transform(f: (A) -> B, noinline g: (Cofree<S, A>) -> Cofree<S, B>): Cofree<S, B> = Cofree(FS, f(head), tail.map { it.map(g) })
+  fun <B> transform(f: (A) -> B, g: (Cofree<S, A>) -> Cofree<S, B>): Cofree<S, B> = Cofree(FS, f(head), tail.map { it.map(g) })
 
   fun <B> map(f: (A) -> B): Cofree<S, B> = transform(f) { it.map(f) }
 

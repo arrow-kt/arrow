@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.KModifier.OUT
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName
@@ -49,8 +50,6 @@ fun generateCoproducts(destination: File) {
     FileSpec.builder("arrow.generic.coproduct$size", "Coproduct$size")
       .apply {
         addCoproductClassDeclaration(generics)
-        addCoproductOfConstructors(generics)
-        addCopExtensionConstructors(generics)
         addExtensionConstructors(generics)
         addSelectFunctions(generics)
         addFoldFunction(generics)
@@ -67,7 +66,7 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
         "Represents a sealed hierarchy of ${generics.size} types where only one of the types is actually present.\n"
       )
       .addModifiers(KModifier.SEALED)
-      .addTypeVariables(generics.map { TypeVariableName(it) })
+      .addTypeVariables(generics.map { TypeVariableName(it, variance = OUT) })
       .build()
   )
 
@@ -90,57 +89,6 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
             .addParameter(generic.toLowerCase(), TypeVariableName(generic))
             .build()
         )
-        .build()
-    )
-  }
-}
-
-private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>) {
-  for (generic in generics) {
-    val additionalParameterCount = generics.indexOf(generic)
-    val typeParameters = generics.joinToString(separator = ",·")
-    val replacementClassName = genericsToClassNames[generic]
-
-    addFunction(
-      FunSpec.builder("coproductOf")
-        .addAnnotation(
-          AnnotationSpec.builder(Deprecated::class)
-            .addMember("message = \"This has issues with type inference, use $replacementClassName() instead\",\n" +
-              "replaceWith = ReplaceWith(\"$replacementClassName<$typeParameters>(${generic.toLowerCase()})\"," +
-              " \"arrow.generic.coproduct${generics.size}.$replacementClassName\")\n")
-            .build()
-        )
-        .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
-        .addTypeVariables(generics.toTypeParameters())
-        .addParameter(generic.toLowerCase(), TypeVariableName(generic))
-        .addParameters(additionalParameterSpecs(additionalParameterCount))
-        .addStatement("return ${genericsToClassNames[generic]}(${generic.toLowerCase()})")
-        .returns(parameterizedCoproductNClassName(generics))
-        .build()
-    )
-  }
-}
-
-private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>) {
-  for (generic in generics) {
-    val additionalParameterCount = generics.indexOf(generic)
-    val typeParameters = generics.joinToString(separator = ",·")
-    val replacementFunctionName = genericsToClassNames[generic]!!.toCamelCase()
-
-    addFunction(
-      FunSpec.builder("cop")
-        .addAnnotation(
-          AnnotationSpec.builder(Deprecated::class)
-            .addMember("message = \"This has issues with type inference, use .$replacementFunctionName() instead\",\n" +
-              "replaceWith = ReplaceWith(\"this.$replacementFunctionName<$typeParameters>()\")\n")
-            .build()
-        )
-        .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
-        .receiver(TypeVariableName(generic))
-        .addTypeVariables(generics.toTypeParameters())
-        .addParameters(additionalParameterSpecs(additionalParameterCount))
-        .addStatement("return coproductOf<$typeParameters>(this)")
-        .returns(parameterizedCoproductNClassName(generics))
         .build()
     )
   }

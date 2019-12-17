@@ -1,48 +1,49 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.Const
+import arrow.core.ConstPartialOf
 import arrow.core.Either
+import arrow.core.ForListK
 import arrow.core.ForOption
+import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.ForListK
-import arrow.core.ListK
+import arrow.core.const
 import arrow.core.extensions.const.divisible.divisible
+import arrow.core.extensions.listk.monad.monad
+import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.alternative.alternative
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.monad
+import arrow.core.extensions.option.monadFilter.monadFilter
+import arrow.core.fix
+import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.mtl.writert.async.async
-import arrow.core.extensions.listk.monad.monad
-import arrow.core.extensions.listk.monoidK.monoidK
-import arrow.core.extensions.option.monad.monad
-import arrow.core.fix
+import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
 import arrow.mtl.extensions.writert.monad.monad
-import arrow.mtl.extensions.writert.monoidK.monoidK
-import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
+import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
+import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
-import arrow.typeclasses.const
-import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class WriterTTest : UnitSpec() {
 
   private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
@@ -56,6 +57,12 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
+      AlternativeLaws.laws(
+        WriterT.alternative(Int.monoid(), Option.alternative()),
+        { i -> WriterT.just(Option.applicative(), Int.monoid(), i) },
+        { i -> WriterT.just(Option.applicative(), Int.monoid(), { j: Int -> i + j }) },
+        Eq { a, b -> a.value() == b.value() }
+      ),
       DivisibleLaws.laws(
         WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         { WriterT(it.const()) },

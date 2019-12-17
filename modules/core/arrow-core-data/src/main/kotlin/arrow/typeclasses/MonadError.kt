@@ -137,13 +137,6 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
       override val ME: MonadThrow<F> = this@MonadThrow
     }
 
-  @Deprecated(
-    "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monadThrow")
-  )
-  fun <B> bindingCatch(c: suspend MonadThrowSyntax<F>.() -> B): Kind<F, B> =
-    fx.monadThrow(c)
-
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
     if (NonFatal(this)) raiseError(this) else throw this
 }

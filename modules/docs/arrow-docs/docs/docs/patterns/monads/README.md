@@ -232,7 +232,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 Let me do one further trick and format the same code in an unusual way:
 
 ```kotlin
-fun allCitiesToVisit(Speaker speaker): List<City> {
+fun allCitiesToVisit(speaker: Speaker): List<City> {
     return
         speaker
         .getTalks()           .flatMap { x -> x
@@ -675,7 +675,7 @@ monadicValue.flatMap { x -> just(x) } == monadicValue
 // Given
 val m: Kind<F, T>
 val f: (T) -> Kind<F, U>
-val g: (T) -> Kind<F, V>
+val g: (U) -> Kind<F, V>
 
 // Then (== means both parts are equivalent)
 m.flatMap(f).flatMap(g) == m.flatMap { a -> f(a).flatMap(g) }

@@ -1,10 +1,10 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core-data/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
+[![Latest snapshot](https://img.shields.io/maven-metadata/v?color=%230576b6&label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
+[![Release Status](https://github.com/arrow-kt/arrow/workflows/Release/badge.svg)](https://github.com/arrow-kt/arrow/actions?query=workflow%3ARelease+branch%3Amaster)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)]( http://stackoverflow.com/questions/tagged/arrow-kt )
 
 
@@ -28,7 +28,7 @@ Use the list below to learn more about Λrrow's main features.
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
 
-#### Join Us
+## Join Us
 
 Arrow is an inclusive community powered by awesome individuals like you. As an actively growing ecosystem, Arrow and its associated libraries and toolsets are in need of new contributors! We have issues suited for all levels, from entry to advanced, and our maintainers are happy to provide 1:1 mentoring. All are welcome in Arrow.
 
@@ -38,11 +38,27 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 - [#Arrow on Kotlin Slack](https://kotlinlang.slack.com/)
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
-# Basic Setup
+## Setup
+
+### Next development version
+
+If you want to try the last features, replace `0.10.3` by `0.10.4-SNAPSHOT` in the following guideline.
+
+### JDK
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-Add this in your root `build.gradle` at the end of repositories.
+### Android
+
+Arrow supports Android out of the box starting on API 21 and up.
+
+We'll be working on a Arrow-Android integration module that adds some helpers and integrations.
+
+### Gradle
+
+#### Basic Setup
+
+In your project's root `build.gradle` append these repositories to your list:
 
 ```groovy
 allprojects {
@@ -55,58 +71,66 @@ allprojects {
 }
 ```
 
-# Next development version 0.10.0
+Add the dependencies into the project's `build.gradle`:
 
-Add the dependencies into the project's `build.gradle`
-
-## Λrrow Core
+##### Λrrow Core
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+apply plugin: 'kotlin-kapt'
+
+def arrow_version = "0.10.3"
 dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
-## Λrrow Core + Λrrow Optics
+##### Λrrow Core + Λrrow Optics
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+apply plugin: 'kotlin-kapt'
+
+def arrow_version = "0.10.3"
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
-## Λrrow Core + Λrrow Fx 
+##### Λrrow Core + Λrrow Fx 
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+apply plugin: 'kotlin-kapt'
+
+def arrow_version = "0.10.3"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
-## Λrrow Core + Λrrow Optics + Λrrow Fx
+##### Λrrow Core + Λrrow Optics + Λrrow Fx
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+apply plugin: 'kotlin-kapt'
+
+def arrow_version = "0.10.3"
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
+
+##### Other libraries
 
 Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
-# Additional Setup
+#### Additional Setup
 
 For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
 the setup below is also required:
@@ -117,10 +141,10 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.3"
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
     ...
 }
 ```
@@ -151,7 +175,83 @@ idea {
 }
 ```
 
-# License
+### Maven
+ 
+#### Basic Setup
+
+Add to your pom.xml file the following properties:
+```
+<properties>
+    <kotlin.version>1.3.0</kotlin.version>
+     <arrow.version>0.10.3</arrow.version>
+</properties>
+```
+
+Add the dependencies that you want to use
+```
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-core</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-syntax</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
+```
+
+#### Enabling kapt
+
+Enable annotaton processing using kotlin plugin 
+```
+<plugin>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-maven-plugin</artifactId>
+    <version>${kotlin.version}</version>
+    <executions>
+        <execution>
+            <id>kapt</id>
+            <goals>
+                <goal>kapt</goal>
+            </goals>
+            <configuration>
+                <sourceDirs>
+                    <sourceDir>src/main/kotlin</sourceDir>
+                </sourceDirs>
+                <annotationProcessorPaths>
+                    <annotationProcessorPath>
+                        <groupId>io.arrow-kt</groupId>
+                        <artifactId>arrow-meta</artifactId>
+                        <version>${arrow.version}</version>
+                    </annotationProcessorPath>
+                </annotationProcessorPaths>
+            </configuration>
+        </execution>
+        <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+                <goal>compile</goal>
+            </goals>
+            <configuration>
+                <sourceDirs>
+                    <sourceDir>src/main/kotlin</sourceDir>
+                </sourceDirs>
+            </configuration>
+        </execution>
+        <execution>
+            <id>test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+                <goal>test-compile</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+## License
 
     Copyright (C) 2017 The Λrrow Authors
 

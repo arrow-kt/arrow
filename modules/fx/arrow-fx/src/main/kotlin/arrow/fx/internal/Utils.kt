@@ -4,15 +4,15 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
+import arrow.fx.IOConnection
 import arrow.fx.IOOf
-import arrow.fx.KindConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.CoroutineContext
 
@@ -130,7 +130,7 @@ object Platform {
   const val maxStackDepthSize = 127
 
   inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = AtomicBoolean(false)
+    val wasCalled = AtomicBooleanW(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
@@ -139,8 +139,8 @@ object Platform {
     }
   }
 
-  inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
-    val wasCalled = AtomicBoolean(false)
+  internal inline fun <A> onceOnly(conn: IOConnection, crossinline f: (A) -> Unit): (A) -> Unit {
+    val wasCalled = AtomicBooleanW(false)
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
@@ -201,8 +201,9 @@ object Platform {
   private val underlying = Executor { it.run() }
 
   @PublishedApi
-  internal val _trampoline = ThreadLocal.withInitial {
-    TrampolineExecutor(underlying)
+  internal val _trampoline = object : ThreadLocal<TrampolineExecutor>() {
+    override fun initialValue(): TrampolineExecutor =
+      TrampolineExecutor(underlying)
   }
 
   @PublishedApi
@@ -271,11 +272,11 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
 }
 
 /**
- * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * [arrow.typeclasses.Continuation] to run coroutine on `ctx` and link result to callback [cc].
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
-internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
-  object : arrow.core.Continuation<A> {
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.typeclasses.Continuation<A> =
+  object : arrow.typeclasses.Continuation<A> {
     override val context: CoroutineContext = ctx
 
     override fun resume(value: A) {
@@ -289,7 +290,7 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
 
 /**
  * Utility to makes sure that the original [fa] is gets forked on [ctx].
- * @see IO.startFiber
+ * @see IO.fork
  * @see arrow.fx.racePair
  * @see arrow.fx.raceTriple
  *

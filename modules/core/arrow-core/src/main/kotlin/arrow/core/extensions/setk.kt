@@ -5,10 +5,12 @@ import arrow.core.Eval
 import arrow.core.ForSetK
 import arrow.core.SetK
 import arrow.core.Tuple2
+import arrow.core.extensions.setk.eq.eq
 import arrow.core.fix
 import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -23,7 +25,7 @@ import arrow.core.combineK as setCombineK
 @extension
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
-    (this.plus(b)).k()
+    this.fix().setCombineK(b)
 }
 
 @extension
@@ -98,4 +100,14 @@ interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
   override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface SetKEqK : EqK<ForSetK> {
+  override fun <A> Kind<ForSetK, A>.eqK(other: Kind<ForSetK, A>, EQ: Eq<A>) =
+    (this.fix() to other.fix()).let {
+      SetK.eq(EQ).run {
+        it.first.eqv(it.second)
+      }
+    }
 }

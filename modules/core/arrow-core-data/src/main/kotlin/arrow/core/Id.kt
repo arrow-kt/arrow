@@ -46,9 +46,9 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
 @higherkind
 data class Id<out A>(private val value: A) : IdOf<A> {
 
-  inline fun <B> map(f: (A) -> B): Id<B> = Id(f(extract()))
+  fun <B> map(f: (A) -> B): Id<B> = Id(f(extract()))
 
-  inline fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(extract()).fix()
+  fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(extract()).fix()
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = operation(initial, value)
 

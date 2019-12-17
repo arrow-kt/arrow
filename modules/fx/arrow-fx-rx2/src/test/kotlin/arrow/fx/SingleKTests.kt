@@ -1,41 +1,37 @@
 package arrow.fx
 
-import arrow.core.Try
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.extensions.singlek.async.async
 import arrow.fx.rx2.extensions.singlek.monad.flatMap
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
+import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
-import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
-@RunWith(KotlinTestRunner::class)
-class SingleKTests : UnitSpec() {
+class SingleKTests : RxJavaSpec() {
+
+  private val awaitDelay = 300L
 
   fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
     override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
-      val res1 = Try { value().timeout(5, TimeUnit.SECONDS).blockingGet() }
-      val res2 = arrow.core.Try { b.value().timeout(5, TimeUnit.SECONDS).blockingGet() }
+      val res1 = attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
+      val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
       return res1.fold({ t1 ->
         res2.fold({ t2 ->
           (t1::class.java == t2::class.java)
@@ -48,61 +44,79 @@ class SingleKTests : UnitSpec() {
     }
   }
 
-  val CS = SingleK.concurrent(object : Dispatchers<ForSingleK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
-
   init {
     testLaws(
-      ConcurrentLaws.laws(CS, EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
 
-    "Multi-thread Singles finish correctly" {
-      val value: Single<Long> = SingleK.fx {
-        val a = Single.timer(2, TimeUnit.SECONDS).k().bind()
-        a
+    "fx should defer evaluation until subscribed" {
+      var run = false
+      val value = SingleK.fx {
+        run = true
       }.value()
 
-      val test: TestObserver<Long> = value.test()
-      test.awaitDone(5, TimeUnit.SECONDS)
-      test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
+      run shouldBe false
+      value.subscribe()
+      run shouldBe true
+    }
+
+    "Multi-thread Singles finish correctly" {
+      forFew(10, Gen.choose(10L, 50)) { delay ->
+        SingleK.fx {
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().bind()
+          a
+        }.value()
+          .test()
+          .awaitDone(delay + awaitDelay, TimeUnit.MILLISECONDS)
+          .assertTerminated()
+          .assertComplete()
+          .assertNoErrors()
+          .assertValue(0)
+          .let { true }
+      }
     }
 
     "Multi-thread Singles should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
-      var threadRef: Thread? = null
+      forFew(10, Gen.choose(10L, 50)) { delay ->
+        val originalThread: Thread = Thread.currentThread()
+        var threadRef: Thread? = null
 
-      val value: Single<Long> = SingleK.fx {
-        val a = Single.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
-        threadRef = Thread.currentThread()
-        val b = Single.just(a).observeOn(Schedulers.newThread()).k().bind()
-        b
-      }.value()
+        val value: Single<Long> = SingleK.fx {
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io()).k().bind()
+          threadRef = Thread.currentThread()
+          val b = Single.just(a).observeOn(Schedulers.computation()).k().bind()
+          b
+        }.value()
 
-      val test: TestObserver<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-      val nextThread = (threadRef?.name ?: "")
+        val test: TestObserver<Long> = value.test()
+        val lastThread: Thread = test.awaitDone(delay + awaitDelay, TimeUnit.MILLISECONDS).lastThread()
+        val nextThread = (threadRef?.name ?: "")
 
-      nextThread shouldNotBe originalThread.name
-      lastThread.name shouldNotBe originalThread.name
-      lastThread.name shouldNotBe nextThread
+        nextThread != originalThread.name && lastThread.name != originalThread.name && lastThread.name != nextThread
+      }
     }
 
     "Single dispose forces binding to cancel without completing too" {
-      val value: Single<Long> = SingleK.fx {
-        val a = Single.timer(3, TimeUnit.SECONDS).k().bind()
-        a
-      }.value()
+      forFew(5, Gen.choose(10L, 50)) { delay ->
+        val value: Single<Long> = SingleK.fx {
+          val a = Single.timer(delay + awaitDelay, TimeUnit.MILLISECONDS).k().bind()
+          a
+        }.value()
 
-      val test: TestObserver<Long> = value.doOnSubscribe { subscription ->
-        Single.timer(1, TimeUnit.SECONDS).subscribe { _ ->
-          subscription.dispose()
-        }
-      }.test()
+        val test: TestObserver<Long> = value.doOnSubscribe { subscription ->
+          Single.timer(delay, TimeUnit.MILLISECONDS).subscribe { _ ->
+            subscription.dispose()
+          }
+        }.test()
 
-      test.awaitTerminalEvent(5, TimeUnit.SECONDS)
-      test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
+        test.awaitTerminalEvent(delay + (2 * awaitDelay), TimeUnit.MILLISECONDS)
+        test.assertNotTerminated()
+          .assertNotComplete()
+          .assertNoErrors()
+          .assertNoValues()
+          .let { true }
+      }
     }
 
     "SingleK bracket cancellation should release resource with cancel exit status" {

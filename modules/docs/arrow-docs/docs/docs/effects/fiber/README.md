@@ -27,8 +27,8 @@ fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   IO.fx {
-    val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
-    val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
+    val (fiberOne: Fiber<ForIO, A>) = first.fork(Default)
+    val (fiberTwo: Fiber<ForIO, B>) = second.fork(Default)
     f(!fiberOne.join(), !fiberTwo.join())
   }
 
@@ -61,8 +61,8 @@ import arrow.fx.extensions.io.monad.map
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,
                           f: (A, B) -> C): IO<C> =
-      first.startFiber(Default).bracket(use = { (joinA, _) ->
-          second.startFiber(Default).bracket(use = { (joinB, _) ->
+      first.fork(Default).bracket(use = { (joinA, _) ->
+          second.fork(Default).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->
               joinB.map { b -> f(a, b) }
             }

@@ -216,10 +216,10 @@ Kind stands for Higher Kind, which is the name of the language feature that allo
 In a Higher Kind with the shape `Kind<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
 
 A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`Kind<Option<A>, A>`~~.
-This incorrect representation has large a number of issues when working with partially applied types and nested types.
+This incorrect representation has a large number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
+These types are named the same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
 You have seen these types used in the Syntax section above! 
 
 ```kotlin:ank:silent
@@ -396,7 +396,7 @@ To learn more about this `Typeclassless` technique you should head to the [`Depe
 
 ### Side-effects and Effects
 
-A side-effect is statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
+A side-effect is a statement that changes something in the running environment. Generally this means setting a variable, displaying a value on screen, writing to a file or a database, logging, start a new thread...
 
 When talking about side-effects, we generally see functions that have the signature `(...) -> Unit`, meaning that unless the function doesn't do anything, there's at least one side-effect. Side-effects can also happen in the middle of another function, which is an undesirable behavior in Functional Programming.
 

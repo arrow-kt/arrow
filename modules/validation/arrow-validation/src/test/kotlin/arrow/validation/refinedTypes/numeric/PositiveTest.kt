@@ -7,10 +7,7 @@ import arrow.test.generators.lessEqual
 import arrow.validation.refinedTypes.numeric.validated.positive.positive
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class PositiveTest : UnitSpec() {
   init {
 

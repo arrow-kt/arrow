@@ -7,8 +7,6 @@ import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.extensions.ComposedTraverseFilter
-import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.option.traverseFilter.traverseFilter
@@ -25,11 +23,14 @@ import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.filterMap
+import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.compose
+import arrow.mtl.typeclasses.unnest
 import arrow.mtl.value
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
@@ -42,12 +43,9 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
-import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
-import arrow.typeclasses.compose
-import arrow.typeclasses.unnest
 import arrow.undocumented
 
 @extension
@@ -131,7 +129,7 @@ fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eva
 }
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { value().traverseC(f, GA) }
+  val fa = ComposedTraverse(FF, Option.traverse()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
@@ -240,7 +238,7 @@ interface OptionTFunctorFilter<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTF
 
   override fun FF(): Functor<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
+  override fun <A, B> OptionTOf<F, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
     fix().filterMap(FF(), f)
 }
 
@@ -261,7 +259,22 @@ fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<OptionTParti
   OptionT.monad(M).fx.monad(c).fix()
 
 fun <F, G, A, B> OptionT<F, A>.traverseFilter(f: (A) -> Kind<G, Option<B>>, GA: Applicative<G>, FF: Traverse<F>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverseFilter(FF, Option.traverseFilter(), Option.applicative()).traverseFilterC(value(), f, GA)
+  val fa = ComposedTraverseFilter(FF, Option.traverseFilter()).traverseFilterC(value(), f, GA)
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { nested -> OptionT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
+}
+
+@extension
+interface OptionTAlternative<F> : Alternative<OptionTPartialOf<F>>, OptionTApplicative<F> {
+  override fun AF(): Applicative<F> = MF()
+  fun MF(): Monad<F>
+  override fun <A> empty(): Kind<OptionTPartialOf<F>, A> = OptionT.none(AF())
+  override fun <A> Kind<OptionTPartialOf<F>, A>.orElse(b: Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, A> =
+    OptionT(
+      MF().fx.monad {
+        val l = !value()
+        if (l.isEmpty()) !b.value()
+        else l
+      }
+    )
 }

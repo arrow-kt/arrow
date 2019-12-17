@@ -12,10 +12,7 @@ import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class SetInstanceTest : UnitSpec() {
 
   object AndMonoid : Monoid<Boolean> {

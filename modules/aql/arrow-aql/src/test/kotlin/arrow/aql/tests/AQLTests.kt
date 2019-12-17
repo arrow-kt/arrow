@@ -1,36 +1,44 @@
 package arrow.aql.tests
 
 import arrow.aql.Ord
+import arrow.aql.extensions.list.count.count
 import arrow.aql.extensions.list.from.join
 import arrow.aql.extensions.list.groupBy.groupBy
-import arrow.aql.extensions.list.select.query
+import arrow.aql.extensions.list.max.max
+import arrow.aql.extensions.list.min.min
 import arrow.aql.extensions.list.orderBy.orderBy
 import arrow.aql.extensions.list.orderBy.orderMap
 import arrow.aql.extensions.list.orderBy.value
+import arrow.aql.extensions.list.select.query
 import arrow.aql.extensions.list.sum.sum
 import arrow.aql.extensions.list.sum.value
 import arrow.aql.extensions.list.union.union
 import arrow.aql.extensions.list.where.where
 import arrow.aql.extensions.list.where.whereSelection
-import arrow.aql.extensions.list.count.count
 import arrow.aql.extensions.listk.select.select
 import arrow.aql.extensions.listk.select.selectAll
 import arrow.aql.extensions.listk.select.value
+import arrow.aql.extensions.list.min.value
 import arrow.aql.extensions.option.select.query
 import arrow.aql.extensions.option.select.select
 import arrow.aql.extensions.option.select.value
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.None
 import arrow.core.extensions.order
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class AQLTests : UnitSpec() {
 
   init {
+
+    data class Student(val name: String, val age: Int)
+
+    val john = Student("John", 30)
+    val jane = Student("Jane", 32)
+    val jack = Student("Jack", 32)
+    val chris = Student("Chris", 40)
 
     "AQL is able to `select`" {
       listOf(1, 2, 3).query {
@@ -68,22 +76,10 @@ class AQLTests : UnitSpec() {
     }
 
     "AQL is able to `groupBy`" {
-      data class Student(val name: String, val age: Int)
-
-      val john = Student("John", 30)
-      val jane = Student("Jane", 32)
-      val jack = Student("Jack", 32)
       listOf(john, jane, jack).query {
         selectAll() groupBy { age }
       }.value() shouldBe mapOf(30 to listOf(john), 32 to listOf(jane, jack))
     }
-
-    data class Student(val name: String, val age: Int)
-
-    val john = Student("John", 30)
-    val jane = Student("Jane", 32)
-    val jack = Student("Jack", 32)
-    val chris = Student("Chris", 40)
 
     "AQL is able to filter using `where` and then `groupBy`" {
       listOf(john, jane, jack).query {
@@ -124,6 +120,42 @@ class AQLTests : UnitSpec() {
         "sales" to jack,
         "sales" to chris
       )
+    }
+
+    "AQL is able to `max`" {
+      listOf(john, jane, jack, chris).query {
+        selectAll().max(Int.order()) { age }
+      }.value() shouldBe Some(chris)
+    }
+
+    "AQL is able to `max` and return the select type" {
+      listOf(john, jane, jack, chris).query {
+        select { this.age }.max(Int.order()) { age }
+      }.value() shouldBe Some(40)
+    }
+
+    "AQL `max` call in an empty List returns None" {
+      emptyList<Student>().query {
+        selectAll().max(Long.order()) { age.toLong() }
+      }.value() shouldBe None
+    }
+
+    "AQL is able to `min`" {
+      listOf(john, jane, jack, chris).query {
+        selectAll().min(Long.order()) { age.toLong() }
+      }.value() shouldBe Some(john)
+    }
+
+    "AQL is able to `min` and return the select type" {
+      listOf(john, jane, jack, chris).query {
+        select { this.age }.min(Int.order()) { age }
+      }.value() shouldBe Some(30)
+    }
+
+    "AQL `min` in an empty List returns None" {
+      emptyList<Student>().query {
+        selectAll().min(Long.order()) { age.toLong() }
+      }.value() shouldBe None
     }
   }
 }

@@ -1,6 +1,6 @@
 package arrow.fx.reactor
 
-import arrow.core.Continuation
+import arrow.typeclasses.Continuation
 import reactor.core.Disposable
 import reactor.core.scheduler.Scheduler
 import kotlin.coroutines.CoroutineContext

@@ -38,4 +38,8 @@ open class DeepBind {
   @Benchmark
   fun zio(): Any =
     arrow.benchmarks.effects.scala.zio.`DeepBind$`.`MODULE$`.fib(depth)
+
+  @Benchmark
+  fun kio(): Any =
+    arrow.benchmarks.effects.kio.DeepBind.fib(depth)
 }

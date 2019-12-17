@@ -19,7 +19,8 @@ data class HigherKind(
   val tparams: List<ProtoBuf.TypeParameter> = target.classOrPackageProto.typeParameters
   val kindName: Name = target.classElement.simpleName
   val alias: String = if (tparams.size == 1) "arrow.Kind" else "arrow.Kind${tparams.size}"
-  val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "io.kindedj.HkJ${tparams.size}"
+  private val hkjsPackage = "arrow"
+  val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "$hkjsPackage.HkJ${tparams.size}"
   val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
   val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
     separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })

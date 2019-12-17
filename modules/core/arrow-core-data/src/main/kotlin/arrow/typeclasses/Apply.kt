@@ -15,6 +15,27 @@ import arrow.core.Tuple10
 import arrow.Kind
 
 interface Apply<F> : Functor<F> {
+
+  /**
+   * Given both the value and the function are within [F], **ap**ply the function to the value.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.core.Option
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   //sampleStart
+   *   val someF: Option<(Int) -> Long> = Some { i: Int -> i.toLong() + 1 }
+   *
+   *   val a = Some(3).ap(someF)
+   *   val b = none<Int>().ap(someF)
+   *   val c = Some(3).ap(none<(Int) -> Long>())
+   *   //sampleEnd
+   *   println("a: $a, b: $b, c: $c")
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
   fun <A, B, Z> map(

@@ -1,7 +1,7 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.Continuation
+import arrow.typeclasses.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
@@ -47,18 +47,6 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     }
     COROUTINE_SUSPENDED
   }
-}
-
-@Deprecated(
-  "`bindingStackSafe` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-  ReplaceWith("fx.stackSafe(c)", "import arrow.free.stackSafe")
-)
-fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
-  Free<F, B> {
-  val continuation = StackSafeMonadContinuation<F, B>(this)
-  val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
-  wrapReturn.startCoroutine(continuation, continuation)
-  return continuation.returnedMonad()
 }
 
 /**

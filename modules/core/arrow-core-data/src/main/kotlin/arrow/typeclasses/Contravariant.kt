@@ -8,8 +8,7 @@ import arrow.Kind
 interface Contravariant<F> : Invariant<F> {
     fun <A, B> Kind<F, A>.contramap(f: (B) -> A): Kind<F, B>
 
-    fun <A, B> lift(f: (A) -> B, dummy: Unit = Unit): (Kind<F, B>) -> Kind<F, A> =
-        { fb: Kind<F, B> ->
+    fun <A, B> lift(f: (A) -> B, dummy: Unit = Unit): (Kind<F, B>) -> Kind<F, A> = { fb: Kind<F, B> ->
             fb.contramap(f)
         }
 

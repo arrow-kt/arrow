@@ -7,14 +7,11 @@ import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.FunctionK
 import arrow.core.Id
+import arrow.core.ListK
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.ListK
-import arrow.core.NonEmptyList
-import arrow.mtl.OptionT
-import arrow.free.Cofree.Companion.unfold
-import arrow.free.extensions.cofree.comonad.comonad
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
@@ -24,6 +21,9 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
 import arrow.core.value
+import arrow.free.Cofree.Companion.unfold
+import arrow.free.extensions.cofree.comonad.comonad
+import arrow.mtl.OptionT
 import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
@@ -32,11 +32,8 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {
 
   init {

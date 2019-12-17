@@ -1,19 +1,28 @@
 package arrow.fx
 
+import arrow.core.internal.AtomicIntW
 import arrow.undocumented
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.ForkJoinPool
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @undocumented
 // FIXME use expected and actual for multiplatform
 object IODispatchers {
   // FIXME use ForkJoinPool.commonPool() in Java 8
-  val CommonPool: CoroutineContext = EmptyCoroutineContext + ForkJoinPool().asCoroutineContext()
+  val CommonPool: CoroutineContext = ForkJoinPool().asCoroutineContext()
+
+  private val ioCtr = AtomicIntW(0)
+  val IOPool = Executors.newCachedThreadPool { r ->
+    Thread(r).apply {
+      name = "io-arrow-kt-worker-${ioCtr.getAndIncrement()}"
+      isDaemon = true
+    }
+  }.asCoroutineContext()
 }
 
 fun ExecutorService.asCoroutineContext(): CoroutineContext =

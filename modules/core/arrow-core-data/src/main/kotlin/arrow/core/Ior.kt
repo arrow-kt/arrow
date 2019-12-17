@@ -1,6 +1,8 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Ior.Left
+import arrow.core.Ior.Right
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -162,7 +164,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
    * ```
    */
-  inline fun <D> map(f: (B) -> D): Ior<A, D> = fold(
+  fun <D> map(f: (B) -> D): Ior<A, D> = fold(
     { Left(it) },
     { Right(f(it)) },
     { a, b -> Both(a, f(b)) }
@@ -179,7 +181,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
    * ```
    */
-  inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
+  fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
     { Left(fa(it)) },
     { Right(fb(it)) },
     { a, b -> Both(fa(a), fb(b)) }
@@ -195,7 +197,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
    * ```
    */
-  inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
+  fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
     { Left(fa(it)) },
     { Right((it)) },
     { a, b -> Both(fa(a), b) }
@@ -270,6 +272,20 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
   fun toOption(): Option<B> = fold({ None }, { Some(it) }, { _, b -> Some(b) })
 
   /**
+   * Returns a [Some] containing the [Left] value or `A` if this is [Left] or [Both]
+   * and [None] if this is a [Right].
+   *
+   * Example:
+   * ```
+   * Right(12).toLeftOption() // Result: None
+   * Left(12).toLeftOption()  // Result: Some(12)
+   * Both(12, "power").toLeftOption()  // Result: Some(12)
+   * ```
+   */
+  fun toLeftOption(): Option<A> =
+    fold({ Option.just(it) }, { Option.empty() }, { a, _ -> Option.just(a) })
+
+  /**
    * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]
    * and [Validated.Invalid] if this is a [Left].
    *
@@ -333,7 +349,7 @@ fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
   ff.fix().flatMap(SG) { f -> map(f) }
 
-inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
+fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
 
 fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
   fix().traverse(GA, ::identity)

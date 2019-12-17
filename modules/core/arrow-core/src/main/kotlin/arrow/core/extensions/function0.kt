@@ -27,8 +27,7 @@ import arrow.core.select as fun0Select
 interface Function0Semigroup<A> : Semigroup<Function0<A>> {
   fun SA(): Semigroup<A>
 
-  override fun Function0<A>.combine(b: Function0<A>): Function0<A> =
-    { SA().run { invoke().combine(b.invoke()) } }.k()
+  override fun Function0<A>.combine(b: Function0<A>): Function0<A> = { SA().run { invoke().combine(b.invoke()) } }.k()
 }
 
 @extension
@@ -37,8 +36,7 @@ interface Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
 
   override fun SA() = MA()
 
-  override fun empty(): Function0<A> =
-    { MA().run { empty() } }.k()
+  override fun empty(): Function0<A> = { MA().run { empty() } }.k()
 }
 
 @extension

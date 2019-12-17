@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.Kind
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
@@ -18,6 +17,4 @@ open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context:
   override fun resumeWithException(exception: Throwable) {
     returnedMonad = raiseError(exception)
   }
-
-  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> = fx.monad(c)
 }

@@ -52,6 +52,18 @@ open class MapStream {
   @Benchmark
   fun catsBatch120(): Long =
     arrow.benchmarks.effects.scala.cats.`MapStream$`.`MODULE$`.test(12000 / 120, 120)
+
+  @Benchmark
+  fun kioOne(): Long =
+    arrow.benchmarks.effects.kio.MapStream.test(12000, 1)
+
+  @Benchmark
+  fun kioBatch30(): Long =
+    arrow.benchmarks.effects.kio.MapStream.test(12000 / 30, 30)
+
+  @Benchmark
+  fun kioBatch120(): Long =
+    arrow.benchmarks.effects.kio.MapStream.test(12000 / 120, 120)
 }
 
 object IOStream {

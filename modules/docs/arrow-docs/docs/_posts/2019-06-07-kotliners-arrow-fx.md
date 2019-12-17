@@ -1,5 +1,5 @@
 ---
-title: Kotliners 2019 - ArrowFx: Functional Programming for the masses
+title: Kotliners 2019 - ArrowFx Functional Programming for the masses
 icon: /img/icon-video.svg
 header-image: https://img.youtube.com/vi/uyqqoooKpmI/maxresdefault.jpg
 category: media

@@ -2,18 +2,23 @@ package arrow.free.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
 import arrow.core.FunctionK
 import arrow.extension
 import arrow.free.Free
 import arrow.free.FreeOf
 import arrow.free.FreePartialOf
+import arrow.free.extensions.free.foldable.foldLeft
+import arrow.free.extensions.free.foldable.foldRight
 import arrow.free.fix
 import arrow.free.foldMap
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
 import arrow.undocumented
 import arrow.free.ap as freeAp
 import arrow.free.flatMap as freeFlatMap
@@ -82,4 +87,45 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 
   override fun Kind<FreePartialOf<F>, A>.eqv(b: Kind<FreePartialOf<F>, A>): Boolean =
     fix().foldMap(FK(), MG()) == b.fix().foldMap(FK(), MG())
+}
+
+@extension
+@undocumented
+interface FreeFoldable<F> : Foldable<FreePartialOf<F>> {
+  fun FF(): Foldable<F>
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+    fix().foldStep(
+      onPure = { a -> f(b, a) },
+      onSuspend = { fa: Kind<F, A> -> FF().run { fa.foldLeft(b, f) } },
+      onFlatMapped = { fa: Kind<F, A>, g: (A) -> Free<F, A> -> FF().run { fa.foldLeft(b) { bb: B, a: A -> g(a).foldLeft(bb, f) } } }
+    )
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldStep(
+      onPure = { a -> f(a, lb) },
+      onSuspend = { fa: Kind<F, A> -> FF().run { fa.foldRight(lb, f) } },
+      onFlatMapped = { fa: Kind<F, A>, g: (A) -> Free<F, A> -> FF().run { fa.foldRight(lb) { a: A, lbb: Eval<B> -> g(a).foldRight(lbb, f) } } }
+    )
+}
+
+@extension
+@undocumented
+interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
+  fun FT(): Traverse<F>
+  fun FF(): Foldable<F> = FT()
+
+  override fun <G, A, B> Kind<FreePartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<FreePartialOf<F>, B>> =
+    when (val x: Either<Kind<F, Free<F, A>>, A> = fix().resume(FT())) {
+      is Either.Right -> AP.run { f(x.b).map { Free.Pure<F, B>(it) } }
+      is Either.Left -> AP.run { FT().run { x.a.traverse(AP) { free -> free.traverse(AP, f) }.map { s -> Free.roll(s) } } }
+    }
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+    foldLeft(FF(), b, f)
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    foldRight(FF(), lb, f)
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.map(f: (A) -> B): Kind<FreePartialOf<F>, B> =
+    fix().freeMap(f)
 }

@@ -20,4 +20,4 @@ import arrow.core.*
 DataType(SortedMapK::class).tcMarkdownList()
 ```
 
-TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).
+`SortedMapK` is pretty much the same as [`MapK`]({{ '/docs/arrow/data/mapk' | relative_url }}) except that it is sorted.

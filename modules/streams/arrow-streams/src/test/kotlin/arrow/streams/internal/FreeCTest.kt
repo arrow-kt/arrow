@@ -33,9 +33,7 @@ import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -50,6 +48,8 @@ sealed class Ops<out A> : OpsOf<A> {
     fun subtract(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Subtract(n, y))
   }
 }
+
+private fun genOps() = Gen.int().map { Ops.value(it) }
 
 @Suppress("UNCHECKED_CAST")
 val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : FunctionK<ForOps, EitherPartialOf<Throwable>> {
@@ -87,7 +87,6 @@ private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.
   r
 }.fix()
 
-@RunWith(KotlinTestRunner::class)
 class FreeCTest : UnitSpec() {
 
   init {
@@ -95,7 +94,7 @@ class FreeCTest : UnitSpec() {
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { Ops.value(it) },
+      EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
         SC = Ops,
         EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),

@@ -9,7 +9,6 @@ import arrow.core.Tuple2
 import arrow.mtl.ReaderApi
 import arrow.mtl.ReaderPartialOf
 import arrow.mtl.ForKleisli
-import arrow.core.Ior
 import arrow.mtl.KleisliOf
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
@@ -37,6 +36,7 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Alternative
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -185,6 +185,16 @@ interface KleisliMonadThrow<F, D> : MonadThrow<KleisliPartialOf<F, D>>, KleisliM
 }
 
 @extension
+interface KleisliAlternative<F, D> : Alternative<KleisliPartialOf<F, D>>, KleisliApplicative<F, D> {
+  override fun AF(): Applicative<F> = AL()
+  fun AL(): Alternative<F>
+
+  override fun <A> empty(): Kind<KleisliPartialOf<F, D>, A> = Kleisli { AL().empty() }
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.orElse(b: Kind<KleisliPartialOf<F, D>, A>): Kind<KleisliPartialOf<F, D>, A> =
+    Kleisli { d -> AL().run { run(d).orElse(b.run(d)) } }
+}
+
+@extension
 interface KleisliMonadReader<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonad<F, D> {
 
   override fun MF(): Monad<F>
@@ -216,5 +226,5 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
-fun <F, D, A> Ior.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
+fun <F, D, A> Kleisli.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
   Kleisli.monad<F, D>(MF).fx.monad(c).fix()

@@ -42,7 +42,7 @@ interface EitherTBracket<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>
     use: (A) -> EitherTOf<F, Throwable, B>
   ): EitherT<F, Throwable, B> = MDF().run {
 
-    EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(this, Ref(this) { None }).flatMap(this) { ref ->
+    EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(this, Ref(this, None)).flatMap(this) { ref ->
       EitherT(
         value().bracketCase(use = { eith ->
           when (eith) {

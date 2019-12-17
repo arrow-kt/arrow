@@ -28,8 +28,7 @@ In the most basic of scenarios, we'll only be dealing with one monad at a time m
 So let's test this out with an example:
 
 ```kotlin:ank
-import arrow.*
-import arrow.core.*
+import arrow.core.Option
 
 data class Country(val code: String)
 data class Address(val id: Int, val country: Option<Country>)
@@ -53,9 +52,14 @@ typealias CountryNotFound = BizError.CountryNotFound
 We can now implement a naive lookup function to obtain the country code given a person result.
 
 ```kotlin:ank
+import arrow.core.Either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
+
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   maybePerson.flatMap { person ->
-    person.address.toEither({ AddressNotFound(person.id) }).flatMap { address ->
+    person.address.toEither { AddressNotFound(person.id) }.flatMap { address ->
       address.country.fold({ CountryNotFound(address.id).left() }, { it.code.right() })
     }
   }
@@ -63,19 +67,18 @@ fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, Str
 
 Nested flatMap calls flatten the `Either` but the resulting function starts looking like a pyramid and can easily lead to callback hell.
 
-We can further simplify this case by using Arrow `binding` facilities
+We can further simplify this case by using Arrow `fx` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
-import arrow.typeclasses.*
-import arrow.mtl.extensions.*
-import arrow.core.extensions.either.monad.*
+import arrow.core.extensions.fx
+import arrow.core.fix
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  binding<BizError, String> {
+  Either.fx<BizError, String> {
     val (person) = maybePerson
-    val (address) = person.address.toEither({ AddressNotFound(person.id) })
-    val (country) = address.country.toEither({ CountryNotFound(address.id)})
+    val (address) = person.address.toEither { AddressNotFound(person.id) }
+    val (country) = address.country.toEither { CountryNotFound(address.id)}
     country.code
   }.fix()
 ```
@@ -85,6 +88,8 @@ Alright, a piece of cake right? That's because we were dealing with a simple typ
 Consider this simple database representation:
 
 ```kotlin:ank
+import arrow.core.Some
+
 val personDB: Map<Int, Person> = mapOf(
   1 to Person(
         id = 1,
@@ -117,25 +122,26 @@ val adressDB: Map<Int, Address> = mapOf(
 Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableK`. This is common in most APIs that handle loading asynchronously.
 
 ```kotlin:ank
-import arrow.fx.rx2.*
+import arrow.fx.rx2.ObservableK
 
-fun findPerson(personId : Int) : ObservableK<Either<BizError, Person>> =
+fun findPerson(personId: Int): ObservableK<Either<BizError, Person>> =
   ObservableK.just(
     Option.fromNullable(personDB.get(personId)).toEither { PersonNotFound(personId) }
   ) //mock impl for simplicity
 
-fun findCountry(addressId : Int) : ObservableK<Either<BizError, Country>> =
+fun findCountry(addressId: Int): ObservableK<Either<BizError, Country>> =
   ObservableK.just(
     Option.fromNullable(adressDB.get(addressId))
       .flatMap { it.country }
       .toEither { CountryNotFound(addressId) }
   ) //mock impl for simplicity
-
 ```
 
 A naive implementation attempt to get to a `country.code` from a `person.id` might look something like this.
 
 ```kotlin:ank
+import arrow.fx.rx2.extensions.fx
+
 fun getCountryCode(personId: Int) =
   findPerson(personId).map { maybePerson ->
     maybePerson.map { person ->
@@ -166,18 +172,18 @@ import arrow.fx.rx2.extensions.fx
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   ObservableK.fx {
-    val person = findPerson(personId).bind()
-    val address = person.fold (
+    val person = !findPerson(personId)
+    val address = person.fold(
       { it.left() },
       { it.address.toEither { AddressNotFound(personId) } }
     )
-    val maybeCountry = address.fold(
+    val maybeCountry = !address.fold(
       { ObservableK.just(it.left()) },
       { findCountry(it.id) }
-    ).bind()
+    )
     val code = maybeCountry.fold(
-        { it.left() },
-        { it.code.right() }
+      { it.left() },
+      { it.code.right() }
     )
     code
   }
@@ -200,8 +206,9 @@ So our specialization `EitherT<ForObservableK, BizError, A>` is the EitherT tran
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.fx.rx2.extensions.observablek.applicative.*
-import arrow.mtl.*
+import arrow.fx.rx2.ForObservableK
+import arrow.mtl.EitherT
+import arrow.fx.rx2.extensions.observablek.applicative.applicative
 
 val eitherTVal = EitherT.just<ForObservableK, BizError, Int>(ObservableK.applicative(), 1)
 eitherTVal
@@ -210,20 +217,24 @@ eitherTVal
 And back to the `ObservableK<Either<BizError, A>>` running the transformer
 
 ```kotlin:ank
+import arrow.mtl.value
+
 eitherTVal.value()
 ```
 
 So how would our function look if we implemented it with the EitherT monad transformer?
 
-```kotlin
-import arrow.mtl.extensions.eithert.monad.*
+```kotlin:ank
+import arrow.fx.rx2.extensions.observablek.monad.monad
+import arrow.fx.rx2.fix
+import arrow.mtl.extensions.eithert.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).fx.monad {
     val (person) = EitherT(findPerson(personId))
-    val address = EitherT(ObservableK.just(
+    val address = !EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
-    )).bind()
+    ))
     val (country) = EitherT(findCountry(address.id))
     country.code
   }.value().fix()
@@ -236,7 +247,7 @@ Here we no longer have to deal with the `Left` cases, and the binding to the val
 As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
 
 ```kotlin:ank
-import arrow.core.extensions.option.functor.*
+import arrow.core.extensions.option.functor.functor
 
 EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```
@@ -244,9 +255,9 @@ EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ### Supported type classes
 
 ```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.mtl.*
-import arrow.core.*
+import arrow.reflect.DataType
+import arrow.reflect.tcMarkdownList
+import arrow.mtl.EitherT
 
 DataType(EitherT::class).tcMarkdownList()
 ```

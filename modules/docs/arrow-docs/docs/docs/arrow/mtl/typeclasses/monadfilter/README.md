@@ -15,7 +15,7 @@ advanced
 
 All instances of `MonadFilter` provide syntax over their respective data types to comprehend monadically over their computation:
 
-## continueWith
+## continueIf
 
 Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning monad filter instance `empty()` value.
 
@@ -74,7 +74,7 @@ ListK.monadFilter().fx.monadFilter {
 }
 ```    
 
-##bindWithFilter
+## bindWithFilter
 
 Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `bindWithFilter` guard that requires a `Boolean` predicate as value getting matched on the monad capturing inner value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning the monad filter instance `empty()` value.
 

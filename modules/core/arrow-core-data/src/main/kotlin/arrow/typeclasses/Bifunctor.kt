@@ -53,8 +53,7 @@ interface Bifunctor<F> {
    *
    * ```
    */
-  fun <A, B, C, D> lift(fl: (A) -> C, fr: (B) -> D): (Kind2<F, A, B>) -> Kind2<F, C, D> =
-    { kind2 ->
+  fun <A, B, C, D> lift(fl: (A) -> C, fr: (B) -> D): (Kind2<F, A, B>) -> Kind2<F, C, D> = { kind2 ->
       kind2.bimap(fl, fr)
     }
 

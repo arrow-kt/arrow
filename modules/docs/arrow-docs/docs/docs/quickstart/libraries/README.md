@@ -15,29 +15,29 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 #### Table of Content
-* [arrow-core](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core)
-* [arrow-core-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core-data)
-* [arrow-optics](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics)
-* [arrow-fx](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx)
-* [arrow-syntax](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-syntax)
-* [arrow-fx-rx2 & arrow-fx-reactor](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx-rx2&arrow-fx-reactor)
-* [arrow-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl)
-* [arrow-mtl-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl-data)
-* [arrow-optics-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics-mtl)
-* [arrow-recursion](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion)
-* [arrow-recursion-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion-data)
-* [arrow-integration-retrofit-adapter](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-integration-retrofit-adapter)
-* [arrow-free](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free)
-* [arrow-free-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free-data)
-* [arrow-aql](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-aql)
-* [arrow-meta](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-meta)
-* [arrow-generic](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-generic)
+* [arrow-core]({{ '/docs/quickstart/libraries/#arrow-core' | relative_url }})
+* [arrow-core-data]({{ '/docs/quickstart/libraries/#arrow-core-data' | relative_url }})
+* [arrow-optics]({{ '/docs/quickstart/libraries/#arrow-optics' | relative_url }})
+* [arrow-fx]({{ '/docs/quickstart/libraries/#arrow-fx' | relative_url }})
+* [arrow-syntax]({{ '/docs/quickstart/libraries/#arrow-syntax' | relative_url }})
+* [arrow-fx-rx2 & arrow-fx-reactor]({{ '/docs/quickstart/libraries/#arrow-fx-rx2&arrow-fx-reactor' | relative_url }})
+* [arrow-mtl]({{ '/docs/quickstart/libraries/#arrow-mtl' | relative_url }})
+* [arrow-mtl-data]({{ '/docs/quickstart/libraries/#arrow-mtl-data' | relative_url }})
+* [arrow-optics-mtl]({{ '/docs/quickstart/libraries/#arrow-optics-mtl' | relative_url }})
+* [arrow-recursion]({{ '/docs/quickstart/libraries/#arrow-recursion' | relative_url }})
+* [arrow-recursion-data]({{ '/docs/quickstart/libraries/#arrow-recursion-data' | relative_url }})
+* [arrow-integration-retrofit-adapter]({{ '/docs/quickstart/libraries/#arrow-integration-retrofit-adapter' | relative_url }})
+* [arrow-free]({{ '/docs/quickstart/libraries/#arrow-free' | relative_url }})
+* [arrow-free-data]({{ '/docs/quickstart/libraries/#arrow-free-data' | relative_url }})
+* [arrow-aql]({{ '/docs/quickstart/libraries/#arrow-aql' | relative_url }})
+* [arrow-meta]({{ '/docs/quickstart/libraries/#arrow-meta' | relative_url }})
+* [arrow-generic]({{ '/docs/quickstart/libraries/#arrow-generic' | relative_url }})
 
 ### arrow-core
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
+    implementation "io.arrow-kt:arrow-core:$arrow_version"
 }
 ```
 
@@ -49,7 +49,7 @@ Dependency: `arrow-core-data`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-core-data:$arrow_version"
+    implementation "io.arrow-kt:arrow-core-data:$arrow_version"
 }
 ```
 
@@ -60,7 +60,7 @@ The focus here is on API design and abstracting small code patterns.
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
 }
 ```
 
@@ -76,7 +76,7 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx:$arrow_version"
 }
 ```
 
@@ -92,7 +92,7 @@ These libraries are hosted inside the arrow repository building on the core, to 
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    implementation "io.arrow-kt:arrow-syntax:$arrow_version"
 }
 ```
 
@@ -108,8 +108,8 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-fx-rx2:$arrow_version"
-    compile "io.arrow-kt:arrow-fx-reactor:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx-rx2:$arrow_version"
+    implementation "io.arrow-kt:arrow-fx-reactor:$arrow_version"
 }
 ```
 
@@ -125,7 +125,7 @@ Dependency: `arrow-fx`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-mtl:$arrow_version"
+    implementation "io.arrow-kt:arrow-mtl:$arrow_version"
 }
 ```
 
@@ -139,7 +139,7 @@ Dependency: `arrow-mtl-data`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-mtl-data:$arrow_version"
+    implementation "io.arrow-kt:arrow-mtl-data:$arrow_version"
 }
 ```
 
@@ -149,7 +149,7 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-optics-mtl:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics-mtl:$arrow_version"
 }
 ```
 
@@ -159,7 +159,7 @@ Dependencies: `arrow-optics`, `arrow-mtl-data`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-recursion:$arrow_version"
+    implementation "io.arrow-kt:arrow-recursion:$arrow_version"
 }
 ```
 
@@ -171,7 +171,7 @@ Dependency: `arrow-recursion-data`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-recursion-data:$arrow_version"
+    implementation "io.arrow-kt:arrow-recursion-data:$arrow_version"
 }
 ```
 
@@ -183,7 +183,7 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version"
+    implementation "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version"
 }
 ```
 
@@ -195,7 +195,7 @@ Dependency: `arrow-fx`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-free:$arrow_version"
+    implementation "io.arrow-kt:arrow-free:$arrow_version"
 }
 ```
 
@@ -208,7 +208,7 @@ Dependency: `arrow-free-data`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-free-data:$arrow_version"
+    implementation "io.arrow-kt:arrow-free-data:$arrow_version"
 }
 ```
 
@@ -220,7 +220,7 @@ Dependency: `arrow-core`
 
 ```groovy
 dependencies {
-    compile "io.arrow-kt:arrow-query-language:$arrow_version"
+    implementation "io.arrow-kt:arrow-aql:$arrow_version"
 }
 ```
 
