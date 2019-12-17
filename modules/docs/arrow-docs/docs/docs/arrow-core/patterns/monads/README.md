@@ -401,7 +401,7 @@ Keep going and let's have a look at several sample implementations of Monad patt
 
 My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it maybe has a value, or maybe not).
 
-Option is another approach to dealing with "no value" value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) to see how Arrow implemented it.
+Option is another approach to dealing with "no value" value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implemented it.
 
 When null is not allowed, any API contract gets more explicit: either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.

@@ -42,7 +42,7 @@ IO.async()
 
 Receives a function returning `Unit` with a callback as a parameter.
 The function is responsible of calling the callback once it obtains a result.
-The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution and the right side is the completion value of the operation.
+The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) represents an error in the execution and the right side is the completion value of the operation.
 
 ```kotlin
 IO.async()

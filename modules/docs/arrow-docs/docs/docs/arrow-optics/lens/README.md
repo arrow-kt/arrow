@@ -58,7 +58,7 @@ val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (
 liftF(player)
 ```
 
-There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
+There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*

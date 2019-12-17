@@ -196,7 +196,7 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
-- [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
+- [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }})
 
 - [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }})
 

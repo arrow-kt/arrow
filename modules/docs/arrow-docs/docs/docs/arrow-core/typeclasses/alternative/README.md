@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-We use [`Option`]({{ '/docs/arrow/core/option' }}) to indicate a computation can fail somehow (that is, it can have either zero results or one result), and we use lists for computations that can have many possible results (ranging from zero to arbitrarily many results). In both of these cases, one useful operation is combining all possible results from multiple computations into a single computation. The `Alternative` type class captures this combination.
+We use [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' }}) to indicate a computation can fail somehow (that is, it can have either zero results or one result), and we use lists for computations that can have many possible results (ranging from zero to arbitrarily many results). In both of these cases, one useful operation is combining all possible results from multiple computations into a single computation. The `Alternative` type class captures this combination.
 
 `Alternative` is for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' }}) functors which also have a [`Monoid`]({{ '/docs/arrow/typeclasses/monoid' }}) structure.
 
@@ -71,7 +71,7 @@ Repeats the current computation, lazily collecting its results into a sequence, 
 import arrow.core.Option
 import arrow.core.extensions.option.monadCombine.monadCombine
 
-Option.monadCombine().run { 
+Option.monadCombine().run {
   val x = Option.just(1)
   x.some().map { it.take(5).toList() }
 }
@@ -81,7 +81,7 @@ Option.monadCombine().run {
 import arrow.core.Option
 import arrow.core.extensions.option.monadCombine.monadCombine
 
-Option.monadCombine().run { 
+Option.monadCombine().run {
   val x = Option.empty<Int>()
   x.some().map { it.take(5).toList() }
 }
@@ -97,7 +97,7 @@ Same function as some, but it does not require the computation to succeed.
 import arrow.core.Option
 import arrow.core.extensions.option.monadCombine.monadCombine
 
-Option.monadCombine().run { 
+Option.monadCombine().run {
   val x = Option.empty<Int>()
   x.many().map { it.take(5).toList() }
 }
