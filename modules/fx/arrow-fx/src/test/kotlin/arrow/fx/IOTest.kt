@@ -634,6 +634,30 @@ class IOTest : UnitSpec() {
         .toIO { exception }
         .attempt().unsafeRunSync() shouldBe Left(exception)
     }
+
+    "Cancelation is wired accross suspend" {
+      fun infiniteLoop(): IO<Unit> {
+        fun loop(iterations: Int): IO<Unit> =
+          just(iterations).flatMap { i -> loop(i + 1) }
+
+        return loop(0)
+      }
+
+      val wrappedInfiniteLoop: IO<Unit> =
+        IO.effect { infiniteLoop().suspended() }
+
+      IO.fx {
+        val p = !Promise<ExitCase<Throwable>>()
+        val (_, cancel) = !IO.unit.bracketCase(
+          release = { _, ec -> p.complete(ec) },
+          use = { wrappedInfiniteLoop }
+        ).fork()
+        !sleep(100.milliseconds)
+        !cancel
+        val result = !p.get()
+        !effect { result shouldBe ExitCase.Canceled }
+      }.suspended()
+    }
   }
 }
 
