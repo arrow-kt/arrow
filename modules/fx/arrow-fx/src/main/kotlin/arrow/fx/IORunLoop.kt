@@ -21,14 +21,14 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 internal object IORunLoop {
 
   fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, KindConnection.uncancelable, cb as Callback, null, null, null, EmptyCoroutineContext)
+    loop(source, KindConnection.uncancelable, cb as Callback, null, null, null, IOContext(KindConnection.uncancelable))
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
   fun <A> startCancelable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, conn, cb as Callback, null, null, null, EmptyCoroutineContext)
+    loop(source, conn, cb as Callback, null, null, null, IOContext(conn))
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
