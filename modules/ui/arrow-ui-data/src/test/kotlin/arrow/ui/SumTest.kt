@@ -2,7 +2,6 @@ package arrow.ui
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.const.divisible.divisible
@@ -56,7 +55,6 @@ class SumTest : UnitSpec() {
     val IDEQ = Eq<Kind<ForId, Int>> { a, b -> Id.eq(Int.eq()).run { a.fix().eqv(b.fix()) } }
     val IDH = Hash<Kind<ForId, Int>> { Id.hash(Int.hash()).run { it.fix().hash() } }
 
-    val cfSumConst: (Int) -> Sum<Kind<ForConst, Int>, Kind<ForConst, Int>, Int> = { Sum.left(Const.just(it), Const.just(it)) }
     val genSumConst =
       genk(Const.genK(Gen.int()), Const.genK(Gen.int()))
 
