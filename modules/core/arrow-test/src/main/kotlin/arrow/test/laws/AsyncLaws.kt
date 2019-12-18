@@ -126,7 +126,7 @@ object AsyncLaws {
           }
         })
 
-        asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().`as`(Unit) } }
+        asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().mapConst(Unit) } }
           .flatMap { promise.get() }
       }.equalUnderTheLaw(just(b), EQ)
     }
