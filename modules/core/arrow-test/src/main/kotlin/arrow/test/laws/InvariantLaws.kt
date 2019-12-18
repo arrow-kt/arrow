@@ -18,7 +18,7 @@ object InvariantLaws {
     laws(IF, G.genK<Int>(Gen.int()), EQK)
 
   @Deprecated("should be internal")
-  fun <F> laws(IF: Invariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  internal fun <F> laws(IF: Invariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
     return listOf(

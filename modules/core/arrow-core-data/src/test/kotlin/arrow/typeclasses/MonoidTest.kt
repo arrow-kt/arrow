@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.extensions.monoid
 import arrow.core.extensions.monoid.invariant.invariant
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.InvariantLaws
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
@@ -30,11 +31,14 @@ class MonoidTest : UnitSpec() {
       }
   }
 
-  val GEN = Gen.constant(Int.monoid()) as Gen<Kind<ForMonoid, Int>>
+  fun <A> genk(M: Monoid<A>) = object : GenK<ForMonoid> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForMonoid, A>> =
+      Gen.constant(M) as Gen<Kind<ForMonoid, A>>
+  }
 
   init {
     testLaws(
-      InvariantLaws.laws(Monoid.invariant<Int>(), GEN, EQK())
+      InvariantLaws.laws(Monoid.invariant<Int>(), genk(Int.monoid()), EQK())
     )
   }
 }
