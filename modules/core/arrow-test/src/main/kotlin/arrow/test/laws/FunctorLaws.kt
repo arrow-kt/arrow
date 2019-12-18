@@ -17,6 +17,7 @@ object FunctorLaws {
   fun <F> laws(FF: Functor<F>, G: GenK<F>, EQK: EqK<F>): List<Law> =
     laws(FF, G.genK(Gen.int()), EQK)
 
+  @Deprecated("use GENK version")
   internal fun <F> laws(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 

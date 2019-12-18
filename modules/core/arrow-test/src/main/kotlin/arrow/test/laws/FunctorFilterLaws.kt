@@ -23,7 +23,7 @@ object FunctorFilterLaws {
     laws(FFF, GENK.genK(Gen.int()), EQK)
 
   @Deprecated("should be internal, use GenK one")
-  fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  internal fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
     return FunctorLaws.laws(FFF, GEN, EQK) + listOf(

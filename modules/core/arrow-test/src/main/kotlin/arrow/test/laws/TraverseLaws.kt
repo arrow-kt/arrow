@@ -59,8 +59,8 @@ object TraverseLaws {
     val GEN = GENK.genK(Gen.intSmall())
     val EQ = EQK.liftEq(Int.eq())
 
-    return FoldableLaws.laws(TF, GEN) +
-        FunctorLaws.laws(TF, GEN, EQK) + listOf(
+    return FoldableLaws.laws(TF, GENK) +
+        FunctorLaws.laws(TF, GENK, EQK) + listOf(
         Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
         Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
         Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
