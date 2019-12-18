@@ -37,24 +37,21 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class ForBIO private constructor() {
+class ForIO private constructor() {
   companion object
 }
-typealias BIOOf<E, A> = arrow.Kind2<ForBIO, E, A>
-typealias BIOPartialOf<E> = Kind<ForBIO, E>
+typealias IOOf<E, A> = arrow.Kind2<ForIO, E, A>
+typealias IOPartialOf<E> = Kind<ForIO, E>
 
-inline fun <E, A> BIOOf<E, A>.fix(): BIO<E, A> =
-  this as BIO<E, A>
+inline fun <E, A> IOOf<E, A>.fix(): IO<E, A> =
+  this as IO<E, A>
 
-typealias IO<A> = BIO<Nothing, A>
-typealias IOOf<A> = BIOOf<Nothing, A>
-typealias ForIO = BIOPartialOf<Nothing>
 
 typealias IOProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
+typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Nothing, Unit>
 
 @Suppress("StringLiteralDuplication")
-sealed class BIO<out E, out A> : BIOOf<E, A> {
+sealed class IO<out E, out A> : IOOf<E, A> {
 
   companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
 
@@ -75,7 +72,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> effect(f: suspend () -> A): IO<A> =
+    fun <A> effect(f: suspend () -> A): IO<Nothing, A> =
       Effect(effect = f)
 
     /**
@@ -97,15 +94,15 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<Nothing, A> =
       Effect(ctx, f)
 
     /** @see effect */
-    operator fun <A> invoke(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+    operator fun <A> invoke(ctx: CoroutineContext, f: suspend () -> A): IO<Nothing, A> =
       effect(ctx, f)
 
     /** @see effect */
-    operator fun <A> invoke(f: suspend () -> A): IO<A> =
+    operator fun <A> invoke(f: suspend () -> A): IO<Nothing, A> =
       effect(EmptyCoroutineContext, f)
 
     /**
@@ -122,7 +119,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> just(a: A): IO<A> = Pure(a)
+    fun <A> just(a: A): IO<Nothing, A> = Pure(a)
 
     /**
      * Raise an exception in a pure way without actually throwing.
@@ -132,13 +129,13 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result: IO<Int> = IO.raiseException<Int>(RuntimeException("Boom"))
+     *   val result: IO<Nothing, Int> = IO.raiseException<Int>(RuntimeException("Boom"))
      *   //sampleEnd
      *   println(result.unsafeRunSync())
      * }
      * ```
      */
-    fun <A> raiseException(e: Throwable): BIO<Nothing, A> = RaiseException(e)
+    fun <A> raiseException(e: Throwable): IO<Nothing, A> = RaiseException(e)
 
     /**
      * Raise an error in a pure way
@@ -150,13 +147,13 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result: BIO<NetworkError, Int> = IO.raiseError(NetworkError)
+     *   val result: IO<Nothing, NetworkError, Int> = IO.raiseError(NetworkError)
      *   //sampleEnd
      *   println(result.unsafeRunSync())
      * }
      * ```
      */
-    fun <E, A> raiseError(e: E): BIO<E, A> = RaiseError(e)
+    fun <E, A> raiseError(e: E): IO<E, A> = RaiseError(e)
 
     /**
      *  Sleeps for a given [duration] without blocking a thread.
@@ -176,7 +173,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      **/
-    fun sleep(duration: Duration, continueOn: CoroutineContext = IODispatchers.CommonPool): IO<Unit> =
+    fun sleep(duration: Duration, continueOn: CoroutineContext = IODispatchers.CommonPool): IO<Nothing, Unit> =
       cancelable { cb ->
         val cancelRef = scheduler.schedule(ShiftTick(continueOn, cb), duration.amount, duration.timeUnit)
         later { cancelRef.cancel(false); Unit }
@@ -198,7 +195,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> later(f: () -> A): IO<A> =
+    fun <A> later(f: () -> A): IO<Nothing, A> =
       defer { Pure(f()) }
 
     /**
@@ -215,7 +212,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> defer(f: () -> IOOf<A>): IO<A> =
+    fun <A> defer(f: () -> IOOf<Nothing, A>): IO<Nothing, A> =
       Suspend(f)
 
     /**
@@ -238,7 +235,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   fun getUsernames(): IO<List<String>> =
+     *   fun getUsernames(): IO<Nothing, List<String>> =
      *     IO.async { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       GithubService.getUsernames { names, throwable ->
      *         when {
@@ -259,7 +256,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * @see cancelable for an operator that supports cancelation.
      * @see asyncF for a version that can suspend side effects in the registration function.
      */
-    fun <A> async(k: IOProc<A>): IO<A> =
+    fun <A> async(k: IOProc<A>): IO<Nothing, A> =
       Async { _: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
         onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
@@ -289,7 +286,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   fun getUsernames(): IO<List<String>> =
+     *   fun getUsernames(): IO<Nothing, List<String>> =
      *     IO.asyncF { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       IO {
      *         GithubService.getUsernames { names, throwable ->
@@ -312,7 +309,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * @see async for a version that can suspend side effects in the registration function.
      * @see cancelableF for an operator that supports cancelation.
      */
-    fun <A> asyncF(k: IOProcF<A>): IO<A> =
+    fun <A> asyncF(k: IOProcF<A>): IO<Nothing, A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
         val conn2 = IOConnection()
         conn.push(conn2.cancel())
@@ -361,7 +358,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   fun getUsernames(): IO<List<String>> =
+     *   fun getUsernames(): IO<Nothing, List<String>> =
      *     IO.cancelable { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       val id = GithubService.getUsernames { names, throwable ->
      *         when {
@@ -383,7 +380,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * @param cb an asynchronous computation that might fail.
      * @see async for wrapping impure APIs without cancelation
      */
-    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
+    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> IO<Nothing, Unit>): IO<Nothing, A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
         onceOnly(conn, cbb).let { cbb2 ->
           val cancelable = ForwardCancelable()
@@ -427,7 +424,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   fun getUsernames(): IO<List<String>> =
+     *   fun getUsernames(): IO<Nothing, List<String>> =
      *     IO.cancelableF { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       IO {
      *         val id = GithubService.getUsernames { names, throwable ->
@@ -451,7 +448,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * @param cb a deferred asynchronous computation that might fail.
      * @see asyncF for wrapping impure APIs without cancelation
      */
-    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<Nothing, IO<Nothing, Unit>>): IO<Nothing, A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
         val cancelable = ForwardCancelable()
         val conn2 = IOConnection()
@@ -459,7 +456,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
         conn.push(conn2.cancel())
 
         onceOnly(conn, cbb).let { cbb2 ->
-          val fa: IOOf<CancelToken<ForIO>> = try {
+          val fa: IOOf<Nothing, IO<Nothing, Unit>> = try {
             cb(cbb2)
           } catch (throwable: Throwable) {
             cbb2(Left(throwable.nonFatalOrThrow()))
@@ -487,7 +484,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    val unit: IO<Unit> =
+    val unit: IO<Nothing, Unit> =
       just(Unit)
 
     /**
@@ -504,7 +501,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    val lazy: IO<Unit> =
+    val lazy: IO<Nothing, Unit> =
       invoke { }
 
     /**
@@ -523,7 +520,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A> eval(eval: Eval<A>): IO<A> =
+    fun <A> eval(eval: Eval<A>): IO<Nothing, A> =
       when (eval) {
         is Eval.Now -> just(eval.value)
         else -> invoke { eval.value() }
@@ -551,7 +548,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      * }
      * ```
      */
-    fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
+    fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Nothing, Either<A, B>>): IO<Nothing, B> =
       f(a).fix().flatMap {
         when (it) {
           is Either.Left -> tailRecM(it.a, f)
@@ -568,13 +565,13 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result: IO<Int> = IO.never
+     *   val result: IO<Nothing, Int> = IO.never
      *   //sampleEnd
      *   println(result.unsafeRunSync())
      * }
      * ```
      */
-    val never: IO<Nothing> = async { }
+    val never: IO<Nothing, Nothing> = async { }
   }
 
   /**
@@ -622,7 +619,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * }
    * ```
    */
-  open fun <B> map(f: (A) -> B): BIO<E, B> =
+  open fun <B> map(f: (A) -> B): IO<E, B> =
     Map(this, f, 0)
 
   /**
@@ -645,7 +642,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * }
    * ```
    */
-  open fun continueOn(ctx: CoroutineContext): BIO<E, A> =
+  open fun continueOn(ctx: CoroutineContext): IO<E, A> =
     ContinueOn(this, ctx)
 
   /**
@@ -656,7 +653,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    *
    * fun main() {
    *   //sampleStart
-   *   val someF: IO<(Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
+   *   val someF: IO<Nothing, (Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
    *   val a = IO.just(3).ap(someF)
    *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
    *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
@@ -665,7 +662,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * }
    * ```
    */
-  fun <B> ap(ff: IOOf<(A) -> B>): IO<B> =
+  fun <B> ap(ff: IOOf<Nothing, (A) -> B>): IO<Nothing, B> =
     flatMap { a -> ff.fix().map { it(a) } }
 
   /**
@@ -693,7 +690,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
-  fun fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { cb ->
+  fun fork(ctx: CoroutineContext): IO<Nothing, Fiber<ForIO, A>> = async { cb ->
     val promise = UnsafePromise<A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
@@ -718,7 +715,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    *
    * @see flatMap if you need to act on the output of the original [IO].
    */
-  fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
+  fun <B> followedBy(fb: IOOf<Nothing, B>) = flatMap { fb }
 
   /**
    * Safely attempts the [IO] and lift any errors to the value side into [Either].
@@ -737,7 +734,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    *
    * @see flatMap if you need to act on the output of the original [IO].
    */
-  fun attempt(): IO<Either<Throwable, A>> =
+  fun attempt(): IO<Nothing, Either<Throwable, A>> =
     Bind(this, IOFrame.attempt())
 
   /**
@@ -756,7 +753,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * }
    * ```
    */
-  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
+  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<Nothing, B> =
     Bind(this, IOFrame.Companion.Redeem(fe, fb))
 
   /**
@@ -775,7 +772,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * }
    * ```
    */
-  fun <B> redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
+  fun <B> redeemWith(fe: (Throwable) -> IOOf<Nothing, B>, fb: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
     Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
 
   /**
@@ -784,7 +781,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * Reason it can happen in a referential transparent manner is because nothing is actually running when this method is invoked.
    * The combinator can be used to define how several programs have to run in a safe manner.
    */
-  fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
+  fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Unit> =
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
   /**
@@ -812,7 +809,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
    * @see [unsafeRunAsync] to run in an unsafe and non-cancellable manner.
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
-  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
     async { ccb ->
       val conn = IOConnection()
       val onCancelCb =
@@ -871,62 +868,62 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
-  fun uncancelable(): BIO<E, A> =
+  fun uncancelable(): IO<E, A> =
     ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
-  internal data class Pure<out A>(val a: A) : IO<A>() {
+  internal data class Pure<out A>(val a: A) : IO<Nothing, A>() {
     // Pure can be replaced by its value
-    override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
+    override fun <B> map(f: (A) -> B): IO<Nothing, B> = Suspend { Pure(f(a)) }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
 
-  internal data class RaiseException(val exception: Throwable) : IO<Nothing>() {
+  internal data class RaiseException(val exception: Throwable) : IO<Nothing, Nothing>() {
     // Errors short-circuit
-    override fun <B> map(f: (Nothing) -> B): IO<B> = this
+    override fun <B> map(f: (Nothing) -> B): IO<Nothing, B> = this
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
   }
 
-  internal data class RaiseError<E>(val error: E) : BIO<E, Nothing>() {
+  internal data class RaiseError<E>(val error: E) : IO<E, Nothing>() {
     // Errors short-circuit
-    override fun <B> map(f: (Nothing) -> B): BIO<E, B> = this
+    override fun <B> map(f: (Nothing) -> B): IO<E, B> = this
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = None
   }
 
-  internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
+  internal data class Delay<out A>(val thunk: () -> A) : IO<Nothing, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Suspend<out E, out A>(val thunk: () -> BIOOf<E, A>) : BIO<E, A>() {
+  internal data class Suspend<out E, out A>(val thunk: () -> IOOf<E, A>) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+  internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<Nothing, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
+  internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<Nothing, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<A, E, out B, out E2 : E>(val cont: BIO<E, A>, val g: (A) -> BIOOf<E, B>) : BIO<E2, B>() {
+  internal data class Bind<A, E, out B, out E2 : E>(val cont: IO<E, A>, val g: (A) -> IOOf<E, B>) : IO<E2, B>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContinueOn<E, A>(val cont: BIO<E, A>, val cc: CoroutineContext) : BIO<E, A>() {
+  internal data class ContinueOn<E, A>(val cont: IO<E, A>, val cc: CoroutineContext) : IO<E, A>() {
     // If a ContinueOn follows another ContinueOn, execute only the latest
-    override fun continueOn(ctx: CoroutineContext): BIO<E, A> = ContinueOn(cont, ctx)
+    override fun continueOn(ctx: CoroutineContext): IO<E, A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class ContextSwitch<E, A>(
-    val source: BIO<E, A>,
+    val source: IO<E, A>,
     val modify: (IOConnection) -> IOConnection,
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
-  ) : BIO<E, A>() {
+  ) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
@@ -938,10 +935,10 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
     }
   }
 
-  internal data class Map<A, out E, out B>(val source: BIOOf<E, A>, val g: (A) -> B, val index: Int) : BIO<E, B>(), (A) -> BIO<E, B> {
-    override fun invoke(value: A): BIO<E, B> = just(g(value))
+  internal data class Map<A, out E, out B>(val source: IOOf<E, A>, val g: (A) -> B, val index: Int) : IO<E, B>(), (A) -> IO<E, B> {
+    override fun invoke(value: A): IO<E, B> = just(g(value))
 
-    override fun <C> map(f: (B) -> C): BIO<E, C> =
+    override fun <C> map(f: (B) -> C): IO<E, C> =
     // Allowed to do maxStackDepthSize map operations in sequence before
       // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
@@ -969,8 +966,8 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
  *
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
-fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
-  handleErrorWith { e -> BIO.Pure(f(e)) }
+fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
+  handleErrorWith { e -> IO.Pure(f(e)) }
 
 /**
  * Handle the error by resolving the error with an effect that results in [A].
@@ -981,7 +978,7 @@ fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
  * import arrow.fx.typeclasses.milliseconds
  *
  * fun main(args: Array<String>) {
- *   fun getMessage(e: Throwable): IO<String> = IO.sleep(250.milliseconds)
+ *   fun getMessage(e: Throwable): IO<Nothing, String> = IO.sleep(250.milliseconds)
  *     .followedBy(IO.effect { "Delayed goodbye World! after $e" })
  *
  *   //sampleStart
@@ -994,8 +991,8 @@ fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
  *
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
-fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  BIO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+fun <A> IOOf<Nothing, A>.handleErrorWith(f: (Throwable) -> IOOf<Nothing, A>): IO<Nothing, A> =
+  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
 
 /**
  * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
@@ -1008,7 +1005,7 @@ fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
  * @see [bracketCase] for the more general operation
  *
  */
-fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
+fun <A> IOOf<Nothing, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Nothing, Unit>): IO<Nothing, A> =
   IOBracket.guaranteeCase(fix(), finalizer)
 
 /**
@@ -1029,12 +1026,12 @@ fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): I
  * }
  * ```
  */
-fun <E, A, B, E2 : E> BIOOf<E, A>.flatMap(f: (A) -> BIOOf<E2, B>): BIO<E2, B> =
+fun <E, A, B, E2 : E> IOOf<E, A>.flatMap(f: (A) -> IOOf<E2, B>): IO<E2, B> =
   when (val current = fix()) {
-    is BIO.RaiseException -> current
-    is BIO.RaiseError<E> -> current as BIO<E2, B>
-    is BIO.Pure<A> -> BIO.Suspend { f(current.a) }
-    else -> BIO.Bind(current, f)
+    is IO.RaiseException -> current
+    is IO.RaiseError<E> -> current as IO<E2, B>
+    is IO.Pure<A> -> IO.Suspend { f(current.a) }
+    else -> IO.Bind(current, f)
   }
 
 /**
@@ -1054,9 +1051,9 @@ fun <E, A, B, E2 : E> BIOOf<E, A>.flatMap(f: (A) -> BIOOf<E2, B>): BIO<E2, B> =
  *   override fun toString(): String = "This file contains some interesting content!"
  * }
  *
- * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
- * fun closeFile(file: File): IO<Unit> = IO { file.close() }
- * fun fileToString(file: File): IO<String> = IO { file.toString() }
+ * fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
+ * fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
+ * fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -1066,7 +1063,7 @@ fun <E, A, B, E2 : E> BIOOf<E, A>.flatMap(f: (A) -> BIOOf<E2, B>): BIO<E2, B> =
  * }
  * ```
  */
-fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
+fun <A, B> IOOf<Nothing, A>.bracket(release: (A) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
   bracketCase({ a, _ -> release(a) }, use)
 
 /**
@@ -1103,12 +1100,12 @@ fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<
  * class File(url: String) {
  *   fun open(): File = this
  *   fun close(): Unit {}
- *   fun content(): IO<String> =
+ *   fun content(): IO<Nothing, String> =
  *     IO.just("This file contains some interesting content!")
  * }
  *
- * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
- * fun closeFile(file: File): IO<Unit> = IO { file.close() }
+ * fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
+ * fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -1128,7 +1125,7 @@ fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<
  * }
  *  ```
  */
-fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
+fun <A, B> IOOf<Nothing, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
   IOBracket(this, release, use)
 
 /**
@@ -1139,4 +1136,4 @@ fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, 
  * @see [guaranteeCase] for the version that can discriminate between termination conditions
  * @see [bracket] for the more general operation
  */
-fun <A> IOOf<A>.guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
+fun <A> IOOf<Nothing, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<Nothing, A> = guaranteeCase { finalizer }

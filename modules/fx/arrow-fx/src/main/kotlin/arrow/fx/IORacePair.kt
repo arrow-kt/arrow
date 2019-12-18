@@ -47,8 +47,8 @@ interface IORacePair {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
-  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    BIO.Async { conn, cb ->
+  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Nothing, RacePair<ForIO, A, B>> =
+    IO.Async { conn, cb ->
       val active = AtomicBooleanW(true)
 
       val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }

@@ -10,7 +10,6 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.applicativeError.handleError
 import arrow.core.nonFatalOrThrow
 import arrow.core.none
-import arrow.core.some
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import kotlin.coroutines.CoroutineContext
@@ -24,7 +23,7 @@ interface IOParMap3 {
     fb: IOOf<B>,
     fc: IOOf<C>,
     f: (A, B, C) -> D
-  ): IO<D> = BIO.Async { conn, cb ->
+  ): IO<Nothing, D> = IO.Async { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
     val active = AtomicBooleanW(true)

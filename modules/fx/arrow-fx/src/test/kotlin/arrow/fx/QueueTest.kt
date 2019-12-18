@@ -27,7 +27,7 @@ class QueueTest : UnitSpec() {
     fun tests(
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
-      queue: (Int) -> IO<Queue<ForIO, Int>>
+      queue: (Int) -> IO<Nothing, Queue<ForIO, Int>>
     ) {
 
       "$label - make a queue the add values then retrieve in the same order" {
