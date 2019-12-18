@@ -19,7 +19,6 @@ import arrow.test.laws.ProfunctorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
-import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -45,7 +44,7 @@ class Function1Test : UnitSpec() {
       }
   }
 
-  fun genk() = object: GenK<Conested<ForFunction1, Int>> {
+  fun genk() = object : GenK<Conested<ForFunction1, Int>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForFunction1, Int>, A>> =
       gen.map {
         Function1.just<Int, A>(it).conest()
