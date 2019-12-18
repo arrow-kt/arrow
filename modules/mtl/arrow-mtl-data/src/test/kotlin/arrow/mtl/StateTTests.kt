@@ -1,7 +1,6 @@
 package arrow.mtl
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.ForTry
 import arrow.core.Try
 import arrow.core.ForListK
@@ -44,19 +43,14 @@ class StateTTests : UnitSpec() {
     a.runM(ListK.monad(), 1) == b.runM(ListK.monad(), 1)
   }
 
-  private fun IOEQ(): Eq<StateTOf<ForIO, Int, Int>> = Eq { a, b ->
-    a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
-  }
-
-  private fun IOEitherEQ(): Eq<StateTOf<ForIO, Int, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun <A> IOEQ(): Eq<StateTOf<ForIO, Int, A>> = Eq { a, b ->
     a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
   }
 
   init {
-
     testLaws(
       MonadStateLaws.laws(M, EQ, EQ_UNIT),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEitherEQ()),
+      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEQ()),
       SemigroupKLaws.laws(
         StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
         StateT.applicative<ForListK, Int>(ListK.monad()),
