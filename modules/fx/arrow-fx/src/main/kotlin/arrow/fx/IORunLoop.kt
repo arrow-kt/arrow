@@ -75,7 +75,7 @@ internal object IORunLoop {
         is BIO.Effect -> {
           return suspendAsync(currentIO, bFirst, bRest) as IO<A>
         }
-        is BIO.Bind<*, *, *> -> {
+        is BIO.Bind<*, *, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -85,7 +85,7 @@ internal object IORunLoop {
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
-        is BIO.ContinueOn -> {
+        is BIO.ContinueOn<*, *> -> {
           val currentCC = currentIO.cc
           val localCont = currentIO.cont
 
@@ -227,7 +227,7 @@ internal object IORunLoop {
           rcb.start(currentIO, ctx, bFirst, bRest)
           return
         }
-        is BIO.Bind<*, *, *> -> {
+        is BIO.Bind<*, *, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) bRest = ArrayStack()
             bRest.push(bFirst)
@@ -235,7 +235,7 @@ internal object IORunLoop {
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
-        is BIO.ContinueOn<*> -> {
+        is BIO.ContinueOn<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) bRest = ArrayStack()
             bRest.push(bFirst)

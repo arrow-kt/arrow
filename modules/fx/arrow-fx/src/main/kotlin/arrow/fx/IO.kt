@@ -1013,7 +1013,7 @@ sealed class BIO<out E, out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<A, E, out B, out E2: E>(val cont: BIO<E, A>, val g: (A) -> BIO<E, B>) : BIO<E2, B>() {
+  internal data class Bind<A, E, out B, out E2 : E>(val cont: BIO<E, A>, val g: (A) -> BIO<E, B>) : BIO<E2, B>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
   }
 
@@ -1098,7 +1098,6 @@ fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
  */
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
   BIO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
-
 
 /**
  * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing

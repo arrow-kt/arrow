@@ -45,8 +45,9 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.fx.handleError as ioHandleError
-import arrow.fx.handleErrorWith as ioHandleErrorWith
+import arrow.fx.handleError as HandleError
+import arrow.fx.handleErrorWith as HandleErrorWith
+import arrow.fx.guaranteeCase as GuaranteeCase
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -96,10 +97,10 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
     fix().attempt()
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-    ioHandleErrorWith(f)
+    HandleErrorWith(f)
 
   override fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
-    ioHandleError(f)
+    HandleError(f)
 
   override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
     fix().redeem(fe, fb)
@@ -123,7 +124,7 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
     fix().attempt()
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-    ioHandleErrorWith(f)
+    HandleErrorWith(f)
 
   override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
     fix().redeemWith(fe, fb)
@@ -147,7 +148,7 @@ interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
     fix().guarantee(finalizer)
 
   override fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    fix().guaranteeCase(finalizer)
+    GuaranteeCase(finalizer)
 }
 
 @extension
