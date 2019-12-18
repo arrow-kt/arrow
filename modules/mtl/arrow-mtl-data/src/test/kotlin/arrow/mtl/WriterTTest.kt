@@ -11,7 +11,6 @@ import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
 import arrow.core.extensions.listk.eqK.eqK
-import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
@@ -24,7 +23,6 @@ import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.writert.alternative.alternative
-import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
@@ -72,7 +70,7 @@ class WriterTTest : UnitSpec() {
       ConcurrentLaws.laws(WriterT.concurrent(IO.concurrent(), Int.monoid()), ioEQK()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
-        WriterT.applicative(ListK.monad(), Int.monoid()),
+        WriterT.genK(ListK.genK(), Gen.int()),
         listEQK()
       ),
 

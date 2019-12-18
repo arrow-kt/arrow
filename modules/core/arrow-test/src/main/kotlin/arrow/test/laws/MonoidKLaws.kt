@@ -17,7 +17,7 @@ object MonoidKLaws {
     laws(SGK, GENK.genK(Gen.int()), EQK)
 
   @Deprecated("remove")
-  fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
+  internal fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, Gen.int().map { AP.just(it) }, EQK)
 
   private fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
