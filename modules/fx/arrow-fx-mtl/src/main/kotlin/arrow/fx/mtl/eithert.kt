@@ -13,6 +13,7 @@ import arrow.fx.RaceTriple
 import arrow.fx.Ref
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
@@ -115,6 +116,10 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
 
   override fun dispatchers(): Dispatchers<EitherTPartialOf<F, L>> =
     CF().dispatchers() as Dispatchers<EitherTPartialOf<F, L>>
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<EitherTPartialOf<F, L>>): EitherT<F, L, A> = CF().run {
+    EitherT.liftF(this, CF().cancelable { cb -> k(cb).value().map { Unit } })
+  }
 
   override fun <A> EitherTOf<F, L, A>.fork(ctx: CoroutineContext): EitherT<F, L, Fiber<EitherTPartialOf<F, L>, A>> = CF().run {
     EitherT.liftF(this, value().fork(ctx).map(::fiberT))
