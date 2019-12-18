@@ -49,7 +49,6 @@ class ListKTest : UnitSpec() {
 
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
     val associativeSemigroupalEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
-    val aShortListK = Gen.listK(Gen.int()).filter { it.size < 10 } as Gen<Kind<ForListK, Int>>
 
     testLaws(
       MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, ListK.eqK()),
@@ -57,8 +56,8 @@ class ListKTest : UnitSpec() {
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), ListK.genK(), ListK.eqK()),
       MonoidalLaws.laws(ListK.monoidal(),
-        aShortListK,
-        ListK.eq(Tuple2.eq(Int.eq(), Int.eq())),
+        ListK.genK(10),
+        ListK.eqK(),
         this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
       TraverseLaws.laws(ListK.traverse(), ListK.genK(), ListK.eqK()),

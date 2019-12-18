@@ -46,9 +46,9 @@ fun Id.Companion.genK() = object : GenK<ForId> {
     Gen.id(gen) as Gen<Kind<ForId, A>>
 }
 
-fun ListK.Companion.genK() = object : GenK<ForListK> {
+fun ListK.Companion.genK(withMaxSize: Int = Int.MAX_VALUE) = object : GenK<ForListK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForListK, A>> =
-    Gen.listK(gen) as Gen<Kind<ForListK, A>>
+    Gen.listK(gen).filter { it.size <= withMaxSize } as Gen<Kind<ForListK, A>>
 }
 
 fun NonEmptyList.Companion.genK() = object : GenK<ForNonEmptyList> {
@@ -73,9 +73,9 @@ fun <K : Comparable<K>> SortedMapK.Companion.genK(kgen: Gen<K>) =
       Gen.sortedMapK(kgen, gen) as Gen<Kind<SortedMapKPartialOf<K>, A>>
   }
 
-fun SetK.Companion.genK() = object : GenK<ForSetK> {
+fun SetK.Companion.genK(withMaxSize: Int = Int.MAX_VALUE) = object : GenK<ForSetK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSetK, A>> =
-    Gen.genSetK(gen) as Gen<Kind<ForSetK, A>>
+    Gen.genSetK(gen).filter { it.size <= withMaxSize } as Gen<Kind<ForSetK, A>>
 }
 
 fun <A> Ior.Companion.genK(kgen: Gen<A>) =

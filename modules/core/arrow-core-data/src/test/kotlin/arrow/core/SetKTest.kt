@@ -41,16 +41,13 @@ class SetKTest : UnitSpec() {
 
     val EQ = SetK.eq(Int.eq())
 
-    // limit size of testdata to control test times
-    val aSmallSetK = Gen.genSetK(Gen.int()).filter { it.size < 10 } as Gen<Kind<ForSetK, Int>>
-
     testLaws(
       ShowLaws.laws(SetK.show(), EQ, Gen.genSetK(Gen.int())),
       MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
       SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
       MonoidalLaws.laws(SetK.monoidal(),
-        aSmallSetK,
-        Eq.any(),
+        SetK.genK(10),
+        SetK.eqK(),
         this::bijection,
         associativeSemigroupalEq),
       MonoidKLaws.laws(SetK.monoidK(), SetK.genK(), SetK.eqK()),
