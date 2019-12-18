@@ -11,4 +11,4 @@ redirect_from:
 
 
 
-`SortedMapK` is pretty much the same as [`MapK`]({{ '/docs/arrow/data/mapk' | relative_url }}) except that it is sorted.
+`SortedMapK` is pretty much the same as [`MapK`]({{ '/docs/arrow/core/mapk' | relative_url }}) except that it is sorted.

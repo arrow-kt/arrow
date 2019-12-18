@@ -61,9 +61,9 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### General use
 
-- [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
+- [`NonEmptyList`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-non-empty-list/' | relative_url }}) - a homogeneous list that has at least 1 value
 
-- [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
+- [`Ior`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
 - [`Const`]({{ '/docs/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 
@@ -71,17 +71,17 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
 
-- [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Validated`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 
 ##### Reader/Writer/State
 
-- [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
+- [`Kleisli`]({{ '/docs/arrow/mtl/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
 
 - [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
-- [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
+- [`Writer`]({{ '/docs/arrow/mtl/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
 
-- [`State`]({{ '/docs/arrow/data/state/' | relative_url }}) - represents a stateful calculation with a carried value that can be read from or modified, like a combination of reader and writer
+- [`State`]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) - represents a stateful calculation with a carried value that can be read from or modified, like a combination of reader and writer
 
 ##### Wrappers
 
@@ -89,31 +89,31 @@ These types wrap over some of Kotlin's collections and functions to give them ca
 
 - [`ListK`]({{ '/docs/arrow/core/listk/' | relative_url }})
 
-- [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }})
+- [`SequenceK`]({{ '/docs/arrow/core/sequencek/' | relative_url }})
 
-- [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }})
+- [`SetK`]({{ '/docs/arrow/core/setk/' | relative_url }})
 
-- [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }})
+- [`MapK`]({{ '/docs/arrow/core/mapk/' | relative_url }})
 
-- [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }})
+- [`SortedMapK`]({{ '/docs/arrow/core/sortedmapk/' | relative_url }})
 
 - [`Function0`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-function0/' | relative_url }})
 
-- [`Function1`]({{ '/docs/arrow/core/function1/' | relative_url }})
+- [`Function1`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-function1/' | relative_url }})
 
 ##### Transformers
 
 A transformer is a special kind of datatype that allows combining two datatypes to give one of them the abstractions of another
 
-- [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
+- [`OptionT`]({{ '/docs/arrow/mtl/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
 
-- [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
+- [`EitherT`]({{ '/docs/arrow/mtl/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
 
-- [`ReaderT`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
+- [`ReaderT`]({{ '/docs/arrow/mtl/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
 
-- [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
+- [`WriterT`]({{ '/docs/arrow/mtl/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
 
-- [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}) - gives the datatype wrapped the properties of `State`
+- [`StateT`]({{ '/docs/arrow/mtl/statet/' | relative_url }}) - gives the datatype wrapped the properties of `State`
 
 
 ##### Codata
@@ -124,13 +124,13 @@ TODO
 
 - [`Coreader`]
 
-- [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+- [`Store`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
 
-- [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+- [`Moore`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
-- [`Sum`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+- [`Sum`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-moore/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
-- [`Day`]({{ '/docs/arrow/data/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
+- [`Day`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
 
 #### Effects
 
