@@ -9,15 +9,18 @@ import arrow.core.Right
 import arrow.core.internal.AtomicRefW
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
+
 import arrow.fx.internal.Platform
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
+
+typealias ObservableKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias ObservableKProcF<A> = ((Either<Throwable, A>) -> Unit) -> ObservableKOf<Unit>
 
 class ForObservableK private constructor() {
   companion object

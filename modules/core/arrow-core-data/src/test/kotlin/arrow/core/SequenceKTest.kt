@@ -5,7 +5,9 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.sequencek.align.align
 import arrow.core.extensions.sequencek.applicative.applicative
+import arrow.core.extensions.sequencek.crosswalk.crosswalk
 import arrow.core.extensions.sequencek.eq.eq
+import arrow.core.extensions.sequencek.eqK.eqK
 import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
@@ -14,12 +16,16 @@ import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
+import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
+import arrow.core.extensions.sequencek.unzip.unzip
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.sequenceK
 import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
@@ -27,11 +33,12 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
@@ -63,29 +70,39 @@ class SequenceKTest : UnitSpec() {
         fix().toList().toString()
     }
 
-    val EQK = object : EqK<ForSequenceK> {
-      override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
-        SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
-    }
-
     testLaws(
       MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
-      ShowLaws.laws(show, eq) { sequenceOf(it).k() },
+      ShowLaws.laws(show, eq, Gen.sequenceK(Gen.int())),
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
       MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq, this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), { SequenceK.just(it) }, eq),
-      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
+      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
       AlignLaws.laws(SequenceK.align(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        EQK,
+        SequenceK.genK(),
+        SequenceK.eqK(),
         SequenceK.foldable()
       ),
       UnalignLaws.laws(SequenceK.unalign(),
-        Gen.sequenceK(Gen.int()) as Gen<Kind<ForSequenceK, Int>>,
-        EQK
+        SequenceK.genK(),
+        SequenceK.eqK(),
+        SequenceK.foldable()
+      ),
+      RepeatLaws.laws(SequenceK.repeat(),
+        SequenceK.genK(),
+        SequenceK.eqK(),
+        SequenceK.foldable()
+      ),
+      UnzipLaws.laws(SequenceK.unzip(),
+        SequenceK.genK(),
+        SequenceK.eqK(),
+        SequenceK.foldable()
+      ),
+      CrosswalkLaws.laws(SequenceK.crosswalk(),
+        SequenceK.genK(),
+        SequenceK.eqK()
       )
     )
 

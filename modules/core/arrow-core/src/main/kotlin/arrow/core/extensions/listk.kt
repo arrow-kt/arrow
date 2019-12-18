@@ -14,15 +14,15 @@ import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.k
-import arrow.core.leftIor
-import arrow.core.rightIor
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
@@ -43,8 +43,11 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
+import arrow.typeclasses.Zip
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
+import kotlin.collections.zip as listZip
 
 @extension
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
@@ -64,7 +67,7 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
   fun EQ(): Eq<A>
 
   override fun ListKOf<A>.eqv(b: ListKOf<A>): Boolean =
-    if (fix().size == b.fix().size) fix().zip(b.fix()) { aa, bb ->
+    if (fix().size == b.fix().size) fix().listZip(b.fix()) { aa, bb ->
       EQ().run { aa.eqv(bb) }
     }.fold(true) { acc, bool ->
       acc && bool
@@ -312,13 +315,7 @@ interface ListKSemialign : Semialign<ForListK>, ListKFunctor {
   override fun <A, B> align(
     a: Kind<ForListK, A>,
     b: Kind<ForListK, B>
-  ): Kind<ForListK, Ior<A, B>> = alignRec(a.fix(), b.fix()).k()
-
-  private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
-    ls.isEmpty() -> rs.map { it.rightIor() }
-    rs.isEmpty() -> ls.map { it.leftIor() }
-    else -> listOf(Ior.Both(ls.first(), rs.first())).listPlus(alignRec(ls.drop(1), rs.drop(1)))
-  }
+  ): Kind<ForListK, Ior<A, B>> = ListK.align(a.fix(), b.fix())
 }
 
 @extension
@@ -337,5 +334,42 @@ interface ListKUnalign : Unalign<ForListK>, ListKSemialign {
           { a, b -> l.listPlus(a) toT r.listPlus(b) }
         )
       }.bimap({ it.k() }, { it.k() })
+    }
+}
+
+@extension
+interface ListKZip : Zip<ForListK>, ListKSemialign {
+  override fun <A, B> Kind<ForListK, A>.zip(other: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
+    this.fix().listZip(other.fix()).map { it.first toT it.second }.k()
+}
+
+@extension
+interface ListKUnzip : Unzip<ForListK>, ListKZip {
+  override fun <A, B> Kind<ForListK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
+    this.fix().let { list ->
+      list.fold(emptyList<A>() toT emptyList<B>()) { (l, r), x ->
+        l.listPlus(x.a) toT r.listPlus(x.b)
+      }
+    }.bimap({ it.k() }, { it.k() })
+}
+
+@extension
+interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
+  override fun <F, A, B> crosswalk(
+    ALIGN: Align<F>,
+    a: Kind<ForListK, A>,
+    fa: (A) -> Kind<F, B>
+  ): Kind<F, Kind<ForListK, B>> =
+    a.fix().let { list ->
+      list.foldLeft(ALIGN.run { empty<ListK<B>>() }) { xs, x ->
+        ALIGN.run {
+          alignWith(fa(x), xs) { ior ->
+            ior.fold(
+              { ListK.just(it) },
+              ::identity,
+              { l, r -> ListK.just(l) + r.fix() })
+          }
+        }
+      }
     }
 }

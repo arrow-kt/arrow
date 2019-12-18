@@ -5,9 +5,10 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-typealias MonoKConnection = KindConnection<ForMonoK>
-typealias MonoKProc<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias MonoKProcF<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>
+@Deprecated("Cancelation should be done with the cancelable combinator")
+typealias MonoKProc<A> = (KindConnection<ForMonoK>, (Either<Throwable, A>) -> Unit) -> Unit
+@Deprecated("Cancelation should be done with the cancelable combinator")
+typealias MonoKProcF<A> = (KindConnection<ForMonoK>, (Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>
 
 /**
  * Connection for [MonoK].
@@ -20,6 +21,8 @@ typealias MonoKProcF<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> M
  * @see MonoK.async
  */
 @Suppress("UNUSED_PARAMETER", "FunctionName")
+@Deprecated(message = "Cancelling operations through MonoKConnection will not be supported anymore." +
+"In case you need to cancel multiple processes can do so by using cancelable and composing cancel operations using zipWith or other parallel operators")
 fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnection(object : MonadDefer<ForMonoK> {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)

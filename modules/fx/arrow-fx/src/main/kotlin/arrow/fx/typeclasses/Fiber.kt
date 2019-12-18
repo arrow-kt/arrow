@@ -1,7 +1,7 @@
 package arrow.fx.typeclasses
 
 import arrow.Kind
-import arrow.fx.CancelToken
+
 import arrow.higherkind
 
 /**
