@@ -21,25 +21,16 @@ object TraverseFilterLaws {
     GA: Applicative<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> =
-    laws(TF, GA, GENK.genK(Gen.int()), EQK)
-
-  @Deprecated("should be internal, use GENK one")
-  // FIXME(paco): TraverseLaws cannot receive AP::just due to a crash caused by the inliner. Check in TraverseLaws why.
-  fun <F> laws(
-    TF: TraverseFilter<F>,
-    GA: Applicative<F>,
-    GEN: Gen<Kind<F, Int>>,
-    EQK: EqK<F>
   ): List<Law> {
+    val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
     val EQ_NESTED = EQK.liftEq(EQ)
 
-    return TraverseLaws.laws(TF, GEN, EQK) +
-      listOf(
-        Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
-        Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, GA, EQ_NESTED) }
-      )
+    return TraverseLaws.laws(TF, GENK, EQK) +
+        listOf(
+          Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
+          Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, GA, EQ_NESTED) }
+        )
   }
 
   fun <F> TraverseFilter<F>.identityTraverseFilter(GEN: Gen<Kind<F, Int>>, GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =

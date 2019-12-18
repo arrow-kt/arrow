@@ -55,20 +55,17 @@ object TraverseLaws {
       )
   */
 
-  fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(TF, GENK.genK(Gen.intSmall()), EQK)
-
-  @Deprecated("should be internal")
-  fun <F> laws(TF: Traverse<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.intSmall())
     val EQ = EQK.liftEq(Int.eq())
 
     return FoldableLaws.laws(TF, GEN) +
-      FunctorLaws.laws(TF, GEN, EQK) + listOf(
-      Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
-      Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
-      Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
-      Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) }
-    )
+        FunctorLaws.laws(TF, GEN, EQK) + listOf(
+        Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
+        Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
+        Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
+        Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) }
+      )
   }
 
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {

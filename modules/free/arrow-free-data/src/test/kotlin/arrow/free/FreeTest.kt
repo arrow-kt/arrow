@@ -21,6 +21,7 @@ import arrow.free.extensions.free.monad.monad
 import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
@@ -59,16 +60,16 @@ class FreeTest : UnitSpec() {
   }.fix()
 
   init {
-
     val IdMonad = Id.monad()
 
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
-    val cf: (Int) -> Free<ForId, Int> = { it.free() }
-
-    val EQ1 = Free.eq<ForId, ForId, Int>(Id.monad(), FunctionK.id())
-
-    val G = Gen.int().map(cf) as Gen<Kind<FreePartialOf<ForId>, Int>>
+    fun <S> GK() = object : GenK<FreePartialOf<S>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreePartialOf<S>, A>> =
+        gen.map {
+          it.free<S, A>()
+        }
+    }
 
     val opsEQK = object : EqK<FreePartialOf<ForOps>> {
       override fun <A> Kind<FreePartialOf<ForOps>, A>.eqK(other: Kind<FreePartialOf<ForOps>, A>, EQ: Eq<A>): Boolean =
@@ -92,8 +93,8 @@ class FreeTest : UnitSpec() {
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
       MonadLaws.laws(Ops, opsEQK),
       MonadLaws.laws(Free.monad(), opsEQK),
-      FoldableLaws.laws(Free.foldable(Id.foldable()), G),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), G, idEQK)
+      FoldableLaws.laws(Free.foldable(Id.foldable()), GK()),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), GK(), idEQK)
     )
 
     "Can interpret an ADT as Free operations to Option" {

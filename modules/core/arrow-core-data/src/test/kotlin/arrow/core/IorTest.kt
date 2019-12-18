@@ -50,7 +50,7 @@ class IorTest : UnitSpec() {
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
       TraverseLaws.laws(Ior.traverse(),
-        Gen.ior(Gen.int(), Gen.int()).filter { it is Right } as Gen<Kind<IorPartialOf<Int>, Int>>,
+        Ior.genK(Gen.int()),
         Ior.eqK(Int.eq())
       ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),

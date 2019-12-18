@@ -24,10 +24,6 @@ class DayTest : UnitSpec() {
     val cf = { x: Int -> Day(Id(x), Id(0)) { xx, yy -> xx + yy } }
     val g = Gen.int().map(cf) as Gen<Kind<Kind<Kind<ForDay, ForId>, ForId>, Int>>
 
-    val EQ: Eq<DayOf<ForId, ForId, Int>> = Eq { a, b ->
-      a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
-    }
-
     val EQK = object : EqK<DayPartialOf<ForId, ForId>> {
       override fun <A> Kind<DayPartialOf<ForId, ForId>, A>.eqK(other: Kind<DayPartialOf<ForId, ForId>, A>, EQ: Eq<A>): Boolean =
         (this.fix() to other.fix()).let {

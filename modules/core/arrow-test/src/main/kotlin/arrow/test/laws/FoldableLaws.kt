@@ -22,6 +22,7 @@ object FoldableLaws {
   fun <F> laws(FF: Foldable<F>, GENK: GenK<F>): List<Law> =
     laws(FF, GENK.genK(Gen.intSmall()))
 
+  @Deprecated("should be internal, use the GENK version")
   fun <F> laws(FF: Foldable<F>, GEN: Gen<Kind<F, Int>>): List<Law> {
     val EQ = Int.eq()
 
