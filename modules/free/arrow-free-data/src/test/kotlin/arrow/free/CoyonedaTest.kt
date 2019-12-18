@@ -13,6 +13,7 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.free.extensions.coyoneda.functor.functor
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -28,12 +29,18 @@ class CoyonedaTest : UnitSpec() {
     }
   }
 
+  fun genk() = object : GenK<Kind2<ForCoyoneda, ForId, Int>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, A>> =
+      gen.map {
+        Coyoneda(Id(0)) {
+          it
+        }
+      } as Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, A>>
+  }
+
   init {
 
-    val f: (Int) -> Coyoneda<ForId, Int, Int> = { _ -> Coyoneda(Id(0)) { it } }
-    val g: Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, Int>> = Gen.int().map(f) as Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, Int>>
-
-    testLaws(FunctorLaws.laws(Coyoneda.functor(), g, EQK))
+    testLaws(FunctorLaws.laws(Coyoneda.functor(), genk(), EQK))
 
     "map should be stack-safe" {
       val loops = 10000
