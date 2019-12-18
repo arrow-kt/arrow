@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.ForListK
+import arrow.core.ForOption
 import arrow.core.ForTry
 import arrow.core.ListK
 import arrow.core.Option
@@ -12,8 +13,10 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
-import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.monad.monad
+import arrow.core.extensions.option.semigroupK.semigroupK
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.fix
 import arrow.fx.ForIO
@@ -22,12 +25,12 @@ import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
-import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.statet.semigroupK.semigroupK
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.generators.tuple2
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
@@ -55,6 +58,8 @@ class StateTTests : UnitSpec() {
   }
 
   val listkStateEQK = eqk(ListK.eqK(), Int.eq(), ListK.monad(), 1)
+
+  val optionStateEQK = eqk(Option.eqK(), Int.eq(), Option.monad(), 1)
 
   val ioStateEQK = eqk(IO.eqK(), Int.eq(), IO.monad(), 1)
 
@@ -85,11 +90,9 @@ class StateTTests : UnitSpec() {
       AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioStateEQK),
 
       SemigroupKLaws.laws(
-        StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
-        Gen.int().map { StateT.applicative<ForListK, Int>(ListK.monad()).just(it) } as Gen<Kind<StateTPartialOf<ForListK, Int>, Int>>,
-        // question: this gen seems to work in principle but is too slow + GC exception
-        // genk(ListK.genK(), Gen.int()),
-        listkStateEQK),
+        StateT.semigroupK<ForOption, Int>(Option.monad(), Option.semigroupK()),
+        genk(Option.genK(), Gen.int()),
+        optionStateEQK),
       MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },
         { StateT.liftF(ListK.monad(), ListK.just { s: Int -> s * 2 }) },

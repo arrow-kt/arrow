@@ -39,7 +39,9 @@ class SumTest : UnitSpec() {
         Sum.left(a, b)
       }
 
-      // question: this does not work. should we have right side too?
+      // TODO: tests fail when Sum.right is also generated.
+      // open ticket after merging this PR (https://github.com/arrow-kt/arrow/pull/1844#discussion_r359530920)
+
       //  Gen.bind(GENKF.genK(gen), GENKG.genK(gen)) { a, b ->
       //  Sum.right(a, b)
       //    }

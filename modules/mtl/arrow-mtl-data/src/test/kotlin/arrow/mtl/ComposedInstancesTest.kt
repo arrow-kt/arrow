@@ -13,15 +13,16 @@ import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.function1.contravariant.contravariant
+import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.applicative.applicative
-import arrow.core.extensions.nonemptylist.eq.eq
+import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
@@ -29,7 +30,7 @@ import arrow.core.extensions.tuple2.bifunctor.bifunctor
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.core.k
-import arrow.core.nel
+import arrow.mtl.extensions.nested
 import arrow.mtl.typeclasses.ComposedApplicative
 import arrow.mtl.typeclasses.ComposedBifunctor
 import arrow.mtl.typeclasses.ComposedFoldable
@@ -43,11 +44,11 @@ import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.biunnest
 import arrow.mtl.typeclasses.nest
-import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
-import arrow.test.generators.option
+import arrow.test.generators.genK
+import arrow.test.generators.nested
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.FoldableLaws
@@ -66,53 +67,39 @@ import io.kotlintest.properties.Gen
 class ComposedInstancesTest : UnitSpec() {
   init {
 
-    val GENK_LK_OPTION = object : GenK<Nested<ForListK, ForOption>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForListK, ForOption>, A>> = Gen.option(gen).map { ListK.just(it).nest() }
-    }
+    val GENK_LK_OPTION = ListK.genK().nested(Option.genK())
 
-    val EQK_LK_OPTION = object : EqK<Nested<ForListK, ForOption>> {
-      override fun <A> Kind<Nested<ForListK, ForOption>, A>.eqK(other: Kind<Nested<ForListK, ForOption>, A>, EQ: Eq<A>): Boolean =
-        this.unnest().fix() == other.unnest().fix()
-    }
+    val EQK_LK_OPTION = ListK.eqK().nested(Option.eqK())
 
-    val EQK_OPTION_FN1 = object : EqK<Nested<ForOption, Conested<ForFunction1, Int>>> {
-      override fun <A> Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>.eqK(other: Kind<Nested<ForOption, Conested<ForFunction1, Int>>, A>, EQ: Eq<A>): Boolean =
-        this.unnest().fix().fold(
-          { other.unnest().fix().isEmpty() },
-          { fnA ->
-            other.unnest().fix().fold(
-              { false },
-              { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
-            )
-          }
-        )
-    }
+    fun EQK_FN1() = object : EqK<Conested<ForFunction1, Int>> {
+      override fun <A> Kind<Conested<ForFunction1, Int>, A>.eqK(other: Kind<Conested<ForFunction1, Int>, A>, EQ: Eq<A>): Boolean =
+        (this.counnest() to other.counnest()).let {
+          val ls = it.first.fix().invoke(1)
+          val rs = it.first.fix().invoke(1)
 
-    fun <A> GENK_OPTION_FN1(genA: Gen<A>) = object : GenK<Nested<ForOption, Conested<ForFunction1, A>>> {
-      override fun <B> genK(gen: Gen<B>): Gen<Kind<Nested<ForOption, Conested<ForFunction1, A>>, B>> =
-        Gen.functionAToB<B, A>(genA).map { it.k().conest() }.orNull().map {
-          Option.fromNullable(it).nest()
+          ls == rs
         }
     }
+
+    val EQK_OPTION_FN1: EqK<Nested<ForOption, Conested<ForFunction1, Int>>> = Option.eqK().nested(EQK_FN1())
+
+    fun <A> GENK_OPTION_FN1(genA: Gen<A>): GenK<Nested<ForOption, Conested<ForFunction1, A>>> =
+      object : GenK<Nested<ForOption, Conested<ForFunction1, A>>> {
+        override fun <B> genK(gen: Gen<B>): Gen<Kind<Nested<ForOption, Conested<ForFunction1, A>>, B>> =
+          Gen.functionAToB<B, A>(genA).map { it.k().conest() }.orNull().map {
+            Option.fromNullable(it).nest()
+          }
+      }
 
     val EQ_TUPLE2: Eq<Kind2<Nested<ForTuple2, ForTuple2>, Int, Int>> = Eq { a, b ->
       a.biunnest().fix() == b.biunnest().fix()
     }
 
-    val EQK_OPTION_NEL = object : EqK<Nested<ForOption, ForNonEmptyList>> {
-      override fun <A> Kind<Nested<ForOption, ForNonEmptyList>, A>.eqK(other: Kind<Nested<ForOption, ForNonEmptyList>, A>, EQ: Eq<A>): Boolean {
-        val ls = this.unnest().fix().map { it.fix() }
-        val rs = other.unnest().fix().map { it.fix() }
+    val EQK_OPTION_NEL: EqK<Nested<ForOption, ForNonEmptyList>> =
+      Option.eqK().nested(NonEmptyList.eqK())
 
-        return Option.eq(NonEmptyList.eq(EQ)).run {
-          ls.eqv(rs)
-        }
-      }
-    }
-
-    val GENK_OPTION_NEL = object : GenK<Nested<ForOption, ForNonEmptyList>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<ForOption, ForNonEmptyList>, A>> = gen.map { it.nel() }.orNull().map { Option.fromNullable(it).nest() }
-    }
+    val GENK_OPTION_NEL: GenK<Nested<ForOption, ForNonEmptyList>> =
+      Option.genK().nested(NonEmptyList.genK())
 
     val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
 

@@ -18,14 +18,14 @@ class MooreTest : UnitSpec() {
     val intMoore: (Int) -> MooreOf<Int, Int> = { x: Int -> Moore(x, ::handle) }
     val g = Gen.int().map(intMoore)
 
-    val EQ = object : EqK<MoorePartialOf<Int>> {
+    val EQK = object : EqK<MoorePartialOf<Int>> {
       override fun <A> Kind<MoorePartialOf<Int>, A>.eqK(other: Kind<MoorePartialOf<Int>, A>, EQ: Eq<A>): Boolean {
         return this.fix().extract() == other.fix().extract()
       }
     }
 
     testLaws(
-      ComonadLaws.laws(Moore.comonad(), g, EQ)
+      ComonadLaws.laws(Moore.comonad(), g, EQK)
     )
 
     fun handleRoute(route: String): Moore<String, Id<String>> = when (route) {

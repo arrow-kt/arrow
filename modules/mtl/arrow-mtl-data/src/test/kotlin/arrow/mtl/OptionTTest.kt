@@ -30,6 +30,7 @@ import arrow.fx.mtl.concurrent
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
+import arrow.mtl.extensions.nested
 import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
 import arrow.mtl.extensions.optiont.eqK.eqK
@@ -37,8 +38,6 @@ import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
-import arrow.mtl.typeclasses.Nested
-import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -156,16 +155,6 @@ fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
 
       Option.eq(Either.eq(Eq.any(), EQ)).run {
         ls.eqv(rs)
-      }
-    }
-}
-
-fun <F, G> EqK<F>.nested(EQKG: EqK<G>): EqK<Nested<F, G>> = object : EqK<Nested<F, G>> {
-  override fun <A> Kind<Nested<F, G>, A>.eqK(other: Kind<Nested<F, G>, A>, EQ: Eq<A>): Boolean =
-    (this.unnest() to other.unnest()).let { (a, b) ->
-
-      this@nested.liftEq(EQKG.liftEq(EQ)).run {
-        a.eqv(b)
       }
     }
 }
