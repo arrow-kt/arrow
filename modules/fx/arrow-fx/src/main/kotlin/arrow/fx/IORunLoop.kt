@@ -43,7 +43,7 @@ internal object IORunLoop {
           result = currentIO.a
           hasResult = true
         }
-        is BIO.RaiseError -> {
+        is BIO.RaiseException -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
@@ -65,7 +65,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = BIO.RaiseError(t.nonFatalOrThrow())
+            currentIO = BIO.RaiseException(t.nonFatalOrThrow())
           }
         }
         is BIO.Async -> {
@@ -93,7 +93,7 @@ internal object IORunLoop {
             BIO.Effect(currentCC) { a }
           }
         }
-        is BIO.Map<*, *> -> {
+        is BIO.Map<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -110,11 +110,11 @@ internal object IORunLoop {
           }
         }
         null -> {
-          currentIO = BIO.RaiseError(IORunLoopStepOnNull)
+          currentIO = BIO.RaiseException(IORunLoopStepOnNull)
         }
         else -> {
           // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
-          currentIO = IO.raiseError(IORunLoopMissingStep)
+          currentIO = IO.raiseException(IORunLoopMissingStep)
         }
       }
 
@@ -177,7 +177,7 @@ internal object IORunLoop {
           result = currentIO.a
           hasResult = true
         }
-        is BIO.RaiseError -> {
+        is BIO.RaiseException -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
@@ -203,7 +203,7 @@ internal object IORunLoop {
             currentIO = null
           } catch (t: Throwable) {
             if (NonFatal(t)) {
-              currentIO = BIO.RaiseError(t)
+              currentIO = BIO.RaiseException(t)
             } else {
               throw t
             }
@@ -250,7 +250,7 @@ internal object IORunLoop {
             BIO.Effect(currentCC) { a }
           }
         }
-        is BIO.Map<*, *> -> {
+        is BIO.Map<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -275,11 +275,11 @@ internal object IORunLoop {
           }
         }
         null -> {
-          currentIO = BIO.RaiseError(IORunLoopOnNull)
+          currentIO = BIO.RaiseException(IORunLoopOnNull)
         }
         else -> {
           // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
-          currentIO = BIO.RaiseError(IORunLoopMissingLoop)
+          currentIO = BIO.RaiseException(IORunLoopMissingLoop)
         }
       }
 
@@ -306,7 +306,7 @@ internal object IORunLoop {
       f().fix()
     } catch (e: Throwable) {
       if (NonFatal(e)) {
-        BIO.RaiseError(e)
+        BIO.RaiseException(e)
       } else {
         throw e
       }
@@ -418,7 +418,7 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> BIO.RaiseError(either.a)
+          is Either.Left -> BIO.RaiseException(either.a)
           is Either.Right -> BIO.Pure(either.b)
         }.let { r ->
           if (shouldTrampoline) {
@@ -436,7 +436,7 @@ internal object IORunLoop {
         canCall = false
         result.fold(
           { a -> BIO.Pure(a) },
-          { e -> BIO.RaiseError(e) }
+          { e -> BIO.RaiseException(e) }
         ).let { r ->
           if (shouldTrampoline) {
             this.value = r
@@ -464,7 +464,7 @@ internal object IORunLoop {
     override fun invoke(a: Any?): IO<Any?> = BIO.ContextSwitch(BIO.Pure(a), { current -> restore(a, null, old, current) }, null)
 
     override fun recover(e: Throwable): IO<Any> =
-      BIO.ContextSwitch(BIO.RaiseError(e), { current ->
+      BIO.ContextSwitch(BIO.RaiseException(e), { current ->
         restore(null, e, old, current)
       }, null)
   }

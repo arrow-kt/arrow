@@ -25,7 +25,7 @@ open class HandleNonRaised {
   private fun ioHappyPathLoop(i: Int): IO<Int> =
     if (i < size)
       IO.just(i + 1)
-        .ioHandleErrorWith { IO.raiseError(it) }
+        .ioHandleErrorWith { IO.raiseException(it) }
         .flatMap { ioHappyPathLoop(it) }
     else
       IO.just(i)

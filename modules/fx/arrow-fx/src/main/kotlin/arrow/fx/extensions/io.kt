@@ -106,7 +106,7 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
     fix().redeem(fe, fb)
 
   override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+    IO.raiseException(e)
 }
 
 @extension
@@ -130,7 +130,7 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
     fix().redeemWith(fe, fb)
 
   override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+    IO.raiseException(e)
 }
 
 @extension
@@ -302,7 +302,7 @@ fun <A> BIO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
  * Right value or alternatively to the result of applying the specified function to this Left value.
  */
 fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
-  fold({ IO.raiseError(f(it)) }, { IO.just(it) })
+  fold({ IO.raiseException(f(it)) }, { IO.just(it) })
 
 /**
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers

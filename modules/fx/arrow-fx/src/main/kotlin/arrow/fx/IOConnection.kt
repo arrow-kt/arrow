@@ -29,7 +29,7 @@ private object MD : MonadDefer<ForIO> {
     IO.defer(fa)
 
   override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+    IO.raiseException(e)
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
     handleErrorW(f)

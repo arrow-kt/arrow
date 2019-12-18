@@ -26,7 +26,7 @@ open class HandleRaisedError {
 
   private fun ioErrorRaisedloop(i: Int): IO<Int> =
     if (i < size)
-      IO.raiseError<Int>(dummy)
+      IO.raiseException<Int>(dummy)
         .flatMap { x -> IO.just(x + 1) }
         .flatMap { x -> IO.just(x + 1) }
         .ioHandleError { ioErrorRaisedloop(i + 1) }

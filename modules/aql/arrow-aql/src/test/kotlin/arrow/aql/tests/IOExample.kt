@@ -29,7 +29,7 @@ class LocalDataSource : DataSource {
 
   override fun allTasksByUser(user: User): IO<List<Task>> =
     Option.fromNullable(localCache[user]).fold(
-      { IO.raiseError(UserNotInLocalStorage(user)) },
+      { IO.raiseException(UserNotInLocalStorage(user)) },
       { IO.just(it) }
     )
 }
@@ -57,7 +57,7 @@ class DefaultRepository(
     localDS.allTasksByUser(user).handleErrorWith { e: Throwable ->
       when (e) {
         is UserNotInLocalStorage -> remoteDS.allTasksByUser(user)
-        else -> IO.raiseError(UnknownError(e))
+        else -> IO.raiseException(UnknownError(e))
       }
     }
 }

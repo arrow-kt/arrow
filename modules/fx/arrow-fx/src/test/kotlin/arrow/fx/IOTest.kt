@@ -7,8 +7,8 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
-import arrow.fx.IO.Companion.just
-import arrow.fx.IO.Companion.parMapN
+import arrow.fx.BIO.Companion.just
+import arrow.fx.BIO.Companion.parMapN
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -90,7 +90,7 @@ class IOTest : UnitSpec() {
 
     "should throw immediate failure by raiseError" {
       try {
-        IO.raiseError<Int>(MyException()).unsafeRunSync()
+        IO.raiseException<Int>(MyException()).unsafeRunSync()
         fail("")
       } catch (myException: MyException) {
         // Success
@@ -145,7 +145,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with unsafeRunAsync" {
-      IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
+      IO.raiseException<Int>(MyException()).unsafeRunAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
@@ -194,7 +194,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with runAsync" {
-      IO.raiseError<Int>(MyException()).runAsync { either ->
+      IO.raiseException<Int>(MyException()).runAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
@@ -443,7 +443,7 @@ class IOTest : UnitSpec() {
       }
 
       forAll(Gen.string()) { message ->
-        IO.Bind(IO.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
+        BIO.Bind(IO.raiseException(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
           .unsafeRunSync() == message
       }
     }

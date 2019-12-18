@@ -63,7 +63,7 @@ internal object IOBracket {
               val fb = try {
                 use(a)
               } catch (e: Throwable) {
-                IO.raiseError<B>(e.nonFatalOrThrow())
+                IO.raiseException<B>(e.nonFatalOrThrow())
               }
 
               BIO.Bind(fb.fix(), frame)
@@ -143,9 +143,9 @@ internal object IOBracket {
   private class ReleaseRecover(val error: Throwable) : IOFrame<Unit, IO<Nothing>> {
 
     override fun recover(e: Throwable): IO<Nothing> =
-      IO.raiseError(Platform.composeErrors(error, e))
+      IO.raiseException(Platform.composeErrors(error, e))
 
-    override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(error)
+    override fun invoke(a: Unit): IO<Nothing> = IO.raiseException(error)
   }
 
   private val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
