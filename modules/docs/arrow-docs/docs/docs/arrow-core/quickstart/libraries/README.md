@@ -243,7 +243,7 @@ dependencies {
 }
 ```
 
-Allows boilerplate generation for [`@extension`](({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces/' | relative_url }})) instances and [`@higherkind`]({{ '/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
+Allows boilerplate generation for [`@extension`]({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces/' | relative_url }}) instances and [`@higherkind`]({{ '/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
 

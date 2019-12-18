@@ -37,7 +37,7 @@ val g = sum2 andThen str
 f(4) == g(4)
 ```
 
-Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/arrow/core/function1' | relative_url }}).
+Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-function1/' | relative_url }}).
 
 So, if we have a function `(A) -> B` and a `Profunctor` instance for it, we can make the following transformation with `dimap`: `((C) -> A) -> ((A) -> B) -> ((B) -> D)`.
 

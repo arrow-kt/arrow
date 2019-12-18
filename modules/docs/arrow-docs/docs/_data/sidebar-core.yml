@@ -215,7 +215,7 @@ options:
         url: /docs/arrow/typeclasses/monoidk/
 
       - title: Inject
-        url: /docs/typeclasses/inject/
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-inject/
 
       - title: Alternative
         url: /docs/arrow/typeclasses/alternative/

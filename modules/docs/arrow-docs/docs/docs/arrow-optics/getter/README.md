@@ -60,7 +60,7 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*

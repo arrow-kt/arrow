@@ -59,7 +59,7 @@ Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 Tuple10.traversal<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank
