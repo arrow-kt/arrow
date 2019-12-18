@@ -3,7 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTry
@@ -21,10 +20,10 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.bracket.bracket
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
-import arrow.fx.mtl.kleisli.bracket.bracket
+import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
@@ -33,7 +32,7 @@ import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.BracketLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.typeclasses.Conested
@@ -51,11 +50,7 @@ class KleisliTest : UnitSpec() {
     a.counnest().run(1) == b.counnest().run(1)
   }
 
-  private fun IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
-  }
-
-  private fun IOEitherEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun <A> IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, A>> = Eq { a, b ->
     a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
   }
 
@@ -68,14 +63,14 @@ class KleisliTest : UnitSpec() {
         { i -> Kleisli { { j: Int -> i + j }.some() } },
         Eq { a, b -> a.fix().run(0) == b.fix().run(0) }
       ),
-      BracketLaws.laws(
-        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
+      ConcurrentLaws.laws(
+        Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
         Kleisli.functor<ForIO, Int>(IO.functor()),
         Kleisli.applicative<ForIO, Int>(IO.applicative()),
         Kleisli.monad<ForIO, Int>(IO.monad()),
-        EQ = IOEQ(),
-        EQ_EITHER = IOEitherEQ(),
-        EQERR = IOEQ()
+        IOEQ(),
+        IOEQ(),
+        IOEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       DivisibleLaws.laws(

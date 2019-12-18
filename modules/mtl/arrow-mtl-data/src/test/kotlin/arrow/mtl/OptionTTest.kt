@@ -2,7 +2,6 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
@@ -23,10 +22,10 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
-import arrow.fx.mtl.optiont.async.async
+import arrow.fx.mtl.concurrent
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.applicative.applicative
@@ -41,7 +40,7 @@ import arrow.mtl.typeclasses.NestedType
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.MonoidKLaws
@@ -61,10 +60,6 @@ class OptionTTest : UnitSpec() {
 
   fun <A> EQ_NESTED(): Eq<Kind<OptionTPartialOf<A>, Kind<OptionTPartialOf<A>, Int>>> = Eq { a, b ->
     a.value() == b.value()
-  }
-
-  private fun IOEitherEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
@@ -87,13 +82,14 @@ class OptionTTest : UnitSpec() {
       }
 
     testLaws(
-      AsyncLaws.laws(
-        OptionT.async(IO.async()),
+      ConcurrentLaws.laws(
+        OptionT.concurrent(IO.concurrent()),
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.applicative()),
         OptionT.monad(IO.monad()),
         IOEQ(),
-        IOEitherEQ()
+        IOEQ(),
+        IOEQ()
       ),
 
       SemigroupKLaws.laws(

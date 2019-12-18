@@ -7,13 +7,9 @@ import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-
-/**
- * Alias that represents a function from [D] to a monadic value `Kind<F, A>`
- */
-typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
 
 fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
 
@@ -26,7 +22,7 @@ fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
  * @property run the arrow from [D] to `Kind<F, A>`.
  */
 @higherkind
-class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
+class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
 
   /**
    * Apply a function `(A) -> B` that operates within the [Kleisli] context.
@@ -34,8 +30,9 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param ff function with the [Kleisli] context.
    * @param AF [Applicative] for the context [F].
    */
-  fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    AF.run { Kleisli { run(it).ap(ff.run(it)) } }
+  fun <B> ap(AF: Apply<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> = AF.run {
+    Kleisli { d -> run(d).ap(ff.run(d)) }
+  }
 
   /**
    * Map the end of the arrow [A] to [B] given a function [f].
@@ -55,7 +52,9 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    */
   fun <B> flatMap(MF: Monad<F>, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> = MF.run {
     Kleisli { d ->
-      run(d).flatMap { a -> f(a).run(d) }
+      run(d).flatMap { a ->
+        f(a).run(d)
+      }
     }
   }
 
@@ -65,10 +64,13 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param o other [Kleisli] to zip with.
    * @param MF [Monad] for the context [F].
    */
-  fun <B> zip(MF: Monad<F>, o: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    flatMap(MF) { a ->
-      o.fix().map(MF) { b -> Tuple2(a, b) }
+  fun <B> zip(MF: Monad<F>, o: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> = MF.run {
+    Kleisli { d ->
+      run(d).flatMap { a ->
+        o.fix().map(MF) { b -> Tuple2(a, b) }.run(d)
+      }
     }
+  }
 
   /**
    * Compose this arrow with another function to transform the input of the arrow.
@@ -94,7 +96,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param MF [Monad] for the context [F].
    */
   fun <B> andThen(MF: Monad<F>, f: (A) -> Kind<F, B>): Kleisli<F, D, B> = MF.run {
-    Kleisli { d -> run(d).flatMap(f) }
+    Kleisli { d: D -> run(d).flatMap(f) }
   }
 
   /**
@@ -123,7 +125,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      *
      * @param run the arrow from [D] to a monadic value `Kind<F, A>`
      */
-    operator fun <F, D, A> invoke(run: KleisliFun<F, D, A>): Kleisli<F, D, A> =
+    operator fun <F, D, A> invoke(run: (D) -> Kind<F, A>): Kleisli<F, D, A> =
       Kleisli(run)
 
     /**
@@ -143,7 +145,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param AF [Applicative] for context [F].
      */
     fun <F, D, A> just(AF: Applicative<F>, x: A): Kleisli<F, D, A> =
-      Kleisli { _ -> AF.just(x) }
+      Kleisli { AF.just(x) }
 
     /**
      * Ask an arrow from [D] to [D].
@@ -165,7 +167,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param fa value to lift for context [F].
      */
     fun <F, D, A> liftF(fa: Kind<F, A>): Kleisli<F, D, A> =
-      Kleisli { _ -> fa }
+      Kleisli { fa }
   }
 }
 
@@ -181,12 +183,7 @@ fun <F, D, A> KleisliOf<F, D, Kleisli<F, D, A>>.flatten(MF: Monad<F>): Kleisli<F
  *
  * @receiver [KleisliFun] a function that represents computation dependent on [D] with the result in context [F].
  */
-fun <F, D, A> KleisliFun<F, D, A>.kleisli(): Kleisli<F, D, A> = Kleisli(this)
-
-/**
- * Alias that represents a computation that has a dependency on [D].
- */
-typealias ReaderTFun<F, D, A> = KleisliFun<F, D, A>
+fun <F, D, A> ((D) -> Kind<F, A>).kleisli(): Kleisli<F, D, A> = Kleisli(this)
 
 /**
  * Alias ReaderTHK for [KleisliHK]
@@ -225,4 +222,4 @@ typealias ReaderT<F, D, A> = Kleisli<F, D, A>
  *
  * @receiver [ReaderTFun] a function that represents computation dependent on [D] with the result in context [F].
  */
-fun <F, D, A> ReaderTFun<F, D, A>.readerT(): ReaderT<F, D, A> = ReaderT(this)
+fun <F, D, A> ((D) -> Kind<F, A>).readerT(): ReaderT<F, D, A> = ReaderT(this)

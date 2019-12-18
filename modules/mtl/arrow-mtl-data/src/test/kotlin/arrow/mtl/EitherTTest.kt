@@ -23,10 +23,10 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
-import arrow.fx.mtl.eithert.async.async
+import arrow.fx.mtl.concurrent
 import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.applicative.applicative
@@ -37,7 +37,7 @@ import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
@@ -46,7 +46,7 @@ import io.kotlintest.properties.forAll
 
 class EitherTTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->
+  fun <E, A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, E>, A>> = Eq { a, b ->
     a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
   }
 
@@ -66,7 +66,7 @@ class EitherTTest : UnitSpec() {
           a.value().fix() == b.value().fix()
         }
       ),
-      AsyncLaws.laws(EitherT.async(IO.async()), EitherT.functor<ForIO, Throwable>(IO.functor()), EitherT.applicative<ForIO, Throwable>(IO.applicative()), EitherT.monad<ForIO, Throwable>(IO.monad()), EQ(), EQ()),
+      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()), EitherT.functor(IO.functor()), EitherT.applicative(IO.applicative()), EitherT.monad(IO.monad()), EQ(), EQ(), EQ()),
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),

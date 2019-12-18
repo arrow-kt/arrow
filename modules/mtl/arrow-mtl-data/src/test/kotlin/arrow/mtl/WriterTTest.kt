@@ -3,7 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.Either
 import arrow.core.ForListK
 import arrow.core.ForOption
 import arrow.core.ListK
@@ -25,10 +24,10 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.attempt
-import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
-import arrow.fx.mtl.writert.async.async
+import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
@@ -41,7 +40,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
@@ -51,11 +50,7 @@ import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
-  }
-
-  private fun IOEitherEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun <A> IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, A>> = Eq { a, b ->
     a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
@@ -73,13 +68,13 @@ class WriterTTest : UnitSpec() {
         { WriterT(it.const()) },
         Eq { a, b -> a.value().value() == b.value().value() }
       ),
-      AsyncLaws.laws(
-        WriterT.async(IO.async(), Int.monoid()),
+      ConcurrentLaws.laws(
+        WriterT.concurrent(IO.concurrent(), Int.monoid()),
         WriterT.functor<ForIO, Int>(IO.functor()),
         WriterT.applicative(IO.applicative(), Int.monoid()),
         WriterT.monad(IO.monad(), Int.monoid()),
         IOEQ(),
-        IOEitherEQ()
+        IOEQ(), IOEQ()
       ),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
