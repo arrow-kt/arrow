@@ -2,6 +2,7 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.nonFatalOrThrow
+import arrow.fx.BIO
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
@@ -19,7 +20,7 @@ internal object IOBracket {
    * Implementation for `IO.bracketCase`.
    */
   operator fun <A, B> invoke(acquire: IOOf<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    IO.Async { conn, cb ->
+    BIO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
       conn.push(deferredRelease.cancel())
@@ -65,7 +66,7 @@ internal object IOBracket {
                 IO.raiseError<B>(e.nonFatalOrThrow())
               }
 
-              IO.Bind(fb.fix(), frame)
+              BIO.Bind(fb.fix(), frame)
             }
 
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
@@ -80,7 +81,7 @@ internal object IOBracket {
   }
 
   fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    IO.Async { conn, cb ->
+    BIO.Async { conn, cb ->
       Platform.trampoline {
         val frame = EnsureReleaseFrame<A>(release)
         val onNext = source.flatMap(frame)
@@ -128,14 +129,14 @@ internal object IOBracket {
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
+    override fun recover(e: Throwable): IO<B> = BIO.ContextSwitch(applyRelease(ExitCase.Error(e)), BIO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
       .flatMap(ReleaseRecover(e))
 
     override operator fun invoke(a: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-      IO.ContextSwitch(applyRelease(ExitCase.Completed), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
+      BIO.ContextSwitch(applyRelease(ExitCase.Completed), BIO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
         .map { a }
   }
 

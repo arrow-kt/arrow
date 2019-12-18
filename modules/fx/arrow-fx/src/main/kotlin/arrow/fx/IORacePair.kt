@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.internal.AtomicBooleanW
-import arrow.fx.IO.Companion.defer
-import arrow.fx.IO.Companion.unit
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
@@ -50,10 +48,10 @@ interface IORacePair {
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
   fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.Async { conn, cb ->
+    BIO.Async { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
+      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
 
       // Cancelable connection for the left value
       val connA = IOConnection()

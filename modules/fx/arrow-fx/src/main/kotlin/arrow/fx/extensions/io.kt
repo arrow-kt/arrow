@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
+import arrow.fx.BIO
 
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -199,11 +200,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
     IO.parMapN(this@parMapN, fa, fb, fc, f)
 }
 
-fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
+fun BIO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
-fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
+fun BIO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
   Timer(CF)
 
 @extension
@@ -219,7 +220,7 @@ interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
-fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
+fun BIO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
@@ -287,12 +288,12 @@ interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
     IO.dispatchers()
 }
 
-fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
+fun BIO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 
 @extension
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
-fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
+fun <A> BIO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
   defer { IO.concurrent().fx.concurrent(c).fix() }
 
 /**

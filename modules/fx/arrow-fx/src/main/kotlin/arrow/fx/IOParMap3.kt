@@ -24,7 +24,7 @@ interface IOParMap3 {
     fb: IOOf<B>,
     fc: IOOf<C>,
     f: (A, B, C) -> D
-  ): IO<D> = IO.Async { conn, cb ->
+  ): IO<D> = BIO.Async { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
     val active = AtomicBooleanW(true)

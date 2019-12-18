@@ -2,6 +2,7 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
+import arrow.fx.BIO
 
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -35,7 +36,7 @@ internal class ForwardCancelable {
       }
     }
 
-    return IO.Async { conn, cb -> loop(conn, cb) }
+    return BIO.Async { conn, cb -> loop(conn, cb) }
   }
 
   fun complete(value: CancelToken<ForIO>): Unit = state.value.let { current ->

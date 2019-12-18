@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
+import arrow.fx.BIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOOf
@@ -299,4 +300,4 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
  * @see [arrow.fx.IORunLoop.RestartCallback]
  */
 internal fun <A> IOForkedStart(fa: IOOf<A>, ctx: CoroutineContext): IO<A> =
-  IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }
+  BIO.Bind(BIO.ContinueOn(IO.unit, ctx)) { fa.fix() }

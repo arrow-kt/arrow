@@ -47,8 +47,10 @@ inline fun <A> IOOf<A>.fix(): IO<A> =
 typealias IOProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 
+typealias IO<A> = BIO<Nothing, A>
+
 @Suppress("StringLiteralDuplication")
-sealed class IO<out A> : IOOf<A> {
+sealed class BIO<out E, out A> : IOOf<A> {
 
   companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
 
@@ -642,7 +644,7 @@ sealed class IO<out A> : IOOf<A> {
    * }
    * ```
    */
-  open fun continueOn(ctx: CoroutineContext): IO<A> =
+  open fun continueOn(ctx: CoroutineContext): BIO<E, A> =
     ContinueOn(this, ctx)
 
   /**
@@ -862,12 +864,13 @@ sealed class IO<out A> : IOOf<A> {
    *
    * @see unsafeRunSync
    */
-  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
+  fun unsafeRunTimed(limit: Duration): Option<A> =
+    IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
-  fun uncancelable(): IO<A> =
+  fun uncancelable(): BIO<E, A> =
     ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   /**
@@ -974,20 +977,6 @@ sealed class IO<out A> : IOOf<A> {
    */
   fun guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
 
-  /**
-   * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
-   * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
-   *
-   * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
-   * Prefer [bracketCase] for the acquisition and release of resources.
-   *
-   * @see [guarantee] for the simpler version
-   * @see [bracketCase] for the more general operation
-   *
-   */
-  fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    IOBracket.guaranteeCase(this, finalizer)
-
   internal data class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
     override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
@@ -1024,22 +1013,22 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+  internal data class Bind<A, E, out B, out E2: E>(val cont: BIO<E, A>, val g: (A) -> BIO<E, B>) : BIO<E2, B>() {
+    override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
+  internal data class ContinueOn<E, A>(val cont: BIO<E, A>, val cc: CoroutineContext) : BIO<E, A>() {
     // If a ContinueOn follows another ContinueOn, execute only the latest
-    override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
+    override fun continueOn(ctx: CoroutineContext): BIO<E, A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContextSwitch<A>(
-    val source: IO<A>,
+  internal data class ContextSwitch<E, A>(
+    val source: BIO<E, A>,
     val modify: (IOConnection) -> IOConnection,
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
-  ) : IO<A>() {
+  ) : BIO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
@@ -1083,7 +1072,7 @@ sealed class IO<out A> : IOOf<A> {
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
-  handleErrorWith { e -> IO.Pure(f(e)) }
+  handleErrorWith { e -> BIO.Pure(f(e)) }
 
 /**
  * Handle the error by resolving the error with an effect that results in [A].
@@ -1108,4 +1097,19 @@ fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+  BIO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+
+
+/**
+ * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
+ * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
+ *
+ * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
+ * Prefer [bracketCase] for the acquisition and release of resources.
+ *
+ * @see [guarantee] for the simpler version
+ * @see [bracketCase] for the more general operation
+ *
+ */
+fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
+  IOBracket.guaranteeCase(fix(), finalizer)
