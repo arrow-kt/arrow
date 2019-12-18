@@ -2,7 +2,6 @@ package arrow.ui
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.ConstPartialOf
 import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.Id
@@ -18,6 +17,8 @@ import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.monoid
 import arrow.core.fix
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.HashLaws
@@ -32,8 +33,20 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class SumTest : UnitSpec() {
-  init {
+  fun <F, G> genk(GENKF: GenK<F>, GENKG: GenK<G>) = object : GenK<SumPartialOf<F, G>> {
+    override fun <V> genK(gen: Gen<V>): Gen<Kind<SumPartialOf<F, G>, V>> = Gen.oneOf(
+      Gen.bind(GENKF.genK(gen), GENKG.genK(gen)) { a, b ->
+        Sum.left(a, b)
+      }
 
+      // question: this does not work. should we have right side too?
+      //  Gen.bind(GENKF.genK(gen), GENKG.genK(gen)) { a, b ->
+      //  Sum.right(a, b)
+      //    }
+    )
+  }
+
+  init {
     val cfSumId = { x: Int -> Sum.left(Id.just(x), Id.just(x)) }
     val genSumId = Gen.int().map(cfSumId) as Gen<Kind<Kind<Kind<ForSum, ForId>, ForId>, Int>>
 
@@ -42,7 +55,8 @@ class SumTest : UnitSpec() {
     val IDH = Hash<Kind<ForId, Int>> { Id.hash(Int.hash()).run { it.fix().hash() } }
 
     val cfSumConst: (Int) -> Sum<Kind<ForConst, Int>, Kind<ForConst, Int>, Int> = { Sum.left(Const.just(it), Const.just(it)) }
-    val genSumConst = Gen.int().map(cfSumConst) as Gen<Kind<SumPartialOf<ConstPartialOf<Int>, ConstPartialOf<Int>>, Int>>
+    val genSumConst =
+      genk(Const.genK(Gen.int()), Const.genK(Gen.int()))
 
     val constEQK = Const.eqK(Int.eq())
     val sumConstEQK = Sum.eqK(constEQK, constEQK)

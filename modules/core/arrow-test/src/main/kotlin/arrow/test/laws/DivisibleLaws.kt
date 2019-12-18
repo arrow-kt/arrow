@@ -15,21 +15,13 @@ object DivisibleLaws {
     DF: Divisible<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> =
-    laws(DF, GENK.genK(Gen.int()), EQK)
-
-  @Deprecated("should be internal, use the GENK one")
-  fun <F> laws(
-    DF: Divisible<F>,
-    G: Gen<Kind<F, Int>>,
-    EQK: EqK<F>
   ): List<Law> {
+    val G = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
-
     return DivideLaws.laws(DF, G, EQK) + listOf(
-      Law("Divisible laws: Left identity") { DF.leftIdentity(G, EQ) },
-      Law("Divisible laws: Right identity") { DF.rightIdentity(G, EQ) }
-    )
+        Law("Divisible laws: Left identity") { DF.leftIdentity(G, EQ) },
+        Law("Divisible laws: Right identity") { DF.rightIdentity(G, EQ) }
+      )
   }
 
   fun <F> Divisible<F>.leftIdentity(

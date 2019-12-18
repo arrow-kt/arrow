@@ -10,6 +10,7 @@ import arrow.core.extensions.function1.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadLaws
@@ -44,10 +45,17 @@ class Function1Test : UnitSpec() {
       }
   }
 
+  fun genk() = object: GenK<Conested<ForFunction1, Int>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForFunction1, Int>, A>> =
+      gen.map {
+        Function1.just<Int, A>(it).conest()
+      } as Gen<Kind<Conested<ForFunction1, Int>, A>>
+  }
+
   init {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
-      DivisibleLaws.laws(Function1.divisible(Int.monoid()), Gen.int().map { Function1.just<Int, Int>(it).conest() }, conestedEQK),
+      DivisibleLaws.laws(Function1.divisible(Int.monoid()), genk(), conestedEQK),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQK(5150)),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
