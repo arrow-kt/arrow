@@ -27,6 +27,8 @@ import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTPartialOf
+import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.nest
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {
@@ -110,3 +112,8 @@ fun <F, L> EitherT.Companion.genK(genkF: GenK<F>, genL: Gen<L>) =
         EitherT(it)
       }
   }
+
+fun <F, G> GenK<F>.nested(GENKG: GenK<G>): GenK<Nested<F, G>> = object : GenK<Nested<F, G>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<F, G>, A>> =
+    this@nested.genK(GENKG.genK(gen)).map { it.nest() }
+}

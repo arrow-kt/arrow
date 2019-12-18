@@ -3,7 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
-import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
 import arrow.core.NonEmptyList
@@ -14,17 +13,15 @@ import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
+import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
-import arrow.core.extensions.nonemptylist.eq.eq
+import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.traverseFilter.traverseFilter
-import arrow.core.fix
-import arrow.core.toT
-import arrow.core.value
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -41,11 +38,11 @@ import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
 import arrow.mtl.typeclasses.Nested
-import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
+import arrow.test.generators.nested
 import arrow.test.generators.option
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
@@ -69,32 +66,7 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    val nestedEQK = object : EqK<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>> {
-      override fun <A> Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>.eqK(other: Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>, EQ: Eq<A>): Boolean =
-        (this.unnest().fix() toT other.unnest().fix()).let { (a, b) ->
-
-          a.value().value().fix().fold(
-            { b.value().value().isEmpty() },
-
-            { optionA ->
-              b.value().value().fix().fold(
-                { false },
-
-                { some ->
-                  NonEmptyList.eq(Option.eq(EQ)).run { some.value().fix().eqv(optionA.fix().value().fix()) }
-                }
-              )
-            }
-          )
-        }
-    }
-
-    fun nestedGenk() = object : GenK<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>>, A>> =
-        gen.map {
-          OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest()
-        }
-    }
+    val nestedEQK = OptionT.eqK(Id.eqK()).nested(OptionT.eqK(NonEmptyList.eqK()))
 
     testLaws(
       ConcurrentLaws.laws(OptionT.concurrent(IO.concurrent()), ioEQK),
@@ -107,7 +79,7 @@ class OptionTTest : UnitSpec() {
       FunctorFilterLaws.laws(
         ComposedFunctorFilter(OptionT.functorFilter(Id.monad()),
           OptionT.functorFilter(NonEmptyList.monad())),
-        nestedGenk(),
+        OptionT.genk(Id.genK()).nested(OptionT.genk(NonEmptyList.genK())),
         nestedEQK),
 
       MonoidKLaws.laws(
@@ -184,6 +156,16 @@ fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
 
       Option.eq(Either.eq(Eq.any(), EQ)).run {
         ls.eqv(rs)
+      }
+    }
+}
+
+fun <F, G> EqK<F>.nested(EQKG: EqK<G>): EqK<Nested<F, G>> = object : EqK<Nested<F, G>> {
+  override fun <A> Kind<Nested<F, G>, A>.eqK(other: Kind<Nested<F, G>, A>, EQ: Eq<A>): Boolean =
+    (this.unnest() to other.unnest()).let { (a, b) ->
+
+      this@nested.liftEq(EQKG.liftEq(EQ)).run {
+        a.eqv(b)
       }
     }
 }
