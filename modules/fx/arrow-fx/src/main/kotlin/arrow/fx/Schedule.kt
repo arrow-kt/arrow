@@ -645,6 +645,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       fun MM(): Monad<M>
 
       fun <A> identity(): Schedule<M, A, A> = identity(MM())
+
       fun <A> unfoldM(c: Kind<M, A>, f: (A) -> Kind<M, A>): Schedule<M, Any?, A> =
         unfoldM(MM(), c, f)
 
@@ -693,6 +694,8 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
       fun exponential(base: Duration, factor: Double = 2.0): Schedule<M, Any?, Duration> =
         exponential(MM(), base, factor)
+
+      fun never(): Schedule<M, Any?, Nothing> = never(MM())
     }
 
     /**
