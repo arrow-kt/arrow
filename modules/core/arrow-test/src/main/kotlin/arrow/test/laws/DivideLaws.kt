@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.toT
+import arrow.test.generators.GenK
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -14,11 +15,15 @@ object DivideLaws {
 
   fun <F> laws(
     DF: Divide<F>,
-    G: Gen<Kind<F, Int>>,
+    GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> = ContravariantLaws.laws(DF, G, EQK) + listOf(
-    Law("Divide laws: Associative") { DF.associative(G, EQK.liftEq(Int.eq())) }
-  )
+  ): List<Law> {
+    val G = GENK.genK(Gen.int())
+
+    return ContravariantLaws.laws(DF, G, EQK) + listOf(
+      Law("Divide laws: Associative") { DF.associative(G, EQK.liftEq(Int.eq())) }
+    )
+  }
 
   fun <A> delta(a: A): Tuple2<A, A> = a toT a
 
