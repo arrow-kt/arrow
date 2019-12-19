@@ -559,23 +559,17 @@ sealed class IO<out A> : IOOf<A> {
    * ```kotlin:ank:playground
    * import arrow.fx.IO
    *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val io = IO.effect { println("Hello World!") }
-   *
-   *   kotlinx.coroutines.runBlocking {
-   *     io.suspended()
-   *   }
-   *   //sampleEnd
-   * }
+   * //sampleStart
+   * suspend fun main(args: Array<String>): Unit =
+   *   IO.effect { println("Hello World!") }
+   *   .suspended()
+   * //sampleEnd
    * ```
-   *
-   * **BEWARE** this does **not** support cancelation since Kotlin has no cancelation support for `suspend` on the language level.
    */
   suspend fun suspended(): A = suspendCoroutine { cont ->
-    val connection = cont.context[IOContext]?.connection
+    val connection = cont.context[IOContext]?.connection ?: IOConnection.uncancelable
 
-    IORunLoop.startCancelable(this, connection ?: IOConnection.uncancelable) {
+    IORunLoop.startCancelable(this, connection) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }
