@@ -7,15 +7,15 @@ permalink: /docs/optics/optional/
 ## Optional
 
 
-An `Optional` is an optic that allows to see into a structure and getting, setting or modifying an optional focus.
-It combines the properties of a `Lens` (getting, setting and modifying) with the properties of a `Prism` (an optional focus).
+An `Optional` is an optic that allows seeing into a structure and getting, setting, or modifying an optional focus.
+It combines the properties of a `Lens` (getting, setting, and modifying) with the properties of a `Prism` (an optional focus).
 
-`Optional` combines their weakest functions: `set` and `getOrModify`
+`Optional` combines their weakest functions: `set` and `getOrModify`.
 
-* `set: (S, A) -> S` meaning we can look into `S` and set a value for an optional focus `A` and obtain the modified source.
-* `getOrModify: (S) -> Either<S, A>` meaning we can get the focus OR return the original value
+* `set: (S, A) -> S`, meaning we can look into `S`, set a value for an optional focus `A`, and obtain the modified source.
+* `getOrModify: (S) -> Either<S, A>`, meaning we can get the focus OR return the original value.
 
-For a structure `List<Int>` we can create an `Optional` to focus an optional head `Int`.
+For a structure `List<Int>`, we can create an `Optional` to focus an optional head `Int`.
 
 ```kotlin:ank
 import arrow.core.*
@@ -27,7 +27,7 @@ val optionalHead: Optional<ListK<Int>, Int> = Optional(
 )
 ```
 
-Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`
+Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`.
 
 ```kotlin:ank
 import arrow.optics.extensions.*
@@ -45,7 +45,7 @@ val lifted = ListK.head<Int>().lift { head -> head * 5 }
 lifted(emptyList<Int>().k())
 ```
 
-Or modify or lift functions using `Applicative`
+Or modify or lift functions using `Applicative`.
 
 ```kotlin:ank
 import arrow.core.extensions.`try`.applicative.*
@@ -61,11 +61,11 @@ val liftedF = ListK.head<Int>().liftF(Try.applicative()) { head ->
 liftedF(listOf(1, 3, 6).k())
 ```
 
-An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens` or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
+An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens`, or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
 
 ### Composition
 
-We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User` his email from a backend. The result of our call is `Try<User>`. So we first want to look into `Try` which **optionally** could be a `Success` and then we want to look into `User` which optionally filled in his email.
+We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Try<User>`. So, we first want to look into `Try`, which **optionally** could be a `Success`. And then we want to look into `User`, which optionally filled in his email.
 
 ```kotlin:ank
 data class Participant(val name: String, val email: String?)
@@ -83,7 +83,7 @@ triedEmail.getOption(Try.Success(Participant("test", "email")))
 triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with network")))
 ```
 
-`Optional` can be composed with all optics, resulting in the following optics.
+`Optional` can be composed with all optics, resulting in the following optics:
 
 |   | Iso | Lens | Prism | Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -91,7 +91,7 @@ triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with net
 
 ### Generating optional
 
-To avoid boilerplate, optionals can be generated for `A?` and `Option<A>` fields for a `data class`.
+To avoid boilerplate, optionals can be generated for `A?`, and `Option<A>` fields for a `data class`.
 The `Optionals` will be generated as extension properties on the companion object `val T.Companion.paramName`.
 
 ```kotlin
@@ -106,9 +106,9 @@ val optionalAddress: Optional<Person, Address> = Person.address
 
 ### Polymorphic optional
 
-A `POptional` is very similar to [PLens](/docs/optics/lens#Plens) and [PPrism](/docs/optics/prism#PPrism) so lets see if we can combine both examples shown in their documentation.
+A `POptional` is very similar to [PLens](/docs/optics/lens#Plens) and [PPrism](/docs/optics/prism#PPrism). So let's see if we can combine both examples shown in their documentation.
 
-Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`. We can compose them together build an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
+Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
 val pprism = Try.pSuccess<Tuple2<Int, String>, Tuple2<String, String>>()

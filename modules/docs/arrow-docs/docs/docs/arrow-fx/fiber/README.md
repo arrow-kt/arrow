@@ -8,11 +8,11 @@ permalink: /docs/effects/fiber/
 
 
 A `Fiber` is a concurrency primitive for describing parallel operations or multi-tasking.
-Concurrently started tasks can either be joined or canceled and this are the only two operators available on `Fiber`.
+Concurrently started tasks can either be joined or canceled, and these are the only two operators available on `Fiber`.
 
-Using `Fiber` we can verily easily describe parallel operations such as `parallelMap`.
-**Note** the operation written below does not support proper cancellation,
-when the resulting `IO` is canceled it does not propagate this cancellation back to the underlying `IO`.
+Using `Fiber`, we can describe parallel operations such as `parallelMap` relatively easily.
+**Note** the operation written below does not support proper cancellation.
+When the resulting `IO` is canceled, it does not propagate this cancellation back to the underlying `IO`.
 
 ```kotlin:ank
 import arrow.fx.*
@@ -50,7 +50,7 @@ parallelMap(first, second, Int::plus).await()
 ```
 
 We could fix this snippet to support proper cancellation by using `bracket` instead of `flatMap`,
-which allows us to register an operation to run on cancellation, error or completion.
+which allows us to register an operation to run on cancellation, error, or completion.
 
 ```kotlin:ank
 import arrow.fx.extensions.io.monad.flatMap

@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-Before reading this typeclass we recommend you to understand [Contravariance](https://typeclasses.com/contravariance) first. But for making things easier we will consider `Contravariance` as the ability to _flip composition_.
+Before reading this typeclass, we recommend that you understand [Contravariance](https://typeclasses.com/contravariance) first. But, for making things easier, we will consider `Contravariance` as the ability to _flip composition_.
 
 `Profunctors` are [`Bifunctors`]({{ '/docs/arrow/typeclasses/bifunctor' | relative_url }}) that are contravariant in their first argument and covariant in the second one.
 
@@ -24,7 +24,7 @@ The main difference between `bimap` and `dimap` is the function they accept as t
 * `bimap`: `fl: (A) -> C`
 * `dimap`: `fl: (C) -> A`
 
-And how this works? Well, if we think in terms of function composition, functions can be composed in both directions:
+And how does this work? Well, if we think in terms of function composition, functions can be composed in both directions:
 
 ```kotlin:ank
 import arrow.core.*
@@ -59,7 +59,7 @@ h(4)
 
 #### Kind2<F, A, B>#bimap
 
-Contramap on the first type parameter and map on the second type parameter
+Contramap on the first type parameter and map on the second type parameter.
 
 `fun Kind2<F, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<F, C, D>`
 
@@ -77,7 +77,7 @@ g("6")
 
 #### Other combinators
 
-For a full list of other useful combinators available in `Profunctor` see the [Source][profunctor_source]{:target="_blank"}
+For a full list of other useful combinators available in `Profunctor`, see the [Source][profunctor_source]{:target="_blank"}
 
 ### Laws
 

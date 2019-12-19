@@ -11,7 +11,7 @@ permalink: /docs/patterns/monads/
 
 ### Credits
 
-This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples and how they relate to standard library constructs.
+This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples showing how they relate to standard library constructs.
 
 If you're just interested in the API, head down to the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass page.
 
@@ -23,41 +23,41 @@ But at the same time, I realize that learning functional programming is a challe
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//functional-programming-word-cloud.png)
 
-*some of functional lingo*
+*some of the functional lingo*
 
-`Monad` is probably the most infamous term from the list above. Monads have reputation of being something very abstract and very confusing.
+`Monad` is probably the most infamous term from the list above. Monads have the reputation of being something very abstract and very confusing.
 
 ### The Fallacy of Monad Tutorials
 
-Numerous attempts were made to explain monads in simple definitions; and monad tutorials have become a genre of its own. And yet, times and times again, they fail to enlighten the readers.
+Numerous attempts were made to explain monads in simple definitions. And monad tutorials have become a genre of its own. And yet, time and time again, they fail to enlighten the readers.
 
 The shortest explanation of monads looks like this:
 
-> A Monad is just a monoid in the category of endofunctors
+> A Monad is just a monoid in the category of endofunctors.
 
 It's both mathematically correct and totally useless to anybody learning functional programming. To understand this statement, one has to know the terms "monoid", "category" and "endofunctors" and be able to mentally compose them into something meaningful.
 
-The same problem is apparent in most monad tutorials. They assume some pre-existing knowledge in heads of their readers, and if that assumption fails, the tutorial doesn't click.
+The same problem is apparent in most monad tutorials. They assume some pre-existing knowledge in the heads of their readers, and if that assumption fails, the tutorial doesn't click.
 
-Focusing too much on mechanics of monads instead of explaining why they are important is another common problem.
+Focusing too much on mechanics of monads, instead of explaining why they are important, is another common problem.
 
 Douglas Crockford grasped this fallacy very well:
 
 >The monadic curse is that once someone learns what monads are and how to use them, they lose the ability to explain them to other people
 
-The problem here is likely the following. Every person who understands monads had their own path to this knowledge. It hasn't come all at once, instead there was a series of steps, each giving an insight, until the last final step made the puzzle complete.
+The problem here is likely the following: Every person who understands monads had their own path to this knowledge. It hasn't come all at once. Instead, there was a series of steps, each giving an insight, until the last final step made the puzzle complete.
 
 But they don't remember the whole path anymore. They go online and blog about that very last step as the key to understanding, joining the club of flawed explanations.
 
 There is an actual academic paper from Tomas Petricek that studies monad tutorials.
 
-I've read that paper and a dozen of monad tutorials online. And of course, now I came up with my own.
+I've read that paper and a dozen of monad tutorials online. And, of course, now I came up with my own.
 
 I'm probably doomed to fail too, at least for some readers.
 
 ### Story of Composition
 
-The base element of each functional program is Function. In typed languages each function is just a mapping between the type of its input parameter and output parameter. Such type can be annotated as `func: TypeA -> TypeB`.
+The base element of each functional program is Function. In typed languages, each function is just a mapping between the type of its input parameter and output parameter. Such type can be annotated as `func: TypeA -> TypeB`.
 
 Kotlin is an object-oriented language, so we use methods to declare functions. There are two ways to define a method comparable to function `func` above. I can use a top level "static" method:
 
@@ -76,9 +76,9 @@ class ClassA {
 
 The top level form looks closer to the function notation, but both ways are actually equivalent for the purpose of our discussion. I will use instance methods in my examples, however all of them could be written as top level extension methods too.
 
-How do we compose more complex workflows, programs and applications, out of such simple building blocks? A lot of patterns in both OOP and FP worlds revolve around this question. And monads are one of the answers.
+How do we compose more complex workflows, programs, and applications out of such simple building blocks? A lot of patterns in both OOP and FP worlds revolve around this question. And monads are one of the answers.
 
-My sample code is going to be about conferences and speakers. The method implementations aren't really important, just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
+My sample code is going to be about conferences and speakers. The method implementations aren't really important. Just watch the types carefully. There are 4 classes (types) and 3 methods (functions):
 
 ```kotlin
 class Speaker {
@@ -117,13 +117,13 @@ fun nextTalkCity(speaker: Speaker): City =
     .getCity()
 ```
 
-This code looks quite readable. It's concise and it flows from top to bottom, from left to right, similar to how we are used to read any text. There is not much noise too.
+This code looks quite readable. It's concise and it flows from top to bottom, from left to right, similar to how we are used to reading any text. There isn't much noise either.
 
 That's not what real codebases look like though, because there are multiple complications along the happy composition path. Let's look at some of them.
 
 ### NULLs
 
-Any class instance in Kotlin can be null. In the example above I might get runtime errors if one of the methods ever returns null back.
+Any class instance in Kotlin can be null. In the example above, I might get runtime errors if one of the methods ever returns null back.
 
 Typed functional programming always tries to be explicit about types, so I'll re-write the signatures of my methods to annotate the return types as nullables:
 
@@ -160,7 +160,7 @@ fun nextTalkCity(speaker: Speaker?): City? {
 }
 ```
 
-It's still the same method, but it got more noise now. Even though I used short-circuit returns and one-liners, it still got harder to read.
+It's still the same method, but it has more noise now. Even though I used short-circuit returns and one-liners, it still got harder to read.
 
 To fight that problem, smart language designers came up with the [Safe Call Operator](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls):
 
@@ -174,13 +174,13 @@ fun nextTalkCity(speaker: Speaker?): City? {
 }
 ```
 
-Now we are almost back to our original workflow code: it's clean and concise, we just got 3 extra `?` symbols around.
+Now we are almost back to our original workflow code: It's clean and concise, but we still have 3 extra `?` symbols hanging around.
 
 Let's take another leap.
 
 ### Collections
 
-Quite often a function returns a collection of items, not just a single item. To some extent, that's a generalization of `null` case: with `T?` we might get 0 or 1 results back, while with a collection we can get 0 to any n results.
+Quite often, a function returns a collection of items, not just a single item. To some extent, that's a generalization of `null` case: With `T?`, we might get 0 or 1 results back, while, with a collection, we can get 0 to any n results.
 
 Our sample API could look like this:
 
@@ -198,7 +198,7 @@ class Conference {
 }
 ```
 
-I used `List<T>` but it could be any class or even a `Sequence<T>`.
+I used `List<T>`, but it could be any class or even a `Sequence<T>`.
 
 How would we combine the methods into one workflow? The traditional version would look like this:
 
@@ -215,7 +215,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 }
 ```
 
-It reads ok-ish still. But the combination of nested loops and mutation with some conditionals sprinkled on them can get unreadable pretty soon. The exact workflow might be lost in the mechanics.
+It still reads ok-ish. But the combination of nested loops and mutation with some conditionals sprinkled on them can get unreadable pretty fast. The exact workflow might be lost in the mechanics.
 
 As an alternative, the Kotlin language designers included extension methods. We can write code like this:
 
@@ -229,7 +229,7 @@ fun allCitiesToVisit(speaker: Speaker): List<City> {
 }
 ```
 
-Let me do one further trick and format the same code in an unusual way:
+Let me do one additional trick and format the same code in an unusual way:
 
 ```kotlin
 fun allCitiesToVisit(Speaker speaker): List<City> {
@@ -241,7 +241,7 @@ fun allCitiesToVisit(Speaker speaker): List<City> {
 }
 ```
 
-Now you can see the original original code on the left, combined with just a bit of technical repetitive clutter on the right. Hold on, I'll show you where I'm going.
+Now you can see the original code on the left, combined with just a bit of technical repetitive clutter on the right. Hold on, I'll show you where I'm going.
 
 Let's discuss another possible complication.
 
@@ -275,7 +275,7 @@ fun nextTalkCity(speaker: Speaker): Task<City> {
 }
 ```
 
-Hard to read, but let me apply my formatting trick again:
+It's hard to read, but let me apply my formatting trick again:
 
 ```kotlin
 fun nextTalkCity(speaker: Speaker): Task<City> {
@@ -287,13 +287,13 @@ fun nextTalkCity(speaker: Speaker): Task<City> {
 }
 ```
 
-You can see that, once again, it's our nice readable workflow on the left plus some mechanical repeatable junction code on the right.
+You can see that, once again, it's our nice, readable workflow on the left, plus some mechanical repeatable junction code on the right.
 
 ### Pattern
 
 Can you see a pattern yet?
 
-I'll repeat the `T?`, `List<T>` `Task<T>`-based workflows again:
+I'll repeat the `T?`, `List<T>`, `Task<T>`-based workflows again:
 
 ```kotlin
 fun nextTalkCity(speaker: Speaker?): City? {
@@ -321,9 +321,9 @@ fun nextTalkCity(speaker: Speaker): Task<City> {
 }
 ```
 
-In all 3 cases there was a complication which prevented us from sequencing method calls fluently. In all 3 cases we found the gluing code to get back to fluent composition.
+In all 3 cases, there was a complication that prevented us from sequencing method calls fluently. In all 3 cases, we found the gluing code to get back to fluent composition.
 
-Let's try to generalize this approach. Given some generic container type `WorkflowThatReturns<T>`, we have a method to combine an instance of such workflow with a function which accepts the result of that workflow and returns another workflow back:
+Let's try to generalize this approach. Given some generic container type `WorkflowThatReturns<T>`, we have a method to combine an instance of such a workflow with a function that accepts the result of that workflow and returns another workflow back:
 
 ```kotlin
 class WorkflowThatReturns<T> {
@@ -339,7 +339,7 @@ An instance of type `T` sits in a generic container.
 
 We call `addStep` with a function, which maps `T` to `U` sitting inside yet another container.
 
-We get an instance of `U` but inside two containers.
+We get an instance of `U`, but inside two containers.
 
 Two containers are automatically unwrapped into a single container to get back to the original shape.
 
@@ -365,7 +365,7 @@ Subsequently, `addStep` is called two times to transfer to `Conference` and then
 
 The name of this pattern is **Monad**.
 
-In Arrow terms, a Monad is an interface with two operations: a constructor `just`, and `flatMap`.
+In Arrow terms, a Monad is an interface with two operations: A constructor `just`, and `flatMap`.
 
 ```kotlin
 interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
@@ -375,13 +375,13 @@ interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
 }
 ```
 
-See that instead of `WorkflowThatReturns<A>` our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
+See that, instead of `WorkflowThatReturns<A>`, our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
 
 The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
 
 It's important that `flatMaps`'s argument returns `Kind<F, B>` and not just `B`, as this new contained object can have different behavior, like a left branch of `Either` or an async execution of `IO`.
 
-We can think of `flatMap` as a combination of `map` and `flatten` as defined by the following signature:
+We can think of `flatMap` as a combination of `map` and `flatten`, as defined by the following signature:
 
 ```kotlin
 fun <F, A, B> Kind<F, A>.map(f: (A) ->  B): Kind<F, B> // Inherited from Functor
@@ -399,11 +399,11 @@ Keep going and let's have a look at several sample implementations of Monad patt
 
 ### Option
 
-My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it maybe has a value, or maybe not).
+My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it might have a value, but might not).
 
-Option is another approach to dealing with "no value" value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implemented it.
+Option is another approach to dealing with "no value" value, an alternative to the concept of null. You can read more about [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) to see how Arrow implements it.
 
-When null is not allowed, any API contract gets more explicit: either you return type `T` and it's always going to be filled, or you return `Option<T>`.
+When null is not allowed, any API contract gets more explicit: Either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.
 
 Given an imaginary repository contract (which does something with customers and orders):
@@ -434,9 +434,9 @@ fun shipperOfLastOrderOnCurrentAddress(customerId: Int): Option<Shipper> =
 
 Sequence is an interface for enumerable containers.
 
-You might have used `Sequence<T>` before, but what you probably didn't know is that it's a container type that fills the requirements of a Monad: sequences can be constructed, and they can be flatMapped.
+You might have used `Sequence<T>` before, but what you probably didn't know is that it's a container type that fills the requirements of a Monad: Sequences can be constructed, and they can be flatMapped.
 
-Here's the signature of `flatMap` as defined in the [Kotlin standard library](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/flat-map.html):
+Here's the signature of `flatMap`, as defined in the [Kotlin standard library](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/flat-map.html):
 
 ```kotlin
 fun <T, R> Sequence<T>.flatMap(
@@ -458,7 +458,7 @@ The query has no idea about how the collections are stored (encapsulated in cont
 
 ### Deferred (Future)
 
-In the Kotlin coroutines library `Deferred<T>` type is used to denote asynchronous computation which will eventually return an instance of `T`.
+In the Kotlin coroutines library, `Deferred<T>` type is used to denote asynchronous computation, which will eventually return an instance of `T`.
 The other names for similar concepts in other languages are Promise and Future.
 
 While the typical usage of Deferred in Kotlin is different from the Monad pattern we discussed, I can still come up with a Future class with the familiar structure:
@@ -486,7 +486,7 @@ class Future<T>(
 }
 ```
 
-Effectively, it's just a wrapper around the Deferred which doesn't add too much value, but it's a useful illustration because now we can do:
+Effectively, it's just a wrapper around the Deferred, which doesn't add too much value, but it's a useful illustration because now we can do:
 
 ```kotlin
 repository
@@ -506,14 +506,14 @@ We are back to the familiar structure. Time for some more complications.
 ### Abstraction for all Monads
 
 We're going to dispel one common misconception.
-Sometimes the word Monad is used to refer to types like Option, Future, Either... and so on, and that's not correct.
+Sometimes the word Monad is used to refer to types like Option, Future, Either, and so on, and that's not correct.
 Those are called [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
 
 As you have seen, neither Future nor Option implement Monad directly.
 This is intentional, as you can potentially have several Monad implementations for a single type.
 For example, RxJava's Observable can be chained using `flatMap`, `switchMap`, and `concatMap`, and using each is still a Monad.
 
-Instead, Arrow specifies that Monad must be implemented by a separate object or class, referred as the "instance of Monad for type F".
+Instead, Arrow specifies that Monad must be implemented by a separate object or class, referred to as the "instance of Monad for type F".
 
 ```kotlin
 object FutureMonad: Monad<ForFuture> {
@@ -565,7 +565,7 @@ fun <F> Monad<F>.shipperOfLastOrderOnCurrentAddress(customerId: Int): Kind<F, Sh
         .flatMap { lo -> repo.getOrder(lo.id) }
         .flatMap { o -> o.shipper }
 ```
-In this case, like with any other interface, Monad defines the API and behavior but not the implementation details.
+In this case, like with any other interface, Monad defines the API and behavior, but not the implementation details.
 This pattern is specially useful for libraries that must remain agnostic to implementations, and gives them a *lingua franca* when building on top of each other.
 
 Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions that can be reused by other codebases.
@@ -574,7 +574,7 @@ You can read more about generalizing code in the [glossary]({{ '/docs/patterns/g
 
 ### Non-Sequential Workflows
 
-Up until now, all the composed workflows had very linear, sequential structure: the output of a previous step was always the input for the next step.
+Up until now, all the composed workflows had very linear, sequential structure: The output of a previous step was always the input for the next step.
 That piece of data could be discarded after the first use because it was never needed for later steps:
 
 ![](https://mikhail.io/2018/07/monads-explained-in-csharp-again//linear-workflow.png)
@@ -603,11 +603,11 @@ repository
     }
 ```
 
-Obviously, this gets ugly very soon.
+Obviously, this gets ugly very fast.
 
-To solve this structural problem the Kotlin language introduced coroutines, the design of which was inspired by other languages such as C# and JavaScript.
+To solve this structural problem, the Kotlin language introduced coroutines—the design that was inspired by other languages such as C# and JavaScript.
 
-If we move back to using Deferred instead of our custom Future, we are able to write
+If we move back to using Deferred instead of our custom Future, we are able to write:
 
 ```kotlin
 val speaker = repository.loadSpeaker().await()
@@ -619,7 +619,7 @@ reservations.bookFlight(speaker, city).await()
 
 Even though we lost the fluent syntax, at least the block has just one level, which makes it easier to read and navigate.
 
-By using coroutines Arrow provides a specialization that enables readable async/await style code for any Monad.
+By using coroutines, Arrow provides a specialization that enables readable async/await style code for any Monad.
 This specialization can be accessed using the function `binding` on any Monad, and the method `bind`. Internally, `Monad#flatMap` is used for chaining.
 
 ```kotlin
@@ -646,9 +646,9 @@ These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions'
 There are a couple laws that `just` constructor and `flatMap` need to adhere to, so that they produce a Monad with a stable implementation.
 These laws are encoded in Arrow as tests you can find in the `arrow-test` module, and are already tested for all instances in the library.
 
-A typical monad tutorial will make a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
+A typical monad tutorial will place a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 
-`Left Identity law` says that Monad constructor is a neutral operation: you can safely run it before `flatMap`, and it won't change the result of the function call:
+`Left Identity law` says that Monad constructor is a neutral operation: You can safely run it before `flatMap`, and it won't change the result of the function call:
 
 ```
 // Given
@@ -659,7 +659,7 @@ val f: (A) -> Kind<F, B>
 just(value).flatMap(f) == f(value)
 ```
 
-`Right Identity law` says that given a monadic value, wrapping its contained data into another monad of same type and then `flatMap` it, doesn't change the original value:
+`Right Identity law` says that, given a monadic value, wrapping its contained data into another monad of same type and then `flatMap` it doesn't change the original value:
 
 ```
 // Given
@@ -681,11 +681,11 @@ val g: (U) -> Kind<F, V>
 m.flatMap(f).flatMap(g) == m.flatMap { a -> f(a).flatMap(g) }
 ```
 
-The laws may look complicated, but in fact they are very natural expectations that any developer has when working with monads, so don't spend too much mental effort on memorizing them.
+The laws may look complicated, but, in fact, they are very natural expectations that any developer has when working with monads, so don't spend too much mental effort on memorizing them.
 
 ### Conclusion
 
-You should not be afraid of the "M-word" just because you are a Kotlin programmer.
+Don't be afraid of the "M-word" just because you are a Kotlin programmer.
 
 Kotlin does not have a notion of monads as predefined language constructs, but that doesn't mean we can't borrow some ideas from the functional world.
 Having said that, it's also true that Kotlin is lacking some powerful ways to combine and generalize monads that are available in functional programming languages.

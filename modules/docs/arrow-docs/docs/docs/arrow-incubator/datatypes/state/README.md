@@ -10,7 +10,7 @@ video: GcXC0xARSXg
 ## State
 
 
-`State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
+`State` is a structure that provides a functional approach to handling application state. `State<S, A>` is basically a function `S -> Tuple2(S, A)`, where `S` is the type that represents your state, and `A` is the result the function produces. In addition to returning the result of type `A`, the function returns a new `S` value, which is the updated state.
 
 ## Stack
 
@@ -126,7 +126,7 @@ fun main() {
 }
 ```
 
-As you can see, since we cannot modify the immutable Stack, we need to create a new instance every time we push or pop values from it. For that same reason we have to return the newly created Stack with every operation.
+As you can see, since we cannot modify the immutable Stack, we need to create a new instance every time we push or pop values from it. For that same reason, we have to return the newly created Stack with every operation.
 
 However, it is a bit cumbersome to explicitly pass around all of this intermediate state. It's also a bit error-prone. It would have been easy to accidentally return `pop(s1)`, for example.
 
@@ -163,7 +163,7 @@ fun push(s: String) = State<Stack, Unit> { stack ->
 }
 ```
 
-The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. The updated state (`S`) after the first call is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
+The `flatMap` method on `State<S, A>` lets you use the result of one `State` in a subsequent `State`. After the first call, the updated state (`S`) is passed into the second call. These `flatMap` and `map` methods allow us to use `State` in for-comprehensions:
 
 ```kotlin:ank
 import arrow.core.ForId

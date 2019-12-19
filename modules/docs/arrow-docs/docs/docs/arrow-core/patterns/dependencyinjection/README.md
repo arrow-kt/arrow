@@ -7,7 +7,7 @@ video: CR5h2Wq1yPE
 
 If you would like to know about using the [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
-If what you want is the example of the video to follow along, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
+If you'd like to follow along with a video, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
 ## Dependency Injection using the `Typeclassless` technique
 
@@ -16,7 +16,7 @@ If what you want is the example of the video to follow along, you can find it in
 
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
-The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
+The technique for writing polymorphic code demonstrated below is available for all other typeclasses besides [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
@@ -29,33 +29,33 @@ multiplyBy2(Try.functor(), Try.just(1))
 // Success(2)
 ```
 
-In the example above we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
+In the example above, we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
 And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
 This technique applied to other Typeclasses allows users to describe entire programs in terms of behaviors typeclasses removing
 dependencies to concrete data types and how they operate.
 
-This technique does not enforce inheritance or any kind of subtyping relationship and is frequently known as [`ad-hoc polymorphism`](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism)
+This technique does not enforce inheritance or any kind of subtyping relationship, and is frequently known as [`ad-hoc polymorphism`](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism)
 and frequently used in programming languages that support [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) and [typeclass]({{ '/docs/patterns/glossary' | relative_url }}).
 
-Entire libraries and applications can be written without enforcing consumers to use the lib author provided datatypes but letting
-users provide their own provided there is typeclass instances for their datatypes.
+Entire libraries and applications can be written without forcing consumers to use the lib author provided datatypes, but rather letting
+users provide their own typeclass instances for their datatypes.
 
-Now, passing around a typeclass parameter like `Functor` to every function is repetitive, tedious, and error-prone. For that reason, many programming languages provide with a mechanism to describe the dependencies of the function without having to pass them as parameter explicitly. In Kotlin, this is achieved using extension functions.
+Now, passing around a typeclass parameter like `Functor` to every function is repetitive, tedious, and error-prone. For that reason, many programming languages provide a mechanism to describe the dependencies of the function without having to pass them as parameter explicitly. In Kotlin, this is achieved using extension functions.
 
 ## Typeclasses as dependencies
 
-As described in the glossary, typeclasses are a grouping of constructors and extension functions on `Kind<F, A>` that form a DSL for the type they're declared to. To access these extension functions you need to be in the scope of a typeclass. That is, the typeclass object has to be bound to `this`. Kotlin provides two ways of achieving this: with standard library functions, and with more extension functions.
+As described in the glossary, typeclasses are a grouping of constructors and extension functions on `Kind<F, A>` that form a DSL for the type they're declared to. To access these extension functions, you need to be in the scope of a typeclass. That is, the typeclass object has to be bound to `this`. Kotlin provides two ways of achieving this: With standard library functions, and with more extension functions.
 
 #### Standard library functions
 
-The function `multiplyBy2` as defined above receives `FT: Functor<F>` as a parameter. We need to bind `FT` to `this` to be able to access the extension function `fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` inside. For that we use the standard library function `typeclass.run { }`, which requires a value return.
+The function `multiplyBy2`, as defined above, receives `FT: Functor<F>` as a parameter. We need to bind `FT` to `this` to be able to access the extension function `fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` inside. For that, we use the standard library function `typeclass.run { }`, which requires a value return.
 
 ```kotlin
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
   FT.run { fa.map { it * 2 } }
 ```
 
-If we have a block that does not return a value or `Unit`, I recommended to use either `with(typeclass) { }` to emphasize the difference.
+If we have a block that does not return a value or `Unit`, using either `with(typeclass) { }` to emphasize the difference is recommended.
 
 ```kotlin
 fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
@@ -67,7 +67,7 @@ fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
 
 #### Extension functions
 
-An extension function is applied to a type, that becomes bound to `this` and enables calling all its functions without using `this.method()`. If we declare a function to depend on the typeclass, we get automatic access to the extension functions declared inside.
+An extension function is applied to a type that becomes bound to `this`, and enables calling all its functions without using `this.method()`. If we declare a function to depend on the typeclass, we get automatic access to the extension functions declared inside.
 
 ```kotlin:ank:silent
 import arrow.*
@@ -216,7 +216,7 @@ fetcher.getUserFriends(fetcher.createId("122344"))
 ### Methods inside a class
 
 This is the case where we find the limitations of the Kotlin compiler. Once you're inside a class, `this` gets bound to the class scope.
-This makes that extension functions declared inside a class require using the standard library functions to access them, which is not very idiomatic.
+This requires extension functions declared inside a class to use the standard library functions to access them, which is not very idiomatic.
 
 ```kotlin
 // WRONG
@@ -232,8 +232,8 @@ ForOption.run {
 }
 ```
 
-For these cases the most ergonomic option is not to use extension functions, and instead fall back to regular parameter passing.
-Once inside the method we can use the standard library functions to access the scope of the typeclass, and treat the method the same as if it was a scoped function.
+For these cases, the most ergonomic option is to not use extension functions and, instead, fall back to regular parameter passing.
+Once inside the method, we can use the standard library functions to access the scope of the typeclass, and treat the method the same as if it was a scoped function.
 
 ```kotlin
 class Parser {
@@ -249,11 +249,11 @@ Parser().parseInts(Option.monad(), listOf("1".some(), "2".some()))
 ```
 
 We are almost back to where we started with parameter passing, at least on this first layer.
-Except, there are some benefits once you're inside these public functions, as you can declare private extension methods inside the class and you will be able to seamlessly call them as well as other scoped functions.
+Except, there are some benefits once you're inside these public functions, as you can declare private extension methods inside the class, and you will be able to seamlessly call them as well as other scoped functions.
 
 ## Composing dependencies
 
-In several of the prior examples we have found that we depend on multiple typeclasses that are not part of the same hierarchy.
+In several of the prior examples, we have found that we depend on multiple typeclasses that are not part of the same hierarchy.
 This is not an uncommon case, and it has to be addressed. How can we express this combination? Luckily, the Kotlin language comes to our aid again.
 
 Kotlin has a keyword `where`, used in method signatures to describe multiple bounds on a generic parameter.
@@ -269,7 +269,7 @@ fun <F> Applicative<F>.findUserName(S: Show<User>, id: Kind<F, UserId>): Kind<F,
 
 Let's do a rewrite using `where` to define multiple typeclass requirements.
 We will create a generic parameter `TC` that is bound to both typeclasses. That parameter will be the one we declare an extension on.
-We'll also remove running `Show` as it isn't required anymore.
+We'll also remove running `Show`, as it isn't required anymore.
 
 ```kotlin
 fun <F, TC> TC.findUserName(id: Kind<F, UserId>)
@@ -300,7 +300,7 @@ createApplicativeShow(Either.applicative<Throwable>(), Show.any())
 ### Creating real types
 
 Alternatively, you can compose the types in a new interface and give it a new name.
-This way you can also skip `where` clauses.
+This way, you can also skip `where` clauses.
 The major downside is that you'll find a combinatory explosion of new interfaces on your codebase,
 so use them scarcely when you have a type that repeats itself pervasively through the codebase.
 
@@ -313,7 +313,7 @@ fun <F, T> createApplicativeShow(AP: Applicative<F>, S: Show<T>): ApplicativeSho
   object: ApplicativeShow<F, T>, Applicative<F> by AP, Show<T> by S
 ```
 
-There is also another reason to create a new real type, when you have two colliding typeclass instances.
+Another reason to create a new real type is when you have two colliding typeclass instances.
 
 ### Disambiguating colliding instances
 
@@ -323,10 +323,10 @@ Another way of looking at this kind of collisions is when annotation-based DI fr
 In the case of Arrow, you will need to disambiguate them manually based off fields.
 This has some benefits over the DI framework approach:
 
-* it will only happen at the caller layer, once per collision
-* it doesn't require any maintenance changes on all the declaration sites
-* the solution is strongly typed
-* the solution depends on a function call rather than a string convention, so static analysis and refactor tools are available
+* It will only happen at the caller layer, once per collision.
+* It doesn't require any maintenance changes on all the declaration sites.
+* The solution is strongly typed.
+* The solution depends on a function call, rather than a string convention, so static analysis and refactor tools are available.
 
 This collision happens in an example we saw before. The typeclasses `Monad<F>` and `Traverse<F>` both inherit from `Functor<F>`.
 You cannot define a boundary for two different values of `F`. This happened in our Parser class:
@@ -336,7 +336,7 @@ You cannot define a boundary for two different values of `F`. This happened in o
 data class Parser: Monad<ForOption> by Option.monad(), Traverse<ForListK> by ListK.traverse()
 ```
 
-Same as with methods inside a class, we have a situation where multiple `this` bindings collide.
+As with methods inside a class, we have a situation where multiple `this` bindings collide.
 The way of disambiguating is by creating a new type that provides both bounds as functions, and has an instance in its companion object:
 
 ```kotlin
@@ -369,14 +369,14 @@ data class Parser: ParserDependencies by ParserDependencies {
 
 We have the same benefits and pitfalls we had in methods inside a class.
 Once inside the `run` blocks, we're able to call all other scoped extension functions declared for the enclosing typeclass.
-This disambiguation only happens in one of the layers, who's responsible for the ambiguity in the first place!
+This disambiguation only happens in one of the layers, which is responsible for the ambiguity in the first place!
 
-Cool, once we have all the pieces in place, explained and understood, let's mention one last use case: general dependency injection!
+Cool. Once we have all the pieces in place, explained, and understood, let's mention one last use case: General dependency injection!
 
 ## Using DI to inject any object
 
 Now that you know how to define new types to declare multiple dependencies, and add fields to prevent collision between typeclasses in the same hierarchy,
-what prevents you from adding arbitrary data to any fields of the type? Well, the answer is nothing :D
+what prevents you from adding arbitrary data to any fields of the type? Well, the answer is nothing. :D
 
 Let's grab one of our previous examples and refactor it
 
@@ -410,7 +410,7 @@ interface FetcherDependencies<F>: MonadThrow<F> {
 }
 ```
 
-With this type we don't need a class anymore, as it already encloses all state.
+With this type, we don't need a class anymore, as it already encloses all state.
 We can move the functions to an object scope, and make them depend on `FetcherDependencies` and `MonadError<F, Throwable>`.
 
 ```kotlin
@@ -438,10 +438,10 @@ deps.getUserFriends(deps.createId("1234"))
 
 What have we gained from this change? We have replaced one concretion, a final class, with an abstraction that's an interface.
 
-* The code is more functional: we have one structural type and many functions that act on it
-* A single instance of the object that's used but not retained by the functions, so there's single ownership
-* We can still define as many extensions to the functionality as we want
-* We can call any function that requires just one or some of the types, encapsulating the rest
+* The code is more functional: We have one structural type and many functions that act on it.
+* A single instance of the object that's used, but not retained by the functions, so there's single ownership.
+* We can still define as many extensions to the functionality as we want.
+* We can call any function that requires just one or some of the types, encapsulating the rest.
 
 And as a consequence to all of this, testability and refactoring possibilities are through the roof!
 Many of the promises of OOP, fulfilled with simple functions and interfaces.
@@ -471,9 +471,9 @@ with (FetcherDependencies(Option.monadError(), MockApiService())) {
 ### Scoping
 
 Typeclasses are completely stateless collections of functions.
-Once you start adding other objects that are stateful you need to take care of the lifecycle of your Dependencies object.
+Once you start adding other objects that are stateful, you need to take care of the lifecycle of your Dependencies object.
 
-Luckily for us, as there is only one reference to the Syntax object that's passed around across layers through function parameters instead of being retained by classes, it's easy to track its lifecycle and manage it.
+Luckily for us, because there is only one reference to the Syntax object that's passed around across layers through function parameters instead of being retained by classes, it's easy to track its lifecycle and manage it.
 
 Assuming this Dependencies object is completely stateless and it lives at the global scope, a simple root value suffices:
 

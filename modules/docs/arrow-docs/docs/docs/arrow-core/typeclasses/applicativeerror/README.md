@@ -15,10 +15,10 @@ redirect_from:
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
-like for example a sealed class UserNotFoundReason that contains 3 inheritors.
+a sealed class UserNotFoundReason that contains three inheritors, for example.
 
 Some of the datatypes Λrrow provides can have these error types already fixed.
-That's the case of [`Try<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), which has its error type fixed to `Throwable`.
+That's the case with [`Try<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), which has its error type fixed to `Throwable`.
 Other datatypes like [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allow for the user to apply their error type of choice.
 
 ### Main Combinators
@@ -105,13 +105,13 @@ While `fromOption()` requires creating a new error value.
 Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException("Boom") } }
 ```
 
-In the case of `fromTry()` it is required converting from `Throwable` to the type of the error.
+In the case of `fromTry()`, converting from `Throwable` to the type of the error is required.
 
 ```kotlin:ank
 Either.applicativeError<String>().run { Try { RuntimeException("Boom") }.fromTry { it.message!! } }
 ```
 
-In the case of `fromEither()` it is required converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E>.
+In the case of `fromEither()`, converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E> is required. 
 
 ```kotlin:ank
 IO.applicativeError().run { Either.Right(1).fromEither { it } }
@@ -124,7 +124,7 @@ IO.applicativeError().run { Either.Left(RuntimeException("Boom")).fromEither { i
 #### catch
 
 Constructor function. It takes two function parameters. The first is a generator function from `() -> A`. The second is an error mapping function from `(Throwable) -> E`.
-`catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
+`catch()` runs the generator function to generate a success datatype, and if it throws an exception, it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
 val eitherAE = Either.applicativeError<Throwable>()
@@ -142,7 +142,7 @@ Arrow provides `ApplicativeErrorLaws` in the form of test cases for internal ver
 
 ### Example : Alternative validation strategies using `ApplicativeError`
 
-In this validation example we demonstrate how we can use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
+In this validation example, we demonstrate how we can use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raise errors in the context we are computing in.
 
 *Model*
 
@@ -193,9 +193,9 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 }
 ```
 
-`Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
+`Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values into the positive result and `raiseError` into the error context.
 
-Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
+Once we have such abstract algebra defined, we can simply materialize it to data types that support different error strategies:
 
 *Error accumulation*
 

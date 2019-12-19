@@ -13,7 +13,7 @@ redirect_from:
 
 `Monad` is a typeclass that abstracts over sequential execution of code.
 This doc focuses on the methods provided by the typeclass.
-If you'd like a long explanation of its origins with simple examples with nullable, `Option` and `List`,
+If you'd like a long explanation of its origins with simple examples with nullable, `Option`, and `List`,
 head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
@@ -37,7 +37,7 @@ Some(1).flatMap { a ->
 }
 ```
 
-The improvement of `flatMap` over regular function composition is that `flatMap` understands about sealed datatypes, and allows for short-circuiting execution.
+The improvement of `flatMap` over regular function composition is that `flatMap` understands sealed datatypes, and allows for short-circuiting execution.
 
 ```kotlin:ank
 None.flatMap { a: Int ->
@@ -53,12 +53,12 @@ Right(1).flatMap { _ ->
 }
 ```
 
-Note that depending on the implementation of `Kind<F, A>`, this chaining function may be executed immediately, i.e. for `Option` or `Either`;
-or lazily, i.e. `IO` or `ObservableK`.
+Note that, depending on the implementation of `Kind<F, A>`, this chaining function may be executed immediately, i.e., for `Option` or `Either`;
+or lazily, i.e., `IO` or `ObservableK`.
 
 #### Kind<F, Kind<F, A>>#flatten
 
-Combines two nested elements into one `Kind<F, A>`
+Combines two nested elements into one `Kind<F, A>`.
 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.flatten
@@ -84,7 +84,7 @@ Some(5).mproduct {
 
 #### followedBy/followedByEval
 
-Executes sequentially two elements that are independent from one another.
+Sequentially executes two elements that are independent from one another.
 The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
@@ -95,7 +95,7 @@ Some(1).followedBy(Some(2))
 
 #### flatTap (formerly ~~effectM~~)
 
-Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
+Sequentially executes two elements and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
 import arrow.fx.extensions.io.monad.*
@@ -107,7 +107,7 @@ IO.just(1).flatTap(::logValue).fix().unsafeRunSync()
 
 #### productL/productLEval (formerly ~~forEffect~~/~~forEffectEval~~)
 
-Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
+Sequentially executes two elements that are independent from one another, ignoring the value of the second one.
 The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
