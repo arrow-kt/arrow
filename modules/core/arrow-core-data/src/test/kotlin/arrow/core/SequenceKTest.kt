@@ -3,7 +3,6 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.sequencek.align.align
 import arrow.core.extensions.sequencek.crosswalk.crosswalk
 import arrow.core.extensions.sequencek.eq.eq
@@ -39,7 +38,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
@@ -54,15 +52,6 @@ class SequenceKTest : UnitSpec() {
     val EQ: Eq<Kind<ForSequenceK, Int>> = object : Eq<Kind<ForSequenceK, Int>> {
       override fun Kind<ForSequenceK, Int>.eqv(b: Kind<ForSequenceK, Int>): Boolean =
         fix().toList() == b.fix().toList()
-    }
-
-    fun EQK() = object : EqK<ForSequenceK> {
-      override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
-        (this.fix().toList().k() to other.fix().toList().k()).let {
-          ListK.eq(EQ).run {
-            it.first.eqv(it.second)
-          }
-        }
     }
 
     val associativeSemigroupalEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
@@ -81,10 +70,10 @@ class SequenceKTest : UnitSpec() {
     }
 
     testLaws(
-      MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, EQK()),
+      MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, SequenceK.eqK()),
       ShowLaws.laws(show, EQ, Gen.sequenceK(Gen.int())),
-      MonadLaws.laws(SequenceK.monad(), EQK()),
-      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), EQK()),
+      MonadLaws.laws(SequenceK.monad(), SequenceK.eqK()),
+      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), SequenceK.eqK()),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
