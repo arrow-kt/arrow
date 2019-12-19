@@ -1,5 +1,0 @@
-# Tags plugin configuration
-tag_page_layout: tags
-tag_page_dir: /media/tags
-tag_permalink_style: pretty
-ignored_tags: []
