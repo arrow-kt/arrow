@@ -15,9 +15,6 @@ class MonoidTest : UnitSpec() {
     override fun <A> Kind<ForMonoid, A>.eqK(other: Kind<ForMonoid, A>, EQ: Eq<A>): Boolean =
       (this.fix() to other.fix()).let { (ls, rs) ->
 
-        // question: does it still make sense to have this test?
-        // couldn't think of a generic way of passing in A values here
-        // using empty seems pointless.
         val l = ls.run {
           ls.empty().combine(ls.empty())
         }
