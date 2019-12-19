@@ -35,7 +35,7 @@ The shortest explanation of monads looks like this:
 
 > A Monad is just a monoid in the category of endofunctors.
 
-It's both mathematically correct and totally useless to anybody learning functional programming. To understand this statement, one has to know the terms "monoid," "category," and "endofunctors," and be able to mentally compose them into something meaningful.
+It's both mathematically correct and totally useless to anybody learning functional programming. To understand this statement, one has to know the terms "monoid", "category" and "endofunctors" and be able to mentally compose them into something meaningful.
 
 The same problem is apparent in most monad tutorials. They assume some pre-existing knowledge in the heads of their readers, and if that assumption fails, the tutorial doesn't click.
 
