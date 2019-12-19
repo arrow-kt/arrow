@@ -14,7 +14,7 @@ redirect_from:
 The `Eq` typeclass abstracts the ability to compare two instances of any object.
 It can be considered the typeclass equivalent of Java's `Object#equals`.
 
-Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id fields-, or any combination of the above.
+Depending on your needs, this comparison can be structural (the content of the object), referential (the memory address of the object), based on an identity (like an Id fields), or any combination of these.
 
 ```kotlin:ank
 import arrow.core.extensions.*
@@ -56,9 +56,9 @@ Arrow provides `EqLaws` in the form of test cases for internal verification of l
 
 #### Creating your own `Eq` instances
 
-Eq provides one special instance that can be potentially applicable to most datatypes.
+Eq provides one special instance that potentially can be applicable to most datatypes.
 It uses kotlin's == comparison to compare any two instances.
-Note that this instance will fail on many all datatypes that contain a property or field that doesn't implement structural equality, i.e. functions, typeclasses, non-data classes
+Note that this instance will fail on many all datatypes that contain a property or field that doesn't implement structural equality, i.e., functions, typeclasses, non-data classes.
 
 ```kotlin:ank
 import arrow.core.*
@@ -89,6 +89,6 @@ import arrow.typeclasses.Eq
 TypeClass(Eq::class).dtMarkdownList()
 ```
 
-Additionally all instances of [`Order`]({{ '/docs/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
+Additionally, all instances of [`Order`]({{ '/docs/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`.
 
 ank_macro_hierarchy(arrow.typeclasses.Eq)

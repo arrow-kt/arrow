@@ -12,9 +12,9 @@ redirect_from:
 
  
 The `Decidable` is a typeclass modeling contravariant decision. `Decidable` is the contravariant version of `Alternative`.
-`Decidable` basically states: Given a `Kind<F, A>` and a `Kind<F, B>` and a way to turn `C` into either `A` or `B` it gives you a `Kind<F, C>`
+`Decidable` basically states: Given a `Kind<F, A>` and a `Kind<F, B>`, and a way to turn `C` into either `A` or `B`, it gives you a `Kind<F, C>`.
 
-With decidable we can extend our serializer from the `Divide`/`Divisible` examples, by adding a decision process while serializing.
+With decidable, we can extend our serializer from the `Divide`/`Divisible` examples by adding a decision process while serializing.
 Consider this example where a type is either an int or a string.
 
 ```kotlin:ank:playground
@@ -45,7 +45,7 @@ fun main(args: Array<String>) {
 
 #### choose
 
-Constructs a `Kind<F, C>` from a `Kind<F, A>`, a `Kind<F, B>` and a function `(C) -> Either<A, B>`.
+Constructs a `Kind<F, C>` from a `Kind<F, A>`, a `Kind<F, B>`, and a function `(C) -> Either<A, B>`.
 The intuition here is that the function "decides" what value to use by specifying it with the either constructed.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Decidable` instances for custom datatypes.

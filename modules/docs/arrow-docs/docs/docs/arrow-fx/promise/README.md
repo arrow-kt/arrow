@@ -9,13 +9,13 @@ permalink: /docs/effects/promise/
 
 
 
-When made, a `Promise` is empty. Until it is fulfilled, which can only happen once.
+When made, a `Promise` is empty. That is, until it is fulfilled, which can only happen once.
 A `Promise` guarantees (promises) `A` at some point in the future within the context of `F`.
 
 ## Constructing a Promise
 
 A promise can easily be made by calling `uncancelable`.
-Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
+Since the allocation of mutable state is not referentially transparent, this side-effect is contained within `F`.
 
 ```kotlin:ank:playground
 import arrow.fx.*
@@ -30,7 +30,7 @@ println(promise)
 }
 ```
 
-In case you want the side-effect to execute immediately and return the `Promise` instance you can use the `unsafeUncancelable` function.
+In case you want the side-effect to execute immediately and return the `Promise` instance, you can use the `unsafeUncancelable` function.
 
 ```kotlin:ank:playground
 import arrow.fx.*

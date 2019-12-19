@@ -7,11 +7,11 @@ permalink: /docs/optics/filterindex/
 ## FilterIndex
 
 
-`FilterIndex` provides a [Traversal]({{ '/docs/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set or modify 0 to N foci whose index `I` satisfies a predicate.
+`FilterIndex` provides a [Traversal]({{ '/docs/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set, or modify 0 to N foci whose index `I` satisfies a predicate.
 
-If for a structure `S` the foci `A` can be indexed by `I` then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
+If the foci `A` for a structure `S` can be indexed by `I`, then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
 
-`FilterIndex` can easily be created given a `Traverse` instance and an indexing function.
+`FilterIndex` can easily be created, given a `Traverse` instance and an indexing function.
 
 ```kotlin:ank
 import arrow.core.*
@@ -26,7 +26,7 @@ val filterIndexStringByIndex = FilterIndex.fromTraverse<ForListK, String>({ list
 }, ListK.traverse())
 ```
 
-Given a `FilterIndex` instance we can create a `Traversal` that filters out the foci that do not match the predicate.
+Given a `FilterIndex` instance, we can create a `Traversal` that filters out the foci that do not match the predicate.
 
 ```kotlin:ank
 val filter: Traversal<ListKOf<String>, String> = filterIndexStringByIndex.filter { length -> length > 3 }
@@ -34,7 +34,7 @@ val filter: Traversal<ListKOf<String>, String> = filterIndexStringByIndex.filter
 filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 ```
 
-Arrow provides `FilterIndex` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be filtered by index, like `ListK` and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
+Arrow provides `FilterIndex` instances for some common datatypes in both Arrow and the Kotlin stdlib that can be filtered by index, like `ListK`, and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
 import arrow.optics.extensions.listk.filterIndex.*

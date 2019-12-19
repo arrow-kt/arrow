@@ -32,7 +32,7 @@ fun <T> nonEmptyListHead() = Getter<NonEmptyList<T>, T> {
 nonEmptyListHead<Int>().get(NonEmptyList.of(1, 2, 3, 4))
 ```
 
-Or from any of the optics defined in `arrow-optics` that allow to safely getting its focus.
+Or, from any of the optics defined in `arrow-optics` that allow getting its focus safely.
 
 ```kotlin:ank:silent
 import arrow.core.*
@@ -77,14 +77,14 @@ takeMedpack.run(player)
 
 ## Composition
 
-Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested structures.
+Unlike a regular `get` function, a `Getter` composes. Similar to a `Lens`, we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
 val firstBar: Getter<NonEmptyList<Player>, Int> = NonEmptyList.head<Player>() compose healthGetter
 firstBar.get(Player(5).nel())
 ```
 
-`Getter` can be composed with `Getter`, `Iso`, `Lens` and `Fold` and the composition results in the following optics.
+`Getter` can be composed with `Getter`, `Iso`, `Lens`, and `Fold`, and the composition results in the following optics:
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
