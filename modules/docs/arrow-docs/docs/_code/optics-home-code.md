@@ -37,12 +37,13 @@ fun main() {
 
 
   val john =
-    Employee("John Doe", Company("Arrow",
-                               Address("Functional city",
-                               Street(42, "lambda street"))))
-  val modify =
-    Employee.company.address.street.name.modify(john,
-                                              String::toUpperCase)
+  Employee("John Doe",
+          Company("Arrow",
+                  Address("Functional city",
+                          Street(42, "lambda street"))))
+
+  val modify = Employee.company.address.street.name
+      .modify(john, String::toUpperCase)
 
   println(modify)
 //sampleEnd
