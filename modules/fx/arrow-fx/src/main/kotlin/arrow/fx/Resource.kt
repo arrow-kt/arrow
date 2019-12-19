@@ -43,7 +43,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
  * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
+ * fun shutDownFancyService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val program = IO.fx {
