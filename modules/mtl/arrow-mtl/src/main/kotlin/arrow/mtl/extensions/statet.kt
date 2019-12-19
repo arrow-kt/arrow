@@ -6,7 +6,6 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
@@ -30,8 +29,6 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
@@ -295,22 +292,4 @@ interface StateTAlternative<F, S> : Alternative<StateTPartialOf<F, S>>, StateTMo
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
     orElse(y).fix()
-}
-
-@extension
-interface StateTEqK<F, S> : EqK<StateTPartialOf<F, S>> {
-  fun EQKF(): EqK<F>
-  fun EQS(): Eq<S>
-  fun M(): Monad<F>
-  fun s(): S
-
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.runM(M(), s())
-      val rs = it.second.runM(M(), s())
-
-      EQKF().liftEq(Tuple2.eq(EQS(), EQ)).run {
-        ls.eqv(rs)
-      }
-    }
 }
