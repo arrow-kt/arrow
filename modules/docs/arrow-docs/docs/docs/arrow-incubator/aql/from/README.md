@@ -6,8 +6,8 @@ permalink: /docs/aql/from/
 
 ## from
 
-{:.beginner}
-beginner
+
+
 
 AQL does not require of a `from` clause to operate because the data source with the shape `Kind<F, A>` is already used as the initial point to compose a query.
 
@@ -53,7 +53,7 @@ import arrow.aql.*
 TypeClass(From::class).dtMarkdownList()
 ```
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

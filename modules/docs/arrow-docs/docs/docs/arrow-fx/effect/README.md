@@ -6,8 +6,8 @@ permalink: /docs/effects/effect/
 
 ## Effect
 
-{:.intermediate}
-intermediate
+
+
 
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">But can I use callback? I love callbacks. Christmas tree style. with the lights and all....</p>&mdash; Hadi Hariri (@hhariri) <a href="https://twitter.com/hhariri/status/986652337543491586?ref_src=twsrc%5Etfw">April 18, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>

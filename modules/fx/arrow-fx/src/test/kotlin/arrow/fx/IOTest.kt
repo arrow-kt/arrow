@@ -16,6 +16,7 @@ import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
+import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase
@@ -27,15 +28,12 @@ import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
-import org.junit.runner.RunWith
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.EmptyCoroutineContext
 
-@RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 
@@ -280,6 +278,17 @@ class IOTest : UnitSpec() {
         .continueOn(ctxB)
         .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxB } }
         .unsafeRunSync()
+    }
+
+    "fx should defer evaluation until run" {
+      var run = false
+      val program = IO.fx {
+        run = true
+      }
+
+      run shouldBe false
+      program.unsafeRunSync()
+      run shouldBe true
     }
 
     "fx can switch execution context state across not/bind" {
@@ -597,11 +606,64 @@ class IOTest : UnitSpec() {
       IO.concurrent().parMap3(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
+
+    "can go from Either to IO directly when Left type is a Throwable" {
+
+      val exception = RuntimeException()
+      val left = Either.left(exception)
+      val right = Either.right("rightValue")
+
+      left.toIO()
+        .attempt().unsafeRunSync() shouldBe Left(exception)
+
+      right.toIO()
+        .unsafeRunSync() shouldBe "rightValue"
+    }
+
+    "can go from Either to IO by mapping the Left value to a Throwable" {
+
+      val exception = RuntimeException()
+      val left = Either.left("boom")
+      val right = Either.right("rightValue")
+
+      right
+        .toIO { exception }
+        .unsafeRunSync() shouldBe "rightValue"
+
+      left
+        .toIO { exception }
+        .attempt().unsafeRunSync() shouldBe Left(exception)
+    }
+
+    "Cancelation is wired accross suspend" {
+      fun infiniteLoop(): IO<Unit> {
+        fun loop(iterations: Int): IO<Unit> =
+          just(iterations).flatMap { i -> loop(i + 1) }
+
+        return loop(0)
+      }
+
+      val wrappedInfiniteLoop: IO<Unit> =
+        IO.effect { infiniteLoop().suspended() }
+
+      IO.fx {
+        val p = !Promise<ExitCase<Throwable>>()
+        val (_, cancel) = !IO.unit.bracketCase(
+          release = { _, ec -> p.complete(ec) },
+          use = { wrappedInfiniteLoop }
+        ).fork()
+        !sleep(100.milliseconds)
+        !cancel
+        val result = !p.get()
+        !effect { result shouldBe ExitCase.Canceled }
+      }.suspended()
+    }
   }
 }
 
 /** Represents a unique identifier context using object equality. */
 internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
+
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }

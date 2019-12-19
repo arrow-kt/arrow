@@ -4,11 +4,8 @@ import arrow.ui.extensions.store.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class StoreTest : UnitSpec() {
 
   init {

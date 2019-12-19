@@ -8,8 +8,8 @@ redirect_from:
 
 ## FunctorFilter
 
-{:.advanced}
-advanced
+
+
 
 ### Data types
 

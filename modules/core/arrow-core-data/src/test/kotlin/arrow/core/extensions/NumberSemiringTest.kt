@@ -2,11 +2,8 @@ package arrow.core.extensions
 
 import arrow.test.UnitSpec
 import arrow.test.laws.SemiringLaws
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class NumberSemiringTest : UnitSpec() {
 
     companion object {

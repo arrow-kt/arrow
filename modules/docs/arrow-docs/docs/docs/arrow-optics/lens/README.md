@@ -6,8 +6,6 @@ permalink: /docs/optics/lens/
 
 ## Lens
 
-{:.beginner}
-beginner
 
 Optics are essentially abstractions to update immutable data structures in an elegant way.
 A `Lens` (aka functional reference) is an optic that can focus into a structure and `get`, `modify` or `set` its focus (target). They're mostly used for `product types` such as a `data class` or a `TupleN`.
@@ -60,7 +58,7 @@ val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (
 liftF(player)
 ```
 
-There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
+There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*
@@ -78,7 +76,7 @@ playerLens.asks(Int::inc)
   .runId(Player(50))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank

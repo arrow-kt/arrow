@@ -1,6 +1,7 @@
 package arrow.ui
 
 import arrow.Kind
+import arrow.core.Const
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.const.divisible.divisible
@@ -12,23 +13,20 @@ import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.monoid
 import arrow.core.fix
-import arrow.ui.extensions.sum.comonad.comonad
-import arrow.ui.extensions.sum.divisible.divisible
-import arrow.ui.extensions.sum.eq.eq
-import arrow.ui.extensions.sum.hash.hash
+import arrow.core.value
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.HashLaws
-import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
-import arrow.typeclasses.value
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import arrow.ui.extensions.sum.comonad.comonad
+import arrow.ui.extensions.sum.divisible.divisible
+import arrow.ui.extensions.sum.eq.eq
+import arrow.ui.extensions.sum.hash.hash
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class SumTest : UnitSpec() {
   init {
 
@@ -52,7 +50,7 @@ class SumTest : UnitSpec() {
         }
       ),
       ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ),
-      HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), cf)
+      HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), genSum())
     )
 
     val abSum = Sum.left(Id.just("A"), Id.just("B"))
@@ -87,3 +85,8 @@ class SumTest : UnitSpec() {
     }
   }
 }
+
+private fun genSum(): Gen<Sum<ForId, ForId, Int>> =
+  Gen.int().map {
+    Sum.left(Id.just(it), Id.just(it))
+  }

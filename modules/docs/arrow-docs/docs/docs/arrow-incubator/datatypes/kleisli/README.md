@@ -9,8 +9,6 @@ video: vAdhMJWnBUI
 
 ## Kleisli
 
-{:.intermediate}
-intermediate
 
 Kleisli enables composition of functions that return a monadic value, for instance, an `Option<Int>` or an `Either<String, Int>`, without having functions take an `Option` or `Either` as a parameter.
 

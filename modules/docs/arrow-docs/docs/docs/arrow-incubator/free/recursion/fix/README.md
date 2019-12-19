@@ -6,8 +6,8 @@ permalink: /docs/recursion/fix/
 
 ## Fix
 
-{:.advanced}
-advanced
+
+
 
 The fix datatype is the simplest way to model birecursion via a direct encoding of
 the `project` and `embed` functions.

@@ -1,34 +1,39 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.Kind2
+import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.semigroup
 import arrow.core.extensions.ior.applicative.applicative
+import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
 import arrow.core.extensions.ior.bifunctor.bifunctor
+import arrow.core.extensions.ior.bitraverse.bitraverse
+import arrow.core.extensions.ior.crosswalk.crosswalk
 import arrow.core.extensions.ior.eq.eq
+import arrow.core.extensions.ior.eqK.eqK
 import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
-import arrow.core.extensions.ior.bitraverse.bitraverse
-import arrow.core.Ior.Right
+import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
+import arrow.test.generators.ior
+import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class IorTest : UnitSpec() {
 
   init {
@@ -43,11 +48,13 @@ class IorTest : UnitSpec() {
 
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
-      ShowLaws.laws(Ior.show(), EQ) { Right(it) },
+      ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
-      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
-      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any())
+      HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
+      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
+      CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Eq.any())
     )
 
     "bimap() should allow modify both value" {

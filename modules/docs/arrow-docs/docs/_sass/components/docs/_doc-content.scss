@@ -50,7 +50,11 @@
     .browser {
         margin-top: ($base-point-grid * 3);
     }
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-content.scss
+    
+=======
 
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-content.scss
     ul, ol {
         padding-left: ($base-point-grid * 3);
     }
@@ -61,13 +65,33 @@
             list-style: circle;
         }
     }
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-content.scss
+    
+=======
 
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-content.scss
     ol {
         li {
             list-style-type: decimal;
         }
     }
 
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-content.scss
+
+    strong {
+        font-weight: $font-bold;
+    }
+    
+    del {
+        text-decoration: line-through;
+    }
+    
+    em {
+        font-style: italic;
+    }
+    
+    
+=======
     strong {
         font-weight: $font-bold;
     }
@@ -79,6 +103,7 @@
     em {
         font-style: italic;
     }
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-content.scss
 
     hr {
         border: none;
@@ -86,6 +111,11 @@
         width: 100%;
         background: rgba($brand-secondary, 0.9);
     }
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-content.scss
+
+    a {
+        @include links($core-color, $core-color, $core-color, $core-color)
+=======
     
     table {
         width: 100%;
@@ -102,6 +132,7 @@
         tr:nth-child(2n) {
             background: $background-color;
         }
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-content.scss
     }
 
     .header-link {
@@ -124,4 +155,8 @@
             opacity: 1;
         }
     }
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-content.scss
 }
+=======
+}
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-content.scss

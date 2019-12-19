@@ -6,8 +6,8 @@ permalink: /docs/integrations/rx2/
 
 ## RxJava 2
 
-{:.intermediate}
-intermediate
+
+
 
 Arrow aims to enhance the user experience when using RxJava. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 

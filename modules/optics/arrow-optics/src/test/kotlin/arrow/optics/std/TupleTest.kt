@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple10
 import arrow.core.Tuple2
@@ -10,10 +11,10 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.extensions.monoid
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
-import arrow.core.ListK
+import arrow.core.extensions.tuple2.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.tuple10
@@ -26,16 +27,22 @@ import arrow.test.generators.tuple7
 import arrow.test.generators.tuple8
 import arrow.test.generators.tuple9
 import arrow.test.laws.LensLaws
+import arrow.test.laws.MonoidLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class TupleTest : UnitSpec() {
 
   init {
+
+    testLaws(
+      MonoidLaws.laws(
+        M = Tuple2.monoid(Int.monoid(), String.monoid()),
+        A = Gen.tuple2(Gen.int(), Gen.string()),
+        EQ = Eq.any()
+      )
+    )
 
     testLaws(
       LensLaws.laws(

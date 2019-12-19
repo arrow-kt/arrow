@@ -1,8 +1,8 @@
 package arrow.fx
 
 import arrow.core.extensions.eq
-import arrow.core.toT
 import arrow.core.extensions.list.traverse.traverse
+import arrow.core.toT
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.handleError
 import arrow.fx.extensions.io.async.async
@@ -15,11 +15,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import kotlinx.coroutines.Dispatchers
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class SemaphoreTest : UnitSpec() {
 
   init {

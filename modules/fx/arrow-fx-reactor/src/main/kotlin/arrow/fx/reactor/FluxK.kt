@@ -5,11 +5,15 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.NonFatal
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.internal.AtomicRefW
+import arrow.core.nonFatalOrThrow
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Applicative
@@ -21,7 +25,6 @@ class ForFluxK private constructor() {
   companion object
 }
 typealias FluxKOf<A> = arrow.Kind<ForFluxK, A>
-typealias FluxKKindedJ<A> = io.kindedj.Hk<ForFluxK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
@@ -29,11 +32,12 @@ inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 
+@Suppress("UNCHECKED_CAST")
 fun <A> FluxKOf<A>.value(): Flux<A> =
-  this.fix().flux
+  this.fix().flux as Flux<A>
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
+data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
@@ -137,9 +141,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       GA.run { f(a).map2Eval(eval) { Flux.concat(Flux.just<B>(it.a), it.b.flux).k() } }
     }.value()
 
-  fun handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
-    this.fix().flux.onErrorResume { t: Throwable -> function(t).flux }.k()
-
   fun continueOn(ctx: CoroutineContext): FluxK<A> =
     flux.publishOn(ctx.asScheduler()).k()
 
@@ -160,6 +161,11 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       else -> false
     }
 
+  fun <B> filterMap(f: (A) -> Option<B>): FluxK<B> =
+    flux.flatMap { a ->
+      f(a).fold({ Flux.empty<B>() }, { b -> Flux.just(b) })
+    }.k()
+
   override fun hashCode(): Int = flux.hashCode()
 
   companion object {
@@ -178,9 +184,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     /**
      * Creates a [FluxK] that'll run [FluxKProc].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
      * import arrow.fx.reactor.FluxK
@@ -194,9 +198,8 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = FluxK.async { cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
-     *     conn.push(FluxK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
@@ -204,6 +207,9 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
      * }
      * ```
      */
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelable instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated async")
     fun <A> async(fa: FluxKProc<A>): FluxK<A> =
       Flux.create<A> { sink ->
         val conn = FluxKConnection()
@@ -222,6 +228,21 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         }
       }.k()
 
+    fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): FluxK<A> =
+      Flux.create<A> { sink ->
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }
+      }.k()
+
+    @Deprecated(message =
+    "For wrapping cancelable operations you should use cancelableF instead.\n" +
+      "For wrapping uncancelable operations you can use the non-deprecated asyncF")
     fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
       Flux.create { sink: FluxSink<A> ->
         val conn = FluxKConnection()
@@ -240,6 +261,66 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         }.fix().flux.subscribe({}, sink::error)
       }.k()
 
+    fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>): FluxK<A> =
+      Flux.create { sink: FluxSink<A> ->
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }.fix().flux.subscribe({}, sink::error)
+      }.k()
+
+    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val token = fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            sink.error(e)
+          }, { a ->
+            sink.next(a)
+            sink.complete()
+          })
+        }
+        sink.onDispose { token.value().subscribe({}, sink::error) }
+      }.k()
+
+    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            sink.error(e)
+          }, { a ->
+            sink.next(a)
+            sink.complete()
+          })
+        }
+
+        val fa2 = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(just(Unit))
+        }
+
+        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForFluxK>>?>(null)
+        val disp = fa2.value().subscribe({ token ->
+          val cancel = cancelOrToken.getAndSet(Right(token))
+          cancel?.fold({
+            token.value().subscribe({}, sink::error)
+          }, { Unit })
+        }, sink::error)
+
+        sink.onDispose {
+          disp.dispose()
+          val token = cancelOrToken.getAndSet(Left(Unit))
+          token?.fold({}, {
+            it.value().subscribe({}, sink::error)
+          })
+        }
+      }.k()
+
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {
       val either = f(a).value().blockFirst()
       return when (either) {
@@ -252,3 +333,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
 fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)
+
+fun <A> FluxKOf<A>.handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
+  value().onErrorResume { t: Throwable -> function(t).value() }.k()

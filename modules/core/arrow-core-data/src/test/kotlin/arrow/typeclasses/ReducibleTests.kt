@@ -12,11 +12,8 @@ import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class ReducibleTests : UnitSpec() {
   init {
     val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK> {

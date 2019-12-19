@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.fx.CancelToken
+
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.rx2.FlowableK
@@ -28,7 +28,6 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.Timer
-import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Fiber
 import arrow.extension
@@ -45,14 +44,19 @@ import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.functions.BiFunction
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.rx2.asScheduler
+import arrow.fx.rx2.extensions.flowablek.dispatchers.dispatchers
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
+import arrow.fx.typeclasses.CancelToken
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.typeclasses.FunctorFilter
+import arrow.typeclasses.MonadFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -122,7 +126,7 @@ interface FlowableKApplicativeError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -133,7 +137,7 @@ interface FlowableKMonadError :
     FlowableK.raiseError(e)
 
   override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().flowableHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -249,8 +253,17 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
     }
 }
 
-fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
+fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK> = FlowableK.dispatchers()): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
   override fun dispatchers(): Dispatchers<ForFlowableK> = dispatchers
+}
+
+@extension
+interface FlowableKDispatchers : Dispatchers<ForFlowableK> {
+  override fun default(): CoroutineContext =
+    ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension
@@ -353,6 +366,31 @@ interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
     fix().map(f)
 }
 
-// TODO FlowableK does not yet have a Concurrent instance
-fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
-  FlowableK.async().fx.async(c).fix()
+@extension
+interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
+  override fun <A> empty(): FlowableK<A> =
+    Flowable.empty<A>().k()
+
+  override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    fix().filterMap(f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.ap(ff: Kind<ForFlowableK, (A) -> B>): FlowableK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
+    FlowableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForFlowableK, A>.map2(fb: Kind<ForFlowableK, B>, f: (Tuple2<A, B>) -> Z): FlowableK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): FlowableK<A> =
+    FlowableK.just(a)
+}
+fun <A> FlowableK.Companion.fx(c: suspend ConcurrentSyntax<ForFlowableK>.() -> A): FlowableK<A> =
+  defer { FlowableK.concurrent().fx.concurrent(c).fix() }

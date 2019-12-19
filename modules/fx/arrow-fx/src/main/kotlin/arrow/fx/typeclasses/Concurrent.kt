@@ -7,6 +7,7 @@ import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.internal.AtomicRefW
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
@@ -14,7 +15,6 @@ import arrow.core.k
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative
-import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Race2
@@ -31,9 +31,10 @@ import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
+
+typealias CancelToken<F> = Kind<F, Unit>
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Concurrent)
@@ -274,13 +275,13 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
+      val state = AtomicRefW<((Either<Throwable, Unit>) -> Unit)?>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)
         } finally {
           if (!state.compareAndSet(null, mapUnit)) {
-            val cb2 = state.get()
+            val cb2 = state.value!!
             state.lazySet(null)
             cb2(rightUnit)
           }

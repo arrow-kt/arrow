@@ -6,8 +6,8 @@ permalink: /docs/effects/ref/
 
 ## Ref
 
-{:.intermediate}
-intermediate
+
+
 
 `Ref` is an asynchronous, concurrent mutable reference. It provides safe concurrent access and modification of its content.
 You could consider `Ref` a purely functional wrapper over an `AtomicReference` in context `F`, that is always initialised to a value `A`.

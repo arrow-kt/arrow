@@ -8,8 +8,8 @@ redirect_from:
 
 ## Hash
 
-{:.beginner}
-beginner
+
+
 
 The `Hash` typeclass abstracts the ability to compute the hash of any object.  
 It can be considered the typeclass equivalent of Java's `Object#hashcode` and Kotlin's `Any#hashCode`.  

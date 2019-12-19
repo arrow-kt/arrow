@@ -6,19 +6,19 @@ permalink: /docs/patterns/error_handling/
 
 ## Functional Error Handling
 
-{:.beginner}
-beginner
+
+
 
 When dealing with errors in a purely functional way we try as much as we can to avoid exceptions.
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
 
 In the following example we are going to model a basic program and go over the different options we have for dealing with errors in Arrow.
-The program simulates the typical game scenario where we have to shoot a target and series of preconditions need to be met in order actually shot and hit it.
+The program simulates the typical game scenario where we have to shoot a target and series of preconditions need to be met in order to shoot and hit it.
 
 ### Requirements
 
 - Arm a Nuke launcher
-- Aim toward a Target
+- Aim towards a Target
 - Launch a Nuke and impact the Target
 
 ### Requirements
@@ -86,7 +86,7 @@ try {
 }
 ```
 
-Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attempts to gather all stack information to present you with a meaningful stacktrace.
+Furthermore exceptions are costly to create. `Throwable#fillInStackTrace` attempts to gather all the stack information to present you with a meaningful stacktrace.
 
 ```java
 public class Throwable {
@@ -101,7 +101,7 @@ public class Throwable {
 
 Constructing an exception may be as costly as your current Thread stack size and it's also platform dependent since `fillInStackTrace` calls into native code.
 
-More info in the cost of instantiating Throwables and throwing exceptions in generals can be found in the links below.
+More info on the cost of instantiating Throwables and throwing exceptions in generals can be found in the links below.
 
 > [The Hidden Performance costs of instantiating Throwables](http://normanmaurer.me/blog/2013/11/09/The-hidden-performance-costs-of-instantiating-Throwables/)
 > * New: Creating a new Throwable each time
@@ -117,11 +117,11 @@ Exceptions may be considered generally a poor choice in Functional Programming w
 
 ### How do we model exceptional cases then?
 
-Arrow provide proper datatypes and typeclasses to represent exceptional cases.
+Arrow provides proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
-We use [`Option`](/docs/arrow/core/option) to model the potential absence of a value
+We use [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) to model the potential absence of a value
 
 When using `Option` our previous example may look like:
 
@@ -134,7 +134,7 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/arrow/core/option) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+It's easy to work with [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) if your language supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/arrow/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
@@ -162,7 +162,7 @@ In the next example we are going to use `Try` to deal with potentially thrown ex
 
 ### Try
 
-We use [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
+We use [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
 
 How would our example look like implemented with `Try`?
 
@@ -223,7 +223,7 @@ We should redefine our functions to express that their result is not just a `Nuk
 
 ### Either
 
-When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
+When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
 
@@ -267,7 +267,7 @@ fun attackEither(): Either<NukeException, Impacted> =
     val (impact) = launch(target, nuke)
     impact
   }
-  
+
 attackEither()
 //Left(MissedByMeters(5))
 ```
@@ -395,10 +395,10 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 
   object ErrorAccumulationStrategy :
     Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
-  
+
   object FailFastStrategy :
     Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
-  
+
   companion object {
     infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
     infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
@@ -428,7 +428,7 @@ Rules accumulateErrors {
 Rules failFast {
   listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
-    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
     FormField("Valid Email Label", "getlost@nowhere.com")
   ).map { it.validateEmail() }
 }

@@ -7,8 +7,8 @@ video: 3y9KI7XWXSY
 
 ## Typeclasses
 
-{:.beginner}
-beginner
+
+
 
 Typeclasses are interfaces that define a set of extension functions associated to one type. You may see them referred as "extension interfaces".
 
@@ -100,7 +100,7 @@ We will list them by their hierarchy.
 
 ##### General
 
-- [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}) - transformation between datatypes
+- [`Inject`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-inject/' | relative_url }}) - transformation between datatypes
 
 - [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has a structure that contains either of two values
 
@@ -134,13 +134,13 @@ We will list them by their hierarchy.
 
 ##### Semigroupal
 
-- [`Semigroupal`]({{ '/docs/arrow/typeclasses/semigroupal/' | relative_url }}) - abstraction over the cartesian product
+- [`Semigroupal`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-semigroupal/' | relative_url }}) - abstraction over the cartesian product
 
-- [`Monoidal`]({{ '/docs/arrow/typeclasses/monoidal/' | relative_url }}) - adds an identity element to a semigroupal
+- [`Monoidal`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-monoidal/' | relative_url }}) - adds an identity element to a semigroupal
 
 ##### Semiring
 
-- [`Semiring`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
+- [`Semiring`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
 
 ##### Functor
 
@@ -168,7 +168,7 @@ We will list them by their hierarchy.
 
 - [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
 
-- [`Bitraverse`]({{ '/docs/apidocs/arrow-typeclasses/arrow.typeclasses/-bitraverse/' | relative_url }}) - For those structures which are `Bifoldable` adds the functionality of `Traverse` in each side of the datatype
+- [`Bitraverse`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-bitraverse/' | relative_url }}) - For those structures which are `Bifoldable` adds the functionality of `Traverse` in each side of the datatype
 
 - [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 
@@ -196,9 +196,9 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
-- [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
+- [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }})
 
-- [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }})
+- [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/arrow/mtl/writert/' | relative_url }})
 
 - [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/docs/datatypes/state/' | relative_url }})
 

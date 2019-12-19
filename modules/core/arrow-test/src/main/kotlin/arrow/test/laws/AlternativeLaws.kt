@@ -18,7 +18,9 @@ object AlternativeLaws {
     ApplicativeLaws.laws(AF, EQ) + MonoidKLaws.laws(AF, AF, EQ) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
-      Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) })
+      Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) },
+      Law("Alternative Laws: alt is associative") { AF.alternativeAssociativity(cf, EQ) }
+    )
 
   fun <F> Alternative<F>.alternativeRightAbsorption(cff: (Int) -> Kind<F, (Int) -> Int>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int().map(cff)) { fa: Kind<F, (Int) -> Int> ->
@@ -39,5 +41,14 @@ object AlternativeLaws {
     forAll(Gen.int().map(cf), Gen.int().map(cff), Gen.int().map(cff)
     ) { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
       fa.ap(ff.combineK(fg)).equalUnderTheLaw(fa.ap(ff).combineK(fa.ap(fg)), EQ)
+    }
+
+  fun <F> Alternative<F>.alternativeAssociativity(
+    cf: (Int) -> Kind<F, Int>,
+    EQ: Eq<Kind<F, Int>>
+  ): Unit =
+    forAll(Gen.int().map(cf), Gen.int().map(cf), Gen.int().map(cf)) {
+      fa: Kind<F, Int>, fa2: Kind<F, Int>, fa3: Kind<F, Int> ->
+        (fa alt (fa2 alt fa3)).equalUnderTheLaw((fa alt fa2) alt fa3, EQ)
     }
 }

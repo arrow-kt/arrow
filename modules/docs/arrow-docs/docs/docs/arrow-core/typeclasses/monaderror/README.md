@@ -8,8 +8,8 @@ redirect_from:
 
 ## MonadError
 
-{:.intermediate}
-intermediate
+
+
 
 MonadError is the typeclass used to explicitly represent errors during sequential execution.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.

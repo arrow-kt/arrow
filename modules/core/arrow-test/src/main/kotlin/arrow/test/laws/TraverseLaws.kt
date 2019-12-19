@@ -1,29 +1,28 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.Const
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.Tuple2
-import arrow.core.extensions.monoid
-import arrow.core.toT
+import arrow.core.const
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
+import arrow.core.extensions.monoid
 import arrow.core.fix
+import arrow.core.toT
 import arrow.core.value
+import arrow.mtl.typeclasses.ComposedApplicative
+import arrow.mtl.typeclasses.nest
+import arrow.mtl.typeclasses.unnest
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative
-import arrow.mtl.typeclasses.ComposedApplicative
-import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.const
-import arrow.mtl.typeclasses.nest
-import arrow.mtl.typeclasses.unnest
-import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

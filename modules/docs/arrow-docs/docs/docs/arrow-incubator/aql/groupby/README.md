@@ -4,8 +4,8 @@ title: groupBy
 permalink: /docs/aql/groupby/
 ---
 
-{:.beginner}
-beginner
+
+
 
 ## groupBy
 
@@ -38,8 +38,6 @@ println(result)
 }
 ```
 
-{:.intermediate}
-intermediate
 
 `groupBy` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
 
@@ -62,7 +60,7 @@ import arrow.aql.*
 TypeClass(GroupBy::class).dtMarkdownList()
 ```
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

@@ -1,8 +1,8 @@
 package arrow.optics
 
+import arrow.core.Const
 import arrow.core.None
 import arrow.core.Option
-import arrow.typeclasses.Const
 import arrow.typeclasses.Monoid
 
 @PublishedApi

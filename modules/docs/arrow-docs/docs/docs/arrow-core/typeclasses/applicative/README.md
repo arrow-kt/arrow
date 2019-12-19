@@ -8,8 +8,8 @@ redirect_from:
 
 ## Applicative
 
-{:.intermediate}
-intermediate
+
+
 
 The `Applicative` typeclass abstracts the ability to lift values and apply functions over the computational context of a type constructor.
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,

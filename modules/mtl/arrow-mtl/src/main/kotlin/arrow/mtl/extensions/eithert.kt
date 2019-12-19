@@ -7,7 +7,6 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
 import arrow.core.extensions.either.foldable.foldable
-import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
@@ -40,6 +39,8 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.Monoid
 import arrow.undocumented
 
 @extension
@@ -108,38 +109,37 @@ interface EitherTMonad<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicative
 
 @extension
 @undocumented
-interface EitherTApplicativeError<F, L> : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicative<F, L> {
+interface EitherTApplicativeError<F, L, E> : ApplicativeError<EitherTPartialOf<F, L>, E>, EitherTApplicative<F, L> {
 
-  fun AE(): ApplicativeError<F, L>
+  fun AE(): ApplicativeError<F, E>
 
   override fun AF(): Applicative<F> = AE()
 
-  override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
-    EitherT(value().handleErrorWith { l -> f(l).value() })
-  }
+  override fun <A> raiseError(e: E): EitherT<F, L, A> =
+    EitherT.liftF(AE(), AE().raiseError(e))
 
-  override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
-    EitherT.liftF(this, raiseError(e))
+  override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (E) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
+    EitherT(value().handleErrorWith { l -> f(l).value() })
   }
 }
 
 @extension
 @undocumented
-interface EitherTMonadError<F, L> : MonadError<EitherTPartialOf<F, L>, L>, EitherTApplicativeError<F, L>, EitherTMonad<F, L> {
+interface EitherTMonadError<F, L, E> : MonadError<EitherTPartialOf<F, L>, E>, EitherTApplicativeError<F, L, E>, EitherTMonad<F, L> {
   override fun MF(): Monad<F>
-  override fun AE(): ApplicativeError<F, L>
+  override fun AE(): ApplicativeError<F, E>
   override fun AF(): Applicative<F> = MF()
 }
 
-fun <F, L> EitherT.Companion.monadError(ME: MonadError<F, L>): MonadError<EitherTPartialOf<F, L>, L> =
-  object : EitherTMonadError<F, L> {
+fun <F, L, E> EitherT.Companion.monadError(ME: MonadError<F, E>): MonadError<EitherTPartialOf<F, L>, E> =
+  object : EitherTMonadError<F, L, E> {
     override fun MF(): Monad<F> = ME
-    override fun AE(): ApplicativeError<F, L> = ME
+    override fun AE(): ApplicativeError<F, E> = ME
   }
 
 @extension
 @undocumented
-interface EitherTMonadThrow<F> : MonadThrow<EitherTPartialOf<F, Throwable>>, EitherTMonadError<F, Throwable> {
+interface EitherTMonadThrow<F, L> : MonadThrow<EitherTPartialOf<F, L>>, EitherTMonadError<F, L, Throwable> {
   override fun MF(): Monad<F>
   override fun AE(): ApplicativeError<F, Throwable>
 }
@@ -247,6 +247,32 @@ interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, Ei
     )
 }
 
+@extension
+interface EitherTAlternative<F, L> : Alternative<EitherTPartialOf<F, L>>, EitherTApplicative<F, L> {
+  override fun AF(): Applicative<F> = MF()
+  fun MF(): Monad<F>
+  fun ME(): Monoid<L>
+
+  override fun <A> empty(): Kind<EitherTPartialOf<F, L>, A> = EitherT(MF().just(ME().empty().left()))
+
+  override fun <A> Kind<EitherTPartialOf<F, L>, A>.orElse(b: Kind<EitherTPartialOf<F, L>, A>): Kind<EitherTPartialOf<F, L>, A> =
+    EitherT(
+      MF().fx.monad {
+        val l = !value()
+        l.fold({ ll ->
+          val r = !b.value()
+          r.fold({
+            ME().run { (ll + it).left() }
+          }, {
+            it.right()
+          })
+        }, {
+          it.right()
+        })
+      }
+    )
+}
+
 fun <F, A, B, C> EitherTOf<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
   FF.compose(Either.foldable<A>()).foldLC(value(), b, f)
 
@@ -255,7 +281,7 @@ fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (
 }
 
 fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
-  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).run { value().traverseC(f, GA) }
+  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse<A>()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<F, A, C> = { nested -> EitherT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }
@@ -296,5 +322,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
-  EitherT.monadThrow(M, M).fx.monadThrow(c).fix()
+fun <F, L, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, L>>.() -> R): EitherT<F, L, R> =
+  EitherT.monadThrow<F, L>(M, M).fx.monadThrow(c).fix()

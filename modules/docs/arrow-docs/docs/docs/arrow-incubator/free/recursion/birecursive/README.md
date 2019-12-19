@@ -6,8 +6,8 @@ permalink: /docs/recursion/birecursive/
 
 ## Birecursive
 
-{:.advanced}
-advanced
+
+
 
 A datatype that's both `Recursive` and `Corecursive`, which enables applying both `fold` and `unfold`
 operations to it.

@@ -6,8 +6,8 @@ permalink: /docs/aql/custom/
 
 ## Adapting custom data types for AQL
 
-{:.advanced}
-advanced
+
+
 
 If you are a library author or you simply wish to provide AQL `query` support to your custom data types you can easily do so by simply implementing the type classes required for AQL to automatically derive a AQL DSL for you custom data type.
 

@@ -2,31 +2,46 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Ior
 import arrow.core.MapK
 import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.Tuple2
+import arrow.core.extensions.list.functorFilter.flattenOption
+import arrow.core.extensions.mapk.eq.eq
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.set.foldable.foldLeft
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
 import arrow.core.fix
+import arrow.core.getOption
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.sequence
+import arrow.core.toMap
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.updated
 import arrow.extension
+import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Zip
+import arrow.typeclasses.Unalign
+import arrow.typeclasses.Unzip
 import arrow.undocumented
 
 @extension
@@ -125,5 +140,72 @@ interface MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
   override fun MapK<K, A>.hash(): Int =
     SetK.hash(HK()).run { keys.k().hash() } xor foldLeft(1) { hash, a ->
       31 * hash + HA().run { a.hash() }
+    }
+}
+
+@extension
+interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
+  override fun <A, B> align(
+    a: Kind<MapKPartialOf<K>, A>,
+    b: Kind<MapKPartialOf<K>, B>
+  ): Kind<MapKPartialOf<K>, Ior<A, B>> {
+    val l = a.fix()
+    val r = b.fix()
+    val keys = l.keys + r.keys
+
+    return keys.map { key ->
+      Ior.fromOptions(l[key].toOption(), r[key].toOption()).map { key toT it }
+    }.flattenOption().toMap().k()
+  }
+}
+
+@extension
+interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
+}
+
+@extension
+interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    ior.fix().let { map ->
+      map.entries.foldLeft(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        v.fold(
+          { a -> ls.plus(k to a) toT rs },
+          { b -> ls toT rs.plus(k to b) },
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+      }.bimap({ it.k() }, { it.k() })
+    }
+}
+
+@extension
+interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.zip(other: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      val keys = (ls.keys.intersect(rs.keys))
+
+      val values = keys.map { key -> ls.getOption(key).flatMap { l -> rs.getOption(key).map { key to (l toT it) } } }.flattenOption()
+
+      return values.toMap().k()
+    }
+}
+
+@extension
+interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
+  override fun <A, B> Kind<MapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
+    this.fix().let { map ->
+      map.entries.fold(emptyMap<K, A>() toT emptyMap<K, B>()) { (ls, rs), (k, v) ->
+        ls.plus(k to v.a) toT rs.plus(k to v.b)
+      }
+    }.bimap({ it.k() }, { it.k() })
+}
+
+@extension
+interface MapKEqK<K> : EqK<MapKPartialOf<K>> {
+
+  fun EQK(): Eq<K>
+
+  override fun <A> Kind<MapKPartialOf<K>, A>.eqK(other: Kind<MapKPartialOf<K>, A>, EQ: Eq<A>): Boolean =
+    MapK.eq(EQK(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
     }
 }

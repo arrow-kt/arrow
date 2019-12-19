@@ -1,0 +1,16 @@
+// DOC-BODY
+// -----------------------------------------------
+// -----------------------------------------------
+<<<<<<< HEAD
+#doc-body {
+    background: $white;
+=======
+
+#doc-body {
+<<<<<<< HEAD:arrow-site/doc/_sass/components/docs/_doc-body.scss
+  background: $white;
+=======
+    background: $white;
+>>>>>>> upstream/master:modules/docs/arrow-docs/docs/_sass/components/docs/_doc-body.scss
+>>>>>>> upstream/master
+}

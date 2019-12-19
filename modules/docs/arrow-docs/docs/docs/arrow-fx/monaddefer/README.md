@@ -6,8 +6,8 @@ permalink: /docs/effects/monaddefer/
 
 ## MonadDefer
 
-{:.intermediate}
-intermediate
+
+
 
 `MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension the effects would otherwise run immediately.
 
@@ -91,7 +91,7 @@ lazyResult
 #### laterOrRaise
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
+The left side of the [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) represents an error in the execution.
 This function is assumed to never throw any internal exceptions.
 
 ```kotlin

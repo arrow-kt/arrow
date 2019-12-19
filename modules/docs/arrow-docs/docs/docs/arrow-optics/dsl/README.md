@@ -6,8 +6,6 @@ permalink: /docs/optics/dsl/
 
 ## Optics DSL
 
-{:.beginner}
-beginner
 
 Arrow offers a Optics DSL to compose different Optics while improving ease of use and readability.
 To avoid boilerplate Arrow will generate this property-like dsl using `@optics` annotation.

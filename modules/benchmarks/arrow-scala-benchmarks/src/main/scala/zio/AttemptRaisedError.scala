@@ -1,6 +1,6 @@
 package arrow.benchmarks.effects.scala.zio
 
-import scalaz.zio._
+import zio._
 
 object dummy extends RuntimeException {
   override def fillInStackTrace(): Throwable = this

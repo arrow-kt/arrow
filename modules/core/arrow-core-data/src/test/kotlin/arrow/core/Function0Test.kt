@@ -11,15 +11,11 @@ import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.BimonadLaws
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class Function0Test : UnitSpec() {
   val EQ1: Eq<Kind<ForFunction0, Int>> = Eq { a, b ->
     a() == b()
@@ -31,7 +27,6 @@ class Function0Test : UnitSpec() {
 
   init {
     testLaws(
-      SemigroupLaws.laws(Function0.semigroup(Int.semigroup()), { 1 }.k(), { 2 }.k(), { 3 }.k(), EQ1),
       MonoidLaws.laws(Function0.monoid(Int.monoid()), Gen.constant({ 1 }.k()), EQ1),
       BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), { { it }.k() }, EQ1, EQ2, Eq.any())
     )

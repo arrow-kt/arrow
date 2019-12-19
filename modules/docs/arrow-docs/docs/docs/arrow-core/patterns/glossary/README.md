@@ -6,8 +6,8 @@ permalink: /docs/patterns/glossary/
 
 ## Functional Programming Glossary
 
-{:.beginner}
-beginner
+
+
 
 Note: This section keeps on growing! Keep an eye on it from time to time.
 
@@ -22,9 +22,9 @@ can be found for examples [in JavaScript](https://github.com/hemanth/functional-
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/arrow/core/option' | relative_url }}),
-branching in code with [`Either`]({{ '/docs/arrow/core/either' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/arrow/core/try' | relative_url }}),
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
+branching in code with [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
+catching exceptions with [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
@@ -42,7 +42,7 @@ IO { 0 }
 ```
 
 You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
- 
+
 ### Typeclasses
 
 Typeclasses are interface abstractions that define a set of extension functions associated to one type.
@@ -199,12 +199,12 @@ listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/arrow/data/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
+[`ListK<A>`]({{ '/docs/arrow/core/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/arrow/core/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
 For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.
@@ -216,11 +216,11 @@ Kind stands for Higher Kind, which is the name of the language feature that allo
 In a Higher Kind with the shape `Kind<F, A>`, if `A` is the type of the content then `F` has to be the type of the container.
 
 A malformed Higher Kind would use the whole type constructor to define the container, duplicating the type of the content ~~`Kind<Option<A>, A>`~~.
-This incorrect representation has large a number of issues when working with partially applied types and nested types.
+This incorrect representation has a large number of issues when working with partially applied types and nested types.
 
 What Λrrow does instead is define a surrogate type that's not parametrized to represent `F`.
-These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
-You have seen these types used in the Syntax section above! 
+These types are named the same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
+You have seen these types used in the Syntax section above!
 
 ```kotlin:ank:silent
 class ForOption private constructor() { companion object {} }
@@ -288,7 +288,7 @@ interface ListKFunctor : Functor<ForListK> {
 
 This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@extension` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
 The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
-These extensions functions may be imported a la carte when working with concrete data types. 
+These extensions functions may be imported a la carte when working with concrete data types.
 
 ```kotlin:ank:silent
 @extension

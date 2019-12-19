@@ -6,8 +6,8 @@ permalink: /docs/recursion/nu/
 
 ## Nu
 
-{:.advanced}
-advanced
+
+
 
 The Nu datatype is the simplest way to model corecursion via a direct encoding of the
 ana function.

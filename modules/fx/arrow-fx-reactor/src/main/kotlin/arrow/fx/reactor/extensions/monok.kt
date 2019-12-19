@@ -1,11 +1,11 @@
 package arrow.fx.reactor.extensions
 
 import arrow.core.Either
+import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
-import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.monok.async.async
 import arrow.fx.reactor.fix
 import arrow.fx.typeclasses.Async
@@ -19,7 +19,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
@@ -28,6 +27,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
+import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
 
 @extension
 interface MonoKFunctor : Functor<ForMonoK> {
@@ -68,7 +68,7 @@ interface MonoKApplicativeError : ApplicativeError<ForMonoK, Throwable>, MonoKAp
     MonoK.raiseError(e)
 
   override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().monoHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -80,7 +80,7 @@ interface MonoKMonadError : MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKAp
     MonoK.raiseError(e)
 
   override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().monoHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -131,4 +131,4 @@ interface MonoKTimer : Timer<ForMonoK> {
 
 // TODO FluxK does not yet have a Concurrent instance
 fun <A> MonoK.Companion.fx(c: suspend AsyncSyntax<ForMonoK>.() -> A): MonoK<A> =
-  MonoK.async().fx.async(c).fix()
+  defer { MonoK.async().fx.async(c).fix() }

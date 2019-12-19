@@ -8,8 +8,8 @@ redirect_from:
 
 ## Divisible
 
-{:.beginner}
-beginner
+
+
 
 `Divisible` extends upon `Divide` by providing an empty method called `conquer`.
 `conquer` is useful to prove identiy laws when working with `Divisible` instances.

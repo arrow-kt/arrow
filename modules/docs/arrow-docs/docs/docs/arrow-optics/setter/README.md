@@ -6,8 +6,6 @@ permalink: /docs/optics/setter/
 
 ## Setter
 
-{:.beginner}
-beginner
 
 A `Setter` is an optic that can see into a structure and set or modify its focus.
 
@@ -54,7 +52,7 @@ val lift = playerSetter.lift(increment)
 lift(Player(75))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank

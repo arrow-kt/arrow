@@ -10,8 +10,8 @@ video: 1h4X8CrMjVs
 
 ## EitherT
 
-{:.advanced}
-advanced
+
+
 
 `EitherT` also known as the `Either` monad transformer allows to compute inside the context when `Either` is nested in a different monad.
 
@@ -253,7 +253,7 @@ EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```
 
 
-Take a look at the [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
+Take a look at the [`OptionT` docs]({{ '/docs/arrow/mtl/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 
 ## Credits
 

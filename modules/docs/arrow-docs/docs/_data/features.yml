@@ -20,7 +20,7 @@ content:
     - title: Arrow Meta
       description: Arrow Meta is the functional companion to the Kotlin Compiler and its plugin ecosystem
       icon: img/home/arrow-meta-lines
-      url: /docs/arrow/meta/
+      url: https://meta.arrow-kt.io/
       id: meta
 
     - title: Arrow Incubator

@@ -18,7 +18,7 @@ import kotlin.coroutines.startCoroutine
  * `Kind<F, ?>` where `?` denotes a value being transformed.
  *
  * This is true for all type constructors that can support the [Monad] type class including and not limited to
- * [IO], [DeferredK], [ObservableK], [Option], [Either], [List], [Try] ...
+ * [IO], [ObservableK], [Option], [Either], [List], [Try] ...
  *
  * [The Monad Tutorial](https://arrow-kt.io/docs/patterns/monads/)
  *

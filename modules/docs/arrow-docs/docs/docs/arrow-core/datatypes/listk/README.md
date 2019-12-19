@@ -8,8 +8,8 @@ redirect_from:
 
 ## ListK
 
-{:.beginner}
-beginner
+
+
 
 ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
 

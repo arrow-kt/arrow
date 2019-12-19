@@ -6,8 +6,6 @@ permalink: /docs/optics/getter/
 
 ## Getter
 
-{:.beginner}
-beginner
 
 A `Getter` is an optic that can focus into a structure and `get` its focus.
 It can be seen as a wrapper of a get function `(S) -> A` that can be composed with other optics.
@@ -44,7 +42,7 @@ val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
 ```
 
-`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
+`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*
@@ -62,7 +60,7 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*

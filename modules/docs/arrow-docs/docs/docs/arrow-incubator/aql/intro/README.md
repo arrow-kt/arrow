@@ -4,8 +4,8 @@ title: The Λrrow Query Language
 permalink: /docs/aql/intro/
 ---
 
-{:.beginner}
-beginner
+
+
 
 ## The Λrrow Query Language
 
@@ -81,7 +81,7 @@ Learn more about the `AQL` combinators
 - [_sum_](/docs/aql/sum/)
 - [_union_](/docs/aql/union/)
 
-{:.advanced}
-advanced
+
+
 
 [Adapt AQL to your own _custom data types_](/docs/aql/custom/)

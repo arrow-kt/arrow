@@ -41,8 +41,6 @@ interface ComposedTraverseFilter<F, G> :
 
   override fun GT(): TraverseFilter<G>
 
-  override fun GA(): Applicative<G>
-
   override fun <H, A, B> Kind<Nested<F, G>, A>.traverseFilter(AP: Applicative<H>, f: (A) -> Kind<H, Option<B>>): Kind<H, Kind<Nested<F, G>, B>> = AP.run {
     FT().run { unnest().traverse(AP) { ga -> GT().run { ga.traverseFilter(AP, f) } } }.map { it.nest() }
   }
@@ -53,15 +51,12 @@ interface ComposedTraverseFilter<F, G> :
   companion object {
     operator fun <F, G> invoke(
       FF: Traverse<F>,
-      GF: TraverseFilter<G>,
-      GA: Applicative<G>
+      GF: TraverseFilter<G>
     ): ComposedTraverseFilter<F, G> =
       object : ComposedTraverseFilter<F, G> {
         override fun FT(): Traverse<F> = FF
 
         override fun GT(): TraverseFilter<G> = GF
-
-        override fun GA(): Applicative<G> = GA
       }
   }
 }

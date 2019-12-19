@@ -4,33 +4,46 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.hash.hash
+import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
+import arrow.core.extensions.option.repeat.repeat
 import arrow.core.extensions.option.show.show
-import arrow.core.extensions.tuple2.eq.eq
-import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.option.unalign.unalign
+import arrow.core.extensions.option.unzip.unzip
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genK
 import arrow.test.generators.option
+import arrow.test.laws.AlignLaws
+import arrow.test.laws.CrosswalkLaws
+import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.RepeatLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.UnalignLaws
+import arrow.test.laws.UnzipLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
-import org.junit.runner.RunWith
 
-@RunWith(KotlinTestRunner::class)
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
@@ -47,14 +60,43 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
+      MonadCombineLaws.laws(Option.monadCombine(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
+      ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq)
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
+      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
+      EqKLaws.laws(
+        Option.eqK(),
+        Option.genK()
+      ),
+      AlignLaws.laws(Option.align(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      UnalignLaws.laws(Option.unalign(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      RepeatLaws.laws(Option.repeat(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      UnzipLaws.laws(Option.unzip(),
+        Option.genK(),
+        Option.eqK(),
+        Option.foldable()
+      ),
+      CrosswalkLaws.laws(Option.crosswalk(),
+        Option.genK(),
+        Option.eqK()
+      )
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
@@ -164,6 +206,12 @@ class OptionTest : UnitSpec() {
       x or None shouldBe Some(2)
       None or x shouldBe Some(2)
       None or None shouldBe None
+    }
+
+    "toLeftOption" {
+      1.leftIor().toLeftOption() shouldBe Some(1)
+      2.rightIor().toLeftOption() shouldBe None
+      (1 toT 2).bothIor().toLeftOption() shouldBe Some(1)
     }
   }
 
