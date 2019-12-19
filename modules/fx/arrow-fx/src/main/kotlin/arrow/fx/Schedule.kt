@@ -614,7 +614,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       delayed(
         M,
         unfold(M, 0.seconds toT one) { (del, acc) ->
-          del toT del + acc
+          acc toT del + acc
         }.map { it.a }
       )
 

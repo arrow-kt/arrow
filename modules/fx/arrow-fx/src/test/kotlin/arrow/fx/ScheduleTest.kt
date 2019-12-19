@@ -3,20 +3,26 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.extensions.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.foldable.forAll
+import arrow.core.extensions.list.traverse.traverse
+import arrow.core.extensions.sequence.foldable.foldLeft
+import arrow.core.extensions.sequence.traverse.traverse
+import arrow.core.toT
 import arrow.core.value
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
+import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import kotlin.math.pow
 
 class ScheduleTest : UnitSpec() {
 
@@ -53,13 +59,16 @@ class ScheduleTest : UnitSpec() {
 
   fun <I, A> Schedule<ForId, I, A>.runIdSchedule(i: I, n: Int): List<Schedule.Decision<Any?, A>> {
     (this as Schedule.ScheduleImpl<ForId, Any?, I, A>)
-    fun go(s: Any?, rem: Int): List<Schedule.Decision<Any?, A>> =
-      if (rem <= 0) emptyList()
-      else update(i, s).value().let {
-        listOf(it) + go(it.state, rem - 1)
+    tailrec fun go(s: Any?, rem: Int, acc: List<Schedule.Decision<Any?, A>>): List<Schedule.Decision<Any?, A>> =
+      if (rem <= 0) acc
+      else {
+        val res = update(i, s).value()
+        go(res.state, rem - 1, acc + listOf(res))
       }
-    return go(initialState.value(), n)
+    return go(initialState.value(), n, emptyList())
   }
+
+  val scheduleEq = EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any())
 
   init {
     // Test laws TODO not before the larger testing rework because I don't want to rewrite this in an hour
@@ -86,7 +95,7 @@ class ScheduleTest : UnitSpec() {
     }
 
     "Schedule.forever() == Schedule.unfold(0) { it + 1 }" {
-      EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq()).run {
+      scheduleEq.run {
         Schedule.forever(Id.monad()).eqv(Schedule.unfold(Id.monad(), 0) { it + 1 })
       }
     }
@@ -102,17 +111,72 @@ class ScheduleTest : UnitSpec() {
     }
 
     "Schedule.once() == Schedule.recurs(1)" {
-      EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any()).run {
+      scheduleEq.run {
         Schedule.once(Id.monad()).eqv(Schedule.recurs(Id.monad(), 1).const(Unit)) shouldBe true
       }
     }
 
     "Schedule.never() == Schedule.recurs(0)" {
-      EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any()).run {
+      scheduleEq.run {
         Schedule.never(Id.monad()).eqv(Schedule.recurs(Id.monad(), 0)) shouldBe true
+      }
+    }
+
+    "Schedule.spaced()" {
+      forAll(Gen.intSmall().filter { it > 0 }, Gen.intSmall().filter { it > 0 }.filter { it < 1000 }) { i, n ->
+        val res = Schedule.spaced(Id.monad(), i.seconds).runIdSchedule(0, n)
+
+        res.forAll { it.delay.nanoseconds == i.seconds.nanoseconds && it.cont }
+      }
+    }
+
+    "Schedule.fibonacci()" {
+      forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
+        val res = Schedule.fibonacci(Id.monad(), i.seconds).runIdSchedule(0, n)
+
+        val sum = res.fold(0L) { acc, v ->
+          acc + v.delay.amount
+        }
+        val fibSum = fibs(i.toLong()).drop(1).take(res.size).sum()
+
+        res.forAll { it.cont } && sum == fibSum
+      }
+    }
+
+    "Schedule.linear()" {
+      forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
+        val res = Schedule.linear(Id.monad(), i.seconds).runIdSchedule(0, n)
+
+        val sum = res.fold(0L) { acc, v -> acc + v.delay.amount }
+        val expSum = linear(i.toLong()).drop(1).take(n).sum()
+
+        res.forAll { it.cont } && sum == expSum
+      }
+    }
+
+    "Schedule.exponential()" {
+      forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
+        val res = Schedule.exponential(Id.monad(), i.seconds).runIdSchedule(0, n)
+
+        val sum = res.fold(0L) { acc, v -> acc + v.delay.amount }
+        val expSum = exp(i.toLong()).drop(1).take(n).sum()
+
+        res.forAll { it.cont } && sum == expSum
       }
     }
 
     // find good properties to test running schedules
   }
+
+  private fun fibs(one: Long): Sequence<Long> = generateSequence(0L toT one) { (a, b) ->
+    b toT (a + b)
+  }.map { it.a }
+
+  private fun exp(base: Long): Sequence<Long> = generateSequence(base toT 1.0) { (_, n) ->
+    (base * 2.0.pow(n)).toLong() toT n + 1
+  }.map { it.a }
+
+  private fun linear(base: Long): Sequence<Long> = generateSequence(base toT 1L) { (_, n) ->
+    (base * n) toT (n + 1)
+  }.map { it.a }
 }
