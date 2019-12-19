@@ -40,7 +40,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleEnd
  * ```
  *
- * You run your program and it says key "url" not found. Turns out the key was "endpoint." So
+ * You run your program and it says key "url" not found. Turns out the key was "endpoint". So
  * you change your code and re-run. Now it says the "port" key was not a well-formed integer.
  *
  * It would be nice to have all of these errors reported simultaneously. That the username can't
