@@ -1,0 +1,113 @@
+// SIDEBAR
+// -----------------------------------------------
+// -----------------------------------------------
+
+#wrapper {
+    padding-left: $sidebar-width;
+    transition: padding 0.4s ease-in-out;
+
+    &.toggled {
+        padding-left: 0;
+    }
+}
+
+#sidebar-wrapper {
+    left: 0;
+    height: 100%;
+    overflow-y: auto;
+    position: fixed;
+    transition: left 0.4s ease-in-out;
+    width: $sidebar-width;
+    z-index: 11;
+
+    .sidebar-toggle {
+        display: none;
+    }
+}
+
+#wrapper.toggled {
+    #sidebar-wrapper {
+        left: -$sidebar-width;
+    }
+}
+
+.toggle-container {
+    display: flex;
+    justify-content: end;
+    margin-top: ($base-point-grid * 1);
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: $brand-tertiary;
+    padding: 28px 32px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+
+    .menu-icon {
+        position: absolute;
+        top: 37%;
+        left: 38%;
+    }
+
+    &:hover {
+        color: $brand-primary;
+        cursor: pointer;
+        transform: scaleX(1.5);
+    }
+}
+
+.sidebar-brand {
+    padding: 60px 0 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .brand-title {
+        font-family: $base-font-family;
+        font-size: 18px;
+        font-weight: $font-medium;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 23px;
+        color: $white;
+    }
+}
+
+@include bp(medium) {
+    #wrapper {
+        padding-left: 0;
+        transition: all 0.4s ease-in-out;
+    }
+
+    #sidebar-wrapper {
+        left: -100%;
+    }
+
+    #wrapper.toggled {
+        #sidebar-wrapper {
+            left: 0;
+            top: 0;
+            width: 100%;
+
+            .sidebar-toggle {
+                display: block;
+                opacity: 0.7;
+                transition: opacity 0.3s ease, transform 0.3s ease;
+
+                &:hover {
+                    opacity: 1;
+                    transform: rotate(-180deg);
+                }
+            }
+        }
+
+        #doc-wrapper {
+            height: 100vh;
+            overflow: hidden;
+        }
+    }
+}

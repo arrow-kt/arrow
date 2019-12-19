@@ -1,0 +1,23 @@
+{% assign cat-id = "cat-" | append: {{cat_id}} | append: "-dropdown" %}
+<div id="{{cat-id}}">
+  <ul class="sidebar-nav">
+    <li class="sidebar-nav-item">
+      <a href="#">
+        <span class="brand-title">{{cat_title}}</span>
+        <i class="fa fa-angle-right"></i>
+      </a>
+      <ul>
+        {% for item in site.data.features.content %}
+        {% assign cat = item.title | downcase  %}
+        {% if cat != cat_title %}
+        <li>
+          <a href="{{ item.url | relative_url }}">
+            <span>{{ item.title }}</span>
+          </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</div>

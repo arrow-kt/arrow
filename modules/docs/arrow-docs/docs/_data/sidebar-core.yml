@@ -1,0 +1,332 @@
+options:
+  - title: Quick Start
+
+    nested_options:
+
+      - title: Index
+        url: /docs/core/
+
+      - title: Setup
+        url: /docs/quickstart/setup/
+
+      - title: Linting
+        url: /docs/quickstart/linting/
+
+      - title: Libraries
+        url: /docs/quickstart/libraries/
+
+      - title: Media
+        url: https://media.arrow-kt.io
+
+      - title: Projects & Examples
+        url: /docs/quickstart/projects/
+
+  - title: Patterns
+
+    nested_options:
+
+      - title: Glossary
+        url: /docs/patterns/glossary/
+
+      - title: Error Handling
+        url: /docs/patterns/error_handling/
+
+      - title: Dependency Injection
+        url: /docs/patterns/dependency_injection/
+
+      - title: The Monad Tutorial
+        url: /docs/patterns/monads/
+
+      - title: Monad Comprehensions
+        url: /docs/patterns/monad_comprehensions/
+
+      - title: Polymorphic Programs
+        url: /docs/patterns/polymorphic_programs/
+
+      - title: Free Algebras
+        url: /docs/patterns/free_algebras/
+
+  - title: Data Types
+
+    nested_options:
+
+      - title: Intro
+        url: /docs/datatypes/intro/
+
+      - title: Basic Types
+        url: /docs/datatypes/basic/
+
+      - title: Option
+        url: /docs/apidocs/arrow-core-data/arrow.core/-option/
+
+      - title: Either
+        url: /docs/apidocs/arrow-core-data/arrow.core/-either/
+
+      - title: Try
+        url: /docs/apidocs/arrow-core-data/arrow.core/-try/
+
+      - title: Validated
+        url: /docs/apidocs/arrow-core-data/arrow.core/-validated/
+
+      - title: NonEmptyList
+        url: /docs/arrow/core/nonemptylist/
+
+      - title: ListK
+        url: /docs/arrow/core/listk/
+
+      - title: SequenceK
+        url: /docs/arrow/core/sequencek/
+
+      - title: SetK
+        url: /docs/arrow/core/setk/
+
+      - title: MapK
+        url: /docs/arrow/core/mapk/
+
+      - title: SortedMapK
+        url: /docs/arrow/core/sortedmapk/
+
+      - title: Ior
+        url: /docs/apidocs/arrow-core-data/arrow.core/-ior/
+
+      - title: Id
+        url: /docs/apidocs/arrow-core-data/arrow.core/-id/
+
+      - title: Eval
+        url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
+
+      - title: Function0
+        url: /docs/apidocs/arrow-core-data/arrow.core/-function0/
+
+      - title: Function1
+        url: /docs/apidocs/arrow-core-data/arrow.core/-function1/
+
+      - title: Store
+        url: /docs/arrow/ui/store/
+
+      - title: Moore
+        url: /docs/arrow/ui/moore/
+
+      - title: Sum
+        url: /docs/arrow/ui/sum/
+
+      - title: Day
+        url: /docs/arrow/ui/day/
+
+
+  - title: Type Classes
+
+    nested_options:
+
+      - title: Intro
+        url: /docs/typeclasses/intro/
+
+      - title: Show
+        url: /docs/arrow/typeclasses/show/
+
+      - title: Eq
+        url: /docs/arrow/typeclasses/eq/
+
+      - title: EqK
+        url: /docs/arrow/typeclasses/eqk/
+
+      - title: Hash
+        url: /docs/arrow/typeclasses/hash/
+
+      - title: Order
+        url: /docs/arrow/typeclasses/order/
+
+      - title: Semigroup
+        url: /docs/arrow/typeclasses/semigroup/
+
+      - title: Semigroupal
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-semigroupal/
+
+      - title: Monoidal
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-monoidal/
+
+      - title: Monoid
+        url: /docs/arrow/typeclasses/monoid/
+
+      - title: Semiring
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-semiring/
+
+      - title: Foldable
+        url: /docs/arrow/typeclasses/foldable/
+
+      - title: Bifoldable
+        url: /docs/arrow/typeclasses/bifoldable/
+
+      - title: Bitraverse
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-bitraverse/
+
+      - title: Traverse
+        url: /docs/arrow/typeclasses/traverse/
+
+      - title: Reducible
+        url: /docs/arrow/typeclasses/reducible/
+
+      - title: TraverseFilter
+        url: /docs/arrow/typeclasses/traversefilter/
+
+      - title: Functor
+        url: /docs/arrow/typeclasses/functor/
+
+      - title: FunctorFilter
+        url: /docs/arrow/typeclasses/functorfilter/
+
+      - title: Applicative
+        url: /docs/arrow/typeclasses/applicative/
+
+      - title: ApplicativeError
+        url: /docs/arrow/typeclasses/applicativeerror/
+
+      - title: Selective
+        url: /docs/arrow/typeclasses/selective/
+
+      - title: Monad
+        url: /docs/arrow/typeclasses/monad/
+
+      - title: MonadError
+        url: /docs/arrow/typeclasses/monaderror/
+
+      - title: MonadFilter
+        url: /docs/arrow/typeclasses/monadfilter/
+
+      - title: MonadCombine
+        url: /docs/arrow/typeclasses/monadcombine/
+
+      - title: Comonad
+        url: /docs/arrow/typeclasses/comonad/
+
+      - title: Bimonad
+        url: /docs/arrow/typeclasses/bimonad/
+
+      - title: Bifunctor
+        url: /docs/arrow/typeclasses/bifunctor/
+
+      - title: Profunctor
+        url: /docs/arrow/typeclasses/profunctor/
+
+      - title: SemigroupK
+        url: /docs/arrow/typeclasses/semigroupk/
+
+      - title: MonoidK
+        url: /docs/arrow/typeclasses/monoidk/
+
+      - title: Inject
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-inject/
+
+      - title: Alternative
+        url: /docs/arrow/typeclasses/alternative/
+
+      - title: Divide
+        url: /docs/arrow/typeclasses/divide/
+
+      - title: Divisible
+        url: /docs/arrow/typeclasses/divisible/
+
+      - title: Decidable
+        url: /docs/arrow/typeclasses/decidable/
+
+      - title: Const
+        url: /docs/arrow/typeclasses/const/
+
+      - title: Semialign
+        url: /docs/arrow/typeclasses/semialign/
+
+      - title: Align
+        url: /docs/arrow/typeclasses/align/
+
+      - title: Unalign
+        url: /docs/arrow/typeclasses/unalign/
+
+      - title: Zip
+        url: /docs/arrow/typeclasses/zip/
+
+      - title: Repeat
+        url: /docs/arrow/typeclasses/repeat/
+
+      - title: Crosswalk
+        url: /docs/arrow/typeclasses/crosswalk/
+
+      - title: Bicrosswalk
+        url: /docs/arrow/typeclasses/bicrosswalk/
+
+  - title: Integrations
+
+    nested_options:
+
+      - title: Rx2
+        url: /docs/integrations/rx2/
+
+      - title: Reactor
+        url: /docs/integrations/reactor/
+
+      - title: kotlinx.coroutines
+        url: /docs/integrations/kotlinxcoroutines/
+
+      - title: Retrofit
+        url: /docs/integrations/retrofit/
+
+      - title: KindedJ
+        url: /docs/integrations/kindedj/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Ank
+        url: /docs/apidocs/arrow-ank/
+
+      - title: Benchmarks Effects
+        url: /docs/apidocs/arrow-benchmarks-fx/
+
+      - title: Core
+        url: /docs/apidocs/arrow-core/
+
+      - title: Core Extensions
+        url: /docs/apidocs/arrow-core-data/
+
+      - title: Docs
+        url: /docs/apidocs/arrow-docs/
+
+      - title: Examples
+        url: /docs/apidocs/arrow-examples/
+
+      - title: Integrations Retrofit Adapter
+        url: /docs/apidocs/arrow-integrations-retrofit-adapter/
+
+      - title: Kindedj
+        url: /docs/apidocs/arrow-kindedj/
+
+      - title: Reflect
+        url: /docs/apidocs/arrow-reflect/
+
+      - title: Streams
+        url: /docs/apidocs/arrow-streams/
+
+      - title: Syntax
+        url: /docs/apidocs/arrow-syntax/
+
+      - title: Test
+        url: /docs/apidocs/arrow-test/
+
+      - title: UI
+        url: /docs/apidocs/arrow-ui/
+
+      - title: UI Extensions
+        url: /docs/apidocs/arrow-ui-data/
+
+      - title: Validation
+        url: /docs/apidocs/arrow-validation/
+
+  - title: Legal
+
+    nested_options:
+
+      - title: Credits
+        url: https://github.com/arrow-kt/arrow/graphs/contributors
+
+      - title: Licenses
+        url: https://github.com/arrow-kt/arrow/blob/master/LICENSE

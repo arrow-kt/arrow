@@ -1,11 +1,117 @@
+title: Arrow
+#-------------------------
+name: Λrrow
+#-------------------------
+description: Functional companion to Kotlin's Standard Library
+#-------------------------
+author: The Λrrow Authors
+keywords: functional-programming, kotlin-library, monads, monad-transformers, functional-data-structure, kotlin, fp-types, adt, free-monads, tagless-final, mtl, for-comprehension, category-theory
+#-------------------------
+url: https://arrow-kt.io
+#-------------------------
+twitter_handle: "@arrow_kt"
+#-------------------------
+gitter_room: "arrow-kt/Lobby"
+#-------------------------
+sass:
+    style: compressed
+#-------------------------
+exclude: ['config.ru', 'Gemfile', 'Gemfile.lock', 'vendor', 'Procfile', 'Rakefile', '.bundle']
+#-------------------------
+collections:
+  code:
+    output: true
 # Default Front Matter values to be set
 defaults:
-  -
-    scope:
+  - scope:
+      path: "docs/apidocs/arrow-optics-mtl"
+      type: "pages"
+    values:
+      layout: "docs-optics"
+  - scope:
+      path: "docs/apidocs/arrow-optics"
+      type: "pages"
+    values:
+      layout: "docs-optics"
+  - scope:
+      path: "docs/apidocs/arrow-fx-mtl"
+      type: "pages"
+    values:
+      layout: "docs-fx"
+  - scope:
+      path: "docs/apidocs/arrow-fx-reactor"
+      type: "pages"
+    values:
+      layout: "docs-fx"
+  - scope:
+      path: "docs/apidocs/arrow-fx-rx2"
+      type: "pages"
+    values:
+      layout: "docs-fx"
+  - scope:
+      path: "docs/apidocs/arrow-fx"
+      type: "pages"
+    values:
+      layout: "docs-fx"
+  - scope:
+      path: "docs/apidocs/arrow-aql"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-mtl"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-mtl-data"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-recursion"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-recursion-data"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-generic"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-free"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-free-data"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "docs/apidocs/arrow-meta"
+      type: "pages"
+    values:
+      layout: "docs-meta"
+  - scope:
+      path: "docs/apidocs/arrow-meta-test-models"
+      type: "pages"
+    values:
+      layout: "docs-meta"
+  - scope:
       path: "docs/apidocs"
       type: "pages"
     values:
-      layout: "docs"
+      layout: "docs-core"
+  - scope:
+      type: code
+    values:
+      layout: code
 
 # Plugins
 plugins:

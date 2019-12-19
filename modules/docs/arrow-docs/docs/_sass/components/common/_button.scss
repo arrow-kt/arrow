@@ -1,0 +1,57 @@
+// Buttons
+// ----------------------------------------------
+// ----------------------------------------------
+
+.button {
+  display: block;
+  background: none;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  > img {
+    vertical-align: bottom;
+  }
+}
+
+.error-button {
+  display: block;
+  background: none;
+  border: solid 1px;
+  padding: ($base-point-grid) ($base-point-grid * 3);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.close {
+  height: 28px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+
+  &::after,
+  &::before {
+    background-color: #fff;
+    content: " ";
+    height: 100%;
+    left: 98%;
+    position: absolute;
+    top: 50%;
+    width: 2px;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}
