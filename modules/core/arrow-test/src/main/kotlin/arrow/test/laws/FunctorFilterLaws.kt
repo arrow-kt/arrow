@@ -22,7 +22,8 @@ object FunctorFilterLaws {
   fun <F> laws(FFF: FunctorFilter<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
     laws(FFF, GENK.genK(Gen.int()), EQK)
 
-  @Deprecated("use GenK version")
+    @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
+
   internal fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 

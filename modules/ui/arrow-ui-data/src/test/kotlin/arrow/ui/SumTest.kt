@@ -54,8 +54,7 @@ class SumTest : UnitSpec() {
     val sumConstEQK = Sum.eqK(constEQK, constEQK)
 
     testLaws(
-      // TODO: tests fail when Sum.right is also generated.
-      // open ticket after merging this PR (https://github.com/arrow-kt/arrow/pull/1844#discussion_r359530920)
+      // TODO: tests fail when Sum.right is also generated. (https://github.com/arrow-kt/arrow/issues/1856)
 
       /*
        DivisibleLaws.laws(

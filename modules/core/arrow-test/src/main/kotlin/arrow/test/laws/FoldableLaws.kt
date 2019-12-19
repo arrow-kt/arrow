@@ -22,7 +22,8 @@ object FoldableLaws {
   fun <F> laws(FF: Foldable<F>, GENK: GenK<F>): List<Law> =
     laws(FF, GENK.genK(Gen.intSmall()))
 
-  @Deprecated("use GenK version")
+    @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
+
   internal fun <F> laws(FF: Foldable<F>, GEN: Gen<Kind<F, Int>>): List<Law> {
     val EQ = Int.eq()
 

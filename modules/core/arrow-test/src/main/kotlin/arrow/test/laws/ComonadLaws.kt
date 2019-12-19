@@ -23,7 +23,7 @@ object ComonadLaws {
       Law("Comonad Laws: right identity") { CM.comonadRightIdentity(G, EQ) },
       Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(G, EQ) },
       Law("Comonad Laws: cokleisli right identity") { CM.cokleisliRightIdentity(G, EQ) }
-      // TODO: open issue for this test after merging the PR (https://github.com/arrow-kt/arrow/pull/1844#discussion_r359567452)
+      // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
       // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
     )
   }
