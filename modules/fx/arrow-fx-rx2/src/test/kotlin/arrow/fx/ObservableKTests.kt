@@ -7,8 +7,11 @@ import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.observablek.applicative.applicative
 import arrow.fx.rx2.extensions.observablek.async.async
+import arrow.fx.rx2.extensions.observablek.functor.functor
 import arrow.fx.rx2.extensions.observablek.monad.flatMap
+import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.observablek.timer.timer
 import arrow.fx.rx2.extensions.observablek.traverse.traverse
@@ -68,9 +71,9 @@ class ObservableKTests : RxJavaSpec() {
   init {
     testLaws(
       TraverseLaws.laws(ObservableK.traverse(), GENK(), EQK()),
-      ConcurrentLaws.laws(ObservableK.concurrent(), EQK(), testStackSafety = false),
+      ConcurrentLaws.laws(ObservableK.concurrent(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), EQK(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
-      MonadFilterLaws.laws(ObservableK.monadFilter(), { Observable.just(it).k() }, EQK())
+      MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), { Observable.just(it).k() }, EQK())
     )
 
     "fx should defer evaluation until subscribed" {

@@ -11,7 +11,6 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.extensions.`try`.eqK.eqK
-import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
@@ -22,13 +21,18 @@ import arrow.core.extensions.option.eqK.eqK
 import arrow.core.some
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.kleisli.alternative.alternative
+import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.eqK.eqK
-import arrow.mtl.extensions.kleisli.monadError.monadError
+import arrow.mtl.extensions.kleisli.functor.functor
+import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -36,7 +40,6 @@ import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
-import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -86,6 +89,9 @@ class KleisliTest : UnitSpec() {
       ),
       ConcurrentLaws.laws(
         Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
+        Kleisli.functor<ForIO, Int>(IO.functor()),
+        Kleisli.applicative<ForIO, Int>(IO.applicative()),
+        Kleisli.monad<ForIO, Int>(IO.monad()),
         ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), conestTryGENK(), conestTryEQK()),
@@ -93,8 +99,7 @@ class KleisliTest : UnitSpec() {
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         genk<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
         constEQK
-      ),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), tryEQK)
+      )
     )
 
     "andThen should continue sequence" {

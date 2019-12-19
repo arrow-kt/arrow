@@ -2,16 +2,19 @@ package arrow.core
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.crosswalk.crosswalk
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.foldable.foldable
+import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.hash.hash
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.monoid.monoid
 import arrow.core.extensions.id.repeat.repeat
+import arrow.core.extensions.id.selective.selective
 import arrow.core.extensions.id.semialign.semialign
 import arrow.core.extensions.id.semigroup.semigroup
 import arrow.core.extensions.id.show.show
@@ -43,7 +46,16 @@ class IdTest : UnitSpec() {
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
       TraverseLaws.laws(Id.traverse(), Id.genK(), Id.eqK()),
-      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.genK(), Id.eqK()),
+      BimonadLaws.laws(
+        Id.bimonad(),
+        Id.monad(),
+        Id.comonad(),
+        Id.functor(),
+        Id.applicative(),
+        Id.selective(),
+        Id.genK(),
+        Id.eqK()
+      ),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(
         Id.eqK(),

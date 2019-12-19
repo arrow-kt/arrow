@@ -1,28 +1,48 @@
-<main id="content" class="indirect-injection-final">
-    <section class="features">
-        <div class="container">
-            <a href="/docs/patterns/glossary/" class="feature-item">
-                <img class="feature-img" src="img/pattern_icon.svg" alt="">
-                <h2 class="feature-title">Patterns</h2>
-                <p>A list of tutorials and FP patterns demonstrating solutions to common programming tasks in a pure FP
-                    way</p>
-            </a>
-            <a href="/docs/typeclasses/intro/" class="feature-item">
-                <img class="feature-img" src="img/typeclasses_icon.svg" alt="">
-                <h2 class="feature-title">Typeclasses</h2>
-                <p>Functor, Applicative, Monad and all their friends so you can take advantage of ad-hoc polymorphism in
-                    Kotlin</p>
-            </a>
-            <a href="/docs/datatypes/intro/" class="feature-item">
-                <img class="feature-img" src="img/datatypes_icon.svg" alt="">
-                <h2 class="feature-title">Data types</h2>
-                <p>Option, Try, Either, Eval, NonEmptyList and many other data types based on algebraic properties</p>
-            </a>
-            <a href="/docs/integrations/rx2/" class="feature-item">
-                <img class="feature-img" src="img/integrations_icon.svg" alt="">
-                <h2 class="feature-title">Integrations</h2>
-                <p>Integrations with Rx2 and other popular frameworks and data types in the Kotlin ecosystem</p>
-            </a>
+<main id="site-main">
+  <div class="wrapper features">
+    <div id="main-flex" class="main-flex">
+      {% for item in site.data.features.content %}
+      {% assign title = item.title | downcase  %}
+      {% if title != "arrow incubator" %}
+      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url | relative_url }}">
+
+        <div id="{{ item.id }}-header" class="item-header">
+          <div id="icon-{{ item.id }}-content" class="icon-content">
+            <img id="{{ item.id }}-dark" class="cat-icon-dark" src="{{ item.icon }}.svg" alt="{{ item.title }}">
+            <img id="{{ item.id }}-white" class="cat-icon-white" src="{{ item.icon }}-white.svg" alt="{{ item.title }} white">
+            <img id="cat-icon-color-{{ item.id }}" class="cat-icon-color" src="{{ item.icon }}-color.svg" alt="{{ item.title }} color">
+          </div>
+          <h2 id="{{ item.id }}-title">{{ item.title }}</h2>
+          <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
-    </section>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% include _header.html %}
+  <div class="wrapper">
+    <div id="incubator" class="incubator-container feature">
+      <div class="incubator-text">
+        <h2>Λrrow Incubator</h2>
+        <ul id="incubator-list" class="incubator-list">
+          {% for item in site.data.features.incubator %}
+          {% if item.title == 'Arrow Query Language' %}
+          {% assign aqlUrl = item.url %}
+          {% endif %}
+          <li class="incubator-items">
+            <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <a class="incubator-image" href="{{ aqlUrl }}">
+        <div id="incubator-base-animation" alt="Incubator"></div>
+        <div id="incubator-core-animation" alt="Incubator"></div>
+        <div id="incubator-fx-animation" alt="Incubator"></div>
+        <div id="incubator-optics-animation" alt="Incubator"></div>
+        <div id="incubator-meta-animation" alt="Incubator"></div>
+        <div id="incubator-hover-animation" alt="Incubator"></div>
+      </a>
+    </div>
 </main>

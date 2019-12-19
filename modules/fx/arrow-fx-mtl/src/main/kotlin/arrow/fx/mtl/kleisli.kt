@@ -1,10 +1,12 @@
 package arrow.fx.mtl
 
+import arrow.core.Either
 import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
@@ -108,6 +110,10 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
 
   override fun dispatchers(): Dispatchers<KleisliPartialOf<F, R>> =
     CF().dispatchers() as Dispatchers<KleisliPartialOf<F, R>>
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<KleisliPartialOf<F, R>>): Kleisli<F, R, A> = CF().run {
+    Kleisli { d -> cancelable { cb -> k(cb).run(d).map { Unit } } }
+  }
 
   override fun <A> KleisliOf<F, R, A>.fork(ctx: CoroutineContext): Kleisli<F, R, Fiber<KleisliPartialOf<F, R>, A>> = CF().run {
     Kleisli { r -> run(r).fork(ctx).map(::fiberT) }

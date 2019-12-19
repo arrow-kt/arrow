@@ -1,0 +1,150 @@
+options:
+  - title: Λrrow Query Language
+
+    nested_options:
+
+      - title: Λrrow Query Language
+        url: /docs/aql/intro/
+
+      - title: select
+        url: /docs/aql/select/
+
+      - title: from
+        url: /docs/aql/from/
+
+      - title: where
+        url: /docs/aql/where/
+
+      - title: groupBy
+        url: /docs/aql/groupby/
+
+      - title: orderBy
+        url: /docs/aql/orderby/
+
+      - title: sum
+        url: /docs/aql/sum/
+
+      - title: union
+        url: /docs/aql/union/
+
+      - title: Custom Data Types
+        url: /docs/aql/custom/
+
+  - title: Generic
+    nested_options:
+
+      - title: Product
+        url: /docs/generic/product/
+
+  - title: Free
+
+    nested_options:
+
+      - title: Free
+        url: /docs/free/free/
+
+      - title: FreeApplicative
+        url: /docs/free/freeapplicative/
+
+      - title: Cofree
+        url: /docs/free/cofree/
+
+      - title: Yoneda
+        url: /docs/free/yoneda/
+
+      - title: Coyoneda
+        url: /docs/free/coyoneda/
+
+      - title: Trampoline
+        url: /docs/free/trampoline/
+
+  - title: Recursion Schemes
+
+    nested_options:
+
+      - title: Intro
+        url: /docs/recursion/intro/
+
+      - title: Recursive
+        url: /docs/recursion/recursive/
+
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
+      - title: Birecursive
+        url: /docs/recursion/birecursive/
+
+      - title: Mu
+        url: /docs/recursion/mu/
+
+      - title: Nu
+        url: /docs/recursion/nu/
+
+      - title: Fix
+        url: /docs/recursion/fix/
+
+  - title: Data Types
+
+    nested_options:
+
+      - title: Reader
+        url: /docs/arrow/mtl/reader/
+
+      - title: Kleisli
+        url: /docs/arrow/mtl/kleisli/
+
+      - title: State
+        url: /docs/arrow/mtl/state/
+
+      - title: StateT
+        url: /docs/arrow/mtl/statet/
+
+      - title: WriterT
+        url: /docs/arrow/mtl/writert/
+
+      - title: OptionT
+        url: /docs/arrow/mtl/optiont/
+
+      - title: EitherT
+        url: /docs/arrow/mtl/eithert/
+
+  - title: Type Classes
+
+    nested_options:
+
+      - title: MonadReader
+        url: /docs/arrow/mtl/typeclasses/monadreader/
+
+      - title: MonadWriter
+        url: /docs/arrow/mtl/typeclasses/monadwriter/
+
+      - title: MonadState
+        url: /docs/arrow/mtl/typeclasses/monadstate/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: AQL
+        url: /docs/apidocs/arrow-aql/
+
+      - title: MTL
+        url: /docs/apidocs/arrow-mtl/
+
+      - title: MTL Extensions
+        url: /docs/apidocs/arrow-mtl-data/
+
+      - title: Recursion
+        url: /docs/apidocs/arrow-recursion/
+
+      - title: Recursion Extensions
+        url: /docs/apidocs/arrow-recursion-data/
+
+      - title: Generic
+        url: /docs/apidocs/arrow-generic/
+
+      - title: Free
+        url: /docs/apidocs/arrow-free/
+
+      - title: Free Extensions
+        url: /docs/apidocs/arrow-free-data/

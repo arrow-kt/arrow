@@ -3,15 +3,35 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.test.generators.GenK
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BimonadLaws {
+
+  private fun <F> bimonadLaws(
+    BF: Bimonad<F>,
+    EQK: EqK<F>
+  ): List<Law> {
+    val GEN = Gen.int()
+
+    val EQ1 = EQK.liftEq(Int.eq())
+    val EQ2 = EQK.liftEq(EQ1)
+    val EQ3 = Int.eq()
+
+    return listOf(
+      Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(GEN, EQ3) },
+      Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(GEN, EQ2) },
+      Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(GEN, EQ3) }
+    )
+  }
 
   fun <F> laws(
     BF: Bimonad<F>,
@@ -20,19 +40,28 @@ object BimonadLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> {
-    val EQ1 = EQK.liftEq(Int.eq())
-    val EQ2 = EQK.liftEq(EQ1)
-    val EQ3 = Int.eq()
-
     val GEN = GENK.genK(Gen.int())
 
     return MonadLaws.laws(M, EQK) +
       ComonadLaws.laws(CM, GEN, EQK) +
-      listOf(
-        Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(Gen.int(), EQ3) },
-        Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(Gen.int(), EQ2) },
-        Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(Gen.int(), EQ3) }
-      )
+      bimonadLaws(BF, EQK)
+  }
+
+  fun <F> laws(
+    BF: Bimonad<F>,
+    M: Monad<F>,
+    CM: Comonad<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ): List<Law> {
+    val GEN = GENK.genK(Gen.int())
+
+    return MonadLaws.laws(M, FF, AP, SL, EQK) +
+      ComonadLaws.laws(CM, GEN, EQK) +
+      bimonadLaws(BF, EQK)
   }
 
   fun <F, A> Bimonad<F>.extractIsIdentity(G: Gen<A>, EQ: Eq<A>): Unit =

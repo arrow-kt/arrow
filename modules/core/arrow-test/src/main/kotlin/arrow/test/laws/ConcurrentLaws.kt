@@ -18,8 +18,30 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
+import arrow.test.laws.ConcurrentLaws.acquireBracketIsNotCancelable
+import arrow.test.laws.ConcurrentLaws.asyncFRegisterCanBeCancelled
+import arrow.test.laws.ConcurrentLaws.cancelOnBracketReleases
+import arrow.test.laws.ConcurrentLaws.cancelableFReceivesCancelSignal
+import arrow.test.laws.ConcurrentLaws.cancelableReceivesCancelSignal
+import arrow.test.laws.ConcurrentLaws.joinIsIdempotent
+import arrow.test.laws.ConcurrentLaws.parMapCancelCancelsBoth
+import arrow.test.laws.ConcurrentLaws.raceCancelCancelsBoth
+import arrow.test.laws.ConcurrentLaws.raceCancelsLoser
+import arrow.test.laws.ConcurrentLaws.racePairCanCancelsLoser
+import arrow.test.laws.ConcurrentLaws.racePairCanJoinLeft
+import arrow.test.laws.ConcurrentLaws.racePairCanJoinRight
+import arrow.test.laws.ConcurrentLaws.racePairCancelCancelsBoth
+import arrow.test.laws.ConcurrentLaws.raceTripleCanCancelsLoser
+import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinLeft
+import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinMiddle
+import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinRight
+import arrow.test.laws.ConcurrentLaws.raceTripleCancelCancelsAll
+import arrow.test.laws.ConcurrentLaws.releaseBracketIsNotCancelable
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -29,16 +51,16 @@ import kotlin.coroutines.CoroutineContext
 
 object ConcurrentLaws {
 
-  fun <F> laws(
+  private fun <F> concurrentLaws(
     CF: Concurrent<F>,
     EQK: EqK<F>,
-    ctx: CoroutineContext = CF.dispatchers().default(),
-    testStackSafety: Boolean = true
+    ctx: CoroutineContext
   ): List<Law> {
+
     val EQ = EQK.liftEq(Int.eq())
     val EQ_UNIT = EQK.liftEq(Eq.any())
 
-    return AsyncLaws.laws(CF, EQK, testStackSafety) + listOf(
+    return listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
@@ -77,6 +99,27 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
     )
   }
+
+  fun <F> laws(
+    CF: Concurrent<F>,
+    EQK: EqK<F>,
+    ctx: CoroutineContext = CF.dispatchers().default(),
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    AsyncLaws.laws(CF, EQK, testStackSafety) +
+      concurrentLaws(CF, EQK, ctx)
+
+  fun <F> laws(
+    CF: Concurrent<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    EQK: EqK<F>,
+    ctx: CoroutineContext = CF.dispatchers().default(),
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    AsyncLaws.laws(CF, FF, AP, SL, EQK, testStackSafety) +
+      concurrentLaws(CF, EQK, ctx)
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     forAll(Gen.int()) { i ->

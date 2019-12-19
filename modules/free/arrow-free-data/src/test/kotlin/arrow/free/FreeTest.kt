@@ -15,8 +15,10 @@ import arrow.core.extensions.option.monad.monad
 import arrow.core.value
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
+import arrow.free.extensions.free.applicative.applicative
 import arrow.free.extensions.free.eq.eq
 import arrow.free.extensions.free.foldable.foldable
+import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
 import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
@@ -92,7 +94,7 @@ class FreeTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
       MonadLaws.laws(Ops, opsEQK),
-      MonadLaws.laws(Free.monad(), opsEQK),
+      MonadLaws.laws(Free.monad(), Free.functor(), Free.applicative(), Free.monad(), opsEQK),
       FoldableLaws.laws(Free.foldable(Id.foldable()), GK()),
       TraverseLaws.laws(Free.traverse(Id.traverse()), GK(), idEQK)
     )

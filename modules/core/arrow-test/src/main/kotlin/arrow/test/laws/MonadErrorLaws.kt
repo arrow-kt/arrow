@@ -7,9 +7,12 @@ import arrow.test.generators.applicativeError
 import arrow.test.generators.fatalThrowable
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.Selective
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -17,10 +20,10 @@ import io.kotlintest.shouldThrowAny
 
 object MonadErrorLaws {
 
-  fun <F> laws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> {
+  private fun <F> monadErrorLaws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return MonadLaws.laws(M, EQK) + ApplicativeErrorLaws.laws(M, EQK) + listOf(
+    return listOf(
       Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQ) },
       Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQ) },
       Law("Monad Error Laws: NonFatal is caught") { M.monadErrorCatchesNonFatalThrowables(EQ) },
@@ -29,6 +32,22 @@ object MonadErrorLaws {
       Law("Monad Error Laws: redeemWith pure is flatMap") { M.monadErrorRedeemWithPureIsFlatMap(EQ) }
     )
   }
+
+  fun <F> laws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> =
+    MonadLaws.laws(M, EQK) +
+      ApplicativeErrorLaws.laws(M, EQK) +
+      monadErrorLaws(M, EQK)
+
+  fun <F> laws(
+    M: MonadError<F, Throwable>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    EQK: EqK<F>
+  ): List<Law> =
+    MonadLaws.laws(M, FF, AP, SL, EQK) +
+      ApplicativeErrorLaws.laws(M, EQK) +
+      monadErrorLaws(M, EQK)
 
   fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicativeError(this)), Gen.throwable()) { f: (Int) -> Kind<F, Int>, e: Throwable ->

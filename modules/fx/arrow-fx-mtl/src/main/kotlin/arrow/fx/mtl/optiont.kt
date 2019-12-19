@@ -1,6 +1,7 @@
 package arrow.fx.mtl
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -10,6 +11,7 @@ import arrow.fx.RaceTriple
 import arrow.fx.Ref
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
@@ -100,6 +102,10 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
 
   override fun dispatchers(): Dispatchers<OptionTPartialOf<F>> =
     CF().dispatchers() as Dispatchers<OptionTPartialOf<F>>
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<OptionTPartialOf<F>>): OptionT<F, A> = CF().run {
+    OptionT.liftF(this, cancelable { cb -> k(cb).value().map { Unit } })
+  }
 
   override fun <A> OptionTOf<F, A>.fork(ctx: CoroutineContext): OptionT<F, Fiber<OptionTPartialOf<F>, A>> = CF().run {
     OptionT.liftF(this, value().fork(ctx).map(::fiberT))

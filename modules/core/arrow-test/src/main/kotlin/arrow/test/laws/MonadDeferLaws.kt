@@ -10,15 +10,18 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 object MonadDeferLaws {
 
-  fun <F> laws(
+  private fun <F> monadDeferLaws(
     SC: MonadDefer<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
@@ -48,6 +51,25 @@ object MonadDeferLaws {
       emptyList()
     }
   }
+
+  fun <F> laws(
+    SC: MonadDefer<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    BracketLaws.laws(SC, EQK) +
+      monadDeferLaws(SC, EQK, testStackSafety)
+
+  fun <F> laws(
+    SC: MonadDefer<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    BracketLaws.laws(SC, FF, AP, SL, EQK) +
+      monadDeferLaws(SC, EQK, testStackSafety)
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->

@@ -1,80 +1,109 @@
-// VARIABLES
+// Variables
 // -----------------------------------------------
 // -----------------------------------------------
-
-@font-face {
-    font-family: 'monoidregular';
-    src: url('../fonts/monoid-regular.eot');
-    src: url('../fonts/monoid-regular.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/monoid-regular.woff2') format('woff2'),
-         url('../fonts/monoid-regular.woff') format('woff'),
-         url('../fonts/monoid-regular.ttf') format('truetype'),
-         url('../fonts/monoid-regular.svg#monoidregular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web:400,600,700');
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700');
-
 // Colors
-$brand-primary: #193E88;
-$brand-secondary: #526795;
-$brand-tertiary: #4B74E5;
-$brand-quaternary: #61A8FF;
-$brand-quinary: #00B5E2;
-$white: #fff;
-$top-warning-base: #3a7bdb;
-
-$link-color: $brand-tertiary;
-
-$feature-typeclasses: #2F5DC1;
-$feature-datatypess: #557FE8;
-$feature-patterns: #61A8FF;
-$feature-integrations: #00B5E2;
-
+// -----------------------------------------------
+$brand-primary: var(--color-primary);
+$brand-secondary: #DCDEE0;
+$brand-tertiary: #C5C8CB;
+$gray-primary: #A9AAAB;
+$white: rgb(255, 255, 255);
+$link-color: darken(#263238, 10%);
+$link-hover: darken(#263238, 15%);
+$background-color: #F5F7F8;
+// core
+$core-color: #2D9DFF;
+$core-background: #354755;
+$core-hover: #465764;
+// fx
+$fx-color: #807373;
+$fx-background: #33393f;
+$fx-hover: #44494f;
+// optics
+$optics-color: #00C9AA;
+$optics-background: #35565F;
+$optics-hover: #3f5b63;
+// incubator
+$incubator-color: #FF9B00;
+$incubator-background: #354755;
+$incubator-hover: #465764;
+// meta
+$meta-color: #CD151D;
+$meta-background: #2E3B44;
+$meta-hover: #424E56;
 // Typography
-$base-font-family: 'Titillium Web', sans-serif;
-$brand-font-family: 'Source Sans Pro', sans-serif;
-$code-font-family: 'monoidregular', monospace;
+// -----------------------------------------------
+$base-font-family: 'Iosevka Web';
+$header-font-family: $base-font-family;
+$code-font-family: $base-font-family;
+$doc-font-family: 'Open Sans', sans-serif;
+$base-font-color: $brand-primary;
 $header-font-color: $brand-primary;
-$base-font-color: $brand-secondary;
-
 $font-regular: 400;
 $font-medium: 500;
 $font-semibold: 600;
 $font-bold: 700;
-
-$em-base: 16px !global;
-$base-font-size: $em-base;
-$base-line-height: 1.6;
-
+$base-font-size: 14px;
+$base-line-height: 28px;
+$base-docs-font-size: 16px;
 // Sizes
+// -----------------------------------------------
 $base-point-grid: 8px;
-
-// Animations
+$sidebar-cat-button: 164px;
+$sidebar-doc-version-button: 200px;
+$height-home-code-block: 400px;
+$width-home-code-block: 580px;
+// Animation
+// -----------------------------------------------
+$short-duration: 150ms;
 $base-duration: 350ms;
-$base-timing: ease;
-
-// Grid
-
+$doble-base-duration: 500ms;
+$base-timing: ease-in-out;
+$opacity-transition: opacity $base-duration $base-timing, transform $base-duration $base-timing;
+$long-transition: opacity $doble-base-duration $base-timing;
+$icons-transition: opacity 400ms ease;
+// Breakpoint
+// -----------------------------------------------
 $bp-small: 480px;
 $bp-medium: 768px;
 $bp-large: 992px;
-$bp-xlarge: 1130px;
+$bp-xlarge: 1140px;
+// Grid
+// -----------------------------------------------
+$column-1: (1/12*100%);
+$column-2: (2/12*100%);
+$column-3: (3/12*100%);
+$column-4: (4/12*100%);
+$column-5: (5/12*100%);
+$column-6: (6/12*100%);
+$column-7: (7/12*100%);
+$column-8: (8/12*100%);
+$column-9: (9/12*100%);
+$column-10: (10/12*100%);
+$column-11: (11/12*100%);
+$column-12: (12/12*100%);
+$gutter-margin: ($base-point-grid * 4);
+// Border
+// -----------------------------------------------
 
-$base-grid: (
-    columns: 12,
-    gutter: 32px,
-);
+// Code
+// -----------------------------------------------
+$code-border-color: rgba($gray-primary, 0.2);
+$code-padding: 16px;
+$code-margin: 30px;
 
+
+$border-color: rgba($gray-primary, 0.1);
+$doc-header-border: rgba($brand-secondary, 0.8);
+$sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
+// Sidebar Sizes
+// -----------------------------------------------
+$sidebar-width: 325px;
 // Box Shadow
 $box-shadow-item: rgba($brand-primary, 0.10) 0 0 20px;
-
 // Docsearch dropdown
 $dropdown-config: (
-  main-color: $brand-quaternary,
+  main-color: $brand-tertiary,
   layout-type: normal,
   layout-width: full,
   background-color: #fff,
@@ -85,13 +114,14 @@ $dropdown-config: (
   branding-position: bottom,
   spacing: normal,
   include-desc: yes,
-  background-category-header:  #ffffff,
+  background-category-header: #ffffff,
   font-size: normal,
   header-color: $brand-primary,
   title-color: $brand-primary,
-  subtitle-color: $brand-tertiary,
+  subtitle-color: $base-font-color,
   text-color: $brand-secondary,
   highlight-color: #ef8836,
-  highlight-opacity: .1,
+  highlight-opacity: 0.3,
   highlight-type: underline
-) !default;
+)
+!default;

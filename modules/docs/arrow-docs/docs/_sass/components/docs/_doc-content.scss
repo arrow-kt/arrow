@@ -1,0 +1,127 @@
+// DOC-CONTENT
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content {
+    font-family: $doc-font-family;
+    position: relative;
+    padding: ($base-point-grid * 4);
+    font-size: 1.125rem;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: ($base-point-grid * 2);
+        margin-top: ($base-point-grid * 4);
+        color: $header-font-color;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    h1 {
+        font-size: 2.25rem;
+    }
+
+    h2 {
+        font-size: 1.9rem;
+    }
+
+    h3 {
+        font-size: 1.675rem;
+    }
+
+    h4 {
+        font-size: 1.425rem;
+    }
+
+    h5 {}
+
+    h6 {}
+
+    p {
+        margin-bottom: ($base-point-grid * 2);
+    }
+
+    .browser {
+        margin-top: ($base-point-grid * 3);
+    }
+
+    ul, ol {
+        padding-left: ($base-point-grid * 3);
+    }
+
+    ul {
+
+        li {
+            list-style: circle;
+        }
+    }
+
+    ol {
+        li {
+            list-style-type: decimal;
+        }
+    }
+
+    strong {
+        font-weight: $font-bold;
+    }
+
+    del {
+        text-decoration: line-through;
+    }
+
+    em {
+        font-style: italic;
+    }
+
+    hr {
+        border: none;
+        height: 1px;
+        width: 100%;
+        background: rgba($brand-secondary, 0.9);
+    }
+    
+    table {
+        width: 100%;
+        thead {
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        th, td {
+            padding: $base-point-grid;
+            border: 1px solid rgba($brand-secondary, 0.9);
+        }
+        
+        tr:nth-child(2n) {
+            background: $background-color;
+        }
+    }
+
+    .header-link {
+        float: left;
+        font-size: 1.4rem;
+        line-height: 1;
+        margin-left: -24px;
+        margin-top: 10px;
+        opacity: 0;
+        transition: opacity $base-duration $base-timing;
+    }
+
+    h1:hover,
+    h2:hover,
+    h3:hover,
+    h4:hover,
+    h5:hover,
+    h6:hover {
+        .header-link {
+            opacity: 1;
+        }
+    }
+}

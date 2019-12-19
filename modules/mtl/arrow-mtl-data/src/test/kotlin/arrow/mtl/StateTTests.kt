@@ -9,9 +9,11 @@ import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.extensions.`try`.eqK.eqK
+import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.eq
 import arrow.core.extensions.listk.eqK.eqK
+import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.option.eqK.eqK
@@ -21,9 +23,13 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
+import arrow.mtl.extensions.statet.applicative.applicative
+import arrow.mtl.extensions.statet.functor.functor
+import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.statet.semigroupK.semigroupK
@@ -54,14 +60,32 @@ class StateTTests : UnitSpec() {
 
   init {
     testLaws(
-      MonadStateLaws.laws(M, tryStateEqK),
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), ioStateEQK),
+      MonadStateLaws.laws(
+        M,
+        StateT.functor<ForTry, Int>(Try.functor()),
+        StateT.applicative<ForTry, Int>(Try.monad()),
+        StateT.monad<ForTry, Int>(Try.monad()),
+        tryStateEqK
+      ),
+
+      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(
+        StateT.async(IO.async()),
+        StateT.functor(IO.functor()),
+        StateT.applicative(IO.monad()),
+        StateT.monad(IO.monad()),
+        ioStateEQK
+      ),
 
       SemigroupKLaws.laws(
         StateT.semigroupK<ForOption, Int>(Option.monad(), Option.semigroupK()),
         genk(Option.genK(), Gen.int()),
         optionStateEQK),
-      MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
+
+      MonadCombineLaws.laws(
+        StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
+        StateT.functor<ForListK, Int>(ListK.functor()),
+        StateT.applicative<ForListK, Int>(ListK.monad()),
+        StateT.monad<ForListK, Int>(ListK.monad()),
         { StateT.liftF(ListK.monad(), ListK.just(it)) },
         { StateT.liftF(ListK.monad(), ListK.just { s: Int -> s * 2 }) },
         listkStateEQK)

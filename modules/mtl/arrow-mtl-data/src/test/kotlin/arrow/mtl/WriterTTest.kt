@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.ForListK
+import arrow.core.ForOption
 import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -16,14 +17,21 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
+import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.writert.alternative.alternative
+import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
 import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.functor.functor
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
@@ -65,16 +73,26 @@ class WriterTTest : UnitSpec() {
         WriterT.genK(Const.genK(Gen.int()), Gen.int()),
         constEQK()
       ),
-      ConcurrentLaws.laws(WriterT.concurrent(IO.concurrent(), Int.monoid()), ioEQK()),
+      ConcurrentLaws.laws(
+        WriterT.concurrent(IO.concurrent(), Int.monoid()),
+        WriterT.functor<ForIO, Int>(IO.functor()),
+        WriterT.applicative(IO.applicative(), Int.monoid()),
+        WriterT.monad(IO.monad(), Int.monoid()),
+        ioEQK()
+      ),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
         WriterT.genK(ListK.genK(), Gen.int()),
         listEQK()
       ),
 
-      MonadWriterLaws.laws(WriterT.monad(Option.monad(), Int.monoid()),
+      MonadWriterLaws.laws(
+        WriterT.monad(Option.monad(), Int.monoid()),
         WriterT.monadWriter(Option.monad(), Int.monoid()),
         Int.monoid(),
+        WriterT.functor<ForOption, Int>(Option.functor()),
+        WriterT.applicative(Option.applicative(), Int.monoid()),
+        WriterT.monad(Option.monad(), Int.monoid()),
         Gen.intSmall(),
         optionEQK(),
         Int.eq()
@@ -82,6 +100,9 @@ class WriterTTest : UnitSpec() {
 
       MonadFilterLaws.laws(
         WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
+        WriterT.functor<ForOption, Int>(Option.functor()),
+        WriterT.applicative(Option.applicative(), Int.monoid()),
+        WriterT.monad(Option.monad(), Int.monoid()),
         { WriterT(Option(Tuple2(it, it))) },
         optionEQK()
       )

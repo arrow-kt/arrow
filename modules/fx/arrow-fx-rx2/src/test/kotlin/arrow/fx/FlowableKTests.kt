@@ -10,8 +10,11 @@ import arrow.fx.rx2.extensions.asyncError
 import arrow.fx.rx2.extensions.asyncLatest
 import arrow.fx.rx2.extensions.asyncMissing
 import arrow.fx.rx2.extensions.concurrent
+import arrow.fx.rx2.extensions.flowablek.applicative.applicative
 import arrow.fx.rx2.extensions.flowablek.async.async
+import arrow.fx.rx2.extensions.flowablek.functor.functor
 import arrow.fx.rx2.extensions.flowablek.monad.flatMap
+import arrow.fx.rx2.extensions.flowablek.monad.monad
 import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
 import arrow.fx.rx2.extensions.flowablek.traverse.traverse
@@ -72,34 +75,34 @@ class FlowableKTests : RxJavaSpec() {
 
   init {
     testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), EQK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncError(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), GENK(), EQK()))
 
-    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), { Flowable.just(it).k() }, EQK()))
+    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), { Flowable.just(it).k() }, EQK()))
 
     "fx should defer evaluation until subscribed" {
       var run = false

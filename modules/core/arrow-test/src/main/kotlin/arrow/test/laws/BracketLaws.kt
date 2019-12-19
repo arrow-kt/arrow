@@ -8,21 +8,23 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BracketLaws {
 
-  fun <F> laws(
+  private fun <F> bracketLaws(
     BF: Bracket<F, Throwable>,
     EQK: EqK<F>
   ): List<Law> {
-
     val EQ = EQK.liftEq(Int.eq())
 
-    return MonadErrorLaws.laws(BF, EQK) + listOf(
+    return listOf(
       Law("Bracket: bracketCase with just Unit is eqv to Map") { BF.bracketCaseWithJustUnitEqvMap(EQ) },
       Law("Bracket: bracketCase with just Unit is uncancelable") { BF.bracketCaseWithJustUnitIsUncancelable(EQ) },
       Law("Bracket: bracketCase failure in acquisition remains failure") { BF.bracketCaseFailureInAcquisitionRemainsFailure(EQ) },
@@ -35,6 +37,23 @@ object BracketLaws {
       Law("Bracket: bracket must run release task") { BF.bracketMustRunReleaseTask(EQ) }
     )
   }
+
+  fun <F> laws(
+    BF: Bracket<F, Throwable>,
+    EQK: EqK<F>
+  ): List<Law> =
+    MonadErrorLaws.laws(BF, EQK) +
+      bracketLaws(BF, EQK)
+
+  fun <F> laws(
+    BF: Bracket<F, Throwable>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    EQK: EqK<F>
+  ): List<Law> =
+    MonadErrorLaws.laws(BF, FF, AP, SL, EQK) +
+      bracketLaws(BF, EQK)
 
   fun <F> Bracket<F, Throwable>.bracketCaseWithJustUnitEqvMap(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int().applicativeError(this), Gen.functionAToB<Int, Int>(Gen.int())

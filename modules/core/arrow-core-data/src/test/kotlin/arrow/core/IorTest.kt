@@ -5,12 +5,14 @@ import arrow.Kind2
 import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
 import arrow.core.extensions.ior.bifunctor.bifunctor
 import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.extensions.ior.crosswalk.crosswalk
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.eqK.eqK
+import arrow.core.extensions.ior.functor.functor
 import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
@@ -48,7 +50,7 @@ class IorTest : UnitSpec() {
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
-      MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
+      MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.functor(), Ior.applicative(Int.semigroup()), Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
       TraverseLaws.laws(Ior.traverse(),
         Ior.genK(Gen.int()),
         Ior.eqK(Int.eq())

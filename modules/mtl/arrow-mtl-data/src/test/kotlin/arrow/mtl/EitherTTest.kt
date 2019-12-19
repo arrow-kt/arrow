@@ -21,11 +21,17 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.functor.functor
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.functor.functor
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.eithert.alternative.alternative
+import arrow.mtl.extensions.eithert.applicative.applicative
 import arrow.mtl.extensions.eithert.divisible.divisible
 import arrow.mtl.extensions.eithert.eqK.eqK
+import arrow.mtl.extensions.eithert.functor.functor
+import arrow.mtl.extensions.eithert.monad.monad
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
@@ -55,16 +61,24 @@ class EitherTTest : UnitSpec() {
         EitherT.genK(Const.genK(Gen.int()), Gen.int()),
         constEQK
       ),
+
       AlternativeLaws.laws(
         EitherT.alternative(Id.monad(), Int.monoid()),
         { EitherT.just(Id.applicative(), it) },
         { i -> EitherT.just(Id.applicative(), { j: Int -> i + j }) },
         idEQK
       ),
-      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()), ioEQK),
+
+      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()),
+        EitherT.functor(IO.functor()),
+        EitherT.applicative(IO.applicative()),
+        EitherT.monad(IO.monad()),
+        ioEQK),
+
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()),
         EitherT.genK(Id.genK(), Gen.int()),
         idEQK),
+
       SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),
         EitherT.genK(Id.genK(), Gen.int()),

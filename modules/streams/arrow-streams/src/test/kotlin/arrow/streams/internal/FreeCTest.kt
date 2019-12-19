@@ -26,7 +26,10 @@ import arrow.fx.IO
 import arrow.fx.extensions.io.monadError.monadError
 import arrow.fx.fix
 import arrow.higherkind
+import arrow.streams.internal.freec.applicative.applicative
 import arrow.streams.internal.freec.eq.eq
+import arrow.streams.internal.freec.functor.functor
+import arrow.streams.internal.freec.monad.monad
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
@@ -118,8 +121,12 @@ class FreeCTest : UnitSpec() {
     )
     testLaws(
       MonadDeferLaws.laws(
-        FreeC.monadDefer(),
-        EQK
+        SC = FreeC.monadDefer(),
+        FF = FreeC.functor(),
+        AP = FreeC.applicative(),
+        SL = FreeC.monad(),
+        EQK = EQK
+
       ))
 
     "Can interpret an ADT as Free operations" {
