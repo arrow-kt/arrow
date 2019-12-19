@@ -34,7 +34,7 @@ class ConstTest : UnitSpec() {
           Const.applicative(this),
           Const.genK(Gen.int()),
           EQK(Int.eq())),
-        ApplicativeLaws.laws(Const.applicative(this), EQK(Int.eq())),
+        ApplicativeLaws.laws(Const.applicative(this), Const.genK(Gen.int()), EQK(Int.eq())),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
         ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
       )

@@ -17,6 +17,7 @@ import arrow.free.extensions.FreeApplicativeEq
 import arrow.free.extensions.freeapplicative.applicative.applicative
 import arrow.free.extensions.freeapplicative.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
 import arrow.typeclasses.Eq
@@ -60,10 +61,15 @@ class FreeApplicativeTest : UnitSpec() {
         }
     }
 
+    fun GENK() = object : GenK<FreeApplicativePartialOf<OpsAp.F>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreeApplicativePartialOf<OpsAp.F>, A>> =
+        gen.map { OpsAp.just(it) }
+    }
+
     testLaws(
       EqLaws.laws(EQ, Gen.opsAp()),
-      ApplicativeLaws.laws(OpsAp, EQK()),
-      ApplicativeLaws.laws(FreeApplicative.applicative(), EQK())
+      ApplicativeLaws.laws(OpsAp, GENK(), EQK()),
+      ApplicativeLaws.laws(FreeApplicative.applicative(), GENK(), EQK())
     )
 
     "Can interpret an ADT as FreeApplicative operations" {

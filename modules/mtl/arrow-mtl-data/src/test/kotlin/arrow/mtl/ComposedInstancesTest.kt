@@ -113,7 +113,7 @@ class ComposedInstancesTest : UnitSpec() {
 
     testLaws(
       FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), GENK_OPTION_NEL, EQK_OPTION_NEL),
-      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQK_OPTION_NEL),
+      ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), GENK_OPTION_NEL, EQK_OPTION_NEL),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), GENK_OPTION_NEL),
       TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), GENK_OPTION_NEL, EQK_OPTION_NEL),
       SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), GENK_LK_OPTION, EQK_LK_OPTION),

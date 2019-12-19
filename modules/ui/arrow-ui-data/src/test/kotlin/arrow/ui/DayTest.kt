@@ -9,6 +9,8 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.fix
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
@@ -33,8 +35,21 @@ class DayTest : UnitSpec() {
         }
     }
 
+    fun <F, G, X, Y> GENK(genkF: GenK<F>, genkG: GenK<G>, genX: Gen<X>, genY: Gen<Y>) = object : GenK<DayPartialOf<F, G>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<DayPartialOf<F, G>, A>> {
+
+        val genF = gen.map {
+          { _: X, _: Y -> it }
+        }
+
+        return Gen.bind(genkF.genK(genX), genkG.genK(genY), genF) { a, b, f ->
+          Day(a, b, f)
+        }
+      }
+    }
+
     testLaws(
-      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), EQK),
+      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), GENK(Id.genK(), Id.genK(), Gen.int(), Gen.int()), EQK),
       ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQK)
     )
 

@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
@@ -13,10 +14,17 @@ import io.kotlintest.properties.forAll
 
 object ApplicativeLaws {
 
-  fun <F> laws(A: Applicative<F>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(A: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
+    FunctorLaws.laws(A, GENK, EQK) + applicativeLaws(A, EQK)
+
+  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
+  internal fun <F> laws(A: Applicative<F>, EQK: EqK<F>): List<Law> =
+    FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQK) + applicativeLaws(A, EQK)
+
+  private fun <F> applicativeLaws(A: Applicative<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(A, Gen.int().map { A.just(it) }, EQK) + listOf(
+    return listOf(
       Law("Applicative Laws: ap identity") { A.apIdentity(EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
       Law("Applicative Laws: interchange") { A.interchange(EQ) },
