@@ -11,10 +11,6 @@ import io.kotlintest.properties.Gen
 
 class MonoidTest : UnitSpec() {
 
-  val EQ: Eq<MonoidOf<Int>> = Eq.invoke { a, b ->
-    a.fix().run { 3.combine(1) } == b.fix().run { 3.combine(1) }
-  }
-
   fun EQK() = object : EqK<ForMonoid> {
     override fun <A> Kind<ForMonoid, A>.eqK(other: Kind<ForMonoid, A>, EQ: Eq<A>): Boolean =
       (this.fix() to other.fix()).let { (ls, rs) ->
