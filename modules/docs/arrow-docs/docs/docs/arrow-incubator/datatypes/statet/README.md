@@ -12,17 +12,17 @@ video: 1MJBXKaq0Hc
 
 
 
-`StateT` also known as the `State` monad transformer allows to compute inside the context when `State` is nested in a different monad.
+`StateT`, also known as the `State` monad transformer, allows computation inside the context when `State` is nested in a different monad.
 
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `Either` and `State`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
 
-For our purposes here, we're going to transform a monad that serves as a container that represents branching as an an error (left) or state (right) where computation can be performed. Given that both `State<S, A>` and `Either<L, R>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
+For our purposes here, we're going to transform a monad that serves as a container that represents branching as an an error (left) or state (right) where computation can be performed. Both `State<S, A>` and `Either<L, R>` would be examples of datatypes that provide instances for the `Monad` typeclasses.
 
-Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `Either<Error, State<Either<Error, State<S, Unit>>, Unit>>` when using `Either` and `State` together. Using Monad Transformers can help us to reduce this boilerplate.
+Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-not-compose/), we may end up with nested structures such as `Either<Error, State<Either<Error, State<S, Unit>>, Unit>>` when using `Either` and `State` together. Using Monad Transformers can help us reduce this boilerplate.
 
-In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `Either<Error, A>`, and others will return `State<S, A>`.
+In the most basic of scenarios, we'll only be dealing with one monad at a time, making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `Either<Error, A>`, and others will return `State<S, A>`.
 
-So let's rewrite the example of [`State` docs]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList` let's represent it as a `List`.
+So let's rewrite the example of [`State` docs]({{ '/docs/arrow/data/state' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList`, let's represent it as a `List`.
 
 ```kotlin:ank
 import arrow.core.Tuple2
@@ -71,7 +71,7 @@ fun main() {
 }
 ```
 
-But if we now `pop` an empty `Stack` it will result in `java.util.NoSuchElementException: List is empty.`.
+But if we now `pop` an empty `Stack`, it will result in `java.util.NoSuchElementException: List is empty.`.
 
 ```kotlin:ank:fail
 import arrow.core.Tuple2
@@ -95,7 +95,7 @@ fun stackOperations(stack: Stack): Tuple2<Stack, String> {
 stackOperations(listOf())
 ```
 
-Luckily Arrow offers some nice solutions [`Functional Error Handling` docs]({{ '/docs/patterns/error_handling' | relative_url }}).
+Luckily, Arrow offers some nice solutions [`Functional Error Handling` docs]({{ '/docs/patterns/error_handling' | relative_url }}).
 Now we can model our error domain with ease.
 
 ```kotlin:ank
@@ -211,10 +211,10 @@ fun main() {
 }
 ```
 
-As is immediately clear, this code while properly modelling the errors, has become more complex but our signature now represents a simple `Stack` as a `List` with an error domain.
+As is immediately clear, this code, while properly modelling the errors, has become more complex. But our signature now represents a simple `Stack` as a `List` with an error domain.
 Let's refactor our manual state management in the form of `(S) -> Tuple2<S, A>` to `State`.
 
-So what we want is a return type that represents `Either` a `StackError` or a certain `State` of `Stack.` When working with `State` we don't pass around `Stack` anymore, so there is no parameter to check if the `Stack` is empty.
+So what we want is a return type that represents `Either` a `StackError` or a certain `State` of `Stack.` When working with `State`, we don't pass around `Stack` anymore, so there is no parameter to check if the `Stack` is empty.
 
 ```kotlin:ank:silent
 import arrow.core.ForId
@@ -224,7 +224,7 @@ fun _popS(): Either<StackError, StateT<ForId, Stack, String>> = TODO()
 ```
 
 The only thing we can do is handle this with `StateT`. We want to wrap `State` with `Either`.
-`EitherKindPartial` is an alias that helps us to fix `StackError` as the left type parameter for `Either<L, R>`.
+`EitherKindPartial` is an alias that helps us fix `StackError` as the left type parameter for `Either<L, R>`.
 
 ```kotlin:ank:playground
 import arrow.core.Either
@@ -315,7 +315,7 @@ fun main() {
 }
 ```
 
-While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
+While our code looks very similar to what we had before, there are some key advantages. State management is now contained within `State`, and we are dealing with only 1 monad instead of 2 nested monads, so we can use monad bindings!
 
 ```kotlin:ank:playground
 import arrow.core.Either

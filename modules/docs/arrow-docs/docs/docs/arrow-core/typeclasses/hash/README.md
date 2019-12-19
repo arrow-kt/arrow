@@ -54,8 +54,8 @@ Arrow provides [`HashLaws`][hash_laws_source]{:target="_blank"} in the form of t
 
 #### Creating your own `Hash` instances
 
-Hash contains a special instance that delegates to Kotlin's `Any?.hashCode()` function in all cases. This may be sufficient for most use cases, but will fail for data types that contain functions, typeclasses or non-data classes.
-It also might make more sense to provide your own instance in for some cases, for example when there is already a unique property on an object.
+Hash contains a special instance that delegates to Kotlin's `Any?.hashCode()` function in all cases. This may be sufficient for most use cases, but will fail for data types that contain functions, typeclasses, or non-data classes.
+It also might make more sense to provide your own instance in some cases; for example, when there is already a unique property on an object.
 Hash has a constructor to create a `Hash` instance from any function `(F) -> Int`.
 
 ```kotlin:ank:playground

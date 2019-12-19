@@ -26,7 +26,7 @@ Int.show().run { 1.show() }
 
 #### F#show
 
-Given an instance of `F` it returns the `String` representation of this instance.
+Given an instance of `F`, it returns the `String` representation of this instance.
 
 `fun F.show(): String`
 
@@ -36,8 +36,8 @@ Arrow provides `ShowLaws` in the form of test cases for internal verification of
 
 #### Creating your own `Show` instances
 
-Show provides one special instance that can be potentially applicable to most datatypes.
-It uses kotlin's `toString` method to get an object's literal representation.
+Show provides one special instance that potentially can be applicable to most datatypes.
+It uses Kotlin's `toString` method to get an object's literal representation.
 This will work well in many cases, specially for data classes.
 
 ```kotlin:ank

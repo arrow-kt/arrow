@@ -24,7 +24,7 @@ We'll be working on a Arrow-Android integration module that adds some helpers an
 
 #### Basic Setup
 
-In your project's root `build.gradle` append these repositories to your list:
+In your project's root `build.gradle`, append these repositories to your list:
 
 ```groovy
 allprojects {
@@ -39,7 +39,7 @@ allprojects {
 
 Add the dependencies into the project's `build.gradle`:
 
-##### Λrrow Core
+##### Arrow Core
 
 ```groovy
 apply plugin: 'kotlin-kapt'
@@ -52,7 +52,7 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Optics
+##### Arrow Core + Arrow Optics
 
 ```groovy
 apply plugin: 'kotlin-kapt'
@@ -65,7 +65,7 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Fx
+##### Arrow Core + Arrow Fx
 
 ```groovy
 apply plugin: 'kotlin-kapt'
@@ -78,7 +78,7 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Optics + Λrrow Fx
+##### Arrow Core + Arrow Optics + Arrow Fx
 
 ```groovy
 apply plugin: 'kotlin-kapt'
@@ -96,7 +96,7 @@ Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_
 
 #### Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -143,7 +143,7 @@ idea {
 
 #### Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
+Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
@@ -152,7 +152,7 @@ Add to your pom.xml file the following properties:
 </properties>
 ```
 
-Add the dependencies that you want to use
+Add the dependencies that you want to use:
 ```
         <dependency>
             <groupId>io.arrow-kt</groupId>
@@ -169,7 +169,7 @@ Add the dependencies that you want to use
 
 #### Enabling kapt
 
-Enable annotaton processing using kotlin plugin
+Enable annotaton processing using Kotlin plugin:
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>

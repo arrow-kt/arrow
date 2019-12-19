@@ -12,7 +12,7 @@ redirect_from:
 
 
 The `Order` typeclass abstracts the ability to compare two instances of any object and determine their total order.
-Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id field-, or any combination of the above.
+Depending on your needs, this comparison can be structural (the content of the object), referential (the memory address of the object), based on an identity (like an Id field), or any combination of these.
 
 It can be considered the typeclass equivalent of Java's `Comparable`.
 
@@ -35,7 +35,7 @@ import arrow.core.extensions.*
 Int.order().run { 1.compare(2) }
 ```
 
-Additionaly, `Order` overloads operators `>`, `<`, `<=` and `>=` following the kotlin `compareTo` convention for every type for each an exists an `Order` instance.
+Additionaly, `Order` overloads operators `>`, `<`, `<=`, and `>=`, following the Kotlin `compareTo` convention for every type where an `Order` instance exists.
 
 ```kotlin:ank
 Int.order().run { 1 > 2 }
@@ -43,7 +43,7 @@ Int.order().run { 1 > 2 }
 
 #### F#lte / F#lt
 
-Lesser than or equal to defines total order in a set, it compares two elements and returns true if they're equal or the first is lesser than the second.
+Lesser than or equal to defines total order in a set, it compares two elements, and returns true if they're equal or the first is lesser than the second.
 It is the opposite of `gte`.
 
 ```kotlin:ank
@@ -81,7 +81,7 @@ Int.order().run {
 
 #### F#sort
 
-Sorts the elements in a `Tuple2`
+Sorts the elements in a `Tuple2`.
 
 ```kotlin:ank
 Int.order().run {

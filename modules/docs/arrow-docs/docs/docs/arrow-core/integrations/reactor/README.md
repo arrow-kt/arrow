@@ -11,7 +11,7 @@ permalink: /docs/integrations/reactor/
 
 Arrow aims to enhance the user experience when using Project Reactor. While providing other datatypes that are capable of handling effects, like IO, the style of programming encouraged by the library allows users to generify behavior for any existing abstractions.
 
-One of such abstractions is Project Reactor, a library that, like RxJava, offers reactive streams.
+One of these abstractions is Project Reactor, a library that, like RxJava, offers reactive streams.
 
 ```kotlin
 val flux = Flux.just(7, 4, 11 ,3)
@@ -30,7 +30,7 @@ The largest quality of life improvement when using Flux streams in Arrow is the 
 
 #### Arrow Wrapper
 
-To wrap any existing Flux in its Arrow Wrapper counterpart you can use the extension function `k()`.
+To wrap any existing Flux in its Arrow Wrapper counterpart, you can use the extension function `k()`.
 
 ```kotlin:ank
 import arrow.fx.reactor.*
@@ -87,7 +87,7 @@ getSongUrlAsync()
   }
 ```
 
-When rewritten using `fx.monadThrow` it becomes:
+When rewritten using `fx.monadThrow`, it becomes:
 
 ```kotlin
 import arrow.fx.reactor.*
@@ -128,9 +128,9 @@ disposable.dispose()
 ### Stack safety
 
 While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types.
-This is a limitation on reactor's side. See the corresponding github [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
+This is a limitation on reactor's side. See the corresponding GitHub [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
 
-To overcome this limitation and run code in a stack safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe`, which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
 ```kotlin:ank:playground
 import arrow.Kind
