@@ -6,6 +6,7 @@ import arrow.core.Option
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAAToA
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
@@ -16,12 +17,13 @@ import io.kotlintest.properties.forAll
 
 object ReducibleLaws {
 
-  fun <F> laws(RF: Reducible<F>, G: Gen<Kind<F, Int>>): List<Law> {
+  fun <F> laws(RF: Reducible<F>, GENK: GenK<F>): List<Law> {
 
     val EQ = Int.eq()
     val EQOptionInt = Option.eq(Int.eq())
     val EQLong = Long.eq()
-
+    val G = GENK.genK(Gen.int()
+    )
     return FoldableLaws.laws(RF, G) +
       listOf(
         Law("Reducible Laws: reduceLeftTo consistent with reduceMap") { RF.reduceLeftToConsistentWithReduceMap(G, EQ) },

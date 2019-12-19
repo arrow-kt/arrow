@@ -58,7 +58,7 @@ class ListKTest : UnitSpec() {
       MonoidalLaws.laws(ListK.monoidal(),
         ListK.genK(10),
         ListK.eqK(),
-        this::bijection, associativeSemigroupalEq),
+        this::bijection),
       MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
       TraverseLaws.laws(ListK.traverse(), ListK.genK(), ListK.eqK()),
       MonadCombineLaws.laws(ListK.monadCombine(),

@@ -5,7 +5,6 @@ import arrow.core.None
 import arrow.core.Some
 import arrow.core.extensions.eq
 import arrow.test.generators.GenK
-import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
@@ -23,14 +22,15 @@ object TraverseFilterLaws {
     EQK: EqK<F>
   ): List<Law> {
     val GEN = GENK.genK(Gen.int())
+    val genBool = GENK.genK(Gen.bool())
     val EQ = EQK.liftEq(Int.eq())
     val EQ_NESTED = EQK.liftEq(EQ)
 
     return TraverseLaws.laws(TF, GENK, EQK) +
-        listOf(
-          Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
-          Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, GA, EQ_NESTED) }
-        )
+      listOf(
+        Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
+        Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, genBool, GA, EQ_NESTED) }
+      )
   }
 
   fun <F> TraverseFilter<F>.identityTraverseFilter(GEN: Gen<Kind<F, Int>>, GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) =
@@ -38,8 +38,13 @@ object TraverseFilterLaws {
       fa.traverseFilter(GA) { GA.just(Some(it)) }.equalUnderTheLaw(GA.just(fa), EQ)
     }
 
-  fun <F> TraverseFilter<F>.filterAconsistentWithTraverseFilter(GEN: Gen<Kind<F, Int>>, GA: Applicative<F>, EQ: Eq<Kind<F, Kind<F, Int>>> = Eq.any()) = run {
-    forAll(GEN, Gen.functionAToB<Int, Kind<F, Boolean>>(Gen.bool().applicative(GA))) { fa: Kind<F, Int>, f: (Int) -> Kind<F, Boolean> ->
+  fun <F> TraverseFilter<F>.filterAconsistentWithTraverseFilter(
+    genInt: Gen<Kind<F, Int>>,
+    genBool: Gen<Kind<F, Boolean>>,
+    GA: Applicative<F>,
+    EQ: Eq<Kind<F, Kind<F, Int>>>
+  ) = run {
+    forAll(genInt, Gen.functionAToB<Int, Kind<F, Boolean>>(genBool)) { fa: Kind<F, Int>, f: (Int) -> Kind<F, Boolean> ->
       fa.filterA(f, GA).equalUnderTheLaw(fa.traverseFilter(GA) { a -> f(a).map { b: Boolean -> if (b) Some(a) else None } }, EQ)
     }
   }

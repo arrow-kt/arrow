@@ -10,6 +10,7 @@ import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
+import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
@@ -58,18 +59,14 @@ class KleisliTest : UnitSpec() {
       }
     }
 
-    val optionEQK = Kleisli.eqK(Option.eqK(), Int.eq(), 0)
+    val optionEQK = Kleisli.eqK(Option.eqK(), 0)
 
-    val ioEQK = Kleisli.eqK(IO.eqK(), Int.eq(), 1)
+    val ioEQK: EqK<Kind<Kind<ForKleisli, ForIO>, Int>> = Kleisli.eqK(IO.eqK(), 1)
 
-    val tryEQK = object : EqK<KleisliPartialOf<ForTry, Int>> {
-      override fun <A> Kind<KleisliPartialOf<ForTry, Int>, A>.eqK(other: Kind<KleisliPartialOf<ForTry, Int>, A>, EQ: Eq<A>): Boolean =
-        (this.fix() to other.fix()).let {
-          it.first.run(1) == it.second.run(1)
-        }
-    }
+    val tryEQK: EqK<Kind<Kind<ForKleisli, ForTry>, Int>> =
+      Kleisli.eqK(Try.eqK(), 1)
 
-    val constEQK: EqK<Kind<Kind<ForKleisli, Kind<ForConst, Int>>, Int>> = Kleisli.eqK(Const.eqK(Int.eq()), Int.eq(), 1)
+    val constEQK: EqK<Kind<Kind<ForKleisli, Kind<ForConst, Int>>, Int>> = Kleisli.eqK(Const.eqK(Int.eq()), 1)
 
     testLaws(
       AlternativeLaws.laws(
@@ -101,7 +98,7 @@ class KleisliTest : UnitSpec() {
   }
 }
 
-private fun <F, D> Kleisli.Companion.eqK(EQKF: EqK<F>, EQD: Eq<D>, d: D) = object : EqK<KleisliPartialOf<F, D>> {
+private fun <F, D> Kleisli.Companion.eqK(EQKF: EqK<F>, d: D) = object : EqK<KleisliPartialOf<F, D>> {
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.eqK(other: Kind<KleisliPartialOf<F, D>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
       val ls = it.first.run(d)

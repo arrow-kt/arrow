@@ -69,7 +69,7 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), Option.genK(), Option.eqK()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Option.eqK()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
-      MonoidalLaws.laws(Option.monoidal(), Option.genK(), Option.eqK(), ::bijection, associativeSemigroupalEq),
+      MonoidalLaws.laws(Option.monoidal(), Option.genK(), Option.eqK(), ::bijection),
       EqKLaws.laws(
         Option.eqK(),
         Option.genK()

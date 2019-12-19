@@ -2,7 +2,6 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
-import arrow.core.Either
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
 import arrow.core.NonEmptyList
@@ -11,24 +10,18 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
-import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.monad.monad
-import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.traverseFilter.traverseFilter
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.fix
 import arrow.fx.mtl.concurrent
-import arrow.fx.typeclasses.Duration
-import arrow.fx.typeclasses.seconds
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.nested
 import arrow.mtl.extensions.optiont.applicative.applicative
@@ -49,8 +42,6 @@ import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseFilterLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -141,16 +132,4 @@ fun <F> OptionT.Companion.genk(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, 
   override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind<ForOptionT, F>, A>> = genkF.genK(Gen.option(gen)).map {
     OptionT(it)
   }
-}
-
-fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
-  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.attempt().unsafeRunTimed(timeout)
-      val rs = it.second.attempt().unsafeRunTimed(timeout)
-
-      Option.eq(Either.eq(Eq.any(), EQ)).run {
-        ls.eqv(rs)
-      }
-    }
 }

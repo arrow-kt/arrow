@@ -17,15 +17,15 @@ object MonoidalLaws {
     MDAL: Monoidal<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    BIJECTION: (Kind<F, Tuple2<Tuple2<Int, Int>, Int>>) -> (Kind<F, Tuple2<Int, Tuple2<Int, Int>>>),
-    ASSOCIATIVE_SEMIGROUPAL_EQ: Eq<Kind<F, Tuple2<Int, Tuple2<Int, Int>>>>
+    BIJECTION: (Kind<F, Tuple2<Tuple2<Int, Int>, Int>>) -> (Kind<F, Tuple2<Int, Tuple2<Int, Int>>>)
   ): List<Law> {
     val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Tuple2.eq(Int.eq(), Int.eq()))
 
     return SemigroupalLaws.laws(MDAL,
-      GEN, BIJECTION,
-      ASSOCIATIVE_SEMIGROUPAL_EQ
+      GENK,
+      BIJECTION,
+      EQK
     ) + listOf(
       Law("Monoidal Laws: Left identity") { MDAL.monoidalLeftIdentity(GEN, EQ) },
       Law("Monoidal Laws: Right identity") { MDAL.monoidalRightIdentity(GEN, EQ) }

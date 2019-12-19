@@ -48,8 +48,8 @@ class SetKTest : UnitSpec() {
       MonoidalLaws.laws(SetK.monoidal(),
         SetK.genK(10),
         SetK.eqK(),
-        this::bijection,
-        associativeSemigroupalEq),
+        this::bijection
+      ),
       MonoidKLaws.laws(SetK.monoidK(), SetK.genK(), SetK.eqK()),
       FoldableLaws.laws(SetK.foldable(), SetK.genK()),
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq()), Gen.genSetK(Gen.int())),

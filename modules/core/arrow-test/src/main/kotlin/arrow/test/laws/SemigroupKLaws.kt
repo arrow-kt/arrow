@@ -14,8 +14,8 @@ object SemigroupKLaws {
   fun <F> laws(SGK: SemigroupK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, GENK.genK(Gen.int()), EQK)
 
-  @Deprecated("should be internal")
-  fun <F> laws(SGK: SemigroupK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> =
+  @Deprecated("use GenK version")
+  internal fun <F> laws(SGK: SemigroupK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> =
     listOf(Law("SemigroupK: associativity") { SGK.semigroupKAssociative(GEN, EQK.liftEq(Int.eq())) })
 
   fun <F> SemigroupK<F>.semigroupKAssociative(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

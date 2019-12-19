@@ -19,18 +19,18 @@ object MonadWriterLaws {
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     genW: Gen<W>,
-    genTupleWA: Gen<Tuple2<W, Int>>,
     EQK: EqK<F>,
     EQW: Eq<W>
   ): List<Law> {
     val EQ_INT = EQK.liftEq(Int.eq())
     val EQ_TUPLE = EQK.liftEq(Tuple2.eq(EQW, Int.eq()))
+    val GEN_TUPLE = Gen.bind(genW, Gen.int(), ::Tuple2)
 
     return MonadLaws.laws(MF, EQK) + listOf(
       Law("Monad Writer Laws: writer just") { MW.monadWriterWriterJust(MOW, EQ_INT) },
       Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW) },
       Law("Monad Writer Laws: listen just") { MW.monadWriterListenJust(MOW, EQ_TUPLE) },
-      Law("Monad Writer Laws: listen writer") { MW.monadWriterListenWriter(genTupleWA, EQ_TUPLE) })
+      Law("Monad Writer Laws: listen writer") { MW.monadWriterListenWriter(GEN_TUPLE, EQ_TUPLE) })
   }
 
   fun <F, W> MonadWriter<F, W>.monadWriterWriterJust(

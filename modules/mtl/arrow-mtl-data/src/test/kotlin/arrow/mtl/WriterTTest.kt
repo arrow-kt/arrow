@@ -78,8 +78,7 @@ class WriterTTest : UnitSpec() {
         WriterT.monadWriter(Option.monad(), Int.monoid()),
         Int.monoid(),
         Gen.intSmall(),
-        Gen.tuple2(Gen.intSmall(), Gen.intSmall()),
-        optionEQK(),
+              optionEQK(),
         Int.eq()
       ),
 

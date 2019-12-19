@@ -75,7 +75,7 @@ class SequenceKTest : UnitSpec() {
       MonadLaws.laws(SequenceK.monad(), SequenceK.eqK()),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), SequenceK.eqK()),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
-      MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection, associativeSemigroupalEq),
+      MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
