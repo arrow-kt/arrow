@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.compose
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Eq
@@ -12,10 +13,20 @@ import io.kotlintest.properties.forAll
 
 object ContravariantLaws {
 
-  fun <F> laws(CF: Contravariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(CF: Contravariant<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val G = GENK.genK(Gen.int())
+
+    return InvariantLaws.laws(CF, G, EQK) + contravariantLaws(CF, G, EQK)
+  }
+
+  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
+  internal fun <F> laws(CF: Contravariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> =
+    InvariantLaws.laws(CF, G, EQK) + contravariantLaws(CF, G, EQK)
+
+  private fun <F> contravariantLaws(CF: Contravariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return InvariantLaws.laws(CF, G, EQK) + listOf(
+    return listOf(
       Law("Contravariant Laws: Contravariant Identity") { CF.identity(G, EQ) },
       Law("Contravariant Laws: Contravariant Composition") { CF.composition(G, EQ) }
     )

@@ -9,6 +9,7 @@ import arrow.core.extensions.andthen.profunctor.profunctor
 import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.ContravariantLaws
@@ -44,14 +45,20 @@ class AndThenTest : UnitSpec() {
       }
   }
 
-  val GEN = Gen.int().map { AndThen.just<Int, Int>(it).conest() }
+  fun genk() = object : GenK<Conested<ForAndThen, Int>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForAndThen, Int>, A>> {
+      return gen.map {
+        AndThen.just<Int, A>(it).conest()
+      } as Gen<Kind<Conested<ForAndThen, Int>, A>>
+    }
+  }
 
   init {
 
     testLaws(
       MonadLaws.laws(AndThen.monad(), EQK<AndThenPartialOf<Int>>()),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant(), GEN, conestedEQK),
+      ContravariantLaws.laws(AndThen.contravariant(), genk(), conestedEQK),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
     )
