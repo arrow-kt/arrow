@@ -98,6 +98,22 @@ Computation happens when `.value()` is invoked.
 Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value() }
 ```
 
+#### Kind<F, A>#followedBy
+
+Sequences actions, discarding the value of the first argument.
+
+```kotlin:ank
+Option.applicative().run { Some(1).followedBy(Some(2)) }
+```
+
+#### Kind<F, A>#apTap
+
+This is a reverse for `followedBy`. Sequences actions but discarding the value of the second argument.
+
+```kotlin:ank
+Option.applicative().run { Some(1).apTap(Some(2)) } 
+```
+
 ### Apply
 
 A closely related type class is Apply which is identical to Applicative, modulo the ``just`` method. Indeed Applicative is a subclass of Apply with the addition of this method.

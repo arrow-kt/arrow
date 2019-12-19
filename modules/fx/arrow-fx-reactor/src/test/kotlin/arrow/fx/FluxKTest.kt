@@ -3,10 +3,12 @@ package arrow.fx
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
+import arrow.fx.reactor.extensions.fluxk.applicative.applicative
 import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.foldable.foldable
 import arrow.fx.reactor.extensions.fluxk.functor.functor
 import arrow.fx.reactor.extensions.fluxk.monad.flatMap
+import arrow.fx.reactor.extensions.fluxk.monad.monad
 import arrow.fx.reactor.extensions.fluxk.monadFilter.monadFilter
 import arrow.fx.reactor.extensions.fluxk.timer.timer
 import arrow.fx.reactor.extensions.fluxk.traverse.traverse
@@ -65,10 +67,10 @@ class FluxKTest : UnitSpec() {
 
     testLaws(
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
-      AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(FluxK.async(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ()),
-      MonadFilterLaws.laws(FluxK.monadFilter(), { Flux.just(it).k() }, EQ())
+      MonadFilterLaws.laws(FluxK.monadFilter(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), { Flux.just(it).k() }, EQ())
     )
 
     "fx should defer evaluation until subscribed" {

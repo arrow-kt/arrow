@@ -9,7 +9,9 @@ import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
+import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
+import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.listk.monoidK.monoidK
@@ -53,17 +55,13 @@ class ListKTest : UnitSpec() {
     val associativeSemigroupalEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
 
     testLaws(
-      MonadCombineLaws.laws(ListK.monadCombine(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, eq),
+      MonadCombineLaws.laws(ListK.monadCombine(), ListK.functor(), ListK.applicative(), ListK.monad(), { listOf(it).k() }, { i -> listOf({ j: Int -> j + i }).k() }, eq),
       ShowLaws.laws(ListK.show(), eq, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq())), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
       TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
-      MonadCombineLaws.laws(ListK.monadCombine(),
-        { n -> ListK(listOf(n)) },
-        { n -> ListK(listOf({ s: Int -> n * s })) },
-        eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq()), Gen.listK(Gen.int())),
       EqKLaws.laws(
         ListK.eqK(),

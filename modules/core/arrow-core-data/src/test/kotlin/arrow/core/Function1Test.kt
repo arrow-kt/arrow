@@ -1,8 +1,10 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.extensions.function1.applicative.applicative
 import arrow.core.extensions.function1.category.category
 import arrow.core.extensions.function1.divisible.divisible
+import arrow.core.extensions.function1.functor.functor
 import arrow.core.extensions.function1.monad.monad
 import arrow.core.extensions.function1.monoid.monoid
 import arrow.core.extensions.function1.profunctor.profunctor
@@ -36,7 +38,7 @@ class Function1Test : UnitSpec() {
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
       DivisibleLaws.laws(Function1.divisible(Int.monoid()), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
-      MonadLaws.laws(Function1.monad(), EQ),
+      MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), EQ),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
 

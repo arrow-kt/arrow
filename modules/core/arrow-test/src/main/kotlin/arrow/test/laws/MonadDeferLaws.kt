@@ -10,12 +10,58 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
+import arrow.test.laws.MonadDeferLaws.deferConstantEqualsPure
+import arrow.test.laws.MonadDeferLaws.deferSuspendsEvaluation
+import arrow.test.laws.MonadDeferLaws.delayConstantEqualsPure
+import arrow.test.laws.MonadDeferLaws.delayOrRaiseConstantLeftEqualsRaiseError
+import arrow.test.laws.MonadDeferLaws.delayOrRaiseConstantRightEqualsPure
+import arrow.test.laws.MonadDeferLaws.delaySuspendsEvaluation
+import arrow.test.laws.MonadDeferLaws.delayThrowEqualsRaiseError
+import arrow.test.laws.MonadDeferLaws.flatMapSuspendsEvaluation
+import arrow.test.laws.MonadDeferLaws.mapSuspendsEvaluation
+import arrow.test.laws.MonadDeferLaws.propagateErrorsThroughBind
+import arrow.test.laws.MonadDeferLaws.repeatedSyncEvaluationNotMemoized
+import arrow.test.laws.MonadDeferLaws.stackSafetyOnRepeatedMaps
+import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedAttempts
+import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedLeftBinds
+import arrow.test.laws.MonadDeferLaws.stackSafetyOverRepeatedRightBinds
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 object MonadDeferLaws {
+
+  fun <F> monadDeferLaws(
+    SC: MonadDefer<F>,
+    EQ: Eq<Kind<F, Int>>,
+    EQERR: Eq<Kind<F, Int>> = EQ,
+    testStackSafety: Boolean = true
+  ) = listOf(
+    Law("MonadDefer laws: later constant equals pure") { SC.delayConstantEqualsPure(EQ) },
+    Law("MonadDefer laws: later throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
+    Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },
+    Law("MonadDefer laws: laterOrRaise constant right equals pure") { SC.delayOrRaiseConstantRightEqualsPure(EQ) },
+    Law("MonadDefer laws: laterOrRaise constant left equals raiseError") { SC.delayOrRaiseConstantLeftEqualsRaiseError(EQERR) },
+    Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
+    Law("MonadDefer laws: defer suspends evaluation") { SC.deferSuspendsEvaluation(EQ) },
+    Law("MonadDefer laws: later suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
+    Law("MonadDefer laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
+    Law("MonadDefer laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
+    Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
+  ) + if (testStackSafety) {
+    listOf(
+      Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
+      Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
+      Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
+      Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
+    )
+  } else {
+    emptyList()
+  }
 
   fun <F> laws(
     SC: MonadDefer<F>,
@@ -24,28 +70,21 @@ object MonadDeferLaws {
     EQERR: Eq<Kind<F, Int>> = EQ,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) + listOf(
-      Law("MonadDefer laws: later constant equals pure") { SC.delayConstantEqualsPure(EQ) },
-      Law("MonadDefer laws: later throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
-      Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },
-      Law("MonadDefer laws: laterOrRaise constant right equals pure") { SC.delayOrRaiseConstantRightEqualsPure(EQ) },
-      Law("MonadDefer laws: laterOrRaise constant left equals raiseError") { SC.delayOrRaiseConstantLeftEqualsRaiseError(EQERR) },
-      Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
-      Law("MonadDefer laws: defer suspends evaluation") { SC.deferSuspendsEvaluation(EQ) },
-      Law("MonadDefer laws: later suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
-      Law("MonadDefer laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
-      Law("MonadDefer laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
-      Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
-    ) + if (testStackSafety) {
-      listOf(
-        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
-      )
-    } else {
-      emptyList()
-    }
+    BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) +
+      monadDeferLaws(SC, EQ, EQERR, testStackSafety)
+
+  fun <F> laws(
+    SC: MonadDefer<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    EQ: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQERR: Eq<Kind<F, Int>> = EQ,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    BracketLaws.laws(SC, FF, AP, SL, EQ, EQ_EITHER, EQERR) +
+      monadDeferLaws(SC, EQ, EQERR, testStackSafety)
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
