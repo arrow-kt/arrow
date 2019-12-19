@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-A semigroup for some given type `A` has a single operation (which we will call `combine`), which takes two values of type `A`, and returns a value of type `A`. This operation must be guaranteed to be associative. That is to say that:
+A semigroup for some given type `A` has a single operation (which we will call `combine`), which takes two values of type `A`, and returns a value of type `A`. This operation must be guaranteed to be associative. That is to say that,
 
 ```kotlin
 (a.combine(b)).combine(c)
@@ -23,14 +23,14 @@ must be the same as
 a.combine(b.combine(c))
 ```
 
-for all possible values of a, b ,c.
+for all possible values of a, b, c.
 
 There are instances of `Semigroup` defined for many types found in Arrow and the Kotlin std lib.
-For example, `Int` values are combined using addition by default but multiplication is also associative and forms another `Semigroup`.
+For example, `Int` values are combined using addition by default, but multiplication is also associative and forms another `Semigroup`.
 
 ### Examples
 
-Now that you've learned about the Semigroup instance for Int try to guess how it works in the following examples:
+Now that you've learned about the Semigroup instance for Int, try to guess how it works in the following examples:
 
 ```kotlin:ank
 import arrow.*
@@ -64,9 +64,9 @@ Option.semigroup(Int.semigroup()).run {
 }
 ```
 
-Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.
+Many of these types have methods defined directly on them, which allow for this example of combining: `+` on `List`. But the value of having a `Semigroup` typeclass available is that these compose.
 
-Additionaly `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
+Additionaly, `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
 
 ```kotlin:ank
 Option.semigroup(Int.semigroup()).run {

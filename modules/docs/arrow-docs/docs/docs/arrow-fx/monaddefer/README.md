@@ -9,7 +9,7 @@ permalink: /docs/effects/monaddefer/
 
 
 
-`MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension the effects would otherwise run immediately.
+`MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension, the effects would otherwise run immediately.
 
 ```kotlin
 val now = IO.applicative().just(println("eager side effect"))
@@ -31,7 +31,7 @@ All the new combinators added by `MonadDefer` are constructors. `MonadDefer` als
 
 #### invoke
 
-Receives a function returning `A`. The instance is responsible of evaluating the function lazily.
+Receives a function returning `A`. The instance is responsible for evaluating the function lazily.
 
 ```kotlin
 IO.monadDefer().invoke { 1 }
@@ -49,7 +49,7 @@ val songDeferred: DeferredKOf<Url> = getSongUrlAsync(DeferredK.monadDefer())
 
 #### defer
 
-Receives a function returning `Kind<F, A>`. The instance is responsible of creating and running the returned datatype lazily.
+Receives a function returning `Kind<F, A>`. The instance is responsible for creating and running the returned datatype lazily.
 
 ```kotlin
 IO.monadDefer().defer { IO.just(1) }

@@ -6,9 +6,9 @@ permalink: /docs/fx/
 
 # Arrow Fx. Typed FP for the masses
 
-Arrow Fx is a next-generation Typed FP Effects Library that makes effectful and polymorphic programming first class in Kotlin and acts as an extension to the Kotlin native suspend system.
+Arrow Fx is a next-generation Typed FP Effects Library that makes effectful and polymorphic programming first class in Kotlin, and acts as an extension to the Kotlin native suspend system.
 
-The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin and is a fun and easy tool for creating Typed Pure Functional Programs.
+The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
 
 Arrow Fx programs run unmodified in multiple supported frameworks and runtimes such as Arrow Effects IO, KotlinX Coroutines Deferred, Rx2 Observable, and many others.
 
@@ -16,7 +16,7 @@ Arrow Fx programs run unmodified in multiple supported frameworks and runtimes s
 
 ## Pure & Referentially Transparent Functions
 
-A pure function is a function that consistently returns the same output when given the same input. Pure functions exhibit a deterministic behavior and cause no observable effects externally. We call this property, referential transparency.
+A pure function is a function that consistently returns the same output when given the same input. Pure functions exhibit a deterministic behavior and cause no observable effects externally. We call this property referential transparency.
 
 Referential transparency allows us to reason about the different pieces of our program in isolation.
 
@@ -38,11 +38,11 @@ We can state that `helloWorld` is a pure and referentially transparent function 
 
 A side effect is an externally observable effect a function performs in addition to returning a value.
 
-Performing network or file IO, writing to streams, and in general, all functions that return `Unit` are very likely to produce side effects. That's because a `Unit` return value denotes *no useful return* which implies that the function does nothing but perform effects.
+Performing network or file IO, writing to streams, and, in general, all functions that return `Unit` are very likely to produce side effects. That's because a `Unit` return value denotes *no useful return*, which implies that the function does nothing but perform effects.
 
 In Arrow Fx, we use `suspend fun` to denote a function that may cause side effects when invoked.
 
-In the example below, `println(a : Any): Unit` is a side effect because every time it's invoked, it causes observable effects by interacting with the `System.out` stream and signals that it produces no useful output by returning `Unit`.
+In the example below, `println(a : Any): Unit` is a side effect because, every time it's invoked, it causes observable effects by interacting with the `System.out` stream and signals that it produces no useful output by returning `Unit`.
 
 When we denote side effects as `suspend`, the Kotlin compiler will ensure that we're not applying uncontrolled side effects in the pure environment.
 
@@ -60,7 +60,7 @@ sayHello()
 
 Compiling the snippet above will result in a compilation error.
 
-The Kotlin compiler disallows the invocation of suspended functions in the pure environment because  `suspend fun` requires declaration inside another suspended function or a continuation.
+The Kotlin compiler disallows the invocation of suspended functions in the pure environment because `suspend fun` requires declaration inside another suspended function or a continuation.
 
 A continuation is a Kotlin Interface, `Continuation<A>`, that proves we know how to handle success and error cases resulting from running the suspended effect.
 
@@ -120,9 +120,9 @@ When we capture suspended side effects as `IO` values with `effect`, we can pass
 
 #### Applying side effects with `!effect`
 
-We apply side effects with the operator `!`. Once you purify a side effect with `effect`, you can extract its value in a non-blocking way. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures the continuation context controls them before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run at the edge.
+We apply side effects with the operator `!`. Once you purify a side effect with `effect`, you can extract its value in a non-blocking way. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures the continuation context controls them before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent, and will only run at the edge.
 
-Note that running `greet()` in the previous example does not perform any effects because it returns a wrapped lazy value. Since invoking this function does not produce effects, we can be confident that `greet` is pure and referentially transparent despite referring to the effects application.
+Note that running `greet()` in the previous example does not perform any effects because it returns a wrapped lazy value. Since invoking this function does not produce effects, we can be confident that `greet` is pure and referentially transparent, despite referring to the effects application.
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -169,7 +169,7 @@ Arrow enforces usage to be explicit about effects application.
 
 #### Applying existing datatypes
 
-Composition using regular datatypes such as `IO` is still possible within `fx` blocks the same way as `effect` blocks. In addition to `!` you can also use the extension function `bind()` to execute them.
+Composition using regular datatypes such as `IO` is still possible within `fx` blocks just like `effect` blocks. In addition to `!`, you can also use the extension function `bind()` to execute them.
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -191,7 +191,7 @@ fun main() {
 ## Executing effectful programs
 
 The `greet` program is ready to run as soon as the user is ready to commit to an execution strategy that is either `blocking` or `non-blocking`.
-`blocking` execution strategies will block the current thread that's waiting for the program to yield a value whereas `non-blocking` strategies will immediately return and perform the program's work without blocking the current thread.
+`blocking` execution strategies will block the current thread that's waiting for the program to yield a value, whereas `non-blocking` strategies will immediately return and perform the program's work without blocking the current thread.
 
 Since both blocking and non-blocking execution scenarios perform side effects, we consider running effects as an `unsafe` operation.
 
@@ -225,9 +225,9 @@ fun main() { // The edge of our world
 
 Arrow Fx emphasizes the guarantee that users understand when they are performing side effects in their program declaration.
 
-Arrow Fx programs are not restricted to `IO` but, in fact, are polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux`, and in general, any third party data type that can model sync and async effect suspension. See [Issue 1281](https://github.com/arrow-kt/arrow/issues/1281) which tracks support for those frameworks or reach out to us if you are interested in support for any other framework.
+Arrow Fx programs are not restricted to `IO` but, in fact, are polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux`, and, in general, any third party data type that can model sync and async effect suspension. See [Issue 1281](https://github.com/arrow-kt/arrow/issues/1281), which tracks support for those frameworks, or reach out to us if you are interested in support for any other framework.
 
-If you're not very familiar with Functional Programming, and you've made it this far, you may realize that despite the buzzwords and some FP jargon, you already know how to use Arrow Fx in general. This is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming.
+If you're not very familiar with Functional Programming, and you've made it this far, you may realize that, despite the buzzwords and some FP jargon, you already know how to use Arrow Fx in general. This is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming.
 
 
 # Conclusion
@@ -235,8 +235,8 @@ If you're not very familiar with Functional Programming, and you've made it this
 Complementing the Kotlin Coroutines library, Arrow Fx adds an extra layer of safety to concurrent and asynchronous programming so you're well aware of where effects are localized in your apps.
 It does this by empowering polymorphic programs that can be interpreted untouched, preserving the same declaration in multiple popular frameworks such as Rx2, Reactor, etc.
 
-Arrow Fx offers direct style syntax and effect control without compromises and removes the syntactic burden of type parametrization while still yielding programs that are pure, safe, and referentially transparent.
+Arrow Fx offers direct style syntax and effect control without compromises, and removes the syntactic burden of type parametrization while still yielding programs that are pure, safe, and referentially transparent.
 
-Despite some limitations of the Kotlin type system like lack of Higher Kinded Types, the Kotlin language is excellent for encoding typed programs with a first-class imperative syntax for FP. These programs are approachable by the broader programming community and arguably easier to encode than some solutions currently used in mainstream Kotlin and Scala FP communities.
+Despite some limitations of the Kotlin type system, like lack of Higher Kinded Types, the Kotlin language is excellent for encoding typed programs with a first-class imperative syntax for FP. These programs are approachable by the broader programming community, and arguably easier to encode than some solutions currently used in mainstream Kotlin and Scala FP communities.
 
 Come check out Arrow fx and join the discussion in the Kotlin Slack and Gitter at [arrow-kt.io]()

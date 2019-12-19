@@ -7,11 +7,11 @@ permalink: /docs/optics/iso/
 ## Iso
 
 
-An `Iso` is a lossless invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
+An `Iso` is a lossless invertible optic that defines an isomorphism between a type `S` and `A` (i.e., a data class and its properties represented by `TupleN`).
 
-Isos can be seen as a pair of functions that represent an isomorphism, `get` and `reverseGet`. So an `Iso<S, A>` represents two getters: `get: (S) -> A` and `reverseGet: (A) -> S` where `S` is called the source of the `Iso` and `A` is called the focus or target of the `Iso`.
+Isos can be seen as a pair of functions that represent an isomorphism, `get`, and `reverseGet`. So, an `Iso<S, A>` represents two getters: `get: (S) -> A` and `reverseGet: (A) -> S`, where `S` is called the source of the `Iso`, and `A` is called the focus or target of the `Iso`.
 
-A simple structure `Point2D` is equivalent to `Tuple2<Int, Int>` so we can create an `Iso<Point2D, Tuple2<Int, Int>>`
+A simple structure `Point2D` is equivalent to `Tuple2<Int, Int>`, so we can create an `Iso<Point2D, Tuple2<Int, Int>>`
 
 ```kotlin:ank
 import arrow.*
@@ -36,13 +36,13 @@ tuple
 pointIsoTuple.reverseGet(tuple)
 ```
 
-Given an `Iso<Point2D, Tuple2<Int, Int>>` we also have an `Iso<Tuple2<Int, Int>, Point2D>` since it represents an isomorphism between equivalent structures we can reverse it.
+Given an `Iso<Point2D, Tuple2<Int, Int>>`, we also have an `Iso<Tuple2<Int, Int>, Point2D>`. Since it represents an isomorphism between equivalent structures, we can reverse it.
 
 ```kotlin:ank:silent
 val reversedIso: Iso<Tuple2<Int, Int>, Point2D> = pointIsoTuple.reverse()
 ```
 
-Using an `Iso` we can modify our source `S` with a function that works on our focus `A`.
+Using an `Iso`, we can modify our source `S` with a function that works on our focus `A`.
 
 ```kotlin:ank
 val addFive: (Tuple2<Int, Int>) -> Tuple2<Int, Int> = { tuple2 -> (tuple2.a + 5) toT (tuple2.b + 5) }
@@ -56,7 +56,7 @@ val liftedAddFive: (Point2D) -> Point2D = pointIsoTuple.lift(addFive)
 liftedAddFive(point)
 ```
 
-We can do the same with a Functor mapping
+We can do the same with a Functor mapping.
 
 ```kotlin:ank
 import arrow.core.*
@@ -77,7 +77,7 @@ liftF(point)
 
 ### Composition
 
-By composing isos we can create additional isos without defining them. When dealing with different APIs or frameworks we frequently run into multiple equivalent but different structures like `Point2D`, `Tuple2`, `Pair`, `Coord`, etc.
+By composing Isos, we can create additional Isos without defining them. When dealing with different APIs or frameworks, we frequently run into multiple equivalent but different structures like `Point2D`, `Tuple2`, `Pair`, `Coord`, etc.
 
 ```kotlin
 data class Coord(val xAxis: Int, val yAxis: Int)
@@ -93,9 +93,9 @@ val tupleIsoPair: Iso<Tuple2<Int, Int>, Pair<Int, Int>> = Iso(
 )
 ```
 
-By composing `pointIsoTuple`, `pairIsoCoord` and `tupleIsoPair` (and/or reversing) we can use `Point2D`, `Tuple2<Int, Int>`, `Pair<Int, Int>` and `Coord` interchangeably as we can lift functions to the required structure.
+By composing `pointIsoTuple`, `pairIsoCoord`, and `tupleIsoPair` (and/or reversing), we can use `Point2D`, `Tuple2<Int, Int>`, `Pair<Int, Int>`, and `Coord` interchangeably as we can lift functions to the required structure.
 
-Composing an `Iso` with functions can also be useful to change input or output type of a function. In the `Iso<A?, Option<A>>` is available in `arrow-optics` as `nullableToOption()`.
+Composing an `Iso` with functions can also be useful for changing the input or output type of a function. The `Iso<A?, Option<A>>` is available in `arrow-optics` as `nullableToOption()`.
 
 ```kotlin
 val unknownCode: (String) -> String? = { value ->
@@ -106,7 +106,7 @@ val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
 (unknownCode andThen nullableOptionIso::get)("Retrieve an Option")
 ```
 
-`Iso` can be composed with all optics and composition them results in the following optics.
+`Iso` can be composed with all optics, and composing them results in the following optics:
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
 
 ### Generating isos
 
-To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@optics` annotation.
+To avoid boilerplate, Isos can be generated for a `data class` to `TupleN` with two to 10 parameters by the `@optics` annotation.
 The `Iso` will be generated as a extension property on the companion object `val T.Companion.iso`.
 
 ```kotlin
@@ -126,10 +126,10 @@ The `Iso` will be generated as a extension property on the companion object `val
 val iso: Iso<Pos, Tuple2<Int, Int>> = Pos.iso
 ```
 
-### Polymorphic isos
-When dealing with polymorphic equivalent structures we can create polymorphic isos to allow us to morph the type of the focus (and as a result the constructed type) of our `PIso`.
+### Polymorphic Isos
+When dealing with polymorphic equivalent structures, we can create polymorphic Isos allowing us to morph the type of the focus (and, as a result, the constructed type) of our `PIso`.
 
-Given our previous structures `Tuple2<A, B>` and `Pair<A, B>` we can create a polymorphic `PIso` that represents a `get: (Tuple2<A, B>) -> Pair<A, B>` and a `reverseGet: (Tuple2<C, D) -> Pair<C, D>`.
+Given our previous structures `Tuple2<A, B>` and `Pair<A, B>`, we can create a polymorphic `PIso` that represents a `get: (Tuple2<A, B>) -> Pair<A, B>` and a `reverseGet: (Tuple2<C, D) -> Pair<C, D>`.
 
 ```kotlin
 fun <A, B, C, D> tuple2(): PIso<Tuple2<A, B>, Pair<C, D>, Pair<A, B>, Tuple2<C, D>> = PIso(
@@ -138,7 +138,7 @@ fun <A, B, C, D> tuple2(): PIso<Tuple2<A, B>, Pair<C, D>, Pair<A, B>, Tuple2<C, 
 )
 ```
 
-Above defined `PIso` can lift a `reverse` function of `(Pair<A, B>) -> Tuple2<B, A>` to a function `(Tuple2<A, B>) -> Pair<B, A>`.
+`PIso` (defined above) can lift a `reverse` function of `(Pair<A, B>) -> Tuple2<B, A>` to a function `(Tuple2<A, B>) -> Pair<B, A>`.
 
 ```kotlin
 val reverseTupleAsPair: (Tuple2<Int, String>) -> Pair<String, Int> =

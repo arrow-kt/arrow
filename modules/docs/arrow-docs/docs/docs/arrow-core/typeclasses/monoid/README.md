@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-`Monoid` extends the `Semigroup` type class, adding an `empty` method to semigroup's `combine`. The empty method must return a value that when combined with any other instance of that type returns the other instance, i.e.
+`Monoid` extends the `Semigroup` type class, adding an `empty` method to semigroup's `combine`. The empty method must return a value that, when combined with any other instance of that type, returns the other instance, i.e.,
 
 ```kotlin
 (combine(x, empty) == combine(empty, x) == x)
@@ -44,7 +44,7 @@ import arrow.core.extensions.option.monoid.*
 Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```
 
-The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, e.g.
+The advantage of using these type class provided methods, rather than the specific ones for each type, is that we can compose monoids to allow us to operate on more complex types, for example.
 
 This is also true if we define our own instances. As an example, let's use `Foldable`'s `foldMap`, which maps over values accumulating the results, using the available `Monoid` for the type mapped onto.
 
@@ -75,7 +75,7 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
   }
 ```
 
-This way we are able to combine both values in one pass, hurrah!
+This way, we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
 val M = monoidTuple(Int.monoid(), String.monoid())

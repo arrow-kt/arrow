@@ -13,10 +13,10 @@ permalink: /docs/optics/at/
 
 ### Example
 
-If for a structure `S` the focus `A` can be indexed by `I` then `At` can create an `Lens` with focus at `S` for a given index `I`.
-We can use that `Lens` to operate on that focus `S` to get, set and modify the focus at a given index `I`.
+If, for a structure `S`, the focus `A` can be indexed by `I`, then `At` can create an `Lens` with focus at `S` for a given index `I`.
+We can use that `Lens` to operate on that focus `S` to get, set, and modify the focus at a given index `I`.
 
-A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index an entry can be found.
+A `MapK<Int, String>` can be indexed by its keys `Int`, but not for every index where an entry can be found.
 
 ```kotlin:ank
 import arrow.core.*
@@ -34,7 +34,7 @@ val map = mapOf(
 mapAt.set(map, "new value".some())
 ```
 
-By setting an empty value for a key we delete that entry by removing the value.
+By setting an empty value for a key, we delete that entry by removing the value.
 
 ```kotlin:ank
 mapAt.set(map, none())

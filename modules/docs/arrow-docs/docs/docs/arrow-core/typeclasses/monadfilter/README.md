@@ -17,11 +17,11 @@ All instances of `MonadFilter` provide syntax over their respective data types t
 
 ## continueIf
 
-Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning monad filter instance `empty()` value.
+Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `continueIf` guard that requires a `Boolean` predicate as value. If the predicate is `true`, the computation will continue. And if the predicate returns `false`, the computation is short-circuited, returning monad filter instance `empty()` value.
 
-In the example below we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListK` since both data types can provide a safe `empty` value.
+In the example below, we demonstrate monadic comprehension over the `MonadFilter` instances for both `Option` and `ListK` since both data types can provide a safe `empty` value.
 
-When `continueIf` is satisfied the computation continues
+When `continueIf` is satisfied, the computation continues.
 
 ```kotlin:ank
 import arrow.*
@@ -52,7 +52,7 @@ ListK.monadFilter().fx.monadFilter {
 }
 ```    
 
-When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned
+When `continueIf` returns `false`, the computation is interrupted and the `empty()` value is returned.
 
 ```kotlin:ank
 Option.monadFilter().fx.monadFilter {
@@ -76,9 +76,9 @@ ListK.monadFilter().fx.monadFilter {
 
 ## bindWithFilter
 
-Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `bindWithFilter` guard that requires a `Boolean` predicate as value getting matched on the monad capturing inner value. If the predicate is `true` the computation will continue and if the predicate returns `false` the computation is short-circuited returning the monad filter instance `empty()` value.
+Binding over `MonadFilter` instances with `fx.monadFilter` brings into scope the `bindWithFilter` guard that requires a `Boolean` predicate as value getting matched on the monad capturing inner value. If the predicate is `true`, the computation will continue. And if the predicate returns `false`, the computation is short-circuited, returning the monad filter instance `empty()` value.
 
-When `bindWithFilter` is satisfied the computation continues
+When `bindWithFilter` is satisfied the computation continues.
 
 ```kotlin:ank
 Option.monadFilter().fx.monadFilter {
@@ -96,7 +96,7 @@ ListK.monadFilter().fx.monadFilter {
 }
 ```
 
-When `bindWithFilter` returns `false` the computation short circuits yielding the monad's empty value
+When `bindWithFilter` returns `false`, the computation short circuits, yielding the monad's empty value.
 
 ```kotlin:ank
 Option.monadFilter().fx.monadFilter {

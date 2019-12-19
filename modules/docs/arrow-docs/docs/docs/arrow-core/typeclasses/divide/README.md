@@ -12,11 +12,11 @@ redirect_from:
 
 
 `Divide` is a typeclass that models the divide part of divide and conquer.
-`Divide` basically states: Given a `Kind<F, A>` and a `Kind<F, B>` and a way to turn `C` into a tuple of `A` and `B` it provides you a `Kind<F, C>`
+`Divide` basically states: Given a `Kind<F, A>` and a `Kind<F, B>`, and a way to turn `C` into a tuple of `A` and `B`, it provides you a `Kind<F, C>`.
 
-A useful example is deriving serializers for a datatype from simpler serializers
+A useful example is deriving serializers for a datatype from simpler serializers.
 
-Here we can easily construct a serializer for a `Tuple<A, B>` because we already have a serializer for `A` and `B`. Since most data classes can be expressed with tuples writing serializers by combining them like this is trivial.
+Here, we can easily construct a serializer for a `Tuple<A, B>` because we already have a serializer for `A` and `B`. Since most data classes can be expressed with tuples, writing serializers by combining them like this is trivial.
 
 ```kotlin:ank:playground
 import arrow.typeclasses.Divide

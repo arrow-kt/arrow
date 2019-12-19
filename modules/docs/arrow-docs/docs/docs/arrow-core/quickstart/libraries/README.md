@@ -9,10 +9,10 @@ permalink: /docs/quickstart/libraries/
 Arrow is a modular set of libraries that build on top of each other to provide increasingly higher level features.
 
 One of our design principles is to keep each library as lean as possible to avoid pulling unnecessary dependencies,
-specially to support Android development where app size affects performance. You're free to pick and choose only those libraries that your project needs!
+specifically to support Android development where app size affects performance. You're free to pick and choose only those libraries that your project needs!
 Thereby, one only needs to download the toplevel artifacts if it's desired to download the datatypes, typeclasses and their respective extensions.
 
-In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
+In this doc, we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 #### Table of Content
 * [arrow-core]({{ '/docs/quickstart/libraries/#arrow-core' | relative_url }})
@@ -68,7 +68,7 @@ Optics is the functional way of handling immutable data and collections in a way
 
 Arrow Optics offers a way of declaring how to focus deeply into immutable structure without boilerplate. It also offers an [Optics DSL]({{ '/docs/optics/dsl/' | relative_url }})  to elegantly describe complex use-cases in an elegant and simple manner without requiring to understand the underlying theory.
 
-For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
+For all the new typeclasses, it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
 Dependency: `arrow-core`
 
@@ -86,7 +86,7 @@ Dependency: `arrow-core`
 
 ## Extension libraries
 
-These libraries are hosted inside the arrow repository building on the core, to provide higher level constructs to deal with concepts rather than code abstraction.
+These libraries are hosted inside the Arrow repository building on the core, to provide higher level constructs to deal with concepts rather than code abstraction.
 
 ### arrow-syntax
 
@@ -98,7 +98,7 @@ dependencies {
 
 Multiple extensions functions to work better with function objects and collections.
 
-For function objects the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
+For function objects, the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
 
 For collections, arrow-syntax provides `firstOption`, tail, basic list traversal, and tuple addition.
 
@@ -187,7 +187,7 @@ dependencies {
 }
 ```
 
-The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes, through the use of typeclasses.
+The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
 
 Dependency: `arrow-fx`
 
@@ -199,7 +199,7 @@ dependencies {
 }
 ```
 
-The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpreting domain specific languages from inside your program, including a configurable runner and flexible algebras.
+The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpreting domain-specific languages from inside your program, including a configurable runner and flexible algebras.
 This allows optimization of operations like operator fusion or parallelism, while remaining on your business domain.
 
 Dependency: `arrow-free-data`

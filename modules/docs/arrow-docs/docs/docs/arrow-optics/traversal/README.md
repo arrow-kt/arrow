@@ -7,10 +7,10 @@ permalink: /docs/optics/traversal/
 ## Traversal
 
 
-A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
+A `Traversal` is an optic that can see into a structure and get, set, or modify 0 to N foci.
 
-It is a generalization of [`Traverse#traverse`](/docs/arrow/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
-We can think of `Kind<F, A>` as a structure `S` that has a focus `A`. So given a `PTraversal<S, T, A, B>` we can apply a function `(A) -> Kind<F, B>` to `S` and get `Kind<F, T>`.
+It is a generalization of [`Traverse#traverse`](/docs/arrow/typeclasses/traverse). Given a `Traverse<F>`, we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
+We can think of `Kind<F, A>` as a structure `S` that has a focus `A`. So, given a `PTraversal<S, T, A, B>`, we can apply a function `(A) -> Kind<F, B>` to `S` and get `Kind<F, T>`.
 
  - `Traverse.traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<F, B>>`
  - `PTraversal.modifyF(s: S, f: (A) -> Kind<F, B>, GA: Applicative<F>): Kind<F, T>`
@@ -90,7 +90,7 @@ val nestedStrings = listOfPairTraversal compose Tuple2.traversal<String>()
 nestedStrings.fold(String.monoid(), listOf("Hello, " toT "World ", "from " toT "nested structures!").k())
 ```
 
-`Traversal` can be composed with all optics and results in the following optics.
+`Traversal` can be composed with all optics, and results in the following optics:
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
@@ -98,9 +98,9 @@ nestedStrings.fold(String.monoid(), listOf("Hello, " toT "World ", "from " toT "
 
 ### Polymorphic Traversal
 
-When dealing with polymorphic types we can also have polymorphic `Traversal`s that allow us to morph the type of the foci.
-Previously we used a `Traversal<ListKOf<Int>, Int>`, it was able to morph the `Int` values in the constructed type `ListK<Int>`.
-With a `PTraversal<ListKOf<Int>, ListKOf<String>, Int, String>` we can morph an `Int` to a `String` and thus also morph the type from `ListK<Int>` to `ListK<String>`.
+When dealing with polymorphic types, we can also have polymorphic `Traversal`s that allow us to morph the type of the foci.
+Previously, we used a `Traversal<ListKOf<Int>, Int>`; it was able to morph the `Int` values in the constructed type `ListK<Int>`.
+With a `PTraversal<ListKOf<Int>, ListKOf<String>, Int, String>`, we can morph an `Int` to a `String`, and thus, also morph the type from `ListK<Int>` to `ListK<String>`.
 
 ```kotlin:ank
 val pTraversal: PTraversal<ListKOf<Int>, ListKOf<String>, Int, String> = PTraversal.fromTraversable(ListK.traverse())

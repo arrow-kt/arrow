@@ -12,9 +12,9 @@ redirect_from:
 
 
 `Divisible` extends upon `Divide` by providing an empty method called `conquer`.
-`conquer` is useful to prove identiy laws when working with `Divisible` instances.
+`conquer` is useful for proving identiy laws when working with `Divisible` instances.
 
-Extending the serializer example from `Divide` `conquer` would simply serialize data to an empty string.
+Extending the serializer example from `Divide`, `conquer` would simply serialize data to an empty string.
 
 ```kotlin:ank:playground
 import arrow.Kind
@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
 
 #### conquer
 
-Construct an empty value for any `Kind<F, A>`.
+Constructs an empty value for any `Kind<F, A>`.
 
 ### Laws
 

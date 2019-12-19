@@ -9,11 +9,11 @@ permalink: /docs/effects/async/
 
 
 
-Being able to run code in a different context of execution (i.e. thread) than the current one implies that, even if it's part of a sequence, the code will have to be asynchronous.
+Being able to run code in a different context of execution (i.e., thread) than the current one implies that, even if it's part of a sequence, the code will have to be asynchronous.
 Running asynchronous code always requires a callback after completion on error capable of returning to the current thread.
 
 The same way the typeclass [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) represents a sequence of events, and [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) a sequence that can fail, the typeclass `Async` represents asynchronous code with a callback.
-Examples of that can run code asynchronously are typically datatypes that can suspend effects, and delay evaluation.
+Examples that can run code asynchronously are typically datatypes that can suspend effects and delay evaluation.
 
 ```kotlin:ank
 import arrow.*
@@ -41,8 +41,8 @@ IO.async()
 #### async
 
 Receives a function returning `Unit` with a callback as a parameter.
-The function is responsible of calling the callback once it obtains a result.
-The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) represents an error in the execution and the right side is the completion value of the operation.
+The function is responsible for calling the callback once it obtains a result.
+The callback accepts `Either<Throwable, A>` as the return, where the left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution, and the right side is the completion value of the operation.
 
 ```kotlin
 IO.async()
@@ -68,7 +68,7 @@ IO.async()
 
 #### continueOn
 
-It makes the rest of the operator chain to be executed on a separate `CoroutineContext`, effectively jumping threads if necessary.
+It makes the rest of the operator chain execute on a separate `CoroutineContext`, effectively jumping threads if necessary.
 
 ```kotlin
 IO.async().run {
@@ -83,13 +83,13 @@ IO.async().run {
 }
 ```
 
-Behind the scenes `continueOn()` starts a new coroutine and passes the rest of the chain as the block to execute.
+Behind the scenes, `continueOn()` starts a new coroutine and passes the rest of the chain as the block to execute.
 
 The function `continueOn()` is also available inside [`Monad Comprehensions`]({{ '/docs/patterns/monad_comprehensions' | relative_url }}).
 
 #### effect
 
-Similar to `MonadDefer`'s `later`, this constructor takes a single suspended function and optionally the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `later`, this constructor takes a single suspended function and, optionally, the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
@@ -135,7 +135,7 @@ IO.async().run {
 
 Creates an object using `async()` whose callback is never called.
 
-Depending on how the datatype is implemented this may cause unexpected errors like awaiting forever for a result.
+Depending on how the datatype is implemented, this may cause unexpected errors like awaiting forever for a result.
 
 Use with *SEVERE CAUTION*.
 

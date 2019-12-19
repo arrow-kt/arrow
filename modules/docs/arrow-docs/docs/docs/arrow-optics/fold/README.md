@@ -7,10 +7,10 @@ permalink: /docs/optics/fold/
 ## Fold
 
 
-Note: Don't confuse with the collection aggregate operation [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce).
+Note: Don't confuse this with the collection aggregate operation [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce).
 
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
-It is a generalisation of an instance of [`Foldable`](/docs/arrow/typeclasses/foldable).
+It is a generalization of an instance of [`Foldable`](/docs/arrow/typeclasses/foldable).
 
 Creating a `Fold` can be done by manually defining `foldMap`.
 
@@ -34,7 +34,7 @@ import arrow.core.extensions.nonemptylist.foldable.*
 val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
 ```
 
-`Fold` has a similar API as `Foldable` but because it's defined in terms of `foldMap` there are no associative fold functions available.
+`Fold` has an API similar to `Foldable`, but because it's defined in terms of `foldMap`, there are no associative fold functions available.
 
 ```kotlin:ank
 nullableFold<Int>().isEmpty(null)
@@ -63,7 +63,7 @@ val nestedNel = NonEmptyList.of(1, 2, 3, 4).map {
 (nestedNelFold compose nonEmptyIntFold).getAll(nestedNel)
 ```
 
-`Fold` can be composed with all optics but `Setter` and results in the following optics.
+`Fold` can be composed with all optics except `Setter`, and results in the following optics.
 
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
