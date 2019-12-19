@@ -9,19 +9,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-sealed class IOResult<out E, out A> {
-  data class Right<A>(val value: A) : IOResult<Nothing, A>()
-  data class Error<E>(val error: E) : IOResult<E, Nothing>()
-  data class Exception(val exception: Throwable) : IOResult<Nothing, Nothing>()
-
-  fun <R> fold(ifException: (Throwable) -> R, ifLeft: (E) -> R, ifRight: (A) -> R): R =
-    when (this) {
-      is Right -> ifRight(this.value)
-      is Error -> ifLeft(this.error)
-      is Exception -> ifException(this.exception)
-    }
-}
-
 private typealias Current = IOOf<Any?, Any?>
 private typealias BindF = (Any?) -> IO<Any?, Any?>
 private typealias CallStack = ArrayStack<BindF>

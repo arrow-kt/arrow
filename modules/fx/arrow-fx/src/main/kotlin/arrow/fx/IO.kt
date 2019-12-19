@@ -36,6 +36,19 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+sealed class IOResult<out E, out A> {
+  data class Right<A>(val value: A) : IOResult<Nothing, A>()
+  data class Error<E>(val error: E) : IOResult<E, Nothing>()
+  data class Exception(val exception: Throwable) : IOResult<Nothing, Nothing>()
+
+  fun <R> fold(ifException: (Throwable) -> R, ifLeft: (E) -> R, ifRight: (A) -> R): R =
+    when (this) {
+      is Right -> ifRight(this.value)
+      is Error -> ifLeft(this.error)
+      is Exception -> ifException(this.exception)
+    }
+}
+
 class ForIO private constructor() {
   companion object
 }
@@ -888,7 +901,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <E, A> IOOf<E, A>.handleError(f: (Throwable) -> A, fe: (E) -> A): IO<Nothing, A> =
-  handleErrorWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
+  handleAllWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
 
 fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
   handleError(f, ::identity)
@@ -912,8 +925,6 @@ fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
  *   println(result.unsafeRunSync())
  * }
  * ```
- *
- * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <E, A, E2 : E> IOOf<E, A>.handleErrorWith(f: (Throwable) -> IOOf<E2, A>, fe: (E) -> IOOf<E2, A>): IO<E2, A> =
   IO.Bind(this, IOFrame.Companion.ErrorHandler(f, fe))
@@ -1057,11 +1068,11 @@ fun <E, A, E2, B : A> IOOf<E, A>.flatMapLeft(f: (E) -> IOOf<E2, A>): IO<E2, A> =
     else -> IO.Bind(bio, IOFrame.Companion.MapError(f))
   }
 
-fun <E, A, E2> IOOf<E, A>.mapLeft(f: (E) -> E2): IO<E2, A> =
+fun <E, A, E2> IOOf<E, A>.mapError(f: (E) -> E2): IO<E2, A> =
   flatMapLeft { e -> IO.RaiseError(f(e)) }
 
 fun <E, A, E2, B> IOOf<E, A>.bimap(fe: (E) -> E2, fa: (A) -> B): IO<E2, B> =
-  mapLeft(fe).map(fa)
+  mapError(fe).map(fa)
 
 /**
  * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
