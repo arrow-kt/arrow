@@ -60,7 +60,7 @@ inline fun <E, A> IOOf<E, A>.fix(): IO<E, A> =
   this as IO<E, A>
 
 typealias IOProc<E, A> = ((IOResult<E, A>) -> Unit) -> Unit
-typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<Nothing, Unit>
+typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<E, Unit>
 
 @Suppress("StringLiteralDuplication")
 sealed class IO<out E, out A> : IOOf<E, A> {
@@ -224,7 +224,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * }
      * ```
      */
-    fun <A> defer(f: () -> IOOf<Nothing, A>): IO<Nothing, A> =
+    fun <E, A> defer(f: () -> IOOf<E, A>): IO<E, A> =
       Suspend(f)
 
     /**
@@ -337,7 +337,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->
-            result.fold({ e -> callback(IOResult.Exception(e)) }, mapUnit, mapUnit)
+            result.fold({ e -> callback(IOResult.Exception(e)) }, { e -> callback(IOResult.Error(e)) }, mapUnit)
           }
         }
       }
@@ -560,10 +560,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * }
      * ```
      */
-    fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Nothing, Either<A, B>>): IO<Nothing, B> =
+    fun <E, A, B> tailRecM(a: A, f: (A) -> IOOf<E, Either<A, B>>): IO<E, B> =
       f(a).fix().flatMap {
         when (it) {
-          is Either.Left -> tailRecM(it.a, f)
+          is Left -> tailRecM(it.a, f)
           is Either.Right -> just(it.b)
         }
       }
@@ -1166,7 +1166,7 @@ fun <A, B> IOOf<Nothing, A>.bracket(release: (A) -> IOOf<Nothing, Unit>, use: (A
  * }
  *  ```
  */
-fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   IOBracket(this, release, use)
 
 /**

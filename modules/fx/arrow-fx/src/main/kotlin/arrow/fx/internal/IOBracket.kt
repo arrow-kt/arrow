@@ -1,9 +1,7 @@
 package arrow.fx.internal
 
-import arrow.core.Either
 import arrow.core.nonFatalOrThrow
 import arrow.fx.IO
-import arrow.fx.ForIO
 import arrow.fx.IOConnection
 import arrow.fx.IOFrame
 import arrow.fx.IOOf
@@ -11,8 +9,7 @@ import arrow.fx.IOResult
 import arrow.fx.IORunLoop
 import arrow.fx.fix
 import arrow.fx.flatMap
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ExitCase
+import arrow.fx.handleErrorWith
 import arrow.fx.typeclasses.ExitCase2
 import kotlinx.atomicfu.atomic
 
@@ -21,7 +18,7 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <E, E2 : E, A, B> invoke(acquire: IOOf<E, A>, release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<E2, B>): IO<E2, B> =
+  operator fun <E, E2 : E, A, B> invoke(acquire: IOOf<E, A>, release: (A, ExitCase2<E>) -> IOOf<E2, Unit>, use: (A) -> IOOf<E2, B>): IO<E2, B> =
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
@@ -42,20 +39,13 @@ internal object IOBracket {
   // Internals of `IO.bracketCase`.
   private class BracketStart<E, E2 : E, A, B>(
     val use: (A) -> IOOf<E2, B>,
-    val release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>,
+    val release: (A, ExitCase2<E>) -> IOOf<E2, Unit>,
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
     val cb: (IOResult<E2, B>) -> Unit
   ) : (IOResult<E, A>) -> Unit {
-
-    // This runnable is a dirty optimization to avoid some memory allocations;
-    // This class switches from being a Callback to a Runnable, but relies on the internal IO callback protocol to be
-    // respected (called at most once).
-    private var result: Either<Throwable, A>? = null
-
     override fun invoke(ea: IOResult<E, A>) {
-      // Introducing a light async boundary, otherwise executing the required
-      // logic directly will yield a StackOverflowException
+      // Introducing a light async boundary, otherwise executing the required logic directly will yield a StackOverflowException
       Platform.trampoline {
         when (ea) {
           is IOResult.Success -> {
@@ -72,9 +62,8 @@ internal object IOBracket {
             }
 
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
-            deferredRelease.complete(frame.cancel)
-            // Actual execution
-            IORunLoop.startCancelable<E2, B>(onNext(), conn, cb)
+            deferredRelease.complete(frame.cancel.rethrow)
+            IORunLoop.startCancelable(onNext(), conn, cb)
           }
           is IOResult.Error -> cb(ea as IOResult<E2, B>)
           is IOResult.Exception -> cb(ea)
@@ -90,7 +79,7 @@ internal object IOBracket {
         val onNext = source.flatMap(frame)
         // Registering our cancelable token ensures that in case
         // cancellation is detected, `release` gets called
-        conn.push(frame.cancel)
+        conn.push(frame.cancel.rethrow)
 
         // Race condition check, avoiding starting `source` in case
         // the connection was already cancelled — n.b. we don't need
@@ -99,16 +88,16 @@ internal object IOBracket {
       }
     }
 
-  private class BracketReleaseFrame<E, A, B>(val a: A, val releaseFn: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>) :
+  private class BracketReleaseFrame<E, A, B>(val a: A, val releaseFn: (A, ExitCase2<E>) -> IOOf<E, Unit>) :
     BaseReleaseFrame<E, A, B>() {
 
-    override fun release(c: ExitCase2<E>): IOOf<Nothing, Unit> =
+    override fun release(c: ExitCase2<E>): IOOf<E, Unit> =
       releaseFn(a, c)
   }
 
-  private class EnsureReleaseFrame<E, A>(val releaseFn: (ExitCase2<E>) -> IOOf<Nothing, Unit>) : BaseReleaseFrame<E, Unit, A>() {
+  private class EnsureReleaseFrame<E, A>(val releaseFn: (ExitCase2<E>) -> IOOf<E, Unit>) : BaseReleaseFrame<E, Unit, A>() {
 
-    override fun release(c: ExitCase2<E>): IOOf<Nothing, Unit> = releaseFn(c)
+    override fun release(c: ExitCase2<E>): IOOf<E, Unit> = releaseFn(c)
   }
 
   private abstract class BaseReleaseFrame<E, A, B> : IOFrame<E, B, IO<E, B>> {
@@ -117,26 +106,24 @@ internal object IOBracket {
     // of the release; otherwise `release` can be called twice
     private val waitsForResult = atomic(true)
 
-    abstract fun release(c: ExitCase2<E>): IOOf<Nothing, Unit>
+    abstract fun release(c: ExitCase2<E>): IOOf<E, Unit>
 
-    private fun applyRelease(e: ExitCase2<E>): IO<Nothing, Unit> =
+    private fun applyRelease(e: ExitCase2<E>): IO<E, Unit> =
       IO.defer {
-        if (waitsForResult.compareAndSet(true, false))
-          release(e)
-        else
-          IO.unit
+        if (waitsForResult.compareAndSet(true, false)) release(e)
+        else IO.unit
       }
 
-    val cancel: IOOf<Nothing, Unit> = applyRelease(ExitCase2.Canceled).fix().uncancelable()
+    val cancel: IOOf<E, Unit> = applyRelease(ExitCase2.Canceled).fix().uncancelable()
 
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<Nothing, B> =
-      IO.ContextSwitch(applyRelease(ExitCase2.Exception(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
-        .flatMap(ReleaseRecoverException(e))
+    override fun recover(e: Throwable): IO<E, B> =
+      IO.Bind(IO.ContextSwitch(applyRelease(ExitCase2.Exception(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop),
+        ReleaseRecoverException(e))
 
-    override operator fun invoke(a: B): IO<Nothing, B> =
+    override operator fun invoke(a: B): IO<E, B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
       // otherwise we might have a conflict with the auto-cancellation logic
@@ -144,8 +131,8 @@ internal object IOBracket {
         .map { a }
 
     override fun handleError(e: E): IO<E, B> =
-      IO.ContextSwitch(applyRelease(ExitCase2.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
-        .flatMap(ReleaseRecoverError(e))
+      IO.Bind(IO.ContextSwitch(applyRelease(ExitCase2.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop),
+        ReleaseRecoverError(e))
   }
 
   private class ReleaseRecoverException(val error: Throwable) : IOFrame<Any?, Unit, IO<Nothing, Nothing>> {
@@ -176,3 +163,11 @@ internal object IOBracket {
       old
     }
 }
+
+// TODO hide in `IOConnection` and this would become Arrow's version of RxJava's
+//  `UndeliverableException` where a value is produced or an error occurs after cancelation.
+private class UnhandeledError(val error: Any?) : Throwable() {
+  override fun fillInStackTrace(): Throwable = this
+}
+private val <E, A> IOOf<E, A>.rethrow: IO<Nothing, A>
+  get() = handleErrorWith({ t -> IO.raiseException<Nothing>(t) }, { e -> IO.raiseException(UnhandeledError(e)) })
