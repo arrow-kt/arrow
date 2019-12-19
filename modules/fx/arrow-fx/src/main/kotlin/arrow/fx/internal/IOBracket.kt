@@ -64,7 +64,7 @@ internal object IOBracket {
                 IO.raiseException<B>(e.nonFatalOrThrow())
               }
 
-              IO.Bind(fb.fix(), frame)
+              IO.Bind(fb, frame)
             }
 
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called

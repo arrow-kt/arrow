@@ -25,7 +25,6 @@ import arrow.fx.internal.Platform.unsafeResync
 import arrow.fx.internal.ShiftTick
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.internal.scheduler
-import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
@@ -646,26 +645,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     ContinueOn(this, ctx)
 
   /**
-   * Given both the value and the function are within [IO], **ap**ply the function to the value.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.IO
-   *
-   * fun main() {
-   *   //sampleStart
-   *   val someF: IO<Nothing, (Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
-   *   val a = IO.just(3).ap(someF)
-   *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
-   *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
-   *   //sampleEnd
-   *   println("a: $a, b: $b, c: $c")
-   * }
-   * ```
-   */
-  fun <B> ap(ff: IOOf<Nothing, (A) -> B>): IO<Nothing, B> =
-    flatMap { a -> ff.fix().map { it(a) } }
-
-  /**
    * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
    *
    * ```kotlin:ank:playground
@@ -699,25 +678,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   }
 
   /**
-   * Compose this [IO] with another [IO] [fb] while ignoring the output.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.IO
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = IO.effect { println("Hello World!") }
-   *     .followedBy(IO.effect { println("Goodbye World!") })
-   *   //sampleEnd
-   *   println(result.unsafeRunSync())
-   * }
-   * ```
-   *
-   * @see flatMap if you need to act on the output of the original [IO].
-   */
-  fun <B> followedBy(fb: IOOf<Nothing, B>) = flatMap { fb }
-
-  /**
    * Safely attempts the [IO] and lift any errors to the value side into [Either].
    *
    * ```kotlin:ank:playground
@@ -734,46 +694,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    *
    * @see flatMap if you need to act on the output of the original [IO].
    */
-  fun attempt(): IO<Nothing, Either<Throwable, A>> =
+  fun attempt(): IO<E, Either<Throwable, A>> =
     Bind(this, IOFrame.attempt())
-
-  /**
-   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.IO
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   IO.raiseError<Int>(RuntimeException("Hello from Error"))
-   *     .redeem({ e -> e.message ?: "" }, Int::toString)
-   *   //sampleEnd
-   *   println(result.unsafeRunSync())
-   * }
-   * ```
-   */
-  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<Nothing, B> =
-    Bind(this, IOFrame.Companion.Redeem(fe, fb))
-
-  /**
-   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.IO
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   IO.just("1")
-   *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
-   *   //sampleEnd
-   *   println(result.unsafeRunSync())
-   * }
-   * ```
-   */
-  fun <B> redeemWith(fe: (Throwable) -> IOOf<Nothing, B>, fb: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
-    Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
 
   /**
    * [runAsync] allows you to run any [IO] in a referential transparent manner.
@@ -908,7 +830,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<A, E, out B, out E2 : E>(val cont: IO<E, A>, val g: (A) -> IOOf<E, B>) : IO<E2, B>() {
+  internal data class Bind<A, E, out B, out E2 : E>(val cont: IOOf<E, A>, val g: (A) -> IOOf<E, B>) : IO<E2, B>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
   }
 
@@ -922,7 +844,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   internal data class ContextSwitch<E, A>(
     val source: IO<E, A>,
     val modify: (IOConnection) -> IOConnection,
-    val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
+    val restore: ((a: Any?, e: Any?, t: Throwable?, old: IOConnection, new: IOConnection) -> IOConnection)?
   ) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
@@ -930,8 +852,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
       // Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
 
-      internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
-        { _, _, old, _ -> old }
+      internal val disableUncancelable: (Any?, Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
+        { _, _, _, old, _ -> old }
     }
   }
 
@@ -966,8 +888,11 @@ sealed class IO<out E, out A> : IOOf<E, A> {
  *
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
+fun <E, A> IOOf<E, A>.handleError(f: (Throwable) -> A, fe: (E) -> A): IO<Nothing, A> =
+  handleErrorWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
+
 fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
-  handleErrorWith { e -> IO.Pure(f(e)) }
+  handleError(f, ::identity)
 
 /**
  * Handle the error by resolving the error with an effect that results in [A].
@@ -991,8 +916,57 @@ fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
  *
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
+fun <E, A, E2 : E> IOOf<E, A>.handleErrorWith(f: (Throwable) -> IOOf<E2, A>, fe: (E) -> IOOf<E2, A>): IO<E2, A> =
+  IO.Bind(this, IOFrame.Companion.ErrorHandler(f, fe))
+
 fun <A> IOOf<Nothing, A>.handleErrorWith(f: (Throwable) -> IOOf<Nothing, A>): IO<Nothing, A> =
-  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+  handleErrorWith(f, ::identity)
+
+fun <E, A> IOOf<E, A>.fallbackTo(f: () -> A): IOOf<E, A> =
+  handleError({ f() }, { f() })
+
+fun <E, A, E2> IOOf<E, A>.fallbackWith(fa: IOOf<E2, A>): IO<E2, A> =
+  handleErrorWith({ fa }, { fa })
+
+/**
+ * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.raiseError<Int>(RuntimeException("Hello from Error"))
+ *     .redeem({ e -> e.message ?: "" }, Int::toString)
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, B> IOOf<E, A>.redeem(ft: (Throwable) -> B, fe: (E) -> B, fb: (A) -> B): IO<Nothing, B> =
+  IO.Bind(this, IOFrame.Companion.Redeem(ft, fe, fb))
+
+/**
+ * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.just("1")
+ *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(ft: (Throwable) -> IOOf<E2, B>,
+                                            fe: (E) -> IOOf<E2, B>,
+                                            fb: (A) -> IOOf<E2, B>): IO<E2, B> =
+  IO.Bind(this, IOFrame.Companion.RedeemWith(ft, fe, fb))
 
 /**
  * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
@@ -1033,6 +1007,60 @@ fun <E, A, B, E2 : E> IOOf<E, A>.flatMap(f: (A) -> IOOf<E2, B>): IO<E2, B> =
     is IO.Pure<A> -> IO.Suspend { f(current.a) }
     else -> IO.Bind(current, f)
   }
+
+/**
+ * Compose this [IO] with another [IO] [fb] while ignoring the output.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.effect { println("Hello World!") }
+ *     .followedBy(IO.effect { println("Goodbye World!") })
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ *
+ * @see flatMap if you need to act on the output of the original [IO].
+ */
+fun <E, A, B, E2 : E> IOOf<E, A>.followedBy(fb: IOOf<E2, B>): IO<E2, B> =
+  flatMap { fb }
+
+/**
+ * Given both the value and the function are within [IO], **ap**ply the function to the value.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main() {
+ *   //sampleStart
+ *   val someF: IO<(Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
+ *   val a = IO.just(3).ap(someF)
+ *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
+ *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
+ *   //sampleEnd
+ *   println("a: $a, b: $b, c: $c")
+ * }
+ * ```
+ */
+fun <E, A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+  flatMap { a -> ff.fix().map { it(a) } }
+
+fun <E, A, E2, B : A> IOOf<E, A>.flatMapLeft(f: (E) -> IOOf<E2, A>): IO<E2, A> =
+  when (val bio = fix()) {
+    is IO.RaiseError -> f(bio.error).fix()
+    is IO.Pure,
+    is IO.RaiseException -> bio as IO<E2, B>
+    else -> IO.Bind(bio, IOFrame.Companion.MapError(f))
+  }
+
+fun <E, A, E2> IOOf<E, A>.mapLeft(f: (E) -> E2): IO<E2, A> =
+  flatMapLeft { e -> IO.RaiseError(f(e)) }
+
+fun <E, A, E2, B> IOOf<E, A>.bimap(fe: (E) -> E2, fa: (A) -> B): IO<E2, B> =
+  mapLeft(fe).map(fa)
 
 /**
  * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
