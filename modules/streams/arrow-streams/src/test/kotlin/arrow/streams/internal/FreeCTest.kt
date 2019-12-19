@@ -23,7 +23,10 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
+import arrow.streams.internal.freec.applicative.applicative
 import arrow.streams.internal.freec.eq.eq
+import arrow.streams.internal.freec.functor.functor
+import arrow.streams.internal.freec.monad.monad
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
@@ -105,6 +108,9 @@ class FreeCTest : UnitSpec() {
     testLaws(
       MonadDeferLaws.laws(
         SC = FreeC.monadDefer(),
+        FF = FreeC.functor(),
+        AP = FreeC.applicative(),
+        SL = FreeC.monad(),
         EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
         EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
         EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())

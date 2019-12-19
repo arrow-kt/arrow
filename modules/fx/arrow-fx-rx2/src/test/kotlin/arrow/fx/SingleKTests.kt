@@ -5,9 +5,12 @@ import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.singlek.applicative.applicative
 import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.extensions.singlek.async.async
+import arrow.fx.rx2.extensions.singlek.functor.functor
 import arrow.fx.rx2.extensions.singlek.monad.flatMap
+import arrow.fx.rx2.extensions.singlek.monad.monad
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
@@ -46,7 +49,7 @@ class SingleKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(SingleK.concurrent(), SingleK.functor(), SingleK.applicative(), SingleK.monad(), EQ(), EQ(), EQ(), testStackSafety = false),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
 

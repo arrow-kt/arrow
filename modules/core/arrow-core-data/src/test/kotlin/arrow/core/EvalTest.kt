@@ -2,8 +2,10 @@ package arrow.core
 
 import arrow.Kind
 import arrow.core.Eval.Now
+import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad
+import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -26,7 +28,7 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), ::Now, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), ::Now, EQ1, EQ2, Eq.any())
     )
 
     "should map wrapped value" {
