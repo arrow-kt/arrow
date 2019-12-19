@@ -16,8 +16,7 @@ object MonoidKLaws {
   fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, GENK.genK(Gen.int()), EQK)
 
-    @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-
+  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
   internal fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
     laws(SGK, Gen.int().map { AP.just(it) }, EQK)
 
