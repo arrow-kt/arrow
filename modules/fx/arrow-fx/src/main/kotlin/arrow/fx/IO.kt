@@ -28,6 +28,7 @@ import arrow.fx.internal.scheduler
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import kotlin.coroutines.CoroutineContext
@@ -862,7 +863,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
+      internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
       internal val disableUncancelable: (Any?, Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, _, old, _ -> old }
@@ -901,7 +902,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <E, A> IOOf<E, A>.handleError(f: (Throwable) -> A, fe: (E) -> A): IO<Nothing, A> =
-  handleAllWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
+  handleErrorWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
 
 fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
   handleError(f, ::identity)
@@ -991,8 +992,8 @@ fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(
  * @see [bracketCase] for the more general operation
  *
  */
-fun <A> IOOf<Nothing, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Nothing, Unit>): IO<Nothing, A> =
-  IOBracket.guaranteeCase(fix(), finalizer)
+fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
+  IOBracket.guaranteeCase(this, finalizer)
 
 /**
  * Transform the [IO] value of [A] by sequencing an effect [IO] that results in [B].
@@ -1165,7 +1166,7 @@ fun <A, B> IOOf<Nothing, A>.bracket(release: (A) -> IOOf<Nothing, Unit>, use: (A
  * }
  *  ```
  */
-fun <A, B> IOOf<Nothing, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
+fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   IOBracket(this, release, use)
 
 /**
@@ -1176,4 +1177,5 @@ fun <A, B> IOOf<Nothing, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOO
  * @see [guaranteeCase] for the version that can discriminate between termination conditions
  * @see [bracket] for the more general operation
  */
-fun <A> IOOf<Nothing, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<Nothing, A> = guaranteeCase { finalizer }
+fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
+  guaranteeCase { finalizer }

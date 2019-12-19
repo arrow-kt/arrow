@@ -7,9 +7,13 @@ import arrow.fx.ForIO
 import arrow.fx.IOConnection
 import arrow.fx.IOFrame
 import arrow.fx.IOOf
+import arrow.fx.IOResult
 import arrow.fx.IORunLoop
+import arrow.fx.fix
+import arrow.fx.flatMap
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.ExitCase2
 import kotlinx.atomicfu.atomic
 
 internal object IOBracket {
@@ -17,7 +21,7 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <A, B> invoke(acquire: IOOf<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<Nothing, B> =
+  operator fun <E, E2 : E, A, B> invoke(acquire: IOOf<E, A>, release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<E2, B>): IO<E2, B> =
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
@@ -29,34 +33,34 @@ internal object IOBracket {
       if (!conn.isCanceled()) {
         // Note `acquire` is uncancelable due to usage of `IORunLoop.start`
         // (in other words it is disconnected from our IOConnection)
-        IORunLoop.start(acquire, BracketStart(use, release, conn, deferredRelease, cb))
+        IORunLoop.start(acquire, BracketStart<E, E2, A, B>(use, release, conn, deferredRelease, cb))
       } else {
         deferredRelease.complete(IO.unit)
       }
     }
 
   // Internals of `IO.bracketCase`.
-  private class BracketStart<A, B>(
-    val use: (A) -> IOOf<B>,
-    val release: (A, ExitCase<Throwable>) -> IOOf<Unit>,
+  private class BracketStart<E, E2 : E, A, B>(
+    val use: (A) -> IOOf<E2, B>,
+    val release: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>,
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
-    val cb: (Either<Throwable, B>) -> Unit
-  ) : (Either<Throwable, A>) -> Unit {
+    val cb: (IOResult<E2, B>) -> Unit
+  ) : (IOResult<E, A>) -> Unit {
 
     // This runnable is a dirty optimization to avoid some memory allocations;
     // This class switches from being a Callback to a Runnable, but relies on the internal IO callback protocol to be
     // respected (called at most once).
     private var result: Either<Throwable, A>? = null
 
-    override fun invoke(ea: Either<Throwable, A>) {
+    override fun invoke(ea: IOResult<E, A>) {
       // Introducing a light async boundary, otherwise executing the required
       // logic directly will yield a StackOverflowException
       Platform.trampoline {
         when (ea) {
-          is Either.Right -> {
-            val a = ea.b
-            val frame = BracketReleaseFrame<A, B>(a, release)
+          is IOResult.Success -> {
+            val a = ea.value
+            val frame = BracketReleaseFrame<E2, A, B>(a, release)
             val onNext = {
               val fb = try {
                 use(a)
@@ -70,18 +74,19 @@ internal object IOBracket {
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
             // Actual execution
-            IORunLoop.startCancelable(onNext(), conn, cb)
+            IORunLoop.startCancelable<E2, B>(onNext(), conn, cb)
           }
-          is Either.Left -> cb(ea)
+          is IOResult.Error -> cb(ea as IOResult<E2, B>)
+          is IOResult.Exception -> cb(ea)
         }
       }
     }
   }
 
-  fun <A> guaranteeCase(source: IO<Nothing, A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<Nothing, A> =
+  fun <E, A> guaranteeCase(source: IOOf<E, A>, release: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
     IO.Async { conn, cb ->
       Platform.trampoline {
-        val frame = EnsureReleaseFrame<A>(release)
+        val frame = EnsureReleaseFrame<E, A>(release)
         val onNext = source.flatMap(frame)
         // Registering our cancelable token ensures that in case
         // cancellation is detected, `release` gets called
@@ -94,27 +99,27 @@ internal object IOBracket {
       }
     }
 
-  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> IOOf<Unit>) :
-    BaseReleaseFrame<A, B>() {
+  private class BracketReleaseFrame<E, A, B>(val a: A, val releaseFn: (A, ExitCase2<E>) -> IOOf<Nothing, Unit>) :
+    BaseReleaseFrame<E, A, B>() {
 
-    override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> =
+    override fun release(c: ExitCase2<E>): IOOf<Nothing, Unit> =
       releaseFn(a, c)
   }
 
-  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> IOOf<Unit>) : BaseReleaseFrame<Unit, A>() {
+  private class EnsureReleaseFrame<E, A>(val releaseFn: (ExitCase2<E>) -> IOOf<Nothing, Unit>) : BaseReleaseFrame<E, Unit, A>() {
 
-    override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> = releaseFn(c)
+    override fun release(c: ExitCase2<E>): IOOf<Nothing, Unit> = releaseFn(c)
   }
 
-  private abstract class BaseReleaseFrame<A, B> : IOFrame<B, IO<Nothing, B>> {
+  private abstract class BaseReleaseFrame<E, A, B> : IOFrame<E, B, IO<E, B>> {
 
     // Guard used for thread-safety, to ensure the idempotency
     // of the release; otherwise `release` can be called twice
     private val waitsForResult = atomic(true)
 
-    abstract fun release(c: ExitCase<Throwable>): CancelToken<ForIO>
+    abstract fun release(c: ExitCase2<E>): IOOf<Nothing, Unit>
 
-    private fun applyRelease(e: ExitCase<Throwable>): IO<Nothing, Unit> =
+    private fun applyRelease(e: ExitCase2<E>): IO<Nothing, Unit> =
       IO.defer {
         if (waitsForResult.compareAndSet(true, false))
           release(e)
@@ -122,32 +127,51 @@ internal object IOBracket {
           IO.unit
       }
 
-    val cancel: CancelToken<ForIO> = applyRelease(ExitCase.Canceled).fix().uncancelable()
+    val cancel: IOOf<Nothing, Unit> = applyRelease(ExitCase2.Canceled).fix().uncancelable()
 
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<Nothing, B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
-      .flatMap(ReleaseRecover(e))
+    override fun recover(e: Throwable): IO<Nothing, B> =
+      IO.ContextSwitch(applyRelease(ExitCase2.Exception(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
+        .flatMap(ReleaseRecoverException(e))
 
     override operator fun invoke(a: B): IO<Nothing, B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
-    // otherwise we might have a conflict with the auto-cancellation logic
-      IO.ContextSwitch(applyRelease(ExitCase.Completed), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
+      // otherwise we might have a conflict with the auto-cancellation logic
+      IO.ContextSwitch(applyRelease(ExitCase2.Completed), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
         .map { a }
+
+    override fun handleError(e: E): IO<E, B> =
+      IO.ContextSwitch(applyRelease(ExitCase2.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
+        .flatMap(ReleaseRecoverError(e))
   }
 
-  private class ReleaseRecover(val error: Throwable) : IOFrame<Unit, IO<Nothing, Nothing>> {
+  private class ReleaseRecoverException(val error: Throwable) : IOFrame<Any?, Unit, IO<Nothing, Nothing>> {
 
     override fun recover(e: Throwable): IO<Nothing, Nothing> =
       IO.raiseException(Platform.composeErrors(error, e))
 
     override fun invoke(a: Unit): IO<Nothing, Nothing> = IO.raiseException(error)
+
+    override fun handleError(e: Any?): IO<Nothing, Nothing> = IO.raiseException(error)
   }
 
-  private val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
-    { _, _, old, _ ->
+  private class ReleaseRecoverError<E>(val error: E) : IOFrame<E, Unit, IO<E, Nothing>> {
+
+    override fun handleError(e: E): IO<E, Nothing> =
+      IO.RaiseError(error)
+
+    override fun recover(e: Throwable): IO<E, Nothing> =
+      IO.RaiseError(error)
+
+    override fun invoke(a: Unit): IO<E, Nothing> =
+      IO.RaiseError(error)
+  }
+
+  private val disableUncancelableAndPop: (Any?, Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
+    { _, _, _, old, _ ->
       old.pop()
       old
     }
