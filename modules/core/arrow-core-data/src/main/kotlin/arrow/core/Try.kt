@@ -9,8 +9,6 @@ typealias Success<A> = Try.Success<A>
  *
  * ank_macro_hierarchy(arrow.core.Option)
  *
- * {:.beginner}
- * beginner
  *
  * Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation.
  *
