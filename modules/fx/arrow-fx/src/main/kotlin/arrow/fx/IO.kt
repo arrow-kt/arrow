@@ -7,11 +7,11 @@ import arrow.core.Eval
 import arrow.core.NonFatal
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import arrow.core.right
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
@@ -19,10 +19,10 @@ import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
+import arrow.fx.internal.IOTick
 import arrow.fx.internal.Platform.maxStackDepthSize
 import arrow.fx.internal.Platform.onceOnly
 import arrow.fx.internal.Platform.unsafeResync
-import arrow.fx.internal.ShiftTick
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.internal.scheduler
 import arrow.fx.typeclasses.Disposable
@@ -45,9 +45,8 @@ typealias IOPartialOf<E> = Kind<ForIO, E>
 inline fun <E, A> IOOf<E, A>.fix(): IO<E, A> =
   this as IO<E, A>
 
-
-typealias IOProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Nothing, Unit>
+typealias IOProc<E, A> = ((IOResult<E, A>) -> Unit) -> Unit
+typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<Nothing, Unit>
 
 @Suppress("StringLiteralDuplication")
 sealed class IO<out E, out A> : IOOf<E, A> {
@@ -174,7 +173,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      **/
     fun sleep(duration: Duration, continueOn: CoroutineContext = IODispatchers.CommonPool): IO<Nothing, Unit> =
       cancelable { cb ->
-        val cancelRef = scheduler.schedule(ShiftTick(continueOn, cb), duration.amount, duration.timeUnit)
+        val cancelRef = scheduler.schedule(IOTick(continueOn, cb), duration.amount, duration.timeUnit)
         later { cancelRef.cancel(false); Unit }
       }
 
@@ -255,13 +254,13 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @see cancelable for an operator that supports cancelation.
      * @see asyncF for a version that can suspend side effects in the registration function.
      */
-    fun <A> async(k: IOProc<A>): IO<Nothing, A> =
-      Async { _: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
-        onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
+    fun <E, A> async(k: IOProc<E, A>): IO<E, A> =
+      Async { _: IOConnection, ff: (IOResult<E, A>) -> Unit ->
+        onceOnly(ff).let { callback: (IOResult<E, A>) -> Unit ->
           try {
             k(callback)
           } catch (throwable: Throwable) {
-            callback(Left(throwable.nonFatalOrThrow()))
+            callback(IOResult.Exception(throwable.nonFatalOrThrow()))
           }
         }
       }
@@ -308,23 +307,23 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @see async for a version that can suspend side effects in the registration function.
      * @see cancelableF for an operator that supports cancelation.
      */
-    fun <A> asyncF(k: IOProcF<A>): IO<Nothing, A> =
-      Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
+    fun <E, A> asyncF(k: IOProcF<E, A>): IO<E, A> =
+      Async { conn: IOConnection, ff: (IOResult<E, A>) -> Unit ->
         val conn2 = IOConnection()
         conn.push(conn2.cancel())
-        onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
+        onceOnly(conn, ff).let { callback: (IOResult<E, A>) -> Unit ->
           val fa = try {
             k(callback)
           } catch (t: Throwable) {
             if (NonFatal(t)) {
-              IO { callback(Left(t)) }
+              IO { callback(IOResult.Exception(t)) }
             } else {
               throw t
             }
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->
-            result.fold({ e -> callback(Left(e)) }, mapUnit)
+            result.fold({ e -> callback(IOResult.Exception(e)) }, mapUnit, mapUnit)
           }
         }
       }
@@ -379,8 +378,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @param cb an asynchronous computation that might fail.
      * @see async for wrapping impure APIs without cancelation
      */
-    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> IO<Nothing, Unit>): IO<Nothing, A> =
-      Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
+    fun <E, A> cancelable(cb: ((IOResult<E, A>) -> Unit) -> IO<Nothing, Unit>): IO<E, A> =
+      Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
         onceOnly(conn, cbb).let { cbb2 ->
           val cancelable = ForwardCancelable()
           conn.push(cancelable.cancel())
@@ -388,7 +387,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
             cancelable.complete(try {
               cb(cbb2)
             } catch (throwable: Throwable) {
-              cbb2(Left(throwable.nonFatalOrThrow()))
+              cbb2(IOResult.Exception(throwable.nonFatalOrThrow()))
               unit
             })
           }
@@ -447,8 +446,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @param cb a deferred asynchronous computation that might fail.
      * @see asyncF for wrapping impure APIs without cancelation
      */
-    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<Nothing, IO<Nothing, Unit>>): IO<Nothing, A> =
-      Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
+    fun <E, A> cancelableF(cb: ((IOResult<E, A>) -> Unit) -> IOOf<Nothing, IO<Nothing, Unit>>): IO<E, A> =
+      Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
         val cancelable = ForwardCancelable()
         val conn2 = IOConnection()
         conn.push(cancelable.cancel())
@@ -458,13 +457,13 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           val fa: IOOf<Nothing, IO<Nothing, Unit>> = try {
             cb(cbb2)
           } catch (throwable: Throwable) {
-            cbb2(Left(throwable.nonFatalOrThrow()))
+            cbb2(IOResult.Exception(throwable.nonFatalOrThrow()))
             just(unit)
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->
             conn.pop()
-            result.fold({ }, cancelable::complete)
+            result.fold({}, {}, cancelable::complete)
           }
         }
       }
@@ -592,11 +591,11 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    *
    * **BEWARE** this does **not** support cancelation since Kotlin has no cancelation support for `suspend` on the language level.
    */
-  suspend fun suspended(): A = suspendCoroutine { cont ->
+  suspend fun suspended(): Either<E, A> = suspendCoroutine { cont ->
     val connection = cont.context[IOContext]?.connection
 
     IORunLoop.startCancelable(this, connection ?: IOConnection.uncancelable) {
-      it.fold(cont::resumeWithException, cont::resume)
+      it.fold(cont::resumeWithException, { e -> cont.resume(Left(e)) }, { a -> cont.resume(Right(a)) })
     }
   }
 
@@ -674,7 +673,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
     IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
-    cb(Either.Right(IOFiber(promise, conn)))
+    cb(IOResult.Right(IOFiber(promise, conn)))
   }
 
   /**
@@ -703,7 +702,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * Reason it can happen in a referential transparent manner is because nothing is actually running when this method is invoked.
    * The combinator can be used to define how several programs have to run in a safe manner.
    */
-  fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Unit> =
+  fun runAsync(cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Unit> =
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
   /**
@@ -717,7 +716,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun unsafeRunAsync(cb: (IOResult<E, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
 
   /**
@@ -731,7 +730,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsync] to run in an unsafe and non-cancellable manner.
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
-  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
     async { ccb ->
       val conn = IOConnection()
       val onCancelCb =
@@ -739,9 +738,9 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           ThrowCancellationException ->
             cb andThen { it.fix().unsafeRunAsync { } }
           Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
+            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
         }
-      ccb(conn.toDisposable().right())
+      ccb(IOResult.Right(conn.toDisposable()))
       IORunLoop.startCancelable(this, conn, onCancelCb)
     }
 
@@ -757,8 +756,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
-    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync()
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> Unit): Disposable =
+    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync().fold(::identity, ::identity)
 
   /**
    * [unsafeRunSync] allows you to run any [IO] to its wrapped value [A].
@@ -772,7 +771,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsync] or [unsafeRunAsyncCancellable] that run the value as [Either].
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunSync(): A =
+  fun unsafeRunSync(): Either<E, A> =
     unsafeRunTimed(Duration.INFINITE)
       .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
@@ -784,10 +783,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    *
    * @see unsafeRunSync
    */
-  fun unsafeRunTimed(limit: Duration): Option<A> =
+  fun unsafeRunTimed(limit: Duration): Option<Either<E, A>> =
     IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
-  internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+  internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<Either<E, A>>
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<E, A> =
@@ -797,7 +796,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // Pure can be replaced by its value
     override fun <B> map(f: (A) -> B): IO<Nothing, B> = Suspend { Pure(f(a)) }
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Either<Nothing, A>> = Some(Right(a))
   }
 
   internal data class RaiseException(val exception: Throwable) : IO<Nothing, Nothing>() {
@@ -815,30 +814,30 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   }
 
   internal data class Delay<out A>(val thunk: () -> A) : IO<Nothing, A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
   }
 
   internal data class Suspend<out E, out A>(val thunk: () -> IOOf<E, A>) : IO<E, A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<Nothing, A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+  internal data class Async<out E, out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (IOResult<E, A>) -> Unit) -> Unit) : IO<E, A>() {
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Either<E, A>> = unsafeResync(this, limit)
   }
 
   internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<Nothing, A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Either<Nothing, A>> = unsafeResync(this, limit)
   }
 
   internal data class Bind<A, E, out B, out E2 : E>(val cont: IOOf<E, A>, val g: (A) -> IOOf<E, B>) : IO<E2, B>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
   }
 
   internal data class ContinueOn<E, A>(val cont: IO<E, A>, val cc: CoroutineContext) : IO<E, A>() {
     // If a ContinueOn follows another ContinueOn, execute only the latest
     override fun continueOn(ctx: CoroutineContext): IO<E, A> = ContinueOn(cont, ctx)
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
   }
 
   internal data class ContextSwitch<E, A>(
@@ -846,7 +845,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     val modify: (IOConnection) -> IOConnection,
     val restore: ((a: Any?, e: Any?, t: Throwable?, old: IOConnection, new: IOConnection) -> IOConnection)?
   ) : IO<E, A>() {
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
 
     companion object {
       // Internal reusable reference.
@@ -866,7 +865,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<B> = throw AssertionError("Unreachable")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw AssertionError("Unreachable")
   }
 }
 
@@ -963,9 +962,11 @@ fun <E, A, B> IOOf<E, A>.redeem(ft: (Throwable) -> B, fe: (E) -> B, fb: (A) -> B
  * }
  * ```
  */
-fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(ft: (Throwable) -> IOOf<E2, B>,
-                                            fe: (E) -> IOOf<E2, B>,
-                                            fb: (A) -> IOOf<E2, B>): IO<E2, B> =
+fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(
+  ft: (Throwable) -> IOOf<E2, B>,
+  fe: (E) -> IOOf<E2, B>,
+  fb: (A) -> IOOf<E2, B>
+): IO<E2, B> =
   IO.Bind(this, IOFrame.Companion.RedeemWith(ft, fe, fb))
 
 /**
