@@ -90,7 +90,7 @@ class IOTest : UnitSpec() {
 
     "should throw immediate failure by raiseError" {
       try {
-        IO.raiseError<Int>(MyException()).unsafeRunSync()
+        IO.raiseException<Int>(MyException()).unsafeRunSync()
         fail("")
       } catch (myException: MyException) {
         // Success
@@ -145,7 +145,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with unsafeRunAsync" {
-      IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
+      IO.raiseException<Int>(MyException()).unsafeRunAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
@@ -158,7 +158,7 @@ class IOTest : UnitSpec() {
 
     "should return exceptions within main block with unsafeRunAsync" {
       val exception = MyException()
-      val ioa = IO<Int> { throw exception }
+      val ioa = IO<Nothing, Int> { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
@@ -167,7 +167,7 @@ class IOTest : UnitSpec() {
     "should not catch exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
-        val ioa = IO<Int> { throw exception }
+        val ioa = IO<Nothing, Int> { throw exception }
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
@@ -194,7 +194,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return an error when running an exception with runAsync" {
-      IO.raiseError<Int>(MyException()).runAsync { either ->
+      IO.raiseException<Int>(MyException()).runAsync { either ->
         either.fold({
           when (it) {
             is MyException -> {
@@ -208,7 +208,7 @@ class IOTest : UnitSpec() {
 
     "should return exceptions within main block with runAsync" {
       val exception = MyException()
-      val ioa = IO<Int> { throw exception }
+      val ioa = IO<Nothing, Int> { throw exception }
       ioa.runAsync { either ->
         either.fold({ IO { it shouldBe exception } }, { fail("") })
       }
@@ -217,7 +217,7 @@ class IOTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = IO<Int> { throw exception }
+        val ioa = IO<Nothing, Int> { throw exception }
         ioa.runAsync { either ->
           either.fold({ throw it }, { fail("") })
         }.unsafeRunSync()
@@ -358,7 +358,7 @@ class IOTest : UnitSpec() {
     "parallel execution preserves order for synchronous IOs" {
       val order = mutableListOf<Long>()
 
-      fun IO<Long>.order() =
+      fun IO<Nothing, Long>.order() =
         map {
           order.add(it)
           it
@@ -443,7 +443,7 @@ class IOTest : UnitSpec() {
       }
 
       forAll(Gen.string()) { message ->
-        IO.Bind(IO.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
+        IO.Bind(IO.raiseException(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<Nothing, String>)
           .unsafeRunSync() == message
       }
     }
@@ -522,7 +522,7 @@ class IOTest : UnitSpec() {
     "Bracket should be stack safe" {
       val size = 5000
 
-      fun ioBracketLoop(i: Int): IO<Int> =
+      fun ioBracketLoop(i: Int): IO<Nothing, Int> =
         IO.unit.bracket(use = { just(i + 1) }, release = { IO.unit }).flatMap { ii ->
           if (ii < size) ioBracketLoop(ii)
           else just(ii)
@@ -534,7 +534,7 @@ class IOTest : UnitSpec() {
     "GuaranteeCase should be stack safe" {
       val size = 5000
 
-      fun ioGuaranteeCase(i: Int): IO<Int> =
+      fun ioGuaranteeCase(i: Int): IO<Nothing, Int> =
         IO.unit.guaranteeCase { IO.unit }.flatMap {
           val ii = i + 1
           if (ii < size) ioGuaranteeCase(ii)
@@ -547,7 +547,7 @@ class IOTest : UnitSpec() {
     "Async should be stack safe" {
       val size = 5000
 
-      fun ioAsync(i: Int): IO<Int> = IO.async<Int> { cb ->
+      fun ioAsync(i: Int): IO<Nothing, Int> = IO.async<Int> { cb ->
         cb(Right(i))
       }.flatMap { ii ->
         if (ii < size) ioAsync(ii + 1)
@@ -636,14 +636,14 @@ class IOTest : UnitSpec() {
     }
 
     "Cancelation is wired accross suspend" {
-      fun infiniteLoop(): IO<Unit> {
-        fun loop(iterations: Int): IO<Unit> =
+      fun infiniteLoop(): IO<Nothing, Unit> {
+        fun loop(iterations: Int): IO<Nothing, Unit> =
           just(iterations).flatMap { i -> loop(i + 1) }
 
         return loop(0)
       }
 
-      val wrappedInfiniteLoop: IO<Unit> =
+      val wrappedInfiniteLoop: IO<Nothing, Unit> =
         IO.effect { infiniteLoop().suspended() }
 
       IO.fx {

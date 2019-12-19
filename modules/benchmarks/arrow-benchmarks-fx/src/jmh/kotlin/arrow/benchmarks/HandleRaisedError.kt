@@ -24,9 +24,9 @@ open class HandleRaisedError {
 
   private val dummy = RuntimeException("dummy")
 
-  private fun ioErrorRaisedloop(i: Int): IO<Int> =
+  private fun ioErrorRaisedloop(i: Int): IO<Nothing, Int> =
     if (i < size)
-      IO.raiseError<Int>(dummy)
+      IO.raiseException<Int>(dummy)
         .flatMap { x -> IO.just(x + 1) }
         .flatMap { x -> IO.just(x + 1) }
         .ioHandleError { ioErrorRaisedloop(i + 1) }

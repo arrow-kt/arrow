@@ -2,9 +2,9 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
+import arrow.fx.IO
 
 import arrow.fx.ForIO
-import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IORunLoop
 import arrow.fx.fix
@@ -21,7 +21,7 @@ internal class ForwardCancelable {
 
   private val state = atomic<State>(init)
 
-  fun cancel(): CancelToken<ForIO> {
+  fun cancel(): IO<Nothing, Unit> {
     fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
         is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack)))
@@ -38,7 +38,7 @@ internal class ForwardCancelable {
     return IO.Async { conn, cb -> loop(conn, cb) }
   }
 
-  fun complete(value: CancelToken<ForIO>): Unit = state.value.let { current ->
+  fun complete(value: IO<Nothing, Unit>): Unit = state.value.let { current ->
     when (current) {
       is Active -> {
         value.fix().unsafeRunAsync {}
@@ -72,13 +72,13 @@ internal class ForwardCancelable {
      */
     private sealed class State {
       data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()
-      data class Active(val token: CancelToken<ForIO>) : State()
+      data class Active(val token: IO<Nothing, Unit>) : State()
     }
 
     private val init: State = Empty(listOf())
     private val finished: State = Active(IO.unit)
 
-    private fun execute(token: CancelToken<ForIO>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
+    private fun execute(token: IO<Nothing, Unit>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
       // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->

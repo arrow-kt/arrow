@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.internal.AtomicBooleanW
-import arrow.fx.IO.Companion.defer
-import arrow.fx.IO.Companion.unit
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
@@ -50,11 +48,11 @@ interface IORaceTriple {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
-  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<Nothing, RaceTriple<ForIO, A, B, C>> =
     IO.Async { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
+      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
 
       val connA = IOConnection()
       connA.push(upstreamCancelToken)

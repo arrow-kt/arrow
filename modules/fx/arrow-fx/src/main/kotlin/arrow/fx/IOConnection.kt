@@ -25,24 +25,24 @@ internal inline val KindConnection.Companion.uncancelable: IOConnection
   inline get() = _uncancelable
 
 private object MD : MonadDefer<ForIO> {
-  override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
-    arrow.fx.IO.defer(fa)
+  override fun <A> defer(fa: () -> IOOf<A>): IO<Nothing, A> =
+    IO.defer(fa)
 
-  override fun <A> raiseError(e: Throwable): IO<A> =
-    arrow.fx.IO.raiseError(e)
+  override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
+    IO.raiseException(e)
 
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<Nothing, A> =
     handleErrorW(f)
 
-  override fun <A> just(a: A): IO<A> =
-    arrow.fx.IO.just(a)
+  override fun <A> just(a: A): IO<Nothing, A> =
+    IO.just(a)
 
-  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
+  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<Nothing, B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
-    arrow.fx.IO.tailRecM(a, f)
+  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<Nothing, B> =
+    IO.tailRecM(a, f)
 
-  override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracketCase(release = { a, e -> release(a, e).fix() }, use = { use(it).fix() })
+  override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<Nothing, B> =
+    fix().bracketCase(release, use)
 }
