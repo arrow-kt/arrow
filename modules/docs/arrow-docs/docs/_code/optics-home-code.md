@@ -34,13 +34,12 @@ data class Employee(val name: String, val company: Company?) {
 }
 fun main() {
   //sampleStart
-
-
   val john =
   Employee("John Doe",
           Company("Arrow",
                   Address("Functional city",
                           Street(42, "lambda street"))))
+
   val modify = Employee.company.address.street.name
       .modify(john, String::toUpperCase)
 
