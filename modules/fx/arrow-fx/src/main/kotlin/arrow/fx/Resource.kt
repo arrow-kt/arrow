@@ -55,7 +55,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *   // <...>
  *
  *   // we are done, now onto releasing resources
- *   !shutDownFanceService(service)
+ *   !shutDownFancyService(service)
  *   !closeDBHandle(handle)
  *   !closeConsumer(consumer)
  * }
