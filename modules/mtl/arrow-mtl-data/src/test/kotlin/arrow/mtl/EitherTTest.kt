@@ -12,7 +12,6 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
-import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.eqK.eqK
@@ -26,6 +25,7 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.divisible.divisible
+import arrow.mtl.extensions.eithert.eqK.eqK
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
@@ -82,16 +82,4 @@ class EitherTTest : UnitSpec() {
       }
     }
   }
-}
-
-fun <F, L> EitherT.Companion.eqK(
-  EQKF: EqK<F>,
-  EQL: Eq<L>
-) = object : EqK<EitherTPartialOf<F, L>> {
-  override fun <R> Kind<EitherTPartialOf<F, L>, R>.eqK(other: Kind<EitherTPartialOf<F, L>, R>, EQ: Eq<R>): Boolean =
-    (this.fix() to other.fix()).let {
-      EQKF.liftEq(Either.eq(EQL, EQ)).run {
-        it.first.value().eqv(it.second.value())
-      }
-    }
 }

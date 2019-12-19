@@ -6,6 +6,7 @@ import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
@@ -32,6 +33,8 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -324,3 +327,17 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
 
 fun <F, L, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, L>>.() -> R): EitherT<F, L, R> =
   EitherT.monadThrow<F, L>(M, M).fx.monadThrow(c).fix()
+
+@extension
+interface EitherTEqK<F, L> : EqK<EitherTPartialOf<F, L>> {
+  fun EQKF(): EqK<F>
+
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<EitherTPartialOf<F, L>, R>.eqK(other: Kind<EitherTPartialOf<F, L>, R>, EQ: Eq<R>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF().liftEq(Either.eq(EQL(), EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
+    }
+}

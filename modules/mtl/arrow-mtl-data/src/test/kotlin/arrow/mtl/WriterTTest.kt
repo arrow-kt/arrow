@@ -18,12 +18,12 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.divisible.divisible
+import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
@@ -39,8 +39,6 @@ import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
@@ -78,7 +76,7 @@ class WriterTTest : UnitSpec() {
         WriterT.monadWriter(Option.monad(), Int.monoid()),
         Int.monoid(),
         Gen.intSmall(),
-              optionEQK(),
+        optionEQK(),
         Int.eq()
       ),
 
@@ -97,13 +95,4 @@ private fun <F, W> WriterT.Companion.genK(
 ) = object : GenK<WriterTPartialOf<F, W>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
     GENKF.genK(Gen.tuple2(GENW, gen)).map(::WriterT)
-}
-
-fun <F, W> WriterT.Companion.eqK(EQKF: EqK<F>, EQW: Eq<W>) = object : EqK<WriterTPartialOf<F, W>> {
-  override fun <A> Kind<WriterTPartialOf<F, W>, A>.eqK(other: Kind<WriterTPartialOf<F, W>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      EQKF.liftEq(Tuple2.eq(EQW, EQ)).run {
-        it.first.value().eqv(it.second.value())
-      }
-    }
 }

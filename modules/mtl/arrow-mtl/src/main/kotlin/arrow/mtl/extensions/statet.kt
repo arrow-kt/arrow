@@ -1,43 +1,46 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.core.toT
-import arrow.mtl.StateT
-import arrow.mtl.StateTPartialOf
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toT
+import arrow.extension
 import arrow.mtl.State
+import arrow.mtl.StateApi
+import arrow.mtl.StatePartialOf
+import arrow.mtl.StateT
+import arrow.mtl.StateTOf
+import arrow.mtl.StateTPartialOf
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.functor.functor
 import arrow.mtl.extensions.statet.monad.monad
-import arrow.mtl.StateApi
-import arrow.mtl.StatePartialOf
-import arrow.mtl.StateTOf
 import arrow.mtl.fix
 import arrow.mtl.runM
-import arrow.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.extension
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented
@@ -292,4 +295,22 @@ interface StateTAlternative<F, S> : Alternative<StateTPartialOf<F, S>>, StateTMo
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
     orElse(y).fix()
+}
+
+@extension
+interface StateTEqK<F, S> : EqK<StateTPartialOf<F, S>> {
+  fun EQKF(): EqK<F>
+  fun EQS(): Eq<S>
+  fun M(): Monad<F>
+  fun s(): S
+
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      val ls = it.first.runM(M(), s())
+      val rs = it.second.runM(M(), s())
+
+      EQKF().liftEq(Tuple2.eq(EQS(), EQ)).run {
+        ls.eqv(rs)
+      }
+    }
 }
