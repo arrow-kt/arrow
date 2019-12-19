@@ -541,6 +541,13 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     fun <F> once(M: Monad<F>): Schedule<F, Any?, Unit> = recurs(M, 1).unit()
 
     /**
+     * Create a schedule that never retries.
+     * This is a difference with zio, where they define never as a schedule that itself never executes.
+     */
+    fun <F> never(M: Monad<F>): Schedule<F, Any?, Nothing> =
+      recurs(M, 0).map { throw IllegalStateException("Impossible") }
+
+    /**
      * Create a schedule that uses another schedule to generate the delay of this schedule.
      * Continues for as long as [delaySchedule] continues and adds the output of [delaySchedule] to
      *  the delay that [delaySchedule] produced. Also returns the full delay as output.
@@ -688,6 +695,9 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
         exponential(MM(), base, factor)
     }
 
+    /**
+     * Build a schedule with functions that have the `Monad` already partially applied. Prefer this to the general combinators as soon as you create more than one schedule and combine it somehow.
+     */
     fun <M, Input, Output> withMonad(MM: Monad<M>, f: ScheduleFor<M>.() -> Schedule<M, Input, Output>): Schedule<M, Input, Output> =
       object : ScheduleFor<M> {
         override fun MM(): Monad<M> = MM
