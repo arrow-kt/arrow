@@ -1,0 +1,43 @@
+content:
+    - title: Arrow Core
+      description: Arrow is the functional companion to Kotlin's Standard Library
+      icon: img/home/arrow-core-lines
+      url: /docs/core/
+      id: core
+
+    - title: Arrow FX
+      description: Arrow FX is a next-generation Typed FP Effects Library built to tame side effectful APIs
+      icon: img/home/arrow-fx-lines
+      url: /docs/fx/
+      id: fx
+
+    - title: Arrow Optics
+      description: Arrow Optics helps by transforming and computing over immutable data models in Kotlin
+      icon: img/home/arrow-optics-lines
+      url: /docs/optics/dsl/
+      id: optics
+
+    - title: Arrow Meta
+      description: Arrow Meta is the functional companion to the Kotlin Compiler and its plugin ecosystem
+      icon: img/home/arrow-meta-lines
+      url: https://meta.arrow-kt.io/
+      id: meta
+
+    - title: Arrow Incubator
+      description:
+      icon:
+      url: /docs/aql/intro/
+      id: incubator
+
+incubator:
+    - title: Arrow Query Language
+      url: /docs/aql/intro/
+
+    - title: Recursion Schemes
+      url: /docs/recursion/intro/
+
+    - title: Arrow Generic
+      url: /docs/generic/product/
+
+    - title: Arrow Free
+      url: /docs/free/free/
