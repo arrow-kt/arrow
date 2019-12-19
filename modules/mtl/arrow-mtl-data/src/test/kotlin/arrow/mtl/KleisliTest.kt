@@ -27,6 +27,7 @@ import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
+import arrow.mtl.extensions.kleisli.eqK.eqK
 import arrow.mtl.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
@@ -98,14 +99,3 @@ class KleisliTest : UnitSpec() {
   }
 }
 
-private fun <F, D> Kleisli.Companion.eqK(EQKF: EqK<F>, d: D) = object : EqK<KleisliPartialOf<F, D>> {
-  override fun <A> Kind<KleisliPartialOf<F, D>, A>.eqK(other: Kind<KleisliPartialOf<F, D>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.run(d)
-      val rs = it.second.run(d)
-
-      EQKF.liftEq(EQ).run {
-        ls.eqv(rs)
-      }
-    }
-}
