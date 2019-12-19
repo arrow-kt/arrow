@@ -25,7 +25,7 @@ val store = Store(0) { "The current value is: $it" }
 store.extract()
 ```
 
-If we want to change the initial state of the store we have a `move` method:
+If we want to change the initial state of the store, we have a `move` method:
 
 ```kotlin:ank
 val newStore = store.move(store.state + 1)
@@ -45,7 +45,7 @@ val tupleStore = store.coflatMap { it: Store<Int, String> -> Tuple2("State", it.
 tupleStore.extract()
 ```
 
-And as a `Comonad` is also a `Functor` we have `map` which allows us to transform the state representation:
+And, as a `Comonad` is also a `Functor`, we have `map`, which allows us to transform the state representation:
 
 ```kotlin:ank
 val upperCaseStore = store.map { it: String -> it.toUpperCase() }

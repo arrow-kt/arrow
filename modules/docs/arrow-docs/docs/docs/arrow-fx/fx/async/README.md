@@ -6,7 +6,7 @@ permalink: /docs/fx/async/
 
 # Asynchronous & Concurrent Programming
 
-Arrow Fx benefits from the `!effect` application and direct syntax for asynchronous programming by yielding extremely succinct programs without callbacks. This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime and bind their results to the left-hand side. The resulting expressions enjoy the same syntax that most OOP and Java programmers are already accustomed to, direct blocking imperative style.
+Arrow Fx benefits from the `!effect` application and direct syntax for asynchronous programming by yielding extremely succinct programs without callbacks. This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime, and bind their results to the left-hand side. The resulting expressions enjoy the same syntax that most OOP and Java programmers are already accustomed to—direct blocking imperative style.
 
 ## Dispatchers and Contexts
 
@@ -73,15 +73,15 @@ When we spawn fibers, we can obtain their deferred non-blocking result using `jo
 
 Note that, because we are using `Fiber` and a Dispatcher that may not create new threads in all cases here, there is no guarantee that the printed thread names will be different.
 
-This is part of the greatness of Fibers. They run as scheduled based on the policies provided by the Dispatcher's Context.
+This is part of the greatness of Fibers. They run as scheduled, based on the policies provided by the Dispatcher's Context.
 
 ## Parallelization & Concurrency
 
-Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence` allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
+Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence`, allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
 
 ### `parMapN`
 
-`parMapN` allows *N#* effects to run in parallel non-blocking waiting for all results to complete and then delegates to a user-provided function that applies a final transformation over the results.
+`parMapN` allows *N#* effects to run in parallel non-blocking waiting for all results to complete, and then delegates to a user-provided function that applies a final transformation over the results.
 Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side.
 
 ```kotlin:ank:playground
@@ -117,7 +117,7 @@ fun main() { // The edge of our world
 
 ### `parTraverse`
 
-`parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user-provided function over each effect result and then gather all the transformed results in a `List<B>`.
+`parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user-provided function over each effect result, and then gather all the transformed results in a `List<B>`.
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -144,7 +144,7 @@ fun main() { // The edge of our world
 
 ### `parSequence`
 
-`parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel and then gathers all the transformed results and returns them in a `List<B>`.
+`parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel, then gathers all the transformed results and returns them in a `List<B>`.
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -173,11 +173,11 @@ fun main() { // The edge of our world
 
 ## Arrow Fx vs KotlinX Coroutines
 
-In the same way that Arrow serves as a companion to the Kotlin standard library in providing the abstractions and runtime to implement Typed FP in Kotlin, Arrow Fx can be seen as a companion to the KotlinX Coroutines library.
+Arrow Fx can be seen as a companion to the KotlinX Coroutines library in the same way that Arrow serves as a companion to the Kotlin standard library in providing the abstractions and runtime to implement Typed FP in Kotlin.
 
 Arrow Fx adds an extra layer of security and effect control where we can easily model side effects and how they interact with pure computations.
 
-In contrast with the couroutines library where `Deferred` computations are eager by default and fire immediately when instantiated, in Arrow Fx, all bindings and compositions are lazy and suspended ensuring execution is explicit and always deferred until the last second.
+In contrast with the couroutines library, where `Deferred` computations are eager by default and fire immediately when instantiated, in Arrow Fx, all bindings and compositions are lazy and suspended, ensuring execution is explicit and always deferred until the last second.
 
 Deferring execution and being able to suspend side effects is essential for programs built with Arrow because we can ensure that effects run in a controlled environment and preserve the properties of purity and referential transparency, allowing us to apply equational reasoning over the different parts that conform our programs.
 
@@ -224,7 +224,7 @@ fun main() {
 ```
 
 In the previous program, `printThreadName()` may be invoked before we call `await`.
-If we wanted a pure lazy version of this operation, we need to hint to the `async` constructor that our policy is not to start right away.
+If we want a pure lazy version of this operation, we need to hint to the `async` constructor that our policy is not to start right away.
 
 ```kotlin:ank:playground
 import kotlinx.coroutines.*
@@ -249,9 +249,9 @@ Arrow Fx is not opinionated as to whether eagerly firing is a more or less appro
 
 Life goes on.
 
-Arrow Fx offers in contrast, a different approach that is in-line with Arrow's primary concern - helping you, as a user, create well-typed safe and pure programs in Kotlin.
+Arrow Fx offers, in contrast, a different approach that is in line with Arrow's primary concern——helping you, as a user, create well-typed, safe, and pure programs in Kotlin.
 
-On top of complementing the KolinX Coroutines API, Arrow Fx provides interoperability with its runtime allowing you to run polymorphic programs over the KotlinX Coroutines, Rx2, Reactor, and even custom runtimes.
+On top of complementing the KolinX Coroutines API, Arrow Fx provides interoperability with its runtime, allowing you to run polymorphic programs over the KotlinX Coroutines, Rx2, Reactor, and even custom runtimes.
 
 ## Integrating with third-party libraries
 

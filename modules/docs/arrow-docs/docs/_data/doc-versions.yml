@@ -4,11 +4,11 @@ docVersions:
       url: https://0-9-0.arrow-kt.io/
       previous: https://0-8-2.arrow-kt.io/
 
-    - title: "v0.10.3"
+    - title: "v0.10.4"
       url: https://arrow-kt.io/
       previous: https://0-9-0.arrow-kt.io/
 
-    - title: "v0.10.4-SNAPSHOT"
+    - title: "v0.10.5-SNAPSHOT"
       url: https://next.arrow-kt.io/
       previous: https://arrow-kt.io/
 

@@ -33,7 +33,7 @@ listTraversal.lastOption(ListK.empty())
 
 Arrow provides `Each` instances for some common datatypes in Arrow. You can look them up by calling `Each.each()`.
 
-You may create instances of `Each` for your own datatypes which you will be able to use as demonstrated in the [example](#example) above.
+You may create instances of `Each` for your own datatypes, which you will be able to use as demonstrated in the [example](#example) above.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Each` instances for custom datatypes.
 

@@ -8,7 +8,7 @@ permalink: /docs/quickstart/setup/
 
 ### Next development version
 
-If you want to try the last features, replace `0.10.3` by `0.10.4-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.10.4` by `0.10.5-SNAPSHOT` in the following guideline.
 
 ### JDK
 
@@ -24,7 +24,7 @@ We'll be working on a Arrow-Android integration module that adds some helpers an
 
 #### Basic Setup
 
-In your project's root `build.gradle` append these repositories to your list:
+In your project's root `build.gradle`, append these repositories to your list:
 
 ```groovy
 allprojects {
@@ -39,12 +39,12 @@ allprojects {
 
 Add the dependencies into the project's `build.gradle`:
 
-##### Λrrow Core
+##### Arrow Core
 
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -52,12 +52,12 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Optics
+##### Arrow Core + Arrow Optics
 
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -65,12 +65,12 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Fx
+##### Arrow Core + Arrow Fx
 
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -78,12 +78,12 @@ dependencies {
 }
 ```
 
-##### Λrrow Core + Λrrow Optics + Λrrow Fx
+##### Arrow Core + Arrow Optics + Arrow Fx
 
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-optics:$arrow_version"
@@ -96,7 +96,7 @@ Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_
 
 #### Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -105,7 +105,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
@@ -143,16 +143,16 @@ idea {
 
 #### Basic Setup
 
-Make sure to have the at least the latest version of JDK 1.8 installed.
+Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-     <arrow.version>0.10.3</arrow.version>
+     <arrow.version>0.10.4</arrow.version>
 </properties>
 ```
 
-Add the dependencies that you want to use
+Add the dependencies that you want to use:
 ```
         <dependency>
             <groupId>io.arrow-kt</groupId>
@@ -169,7 +169,7 @@ Add the dependencies that you want to use
 
 #### Enabling kapt
 
-Enable annotaton processing using kotlin plugin
+Enable annotaton processing using Kotlin plugin:
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>

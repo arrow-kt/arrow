@@ -11,16 +11,16 @@ redirect_from:
 
 
 
-The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, aggregates their values `A`.
+The Typeclass `Foldable` provide us the ability, given a type `Kind<F, A>`, to aggregate their values `A`.
 
 `Foldable<F>` is implemented in terms of two basic methods:
 
 - `fa.foldLeft(init, f)` eagerly folds `fa` from left-to-right.
 - `fa.foldRight(init, f)` lazily folds `fa` from right-to-left.
 
-Beyond these it provides many other useful methods related to folding over `Kind<F, A>` values.
+Beyond these, it provides many other useful methods related to folding over `Kind<F, A>` values.
 
-For the following examples we are going to use some common imports
+For the following examples, we are going to use some common imports.
 
 ```kotlin:ank:silent
 import arrow.Kind
@@ -33,7 +33,7 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.typeclasses.Foldable
 ```
 
-and the same two variables to see the different behaviors of `Foldable`:
+And we'll use the same two variables to see the different behaviors of `Foldable`:
 
 ```kotlin:ank:silent
 val maybeStr: Option<String> = Some("abc")
@@ -67,7 +67,7 @@ Right associative lazy fold on `F` using the provided function.
 
 This method evaluates `lb` lazily, and returns a lazy value to support laziness in a stack-safe way avoiding StackOverflows.
 
-For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}).
+For more detailed information about how this method works, see the documentation for [`Eval<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}).
 
 ```kotlin:ank:silent
 fun <F> concatenateStringFromRight(strKind: Kind<F, String>, FO: Foldable<F>): String =
@@ -111,7 +111,7 @@ concatenateString(None, Option.foldable())
 concatenateString(strList, ListK.foldable())
 ```
 
-Besides we have `combineAll` which is an alias for fold.
+Alternatively, we have `combineAll`, which is an alias for fold.
 
 ```kotlin:ank:silent
 fun <F> combineAllString(strKind: Kind<F, String>, FO: Foldable<F>): String =
@@ -229,7 +229,7 @@ getLengthFromRight(strList, ListK.foldable())
 ```
 
 ### FoldMap
-Fold implemented by mapping `A` values into `B` and then combining them using the given `Monoid<B>` instance.
+Fold implemented by mapping `A` values into `B`, and then combining them using the given `Monoid<B>` instance.
 
 ```kotlin:ank:silent
 fun <F> getLenght(strKind: Kind<F, String>, FO: Foldable<F>): Int =
@@ -278,7 +278,7 @@ traverse(strList, ListK.foldable())
 ```
 
 ### Sequence_
-Similar to `traverse_` except it operates on `Kind<F, Kind<G, A>>` values, so no additional functions are needed.
+Similar to `traverse_`, except it operates on `Kind<F, Kind<G, A>>` values, so no additional functions are needed.
 
 ```kotlin:ank:silent
 import arrow.core.extensions.option.applicative.applicative
@@ -426,7 +426,7 @@ foldableNonEmpty(strList, ListK.foldable())
 ### Size
 The size of this `Foldable`.
 
-Note: will not terminate for infinite-sized collections.
+Note: Will not terminate for infinite-sized collections.
 
 ```kotlin:ank:silent
 fun <F> foldableSize(strKind: Kind<F, String>, FO: Foldable<F>): Long =
