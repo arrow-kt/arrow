@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
+import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.hash.hash
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.`try`.monoid.monoid
@@ -22,7 +23,6 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Hash
 import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
@@ -38,14 +38,7 @@ class TryTest : UnitSpec() {
 
   val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
-  val EQK = object : EqK<ForTry> {
-    override fun <A> Kind<ForTry, A>.eqK(other: Kind<ForTry, A>, EQ: Eq<A>): Boolean =
-      (this.fix() to other.fix()).let {
-        Try.eq(EQ, Eq.any()).run {
-          it.first.eqv(it.second)
-        }
-      }
-  }
+  val EQK = Try.eqK()
 
   val GENK = object : GenK<ForTry> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =
