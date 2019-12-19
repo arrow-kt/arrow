@@ -3,28 +3,25 @@ library: fx
 ---
 {: data-executable="true"}
 ```kotlin
-import arrow.core.Tuple2
 import arrow.fx.IO
-import arrow.unsafe
-import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
+import kotlinx.coroutines.newSingleThreadContext
 
-suspend fun threadName(): String =
-    Thread.currentThread().name
 //sampleStart
 
 
-val program = IO.fx {
-    val (threadA: String, threadB: String) =
-    !dispatchers().default().parMapN(
-        effect { threadName() },
-        effect { threadName() },
-        ::Tuple2
-    )
-    !effect { println("Visited $threadA, $threadB") }
-}
+val Computation = newSingleThreadContext("Computation")
+val BlockingIO = newSingleThreadContext("Blocking IO")
+val UI = newSingleThreadContext("UI")
+
+suspend fun main(): Unit = IO.fx {
+  continueOn(Computation)
+  val t1 = !effect { Thread.currentThread().name }
+  continueOn(BlockingIO)
+  val t2 = !effect { Thread.currentThread().name }
+  continueOn(UI)
+  val t3 = !effect { Thread.currentThread().name }
+  !effect { println("$t1 ~> $t2 ~> $t3") }
+}.suspended()
 //sampleEnd
-fun main() { // The edge of our world
-  unsafe { runBlocking { program } }
-}
 ```
