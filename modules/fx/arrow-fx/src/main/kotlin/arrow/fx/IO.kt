@@ -37,13 +37,13 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 sealed class IOResult<out E, out A> {
-  data class Right<A>(val value: A) : IOResult<Nothing, A>()
+  data class Success<A>(val value: A) : IOResult<Nothing, A>()
   data class Error<E>(val error: E) : IOResult<E, Nothing>()
   data class Exception(val exception: Throwable) : IOResult<Nothing, Nothing>()
 
-  fun <R> fold(ifException: (Throwable) -> R, ifLeft: (E) -> R, ifRight: (A) -> R): R =
+  fun <R> fold(ifException: (Throwable) -> R, ifLeft: (E) -> R, ifSuccess: (A) -> R): R =
     when (this) {
-      is Right -> ifRight(this.value)
+      is Success -> ifSuccess(this.value)
       is Error -> ifLeft(this.error)
       is Exception -> ifException(this.exception)
     }
@@ -686,7 +686,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
     IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
-    cb(IOResult.Right(IOFiber(promise, conn)))
+    cb(IOResult.Success(IOFiber(promise, conn)))
   }
 
   /**
@@ -753,7 +753,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           Silent ->
             { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
         }
-      ccb(IOResult.Right(conn.toDisposable()))
+      ccb(IOResult.Success(conn.toDisposable()))
       IORunLoop.startCancelable(this, conn, onCancelCb)
     }
 

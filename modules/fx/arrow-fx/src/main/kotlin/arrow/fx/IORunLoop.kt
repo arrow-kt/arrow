@@ -313,7 +313,7 @@ internal object IORunLoop {
 
         // Return case when no there are no more binds left
         if (nextBind == null) {
-          cb(IOResult.Right(result))
+          cb(IOResult.Success(result))
           return
         } else {
           currentIO = executeSafe { nextBind(result) }
@@ -442,7 +442,7 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         when (p1) {
-          is IOResult.Right -> IO.Pure(p1.value)
+          is IOResult.Success -> IO.Pure(p1.value)
           is IOResult.Error -> IO.RaiseError(p1.error)
           is IOResult.Exception -> IO.RaiseException(p1.exception)
         }.let { r ->

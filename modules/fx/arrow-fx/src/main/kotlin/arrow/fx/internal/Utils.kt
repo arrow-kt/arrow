@@ -168,7 +168,7 @@ object Platform {
 
     return when (val eitherRef = ref) {
       null -> None
-      is IOResult.Right -> Some(Right(eitherRef.value))
+      is IOResult.Success -> Some(Right(eitherRef.value))
       is IOResult.Error -> Some(Left(eitherRef.error))
       is IOResult.Exception -> throw eitherRef.exception
     }

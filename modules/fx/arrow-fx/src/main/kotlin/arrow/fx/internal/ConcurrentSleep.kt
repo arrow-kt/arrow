@@ -53,7 +53,7 @@ internal class IOTick<E>(
 ) : Runnable {
   override fun run() {
     suspend { Unit }.startCoroutine(Continuation(ctx) {
-      it.fold({ unit -> cb(IOResult.Right(unit)) }, { e -> cb(IOResult.Exception(e)) })
+      it.fold({ unit -> cb(IOResult.Success(unit)) }, { e -> cb(IOResult.Exception(e)) })
     })
   }
 }
