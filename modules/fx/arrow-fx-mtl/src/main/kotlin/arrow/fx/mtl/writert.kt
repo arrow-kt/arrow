@@ -1,6 +1,7 @@
 package arrow.fx.mtl
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.fx.Ref
 import arrow.mtl.WriterT
@@ -17,6 +18,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Fiber
@@ -102,6 +104,10 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
 
   override fun dispatchers(): Dispatchers<WriterTPartialOf<F, W>> =
     CF().dispatchers() as Dispatchers<WriterTPartialOf<F, W>>
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<WriterTPartialOf<F, W>>): WriterT<F, W, A> = CF().run {
+    WriterT.liftF(cancelable { cb -> k(cb).value().unit() }, MM(), this)
+  }
 
   override fun <A> WriterTOf<F, W, A>.fork(ctx: CoroutineContext): WriterT<F, W, Fiber<WriterTPartialOf<F, W>, A>> = CF().run {
     val fork: Kind<F, Tuple2<W, Fiber<WriterTPartialOf<F, W>, A>>> = value().fork(ctx).map { fiber: Fiber<F, Tuple2<W, A>> ->
