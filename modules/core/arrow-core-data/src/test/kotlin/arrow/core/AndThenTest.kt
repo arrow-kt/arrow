@@ -58,7 +58,7 @@ class AndThenTest : UnitSpec() {
     testLaws(
       MonadLaws.laws(AndThen.monad(), EQK<AndThenPartialOf<Int>>()),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant(), genk(), conestedEQK),
+      ContravariantLaws.laws(AndThen.contravariant<Int>(), genk(), conestedEQK),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
     )
