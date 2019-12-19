@@ -9,6 +9,7 @@ import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
 import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.foldable.foldable
+import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.semialign.semialign
@@ -48,7 +49,16 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.semigroupK(),
         NonEmptyList.applicative(),
         Eq.any()),
-      BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any(), EQ2, Eq.any()),
+      BimonadLaws.laws(
+        NonEmptyList.bimonad(),
+        NonEmptyList.monad(),
+        NonEmptyList.comonad(),
+        NonEmptyList.functor(),
+        NonEmptyList.applicative(),
+        NonEmptyList.monad(),
+        { NonEmptyList.of(it) },
+        Eq.any(), EQ2, Eq.any()
+      ),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),

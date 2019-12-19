@@ -8,7 +8,9 @@ import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.bitraverse.bitraverse
 import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.hash.hash
+import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.either.monoid.monoid
 import arrow.core.extensions.either.semigroupK.semigroupK
@@ -42,7 +44,7 @@ class EitherTest : UnitSpec() {
       BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, Eq.any()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
-      MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
+      MonadErrorLaws.laws(Either.monadError(), Either.functor(), Either.applicative(), Either.monad(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
