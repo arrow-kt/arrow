@@ -1,9 +1,11 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.extensions.andthen.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.extensions.andthen.category.category
 import arrow.core.extensions.andthen.contravariant.contravariant
+import arrow.core.extensions.andthen.functor.functor
 import arrow.core.extensions.andthen.monad.monad
 import arrow.core.extensions.andthen.monoid.monoid
 import arrow.core.extensions.andthen.profunctor.profunctor
@@ -36,7 +38,7 @@ class AndThenTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadLaws.laws(AndThen.monad(), EQ),
+      MonadLaws.laws(AndThen.monad(), AndThen.functor(), AndThen.applicative(), AndThen.monad(), EQ),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
       ContravariantLaws.laws(AndThen.contravariant(), { AndThen.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),

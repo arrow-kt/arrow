@@ -8,8 +8,11 @@ import arrow.mtl.Kleisli
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -24,9 +27,15 @@ object MonadLaws {
         Law("Monad Laws: kleisli right identity") { M.kleisliRightIdentity(EQ) },
         Law("Monad Laws: map / flatMap coherence") { M.mapFlatMapCoherence(EQ) },
         Law("Monad Laws: monad comprehensions") { M.monadComprehensions(EQ) },
-        Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) },
-        Law("Monad Laws: selectM == select when Selective has a monad instance") { M.selectEQSelectM(EQ) }
+        Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) }
       )
+
+  fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Apply<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    laws(M, EQ) + listOf(
+      Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
+      Law("Monad Laws: monad instance should preserve behavior of Apply") { M.preservesApply(AP, EQ) },
+      Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }
+    )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
@@ -72,9 +81,25 @@ object MonadLaws {
       }.equalUnderTheLaw(just(num + 2), EQ)
     }
 
-  fun <F> Monad<F>.selectEQSelectM(EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Monad<F>.preservesSelective(SL: Selective<F>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.int(), Gen.int())) { either ->
       val f = just<(Int) -> Int>(::identity)
-      just(either).select(f).equalUnderTheLaw(just(either).selectM(f), EQ)
+      SL.run { just(either).select(f) }.equalUnderTheLaw(just(either).select(f), EQ)
+    }
+
+  fun <F> Monad<F>.preservesFunctor(FF: Functor<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { num, f ->
+      FF.run { just(num).map(f) }.equalUnderTheLaw(just(num).map(f), EQ)
+    }
+
+  fun <F> Monad<F>.preservesApply(AP: Apply<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { num, f ->
+      val ff = just(f)
+      AP.run { just(num).ap(ff) }.equalUnderTheLaw(just(num).ap(ff), EQ)
+
+      val fg = just(1)
+      AP.run { just(num).followedBy(fg) }.equalUnderTheLaw(just(num).followedBy(fg), EQ)
+
+      AP.run { just(num).apTap(fg) }.equalUnderTheLaw(just(num).apTap(fg), EQ)
     }
 }

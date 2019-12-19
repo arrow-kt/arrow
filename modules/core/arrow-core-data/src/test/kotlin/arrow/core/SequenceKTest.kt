@@ -9,6 +9,7 @@ import arrow.core.extensions.sequencek.crosswalk.crosswalk
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.eqK.eqK
 import arrow.core.extensions.sequencek.foldable.foldable
+import arrow.core.extensions.sequencek.functor.functor
 import arrow.core.extensions.sequencek.functorFilter.functorFilter
 import arrow.core.extensions.sequencek.hash.hash
 import arrow.core.extensions.sequencek.monad.monad
@@ -29,7 +30,6 @@ import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
@@ -71,9 +71,8 @@ class SequenceKTest : UnitSpec() {
     }
 
     testLaws(
-      MonadCombineLaws.laws(SequenceK.monadCombine(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
+      MonadCombineLaws.laws(SequenceK.monadCombine(), SequenceK.functor(), SequenceK.applicative(), SequenceK.monad(), { sequenceOf(it).k() }, { i -> sequenceOf({ j: Int -> i + j }).k() }, eq),
       ShowLaws.laws(show, eq, Gen.sequenceK(Gen.int())),
-      MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
       MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq, this::bijection, associativeSemigroupalEq),

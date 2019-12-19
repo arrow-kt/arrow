@@ -1,9 +1,11 @@
 package arrow.core
 
+import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.hash.hash
+import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.`try`.monoid.monoid
 import arrow.core.extensions.`try`.show.show
@@ -40,7 +42,7 @@ class TryTest : UnitSpec() {
     testLaws(
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
-      MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+      MonadErrorLaws.laws(Try.monadError(), Try.functor(), Try.applicative(), Try.monad(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
     )

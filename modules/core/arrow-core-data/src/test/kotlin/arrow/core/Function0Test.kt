@@ -1,10 +1,13 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.extensions.function0.applicative.applicative
 import arrow.core.extensions.function0.bimonad.bimonad
 import arrow.core.extensions.function0.comonad.comonad
+import arrow.core.extensions.function0.functor.functor
 import arrow.core.extensions.function0.monad.monad
 import arrow.core.extensions.function0.monoid.monoid
+import arrow.core.extensions.function0.selective.selective
 import arrow.core.extensions.function0.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
@@ -28,7 +31,7 @@ class Function0Test : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Function0.monoid(Int.monoid()), Gen.constant({ 1 }.k()), EQ1),
-      BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), { { it }.k() }, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), Function0.functor(), Function0.applicative(), Function0.selective(), { { it }.k() }, EQ1, EQ2, Eq.any())
     )
 
     "Semigroup of Function0<A> is Function0<Semigroup<A>>" {
