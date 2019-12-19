@@ -25,7 +25,7 @@ class ResourceTest : UnitSpec() {
   init {
 
     val EQ = Eq<Kind<ResourcePartialOf<ForIO, Throwable>, Int>> { a, b ->
-      val tested: IO<Int> = a.fix().invoke { IO.just(1) }.fix()
+      val tested: IO<Nothing, Int> = a.fix().invoke { IO.just(1) }.fix()
       val expected = b.fix().invoke { IO.just(1) }.fix()
       val compare = IO.applicative().map(tested, expected) { (t, e) -> t == e }.fix()
       compare.unsafeRunTimed(5.seconds) == Some(true)

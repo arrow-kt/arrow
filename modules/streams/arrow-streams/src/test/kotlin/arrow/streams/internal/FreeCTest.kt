@@ -73,13 +73,13 @@ val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : 
 
 @Suppress("UNCHECKED_CAST")
 val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> {
-  override fun <A> invoke(fa: Kind<ForOps, A>): IO<A> {
+  override fun <A> invoke(fa: Kind<ForOps, A>): IO<Nothing, A> {
     val op = fa.fix()
     return when (op) {
       is Ops.Add -> IO { op.k(op.a + op.y) }
       is Ops.Subtract -> IO { op.k(op.a - op.y) }
       is Ops.Value -> IO { op.k(op.a) }
-    }
+    } as IO<Nothing, A>
   }
 }
 

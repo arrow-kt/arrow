@@ -54,7 +54,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * Effect blocks suspend side effect in the monadic computation of the runtime
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
-      val program: IO<String> = IO.fx {
+      val program: IO<Nothing, String> = IO.fx {
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -253,7 +253,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
   }
 }
 
-fun <A> fxTest(f: () -> IO<A>): A =
+fun <A> fxTest(f: () -> IO<Nothing, A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()

@@ -100,7 +100,7 @@ Sequentially executes two elements and ignores the result of the second. This is
 ```kotlin:ank
 import arrow.fx.extensions.io.monad.*
 
-fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
+fun logValue(i: Int): IO<Nothing, Unit> = IO { /* println(i) */ }
 
 IO.just(1).flatTap(::logValue).fix().unsafeRunSync()
 ```

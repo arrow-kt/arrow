@@ -23,7 +23,7 @@ open class ForkFiber {
   @Param("100")
   var size: Int = 0
 
-  private fun ioStartLoop(i: Int): IO<Int> =
+  private fun ioStartLoop(i: Int): IO<Nothing, Int> =
     if (i < size) {
       IO { i + 1 }.fork(IODispatchers.CommonPool).flatMap { fiber ->
         fiber.join().fix().flatMap { ioStartLoop(it) }
