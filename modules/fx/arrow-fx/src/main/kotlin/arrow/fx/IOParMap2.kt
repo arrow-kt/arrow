@@ -12,7 +12,7 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IOParMap2 {
 
-  fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<Nothing, C> = IO.Async { conn, cb ->
+  fun <E, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<E, A>, fb: IOOf<E, B>, f: (A, B) -> C): IO<E, C> = IO.Async { conn, cb ->
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicRefW<Any?>(null)
 
@@ -24,22 +24,34 @@ interface IOParMap2 {
     fun complete(a: A, b: B) {
       conn.pop()
       cb(try {
-        Either.Right(f(a, b))
+        IOResult.Success(f(a, b))
       } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
+        IOResult.Exception(e.nonFatalOrThrow())
       })
     }
 
-    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
-      is Throwable -> Unit // Do nothing we already finished
+    fun sendException(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
+      is Throwable -> Unit // Do nothing we already finished TODO replace with active field
       else -> other.cancel().fix().unsafeRunAsync { r ->
         conn.pop()
-        cb(Left(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
+        // TODO if `r` is an exception send it to the asyncErrorHandler
+        cb(IOResult.Exception(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e }, { e })))
+      }
+    }
+
+    fun sendError(other: IOConnection, e: E) = when (state.getAndSet(e)) {
+      is Throwable -> Unit
+      else -> other.cancel().fix().unsafeRunAsync { r ->
+        conn.pop()
+        cb(IOResult.Error(e))
+        // TODO if `r` is an exception send it to the asyncErrorHandler
       }
     }
 
     IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
       resultA.fold({ e ->
+        sendException(connB, e)
+      }, { e ->
         sendError(connB, e)
       }, { a ->
         when (val oldState = state.getAndSet(Left(a))) {
@@ -53,7 +65,9 @@ interface IOParMap2 {
 
     IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
       resultB.fold({ e ->
-        sendError(connA, e)
+        sendException(connA, e)
+      }, { e ->
+        sendError(connB, e)
       }, { b ->
         when (val oldState = state.getAndSet(Right(b))) {
           null -> Unit // Wait for A
