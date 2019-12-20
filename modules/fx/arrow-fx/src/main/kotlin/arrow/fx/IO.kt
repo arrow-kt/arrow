@@ -477,7 +477,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
           IORunLoop.startCancelable(fa, conn2) { result ->
             conn.pop()
-            result.fold({}, {}, cancelable::complete)
+            result.fold({}, {}, { cancelable.complete(it)  })
           }
         }
       }
@@ -656,39 +656,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    */
   open fun continueOn(ctx: CoroutineContext): IO<E, A> =
     ContinueOn(this, ctx)
-
-  /**
-   * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.*
-   * import arrow.fx.extensions.fx
-   * import kotlinx.coroutines.Dispatchers
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = IO.fx {
-   *     val (join, cancel) = !IO.effect {
-   *       println("Hello from a fiber on ${Thread.currentThread().name}")
-   *     }.fork(Dispatchers.Default)
-   *   }
-   *
-   *   //sampleEnd
-   *   result.unsafeRunSync()
-   * }
-   * ```
-   *
-   * @receiver [IO] to execute on [ctx] within a new suspended [IO].
-   * @param ctx [CoroutineContext] to execute the source [IO] on.
-   * @return [IO] with suspended execution of source [IO] on context [ctx].
-   */
-  fun fork(ctx: CoroutineContext): IO<Nothing, Fiber<ForIO, A>> = async { cb ->
-    val promise = UnsafePromise<A>()
-    // A new IOConnection, because its cancellation is now decoupled from our current one.
-    val conn = IOConnection()
-    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
-    cb(IOResult.Success(IOFiber(promise, conn)))
-  }
 
   /**
    * Safely attempts the [IO] and lift any errors to the value side into [Either].
@@ -1179,3 +1146,37 @@ fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>
  */
 fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
   guaranteeCase { finalizer }
+
+/**
+ * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.extensions.fx
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.fx {
+ *     val (join, cancel) = !IO.effect {
+ *       println("Hello from a fiber on ${Thread.currentThread().name}")
+ *     }.fork(Dispatchers.Default)
+ *   }
+ *
+ *   //sampleEnd
+ *   result.unsafeRunSync()
+ * }
+ * ```
+ *
+ * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+ * @param ctx [CoroutineContext] to execute the source [IO] on.
+ * @return [IO] with suspended execution of source [IO] on context [ctx].
+ */
+fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A>> =
+  IO.async { cb ->
+    val promise = UnsafePromise<E, A>()
+    // A new IOConnection, because its cancellation is now decoupled from our current one.
+    val conn = IOConnection()
+    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
+    cb(IOResult.Success(IOFiber(promise, conn)))
+  }
