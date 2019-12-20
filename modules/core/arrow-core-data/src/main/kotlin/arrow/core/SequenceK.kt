@@ -16,11 +16,9 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-    fun loop(fa_p: SequenceK<A>): Eval<B> = when {
-      fa_p.sequence.none() -> lb
-      else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1).k()) })
-    }
-    return Eval.defer { loop(this) }
+    fun Iterator<A>.loop(): Eval<B> =
+      if (hasNext()) f(next(), Eval.defer { loop() }) else lb
+    return Eval.defer { this.iterator().loop() }
   }
 
   /**
@@ -31,7 +29,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
    */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
-      Eval.later { GA.run { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
+      GA.run { Eval.later {  f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
     }.value()
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
