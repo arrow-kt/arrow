@@ -50,8 +50,11 @@ class IorTest : UnitSpec() {
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
-      MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.functor(), Ior.applicative(Int.semigroup()), Ior.monad(Int.semigroup()), Eq.any()),
-      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
+      MonadLaws.laws(Ior.monad(Int.semigroup()), Ior.functor(), Ior.applicative(Int.semigroup()), Ior.monad(Int.semigroup()), Ior.eqK(Int.eq())),
+      TraverseLaws.laws(Ior.traverse(),
+        Ior.genK(Gen.int()),
+        Ior.eqK(Int.eq())
+      ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),

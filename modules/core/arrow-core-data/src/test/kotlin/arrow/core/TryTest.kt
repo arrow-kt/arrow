@@ -1,8 +1,10 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
+import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.hash.hash
 import arrow.core.extensions.`try`.monad.monad
@@ -15,7 +17,9 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.`try`
+import arrow.test.generators.throwable
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonoidLaws
@@ -35,15 +39,25 @@ class TryTest : UnitSpec() {
   val success = Try { "10".toInt() }
   val failure = Try { "NaN".toInt() }
 
-  init {
+  val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
-    val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
+  val EQK = Try.eqK()
+
+  val GENK = object : GenK<ForTry> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =
+      Gen.oneOf(
+        gen.map {
+          Success(it)
+        }, Gen.throwable().map { Try.Failure(it) })
+  }
+
+  init {
 
     testLaws(
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
-      MonadErrorLaws.laws(Try.monadError(), Try.functor(), Try.applicative(), Try.monad(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
+      MonadErrorLaws.laws(Try.monadError(), Try.functor(), Try.applicative(), Try.monad(), EQK),
+      TraverseLaws.laws(Try.traverse(), GENK, EQK),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
     )
 

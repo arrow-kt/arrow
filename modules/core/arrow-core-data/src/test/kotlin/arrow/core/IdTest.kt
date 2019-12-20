@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.id.applicative.applicative
@@ -41,16 +40,22 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class IdTest : UnitSpec() {
-  val EQ: Eq<Kind<ForId, Kind<ForId, Int>>> = Eq { a, b ->
-    a.value().value() == b.value().value()
-  }
 
   init {
     testLaws(
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
-      TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
-      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), Id.functor(), Id.applicative(), Id.selective(), ::Id, Eq.any(), EQ, Eq.any()),
+      TraverseLaws.laws(Id.traverse(), Id.genK(), Id.eqK()),
+      BimonadLaws.laws(
+        Id.bimonad(),
+        Id.monad(),
+        Id.comonad(),
+        Id.functor(),
+        Id.applicative(),
+        Id.selective(),
+        Id.genK(),
+        Id.eqK()
+      ),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
       EqKLaws.laws(
         Id.eqK(),
