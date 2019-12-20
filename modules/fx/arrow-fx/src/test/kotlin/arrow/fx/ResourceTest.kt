@@ -2,8 +2,8 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Some
-import arrow.core.extensions.monoid
 import arrow.core.extensions.list.traverse.traverse
+import arrow.core.extensions.monoid
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.bracket.bracket
 import arrow.fx.extensions.resource.applicative.applicative
@@ -17,6 +17,7 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
 class ResourceTest : UnitSpec() {
@@ -29,8 +30,19 @@ class ResourceTest : UnitSpec() {
       compare.unsafeRunTimed(5.seconds) == Some(true)
     }
 
+    fun EQK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
+      override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          val ls = it.first.invoke { IO.just(1) }.fix()
+          val rs = it.second.invoke { IO.just(1) }.fix()
+          val compare = IO.applicative().map(ls, rs) { (l, r) -> l == r }.fix()
+
+          compare.unsafeRunTimed(5.seconds) == Some(true)
+        }
+    }
+
     testLaws(
-      MonadLaws.laws(Resource.monad(IO.bracket()), Resource.functor(IO.bracket()), Resource.applicative(IO.bracket()), Resource.selective(IO.bracket()), EQ),
+      MonadLaws.laws(Resource.monad(IO.bracket()), Resource.functor(IO.bracket()), Resource.applicative(IO.bracket()), Resource.selective(IO.bracket()), EQK()),
       MonoidLaws.laws(Resource.monoid(Int.monoid(), IO.bracket()), Gen.int().map { Resource.just(it, IO.bracket()) }, EQ)
     )
 

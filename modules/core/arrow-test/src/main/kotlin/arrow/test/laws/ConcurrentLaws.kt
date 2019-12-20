@@ -1,15 +1,14 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
+import arrow.core.extensions.eq
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.identity
 import arrow.core.k
-
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
@@ -20,43 +19,27 @@ import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws.acquireBracketIsNotCancelable
-import arrow.test.laws.ConcurrentLaws.actionConcurrentWithPureValueIsJustAction
-import arrow.test.laws.ConcurrentLaws.asyncCancelableCoherence
 import arrow.test.laws.ConcurrentLaws.asyncFRegisterCanBeCancelled
 import arrow.test.laws.ConcurrentLaws.cancelOnBracketReleases
-import arrow.test.laws.ConcurrentLaws.cancelableCancelableFCoherence
 import arrow.test.laws.ConcurrentLaws.cancelableFReceivesCancelSignal
 import arrow.test.laws.ConcurrentLaws.cancelableReceivesCancelSignal
 import arrow.test.laws.ConcurrentLaws.joinIsIdempotent
 import arrow.test.laws.ConcurrentLaws.parMapCancelCancelsBoth
-import arrow.test.laws.ConcurrentLaws.parSequenceForksTheEffects
-import arrow.test.laws.ConcurrentLaws.parTraverseCanTraverseEffectfullComputations
-import arrow.test.laws.ConcurrentLaws.parTraverseForksTheEffects
-import arrow.test.laws.ConcurrentLaws.parTraverseResultsInTheCorrectError
 import arrow.test.laws.ConcurrentLaws.raceCancelCancelsBoth
 import arrow.test.laws.ConcurrentLaws.raceCancelsLoser
-import arrow.test.laws.ConcurrentLaws.raceMirrorsLeftWinner
-import arrow.test.laws.ConcurrentLaws.raceMirrorsRightWinner
 import arrow.test.laws.ConcurrentLaws.racePairCanCancelsLoser
 import arrow.test.laws.ConcurrentLaws.racePairCanJoinLeft
 import arrow.test.laws.ConcurrentLaws.racePairCanJoinRight
 import arrow.test.laws.ConcurrentLaws.racePairCancelCancelsBoth
-import arrow.test.laws.ConcurrentLaws.racePairMirrorsLeftWinner
-import arrow.test.laws.ConcurrentLaws.racePairMirrorsRightWinner
 import arrow.test.laws.ConcurrentLaws.raceTripleCanCancelsLoser
 import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinLeft
 import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinMiddle
 import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinRight
 import arrow.test.laws.ConcurrentLaws.raceTripleCancelCancelsAll
-import arrow.test.laws.ConcurrentLaws.raceTripleMirrorsLeftWinner
-import arrow.test.laws.ConcurrentLaws.raceTripleMirrorsMiddleWinner
-import arrow.test.laws.ConcurrentLaws.raceTripleMirrorsRightWinner
 import arrow.test.laws.ConcurrentLaws.releaseBracketIsNotCancelable
-import arrow.test.laws.ConcurrentLaws.startCancelIsUnit
-import arrow.test.laws.ConcurrentLaws.startJoinIsIdentity
-import arrow.test.laws.ConcurrentLaws.uncancelableMirrorsSource
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
@@ -70,72 +53,73 @@ object ConcurrentLaws {
 
   private fun <F> concurrentLaws(
     CF: Concurrent<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_UNIT: Eq<Kind<F, Unit>>,
+    EQK: EqK<F>,
     ctx: CoroutineContext
-  ): List<Law> = listOf(
-    Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
-    Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
-    Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
-    Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
-    Law("Concurrent Laws: cancelable cancelableF coherence") { CF.cancelableCancelableFCoherence(EQ) },
-    Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
-    Law("Concurrent Laws: cancelableF should run CancelToken on cancel") { CF.cancelableFReceivesCancelSignal(EQ, ctx) },
-    Law("Concurrent Laws: asyncF register can be cancelled") { CF.asyncFRegisterCanBeCancelled(EQ, ctx) },
-    Law("Concurrent Laws: start join is identity") { CF.startJoinIsIdentity(EQ, ctx) },
-    Law("Concurrent Laws: join is idempotent") { CF.joinIsIdempotent(EQ, ctx) },
-    Law("Concurrent Laws: start cancel is unit") { CF.startCancelIsUnit(EQ_UNIT, ctx) },
-    Law("Concurrent Laws: uncancelable mirrors source") { CF.uncancelableMirrorsSource(EQ) },
-    Law("Concurrent Laws: race pair mirrors left winner") { CF.racePairMirrorsLeftWinner(EQ, ctx) },
-    Law("Concurrent Laws: race pair mirrors right winner") { CF.racePairMirrorsRightWinner(EQ, ctx) },
-    Law("Concurrent Laws: race pair can cancel loser") { CF.racePairCanCancelsLoser(EQ, ctx) },
-    Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
-    Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
-    Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelCancelsBoth(EQ, ctx) },
-    Law("Concurrent Laws: race triple mirrors left winner") { CF.raceTripleMirrorsLeftWinner(EQ, ctx) },
-    Law("Concurrent Laws: race triple mirrors middle winner") { CF.raceTripleMirrorsMiddleWinner(EQ, ctx) },
-    Law("Concurrent Laws: race triple mirrors right winner") { CF.raceTripleMirrorsRightWinner(EQ, ctx) },
-    Law("Concurrent Laws: race triple can cancel loser") { CF.raceTripleCanCancelsLoser(EQ, ctx) },
-    Law("Concurrent Laws: race triple can join left") { CF.raceTripleCanJoinLeft(EQ, ctx) },
-    Law("Concurrent Laws: race triple can join middle") { CF.raceTripleCanJoinMiddle(EQ, ctx) },
-    Law("Concurrent Laws: race triple can join right") { CF.raceTripleCanJoinRight(EQ, ctx) },
-    Law("Concurrent Laws: cancelling race triple cancels all") { CF.raceTripleCancelCancelsAll(EQ, ctx) },
-    Law("Concurrent Laws: race mirrors left winner") { CF.raceMirrorsLeftWinner(EQ, ctx) },
-    Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
-    Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
-    Law("Concurrent Laws: race cancels both") { CF.raceCancelCancelsBoth(EQ, ctx) },
-    Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelCancelsBoth(EQ, ctx) },
-    Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) },
-    Law("Concurrent Laws: parTraverse can traverse effectful computations") { CF.parTraverseCanTraverseEffectfullComputations(EQ) },
-    Law("Concurrent Laws: parTraverse results in the correct error") { CF.parTraverseResultsInTheCorrectError(EQ_UNIT) },
-    Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
-    Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
-  )
+  ): List<Law> {
+
+    val EQ = EQK.liftEq(Int.eq())
+    val EQ_UNIT = EQK.liftEq(Eq.any())
+
+    return listOf(
+      Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
+      Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
+      Law("Concurrent Laws: cancelable cancelableF coherence") { CF.cancelableCancelableFCoherence(EQ) },
+      Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
+      Law("Concurrent Laws: cancelableF should run CancelToken on cancel") { CF.cancelableFReceivesCancelSignal(EQ, ctx) },
+      Law("Concurrent Laws: asyncF register can be cancelled") { CF.asyncFRegisterCanBeCancelled(EQ, ctx) },
+      Law("Concurrent Laws: start join is identity") { CF.startJoinIsIdentity(EQ, ctx) },
+      Law("Concurrent Laws: join is idempotent") { CF.joinIsIdempotent(EQ, ctx) },
+      Law("Concurrent Laws: start cancel is unit") { CF.startCancelIsUnit(EQ_UNIT, ctx) },
+      Law("Concurrent Laws: uncancelable mirrors source") { CF.uncancelableMirrorsSource(EQ) },
+      Law("Concurrent Laws: race pair mirrors left winner") { CF.racePairMirrorsLeftWinner(EQ, ctx) },
+      Law("Concurrent Laws: race pair mirrors right winner") { CF.racePairMirrorsRightWinner(EQ, ctx) },
+      Law("Concurrent Laws: race pair can cancel loser") { CF.racePairCanCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
+      Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
+      Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors left winner") { CF.raceTripleMirrorsLeftWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors middle winner") { CF.raceTripleMirrorsMiddleWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors right winner") { CF.raceTripleMirrorsRightWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple can cancel loser") { CF.raceTripleCanCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join left") { CF.raceTripleCanJoinLeft(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join middle") { CF.raceTripleCanJoinMiddle(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join right") { CF.raceTripleCanJoinRight(EQ, ctx) },
+      Law("Concurrent Laws: cancelling race triple cancels all") { CF.raceTripleCancelCancelsAll(EQ, ctx) },
+      Law("Concurrent Laws: race mirrors left winner") { CF.raceMirrorsLeftWinner(EQ, ctx) },
+      Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
+      Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race cancels both") { CF.raceCancelCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) },
+      Law("Concurrent Laws: parTraverse can traverse effectful computations") { CF.parTraverseCanTraverseEffectfullComputations(EQ) },
+      Law("Concurrent Laws: parTraverse results in the correct error") { CF.parTraverseResultsInTheCorrectError(EQ_UNIT) },
+      Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
+      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
+    )
+  }
 
   fun <F> laws(
     CF: Concurrent<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    EQ_UNIT: Eq<Kind<F, Unit>>,
+    EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
-    AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) +
-      concurrentLaws(CF, EQ, EQ_UNIT, ctx)
+    AsyncLaws.laws(CF, EQK, testStackSafety) +
+      concurrentLaws(CF, EQK, ctx)
 
   fun <F> laws(
     CF: Concurrent<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    EQ_UNIT: Eq<Kind<F, Unit>>,
+    EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
-    AsyncLaws.laws(CF, FF, AP, SL, EQ, EQ_EITHER, testStackSafety) +
-      concurrentLaws(CF, EQ, EQ_UNIT, ctx)
+    AsyncLaws.laws(CF, FF, AP, SL, EQK, testStackSafety) +
+      concurrentLaws(CF, EQK, ctx)
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     forAll(Gen.int()) { i ->
