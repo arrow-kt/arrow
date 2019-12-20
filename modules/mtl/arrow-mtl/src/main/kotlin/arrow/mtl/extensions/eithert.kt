@@ -6,6 +6,7 @@ import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
+import arrow.core.ap
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
@@ -66,13 +67,20 @@ interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, 
 
   override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
     fix().ap(AF(), ff)
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.lazyAp(ff: () -> Kind<EitherTPartialOf<F, L>, (A) -> B>): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      AF().run {
+        fix().value().lazyAp { ff().value().map { r -> { l: Either<L, A> -> l.ap(r) } } }
+      }
+    )
 }
 
 @extension
 @undocumented
-interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTApply<F, L> {
 
-  fun AF(): Applicative<F>
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 
@@ -81,9 +89,6 @@ interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, Either
 
   override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
     fix().map(AF(), f)
-
-  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
-    fix().ap(AF(), ff)
 }
 
 @extension

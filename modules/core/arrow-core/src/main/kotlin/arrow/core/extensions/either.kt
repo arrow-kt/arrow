@@ -105,14 +105,11 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 }
 
 @extension
-interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<L> {
+interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
-
-  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
 }
 
 @extension

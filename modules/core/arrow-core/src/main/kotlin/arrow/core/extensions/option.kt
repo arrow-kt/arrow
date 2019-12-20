@@ -179,7 +179,7 @@ interface OptionApply : Apply<ForOption> {
 }
 
 @extension
-interface OptionApplicative : Applicative<ForOption> {
+interface OptionApplicative : Applicative<ForOption>, OptionApply {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -197,7 +197,7 @@ interface OptionSelective : Selective<ForOption>, OptionApplicative {
 }
 
 @extension
-interface OptionMonad : Monad<ForOption> {
+interface OptionMonad : Monad<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
