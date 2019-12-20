@@ -1,36 +1,39 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.core.Tuple2
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
+import arrow.extension
 import arrow.mtl.WriterT
 import arrow.mtl.WriterTOf
 import arrow.mtl.WriterTPartialOf
-import arrow.mtl.value
-import arrow.mtl.fix
 import arrow.mtl.extensions.writert.monad.monad
-import arrow.typeclasses.MonadFilter
+import arrow.mtl.fix
 import arrow.mtl.typeclasses.MonadWriter
-import arrow.typeclasses.Monoid
+import arrow.mtl.value
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.extension
-import arrow.typeclasses.Alternative
 
 @extension
 @undocumented
@@ -252,4 +255,17 @@ interface WriterTAlternative<F, W> : Alternative<WriterTPartialOf<F, W>>, Writer
 
   override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
     orElse(y).fix()
+}
+
+@extension
+interface WriterTEqK<F, W> : EqK<WriterTPartialOf<F, W>> {
+  fun EQKF(): EqK<F>
+  fun EQW(): Eq<W>
+
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.eqK(other: Kind<WriterTPartialOf<F, W>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF().liftEq(Tuple2.eq(EQW(), EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
+    }
 }

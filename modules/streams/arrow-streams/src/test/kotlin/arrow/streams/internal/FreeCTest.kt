@@ -8,21 +8,24 @@ import arrow.core.ForTry
 import arrow.core.FunctionK
 import arrow.core.Left
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Success
 import arrow.core.Try
-import arrow.fx.ForIO
-import arrow.fx.IO
-import arrow.fx.fix
-import arrow.fx.extensions.io.monadError.monadError
-import arrow.higherkind
 import arrow.core.extensions.`try`.monadError.monadError
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monadError.monadError
+import arrow.core.extensions.option.eq.eq
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.extensions.io.monadError.monadError
+import arrow.fx.fix
+import arrow.higherkind
 import arrow.streams.internal.freec.applicative.applicative
 import arrow.streams.internal.freec.eq.eq
 import arrow.streams.internal.freec.functor.functor
@@ -34,6 +37,7 @@ import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -96,13 +100,23 @@ class FreeCTest : UnitSpec() {
 
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
+    val EQK = object : EqK<FreeCPartialOf<ForOps>> {
+      override fun <A> Kind<FreeCPartialOf<ForOps>, A>.eqK(other: Kind<FreeCPartialOf<ForOps>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let { (ls, rs) ->
+          val eq1 = Either.eq(Eq.any(), Option.eq(EQ)) as Eq<Kind<EitherPartialOf<Throwable>, Option<A>>>
+          val eq2 = FreeC.eq<ForOps, EitherPartialOf<Throwable>, A>(Either.monadError(), eitherInterpreter, eq1)
+
+          eq2.run {
+            ls.eqv(rs)
+          }
+        }
+    }
+
     testLaws(
       EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
-        SC = Ops,
-        EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQERR = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
+        Ops,
+        EQK
       )
     )
     testLaws(
@@ -111,9 +125,8 @@ class FreeCTest : UnitSpec() {
         FF = FreeC.functor(),
         AP = FreeC.applicative(),
         SL = FreeC.monad(),
-        EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-        EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-        EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
+        EQK = EQK
+
       ))
 
     "Can interpret an ADT as Free operations" {

@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.mtl.Kleisli
 import arrow.test.generators.applicative
@@ -10,6 +11,7 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Selective
@@ -18,8 +20,10 @@ import io.kotlintest.properties.forAll
 
 object MonadLaws {
 
-  fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    SelectiveLaws.laws(M, EQ) +
+  fun <F> laws(M: Monad<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return SelectiveLaws.laws(M, EQK) +
       listOf(
         Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
         Law("Monad Laws: right identity") { M.rightIdentity(EQ) },
@@ -29,13 +33,17 @@ object MonadLaws {
         Law("Monad Laws: monad comprehensions") { M.monadComprehensions(EQ) },
         Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) }
       )
+  }
 
-  fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Apply<F>, SL: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    laws(M, EQ) + listOf(
-      Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
-      Law("Monad Laws: monad instance should preserve behavior of Apply") { M.preservesApply(AP, EQ) },
-      Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }
-    )
+    fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Apply<F>, SL: Selective<F>, EQK: EqK<F>): List<Law> {
+      val EQ = EQK.liftEq(Int.eq())
+
+      return laws(M, EQK) + listOf(
+        Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
+        Law("Monad Laws: monad instance should preserve behavior of Apply") { M.preservesApply(AP, EQ) },
+        Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }
+      )
+    }
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
