@@ -10,6 +10,7 @@ import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
+import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.option.apply.apply
@@ -17,6 +18,7 @@ import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.k
 import arrow.core.orElse
 import arrow.core.some
 import arrow.core.toT
