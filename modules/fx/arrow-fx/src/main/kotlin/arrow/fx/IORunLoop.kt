@@ -1,9 +1,6 @@
 package arrow.fx
 
-import arrow.core.Either
-import arrow.core.Left
 import arrow.core.NonFatal
-import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.Platform
@@ -13,21 +10,21 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 private typealias Current = IOOf<Any?, Any?>
-private typealias BindF = (Any?) -> IO<Nothing, Any?>
+private typealias BindF = (Any?) -> IO<Any?, Any?>
 private typealias CallStack = ArrayStack<BindF>
-private typealias Callback = (Either<Throwable, Any?>) -> Unit
+private typealias Callback = (IOResult<Any?, Any?>) -> Unit
 
 @Suppress("UNCHECKED_CAST", "ReturnCount", "ComplexMethod")
 internal object IORunLoop {
 
-  fun <A> start(source: IOOf<Nothing, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <E, A> start(source: IOOf<E, A>, cb: (IOResult<E, A>) -> Unit): Unit =
     loop(source, KindConnection.uncancelable, cb as Callback, null, null, null, IOContext(KindConnection.uncancelable))
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <A> startCancelable(source: IOOf<Nothing, A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <E, A> startCancelable(source: IOOf<E, A>, conn: IOConnection, cb: (IOResult<E, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null, IOContext(conn))
 
   fun <E, A> step(source: IO<E, A>): IO<E, A> {
@@ -44,13 +41,25 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseException -> {
-          val errorHandler: IOFrame<Any?, IO<Nothing, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> return currentIO
             else -> {
               val exception: Throwable = currentIO.exception
               currentIO = executeSafe { errorHandler.recover(exception) }
+              bFirst = null
+            }
+          }
+        }
+        is IO.RaiseError -> {
+          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          when (errorHandler) {
+            // Return case for unhandled errors
+            null -> return currentIO as IO<E, A>
+            else -> {
+              val error: Any? = currentIO.error
+              currentIO = executeSafe { errorHandler.handleError(error) }
               bFirst = null
             }
           }
@@ -70,10 +79,10 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendAsync(currentIO, bFirst, bRest) as IO<Nothing, A>
+          return suspendAsync(currentIO, bFirst, bRest) as IO<E, A>
         }
         is IO.Effect -> {
-          return suspendAsync(currentIO, bFirst, bRest) as IO<Nothing, A>
+          return suspendAsync(currentIO, bFirst, bRest) as IO<E, A>
         }
         is IO.Bind<*, *, *, *> -> {
           if (bFirst != null) {
@@ -135,10 +144,10 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<Nothing, A> =
-    (currentIO ?: IO.Pure(unboxed)) as IO<Nothing, A>
+  private fun <E, A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<E, A> =
+    (currentIO ?: IO.Pure(unboxed)) as IO<E, A>
 
-  private fun suspendAsync(currentIO: IO<Nothing, Any?>, bFirst: BindF?, bRest: CallStack?): IO<Nothing, Any?> =
+  private fun suspendAsync(currentIO: IO<Any?, Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?, Any?> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
     if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
       IO.Async { conn, cb ->
@@ -151,7 +160,7 @@ internal object IORunLoop {
   private fun loop(
     source: Current,
     cancelable: IOConnection,
-    cb: (Either<Throwable, Any?>) -> Unit,
+    cb: (IOResult<Any?, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?,
@@ -169,7 +178,7 @@ internal object IORunLoop {
 
     do {
       if (conn.isCanceled()) {
-        cb(Left(OnCancel.CancellationException))
+        cb(IOResult.Exception(OnCancel.CancellationException))
         return
       }
       when (currentIO) {
@@ -178,16 +187,31 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseException -> {
-          val errorHandler: IOFrame<Any?, IO<Nothing, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> {
-              cb(Left(currentIO.exception))
+              cb(IOResult.Exception(currentIO.exception))
               return
             }
             else -> {
               val exception: Throwable = currentIO.exception
               currentIO = executeSafe { errorHandler.recover(exception) }
+              bFirst = null
+            }
+          }
+        }
+        is IO.RaiseError -> {
+          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          when (errorHandler) {
+            // Return case for unhandled errors
+            null -> {
+              cb(IOResult.Error(currentIO.error))
+              return
+            }
+            else -> {
+              val error: Any? = currentIO.error
+              currentIO = executeSafe { errorHandler.handleError(error) }
               bFirst = null
             }
           }
@@ -261,7 +285,7 @@ internal object IORunLoop {
           currentIO = currentIO.source
         }
         is IO.ContextSwitch<*, *> -> {
-          val next = currentIO.source as IO<Nothing, Any?>
+          val next = currentIO.source
           val modify = currentIO.modify
           val restore = currentIO.restore
 
@@ -289,7 +313,7 @@ internal object IORunLoop {
 
         // Return case when no there are no more binds left
         if (nextBind == null) {
-          cb(Right(result))
+          cb(IOResult.Success(result))
           return
         } else {
           currentIO = executeSafe { nextBind(result) }
@@ -318,33 +342,33 @@ internal object IORunLoop {
    * anything — an optimization for `handleError`.
    */
   private fun popNextBind(bFirst: BindF?, bRest: CallStack?): BindF? =
-    if ((bFirst != null) && bFirst !is IOFrame.Companion.ErrorHandler)
+    if ((bFirst != null) && bFirst !is IOFrame.Companion.ErrorHandler<*, *, *>)
       bFirst
     else if (bRest != null) {
       var cursor: BindF? = null
       while (cursor == null && bRest.isNotEmpty()) {
         val ref = bRest.pop()
-        if (ref !is IOFrame.Companion.ErrorHandler) cursor = ref
+        if (ref !is IOFrame.Companion.ErrorHandler<*, *, *>) cursor = ref
       }
       cursor
     } else {
       null
     }
 
-  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, IO<Nothing, Any?>>? {
-    if (bFirst != null && bFirst is IOFrame) {
-      return bFirst
+  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, Any?, IOOf<Any?, Any?>>? {
+    if (bFirst != null && bFirst is IOFrame<*, *, *>) {
+      return bFirst as IOFrame<Any?, Any?, IOOf<Any?, Any?>>
     } else if (bRest == null) {
       return null
     }
 
-    var result: IOFrame<Any?, IO<Nothing, Any?>>? = null
+    var result: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = null
     var cursor: BindF? = bFirst
 
     @Suppress("LoopWithTooManyJumpStatements")
     do {
-      if (cursor != null && cursor is IOFrame) {
-        result = cursor
+      if (cursor != null && cursor is IOFrame<*, *, *>) {
+        result = cursor as IOFrame<Any?, Any?, IOOf<Any?, Any?>>
         break
       } else {
         cursor = if (bRest.isNotEmpty()) {
@@ -377,7 +401,7 @@ internal object IORunLoop {
     private var trampolineAfter: Boolean = false
     private inline val shouldTrampoline inline get() = trampolineAfter || contIndex == Platform.maxStackDepthSize
 
-    private var value: IO<Nothing, Any?>? = null
+    private var value: IO<Any?, Any?>? = null
 
     fun contextSwitch(conn: IOConnection) {
       this.conn = conn
@@ -391,7 +415,7 @@ internal object IORunLoop {
       contIndex++
     }
 
-    fun start(async: IO.Async<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+    fun start(async: IO.Async<Any?, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       prepare(ctx, bFirst, bRest)
       trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
@@ -402,7 +426,7 @@ internal object IORunLoop {
       effect.effect.startCoroutine(this)
     }
 
-    private fun signal(result: IO<Nothing, Any?>) {
+    private fun signal(result: IO<Any?, Any?>) {
       // Allow GC to collect
       val bFirst = this.bFirst
       val bRest = this.bRest
@@ -414,12 +438,13 @@ internal object IORunLoop {
       loop(result, conn, cb, this, bFirst, bRest, ctx)
     }
 
-    override operator fun invoke(either: Either<Throwable, Any?>) {
+    override operator fun invoke(p1: IOResult<Any?, Any?>) {
       if (canCall) {
         canCall = false
-        when (either) {
-          is Either.Left -> IO.RaiseException(either.a)
-          is Either.Right -> IO.Pure(either.b)
+        when (p1) {
+          is IOResult.Success -> IO.Pure(p1.value)
+          is IOResult.Error -> IO.RaiseError(p1.error)
+          is IOResult.Exception -> IO.RaiseException(p1.exception)
         }.let { r ->
           if (shouldTrampoline) {
             this.value = r
@@ -458,14 +483,22 @@ internal object IORunLoop {
 
   private class RestoreContext(
     val old: IOConnection,
-    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection
-  ) : IOFrame<Any?, IO<Nothing, Any?>> {
+    val restore: (Any?, Any?, Throwable?, IOConnection, IOConnection) -> IOConnection
+  ) : IOFrame<Any?, Any?, IO<Any?, Any?>> {
 
-    override fun invoke(a: Any?): IO<Nothing, Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
+    override fun invoke(a: Any?): IO<Any?, Any?> =
+      IO.ContextSwitch(IO.Pure(a),
+        { current -> restore(a, null, null, old, current) },
+        null)
 
-    override fun recover(e: Throwable): IO<Nothing, Any> =
+    override fun recover(e: Throwable): IO<Any?, Any?> =
       IO.ContextSwitch(IO.RaiseException(e), { current ->
-        restore(null, e, old, current)
+        restore(null, null, e, old, current)
+      }, null)
+
+    override fun handleError(e: Any?): IO<Any?, Any?> =
+      IO.ContextSwitch(IO.RaiseError(e), { current ->
+        restore(null, e, null, old, current)
       }, null)
   }
 }
