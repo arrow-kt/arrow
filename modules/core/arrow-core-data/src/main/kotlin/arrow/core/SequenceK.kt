@@ -28,8 +28,8 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
    *  cause a stackoverflow, trying to access elements further back in the sequence will.
    */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
-    foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
-      GA.run { Eval.later {  f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
+    foldRight(Eval.now(GA.just(emptySequence<B>().k()))) { a, eval ->
+      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
     }.value()
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
