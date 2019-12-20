@@ -24,14 +24,19 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
   }
 
   /**
-   * Note: This will always evaluate the entire sequence because it uses applicative internally which
-   *  takes only strict arguments. This will fail on infinite sequences. If you need this to work on
-   *  infinite sequences your best bet is to define a new traverse instance together with a lazy version of
-   *  ap from Applicative for whatever applicative you want to use.
+   * Note, if you applicative instance can, it will short-circuit and thus no evaluate the entire
+   *  sequence, this means you can even use this on infinite sequences.
+   * There is just one problem: This rebuilds the sequence using + from the stdlib, and that is not stacksafe, so while building itself won't
+   *  cause a stackoverflow, trying to access elements further back in the sequence will.
    */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
-      GA.run { f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() } }
+      Eval.later { GA.run { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
+    }.value()
+
+  fun <G, B> traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
+    foldRight(Eval.always { GA.just(Unit) }) { a, eval ->
+      Eval.later { GA.run { f(a).lazyAp { eval.value().map { { _: B -> Unit } } } } }
     }.value()
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
@@ -58,7 +63,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         f: (A) -> SequenceKOf<Either<A, B>>,
         v: SequenceK<Either<A, B>>
       ) {
-        if (!(v.toList().isEmpty())) {
+        if (v.toList().isNotEmpty()) {
           val head: Either<A, B> = v.first()
           when (head) {
             is Either.Right -> {

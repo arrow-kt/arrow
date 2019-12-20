@@ -12,6 +12,7 @@ import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.either.monad.flatMap
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.core.left
@@ -95,6 +96,9 @@ interface EitherBifunctor : Bifunctor<ForEither> {
 interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
     fix().eitherAp(ff)

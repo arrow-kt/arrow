@@ -55,6 +55,9 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
+    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
+
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
     fix().ap(SL(), ff)
 }
