@@ -22,7 +22,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
   }
 
   /**
-   * Note, if you applicative instance can, it will short-circuit and thus no evaluate the entire
+   * Note, if the applicative instance can, it will short-circuit and thus not evaluate the entire
    *  sequence, this means you can even use this on infinite sequences.
    * There is just one problem: This rebuilds the sequence using + from the stdlib, and that is not stacksafe, so while building itself won't
    *  cause a stackoverflow, trying to access elements further back in the sequence will.
