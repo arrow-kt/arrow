@@ -34,11 +34,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       Eval.later { GA.run { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
     }.value()
 
-  fun <G, B> traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
-    foldRight(Eval.always { GA.just(Unit) }) { a, eval ->
-      Eval.later { GA.run { f(a).lazyAp { eval.value().map { { _: B -> Unit } } } } }
-    }.value()
-
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->
       fb.fix().map { b ->
