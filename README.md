@@ -66,7 +66,7 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } 
-        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" } // for SNAPSHOT builds
     }
 }
 ```
@@ -179,8 +179,8 @@ idea {
  
 #### Basic Setup
 
-Add to your pom.xml file the following properties:
-```
+Add to your `pom.xml` file the following properties:
+```xml
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
      <arrow.version>0.10.4</arrow.version>
@@ -188,24 +188,23 @@ Add to your pom.xml file the following properties:
 ```
 
 Add the dependencies that you want to use
-```
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-core</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-syntax</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-
+```xml
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-core</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-syntax</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
 ```
 
 #### Enabling kapt
 
 Enable annotaton processing using kotlin plugin 
-```
+```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
     <artifactId>kotlin-maven-plugin</artifactId>
