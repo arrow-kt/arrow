@@ -22,7 +22,6 @@ import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.runM
 import arrow.mtl.typeclasses.MonadState
-import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -35,10 +34,8 @@ import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.extension
 import arrow.mtl.extensions.statet.monad.flatMap
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.MonoidK
