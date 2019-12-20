@@ -64,6 +64,9 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<Either<A, B>>>): MonoK<B> =
     MonoK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForMonoK, A>.lazyAp(ff: () -> Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

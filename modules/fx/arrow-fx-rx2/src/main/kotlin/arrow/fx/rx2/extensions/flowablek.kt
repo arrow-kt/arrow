@@ -92,6 +92,9 @@ interface FlowableKMonad : Monad<ForFlowableK>, FlowableKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

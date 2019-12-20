@@ -110,6 +110,13 @@ interface EitherTMonad<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
     EitherT.tailRecM(MF(), a, f)
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.lazyAp(ff: () -> Kind<EitherTPartialOf<F, L>, (A) -> B>): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      AF().run {
+        fix().value().lazyAp { ff().value().map { r -> { l: Either<L, A> -> l.ap(r) } } }
+      }
+    )
 }
 
 @extension

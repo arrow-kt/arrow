@@ -216,6 +216,9 @@ interface OptionMonad : Monad<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
 
+  override fun <A, B> Kind<ForOption, A>.lazyAp(ff: () -> Kind<ForOption, (A) -> B>): Kind<ForOption, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
+
   override val fx: MonadFx<ForOption>
     get() = OptionFxMonad
 }
@@ -351,6 +354,9 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
+
+  override fun <A, B> Kind<ForOption, A>.lazyAp(ff: () -> Kind<ForOption, (A) -> B>): Kind<ForOption, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 
   override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
     fix().fold(

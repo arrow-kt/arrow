@@ -75,6 +75,9 @@ interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<arrow.core.Either<A, B>>>): FluxK<B> =
     FluxK.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

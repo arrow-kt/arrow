@@ -126,6 +126,9 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
 
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
+
   @Suppress("UNCHECKED_CAST")
   override val fx: MonadFx<EitherPartialOf<L>>
     get() = EitherMonadFx as MonadFx<EitherPartialOf<L>>
