@@ -3,18 +3,29 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
+import arrow.core.extensions.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.foldable.forAll
-import arrow.core.extensions.list.traverse.traverse
-import arrow.core.extensions.sequence.foldable.foldLeft
-import arrow.core.extensions.sequence.traverse.traverse
+import arrow.core.extensions.monoid
 import arrow.core.toT
 import arrow.core.value
-import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.schedule.alternative.alternative
+import arrow.fx.extensions.schedule.applicative.applicative
+import arrow.fx.extensions.schedule.category.category
+import arrow.fx.extensions.schedule.profunctor.profunctor
+import arrow.fx.extensions.schedule.semiring.semiring
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.applicative
 import arrow.test.generators.intSmall
+import arrow.test.laws.AlternativeLaws
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.CategoryLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.ProfunctorLaws
+import arrow.test.laws.SemiringLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -26,12 +37,11 @@ import kotlin.math.pow
 
 class ScheduleTest : UnitSpec() {
 
-  fun <S>decEqK(eqS: Eq<S>): EqK<DecisionPartialOf<S>> = object: EqK<DecisionPartialOf<S>> {
-    override fun <A> Kind<DecisionPartialOf<S>, A>.eqK(other: Kind<DecisionPartialOf<S>, A>, EQ: Eq<A>): Boolean =
+  fun decEqK(): EqK<DecisionPartialOf<Any?>> = object: EqK<DecisionPartialOf<Any?>> {
+    override fun <A> Kind<DecisionPartialOf<Any?>, A>.eqK(other: Kind<DecisionPartialOf<Any?>, A>, EQ: Eq<A>): Boolean =
       (fix() to other.fix()).let { (l, r) ->
         l.cont == r.cont &&
-          l.delay == r.delay &&
-          eqS.run { l.state.eqv(r.state) } &&
+          l.delay.nanoseconds == r.delay.nanoseconds &&
           // don't force end result if we don't continue as it may contain Nothing
           (if (l.cont) EQ.run { l.finish.value().eqv(r.finish.value()) } else true)
       }
@@ -42,16 +52,19 @@ class ScheduleTest : UnitSpec() {
       val t = fix() as Schedule.ScheduleImpl<F, Any?, I, A>
       (other as Schedule.ScheduleImpl<F, Any?, I, A>)
 
-      val initialStateEq = fEqK.liftEq(Eq.any()).run { t.initialState.eqv(other.initialState) }
-      val updateEq = MF.run {
+      return MF.run {
         val lhs = t.initialState.flatMap { s -> t.update(i, s) }
         val rhs = other.initialState.flatMap { s -> other.update(i, s) }
 
-        fEqK.liftEq(decEqK(Eq.any()).liftEq(EQ)).run { lhs.eqv(rhs) }
+        fEqK.liftEq(decEqK().liftEq(EQ)).run { lhs.eqv(rhs) }
       }
-
-      return initialStateEq && updateEq
     }
+  }
+
+  // This is a bad gen. But generating random schedules is weird
+  fun <F, I> Schedule.Companion.genK(MF: Monad<F>): GenK<SchedulePartialOf<F, I>> = object: GenK<SchedulePartialOf<F, I>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<SchedulePartialOf<F, I>, A>> =
+      gen.applicative(Schedule.applicative<F, I>(MF))
   }
 
   fun <I, A> Schedule<ForId, I, A>.runIdSchedule(i: I): Schedule.Decision<Any?, A> =
@@ -72,6 +85,37 @@ class ScheduleTest : UnitSpec() {
 
   init {
     // Test laws TODO not before the larger testing rework because I don't want to rewrite this in an hour
+    testLaws(
+      ApplicativeLaws.laws(
+        Schedule.applicative<ForId, Int>(Id.monad()),
+        Schedule.genK<ForId, Int>(Id.monad()),
+        EQK(Id.eqK(), Id.monad(), 0)
+      ),
+      /* TODO uncomment when semiring laws use eqv instead of ==
+      SemiringLaws.laws(
+        Schedule.semiring<ForId, Any?, Int>(Int.monoid(), Id.monad()),
+        Schedule.forever(Id.monad()),
+        Schedule.forever(Id.monad()),
+        Schedule.forever(Id.monad())
+      )
+      */
+      // TODO alternative laws once that uses GenK + EqK
+      MonoidKLaws.laws(
+        Schedule.alternative<ForId, Int>(Id.monad()),
+        Schedule.genK<ForId, Int>(Id.monad()),
+        EQK(Id.eqK(), Id.monad(), 0)
+      ),
+      ProfunctorLaws.laws(
+        Schedule.profunctor(),
+        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
+        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+      ),
+      CategoryLaws.laws(
+        Schedule.category(Id.monad()),
+        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
+        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+      )
+    )
 
     // find good properties to test creating schedules
     "Schedule.identity()" {
