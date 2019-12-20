@@ -84,25 +84,23 @@ class ScheduleTest : UnitSpec() {
   val scheduleEq = EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any())
 
   init {
-    // Test laws TODO not before the larger testing rework because I don't want to rewrite this in an hour
     testLaws(
       ApplicativeLaws.laws(
         Schedule.applicative<ForId, Int>(Id.monad()),
         Schedule.genK<ForId, Int>(Id.monad()),
         EQK(Id.eqK(), Id.monad(), 0)
       ),
-      /* TODO uncomment when semiring laws use eqv instead of ==
       SemiringLaws.laws(
         Schedule.semiring<ForId, Any?, Int>(Int.monoid(), Id.monad()),
         Schedule.forever(Id.monad()),
         Schedule.forever(Id.monad()),
-        Schedule.forever(Id.monad())
-      )
-      */
-      // TODO alternative laws once that uses GenK + EqK
-      MonoidKLaws.laws(
+        Schedule.forever(Id.monad()),
+        EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq())
+      ),
+      AlternativeLaws.laws(
         Schedule.alternative<ForId, Int>(Id.monad()),
-        Schedule.genK<ForId, Int>(Id.monad()),
+        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
+        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just({ j: Int -> j + i }) },
         EQK(Id.eqK(), Id.monad(), 0)
       ),
       ProfunctorLaws.laws(
