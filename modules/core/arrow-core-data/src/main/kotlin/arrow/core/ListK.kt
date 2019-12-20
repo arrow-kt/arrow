@@ -8,8 +8,6 @@ import arrow.typeclasses.Applicative
  *
  * ank_macro_hierarchy(arrow.core.ListK)
  *
- * {:.beginner}
- * beginner
  *
  * ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
  *

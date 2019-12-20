@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
@@ -10,12 +11,15 @@ import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
@@ -25,6 +29,8 @@ import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -41,8 +47,14 @@ class IOTest : UnitSpec() {
   private val all = newSingleThreadContext("all")
   private val NonBlocking = IO.dispatchers().default()
 
+  val EQK = object : EqK<ForIO> {
+    override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ<A>().run {
+      this@eqK.fix().eqv(other.fix())
+    }
+  }
+
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), EQK))
 
     "should defer evaluation until run" {
       var run = false

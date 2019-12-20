@@ -1,9 +1,6 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.core.toT
-import arrow.mtl.StateT
-import arrow.mtl.StateTPartialOf
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
@@ -11,17 +8,21 @@ import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toT
+import arrow.extension
 import arrow.mtl.State
+import arrow.mtl.StateApi
+import arrow.mtl.StatePartialOf
+import arrow.mtl.StateT
+import arrow.mtl.StateTOf
+import arrow.mtl.StateTPartialOf
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.functor.functor
 import arrow.mtl.extensions.statet.monad.monad
-import arrow.mtl.StateApi
-import arrow.mtl.StatePartialOf
-import arrow.mtl.StateTOf
 import arrow.mtl.fix
 import arrow.mtl.runM
-import arrow.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -30,14 +31,13 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.extension
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented

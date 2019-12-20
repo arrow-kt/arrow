@@ -1,0 +1,112 @@
+.fx {
+    background: $fx-background;
+}
+
+#fx-sidebar-nav {
+    .sidebar-nav-item {
+        > a {
+            transition: background $base-duration $base-timing;
+            &:hover {
+                background: $fx-hover;
+            }
+        }
+
+        &.active {
+            > a {
+                background: $fx-hover;
+                border-left: 4px solid $fx-color;
+            }
+        }
+
+        ul {
+            background: $fx-hover;
+
+            li {
+                a {
+                    &:before {
+                        content: "•";
+                        margin-right: ($base-point-grid * 2);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#cat-fx-dropdown {
+    min-width: $sidebar-cat-button;
+
+    .sidebar-nav {
+        .sidebar-nav-item {
+            > a {
+                transition: background $base-duration $base-timing;
+                &:hover {
+                    background: $fx-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $fx-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $fx-hover;
+
+                a {
+                    color: $white;
+                    transition: all $base-duration $base-timing;
+
+                    &:hover {
+                        background: rgba($white, 0.05);
+                        color: rgba($white, 0.8);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#doc-fx-version-button {
+    .sidebar-doc-versions {
+        .sidebar-nav-item {
+            background: $fx-background;
+            > a {
+                transition: background $base-duration $base-timing;
+                &:hover {
+                    background: $fx-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $fx-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $fx-hover;
+
+                a {
+                    color: $white;
+                    padding-left: 10px;
+
+                    &:hover {
+                        @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+                    }
+                }
+            }
+        }
+    }
+}

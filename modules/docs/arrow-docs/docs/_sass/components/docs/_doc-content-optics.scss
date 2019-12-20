@@ -1,0 +1,46 @@
+// DOC CONTENT OPTICS
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content-optics {
+    .doc-content {
+        a {
+            color: $optics-color;
+        }
+
+        p,
+        ul {
+            code {
+                background: rgba($optics-background, 0.08);
+
+            }
+        }
+
+        .cm-s-arrow span.cm-keyword {
+            color: $optics-color;
+        }
+        
+        
+                .hljs-variable,
+        .hljs-template-variable,
+        .hljs-tag,
+        .hljs-name,
+        .hljs-selector-id,
+        .hljs-selector-class,
+        .hljs-regexp,
+        .hljs-deletion {
+            color: $optics-color;
+        }
+
+        .button-video {
+            background: $white;
+            border: 2px solid $optics-color;
+            transition: background $base-duration;
+
+            &:hover {
+                background: $optics-color;
+                color: $white;
+            }
+        }
+    }
+}

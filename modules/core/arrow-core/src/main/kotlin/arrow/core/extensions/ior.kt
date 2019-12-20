@@ -152,6 +152,16 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
 }
 
 @extension
+interface IorEqK<A> : EqK<IorPartialOf<A>> {
+  fun EQA(): Eq<A>
+
+  override fun <B> Kind<IorPartialOf<A>, B>.eqK(other: Kind<IorPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+    Ior.eq(EQA(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
 interface IorShow<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()
@@ -176,16 +186,6 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()
-
-@extension
-interface IorEqK<L> : EqK<IorPartialOf<L>> {
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let { (ls, rs) ->
-      Ior.eq(EQL(), EQ).run { ls.eqv(rs) }
-    }
-}
 
 @extension
 interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldable<L> {

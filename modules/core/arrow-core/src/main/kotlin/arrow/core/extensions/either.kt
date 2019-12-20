@@ -209,6 +209,16 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 }
 
 @extension
+interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<EitherPartialOf<L>, R>.eqK(other: Kind<EitherPartialOf<L>, R>, EQ: Eq<R>): Boolean =
+    Either.eq(EQL(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
@@ -249,16 +259,5 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
       is Either.Right -> ALIGN.run {
         fb(e.b).map { it.right() }
       }
-    }
-}
-
-@extension
-interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
-
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<EitherPartialOf<L>, A>.eqK(other: Kind<EitherPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    Either.eq(EQL(), EQ).run {
-      this@eqK.fix().eqv(other.fix())
     }
 }
