@@ -7,6 +7,7 @@ import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.option.traverseFilter.traverseFilter
@@ -35,6 +36,8 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
@@ -277,4 +280,17 @@ interface OptionTAlternative<F> : Alternative<OptionTPartialOf<F>>, OptionTAppli
         else l
       }
     )
+}
+
+@extension
+interface OptionTEqK<F> : EqK<OptionTPartialOf<F>> {
+
+  fun EQKF(): EqK<F>
+
+  override fun <A> Kind<OptionTPartialOf<F>, A>.eqK(other: Kind<OptionTPartialOf<F>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF().liftEq(Option.eq(EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
+    }
 }
