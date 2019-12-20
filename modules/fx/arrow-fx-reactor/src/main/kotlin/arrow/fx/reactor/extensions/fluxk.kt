@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf

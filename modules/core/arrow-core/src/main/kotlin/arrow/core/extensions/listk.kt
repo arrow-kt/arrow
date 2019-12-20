@@ -8,7 +8,6 @@ import arrow.core.Ior
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
-import arrow.core.SequenceK
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
