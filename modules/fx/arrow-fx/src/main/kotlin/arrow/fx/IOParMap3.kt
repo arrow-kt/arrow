@@ -1,7 +1,5 @@
 package arrow.fx
 
-import arrow.core.Either
-import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Tuple3
 import arrow.core.internal.AtomicBooleanW
@@ -10,20 +8,21 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.applicativeError.handleError
 import arrow.core.nonFatalOrThrow
 import arrow.core.none
+import arrow.core.some
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import kotlin.coroutines.CoroutineContext
 
-/** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
+/** Mix-in to enable `parMapN` 3-arity on IO's companion directly. */
 interface IOParMap3 {
 
-  fun <A, B, C, D> parMapN(
+  fun <E, A, B, C, D> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
+    fa: IOOf<E, A>,
+    fb: IOOf<E, B>,
+    fc: IOOf<E, C>,
     f: (A, B, C) -> D
-  ): IO<Nothing, D> = IO.Async { conn, cb ->
+  ): IO<E, D> = IO.Async { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
     val active = AtomicBooleanW(true)
@@ -38,10 +37,10 @@ interface IOParMap3 {
 
     fun complete(a: A, b: B, c: C) {
       conn.pop()
-      val result: Either<Throwable, D> = try {
-        Either.Right(f(a, b, c))
+      val result: IOResult<E, D> = try {
+        IOResult.Success(f(a, b, c))
       } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
+        IOResult.Exception(e.nonFatalOrThrow())
       }
       cb(result)
     }
@@ -49,22 +48,35 @@ interface IOParMap3 {
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
       result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
-    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
+    fun sendException(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
         other.cancel().fix().unsafeRunAsync { r1 ->
           other2.cancel().fix().unsafeRunAsync { r2 ->
             conn.pop()
-            cb(Left(r1.fold({ e2 ->
-              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
+            cb(IOResult.Exception(r1.fold({ e2 ->
+              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) }, { e })
             }, {
-              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
-            })))
+              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e }, { e })
+            }, { e })))
+          }
+        }
+      } else Unit
+
+    fun sendError(other: IOConnection, other2: IOConnection, e: E) =
+      if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
+        other.cancel().fix().unsafeRunAsync { r1 ->
+          other2.cancel().fix().unsafeRunAsync { r2 ->
+            conn.pop()
+            // Send r1 & r2 to asyncErrorHandler if cancelation failed
+            cb(IOResult.Error(e))
           }
         }
       } else Unit
 
     IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
       resultA.fold({ e ->
+        sendException(connB, connC, e)
+      }, { e ->
         sendError(connB, connC, e)
       }, { a ->
         tryComplete(state.updateAndGet { current ->
@@ -77,7 +89,9 @@ interface IOParMap3 {
 
     IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
       resultB.fold({ e ->
-        sendError(connA, connC, e)
+        sendException(connA, connC, e)
+      }, { e ->
+        sendError(connB, connC, e)
       }, { b ->
         tryComplete(state.updateAndGet { current ->
           current
@@ -89,7 +103,9 @@ interface IOParMap3 {
 
     IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) { resultC ->
       resultC.fold({ e ->
-        sendError(connA, connB, e)
+        sendException(connA, connB, e)
+      }, { e ->
+        sendError(connB, connC, e)
       }, { c ->
         tryComplete(state.updateAndGet { current ->
           current
