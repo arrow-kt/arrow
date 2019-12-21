@@ -71,10 +71,13 @@ interface ObservableKApplicative : Applicative<ForObservableK> {
 
   override fun <A> just(a: A): ObservableK<A> =
     ObservableK.just(a)
+
+  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface ObservableKMonad : Monad<ForObservableK> {
+interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 
@@ -87,8 +90,8 @@ interface ObservableKMonad : Monad<ForObservableK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
-  override fun <A> just(a: A): ObservableK<A> =
-    ObservableK.just(a)
+  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -297,37 +300,16 @@ interface ObservableKTimer : Timer<ForObservableK> {
 }
 
 @extension
-interface ObservableKFunctorFilter : FunctorFilter<ForObservableK> {
+interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKFunctor {
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
 }
 
 @extension
-interface ObservableKMonadFilter : MonadFilter<ForObservableK> {
+interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
   override fun <A> empty(): ObservableK<A> =
     Observable.empty<A>().k()
 
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForObservableK, A>.ap(ff: Kind<ForObservableK, (A) -> B>): ObservableK<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
-    ObservableK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
-
-  override fun <A, B, Z> Kind<ForObservableK, A>.map2(fb: Kind<ForObservableK, B>, f: (Tuple2<A, B>) -> Z): ObservableK<Z> =
-    fix().map2(fb, f)
-
-  override fun <A> just(a: A): ObservableK<A> =
-    ObservableK.just(a)
 }

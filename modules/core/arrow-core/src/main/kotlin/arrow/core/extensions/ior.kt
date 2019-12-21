@@ -55,14 +55,17 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
+    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
+
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
     fix().ap(SL(), ff)
 }
 
 @extension
-interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
+interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorApply<L> {
 
-  fun SL(): Semigroup<L>
+  override fun SL(): Semigroup<L>
 
   override fun <A> just(a: A): Ior<L, A> = Ior.Right(a)
 
@@ -87,6 +90,9 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
+    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
 }
 
 @extension

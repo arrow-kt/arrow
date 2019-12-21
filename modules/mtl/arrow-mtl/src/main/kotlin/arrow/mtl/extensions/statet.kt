@@ -22,7 +22,6 @@ import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.runM
 import arrow.mtl.typeclasses.MonadState
-import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -35,9 +34,11 @@ import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
+import arrow.mtl.extensions.statet.monad.flatMap
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented
@@ -68,6 +69,9 @@ interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFu
 
   override fun <A, B> StateTOf<F, S, A>.product(fb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
     fix().product(MF(), fb)
+
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
+    flatMap(MF()) { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -87,6 +91,9 @@ interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F,
 
   override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
     ff.fix().map2(MF(), this) { f, a -> f(a) }
+
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
+    flatMap(MF()) { a -> ff().map { f -> f(a) } }
 }
 
 @extension

@@ -18,7 +18,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results with at least 1 repetition.
    */
-  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = map(this, many()) { (v, vs) -> (sequenceOf(v) + vs).k() }
+  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = lazyAp { many().map { { a: A -> (sequenceOf(a) + it).k() } } }
 
   /**
    * Repeats the computation until it fails. Does not requires it to succeed.
