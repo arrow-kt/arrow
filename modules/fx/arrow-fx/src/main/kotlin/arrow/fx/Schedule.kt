@@ -51,31 +51,44 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
   this as Schedule.Decision<A, B>
 
 /**
+ * # Retrying and repeating effects
+ *
  * A common demand when working with effects is to retry or repeat them when certain circumstances happen. Usually, the retrial or repetition does not happen right away; rather, it is done based on a policy. For instance, when fetching content from a network request, we may want to retry it when it fails, using an exponential backoff algorithm, for a maximum of 15 seconds or 5 attempts, whatever happens first.
  *
  * [Schedule] allows you to define and compose powerful yet simple policies, which can be used to either repeat or retry computation.
  *
- * The two core semantics of running a schedule are:
+ * The two core methods of running a schedule are:
  * - __retry__: The effect is executed once, and if it fails, it will be reattempted based on the scheduling policy passed as an argument. It will stop if the effect ever succeeds, or the policy determines it should not be reattempted again.
  * - __repeat__: The effect is executed once, and if it succeeds, it will be executed again based on the scheduling policy passed as an argument. It will stop if the effect ever fails, or the policy determines it should not be executed again. It will return the last internal state of the scheduling policy, or the error that happened running the effect.
  *
- * Constructing a policy:
- * ------------------
+ * ## Constructing a policy:
  *
  * > Because schedules are polymorphic over any [F] that is also a [Monad], constructing a [Schedule] can sometimes mean having to explicitly write the type-parameters. This can be avoided using [Schedule.withMonad] which partially applies the chosen [Monad].
  *
  * Constructing a simple schedule which recurs 10 times until it succeeds:
- * ```kotlin
- * Schedule.recurs(IO.monad(), 10)
+ * ```kotlin:ank
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.monad.monad
+ *
+ * fun <A> recurTenTimes() = Schedule.recurs<ForIO, A>(IO.monad(), 10)
  * ```
  *
  * A more complex schedule is best put together using the [withMonad] constructor:
- * ```kotlin
+ * ```kotlin:ank
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.extensions.io.monadDefer.monadDefer
+ * import arrow.fx.typeclasses.milliseconds
+ * import arrow.fx.typeclasses.seconds
+ *
  * fun <A> complexPolicy() =
- *  Schedule.withMonad(IO.monad()) {
- *    exponential(10.milliseconds).whileOutput { it.nanoseconds < 60.seconds.nanoseconds }
- *      .andThen(spaced(60.seconds) and recurs(100)).jittered(IO.monadDefer())
- *      .zipRight(identity<A>().collect())
+ *   Schedule.withMonad(IO.monad()) {
+ *     exponential<A>(10.milliseconds).whileOutput { it.nanoseconds < 60.seconds.nanoseconds }
+ *       .andThen(spaced<A>(60.seconds) and recurs<A>(100)).jittered(IO.monadDefer())
+ *       .zipRight(identity<A>().collect())
  *   }
  * ```
  *
@@ -83,6 +96,157 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * The delay is also randomized slightly to avoid coordinated backoff from multiple services.
  * Finally we also collect every input to the schedule and return it. When used with [retry] this will return a list of exceptions that occured on failed attempts.
  *
+ * ## Common use cases
+ *
+ * Common use cases
+ * Once we have building blocks and ways to combine them, let’s see how we can use them to solve some use cases.
+ *
+ * ### Repeating an effect and dealing with its result
+ *
+ * When we repeat an effect, we do it as long as it keeps providing successful results and the scheduling policy tells us to keep recursing. But then, there is a question on what to do with the results provided by each iteration of the repetition.
+ *
+ * There are at least 3 possible things we would like to do:
+ *
+ * - Discard all results; i.e., return `Void`.
+ * - Discard all intermediate results and just keep the last produced result.
+ * - Keep all intermediate results.
+ *
+ * Assuming we have an effect in [IO], and we want to repeat it 3 times after its first successful execution, we can do:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.concurrent.concurrent
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.fix
+ * import arrow.fx.repeat
+ *
+ * fun main() {
+ *   var counter = 0
+ *   val io = IO { println("Run: ${counter++}") }
+ *   //sampleStart
+ *   val res = io.repeat(IO.concurrent(), Schedule.recurs(IO.monad(), 3))
+ *   //sampleEnd
+ *   println(res.fix().unsafeRunSync())
+ * }
+ * ```
+ *
+ * However, when running this new effect, its output will be the number of iterations it has performed, as stated in the documentation of the function. Also notice that we did not handle the error case, there are overloads [repeatOrElse] and [repeatOrElseEither] which offer that capability, [repeat] will just rethrow any error encountered.
+ *
+ * If we want to discard the values provided by the repetition of the effect, we can combine our policy with [Schedule.unit], using the [zipLeft] or [zipRight] combinators, which will keep just the output of one of the policies:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.concurrent.concurrent
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.fix
+ * import arrow.fx.repeat
+ *
+ * fun main() {
+ *   var counter = 0
+ *   val io = IO { println("Run: ${counter++}") }
+ *   //sampleStart
+ *   val res = io.repeat(IO.concurrent(), Schedule.unit<ForIO, Unit>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *
+ *   // equal to
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Unit>(IO.monad(), 3).zipRight(Schedule.unit(IO.monad())))
+ *
+ *   //sampleEnd
+ *   println(res.fix().unsafeRunSync())
+ *   println(res2.fix().unsafeRunSync())
+ * }
+ * ```
+ *
+ * Following the same strategy, we can zip it with the [Schedule.identity] policy to keep only the last provided result by the effect.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.concurrent.concurrent
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.fix
+ * import arrow.fx.repeat
+ *
+ * fun main() {
+ *   var counter = 0
+ *   val io = IO { println("Run: ${counter++}"); counter }
+ *   //sampleStart
+ *   val res = io.repeat(IO.concurrent(), Schedule.identity<ForIO, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *
+ *   // equal to
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Int>(IO.monad(), 3).zipRight(Schedule.identity<ForIO, Int>(IO.monad())))
+ *
+ *   //sampleEnd
+ *   println(res.fix().unsafeRunSync())
+ *   println(res2.fix().unsafeRunSync())
+ * }
+ * ```
+ *
+ * Finally, if we want to keep all intermediate results, we can zip the policy with [Schedule.collect]:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.concurrent.concurrent
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.fix
+ * import arrow.fx.repeat
+ *
+ * fun main() {
+ *   var counter = 0
+ *   val io = IO { println("Run: ${counter++}"); counter }
+ *   //sampleStart
+ *   val res = io.repeat(IO.concurrent(), Schedule.collect<ForIO, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *
+ *   // equal to
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Int>(IO.monad(), 3).zipRight(Schedule.collect<ForIO, Int>(IO.monad())))
+ *
+ *   //sampleEnd
+ *   println(res.fix().unsafeRunSync())
+ *   println(res2.fix().unsafeRunSync())
+ * }
+ * ```
+ *
+ * ## Repeating an effect until/while it produces a certain value
+ *
+ * We can make use of the policies doWhile or doUntil to repeat an effect while or until its produced result matches a given predicate.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.concurrent.concurrent
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.fix
+ * import arrow.fx.repeat
+ *
+ * fun main() {
+ *   var counter = 0
+ *   val io = IO { println("Run: ${counter++}"); counter }
+ *   //sampleStart
+ *   val res = io.repeat(IO.concurrent(), Schedule.doWhile<ForIO, Int>(IO.monad()) { it <= 3 })
+ *   //sampleEnd
+ *   println(res.fix().unsafeRunSync())
+ * }
+ * ```
+ *
+ * ## Exponential backoff retries
+ *
+ * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
+ *
+ * ```kotlin:ank
+ * import arrow.fx.ForIO
+ * import arrow.fx.IO
+ * import arrow.fx.Schedule
+ * import arrow.fx.extensions.io.monad.monad
+ * import arrow.fx.typeclasses.milliseconds
+ *
+ * val exponential = Schedule.exponential<ForIO, Unit>(IO.monad(), 250.milliseconds)
+ * ```
  */
 sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
   internal abstract val M: Monad<F>
@@ -501,42 +665,48 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     }
 
     /**
+     * Creates a schedule that continues without delay and always returns Unit
+     */
+    fun <F, A> unit(M: Monad<F>): Schedule<F, A, Unit> =
+      identity<F, A>(M).unit()
+
+    /**
      * Create a schedule that unfolds effectfully using a seed value [c] and a unfold function [f].
      * This keeps the current state (the current seed) as [State] and runs the unfold function on every
      *  call to update. This schedule always continues without delay and returns the current state.
      */
-    fun <F, A> unfoldM(M: Monad<F>, c: Kind<F, A>, f: (A) -> Kind<F, A>): Schedule<F, Any?, A> =
-      invoke(M, c) { _: Any?, acc -> M.run { f(acc).map { Decision.cont(0.seconds, it, Eval.now(it)) } } }
+    fun <F, I, A> unfoldM(M: Monad<F>, c: Kind<F, A>, f: (A) -> Kind<F, A>): Schedule<F, I, A> =
+      invoke(M, c) { _: I, acc -> M.run { f(acc).map { Decision.cont(0.seconds, it, Eval.now(it)) } } }
 
     /**
      * Non-effectful variant of [unfoldM]
      */
-    fun <F, A> unfold(M: Monad<F>, c: A, f: (A) -> A): Schedule<F, Any?, A> =
+    fun <F, I, A> unfold(M: Monad<F>, c: A, f: (A) -> A): Schedule<F, I, A> =
       unfoldM(M, M.just(c)) { M.just(f(it)) }
 
     /**
      * Create a schedule that continues forever and returns the number of iterations.
      */
-    fun <F> forever(M: Monad<F>): Schedule<F, Any?, Int> =
+    fun <F, A> forever(M: Monad<F>): Schedule<F, A, Int> =
       unfold(M, 0) { it + 1 }
 
     /**
      * Create a schedule that continues n times and returns the number of iterations.
      */
-    fun <F> recurs(M: Monad<F>, n: Int): Schedule<F, Any?, Int> =
-      forever(M).whileOutput { it <= n }
+    fun <F, A> recurs(M: Monad<F>, n: Int): Schedule<F, A, Int> =
+      forever<F, A>(M).whileOutput { it <= n }
 
     /**
      * Create a schedule that only ever retries once.
      */
-    fun <F> once(M: Monad<F>): Schedule<F, Any?, Unit> = recurs(M, 1).unit()
+    fun <F, A> once(M: Monad<F>): Schedule<F, A, Unit> = recurs<F, A>(M, 1).unit()
 
     /**
      * Create a schedule that never retries.
      * This is a difference with zio, where they define never as a schedule that itself never executes.
      */
-    fun <F> never(M: Monad<F>): Schedule<F, Any?, Nothing> =
-      recurs(M, 0).map { throw IllegalStateException("Impossible") }
+    fun <F, A> never(M: Monad<F>): Schedule<F, A, Nothing> =
+      recurs<F, A>(M, 0).map { throw IllegalStateException("Impossible") }
 
     /**
      * Create a schedule that uses another schedule to generate the delay of this schedule.
@@ -583,28 +753,28 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     /**
      * Create a schedule that returns its delay.
      */
-    fun <F> delay(M: Monad<F>): Schedule<F, Any?, Duration> =
-      (forever(M) as ScheduleImpl<F, Int, Any?, Int>).reconsider { _: Any?, decision -> Decision(cont = decision.cont, delay = decision.delay, state = decision.state, finish = Eval.now(decision.delay)) }
+    fun <F, A> delay(M: Monad<F>): Schedule<F, A, Duration> =
+      (forever<F, A>(M) as ScheduleImpl<F, Int, A, Int>).reconsider { _: A, decision -> Decision(cont = decision.cont, delay = decision.delay, state = decision.state, finish = Eval.now(decision.delay)) }
 
     /**
      * Create a schedule that returns its decisions
      */
-    fun <F> decision(M: Monad<F>): Schedule<F, Any?, Boolean> =
-      (forever(M) as ScheduleImpl<F, Int, Any?, Int>).reconsider { _: Any?, decision -> Decision(cont = decision.cont, delay = decision.delay, state = decision.state, finish = Eval.now(decision.cont)) }
+    fun <F, A> decision(M: Monad<F>): Schedule<F, A, Boolean> =
+      (forever<F, A>(M) as ScheduleImpl<F, Int, A, Int>).reconsider { _: A, decision -> Decision(cont = decision.cont, delay = decision.delay, state = decision.state, finish = Eval.now(decision.cont)) }
 
     /**
      * Create a schedule that continues with fixed delay.
      */
-    fun <F> spaced(M: Monad<F>, interval: Duration): Schedule<F, Any?, Int> =
-      forever(M).delayed { d -> d + interval }
+    fun <F, A> spaced(M: Monad<F>, interval: Duration): Schedule<F, A, Int> =
+      forever<F, A>(M).delayed { d -> d + interval }
 
     /**
      * Create a schedule that continues with increasing delay by adding the last two delays.
      */
-    fun <F> fibonacci(M: Monad<F>, one: Duration): Schedule<F, Any?, Duration> =
+    fun <F, A> fibonacci(M: Monad<F>, one: Duration): Schedule<F, A, Duration> =
       delayed(
         M,
-        unfold(M, 0.seconds toT one) { (del, acc) ->
+        unfold<F, A, Tuple2<Duration, Duration>>(M, 0.seconds toT one) { (del, acc) ->
           acc toT del + acc
         }.map { it.a }
       )
@@ -613,20 +783,20 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
      * Create a schedule which increases its delay linear by n * base where n is the number of
      *  executions.
      */
-    fun <F> linear(M: Monad<F>, base: Duration): Schedule<F, Any?, Duration> =
+    fun <F, A> linear(M: Monad<F>, base: Duration): Schedule<F, A, Duration> =
       delayed(
         M,
-        forever(M).map { base * it }
+        forever<F, A>(M).map { base * it }
       )
 
     /**
      * Create a schedule that increases its delay exponentially with a given factor and base.
      * Delay can be calculated as [base] * factor ^ n where n is the number of executions.
      */
-    fun <F> exponential(M: Monad<F>, base: Duration, factor: Double = 2.0): Schedule<F, Any?, Duration> =
+    fun <F, A> exponential(M: Monad<F>, base: Duration, factor: Double = 2.0): Schedule<F, A, Duration> =
       delayed(
         M,
-        forever(M).map { base * factor.pow(it).roundToInt() }
+        forever<F, A>(M).map { base * factor.pow(it).roundToInt() }
       )
 
     /**
@@ -637,19 +807,21 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
       fun <A> identity(): Schedule<M, A, A> = identity(MM())
 
-      fun <A> unfoldM(c: Kind<M, A>, f: (A) -> Kind<M, A>): Schedule<M, Any?, A> =
+      fun <A, I> unfoldM(c: Kind<M, A>, f: (A) -> Kind<M, A>): Schedule<M, I, A> =
         unfoldM(MM(), c, f)
 
-      fun <A> unfold(c: A, f: (A) -> A): Schedule<M, Any?, A> =
+      fun <A, I> unfold(c: A, f: (A) -> A): Schedule<M, I, A> =
         unfold(MM(), c, f)
 
-      fun forever(): Schedule<M, Any?, Int> =
+      fun <A> forever(): Schedule<M, A, Int> =
         forever(MM())
 
-      fun recurs(n: Int): Schedule<M, Any?, Int> =
+      fun <A> unit(): Schedule<M, A, Unit> = unit(MM())
+
+      fun <A> recurs(n: Int): Schedule<M, A, Int> =
         recurs(MM(), n)
 
-      fun once(): Schedule<M, *, Unit> = once(MM())
+      fun <A> once(): Schedule<M, A, Unit> = once(MM())
       fun <S, A> delayed(delaySchedule: Schedule<M, A, Duration>): Schedule<M, A, Duration> =
         delayed(MM(), delaySchedule)
 
@@ -668,25 +840,25 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       fun <A> logOutput(f: (A) -> Kind<M, Unit>): Schedule<M, A, A> =
         logOutput(MM(), f)
 
-      fun delay(): Schedule<M, Any?, Duration> =
+      fun <A> delay(): Schedule<M, A, Duration> =
         delay(MM())
 
-      fun decision(): Schedule<M, Any?, Boolean> =
+      fun <A> decision(): Schedule<M, A, Boolean> =
         decision(MM())
 
-      fun spaced(interval: Duration): Schedule<M, Any?, Int> =
+      fun <A> spaced(interval: Duration): Schedule<M, A, Int> =
         spaced(MM(), interval)
 
-      fun fibonacci(one: Duration): Schedule<M, Any?, Duration> =
+      fun <A> fibonacci(one: Duration): Schedule<M, A, Duration> =
         fibonacci(MM(), one)
 
-      fun linear(base: Duration): Schedule<M, Any?, Duration> =
+      fun <A> linear(base: Duration): Schedule<M, A, Duration> =
         linear(MM(), base)
 
-      fun exponential(base: Duration, factor: Double = 2.0): Schedule<M, Any?, Duration> =
+      fun <A> exponential(base: Duration, factor: Double = 2.0): Schedule<M, A, Duration> =
         exponential(MM(), base, factor)
 
-      fun never(): Schedule<M, Any?, Nothing> = never(MM())
+      fun <A> never(): Schedule<M, A, Nothing> = never(MM())
     }
 
     /**

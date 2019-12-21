@@ -150,7 +150,7 @@ class ScheduleTest : UnitSpec() {
     }
 
     "Schedule.unfold()" {
-      val dec = Schedule.unfold(Id.monad(), 0) { it + 1 }.runIdSchedule(0)
+      val dec = Schedule.unfold<ForId, Any?, Int>(Id.monad(), 0) { it + 1 }.runIdSchedule(0)
 
       dec.cont shouldBe true
       dec.delay.amount shouldBe 0L
@@ -160,13 +160,13 @@ class ScheduleTest : UnitSpec() {
 
     "Schedule.forever() == Schedule.unfold(0) { it + 1 }" {
       scheduleEq.run {
-        Schedule.forever(Id.monad()).eqv(Schedule.unfold(Id.monad(), 0) { it + 1 })
+        Schedule.forever<ForId, Any?>(Id.monad()).eqv(Schedule.unfold(Id.monad(), 0) { it + 1 })
       }
     }
 
     "Schedule.recurs(n: Int)" {
       forAll(Gen.intSmall().filter { it < 1000 }) { i ->
-        val res = Schedule.recurs(Id.monad(), i).runIdSchedule(0 as Any?, i + 1)
+        val res = Schedule.recurs<ForId, Int>(Id.monad(), i).runIdSchedule(0, i + 1)
 
         if (i <= 0) res.isEmpty()
         else res.dropLast(1).forAll { it.cont && it.delay.amount == 0L } &&
@@ -176,19 +176,19 @@ class ScheduleTest : UnitSpec() {
 
     "Schedule.once() == Schedule.recurs(1)" {
       scheduleEq.run {
-        Schedule.once(Id.monad()).eqv(Schedule.recurs(Id.monad(), 1).const(Unit)) shouldBe true
+        Schedule.once<ForId, Any?>(Id.monad()).eqv(Schedule.recurs<ForId, Any?>(Id.monad(), 1).const(Unit)) shouldBe true
       }
     }
 
     "Schedule.never() == Schedule.recurs(0)" {
       scheduleEq.run {
-        Schedule.never(Id.monad()).eqv(Schedule.recurs(Id.monad(), 0)) shouldBe true
+        Schedule.never<ForId, Any?>(Id.monad()).eqv(Schedule.recurs(Id.monad(), 0)) shouldBe true
       }
     }
 
     "Schedule.spaced()" {
       forAll(Gen.intSmall().filter { it > 0 }, Gen.intSmall().filter { it > 0 }.filter { it < 1000 }) { i, n ->
-        val res = Schedule.spaced(Id.monad(), i.seconds).runIdSchedule(0, n)
+        val res = Schedule.spaced<ForId, Any>(Id.monad(), i.seconds).runIdSchedule(0, n)
 
         res.forAll { it.delay.nanoseconds == i.seconds.nanoseconds && it.cont }
       }
@@ -196,7 +196,7 @@ class ScheduleTest : UnitSpec() {
 
     "Schedule.fibonacci()" {
       forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
-        val res = Schedule.fibonacci(Id.monad(), i.seconds).runIdSchedule(0, n)
+        val res = Schedule.fibonacci<ForId, Any?>(Id.monad(), i.seconds).runIdSchedule(0, n)
 
         val sum = res.fold(0L) { acc, v ->
           acc + v.delay.amount
@@ -209,7 +209,7 @@ class ScheduleTest : UnitSpec() {
 
     "Schedule.linear()" {
       forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
-        val res = Schedule.linear(Id.monad(), i.seconds).runIdSchedule(0, n)
+        val res = Schedule.linear<ForId, Any?>(Id.monad(), i.seconds).runIdSchedule(0, n)
 
         val sum = res.fold(0L) { acc, v -> acc + v.delay.amount }
         val expSum = linear(i.toLong()).drop(1).take(n).sum()
@@ -220,7 +220,7 @@ class ScheduleTest : UnitSpec() {
 
     "Schedule.exponential()" {
       forFew(5, Gen.intSmall().filter { it > 0 }.filter { it < 10 }, Gen.intSmall().filter { it > 0 }.filter { it < 10 }) { i, n ->
-        val res = Schedule.exponential(Id.monad(), i.seconds).runIdSchedule(0, n)
+        val res = Schedule.exponential<ForId, Any?>(Id.monad(), i.seconds).runIdSchedule(0, n)
 
         val sum = res.fold(0L) { acc, v -> acc + v.delay.amount }
         val expSum = exp(i.toLong()).drop(1).take(n).sum()
