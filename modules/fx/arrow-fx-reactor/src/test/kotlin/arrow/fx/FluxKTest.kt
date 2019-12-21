@@ -20,6 +20,7 @@ import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadFilterLaws
@@ -70,7 +71,15 @@ class FluxKTest : UnitSpec() {
 
   fun GENK() = object : GenK<ForFluxK> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<ForFluxK, A>> =
-      Gen.list(gen).map { Flux.fromIterable(it).k() }
+      Gen.oneOf(
+        Gen.constant(Flux.empty<A>()),
+
+        /*
+        question: should we include errors here?
+        Gen.throwable().map { Flux.error<A>(it) },
+        */
+        Gen.list(gen).map { Flux.fromIterable(it) }
+      ).map { it.k() }
   }
 
   fun EQK(): EqK<ForFluxK> = object : EqK<ForFluxK> {

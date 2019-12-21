@@ -20,6 +20,7 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
@@ -59,9 +60,25 @@ class ObservableKTests : RxJavaSpec() {
       }
   }
 
-  fun <A> GEN(gen: Gen<A>) = Gen.list(gen).map {
-    Observable.fromIterable(it).k()
-  }
+  /*
+    question: Observable can emit error too. this lets some tests fail:
+
+    java:test://arrow.fx.ObservableKTests.Foldable Laws: Exists is consistent with find
+    java:test://arrow.fx.ObservableKTests.Traverse Laws: FoldMap derived
+    java:test://arrow.fx.ObservableKTests.MonadFilter Laws: Right Empty
+    ...
+   */
+  fun <A> GEN(gen: Gen<A>) =
+    Gen.oneOf(
+      Gen.constant(Observable.empty<A>()),
+
+      Gen.throwable().map {
+        Observable.error<A>(it)
+      },
+
+      Gen.list(gen).map {
+        Observable.fromIterable(it)
+      }).map { it.k() }
 
   fun GENK() = object : GenK<ForObservableK> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<ForObservableK, A>> =
