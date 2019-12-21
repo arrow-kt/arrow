@@ -8,6 +8,7 @@ import arrow.core.ForOption
 import arrow.core.FunctionK
 import arrow.core.Id
 import arrow.core.ListK
+import arrow.core.Nel
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
@@ -30,6 +31,8 @@ import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.value
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.GenK
+import arrow.test.generators.nonEmptyList
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -40,14 +43,15 @@ class CofreeTest : UnitSpec() {
 
   init {
 
-    val cf: (Int) -> Cofree<ForOption, Int> = {
-      val sideEffect = SideEffect()
-      unfold(Option.functor(), sideEffect.counter) {
-        sideEffect.increment()
-        if (it % 2 == 0) None else Some(it + 1)
-      }
+    val genk = object : GenK<CofreePartialOf<ForOption>> {
+      private fun <A> NonEmptyList<A>.toCofree(): Cofree<ForOption, A> =
+        Cofree(Option.functor(), this.head, Eval.later { Nel.fromList(this.tail).map { it.toCofree() } })
+
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<CofreePartialOf<ForOption>, A>> =
+        Gen.nonEmptyList(gen).map {
+          it.toCofree()
+        }
     }
-    val g = Gen.int().map(cf) as Gen<Kind<Kind<ForCofree, ForOption>, Int>>
 
     val eqk = object : EqK<CofreePartialOf<ForOption>> {
       override fun <A> Kind<CofreePartialOf<ForOption>, A>.eqK(other: Kind<CofreePartialOf<ForOption>, A>, EQ: Eq<A>): Boolean {
@@ -55,7 +59,7 @@ class CofreeTest : UnitSpec() {
       }
     }
 
-    testLaws(ComonadLaws.laws(Cofree.comonad(), g, eqk))
+    testLaws(ComonadLaws.laws(Cofree.comonad(), genk, eqk))
 
     "tailForced should evaluate and return" {
       val sideEffect = SideEffect()

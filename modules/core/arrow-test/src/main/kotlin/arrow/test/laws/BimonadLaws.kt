@@ -39,13 +39,10 @@ object BimonadLaws {
     CM: Comonad<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> {
-    val GEN = GENK.genK(Gen.int())
-
-    return MonadLaws.laws(M, EQK) +
-      ComonadLaws.laws(CM, GEN, EQK) +
+  ): List<Law> =
+    MonadLaws.laws(M, EQK) +
+      ComonadLaws.laws(CM, GENK, EQK) +
       bimonadLaws(BF, EQK)
-  }
 
   fun <F> laws(
     BF: Bimonad<F>,
@@ -56,13 +53,10 @@ object BimonadLaws {
     SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>
-  ): List<Law> {
-    val GEN = GENK.genK(Gen.int())
-
-    return MonadLaws.laws(M, FF, AP, SL, EQK) +
-      ComonadLaws.laws(CM, GEN, EQK) +
+  ): List<Law> =
+    MonadLaws.laws(M, FF, AP, SL, EQK) +
+      ComonadLaws.laws(CM, GENK, EQK) +
       bimonadLaws(BF, EQK)
-  }
 
   fun <F, A> Bimonad<F>.extractIsIdentity(G: Gen<A>, EQ: Eq<A>): Unit =
     forAll(
