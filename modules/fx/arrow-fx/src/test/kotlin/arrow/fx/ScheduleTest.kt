@@ -1,6 +1,8 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.Either
+import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.eq
@@ -10,20 +12,26 @@ import arrow.core.extensions.list.foldable.forAll
 import arrow.core.extensions.monoid
 import arrow.core.toT
 import arrow.core.value
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.monad.monad
+import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.extensions.io.monadThrow.monadThrow
 import arrow.fx.extensions.schedule.alternative.alternative
 import arrow.fx.extensions.schedule.applicative.applicative
 import arrow.fx.extensions.schedule.category.category
 import arrow.fx.extensions.schedule.profunctor.profunctor
 import arrow.fx.extensions.schedule.semiring.semiring
+import arrow.fx.typeclasses.Duration
+import arrow.fx.typeclasses.nanoseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
+import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.intSmall
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.CategoryLaws
-import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.ProfunctorLaws
 import arrow.test.laws.SemiringLaws
 import arrow.test.laws.forFew
@@ -33,6 +41,7 @@ import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import kotlin.math.max
 import kotlin.math.pow
 
 class ScheduleTest : UnitSpec() {
@@ -67,6 +76,15 @@ class ScheduleTest : UnitSpec() {
       gen.applicative(Schedule.applicative<F, I>(MF))
   }
 
+  fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object: GenK<DecisionPartialOf<Any?>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<DecisionPartialOf<Any?>, A>> =
+      Gen.bind(
+        Gen.bool(),
+        Gen.intSmall(),
+        gen
+      ) { cont, delay, res -> Schedule.Decision(cont, delay.nanoseconds, 0 as Any?, Eval.now(res)) }
+  }
+
   fun <I, A> Schedule<ForId, I, A>.runIdSchedule(i: I): Schedule.Decision<Any?, A> =
     runIdSchedule(i, 1).first()
 
@@ -79,6 +97,11 @@ class ScheduleTest : UnitSpec() {
         go(res.state, rem - 1, acc + listOf(res))
       }
     return go(initialState.value(), n, emptyList())
+  }
+
+  fun refTimer(ref: Ref<ForIO, Duration>): Timer<ForIO> = object: Timer<ForIO> {
+    override fun sleep(duration: Duration): Kind<ForIO, Unit> =
+      ref.update { d -> d + duration }
   }
 
   val scheduleEq = EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any())
@@ -115,7 +138,6 @@ class ScheduleTest : UnitSpec() {
       )
     )
 
-    // find good properties to test creating schedules
     "Schedule.identity()" {
       forAll(Gen.int()) { i ->
         val dec = Schedule.identity<ForId, Int>(Id.monad()).runIdSchedule(i)
@@ -207,7 +229,47 @@ class ScheduleTest : UnitSpec() {
       }
     }
 
-    // find good properties to test running schedules
+    "repeat" {
+      forAll(Schedule.Decision.genK().genK(Gen.int()), Gen.intSmall().filter { it < 100 }.filter { it >= 0 }) { dec, n ->
+        val schedule = Schedule(IO.monad(), IO.just(0 as Any?)) { _: Unit, _ -> IO.just(dec.fix()) }
+
+        val eff = SideEffect()
+        val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
+
+        val res = IO { if (eff.counter >= n) throw RuntimeException("WOOO") else eff.increment() }
+          .repeat(IO.monadThrow(), refTimer(ref), schedule)
+          .attempt()
+          .fix().unsafeRunSync()
+
+        if (dec.fix().cont || n == 0) res.isLeft() &&
+          ref.get().fix().unsafeRunSync().nanoseconds == max(n - 1, 0) * dec.fix().delay.nanoseconds &&
+          eff.counter == n
+        else res.isRight() && eff.counter == 1 &&
+          ref.get().fix().unsafeRunSync().nanoseconds == 0L &&
+          (res as Either.Right).b == dec.fix().finish.value()
+      }
+    }
+
+    "retry" {
+      forAll(Schedule.Decision.genK().genK(Gen.int()), Gen.intSmall().filter { it < 100 }.filter { it >= 0 }) { dec, n ->
+        val schedule = Schedule(IO.monad(), IO.just(0 as Any?)) { _: Throwable, _ -> IO.just(dec.fix()) }
+
+        val eff = SideEffect()
+        val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
+
+        val res = IO { if (eff.counter <= n) { eff.increment(); throw RuntimeException("WOOO") } else Unit}
+          .retry(IO.monadThrow(), refTimer(ref), schedule)
+          .attempt()
+          .fix().unsafeRunSync()
+
+        if (dec.fix().cont) res.isRight() &&
+          eff.counter == n + 1 &&
+          ref.get().fix().unsafeRunSync().nanoseconds == (n + 1) * dec.fix().delay.nanoseconds
+        else res.isLeft() &&
+          eff.counter == 1 &&
+          ref.get().fix().unsafeRunSync().nanoseconds == 0L
+      }
+    }
   }
 
   private fun fibs(one: Long): Sequence<Long> = generateSequence(0L toT one) { (a, b) ->
