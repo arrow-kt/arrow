@@ -20,7 +20,7 @@ internal fun <A> firstOptionMonoid(): Monoid<Const<Option<A>, First>> = object :
   override fun empty(): Const<Option<A>, First> = Const(None)
 
   override fun Const<Option<A>, First>.combine(b: Const<Option<A>, First>): Const<Option<A>, First> =
-    if (value().fold({ false }, { true })) this else b
+    if (value().isDefined()) this else b
 }
 
 internal fun <A> lastOptionMonoid(): Monoid<Const<Option<A>, Last>> = object : Monoid<Const<Option<A>, Last>> {
@@ -28,5 +28,5 @@ internal fun <A> lastOptionMonoid(): Monoid<Const<Option<A>, Last>> = object : M
   override fun empty(): Const<Option<A>, Last> = Const(None)
 
   override fun Const<Option<A>, Last>.combine(b: Const<Option<A>, Last>): Const<Option<A>, Last> =
-    if (b.value().fold({ false }, { true })) b else this
+    if (b.value().isDefined()) b else this
 }
