@@ -121,9 +121,3 @@ private fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object 
       StateT(it)
     }
 }
-
-private fun Try.Companion.genK() = object : GenK<ForTry> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> = gen.map {
-    Try.just(it)
-  }
-}

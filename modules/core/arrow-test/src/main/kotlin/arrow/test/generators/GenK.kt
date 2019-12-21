@@ -123,7 +123,7 @@ fun <F, G> GenK<F>.nested(GENKG: GenK<G>): GenK<Nested<F, G>> = object : GenK<Ne
     this@nested.genK(GENKG.genK(gen)).map { it.nest() }
 }
 
-fun Try.Companion.genK() =  object : GenK<ForTry> {
+fun Try.Companion.genK() = object : GenK<ForTry> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =
     Gen.oneOf(
       gen.map {
