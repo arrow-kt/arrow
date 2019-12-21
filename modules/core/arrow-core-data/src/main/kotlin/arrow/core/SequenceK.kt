@@ -21,16 +21,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { this.iterator().loop() }
   }
 
-  /**
-   * Note, if the applicative instance can, it will short-circuit and thus not evaluate the entire
-   *  sequence, this means you can even use this on infinite sequences.
-   * There is just one problem: This rebuilds the sequence using + from the stdlib, and that is not stacksafe, so while building itself won't
-   *  cause a stackoverflow, trying to access elements further back in the sequence will.
-   */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
-    foldRight(Eval.now(GA.just(emptySequence<B>().k()))) { a, eval ->
-      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
-    }.value()
+    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
+      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (listOf(b) + xs).k() } } } } }
+    }.value().let { GA.run { it.map { it.asSequence().k() } } }
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->
