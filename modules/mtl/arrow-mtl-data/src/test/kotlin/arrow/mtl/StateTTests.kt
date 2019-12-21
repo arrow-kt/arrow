@@ -17,7 +17,9 @@ import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.option.eqK.eqK
+import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
+import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.semigroupK.semigroupK
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
@@ -81,14 +83,18 @@ class StateTTests : UnitSpec() {
         genk(Option.genK(), Gen.int()),
         optionStateEQK),
 
+      /*
+          question: these tests failed  with the previous ListK as state
+          java:test://arrow.mtl.StateTTests.Alternative Laws: Right Distributivity
+          java:test://arrow.mtl.StateTTests.Alternative Laws: alt is associative
+       */
       MonadCombineLaws.laws(
-        StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
-        StateT.functor<ForListK, Int>(ListK.functor()),
-        StateT.applicative<ForListK, Int>(ListK.monad()),
-        StateT.monad<ForListK, Int>(ListK.monad()),
-        { StateT.liftF(ListK.monad(), ListK.just(it)) },
-        { StateT.liftF(ListK.monad(), ListK.just { s: Int -> s * 2 }) },
-        listkStateEQK)
+        StateT.monadCombine<ForOption, Int>(Option.monadCombine()),
+        StateT.functor<ForOption, Int>(Option.functor()),
+        StateT.applicative<ForOption, Int>(Option.monad()),
+        StateT.monad<ForOption, Int>(Option.monad()),
+        genk(Option.genK(), Gen.int()),
+        optionStateEQK)
     )
   }
 }

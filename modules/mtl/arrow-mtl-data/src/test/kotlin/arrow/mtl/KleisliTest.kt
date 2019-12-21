@@ -18,7 +18,6 @@ import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.eqK.eqK
-import arrow.core.some
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
@@ -83,8 +82,7 @@ class KleisliTest : UnitSpec() {
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
-        { i -> Kleisli { i.some() } },
-        { i -> Kleisli { { j: Int -> i + j }.some() } },
+        genk<ForOption, Int>(Option.genK()),
         optionEQK
       ),
       ConcurrentLaws.laws(

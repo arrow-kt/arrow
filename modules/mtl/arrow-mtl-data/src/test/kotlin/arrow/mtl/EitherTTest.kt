@@ -13,7 +13,6 @@ import arrow.core.Right
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
@@ -62,10 +61,12 @@ class EitherTTest : UnitSpec() {
         constEQK
       ),
 
+      /*
+        question: test java:test://arrow.mtl.EitherTTest.Alternative Laws: Right Distributivity fails
+       */
       AlternativeLaws.laws(
         EitherT.alternative(Id.monad(), Int.monoid()),
-        { EitherT.just(Id.applicative(), it) },
-        { i -> EitherT.just(Id.applicative(), { j: Int -> i + j }) },
+        EitherT.genK(Id.genK(), Gen.int()),
         idEQK
       ),
 

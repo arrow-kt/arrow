@@ -87,7 +87,14 @@ class FluxKTest : UnitSpec() {
       AsyncLaws.laws(FluxK.async(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), EQK(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), GENK()),
       TraverseLaws.laws(FluxK.traverse(), GENK(), EQK()),
-      MonadFilterLaws.laws(FluxK.monadFilter(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), { Flux.just(it).k() }, EQK())
+      MonadFilterLaws.laws(
+        FluxK.monadFilter(),
+        FluxK.functor(),
+        FluxK.applicative(),
+        FluxK.monad(),
+        GENK(),
+        EQK()
+      )
     )
 
     "fx should defer evaluation until subscribed" {

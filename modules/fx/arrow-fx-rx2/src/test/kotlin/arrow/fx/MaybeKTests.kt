@@ -17,11 +17,13 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
@@ -57,11 +59,31 @@ class MaybeKTests : RxJavaSpec() {
       }
   }
 
+  fun GENK() = object : GenK<ForMaybeK> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForMaybeK, A>> =
+      Gen.oneOf(
+        Gen.constant(Maybe.empty<A>()),
+
+        gen.map {
+          Maybe.just(it)
+        }
+
+        /*,
+        // question: adding this lets test fail: java:test://arrow.fx.MaybeKTests.MonadFilter Laws: Right Empty
+        Gen.throwable().map {
+          Maybe.error<A>(it)
+        }
+         */
+      ).map {
+        it.k()
+      }
+  }
+
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
       ConcurrentLaws.laws(MaybeK.concurrent(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), EQK(), testStackSafety = false),
-      MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), { Maybe.just(it).k() }, EQK())
+      MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), GENK(), EQK())
     )
 
     "fx should defer evaluation until subscribed" {

@@ -102,7 +102,7 @@ class FlowableKTests : RxJavaSpec() {
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), GENK(), EQK()))
 
-    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), { Flowable.just(it).k() }, EQK()))
+    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK()))
 
     "fx should defer evaluation until subscribed" {
       var run = false
