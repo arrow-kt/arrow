@@ -47,9 +47,8 @@ class CofreeTest : UnitSpec() {
       private fun <A> NonEmptyList<A>.toCofree(): Cofree<ForOption, A> =
         Cofree(Option.functor(), this.head, Eval.later { Nel.fromList(this.tail).map { it.toCofree() } })
 
-      // question: test fail when nel gets bigger
       override fun <A> genK(gen: Gen<A>): Gen<Kind<CofreePartialOf<ForOption>, A>> =
-        Gen.nonEmptyList(gen).filter { it.size < 3 }.map {
+        Gen.nonEmptyList(gen).map {
           it.toCofree()
         }
     }
