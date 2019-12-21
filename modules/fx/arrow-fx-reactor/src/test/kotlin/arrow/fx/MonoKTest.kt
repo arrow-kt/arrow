@@ -16,11 +16,13 @@ import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.matchers.startWith
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
@@ -69,7 +71,7 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-      AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.monad(), EQK(), testStackSafety = false),
+      AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.monad(), MonoK.genK(), EQK(), testStackSafety = false),
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
 
@@ -200,4 +202,14 @@ class MonoKTest : UnitSpec() {
         .expectError(ConnectionCancellationException::class)
     }
   }
+}
+
+fun MonoK.Companion.genK() = object : GenK<ForMonoK> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForMonoK, A>> =
+    Gen.oneOf(
+      gen.map {
+        Mono.just(it)
+      },
+      Gen.constant(Mono.empty())
+    ).map { it.k() }
 }

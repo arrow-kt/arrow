@@ -8,6 +8,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.fx.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.GenK
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
 import arrow.typeclasses.Apply
@@ -23,12 +24,13 @@ object MonadDeferLaws {
 
   private fun <F> monadDeferLaws(
     SC: MonadDefer<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return BracketLaws.laws(SC, EQK) + listOf(
+    return BracketLaws.laws(SC, GENK, EQK) + listOf(
       Law("MonadDefer laws: later constant equals pure") { SC.delayConstantEqualsPure(EQ) },
       Law("MonadDefer laws: later throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQ) },
       Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },
@@ -54,22 +56,24 @@ object MonadDeferLaws {
 
   fun <F> laws(
     SC: MonadDefer<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, EQK) +
-      monadDeferLaws(SC, EQK, testStackSafety)
+    BracketLaws.laws(SC, GENK, EQK) +
+      monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> laws(
     SC: MonadDefer<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, FF, AP, SL, EQK) +
-      monadDeferLaws(SC, EQK, testStackSafety)
+    BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
+      monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->

@@ -64,7 +64,7 @@ class KleisliTest : UnitSpec() {
   }
 
   init {
-    fun <F, D> genk(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
+    fun <F, D> genK(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
       override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
         Kleisli { _: D -> k }
       }
@@ -82,7 +82,7 @@ class KleisliTest : UnitSpec() {
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
-        genk<ForOption, Int>(Option.genK()),
+        genK<ForOption, Int>(Option.genK()),
         optionEQK
       ),
       ConcurrentLaws.laws(
@@ -90,12 +90,13 @@ class KleisliTest : UnitSpec() {
         Kleisli.functor<ForIO, Int>(IO.functor()),
         Kleisli.applicative<ForIO, Int>(IO.applicative()),
         Kleisli.monad<ForIO, Int>(IO.monad()),
+        genK<ForIO, Int>(IO.genK()),
         ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), conestTryGENK(), conestTryEQK()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        genk<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
+        genK<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
         constEQK
       )
     )

@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.list.foldable.fold
 import arrow.test.generators.GenK
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.MonoidK
@@ -13,20 +12,14 @@ import io.kotlintest.properties.forAll
 
 object MonoidKLaws {
 
-  fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(SGK, GENK.genK(Gen.int()), EQK)
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQK: EqK<F>): List<Law> =
-    laws(SGK, Gen.int().map { AP.just(it) }, EQK)
-
-  private fun <F> laws(SGK: MonoidK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(SGK: MonoidK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return SemigroupKLaws.laws(SGK, GEN, EQK) + listOf(
-      Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(GEN, EQ) },
-      Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
-      Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) })
+    return SemigroupKLaws.laws(SGK, GENK, EQK) + listOf(
+        Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(GEN, EQ) },
+        Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
+        Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) })
   }
 
   fun <F> MonoidK<F>.monoidKLeftIdentity(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

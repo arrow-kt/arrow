@@ -20,7 +20,6 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
-import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
@@ -72,9 +71,11 @@ class ObservableKTests : RxJavaSpec() {
     Gen.oneOf(
       Gen.constant(Observable.empty<A>()),
 
+      /*
       Gen.throwable().map {
         Observable.error<A>(it)
       },
+       */
 
       Gen.list(gen).map {
         Observable.fromIterable(it)
@@ -88,7 +89,7 @@ class ObservableKTests : RxJavaSpec() {
   init {
     testLaws(
       TraverseLaws.laws(ObservableK.traverse(), GENK(), EQK()),
-      ConcurrentLaws.laws(ObservableK.concurrent(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), EQK(), testStackSafety = false),
+      ConcurrentLaws.laws(ObservableK.concurrent(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), GENK(), EQK(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
       MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), GENK(), EQK())
     )

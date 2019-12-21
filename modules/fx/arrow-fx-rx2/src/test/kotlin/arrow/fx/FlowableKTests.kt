@@ -75,27 +75,27 @@ class FlowableKTests : RxJavaSpec() {
 
   init {
     testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncError(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncError(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))

@@ -42,7 +42,7 @@ object BimonadLaws {
   ): List<Law> {
     val GEN = GENK.genK(Gen.int())
 
-    return MonadLaws.laws(M, EQK) +
+    return MonadLaws.laws(M, GENK, EQK) +
       ComonadLaws.laws(CM, GEN, EQK) +
       bimonadLaws(BF, EQK)
   }
@@ -59,7 +59,7 @@ object BimonadLaws {
   ): List<Law> {
     val GEN = GENK.genK(Gen.int())
 
-    return MonadLaws.laws(M, FF, AP, SL, EQK) +
+    return MonadLaws.laws(M, FF, AP, SL, GENK, EQK) +
       ComonadLaws.laws(CM, GEN, EQK) +
       bimonadLaws(BF, EQK)
   }

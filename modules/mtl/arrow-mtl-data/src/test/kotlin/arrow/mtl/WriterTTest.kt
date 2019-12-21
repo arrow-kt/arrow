@@ -76,6 +76,7 @@ class WriterTTest : UnitSpec() {
         WriterT.functor<ForIO, Int>(IO.functor()),
         WriterT.applicative(IO.applicative(), Int.monoid()),
         WriterT.monad(IO.monad(), Int.monoid()),
+        WriterT.genK(IO.genK(), Gen.int()),
         ioEQK()
       ),
       MonoidKLaws.laws(
@@ -92,6 +93,7 @@ class WriterTTest : UnitSpec() {
         WriterT.applicative(Option.applicative(), Int.monoid()),
         WriterT.monad(Option.monad(), Int.monoid()),
         Gen.intSmall(),
+        WriterT.genK(Option.genK(), Gen.int()),
         optionEQK(),
         Int.eq()
       ),

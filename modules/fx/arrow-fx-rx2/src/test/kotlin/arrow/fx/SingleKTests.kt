@@ -16,6 +16,7 @@ import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.forFew
@@ -63,6 +64,7 @@ class SingleKTests : RxJavaSpec() {
         SingleK.functor(),
         SingleK.applicative(),
         SingleK.monad(),
+        SingleK.genK(),
         EQK(),
         testStackSafety = false
       ),
@@ -189,4 +191,14 @@ class SingleKTests : RxJavaSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
   }
+}
+
+fun SingleK.Companion.genK() = object : GenK<ForSingleK> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSingleK, A>> =
+    Gen.oneOf(
+      gen.map {
+        Single.just(it)
+      }).map {
+      it.k()
+    }
 }

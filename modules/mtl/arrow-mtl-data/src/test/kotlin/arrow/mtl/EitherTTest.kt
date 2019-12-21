@@ -74,6 +74,7 @@ class EitherTTest : UnitSpec() {
         EitherT.functor(IO.functor()),
         EitherT.applicative(IO.applicative()),
         EitherT.monad(IO.monad()),
+        EitherT.genK(IO.genK(), Gen.string()),
         ioEQK),
 
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()),

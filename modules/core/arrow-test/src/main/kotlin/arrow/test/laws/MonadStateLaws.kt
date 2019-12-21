@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.mtl.typeclasses.MonadState
+import arrow.test.generators.GenK
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
@@ -29,18 +30,20 @@ object MonadStateLaws {
 
   fun <F> laws(
     M: MonadState<F, Int>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, EQK) + monadStateLaws(M, EQK)
+    MonadLaws.laws(M, GENK, EQK) + monadStateLaws(M, EQK)
 
   fun <F> laws(
     M: MonadState<F, Int>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, SL, EQK) + monadStateLaws(M, EQK)
+    MonadLaws.laws(M, FF, AP, SL, GENK, EQK) + monadStateLaws(M, EQK)
 
   fun <F> MonadState<F, Int>.monadStateGetIdempotent(EQ: Eq<Kind<F, Int>>) {
     get().flatMap { get() }.equalUnderTheLaw(get(), EQ)

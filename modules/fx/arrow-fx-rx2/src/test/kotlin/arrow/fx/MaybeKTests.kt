@@ -82,7 +82,17 @@ class MaybeKTests : RxJavaSpec() {
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      ConcurrentLaws.laws(MaybeK.concurrent(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), EQK(), testStackSafety = false),
+
+      ConcurrentLaws.laws(
+        MaybeK.concurrent(),
+        MaybeK.functor(),
+        MaybeK.applicative(),
+        MaybeK.monad(),
+        GENK(),
+        EQK(),
+        testStackSafety = false
+      ),
+
       MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), GENK(), EQK())
     )
 

@@ -37,7 +37,7 @@ object MonadFilterLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(MF, EQK) +
+    MonadLaws.laws(MF, GENK, EQK) +
       FunctorFilterLaws.laws(MF, GENK, EQK) +
       monadFilterLaws(MF, GENK, EQK)
 
@@ -49,7 +49,7 @@ object MonadFilterLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, SL, EQK) +
+    MonadLaws.laws(MF, FF, AP, SL, GENK, EQK) +
       FunctorFilterLaws.laws(MF, GENK, EQK) +
       monadFilterLaws(MF, GENK, EQK)
 

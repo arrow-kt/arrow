@@ -21,7 +21,7 @@ object AlternativeLaws {
     val cf = GENK.genK(Gen.int())
     val cff = GENK.genK(Gen.functionAToB<Int, Int>(Gen.int()))
 
-    return ApplicativeLaws.laws(AF, EQK) + MonoidKLaws.laws(AF, AF, EQK) + listOf(
+    return ApplicativeLaws.laws(AF, GENK, EQK) + MonoidKLaws.laws(AF, GENK, EQK) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
       Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) },

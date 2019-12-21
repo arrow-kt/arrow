@@ -20,7 +20,6 @@ import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
-import arrow.test.generators.throwable
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadFilterLaws
@@ -93,7 +92,7 @@ class FluxKTest : UnitSpec() {
 
     testLaws(
       TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
-      AsyncLaws.laws(FluxK.async(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), EQK(), testStackSafety = false),
+      AsyncLaws.laws(FluxK.async(), FluxK.functor(), FluxK.applicative(), FluxK.monad(), GENK(), EQK(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), GENK()),
       TraverseLaws.laws(FluxK.traverse(), GENK(), EQK()),
       MonadFilterLaws.laws(
