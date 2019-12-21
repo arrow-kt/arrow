@@ -53,8 +53,7 @@ class ResourceTest : UnitSpec() {
           Resource({ IO { it } }, { r -> IO { released.add(r); Unit } }, IO.bracket())
         }.fix().invoke { IO.unit }.fix().unsafeRunSync()
 
-        // This looks confusing but is correct, traverse is a rightFold => l is already "reversed"
-        l == released
+        l == released.reversed()
       }
     }
   }
