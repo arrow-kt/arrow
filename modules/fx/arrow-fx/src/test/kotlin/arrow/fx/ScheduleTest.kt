@@ -46,7 +46,7 @@ import kotlin.math.pow
 
 class ScheduleTest : UnitSpec() {
 
-  fun decEqK(): EqK<DecisionPartialOf<Any?>> = object: EqK<DecisionPartialOf<Any?>> {
+  fun decEqK(): EqK<DecisionPartialOf<Any?>> = object : EqK<DecisionPartialOf<Any?>> {
     override fun <A> Kind<DecisionPartialOf<Any?>, A>.eqK(other: Kind<DecisionPartialOf<Any?>, A>, EQ: Eq<A>): Boolean =
       (fix() to other.fix()).let { (l, r) ->
         l.cont == r.cont &&
@@ -56,7 +56,7 @@ class ScheduleTest : UnitSpec() {
       }
   }
 
-  fun <F, I> EQK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object: EqK<SchedulePartialOf<F, I>> {
+  fun <F, I> EQK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object : EqK<SchedulePartialOf<F, I>> {
     override fun <A> Kind<SchedulePartialOf<F, I>, A>.eqK(other: Kind<SchedulePartialOf<F, I>, A>, EQ: Eq<A>): Boolean {
       val t = fix() as Schedule.ScheduleImpl<F, Any?, I, A>
       (other as Schedule.ScheduleImpl<F, Any?, I, A>)
@@ -71,12 +71,12 @@ class ScheduleTest : UnitSpec() {
   }
 
   // This is a bad gen. But generating random schedules is weird
-  fun <F, I> Schedule.Companion.genK(MF: Monad<F>): GenK<SchedulePartialOf<F, I>> = object: GenK<SchedulePartialOf<F, I>> {
+  fun <F, I> Schedule.Companion.genK(MF: Monad<F>): GenK<SchedulePartialOf<F, I>> = object : GenK<SchedulePartialOf<F, I>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<SchedulePartialOf<F, I>, A>> =
       gen.applicative(Schedule.applicative<F, I>(MF))
   }
 
-  fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object: GenK<DecisionPartialOf<Any?>> {
+  fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object : GenK<DecisionPartialOf<Any?>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<DecisionPartialOf<Any?>, A>> =
       Gen.bind(
         Gen.bool(),
@@ -99,7 +99,7 @@ class ScheduleTest : UnitSpec() {
     return go(initialState.value(), n, emptyList())
   }
 
-  fun refTimer(ref: Ref<ForIO, Duration>): Timer<ForIO> = object: Timer<ForIO> {
+  fun refTimer(ref: Ref<ForIO, Duration>): Timer<ForIO> = object : Timer<ForIO> {
     override fun sleep(duration: Duration): Kind<ForIO, Unit> =
       ref.update { d -> d + duration }
   }
@@ -257,7 +257,7 @@ class ScheduleTest : UnitSpec() {
         val eff = SideEffect()
         val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
 
-        val res = IO { if (eff.counter <= n) { eff.increment(); throw RuntimeException("WOOO") } else Unit}
+        val res = IO { if (eff.counter <= n) { eff.increment(); throw RuntimeException("WOOO") } else Unit }
           .retry(IO.monadThrow(), refTimer(ref), schedule)
           .attempt()
           .fix().unsafeRunSync()

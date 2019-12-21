@@ -14,12 +14,10 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.some
 import arrow.core.toT
-import arrow.fx.extensions.io.monad.monad
-import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.Schedule.Companion.withMonad
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.nanoseconds
 import arrow.fx.typeclasses.seconds
 import arrow.typeclasses.Monad
@@ -51,13 +49,6 @@ typealias DecisionPartialOf<A> = arrow.Kind<ForDecision, A>
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
   this as Schedule.Decision<A, B>
-
-fun <A> complexPolicy() =
-  Schedule.withMonad(IO.monad()) {
-    exponential(10.milliseconds).whileOutput { it.nanoseconds < 60.seconds.nanoseconds }
-      .andThen(spaced(60.seconds) and recurs(100)).jittered(IO.monadDefer())
-      .zipRight(identity<A>().collect())
-  }
 
 /**
  * A common demand when working with effects is to retry or repeat them when certain circumstances happen. Usually, the retrial or repetition does not happen right away; rather, it is done based on a policy. For instance, when fetching content from a network request, we may want to retry it when it fails, using an exponential backoff algorithm, for a maximum of 15 seconds or 5 attempts, whatever happens first.
