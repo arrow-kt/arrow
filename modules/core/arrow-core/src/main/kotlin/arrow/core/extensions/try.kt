@@ -9,6 +9,7 @@ import arrow.core.ForTry
 import arrow.core.Try
 import arrow.core.Try.Failure
 import arrow.core.TryOf
+import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
@@ -17,6 +18,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -116,6 +118,9 @@ interface TryApply : Apply<ForTry> {
   override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
+  override fun <A, B> Kind<ForTry, A>.lazyAp(ff: () -> Kind<ForTry, (A) -> B>): Kind<ForTry, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
+
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
@@ -213,3 +218,13 @@ internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
 
 fun <A> Try.Companion.fx(c: suspend MonadThrowSyntax<ForTry>.() -> A): Try<A> =
   Try.monadThrow().fx.monadThrow(c).fix()
+
+@extension
+interface TryEqK : EqK<ForTry> {
+  override fun <A> Kind<ForTry, A>.eqK(other: Kind<ForTry, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      Try.eq(EQ, Eq.any()).run {
+        it.first.eqv(it.second)
+      }
+    }
+}

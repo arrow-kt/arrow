@@ -116,7 +116,7 @@ interface Foldable<F> {
    * not otherwise needed.
    */
   fun <G, A, B> Kind<F, A>.traverse_(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Unit> =
-    foldRight(always { GA.just(Unit) }) { a, acc -> GA.run { f(a).map2Eval(acc) { Unit } } }.value()
+    foldRight(always { GA.just(Unit) }) { a, acc -> Eval.later { GA.run { f(a).lazyAp { acc.value().map { { _: B -> Unit } } } } } }.value()
 
   /**
    * Sequence F<G<A>> using Applicative<G>.

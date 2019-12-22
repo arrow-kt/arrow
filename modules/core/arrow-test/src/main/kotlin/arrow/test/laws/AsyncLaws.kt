@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.eq
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
@@ -12,17 +13,10 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
-import arrow.test.laws.AsyncLaws.asyncCanBeDerivedFromAsyncF
-import arrow.test.laws.AsyncLaws.asyncConstructor
-import arrow.test.laws.AsyncLaws.asyncError
-import arrow.test.laws.AsyncLaws.asyncSuccess
 import arrow.test.laws.AsyncLaws.bracketReleaseIscalledOnCompletedOrError
-import arrow.test.laws.AsyncLaws.continueOn
-import arrow.test.laws.AsyncLaws.continueOnComprehension
-import arrow.test.laws.AsyncLaws.effectCanCallSuspend
-import arrow.test.laws.AsyncLaws.effectEquivalence
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
@@ -34,38 +28,40 @@ object AsyncLaws {
   private val one = newSingleThreadContext("1")
   private val two = newSingleThreadContext("2")
 
-  private fun <F> asyncLaws(AC: Async<F>, EQ: Eq<Kind<F, Int>>): List<Law> = listOf(
-    Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
-    Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
-    Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
-    Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
-    Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
-    Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
-    Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
-    Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
-    Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
-  )
+  private fun <F> asyncLaws(AC: Async<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return listOf(
+      Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
+      Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
+      Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
+      Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
+      Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
+      Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
+      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
+      Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
+      Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
+    )
+  }
 
   fun <F> laws(
     AC: Async<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, EQ, EQ_EITHER, testStackSafety = testStackSafety) +
-      asyncLaws(AC, EQ)
+    MonadDeferLaws.laws(AC, EQK, testStackSafety) +
+      asyncLaws(AC, EQK)
 
   fun <F> laws(
     AC: Async<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, FF, AP, SL, EQ, EQ_EITHER, testStackSafety = testStackSafety) +
-      asyncLaws(AC, EQ)
+    MonadDeferLaws.laws(AC, FF, AP, SL, EQK, testStackSafety) +
+      asyncLaws(AC, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->

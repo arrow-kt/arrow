@@ -30,9 +30,9 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
     Cofree(this, head, tail.map { ce -> fk(ce).map { it.mapBranchingT(fk, this) } })
   }
 
-  fun <B> coflatMap(f: (Cofree<S, A>) -> B): Cofree<S, B> = Cofree(FS, f(this), tail.map { it.map { coflatMap(f) } })
+  fun <B> coflatMap(f: (Cofree<S, A>) -> B): Cofree<S, B> = Cofree(FS, f(this), tail.map { it.map { it.coflatMap(f) } })
 
-  fun duplicate(): Cofree<S, Cofree<S, A>> = Cofree(FS, this, tail.map { it.map { duplicate() } })
+  fun duplicate(): Cofree<S, Cofree<S, A>> = Cofree(FS, this, tail.map { it.map { it.duplicate() } })
 
   fun runTail(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.value()))
 

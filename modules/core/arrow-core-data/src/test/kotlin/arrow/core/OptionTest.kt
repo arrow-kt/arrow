@@ -6,6 +6,7 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.align.align
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.applicative.map
 import arrow.core.extensions.option.crosswalk.crosswalk
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
@@ -60,14 +61,14 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), Option.selective(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Eq.any()),
+      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), Option.selective(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Option.eqK()),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
-      FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
-      TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
+      FunctorFilterLaws.laws(Option.traverseFilter(), Option.genK(), Option.eqK()),
+      TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), Option.genK(), Option.eqK()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq()), Gen.option(Gen.int())),
-      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq),
+      MonoidalLaws.laws(Option.monoidal(), Option.genK(), Option.eqK(), ::bijection),
       EqKLaws.laws(
         Option.eqK(),
         Option.genK()
@@ -214,8 +215,8 @@ class OptionTest : UnitSpec() {
     }
   }
 
-  private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
-    val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
-    return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
-  }
+  private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> =
+    from.map { ot ->
+      Tuple2(ot.a.a, Tuple2(ot.a.b, ot.b))
+    }
 }
