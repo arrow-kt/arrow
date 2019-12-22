@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.mtl.Cokleisli
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
@@ -12,20 +13,21 @@ import io.kotlintest.properties.forAll
 
 object ComonadLaws {
 
-  fun <F> laws(CM: Comonad<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(CM: Comonad<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(CM, G, EQK) + listOf(
-      Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(G, EQ) },
-      Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(G, EQ) },
-      Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(G, EQ) },
-      Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(G, EQ) },
-      Law("Comonad Laws: right identity") { CM.comonadRightIdentity(G, EQ) },
-      Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(G, EQ) },
-      Law("Comonad Laws: cokleisli right identity") { CM.cokleisliRightIdentity(G, EQ) }
-      // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
-      // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
-    )
+    return FunctorLaws.laws(CM, GEN, EQK) + listOf(
+        Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(GEN, EQ) },
+        Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(GEN, EQ) },
+        Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(GEN, EQ) },
+        Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(GEN, EQ) },
+        Law("Comonad Laws: right identity") { CM.comonadRightIdentity(GEN, EQ) },
+        Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(GEN, EQ) },
+        Law("Comonad Laws: cokleisli right identity") { CM.cokleisliRightIdentity(GEN, EQ) }
+        // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
+        // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
+      )
   }
 
   fun <F> Comonad<F>.duplicateThenExtractIsId(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
