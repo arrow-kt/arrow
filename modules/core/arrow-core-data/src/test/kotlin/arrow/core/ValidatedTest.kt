@@ -1,24 +1,27 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.core.extensions.validated.applicative.applicative
+import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
-import arrow.core.extensions.validated.functor.functor
+import arrow.core.extensions.validated.eqK.eqK
 import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
-import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
+import arrow.test.generators.genK
 import arrow.test.generators.validated
+import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
@@ -35,15 +38,20 @@ class ValidatedTest : UnitSpec() {
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
+    fun <E> GENK(genL: Gen<E>) = object : GenK<ValidatedPartialOf<E>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<ValidatedPartialOf<E>, A>> =
+        Gen.oneOf(gen.map { Valid(it) }, genL.map { Invalid(it) })
+      }
+
     testLaws(
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
-      SelectiveLaws.laws(Validated.selective(String.semigroup()), Eq.any()),
-      TraverseLaws.laws(Validated.traverse(), Validated.functor(), ::Valid, Eq.any()),
+      SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.eqK(String.eq())),
+      TraverseLaws.laws(Validated.traverse(), GENK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
-        Validated.applicative(String.semigroup()),
-        Eq.any()),
+        Validated.genK(Gen.string()),
+        Validated.eqK(String.eq())),
       BitraverseLaws.laws(Validated.bitraverse(), ::Valid, Eq.any())
     )
 

@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Try
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
@@ -14,14 +15,18 @@ import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.extensions.observablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.observablek.timer.timer
 import arrow.fx.rx2.extensions.observablek.traverse.traverse
+import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -47,12 +52,28 @@ class ObservableKTests : RxJavaSpec() {
     }
   }
 
+  fun EQK() = object : EqK<ForObservableK> {
+    override fun <A> Kind<ForObservableK, A>.eqK(other: Kind<ForObservableK, A>, EQ: Eq<A>): Boolean =
+      EQ<A>().run {
+        this@eqK.fix().eqv(other.fix())
+      }
+  }
+
+  fun <A> GEN(gen: Gen<A>) = Gen.list(gen).map {
+    Observable.fromIterable(it).k()
+  }
+
+  fun GENK() = object : GenK<ForObservableK> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForObservableK, A>> =
+      GEN(gen) as Gen<Kind<ForObservableK, A>>
+  }
+
   init {
     testLaws(
-      TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
-      ConcurrentLaws.laws(ObservableK.concurrent(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), EQ(), EQ(), EQ(), testStackSafety = false),
+      TraverseLaws.laws(ObservableK.traverse(), GENK(), EQK()),
+      ConcurrentLaws.laws(ObservableK.concurrent(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), EQK(), testStackSafety = false),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()),
-      MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), { Observable.just(it).k() }, EQ())
+      MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), { Observable.just(it).k() }, EQK())
     )
 
     "fx should defer evaluation until subscribed" {

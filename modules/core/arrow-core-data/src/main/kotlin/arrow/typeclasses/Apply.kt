@@ -2,7 +2,9 @@
 
 package arrow.typeclasses
 
+import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Tuple4
@@ -11,8 +13,6 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.Tuple10
-import arrow.Kind
 
 interface Apply<F> : Functor<F> {
 
@@ -37,6 +37,12 @@ interface Apply<F> : Functor<F> {
    * ```
    */
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
+
+  /**
+   * Lazy version of ap, useful for datatypes which can short circuit.
+   * This will at some point be removed for a compiler plugin
+   */
+  fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> = ap(ff())
 
   fun <A, B, Z> map(
     a: Kind<F, A>,

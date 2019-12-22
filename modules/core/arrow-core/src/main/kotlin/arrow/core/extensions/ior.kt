@@ -55,14 +55,17 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
+    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
+
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
     fix().ap(SL(), ff)
 }
 
 @extension
-interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
+interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorApply<L> {
 
-  fun SL(): Semigroup<L>
+  override fun SL(): Semigroup<L>
 
   override fun <A> just(a: A): Ior<L, A> = Ior.Right(a)
 
@@ -87,6 +90,9 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
+    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
 }
 
 @extension
@@ -152,6 +158,16 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
 }
 
 @extension
+interface IorEqK<A> : EqK<IorPartialOf<A>> {
+  fun EQA(): Eq<A>
+
+  override fun <B> Kind<IorPartialOf<A>, B>.eqK(other: Kind<IorPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+    Ior.eq(EQA(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
 interface IorShow<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()
@@ -176,16 +192,6 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()
-
-@extension
-interface IorEqK<L> : EqK<IorPartialOf<L>> {
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<IorPartialOf<L>, A>.eqK(other: Kind<IorPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let { (ls, rs) ->
-      Ior.eq(EQL(), EQ).run { ls.eqv(rs) }
-    }
-}
 
 @extension
 interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldable<L> {

@@ -7,7 +7,6 @@ import arrow.core.extensions.mapk.align.align
 import arrow.core.extensions.mapk.eq.eq
 import arrow.core.extensions.mapk.eqK.eqK
 import arrow.core.extensions.mapk.foldable.foldable
-import arrow.core.extensions.mapk.functor.functor
 import arrow.core.extensions.mapk.functorFilter.functorFilter
 import arrow.core.extensions.mapk.hash.hash
 import arrow.core.extensions.mapk.monoid.monoid
@@ -46,11 +45,11 @@ class MapKTest : UnitSpec() {
 
     val testLaws = testLaws(
       ShowLaws.laws(MapK.show(), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
-      TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
+      TraverseLaws.laws(MapK.traverse(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
-      FoldableLaws.laws(MapK.foldable(), { a: Int -> mapOf("key" to a).k() }, Eq.any()),
+      FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.string())),
       EqLaws.laws(MapK.eq(String.eq(), Int.eq()), Gen.mapK(Gen.string(), Gen.int())),
-      FunctorFilterLaws.laws(MapK.functorFilter(), { mapOf(it.toString() to it).k() }, EQ),
+      FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
       HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
       AlignLaws.laws(MapK.align(),
         MapK.genK(Gen.string()),

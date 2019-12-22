@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
@@ -58,10 +57,13 @@ interface FluxKApplicative : Applicative<ForFluxK> {
 
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
+
+  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface FluxKMonad : Monad<ForFluxK> {
+interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
   override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
     fix().ap(ff)
 
@@ -74,8 +76,8 @@ interface FluxKMonad : Monad<ForFluxK> {
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<arrow.core.Either<A, B>>>): FluxK<B> =
     FluxK.tailRecM(a, f)
 
-  override fun <A> just(a: A): FluxK<A> =
-    FluxK.just(a)
+  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -207,37 +209,16 @@ interface FluxKTimer : Timer<ForFluxK> {
 }
 
 @extension
-interface FluxKFunctorFilter : FunctorFilter<ForFluxK> {
+interface FluxKFunctorFilter : FunctorFilter<ForFluxK>, FluxKFunctor {
   override fun <A, B> Kind<ForFluxK, A>.filterMap(f: (A) -> Option<B>): FluxK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
-    fix().map(f)
 }
 
 @extension
-interface FluxKMonadFilter : MonadFilter<ForFluxK> {
+interface FluxKMonadFilter : MonadFilter<ForFluxK>, FluxKMonad {
   override fun <A> empty(): FluxK<A> =
     Flux.empty<A>().k()
 
   override fun <A, B> Kind<ForFluxK, A>.filterMap(f: (A) -> Option<B>): FluxK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForFluxK, A>.ap(ff: Kind<ForFluxK, (A) -> B>): FluxK<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<Either<A, B>>>): FluxK<B> =
-    FluxK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
-    fix().map(f)
-
-  override fun <A, B, Z> Kind<ForFluxK, A>.map2(fb: Kind<ForFluxK, B>, f: (Tuple2<A, B>) -> Z): FluxK<Z> =
-    fix().map2(fb, f)
-
-  override fun <A> just(a: A): FluxK<A> =
-    FluxK.just(a)
 }

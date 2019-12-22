@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.Tuple2
+import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.toT
@@ -11,20 +12,24 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object SelectiveLaws {
 
-  fun <F> laws(A: Selective<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    ApplicativeLaws.laws(A, EQ) + listOf(
+  fun <F> laws(A: Selective<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return ApplicativeLaws.laws(A, EQK) + listOf(
       Law("Selective Laws: identity") { A.identityLaw(EQ) },
       Law("Selective Laws: distributivity") { A.distributivity(EQ) },
       Law("Selective Laws: associativity") { A.associativity(EQ) },
       Law("Selective Laws: branch") { A.branch(EQ) },
       Law("Selective Laws: ifS") { A.ifSLaw(EQ) }
     )
+  }
 
   fun <F> Selective<F>.identityLaw(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.int(), Gen.int())) { either ->
