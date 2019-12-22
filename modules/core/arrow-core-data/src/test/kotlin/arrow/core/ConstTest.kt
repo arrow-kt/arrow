@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq
+import arrow.core.extensions.const.functor.functor
 import arrow.core.extensions.const.show.show
 import arrow.core.extensions.const.traverseFilter.traverseFilter
 import arrow.core.extensions.eq
@@ -34,7 +35,7 @@ class ConstTest : UnitSpec() {
           Const.applicative(this),
           Const.genK(Gen.int()),
           EQK(Int.eq())),
-        ApplicativeLaws.laws(Const.applicative(this), Const.genK(Gen.int()), EQK(Int.eq())),
+        ApplicativeLaws.laws(Const.applicative(this), Const.functor(), Const.genK(Gen.int()), EQK(Int.eq())),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
         ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
       )

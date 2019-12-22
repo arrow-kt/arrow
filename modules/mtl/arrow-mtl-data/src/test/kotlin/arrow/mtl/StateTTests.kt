@@ -50,12 +50,8 @@ class StateTTests : UnitSpec() {
 
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
-  val listkStateEQK: EqK<StateTPartialOf<ForListK, Int>> = eqK(ListK.eqK(), Int.eq(), ListK.monad(), 1)
-
   val optionStateEQK: EqK<StateTPartialOf<ForOption, Int>> = eqK(Option.eqK(), Int.eq(), Option.monad(), 1)
-
   val ioStateEQK: EqK<StateTPartialOf<ForIO, Int>> = eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
-
   val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = eqK(Try.eqK(), Int.eq(), Try.monad(), 1)
 
   init {

@@ -17,6 +17,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.ui.extensions.day.applicative.applicative
 import arrow.ui.extensions.day.comonad.comonad
+import arrow.ui.extensions.day.functor.functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
@@ -48,7 +49,7 @@ class DayTest : UnitSpec() {
     val gk = GENK(Id.genK(), Id.genK(), Gen.int(), Gen.int())
 
     testLaws(
-      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), gk, EQK),
+      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), Day.functor(), gk, EQK),
       ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), gk, EQK)
     )
 

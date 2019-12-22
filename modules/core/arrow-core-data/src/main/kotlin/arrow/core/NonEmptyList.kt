@@ -217,7 +217,7 @@ class NonEmptyList<out A> private constructor(
 
   fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
 
-  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = fix().flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
   operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
