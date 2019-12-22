@@ -5,9 +5,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.CancelToken
+
 import arrow.fx.internal.Platform
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.ExitCase.Canceled
@@ -16,6 +16,12 @@ import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
+typealias SingleKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias SingleKProcF<A> = ((Either<Throwable, A>) -> Unit) -> SingleKOf<Unit>
 
 class ForSingleK private constructor() {
   companion object
@@ -32,6 +38,10 @@ fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 fun <A> SingleKOf<A>.value(): Single<A> = fix().single as Single<A>
 
 data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
+
+  suspend fun suspended(): A = suspendCoroutine { cont ->
+    value().subscribe(cont::resume, cont::resumeWithException)
+  }
 
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()

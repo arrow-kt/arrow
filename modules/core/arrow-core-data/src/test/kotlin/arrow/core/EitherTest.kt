@@ -1,14 +1,17 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.Kind2
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.either.applicativeError.handleErrorWith
+import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.bitraverse.bitraverse
 import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.either.eqK.eqK
+import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.hash.hash
+import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.either.monoid.monoid
 import arrow.core.extensions.either.semigroupK.semigroupK
@@ -16,10 +19,14 @@ import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.either
+import arrow.test.generators.genK
+import arrow.test.generators.id
 import arrow.test.generators.intSmall
+import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.HashLaws
@@ -29,30 +36,26 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class EitherTest : UnitSpec() {
-  val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq { a, b ->
-    a.fix() == b.fix()
-  }
 
-  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq { a, b ->
-    a.fix() == b.fix()
-  }
+  val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
+
+  val throwableEQ: Eq<Throwable> = Eq.any()
 
   init {
-
     testLaws(
-      BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
+      BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, Eq.any()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
-      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
-      MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
+      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
+      MonadErrorLaws.laws(Either.monadError(), Either.functor(), Either.applicative(), Either.monad(), Either.eqK(throwableEQ)),
+      TraverseLaws.laws(Either.traverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
-      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
+      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
+      HashLaws.laws(Either.hash(String.hash(), Int.hash()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
+      BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, Eq.any())
     )
 
     "empty should return a Right of the empty of the inner type" {

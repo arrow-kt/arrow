@@ -10,7 +10,7 @@ dependencies {
     compile project(":arrow-kio-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compileOnly "org.openjdk.jmh:jmh-core:1.21"
+    compileOnly "org.openjdk.jmh:jmh-core:1.22"
 }
 
 apply plugin: "me.champeau.gradle.jmh"

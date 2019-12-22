@@ -3,11 +3,10 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.fx.CancelToken
+
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
-import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
@@ -16,7 +15,6 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
-import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
@@ -30,12 +28,20 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.rx2.asScheduler
+import arrow.fx.rx2.extensions.singlek.dispatchers.dispatchers
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
+import arrow.fx.typeclasses.CancelToken
+import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -61,10 +67,13 @@ interface SingleKApplicative : Applicative<ForSingleK> {
 
   override fun <A> just(a: A): SingleK<A> =
     SingleK.just(a)
+
+  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface SingleKMonad : Monad<ForSingleK> {
+interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
@@ -77,8 +86,8 @@ interface SingleKMonad : Monad<ForSingleK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
-  override fun <A> just(a: A): SingleK<A> =
-    SingleK.just(a)
+  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -213,8 +222,17 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
     }
 }
 
-fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK>): Concurrent<ForSingleK> = object : SingleKConcurrent {
+fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK> = SingleK.dispatchers()): Concurrent<ForSingleK> = object : SingleKConcurrent {
   override fun dispatchers(): Dispatchers<ForSingleK> = dispatchers
+}
+
+@extension
+interface SingleKDispatchers : Dispatchers<ForSingleK> {
+  override fun default(): CoroutineContext =
+    ComputationScheduler
+
+  override fun io(): CoroutineContext =
+    IOScheduler
 }
 
 @extension
@@ -230,6 +248,14 @@ interface SingleKTimer : Timer<ForSingleK> {
       .map { Unit })
 }
 
-// TODO SingleK does not yet have a Concurrent instance
-fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK>.() -> A): SingleK<A> =
-  defer { SingleK.async().fx.async(c).fix() }
+@extension
+interface SingleKUnsafeRun : UnsafeRun<ForSingleK> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForSingleK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForSingleK, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+}
+
+fun <A> SingleK.Companion.fx(c: suspend ConcurrentSyntax<ForSingleK>.() -> A): SingleK<A> =
+  defer { SingleK.concurrent().fx.concurrent(c).fix() }

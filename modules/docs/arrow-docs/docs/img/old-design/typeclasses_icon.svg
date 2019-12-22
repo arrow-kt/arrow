@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>typeclasses_icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="arrow-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons" transform="translate(-65.000000, -39.000000)">
+            <g id="typeclasses_icon" transform="translate(65.000000, 39.000000)">
+                <polygon id="background" fill="#2F5DC1"
+                         points="32 0 59.7128129 16 59.7128129 48 32 64 4.28718708 48 4.28718708 16"></polygon>
+                <path d="M16.812,30.985 L16.812,30.135 L24.751,25.205 L25.72,26.735 L19.532,30.475 L25.72,34.13 L24.751,35.66 L16.812,30.985 Z M27.726,37.989 L35.274,37.989 L35.274,39.808 L27.726,39.808 L27.726,37.989 Z M38.181,35.66 L37.212,34.13 L43.4,30.475 L37.212,26.735 L38.181,25.205 L46.12,30.135 L46.12,30.985 L38.181,35.66 Z"
+                      id="&lt;_&gt;" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -23,6 +23,7 @@ import arrow.fx.internal.Platform.unsafeResync
 import arrow.fx.internal.ShiftTick
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.internal.scheduler
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
@@ -558,21 +559,17 @@ sealed class IO<out A> : IOOf<A> {
    * ```kotlin:ank:playground
    * import arrow.fx.IO
    *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val io = IO.effect { println("Hello World!") }
-   *
-   *   kotlinx.coroutines.runBlocking {
-   *     io.suspended()
-   *   }
-   *   //sampleEnd
-   * }
+   * //sampleStart
+   * suspend fun main(args: Array<String>): Unit =
+   *   IO.effect { println("Hello World!") }
+   *   .suspended()
+   * //sampleEnd
    * ```
-   *
-   * **BEWARE** this does **not** support cancelation since Kotlin has no cancelation support for `suspend` on the language level.
    */
   suspend fun suspended(): A = suspendCoroutine { cont ->
-    IORunLoop.start(this) {
+    val connection = cont.context[IOContext]?.connection ?: IOConnection.uncancelable
+
+    IORunLoop.startCancelable(this, connection) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }
@@ -1041,7 +1038,7 @@ sealed class IO<out A> : IOOf<A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
+      internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
 
       internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }

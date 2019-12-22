@@ -1,32 +1,39 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.Eval.Now
+import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad
+import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.GenK
 import arrow.test.laws.BimonadLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 class EvalTest : UnitSpec() {
-  val EQ1: Eq<Kind<ForEval, Int>> = Eq { a, b ->
-    a.value() == b.value()
+
+  val GENK = object : GenK<ForEval> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<ForEval, A>> {
+      return gen.map { Eval.now(it) }
+    }
   }
 
-  val EQ2: Eq<Kind<ForEval, Kind<ForEval, Int>>> = Eq { a, b ->
-    a.value().value() == b.value().value()
+  val EQK = object : EqK<ForEval> {
+    override fun <A> Kind<ForEval, A>.eqK(other: Kind<ForEval, A>, EQ: Eq<A>): Boolean =
+      EQ.run { this@eqK.fix().value().eqv(other.fix().value()) }
   }
 
   init {
 
     testLaws(
-      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), ::Now, EQ1, EQ2, Eq.any())
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), GENK, EQK)
     )
 
     "should map wrapped value" {

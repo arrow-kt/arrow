@@ -1,31 +1,34 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.maybek.applicative.applicative
 import arrow.fx.rx2.extensions.maybek.async.async
+import arrow.fx.rx2.extensions.maybek.functor.functor
 import arrow.fx.rx2.extensions.maybek.monad.flatMap
+import arrow.fx.rx2.extensions.maybek.monad.monad
 import arrow.fx.rx2.extensions.maybek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.maybek.timer.timer
+import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
-import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class MaybeKTests : RxJavaSpec() {
 
@@ -45,15 +48,20 @@ class MaybeKTests : RxJavaSpec() {
     }
   }
 
-  val CM = MaybeK.concurrent(object : Dispatchers<ForMaybeK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
-  })
+  fun EQK() = object : EqK<ForMaybeK> {
+    override fun <A> Kind<ForMaybeK, A>.eqK(other: Kind<ForMaybeK, A>, EQ: Eq<A>): Boolean =
+      (this.fix() to other.fix()).let {
+        EQ<A>().run {
+          it.first.eqv(it.second)
+        }
+      }
+  }
 
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false),
-      MonadFilterLaws.laws(MaybeK.monadFilter(), { Maybe.just(it).k() }, EQ())
+      ConcurrentLaws.laws(MaybeK.concurrent(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), EQK(), testStackSafety = false),
+      MonadFilterLaws.laws(MaybeK.monadFilter(), MaybeK.functor(), MaybeK.applicative(), MaybeK.monad(), { Maybe.just(it).k() }, EQK())
     )
 
     "fx should defer evaluation until subscribed" {

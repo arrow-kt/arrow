@@ -17,8 +17,12 @@ import arrow.free.extensions.FreeApplicativeEq
 import arrow.free.extensions.freeapplicative.applicative.applicative
 import arrow.free.extensions.freeapplicative.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
@@ -46,10 +50,26 @@ class FreeApplicativeTest : UnitSpec() {
 
     val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(Id.monad(), idApInterpreter)
 
+    fun EQK() = object : EqK<FreeApplicativePartialOf<OpsAp.F>> {
+      override fun <A> Kind<FreeApplicativePartialOf<OpsAp.F>, A>.eqK(other: Kind<FreeApplicativePartialOf<OpsAp.F>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let {
+          val EQ: FreeApplicativeEq<OpsAp.F, ForId, A> = FreeApplicative.eq(Id.monad(), idApInterpreter)
+
+          EQ.run {
+            it.first.eqv(it.second)
+          }
+        }
+    }
+
+    fun GENK() = object : GenK<FreeApplicativePartialOf<OpsAp.F>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreeApplicativePartialOf<OpsAp.F>, A>> =
+        gen.map { OpsAp.just(it) }
+    }
+
     testLaws(
-      EqLaws.laws(EQ) { OpsAp.value(it) },
-      ApplicativeLaws.laws(OpsAp, EQ),
-      ApplicativeLaws.laws(FreeApplicative.applicative(), EQ)
+      EqLaws.laws(EQ, Gen.opsAp()),
+      ApplicativeLaws.laws(OpsAp, GENK(), EQK()),
+      ApplicativeLaws.laws(FreeApplicative.applicative(), GENK(), EQK())
     )
 
     "Can interpret an ADT as FreeApplicative operations" {
@@ -69,4 +89,19 @@ class FreeApplicativeTest : UnitSpec() {
       rx.foldK(NonEmptyList.applicative()) shouldBe NonEmptyList.of(start + loops)
     }
   }
+}
+
+private fun Gen.Companion.opsAp() =
+  oneOf(valueGen, addGen, subtractGen)
+
+private val valueGen = Gen.bind(Gen.int()) {
+  OpsAp.value(it)
+}
+
+private val addGen = Gen.bind(Gen.int(), Gen.int()) { a, b ->
+  OpsAp.add(a, b)
+}
+
+private val subtractGen = Gen.bind(Gen.int(), Gen.int()) { a, b ->
+  OpsAp.subtract(a, b)
 }

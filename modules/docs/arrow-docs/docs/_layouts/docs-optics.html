@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+{% assign cat_id = "optics" %}
+{% assign cat_id_cap = cat_id | capitalize %}
+{% include _head-docs.html %}
+
+<body id="doc-body">
+  <div id="wrapper">
+    {% include _sidebar-wrapper.html %}
+    <div class="doc-content-optics">
+      {% include _doc-wrapper.html %}
+    </div>
+  </div>
+  {% include _js-bottom-docs.html %}
+</body>
+
+</html>
