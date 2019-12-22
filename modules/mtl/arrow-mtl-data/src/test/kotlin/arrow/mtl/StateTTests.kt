@@ -28,7 +28,6 @@ import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
 import arrow.mtl.extensions.statet.applicative.applicative
-import arrow.mtl.extensions.statet.applicative.just
 import arrow.mtl.extensions.statet.functor.functor
 import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
