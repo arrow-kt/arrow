@@ -29,6 +29,7 @@ import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -686,7 +687,12 @@ private fun IO.Companion.eqK() = object : EqK<ForIO> {
 
 private fun IO.Companion.genK() = object : GenK<ForIO> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
-    gen.map {
-      IO.just(it)
-    }
+    Gen.oneOf(
+      gen.map {
+        IO.just(it)
+      },
+      Gen.throwable().map {
+        IO.raiseError<A>(it)
+      }
+    )
 }
