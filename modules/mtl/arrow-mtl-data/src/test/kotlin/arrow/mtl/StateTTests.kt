@@ -83,11 +83,6 @@ class StateTTests : UnitSpec() {
         StateT.genK(Option.genK(), Gen.int()),
         optionStateEQK),
 
-      /*
-          question: these tests failed  with the previous ListK as state
-          java:test://arrow.mtl.StateTTests.Alternative Laws: Right Distributivity
-          java:test://arrow.mtl.StateTTests.Alternative Laws: alt is associative
-       */
       MonadCombineLaws.laws(
         StateT.monadCombine<ForOption, Int>(Option.monadCombine()),
         StateT.functor<ForOption, Int>(Option.functor()),
