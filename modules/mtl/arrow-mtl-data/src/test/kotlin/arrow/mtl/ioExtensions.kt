@@ -10,8 +10,10 @@ import arrow.fx.IO
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
+import arrow.test.generators.GenK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 
 fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
   override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
@@ -22,5 +24,12 @@ fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
       Option.eq(Either.eq(Eq.any(), EQ)).run {
         ls.eqv(rs)
       }
+    }
+}
+
+fun IO.Companion.genK() = object : GenK<ForIO> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
+    gen.map {
+      IO.just(it)
     }
 }

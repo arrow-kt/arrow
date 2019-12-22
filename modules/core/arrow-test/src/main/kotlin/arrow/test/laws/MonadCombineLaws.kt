@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.Kind
+import arrow.test.generators.GenK
 import arrow.typeclasses.Apply
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
@@ -11,20 +11,18 @@ object MonadCombineLaws {
 
   fun <F> laws(
     MCF: MonadCombine<F>,
-    cf: (Int) -> Kind<F, Int>,
-    cff: (Int) -> Kind<F, (Int) -> Int>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadFilterLaws.laws(MCF, cf, EQK) + AlternativeLaws.laws(MCF, cf, cff, EQK)
+    MonadFilterLaws.laws(MCF, GENK, EQK) + AlternativeLaws.laws(MCF, GENK, EQK)
 
   fun <F> laws(
     MCF: MonadCombine<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
-    cf: (Int) -> Kind<F, Int>,
-    cff: (Int) -> Kind<F, (Int) -> Int>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadFilterLaws.laws(MCF, FF, AP, SL, cf, EQK) + AlternativeLaws.laws(MCF, cf, cff, EQK)
+    MonadFilterLaws.laws(MCF, FF, AP, SL, GENK, EQK) + AlternativeLaws.laws(MCF, GENK, EQK)
 }

@@ -11,6 +11,7 @@ import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
 import arrow.core.ForSequenceK
 import arrow.core.ForSetK
+import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Ior
 import arrow.core.IorPartialOf
@@ -23,6 +24,8 @@ import arrow.core.SequenceK
 import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
+import arrow.core.Success
+import arrow.core.Try
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
 import arrow.mtl.EitherT
@@ -118,4 +121,12 @@ fun <F, L> EitherT.Companion.genK(genkF: GenK<F>, genL: Gen<L>) =
 fun <F, G> GenK<F>.nested(GENKG: GenK<G>): GenK<Nested<F, G>> = object : GenK<Nested<F, G>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<Nested<F, G>, A>> =
     this@nested.genK(GENKG.genK(gen)).map { it.nest() }
+}
+
+fun Try.Companion.genK() = object : GenK<ForTry> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =
+    Gen.oneOf(
+      gen.map {
+        Success(it)
+      }, Gen.throwable().map { Try.Failure(it) })
 }

@@ -7,7 +7,6 @@ import arrow.core.ForListK
 import arrow.core.ForOption
 import arrow.core.ListK
 import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
@@ -64,8 +63,7 @@ class WriterTTest : UnitSpec() {
     testLaws(
       AlternativeLaws.laws(
         WriterT.alternative(Int.monoid(), Option.alternative()),
-        { i -> WriterT.just(Option.applicative(), Int.monoid(), i) },
-        { i -> WriterT.just(Option.applicative(), Int.monoid()) { j: Int -> i + j } },
+        WriterT.genK(Option.genK(), Gen.int()),
         optionEQK()
       ),
       DivisibleLaws.laws(
@@ -78,6 +76,7 @@ class WriterTTest : UnitSpec() {
         WriterT.functor<ForIO, Int>(IO.functor()),
         WriterT.applicative(IO.applicative(), Int.monoid()),
         WriterT.monad(IO.monad(), Int.monoid()),
+        WriterT.genK(IO.genK(), Gen.int()),
         ioEQK()
       ),
       MonoidKLaws.laws(
@@ -94,6 +93,7 @@ class WriterTTest : UnitSpec() {
         WriterT.applicative(Option.applicative(), Int.monoid()),
         WriterT.monad(Option.monad(), Int.monoid()),
         Gen.intSmall(),
+        WriterT.genK(Option.genK(), Gen.int()),
         optionEQK(),
         Int.eq()
       ),
@@ -103,7 +103,7 @@ class WriterTTest : UnitSpec() {
         WriterT.functor<ForOption, Int>(Option.functor()),
         WriterT.applicative(Option.applicative(), Int.monoid()),
         WriterT.monad(Option.monad(), Int.monoid()),
-        { WriterT(Option(Tuple2(it, it))) },
+        WriterT.genK(Option.genK(), Gen.int()),
         optionEQK()
       )
     )

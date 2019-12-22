@@ -16,12 +16,8 @@ object ContravariantLaws {
   fun <F> laws(CF: Contravariant<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val G = GENK.genK(Gen.int())
 
-    return InvariantLaws.laws(CF, G, EQK) + contravariantLaws(CF, G, EQK)
+    return InvariantLaws.laws(CF, GENK, EQK) + contravariantLaws(CF, G, EQK)
   }
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(CF: Contravariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> =
-    InvariantLaws.laws(CF, G, EQK) + contravariantLaws(CF, G, EQK)
 
   private fun <F> contravariantLaws(CF: Contravariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
