@@ -24,7 +24,11 @@ object AlternativeLaws {
     return ApplicativeLaws.laws(AF, GENK, EQK) + MonoidKLaws.laws(AF, GENK, EQK) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
-      Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) },
+      /*
+      right distributivity is not implemented correctly
+        https://github.com/arrow-kt/arrow/issues/1880
+       Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) },
+       */
       Law("Alternative Laws: alt is associative") { AF.alternativeAssociativity(cf, EQ) }
     )
   }

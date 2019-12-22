@@ -25,6 +25,7 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
+import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.applicative.applicative
 import arrow.mtl.extensions.eithert.divisible.divisible
 import arrow.mtl.extensions.eithert.eqK.eqK
@@ -34,6 +35,7 @@ import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
+import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
@@ -59,17 +61,11 @@ class EitherTTest : UnitSpec() {
         constEQK
       ),
 
-      /*
-      TODO:
-       Alternative laws right distributivity is not implemented correctly
-       https://github.com/arrow-kt/arrow/issues/1880
-
-       AlternativeLaws.laws(
-         EitherT.alternative(Id.monad(), Int.monoid()),
-         EitherT.genK(Id.genK(), Gen.int()),
-         idEQK
-       ),
-       */
+      AlternativeLaws.laws(
+        EitherT.alternative(Id.monad(), Int.monoid()),
+        EitherT.genK(Id.genK(), Gen.int()),
+        idEQK
+      ),
 
       ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()),
         EitherT.functor(IO.functor()),
