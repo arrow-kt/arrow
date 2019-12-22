@@ -19,7 +19,7 @@ import com.github.benmanes.gradle.versions.reporter.PlainTextReporter
 buildscript {
     ext {
         // Constants
-        ankKotlinVersion = '1.3.11'
+        ankKotlinVersion = '1.3.61'
         dokka_version = '0.10.0'
         ktlint_version = "0.34.2"
         ktlint_gradle_version = '8.2.0'
@@ -210,7 +210,7 @@ tasks.create('repl') {
 }
 
 tasks.wrapper {
-    gradleVersion = "5.0"
+    gradleVersion = "6.0.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 
