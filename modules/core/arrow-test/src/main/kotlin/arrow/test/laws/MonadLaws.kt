@@ -110,9 +110,6 @@ object MonadLaws {
 
   fun <F> Monad<F>.derivedFollowedByConsistent(GK: GenK<F>, AP: Apply<F>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(GK.genK(Gen.int()), GK.genK(Gen.int())) { fa, fb ->
-      val lhs = AP.run { fa.followedBy(fb) }
-      val rhs = fa.followedBy(fb)
-      val bool = lhs.equalUnderTheLaw(rhs, EQ)
       AP.run { fa.followedBy(fb) }.equalUnderTheLaw(fa.followedBy(fb), EQ)
     }
 
