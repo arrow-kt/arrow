@@ -4,10 +4,8 @@ import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.eq
-import arrow.core.identity
 import arrow.mtl.Kleisli
 import arrow.test.generators.GenK
-import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Apply

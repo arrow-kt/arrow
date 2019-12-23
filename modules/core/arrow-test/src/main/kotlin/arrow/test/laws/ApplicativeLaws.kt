@@ -3,7 +3,6 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.test.generators.GenK
-import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative

@@ -230,13 +230,8 @@ class NonEmptyList<out A> private constructor(
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
 
-  fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
-    f(fix().head).map2Eval(Eval.always {
-      tail.k().traverse(AG, f)
-    }) {
-      NonEmptyList(it.a, it.b.fix())
-    }.value()
-  }
+  fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+    AG.run { all.k().traverse(AG, f).map { Nel.fromListUnsafe(it) } }
 
   fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()
