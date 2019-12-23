@@ -19,19 +19,16 @@ import io.kotlintest.properties.forAll
 
 object FunctorFilterLaws {
 
-  fun <F> laws(FFF: FunctorFilter<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(FFF, GENK.genK(Gen.int()), EQK)
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(FFF: FunctorFilter<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(FFF: FunctorFilter<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(FFF, GEN, EQK) + listOf(
-      Law("Functor Filter: filterMap composition") { FFF.filterMapComposition(GEN, EQ) },
-      Law("Functor Filter: filterMap map consistency") { FFF.filterMapMapConsistency(GEN, EQ) },
-      Law("Functor Filter: flattenOption filterMap consistency") { FFF.flattenOptionConsistentWithfilterMap(GEN, EQ) },
-      Law("Functor Filter: filter filterMap consistency") { FFF.filterConsistentWithfilterMap(GEN, EQ) }
-    )
+    return FunctorLaws.laws(FFF, GENK, EQK) + listOf(
+        Law("Functor Filter: filterMap composition") { FFF.filterMapComposition(GEN, EQ) },
+        Law("Functor Filter: filterMap map consistency") { FFF.filterMapMapConsistency(GEN, EQ) },
+        Law("Functor Filter: flattenOption filterMap consistency") { FFF.flattenOptionConsistentWithfilterMap(GEN, EQ) },
+        Law("Functor Filter: filter filterMap consistency") { FFF.filterConsistentWithfilterMap(GEN, EQ) }
+      )
   }
 
   fun <F> FunctorFilter<F>.filterMapComposition(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

@@ -15,6 +15,9 @@ import arrow.core.extensions.monoid
 import arrow.core.fix
 import arrow.core.toT
 import arrow.core.value
+import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.mtl.typeclasses.ComposedApplicative
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
@@ -64,7 +67,8 @@ object TraverseLaws {
         Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
         Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
         Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
-        Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) }
+        Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
+        Law("Traverse Laws: Effect order preserved") { TF.effectOrderPreserved(GEN) }
       )
   }
 
@@ -121,4 +125,14 @@ object TraverseLaws {
       val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())
     }
+
+  fun <F, A> Traverse<F>.effectOrderPreserved(GEN: Gen<Kind<F, A>>) = IO.concurrent().run {
+    forAll(GEN) { fa: Kind<F, A> ->
+      val foldableOrder = fa.foldLeft(emptyList()) { xs: List<A>, x: A -> xs + x }
+      val effectOrder = Ref<List<A>>(emptyList()).flatMap { ref ->
+        fa.traverse(IO.applicative()) { a -> ref.update { it + a } }.followedBy(ref.get())
+      }.unsafeRunSync()
+      effectOrder.equalUnderTheLaw(foldableOrder, Eq.any())
+    }
+  }
 }

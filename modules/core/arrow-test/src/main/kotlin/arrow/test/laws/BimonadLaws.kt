@@ -40,7 +40,7 @@ object BimonadLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, EQK) +
+    MonadLaws.laws(M, GENK, EQK) +
       ComonadLaws.laws(CM, GENK, EQK) +
       bimonadLaws(BF, EQK)
 
@@ -54,7 +54,7 @@ object BimonadLaws {
     GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, SL, EQK) +
+    MonadLaws.laws(M, FF, AP, SL, GENK, EQK) +
       ComonadLaws.laws(CM, GENK, EQK) +
       bimonadLaws(BF, EQK)
 

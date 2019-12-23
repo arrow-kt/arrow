@@ -5,6 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.internal.AtomicIntW
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
@@ -40,9 +41,10 @@ object BracketLaws {
 
   fun <F> laws(
     BF: Bracket<F, Throwable>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadErrorLaws.laws(BF, EQK) +
+    MonadErrorLaws.laws(BF, GENK, EQK) +
       bracketLaws(BF, EQK)
 
   fun <F> laws(
@@ -50,9 +52,10 @@ object BracketLaws {
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadErrorLaws.laws(BF, FF, AP, SL, EQK) +
+    MonadErrorLaws.laws(BF, FF, AP, SL, GENK, EQK) +
       bracketLaws(BF, EQK)
 
   fun <F> Bracket<F, Throwable>.bracketCaseWithJustUnitEqvMap(EQ: Eq<Kind<F, Int>>): Unit =

@@ -47,19 +47,25 @@ class Function1Test : UnitSpec() {
       }
   }
 
-  fun genk() = object : GenK<Conested<ForFunction1, Int>> {
+  fun conestedGENK() = object : GenK<Conested<ForFunction1, Int>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForFunction1, Int>, A>> =
       gen.map {
         Function1.just<Int, A>(it).conest()
       } as Gen<Kind<Conested<ForFunction1, Int>, A>>
   }
 
+  fun <A> genk() = object : GenK<Function1PartialOf<A>> {
+    override fun <B> genK(gen: Gen<B>): Gen<Kind<Function1PartialOf<A>, B>> = gen.map {
+      Function1.just<A, B>(it)
+    }
+  }
+
   init {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
-      DivisibleLaws.laws(Function1.divisible(Int.monoid()), genk(), conestedEQK),
+      DivisibleLaws.laws(Function1.divisible(Int.monoid()), conestedGENK(), conestedEQK),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
-      MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), EQK(5150)),
+      MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), genk(), EQK(5150)),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
 

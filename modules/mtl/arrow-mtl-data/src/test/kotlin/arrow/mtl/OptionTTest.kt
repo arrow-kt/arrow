@@ -69,34 +69,35 @@ class OptionTTest : UnitSpec() {
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.applicative()),
         OptionT.monad(IO.monad()),
+        OptionT.genK(IO.genK()),
         ioEQK
       ),
 
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
-        OptionT.genk(Option.genK()),
+        OptionT.genK(Option.genK()),
         OptionT.eqK(Option.eqK())),
 
       FunctorFilterLaws.laws(
         ComposedFunctorFilter(OptionT.functorFilter(Id.monad()),
           OptionT.functorFilter(NonEmptyList.monad())),
-        OptionT.genk(Id.genK()).nested(OptionT.genk(NonEmptyList.genK())),
+        OptionT.genK(Id.genK()).nested(OptionT.genK(NonEmptyList.genK())),
         nestedEQK),
 
       MonoidKLaws.laws(
         OptionT.monoidK(Option.monad()),
-        OptionT.genk(Option.genK()),
+        OptionT.genK(Option.genK()),
         OptionT.eqK(Option.eqK())),
 
       FunctorFilterLaws.laws(
         OptionT.functorFilter(Option.monad()),
-        OptionT.genk(Option.genK()),
+        OptionT.genK(Option.genK()),
         OptionT.eqK(Option.eqK())),
 
       TraverseFilterLaws.laws(
         OptionT.traverseFilter(Option.traverseFilter()),
         OptionT.applicative(Option.monad()),
-        OptionT.genk(Option.genK()),
+        OptionT.genK(Option.genK()),
         OptionT.eqK(Option.eqK())
       ),
 
@@ -104,7 +105,7 @@ class OptionTTest : UnitSpec() {
         OptionT.divisible(
           Const.divisible(Int.monoid())
         ),
-        OptionT.genk(Const.genK(Gen.int())),
+        OptionT.genK(Const.genK(Gen.int())),
         OptionT.eqK(Const.eqK(Int.eq()))
       )
     )
@@ -139,7 +140,7 @@ class OptionTTest : UnitSpec() {
   }
 }
 
-fun <F> OptionT.Companion.genk(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, F>> {
+fun <F> OptionT.Companion.genK(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, F>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind<ForOptionT, F>, A>> = genkF.genK(Gen.option(gen)).map {
     OptionT(it)
   }

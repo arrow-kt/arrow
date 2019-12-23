@@ -153,7 +153,7 @@ interface Apply<F> : Functor<F> {
     fb.map { fc -> map2(fc, f) }
 
   fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    fb.ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    ap(fb.map { b: B -> { a: A -> Tuple2(a, b) } })
 
   fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
     other: Kind<F, Z>,
