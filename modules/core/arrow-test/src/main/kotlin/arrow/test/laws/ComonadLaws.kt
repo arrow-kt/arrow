@@ -17,7 +17,7 @@ object ComonadLaws {
     val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return FunctorLaws.laws(CM, GEN, EQK) + listOf(
+    return FunctorLaws.laws(CM, GENK, EQK) + listOf(
         Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(GEN, EQ) },
         Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(GEN, EQ) },
         Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(GEN, EQ) },

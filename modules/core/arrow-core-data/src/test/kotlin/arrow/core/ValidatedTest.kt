@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
@@ -13,7 +12,6 @@ import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
 import arrow.test.UnitSpec
-import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.generators.validated
 import arrow.test.laws.BitraverseLaws
@@ -38,16 +36,11 @@ class ValidatedTest : UnitSpec() {
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
-    fun <E> GENK(genL: Gen<E>) = object : GenK<ValidatedPartialOf<E>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<ValidatedPartialOf<E>, A>> =
-        Gen.oneOf(gen.map { Valid(it) }, genL.map { Invalid(it) })
-      }
-
     testLaws(
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
-      SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.eqK(String.eq())),
-      TraverseLaws.laws(Validated.traverse(), GENK(Gen.string()), Validated.eqK(String.eq())),
+      SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
+      TraverseLaws.laws(Validated.traverse(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),

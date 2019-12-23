@@ -8,6 +8,7 @@ import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.fx.IO
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
@@ -20,12 +21,12 @@ import io.kotlintest.properties.forAll
 
 object ApplicativeErrorLaws {
 
-  fun <F> laws(AE: ApplicativeError<F, Throwable>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(AE: ApplicativeError<F, Throwable>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
 
     val EQ = EQK.liftEq(Int.eq())
     val EQ_EITHER = EQK.liftEq(Either.eq(Eq.any(), Int.eq()))
 
-    return ApplicativeLaws.laws(AE, EQK) + listOf(
+    return ApplicativeLaws.laws(AE, GENK, EQK) + listOf(
       Law("Applicative Error Laws: handle") { AE.applicativeErrorHandle(EQ) },
       Law("Applicative Error Laws: handle with for error") { AE.applicativeErrorHandleWith(EQ) },
       Law("Applicative Error Laws: handle with for success") { AE.applicativeErrorHandleWithPure(EQ) },
