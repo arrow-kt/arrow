@@ -66,10 +66,13 @@ interface MaybeKApplicative : Applicative<ForMaybeK> {
 
   override fun <A> just(a: A): MaybeK<A> =
     MaybeK.just(a)
+
+  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface MaybeKMonad : Monad<ForMaybeK> {
+interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
@@ -82,8 +85,8 @@ interface MaybeKMonad : Monad<ForMaybeK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> =
     MaybeK.tailRecM(a, f)
 
-  override fun <A> just(a: A): MaybeK<A> =
-    MaybeK.just(a)
+  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -259,39 +262,18 @@ interface MaybeKTimer : Timer<ForMaybeK> {
 }
 
 @extension
-interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK> {
+interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK>, MaybeKFunctor {
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): Kind<ForMaybeK, B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): Kind<ForMaybeK, B> =
-    fix().map(f)
 }
 
 @extension
-interface MaybeKMonadFilter : MonadFilter<ForMaybeK> {
+interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
   override fun <A> empty(): MaybeK<A> =
     Maybe.empty<A>().k()
 
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): MaybeK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.ap(ff: Kind<ForMaybeK, (A) -> B>): MaybeK<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForMaybeK, A>.flatMap(f: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MaybeKOf<Either<A, B>>>): MaybeK<B> =
-    MaybeK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
-    fix().map(f)
-
-  override fun <A, B, Z> Kind<ForMaybeK, A>.map2(fb: Kind<ForMaybeK, B>, f: (Tuple2<A, B>) -> Z): MaybeK<Z> =
-    fix().map2(fb, f)
-
-  override fun <A> just(a: A): MaybeK<A> =
-    MaybeK.just(a)
 }
 
 fun <A> MaybeK.Companion.fx(c: suspend ConcurrentSyntax<ForMaybeK>.() -> A): MaybeK<A> =

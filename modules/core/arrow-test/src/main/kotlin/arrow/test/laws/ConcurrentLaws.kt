@@ -15,6 +15,7 @@ import arrow.fx.Semaphore
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
@@ -102,11 +103,12 @@ object ConcurrentLaws {
 
   fun <F> laws(
     CF: Concurrent<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
-    AsyncLaws.laws(CF, EQK, testStackSafety) +
+    AsyncLaws.laws(CF, GENK, EQK, testStackSafety) +
       concurrentLaws(CF, EQK, ctx)
 
   fun <F> laws(
@@ -114,11 +116,12 @@ object ConcurrentLaws {
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
-    AsyncLaws.laws(CF, FF, AP, SL, EQK, testStackSafety) +
+    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety) +
       concurrentLaws(CF, EQK, ctx)
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {

@@ -48,6 +48,9 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
+
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.lazyAp(ff: () -> Kind<ValidatedPartialOf<E>, (A) -> B>): Kind<ValidatedPartialOf<E>, B> =
+    fix().fold(::Invalid) { a -> ff().map { f -> f(a) } }
 }
 
 @extension

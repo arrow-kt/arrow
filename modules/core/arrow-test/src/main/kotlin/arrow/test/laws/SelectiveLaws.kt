@@ -8,6 +8,7 @@ import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.toT
+import arrow.test.generators.GenK
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
@@ -19,10 +20,10 @@ import io.kotlintest.properties.forAll
 
 object SelectiveLaws {
 
-  fun <F> laws(A: Selective<F>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(A: Selective<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return ApplicativeLaws.laws(A, EQK) + listOf(
+    return ApplicativeLaws.laws(A, GENK, EQK) + listOf(
       Law("Selective Laws: identity") { A.identityLaw(EQ) },
       Law("Selective Laws: distributivity") { A.distributivity(EQ) },
       Law("Selective Laws: associativity") { A.associativity(EQ) },

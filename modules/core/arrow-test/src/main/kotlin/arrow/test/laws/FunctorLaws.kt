@@ -14,17 +14,14 @@ import io.kotlintest.properties.forAll
 
 object FunctorLaws {
 
-  fun <F> laws(FF: Functor<F>, G: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(FF, G.genK(Gen.int()), EQK)
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(FF: Functor<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val G1 = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return InvariantLaws.laws(FF, G, EQK) + listOf(
-      Law("Functor Laws: Covariant Identity") { FF.covariantIdentity(G, EQ) },
-      Law("Functor Laws: Covariant Composition") { FF.covariantComposition(G, EQ) }
-    )
+    return InvariantLaws.laws(FF, GENK, EQK) + listOf(
+        Law("Functor Laws: Covariant Identity") { FF.covariantIdentity(G1, EQ) },
+        Law("Functor Laws: Covariant Composition") { FF.covariantComposition(G1, EQ) }
+      )
   }
 
   fun <F> Functor<F>.covariantIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

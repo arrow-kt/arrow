@@ -23,9 +23,6 @@ import io.kotlintest.shouldBe
 class DayTest : UnitSpec() {
   init {
 
-    val cf = { x: Int -> Day(Id(x), Id(0)) { xx, yy -> xx + yy } }
-    val g = Gen.int().map(cf) as Gen<Kind<Kind<Kind<ForDay, ForId>, ForId>, Int>>
-
     val EQK = object : EqK<DayPartialOf<ForId, ForId>> {
       override fun <A> Kind<DayPartialOf<ForId, ForId>, A>.eqK(other: Kind<DayPartialOf<ForId, ForId>, A>, EQ: Eq<A>): Boolean =
         (this.fix() to other.fix()).let {
@@ -48,9 +45,11 @@ class DayTest : UnitSpec() {
       }
     }
 
+    val gk = GENK(Id.genK(), Id.genK(), Gen.int(), Gen.int())
+
     testLaws(
-      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), GENK(Id.genK(), Id.genK(), Gen.int(), Gen.int()), EQK),
-      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), g, EQK)
+      ApplicativeLaws.laws(Day.applicative(Id.applicative(), Id.applicative()), gk, EQK),
+      ComonadLaws.laws(Day.comonad(Id.comonad(), Id.comonad()), gk, EQK)
     )
 
     val get: (Int, Int) -> Tuple2<Int, Int> = { left, right -> Tuple2(left, right) }

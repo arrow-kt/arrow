@@ -14,17 +14,14 @@ import io.kotlintest.properties.forAll
 
 object InvariantLaws {
 
-  fun <F> laws(IF: Invariant<F>, G: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(IF, G.genK<Int>(Gen.int()), EQK)
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(IF: Invariant<F>, G: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(IF: Invariant<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val G1 = GENK.genK<Int>(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
     return listOf(
-      Law("Invariant Laws: Invariant Identity") { IF.identity(G, EQ) },
-      Law("Invariant Laws: Invariant Composition") { IF.composition(G, EQ) }
-    )
+        Law("Invariant Laws: Invariant Identity") { IF.identity(G1, EQ) },
+        Law("Invariant Laws: Invariant Composition") { IF.composition(G1, EQ) }
+      )
   }
 
   fun <F> Invariant<F>.identity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

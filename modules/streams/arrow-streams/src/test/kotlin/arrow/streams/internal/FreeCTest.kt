@@ -32,6 +32,7 @@ import arrow.streams.internal.freec.functor.functor
 import arrow.streams.internal.freec.monad.monad
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
@@ -112,10 +113,18 @@ class FreeCTest : UnitSpec() {
         }
     }
 
+    val opsGENK = object : GenK<FreeCPartialOf<ForOps>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreeCPartialOf<ForOps>, A>> =
+        Gen.int().map {
+          Ops.value(it)
+        } as Gen<Kind<FreeCPartialOf<ForOps>, A>>
+    }
+
     testLaws(
       EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
         Ops,
+        opsGENK,
         EQK
       )
     )
@@ -125,6 +134,7 @@ class FreeCTest : UnitSpec() {
         FF = FreeC.functor(),
         AP = FreeC.applicative(),
         SL = FreeC.monad(),
+        GENK = opsGENK,
         EQK = EQK
 
       ))

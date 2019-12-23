@@ -6,6 +6,7 @@ import arrow.core.Right
 import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.mtl.Kleisli
+import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
@@ -20,10 +21,10 @@ import io.kotlintest.properties.forAll
 
 object MonadLaws {
 
-  fun <F> laws(M: Monad<F>, EQK: EqK<F>): List<Law> {
+  fun <F> laws(M: Monad<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return SelectiveLaws.laws(M, EQK) +
+    return SelectiveLaws.laws(M, GENK, EQK) +
       listOf(
         Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
         Law("Monad Laws: right identity") { M.rightIdentity(EQ) },
@@ -35,10 +36,17 @@ object MonadLaws {
       )
   }
 
-    fun <F> laws(M: Monad<F>, FF: Functor<F>, AP: Apply<F>, SL: Selective<F>, EQK: EqK<F>): List<Law> {
+    fun <F> laws(
+      M: Monad<F>,
+      FF: Functor<F>,
+      AP: Apply<F>,
+      SL: Selective<F>,
+      GENK: GenK<F>,
+      EQK: EqK<F>
+    ): List<Law> {
       val EQ = EQK.liftEq(Int.eq())
 
-      return laws(M, EQK) + listOf(
+      return laws(M, GENK, EQK) + listOf(
         Law("Monad Laws: monad instance should preserve behavior of Functor") { M.preservesFunctor(FF, EQ) },
         Law("Monad Laws: monad instance should preserve behavior of Apply") { M.preservesApply(AP, EQ) },
         Law("Monad Laws: monad instance should preserve behavior of Selective") { M.preservesSelective(SL, EQ) }

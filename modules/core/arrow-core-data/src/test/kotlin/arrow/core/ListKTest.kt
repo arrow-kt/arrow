@@ -51,7 +51,6 @@ class ListKTest : UnitSpec() {
   init {
 
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
-    val associativeSemigroupalEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
 
     testLaws(
       MonadCombineLaws.laws(
@@ -59,8 +58,7 @@ class ListKTest : UnitSpec() {
         ListK.functor(),
         ListK.applicative(),
         ListK.monad(),
-        { listOf(it).k() },
-        { i -> listOf({ j: Int -> j + i }).k() },
+        ListK.genK(),
         ListK.eqK()
       ),
       ShowLaws.laws(ListK.show(), EQ, Gen.listK(Gen.int())),

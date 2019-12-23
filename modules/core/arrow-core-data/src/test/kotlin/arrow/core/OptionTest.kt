@@ -61,7 +61,14 @@ class OptionTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadCombineLaws.laws(Option.monadCombine(), Option.functor(), Option.applicative(), Option.selective(), { it.some() }, { i: Int -> { j: Int -> i + j }.some() }, Option.eqK()),
+      MonadCombineLaws.laws(
+        Option.monadCombine(),
+        Option.functor(),
+        Option.applicative(),
+        Option.selective(),
+        Option.genK(),
+        Option.eqK()
+      ),
       ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`

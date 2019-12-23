@@ -61,6 +61,13 @@ interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, Writer
 
   override fun <A, B> WriterTOf<F, W, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(AF()) { f(it) }
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.lazyAp(ff: () -> Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      AF().run {
+        fix().value().lazyAp { ff().fix().value().map { r -> { l: Tuple2<W, A> -> Tuple2(MM().run { l.a + r.a }, r.b(l.b)) } } }
+      }
+    )
 }
 
 @extension
@@ -84,6 +91,13 @@ interface WriterTMonad<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicative
 
   override fun <A, B> WriterTOf<F, W, A>.ap(ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
     fix().ap(MF(), MM(), ff)
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.lazyAp(ff: () -> Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      AF().run {
+        fix().value().lazyAp { ff().fix().value().map { r -> { l: Tuple2<W, A> -> Tuple2(MM().run { l.a + r.a }, r.b(l.b)) } } }
+      }
+    )
 }
 
 @extension

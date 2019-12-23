@@ -8,6 +8,7 @@ import arrow.core.extensions.eq
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
@@ -46,10 +47,11 @@ object AsyncLaws {
 
   fun <F> laws(
     AC: Async<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, EQK, testStackSafety) +
+    MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety) +
       asyncLaws(AC, EQK)
 
   fun <F> laws(
@@ -57,10 +59,11 @@ object AsyncLaws {
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, FF, AP, SL, EQK, testStackSafety) +
+    MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety) +
       asyncLaws(AC, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =

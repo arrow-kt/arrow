@@ -44,7 +44,7 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
     map.iterator().iterateRight(Eval.always { just(sortedMapOf<A, C>().k()) }) { kv, lbuf ->
-      f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
+      Eval.later { f(kv.value).lazyAp { lbuf.value().map { xs -> { b: C -> (mapOf(kv.key to b).k() + xs).toSortedMap().k() } } } }
     }.value()
   }
 
