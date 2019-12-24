@@ -4,7 +4,10 @@ import arrow.core.Option
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
+import arrow.fx.IOResult
+import arrow.fx.flatMapLeft
 import arrow.fx.handleErrorWith
+import arrow.fx.unsafeRunSync
 
 data class UserId(val value: String)
 data class User(val userId: UserId)
@@ -16,7 +19,7 @@ data class UserNotInRemoteStorage(val user: User) : UserLookupError()
 data class UnknownError(val underlying: Throwable) : UserLookupError()
 
 interface DataSource {
-  fun allTasksByUser(user: User): IO<Nothing, List<Task>>
+  fun allTasksByUser(user: User): IO<UserLookupError, List<Task>>
 }
 
 interface Repository {
@@ -27,9 +30,9 @@ class LocalDataSource : DataSource {
   private val localCache: Map<User, List<Task>> =
     mapOf(User(UserId("user1")) to listOf(Task("LocalTask asssigned to user1")))
 
-  override fun allTasksByUser(user: User): IO<Nothing, List<Task>> =
+  override fun allTasksByUser(user: User): IO<UserLookupError, List<Task>> =
     Option.fromNullable(localCache[user]).fold(
-      { IO.raiseException(UserNotInLocalStorage(user)) },
+      { IO.raiseError(UserNotInLocalStorage(user)) },
       { IO.just(it) }
     )
 }
@@ -38,12 +41,12 @@ class RemoteDataSource : DataSource {
   private val internetStorage: Map<User, List<Task>> =
     mapOf(User(UserId("user2")) to listOf(Task("Remote Task assigned to user2")))
 
-  override fun allTasksByUser(user: User): IO<Nothing, List<Task>> =
+  override fun allTasksByUser(user: User): IO<UserLookupError, List<Task>> =
     IO.async { cb ->
       // allows you to take values from callbacks and place them back in the context of `F`
       Option.fromNullable(internetStorage[user]).fold(
-        { cb(UserNotInRemoteStorage(user).left()) },
-        { cb(it.right()) }
+        { cb(IOResult.Error(UserNotInRemoteStorage(user))) },
+        { cb(IOResult.Success(it)) }
       )
     }
 }
@@ -54,12 +57,12 @@ class DefaultRepository(
 ) : Repository {
 
   override fun allTasksByUser(user: User): IO<Nothing, List<Task>> =
-    localDS.allTasksByUser(user).handleErrorWith { e: Throwable ->
-      when (e) {
-        is UserNotInLocalStorage -> remoteDS.allTasksByUser(user)
-        else -> IO.raiseException(UnknownError(e))
+    localDS.allTasksByUser(user).handleErrorWith(
+      { t -> IO.raiseException<List<Task>>(UnknownError(t)) },
+      {
+        remoteDS.allTasksByUser(user).flatMapLeft { IO.raiseException<List<Task>>(it) }
       }
-    }
+    )
 }
 
 class Module {
