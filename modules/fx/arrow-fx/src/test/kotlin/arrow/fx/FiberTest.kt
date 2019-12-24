@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.extensions.monoid
 import arrow.fx.extensions.applicative
+import arrow.fx.extensions.functor
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.monoid
@@ -42,7 +43,7 @@ class FiberTest : UnitSpec() {
     }
 
     testLaws(
-      ApplicativeLaws.laws<FiberPartialOf<ForIO>>(Fiber.applicative(IO.concurrent()), GENK(IO.applicative()), EQK()),
+      ApplicativeLaws.laws<FiberPartialOf<ForIO>>(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), GENK(IO.applicative()), EQK()),
       MonoidLaws.laws(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
         Fiber(IO.just(i), IO.unit)
       }, EQ())
