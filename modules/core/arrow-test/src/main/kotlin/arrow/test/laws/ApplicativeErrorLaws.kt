@@ -6,6 +6,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.fx.IO
+import arrow.fx.unsafeRunSync
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB

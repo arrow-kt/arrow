@@ -169,5 +169,5 @@ internal object IOBracket {
 private class UnhandeledError(val error: Any?) : Throwable() {
   override fun fillInStackTrace(): Throwable = this
 }
-private val <E, A> IOOf<E, A>.rethrow: IO<Nothing, A>
+internal val <E, A> IOOf<E, A>.rethrow: IO<Nothing, A>
   get() = handleErrorWith({ t -> IO.raiseException<Nothing>(t) }, { e -> IO.raiseException(UnhandeledError(e)) })

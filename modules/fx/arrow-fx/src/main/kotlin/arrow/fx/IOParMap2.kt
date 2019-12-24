@@ -32,10 +32,10 @@ interface IOParMap2 {
 
     fun sendException(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished TODO replace with active field
-      else -> other.cancel().fix().unsafeRunAsync { r ->
+      else -> other.cancel().unsafeRunAsync { r ->
         conn.pop()
         // TODO if `r` is an exception send it to the asyncErrorHandler
-        cb(IOResult.Exception(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e }, { e })))
+        cb(IOResult.Exception(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
       }
     }
 

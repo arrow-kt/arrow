@@ -1,10 +1,8 @@
 package arrow.fx.internal
 
 import arrow.fx.IO
-import arrow.fx.ForIO
 import arrow.fx.IOConnection
 import arrow.fx.IOPartialOf
-import arrow.fx.IOResult
 import arrow.fx.typeclasses.Fiber
 
 internal fun <E, A> IOFiber(promise: UnsafePromise<E, A>, conn: IOConnection): Fiber<IOPartialOf<E>, A> {

@@ -3,9 +3,9 @@ package arrow.fx
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
-import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
+import arrow.core.identity
 import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
@@ -39,10 +39,10 @@ class IOTest : UnitSpec() {
 
   private val other = newSingleThreadContext("other")
   private val all = newSingleThreadContext("all")
-  private val NonBlocking = IO.dispatchers().default()
+  private val NonBlocking = IO.dispatchers<Nothing>().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent<String>(), EQ(), EQ(), EQ()))
 
     "should defer evaluation until run" {
       var run = false
@@ -57,7 +57,8 @@ class IOTest : UnitSpec() {
     "should catch exceptions within main block" {
       val exception = MyException()
       val ioa = IO { throw exception }
-      val result: Either<Throwable, Nothing> = ioa.attempt().unsafeRunSync()
+      val result: Either<Throwable, Nothing> =
+        ioa.attempt().unsafeRunSync()
 
       val expected = Left(exception)
 
@@ -108,7 +109,7 @@ class IOTest : UnitSpec() {
     }
 
     "should time out on unending unsafeRunTimed" {
-      val never = IO.async().never<Int>().fix()
+      val never = IO.async<Nothing>().never<Int>().fix()
       val start = System.currentTimeMillis()
       val received = never.unsafeRunTimed(100.milliseconds)
       val elapsed = System.currentTimeMillis() - start
@@ -158,7 +159,7 @@ class IOTest : UnitSpec() {
 
     "should return exceptions within main block with unsafeRunAsync" {
       val exception = MyException()
-      val ioa = IO<Nothing, Int> { throw exception }
+      val ioa = IO<Int> { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
@@ -167,7 +168,7 @@ class IOTest : UnitSpec() {
     "should not catch exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
-        val ioa = IO<Nothing, Int> { throw exception }
+        val ioa = IO<Int> { throw exception }
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
@@ -176,56 +177,6 @@ class IOTest : UnitSpec() {
         // Success
       } catch (throwable: Throwable) {
         fail("Should only throw MyException")
-      }
-    }
-
-    "should complete when running a pure value with runAsync" {
-      val expected = 0
-      just(expected).runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
-      }
-    }
-
-    "should complete when running a return value with runAsync" {
-      val expected = 0
-      IO { expected }.runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
-      }
-    }
-
-    "should return an error when running an exception with runAsync" {
-      IO.raiseException<Int>(MyException()).runAsync { either ->
-        either.fold({
-          when (it) {
-            is MyException -> {
-              IO { }
-            }
-            else -> fail("Should only throw MyException")
-          }
-        }, { fail("") })
-      }
-    }
-
-    "should return exceptions within main block with runAsync" {
-      val exception = MyException()
-      val ioa = IO<Nothing, Int> { throw exception }
-      ioa.runAsync { either ->
-        either.fold({ IO { it shouldBe exception } }, { fail("") })
-      }
-    }
-
-    "should catch exceptions within run block with runAsync" {
-      try {
-        val exception = MyException()
-        val ioa = IO<Nothing, Int> { throw exception }
-        ioa.runAsync { either ->
-          either.fold({ throw it }, { fail("") })
-        }.unsafeRunSync()
-        fail("Should rethrow the exception")
-      } catch (throwable: AssertionError) {
-        fail("${throwable.message}")
-      } catch (throwable: Throwable) {
-        // Success
       }
     }
 
@@ -282,7 +233,7 @@ class IOTest : UnitSpec() {
 
     "fx should defer evaluation until run" {
       var run = false
-      val program = IO.fx {
+      val program = IO.fx<Nothing, Unit> {
         run = true
       }
 
@@ -292,7 +243,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx can switch execution context state across not/bind" {
-      val program = IO.fx {
+      val program = IO.fx<Nothing, Unit> {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(all)
@@ -304,7 +255,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx can pass context state across not/bind" {
-      val program = IO.fx {
+      val program = IO.fx<Nothing, Unit> {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(CoroutineName("Simon"))
@@ -316,7 +267,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx will respect thread switching across not/bind" {
-      val program = IO.fx {
+      val program = IO.fx<Nothing, Unit> {
         continueOn(all)
         val initialThread = !effect { Thread.currentThread().name }
         !(0..130).map { i -> effect { i } }.parSequence()
@@ -328,7 +279,7 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunTimed times out with None result" {
-      val never = IO.async().never<Unit>().fix()
+      val never = IO.async<Nothing>().never<Unit>().fix()
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
     }
@@ -336,7 +287,7 @@ class IOTest : UnitSpec() {
     "parallel execution with single threaded context makes all IOs start at the same time" {
       val order = mutableListOf<Long>()
 
-      fun makePar(num: Long) =
+      fun makePar(num: Long): IO<Nothing, Long> =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 100)
@@ -364,8 +315,8 @@ class IOTest : UnitSpec() {
           it
         }
 
-      fun makePar(num: Long) =
-        IO.concurrent()
+      fun makePar(num: Long): IO<Nothing, Long> =
+        IO.concurrent<Nothing>()
           .sleep((num * 100).milliseconds)
           .map { num }.order()
 
@@ -401,7 +352,7 @@ class IOTest : UnitSpec() {
         all.parMapN(
           IO { Thread.currentThread().name },
           IO.defer { just(Thread.currentThread().name) },
-          IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
+          IO.async<Nothing, String> { cb -> cb(IOResult.Success(Thread.currentThread().name)) },
           IO(other) { Thread.currentThread().name },
           ::Tuple4)
           .unsafeRunSync()
@@ -410,11 +361,11 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async<Nothing, Int> { cb ->
         val cancel =
           IO(all) { }
-            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable(OnCancel.Silent) {
+            .flatMap { IO.async<Nothing, Int> { cb -> Thread.sleep(500); cb(IOResult.Success(1)) } }
+            .unsafeRunAsyncCancellableEither(OnCancel.Silent) {
               cb(it)
             }
         IO(other) { }
@@ -423,12 +374,12 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { cb ->
+      IO.async<Nothing, Throwable> { cb ->
         val cancel =
           IO(all) { }
-            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Nothing, Int> { cb -> Thread.sleep(500); cb(IOResult.Success(1)) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              it.fold({ t -> cb(t.right()) }, { })
+              it.fold({ t -> cb(IOResult.Success(t)) }, { })
             }
         IO(other) { }
           .unsafeRunAsync { cancel() }
@@ -436,10 +387,12 @@ class IOTest : UnitSpec() {
     }
 
     "IOFrame should always be called when using IO.Bind" {
-      val ThrowableAsStringFrame = object : IOFrame<Any?, IOOf<String>> {
+      val ThrowableAsStringFrame = object : IOFrame<Any?, Any?, IOOf<Nothing, String>> {
         override fun invoke(a: Any?) = just(a.toString())
 
         override fun recover(e: Throwable) = just(e.message ?: "")
+
+        override fun handleError(e: Any?) = just(e.toString())
       }
 
       forAll(Gen.string()) { message ->
@@ -449,11 +402,11 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async<Nothing, Int> { cb ->
         val cancel =
           IO(all) { }
-            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
-            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+            .flatMap { IO.async<Nothing, Int> { Thread.sleep(5000); } }
+            .unsafeRunAsyncCancellableEither(OnCancel.ThrowCancellationException) {
               cb(it)
             }
         IO(other) { Thread.sleep(500); }
@@ -462,7 +415,7 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = IO.fx {
+      val result = IO.fx<Nothing, Int> {
         val (x) = IO.just(1)
         val y = !IO { x + 1 }
         y
@@ -471,52 +424,41 @@ class IOTest : UnitSpec() {
     }
 
     "IO bracket cancellation should release resource with cancel exit status" {
-      Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
-        just(0L)
-          .bracketCase(
-            use = { IO.never },
-            release = { _, exitCase -> p.complete(exitCase) }
-          )
+      IO.fx<Nothing, ExitCase<Throwable>> {
+        val p = !Promise<ExitCase<Throwable>>()
+        IO.just(0L).bracketCase(
+          use = { IO.never },
+          release = { _, exitCase -> p.complete(exitCase) }
+        )
           .unsafeRunAsyncCancellable { }
           .invoke() // cancel immediately
 
-        p.get()
+        !p.get()
       }.unsafeRunSync() shouldBe ExitCase.Canceled
     }
 
     "Cancelable should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelable<Unit> {
+      IO.fx<Nothing, Unit> {
+        val p = !Promise<Unit>()
+        IO.cancelable<Nothing, Unit> {
           p.complete(Unit)
-        }.fix()
-          .unsafeRunAsyncCancellable { }
+        }.unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get()
+        !p.get()
       }.unsafeRunSync() shouldBe Unit
     }
 
     "CancelableF should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelableF<Unit> {
+      IO.fx<Nothing, Unit> {
+        val p = !Promise<Unit>()
+        IO.cancelableF<Nothing, Unit> {
           IO { p.complete(Unit) }
-        }.fix()
-          .unsafeRunAsyncCancellable { }
+        }.unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get()
+        !p.get()
       }.unsafeRunSync() shouldBe Unit
-    }
-
-    "IO should cancel cancelable on dispose" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
-        IO {
-          IO.cancelable<Unit> {
-            latch.complete(Unit)
-          }.unsafeRunAsyncCancellable { }
-            .invoke()
-        }.flatMap { latch.get() }
-      }.unsafeRunSync()
     }
 
     "Bracket should be stack safe" {
@@ -547,8 +489,8 @@ class IOTest : UnitSpec() {
     "Async should be stack safe" {
       val size = 5000
 
-      fun ioAsync(i: Int): IO<Nothing, Int> = IO.async<Int> { cb ->
-        cb(Right(i))
+      fun ioAsync(i: Int): IO<Nothing, Int> = IO.async<Nothing, Int> { cb ->
+        cb(IOResult.Success(i))
       }.flatMap { ii ->
         if (ii < size) ioAsync(ii + 1)
         else just(ii)
@@ -583,27 +525,27 @@ class IOTest : UnitSpec() {
     }
 
     "ConcurrentParMap2 left handles null" {
-      IO.concurrent().parMap2(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
+      IO.concurrent<Nothing>().parMap2(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
 
     "ConcurrentParMap2 right handles null" {
-      IO.concurrent().parMap2(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+      IO.concurrent<Nothing>().parMap2(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
 
     "ConcurrentParMap3 left handles null" {
-      IO.concurrent().parMap3(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+      IO.concurrent<Nothing>().parMap3(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
 
     "ConcurrentParMap3 middle handles null" {
-      IO.concurrent().parMap3(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+      IO.concurrent<Nothing>().parMap3(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
 
     "ConcurrentParMap3 right handles null" {
-      IO.concurrent().parMap3(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+      IO.concurrent<Nothing>().parMap3(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .fix().unsafeRunSync() shouldBe Unit
     }
 
@@ -644,9 +586,9 @@ class IOTest : UnitSpec() {
       }
 
       val wrappedInfiniteLoop: IO<Nothing, Unit> =
-        IO.effect { infiniteLoop().suspended() }
+        IO.effect { infiniteLoop().suspended().fold(::identity, ::identity) }
 
-      IO.fx {
+      IO.fx<Nothing, Unit> {
         val p = !Promise<ExitCase<Throwable>>()
         val (_, cancel) = !IO.unit.bracketCase(
           release = { _, ec -> p.complete(ec) },

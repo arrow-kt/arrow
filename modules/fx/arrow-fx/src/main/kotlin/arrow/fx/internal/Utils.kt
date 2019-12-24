@@ -13,6 +13,7 @@ import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOOf
 import arrow.fx.IOResult
+import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -155,7 +156,7 @@ object Platform {
   fun <E, A> unsafeResync(ioa: IO<E, A>, limit: Duration): Option<Either<E, A>> {
     val latch = OneShotLatch()
     var ref: IOResult<E, A>? = null
-    ioa.unsafeRunAsync { a ->
+    ioa.fix().unsafeRunAsyncEither { a ->
       ref = a
       latch.releaseShared(1)
     }

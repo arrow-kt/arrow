@@ -27,7 +27,7 @@ class QueueTest : UnitSpec() {
     fun tests(
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
-      queue: (Int) -> IO<Nothing, Queue<ForIO, Int>>
+      queue: (Int) -> IO<Nothing, Queue<IOPartialOf<Nothing>, Int>>
     ) {
 
       "$label - make a queue the add values then retrieve in the same order" {
@@ -58,7 +58,7 @@ class QueueTest : UnitSpec() {
 
       "$label - time out taking from an empty queue" {
         IO.fx {
-          val wontComplete = queue(10).flatMap(Queue<ForIO, Int>::take)
+          val wontComplete = queue(10).flatMap(Queue<IOPartialOf<Nothing>, Int>::take)
           val start = !effect { System.currentTimeMillis() }
           val received = !wontComplete.map { Some(it) }
             .waitFor(100.milliseconds, default = just(None))
@@ -184,7 +184,7 @@ class QueueTest : UnitSpec() {
       "$label - create a shutdown hook completing a promise, then shutdown the queue, the promise should be completed" {
         IO.fx {
           val q = !queue(10)
-          val p = !Promise<ForIO, Boolean>(IO.concurrent())
+          val p = !Promise<IOPartialOf<Nothing>, Boolean>(IO.concurrent())
           !(q.awaitShutdown().followedBy(p.complete(true))).fork()
           !q.shutdown()
           !p.get()
@@ -194,8 +194,8 @@ class QueueTest : UnitSpec() {
       "$label - create a shutdown hook completing a promise twice, then shutdown the queue, both promises should be completed" {
         IO.fx {
           val q = !queue(10)
-          val p1 = !Promise<ForIO, Boolean>(IO.concurrent())
-          val p2 = !Promise<ForIO, Boolean>(IO.concurrent())
+          val p1 = !Promise<IOPartialOf<Nothing>, Boolean>(IO.concurrent())
+          val p2 = !Promise<IOPartialOf<Nothing>, Boolean>(IO.concurrent())
           !(q.awaitShutdown().followedBy(p1.complete(true))).fork()
           !(q.awaitShutdown().followedBy(p2.complete(true))).fork()
           !q.shutdown()
@@ -207,7 +207,7 @@ class QueueTest : UnitSpec() {
         IO.fx {
           val q = !queue(10)
           !q.shutdown()
-          val p = !Promise<ForIO, Boolean>(IO.concurrent())
+          val p = !Promise<IOPartialOf<Nothing>, Boolean>(IO.concurrent())
           !(q.awaitShutdown().followedBy(p.complete(true))).fork()
           !p.get()
         }.unsafeRunSync()
@@ -215,6 +215,6 @@ class QueueTest : UnitSpec() {
     }
 
     tests("BoundedQueue", queue =
-    { capacity -> Queue.bounded<ForIO, Int>(capacity, IO.concurrent()).fix() })
+    { capacity -> Queue.bounded<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent()).fix() })
   }
 }

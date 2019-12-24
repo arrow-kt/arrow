@@ -67,16 +67,16 @@ interface IORacePair {
       IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: IOResult<E, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
+            connB.cancel().unsafeRunAsync { r2 ->
               conn.pop()
-              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error }, { error })))
+              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
           } else {
             promiseA.complete(IOResult.Exception(error))
           }
         }, { e ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
+            connB.cancel().unsafeRunAsync { r2 ->
               conn.pop()
               // TODO asyncErrorHandler r2
               cb(IOResult.Error(e))
@@ -97,16 +97,16 @@ interface IORacePair {
       IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: IOResult<E, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
+            connA.cancel().unsafeRunAsync { r2 ->
               conn.pop()
-              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error }, { error })))
+              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
           } else {
             promiseB.complete(IOResult.Exception(error))
           }
         }, { e ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
+            connB.cancel().unsafeRunAsync { r2 ->
               conn.pop()
               // TODO asyncErrorHandler r2
               cb(IOResult.Error(e))

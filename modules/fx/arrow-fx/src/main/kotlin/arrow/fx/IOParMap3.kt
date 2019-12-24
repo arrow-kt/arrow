@@ -50,14 +50,14 @@ interface IOParMap3 {
 
     fun sendException(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
-        other.cancel().fix().unsafeRunAsync { r1 ->
-          other2.cancel().fix().unsafeRunAsync { r2 ->
+        other.cancel().unsafeRunAsync { r1 ->
+          other2.cancel().unsafeRunAsync { r2 ->
             conn.pop()
             cb(IOResult.Exception(r1.fold({ e2 ->
-              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) }, { e })
+              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
             }, {
-              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e }, { e })
-            }, { e })))
+              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
+            })))
           }
         }
       } else Unit

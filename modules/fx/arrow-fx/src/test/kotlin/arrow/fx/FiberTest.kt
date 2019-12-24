@@ -18,15 +18,15 @@ import io.kotlintest.properties.Gen
 class FiberTest : UnitSpec() {
 
   init {
-    fun FIBER_EQ(): Eq<FiberOf<ForIO, Int>> = object : Eq<FiberOf<ForIO, Int>> {
-      override fun FiberOf<ForIO, Int>.eqv(b: FiberOf<ForIO, Int>): Boolean = EQ<Int>().run {
+    fun FIBER_EQ(): Eq<FiberOf<IOPartialOf<Nothing>, Int>> = object : Eq<FiberOf<IOPartialOf<Nothing>, Int>> {
+      override fun FiberOf<IOPartialOf<Nothing>, Int>.eqv(b: FiberOf<IOPartialOf<Nothing>, Int>): Boolean = EQ<Nothing, Int>().run {
         fix().join().eqv(b.fix().join())
       }
     }
 
     testLaws(
-      ApplicativeLaws.laws<FiberPartialOf<ForIO>>(Fiber.applicative(IO.concurrent()), FIBER_EQ()),
-      MonoidLaws.laws(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
+      ApplicativeLaws.laws<FiberPartialOf<IOPartialOf<Nothing>>>(Fiber.applicative(IO.concurrent()), FIBER_EQ()),
+      MonoidLaws.laws(Fiber.monoid(IO.concurrent<Nothing>(), Int.monoid()), Gen.int().map { i ->
         Fiber(IO.just(i), IO.unit)
       }, FIBER_EQ())
     )

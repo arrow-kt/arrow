@@ -68,14 +68,14 @@ interface IORaceTriple {
       IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: IOResult<E, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            connB.cancel().unsafeRunAsync { r2 ->
+              connC.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error }, { error })
-                }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
                 cb(IOResult.Exception(errorResult))
               }
             }
@@ -84,8 +84,8 @@ interface IORaceTriple {
           }
         }, { e ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            connB.cancel().unsafeRunAsync { r2 ->
+              connC.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 cb(IOResult.Error(e))
               }
@@ -106,14 +106,14 @@ interface IORaceTriple {
       IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: IOResult<E, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            connA.cancel().unsafeRunAsync { r2 ->
+              connC.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error }, { error })
-                }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
                 cb(IOResult.Exception(errorResult))
               }
             }
@@ -122,8 +122,8 @@ interface IORaceTriple {
           }
         }, { e ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            connA.cancel().unsafeRunAsync { r2 ->
+              connC.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 cb(IOResult.Error(e))
               }
@@ -144,14 +144,14 @@ interface IORaceTriple {
       IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: IOResult<E, C> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connB.cancel().fix().unsafeRunAsync { r3 ->
+            connA.cancel().unsafeRunAsync { r2 ->
+              connB.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error }, { error })
-                }, { error })
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
                 cb(IOResult.Exception(errorResult))
               }
             }
@@ -160,8 +160,8 @@ interface IORaceTriple {
           }
         }, { e ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connB.cancel().fix().unsafeRunAsync { r3 ->
+            connA.cancel().unsafeRunAsync { r2 ->
+              connB.cancel().unsafeRunAsync { r3 ->
                 conn.pop()
                 //
                 cb(IOResult.Error(e))
