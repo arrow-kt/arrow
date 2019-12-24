@@ -1,10 +1,8 @@
 package arrow.mtl
 
 import arrow.Kind
-import arrow.core.ForListK
 import arrow.core.ForOption
 import arrow.core.ForTry
-import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
@@ -12,8 +10,6 @@ import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.eq
-import arrow.core.extensions.listk.eqK.eqK
-import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
@@ -50,12 +46,8 @@ class StateTTests : UnitSpec() {
 
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
-  val listkStateEQK: EqK<StateTPartialOf<ForListK, Int>> = eqK(ListK.eqK(), Int.eq(), ListK.monad(), 1)
-
   val optionStateEQK: EqK<StateTPartialOf<ForOption, Int>> = eqK(Option.eqK(), Int.eq(), Option.monad(), 1)
-
   val ioStateEQK: EqK<StateTPartialOf<ForIO, Int>> = eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
-
   val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = eqK(Try.eqK(), Int.eq(), Try.monad(), 1)
 
   init {
