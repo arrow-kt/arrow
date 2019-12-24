@@ -3,7 +3,7 @@ package arrow.fx
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
 
-class KindConnectionTests : UnitSpec() {
+class IOConnectionTests : UnitSpec() {
 
   init {
     "initial push" {

@@ -18,7 +18,7 @@ private typealias Callback = (IOResult<Any?, Any?>) -> Unit
 internal object IORunLoop {
 
   fun <E, A> start(source: IOOf<E, A>, cb: (IOResult<E, A>) -> Unit): Unit =
-    loop(source, KindConnection.uncancelable, cb as Callback, null, null, null, IOContext(KindConnection.uncancelable))
+    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null, IOContext(IOConnection.uncancelable))
 
   /**
    * Evaluates the given `IO` reference, calling the given callback

@@ -28,6 +28,7 @@ import arrow.fx.internal.scheduler
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import kotlin.coroutines.CoroutineContext
@@ -59,7 +60,7 @@ inline fun <E, A> IOOf<E, A>.fix(): IO<E, A> =
   this as IO<E, A>
 
 typealias IOProc<E, A> = ((IOResult<E, A>) -> Unit) -> Unit
-typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<Nothing, Unit>
+typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<E, Unit>
 
 @Suppress("StringLiteralDuplication")
 sealed class IO<out E, out A> : IOOf<E, A> {
@@ -223,7 +224,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * }
      * ```
      */
-    fun <A> defer(f: () -> IOOf<Nothing, A>): IO<Nothing, A> =
+    fun <E, A> defer(f: () -> IOOf<E, A>): IO<E, A> =
       Suspend(f)
 
     /**
@@ -336,7 +337,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->
-            result.fold({ e -> callback(IOResult.Exception(e)) }, mapUnit, mapUnit)
+            result.fold({ e -> callback(IOResult.Exception(e)) }, { e -> callback(IOResult.Error(e)) }, mapUnit)
           }
         }
       }
@@ -559,10 +560,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * }
      * ```
      */
-    fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Nothing, Either<A, B>>): IO<Nothing, B> =
+    fun <E, A, B> tailRecM(a: A, f: (A) -> IOOf<E, Either<A, B>>): IO<E, B> =
       f(a).fix().flatMap {
         when (it) {
-          is Either.Left -> tailRecM(it.a, f)
+          is Left -> tailRecM(it.a, f)
           is Either.Right -> just(it.b)
         }
       }
@@ -856,7 +857,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
+      internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
       internal val disableUncancelable: (Any?, Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, _, old, _ -> old }
@@ -895,7 +896,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
  * @see handleErrorWith for a version that can resolve the error using an effect
  */
 fun <E, A> IOOf<E, A>.handleError(f: (Throwable) -> A, fe: (E) -> A): IO<Nothing, A> =
-  handleAllWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
+  handleErrorWith({ t -> IO.Pure(f(t)) }, { e -> IO.Pure(fe(e)) })
 
 fun <A> IOOf<Nothing, A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
   handleError(f, ::identity)
@@ -985,8 +986,8 @@ fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(
  * @see [bracketCase] for the more general operation
  *
  */
-fun <A> IOOf<Nothing, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Nothing, Unit>): IO<Nothing, A> =
-  IOBracket.guaranteeCase(fix(), finalizer)
+fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
+  IOBracket.guaranteeCase(this, finalizer)
 
 /**
  * Transform the [IO] value of [A] by sequencing an effect [IO] that results in [B].
@@ -1159,7 +1160,7 @@ fun <A, B> IOOf<Nothing, A>.bracket(release: (A) -> IOOf<Nothing, Unit>, use: (A
  * }
  *  ```
  */
-fun <A, B> IOOf<Nothing, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
+fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   IOBracket(this, release, use)
 
 /**
@@ -1170,4 +1171,5 @@ fun <A, B> IOOf<Nothing, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOO
  * @see [guaranteeCase] for the version that can discriminate between termination conditions
  * @see [bracket] for the more general operation
  */
-fun <A> IOOf<Nothing, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<Nothing, A> = guaranteeCase { finalizer }
+fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
+  guaranteeCase { finalizer }
