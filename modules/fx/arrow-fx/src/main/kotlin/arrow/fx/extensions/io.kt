@@ -2,11 +2,14 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.identity
 import arrow.extension
 import arrow.fx.IO
-
-import arrow.fx.ForIO
+import arrow.fx.IOPartialOf
+import arrow.fx.IOResult
+import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.IODispatchers
 import arrow.fx.IOOf
 import arrow.fx.OnCancel
@@ -16,6 +19,8 @@ import arrow.fx.Timer
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.fix
+import arrow.fx.flatMapLeft
+import arrow.fx.mapError
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -43,127 +48,156 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
+import java.lang.AssertionError
 import kotlin.coroutines.CoroutineContext
+import arrow.fx.ap as Ap
+import arrow.fx.flatMap as FlatMap
+import arrow.fx.handleErrorWith as HandleErrorWith
+import arrow.fx.redeemWith as RedeemWith
+import arrow.fx.bracketCase as BracketCase
 
 @extension
-interface IOFunctor : Functor<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<Nothing, B> =
+interface IOFunctor<E> : Functor<IOPartialOf<E>> {
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
     fix().map(f)
 }
 
 @extension
-interface IOApply : Apply<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<Nothing, B> =
-    fix().map(f)
-
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<Nothing, B> =
-    fix().ap(ff)
+interface IOApply<E> : Apply<IOPartialOf<E>>, IOFunctor<E> {
+  override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+    Ap(ff)
 }
 
 @extension
-interface IOApplicative : Applicative<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<Nothing, B> =
-    fix().map(f)
-
-  override fun <A> just(a: A): IO<Nothing, A> =
+interface IOApplicative<E> : Applicative<IOPartialOf<E>>, IOApply<E> {
+  override fun <A> just(a: A): IO<E, A> =
     IO.just(a)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<Nothing, B> =
-    fix().ap(ff)
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
+    fix().map(f)
 }
 
 @extension
-interface IOMonad : Monad<ForIO> {
-  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<Nothing, B> =
-    fix().flatMap(f)
+interface IOMonad<E> : Monad<IOPartialOf<E>>, IOApplicative<E> {
+  override fun <A, B> IOOf<E, A>.flatMap(f: (A) -> IOOf<E, B>): IO<E, B> =
+    FlatMap(f)
 
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<Nothing, B> =
-    fix().map(f)
-
-  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<Nothing, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<E, Either<A, B>>): IO<E, B> =
     IO.tailRecM(a, f)
 
-  override fun <A> just(a: A): IO<Nothing, A> =
-    IO.just(a)
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
+    fix().map(f)
+
+  override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+    Ap(ff)
 }
 
 @extension
-interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
-  override fun <A> IOOf<A>.attempt(): IO<Nothing, Either<Throwable, A>> =
+interface IOApplicativeError<E> : ApplicativeError<IOPartialOf<E>, Throwable>, IOApplicative<E> {
+  override fun <A> IOOf<E, A>.attempt(): IO<E, Either<Throwable, A>> =
     fix().attempt()
 
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<Nothing, A> =
-    HandleErrorWith(f)
+  override fun <A> IOOf<E, A>.handleErrorWith(f: (Throwable) -> IOOf<E, A>): IO<E, A> =
+    HandleErrorWith(f, { e -> IO.raiseError(e) })
 
-  override fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<Nothing, A> =
-    HandleError(f)
+  override fun <A> IOOf<E, A>.handleError(f: (Throwable) -> A): IO<E, A> =
+    HandleErrorWith({ t -> IO.just(f(t)) }, { e -> IO.raiseError<E, A>(e) })
 
-  override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<Nothing, B> =
-    fix().redeem(fe, fb)
+  override fun <A, B> IOOf<E, A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<E, B> =
+    RedeemWith({ t -> IO.just(fe(t)) }, { e -> IO.raiseError<E, B>(e) }, { a -> IO.just(fb(a)) })
 
-  override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
+  override fun <A> raiseError(e: Throwable): IO<E, A> =
     IO.raiseException(e)
 }
 
 @extension
-interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
+interface IOMonadError<E> : MonadError<IOPartialOf<E>, Throwable>, IOApplicativeError<E>, IOMonad<E> {
 
   override fun <A> just(a: A): IO<Nothing, A> = IO.just(a)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<Nothing, B> =
-    fix().ap(ff)
+  override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+    Ap(ff)
 
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<Nothing, B> =
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
     fix().map(f)
 
-  override fun <A> IOOf<A>.attempt(): IO<Nothing, Either<Throwable, A>> =
+  override fun <A> IOOf<E, A>.attempt(): IO<E, Either<Throwable, A>> =
     fix().attempt()
 
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<Nothing, A> =
-    HandleErrorWith(f)
+  override fun <A> IOOf<E, A>.handleErrorWith(f: (Throwable) -> IOOf<E, A>): IO<E, A> =
+    HandleErrorWith(f, { e -> IO.raiseError(e) })
 
-  override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<Nothing, B> =
-    fix().redeemWith(fe, fb)
+  override fun <A, B> IOOf<E, A>.redeemWith(fe: (Throwable) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<E, B> =
+    RedeemWith({ t -> fe(t) }, { e -> IO.raiseError(e) }, { a -> fb(a) })
 
   override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
     IO.raiseException(e)
 }
 
 @extension
-interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
+interface IOMonadThrow<E> : MonadThrow<IOPartialOf<E>>, IOMonadError<E>
 
 @extension
-interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
-  override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<Nothing, B> =
-    fix().bracketCase(release, use)
-
-  override fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<Nothing, B> =
-    fix().bracket(release, use)
-
-  override fun <A> IOOf<A>.guarantee(finalizer: IOOf<Unit>): IO<Nothing, A> =
-    fix().guarantee(finalizer)
-
-  override fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<Nothing, A> =
-    GuaranteeCase(finalizer)
+interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
+  override fun <A, B> IOOf<E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+    // Capture `E` into `Either`
+    RedeemWith({ t -> IO.raiseException<Either<E, A>>(t) }, { e -> IO.just(Left(e)) }, { a -> IO.just(Right(a)) })
+      .BracketCase<Either<E, A>, E, Either<E, B>>(release = { a, ex ->
+        when (a) {
+          is Either.Right -> { // Release resource.
+            when (ex) {
+              ExitCase2.Completed -> release(a.b, ExitCase.Completed).fix()
+              ExitCase2.Canceled -> release(a.b, ExitCase.Canceled).fix()
+              is ExitCase2.Exception -> release(a.b, ExitCase.Error(ex.exception)).fix()
+              is ExitCase2.Error -> throw AssertionError("Unreachable") // E is `Nothing`.
+            }
+          }
+          is Either.Left -> IO.just(Unit) //Short-circuit
+        }
+      }, use = {
+        when (it) {
+          is Either.Right -> use(it.b).map { b -> Right(b) } // Resource acquired
+          is Either.Left -> IO.just(it) //Short-circuit
+        }
+      }).flatMap { res ->
+        when (res) {  //Lift Either back into IO
+          is Either.Right -> IO.just(res.b)
+          is Either.Left -> IO.raiseError<E, B>(res.a)
+        }
+      }
 }
 
 @extension
-interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
-  override fun <A> defer(fa: () -> IOOf<A>): IO<Nothing, A> =
+interface IOMonadDefer<E> : MonadDefer<IOPartialOf<E>>, IOBracket<E> {
+  override fun <A> defer(fa: () -> IOOf<E, A>): IO<E, A> =
     IO.defer(fa)
 
   override fun lazy(): IO<Nothing, Unit> = IO.lazy
 }
 
 @extension
-interface IOAsync : Async<ForIO>, IOMonadDefer {
-  override fun <A> async(fa: Proc<A>): IO<Nothing, A> =
-    IO.async(fa)
+interface IOAsync<E> : Async<IOPartialOf<E>>, IOMonadDefer<E> {
+  override fun <A> async(fa: Proc<A>): IO<E, A> =
+    IO.async { cb ->
+      fa { result ->
+        when (result) {
+          is Either.Left -> cb(IOResult.Exception(result.a))
+          is Either.Right -> cb(IOResult.Success(result.b))
+        }
+      }
+    }
 
-  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<Nothing, A> =
-    IO.asyncF(k)
+  override fun <A> asyncF(k: ProcF<IOPartialOf<E>, A>): IO<E, A> =
+    IO.asyncF { cb ->
+      k { result ->
+        when (result) {
+          is Either.Left -> cb(IOResult.Exception(result.a))
+          is Either.Right -> cb(IOResult.Success(result.b))
+        }
+      }
+    }
 
-  override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<Nothing, A> =
+  override fun <A> IOOf<E, A>.continueOn(ctx: CoroutineContext): IO<E, A> =
     fix().continueOn(ctx)
 
   override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<Nothing, A> =
@@ -174,51 +208,51 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
-interface IOConcurrent : Concurrent<ForIO>, IOAsync {
-  override fun <A> Kind<ForIO, A>.fork(coroutineContext: CoroutineContext): IO<Nothing, Fiber<ForIO, A>> =
+interface IOConcurrent : Concurrent<IOPartialOf<E>>, IOAsync {
+  override fun <A> Kind<IOPartialOf<E>, A>.fork(coroutineContext: CoroutineContext): IO<Nothing, Fiber<IOPartialOf<E>, A>> =
     fix().fork(coroutineContext)
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<E>>): Kind<IOPartialOf<E>, A> =
     IO.cancelable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<Nothing, A> =
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<IOPartialOf<E>>>): IO<Nothing, A> =
     IO.cancelableF(k)
 
-  override fun <A, B> CoroutineContext.racePair(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<Nothing, RacePair<ForIO, A, B>> =
+  override fun <A, B> CoroutineContext.racePair(fa: Kind<IOPartialOf<E>, A>, fb: Kind<IOPartialOf<E>, B>): IO<Nothing, RacePair<IOPartialOf<E>, A, B>> =
     IO.racePair(this, fa, fb)
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<Nothing, RaceTriple<ForIO, A, B, C>> =
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<IOPartialOf<E>, A>, fb: Kind<IOPartialOf<E>, B>, fc: Kind<IOPartialOf<E>, C>): IO<Nothing, RaceTriple<IOPartialOf<E>, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
 
-  override fun <A, B, C> CoroutineContext.parMapN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, f: (A, B) -> C): Kind<ForIO, C> =
+  override fun <A, B, C> CoroutineContext.parMapN(fa: Kind<IOPartialOf<E>, A>, fb: Kind<IOPartialOf<E>, B>, f: (A, B) -> C): Kind<IOPartialOf<E>, C> =
     IO.parMapN(this@parMapN, fa, fb, f)
 
-  override fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>, f: (A, B, C) -> D): Kind<ForIO, D> =
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<IOPartialOf<E>, A>, fb: Kind<IOPartialOf<E>, B>, fc: Kind<IOPartialOf<E>, C>, f: (A, B, C) -> D): Kind<IOPartialOf<E>, D> =
     IO.parMapN(this@parMapN, fa, fb, fc, f)
 }
 
-fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
-  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+fun IO.Companion.concurrent(dispatchers: Dispatchers<IOPartialOf<E>>): Concurrent<IOPartialOf<E>> = object : IOConcurrent {
+  override fun dispatchers(): Dispatchers<IOPartialOf<E>> = dispatchers
 }
 
-fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
+fun IO.Companion.timer(CF: Concurrent<IOPartialOf<E>>): Timer<IOPartialOf<E>> =
   Timer(CF)
 
 @extension
-interface IOEffect : Effect<ForIO>, IOAsync {
-  override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Nothing, Unit> =
+interface IOEffect<E> : Effect<IOPartialOf<E>>, IOAsync<E> {
+  override fun <A> IOOf<E, A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<E, Unit>): IO<Nothing, Unit> =
     fix().runAsync(cb)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
-interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+interface IOConcurrentEffect<E> : ConcurrentEffect<IOPartialOf<E>>, IOEffect, IOConcurrent {
 
-  override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Nothing, Disposable> =
+  override fun <A> IOOf<E, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Nothing, Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
-fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
-  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<IOPartialOf<E>>): ConcurrentEffect<IOPartialOf<E>> = object : IOConcurrentEffect {
+  override fun dispatchers(): Dispatchers<IOPartialOf<E>> = dispatchers
 }
 
 @extension
@@ -227,7 +261,7 @@ interface IOSemigroup<A> : Semigroup<IO<Nothing, A>> {
   fun SG(): Semigroup<A>
 
   override fun IO<Nothing, A>.combine(b: IO<Nothing, A>): IO<Nothing, A> =
-    flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
+    FlatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
 }
 
 @extension
@@ -241,27 +275,27 @@ interface IOMonoid<A> : Monoid<IO<Nothing, A>>, IOSemigroup<A> {
 }
 
 @extension
-interface IOUnsafeRun : UnsafeRun<ForIO> {
+interface IOUnsafeRun : UnsafeRun<IOPartialOf<E>> {
 
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<IOPartialOf<E>, A>): A = fa().fix().unsafeRunSync()
 
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<IOPartialOf<E>, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 }
 
 @extension
-interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+interface IOUnsafeCancellableRun : UnsafeCancellableRun<IOPartialOf<E>> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<IOPartialOf<E>, A>): A = fa().fix().unsafeRunSync()
 
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<IOPartialOf<E>, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 
-  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
+  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<IOPartialOf<E>, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
     fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
 }
 
 @extension
-interface IODispatchers : Dispatchers<ForIO> {
+interface IODispatchers<E> : Dispatchers<IOPartialOf<E>> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
 
@@ -270,8 +304,8 @@ interface IODispatchers : Dispatchers<ForIO> {
 }
 
 @extension
-interface IOEnvironment : Environment<ForIO> {
-  override fun dispatchers(): Dispatchers<ForIO> =
+interface IOEnvironment<E> : Environment<IOPartialOf<E>> {
+  override fun dispatchers(): Dispatchers<IOPartialOf<E>> =
     IO.dispatchers()
 
   override fun handleAsyncError(e: Throwable): IO<Nothing, Unit> =
@@ -279,18 +313,18 @@ interface IOEnvironment : Environment<ForIO> {
 }
 
 @extension
-interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
+interface IODefaultConcurrent : Concurrent<IOPartialOf<E>>, IOConcurrent {
 
-  override fun dispatchers(): Dispatchers<ForIO> =
+  override fun dispatchers(): Dispatchers<IOPartialOf<E>> =
     IO.dispatchers()
 }
 
-fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
+fun <E> IO.Companion.timer(): Timer<IOPartialOf<E>> = Timer(IO.concurrent())
 
 @extension
-interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
+interface IODefaultConcurrentEffect<E> : ConcurrentEffect<IOPartialOf<E>>, IOConcurrentEffect, IODefaultConcurrent
 
-fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<Nothing, A> =
+fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<E>>.() -> A): IO<Nothing, A> =
   defer { IO.concurrent().fx.concurrent(c).fix() }
 
 /**

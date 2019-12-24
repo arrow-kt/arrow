@@ -20,7 +20,6 @@ import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -134,7 +133,7 @@ class MonoKTest : UnitSpec() {
 
       MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.async<Nothing> { _, _ -> } },
+          use = { MonoK.async<Nothing> { } },
           release = { _, exitCase ->
             MonoK {
               ec = exitCase
@@ -150,24 +149,11 @@ class MonoKTest : UnitSpec() {
       ec shouldBe ExitCase.Canceled
     }
 
-    "MonoK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
-        MonoK {
-          MonoK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.mono.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .expectNext(Unit)
-        .expectComplete()
-    }
-
     "MonoK async should be cancellable" {
       Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
         .flatMap { latch ->
           MonoK {
-            MonoK.async<Unit> { _, _ -> }
+            MonoK.async<Unit> { }
               .value()
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -177,14 +163,6 @@ class MonoKTest : UnitSpec() {
         .test()
         .expectNext(Unit)
         .expectComplete()
-    }
-
-    "KindConnection can cancel upstream" {
-      MonoK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .expectError(ConnectionCancellationException::class)
     }
   }
 }
