@@ -7,7 +7,7 @@ import it.msec.kio.runtime.Runtime
 
 object Pure {
 
-  fun kioPureLoop(size: Int, i: Int): UIO<Nothing, Int> =
+  fun kioPureLoop(size: Int, i: Int): UIO<Int> =
     just(i).flatMap { j ->
       if (j > size) just(j) else kioPureLoop(size, j + 1)
     }
