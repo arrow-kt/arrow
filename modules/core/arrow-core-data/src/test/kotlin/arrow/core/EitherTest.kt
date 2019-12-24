@@ -26,6 +26,7 @@ import arrow.test.generators.either
 import arrow.test.generators.genK
 import arrow.test.generators.id
 import arrow.test.generators.intSmall
+import arrow.test.generators.throwable
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
@@ -50,7 +51,14 @@ class EitherTest : UnitSpec() {
       BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, Eq.any()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
-      MonadErrorLaws.laws(Either.monadError(), Either.functor(), Either.applicative(), Either.monad(), Either.eqK(throwableEQ)),
+      MonadErrorLaws.laws(
+        Either.monadError(),
+        Either.functor(),
+        Either.applicative(),
+        Either.monad(),
+        Either.genK(Gen.throwable()),
+        Either.eqK(throwableEQ)
+      ),
       TraverseLaws.laws(Either.traverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),

@@ -66,7 +66,7 @@ class FreeTest : UnitSpec() {
 
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
-    fun <S> GK() = object : GenK<FreePartialOf<S>> {
+    fun <S> freeGENK() = object : GenK<FreePartialOf<S>> {
       override fun <A> genK(gen: Gen<A>): Gen<Kind<FreePartialOf<S>, A>> =
         gen.map {
           it.free<S, A>()
@@ -91,12 +91,17 @@ class FreeTest : UnitSpec() {
         }
     }
 
+    fun opsGENK() = object : GenK<FreePartialOf<ForOps>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreePartialOf<ForOps>, A>> =
+        Gen.ops(Gen.int()) as Gen<Kind<FreePartialOf<ForOps>, A>>
+    }
+
     testLaws(
       EqLaws.laws(EQ, Gen.ops(Gen.int())),
-      MonadLaws.laws(Ops, opsEQK),
-      MonadLaws.laws(Free.monad(), Free.functor(), Free.applicative(), Free.monad(), opsEQK),
-      FoldableLaws.laws(Free.foldable(Id.foldable()), GK()),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), GK(), idEQK)
+      MonadLaws.laws(Ops, opsGENK(), opsEQK),
+      MonadLaws.laws(Free.monad(), Free.functor(), Free.applicative(), Free.monad(), opsGENK(), opsEQK),
+      FoldableLaws.laws(Free.foldable(Id.foldable()), freeGENK()),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), freeGENK(), idEQK)
     )
 
     "Can interpret an ADT as Free operations to Option" {
@@ -120,4 +125,12 @@ class FreeTest : UnitSpec() {
 }
 
 private fun Gen.Companion.ops(gen: Gen<Int>) =
-  gen.map { Ops.value(it) }
+  Gen.oneOf(
+    gen.map { Ops.value(it) },
+    Gen.bind(gen, gen) { a, b ->
+      Ops.add(a, b)
+    },
+    Gen.bind(gen, gen) { a, b ->
+      Ops.subtract(a, b)
+    }
+  )

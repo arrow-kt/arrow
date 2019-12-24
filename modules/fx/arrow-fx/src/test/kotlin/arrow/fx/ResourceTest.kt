@@ -13,6 +13,7 @@ import arrow.fx.extensions.resource.monoid.monoid
 import arrow.fx.extensions.resource.selective.selective
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.forFew
@@ -30,19 +31,15 @@ class ResourceTest : UnitSpec() {
       compare.unsafeRunTimed(5.seconds) == Some(true)
     }
 
-    fun EQK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
-      override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
-        (this.fix() to other.fix()).let {
-          val ls = it.first.invoke { IO.just(1) }.fix()
-          val rs = it.second.invoke { IO.just(1) }.fix()
-          val compare = IO.applicative().map(ls, rs) { (l, r) -> l == r }.fix()
-
-          compare.unsafeRunTimed(5.seconds) == Some(true)
-        }
-    }
-
     testLaws(
-      MonadLaws.laws(Resource.monad(IO.bracket()), Resource.functor(IO.bracket()), Resource.applicative(IO.bracket()), Resource.selective(IO.bracket()), EQK()),
+      MonadLaws.laws(
+        Resource.monad(IO.bracket()),
+        Resource.functor(IO.bracket()),
+        Resource.applicative(IO.bracket()),
+        Resource.selective(IO.bracket()),
+        Resource.genK(),
+        Resource.eqK()
+      ),
       MonoidLaws.laws(Resource.monoid(Int.monoid(), IO.bracket()), Gen.int().map { Resource.just(it, IO.bracket()) }, EQ)
     )
 
@@ -56,5 +53,22 @@ class ResourceTest : UnitSpec() {
         l == released.reversed()
       }
     }
+  }
+}
+
+private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
+  override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      val ls = it.first.invoke { IO.just(1) }.fix()
+      val rs = it.second.invoke { IO.just(1) }.fix()
+      val compare = IO.applicative().map(ls, rs) { (l, r) -> l == r }.fix()
+
+      compare.unsafeRunTimed(5.seconds) == Some(true)
+    }
+}
+
+private fun Resource.Companion.genK() = object : GenK<ResourcePartialOf<ForIO, Throwable>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ResourcePartialOf<ForIO, Throwable>, A>> = gen.map {
+    Resource.just(it, IO.bracket())
   }
 }

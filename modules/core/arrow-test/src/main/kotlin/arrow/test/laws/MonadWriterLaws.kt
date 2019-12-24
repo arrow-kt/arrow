@@ -5,6 +5,7 @@ import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.typeclasses.MonadWriter
+import arrow.test.generators.GenK
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -40,10 +41,11 @@ object MonadWriterLaws {
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     genW: Gen<W>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     EQW: Eq<W>
   ): List<Law> =
-    MonadLaws.laws(MF, EQK) +
+    MonadLaws.laws(MF, GENK, EQK) +
       monadWriterLaws(MW, MOW, genW, EQK, EQW)
 
   fun <F, W> laws(
@@ -54,10 +56,11 @@ object MonadWriterLaws {
     AP: Apply<F>,
     SL: Selective<F>,
     genW: Gen<W>,
+    GENK: GenK<F>,
     EQK: EqK<F>,
     EQW: Eq<W>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, SL, EQK) + monadWriterLaws(MW, MOW, genW, EQK, EQW)
+    MonadLaws.laws(MF, FF, AP, SL, GENK, EQK) + monadWriterLaws(MW, MOW, genW, EQK, EQW)
 
   fun <F, W> MonadWriter<F, W>.monadWriterWriterJust(
     MOW: Monoid<W>,
