@@ -107,7 +107,7 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  *
  * There are at least 3 possible things we would like to do:
  *
- * - Discard all results; i.e., return `Void`.
+ * - Discard all results; i.e., return `Unit`.
  * - Discard all intermediate results and just keep the last produced result.
  * - Keep all intermediate results.
  *
