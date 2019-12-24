@@ -122,8 +122,7 @@ class ScheduleTest : UnitSpec() {
       ),
       AlternativeLaws.laws(
         Schedule.alternative<ForId, Int>(Id.monad()),
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just({ j: Int -> j + i }) },
+        Schedule.genK<ForId, Int>(Id.monad()),
         EQK(Id.eqK(), Id.monad(), 0)
       ),
       ProfunctorLaws.laws(
