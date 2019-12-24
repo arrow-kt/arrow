@@ -16,6 +16,8 @@ import arrow.core.toT
 import arrow.core.validNel
 import arrow.fx.typeclasses.Concurrent
 import java.nio.file.Path
+import kotlin.math.ln
+import kotlin.math.pow
 
 /**
  * From https://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
@@ -23,9 +25,9 @@ import java.nio.file.Path
 fun Long.humanBytes(): String {
   val unit = 1024
   if (this < unit) return toString() + " B"
-  val exp = (Math.log(toDouble()) / Math.log(unit.toDouble())).toInt()
+  val exp = (ln(toDouble()) / ln(unit.toDouble())).toInt()
   val pre = ("KMGTPE")[exp - 1] + "i"
-  return String.format("%.1f %sB", this / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+  return String.format("%.1f %sB", this / unit.toDouble().pow(exp.toDouble()), pre)
 }
 
 fun <A> toValidatedNel(a: Either<Throwable, A>): ValidatedNel<Throwable, A> =

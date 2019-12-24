@@ -1,9 +1,11 @@
 package arrow.ank
 
+import kotlin.math.max
+
 private fun getMaxLength(strings: List<String>): Int {
   var len = Integer.MIN_VALUE
   for (str in strings) {
-    len = Math.max(str.length, len)
+    len = max(str.length, len)
   }
   return len
 }
