@@ -17,7 +17,7 @@ class OptionModuleTest : UnitSpec() {
 
   init {
     "serializing Option should be the same as serializing a nullable value" {
-      assertAll(Gen.option(Gen.oneOf(Gen.someObject(), Gen.int(), Gen.string(), Gen.bool())))  { option ->
+      assertAll(Gen.option(Gen.oneOf(Gen.someObject(), Gen.int(), Gen.string(), Gen.bool()))) { option ->
         val actual = mapper.writeValueAsString(option)
         val expected = mapper.writeValueAsString(option.orNull())
 
