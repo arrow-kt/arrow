@@ -67,9 +67,6 @@ interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFu
   override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
     fix().ap(MF(), ff)
 
-  override fun <A, B> StateTOf<F, S, A>.product(fb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
-    fix().product(MF(), fb)
-
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
     flatMap(MF()) { a -> ff().map { f -> f(a) } }
 }
@@ -90,7 +87,7 @@ interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F,
     StateT.tailRecM(MF(), a, f)
 
   override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(MF(), this) { f, a -> f(a) }
+    fix().ap(MF(), ff.fix())
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
     flatMap(MF()) { a -> ff().map { f -> f(a) } }

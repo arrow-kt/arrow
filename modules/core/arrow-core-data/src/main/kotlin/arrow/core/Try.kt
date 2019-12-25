@@ -627,7 +627,7 @@ sealed class Try<out A> : TryOf<A> {
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
   }
 
-  fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
