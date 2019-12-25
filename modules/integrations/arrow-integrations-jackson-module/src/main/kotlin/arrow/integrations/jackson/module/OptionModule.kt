@@ -113,7 +113,9 @@ private object OptionDeserializerResolver : Deserializers.Base() {
   private val OPTION = Option::class.java
 
   override fun findBeanDeserializer(
-    type: JavaType, config: DeserializationConfig, beanDesc: BeanDescription
+    type: JavaType,
+    config: DeserializationConfig,
+    beanDesc: BeanDescription
   ): JsonDeserializer<Option<*>>? {
     val rawClass = type.rawClass
 
