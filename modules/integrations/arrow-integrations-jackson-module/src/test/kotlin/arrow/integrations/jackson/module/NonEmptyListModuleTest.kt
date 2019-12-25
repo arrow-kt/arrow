@@ -34,8 +34,3 @@ class NonEmptyListModuleTest : UnitSpec() {
     }
   }
 }
-
-private data class SomeObject(val someString: String, val someInt: Int)
-
-private fun Gen.Companion.someObject(): Gen<SomeObject> =
-  bind(string(), int()) { str, int -> SomeObject(str, int) }
