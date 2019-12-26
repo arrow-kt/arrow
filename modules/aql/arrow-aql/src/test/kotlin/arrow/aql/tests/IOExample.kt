@@ -1,8 +1,6 @@
 package arrow.aql.tests
 
 import arrow.core.Option
-import arrow.core.left
-import arrow.core.right
 import arrow.fx.IO
 import arrow.fx.IOResult
 import arrow.fx.flatMapLeft
