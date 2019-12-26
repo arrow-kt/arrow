@@ -28,7 +28,7 @@ class CallKindAdapterFactoryTest : UnitSpec() {
       val exceptionIO = shouldThrow<IllegalArgumentException> {
         factory.get(IO::class.java, NO_ANNOTATIONS, retrofit)
       }
-      exceptionIO.message shouldBe "Return type must be parameterized as IO<Nothing, Foo> or IO<Nothing, out Foo>"
+      exceptionIO.message shouldBe "Return type must be parameterized as IO<Foo> or IO<out Foo>"
     }
 
     "Should work for CallK types" {
