@@ -53,7 +53,7 @@ Arrow provides [`UnalignLaws`][functor_laws_source]{:target="_blank"} in the for
 #### Creating your own `Unalign` instances
 
 Arrow already provides Unalign instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
-and accomanying testcases for reference.
+and accompanying testcases for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 

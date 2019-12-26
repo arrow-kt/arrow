@@ -107,7 +107,7 @@ val personDB: Map<Int, Person> = mapOf(
       )
 )
 
-val adressDB: Map<Int, Address> = mapOf(
+val addressDB: Map<Int, Address> = mapOf(
   1 to Address(
     id = 1,
     country = Some(
@@ -131,7 +131,7 @@ fun findPerson(personId: Int): ObservableK<Either<BizError, Person>> =
 
 fun findCountry(addressId: Int): ObservableK<Either<BizError, Country>> =
   ObservableK.just(
-    Option.fromNullable(adressDB.get(addressId))
+    Option.fromNullable(addressDB.get(addressId))
       .flatMap { it.country }
       .toEither { CountryNotFound(addressId) }
   ) //mock impl for simplicity
