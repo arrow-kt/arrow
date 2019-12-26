@@ -204,7 +204,7 @@ Add the dependencies that you want to use
 
 #### Enabling kapt
 
-Enable annotaton processing using kotlin plugin 
+Enable annotation processing using kotlin plugin 
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>

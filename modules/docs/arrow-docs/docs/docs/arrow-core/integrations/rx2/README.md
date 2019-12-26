@@ -173,7 +173,7 @@ ObservableK.fx {
 }
 ```
 
-Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.
+Note that any unexpected exception, like `ArithmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the observable.
 
 ### Subscription and cancellation
 
