@@ -41,8 +41,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseException -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> return currentIO
             else -> {
@@ -53,8 +52,7 @@ internal object IORunLoop {
           }
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> return currentIO as IO<E, A>
             else -> {

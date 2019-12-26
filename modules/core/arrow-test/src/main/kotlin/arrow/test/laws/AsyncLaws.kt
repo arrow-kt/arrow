@@ -4,15 +4,22 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.eq
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
+import arrow.test.laws.AsyncLaws.bracketReleaseIscalledOnCompletedOrError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext
@@ -22,13 +29,10 @@ object AsyncLaws {
   private val one = newSingleThreadContext("1")
   private val two = newSingleThreadContext("2")
 
-  fun <F> laws(
-    AC: Async<F>,
-    EQ: Eq<Kind<F, Int>>,
-    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    testStackSafety: Boolean = true
-  ): List<Law> =
-    MonadDeferLaws.laws(AC, EQ, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
+  private fun <F> asyncLaws(AC: Async<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+
+    return listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
@@ -39,6 +43,28 @@ object AsyncLaws {
       Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
       Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
     )
+  }
+
+  fun <F> laws(
+    AC: Async<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety) +
+      asyncLaws(AC, EQK)
+
+  fun <F> laws(
+    AC: Async<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety) +
+      asyncLaws(AC, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
@@ -99,7 +125,7 @@ object AsyncLaws {
           }
         })
 
-        asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().`as`(Unit) } }
+        asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().mapConst(Unit) } }
           .flatMap { promise.get() }
       }.equalUnderTheLaw(just(b), EQ)
     }

@@ -1,26 +1,26 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.mtl.Kleisli
-import arrow.mtl.KleisliPartialOf
 import arrow.core.Either
 import arrow.core.Id
 import arrow.core.Tuple2
-import arrow.mtl.ReaderApi
-import arrow.mtl.ReaderPartialOf
-import arrow.mtl.ForKleisli
-import arrow.mtl.KleisliOf
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.extension
+import arrow.mtl.ForKleisli
+import arrow.mtl.Kleisli
+import arrow.mtl.KleisliOf
+import arrow.mtl.KleisliPartialOf
+import arrow.mtl.ReaderApi
+import arrow.mtl.ReaderPartialOf
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.run
 import arrow.mtl.typeclasses.MonadReader
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -29,14 +29,16 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.undocumented
-import arrow.extension
-import arrow.typeclasses.Alternative
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -110,12 +112,15 @@ interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, 
 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
     Kleisli { AF().run { run(it).product(fb.run(it)) } }
+
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
+    Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
 }
 
 @extension
-interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
+interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliApply<F, D> {
 
-  fun AF(): Applicative<F>
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 
@@ -124,12 +129,6 @@ interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, Kleisl
 
   override fun <A, B> KleisliOf<F, D, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(AF(), f)
-
-  override fun <A, B> KleisliOf<F, D, A>.ap(ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(AF(), ff)
-
-  override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli { AF().run { run(it).product(fb.run(it)) } }
 }
 
 @extension
@@ -150,6 +149,9 @@ interface KleisliMonad<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
     Kleisli.tailRecM(MF(), a, f)
+
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
+    Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
 }
 
 @extension
@@ -228,3 +230,19 @@ fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
 fun <F, D, A> Kleisli.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
   Kleisli.monad<F, D>(MF).fx.monad(c).fix()
+
+@extension
+interface KleisliEqK<F, D> : EqK<KleisliPartialOf<F, D>> {
+  fun EQKF(): EqK<F>
+  fun d(): D
+
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.eqK(other: Kind<KleisliPartialOf<F, D>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      val ls = it.first.run(d())
+      val rs = it.second.run(d())
+
+      EQKF().liftEq(EQ).run {
+        ls.eqv(rs)
+      }
+    }
+}

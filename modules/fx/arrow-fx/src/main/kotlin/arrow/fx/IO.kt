@@ -16,6 +16,8 @@ import arrow.fx.IO.Companion.async
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
+import arrow.fx.extensions.io.monadError.monadError
+import arrow.fx.extensions.timer
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
@@ -1158,7 +1160,9 @@ fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A
 
 fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
   fix().unsafeRunSyncEither()
-    .fold(::identity, ::identity)
+    .fold({
+      throw AssertionError()
+    }, ::identity)
 
 fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
   fix().unsafeRunAsyncEither { result ->
@@ -1177,3 +1181,6 @@ fun <A> IOOf<Nothing, A>.unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, 
       is IOResult.Error -> result.error
     }
   }
+
+fun <A, B> IOOf<Nothing, A>.repeat(schedule: Schedule<IOPartialOf<Nothing>, A, B>): IO<Nothing, B> =
+  repeat(IO.monadError(), IO.timer(), schedule).fix()

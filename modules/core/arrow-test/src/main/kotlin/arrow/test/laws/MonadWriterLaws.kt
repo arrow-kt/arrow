@@ -2,29 +2,65 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Tuple2
+import arrow.core.extensions.eq
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.typeclasses.MonadWriter
+import arrow.test.generators.GenK
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadWriterLaws {
+
+  private fun <F, W> monadWriterLaws(
+    MW: MonadWriter<F, W>,
+    MOW: Monoid<W>,
+    genW: Gen<W>,
+    EQK: EqK<F>,
+    EQW: Eq<W>
+  ): List<Law> {
+    val EQ_INT = EQK.liftEq(Int.eq())
+    val EQ_TUPLE = EQK.liftEq(Tuple2.eq(EQW, Int.eq()))
+    val GEN_TUPLE = Gen.bind(genW, Gen.int(), ::Tuple2)
+
+    return listOf(
+      Law("Monad Writer Laws: writer just") { MW.monadWriterWriterJust(MOW, EQ_INT) },
+      Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW) },
+      Law("Monad Writer Laws: listen just") { MW.monadWriterListenJust(MOW, EQ_TUPLE) },
+      Law("Monad Writer Laws: listen writer") { MW.monadWriterListenWriter(GEN_TUPLE, EQ_TUPLE) })
+  }
 
   fun <F, W> laws(
     MF: Monad<F>,
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     genW: Gen<W>,
-    genTupleWA: Gen<Tuple2<W, Int>>,
-    EqInt: Eq<Kind<F, Int>>,
-    EqTupleWA: Eq<Kind<F, Tuple2<W, Int>>>
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    EQW: Eq<W>
   ): List<Law> =
-    MonadLaws.laws(MF, EqInt) + listOf(
-      Law("Monad Writer Laws: writer just") { MW.monadWriterWriterJust(MOW, EqInt) },
-      Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW) },
-      Law("Monad Writer Laws: listen just") { MW.monadWriterListenJust(MOW, EqTupleWA) },
-      Law("Monad Writer Laws: listen writer") { MW.monadWriterListenWriter(genTupleWA, EqTupleWA) })
+    MonadLaws.laws(MF, GENK, EQK) +
+      monadWriterLaws(MW, MOW, genW, EQK, EQW)
+
+  fun <F, W> laws(
+    MF: Monad<F>,
+    MW: MonadWriter<F, W>,
+    MOW: Monoid<W>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    genW: Gen<W>,
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    EQW: Eq<W>
+  ): List<Law> =
+    MonadLaws.laws(MF, FF, AP, SL, GENK, EQK) + monadWriterLaws(MW, MOW, genW, EQK, EQW)
 
   fun <F, W> MonadWriter<F, W>.monadWriterWriterJust(
     MOW: Monoid<W>,

@@ -45,13 +45,16 @@ interface Monad<F> : Selective<F> {
 
   /** @see [Apply.ap] */
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
-    ff.flatMap { f -> this.map(f) }
+    flatMap { a -> ff.map { f -> f(a) } }
 
   fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
     flatMap(::identity)
 
-  fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
+  override fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
     flatMap { fb }
+
+  override fun <A, B> Kind<F, A>.apTap(fb: Kind<F, B>): Kind<F, A> =
+    flatTap { fb }
 
   fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
     flatMap { fb.value() }
@@ -96,6 +99,9 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
+
+  override fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> =
+    flatMap { a -> ff().map { f -> f(a) } }
 }
 
 interface MonadFx<F> {

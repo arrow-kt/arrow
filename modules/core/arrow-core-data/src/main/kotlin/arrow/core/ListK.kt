@@ -8,8 +8,6 @@ import arrow.typeclasses.Applicative
  *
  * ank_macro_hierarchy(arrow.core.ListK)
  *
- * {:.beginner}
- * beginner
  *
  * ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
  *
@@ -154,11 +152,11 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       else -> false
     }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }
+  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
-    foldRight(Eval.always { GA.just(emptyList<B>().k()) }) { a, eval ->
-      GA.run { f(a).map2Eval(eval) { (listOf(it.a) + it.b).k() } }
+    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
+      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { a: B -> (listOf(a) + xs).k() } } } } }
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =

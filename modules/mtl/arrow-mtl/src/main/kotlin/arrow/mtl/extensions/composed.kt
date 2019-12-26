@@ -7,11 +7,13 @@ import arrow.mtl.typeclasses.ComposedTraverse
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
-import arrow.typeclasses.FunctorFilter
-import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.TraverseFilter
 
 interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFunctor<F, G> {
   override fun F(): Functor<F>
@@ -59,4 +61,13 @@ interface ComposedTraverseFilter<F, G> :
         override fun GT(): TraverseFilter<G> = GF
       }
   }
+}
+
+fun <F, G> EqK<F>.nested(EQKG: EqK<G>): EqK<Nested<F, G>> = object : EqK<Nested<F, G>> {
+  override fun <A> Kind<Nested<F, G>, A>.eqK(other: Kind<Nested<F, G>, A>, EQ: Eq<A>): Boolean =
+    (this.unnest() to other.unnest()).let { (a, b) ->
+      this@nested.liftEq(EQKG.liftEq(EQ)).run {
+        a.eqv(b)
+      }
+    }
 }

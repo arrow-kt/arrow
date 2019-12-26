@@ -68,7 +68,6 @@ In case you're adding docs for a data type or a type class, be sure to add a new
 
 If you're adding a data type, go to other already existing data type docs to follow the same approach.
 Do the same for type class, and any other doc sections.
-  * Use proper `{:.beginner} / {:.intermediate} / {:.advanced}` tags per section to reflect the difficulty of it.
   * Use proper Ank snippet configurations (more details in policies section below).
 
 ## Doc snippets policies

@@ -42,7 +42,7 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
     map.iterator().iterateRight(Eval.always { just(emptyMap<K, B>().k()) }) { kv, lbuf ->
-      f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
+      Eval.later { f(kv.value).lazyAp { lbuf.value().map { m -> { b: B -> (mapOf(kv.key to b).k() + m).k() } } } }
     }.value()
   }
 

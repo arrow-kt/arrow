@@ -6,6 +6,8 @@ import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
+import arrow.core.ap
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
@@ -13,15 +15,18 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
+import arrow.extension
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf
-import arrow.mtl.fix
 import arrow.mtl.extensions.eithert.monadThrow.monadThrow
-import arrow.mtl.value
-import arrow.extension
+import arrow.mtl.fix
 import arrow.mtl.typeclasses.ComposedTraverse
 import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.compose
+import arrow.mtl.typeclasses.unnest
+import arrow.mtl.value
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -29,18 +34,17 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowSyntax
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
-import arrow.mtl.typeclasses.compose
-import arrow.mtl.typeclasses.unnest
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.Monoid
 import arrow.undocumented
 
 @extension
@@ -66,13 +70,20 @@ interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, 
 
   override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
     fix().ap(AF(), ff)
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.lazyAp(ff: () -> Kind<EitherTPartialOf<F, L>, (A) -> B>): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      AF().run {
+        fix().value().lazyAp { ff().value().map { r -> { l: Either<L, A> -> l.ap(r) } } }
+      }
+    )
 }
 
 @extension
 @undocumented
-interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTApply<F, L> {
 
-  fun AF(): Applicative<F>
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 
@@ -81,9 +92,6 @@ interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, Either
 
   override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
     fix().map(AF(), f)
-
-  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
-    fix().ap(AF(), ff)
 }
 
 @extension
@@ -105,6 +113,13 @@ interface EitherTMonad<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
     EitherT.tailRecM(MF(), a, f)
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.lazyAp(ff: () -> Kind<EitherTPartialOf<F, L>, (A) -> B>): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      AF().run {
+        fix().value().lazyAp { ff().value().map { r -> { l: Either<L, A> -> l.ap(r) } } }
+      }
+    )
 }
 
 @extension
@@ -324,3 +339,17 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
 
 fun <F, L, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, L>>.() -> R): EitherT<F, L, R> =
   EitherT.monadThrow<F, L>(M, M).fx.monadThrow(c).fix()
+
+@extension
+interface EitherTEqK<F, L> : EqK<EitherTPartialOf<F, L>> {
+  fun EQKF(): EqK<F>
+
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<EitherTPartialOf<F, L>, R>.eqK(other: Kind<EitherTPartialOf<F, L>, R>, EQ: Eq<R>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQKF().liftEq(Either.eq(EQL(), EQ)).run {
+        it.first.value().eqv(it.second.value())
+      }
+    }
+}

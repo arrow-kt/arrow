@@ -37,6 +37,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
         set -ex
         sudo pip install awscli
@@ -56,3 +57,4 @@ jobs:
         # Waiting for AWS configuration to active this part:
         # aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET/$MAYOR_MINOR_VERSION > aws_sync_jekyll.log
         aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET > aws_sync_jekyll.log
+        aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*" > aws_sync_jekyll.log

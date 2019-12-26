@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
@@ -23,7 +24,11 @@ import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -41,7 +46,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers<Nothing>().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent<String>(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.genK(), IO.eqK()))
 
     "should defer evaluation until run" {
       var run = false
@@ -607,4 +612,21 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
 
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
+}
+
+private fun IO.Companion.eqK() = object : EqK<IOPartialOf<Nothing>> {
+  override fun <A> Kind<IOPartialOf<Nothing>, A>.eqK(other: Kind<IOPartialOf<Nothing>, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      IO_EQ(EQ).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+private fun IO.Companion.genK() = object : GenK<IOPartialOf<Nothing>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<IOPartialOf<Nothing>, A>> =
+    Gen.oneOf(
+      gen.map { IO.just(it) },
+      Gen.throwable().map { IO.raiseException<A>(it) }
+    )
 }

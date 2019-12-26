@@ -1,22 +1,9 @@
 nav:
-    - title: Blog
-      url: /blog
-      icon: "fa-rss"
+    - title: Media
+      url: https://media.arrow-kt.io
 
     - title: Github
       url: https://github.com/arrow-kt/arrow
-      icon: "fa-github"
 
     - title: License
       url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
-      icon: "fa-creative-commons"
-
-tab:
-    - title: All
-      url: /blog
-
-    - title: Media
-      url: /blog/media
-
-    - title: News
-      url: /blog/news
