@@ -23,7 +23,7 @@ object BitraverseLaws {
     val G = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
 
-    return BifoldableLaws.laws(BT, G, Eq.any()) + listOf(Law("Bitraverse Laws: Identity") { BT.identityBitraverse(BT, G, EQ) })
+    return BifoldableLaws.laws(BT, GENK) + listOf(Law("Bitraverse Laws: Identity") { BT.identityBitraverse(BT, G, EQ) })
   }
 
   fun <F> Bitraverse<F>.identityBitraverse(BT: Bitraverse<F>, GEN: Gen<Kind2<F, Int, Int>>, EQ: Eq<Kind2<F, Int, Int>>) =
