@@ -12,7 +12,6 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Success
 import arrow.core.Try
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.fix
 import arrow.fx.extensions.io.monadError.monadError
@@ -23,6 +22,8 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
+import arrow.fx.IOPartialOf
+import arrow.fx.unsafeRunSync
 import arrow.streams.internal.freec.eq.eq
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
@@ -64,7 +65,7 @@ val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : 
 }
 
 @Suppress("UNCHECKED_CAST")
-val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> {
+val ioInterpreter: FunctionK<ForOps, IOPartialOf<Nothing>> = object : FunctionK<ForOps, IOPartialOf<Nothing>> {
   override fun <A> invoke(fa: Kind<ForOps, A>): IO<Nothing, A> {
     val op = fa.fix()
     return when (op) {
@@ -112,7 +113,7 @@ class FreeCTest : UnitSpec() {
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(eitherInterpreter, Either.monadError()).fix() shouldBe Right(Some(-30))
-      program.foldMap(ioInterpreter, IO.monadError()).fix().unsafeRunSync() shouldBe Some(-30)
+      program.foldMap(ioInterpreter, IO.monadError()).unsafeRunSync() shouldBe Some(-30)
     }
 
     "foldMap is stack safe" {
@@ -120,7 +121,6 @@ class FreeCTest : UnitSpec() {
       val hugeProg = stackSafeTestProgram(0, n)
       hugeProg
         .foldMap(ioInterpreter, IO.monadError())
-        .fix()
         .unsafeRunSync() shouldBe Some(n)
 
       hugeProg.foldMap(eitherInterpreter, Either.monadError()).fix() shouldBe Right(Some(n))

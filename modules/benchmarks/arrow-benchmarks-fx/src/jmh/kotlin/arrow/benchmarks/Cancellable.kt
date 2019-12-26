@@ -4,6 +4,8 @@ import arrow.core.Right
 import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.fix
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -25,7 +27,7 @@ open class Cancellable {
   var size: Int = 0
 
   fun evalCancelable(n: Int): IO<Nothing, Int> =
-    IO.concurrent().cancelable<Int> { cb ->
+    IO.concurrent<Nothing>().cancelable<Int> { cb ->
       cb(Right(n))
       IO.unit
     }.fix()

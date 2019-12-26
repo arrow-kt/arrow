@@ -2,6 +2,8 @@ package arrow.benchmarks
 
 import arrow.fx.IO
 import arrow.fx.IODispatchers
+import arrow.fx.followedBy
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
