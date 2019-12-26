@@ -60,10 +60,10 @@ class EitherTest : UnitSpec() {
         Either.eqK(throwableEQ)
       ),
       TraverseLaws.laws(Either.traverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
-      BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
+      BitraverseLaws.laws(Either.bitraverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
-      BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, Eq.any())
+      BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK(Gen.int()), Either.eqK(String.eq()))
     )
 
     "empty should return a Right of the empty of the inner type" {

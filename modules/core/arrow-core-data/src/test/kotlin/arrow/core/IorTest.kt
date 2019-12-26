@@ -1,8 +1,6 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.Kind2
-import arrow.core.Ior.Right
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.ior.applicative.applicative
@@ -63,9 +61,9 @@ class IorTest : UnitSpec() {
         Ior.eqK(Int.eq())
       ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
-      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any()),
+      BitraverseLaws.laws(Ior.bitraverse(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Gen.ior(Gen.int(), Gen.int()) as Gen<Kind<IorPartialOf<Int>, Int>>, Eq.any())
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK(Gen.int()), Ior.eqK(String.eq()))
     )
 
     "bimap() should allow modify both value" {

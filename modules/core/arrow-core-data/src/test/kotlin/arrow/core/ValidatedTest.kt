@@ -21,7 +21,6 @@ import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -46,7 +45,11 @@ class ValidatedTest : UnitSpec() {
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),
         Validated.eqK(String.eq())),
-      BitraverseLaws.laws(Validated.bitraverse(), ::Valid, Eq.any())
+      BitraverseLaws.laws(
+        Validated.bitraverse(),
+        Validated.genK(Gen.int()),
+        Validated.eqK(Int.eq())
+      )
     )
 
     "fold should call function on Invalid" {
