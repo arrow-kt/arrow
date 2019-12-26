@@ -3,12 +3,11 @@ package arrow.fx
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.identity
-import arrow.core.right
 import arrow.fx.IO.Companion.just
-import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -122,7 +121,7 @@ class IOTest : UnitSpec() {
       val never = just<Int?>(null)
       val received = never.unsafeRunTimed(100.milliseconds)
 
-      received shouldBe Some(null)
+      received shouldBe Some(Right(null))
     }
 
     "should return a null value from unsafeRunSync" {
@@ -383,7 +382,7 @@ class IOTest : UnitSpec() {
             }
         IO(other) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
+      }.unsafeRunTimed(2.seconds) shouldBe Some(Right(OnCancel.CancellationException))
     }
 
     "IOFrame should always be called when using IO.Bind" {
@@ -500,27 +499,27 @@ class IOTest : UnitSpec() {
     }
 
     "IOParMap2 left handles null" {
-      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
+      IO.parMapN(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap2 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+      IO.parMapN(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 left handles null" {
-      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+      IO.parMapN(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 middle handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+      IO.parMapN(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+      IO.parMapN(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 

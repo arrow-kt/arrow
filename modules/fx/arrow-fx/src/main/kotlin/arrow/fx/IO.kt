@@ -1161,7 +1161,12 @@ fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
     .fold(::identity, ::identity)
 
 fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
-  fix().unsafeRunAsyncEither {
+  fix().unsafeRunAsyncEither { result ->
+    when (result) {
+      is IOResult.Success -> f(Right(result.value))
+      is IOResult.Exception -> f(Left(result.exception))
+      is IOResult.Error -> result.error
+    }
   }
 
 fun <A> IOOf<Nothing, A>.unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
