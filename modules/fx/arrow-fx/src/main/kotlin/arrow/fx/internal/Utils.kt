@@ -13,7 +13,7 @@ import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOOf
 import arrow.fx.IOResult
-import arrow.fx.IOResult
+import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.locks.AbstractQueuedSynchronizer

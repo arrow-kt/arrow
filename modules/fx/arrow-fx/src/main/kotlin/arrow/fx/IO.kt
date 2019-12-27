@@ -16,6 +16,7 @@ import arrow.fx.IO.Companion.async
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
@@ -707,7 +708,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
       }
       ccb(IOResult.Success(conn.toDisposable()))
       IORunLoop.startCancelable(this, conn, onCancelCb)
-    }.unsafeRunSync().fold(::identity, ::identity)
+    }.unsafeRunSync()
 
   /**
    * [unsafeRunSync] allows you to run any [IO] to its wrapped value [A].
@@ -1152,7 +1153,9 @@ fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A
 
 fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
   fix().unsafeRunSyncEither()
-    .fold(::identity, ::identity)
+    .fold({
+      TODO()
+    }, ::identity)
 
 fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
   fix().unsafeRunAsyncEither { result ->
@@ -1171,3 +1174,9 @@ fun <A> IOOf<Nothing, A>.unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, 
       is IOResult.Error -> result.error
     }
   }
+
+fun <A, B> IOOf<Nothing, A>.repeat(schedule: Schedule<IOPartialOf<Nothing>, A, B>): IO<Nothing, B> =
+  repeat(IO.concurrent(), schedule).fix()
+
+fun <A, B> IOOf<Nothing, A>.retry(schedule: Schedule<IOPartialOf<Nothing>, Throwable, B>): IO<Nothing, A> =
+  retry(IO.concurrent(), schedule).fix()

@@ -10,6 +10,7 @@ import arrow.core.fix
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.typeclasses.milliseconds
 import arrow.test.UnitSpec
 import arrow.test.generators.tuple2
@@ -26,7 +27,7 @@ class QueueTest : UnitSpec() {
 
     fun tests(
       label: String,
-      ctx: CoroutineContext = Dispatchers.Default,
+      ctx: CoroutineContext = IO.dispatchers<Nothing>().default(),
       queue: (Int) -> IO<Nothing, Queue<IOPartialOf<Nothing>, Int>>
     ) {
 

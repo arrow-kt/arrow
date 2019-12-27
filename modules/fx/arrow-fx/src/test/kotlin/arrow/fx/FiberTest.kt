@@ -29,9 +29,9 @@ class FiberTest : UnitSpec() {
       }
     }
 
-    fun EQK() = object : EqK<FiberPartialOf<ForIO>> {
-      override fun <A> Kind<FiberPartialOf<ForIO>, A>.eqK(other: Kind<FiberPartialOf<ForIO>, A>, EQ: Eq<A>): Boolean =
-        EQ<A>().run {
+    fun EQK() = object : EqK<FiberPartialOf<IOPartialOf<Nothing>>> {
+      override fun <A> Kind<FiberPartialOf<IOPartialOf<Nothing>>, A>.eqK(other: Kind<FiberPartialOf<IOPartialOf<Nothing>>, A>, EQ: Eq<A>): Boolean =
+        IO_EQ(EQ).run {
           this@eqK.fix().join().eqv(other.fix().join())
         }
     }

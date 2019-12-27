@@ -33,8 +33,8 @@ class ResourceTest : UnitSpec() {
     }
 
     testLaws(
-      MonadLaws.laws(
-        Resource.monad(IO.bracket<Nothing>()),
+      MonadLaws.laws<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>>(
+        Resource.monad(IO.bracket()),
         Resource.functor(IO.bracket()),
         Resource.applicative(IO.bracket()),
         Resource.selective(IO.bracket()),
@@ -57,19 +57,19 @@ class ResourceTest : UnitSpec() {
   }
 }
 
-private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
-  override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
+private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>> {
+  override fun <A> Kind<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
       val ls = it.first.invoke { IO.just(1) }.fix()
       val rs = it.second.invoke { IO.just(1) }.fix()
-      val compare = IO.applicative().map(ls, rs) { (l, r) -> l == r }.fix()
+      val compare = IO.applicative<Nothing>().map(ls, rs) { (l, r) -> l == r }.fix()
 
-      compare.unsafeRunTimed(5.seconds) == Some(true)
+      compare.unsafeRunTimed(5.seconds) == Some(Right(true))
     }
 }
 
-private fun Resource.Companion.genK() = object : GenK<ResourcePartialOf<ForIO, Throwable>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ResourcePartialOf<ForIO, Throwable>, A>> = gen.map {
-    Resource.just(it, IO.bracket())
+private fun Resource.Companion.genK() = object : GenK<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>, A>> = gen.map {
+    Resource.just(it, IO.bracket<Nothing>())
   }
 }

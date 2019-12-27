@@ -16,7 +16,6 @@ import arrow.core.Try
 import arrow.fx.IO
 import arrow.fx.fix
 import arrow.fx.extensions.io.monadError.monadError
-import arrow.higherkind
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monadError.monadError
@@ -27,7 +26,6 @@ import arrow.core.right
 import arrow.core.some
 import arrow.fx.IOPartialOf
 import arrow.fx.unsafeRunSync
-import arrow.fx.ForIO
 import arrow.fx.extensions.io.monadError.monadError
 import arrow.higherkind
 import arrow.streams.internal.freec.applicative.applicative
