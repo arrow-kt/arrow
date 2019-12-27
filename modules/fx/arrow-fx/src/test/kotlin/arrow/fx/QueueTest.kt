@@ -18,7 +18,6 @@ import arrow.test.generators.tuple3
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
-import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 class QueueTest : UnitSpec() {
