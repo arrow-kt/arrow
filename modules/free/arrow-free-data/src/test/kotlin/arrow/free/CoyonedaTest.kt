@@ -1,5 +1,7 @@
 package arrow.free
 
+import arrow.Kind
+import arrow.Kind2
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.Id
@@ -11,19 +13,34 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.free.extensions.coyoneda.functor.functor
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 class CoyonedaTest : UnitSpec() {
-  val EQ: Eq<CoyonedaOf<ForId, Int, Int>> = Eq { a, b ->
-    a.fix().lower(Id.functor()) == b.fix().lower(Id.functor())
+
+  val EQK = object : EqK<CoyonedaPartialOf<ForId, Int>> {
+    override fun <A> Kind<CoyonedaPartialOf<ForId, Int>, A>.eqK(other: Kind<CoyonedaPartialOf<ForId, Int>, A>, EQ: Eq<A>): Boolean {
+      return this.fix().lower(Id.functor()) == other.fix().lower(Id.functor())
+    }
+  }
+
+  fun genk() = object : GenK<Kind2<ForCoyoneda, ForId, Int>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, A>> =
+      gen.map {
+        Coyoneda(Id(0)) {
+          it
+        }
+      } as Gen<Kind<Kind2<ForCoyoneda, ForId, Int>, A>>
   }
 
   init {
 
-    testLaws(FunctorLaws.laws(Coyoneda.functor(), { _ -> Coyoneda(Id(0)) { it } }, EQ))
+    testLaws(FunctorLaws.laws(Coyoneda.functor(), genk(), EQK))
 
     "map should be stack-safe" {
       val loops = 10000

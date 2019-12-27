@@ -42,7 +42,7 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 
 ### Next development version
 
-If you want to try the last features, replace `0.10.3` by `0.10.4-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.10.4` by `0.10.5-SNAPSHOT` in the following guideline.
 
 ### JDK
 
@@ -78,7 +78,7 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -91,7 +91,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -104,7 +104,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -117,7 +117,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
@@ -141,7 +141,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.3"
+def arrow_version = "0.10.4"
 dependencies {
     ...
     kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
@@ -183,7 +183,7 @@ Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-     <arrow.version>0.10.3</arrow.version>
+     <arrow.version>0.10.4</arrow.version>
 </properties>
 ```
 
@@ -204,7 +204,7 @@ Add the dependencies that you want to use
 
 #### Enabling kapt
 
-Enable annotaton processing using kotlin plugin 
+Enable annotation processing using kotlin plugin 
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>

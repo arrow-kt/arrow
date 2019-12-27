@@ -4,7 +4,6 @@ import arrow.Kind2
 import arrow.core.extensions.align
 import arrow.core.extensions.eq
 import arrow.core.extensions.foldable
-import arrow.core.extensions.functor
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semialign
@@ -43,9 +42,9 @@ class SortedMapKTest : UnitSpec() {
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),
-        SortedMapK.functor<String>(),
-        { a: Int -> sortedMapOf("key" to a).k() },
-        EQ),
+              SortedMapK.genK(Gen.string()),
+        SortedMapK.eqK(String.eq())
+      ),
       AlignLaws.laws(SortedMapK.align<String>(),
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),

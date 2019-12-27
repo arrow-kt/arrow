@@ -67,10 +67,13 @@ interface SingleKApplicative : Applicative<ForSingleK> {
 
   override fun <A> just(a: A): SingleK<A> =
     SingleK.just(a)
+
+  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface SingleKMonad : Monad<ForSingleK> {
+interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
@@ -83,8 +86,8 @@ interface SingleKMonad : Monad<ForSingleK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
-  override fun <A> just(a: A): SingleK<A> =
-    SingleK.just(a)
+  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

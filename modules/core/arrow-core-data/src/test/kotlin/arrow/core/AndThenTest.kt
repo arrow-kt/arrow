@@ -1,44 +1,55 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.extensions.monoid
+import arrow.core.extensions.andthen.applicative.applicative
 import arrow.core.extensions.andthen.category.category
 import arrow.core.extensions.andthen.contravariant.contravariant
+import arrow.core.extensions.andthen.functor.functor
 import arrow.core.extensions.andthen.monad.monad
 import arrow.core.extensions.andthen.monoid.monoid
 import arrow.core.extensions.andthen.profunctor.profunctor
 import arrow.core.extensions.list.foldable.foldLeft
+import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.counnest
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 class AndThenTest : UnitSpec() {
 
-  val ConestedEQ: Eq<Kind<Conested<ForAndThen, Int>, Int>> = Eq { a, b ->
-    a.counnest().invoke(1) == b.counnest().invoke(1)
-  }
-
   val EQ: Eq<AndThenOf<Int, Int>> = Eq { a, b ->
     a(1) == b(1)
+  }
+
+  val conestedEQK = object : EqK<Conested<ForAndThen, Int>> {
+    override fun <A> Kind<Conested<ForAndThen, Int>, A>.eqK(other: Kind<Conested<ForAndThen, Int>, A>, EQ: Eq<A>): Boolean =
+      this@eqK.counnest().invoke(1) == other.counnest().invoke(1)
+  }
+
+  fun conestedGENK() = object : GenK<Conested<ForAndThen, Int>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForAndThen, Int>, A>> = gen.map {
+      AndThen.just<Int, A>(it).conest()
+    } as Gen<Kind<Conested<ForAndThen, Int>, A>>
   }
 
   init {
 
     testLaws(
-      MonadLaws.laws(AndThen.monad(), EQ),
+      MonadLaws.laws(AndThen.monad(), AndThen.functor(), AndThen.applicative(), AndThen.monad(), AndThen.genK<Int>(), AndThen.eqK<Int>()),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant(), { AndThen.just<Int, Int>(it).conest() }, ConestedEQ),
+      ContravariantLaws.laws(AndThen.contravariant<Int>(), conestedGENK(), conestedEQK),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
     )
@@ -97,4 +108,20 @@ class AndThenTest : UnitSpec() {
       }.toString() shouldBe "AndThen.Concat(...)"
     }
   }
+}
+
+private fun <A> AndThen.Companion.eqK() = object : EqK<AndThenPartialOf<A>> {
+  override fun <B> Kind<AndThenPartialOf<A>, B>.eqK(other: Kind<AndThenPartialOf<A>, B>, EQ: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let { (ls, rs) ->
+      EQ.run {
+        ls(1).eqv(rs(1))
+      }
+    }
+}
+
+private fun <A> AndThen.Companion.genK() = object : GenK<AndThenPartialOf<A>> {
+  override fun <B> genK(gen: Gen<B>): Gen<Kind<AndThenPartialOf<A>, B>> =
+    gen.map {
+      AndThen.just<A, B>(it)
+    }
 }

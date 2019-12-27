@@ -43,7 +43,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * fun closeConsumer(consumer: Consumer): IO<Nothing, Unit> = IO { println("Closed consumer") }
  * fun closeDBHandle(handle: Handle): IO<Nothing, Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
+ * fun shutDownFancyService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val program = IO.fx {
@@ -55,7 +55,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *   // <...>
  *
  *   // we are done, now onto releasing resources
- *   !shutDownFanceService(service)
+ *   !shutDownFancyService(service)
  *   !closeDBHandle(handle)
  *   !closeConsumer(consumer)
  * }
@@ -84,13 +84,13 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * fun closeConsumer(consumer: Consumer): IO<Nothing, Unit> = IO { println("Closed consumer") }
  * fun closeDBHandle(handle: Handle): IO<Nothing, Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
+ * fun shutDownFancyService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val bracketProgram =
  *   createConsumer().bracket(::closeConsumer) { consumer ->
  *     createDBHandle().bracket(::closeDBHandle) { handle ->
- *       createFancyService(consumer, handle).bracket(::shutDownFanceService) { service ->
+ *       createFancyService(consumer, handle).bracket(::shutDownFancyService) { service ->
  *         // use service
  *         // <...>
  *         IO.unit
@@ -125,13 +125,13 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * fun closeConsumer(consumer: Consumer): IO<Nothing, Unit> = IO { println("Closed consumer") }
  * fun closeDBHandle(handle: Handle): IO<Nothing, Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
+ * fun shutDownFancyService(service: Service): IO<Nothing, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val managedTProgram = Resource.monad(IO.bracket()).fx.monad {
  *   val consumer = Resource(::createConsumer, ::closeConsumer, IO.bracket()).bind()
  *   val handle = Resource(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
- *   Resource({ createFancyService(consumer, handle) }, ::shutDownFanceService, IO.bracket()).bind()
+ *   Resource({ createFancyService(consumer, handle) }, ::shutDownFancyService, IO.bracket()).bind()
  * }.fix().invoke { service ->
  *   // use service
  *   // <...>

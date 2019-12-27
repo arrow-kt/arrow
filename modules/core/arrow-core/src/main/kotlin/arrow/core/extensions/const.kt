@@ -7,6 +7,7 @@ import arrow.core.ConstPartialOf
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.const.eq.eq
 import arrow.core.fix
 import arrow.core.value
 import arrow.extension
@@ -16,6 +17,7 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -143,6 +145,20 @@ interface ConstEq<A, T> : Eq<Const<A, T>> {
 
   override fun Const<A, T>.eqv(b: Const<A, T>): Boolean =
     EQ().run { value().eqv(b.value()) }
+}
+
+@extension
+interface ConstEqK<A> : EqK<ConstPartialOf<A>> {
+
+  fun EQA(): Eq<A>
+
+  override fun <T> Kind<ConstPartialOf<A>, T>.eqK(other: Kind<ConstPartialOf<A>, T>, EQ: Eq<T>): Boolean =
+    (this.fix() to other.fix()).let {
+
+      Const.eq<A, T>(EQA()).run {
+        it.first.eqv(it.second)
+      }
+    }
 }
 
 @extension

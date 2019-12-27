@@ -7,7 +7,7 @@ import it.msec.kio.runtime.Runtime.unsafeRunSyncAndGet
 
 object LeftBind {
 
-  fun loop(depth: Int, size: Int, i: Int): UIO<Int> =
+  fun loop(depth: Int, size: Int, i: Int): UIO<Nothing, Int> =
     when {
         i % depth == 0 -> just(i + 1).flatMap { loop(depth, size, it) }
         i < size -> loop(depth, size, i + 1).flatMap { just(it) }

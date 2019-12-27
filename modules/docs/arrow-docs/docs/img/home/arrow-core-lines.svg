@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="102px" height="110px" viewBox="0 0 102 110" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 55.2 (78181) - https://sketchapp.com -->
+    <title>E6165C5F-C3EF-4D8A-A653-2379A6500CC8</title>
+    <desc>Created with sketchtool.</desc>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Arrow-Home" transform="translate(-272.000000, -789.000000)">
+            <g id="features" transform="translate(160.000000, 792.000000)">
+                <g id="feature/core/black">
+                    <g id="arrow-core-line-black" transform="translate(103.000000, 0.000000)">
+                        <polygon id="shadow7" fill="#263238" opacity="0.1" points="60 -7.12485644e-15 60 50.0295651 83 63.4200016 83 83.8325282 108 96.6400024"></polygon>
+                        <polygon id="shadow6" fill="#263238" opacity="0.1" points="83 63.4200016 96.2924805 91.3169082 83 83.8325282"></polygon>
+                        <polygon id="shadow5" fill="#263238" opacity="0.1" points="83 84.1532557 108.620605 97.1811841 83 91.3169082"></polygon>
+                        <polygon id="shadow4" fill="#263238" opacity="0.1" transform="translate(23.810303, 90.647190) scale(-1, 1) translate(-23.810303, -90.647190) " points="11 84.1332256 36.6206055 97.161154 11 91.2968781"></polygon>
+                        <polygon id="shadow3" fill="#263238" opacity="0.1" points="37 63.4200016 50 71.4733351 50 83.5533354 60 89.5933356 60 104.88651 37 91.606669"></polygon>
+                        <polygon id="shadow2" fill="#263238" opacity="0.1" points="60 88.958762 60 77.0100019 70 71.4733351 70 83.5533354"></polygon>
+                        <polygon id="shadow1" fill="#263238" opacity="0.1" points="37 63.4200016 25.2475586 89.5933356 37 84.1532557"></polygon>
+                        <polyline id="lines6" stroke="#263238" stroke-width="2" transform="translate(60.000000, 48.320001) scale(-1, 1) translate(-60.000000, -48.320001) " points="83.0613281 84.0875373 108 96.6400024 60 0 60 0 12 96.6400024 36.9422852 84.0857186"></polyline>
+                        <polygon id="lines5" stroke="#263238" stroke-width="2" points="59.9965612 49.3266679 83 63.4200016 82.9931224 91.606669 59.9965612 105.700003 37 91.606669 37 63.4200016"></polygon>
+                        <polygon id="lines4" stroke="#263238" stroke-width="2" points="59.9985049 65.433335 70 71.4733351 69.9970097 83.5533354 59.9985049 89.5933356 50 83.5533354 50 71.4733351"></polygon>
+                        <polygon id="lines3" stroke="#263238" stroke-width="2" points="59.9985049 65.433335 70 71.4733351 69.9970097 83.5533354 59.9985049 89.5933356 50 83.5533354 50 71.4733351"></polygon>
+                        <polyline id="lines2" stroke="#263238" stroke-width="2" points="37 63.4200016 60 77.5133353 83 63.4200016"></polyline>
+                        <path d="M60,105.623815 L60,77.0100019" id="lines1" stroke="#263238" stroke-width="2"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -8,6 +8,7 @@ import arrow.core.ForTry
 import arrow.core.FunctionK
 import arrow.core.Left
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Success
@@ -17,21 +18,31 @@ import arrow.fx.fix
 import arrow.fx.extensions.io.monadError.monadError
 import arrow.higherkind
 import arrow.core.extensions.`try`.monadError.monadError
+import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monadError.monadError
+import arrow.core.extensions.option.eq.eq
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
 import arrow.fx.IOPartialOf
 import arrow.fx.unsafeRunSync
+import arrow.fx.ForIO
+import arrow.fx.extensions.io.monadError.monadError
+import arrow.higherkind
+import arrow.streams.internal.freec.applicative.applicative
 import arrow.streams.internal.freec.eq.eq
+import arrow.streams.internal.freec.functor.functor
+import arrow.streams.internal.freec.monad.monad
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -39,14 +50,14 @@ import io.kotlintest.shouldBe
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
 
-  data class Value(val a: Int) : Ops<Int>()
-  data class Add(val a: Int, val y: Int) : Ops<Int>()
-  data class Subtract(val a: Int, val y: Int) : Ops<Int>()
+  data class Value<A>(val a: Int, val k: (Int) -> A) : Ops<A>()
+  data class Add<A>(val a: Int, val y: Int, val k: (Int) -> A) : Ops<A>()
+  data class Subtract<A>(val a: Int, val y: Int, val k: (Int) -> A) : Ops<A>()
 
   companion object : FreeCMonadDefer<ForOps> {
-    fun value(n: Int): FreeC<ForOps, Int> = FreeC.liftF(Value(n))
-    fun add(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Add(n, y))
-    fun subtract(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Subtract(n, y))
+    fun value(n: Int): FreeC<ForOps, Int> = FreeC.liftF(Value(n, ::identity))
+    fun add(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Add(n, y, ::identity))
+    fun subtract(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Subtract(n, y, ::identity))
   }
 }
 
@@ -57,10 +68,10 @@ val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : 
   override fun <A> invoke(fa: Kind<ForOps, A>): Either<Throwable, A> {
     val op = fa.fix()
     return when (op) {
-      is Ops.Add -> Right(op.a + op.y)
-      is Ops.Subtract -> Right(op.a - op.y)
-      is Ops.Value -> Right(op.a)
-    } as Either<Throwable, A>
+      is Ops.Add -> Right(op.k(op.a + op.y))
+      is Ops.Subtract -> Right(op.k(op.a - op.y))
+      is Ops.Value -> Right(op.k(op.a))
+    }
   }
 }
 
@@ -69,9 +80,9 @@ val ioInterpreter: FunctionK<ForOps, IOPartialOf<Nothing>> = object : FunctionK<
   override fun <A> invoke(fa: Kind<ForOps, A>): IO<Nothing, A> {
     val op = fa.fix()
     return when (op) {
-      is Ops.Add -> IO { op.a + op.y }
-      is Ops.Subtract -> IO { op.a - op.y }
-      is Ops.Value -> IO { op.a }
+      is Ops.Add -> IO { op.k(op.a + op.y) }
+      is Ops.Subtract -> IO { op.k(op.a - op.y) }
+      is Ops.Value -> IO { op.k(op.a) }
     } as IO<Nothing, A>
   }
 }
@@ -94,21 +105,42 @@ class FreeCTest : UnitSpec() {
 
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
+    val EQK = object : EqK<FreeCPartialOf<ForOps>> {
+      override fun <A> Kind<FreeCPartialOf<ForOps>, A>.eqK(other: Kind<FreeCPartialOf<ForOps>, A>, EQ: Eq<A>): Boolean =
+        (this.fix() to other.fix()).let { (ls, rs) ->
+          val eq1 = Either.eq(Eq.any(), Option.eq(EQ)) as Eq<Kind<EitherPartialOf<Throwable>, Option<A>>>
+          val eq2 = FreeC.eq<ForOps, EitherPartialOf<Throwable>, A>(Either.monadError(), eitherInterpreter, eq1)
+
+          eq2.run {
+            ls.eqv(rs)
+          }
+        }
+    }
+
+    val opsGENK = object : GenK<FreeCPartialOf<ForOps>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreeCPartialOf<ForOps>, A>> =
+        Gen.bind(Gen.int(), gen) { i, r ->
+          FreeC.liftF(Ops.Value(i) { r })
+        }
+    }
+
     testLaws(
       EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
-        SC = Ops,
-        EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQERR = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
+        Ops,
+        opsGENK,
+        EQK
       )
     )
     testLaws(
       MonadDeferLaws.laws(
         SC = FreeC.monadDefer(),
-        EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-        EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-        EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
+        FF = FreeC.functor(),
+        AP = FreeC.applicative(),
+        SL = FreeC.monad(),
+        GENK = opsGENK,
+        EQK = EQK
+
       ))
 
     "Can interpret an ADT as Free operations" {

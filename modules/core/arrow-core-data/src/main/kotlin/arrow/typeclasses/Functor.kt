@@ -165,13 +165,18 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   "Hello World"._just_()._`as`_("...")
+   *   "Hello World"._just_()._mapConst_("...")
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.`as`(b: B): Kind<F, B> = map { b }
+  fun <A, B> Kind<F, A>.mapConst(b: B): Kind<F, B> = map { b }
+
+  /**
+   * Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
+   */
+  fun <A, B> A.mapConst(fb: Kind<F, B>): Kind<F, A> = fb.mapConst(this)
 
   /**
    * Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>

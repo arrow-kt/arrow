@@ -1,0 +1,44 @@
+// DOC CONTENT FX
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content-fx {
+    .doc-content {
+        a {
+            color: $fx-color;
+        }
+
+        p,
+        ul {
+            code {
+                background: rgba($fx-background, 0.08);
+            }
+        }
+
+        .cm-s-arrow span.cm-keyword {
+            color: $fx-color;
+        }
+        
+                .hljs-variable,
+        .hljs-template-variable,
+        .hljs-tag,
+        .hljs-name,
+        .hljs-selector-id,
+        .hljs-selector-class,
+        .hljs-regexp,
+        .hljs-deletion {
+            color: $fx-color;
+        }
+
+        .button-video {
+            background: $white;
+            border: 2px solid $fx-color;
+            transition: background $base-duration;
+
+            &:hover {
+                background: $fx-color;
+                color: $white;
+            }
+        }
+    }
+}

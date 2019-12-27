@@ -8,7 +8,10 @@ import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.bitraverse.bitraverse
 import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.either.eqK.eqK
+import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.hash.hash
+import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.either.monoid.monoid
 import arrow.core.extensions.either.semigroupK.semigroupK
@@ -16,10 +19,14 @@ import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.either
+import arrow.test.generators.genK
+import arrow.test.generators.id
 import arrow.test.generators.intSmall
+import arrow.test.generators.throwable
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
@@ -34,18 +41,27 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class EitherTest : UnitSpec() {
+
   val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
 
-  init {
+  val throwableEQ: Eq<Throwable> = Eq.any()
 
+  init {
     testLaws(
       BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, Eq.any()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
-      MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
+      MonadErrorLaws.laws(
+        Either.monadError(),
+        Either.functor(),
+        Either.applicative(),
+        Either.monad(),
+        Either.genK(Gen.throwable()),
+        Either.eqK(throwableEQ)
+      ),
+      TraverseLaws.laws(Either.traverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
+      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Gen.either(Gen.int(), Gen.int()) as Gen<Kind<EitherPartialOf<Int>, Int>>, Eq.any())
     )

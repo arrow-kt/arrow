@@ -9,30 +9,22 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()
 
-  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }
+  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
 
   fun <B> map(f: (A) -> B): SequenceK<B> = sequence.map(f).k()
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
-    fun loop(fa_p: SequenceK<A>): Eval<B> = when {
-      fa_p.sequence.none() -> lb
-      else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1).k()) })
-    }
-    return Eval.defer { loop(this) }
+    fun Iterator<A>.loop(): Eval<B> =
+      if (hasNext()) f(next(), Eval.defer { loop() }) else lb
+    return Eval.defer { this.iterator().loop() }
   }
 
-  /**
-   * Note: This will always evaluate the entire sequence because it uses applicative internally which
-   *  takes only strict arguments. This will fail on infinite sequences. If you need this to work on
-   *  infinite sequences your best bet is to define a new traverse instance together with a lazy version of
-   *  ap from Applicative for whatever applicative you want to use.
-   */
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
-    foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
-      GA.run { f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() } }
-    }.value()
+    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
+      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (listOf(b) + xs).k() } } } } }
+    }.value().let { GA.run { it.map { it.asSequence().k() } } }
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->
@@ -58,7 +50,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         f: (A) -> SequenceKOf<Either<A, B>>,
         v: SequenceK<Either<A, B>>
       ) {
-        if (!(v.toList().isEmpty())) {
+        if (v.toList().isNotEmpty()) {
           val head: Either<A, B> = v.first()
           when (head) {
             is Either.Right -> {
