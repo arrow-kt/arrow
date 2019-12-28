@@ -188,7 +188,7 @@ For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monad
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 
 ```kotlin
-fun <F> MonadError<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> = 
+fun <F> MonadError<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
   fx.monadError {
     val (file) = getFile(path)
     val (lines) = file.readLines()
