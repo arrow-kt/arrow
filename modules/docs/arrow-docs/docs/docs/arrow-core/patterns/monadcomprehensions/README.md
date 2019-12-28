@@ -188,8 +188,8 @@ For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monad
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> =
-  IO.fx {
+fun <F> MonadError<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> = 
+  fx.monadError {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -241,4 +241,4 @@ Remember, this means that you have to precompute thread local values, like a thr
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-Check out the section on the Applicative Builder pattern for information about this.
+Check out the section on the [Applicative Builder]({{ '/docs/typeclasses/applicative' | relative_url }}) pattern for information about this.
