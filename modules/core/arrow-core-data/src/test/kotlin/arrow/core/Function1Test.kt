@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.extensions.function1.applicative.applicative
 import arrow.core.extensions.function1.category.category
 import arrow.core.extensions.function1.divisible.divisible
@@ -12,6 +13,7 @@ import arrow.core.extensions.function1.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.Gen2K
 import arrow.test.generators.GenK
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.DivisibleLaws
@@ -20,6 +22,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq2K
 import arrow.typeclasses.EqK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
@@ -47,6 +50,15 @@ class Function1Test : UnitSpec() {
       }
   }
 
+  fun eq2k() = object : Eq2K<ForFunction1> {
+    override fun <A, B> Kind2<ForFunction1, A, B>.eqK(other: Kind2<ForFunction1, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+      (this.fix() to other.fix()).let { (ls, rs) ->
+        EQB.run {
+          ls(1).eqv(rs(1))
+        }
+      }
+  }
+
   fun conestedGENK() = object : GenK<Conested<ForFunction1, Int>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<Conested<ForFunction1, Int>, A>> =
       gen.map {
@@ -60,13 +72,19 @@ class Function1Test : UnitSpec() {
     }
   }
 
+  fun gen2k() = object : Gen2K<ForFunction1> {
+    override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<ForFunction1, A, B>> = genB.map {
+      Function1.just<A, B>(it)
+    }
+  }
+
   init {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
       DivisibleLaws.laws(Function1.divisible(Int.monoid()), conestedGENK(), conestedEQK),
-      ProfunctorLaws.laws(Function1.profunctor(), genk(), EQK(123)),
+      ProfunctorLaws.laws(Function1.profunctor(), gen2k(), eq2k()),
       MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), genk(), EQK(5150)),
-      CategoryLaws.laws(Function1.category(), genk(), EQK(123))
+      CategoryLaws.laws(Function1.category(), gen2k(), eq2k())
     )
 
     "Semigroup of Function1<A> is Function1<Semigroup<A>>" {

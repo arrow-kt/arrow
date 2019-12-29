@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForId
@@ -26,6 +27,7 @@ import arrow.fx.typeclasses.nanoseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.Gen2K
 import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.intSmall
@@ -36,6 +38,7 @@ import arrow.test.laws.ProfunctorLaws
 import arrow.test.laws.SemiringLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq2K
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
@@ -70,10 +73,24 @@ class ScheduleTest : UnitSpec() {
     }
   }
 
+  fun <F, I> EQ2K(fEqK: EqK<F>, MF: Monad<F>, i: I) = object : Eq2K<Kind<ForSchedule, F>> {
+    override fun <A, B> Kind2<Kind<ForSchedule, F>, A, B>.eqK(other: Kind2<Kind<ForSchedule, F>, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+      ((this as Kind<SchedulePartialOf<F, I>, A>) to (other as Kind<SchedulePartialOf<F, I>, A>)).let {
+        EQK(fEqK, MF, i).liftEq(EQA).run {
+          it.first.eqv(it.second)
+        }
+      }
+  }
+
   // This is a bad gen. But generating random schedules is weird
   fun <F, I> Schedule.Companion.genK(MF: Monad<F>): GenK<SchedulePartialOf<F, I>> = object : GenK<SchedulePartialOf<F, I>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<SchedulePartialOf<F, I>, A>> =
       gen.applicative(Schedule.applicative<F, I>(MF))
+  }
+
+  fun <F> Schedule.Companion.gen2k(MF: Monad<F>) = object : Gen2K<Kind<ForSchedule, F>> {
+    override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Kind<ForSchedule, F>, A, B>> =
+      Schedule.genK<F, A>(MF).genK(genB)
   }
 
   fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object : GenK<DecisionPartialOf<Any?>> {
@@ -127,13 +144,13 @@ class ScheduleTest : UnitSpec() {
       ),
       ProfunctorLaws.laws(
         Schedule.profunctor(),
-        Schedule.genK<ForId, Int>(Id.monad()),
-        EQK(Id.eqK(), Id.monad(), 0)
+        Schedule.gen2k(Id.monad()),
+        EQ2K(Id.eqK(), Id.monad(), 0)
       ),
       CategoryLaws.laws(
         Schedule.category(Id.monad()),
-        Schedule.genK<ForId, Int>(Id.monad()),
-        EQK(Id.eqK(), Id.monad(), 0)
+        Schedule.gen2k(Id.monad()),
+        EQ2K(Id.eqK(), Id.monad(), 0)
       )
     )
 
@@ -256,7 +273,11 @@ class ScheduleTest : UnitSpec() {
         val eff = SideEffect()
         val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
 
-        val res = IO { if (eff.counter <= n) { eff.increment(); throw RuntimeException("WOOO") } else Unit }
+        val res = IO {
+          if (eff.counter <= n) {
+            eff.increment(); throw RuntimeException("WOOO")
+          } else Unit
+        }
           .retry(IO.monadThrow(), refTimer(ref), schedule)
           .attempt()
           .fix().unsafeRunSync()

@@ -1,20 +1,19 @@
 package arrow.test.laws
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.eq
-import arrow.test.generators.GenK
+import arrow.test.generators.Gen2K
 import arrow.typeclasses.Category
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
+import arrow.typeclasses.Eq2K
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object CategoryLaws {
 
-  fun <F> laws(C: Category<F>, GENK: GenK<Kind<F, Int>>, EQK: EqK<Kind<F, Int>>): List<Law> {
-    val G = GENK.genK(Gen.int())
-    val EQ = EQK.liftEq(Int.eq())
+  fun <F> laws(C: Category<F>, GENK: Gen2K<F>, EQK: Eq2K<F>): List<Law> {
+    val G = GENK.genK(Gen.int(), Gen.int())
+    val EQ = EQK.liftEq(Int.eq(), Int.eq())
 
     return categoryLaws<F>(C, G, EQ)
   }

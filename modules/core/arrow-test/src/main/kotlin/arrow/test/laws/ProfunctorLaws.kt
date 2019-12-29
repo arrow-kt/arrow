@@ -1,23 +1,22 @@
 package arrow.test.laws
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.andThen
 import arrow.core.extensions.eq
-import arrow.test.generators.GenK
+import arrow.test.generators.Gen2K
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
+import arrow.typeclasses.Eq2K
 import arrow.typeclasses.Profunctor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object ProfunctorLaws {
 
-  fun <F> laws(PF: Profunctor<F>, GENK: GenK<Kind<F, Int>>, EQK: EqK<Kind<F, Int>>): List<Law> {
+  fun <F> laws(PF: Profunctor<F>, GENK: Gen2K<F>, EQK: Eq2K<F>): List<Law> {
 
-    val G = GENK.genK(Gen.int())
-    val EQ = EQK.liftEq(Int.eq())
+    val G = GENK.genK(Gen.int(), Gen.int())
+    val EQ = EQK.liftEq(Int.eq(), Int.eq())
 
     return listOf(
       Law("Profunctor Laws: Identity") { PF.identity(G, EQ) },
