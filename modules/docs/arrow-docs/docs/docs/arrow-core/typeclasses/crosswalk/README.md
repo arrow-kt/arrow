@@ -33,7 +33,7 @@ ListK.crosswalk().run {
 }
 ```
 
-#### saquenceL
+#### sequenceL
 
 `fun <F, A> sequenceL(ALIGN: Align<F>, tfa: Kind<T, Kind<F, A>>): Kind<F, Kind<T, A>>`
 

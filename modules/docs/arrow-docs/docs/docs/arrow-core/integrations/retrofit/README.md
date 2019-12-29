@@ -53,7 +53,7 @@ interface ApiClientTest {
 }
 ```
 
-You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}) intances as your data wrapper.
+You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}) instances as your data wrapper.
 
 ### Using `CallK` with `IO`
 

@@ -32,6 +32,7 @@ import arrow.streams.internal.freec.functor.functor
 import arrow.streams.internal.freec.monad.monad
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
@@ -45,14 +46,14 @@ import io.kotlintest.shouldBe
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
 
-  data class Value(val a: Int) : Ops<Int>()
-  data class Add(val a: Int, val y: Int) : Ops<Int>()
-  data class Subtract(val a: Int, val y: Int) : Ops<Int>()
+  data class Value<A>(val a: Int, val k: (Int) -> A) : Ops<A>()
+  data class Add<A>(val a: Int, val y: Int, val k: (Int) -> A) : Ops<A>()
+  data class Subtract<A>(val a: Int, val y: Int, val k: (Int) -> A) : Ops<A>()
 
   companion object : FreeCMonadDefer<ForOps> {
-    fun value(n: Int): FreeC<ForOps, Int> = FreeC.liftF(Value(n))
-    fun add(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Add(n, y))
-    fun subtract(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Subtract(n, y))
+    fun value(n: Int): FreeC<ForOps, Int> = FreeC.liftF(Value(n, ::identity))
+    fun add(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Add(n, y, ::identity))
+    fun subtract(n: Int, y: Int): FreeC<ForOps, Int> = FreeC.liftF(Subtract(n, y, ::identity))
   }
 }
 
@@ -63,10 +64,10 @@ val eitherInterpreter: FunctionK<ForOps, EitherPartialOf<Throwable>> = object : 
   override fun <A> invoke(fa: Kind<ForOps, A>): Either<Throwable, A> {
     val op = fa.fix()
     return when (op) {
-      is Ops.Add -> Right(op.a + op.y)
-      is Ops.Subtract -> Right(op.a - op.y)
-      is Ops.Value -> Right(op.a)
-    } as Either<Throwable, A>
+      is Ops.Add -> Right(op.k(op.a + op.y))
+      is Ops.Subtract -> Right(op.k(op.a - op.y))
+      is Ops.Value -> Right(op.k(op.a))
+    }
   }
 }
 
@@ -75,10 +76,10 @@ val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> 
   override fun <A> invoke(fa: Kind<ForOps, A>): IO<A> {
     val op = fa.fix()
     return when (op) {
-      is Ops.Add -> IO { op.a + op.y }
-      is Ops.Subtract -> IO { op.a - op.y }
-      is Ops.Value -> IO { op.a }
-    } as IO<A>
+      is Ops.Add -> IO { op.k(op.a + op.y) }
+      is Ops.Subtract -> IO { op.k(op.a - op.y) }
+      is Ops.Value -> IO { op.k(op.a) }
+    }
   }
 }
 
@@ -112,10 +113,18 @@ class FreeCTest : UnitSpec() {
         }
     }
 
+    val opsGENK = object : GenK<FreeCPartialOf<ForOps>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<FreeCPartialOf<ForOps>, A>> =
+        Gen.bind(Gen.int(), gen) { i, r ->
+          FreeC.liftF(Ops.Value(i) { r })
+        }
+    }
+
     testLaws(
       EqLaws.laws(EQ, genOps()),
       MonadDeferLaws.laws(
         Ops,
+        opsGENK,
         EQK
       )
     )
@@ -125,6 +134,7 @@ class FreeCTest : UnitSpec() {
         FF = FreeC.functor(),
         AP = FreeC.applicative(),
         SL = FreeC.monad(),
+        GENK = opsGENK,
         EQK = EQK
 
       ))

@@ -36,12 +36,12 @@ sum.changeSide(Sum.Side.Right).extract(Store.comonad(), Store.comonad())
 As Sum is also a `Comonad`, we have access to `coflatmap` and `map` for changing the `extract` result.
 
 ```kotlin:ank
-val overridenSum = sum.coflatmap(Store.comonad(), Store.comonad()) {
+val overriddenSum = sum.coflatmap(Store.comonad(), Store.comonad()) {
   when (it.side) {
     is Sum.Side.Left -> "Current side is Left"
     is Sum.Side.Right -> "Current side is Right"
   }
 }
 
-overridenSum.extract(Store.comonad(), Store.comonad())
+overriddenSum.extract(Store.comonad(), Store.comonad())
 ```

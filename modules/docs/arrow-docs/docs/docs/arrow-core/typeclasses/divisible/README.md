@@ -12,7 +12,7 @@ redirect_from:
 
 
 `Divisible` extends upon `Divide` by providing an empty method called `conquer`.
-`conquer` is useful for proving identiy laws when working with `Divisible` instances.
+`conquer` is useful for proving identity laws when working with `Divisible` instances.
 
 Extending the serializer example from `Divide`, `conquer` would simply serialize data to an empty string.
 

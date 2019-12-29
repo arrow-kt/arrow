@@ -66,7 +66,7 @@ Option.semigroup(Int.semigroup()).run {
 
 Many of these types have methods defined directly on them, which allow for this example of combining: `+` on `List`. But the value of having a `Semigroup` typeclass available is that these compose.
 
-Additionaly, `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
+Additionally, `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
 
 ```kotlin:ank
 Option.semigroup(Int.semigroup()).run {

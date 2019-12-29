@@ -85,7 +85,7 @@ val personDB: Map<Int, Person> = mapOf(
       )
 )
 
-val adressDB: Map<Int, Address> = mapOf(
+val addressDB: Map<Int, Address> = mapOf(
   1 to Address(
     id = 1,
     country = Some(
@@ -108,7 +108,7 @@ fun findPerson(personId : Int) : ObservableK<Option<Person>> =
 
 fun findCountry(addressId : Int) : ObservableK<Option<Country>> =
   ObservableK.just(
-    Option.fromNullable(adressDB.get(addressId)).flatMap { it.country }
+    Option.fromNullable(addressDB.get(addressId)).flatMap { it.country }
   ) //mock impl for simplicity
 
 ```

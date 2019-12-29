@@ -169,7 +169,7 @@ Add the dependencies that you want to use:
 
 #### Enabling kapt
 
-Enable annotaton processing using Kotlin plugin:
+Enable annotation processing using Kotlin plugin:
 ```
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>

@@ -12,11 +12,7 @@ import io.kotlintest.properties.forAll
 object SemigroupKLaws {
 
   fun <F> laws(SGK: SemigroupK<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
-    laws(SGK, GENK.genK(Gen.int()), EQK)
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(SGK: SemigroupK<F>, GEN: Gen<Kind<F, Int>>, EQK: EqK<F>): List<Law> =
-    listOf(Law("SemigroupK: associativity") { SGK.semigroupKAssociative(GEN, EQK.liftEq(Int.eq())) })
+    listOf(Law("SemigroupK: associativity") { SGK.semigroupKAssociative(GENK.genK(Gen.int()), EQK.liftEq(Int.eq())) })
 
   fun <F> SemigroupK<F>.semigroupKAssociative(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(GEN, GEN, GEN) { a, b, c ->
