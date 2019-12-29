@@ -74,6 +74,7 @@ include {
 
         integrations {
             _ 'integrations-retrofit-adapter'
+            _ 'integrations-jackson-module'
         }
 
         recursion {

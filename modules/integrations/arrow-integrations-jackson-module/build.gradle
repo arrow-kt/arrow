@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    compile project(':arrow-core-data')
+    compile project(':arrow-syntax')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7"
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile project(':arrow-test')
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
+    testCompile "io.kotlintest:kotlintest-assertions-json:$kotlinTestVersion"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

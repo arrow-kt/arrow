@@ -99,7 +99,7 @@ Composing an `Iso` with functions can also be useful for changing the input or o
 
 ```kotlin
 val unknownCode: (String) -> String? = { value ->
-    "unkown $value"
+    "unknown $value"
 }
 
 val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()

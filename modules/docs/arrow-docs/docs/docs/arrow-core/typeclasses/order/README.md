@@ -35,7 +35,7 @@ import arrow.core.extensions.*
 Int.order().run { 1.compare(2) }
 ```
 
-Additionaly, `Order` overloads operators `>`, `<`, `<=`, and `>=`, following the Kotlin `compareTo` convention for every type where an `Order` instance exists.
+Additionally, `Order` overloads operators `>`, `<`, `<=`, and `>=`, following the Kotlin `compareTo` convention for every type where an `Order` instance exists.
 
 ```kotlin:ank
 Int.order().run { 1 > 2 }
