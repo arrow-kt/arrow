@@ -6,6 +6,7 @@ import arrow.core.extensions.semigroup
 import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
+import arrow.core.extensions.validated.eq2K.eq2K
 import arrow.core.extensions.validated.eqK.eqK
 import arrow.core.extensions.validated.functor.functor
 import arrow.core.extensions.validated.selective.selective
@@ -13,6 +14,7 @@ import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.gen2K
 import arrow.test.generators.genK
 import arrow.test.generators.validated
 import arrow.test.laws.BitraverseLaws
@@ -47,8 +49,8 @@ class ValidatedTest : UnitSpec() {
         Validated.eqK(String.eq())),
       BitraverseLaws.laws(
         Validated.bitraverse(),
-        Validated.genK(Gen.int()),
-        Validated.eqK(Int.eq())
+        Validated.gen2K(),
+        Validated.eq2K()
       )
     )
 

@@ -1,11 +1,10 @@
 package arrow.test.laws
 
-import arrow.Kind
 import arrow.Kind2
 import arrow.core.Eval
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
-import arrow.test.generators.GenK
+import arrow.test.generators.Gen2K
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Bifoldable
@@ -15,10 +14,10 @@ import io.kotlintest.properties.forAll
 
 object BifoldableLaws {
 
-  fun <F> laws(BF: Bifoldable<F>, GENK: GenK<Kind<F, Int>>): List<Law> {
+  fun <F> laws(BF: Bifoldable<F>, GENK: Gen2K<F>): List<Law> {
 
     val EQ = Int.eq()
-    val GEN = GENK.genK(Gen.int())
+    val GEN = GENK.genK(Gen.int(), Gen.int())
 
     return listOf(
       Law("Bifoldable Laws: Left bifold consistent with BifoldMap") { BF.bifoldLeftConsistentWithBifoldMap(GEN, EQ) },

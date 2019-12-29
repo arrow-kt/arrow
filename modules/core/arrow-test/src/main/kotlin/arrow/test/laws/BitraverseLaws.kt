@@ -7,21 +7,21 @@ import arrow.core.Id
 import arrow.core.extensions.eq
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
-import arrow.test.generators.GenK
+import arrow.test.generators.Gen2K
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
+import arrow.typeclasses.Eq2K
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BitraverseLaws {
 
-  fun <F> laws(BT: Bitraverse<F>, GENK: GenK<Kind<F, Int>>, EQK: EqK<Kind<F, Int>>): List<Law> {
+  fun <F> laws(BT: Bitraverse<F>, GENK: Gen2K<F>, EQK: Eq2K<F>): List<Law> {
 
-    val G = GENK.genK(Gen.int())
-    val EQ = EQK.liftEq(Int.eq())
+    val G = GENK.genK(Gen.int(), Gen.int())
+    val EQ = EQK.liftEq(Int.eq(), Int.eq())
 
     return BifoldableLaws.laws(BT, GENK) + listOf(Law("Bitraverse Laws: Identity") { BT.identityBitraverse(BT, G, EQ) })
   }

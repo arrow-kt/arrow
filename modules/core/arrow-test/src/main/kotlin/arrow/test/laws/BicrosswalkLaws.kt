@@ -13,7 +13,6 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Eq2K
-import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.abs
@@ -25,9 +24,6 @@ object BicrosswalkLaws {
     GENK: Gen2K<T>,
     EQK: Eq2K<T>
   ): List<Law> {
-
-    val gen = GENK.genK(Gen.int())
-    val EQ = EQK.liftEq(String.eq())
 
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {
       override fun constants(): Iterable<(Int) -> ListK<String>> = listOf(
@@ -43,7 +39,7 @@ object BicrosswalkLaws {
 
     return listOf(
       Law("Bicrosswalk Laws: bicrosswalk an empty structure == an empty structure") {
-        BCW.bicrosswalkEmpty(ListK.align(), G, buildEq(ListK.eqK(), EQ))
+        BCW.bicrosswalkEmpty(ListK.align(), G, ListK.eqK().liftEq(EQ))
       },
       Law("Bicrosswalk Laws: bicrosswalk function == fmap function andThen sequenceL") {
         BCW.bicrosswalkSequencelEquality(ListK.align(), G, funGen, funGen, EQ1)
