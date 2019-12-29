@@ -30,7 +30,7 @@ Either.eq2K().run {
 ### Laws
 
 Arrow provides `Eq2KLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Eq2K` instances.
-See the existing EqK instances implementations and accompanying tests for reference.
+See the existing EqK2 instances implementations and accompanying tests for reference.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq2K` instances for custom datatypes.
 
