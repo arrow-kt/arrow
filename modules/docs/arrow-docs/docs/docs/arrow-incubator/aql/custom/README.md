@@ -15,7 +15,7 @@ In the example below we will create a minimal data holder data type that can con
 
 ## Creating a __custom data type__
 
-For simplicity the type in the example below is called `Box` and it mirrors the `Option` data type in terms of features. `Box` has two possible states `Empty` and `Full`. The `Empty` state repesents a missing value whereas the `Full<A>` state represents a `Box` that has an `A` value contained within.
+For simplicity the type in the example below is called `Box` and it mirrors the `Option` data type in terms of features. `Box` has two possible states `Empty` and `Full`. The `Empty` state represents a missing value whereas the `Full<A>` state represents a `Box` that has an `A` value contained within.
 
 ```kotlin
 /**

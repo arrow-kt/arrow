@@ -19,25 +19,22 @@ import io.kotlintest.properties.forAll
 
 object FoldableLaws {
 
-  fun <F> laws(FF: Foldable<F>, GENK: GenK<F>): List<Law> =
-    laws(FF, GENK.genK(Gen.intSmall()))
-
-  @Deprecated("use the other laws function that provides GenK/EqK params instead of Gen/cf https://github.com/arrow-kt/arrow/issues/1819")
-  internal fun <F> laws(FF: Foldable<F>, GEN: Gen<Kind<F, Int>>): List<Law> {
+  fun <F> laws(FF: Foldable<F>, GENK: GenK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.intSmall())
     val EQ = Int.eq()
 
     return listOf(
-      Law("Foldable Laws: Left fold consistent with foldMap") { FF.leftFoldConsistentWithFoldMap(GEN, EQ) },
-      Law("Foldable Laws: Right fold consistent with foldMap") { FF.rightFoldConsistentWithFoldMap(GEN, EQ) },
-      Law("Foldable Laws: Exists is consistent with find") { FF.existsConsistentWithFind(GEN) },
-      Law("Foldable Laws: Exists is lazy") { FF.existsIsLazy(GEN, EQ) },
-      Law("Foldable Laws: ForAll is lazy") { FF.forAllIsLazy(GEN, EQ) },
-      Law("Foldable Laws: ForAll consistent with exists") { FF.forallConsistentWithExists(GEN) },
-      Law("Foldable Laws: ForAll returns true if isEmpty") { FF.forallReturnsTrueIfEmpty(GEN) },
-      Law("Foldable Laws: FirstOption returns None if isEmpty") { FF.firstOptionReturnsNoneIfEmpty(GEN) },
-      Law("Foldable Laws: FirstOption returns None if predicate fails") { FF.firstOptionReturnsNoneIfPredicateFails(GEN) },
-      Law("Foldable Laws: FoldM for Id is equivalent to fold left") { FF.foldMIdIsFoldL(GEN, EQ) }
-    )
+        Law("Foldable Laws: Left fold consistent with foldMap") { FF.leftFoldConsistentWithFoldMap(GEN, EQ) },
+        Law("Foldable Laws: Right fold consistent with foldMap") { FF.rightFoldConsistentWithFoldMap(GEN, EQ) },
+        Law("Foldable Laws: Exists is consistent with find") { FF.existsConsistentWithFind(GEN) },
+        Law("Foldable Laws: Exists is lazy") { FF.existsIsLazy(GEN, EQ) },
+        Law("Foldable Laws: ForAll is lazy") { FF.forAllIsLazy(GEN, EQ) },
+        Law("Foldable Laws: ForAll consistent with exists") { FF.forallConsistentWithExists(GEN) },
+        Law("Foldable Laws: ForAll returns true if isEmpty") { FF.forallReturnsTrueIfEmpty(GEN) },
+        Law("Foldable Laws: FirstOption returns None if isEmpty") { FF.firstOptionReturnsNoneIfEmpty(GEN) },
+        Law("Foldable Laws: FirstOption returns None if predicate fails") { FF.firstOptionReturnsNoneIfPredicateFails(GEN) },
+        Law("Foldable Laws: FoldM for Id is equivalent to fold left") { FF.foldMIdIsFoldL(GEN, EQ) }
+      )
   }
 
   fun <F> Foldable<F>.leftFoldConsistentWithFoldMap(G: Gen<Kind<F, Int>>, EQ: Eq<Int>) =

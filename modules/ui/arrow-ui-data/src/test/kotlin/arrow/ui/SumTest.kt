@@ -40,8 +40,8 @@ class SumTest : UnitSpec() {
   }
 
   init {
-    val cfSumId = { x: Int -> Sum.left(Id.just(x), Id.just(x)) }
-    val genSumId = Gen.int().map(cfSumId) as Gen<Kind<Kind<Kind<ForSum, ForId>, ForId>, Int>>
+
+    val genkSumId = genk(Id.genK(), Id.genK())
 
     val sumIdEQK = Sum.eqK(Id.eqK(), Id.eqK())
     val IDEQ = Eq<Kind<ForId, Int>> { a, b -> Id.eq(Int.eq()).run { a.fix().eqv(b.fix()) } }
@@ -62,7 +62,7 @@ class SumTest : UnitSpec() {
         genSumConst,
         sumConstEQK
       ), */
-      ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), genSumId, sumIdEQK),
+      ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), genkSumId, sumIdEQK),
       HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), genSum())
     )
 

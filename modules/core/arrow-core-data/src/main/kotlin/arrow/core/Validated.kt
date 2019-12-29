@@ -764,7 +764,7 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
  */
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
-    { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
+    { e -> f.fold({ Invalid(SE.run { e.combine(it) }) }, { Invalid(e) }) },
     { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 

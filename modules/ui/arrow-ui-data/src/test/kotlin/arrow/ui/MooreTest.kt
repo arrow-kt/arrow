@@ -3,6 +3,7 @@ package arrow.ui
 import arrow.Kind
 import arrow.core.Id
 import arrow.test.UnitSpec
+import arrow.test.generators.GenK
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -14,9 +15,15 @@ class MooreTest : UnitSpec() {
 
   init {
 
-    fun handle(x: Int): Moore<Int, Int> = Moore(x, ::handle)
-    val intMoore: (Int) -> MooreOf<Int, Int> = { x: Int -> Moore(x, ::handle) }
-    val g = Gen.int().map(intMoore)
+    fun <T> handle(x: T): Moore<T, T> = Moore(x, ::handle)
+    fun <T> moore(t: T) = Moore(t, ::handle)
+
+    fun <F> genk() = object : GenK<MoorePartialOf<F>> {
+      override fun <A> genK(gen: Gen<A>): Gen<Kind<MoorePartialOf<F>, A>> =
+        gen.map {
+          moore(it)
+        } as Gen<Kind<MoorePartialOf<F>, A>>
+    }
 
     val EQK = object : EqK<MoorePartialOf<Int>> {
       override fun <A> Kind<MoorePartialOf<Int>, A>.eqK(other: Kind<MoorePartialOf<Int>, A>, EQ: Eq<A>): Boolean {
@@ -25,7 +32,7 @@ class MooreTest : UnitSpec() {
     }
 
     testLaws(
-      ComonadLaws.laws(Moore.comonad(), g, EQK)
+      ComonadLaws.laws(Moore.comonad(), genk(), EQK)
     )
 
     fun handleRoute(route: String): Moore<String, Id<String>> = when (route) {

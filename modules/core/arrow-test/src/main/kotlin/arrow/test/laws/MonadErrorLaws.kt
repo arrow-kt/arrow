@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
+import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.applicativeError
 import arrow.test.generators.fatalThrowable
@@ -33,9 +34,9 @@ object MonadErrorLaws {
     )
   }
 
-  fun <F> laws(M: MonadError<F, Throwable>, EQK: EqK<F>): List<Law> =
-    MonadLaws.laws(M, EQK) +
-      ApplicativeErrorLaws.laws(M, EQK) +
+  fun <F> laws(M: MonadError<F, Throwable>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
+    MonadLaws.laws(M, GENK, EQK) +
+      ApplicativeErrorLaws.laws(M, GENK, EQK) +
       monadErrorLaws(M, EQK)
 
   fun <F> laws(
@@ -43,10 +44,11 @@ object MonadErrorLaws {
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
+    GENK: GenK<F>,
     EQK: EqK<F>
   ): List<Law> =
-    MonadLaws.laws(M, FF, AP, SL, EQK) +
-      ApplicativeErrorLaws.laws(M, EQK) +
+    MonadLaws.laws(M, FF, AP, SL, GENK, EQK) +
+      ApplicativeErrorLaws.laws(M, GENK, EQK) +
       monadErrorLaws(M, EQK)
 
   fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =

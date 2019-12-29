@@ -20,7 +20,7 @@ object DivideLaws {
   ): List<Law> {
     val G = GENK.genK(Gen.int())
 
-    return ContravariantLaws.laws(DF, G, EQK) + listOf(
+    return ContravariantLaws.laws(DF, GENK, EQK) + listOf(
       Law("Divide laws: Associative") { DF.associative(G, EQK.liftEq(Int.eq())) }
     )
   }

@@ -177,7 +177,7 @@ Arrow Fx can be seen as a companion to the KotlinX Coroutines library in the sam
 
 Arrow Fx adds an extra layer of security and effect control where we can easily model side effects and how they interact with pure computations.
 
-In contrast with the couroutines library, where `Deferred` computations are eager by default and fire immediately when instantiated, in Arrow Fx, all bindings and compositions are lazy and suspended, ensuring execution is explicit and always deferred until the last second.
+In contrast with the coroutines library, where `Deferred` computations are eager by default and fire immediately when instantiated, in Arrow Fx, all bindings and compositions are lazy and suspended, ensuring execution is explicit and always deferred until the last second.
 
 Deferring execution and being able to suspend side effects is essential for programs built with Arrow because we can ensure that effects run in a controlled environment and preserve the properties of purity and referential transparency, allowing us to apply equational reasoning over the different parts that conform our programs.
 
@@ -251,7 +251,7 @@ Life goes on.
 
 Arrow Fx offers, in contrast, a different approach that is in line with Arrow's primary concern——helping you, as a user, create well-typed, safe, and pure programs in Kotlin.
 
-On top of complementing the KolinX Coroutines API, Arrow Fx provides interoperability with its runtime, allowing you to run polymorphic programs over the KotlinX Coroutines, Rx2, Reactor, and even custom runtimes.
+On top of complementing the KotlinX Coroutines API, Arrow Fx provides interoperability with its runtime, allowing you to run polymorphic programs over the KotlinX Coroutines, Rx2, Reactor, and even custom runtimes.
 
 ## Integrating with third-party libraries
 
