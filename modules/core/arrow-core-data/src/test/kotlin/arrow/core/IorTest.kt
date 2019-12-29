@@ -24,6 +24,7 @@ import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.CrosswalkLaws
+import arrow.test.laws.Eq2KLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
@@ -43,6 +44,7 @@ class IorTest : UnitSpec() {
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
     testLaws(
+      Eq2KLaws.laws(Ior.eq2K(), Ior.gen2K()),
       BifunctorLaws.laws(Ior.bifunctor(), Ior.gen2K(), Ior.eq2K()),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(

@@ -18,6 +18,7 @@ import arrow.test.generators.gen2K
 import arrow.test.generators.genK
 import arrow.test.generators.validated
 import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.Eq2KLaws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
@@ -39,6 +40,7 @@ class ValidatedTest : UnitSpec() {
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
     testLaws(
+      Eq2KLaws.laws(Validated.eq2K(), Validated.gen2K()),
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),

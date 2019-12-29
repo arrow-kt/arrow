@@ -32,6 +32,7 @@ import arrow.test.generators.throwable
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.Eq2KLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonoidLaws
@@ -50,6 +51,7 @@ class EitherTest : UnitSpec() {
 
   init {
     testLaws(
+      Eq2KLaws.laws(Either.eq2K(), Either.gen2K()),
       BifunctorLaws.laws(Either.bifunctor(), Either.gen2K(), Either.eq2K()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
