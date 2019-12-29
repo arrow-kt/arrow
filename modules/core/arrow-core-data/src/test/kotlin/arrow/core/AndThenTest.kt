@@ -47,11 +47,11 @@ class AndThenTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadLaws.laws(AndThen.monad(), AndThen.functor(), AndThen.applicative(), AndThen.monad(), AndThen.genK<Int>(), AndThen.eqK<Int>()),
+      MonadLaws.laws(AndThen.monad(), AndThen.functor(), AndThen.applicative(), AndThen.monad(), AndThen.genK(), AndThen.eqK<Int>()),
       MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
-      ContravariantLaws.laws(AndThen.contravariant<Int>(), conestedGENK(), conestedEQK),
-      ProfunctorLaws.laws(AndThen.profunctor(), AndThen.genK<Int>(), AndThen.eqK()),
-      CategoryLaws.laws<ForAndThen>(AndThen.category(), AndThen.genK<Int>(), AndThen.eqK<Int>())
+      ContravariantLaws.laws(AndThen.contravariant(), conestedGENK(), conestedEQK),
+      ProfunctorLaws.laws(AndThen.profunctor(), AndThen.genK(), AndThen.eqK()),
+      CategoryLaws.laws(AndThen.category(), AndThen.genK(), AndThen.eqK())
     )
 
     "compose a chain of functions with andThen should be same with AndThen" {
