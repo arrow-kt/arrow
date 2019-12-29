@@ -185,12 +185,14 @@ This exception goes uncaught and finalizes the program with a crash. Knowing thi
 
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
 For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
+It allows us to raise and recover from errors.
+
+The typeclass [`Async`]({{ '/docs/apidocs/arrow-fx/arrow.fx.typeclasses/-async/index.html' | relative_url }}) allows us to wrap effectful operations, and it inherits all the operators from [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 ```kotlin
-fun <F> MonadError<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
-  fx.monadError {
-    val (file) = getFile(path)
+fun <F> Async<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
+  fx.async {
+    val (file) = effect { getFile(path) }
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
