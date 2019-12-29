@@ -14,7 +14,7 @@ The `Eq2K` typeclass abstracts the ability to lift the Eq class to binary type c
 
 #### Kind2<F, A, B>.eqK(other: Kind2<F, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean
 
-Compares two instances of a type with binary typeconstructor in the context of `F` using the provided `Eq<A>` and `Eq<B>`. Returns true if they're considered equal.
+Compares two instances of a type `F` with binary a type constructor using the provided `Eq<A>` and `Eq<B>`. Returns true if they're considered equal.
 
 ```kotlin:ank
 import arrow.core.extensions.*
