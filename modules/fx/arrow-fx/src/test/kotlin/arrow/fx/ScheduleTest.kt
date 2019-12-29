@@ -127,13 +127,13 @@ class ScheduleTest : UnitSpec() {
       ),
       ProfunctorLaws.laws(
         Schedule.profunctor(),
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
-        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+        Schedule.genK<ForId, Int>(Id.monad()),
+        EQK(Id.eqK(), Id.monad(), 0)
       ),
       CategoryLaws.laws(
         Schedule.category(Id.monad()),
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
-        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+        Schedule.genK<ForId, Int>(Id.monad()),
+        EQK(Id.eqK(), Id.monad(), 0)
       )
     )
 
