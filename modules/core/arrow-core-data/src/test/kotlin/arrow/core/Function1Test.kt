@@ -66,7 +66,7 @@ class Function1Test : UnitSpec() {
       DivisibleLaws.laws(Function1.divisible(Int.monoid()), conestedGENK(), conestedEQK),
       ProfunctorLaws.laws(Function1.profunctor(), genk(), EQK(123)),
       MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), genk(), EQK(5150)),
-      CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
+      CategoryLaws.laws(Function1.category(), genk(), EQK(123))
     )
 
     "Semigroup of Function1<A> is Function1<Semigroup<A>>" {
