@@ -19,7 +19,7 @@ interface Eq2K<F> {
    *
    * fun main(args: Array<String>) {
    *    // sampleStart
-   *    val result = Either.eqK().run { Either.right("hello").eqK(Either.right("kotlin"), String.eq(), String.eq()) }
+   *    val result = Either.eq2K().run { Either.right("hello").eqK(Either.right("kotlin"), String.eq(), String.eq()) }
    *    // sampleEnd
    *    println(result)
    * }
@@ -39,7 +39,7 @@ interface Eq2K<F> {
    *
    * fun main(args: Array<String>) {
    *    // sampleStart
-   *    val EQ = Either.eqK().liftEq(String.eq(), String.eq())
+   *    val EQ = Either.eq2K().liftEq(String.eq(), String.eq())
    *    val result = EQ.run { Either.right("hello").eqv(Either.right("kotlin")) }
    *    // sampleEnd
    *    println(result)
