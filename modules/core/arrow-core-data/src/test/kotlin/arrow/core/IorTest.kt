@@ -8,8 +8,8 @@ import arrow.core.extensions.ior.bifunctor.bifunctor
 import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.extensions.ior.crosswalk.crosswalk
 import arrow.core.extensions.ior.eq.eq
-import arrow.core.extensions.ior.eq2K.eq2K
 import arrow.core.extensions.ior.eqK.eqK
+import arrow.core.extensions.ior.eqK2.eqK2
 import arrow.core.extensions.ior.functor.functor
 import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
@@ -17,14 +17,14 @@ import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.generators.gen2K
 import arrow.test.generators.genK
+import arrow.test.generators.genK2
 import arrow.test.generators.ior
 import arrow.test.laws.BicrosswalkLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.test.laws.CrosswalkLaws
-import arrow.test.laws.Eq2KLaws
+import arrow.test.laws.EqK2Laws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
@@ -44,8 +44,8 @@ class IorTest : UnitSpec() {
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
     testLaws(
-      Eq2KLaws.laws(Ior.eq2K(), Ior.gen2K()),
-      BifunctorLaws.laws(Ior.bifunctor(), Ior.gen2K(), Ior.eq2K()),
+      EqK2Laws.laws(Ior.eqK2(), Ior.genK2()),
+      BifunctorLaws.laws(Ior.bifunctor(), Ior.genK2(), Ior.eqK2()),
       ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(
         Ior.monad(Int.semigroup()),
@@ -60,9 +60,9 @@ class IorTest : UnitSpec() {
         Ior.eqK(Int.eq())
       ),
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
-      BitraverseLaws.laws(Ior.bitraverse(), Ior.gen2K(), Ior.eq2K()),
+      BitraverseLaws.laws(Ior.bitraverse(), Ior.genK2(), Ior.eqK2()),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.gen2K(), Ior.eq2K())
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK2(), Ior.eqK2())
     )
 
     "bimap() should allow modify both value" {

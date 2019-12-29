@@ -45,8 +45,8 @@ import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.biunnest
 import arrow.mtl.typeclasses.nest
 import arrow.test.UnitSpec
-import arrow.test.generators.Gen2K
 import arrow.test.generators.GenK
+import arrow.test.generators.GenK2
 import arrow.test.generators.functionAToB
 import arrow.test.generators.genK
 import arrow.test.generators.nested
@@ -60,8 +60,8 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq2K
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
@@ -99,14 +99,14 @@ class ComposedInstancesTest : UnitSpec() {
     val GENK_OPTION_NEL: GenK<Nested<ForOption, ForNonEmptyList>> =
       Option.genK().nested(NonEmptyList.genK())
 
-    val biFunctorGenk = object : Gen2K<Nested<ForTuple2, ForTuple2>> {
+    val biFunctorGenk = object : GenK2<Nested<ForTuple2, ForTuple2>> {
       override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Nested<ForTuple2, ForTuple2>, A, B>> =
         Gen.bind(genA, genB) { a, b ->
           Tuple2(Tuple2(a, b), Tuple2(a, b)).binest()
         }
     }
 
-    val biFunctorEqk = object : Eq2K<Nested<ForTuple2, ForTuple2>> {
+    val biFunctorEqk = object : EqK2<Nested<ForTuple2, ForTuple2>> {
       override fun <A, B> Kind2<Nested<ForTuple2, ForTuple2>, A, B>.eqK(other: Kind2<Nested<ForTuple2, ForTuple2>, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
         (biunnest().fix() to other.biunnest().fix()).let {
           it.first == it.second

@@ -9,7 +9,7 @@ import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.compose
 import arrow.test.UnitSpec
-import arrow.test.generators.Gen2K
+import arrow.test.generators.GenK2
 import arrow.test.generators.either
 import arrow.test.generators.intSmall
 import arrow.test.laws.BifoldableLaws
@@ -37,13 +37,13 @@ class BifoldableTests : UnitSpec() {
 
     val eitherGen = Gen.either(Gen.intSmall(), Gen.intSmall())
 
-    val genk = object : Gen2K<Nested<ForEither, ForEither>> {
+    val genK2 = object : GenK2<Nested<ForEither, ForEither>> {
       override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Nested<ForEither, ForEither>, A, B>> =
         Gen.either(eitherGen, Gen.either(genA, genB)).map {
           it.binest()
         } as Gen<Kind2<Nested<ForEither, ForEither>, A, B>>
     }
 
-    testLaws(BifoldableLaws.laws(eitherComposeEither, genk))
+    testLaws(BifoldableLaws.laws(eitherComposeEither, genK2))
   }
 }

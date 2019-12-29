@@ -8,11 +8,11 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.k
-import arrow.test.generators.Gen2K
+import arrow.test.generators.GenK2
 import arrow.typeclasses.Align
 import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq2K
+import arrow.typeclasses.EqK2
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.abs
@@ -21,8 +21,8 @@ object BicrosswalkLaws {
 
   fun <T> laws(
     BCW: Bicrosswalk<T>,
-    GENK: Gen2K<T>,
-    EQK: Eq2K<T>
+    GENK: GenK2<T>,
+    EQK: EqK2<T>
   ): List<Law> {
 
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {

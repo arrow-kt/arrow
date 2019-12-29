@@ -3,9 +3,9 @@ package arrow.typeclasses
 import arrow.Kind2
 
 /**
- * The `Eq2K` typeclass abstracts the ability to lift the Eq class to binary type constructors.
+ * The `EqK2` typeclass abstracts the ability to lift the Eq class to binary type constructors.
  */
-interface Eq2K<F> {
+interface EqK2<F> {
 
   /**
    * Lifts the equality check provided by given Eq<A> and Eq<B> instances to Eq<Kind2<F, A, B>>
@@ -13,13 +13,13 @@ interface Eq2K<F> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.core.extensions.either.eq2K.eq2K
+   * import arrow.core.extensions.either.eqK2.eqK2
    * import arrow.core.extensions.*
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
    *    // sampleStart
-   *    val result = Either.eq2K().run { Either.right("hello").eqK(Either.right("kotlin"), String.eq(), String.eq()) }
+   *    val result = Either.eqK2().run { Either.right("hello").eqK(Either.right("kotlin"), String.eq(), String.eq()) }
    *    // sampleEnd
    *    println(result)
    * }
@@ -33,13 +33,13 @@ interface Eq2K<F> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.core.extensions.either.eq2K.eq2K
+   * import arrow.core.extensions.either.eqK2.eqK2
    * import arrow.core.extensions.*
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
    *    // sampleStart
-   *    val EQ = Either.eq2K().liftEq(String.eq(), String.eq())
+   *    val EQ = Either.eqK2().liftEq(String.eq(), String.eq())
    *    val result = EQ.run { Either.right("hello").eqv(Either.right("kotlin")) }
    *    // sampleEnd
    *    println(result)
@@ -48,6 +48,6 @@ interface Eq2K<F> {
    */
   fun <A, B> liftEq(EQA: Eq<A>, EQB: Eq<B>): Eq<Kind2<F, A, B>> =
     Eq { a, b ->
-      this@Eq2K.run { a.eqK(b, EQA, EQB) }
+      this@EqK2.run { a.eqK(b, EQA, EQB) }
     }
 }

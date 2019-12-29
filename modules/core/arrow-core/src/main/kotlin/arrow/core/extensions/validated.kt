@@ -21,8 +21,8 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Eq2K
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -148,7 +148,7 @@ interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
 }
 
 @extension
-interface ValidatedEq2K : Eq2K<ForValidated> {
+interface ValidatedEqK2 : EqK2<ForValidated> {
   override fun <A, B> Kind2<ForValidated, A, B>.eqK(other: Kind2<ForValidated, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
       Validated.eq(EQA, EQB).run {
