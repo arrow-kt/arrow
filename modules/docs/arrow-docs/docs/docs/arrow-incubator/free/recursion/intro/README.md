@@ -239,7 +239,7 @@ fun factorial(i: Int): Int = IntListPattern.functor().hylo(multiply, downFrom, i
 
 Here we use the `IntListPattern` functor to model recursion which resembles a stack; we unfold a list as
 we traverse deeper into the call structure, then fold a list as we evaluate the result. This allows us
-to effectively model any recursive computation with recursion schemes, making them consistant and stack
+to effectively model any recursive computation with recursion schemes, making them consistent and stack
 safe.
 
 #### Typeclasses

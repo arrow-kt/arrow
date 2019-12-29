@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-SequenceK implements lazy lists representing lazily-evaluated ordered sequence of homogenous values.
+SequenceK implements lazy lists representing lazily-evaluated ordered sequence of homogeneous values.
 
 It can be created from Kotlin Sequence type with a convenient `k()` function.
 

@@ -13,7 +13,7 @@ redirect_from:
 
 The `Semialign` typeclass lets us combine two structures of type `Kind<F, A>` and `Kind<F, B>`
 into a single type `Kind<F, Ior<A,B>>`.
-The type `Ior<A,B>` thats used to hold the elements allows either side to be absent. This allows to combine the two structures
+The type `Ior<A,B>` that's used to hold the elements allows either side to be absent. This allows to combine the two structures
 without truncating to the size of the smaller input.
 
 ### Main Combinators

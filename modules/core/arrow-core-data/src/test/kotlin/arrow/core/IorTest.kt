@@ -17,6 +17,7 @@ import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.generators.gen2K
 import arrow.test.generators.genK
 import arrow.test.generators.ior
 import arrow.test.laws.BicrosswalkLaws
@@ -28,6 +29,7 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq2K
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -43,6 +45,15 @@ class IorTest : UnitSpec() {
 
     val EQ2: Eq<Kind2<ForIor, Int, Int>> = Eq { a, b ->
       a.fix() == b.fix()
+    }
+
+    val iorEq2K = object : Eq2K<ForIor> {
+      override fun <A, B> Kind2<ForIor, A, B>.eqK(other: Kind2<ForIor, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+        (this.fix() to other.fix()).let {
+          Ior.eq(EQA, EQB).run {
+            it.first.eqv(it.second)
+          }
+        }
     }
 
     testLaws(
@@ -63,7 +74,7 @@ class IorTest : UnitSpec() {
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
-      BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK(Gen.int()), Ior.eqK(String.eq()))
+      BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.gen2K(), iorEq2K)
     )
 
     "bimap() should allow modify both value" {

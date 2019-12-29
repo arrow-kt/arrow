@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.either.applicativeError.handleErrorWith
@@ -23,6 +24,7 @@ import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.either
+import arrow.test.generators.gen2K
 import arrow.test.generators.genK
 import arrow.test.generators.id
 import arrow.test.generators.intSmall
@@ -37,6 +39,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Eq2K
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -45,6 +48,15 @@ class EitherTest : UnitSpec() {
   val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
 
   val throwableEQ: Eq<Throwable> = Eq.any()
+
+  val eitherEq2k = object : Eq2K<ForEither> {
+    override fun <A, B> Kind2<ForEither, A, B>.eqK(other: Kind2<ForEither, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+      (this.fix() to other.fix()).let {
+        Either.eq(EQA, EQB).run {
+          it.first.eqv(it.second)
+        }
+      }
+  }
 
   init {
     testLaws(
@@ -63,7 +75,7 @@ class EitherTest : UnitSpec() {
       BitraverseLaws.laws(Either.bitraverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
-      BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK(Gen.int()), Either.eqK(String.eq()))
+      BicrosswalkLaws.laws(Either.bicrosswalk(), Either.gen2K(), eitherEq2k)
     )
 
     "empty should return a Right of the empty of the inner type" {

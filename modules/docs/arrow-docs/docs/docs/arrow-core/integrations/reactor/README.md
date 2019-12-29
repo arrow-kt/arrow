@@ -111,7 +111,7 @@ FluxK.monadThrow().fx.monadThrow {
 }
 ```
 
-Note that any unexpected exception, like `AritmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the flux.
+Note that any unexpected exception, like `ArithmeticException` when `totalTime` is 0, is automatically caught and wrapped inside the flux.
 
 ### Subscription and cancellation
 
