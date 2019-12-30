@@ -26,6 +26,7 @@ import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Crosswalk
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -164,6 +165,16 @@ interface IorEqK<A> : EqK<IorPartialOf<A>> {
   override fun <B> Kind<IorPartialOf<A>, B>.eqK(other: Kind<IorPartialOf<A>, B>, EQ: Eq<B>): Boolean =
     Ior.eq(EQA(), EQ).run {
       this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
+interface IorEqK2 : EqK2<ForIor> {
+  override fun <A, B> Kind2<ForIor, A, B>.eqK(other: Kind2<ForIor, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let {
+      Ior.eq(EQA, EQB).run {
+        it.first.eqv(it.second)
+      }
     }
 }
 
