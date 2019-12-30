@@ -304,6 +304,10 @@ interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative
         }
       }.k()
     }.k()
+
+  override fun <A> List<A>.afromList(): Kind<ForSequenceK, A> = asSequence().k()
+  override fun <T, A> Kind<T, Kind<ForSequenceK, A>>.asum(FT: Foldable<T>): Kind<ForSequenceK, A> = FT.run { toList().asSequence().flatMap { it.fix() }.k() }
+  override fun <T, A> Kind<T, A>.afold(FT: Foldable<T>): Kind<ForSequenceK, A> = FT.run { toList().asSequence().k() }
 }
 
 @extension
