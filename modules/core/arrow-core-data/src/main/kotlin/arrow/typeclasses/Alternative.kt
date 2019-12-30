@@ -76,7 +76,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
 
   fun <T, A> Kind<T, A>.afold(FT: Foldable<T>): Kind<F, A> = FT.run { toList().afromList() }
 
-  fun <A> List<A>.afromList(): Kind<F, A> = map { just(it) }.k().asum(object: Foldable<ForListK> {
+  fun <A> List<A>.afromList(): Kind<F, A> = map { just(it) }.k().asum(object : Foldable<ForListK> {
     override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
     override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().foldRight(lb, f)
   })
