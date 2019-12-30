@@ -627,7 +627,7 @@ sealed class Try<out A> : TryOf<A> {
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
   }
 
-  fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
+  fun <B> apPipe(ff: TryOf<(A) -> B>): Try<B> = flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
@@ -731,6 +731,11 @@ sealed class Try<out A> : TryOf<A> {
     override fun isSuccess(): Boolean = true
   }
 }
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or an effect handler like IO",
+  ReplaceWith("EitherOf<*, (A) -> B>.ap(ff)")
+)
+fun <A, B> TryOf<(A) -> B>.ap(ff: TryOf<A>): Try<B> = fix().flatMap { f -> ff.fix().map(f) }
 
 sealed class TryException(override val message: String) : Exception(message) {
   data class PredicateException(override val message: String) : TryException(message)

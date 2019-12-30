@@ -110,7 +110,7 @@ import arrow.typeclasses.Applicative
  *
  * val value =
  * //sampleStart
- *  listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }))
+ *  listOf({ x: Int -> x + 10 }, { x: Int -> x * 2 }).ap(listOf(1, 2, 3))
  * //sampleEnd
  * fun main() {
  *  println(value)
@@ -152,11 +152,11 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       else -> false
     }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
+  fun <B> apPipe(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { a: B -> (listOf(a) + xs).k() } } } } }
+      GA.run { Eval.later { f(a).map { a: B -> { xs: ListK<B> -> (listOf(a) + xs).k() } }.lazyAp { eval.value() } } }
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
@@ -275,3 +275,5 @@ fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
   (fix() + y.fix()).k()
 
 fun <A> List<A>.k(): ListK<A> = ListK(this)
+
+fun <A, B> ListKOf<(A) -> B>.ap(ff: ListKOf<A>): ListK<B> = fix().flatMap { f -> ff.fix().map(f) }

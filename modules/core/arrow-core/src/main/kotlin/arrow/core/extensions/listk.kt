@@ -47,6 +47,7 @@ import arrow.typeclasses.Zip
 import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 import kotlin.collections.zip as listZip
+import arrow.core.ap as listAp
 
 @extension
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
@@ -87,22 +88,19 @@ interface ListKFunctor : Functor<ForListK> {
 }
 
 @extension
-interface ListKApply : Apply<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+interface ListKApply : Apply<ForListK>, ListKFunctor {
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
 
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+  override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
+    listAp(ff)
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
 }
 
 @extension
-interface ListKApplicative : Applicative<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
-
+interface ListKApplicative : Applicative<ForListK>, ListKApply {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
@@ -114,9 +112,12 @@ interface ListKApplicative : Applicative<ForListK> {
 }
 
 @extension
-interface ListKMonad : Monad<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+interface ListKMonad : Monad<ForListK>, ListKApplicative {
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
+    listAp(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
@@ -173,7 +174,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a: A -> { b: B -> Tuple2(a, b) } })
+    fb.fix().apPipe(fix().map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -222,8 +223,11 @@ interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
   override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
+    listAp(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
@@ -249,8 +253,11 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
+    listAp(ff)
 
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)

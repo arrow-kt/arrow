@@ -39,6 +39,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tuple2Traverse
+import arrow.core.ap as tupAp
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
 // TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
@@ -55,8 +56,11 @@ interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 
-  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
-    fix().ap(ff.fix())
+  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
+    fix().apPipe(ff.fix())
+
+  override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
+    tupAp(ff)
 }
 
 @extension
@@ -66,8 +70,11 @@ interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 
-  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
-    fix().ap(ff.fix())
+  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
+    fix().apPipe(ff.fix())
+
+  override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
+    tupAp(ff)
 
   override fun <A> just(a: A) =
     MF().empty() toT a
@@ -81,8 +88,11 @@ interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 
-  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
-    fix().ap(ff)
+  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
+    fix().apPipe(ff.fix())
+
+  override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
+    tupAp(ff)
 
   override fun <A, B> Tuple2Of<F, A>.flatMap(f: (A) -> Tuple2Of<F, B>) =
     fix().flatMap { f(it).fix() }

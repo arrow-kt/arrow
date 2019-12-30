@@ -43,6 +43,7 @@ import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.undocumented
+import arrow.core.ap as mapKAp
 
 @extension
 @undocumented
@@ -90,8 +91,11 @@ interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
 
 @extension
 interface MapKApply<K> : Apply<MapKPartialOf<K>> {
-  override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
-    fix().ap(ff.fix())
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.apPipe(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
+    fix().apPipe(ff.fix())
+
+  override fun <A, B> Kind<MapKPartialOf<K>, (A) -> B>.ap(ff: Kind<MapKPartialOf<K>, A>): Kind<MapKPartialOf<K>, B> =
+    mapKAp(ff)
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): Kind<MapKPartialOf<K>, B> =
     fix().map(f)

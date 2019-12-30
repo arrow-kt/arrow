@@ -1,5 +1,6 @@
 package arrow.core.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.EvalOf
@@ -15,6 +16,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
+import arrow.core.ap as evalAp
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -24,18 +26,18 @@ interface EvalFunctor : Functor<ForEval> {
 
 @extension
 interface EvalApply : Apply<ForEval> {
-  override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().ap(ff)
+  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
+    fix().evalAp(ff.fix())
 
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 }
 
 @extension
-interface EvalApplicative : Applicative<ForEval> {
-  override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().ap(ff)
-
+interface EvalApplicative : Applicative<ForEval>, EvalApply {
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 
@@ -44,9 +46,12 @@ interface EvalApplicative : Applicative<ForEval> {
 }
 
 @extension
-interface EvalMonad : Monad<ForEval> {
-  override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().ap(ff)
+interface EvalMonad : Monad<ForEval>, EvalApplicative {
+  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
+    fix().evalAp(ff.fix())
 
   override fun <A, B> EvalOf<A>.flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     fix().flatMap(f)
@@ -84,8 +89,11 @@ interface EvalComonad : Comonad<ForEval> {
 
 @extension
 interface EvalBimonad : Bimonad<ForEval> {
-  override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().ap(ff)
+  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
+    fix().evalAp(ff.fix())
 
   override fun <A, B> EvalOf<A>.flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     fix().flatMap(f)

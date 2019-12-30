@@ -1013,8 +1013,8 @@ fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
 fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
   fix().fold({ false }, { it == elem })
 
-fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
-  flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
+fun <A, B, C> EitherOf<A, (B) -> C>.ap(ff: EitherOf<A, B>): Either<A, C> =
+  flatMap { f -> ff.fix().map(f) }.fix()
 
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {

@@ -58,7 +58,7 @@ data class Id<out A>(private val value: A) : IdOf<A> {
 
   fun extract(): A = value
 
-  fun <B> ap(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> apPipe(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   companion object {
 
@@ -83,4 +83,6 @@ data class Id<out A>(private val value: A) : IdOf<A> {
 }
 
 fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =
-  flatMap { it.fold({ l -> just(l).ap(f) }, { r -> just(r) }) }
+  flatMap { it.fold({ l -> just(l).apPipe(f) }, { r -> just(r) }) }
+
+fun <A, B> IdOf<(A) -> B>.ap(ff: IdOf<A>): Id<B> = fix().flatMap { f -> ff.fix().map(f) }

@@ -125,10 +125,8 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   fun <C> flatMap(f: (B) -> AndThenOf<A, C>): AndThen<A, C> =
     AndThen { a: A -> f(this.invoke(a)).fix().invoke(a) }
 
-  fun <C> ap(ff: AndThenOf<A, (B) -> C>): AndThen<A, C> =
-    ff.fix().flatMap { f ->
-      map(f)
-    }
+  fun <C> apPipe(ff: AndThenOf<A, (B) -> C>): AndThen<A, C> =
+    flatMap { b: B -> ff.fix().map { it(b) } }
 
   /**
    * Invoke the `[AndThen]` function
@@ -247,3 +245,5 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     is Single<*, *> -> left.andThenF(right)
   }
 }
+
+fun <A, B, C> AndThenOf<A, (B) -> C>.ap(ff: AndThenOf<A, B>): AndThen<A, C> = fix().flatMap { f -> ff.fix().map(f) }

@@ -38,6 +38,7 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 import arrow.core.combineK as nelCombineK
+import arrow.core.ap as nelAp
 
 @extension
 interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
@@ -68,19 +69,16 @@ interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListApply : Apply<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+interface NonEmptyListApply : Apply<ForNonEmptyList>, NonEmptyListFunctor {
+  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
 
-  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
-    fix().map(f)
+  override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
+    nelAp(ff)
 }
 
 @extension
-interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
-
+interface NonEmptyListApplicative : Applicative<ForNonEmptyList>, NonEmptyListApply {
   override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
@@ -90,8 +88,11 @@ interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListMonad : Monad<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
+    nelAp(ff)
 
   override fun <A, B> NonEmptyListOf<A>.flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
     fix().flatMap(f)
@@ -120,8 +121,11 @@ interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
+  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
+    nelAp(ff)
 
   override fun <A, B> NonEmptyListOf<A>.flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
     fix().flatMap(f)

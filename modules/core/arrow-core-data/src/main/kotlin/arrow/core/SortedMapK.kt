@@ -20,8 +20,8 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     if (fc.value().isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
     else fc.map { c -> this.map2(c, f) }
 
-  fun <C> ap(ff: SortedMapK<A, (B) -> C>): SortedMapK<A, C> =
-    ff.flatMap { this.map(it) }
+  fun <C> apPipe(ff: SortedMapK<A, (B) -> C>): SortedMapK<A, C> =
+    flatMap { a -> ff.map { it(a) } }
 
   fun <C, Z> ap2(f: SortedMapK<A, (B, C) -> Z>, fc: SortedMapK<A, C>): SortedMap<A, Z> =
     f.map.flatMap { (k, f) ->
@@ -44,7 +44,7 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
     map.iterator().iterateRight(Eval.always { just(sortedMapOf<A, C>().k()) }) { kv, lbuf ->
-      Eval.later { f(kv.value).lazyAp { lbuf.value().map { xs -> { b: C -> (mapOf(kv.key to b).k() + xs).toSortedMap().k() } } } }
+      Eval.later { f(kv.value).map { c: C -> { xs: SortedMapK<A, C> -> (mapOf(kv.key toT c) + xs).toSortedMap().k() } }.lazyAp { lbuf.value() } }
     }.value()
   }
 
@@ -59,6 +59,8 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
 
   companion object
 }
+
+fun <A: Comparable<A>, B, C> SortedMapKOf<A, (B) -> C>.ap(ff: SortedMapKOf<A, B>): SortedMapK<A, C> = fix().flatMap { f -> ff.fix().map(f) }
 
 fun <A : Comparable<A>, B> SortedMap<A, B>.k(): SortedMapK<A, B> = SortedMapK(this)
 

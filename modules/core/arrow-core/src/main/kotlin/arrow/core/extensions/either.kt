@@ -40,6 +40,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.core.apPipe as eitherApPipe
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
@@ -97,10 +98,13 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { f -> ff().map(f) }
 
-  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
+  override fun <A, B> EitherOf<L, A>.apPipe(ff: EitherOf<L, (A) -> B>): Either<L, B> =
+    fix().flatMap { a -> ff.map { it(a) } }
+
+  override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.ap(ff: Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
     fix().eitherAp(ff)
 }
 
@@ -117,17 +121,20 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
-
   override fun <A, B> EitherOf<L, A>.flatMap(f: (A) -> EitherOf<L, B>): Either<L, B> =
     fix().eitherFlatMap { f(it).fix() }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { f -> ff().map(f) }
+
+  override fun <A, B> EitherOf<L, A>.apPipe(ff: EitherOf<L, (A) -> B>): Either<L, B> =
+    fix().flatMap { a -> ff.map { it(a) } }
+
+  override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.ap(ff: Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
+    fix().eitherAp(ff)
 
   @Suppress("UNCHECKED_CAST")
   override val fx: MonadFx<EitherPartialOf<L>>

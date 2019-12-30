@@ -60,6 +60,7 @@ import arrow.typeclasses.Zip
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
+import arrow.core.ap as optAp
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -79,7 +80,7 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 @extension
 interface OptionSemigroupal : Semigroupal<ForOption> {
   override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    fb.fix().apPipe(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -167,22 +168,18 @@ interface OptionFunctor : Functor<ForOption> {
 }
 
 @extension
-interface OptionApply : Apply<ForOption> {
-  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
-    fix().ap(ff)
+interface OptionApply : Apply<ForOption>, OptionFunctor {
+  override fun <A, B> OptionOf<A>.apPipe(ff: OptionOf<(A) -> B>): Option<B> =
+    fix().apPipe(ff)
 
-  override fun <A, B> Kind<ForOption, A>.lazyAp(ff: () -> Kind<ForOption, (A) -> B>): Kind<ForOption, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForOption, (A) -> B>.ap(ff: Kind<ForOption, A>): Kind<ForOption, B> = optAp(ff)
 
-  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
+  override fun <A, B> Kind<ForOption, (A) -> B>.lazyAp(ff: () -> Kind<ForOption, A>): Kind<ForOption, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface OptionApplicative : Applicative<ForOption>, OptionApply {
-  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
-    fix().ap(ff)
-
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
@@ -198,8 +195,13 @@ interface OptionSelective : Selective<ForOption>, OptionApplicative {
 
 @extension
 interface OptionMonad : Monad<ForOption>, OptionApplicative {
-  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> OptionOf<A>.apPipe(ff: OptionOf<(A) -> B>): Option<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.ap(ff: Kind<ForOption, A>): Kind<ForOption, B> = optAp(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.lazyAp(ff: () -> Kind<ForOption, A>): Kind<ForOption, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> OptionOf<A>.flatMap(f: (A) -> OptionOf<B>): Option<B> =
     fix().flatMap(f)
@@ -215,9 +217,6 @@ interface OptionMonad : Monad<ForOption>, OptionApplicative {
 
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
-
-  override fun <A, B> Kind<ForOption, A>.lazyAp(ff: () -> Kind<ForOption, (A) -> B>): Kind<ForOption, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 
   override val fx: MonadFx<ForOption>
     get() = OptionFxMonad
@@ -337,8 +336,13 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
   override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> OptionOf<A>.apPipe(ff: OptionOf<(A) -> B>): Option<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.ap(ff: Kind<ForOption, A>): Kind<ForOption, B> = optAp(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.lazyAp(ff: () -> Kind<ForOption, A>): Kind<ForOption, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
     fix().flatMap(f)
@@ -354,9 +358,6 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
-
-  override fun <A, B> Kind<ForOption, A>.lazyAp(ff: () -> Kind<ForOption, (A) -> B>): Kind<ForOption, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 
   override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
     fix().fold(
@@ -428,8 +429,13 @@ interface OptionMonadFilter : MonadFilter<ForOption> {
   override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
-    fix().ap(ff)
+  override fun <A, B> OptionOf<A>.apPipe(ff: OptionOf<(A) -> B>): Option<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.ap(ff: Kind<ForOption, A>): Kind<ForOption, B> = optAp(ff)
+
+  override fun <A, B> Kind<ForOption, (A) -> B>.lazyAp(ff: () -> Kind<ForOption, A>): Kind<ForOption, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
     fix().flatMap(f)

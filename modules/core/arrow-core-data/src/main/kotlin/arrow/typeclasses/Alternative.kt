@@ -1,6 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.ListK
+import arrow.core.Nel
+import arrow.core.NonEmptyList
 import arrow.core.SequenceK
 import arrow.core.k
 
@@ -18,7 +21,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results with at least 1 repetition.
    */
-  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = lazyAp { many().map { { a: A -> (sequenceOf(a) + it).k() } } }
+  fun <A> Kind<F, A>.some(): Kind<F, NonEmptyList<A>> = map { a: A -> { xs: ListK<A> -> Nel(a, xs) } }.lazyAp { many() }
 
   /**
    * Repeats the computation until it fails. Does not requires it to succeed.
@@ -26,7 +29,7 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results.
    */
-  fun <A> Kind<F, A>.many(): Kind<F, SequenceK<A>> = some().orElse(just(emptySequence<A>().k()))
+  fun <A> Kind<F, A>.many(): Kind<F, ListK<A>> = some().map { it.all.k() }.orElse(just(ListK.empty()))
 
   /**
    * Combines two computations.

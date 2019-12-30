@@ -29,6 +29,7 @@ import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
+import arrow.core.ap as funcAp
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -119,25 +120,21 @@ interface Function1Profunctor : Profunctor<ForFunction1> {
 
 @extension
 interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
+  override fun <A, B> Function1Of<I, A>.apPipe(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
+    fix().apPipe(ff)
 
-  override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
-    fix().map(f)
-
-  override fun <A, B> Function1Of<I, A>.ap(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-    fix().ap(ff)
+  override fun <A, B> Kind<Function1PartialOf<I>, (A) -> B>.ap(ff: Kind<Function1PartialOf<I>, A>): Kind<Function1PartialOf<I>, B> =
+    fix().funcAp(ff.fix())
 }
 
 @extension
-interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Functor<I> {
+interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Apply<I> {
 
   override fun <A> just(a: A): Function1<I, A> =
     Function1.just(a)
 
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
-
-  override fun <A, B> Function1Of<I, A>.ap(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-    fix().ap(ff)
 }
 
 @extension
@@ -146,8 +143,11 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
 
-  override fun <A, B> Function1Of<I, A>.ap(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-    fix().ap(ff)
+  override fun <A, B> Function1Of<I, A>.apPipe(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<Function1PartialOf<I>, (A) -> B>.ap(ff: Kind<Function1PartialOf<I>, A>): Kind<Function1PartialOf<I>, B> =
+    fix().funcAp(ff.fix())
 
   override fun <A, B> Function1Of<I, A>.flatMap(f: (A) -> Function1Of<I, B>): Function1<I, B> =
     fix().flatMap(f)

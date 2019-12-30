@@ -2,26 +2,27 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.Either
 import arrow.core.AndThen
 import arrow.core.AndThenOf
 import arrow.core.AndThenPartialOf
+import arrow.core.Either
 import arrow.core.ForAndThen
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monad
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
 import arrow.typeclasses.Conested
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.counnest
-import arrow.typeclasses.conest
 import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
+import arrow.core.ap as apAndThen
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
@@ -51,20 +52,20 @@ interface AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
 
 @extension
 interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
-  override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
-    fix().ap(ff)
+  override fun <A, B> AndThenOf<X, A>.apPipe(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<AndThenPartialOf<X>, (A) -> B>.ap(ff: Kind<AndThenPartialOf<X>, A>): Kind<AndThenPartialOf<X>, B> =
+    apAndThen(ff)
 
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
 }
 
 @extension
-interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X> {
+interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenApply<X> {
   override fun <A> just(a: A): AndThenOf<X, A> =
     AndThen.just(a)
-
-  override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
-    fix().ap(ff)
 
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
@@ -81,8 +82,11 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
 
-  override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
-    fix().ap(ff)
+  override fun <A, B> AndThenOf<X, A>.apPipe(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<AndThenPartialOf<X>, (A) -> B>.ap(ff: Kind<AndThenPartialOf<X>, A>): Kind<AndThenPartialOf<X>, B> =
+    apAndThen(ff)
 }
 
 @extension

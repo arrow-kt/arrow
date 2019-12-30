@@ -27,6 +27,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
+import arrow.core.apPipe as constApPipe
 import arrow.core.ap as constAp
 import arrow.core.combine as combineAp
 
@@ -73,14 +74,17 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
 
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
-  override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+  override fun <B, C> Kind<ConstPartialOf<A>, (B) -> C>.ap(ff: Kind<ConstPartialOf<A>, B>): Kind<ConstPartialOf<A>, C> =
+    fix().constAp(MA(), ff.fix())
+
+  override fun <B, C> Kind<ConstPartialOf<A>, B>.apPipe(ff: Kind<ConstPartialOf<A>, (B) -> C>): Kind<ConstPartialOf<A>, C> =
+    constApPipe(MA(), ff.fix())
 }
 
 @extension
-interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
+interface ConstApplicative<A> : Applicative<ConstPartialOf<A>>, ConstApply<A> {
 
-  fun MA(): Monoid<A>
+  override fun MA(): Monoid<A>
 
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
@@ -88,9 +92,6 @@ interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
     override fun SA(): Semigroup<A> = MA()
     override fun MA(): Monoid<A> = this@ConstApplicative.MA()
   }.empty().fix()
-
-  override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
 }
 
 @extension

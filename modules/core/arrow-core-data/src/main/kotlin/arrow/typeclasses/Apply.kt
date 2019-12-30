@@ -13,6 +13,7 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.toT
 
 interface Apply<F> : Functor<F> {
 
@@ -36,13 +37,35 @@ interface Apply<F> : Functor<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
+  fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B>
+
+  /**
+   * Given both the value and the function are within [F], **ap**ply the function to the value.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.core.Option
+   * import arrow.core.Some
+   * import arrow.core.none
+   *
+   * fun main() {
+   *   //sampleStart
+   *   val someF: Option<(Int) -> Long> = Some { i: Int -> i.toLong() + 1 }
+   *
+   *   val a = Some(3).apPipe(someF)
+   *   val b = none<Int>().apPipe(someF)
+   *   val c = Some(3).apPipe(none<(Int) -> Long>())
+   *   //sampleEnd
+   *   println("a: $a, b: $b, c: $c")
+   * }
+   * ```
+   */
+  fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B>
 
   /**
    * Lazy version of ap, useful for datatypes which can short circuit.
    * This will at some point be removed for a compiler plugin
    */
-  fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> = ap(ff())
+  fun <A, B> Kind<F, (A) -> B>.lazyAp(ff: () -> Kind<F, A>): Kind<F, B> = ap(ff())
 
   fun <A, B, Z> map(
     a: Kind<F, A>,
@@ -153,7 +176,7 @@ interface Apply<F> : Functor<F> {
     fb.map { fc -> map2(fc, f) }
 
   fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    ap(fb.map { b: B -> { a: A -> Tuple2(a, b) } })
+    map { { b: B -> it toT b } }.ap(fb)
 
   fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
     other: Kind<F, Z>,

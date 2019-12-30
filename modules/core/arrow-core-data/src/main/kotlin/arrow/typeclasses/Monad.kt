@@ -43,8 +43,10 @@ interface Monad<F> : Selective<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     flatMap { a -> just(f(a)) }
 
-  /** @see [Apply.ap] */
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> =
+    flatMap { f -> ff.map(f) }
+
+  override fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B> =
     flatMap { a -> ff.map { f -> f(a) } }
 
   fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
@@ -100,8 +102,8 @@ interface Monad<F> : Selective<F> {
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
 
-  override fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> =
-    flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<F, (A) -> B>.lazyAp(ff: () -> Kind<F, A>): Kind<F, B> =
+    flatMap { f -> ff().map(f) }
 }
 
 interface MonadFx<F> {

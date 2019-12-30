@@ -34,6 +34,7 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
+import arrow.core.ap as tryAp
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   flatMap { a ->
@@ -115,11 +116,13 @@ interface TryFunctor : Functor<ForTry> {
 
 @extension
 interface TryApply : Apply<ForTry> {
-  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
-    fix().ap(ff)
+  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
+    fix().apPipe(ff)
 
-  override fun <A, B> Kind<ForTry, A>.lazyAp(ff: () -> Kind<ForTry, (A) -> B>): Kind<ForTry, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
+
+  override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
@@ -127,8 +130,13 @@ interface TryApply : Apply<ForTry> {
 
 @extension
 interface TryApplicative : Applicative<ForTry> {
-  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
-    fix().ap(ff)
+  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
+
+  override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
@@ -139,8 +147,13 @@ interface TryApplicative : Applicative<ForTry> {
 
 @extension
 interface TryMonad : Monad<ForTry> {
-  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
-    fix().ap(ff)
+  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
+    fix().apPipe(ff)
+
+  override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
+
+  override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> TryOf<A>.flatMap(f: (A) -> TryOf<B>): Try<B> =
     fix().flatMap(f)

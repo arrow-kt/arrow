@@ -10,6 +10,7 @@ import arrow.core.Validated
 import arrow.core.ValidatedOf
 import arrow.core.ValidatedPartialOf
 import arrow.core.ap
+import arrow.core.apPipe
 import arrow.core.combineK
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.fix
@@ -31,6 +32,7 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
 import arrow.core.traverse as validatedTraverse
+import arrow.core.ap as valAp
 
 @extension
 @undocumented
@@ -47,7 +49,10 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 
-  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.apPipe(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> =
+    fix().apPipe(SE(), ff.fix())
+
+  override fun <A, B> Kind<ValidatedPartialOf<E>, (A) -> B>.ap(ff: Kind<ValidatedPartialOf<E>, A>): Kind<ValidatedPartialOf<E>, B> = valAp(SE(), ff)
 }
 
 @extension
