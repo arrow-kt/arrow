@@ -53,3 +53,5 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 [arrow-kt/frdomain.kt](https://github.com/arrow-kt/frdomain.kt): Arrow port of the additional code samples (Chapter 6) from [Functional and Reactive Domain Modeling](https://www.manning.com/books/functional-and-reactive-domain-modeling).
 
 [adomokos/kotlin-sandbox](https://github.com/adomokos/kotlin-sandbox/): Using [kotlintest](https://github.com/kotlintest/kotlintest) to demonstrate various features of Arrow.
+
+[Kompute](https://github.com/MikeDepies/Kompute): Kotlin Compiler plugin bringing reactivity to variable declarations.
