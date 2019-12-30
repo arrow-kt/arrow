@@ -273,10 +273,6 @@ interface ListKAlternative : Alternative<ForListK>, ListKApplicative {
   override fun <A> empty(): Kind<ForListK, A> = emptyList<A>().k()
   override fun <A> Kind<ForListK, A>.orElse(b: Kind<ForListK, A>): Kind<ForListK, A> =
     (this.fix() + b.fix()).k()
-
-  override fun <T, A> Kind<T, Kind<ForListK, A>>.asum(FT: Foldable<T>): Kind<ForListK, A> = FT.run { toList().flatMap { it.fix() }.k() }
-  override fun <T, A> Kind<T, A>.afold(FT: Foldable<T>): Kind<ForListK, A> = FT.run { toList().k() }
-  override fun <A> List<A>.afromList(): Kind<ForListK, A> = k()
 }
 
 @extension

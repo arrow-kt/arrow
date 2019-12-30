@@ -67,19 +67,22 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    *  for every Alternative that models success and failure.
    */
   fun <A> Kind<F, A>.lazyOrElse(b: () -> Kind<F, A>): Kind<F, A> = orElse(b())
+}
 
-  fun <T, A> Kind<T, Kind<F, A>>.asum(FT: Foldable<T>): Kind<F, A> = FT.run {
+// TODO move back to alternative once arrow-meta is used to handle @extension because currently this breaks for lists and sequences
+fun <T, F, A> Kind<T, Kind<F, A>>.asum(AF: Alternative<F>, FT: Foldable<T>): Kind<F, A> = AF.run {
+  FT.run {
     foldRight(Eval.now(empty<A>())) { v, acc ->
       Eval.later { v.lazyOrElse { acc.value() } }
     }.value()
   }
-
-  fun <T, A> Kind<T, A>.afold(FT: Foldable<T>): Kind<F, A> = FT.run { toList().afromList() }
-
-  fun <A> List<A>.afromList(): Kind<F, A> = map { just(it) }.k().asum(object : Foldable<ForListK> {
-    override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
-    override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().foldRight(lb, f)
-  })
-
-  fun <A> Option<A>.afromOption(): Kind<F, A> = fold({ empty() }, { just(it) })
 }
+
+fun <T, F, A> Kind<T, A>.afold(AF: Alternative<F>, FT: Foldable<T>): Kind<F, A> = FT.run { toList().afromList(AF) }
+
+fun <F, A> List<A>.afromList(AF: Alternative<F>): Kind<F, A> = map { AF.just(it) }.k().asum(AF, object : Foldable<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
+  override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().foldRight(lb, f)
+})
+
+fun <F, A> Option<A>.afromOption(AF: Alternative<F>): Kind<F, A> = fold({ AF.empty() }, { AF.just(it) })
