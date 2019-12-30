@@ -89,21 +89,6 @@ class CofreeTest : UnitSpec() {
       start.extract() shouldBe 0
     }
 
-    "run with an stack-unsafe monad should blow up the stack" {
-      try {
-        val limit = 10000
-        val counter = SideEffect()
-        val startThousands: Cofree<ForOption, Int> = unfold(Option.functor(), counter.counter) {
-          counter.increment()
-          if (it == limit) None else Some(it + 1)
-        }
-        startThousands.run()
-        throw AssertionError("Run should overflow on a stack-unsafe monad")
-      } catch (e: StackOverflowError) {
-        // Expected. For stack safety use cataM instead
-      }
-    }
-
     "run with an stack-safe monad should not blow up the stack" {
       val counter = SideEffect()
       val startThousands: Cofree<ForEval, Int> = unfold(Eval.functor(), counter.counter) {
