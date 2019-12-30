@@ -22,7 +22,7 @@ import arrow.core.extensions.either.eqK2.eqK2
 import arrow.core.*
 
 // lift String Eq to Either
-Either.eq2K().run {
+Either.eqK2().run {
     Either.right("hello").eqK(Either.right("arrow"), String.eq(), String.eq())
 }
 ```
