@@ -4,11 +4,7 @@ import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.core.andThen
-import arrow.core.extensions.andthen.applicative.applicative
-import arrow.core.fix
 import arrow.core.identity
-import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
