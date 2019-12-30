@@ -257,6 +257,7 @@ interface StateTMonadState<F, S> : MonadState<StateTPartialOf<F, S>, S>, StateTM
 interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateTMonad<F, S>, StateTAlternative<F, S> {
 
   fun MC(): MonadCombine<F>
+  override fun AF(): Alternative<F> = MC()
 
   override fun MF(): Monad<F> = MC()
 
