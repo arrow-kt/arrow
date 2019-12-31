@@ -350,7 +350,7 @@ import arrow.core.SequenceK
  * }
  * ```
  *
- * Notice that in the `Either` case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are runed in isolation.
+ * Notice that in the `Either` case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are run in isolation.
  *
  * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, by using `parApplicative`. Then when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
  *
