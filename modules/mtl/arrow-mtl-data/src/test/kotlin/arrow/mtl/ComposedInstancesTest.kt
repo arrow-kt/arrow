@@ -46,6 +46,7 @@ import arrow.mtl.typeclasses.biunnest
 import arrow.mtl.typeclasses.nest
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
+import arrow.test.generators.GenK2
 import arrow.test.generators.functionAToB
 import arrow.test.generators.genK
 import arrow.test.generators.nested
@@ -60,6 +61,7 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
@@ -91,17 +93,25 @@ class ComposedInstancesTest : UnitSpec() {
           }
       }
 
-    val EQ_TUPLE2: Eq<Kind2<Nested<ForTuple2, ForTuple2>, Int, Int>> = Eq { a, b ->
-      a.biunnest().fix() == b.biunnest().fix()
-    }
-
     val EQK_OPTION_NEL: EqK<Nested<ForOption, ForNonEmptyList>> =
       Option.eqK().nested(NonEmptyList.eqK())
 
     val GENK_OPTION_NEL: GenK<Nested<ForOption, ForNonEmptyList>> =
       Option.genK().nested(NonEmptyList.genK())
 
-    val bifunctorCf: (Int) -> Kind2<Nested<ForTuple2, ForTuple2>, Int, Int> = { Tuple2(Tuple2(it, it), Tuple2(it, it)).binest() }
+    val biFunctorGenk = object : GenK2<Nested<ForTuple2, ForTuple2>> {
+      override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Nested<ForTuple2, ForTuple2>, A, B>> =
+        Gen.bind(genA, genB) { a, b ->
+          Tuple2(Tuple2(a, b), Tuple2(a, b)).binest()
+        }
+    }
+
+    val biFunctorEqk = object : EqK2<Nested<ForTuple2, ForTuple2>> {
+      override fun <A, B> Kind2<Nested<ForTuple2, ForTuple2>, A, B>.eqK(other: Kind2<Nested<ForTuple2, ForTuple2>, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+        (biunnest().fix() to other.biunnest().fix()).let {
+          it.first == it.second
+        }
+    }
 
     testLaws(
       InvariantLaws.laws(ComposedInvariantCovariant(Option.functor(), NonEmptyList.functor()), GENK_OPTION_NEL, EQK_OPTION_NEL)
@@ -118,7 +128,7 @@ class ComposedInstancesTest : UnitSpec() {
       TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse()), GENK_OPTION_NEL, EQK_OPTION_NEL),
       SemigroupKLaws.laws(ComposedSemigroupK<ForListK, ForOption>(ListK.semigroupK()), GENK_LK_OPTION, EQK_LK_OPTION),
       MonoidKLaws.laws(ComposedMonoidK<ForListK, ForOption>(ListK.monoidK()), GENK_LK_OPTION, EQK_LK_OPTION),
-      BifunctorLaws.laws(ComposedBifunctor(Tuple2.bifunctor(), Tuple2.bifunctor()), bifunctorCf, EQ_TUPLE2)
+      BifunctorLaws.laws(ComposedBifunctor(Tuple2.bifunctor(), Tuple2.bifunctor()), biFunctorGenk, biFunctorEqk)
     )
   }
 }

@@ -67,7 +67,7 @@ class OptionTTest : UnitSpec() {
       ConcurrentLaws.laws(
         OptionT.concurrent(IO.concurrent()),
         OptionT.functor(IO.functor()),
-        OptionT.applicative(IO.applicative()),
+        OptionT.applicative(IO.monad()),
         OptionT.monad(IO.monad()),
         OptionT.genK(IO.genK()),
         ioEQK
