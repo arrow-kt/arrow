@@ -10,7 +10,6 @@ import arrow.core.Ior
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
-import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.option.apply.apply
@@ -18,7 +17,6 @@ import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.core.identity
-import arrow.core.k
 import arrow.core.orElse
 import arrow.core.some
 import arrow.core.toT
@@ -57,10 +55,10 @@ import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
+import arrow.core.ap as optAp
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
-import arrow.core.ap as optAp
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -358,34 +356,6 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
-
-  override fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> =
-    fix().fold(
-      { Option.empty() },
-      {
-        Sequence {
-          object : Iterator<A> {
-            override fun hasNext(): Boolean = true
-
-            override fun next(): A = it
-          }
-        }.k().just().fix()
-      }
-    )
-
-  override fun <A> Kind<ForOption, A>.many(): Option<SequenceK<A>> =
-    fix().fold(
-      { emptySequence<A>().k().just().fix() },
-      {
-        Sequence {
-          object : Iterator<A> {
-            override fun hasNext(): Boolean = true
-
-            override fun next(): A = it
-          }
-        }.k().just().fix()
-      }
-    )
 }
 
 @extension

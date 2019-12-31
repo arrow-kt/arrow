@@ -165,7 +165,7 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
       true
     }
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = AS.run {
     this@ap.ap(ff)
   }
 

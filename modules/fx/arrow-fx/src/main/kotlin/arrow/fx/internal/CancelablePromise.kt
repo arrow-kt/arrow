@@ -125,7 +125,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
     }
   }
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = CF.run {
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = CF.run {
     this@ap.ap(ff)
   }
 

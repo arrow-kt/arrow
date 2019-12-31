@@ -656,7 +656,7 @@ sealed class IO<out A> : IOOf<A> {
    * }
    * ```
    */
-  fun <B> ap(ff: IOOf<(A) -> B>): IO<B> =
+  fun <B> apPipe(ff: IOOf<(A) -> B>): IO<B> =
     flatMap { a -> ff.fix().map { it(a) } }
 
   /**
@@ -1078,6 +1078,9 @@ sealed class IO<out A> : IOOf<A> {
  */
 fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
   handleErrorWith { e -> IO.Pure(f(e)) }
+
+fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
+  fix().flatMap { f -> ff.fix().map(f) }
 
 /**
  * Handle the error by resolving the error with an effect that results in [A].

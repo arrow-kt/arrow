@@ -43,7 +43,7 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A>, DayKindedJ<F
       }
   }
 
-  fun <B> ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> =
+  fun <B> apPipe(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> =
     stepDay { left, right, get ->
       f.fix().stepDay { lf, rf, getf ->
         val l = AF.run { tupled(left, lf) }

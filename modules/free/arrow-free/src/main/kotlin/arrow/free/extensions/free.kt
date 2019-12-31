@@ -39,7 +39,7 @@ interface FreeApply<S> : Apply<FreePartialOf<S>>, FreeFunctor<S> {
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 
-  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+  override fun <A, B> Kind<FreePartialOf<S>, (A) -> B>.ap(ff: Kind<FreePartialOf<S>, A>): Free<S, B> =
     fix().freeAp(ff)
 }
 
@@ -52,7 +52,7 @@ interface FreeApplicative<S> : Applicative<FreePartialOf<S>>, FreeFunctor<S> {
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 
-  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+  override fun <A, B> Kind<FreePartialOf<S>, (A) -> B>.ap(ff: Kind<FreePartialOf<S>, A>): Free<S, B> =
     fix().freeAp(ff)
 }
 
@@ -63,7 +63,7 @@ interface FreeMonad<S> : Monad<FreePartialOf<S>>, FreeApplicative<S> {
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 
-  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+  override fun <A, B> Kind<FreePartialOf<S>, (A) -> B>.ap(ff: Kind<FreePartialOf<S>, A>): Free<S, B> =
     fix().freeAp(ff)
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.flatMap(f: (A) -> Kind<FreePartialOf<S>, B>): Free<S, B> =

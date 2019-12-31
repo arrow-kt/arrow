@@ -333,7 +333,7 @@ sealed class KindConnection<F> {
       fold(unit()) { acc, f -> f.flatMap { acc } }
     }
 
-    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = MD.run {
+    override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = MD.run {
       this@ap.ap(ff)
     }
 

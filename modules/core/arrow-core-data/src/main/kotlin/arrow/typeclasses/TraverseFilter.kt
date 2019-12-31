@@ -9,6 +9,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.fix
 import arrow.core.value
+import arrow.core.ap as idAp
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.TraverseFilter)
@@ -16,8 +17,8 @@ import arrow.core.value
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
   private object IdApplicative : Applicative<ForId> {
-    override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
-      fix().ap(ff)
+    override fun <A, B> IdOf<(A) -> B>.ap(ff: IdOf<A>): Id<B> =
+      fix().idAp(ff)
 
     override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
       fix().map(f)

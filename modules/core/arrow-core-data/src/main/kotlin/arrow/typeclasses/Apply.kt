@@ -29,9 +29,9 @@ interface Apply<F> : Functor<F> {
    *   //sampleStart
    *   val someF: Option<(Int) -> Long> = Some { i: Int -> i.toLong() + 1 }
    *
-   *   val a = Some(3).ap(someF)
-   *   val b = none<Int>().ap(someF)
-   *   val c = Some(3).ap(none<(Int) -> Long>())
+   *   val a = someF.ap(Some(3))
+   *   val b = someF.ap(none<Int>())
+   *   val c = none<(Int) -> Long>().ap(Some(3))
    *   //sampleEnd
    *   println("a: $a, b: $b, c: $c")
    * }
@@ -59,7 +59,7 @@ interface Apply<F> : Functor<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B>
+  fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B> = map(this, ff) { (a, f) -> f(a) }
 
   /**
    * Lazy version of ap, useful for datatypes which can short circuit.

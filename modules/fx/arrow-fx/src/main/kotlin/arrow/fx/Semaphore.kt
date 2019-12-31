@@ -335,7 +335,7 @@ internal class DefaultSemaphore<F>(
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
     acquire().bracket({ release() }, { t })
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = AS.run {
     this@ap.ap(ff)
   }
 

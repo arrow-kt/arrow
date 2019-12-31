@@ -98,7 +98,7 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
     }
   }
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = AS.run {
     this@ap.ap(ff)
   }
 

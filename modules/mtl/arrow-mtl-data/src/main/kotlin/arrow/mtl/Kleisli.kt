@@ -30,8 +30,8 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param ff function with the [Kleisli] context.
    * @param AF [Applicative] for the context [F].
    */
-  fun <B> ap(AF: Apply<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> = AF.run {
-    Kleisli { d -> run(d).ap(ff.run(d)) }
+  fun <B> apPipe(AF: Apply<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> = AF.run {
+    Kleisli { d -> run(d).apPipe(ff.run(d)) }
   }
 
   /**
@@ -169,6 +169,10 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
     fun <F, D, A> liftF(fa: Kind<F, A>): Kleisli<F, D, A> =
       Kleisli { fa }
   }
+}
+
+fun <F, D, A, B> KleisliOf<F, D, (A) -> B>.ap(AF: Apply<F>, ff: KleisliOf<F, D, A>): Kleisli<F, D, B> = AF.run {
+  Kleisli { d -> run(d).ap(ff.run(d)) }
 }
 
 /**

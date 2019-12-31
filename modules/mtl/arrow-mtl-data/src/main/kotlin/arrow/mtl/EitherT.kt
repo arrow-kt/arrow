@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
+import arrow.core.left
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -117,10 +118,16 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
     })
   }
 
-  fun <C> ap(AF: Applicative<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> =
-    EitherT(AF.map(ff.value(), value) { (a, b) ->
-      b.flatMap { bb ->
-        a.map { f -> f(bb) }
+  fun <C> apPipe(MF: Monad<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> =
+    EitherT(
+      MF.fx.monad {
+        value().bind().fold({ it.left() }, { a -> ff.value().bind().map { it(a) } })
       }
-    })
+    )
 }
+
+fun <F, E, A, B> EitherTOf<F, E, (A) -> B>.ap(MF: Monad<F>, ff: EitherTOf<F, E, A>): EitherT<F, E, B> = EitherT(
+  MF.fx.monad {
+    value().bind().fold({ it.left() }, { f -> ff.value().bind().map(f) })
+  }
+)

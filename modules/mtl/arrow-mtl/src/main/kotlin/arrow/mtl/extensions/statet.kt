@@ -39,6 +39,7 @@ import arrow.undocumented
 import arrow.mtl.extensions.statet.monad.flatMap
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.MonoidK
+import arrow.mtl.ap as stateAp
 
 @extension
 @undocumented
@@ -64,11 +65,11 @@ interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFu
   override fun <A> just(a: A): StateT<F, S, A> =
     StateT(MF().just({ s: S -> MF().just(Tuple2(s, a)) }))
 
-  override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> StateTOf<F, S, (A) -> B>.ap(ff: StateTOf<F, S, A>): StateT<F, S, B> =
+    fix().stateAp(MF(), ff).fix()
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
-    flatMap(MF()) { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<StateTPartialOf<F, S>, (A) -> B>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, B> =
+    flatMap(MF()) { f -> ff().map(f) }
 }
 
 @extension
@@ -86,11 +87,11 @@ interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F,
   override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
     StateT.tailRecM(MF(), a, f)
 
-  override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    fix().ap(MF(), ff.fix())
+  override fun <A, B> StateTOf<F, S, (A) -> B>.ap(ff: StateTOf<F, S, A>): StateT<F, S, B> =
+    fix().stateAp(MF(), ff).fix()
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
-    flatMap(MF()) { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<StateTPartialOf<F, S>, (A) -> B>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, B> =
+    flatMap(MF()) { f -> ff().map(f) }
 }
 
 @extension

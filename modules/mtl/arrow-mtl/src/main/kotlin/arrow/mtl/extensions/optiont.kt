@@ -50,6 +50,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
 import arrow.undocumented
+import arrow.mtl.ap as optAp
 
 @extension
 interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
@@ -70,11 +71,11 @@ interface OptionTApplicative<F> : Applicative<OptionTPartialOf<F>>, OptionTFunct
 
   override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(MF(), f)
 
-  override fun <A, B> OptionTOf<F, A>.ap(ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> OptionTOf<F, (A) -> B>.ap(ff: OptionTOf<F, A>): OptionT<F, B> =
+    fix().optAp(MF(), ff)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.lazyAp(ff: () -> Kind<OptionTPartialOf<F>, (A) -> B>): Kind<OptionTPartialOf<F>, B> =
-    fix().flatMap(MF()) { a -> ff().fix().map(MF()) { it(a) } }
+  override fun <A, B> Kind<OptionTPartialOf<F>, (A) -> B>.lazyAp(ff: () -> Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, B> =
+    fix().flatMap(MF()) { f -> ff().fix().map(MF(), f) }
 }
 
 @extension
@@ -86,11 +87,11 @@ interface OptionTMonad<F> : Monad<OptionTPartialOf<F>>, OptionTApplicative<F> {
 
   override fun <A, B> OptionTOf<F, A>.flatMap(f: (A) -> OptionTOf<F, B>): OptionT<F, B> = fix().flatMap(MF()) { f(it).fix() }
 
-  override fun <A, B> OptionTOf<F, A>.ap(ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> OptionTOf<F, (A) -> B>.ap(ff: OptionTOf<F, A>): OptionT<F, B> =
+    fix().optAp(MF(), ff)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.lazyAp(ff: () -> Kind<OptionTPartialOf<F>, (A) -> B>): Kind<OptionTPartialOf<F>, B> =
-    fix().flatMap(MF()) { a -> ff().fix().map(MF()) { it(a) } }
+  override fun <A, B> Kind<OptionTPartialOf<F>, (A) -> B>.lazyAp(ff: () -> Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, B> =
+    fix().flatMap(MF()) { f -> ff().fix().map(MF(), f) }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
     OptionT.tailRecM(MF(), a, f)
@@ -112,11 +113,8 @@ interface OptionTApplicativeError<F, E> : ApplicativeError<OptionTPartialOf<F>, 
 
 @extension
 interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTMonad<F>, OptionTApplicativeError<F, E> {
-
   override fun ME(): MonadError<F, E>
   override fun MF(): Monad<F> = ME()
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.lazyAp(ff: () -> Kind<OptionTPartialOf<F>, (A) -> B>): Kind<OptionTPartialOf<F>, B> =
-    flatMap { a -> ff().map { it(a) } }
 }
 
 @extension

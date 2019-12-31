@@ -15,6 +15,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.undocumented
+import arrow.fx.ap as resAp
 
 @extension
 @undocumented
@@ -29,8 +30,8 @@ interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, Reso
   override fun BR(): Bracket<F, E>
 
   override fun <A> just(a: A): Resource<F, E, A> = Resource.just(a, BR())
-  override fun <A, B> ResourceOf<F, E, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().ap(BR(), ff.fix())
+  override fun <A, B> ResourceOf<F, E, (A) -> B>.ap(ff: Kind<ResourcePartialOf<F, E>, A>): Resource<F, E, B> =
+    fix().resAp(BR(), ff.fix())
 
   override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Resource<F, E, B> =
     fix().map(BR(), f)
@@ -40,7 +41,7 @@ interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, Reso
 interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>>, ResourceApplicative<F, E> {
   override fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).ap(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
+    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).apPipe(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension
@@ -55,11 +56,11 @@ interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>>, ResourceSelectiv
   override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Resource<F, E, B> =
     fix().map(BR(), f)
 
-  override fun <A, B> ResourceOf<F, E, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().ap(BR(), ff)
+  override fun <A, B> ResourceOf<F, E, (A) -> B>.ap(ff: Kind<ResourcePartialOf<F, E>, A>): Resource<F, E, B> =
+    fix().resAp(BR(), ff)
 
   override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).ap(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
+    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).apPipe(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension

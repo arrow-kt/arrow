@@ -16,7 +16,6 @@ import arrow.core.extensions.listk.crosswalk.crosswalk
 import arrow.core.extensions.sequence.foldable.firstOption
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.extensions.sequence.foldable.foldRight
-import arrow.core.extensions.sequence.foldable.isEmpty
 import arrow.core.extensions.sequence.monadFilter.filterMap
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.foldable.firstOption
@@ -56,8 +55,8 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
-import arrow.core.combineK as sequenceCombineK
 import arrow.core.ap as seqAp
+import arrow.core.combineK as sequenceCombineK
 
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
@@ -283,30 +282,6 @@ interface SequenceKAlternative : Alternative<ForSequenceK>, SequenceKApplicative
   override fun <A> empty(): Kind<ForSequenceK, A> = emptySequence<A>().k()
   override fun <A> Kind<ForSequenceK, A>.orElse(b: Kind<ForSequenceK, A>): Kind<ForSequenceK, A> =
     (this.fix() + b.fix()).k()
-
-  override fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
-    if (this.fix().isEmpty()) SequenceK.empty()
-    else map {
-      Sequence {
-        object : Iterator<A> {
-          override fun hasNext(): Boolean = true
-
-          override fun next(): A = it
-        }
-      }.k()
-    }.k()
-
-  override fun <A> Kind<ForSequenceK, A>.many(): SequenceK<SequenceK<A>> =
-    if (this.fix().isEmpty()) sequenceOf(emptySequence<A>().k()).k()
-    else map {
-      Sequence {
-        object : Iterator<A> {
-          override fun hasNext(): Boolean = true
-
-          override fun next(): A = it
-        }
-      }.k()
-    }.k()
 }
 
 @extension

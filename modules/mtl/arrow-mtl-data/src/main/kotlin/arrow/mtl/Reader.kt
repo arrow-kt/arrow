@@ -83,7 +83,7 @@ fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatM
  *
  * @param ff function that maps [A] to [B] within the [Reader] context.
  */
-fun <D, A, B> Reader<D, A>.ap(ff: ReaderOf<D, (A) -> B>): Reader<D, B> = ap(IdBimonad, ff)
+fun <D, A, B> Reader<D, (A) -> B>.ap(ff: ReaderOf<D, A>): Reader<D, B> = ap(IdBimonad, ff)
 
 /**
  * Zip with another [Reader].

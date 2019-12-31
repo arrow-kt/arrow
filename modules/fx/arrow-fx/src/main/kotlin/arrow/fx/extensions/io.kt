@@ -46,6 +46,7 @@ import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.handleError as ioHandleError
 import arrow.fx.handleErrorWith as ioHandleErrorWith
+import arrow.fx.ap as ioAp
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -58,11 +59,11 @@ interface IOApply : Apply<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ap(ff)
+  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
+    fix().ioAp(ff.fix())
 
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
@@ -73,11 +74,11 @@ interface IOApplicative : Applicative<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ap(ff)
+  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
+    fix().ioAp(ff.fix())
 
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
@@ -94,8 +95,8 @@ interface IOMonad : Monad<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
@@ -121,8 +122,11 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ap(ff)
+  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
+    fix().ioAp(ff.fix())
+
+  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
+    fix().flatMap { f -> ff().map(f) }
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -138,9 +142,6 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
-
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

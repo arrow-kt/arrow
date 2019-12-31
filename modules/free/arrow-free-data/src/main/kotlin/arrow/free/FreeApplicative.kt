@@ -25,7 +25,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
   companion object {
     fun <F, A> just(a: A): FreeApplicative<F, A> = Pure(a)
 
-    fun <F, P, A> ap(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
+    fun <F, P, A> apPipe(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
 
     fun <F, A> liftF(fa: Kind<F, A>): FreeApplicative<F, A> = Lift(fa)
 
@@ -39,8 +39,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
       override fun <A> just(a: A): FreeApplicative<F, A> =
         Companion.just(a)
 
-      override fun <A, B> Kind<FreeApplicativePartialOf<F>, A>.ap(ff: Kind<FreeApplicativePartialOf<F>, (A) -> B>): FreeApplicative<F, B> =
-        Companion.ap(fix(), ff.fix())
+      override fun <A, B> Kind<FreeApplicativePartialOf<F>, (A) -> B>.ap(ff: Kind<FreeApplicativePartialOf<F>, A>): FreeApplicative<F, B> =
+        Ap(this.fix(), ff.fix())
     }
   }
 
@@ -109,7 +109,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
           fns = fns.drop(1)
           fnsLength -= 1
 
-          var res = GA.run { argT.ap(fn.gab) }
+          var res = GA.run { fn.gab.ap(argT) }
 
           if (fn.remaining > 1) {
             fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
@@ -122,7 +122,7 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
                 fn = fns.first()
                 fns = fns.drop(1)
                 fnsLength -= 1
-                res = GA.run { res.ap(fn.gab) }
+                res = GA.run { fn.gab.ap(res) }
 
                 if (fn.remaining > 1) {
                   fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
@@ -162,6 +162,8 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
 
   override fun toString(): String = "FreeApplicative(...)"
 }
+
+fun <S, A, B> FreeApplicativeOf<S, (A) -> B>.ap(ff: FreeApplicativeOf<S, A>): FreeApplicative<S, B> = FreeApplicative.Ap(this.fix(), ff.fix())
 
 private fun <F, G, A> foldArg(node: FreeApplicative<F, A>, f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
   when (node) {

@@ -34,6 +34,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
+import arrow.mtl.ap as writerAp
 
 @extension
 @undocumented
@@ -56,18 +57,11 @@ interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, Writer
   override fun <A> just(a: A): WriterTOf<F, W, A> =
     WriterT(AF().just(MM().empty() toT a))
 
-  override fun <A, B> WriterTOf<F, W, A>.ap(ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(AF(), MM(), ff)
+  override fun <A, B> WriterTOf<F, W, (A) -> B>.ap(ff: WriterTOf<F, W, A>): WriterT<F, W, B> =
+    fix().writerAp(AF(), MM(), ff)
 
   override fun <A, B> WriterTOf<F, W, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(AF()) { f(it) }
-
-  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.lazyAp(ff: () -> Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
-    WriterT(
-      AF().run {
-        fix().value().lazyAp { ff().fix().value().map { r -> { l: Tuple2<W, A> -> Tuple2(MM().run { l.a + r.a }, r.b(l.b)) } } }
-      }
-    )
 }
 
 @extension
@@ -89,15 +83,8 @@ interface WriterTMonad<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicative
   override fun <A, B> tailRecM(a: A, f: (A) -> WriterTOf<F, W, Either<A, B>>): WriterT<F, W, B> =
     WriterT.tailRecM(MF(), a, f)
 
-  override fun <A, B> WriterTOf<F, W, A>.ap(ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    fix().ap(MF(), MM(), ff)
-
-  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.lazyAp(ff: () -> Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
-    WriterT(
-      AF().run {
-        fix().value().lazyAp { ff().fix().value().map { r -> { l: Tuple2<W, A> -> Tuple2(MM().run { l.a + r.a }, r.b(l.b)) } } }
-      }
-    )
+  override fun <A, B> WriterTOf<F, W, (A) -> B>.ap(ff: WriterTOf<F, W, A>): WriterT<F, W, B> =
+    fix().writerAp(MF(), MM(), ff)
 }
 
 @extension

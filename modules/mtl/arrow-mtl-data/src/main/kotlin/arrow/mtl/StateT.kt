@@ -168,7 +168,7 @@ class StateT<F, S, A>(
    * @param MF [Monad] for the context [F].
    * @param ff function with the [StateT] context.
    */
-  fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
+  fun <B> apPipe(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
     flatMap(MF) { a -> ff.fix().map(MF) { f -> f(a) } }
 
   /**
@@ -275,3 +275,6 @@ fun <F, S, A> StateTFunOf<F, S, A>.stateT(): StateT<F, S, A> = StateT(this)
  * @param MF [Monad] for the context [F].
  */
 fun <F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(MF, this)
+
+fun <F, S, A, B> StateTOf<F, S, (A) -> B>.ap(MF: Monad<F>, ff: StateTOf<F, S, A>): StateTOf<F, S, B> =
+  fix().flatMap(MF) { f -> ff.fix().map(MF, f) }

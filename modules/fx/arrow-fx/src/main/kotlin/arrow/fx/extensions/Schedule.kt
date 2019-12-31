@@ -33,8 +33,8 @@ interface ScheduleFunctor<F, Input> : Functor<SchedulePartialOf<F, Input>> {
 
 @extension
 interface ScheduleAppy<F, Input> : Apply<SchedulePartialOf<F, Input>>, ScheduleFunctor<F, Input> {
-  override fun <A, B> Kind<SchedulePartialOf<F, Input>, A>.ap(ff: Kind<SchedulePartialOf<F, Input>, (A) -> B>): Kind<SchedulePartialOf<F, Input>, B> =
-    fix().and(ff.fix()).map { (a, f) -> f(a) }
+  override fun <A, B> Kind<SchedulePartialOf<F, Input>, (A) -> B>.ap(ff: Kind<SchedulePartialOf<F, Input>, A>): Kind<SchedulePartialOf<F, Input>, B> =
+    fix().and(ff.fix()).map { (f, a) -> f(a) }
 }
 
 @extension

@@ -310,15 +310,15 @@ interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor
   override fun G(): Applicative<G>
 
   override fun <A, B> NestedType<F, G, A>.map(f: (A) -> B): NestedType<F, G, B> =
-    ap(just(f))
+    just(f).ap(this)
 
   override fun <A> just(a: A): NestedType<F, G, A> =
     F().just(G().just(a)).nest()
 
-  override fun <A, B> NestedType<F, G, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): NestedType<F, G, B> =
-    F().run { unnest().ap(ff.unnest().map { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } }) }.nest()
+  override fun <A, B> NestedType<F, G, (A) -> B>.ap(ff: Kind<Nested<F, G>, A>): NestedType<F, G, B> =
+    F().run { unnest().map { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { gfa.ap(ga) } } }.ap(ff.unnest()) }.nest()
 
-  fun <A, B> UnnestedType<F, G, A>.apC(ff: Kind<F, Kind<G, (A) -> B>>): UnnestedType<F, G, B> =
+  fun <A, B> UnnestedType<F, G, (A) -> B>.apC(ff: Kind<F, Kind<G, A>>): UnnestedType<F, G, B> =
     nest().ap(ff.nest()).unnest()
 
   companion object {

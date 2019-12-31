@@ -39,31 +39,25 @@ interface DayFunctor<F, G> : Functor<DayPartialOf<F, G>> {
 
 @extension
 @undocumented
-interface DayApply<F, G> : Apply<DayPartialOf<F, G>> {
+interface DayApply<F, G> : Apply<DayPartialOf<F, G>>, DayFunctor<F, G> {
   fun AF(): Applicative<F>
 
   fun AG(): Applicative<G>
 
-  override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
-    fix().mapLazy(f)
-
-  override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
-    fix().ap(AF(), AG(), ff)
+  override fun <A, B> Kind<DayPartialOf<F, G>, (A) -> B>.ap(ff: Kind<DayPartialOf<F, G>, A>): Day<F, G, B> =
+    fix().apPipe(AF(), AG(), ff.map { a -> { f: (A) -> B -> f(a) } })
 }
 
 @extension
 @undocumented
-interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>> {
-  fun AF(): Applicative<F>
+interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>>, DayApply<F, G> {
+  override fun AF(): Applicative<F>
 
-  fun AG(): Applicative<G>
+  override fun AG(): Applicative<G>
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
 
   override fun <A> just(a: A): Day<F, G, A> =
     Day.just(AF(), AG(), a)
-
-  override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
-    fix().ap(AF(), AG(), ff)
 }

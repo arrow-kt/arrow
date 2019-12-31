@@ -116,9 +116,9 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
   fun swap(MF: Monad<F>): WriterT<F, A, W> =
     transform(MF) { it.b toT it.a }
 
-  fun <B> ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    WriterT(AF.map(ff.value(), value) { (a, b) ->
-      Tuple2(SG.run { a.a.combine(b.a) }, a.b(b.b))
+  fun <B> apPipe(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
+    WriterT(AF.map(value, ff.value()) { (a, b) ->
+      Tuple2(SG.run { a.a.combine(b.a) }, b.b(a.b))
     })
 
   fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> WriterTOf<F, W, B>): WriterT<F, W, B> = MF.run {
@@ -142,3 +142,8 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
     WriterT(value.combineK(y.value()))
   }
 }
+
+fun <F, W, A, B> WriterTOf<F, W, (A) -> B>.ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, A>): WriterT<F, W, B> =
+  WriterT(AF.map(value(), ff.value()) { (a, b) ->
+    Tuple2(SG.run { a.a.combine(b.a) }, a.b(b.b))
+  })

@@ -38,7 +38,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
         override fun <A> just(a: A): Free<F, A> =
           Companion.just(a)
 
-        override fun <A, B> Kind<FreePartialOf<F>, A>.ap(ff: Kind<FreePartialOf<F>, (A) -> B>): Free<F, B> =
+        override fun <A, B> Kind<FreePartialOf<F>, (A) -> B>.ap(ff: Kind<FreePartialOf<F>, A>): Free<F, B> =
           applicative.run { ap(ff).fix() }
       }
   }
@@ -97,7 +97,7 @@ fun <S, A, B> FreeOf<S, A>.map(f: (A) -> B): Free<S, B> = flatMap { Free.Pure<S,
 
 fun <S, A, B> FreeOf<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.FlatMapped(this.fix(), f)
 
-fun <S, A, B> FreeOf<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
+fun <S, A, B> FreeOf<S, (A) -> B>.ap(ff: FreeOf<S, A>): Free<S, B> = fix().flatMap { f -> ff.fix().map(f) }.fix()
 
 /** Takes one evaluation step in the Free monad, re-associating left-nested binds in the process. */
 @Suppress("UNCHECKED_CAST")

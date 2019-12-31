@@ -233,7 +233,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 
-  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = CF.run {
+  override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> = CF.run {
     this@ap.ap(ff)
   }
 

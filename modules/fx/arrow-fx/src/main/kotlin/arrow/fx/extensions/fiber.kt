@@ -25,8 +25,8 @@ fun <F> Fiber.Companion.functor(C: Concurrent<F>): Functor<Kind<ForFiber, F>> =
 
 fun <F> Fiber.Companion.apply(C: Concurrent<F>): Apply<Kind<ForFiber, F>> =
   object : Apply<FiberPartialOf<F>>, Functor<FiberPartialOf<F>> by functor(C) {
-    override fun <A, B> Kind<FiberPartialOf<F>, A>.ap(ff: Kind<FiberPartialOf<F>, (A) -> B>): Kind<FiberPartialOf<F>, B> = C.run {
-      ff.map2(fix()) { (f, a) -> f(a) }
+    override fun <A, B> Kind<FiberPartialOf<F>, (A) -> B>.ap(ff: Kind<FiberPartialOf<F>, A>): Kind<FiberPartialOf<F>, B> = C.run {
+      map2(ff) { (f, a) -> f(a) }
     }
 
     override fun <A, B, Z> Kind<FiberPartialOf<F>, A>.map2(fb: Kind<FiberPartialOf<F>, B>, f: (Tuple2<A, B>) -> Z): Kind<FiberPartialOf<F>, Z> = C.run {

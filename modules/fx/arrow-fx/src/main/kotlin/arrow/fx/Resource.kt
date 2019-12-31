@@ -177,7 +177,7 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
 
   fun <B> map(BR: Bracket<F, E>, f: (A) -> B): Resource<F, E, B> = flatMap { just(f(it), BR) }
 
-  fun <B> ap(BR: Bracket<F, E>, ff: ResourceOf<F, E, (A) -> B>): Resource<F, E, B> = flatMap { res -> ff.fix().map(BR) { it(res) } }
+  fun <B> apPipe(BR: Bracket<F, E>, ff: ResourceOf<F, E, (A) -> B>): Resource<F, E, B> = flatMap { res -> ff.fix().map(BR) { it(res) } }
 
   fun <B> flatMap(f: (A) -> ResourceOf<F, E, B>): Resource<F, E, B> = object : Resource<F, E, B> {
     override fun <C> invoke(use: (B) -> Kind<F, C>): Kind<F, C> = this@Resource { a ->
@@ -259,3 +259,5 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
     ): Resource<F, E, A> = invoke(acquire, { r, _ -> release(r) }, BR)
   }
 }
+
+fun <F, E, A, B> ResourceOf<F, E, (A) -> B>.ap(BR: Bracket<F, E>, ff: ResourceOf<F, E, A>): Resource<F, E, B> = fix().flatMap { f -> ff.fix().map(BR, f) }

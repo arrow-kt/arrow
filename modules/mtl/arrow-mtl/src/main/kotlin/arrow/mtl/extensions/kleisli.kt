@@ -39,6 +39,7 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.undocumented
+import arrow.mtl.ap as kleisliAp
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -107,13 +108,13 @@ interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, 
   override fun <A, B> KleisliOf<F, D, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(AF(), f)
 
-  override fun <A, B> KleisliOf<F, D, A>.ap(ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(AF(), ff)
+  override fun <A, B> KleisliOf<F, D, (A) -> B>.ap(ff: KleisliOf<F, D, A>): Kleisli<F, D, B> =
+    fix().kleisliAp(AF(), ff)
 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
     Kleisli { AF().run { run(it).product(fb.run(it)) } }
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, (A) -> B>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, A>): Kind<KleisliPartialOf<F, D>, B> =
     Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
 }
 
@@ -144,13 +145,13 @@ interface KleisliMonad<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicative
   override fun <A, B> KleisliOf<F, D, A>.flatMap(f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> =
     fix().flatMap(MF(), f)
 
-  override fun <A, B> KleisliOf<F, D, A>.ap(ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> KleisliOf<F, D, (A) -> B>.ap(ff: KleisliOf<F, D, A>): Kleisli<F, D, B> =
+    fix().kleisliAp(AF(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
     Kleisli.tailRecM(MF(), a, f)
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, (A) -> B>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, A>): Kind<KleisliPartialOf<F, D>, B> =
     Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
 }
 
