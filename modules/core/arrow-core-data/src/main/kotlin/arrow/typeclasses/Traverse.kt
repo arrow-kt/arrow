@@ -485,7 +485,7 @@ import arrow.core.SequenceK
  *
  * ### Theory Wrap-up
  *
- * Unsurprisingly, [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
+ * [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
  *
  * In contrast, `homomorphisms` such as `Monoid` and [Applicative] preserve their structure, hence adding two `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.map(::toString)` results in a `List<String>`.
  *
