@@ -39,7 +39,7 @@ interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
   override fun <A> just(a: A): FreeCOf<F, A> =
     FreeC.just(a)
 
-  override fun <A, B> FreeCOf<F, A>.ap(ff: FreeCOf<F, (A) -> B>): FreeCOf<F, B> =
+  override fun <A, B> FreeCOf<F, (A) -> B>.ap(ff: FreeCOf<F, A>): FreeCOf<F, B> =
     apply(ff)
 }
 
@@ -68,7 +68,7 @@ interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwab
   override fun <A> just(a: A): FreeCOf<F, A> =
     FreeC.just(a)
 
-  override fun <A, B> FreeCOf<F, A>.ap(ff: FreeCOf<F, (A) -> B>): FreeCOf<F, B> =
+  override fun <A, B> FreeCOf<F, (A) -> B>.ap(ff: FreeCOf<F, A>): FreeCOf<F, B> =
     apply(ff)
 }
 

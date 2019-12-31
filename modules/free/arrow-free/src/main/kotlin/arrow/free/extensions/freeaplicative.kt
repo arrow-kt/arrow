@@ -37,7 +37,7 @@ interface FreeApplicativeApplicative<S> : Applicative<FreeApplicativePartialOf<S
   override fun <A> just(a: A): FreeApplicative<S, A> = FreeApplicative.just(a)
 
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, (A) -> B>.ap(ff: Kind<FreeApplicativePartialOf<S>, A>): FreeApplicative<S, B> =
-    fix().ap(ff.fix())
+    fix().freeAp(ff.fix())
 
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
 }

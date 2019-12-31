@@ -42,7 +42,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
-  fun <B> ap(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
+  fun <B> apPipe(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
@@ -319,3 +319,5 @@ fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Obser
 
 fun <A> ObservableKOf<A>.handleErrorWith(function: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> ObservableKOf<(A) -> B>.ap(ff: ObservableKOf<A>): ObservableK<B> = fix().flatMap { f -> ff.fix().map(f) }

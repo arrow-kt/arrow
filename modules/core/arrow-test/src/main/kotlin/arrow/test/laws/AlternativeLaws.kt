@@ -22,7 +22,7 @@ object AlternativeLaws {
     val cff = GENK.genK(Gen.functionAToB<Int, Int>(Gen.int()))
 
     return ApplicativeLaws.laws(AF, GENK, EQK) + MonoidKLaws.laws(AF, GENK, EQK) + listOf(
-      Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
+      Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cf, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
       /*
       right distributivity is not implemented correctly
@@ -33,9 +33,9 @@ object AlternativeLaws {
     )
   }
 
-  fun <F> Alternative<F>.alternativeRightAbsorption(G: Gen<Kind<F, (Int) -> Int>>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(G) { fa: Kind<F, (Int) -> Int> ->
-      empty<Int>().ap(fa).equalUnderTheLaw(empty(), EQ)
+  fun <F> Alternative<F>.alternativeRightAbsorption(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(G) { fa: Kind<F, Int> ->
+      empty<(Int) -> Int>().ap(fa).equalUnderTheLaw(empty(), EQ)
     }
 
   fun <F> Alternative<F>.alternativeLeftDistributivity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -50,7 +50,7 @@ object AlternativeLaws {
     EQ: Eq<Kind<F, Int>>
   ): Unit =
     forAll(G, GF, GF) { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
-      fa.ap(ff.combineK(fg)).equalUnderTheLaw(fa.ap(ff).combineK(fa.ap(fg)), EQ)
+      ff.combineK(fg).ap(fa).equalUnderTheLaw(ff.ap(fa).combineK(fg.ap(fa)), EQ)
     }
 
   fun <F> Alternative<F>.alternativeAssociativity(

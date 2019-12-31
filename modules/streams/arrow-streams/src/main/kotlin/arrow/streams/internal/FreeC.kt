@@ -226,8 +226,8 @@ fun <F, G, A, B> FreeCOf<F, A>.transform(f: (A) -> B, fs: FunctionK<F, G>): Free
 /**
  * Given a function [ff] in the context of [FreeC], applies the function.
  */
-fun <F, A, B> FreeCOf<F, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
-  fix().flatMap { a -> ff.fix().map { f -> f(a) } }
+fun <F, A, B> FreeCOf<F, (A) -> B>.ap(ff: Kind<FreeCPartialOf<F>, A>): Kind<FreeCPartialOf<F>, B> =
+  fix().flatMap { f -> ff.fix().map(f) }
 
 /**
  * Transform [FreeC] while being able to inspect the [Result] type.

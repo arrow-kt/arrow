@@ -12,7 +12,6 @@ import arrow.fx.Timer
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
-import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
@@ -49,6 +48,7 @@ import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
+import arrow.fx.rx2.ap as maybeKAp
 
 @extension
 interface MaybeKFunctor : Functor<ForMaybeK> {
@@ -58,24 +58,21 @@ interface MaybeKFunctor : Functor<ForMaybeK> {
 
 @extension
 interface MaybeKApplicative : Applicative<ForMaybeK> {
-  override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
-    fix().ap(ff)
-
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): MaybeK<A> =
     MaybeK.just(a)
 
-  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> MaybeKOf<(A) -> B>.ap(ff: MaybeKOf<A>): MaybeK<B> =
+    fix().maybeKAp(ff)
+
+  override fun <A, B> Kind<ForMaybeK, (A) -> B>.lazyAp(ff: () -> Kind<ForMaybeK, A>): Kind<ForMaybeK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
-  override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
-    fix().ap(ff)
-
   override fun <A, B> MaybeKOf<A>.flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().flatMap(f)
 
@@ -85,8 +82,11 @@ interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
   override fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> =
     MaybeK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> MaybeKOf<(A) -> B>.ap(ff: MaybeKOf<A>): MaybeK<B> =
+    fix().maybeKAp(ff)
+
+  override fun <A, B> Kind<ForMaybeK, (A) -> B>.lazyAp(ff: () -> Kind<ForMaybeK, A>): Kind<ForMaybeK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

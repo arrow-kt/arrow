@@ -57,6 +57,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
+import arrow.fx.rx2.ap as flowAp
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -66,8 +67,6 @@ interface FlowableKFunctor : Functor<ForFlowableK> {
 
 @extension
 interface FlowableKApplicative : Applicative<ForFlowableK> {
-  override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
-    fix().ap(ff)
 
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
@@ -75,15 +74,15 @@ interface FlowableKApplicative : Applicative<ForFlowableK> {
   override fun <A> just(a: A): FlowableK<A> =
     FlowableK.just(a)
 
-  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> FlowableKOf<(A) -> B>.ap(ff: FlowableKOf<A>): FlowableK<B> =
+    fix().flowAp(ff)
+
+  override fun <A, B> Kind<ForFlowableK, (A) -> B>.lazyAp(ff: () -> Kind<ForFlowableK, A>): Kind<ForFlowableK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface FlowableKMonad : Monad<ForFlowableK>, FlowableKApplicative {
-  override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
-    fix().ap(ff)
-
   override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().concatMap(f)
 
@@ -93,8 +92,11 @@ interface FlowableKMonad : Monad<ForFlowableK>, FlowableKApplicative {
   override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> FlowableKOf<(A) -> B>.ap(ff: FlowableKOf<A>): FlowableK<B> =
+    fix().flowAp(ff)
+
+  override fun <A, B> Kind<ForFlowableK, (A) -> B>.lazyAp(ff: () -> Kind<ForFlowableK, A>): Kind<ForFlowableK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

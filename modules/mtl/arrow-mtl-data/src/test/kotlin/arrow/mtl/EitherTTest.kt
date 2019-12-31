@@ -69,7 +69,7 @@ class EitherTTest : UnitSpec() {
 
       ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()),
         EitherT.functor(IO.functor()),
-        EitherT.applicative(IO.applicative()),
+        EitherT.applicative(IO.monad()),
         EitherT.monad(IO.monad()),
         EitherT.genK(IO.genK(), Gen.string()),
         ioEQK),

@@ -49,7 +49,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()
 
-  fun <B> ap(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
+  fun <B> apPipe(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
@@ -318,3 +318,5 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
 
 fun <A> MaybeK<A>.handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> MaybeKOf<(A) -> B>.ap(ff: MaybeKOf<A>): MaybeK<B> = fix().flatMap { f -> ff.fix().map(f) }

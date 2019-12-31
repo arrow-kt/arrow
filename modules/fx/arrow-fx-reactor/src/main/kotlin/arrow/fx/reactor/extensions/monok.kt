@@ -29,6 +29,7 @@ import arrow.typeclasses.MonadThrow
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
+import arrow.fx.reactor.ap as monoAp
 
 @extension
 interface MonoKFunctor : Functor<ForMonoK> {
@@ -41,14 +42,14 @@ interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
-  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
-    fix().ap(ff)
-
   override fun <A> just(a: A): MonoK<A> =
     MonoK.just(a)
 
-  override fun <A, B> Kind<ForMonoK, A>.lazyAp(ff: () -> Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> MonoKOf<(A) -> B>.ap(ff: MonoKOf<A>): MonoK<B> =
+    fix().monoAp(ff)
+
+  override fun <A, B> Kind<ForMonoK, (A) -> B>.lazyAp(ff: () -> Kind<ForMonoK, A>): Kind<ForMonoK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
@@ -56,17 +57,17 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
-  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
-    fix().ap(ff)
-
   override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     fix().flatMap(f)
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<Either<A, B>>>): MonoK<B> =
     MonoK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForMonoK, A>.lazyAp(ff: () -> Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> MonoKOf<(A) -> B>.ap(ff: MonoKOf<A>): MonoK<B> =
+    fix().monoAp(ff)
+
+  override fun <A, B> Kind<ForMonoK, (A) -> B>.lazyAp(ff: () -> Kind<ForMonoK, A>): Kind<ForMonoK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

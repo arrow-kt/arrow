@@ -41,7 +41,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
-  fun <B> ap(fa: FluxKOf<(A) -> B>): FluxK<B> =
+  fun <B> apPipe(fa: FluxKOf<(A) -> B>): FluxK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
@@ -336,3 +336,5 @@ fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
 
 fun <A> FluxKOf<A>.handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
   value().onErrorResume { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> FluxKOf<(A) -> B>.ap(ff: FluxKOf<A>): FluxK<B> = fix().flatMap { f -> ff.fix().map(f) }

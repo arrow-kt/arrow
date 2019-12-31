@@ -40,6 +40,7 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as fluxHandleErrorWith
+import arrow.fx.reactor.ap as fluxAp
 
 @extension
 interface FluxKFunctor : Functor<ForFluxK> {
@@ -52,20 +53,20 @@ interface FluxKApplicative : Applicative<ForFluxK> {
   override fun <A> just(a: A): FluxK<A> =
     FluxK.just(a)
 
-  override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
-    fix().ap(ff)
+  override fun <A, B> FluxKOf<(A) -> B>.ap(ff: FluxKOf<A>): FluxK<B> =
+    fix().fluxAp(ff)
 
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 
-  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForFluxK, (A) -> B>.lazyAp(ff: () -> Kind<ForFluxK, A>): Kind<ForFluxK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
-  override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
-    fix().ap(ff)
+  override fun <A, B> FluxKOf<(A) -> B>.ap(ff: FluxKOf<A>): FluxK<B> =
+    fix().fluxAp(ff)
 
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().flatMap(f)
@@ -76,8 +77,8 @@ interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<arrow.core.Either<A, B>>>): FluxK<B> =
     FluxK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForFluxK, (A) -> B>.lazyAp(ff: () -> Kind<ForFluxK, A>): Kind<ForFluxK, B> =
+      fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

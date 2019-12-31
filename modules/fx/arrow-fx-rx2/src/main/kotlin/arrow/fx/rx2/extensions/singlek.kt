@@ -3,21 +3,26 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-
+import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
-import arrow.fx.rx2.extensions.singlek.async.async
+import arrow.fx.rx2.asScheduler
+import arrow.fx.rx2.extensions.singlek.dispatchers.dispatchers
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
@@ -27,13 +32,6 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
-import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.singlek.dispatchers.dispatchers
-import arrow.fx.rx2.unsafeRunAsync
-import arrow.fx.rx2.unsafeRunSync
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -48,8 +46,9 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as singleHandleErrorWith
+import io.reactivex.disposables.Disposable as RxDisposable
+import arrow.fx.rx2.ap as singleKAp
 
 @extension
 interface SingleKFunctor : Functor<ForSingleK> {
@@ -59,24 +58,21 @@ interface SingleKFunctor : Functor<ForSingleK> {
 
 @extension
 interface SingleKApplicative : Applicative<ForSingleK> {
-  override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
-    fix().ap(ff)
-
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): SingleK<A> =
     SingleK.just(a)
 
-  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> SingleKOf<(A) -> B>.ap(ff: SingleKOf<A>): SingleK<B> =
+    fix().singleKAp(ff)
+
+  override fun <A, B> Kind<ForSingleK, (A) -> B>.lazyAp(ff: () -> Kind<ForSingleK, A>): Kind<ForSingleK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
-  override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
-    fix().ap(ff)
-
   override fun <A, B> SingleKOf<A>.flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     fix().flatMap(f)
 
@@ -86,8 +82,11 @@ interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
   override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> SingleKOf<(A) -> B>.ap(ff: SingleKOf<A>): SingleK<B> =
+    fix().singleKAp(ff)
+
+  override fun <A, B> Kind<ForSingleK, (A) -> B>.lazyAp(ff: () -> Kind<ForSingleK, A>): Kind<ForSingleK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

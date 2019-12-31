@@ -157,12 +157,12 @@ class ValidatedTest : UnitSpec() {
     }
 
     "ap should return Valid(f(a)) if both are Valid" {
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
+      Valid { a: Int -> a + 5 }.ap(plusIntSemigroup, Valid(10)) shouldBe Valid(15)
     }
 
     "ap should return first Invalid found if is unique or combine both in otherwise" {
-      Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
-      Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
+      Valid { a: Int -> a + 5 }.ap<Int, Int, Int>(plusIntSemigroup, Invalid(10)) shouldBe Invalid(10)
+      Invalid(5).ap<Int, Int, Int>(plusIntSemigroup, Valid(10)) shouldBe Invalid(5)
       Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
     }
 

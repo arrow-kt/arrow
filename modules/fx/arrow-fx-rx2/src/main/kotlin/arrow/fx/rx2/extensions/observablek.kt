@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as observableHandleErrorWith
+import arrow.fx.rx2.ap as observableAp
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -63,24 +64,21 @@ interface ObservableKFunctor : Functor<ForObservableK> {
 
 @extension
 interface ObservableKApplicative : Applicative<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
-    fix().ap(ff)
-
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): ObservableK<A> =
     ObservableK.just(a)
 
-  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> ObservableKOf<(A) -> B>.ap(ff: ObservableKOf<A>): ObservableK<B> =
+    fix().observableAp(ff)
+
+  override fun <A, B> Kind<ForObservableK, (A) -> B>.lazyAp(ff: () -> Kind<ForObservableK, A>): Kind<ForObservableK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension
 interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
-  override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
-    fix().ap(ff)
-
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap(f)
 
@@ -90,8 +88,11 @@ interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
   override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> ObservableKOf<(A) -> B>.ap(ff: ObservableKOf<A>): ObservableK<B> =
+    fix().observableAp(ff)
+
+  override fun <A, B> Kind<ForObservableK, (A) -> B>.lazyAp(ff: () -> Kind<ForObservableK, A>): Kind<ForObservableK, B> =
+    fix().flatMap { f -> ff().map(f) }
 }
 
 @extension

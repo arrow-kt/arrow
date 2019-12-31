@@ -44,7 +44,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
-  fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
+  fun <B> apPipe(fa: MonoKOf<(A) -> B>): MonoK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
@@ -377,3 +377,5 @@ fun <A> MonoKOf<A>.unsafeRunSync(): A? =
 
 fun <A> MonoK<A>.handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
   value().onErrorResume { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> MonoKOf<(A) -> B>.ap(ff: MonoKOf<A>): MonoK<B> = fix().flatMap { f -> ff.fix().map(f) }

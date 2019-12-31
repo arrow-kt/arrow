@@ -105,7 +105,7 @@ object MonadLaws {
 
   fun <F> Monad<F>.derivedApConsistent(GK: GenK<F>, AP: Apply<F>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(GK.genK(Gen.int()), GK.genK(Gen.functionAToB<Int, Int>(Gen.int()))) { fa, ff ->
-      AP.run { fa.ap(ff) }.equalUnderTheLaw(fa.ap(ff), EQ)
+      AP.run { ff.ap(fa) }.equalUnderTheLaw(ff.ap(fa), EQ)
     }
 
   fun <F> Monad<F>.derivedFollowedByConsistent(GK: GenK<F>, AP: Apply<F>, EQ: Eq<Kind<F, Int>>): Unit =

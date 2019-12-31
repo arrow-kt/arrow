@@ -42,7 +42,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
   fun <B> map(f: (A) -> B): FlowableK<B> =
     flowable.map(f).k()
 
-  fun <B> ap(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
+  fun <B> apPipe(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
@@ -287,3 +287,5 @@ fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Flowabl
 
 fun <A> FlowableK<A>.handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> FlowableKOf<(A) -> B>.ap(ff: FlowableKOf<A>): FlowableK<B> = fix().flatMap { f -> ff.fix().map(f) }

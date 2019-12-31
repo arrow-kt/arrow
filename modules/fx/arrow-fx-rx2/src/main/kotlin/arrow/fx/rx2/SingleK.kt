@@ -46,7 +46,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
 
-  fun <B> ap(fa: SingleKOf<(A) -> B>): SingleK<B> =
+  fun <B> apPipe(fa: SingleKOf<(A) -> B>): SingleK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
@@ -335,3 +335,5 @@ fun <A> SingleKOf<A>.unsafeRunSync(): A =
 
 fun <A> SingleK<A>.handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
+
+fun <A, B> SingleKOf<(A) -> B>.ap(ff: SingleKOf<A>): SingleK<B> = fix().flatMap { f -> ff.fix().map(f) }
