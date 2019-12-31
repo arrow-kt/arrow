@@ -11,6 +11,7 @@ import arrow.core.Validated
 import arrow.core.Const
 import arrow.core.Nel
 import arrow.core.SequenceK
+import arrow.core.ValidatedNel
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Traverse)
@@ -19,15 +20,13 @@ import arrow.core.SequenceK
  *
  * These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single [String] into an [Int], validating a login, or asynchronously fetching website information for a user.
  *
- * ```kotlin:ank
+ * ```kotlin
  * import arrow.fx.IO
  *
- * //sampleStart
  * interface Profile
  * interface User
  *
  * fun userInfo(u: User): IO<Profile>
- * //sampleEnd
  * ```
  *
  * Each function asks only for the data it needs; in the case of `userInfo`, a single `User`. Indeed, we could write one that takes a `List<User>` and fetches profile for all of them, but it would be a bit strange. If we just wanted to fetch the profile of only one user, we would either have to wrap it in a [List] or write a separate function that takes in a single user, nonetheless. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does it hold in this case?
@@ -155,14 +154,6 @@ import arrow.core.SequenceK
  * }
  * ```
  *
- * In general this holds:
- *
- * ```kotlin
- * map(::f).sequence(AP) == traverse(AP, ::f)
- * ```
- *
- * where AP stands for an `Applicative<G>`, which is in the prior snippet `Applicative<ForOption>`.
- *
  * There exists a much more generalized and powerful form that would allow us to parse a `List<String>` or validate credentials for a `List<User>`.
  *
  * Enter [Traverse].
@@ -186,7 +177,15 @@ import arrow.core.SequenceK
  *
  * Abstracting away the `G` (still imagining `F` to be `List`), [traverse] says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
  *
- * In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist [Traverse] instances for `Option`, `Either`, and `Validated` (among others).
+ * In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist [Traverse] instances for [Option], [Either], and [Validated] (among others).
+ *
+ * In general this holds:
+ *
+ * ```kotlin
+ * map(::f).sequence(AP) == traverse(AP, ::f)
+ * ```
+ *
+ * where AP stands for an `Applicative<G>`, which is in prior snippets `Applicative<ForOption>`, `Applicative<ForIO>` or `Applicative<EitherPartialOf<L>>`.
  *
  * ### When to use Traverse over Foldable
  *
@@ -220,29 +219,11 @@ import arrow.core.SequenceK
  *
  * This is where [Traverse] shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you may use [traverse].
  *
- * Additionally, you're able to wrap your context `F` within a `G`. That is, may among others, the reason why [Traverse] is strictly more powerful than [Foldable].
- *
- * However, for certain computations [traverse] may also be simplified to a `map`:
- *
- * ```kotlin:ank
- * import arrow.core.Id
- * import arrow.core.MapK
- * import arrow.core.extensions.id.applicative.applicative
- * import arrow.core.fix
- * import arrow.core.k
- * import arrow.core.value
- *
- * val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
- *
- * map.traverse(Id.applicative()) { Id("$it") }.fix().value()
- * ```
- * ```kotlin:ank
- * map.map { "$it" }
- * ```
+ * Additionally, you're able to wrap your context `F` within a `G`. That is one reason, may among others, why [Traverse] is strictly more powerful than [Foldable].
  *
  * ### Traversables are Foldable
  *
- * The [Foldable] type class abstracts over “things that can be folded over” similar to how [Traverse] abstracts over “things that can be traversed.” It turns out [Traverse] is strictly more powerful than [Foldable] - that is, `foldLeft` and [foldRight] can be implemented in terms of [traverse] by picking the right [Applicative]. However, arrow's [Traverse] does not implement [foldLeft] and [foldRight] with [traverse] as the actual implementation tends to be inefficient.
+ * The [Foldable] type class abstracts over “things that can be folded over” similar to how [Traverse] abstracts over “things that can be traversed.” It turns out [Traverse] is strictly more powerful than [Foldable] - that is, [foldLeft] and [foldRight] can be implemented in terms of [traverse] by picking the right [Applicative]. However, arrow's [Traverse] does not implement [foldLeft] and [foldRight] with [traverse] as the actual implementation tends to be inefficient.
  *
  * For brevity and demonstration purposes we’ll implement an isomorphic [foldMap] method in terms of [traverse] by using [Const]. You can then implement [foldRight] in terms of [foldMap], and [foldLeft] can then be implemented in terms of [foldRight], though the resulting implementations may be slow.
  *
@@ -263,7 +244,7 @@ import arrow.core.SequenceK
  * fun <F, B, A> Kind<F, A>.foldMap(f: (A) -> B, M: Monoid<B>, TF: Traverse<F>): B =
  *   TF.run {
  *     M.run {
- *       traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
+ *       traverse(Const.applicative(M)) { a: A -> Const<B, Nothing>(f(a)) }.fix().value()
  *     }
  *   }
  *
@@ -293,7 +274,7 @@ import arrow.core.SequenceK
  *   else NumberFormatException("$s is not a valid integer.").invalidNel()
  * ```
  *
- * We can now [traverse] structures that contain strings parsing them into integers and either with a `fail-fast` strategy using `Either` or accumulating failures with `ValidatedNel`.
+ * We can now [traverse] structures that contain strings parsing them into integers and either with a `fail-fast` strategy using [Either] or accumulating failures with [ValidatedNel].
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -350,11 +331,15 @@ import arrow.core.SequenceK
  * }
  * ```
  *
- * Notice that in the `Either` case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are runed in isolation.
+ * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using [Option]). Contrast this with [Validated] where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are runed in isolation.
  *
- * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, by using `parApplicative`. Then when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
+ * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that will not short-circuit, by using `parApplicative`.
  *
- * Ultimately, we use `parTraverse` that runs each operation in parallel:
+ * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`. `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. Consequently, `IO.applicative()` will only run an effect, when the previous one is successful.
+ *
+ * Then when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
+ *
+ * Ultimately, we utilize `parTraverse` that calls traverse with `parApplicative` in an concurrent environment [F] - in the following example `IO`:
  *
  * ```kotlin:ank:playground
  * import arrow.fx.IO
@@ -386,11 +371,13 @@ import arrow.core.SequenceK
  * }
  * ```
  *
- * Evidently, [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, a [SequenceK], or a `Stream`, hence the name [Traverse].
+ * Evidently, [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
  *
  * #### Playing with `Reader`
  *
- * Another interesting data type we can use is `Reader`. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
+ * Another interesting data type we can use is `Reader`. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> Id<A>`.
+ *
+ * In other words all three aforementioned representations are isomorphic to `D -> A` - (Note: In regards to the category of Kotlin, where the morphisms are functions one might consider this signature `D -> A` rather than wrapper Data types like `Kleisli`)
  *
  * If we fix `D` to be some sort of dependency or configuration and `A` as the return type, we can use the `Reader` applicative in our [traverse].
  *
@@ -408,7 +395,7 @@ import arrow.core.SequenceK
  *
  * We can imagine we have a data pipeline that processes a bunch of data, each piece of data being categorized by a topic. Given a specific topic, we produce a `Job` that processes that topic. (Note that since a `Job` is just a `Reader`/`Kleisli`, one could write many small `Jobs` and compose them together into one `Job` that is used/returned by `processTopic`.)
  *
- * Corresponding to bunch of topics, a `List<Topic>` if you will. Since `Reader` has an [Applicative] instance, we can [traverse] over this list with `processTopic`.
+ * Corresponding to bunch of topics, a `List<Topic>` if you will. Since `Reader` has an [Applicative] instance, we can [traverse] over this list.
  *
  * ```kotlin:ank
  * import arrow.core.Id
@@ -469,12 +456,9 @@ import arrow.core.SequenceK
  * import arrow.core.fix
  * import arrow.typeclasses.Applicative
  *
- * object IdApplicative : Applicative<ForId> {
+ * interface IdApplicative : Applicative<ForId> {
  *   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
- *     fix().ap(ff)
- *
- *   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
- *     fix().map(f)
+ *     ff.fix().flatMap { f -> map(f) }.fix()
  *
  *   override fun <A> just(a: A): Id<A> =
  *     Id.just(a)
@@ -483,11 +467,28 @@ import arrow.core.SequenceK
  *
  * We can implement [map] by wrapping and unwrapping [Id] as necessary.
  *
+ * ```kotlin:ank:playground
+ * import arrow.core.Id
+ * import arrow.core.MapK
+ * import arrow.core.extensions.id.applicative.applicative
+ * import arrow.core.fix
+ * import arrow.core.k
+ * import arrow.core.value
+ * //sampleStart
+ * val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+ *
+ * val result = map.traverse(Id.applicative()) { Id("$it") }.fix().value()
+ * //sampleEnd
+ * fun main() {
+ *   println(result)
+ * }
+ * ```
+ *
  * ### Theory Wrap-up
  *
  * Unsurprisingly, [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
  *
- * In contrast, `homomorphisms` such as `Monoid` and [Applicative] preserve their structure, hence adding two `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.map(::toString)` results in a `List<String>`.
+ * In contrast, `homomorphisms` such as `Monoid` and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.ap(Int::inc)` results in a `List<Int>`.
  *
  * We can think of catamorphic operations as:
  *
@@ -508,12 +509,11 @@ import arrow.core.SequenceK
  * TypeClass(Traverse::class).dtMarkdownList()
  * ```
  *
- * ank_macro_hierarchy(arrow.typeclasses.Traverse)
- *
  * ## Futher Reading
  *
  * - [The Essence of the Iterator Pattern](https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf) - Gibbons, Oliveira. JFP, 2009
  * - [Catamorphisms](https://blog.ploeh.dk/2019/04/29/catamorphisms/) - Mark Seemann, 2019
+ * - [Catamorphisms in 15 minutes](http://chrislambda.github.io/blog/2014/01/30/catamorphisms-in-15-minutes/) - Chris Jones, 2014
  *
  * ## Credits
  *

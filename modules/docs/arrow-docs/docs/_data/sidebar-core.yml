@@ -164,7 +164,7 @@ options:
         url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-bitraverse/
 
       - title: Traverse
-        url: /docs/arrow/typeclasses/traverse/
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/
 
       - title: Reducible
         url: /docs/arrow/typeclasses/reducible/
