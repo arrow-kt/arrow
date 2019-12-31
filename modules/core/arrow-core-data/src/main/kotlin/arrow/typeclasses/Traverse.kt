@@ -8,6 +8,7 @@ import arrow.typeclasses.internal.IdBimonad
 import arrow.core.Option
 import arrow.core.Either
 import arrow.core.Validated
+import arrow.core.Const
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Traverse)
@@ -187,7 +188,7 @@ import arrow.core.Validated
  *
  * ### When to use Traverse over Foldable
  *
- * Even though, [Foldable] and [Traverse] are related, because both 'reduce their values to something', it is not obvious why to consider [Traverse] over `Foldable`.
+ * Even though, [Foldable] and [Traverse] are related, because both 'reduce their values to something', it is not obvious why to consider [Traverse] over [Foldable].
  *
  * Here is one example:
  *
@@ -213,11 +214,11 @@ import arrow.core.Validated
  * }
  * ```
  *
- * Both methodologies try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. Resulting in a tiresome implementation, where we need to come up with an algorithm to resolve a key of a given value in the `Map` - let alone that this algorithm is not universal over any given `Map`.
+ * Both methodologies try to attain the same thing, but what [Foldable] lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. Resulting in a tiresome implementation, where we need to come up with an algorithm to resolve a key of a given value in the `Map` - let alone that this algorithm is not universal over any given `Map`.
  *
  * This is where [Traverse] shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you may use [traverse].
  *
- * Additionally, you're able to wrap your context `F` within a `G`. That is, may among others, the reason why [Traverse] is strictly more powerful than `Foldable`.
+ * Additionally, you're able to wrap your context `F` within a `G`. That is, may among others, the reason why [Traverse] is strictly more powerful than [Foldable].
  *
  * However, for certain computations [traverse] may also be simplified to a `map`:
  *
@@ -239,22 +240,35 @@ import arrow.core.Validated
  *
  * ### Traversables are Foldable
  *
- * The `Foldable` type class abstracts over “things that can be folded over” similar to how [Traverse] abstracts over “things that can be traversed.” It turns out [Traverse] is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of [traverse] by picking the right [Applicative]. However, arrow's [Traverse] does not implement `foldLeft` and `foldRight` with [traverse] as the actual implementation tends to be inefficient.
+ * The [Foldable] type class abstracts over “things that can be folded over” similar to how [Traverse] abstracts over “things that can be traversed.” It turns out [Traverse] is strictly more powerful than [Foldable] - that is, `foldLeft` and [foldRight] can be implemented in terms of [traverse] by picking the right [Applicative]. However, arrow's [Traverse] does not implement [foldLeft] and [foldRight] with [traverse] as the actual implementation tends to be inefficient.
  *
- * For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of [traverse] by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
+ * For brevity and demonstration purposes we’ll implement an isomorphic [foldMap] method in terms of [traverse] by using [Const]. You can then implement [foldRight] in terms of [foldMap], and [foldLeft] can then be implemented in terms of [foldRight], though the resulting implementations may be slow.
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.Kind
+ * import arrow.core.Const
+ * import arrow.core.ListK
  * import arrow.core.extensions.const.applicative.applicative
- * import arrow.typeclasses.Const
+ * import arrow.core.extensions.listk.traverse.traverse
+ * import arrow.core.extensions.monoid
+ * import arrow.core.fix
+ * import arrow.core.identity
+ * import arrow.core.k
  * import arrow.typeclasses.Monoid
  * import arrow.typeclasses.Traverse
- * import arrow.typeclasses.fix
  *
- * fun <F, B, A> Kind<F, A>.foldMap(M: Monoid<B>, TF: Traverse<F>, b: B, f: (A) -> B): B = TF.run {
- *   M.run {
- *     traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
+ * //sampleStart
+ * fun <F, B, A> Kind<F, A>.foldMap(f: (A) -> B, M: Monoid<B>, TF: Traverse<F>): B =
+ *   TF.run {
+ *     M.run {
+ *       traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
+ *     }
  *   }
+ *
+ * val sing = listOf("Hello", " from ", "the", " other ", "side!").k().foldMap(::identity, String.monoid(), ListK.traverse())
+ * //sampleEnd
+ * fun main() {
+ *   println("sing= $sing")
  * }
  * ```
  *
