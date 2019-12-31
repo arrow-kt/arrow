@@ -33,8 +33,9 @@ import arrow.core.ValidatedNel
  *
  * Given just `(User) -> IO<Profile>`, what should we do if we want to fetch profiles for a `List<User>`? We could try familiar combinators like map.
  *
- * ```kotlin:ank
- * fun profilesFor(users: List<User>): List<IO<Profile>> = users.map(::userInfo)
+ * ```kotlin
+ * fun profilesFor(users: List<User>): List<IO<Profile>> =
+ *   users.map(::userInfo)
  * ```
  *
  * Note the return type `List<IO<Profile>>`. This makes sense given the type signatures, but seems unwieldy. We now have a list of asynchronous values, and to work with those values we must then use the combinators on `IO` for every single one. It would be nicer instead if we could get the aggregate result in a single `IO`, say a `IO<List<Profile>>`.
@@ -101,7 +102,7 @@ import arrow.core.ValidatedNel
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit>
+ * fun writeToStore(data: Data): IO<Unit> = TODO("")
  * ```
  *
  * If we traverse using this, we end up with a funny type.
@@ -112,6 +113,9 @@ import arrow.core.ValidatedNel
  * import arrow.fx.extensions.io.applicative.applicative
  * import arrow.fx.fix
  *
+ * interface Data
+ *
+ * fun writeToStore(data: Data): IO<Unit> = TODO("")
  * //sampleStart
  * fun writeManyToStore(data: ListK<Data>): IO<ListK<Unit>> =
  *   data.traverse(IO.applicative()) { writeToStore(it) }.fix()
@@ -129,6 +133,9 @@ import arrow.core.ValidatedNel
  * import arrow.fx.extensions.io.applicative.applicative
  * import arrow.fx.fix
  *
+ * interface Data
+ *
+ * fun writeToStore(data: Data): IO<Unit> = TODO("")
  * //sampleStart
  * fun writeManyToStore(data: ListK<Data>): IO<Unit> =
  *   data.traverse_(IO.applicative()) { writeToStore(it) }.fix()
