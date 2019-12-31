@@ -9,6 +9,8 @@ import arrow.core.Option
 import arrow.core.Either
 import arrow.core.Validated
 import arrow.core.Const
+import arrow.core.Nel
+import arrow.core.SequenceK
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Traverse)
@@ -268,7 +270,7 @@ import arrow.core.Const
  * val sing = listOf("Hello", " from ", "the", " other ", "side!").k().foldMap(::identity, String.monoid(), ListK.traverse())
  * //sampleEnd
  * fun main() {
- *   println("sing= $sing")
+ *   println("Sing=$sing")
  * }
  * ```
  *
@@ -384,7 +386,7 @@ import arrow.core.Const
  * }
  * ```
  *
- * Evidently, [Traverse] is not limited to `List` or`Nel`, it provides an abstraction over 'things that can be traversed over', like a Binary tree, a Sequence, or a Stream, hence the name [Traverse].
+ * Evidently, [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, a [SequenceK], or a `Stream`, hence the name [Traverse].
  *
  * #### Playing with `Reader`
  *
