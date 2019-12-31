@@ -331,7 +331,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using [Option]). Contrast this with [Validated] where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are runed in isolation.
+ * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are run in isolation.
  *
  * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that will not short-circuit, by using `parApplicative`.
  *
@@ -414,7 +414,7 @@ import arrow.core.ValidatedNel
  *   }.fix()
  * ```
  *
- * Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
+ * Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that, when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
  *
  * One example of a "context" can be found in the [Spark](http://spark.apache.org/) project or in [Android's Context](https://developer.android.com/reference/android/content/Context). In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a `SparkContext`. Going back to the above example, we can see how one may define topic-specific Spark jobs `(type Job<A> = Reader<SparkContext, A>)` and then run several Spark jobs on a collection of topics via [traverse]. We then get back a `Job<List<Result>>`, which is equivalent to (`SparkContext) -> List<Result>`. When finally passed a `SparkContext`, we can run the job and get our results back.
  *
@@ -486,7 +486,7 @@ import arrow.core.ValidatedNel
  *
  * ### Theory Wrap-up
  *
- * Unsurprisingly, [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
+ * [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
  *
  * In contrast, `homomorphisms` such as `Monoid` and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.ap(Int::inc)` results in a `List<Int>`.
  *
