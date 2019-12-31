@@ -130,6 +130,9 @@ options:
       - title: EqK
         url: /docs/arrow/typeclasses/eqk/
 
+      - title: EqK2
+        url: /docs/arrow/typeclasses/eqk2/
+
       - title: Hash
         url: /docs/arrow/typeclasses/hash/
 

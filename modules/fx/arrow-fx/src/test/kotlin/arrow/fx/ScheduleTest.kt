@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForId
@@ -27,6 +28,7 @@ import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
+import arrow.test.generators.GenK2
 import arrow.test.generators.applicative
 import arrow.test.generators.intSmall
 import arrow.test.laws.AlternativeLaws
@@ -37,6 +39,7 @@ import arrow.test.laws.SemiringLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -56,7 +59,7 @@ class ScheduleTest : UnitSpec() {
       }
   }
 
-  fun <F, I> EQK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object : EqK<SchedulePartialOf<F, I>> {
+  fun <F, I> eqK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object : EqK<SchedulePartialOf<F, I>> {
     override fun <A> Kind<SchedulePartialOf<F, I>, A>.eqK(other: Kind<SchedulePartialOf<F, I>, A>, EQ: Eq<A>): Boolean {
       val t = fix() as Schedule.ScheduleImpl<F, Any?, I, A>
       (other as Schedule.ScheduleImpl<F, Any?, I, A>)
@@ -70,10 +73,24 @@ class ScheduleTest : UnitSpec() {
     }
   }
 
+  fun <F, I> eqK2(fEqK: EqK<F>, MF: Monad<F>, i: I) = object : EqK2<Kind<ForSchedule, F>> {
+    override fun <A, B> Kind2<Kind<ForSchedule, F>, A, B>.eqK(other: Kind2<Kind<ForSchedule, F>, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+      ((this as Kind<SchedulePartialOf<F, I>, A>) to (other as Kind<SchedulePartialOf<F, I>, A>)).let {
+        eqK(fEqK, MF, i).liftEq(EQA).run {
+          it.first.eqv(it.second)
+        }
+      }
+  }
+
   // This is a bad gen. But generating random schedules is weird
   fun <F, I> Schedule.Companion.genK(MF: Monad<F>): GenK<SchedulePartialOf<F, I>> = object : GenK<SchedulePartialOf<F, I>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<SchedulePartialOf<F, I>, A>> =
       gen.applicative(Schedule.applicative<F, I>(MF))
+  }
+
+  fun <F> Schedule.Companion.genK2(MF: Monad<F>) = object : GenK2<Kind<ForSchedule, F>> {
+    override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Kind<ForSchedule, F>, A, B>> =
+      Schedule.genK<F, A>(MF).genK(genB)
   }
 
   fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object : GenK<DecisionPartialOf<Any?>> {
@@ -104,36 +121,36 @@ class ScheduleTest : UnitSpec() {
       ref.update { d -> d + duration }
   }
 
-  val scheduleEq = EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any())
+  val scheduleEq = eqK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Eq.any())
 
   init {
     testLaws(
       ApplicativeLaws.laws(
         Schedule.applicative<ForId, Int>(Id.monad()),
         Schedule.genK<ForId, Int>(Id.monad()),
-        EQK(Id.eqK(), Id.monad(), 0)
+        eqK(Id.eqK(), Id.monad(), 0)
       ),
       SemiringLaws.laws(
         Schedule.semiring<ForId, Any?, Int>(Int.monoid(), Id.monad()),
         Schedule.forever(Id.monad()),
         Schedule.forever(Id.monad()),
         Schedule.forever(Id.monad()),
-        EQK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq())
+        eqK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq())
       ),
       AlternativeLaws.laws(
         Schedule.alternative<ForId, Int>(Id.monad()),
         Schedule.genK<ForId, Int>(Id.monad()),
-        EQK(Id.eqK(), Id.monad(), 0)
+        eqK(Id.eqK(), Id.monad(), 0)
       ),
       ProfunctorLaws.laws(
         Schedule.profunctor(),
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
-        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+        Schedule.genK2(Id.monad()),
+        eqK2(Id.eqK(), Id.monad(), 0)
       ),
       CategoryLaws.laws(
         Schedule.category(Id.monad()),
-        { i: Int -> Schedule.applicative<ForId, Int>(Id.monad()).just(i) },
-        EQK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
+        Schedule.genK2(Id.monad()),
+        eqK2(Id.eqK(), Id.monad(), 0)
       )
     )
 
@@ -256,7 +273,11 @@ class ScheduleTest : UnitSpec() {
         val eff = SideEffect()
         val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
 
-        val res = IO { if (eff.counter <= n) { eff.increment(); throw RuntimeException("WOOO") } else Unit }
+        val res = IO {
+          if (eff.counter <= n) {
+            eff.increment(); throw RuntimeException("WOOO")
+          } else Unit
+        }
           .retry(IO.monadThrow(), refTimer(ref), schedule)
           .attempt()
           .fix().unsafeRunSync()

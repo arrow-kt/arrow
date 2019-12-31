@@ -7,6 +7,7 @@ import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.extensions.validated.eqK.eqK
+import arrow.core.extensions.validated.eqK2.eqK2
 import arrow.core.extensions.validated.functor.functor
 import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
@@ -14,14 +15,15 @@ import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
+import arrow.test.generators.genK2
 import arrow.test.generators.validated
 import arrow.test.laws.BitraverseLaws
+import arrow.test.laws.EqK2Laws
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -38,6 +40,7 @@ class ValidatedTest : UnitSpec() {
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
     testLaws(
+      EqK2Laws.laws(Validated.eqK2(), Validated.genK2()),
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
@@ -46,7 +49,11 @@ class ValidatedTest : UnitSpec() {
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),
         Validated.eqK(String.eq())),
-      BitraverseLaws.laws(Validated.bitraverse(), ::Valid, Eq.any())
+      BitraverseLaws.laws(
+        Validated.bitraverse(),
+        Validated.genK2(),
+        Validated.eqK2()
+      )
     )
 
     "fold should call function on Invalid" {
