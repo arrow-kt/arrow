@@ -5,20 +5,26 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-
+import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
+import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.maybek.async.async
+import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.Effect
@@ -27,11 +33,7 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
-import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -41,14 +43,15 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import io.reactivex.Maybe
-import io.reactivex.disposables.Disposable as RxDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface MaybeKFunctor : Functor<ForMaybeK> {
@@ -243,6 +246,14 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
 
 fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dispatchers()): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
+}
+
+@extension
+interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMaybeK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForMaybeK, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+    fa().fix().unsafeRunAsync(cb)
 }
 
 @extension
