@@ -344,7 +344,7 @@ import arrow.core.ValidatedNel
  *
  * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`. `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. Consequently, `IO.applicative()` will only run an effect, when the previous one is successful.
  *
- * Then when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
+ * Then, when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
  *
  * Ultimately, we utilize `parTraverse` that calls traverse with `parApplicative` in an concurrent environment [F] - in the following example `IO`:
  *
@@ -378,7 +378,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * Evidently, [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
+ * [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
  *
  * #### Playing with `Reader`
  *
