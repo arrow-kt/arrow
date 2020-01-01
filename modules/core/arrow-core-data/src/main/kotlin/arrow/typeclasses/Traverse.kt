@@ -452,7 +452,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * Both have an `Kind<F, A>` receiver and a similar `f` parameter. [traverse] expects the return type of `f` to be `Kind<G, B>` whereas `map` just wants `B`. Similarly the return type of [traverse] is `Kind<G, Kind<F, B>>` whereas for `map` it's just `Kind<F, B>`. This suggests we need to pick a `G` such that `Kind<G, A>` communicates exactly as much information as `A`. We can conjure one up by simply wrapping an `A` in `arrow.core.Id`.
+ * Both have a `Kind<F, A>` receiver and a similar `f` parameter. [traverse] expects the return type of `f` to be `Kind<G, B>` whereas `map` just wants `B`. Similarly the return type of [traverse] is `Kind<G, Kind<F, B>>` whereas for `map` it's just `Kind<F, B>`. This suggests we need to pick a `G` such that `Kind<G, A>` communicates exactly as much information as `A`. We can conjure one up by simply wrapping an `A` in `arrow.core.Id`.
  *
  * In order to call [traverse] [Id] needs to be [Applicative] which is straightforward - note that while [Id] just wraps an `A`, it is still a type constructor which matches the shape required by [Applicative].
  *
