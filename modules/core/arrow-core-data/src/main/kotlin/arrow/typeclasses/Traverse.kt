@@ -378,7 +378,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * Evidently, [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
+ * [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
  *
  * #### Playing with `Reader`
  *
