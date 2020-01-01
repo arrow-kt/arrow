@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
+import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
@@ -12,6 +13,7 @@ import arrow.fx.reactor.extensions.fluxk.async.async
 import arrow.fx.reactor.extensions.fluxk.monad.monad
 import arrow.fx.reactor.extensions.fluxk.monadError.monadError
 import arrow.fx.reactor.fix
+import arrow.fx.reactor.k
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Bracket
@@ -23,8 +25,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
-import arrow.fx.reactor.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
