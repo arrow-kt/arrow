@@ -460,15 +460,15 @@ import arrow.core.ValidatedNel
  * import arrow.core.ForId
  * import arrow.core.Id
  * import arrow.core.IdOf
- * import arrow.core.fix
+ * import arrow.core.extensions.id.comonad.extract
  * import arrow.typeclasses.Applicative
  *
  * interface IdApplicative : Applicative<ForId> {
  *   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
- *     ff.fix().flatMap { f -> map(f) }.fix()
+ *     Id(ff.extract().invoke(extract()))
  *
  *   override fun <A> just(a: A): Id<A> =
- *     Id.just(a)
+ *     Id(a)
  * }
  * ```
  *
