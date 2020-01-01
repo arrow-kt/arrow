@@ -25,6 +25,10 @@ import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.fx.reactor.k
+import arrow.fx.reactor.unsafeRunAsync
+import arrow.fx.reactor.unsafeRunSync
+import arrow.fx.reactor.value
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -35,9 +39,11 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
+import arrow.unsafe
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
+import java.lang.NullPointerException
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as fluxHandleErrorWith
 
@@ -206,6 +212,16 @@ interface FluxKTimer : Timer<ForFluxK> {
   override fun sleep(duration: Duration): FluxK<Unit> =
     FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
       .map { Unit }.toFlux())
+}
+
+
+@extension
+interface FluxKUnsafeRun: UnsafeRun<ForFluxK> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForFluxK, A>): A =
+    fa().fix().unsafeRunSync() ?: throw NullPointerException("Program completes with null")
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForFluxK, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+    fa().fix().unsafeRunAsync(cb)
 }
 
 @extension

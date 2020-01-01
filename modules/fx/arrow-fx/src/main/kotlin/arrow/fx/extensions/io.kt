@@ -259,7 +259,7 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
 
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
     fa().fix().unsafeRunAsync(cb)
 }
 

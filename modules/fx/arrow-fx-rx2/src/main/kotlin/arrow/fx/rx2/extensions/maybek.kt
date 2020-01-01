@@ -30,8 +30,11 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -41,6 +44,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import io.reactivex.Maybe
 import io.reactivex.disposables.Disposable as RxDisposable
 import io.reactivex.functions.BiFunction
@@ -243,6 +247,14 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
 
 fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dispatchers()): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
+}
+
+@extension
+interface MaybeKUnsafeRun: UnsafeRun<ForMaybeK> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMaybeK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForMaybeK, A>, cb: (Either<Throwable, A>) -> Unit) : Unit =
+    fa().fix().unsafeRunAsync(cb)
 }
 
 @extension
