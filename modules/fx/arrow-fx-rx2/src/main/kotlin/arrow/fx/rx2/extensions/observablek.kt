@@ -18,8 +18,6 @@ import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.extensions.observablek.monadError.monadError
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
-import arrow.fx.rx2.unsafeRunAsync
-import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
@@ -36,7 +34,6 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -47,7 +44,6 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
-import arrow.unsafe
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -259,15 +255,6 @@ interface ObservableKDispatchers : Dispatchers<ForObservableK> {
 
 fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK> = ObservableK.dispatchers()): Concurrent<ForObservableK> = object : ObservableKConcurrent {
   override fun dispatchers(): Dispatchers<ForObservableK> = dispatchers
-}
-
-@extension
-interface ObservableKUnsafeRun : UnsafeRun<ForObservableK> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForObservableK, A>): A =
-    fa().fix().unsafeRunSync() ?: throw NullPointerException("Program completes with null")
-
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForObservableK, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    fa().fix().unsafeRunAsync(cb)
 }
 
 @extension

@@ -7,11 +7,8 @@ import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
-import arrow.fx.reactor.extensions.monok.applicativeError.raiseError
 import arrow.fx.reactor.extensions.monok.async.async
 import arrow.fx.reactor.fix
-import arrow.fx.reactor.unsafeRunAsync
-import arrow.fx.reactor.unsafeRunSync
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.AsyncSyntax
 import arrow.fx.typeclasses.Bracket
@@ -23,14 +20,12 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
-import arrow.unsafe
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
@@ -132,15 +127,6 @@ interface MonoKEffect : Effect<ForMonoK>, MonoKAsync {
 interface MonoKConcurrentEffect : ConcurrentEffect<ForMonoK>, MonoKEffect {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
-}
-
-@extension
-interface MonoKUnsafeRun: UnsafeRun<ForMonoK> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMonoK, A>): A =
-    fa().fix().unsafeRunSync() ?: throw NullPointerException("Program completes with null")
-
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForMonoK, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    fa().fix().unsafeRunAsync(cb)
 }
 
 @extension
