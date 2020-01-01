@@ -281,7 +281,7 @@ import arrow.core.ValidatedNel
  *   else NumberFormatException("$s is not a valid integer.").invalidNel()
  * ```
  *
- * We can now [traverse] structures that contain strings parsing them into integers and either with a `fail-fast` strategy using [Either] or accumulating failures with [ValidatedNel].
+ * We can now [traverse] structures that contain strings and parse them into integers with either with a `fail-fast` strategy using [Either] or accumulating failures with [ValidatedNel].
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
