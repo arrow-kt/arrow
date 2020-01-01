@@ -157,7 +157,7 @@ import arrow.core.ValidatedNel
  *
  * We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
  *
- * Traversing solely for the sake of the effects (ignoring any values that may be produced, [Unit] or otherwise) is common, so [Foldable] (superclass of [Traverse]) provides [traverse_] and [sequence_] methods that do the same thing as [traverse] and [sequence] but ignores any value produced along the way, returning [Unit] at the end.
+ * Traversing solely for the sake of the effects (ignoring any values that may be produced, [Unit] or otherwise) is common, so [Foldable] (superclass of [Traverse]) provides [traverse_] and [sequence_] methods that do the same thing as [traverse] and [sequence] but ignore any value produced along the way, returning [Unit] at the end.
  *
  * ```kotlin:ank
  * import arrow.core.ListK
