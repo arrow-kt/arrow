@@ -342,9 +342,9 @@ import arrow.core.ValidatedNel
  *
  * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that will not short-circuit, by using `parApplicative`.
  *
- * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`. `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. Consequently, `IO.applicative()` will only run an effect, when the previous one is successful.
+ * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`, which means `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. The aforementioned law holds in the case of `IO.applicative()`, where an effect only runs , when the previous one is successful - hence the monadic nature.
  *
- * Then, when we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
+ * Continuing with the example, we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
  *
  * Ultimately, we utilize `parTraverse` that calls traverse with `parApplicative` in an concurrent environment [F] - in the following example `IO`:
  *
