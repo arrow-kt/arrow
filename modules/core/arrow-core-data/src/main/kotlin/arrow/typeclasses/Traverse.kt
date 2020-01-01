@@ -42,7 +42,31 @@ import arrow.core.ValidatedNel
  *
  * ### Sequencing
  *
- * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<IO<Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `IO<List<Profile>>`. Given `Option` and `IO` have an [Applicative] instance, we can traverse over the list with the identity function.
+ * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<IO<Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `IO<List<Profile>>`. Given `Option` and `IO` have an [Applicative] instance, we can [sequence] the list to reverse the types.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Option
+ * import arrow.core.extensions.list.traverse.sequence
+ * import arrow.core.extensions.option.applicative.applicative
+ * import arrow.core.none
+ * import arrow.core.some
+ *
+ * fun main() {
+ *   //sampleStart
+ *   val optionList =
+ *     listOf(1.some(), 2.some(), 3.some())
+ *       .sequence(Option.applicative())
+ *
+ *   val emptyList =
+ *     listOf(1.some(), none(), 3.some())
+ *       .sequence(Option.applicative())
+ *   //sampleEnd
+ *   println("optionList = $optionList")
+ *   println("emptyList = $emptyList")
+ * }
+ * ```
+ *
+ * [Traverse] provides [sequence] as a convenience method for `traverse(::identity)`.
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.option.applicative.applicative
@@ -69,29 +93,38 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * [Traverse] provides a convenience method [sequence] that does exactly this.
+ * Interestingly enough, [traverse] is a much more generalized and powerful form of [sequence] that would allow us to parse a `List<String>` or validate credentials for a `List<User>`.
  *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.list.traverse.sequence
- * import arrow.core.extensions.option.applicative.applicative
- * import arrow.core.none
- * import arrow.core.some
+ * Enter [Traverse].
  *
- * fun main() {
- *   //sampleStart
- *   val optionList =
- *     listOf(1.some(), 2.some(), 3.some())
- *       .sequence(Option.applicative())
+ * ### The Typeclass
  *
- *   val emptyList =
- *     listOf(1.some(), none(), 3.some())
- *       .sequence(Option.applicative())
- *   //sampleEnd
- *   println("optionList = $optionList")
- *   println("emptyList = $emptyList")
+ * At center stage of Traverse is the [traverse] method.
+ *
+ * ```kotlin
+ * import arrow.Kind
+ * import arrow.typeclasses.Applicative
+ * import arrow.typeclasses.Foldable
+ * import arrow.typeclasses.Functor
+ *
+ * interface Traverse<F> : Functor<F>, Foldable<F> {
+ *   fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
  * }
  * ```
+ *
+ * In our above example, `F` is `List`, and `G` is `Option` or `IO`. For the profile example, traverse says given a `List<User>` and a function `(User) -> IO<Profile>`, it can give you a `IO<List<Profile>>`.
+ *
+ * Abstracting away the `G` (still imagining `F` to be `List`), [traverse] says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
+ *
+ * In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist [Traverse] instances for [Option], [Either], and [Validated] (among others).
+ *
+ * In general this holds:
+ *
+ * ```kotlin
+ * map(::f).sequence(AP) == traverse(AP, ::f)
+ * ```
+ *
+ * where AP stands for an `Applicative<G>`, which is in prior snippets `Applicative<ForOption>` or `Applicative<ForIO>`.
  *
  * ### Sequencing effects
  *
@@ -160,39 +193,6 @@ import arrow.core.ValidatedNel
  *   println("noneUnit= $leftString")
  * }
  * ```
- *
- * There exists a much more generalized and powerful form that would allow us to parse a `List<String>` or validate credentials for a `List<User>`.
- *
- * Enter [Traverse].
- *
- * ### The Typeclass
- *
- * At center stage of Traverse is the [traverse] method.
- *
- * ```kotlin
- * import arrow.Kind
- * import arrow.typeclasses.Applicative
- * import arrow.typeclasses.Foldable
- * import arrow.typeclasses.Functor
- *
- * interface Traverse<F> : Functor<F>, Foldable<F> {
- *   fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
- * }
- * ```
- *
- * In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `IO`. For the profile example, traverse says given a `List<User>` and a function `(User) -> IO<Profile>`, it can give you a `IO<List<Profile>>`.
- *
- * Abstracting away the `G` (still imagining `F` to be `List`), [traverse] says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
- *
- * In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist [Traverse] instances for [Option], [Either], and [Validated] (among others).
- *
- * In general this holds:
- *
- * ```kotlin
- * map(::f).sequence(AP) == traverse(AP, ::f)
- * ```
- *
- * where AP stands for an `Applicative<G>`, which is in prior snippets `Applicative<ForOption>`, `Applicative<ForIO>` or `Applicative<EitherPartialOf<L>>`.
  *
  * ### When to use Traverse over Foldable
  *
@@ -340,7 +340,7 @@ import arrow.core.ValidatedNel
  *
  * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are run in isolation.
  *
- * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that will not short-circuit, by using `parApplicative`.
+ * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that traverses concurrently, by using `parApplicative`. Contrary to `IO.applicative()`, which runs in sequence.
  *
  * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`, which means `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. The aforementioned law holds in the case of `IO.applicative()`, where an effect only runs , when the previous one is successful - hence the monadic nature.
  *
