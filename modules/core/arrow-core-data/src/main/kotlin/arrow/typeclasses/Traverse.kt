@@ -495,7 +495,7 @@ import arrow.core.ValidatedNel
  *
  * [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in category theory - `Catamorphisms`.
  *
- * In contrast, `homomorphisms` such as [Monoid] and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.ap(Int::inc)` results in a `List<Int>`.
+ * In contrast, `homomorphisms` such as [Monoid] and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.ap(listOf(Int::inc))` results in a `List<Int>`.
  *
  * We can think of catamorphic operations as:
  *
