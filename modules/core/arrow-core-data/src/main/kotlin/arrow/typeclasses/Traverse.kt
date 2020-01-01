@@ -222,7 +222,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * Both methodologies try to attain the same thing, but what [Foldable] lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. Resulting in a tiresome implementation, where we need to come up with an algorithm to resolve a key of a given value in the `Map` - let alone that this algorithm is not universal over any given `Map`.
+ * Both methodologies try to attain the same thing, but what [Foldable] lacks is that it solely drills down to its `A` here `Int` and does not preserve it's shape `F` - `MapK`. Resulting in a tiresome implementation, where we need to come up with an algorithm to resolve a key of a given value in the `Map` - let alone that this algorithm is not universal over any given `Map`.
  *
  * This is where [Traverse] shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you may use [traverse].
  *
