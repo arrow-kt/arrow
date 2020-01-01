@@ -331,12 +331,6 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   }
 }
 
-fun <A> FluxK<A>.unsafeRunSync(): A? =
-  value().blockFirst()
-
-fun <A> FluxK<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
-
 fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)
 

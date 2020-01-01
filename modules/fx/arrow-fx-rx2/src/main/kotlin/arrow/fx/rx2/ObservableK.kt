@@ -313,12 +313,6 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
   }
 }
 
-fun <A> ObservableK<A>.unsafeRunSync(): A? =
-  value().blockingFirst()
-
-fun <A> ObservableK<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
-
 fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)
 
