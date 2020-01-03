@@ -2,12 +2,34 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.core.toT
 import arrow.core.identity
+import arrow.core.toT
 import arrow.fx.internal.IQueue
 import arrow.fx.typeclasses.Concurrent
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+
+class ForQueue private constructor() {
+  companion object
+}
+
+typealias QueueOf<F, A, B> = arrow.Kind3<ForQueue, F, A, B>
+typealias QueuePartialOf<F, A> = arrow.Kind2<ForQueue, F, A>
+
+fun <F, A, B> QueueOf<F, A, B>.fix(): Queue<F, A, B> =
+  this as Queue<F, A, B>
+
+interface Queue<F, A, B> :
+  QueueOf<F, A, B> {
+
+  companion object
+
+  fun size(): Kind<F, Int>
+  fun offer(a: A): Kind<F, Unit>
+  fun take(): Kind<F, B>
+  fun awaitShutdown(): Kind<F, Unit>
+  fun shutdown(): Kind<F, Unit>
+}
 
 /**
  * Lightweight, asynchronous queue for values of A in a Concurrent context F
@@ -18,10 +40,14 @@ import arrow.typeclasses.ApplicativeError
  *
  * ported from Scala ZIO Queue implementation
  */
-class Queue<F, A> private constructor(private val capacity: Int, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
-  Concurrent<F> by CF {
+class ConcurrentQueue<F, A> private constructor(
+  private val capacity: Int,
+  private val ref: Ref<F, State<F, A>>,
+  private val CF: Concurrent<F>
+) : Concurrent<F> by CF,
+  Queue<F, A, A> {
 
-  fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
+  override fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
 
   private sealed class State<F, out A> {
     abstract fun size(): Kind<F, Int>
@@ -39,7 +65,7 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
     }
   }
 
-  fun offer(a: A): Kind<F, Unit> {
+  override fun offer(a: A): Kind<F, Unit> {
     val use: (Promise<F, Unit>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
       state.fold(
         ifSurplus = { surplus ->
@@ -68,7 +94,7 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
     return Promise.bracket(ref, use, release, CF)
   }
 
-  fun take(): Kind<F, A> {
+  override fun take(): Kind<F, A> {
     val use: (Promise<F, A>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
       state.fold(
         ifSurplus = { surplus ->
@@ -113,7 +139,7 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
    * The `IO` returned by this method will not resume until the queue has been shutdown.
    * If the queue is already shutdown, the `IO` will resume right away.
    */
-  fun awaitShutdown(): Kind<F, Unit> =
+  override fun awaitShutdown(): Kind<F, Unit> =
     Promise<F, Unit>(CF).flatMap { promise ->
       val complete = promise.complete(Unit)
       ref.modify { state ->
@@ -129,7 +155,7 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
    * Cancels any fibers that are suspended on `offer` or `take`.
    * Future calls to `offer*` and `take*` will be interrupted immediately.
    */
-  fun shutdown(): Kind<F, Unit> = ref.modify { state ->
+  override fun shutdown(): Kind<F, Unit> = ref.modify { state ->
     state.fold(
       ifSurplus = { surplus ->
         if (surplus.putters.isEmpty()) State.Shutdown(CF) toT surplus.shutdownHook
@@ -163,9 +189,9 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
      *  Holds no values or promises for suspended calls,
      *  an offer or take in Shutdown state creates a QueueShutdown error
      */
-    fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+    fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A, A>> = CF.run {
       Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
-        Queue(capacity, it, this)
+        ConcurrentQueue(capacity = capacity, ref = it, CF = this)
       }
     }
   }
