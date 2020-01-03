@@ -1,21 +1,17 @@
 <div id="doc-wrapper">
-    <div class="doc-header">
-        <button type="button" id="main-toggle" class="sidebar-toggle">
-            <i class="fa fa-lg fa-bars menu-icon"></i>
-        </button>
-        <div class="search-wrapper">
-          <input id="docsearch" class="search" placeholder="Search documentation..." type="search">
-        </div>
-        <a target="_blank"
-          href="{{site.data.commons.github_repository}}/edit/master/modules/docs/arrow-docs/docs{{page.url | replace: '_', ''}}README.md">
-          <i class="fa fa-pencil"></i>
-            Edit
-        </a>
+  <div class="doc-header">
+    <button type="button" id="main-toggle" class="sidebar-toggle">
+      <i class="fa fa-lg fa-bars menu-icon"></i>
+    </button>
+    <div class="search-wrapper">
+      <img src="{{ '/img/docs/search-icon.svg' | relative_url }}" title="search" alt="Search">
+      <input id="docsearch" class="search" placeholder="Search documentation..." type="search">
     </div>
-    <div class="doc-content">
-        {% if page.video %}
-        {% include _media-wrapper.html id=page.video %}
-        {% endif %}
-        {{ content }}
-    </div>
+  </div>
+  <div class="doc-content">
+    {% if page.video %}
+    {% include _media-wrapper.html id=page.video %}
+    {% endif %}
+    {{ content }}
+  </div>
 </div>

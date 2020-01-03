@@ -4,13 +4,15 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.ForListK
 import arrow.core.ListK
+import arrow.core.extensions.eq
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.k
+import arrow.test.generators.GenK2
 import arrow.typeclasses.Align
 import arrow.typeclasses.Bicrosswalk
 import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.abs
@@ -19,8 +21,8 @@ object BicrosswalkLaws {
 
   fun <T> laws(
     BCW: Bicrosswalk<T>,
-    gen: Gen<Kind2<T, Int, Int>>,
-    EQ: Eq<Kind2<T, String, String>>
+    GENK: GenK2<T>,
+    EQK: EqK2<T>
   ): List<Law> {
 
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {
@@ -31,20 +33,19 @@ object BicrosswalkLaws {
       override fun random(): Sequence<(Int) -> ListK<String>> = generateSequence({ int: Int -> List(abs(int % 1000)) { "$it" }.k() }) { it }
     }
 
+    val G = GENK.genK(Gen.int(), Gen.int())
+    val EQ = EQK.liftEq(String.eq(), String.eq())
+    val EQ1 = ListK.eqK().liftEq(EQ)
+
     return listOf(
       Law("Bicrosswalk Laws: bicrosswalk an empty structure == an empty structure") {
-        BCW.bicrosswalkEmpty(ListK.align(), gen, buildEq(ListK.eqK(), EQ))
+        BCW.bicrosswalkEmpty(ListK.align(), G, ListK.eqK().liftEq(EQ))
       },
       Law("Bicrosswalk Laws: bicrosswalk function == fmap function andThen sequenceL") {
-        BCW.bicrosswalkSequencelEquality(ListK.align(), gen, funGen, funGen, buildEq(ListK.eqK(), EQ))
+        BCW.bicrosswalkSequencelEquality(ListK.align(), G, funGen, funGen, EQ1)
       }
     )
   }
-
-  private fun <F, A> buildEq(EQK: EqK<F>, EQ: Eq<A>): Eq<Kind<F, A>> =
-    Eq { a, b ->
-      EQK.run { a.eqK(b, EQ) }
-    }
 
   fun <T, F, A, B, C, D> Bicrosswalk<T>.bicrosswalkEmpty(
     ALIGN: Align<F>,

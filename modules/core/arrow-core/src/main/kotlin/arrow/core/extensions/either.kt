@@ -12,6 +12,7 @@ import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.either.monad.flatMap
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.core.left
@@ -27,6 +28,7 @@ import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -96,19 +98,19 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
+
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
     fix().eitherAp(ff)
 }
 
 @extension
-interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<L> {
+interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
-
-  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
 }
 
 @extension
@@ -124,6 +126,9 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
+
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, (A) -> B>): Kind<EitherPartialOf<L>, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 
   @Suppress("UNCHECKED_CAST")
   override val fx: MonadFx<EitherPartialOf<L>>
@@ -209,6 +214,26 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 }
 
 @extension
+interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<EitherPartialOf<L>, R>.eqK(other: Kind<EitherPartialOf<L>, R>, EQ: Eq<R>): Boolean =
+    Either.eq(EQL(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
+interface EitherEqK2 : EqK2<ForEither> {
+  override fun <A, B> Kind2<ForEither, A, B>.eqK(other: Kind2<ForEither, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let {
+      Either.eq(EQA, EQB).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+@extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
@@ -249,16 +274,5 @@ interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBif
       is Either.Right -> ALIGN.run {
         fb(e.b).map { it.right() }
       }
-    }
-}
-
-@extension
-interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
-
-  fun EQL(): Eq<L>
-
-  override fun <A> Kind<EitherPartialOf<L>, A>.eqK(other: Kind<EitherPartialOf<L>, A>, EQ: Eq<A>): Boolean =
-    Either.eq(EQL(), EQ).run {
-      this@eqK.fix().eqv(other.fix())
     }
 }

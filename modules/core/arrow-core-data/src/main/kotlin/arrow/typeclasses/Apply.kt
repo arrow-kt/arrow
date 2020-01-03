@@ -2,7 +2,9 @@
 
 package arrow.typeclasses
 
+import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Tuple4
@@ -11,8 +13,6 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.Tuple10
-import arrow.Kind
 
 interface Apply<F> : Functor<F> {
 
@@ -37,6 +37,12 @@ interface Apply<F> : Functor<F> {
    * ```
    */
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
+
+  /**
+   * Lazy version of ap, useful for datatypes which can short circuit.
+   * This will at some point be removed for a compiler plugin
+   */
+  fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> = ap(ff())
 
   fun <A, B, Z> map(
     a: Kind<F, A>,
@@ -147,7 +153,7 @@ interface Apply<F> : Functor<F> {
     fb.map { fc -> map2(fc, f) }
 
   fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    fb.ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    ap(fb.map { b: B -> { a: A -> Tuple2(a, b) } })
 
   fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
     other: Kind<F, Z>,
@@ -315,4 +321,22 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, J>> =
     a.product(b).product(c).product(d).product(e).product(f).product(g)
       .product(h).product(i).product(j)
+
+  /**
+   * Given two actions, it performs them sequentially.
+   * Ignores the result of the first action.
+   *
+   * This is equivalent to *> in Haskell.
+   */
+  fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
+    map(this, fb) { (_, right) -> right }
+
+  /**
+   * Given two actions, it performs them sequentially.
+   * Discards the result of the second action.
+   *
+   * This is equivalent to <* in Haskell.
+   */
+  fun <A, B> Kind<F, A>.apTap(fb: Kind<F, B>): Kind<F, A> =
+    map(this, fb) { (left, _) -> left }
 }

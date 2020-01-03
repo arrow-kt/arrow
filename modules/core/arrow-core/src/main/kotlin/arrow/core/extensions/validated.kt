@@ -1,6 +1,7 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForValidated
@@ -11,6 +12,7 @@ import arrow.core.ValidatedOf
 import arrow.core.ValidatedPartialOf
 import arrow.core.ap
 import arrow.core.combineK
+import arrow.core.extensions.validated.eq.eq
 import arrow.core.fix
 import arrow.core.handleLeftWith
 import arrow.extension
@@ -19,6 +21,8 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -131,6 +135,26 @@ interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
       is Valid -> false
     }
   }
+}
+
+@extension
+interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
+  fun EQL(): Eq<L>
+
+  override fun <R> Kind<ValidatedPartialOf<L>, R>.eqK(other: Kind<ValidatedPartialOf<L>, R>, EQ: Eq<R>): Boolean =
+    Validated.eq(EQL(), EQ).run {
+      this@eqK.fix().eqv(other.fix())
+    }
+}
+
+@extension
+interface ValidatedEqK2 : EqK2<ForValidated> {
+  override fun <A, B> Kind2<ForValidated, A, B>.eqK(other: Kind2<ForValidated, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let {
+      Validated.eq(EQA, EQB).run {
+        it.first.eqv(it.second)
+      }
+    }
 }
 
 @extension

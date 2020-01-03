@@ -1,0 +1,59 @@
+options:
+  - title: Optics
+
+    nested_options:
+
+      - title: Optics DSL
+        url: /docs/optics/dsl/
+
+      - title: Iso
+        url: /docs/optics/iso/
+
+      - title: Lens
+        url: /docs/optics/lens/
+
+      - title: Optional
+        url: /docs/optics/optional/
+
+      - title: Prism
+        url: /docs/optics/prism/
+
+      - title: Getter
+        url: /docs/optics/getter/
+
+      - title: Setter
+        url: /docs/optics/setter/
+
+      - title: Fold
+        url: /docs/optics/fold/
+
+      - title: Traversal
+        url: /docs/optics/traversal/
+
+      - title: Cons
+        url: /docs/optics/cons/
+
+      - title: Snoc
+        url: /docs/optics/snoc/
+
+      - title: At
+        url: /docs/optics/at/
+
+      - title: Index
+        url: /docs/optics/index/
+
+      - title: FilterIndex
+        url: /docs/optics/filterindex/
+
+      - title: Each
+        url: /docs/optics/each/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Optics
+        url: /docs/apidocs/arrow-optics/
+
+      - title: Optics MTL
+        url: /docs/apidocs/arrow-optics-mtl/

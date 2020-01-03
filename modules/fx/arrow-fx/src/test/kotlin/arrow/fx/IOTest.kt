@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
@@ -10,12 +11,15 @@ import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
@@ -24,7 +28,11 @@ import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -42,7 +50,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
 
     "should defer evaluation until run" {
       var run = false
@@ -666,4 +674,25 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
 
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
+}
+
+private fun IO.Companion.eqK() = object : EqK<ForIO> {
+  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      EQ(EQ).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+private fun IO.Companion.genK() = object : GenK<ForIO> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
+    Gen.oneOf(
+      gen.map {
+        IO.just(it)
+      },
+      Gen.throwable().map {
+        IO.raiseError<A>(it)
+      }
+    )
 }

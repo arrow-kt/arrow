@@ -44,10 +44,14 @@ class SetKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(SetK.show(), EQ, Gen.genSetK(Gen.int())),
       MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
-      SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
-      MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any(), this::bijection, associativeSemigroupalEq),
-      MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
-      FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
+      SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
+      MonoidalLaws.laws(SetK.monoidal(),
+        SetK.genK(10),
+        SetK.eqK(),
+        this::bijection
+      ),
+      MonoidKLaws.laws(SetK.monoidK(), SetK.genK(), SetK.eqK()),
+      FoldableLaws.laws(SetK.foldable(), SetK.genK()),
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq()), Gen.genSetK(Gen.int())),
       EqKLaws.laws(
         SetK.eqK(),

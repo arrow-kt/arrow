@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.nonemptylist.applicative.applicative
@@ -9,6 +8,7 @@ import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
 import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.nonemptylist.foldable.foldable
+import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.semialign.semialign
@@ -28,7 +28,6 @@ import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnzipLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.math.max
@@ -38,18 +37,24 @@ class NonEmptyListTest : UnitSpec() {
   init {
 
     val EQ1 = NonEmptyList.eq(Int.eq())
-    val EQ2: Eq<Kind<ForNonEmptyList, Kind<ForNonEmptyList, Int>>> = Eq { a, b ->
-      a == b
-    }
 
     testLaws(
       ShowLaws.laws(NonEmptyList.show(), EQ1, Gen.nonEmptyList(Gen.int())),
       SemigroupKLaws.laws(
         NonEmptyList.semigroupK(),
+        NonEmptyList.genK(),
+        NonEmptyList.eqK()),
+      BimonadLaws.laws(
+        NonEmptyList.bimonad(),
+        NonEmptyList.monad(),
+        NonEmptyList.comonad(),
+        NonEmptyList.functor(),
         NonEmptyList.applicative(),
-        Eq.any()),
-      BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any(), EQ2, Eq.any()),
-      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
+        NonEmptyList.monad(),
+        NonEmptyList.genK(),
+        NonEmptyList.eqK()
+      ),
+      TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),
       EqKLaws.laws(
