@@ -1,5 +1,13 @@
 package arrow.generic
 
+import arrow.DerivingTarget
+import arrow.DerivingTarget.SEMIGROUP
+import arrow.DerivingTarget.MONOID
+import arrow.DerivingTarget.TUPLED
+import arrow.DerivingTarget.HLIST
+import arrow.DerivingTarget.APPLICATIVE
+import arrow.DerivingTarget.EQ
+import arrow.DerivingTarget.SHOW
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
@@ -50,9 +58,22 @@ class ProductProcessor : AbstractProcessor() {
       if (properties.size > 22)
         knownError("${element.enclosingElement}.${element.simpleName} up to 22 constructor parameters is supported")
       else
-        AnnotatedGeneric(element as TypeElement, elementClassData, properties)
+        AnnotatedGeneric(element as TypeElement, elementClassData, properties, element.normalizedDerivingTargets())
     }
 
     else -> knownError(productAnnotationError(element, productAnnotationName, productAnnotationTarget))
+  }
+
+  private fun derivingAdditions(target: DerivingTarget): List<DerivingTarget> = when (target) {
+    MONOID -> listOf(SEMIGROUP)
+    APPLICATIVE -> listOf(TUPLED)
+    else -> emptyList()
+  }
+
+  private fun Element.normalizedDerivingTargets(): List<DerivingTarget> = with(getAnnotation(productAnnotationClass).deriving) {
+    when {
+      isEmpty() -> listOf(SEMIGROUP, MONOID, TUPLED, HLIST, APPLICATIVE, EQ, SHOW)
+      else -> toList().flatMap { derivingAdditions(it) + it }
+    }
   }
 }
