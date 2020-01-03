@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.HkJ3
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.identity
@@ -15,12 +16,13 @@ class ForQueue private constructor() {
 
 typealias QueueOf<F, A, B> = arrow.Kind3<ForQueue, F, A, B>
 typealias QueuePartialOf<F, A> = arrow.Kind2<ForQueue, F, A>
+typealias QueueKindedJ<F, A, B> = HkJ3<ForQueue, F, A, B>
 
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 fun <F, A, B> QueueOf<F, A, B>.fix(): Queue<F, A, B> =
   this as Queue<F, A, B>
 
-interface Queue<F, A, B> :
-  QueueOf<F, A, B> {
+interface Queue<F, A, B> : QueueOf<F, A, B> {
 
   companion object
 

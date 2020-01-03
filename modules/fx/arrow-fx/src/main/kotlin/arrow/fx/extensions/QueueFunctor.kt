@@ -11,11 +11,11 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface QueueFunctor<F, A> : Functor<QueuePartialOf<F, A>> {
+interface QueueFunctor<F, E> : Functor<QueuePartialOf<F, E>> {
   fun functorF(): Functor<F>
-  override fun <B, C> QueueOf<F, A, B>.map(f: (B) -> C): Queue<F, A, C> =
-    object : Queue<F, A, C> {
-      override fun offer(a: A): Kind<F, Unit> = this@map.fix().offer(a)
+  override fun <B, C> QueueOf<F, E, B>.map(f: (B) -> C): Queue<F, E, C> =
+    object : Queue<F, E, C> {
+      override fun offer(a: E): Kind<F, Unit> = this@map.fix().offer(a)
       override fun take(): Kind<F, C> = with(functorF()) {
         this@map.fix().take().map(f)
       }
