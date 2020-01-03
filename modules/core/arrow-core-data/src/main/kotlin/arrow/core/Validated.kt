@@ -13,12 +13,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ank_macro_hierarchy(arrow.core.Validated)
  *
- * {:.beginner}
- * beginner
  *
  * Imagine you are filling out a web form to sign up for an account. You input your username and
- * password and submit. Response comes back saying your username can't have dashes in it,
- * so you make some changes and resubmit. Can't have special characters either. Change, resubmit.
+ * password, then submit. A response comes back saying your username can't have dashes in it,
+ * so you make some changes, then resubmit. Can't have special characters either. Change, resubmit.
  * Passwords need to have at least one capital letter. Change, resubmit. Password needs to have at least one number.
  *
  * Or perhaps you're reading from a configuration file. One could imagine the configuration library
@@ -40,7 +38,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleEnd
  * ```
  *
- * You run your program and it says key "url" not found, turns out the key was "endpoint". So
+ * You run your program and it says key "url" not found. Turns out the key was "endpoint". So
  * you change your code and re-run. Now it says the "port" key was not a well-formed integer.
  *
  * It would be nice to have all of these errors reported simultaneously. That the username can't
@@ -54,7 +52,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * Our goal is to report any and all errors across independent bits of data. For instance, when
  * we ask for several pieces of configuration, each configuration field can be validated separately
- * from one another. How then do we enforce that the data we are working with is independent?
+ * from one another. How then do we ensure that the data we are working with is independent?
  * We ask for both of them up front.
  *
  * As our running example, we will look at config parsing. Our config will be represented by a
@@ -88,7 +86,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * ```
  *
  * Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
- * the field is missing, or it is not well-formed with regards to the expected type.
+ * The field is missing, or it is not well-formed with regards to the expected type.
  *
  * ```kotlin:ank
  * sealed class ConfigError {
@@ -135,7 +133,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * ```
  *
  * Everything is in place to write the parallel validator. Recall that we can only do parallel
- * validation if each piece is independent. How do we enforce the data is independent? By
+ * validation if each piece is independent. How do we ensure the data is independent? By
  * asking for all of it up front. Let's start with two pieces of data.
  *
  * ```kotlin:ank
@@ -153,11 +151,11 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleEnd
  * ```
  *
- * We've run into a problem. In the case where both have errors, We want to report both. we
- * don't have a way to combine ConfigErrors. But as clients, we can change our Validated
- * values where the error can be combined, say, a `List<ConfigError>`.We are going to use a
+ * We've run into a problem. In the case where both have errors, we want to report both. We
+ * don't have a way to combine ConfigErrors. But, as clients, we can change our Validated
+ * values where the error can be combined, say, a `List<ConfigError>`. We are going to use a
  * `NonEmptyList<ConfigError>`—the NonEmptyList statically guarantees we have at least one value,
- * which aligns with the fact that if we have an Invalid, then we most certainly have at least one error.
+ * which aligns with the fact that, if we have an Invalid, then we most certainly have at least one error.
  * This technique is so common there is a convenient method on `Validated` called `toValidatedNel`
  * that turns any `Validated<E, A>` value to a `Validated<NonEmptyList<E>, A>`. Additionally, the
  * type alias `ValidatedNel<E, A>` is provided.
@@ -329,7 +327,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ## Sequential Validation
  *
- * If you do want error accumulation but occasionally run into places where sequential validation is needed,
+ * If you do want error accumulation, but occasionally run into places where sequential validation is needed,
  * then Validated provides `withEither` method to allow you to temporarily turn a Validated
  * instance into an Either instance and apply it to a function.
  *
@@ -456,9 +454,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleEnd
  * ```
  *
- * `Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values in to the positive result and `raiseError` into the error context.
+ * `Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values into the positive result and `raiseError` into the error context.
  *
- * Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
+ * Once we have such abstract algebra defined, we can simply materialize it to data types that support different error strategies:
  *
  *  *Error accumulation*
  *
@@ -766,7 +764,7 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
  */
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
-    { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
+    { e -> f.fold({ Invalid(SE.run { e.combine(it) }) }, { Invalid(e) }) },
     { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 

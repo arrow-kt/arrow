@@ -4,31 +4,40 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.fx.IO
+import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object ApplicativeErrorLaws {
 
-  fun <F> laws(AE: ApplicativeError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
-    ApplicativeLaws.laws(AE, EQ) + listOf(
-      Law("Applicative Error Laws: handle") { AE.applicativeErrorHandle(EQERR) },
-      Law("Applicative Error Laws: handle with for error") { AE.applicativeErrorHandleWith(EQERR) },
-      Law("Applicative Error Laws: handle with for success") { AE.applicativeErrorHandleWithPure(EQERR) },
-      Law("Applicative Error Laws: redeem is derived from map and handleError") { AE.redeemIsDerivedFromMapHandleError(EQERR) },
+  fun <F> laws(AE: ApplicativeError<F, Throwable>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+
+    val EQ = EQK.liftEq(Int.eq())
+    val EQ_EITHER = EQK.liftEq(Either.eq(Eq.any(), Int.eq()))
+
+    return ApplicativeLaws.laws(AE, GENK, EQK) + listOf(
+      Law("Applicative Error Laws: handle") { AE.applicativeErrorHandle(EQ) },
+      Law("Applicative Error Laws: handle with for error") { AE.applicativeErrorHandleWith(EQ) },
+      Law("Applicative Error Laws: handle with for success") { AE.applicativeErrorHandleWithPure(EQ) },
+      Law("Applicative Error Laws: redeem is derived from map and handleError") { AE.redeemIsDerivedFromMapHandleError(EQ) },
       Law("Applicative Error Laws: attempt for error") { AE.applicativeErrorAttemptError(EQ_EITHER) },
       Law("Applicative Error Laws: attempt for success") { AE.applicativeErrorAttemptSuccess(EQ_EITHER) },
       Law("Applicative Error Laws: attempt lift from Either consistent with pure") { AE.applicativeErrorAttemptFromEitherConsistentWithPure(EQ_EITHER) },
-      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) },
-      Law("Applicative Error Laws: effectCatch captures errors") { AE.applicativeErrorEffectCatch(EQERR) }
+      Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQ) },
+      Law("Applicative Error Laws: effectCatch captures errors") { AE.applicativeErrorEffectCatch(EQ) }
     )
+  }
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandle(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Throwable, Int>(Gen.int()), Gen.throwable()) { f: (Throwable) -> Int, e: Throwable ->

@@ -5,20 +5,26 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-
+import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
+import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.maybek.async.async
+import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunAsync
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.Effect
@@ -27,11 +33,7 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
-import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.UnsafeRun
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -41,14 +43,15 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
+import arrow.unsafe
 import io.reactivex.Maybe
-import io.reactivex.disposables.Disposable as RxDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface MaybeKFunctor : Functor<ForMaybeK> {
@@ -66,10 +69,13 @@ interface MaybeKApplicative : Applicative<ForMaybeK> {
 
   override fun <A> just(a: A): MaybeK<A> =
     MaybeK.just(a)
+
+  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface MaybeKMonad : Monad<ForMaybeK> {
+interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
@@ -82,8 +88,8 @@ interface MaybeKMonad : Monad<ForMaybeK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> =
     MaybeK.tailRecM(a, f)
 
-  override fun <A> just(a: A): MaybeK<A> =
-    MaybeK.just(a)
+  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -243,6 +249,14 @@ fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dis
 }
 
 @extension
+interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMaybeK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForMaybeK, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+    fa().fix().unsafeRunAsync(cb)
+}
+
+@extension
 interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
@@ -259,39 +273,18 @@ interface MaybeKTimer : Timer<ForMaybeK> {
 }
 
 @extension
-interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK> {
+interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK>, MaybeKFunctor {
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): Kind<ForMaybeK, B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): Kind<ForMaybeK, B> =
-    fix().map(f)
 }
 
 @extension
-interface MaybeKMonadFilter : MonadFilter<ForMaybeK> {
+interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
   override fun <A> empty(): MaybeK<A> =
     Maybe.empty<A>().k()
 
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): MaybeK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.ap(ff: Kind<ForMaybeK, (A) -> B>): MaybeK<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForMaybeK, A>.flatMap(f: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MaybeKOf<Either<A, B>>>): MaybeK<B> =
-    MaybeK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
-    fix().map(f)
-
-  override fun <A, B, Z> Kind<ForMaybeK, A>.map2(fb: Kind<ForMaybeK, B>, f: (Tuple2<A, B>) -> Z): MaybeK<Z> =
-    fix().map2(fb, f)
-
-  override fun <A> just(a: A): MaybeK<A> =
-    MaybeK.just(a)
 }
 
 fun <A> MaybeK.Companion.fx(c: suspend ConcurrentSyntax<ForMaybeK>.() -> A): MaybeK<A> =

@@ -3,9 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.AndThen
 import arrow.core.Either
-import arrow.core.EvalOf
-import arrow.core.Eval
-import arrow.core.fix
 import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.toT
@@ -166,57 +163,13 @@ class StateT<F, S, A>(
   fun <B> map(FF: Functor<F>, f: (A) -> B): StateT<F, S, B> = transform(FF) { (s, a) -> Tuple2(s, f(a)) }
 
   /**
-   * Combine with another [StateT] of same context [F] and state [S].
-   *
-   * @param MF [Monad] for the context [F].
-   * @param sb other state with value of type `B`.
-   * @param fn the function to apply.
-   */
-  fun <B, Z> map2(MF: Monad<F>, sb: StateTOf<F, S, B>, fn: (A, B) -> Z): StateT<F, S, Z> =
-    MF.run {
-      invokeF(runF.map2(sb.fix().runF) { (ssa, ssb) ->
-        AndThen(ssa).andThen { fsa ->
-          fsa.flatMap { (s, a) ->
-            ssb(s).map { (s, b) -> Tuple2(s, fn(a, b)) }
-          }
-        }
-      })
-    }
-
-  /**
-   * Controlled combination of [StateT] that is of same context [F] and state [S] using [Eval].
-   *
-   * @param MF [Monad] for the context [F].
-   * @param sb other state with value of type `B`.
-   * @param fn the function to apply.
-   */
-  fun <B, Z> map2Eval(MF: Monad<F>, sb: EvalOf<StateT<F, S, B>>, fn: (A, B) -> Z): Eval<StateT<F, S, Z>> = MF.run {
-    runF.map2Eval(sb.fix().map { it.runF }) { (ssa, ssb) ->
-      AndThen(ssa).andThen { fsa ->
-        fsa.flatMap { (s, a) ->
-          ssb((s)).map { (s, b) -> Tuple2(s, fn(a, b)) }
-        }
-      }
-    }.map { invokeF(it) }
-  }
-
-  /**
    * Apply a function `(S) -> B` that operates within the [StateT] context.
    *
    * @param MF [Monad] for the context [F].
    * @param ff function with the [StateT] context.
    */
   fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(MF, this) { f: (A) -> B, a: A -> f(a) }
-
-  /**
-   * Create a product of the value types of [StateT].
-   *
-   * @param MF [Monad] for the context [F].
-   * @param sb other stateful computation.
-   */
-  fun <B> product(MF: Monad<F>, sb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
-    map2(MF, sb) { a, b -> Tuple2(a, b) }
+    flatMap(MF) { a -> ff.fix().map(MF) { f -> f(a) } }
 
   /**
    * Map the value [A] to another [StateT] object for the same state [S] and context [F] and flatten the structure.

@@ -1,0 +1,111 @@
+.incubator {
+    background: $incubator-background;
+}
+
+#incubator-sidebar-nav {
+    .sidebar-nav-item {
+        > a {
+            transition: background $base-duration $base-timing;
+            &:hover {
+                background: $incubator-hover;
+            }
+        }
+
+        &.active {
+            > a {
+                background: $incubator-hover;
+                border-left: 4px solid $incubator-color;
+            }
+        }
+
+        ul {
+            background: $incubator-hover;
+            li {
+                a {
+                    &:before {
+                        content: "•";
+                        margin-right: ($base-point-grid * 2);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#cat-incubator-dropdown {
+    min-width: 164px;
+
+    .sidebar-nav {
+        .sidebar-nav-item {
+            > a {
+                transition: background $base-duration $base-timing;
+                &:hover {
+                    background: $incubator-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $incubator-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $incubator-hover;
+
+                a {
+                    color: $white;
+                    transition: all $base-duration $base-timing;
+
+                    &:hover {
+                        background: rgba($white, 0.05);
+                        color: rgba($white, 0.8);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#doc-incubator-version-button {
+    .sidebar-doc-versions {
+        .sidebar-nav-item {
+            background: $incubator-background;
+            > a {
+                transition: background $base-duration $base-timing;
+                &:hover {
+                    background: $incubator-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            &.active {
+                > a {
+                    background: $incubator-hover;
+                    box-shadow: $sidebar-cat-dropdow;
+                }
+            }
+
+            ul {
+                width: 100%;
+                z-index: 1;
+                box-shadow: $sidebar-cat-dropdow;
+                background: $incubator-hover;
+
+                a {
+                    color: $white;
+                    padding-left: 10px;
+
+                    &:hover {
+                        @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+                    }
+                }
+            }
+        }
+    }
+}

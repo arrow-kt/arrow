@@ -1,66 +1,53 @@
-{% for item in site.data.doc-versions.docVersions %}
-  {% if item.url == site.data.commons.stable_version %}
-    {% assign stable_version = item %}
-  {% endif %}
-  {% if item.url == site.data.commons.next_version %}
-    {% assign next_version = item %}
-  {% endif %}
-{% endfor %}
-
-{% for item in site.data.doc-versions.docVersions %}
-  {% if item.url == stable_version.previous %}
-    {% assign previous_version = item %}
-  {% endif %}
-{% endfor %}
-
 <head>
-    <meta charset="UTF-8">
-    <title>{{site.data.commons.name}}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{site.data.commons.description}}">
-    <meta name="keywords" content="{{site.data.commons.keywords}}">
+  <meta charset="UTF-8">
+  <title>{{site.name}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{site.description}}">
+  <meta name="keywords" content="{{site.keywords}}">
 
-    <meta property="og:image" content="http://arrow-kt.io/img/poster.png"/>
-    <meta property="og:title" content="{{site.data.commons.name}}"/>
-    <meta property="og:site_name" content="{{site.data.commons.name}}"/>
-    <meta property="og:url" content="http://arrow-kt.io/"/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:description" content="{{site.data.commons.description}}"/>
-    <meta property="og:keywords" content="{{site.data.commons.keywords}}"/>
+  <meta property="og:image" content="https://arrow-kt.io/img/poster.png" />
+  <meta property="og:title" content="{{site.name}}" />
+  <meta property="og:site_name" content="{{site.name}}" />
+  <meta property="og:url" content="https://arrow-kt.io/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="{{site.description}}" />
+  <meta property="og:keywords" content="{{site.keywords}}" />
 
-    <meta name="twitter:text:description" content="{{site.data.commons.description}}"/>
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@arrow_kt">
-    <meta name="twitter:creator" content="@arrow_kt">
-    <meta name="twitter:image" content="http://arrow-kt.io/img/twitter-card.png"/>
+  <meta name="twitter:text:description" content="{{site.description}}" />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="{{site.twitter_handle}}">
+  <meta name="twitter:creator" content="{{site.twitter_handle}}">
+  <meta name="twitter:image" content="https://arrow-kt.io/img/poster.png" />
 
-    <!-- Arrow versions metadata -->
-    <meta name="previous-version" data-title="{{ previous-version.title }}" data-url="{{ previous-version.url }}" />
-    <meta name="stable-version" data-title="{{ stable-version.title }}" data-url="{{ stable-version.url }}" />
-    <meta name="next-version" data-title="{{ next-version.title }}" data-url="{{ next-version.url }}" />
+  <script defer src="{{ '/js/main.js' | relative_url }}"></script>
+  <script defer src="{{ '/js/main-hovers.js' | relative_url }}"></script>
+  <script defer src="{{ '/js/animations.js' | relative_url }}"></script>
 
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"
-          type="text/css">
-    <!-- Animated -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
-    <!-- Arrow main css -->
-    <link rel="shortcut icon" href="{{ '/img/favicon.png' | relative_url }}">
-    <!-- highlight  css -->
-    <link rel="stylesheet" type="text/css" href="{{ '/css/highlight/atom-one-light.css' | relative_url }}">
-    <!-- Arrow main css -->
-    <link rel="stylesheet" type="text/css" href="{{ '/css/arrow.css' | relative_url }}">
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="{{ '/img/favicon.png' | relative_url }}">
 
-    <!-- Code to manage version information -->
-    <script src="{{ '/js/docVersions.js' | relative_url }}" defer></script>
+  <!-- Site main css -->
+  <link rel="stylesheet" type="text/css" href="{{ '/css/home-styles.css' | relative_url }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.5.6/lottie.min.js" type="text/javascript"></script>
 
-    <!-- Diagrams support -->
-    <script src="{{ '/js/dagre.min.js' | relative_url }}"></script>
-    <script src="{{ '/js/lodash.min.js' | relative_url }}"></script>
-    <script src="{{ '/js/nomnoml.js' | relative_url }}"></script>
-    <script src="{{ '/js/diagrams.js' | relative_url }}" async></script>
+  <!-- Arrow playground -->
+  <script src="https://unpkg.com/arrow-playground@1" data-selector="[class^='language-kotlin']" data-arrow-version="latest"></script>
 
-    {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
-        {% include _google-tag-manager.html %}
-    {% endif %}
+  <!-- Highlight -->
+  <script src="{{ '/js/highlight.pack.js' | relative_url }}"></script>
+  <script>
+    hljs.initHighlighting();
+  </script>
+
+  {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
+  {% include _google-tag-manager.html %}
+  {% endif %}
+
+  <!-- Gitter -->
+  <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" defer></script>
+  <script>
+    ((window.gitter = {}).chat = {}).options = {
+      room: "{{site.gitter_room}}"
+    };
+  </script>
 </head>

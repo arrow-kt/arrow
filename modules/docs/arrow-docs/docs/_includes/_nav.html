@@ -1,20 +1,27 @@
-<nav id="navigation">
-    <div class="navigation-brand">
-        <a href="/">Λrrow</a>
+<nav id="site-nav">
+  <div class="wrapper">
+    <div class="nav-flex">
+      <a class="nav-brand" title="Arrow" href="{{ site.baseurl }}/">
+        <img id="nav-brand-dark" src="{{ 'img/home/nav-brand.svg' | relative_url }}" title="{{ site.name }}" alt="Arrow">
+        <img id="nav-brand-white" src="{{ 'img/home/nav-brand-white.svg' | relative_url }}" title="{{ site.name }}" alt="Arrow">
+        <span id="nav-title">{{ site.name }}</span>
+      </a>
+      <div class="nav-menu">
+        <button class="button nav-icon-close" title="Close" onClick="toggleClass('.nav-menu', 'open');">
+          <img id="nav-icon-close" src="{{ 'img/home/nav-icon-close-white.svg' | relative_url }}" alt="Close">
+        </button>
+        <ul>
+          {% for item in site.data.menu.nav%}
+          <li class="nav-menu-item">
+            <a href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <button class="button nav-icon-open" title="Open" onClick="toggleClass('.nav-menu', 'open');">
+        <img id="nav-icon-open" src="{{ 'img/home/nav-icon-open-white.svg' | relative_url }}" alt="Open">
+      </button>
     </div>
-    <ul class="navigation-menu">
-        {% include _navigation-doc-versions.html %}
-        {% for item in site.data.menu.nav %}
-        <li class="navigation-menu-item {% if item.url == category.url %}active {% endif %}">
-            <a href="{{ item.url }}" title="{{ item.title }}" alt="{{ item.title }}">
-              {% if item.icon != "" %}
-                <i class="nav-item-icon fa fa-lg {{ item.icon }}" aria-hidden="true"></i>
-                <span class="nav-item-text">{{ item.title }}</span>
-              {% else %}
-                <span>{{ item.title }}</span>
-              {% endif %}
-            </a>
-        </li>
-        {% endfor %}
-    </ul>
+  </div>
 </nav>

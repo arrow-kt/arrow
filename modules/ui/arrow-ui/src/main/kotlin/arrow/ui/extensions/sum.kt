@@ -3,9 +3,6 @@ package arrow.ui.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.ui.Sum
-import arrow.ui.SumPartialOf
-import arrow.ui.fix
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Contravariant
@@ -13,9 +10,12 @@ import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
-import arrow.typeclasses.fix
+import arrow.ui.Sum
+import arrow.ui.SumPartialOf
+import arrow.ui.fix
 import arrow.undocumented
 
 @extension
@@ -122,4 +122,31 @@ interface DecidableSumInstance<F, G> : Decidable<SumPartialOf<F, G>>, DivisibleS
       DFFF().choose(fa.fix().left, fb.fix().left, f),
       DGGG().choose(fa.fix().right, fb.fix().right, f)
     )
+}
+
+@extension
+interface SumEqK<F, G> : EqK<SumPartialOf<F, G>> {
+
+  fun EQKF(): EqK<F>
+  fun EQKG(): EqK<G>
+
+  override fun <V> Kind<SumPartialOf<F, G>, V>.eqK(other: Kind<SumPartialOf<F, G>, V>, EQ: Eq<V>): Boolean =
+    (this.fix() to other.fix()).let {
+      when (it.first.side) {
+        is Sum.Side.Left -> when (it.second.side) {
+          is Sum.Side.Left -> EQKF().liftEq(EQ).run {
+            it.first.left.eqv(it.second.left)
+          }
+          else -> false
+        }
+        is Sum.Side.Right -> when (it.second.side) {
+          is Sum.Side.Right -> {
+            EQKG().liftEq(EQ).run {
+              it.first.right.eqv(it.second.right)
+            }
+          }
+          else -> false
+        }
+      }
+    }
 }

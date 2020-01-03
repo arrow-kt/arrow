@@ -60,6 +60,9 @@ interface IOApply : Apply<ForIO> {
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
     fix().ap(ff)
+
+  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -72,6 +75,9 @@ interface IOApplicative : Applicative<ForIO> {
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
     fix().ap(ff)
+
+  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -87,6 +93,9 @@ interface IOMonad : Monad<ForIO> {
 
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
+
+  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -129,6 +138,9 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
+
+  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -247,7 +259,7 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
 
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
     fa().fix().unsafeRunAsync(cb)
 }
 

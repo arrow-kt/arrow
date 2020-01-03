@@ -8,19 +8,25 @@ import arrow.core.IdOf
 import arrow.core.Tuple2
 import arrow.core.const
 import arrow.core.extensions.const.applicative.applicative
+import arrow.core.extensions.eq
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.monoid
 import arrow.core.fix
 import arrow.core.toT
 import arrow.core.value
+import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.mtl.typeclasses.ComposedApplicative
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
+import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.properties.Gen
@@ -52,26 +58,34 @@ object TraverseLaws {
       )
   */
 
-  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    FoldableLaws.laws(TF, cf, Eq.any()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
-      Law("Traverse Laws: Identity") { TF.identityTraverse(FF, cf, EQ) },
-      Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(cf, EQ) },
-      Law("Traverse Laws: Parallel composition") { TF.parallelComposition(cf, EQ) },
-      Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(cf) }
-    )
+  fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.intSmall())
+    val EQ = EQK.liftEq(Int.eq())
 
-  fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
+    return FoldableLaws.laws(TF, GENK) +
+        FunctorLaws.laws(TF, GENK, EQK) + listOf(
+        Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
+        Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
+        Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
+        Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
+        Law("Traverse Laws: Effect order preserved") { TF.effectOrderPreserved(GEN) }
+      )
+  }
+
+  fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
     val idApp = this
-    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), Gen.intSmall().map(cf)) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-      fa.traverse(idApp, f).extract().equalUnderTheLaw(FF.run { fa.map(f).map { it.extract() } }, EQ)
+    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), G) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
+      fa.traverse(idApp, f).extract().equalUnderTheLaw(FF.run {
+        fa.map(f).map { it.extract() }
+      }, EQ)
     }
   }
 
-  fun <F> Traverse<F>.sequentialComposition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
+  fun <F> Traverse<F>.sequentialComposition(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
     val idApp = this
     forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)),
       Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)),
-      Gen.intSmall().map(cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
+      GEN) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
       val fa = fha.traverse(idApp, f).fix()
       val composed = fa.map { it.traverse(idApp, g) }.value().value()
@@ -80,8 +94,8 @@ object TraverseLaws {
     }
   }
 
-  fun <F> Traverse<F>.parallelComposition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) =
-    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), Gen.intSmall().map(cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
+  fun <F> Traverse<F>.parallelComposition(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) =
+    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), GEN) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
       val TIA = object : Applicative<TIF> {
         override fun <A> just(a: A): Kind<TIF, A> =
           TIC(Id(a) toT Id(a))
@@ -105,10 +119,20 @@ object TraverseLaws {
       seen.equalUnderTheLaw(expected, TIEQ)
     }
 
-  fun <F> Traverse<F>.foldMapDerived(cf: (Int) -> Kind<F, Int>) =
-    forAll(Gen.functionAToB<Int, Int>(Gen.intSmall()), Gen.intSmall().map(cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+  fun <F> Traverse<F>.foldMapDerived(GEN: Gen<Kind<F, Int>>) =
+    forAll(Gen.functionAToB<Int, Int>(Gen.intSmall()), GEN) { f: (Int) -> Int, fa: Kind<F, Int> ->
       val traversed = fa.traverse(Const.applicative(Int.monoid())) { a -> f(a).const() }.value()
       val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())
     }
+
+  fun <F, A> Traverse<F>.effectOrderPreserved(GEN: Gen<Kind<F, A>>) = IO.concurrent().run {
+    forAll(GEN) { fa: Kind<F, A> ->
+      val foldableOrder = fa.foldLeft(emptyList()) { xs: List<A>, x: A -> xs + x }
+      val effectOrder = Ref<List<A>>(emptyList()).flatMap { ref ->
+        fa.traverse(IO.applicative()) { a -> ref.update { it + a } }.followedBy(ref.get())
+      }.unsafeRunSync()
+      effectOrder.equalUnderTheLaw(foldableOrder, Eq.any())
+    }
+  }
 }

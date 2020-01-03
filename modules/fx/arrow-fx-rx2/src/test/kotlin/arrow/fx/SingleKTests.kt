@@ -1,21 +1,29 @@
 package arrow.fx
 
+import arrow.Kind
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.singlek.applicative.applicative
 import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.extensions.singlek.async.async
+import arrow.fx.rx2.extensions.singlek.functor.functor
 import arrow.fx.rx2.extensions.singlek.monad.flatMap
+import arrow.fx.rx2.extensions.singlek.monad.monad
 import arrow.fx.rx2.extensions.singlek.timer.timer
+import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.test.generators.GenK
+import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import io.reactivex.Single
@@ -28,26 +36,18 @@ class SingleKTests : RxJavaSpec() {
 
   private val awaitDelay = 300L
 
-  fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
-    override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
-      val res1 = attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
-      val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
-      return res1.fold({ t1 ->
-        res2.fold({ t2 ->
-          (t1::class.java == t2::class.java)
-        }, { false })
-      }, { v1 ->
-        res2.fold({ false }, {
-          v1 == it
-        })
-      })
-    }
-  }
-
   init {
     testLaws(
-      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
-      TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
+      ConcurrentLaws.laws(
+        SingleK.concurrent(),
+        SingleK.functor(),
+        SingleK.applicative(),
+        SingleK.monad(),
+        SingleK.genK(),
+        SingleK.eqK(),
+        testStackSafety = false
+      ),
+      TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
     )
 
     "fx should defer evaluation until subscribed" {
@@ -170,4 +170,42 @@ class SingleKTests : RxJavaSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
   }
+}
+
+private fun <A> Gen.Companion.singleK(gen: Gen<A>): Gen<SingleK<A>> =
+  Gen.oneOf(
+    gen.map { Single.just(it) },
+    Gen.throwable().map { Single.error<A>(it) }
+  ).map {
+    it.k()
+  }
+
+private fun SingleK.Companion.genK() = object : GenK<ForSingleK> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForSingleK, A>> =
+    Gen.singleK(gen) as Gen<Kind<ForSingleK, A>>
+}
+
+private fun <T> SingleK.Companion.eq(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
+  override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
+    val res1 = attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
+    val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
+    return res1.fold({ t1 ->
+      res2.fold({ t2 ->
+        (t1::class.java == t2::class.java)
+      }, { false })
+    }, { v1 ->
+      res2.fold({ false }, {
+        v1 == it
+      })
+    })
+  }
+}
+
+private fun SingleK.Companion.eqK() = object : EqK<ForSingleK> {
+  override fun <A> Kind<ForSingleK, A>.eqK(other: Kind<ForSingleK, A>, EQ: Eq<A>): Boolean =
+    (this.fix() to other.fix()).let {
+      SingleK.eq<A>().run {
+        it.first.eqv(it.second)
+      }
+    }
 }

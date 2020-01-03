@@ -74,10 +74,13 @@ interface FlowableKApplicative : Applicative<ForFlowableK> {
 
   override fun <A> just(a: A): FlowableK<A> =
     FlowableK.just(a)
+
+  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
-interface FlowableKMonad : Monad<ForFlowableK> {
+interface FlowableKMonad : Monad<ForFlowableK>, FlowableKApplicative {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
 
@@ -90,8 +93,8 @@ interface FlowableKMonad : Monad<ForFlowableK> {
   override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
 
-  override fun <A> just(a: A): FlowableK<A> =
-    FlowableK.just(a)
+  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -358,39 +361,18 @@ interface FlowableKTimer : Timer<ForFlowableK> {
 }
 
 @extension
-interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
+interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK>, FlowableKFunctor {
   override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
-    fix().map(f)
 }
 
 @extension
-interface FlowableKMonadFilter : MonadFilter<ForFlowableK> {
+interface FlowableKMonadFilter : MonadFilter<ForFlowableK>, FlowableKMonad {
   override fun <A> empty(): FlowableK<A> =
     Flowable.empty<A>().k()
 
   override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForFlowableK, A>.ap(ff: Kind<ForFlowableK, (A) -> B>): FlowableK<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
-    FlowableK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
-    fix().map(f)
-
-  override fun <A, B, Z> Kind<ForFlowableK, A>.map2(fb: Kind<ForFlowableK, B>, f: (Tuple2<A, B>) -> Z): FlowableK<Z> =
-    fix().map2(fb, f)
-
-  override fun <A> just(a: A): FlowableK<A> =
-    FlowableK.just(a)
 }
 fun <A> FlowableK.Companion.fx(c: suspend ConcurrentSyntax<ForFlowableK>.() -> A): FlowableK<A> =
   defer { FlowableK.concurrent().fx.concurrent(c).fix() }

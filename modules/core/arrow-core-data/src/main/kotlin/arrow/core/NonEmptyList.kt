@@ -9,8 +9,6 @@ typealias Nel<A> = NonEmptyList<A>
 /**
  * ank_macro_hierarchy(arrow.core.NonEmptyList)
  *
- * {:.beginner}
- * beginner
  *
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
  * `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
@@ -219,7 +217,7 @@ class NonEmptyList<out A> private constructor(
 
   fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
 
-  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = fix().flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
   operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
 
@@ -232,13 +230,8 @@ class NonEmptyList<out A> private constructor(
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
 
-  fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
-    f(fix().head).map2Eval(Eval.always {
-      tail.k().traverse(AG, f)
-    }) {
-      NonEmptyList(it.a, it.b.fix())
-    }.value()
-  }
+  fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+    AG.run { all.k().traverse(AG, f).map { Nel.fromListUnsafe(it) } }
 
   fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
     val buf = mutableListOf<B>()
