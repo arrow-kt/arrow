@@ -68,7 +68,5 @@ class ProductTest : APTest("arrow.ap.objects.generic", enforcePackage = false) {
       destFile = "Show.kt",
       processor = ProductProcessor()
     ))
-
   }
-
 }
