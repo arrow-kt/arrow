@@ -1,6 +1,7 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.identity
@@ -41,7 +42,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param FF [Functor] for the context [F].
    */
   fun <B> map(FF: Functor<F>, f: (A) -> B): Kleisli<F, D, B> = FF.run {
-    Kleisli { d -> run(d).map(f) }
+    Kleisli(AndThen(run).andThen { it.map(f) })
   }
 
   /**
@@ -78,7 +79,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param f function that transforms new arrow head [DD] to [D].
    */
   fun <DD> local(f: (DD) -> D): Kleisli<F, DD, A> =
-    Kleisli { dd -> run(f(dd)) }
+    Kleisli(AndThen(run).compose(f))
 
   /**
    * Compose with another [Kleisli].
@@ -96,7 +97,7 @@ class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, Kleisli
    * @param MF [Monad] for the context [F].
    */
   fun <B> andThen(MF: Monad<F>, f: (A) -> Kind<F, B>): Kleisli<F, D, B> = MF.run {
-    Kleisli { d: D -> run(d).flatMap(f) }
+    Kleisli(AndThen(run).andThen { it.flatMap(f) })
   }
 
   /**

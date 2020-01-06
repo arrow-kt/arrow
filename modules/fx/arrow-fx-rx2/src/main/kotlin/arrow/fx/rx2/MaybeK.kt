@@ -316,6 +316,12 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
   }
 }
 
+fun <A> MaybeK<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
+
+fun <A> MaybeK<A>.unsafeRunSync(): A =
+  value().blockingGet()
+
 fun <A> MaybeK<A>.handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 

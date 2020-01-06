@@ -5,14 +5,15 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-
+import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
-import arrow.fx.rx2.extensions.observablek.async.async
+import arrow.fx.rx2.asScheduler
+import arrow.fx.rx2.extensions.observablek.dispatchers.dispatchers
 import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.extensions.observablek.monadError.monadError
 import arrow.fx.rx2.fix
@@ -20,8 +21,10 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
@@ -31,11 +34,6 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
-import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.observablek.dispatchers.dispatchers
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
@@ -52,9 +50,9 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as observableHandleErrorWith
 import arrow.fx.rx2.ap as observableAp
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {

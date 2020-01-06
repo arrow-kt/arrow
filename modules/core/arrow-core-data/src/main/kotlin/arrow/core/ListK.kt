@@ -50,7 +50,7 @@ import arrow.typeclasses.Applicative
  * }
  * ```
  *
- * The functions `traverse` and `sequence` come from [Traverse](/docs/arrow/typeclasses/traverse/).
+ * The functions `traverse` and `sequence` come from [Traverse](/docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/).
  *
  * Traversing a list creates a new container [Kind<F, A>](/docs/patterns/glossary/#type-constructors) by combining the result of a function applied to each element:
  *
