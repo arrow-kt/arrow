@@ -67,7 +67,7 @@ Option.alternative().run {
 
 Repeats the current computation, collecting its results into a non-empty list, until it fails. This will loop forever if the computation cannot or does not fail.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Option
 import arrow.core.extensions.option.alternative.alternative
 
@@ -83,7 +83,7 @@ Option.alternative().run {
 
 Same function as some, but it does not require the computation to succeed.
 
-```kotlin:ank
+```kotlin
 import arrow.core.Option
 import arrow.core.extensions.option.alternative.alternative
 
