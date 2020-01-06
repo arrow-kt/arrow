@@ -44,10 +44,10 @@ object MonadDeferLaws {
       Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
     ) + if (testStackSafety) {
       listOf(
-        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
+        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(20_000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(20_000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(20_000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(20_000, EQ) }
       )
     } else {
       emptyList()
@@ -158,28 +158,28 @@ object MonadDeferLaws {
     df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().k().foldLeft(just(0)) { def, x ->
         def.flatMap { just(x) }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldRight(just(iterations)) { x, def ->
         lazy().flatMap { def }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.attempt().map { x }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.map { x }
