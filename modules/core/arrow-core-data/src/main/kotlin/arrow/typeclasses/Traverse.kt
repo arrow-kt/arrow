@@ -464,8 +464,8 @@ import arrow.core.ValidatedNel
  * import arrow.typeclasses.Applicative
  *
  * interface IdApplicative : Applicative<ForId> {
- *   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
- *     Id(ff.extract().invoke(extract()))
+ *   override fun <A, B> IdOf<(A) -> B>.ap(ff: IdOf<A>): Id<B> =
+ *     Id(extract().invoke(ff.extract()))
  *
  *   override fun <A> just(a: A): Id<A> =
  *     Id(a)
@@ -495,7 +495,7 @@ import arrow.core.ValidatedNel
  *
  * [Foldable] and [Traverse] act on multiple elements and reduce them into a single value - in category theory - `Catamorphisms`.
  *
- * In contrast, `homomorphisms` such as [Monoid] and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `List<Int>.ap(listOf(Int::inc))` results in a `List<Int>`.
+ * In contrast, `homomorphisms` such as [Monoid] and [Applicative] preserve their structure, hence adding two values of type `List<Int>` will yield a `List<Int>` or an [Applicative] example, where `listOf(Int::inc).ap(List<Int>)` results in a `List<Int>`.
  *
  * We can think of catamorphic operations as:
  *

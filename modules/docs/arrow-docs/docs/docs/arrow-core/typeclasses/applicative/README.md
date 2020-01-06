@@ -73,7 +73,7 @@ Apply a function inside the type constructor's context.
 `fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>`
 
 ```kotlin:ank
-Option.applicative().run { Some(1).ap(Some({ n: Int -> n + 1 })) }
+Option.applicative().run { Some({ n: Int -> n + 1 }).ap(Some(1)) }
 ```
 
 #### Other combinators

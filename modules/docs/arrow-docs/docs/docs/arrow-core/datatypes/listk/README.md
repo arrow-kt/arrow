@@ -78,5 +78,5 @@ Or you can apply a list of transformations using `ap` from [`Applicative`](/docs
 import arrow.core.extensions.*
 import arrow.core.extensions.list.apply.*
 
-listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}))
+listOf({ x: Int -> x + 10}, { x: Int -> x * 2}).ap(listOf(1, 2, 3))
 ```

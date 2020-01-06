@@ -24,6 +24,7 @@ interface Apply<F> : Functor<F> {
    * import arrow.core.Option
    * import arrow.core.Some
    * import arrow.core.none
+   * import arrow.core.ap
    *
    * fun main() {
    *   //sampleStart

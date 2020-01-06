@@ -47,8 +47,8 @@ Applying a sequence of functions to a sequence:
 import arrow.core.extensions.*
 import arrow.core.extensions.sequence.apply.ap
 
-sequenceOf(1, 2, 3)
- .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}))
+sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2})
+ .ap(sequenceOf(1, 2, 3))
  .toList()
 ```
 

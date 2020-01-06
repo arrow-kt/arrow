@@ -52,6 +52,7 @@ The `ap` function transform the `Kleisli` into another `Kleisli` with a function
 import arrow.mtl.fix
 import arrow.core.extensions.option.applicative.*
 import arrow.core.extensions.option.monad.*
+import arrow.mtl.ap
 
 val intToDouble = {number:Int -> number.toDouble()}
 
@@ -59,7 +60,7 @@ val optionIntDoubleKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(intToDouble) else None
 }
 
-optionIntKleisli.ap(Option.applicative(), optionIntDoubleKleisli).fix().run("1")
+optionIntDoubleKleisli.ap(Option.applicative(), optionIntKleisli).fix().run("1")
 ```
 
 #### Map

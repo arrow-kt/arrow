@@ -25,9 +25,9 @@ Is a binary function which represents a choice between alternatives.
 
 ```kotlin:ank
 import arrow.core.Option
-import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.alternative.alternative
 
-Option.monadCombine().run {
+Option.alternative().run {
     val x: Option<Int> = Option.just(1)
     val y: Option<Int> = Option.empty()
     x.orElse(y)
@@ -36,10 +36,10 @@ Option.monadCombine().run {
 
 ```kotlin:ank
 import arrow.core.ListK
-import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.listk.alternative.alternative
 import arrow.core.k
 
-ListK.monadCombine().run {
+ListK.alternative().run {
     val x = listOf(1, 2).k()
     val y = listOf(3, 4).k()
     x.orElse(y)
@@ -52,9 +52,9 @@ It is just an infix alias over `orElse`.
 
 ```kotlin:ank
 import arrow.core.Option
-import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.alternative.alternative
 
-Option.monadCombine().run {
+Option.alternative().run {
     val x: Option<Int> = Option.just(1)
     val y: Option<Int> = Option.empty()
     x alt y
@@ -63,43 +63,33 @@ Option.monadCombine().run {
 
 #### Kind<F, A>.some
 
-`fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>>`
+`fun <A> Kind<F, A>.some(): Kind<F, NonEmptyList<A>>`
 
-Repeats the current computation, lazily collecting its results into a sequence, until it fails. It is required that the computation succeeds at least once.
+Repeats the current computation, collecting its results into a non-empty list, until it fails. This will loop forever if the computation cannot or does not fail.
 
 ```kotlin:ank
 import arrow.core.Option
-import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.alternative.alternative
 
-Option.monadCombine().run {
+Option.alternative().run {
   val x = Option.just(1)
-  x.some().map { it.take(5).toList() }
-}
-```
-
-```kotlin:ank
-import arrow.core.Option
-import arrow.core.extensions.option.monadCombine.monadCombine
-
-Option.monadCombine().run {
-  val x = Option.empty<Int>()
-  x.some().map { it.take(5).toList() }
+  x.some()
 }
 ```
 
 #### Kind<F, A>.many
 
-`fun <A> Kind<F, A>.many(): Kind<F, SequenceK<A>>`
+`fun <A> Kind<F, A>.many(): Kind<F, ListK<A>>`
 
 Same function as some, but it does not require the computation to succeed.
 
 ```kotlin:ank
 import arrow.core.Option
-import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.alternative.alternative
 
-Option.monadCombine().run {
+Option.alternative().run {
   val x = Option.empty<Int>()
-  x.many().map { it.take(5).toList() }
+  x.many()
 }
 ```
 

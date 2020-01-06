@@ -64,7 +64,7 @@ val f1: (Int) -> String = { i: Int -> "f1 to \"$i\"" }
 val f2: (Int) -> String = { i: Int -> "f2 to \"$i\"" }
 val map2: MapK<String, (Int) -> String> = mapOf("one" to f1, "two" to f2).k()
 
-val apResult = map1.ap(map2)
+val apResult = map2.ap(map1)
 apResult
 ```
 `ap2` acts like `map2` to `map`
