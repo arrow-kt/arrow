@@ -10,7 +10,6 @@ import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedOf
 import arrow.core.ValidatedPartialOf
-import arrow.core.ap
 import arrow.core.apPipe
 import arrow.core.combineK
 import arrow.core.extensions.validated.eq.eq

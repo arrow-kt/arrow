@@ -770,7 +770,7 @@ fun <E, A, B> ValidatedOf<E, A>.apPipe(SE: Semigroup<E>, f: Validated<E, (A) -> 
 
 fun <E, A, B> ValidatedOf<E, (A) -> B>.ap(SE: Semigroup<E>, ff: ValidatedOf<E, A>): Validated<E, B> =
   fix().fold(
-    { e -> ff.fix().fold({ Invalid(SE.run {  e.combine(it) }) }, { Invalid(e) }) },
+    { e -> ff.fix().fold({ Invalid(SE.run { e.combine(it) }) }, { Invalid(e) }) },
     { f -> ff.fix().fold(::Invalid) { Valid(f(it)) } }
   )
 

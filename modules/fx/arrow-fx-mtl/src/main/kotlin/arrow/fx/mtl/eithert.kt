@@ -26,7 +26,6 @@ import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf
 import arrow.mtl.extensions.EitherTMonadThrow
 import arrow.mtl.value
-import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented

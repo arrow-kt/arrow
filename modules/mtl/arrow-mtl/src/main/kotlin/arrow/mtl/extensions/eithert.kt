@@ -6,7 +6,6 @@ import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
-import arrow.core.ap
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.traverse.traverse

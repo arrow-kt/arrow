@@ -648,9 +648,9 @@ sealed class IO<out A> : IOOf<A> {
    * fun main() {
    *   //sampleStart
    *   val someF: IO<(Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
-   *   val a = IO.just(3).ap(someF)
-   *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
-   *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
+   *   val a = IO.just(3).apPipe(someF)
+   *   val b = IO.raiseError<Int>(RuntimeException("Boom")).apPipe(someF)
+   *   val c = IO.just(3).apPipe(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
    *   //sampleEnd
    *   println("a: $a, b: $b, c: $c")
    * }

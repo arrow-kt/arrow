@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.ListK
 import arrow.core.Nel
 import arrow.core.NonEmptyList
-import arrow.core.SequenceK
 import arrow.core.k
 
 /**

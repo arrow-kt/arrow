@@ -8,7 +8,6 @@ import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
-import arrow.core.ap
 import arrow.core.extensions.ior.eq.eq
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix

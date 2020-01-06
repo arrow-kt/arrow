@@ -60,7 +60,7 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
   companion object
 }
 
-fun <A: Comparable<A>, B, C> SortedMapKOf<A, (B) -> C>.ap(ff: SortedMapKOf<A, B>): SortedMapK<A, C> = fix().flatMap { f -> ff.fix().map(f) }
+fun <A : Comparable<A>, B, C> SortedMapKOf<A, (B) -> C>.ap(ff: SortedMapKOf<A, B>): SortedMapK<A, C> = fix().flatMap { f -> ff.fix().map(f) }
 
 fun <A : Comparable<A>, B> SortedMap<A, B>.k(): SortedMapK<A, B> = SortedMapK(this)
 

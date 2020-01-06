@@ -41,4 +41,3 @@ fun <A, B> Function0<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0<B
   flatMap { it.fold({ l -> just(l).apPipe(f) }, { r -> just(r) }) }
 
 fun <A, B> Function0Of<(A) -> B>.ap(ff: Function0Of<A>): Function0<B> = fix().flatMap { f -> ff.fix().map(f) }
-
