@@ -5,4 +5,11 @@ import kotlin.annotation.AnnotationTarget.CLASS
 
 @Retention(SOURCE)
 @Target(CLASS)
-annotation class product
+/**
+ * Empty arrays means "Everything that matches annotated class"
+ */
+annotation class product(val deriving: Array<DerivingTarget> = [])
+
+enum class DerivingTarget {
+  SEMIGROUP, MONOID, TUPLED, HLIST, APPLICATIVE, EQ, SHOW
+}

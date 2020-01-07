@@ -13,46 +13,33 @@ import arrow.typeclasses.ApplicativeError
  * Lightweight, asynchronous queue for values of A in a Concurrent context F
  * A Queue can be implemented using 4 different strategies
  *
- * Bounded: Offering to a queue at capacity will cause the fiber making the call
- * to be suspended until the queue has space to receive the offer value
+ * Bounded: Offering to a bounded queue at capacity will cause the fiber making
+ * the call to be suspended until the queue has space to receive the offer value
  *
- * ported from Scala ZIO Queue implementation
+ * Dropping: Offering to a dropping queue at capacity will cause the offered
+ * value to be discarded
+ *
+ * Sliding: Offering to a sliding queue at capacity will cause the value at the
+ * front of the queue to be discarded to make room for the offered value
+ *
+ * Unbounded: An unbounded queue has no notion of capacity and is bound only by
+ * exhausting the memory limits of the runtime
+ *
+ * ported from [Scala ZIO Queue](https://zio.dev/docs/datatypes/datatypes_queue)
+ * implementation
  */
-class Queue<F, A> private constructor(private val capacity: Int, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
+class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A>, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
   Concurrent<F> by CF {
 
   fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
 
-  private sealed class State<F, out A> {
-    abstract fun size(): Kind<F, Int>
-
-    internal data class Deficit<F, A>(val takers: IQueue<Promise<F, A>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
-      override fun size(): Kind<F, Int> = AP.just(-takers.length())
-    }
-
-    internal data class Surplus<F, A>(val queue: IQueue<A>, val putters: IQueue<Tuple2<A, Promise<F, Unit>>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
-      override fun size(): Kind<F, Int> = AP.just(queue.length() + putters.length())
-    }
-
-    internal data class Shutdown<F>(val AE: ApplicativeError<F, Throwable>) : State<F, Nothing>() {
-      override fun size(): Kind<F, Int> = AE.raiseError(QueueShutdown)
-    }
-  }
-
   fun offer(a: A): Kind<F, Unit> {
     val use: (Promise<F, Unit>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
       state.fold(
-        ifSurplus = { surplus ->
-          surplus.run {
-            if (queue.length() < capacity && putters.isEmpty())
-              p.complete(Unit) toT copy(queue = queue.enqueue(a))
-            else
-              unit() toT copy(putters = putters.enqueue(a toT p))
-          }
-        },
+        ifSurplus = { surplus -> strategy.handleSurplus(p, surplus, a) },
         ifDeficit = { deficit ->
           deficit.takers.dequeueOption().fold(
-            { p.complete(Unit) toT State.Surplus(IQueue.empty<A>().enqueue(a), IQueue.empty(), CF, deficit.shutdownHook) },
+            { strategy.handleSurplus(p, State.Surplus(IQueue.empty(), IQueue.empty(), CF, deficit.shutdownHook), a) },
             { (taker, takers) ->
               taker.complete(a).followedBy(p.complete(Unit)) toT deficit.copy(takers = takers)
             }
@@ -165,7 +152,28 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
      */
     fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
       Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
-        Queue(capacity, it, this)
+        Queue(SurplusStrategy.Bounded(capacity, this), it, this)
+      }
+    }
+
+    fun <F, A> sliding(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.fx.concurrent {
+      !just(capacity).ensure(
+        { IllegalArgumentException("Sliding queue must have a capacity greater than 0") },
+        { it > 0 }
+      )
+      val ref = !Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), CF, unit()))
+      Queue(SurplusStrategy.Sliding(capacity, CF), ref, CF)
+    }
+
+    fun <F, A> dropping(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
+        Queue(SurplusStrategy.Dropping(capacity, this), it, this)
+      }
+    }
+
+    fun <F, A> unbounded(CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      Ref<State<F, A>>(State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
+        Queue(SurplusStrategy.Unbounded(this), it, this)
       }
     }
   }
@@ -198,6 +206,73 @@ class Queue<F, A> private constructor(private val capacity: Int, private val ref
         ifShutdown = ::identity
       )
     }
+
+  /**
+   * A Queue can be in three states
+   * Deficit:
+   *  Contains a queue of values and a queue of suspended fibers
+   *  waiting to take once a value becomes available
+   * Surplus:
+   *  Contains a queue of values and a queue of suspended fibers
+   *  waiting to offer once there is room (if the queue is bounded)
+   * Shutdown:
+   *  Holds no values or promises for suspended calls,
+   *  an offer or take in Shutdown state creates a QueueShutdown error
+   */
+  private sealed class State<F, out A> {
+    abstract fun size(): Kind<F, Int>
+
+    data class Deficit<F, A>(val takers: IQueue<Promise<F, A>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
+      override fun size(): Kind<F, Int> = AP.just(-takers.length())
+    }
+
+    data class Surplus<F, A>(val queue: IQueue<A>, val putters: IQueue<Tuple2<A, Promise<F, Unit>>>, val AP: Applicative<F>, val shutdownHook: Kind<F, Unit>) : State<F, A>() {
+      override fun size(): Kind<F, Int> = AP.just(queue.length() + putters.length())
+    }
+
+    data class Shutdown<F>(val AE: ApplicativeError<F, Throwable>) : State<F, Nothing>() {
+      override fun size(): Kind<F, Int> = AE.raiseError(QueueShutdown)
+    }
+  }
+
+  private sealed class SurplusStrategy<F, A> {
+    abstract fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>>
+
+    data class Bounded<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {
+      override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
+        surplus.run {
+          if (queue.length() < capacity && putters.isEmpty())
+            p.complete(Unit) toT copy(queue = queue.enqueue(a))
+          else
+            AP.unit() toT copy(putters = putters.enqueue(a toT p))
+        }
+    }
+
+    data class Sliding<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {
+      override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
+        surplus.run {
+          val nextQueue =
+            if (queue.length() < capacity) queue.enqueue(a)
+            else queue.dequeue().b.enqueue(a)
+          p.complete(Unit) toT copy(queue = nextQueue)
+        }
+    }
+
+    data class Dropping<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {
+      override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
+        surplus.run {
+          val nextQueue = if (queue.length() < capacity) queue.enqueue(a) else queue
+          p.complete(Unit) toT copy(queue = nextQueue)
+        }
+    }
+
+    data class Unbounded<F, A>(val AP: Applicative<F>) : SurplusStrategy<F, A>() {
+      override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
+        surplus.run {
+          p.complete(Unit) toT copy(queue = queue.enqueue(a))
+        }
+    }
+  }
 }
 
 object QueueShutdown : RuntimeException() {
