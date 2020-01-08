@@ -62,6 +62,8 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    */
   fun <A> Kind<F, A>.optional(): Kind<F, Option<A>> = map(::Some).orElse(just(None))
 
+  fun guard(b: Boolean): Kind<F, Unit> = if (b) just(Unit) else empty()
+
   /**
    * Lazy or else, useful when traversing a structure with asum which short circuits on success. In general this should be implemented
    *  for every Alternative that models success and failure.
