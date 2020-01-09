@@ -42,7 +42,6 @@ import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
-import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
