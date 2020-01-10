@@ -675,6 +675,15 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     Bind(this, IOFrame.attempt())
 
   /**
+   * [runAsync] allows you to run any [IO] in a referential transparent manner.
+   *
+   * Reason it can happen in a referential transparent manner is because nothing is actually running when this method is invoked.
+   * The combinator can be used to define how several programs have to run in a safe manner.
+   */
+  fun runAsync(cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Unit> =
+    IO { unsafeRunAsyncEither(cb.andThen { it.fix().unsafeRunAsync { } }) }
+
+  /**
    * [unsafeRunAsync] allows you to run any [IO] and receive the values in a callback [cb]
    * and thus **has** the ability to run `NonBlocking` but that depends on the implementation.
    * When the underlying effects/program runs blocking on the callers thread this method will run blocking.
@@ -689,6 +698,28 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     IORunLoop.start(this, cb)
 
   /**
+   * A pure version of [unsafeRunAsyncCancellable], it defines how an [IO] is ran in a cancelable manner but it doesn't run yet.
+   *
+   * It receives the values in a callback [cb] and thus **has** the ability to run `NonBlocking` but that depends on the implementation.
+   * When the underlying effects/program runs blocking on the callers thread this method will run blocking.
+   *
+   * @param cb the callback that is called with the computations result represented as an [Either].
+   * @return a [Disposable] that can be used to cancel the computation.
+   * @see [unsafeRunAsync] to run in an unsafe and non-cancellable manner.
+   * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
+   */
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
+    async { ccb ->
+      val conn = IOConnection()
+      val onCancelCb = when (onCancel) {
+        ThrowCancellationException -> cb andThen { it.fix().unsafeRunAsync { } }
+        Silent -> { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
+      }
+      ccb(IOResult.Success(conn.toDisposable()))
+      IORunLoop.startCancelable(this, conn, onCancelCb)
+    }
+
+  /**
    * [unsafeRunAsyncCancellable] allows you to run any [IO] and receive the values in a callback [cb] while being cancelable.
    * It **has** the ability to run `NonBlocking` but that depends on the implementation, when the underlying
    * effects/program runs blocking on the callers thread this method will run blocking.
@@ -701,15 +732,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [runAsync] to run in a referential transparent manner.
    */
   fun unsafeRunAsyncCancellableEither(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> Unit): Disposable =
-    async<Nothing, Disposable> { ccb ->
-      val conn = IOConnection()
-      val onCancelCb = when (onCancel) {
-        ThrowCancellationException -> cb
-        Silent -> { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
-      }
-      ccb(IOResult.Success(conn.toDisposable()))
-      IORunLoop.startCancelable(this, conn, onCancelCb)
-    }.unsafeRunSync()
+    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync()
 
   /**
    * [unsafeRunSync] allows you to run any [IO] to its wrapped value [A].

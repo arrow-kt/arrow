@@ -187,6 +187,63 @@ class IOTest : UnitSpec() {
       }
     }
 
+    "should complete when running a pure value with runAsync" {
+      val expected = 0
+      just(expected).runAsync { either ->
+        either.fold({ fail("") }, { fail("") }, { IO { it shouldBe expected } })
+      }.unsafeRunSyncEither()
+    }
+
+    "should complete when running a return value with runAsync" {
+      val expected = 0
+      IO { expected }.runAsync { either ->
+        either.fold({ fail("") }, { fail("") }, { IO { it shouldBe expected } })
+      }.unsafeRunSyncEither()
+    }
+
+    "should complete when running a error vallue with runAsync" {
+      val expected = "Error"
+      IO.raiseError<String, Int>(expected).runAsync { result ->
+        result.fold({ fail("") }, { IO { it shouldBe expected } }, { fail("") })
+      }.unsafeRunSyncEither()
+    }
+
+    "should return an error when running an exception with runAsync" {
+      IO.raiseException<Int>(MyException()).runAsync { either ->
+        either.fold({
+          when (it) {
+            is MyException -> {
+              IO { }
+            }
+            else -> fail("Should only throw MyException")
+          }
+        }, { fail("") }, { fail("") })
+      }.unsafeRunSyncEither()
+    }
+
+    "should return exceptions within main block with runAsync" {
+      val exception = MyException()
+      val ioa = IO { throw exception }
+      ioa.runAsync { either ->
+        either.fold({ IO { it shouldBe exception } }, { fail("") }, { fail("") })
+      }.unsafeRunSyncEither()
+    }
+
+    "should catch exceptions within run block with runAsync" {
+      try {
+        val exception = MyException()
+        val ioa = IO { throw exception }
+        ioa.runAsync { either ->
+          either.fold({ throw it }, { fail("") }, { fail("") })
+        }.unsafeRunSync()
+        fail("Should rethrow the exception")
+      } catch (throwable: AssertionError) {
+        fail("${throwable.message}")
+      } catch (throwable: Throwable) {
+        // Success
+      }
+    }
+
     "should map values correctly on success" {
       val run = just(1).map { it + 1 }.unsafeRunSync()
 
@@ -466,6 +523,17 @@ class IOTest : UnitSpec() {
 
         !p.get()
       }.unsafeRunSync() shouldBe Unit
+    }
+
+    "IO should cancel cancelable on dispose" {
+      Promise.uncancelable<IOPartialOf<Nothing>, Unit>(IO.async()).flatMap { latch ->
+        IO {
+          IO.cancelable<Nothing, Unit> {
+            latch.complete(Unit)
+          }.unsafeRunAsyncCancellable { }
+            .invoke()
+        }.flatMap { latch.get() }
+      }.unsafeRunSync()
     }
 
     "Bracket should be stack safe" {
