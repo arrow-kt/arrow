@@ -67,7 +67,7 @@ class IorTest : UnitSpec() {
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->
-        Ior.Right.invoke(b).bimap({ "5" }, { a * 2 }) == Ior.Right.invoke(a * 2) &&
+        Ior.Right(b).bimap({ "5" }, { a * 2 }) == Ior.Right(a * 2) &&
           Ior.Left(a).bimap({ a * 3 }, { "5" }) == Ior.Left(a * 3) &&
           Ior.Both(a, b).bimap({ 2 }, { "power of $it" }) == Ior.Both(2, "power of $b")
       }
@@ -136,9 +136,9 @@ class IorTest : UnitSpec() {
 
     "fromOptions() should build a correct Option<Ior>" {
       forAll { a: Int, b: String ->
-        Ior.fromOptions(Some(a), None) == Some(Ior.Left.invoke(a)) &&
+        Ior.fromOptions(Some(a), None) == Some(Ior.Left(a)) &&
           Ior.fromOptions(Some(a), Some(b)) == Some(Ior.Both(a, b)) &&
-          Ior.fromOptions(None, Some(b)) == Some(Ior.Right.invoke(b)) &&
+          Ior.fromOptions(None, Some(b)) == Some(Ior.Right(b)) &&
           Ior.fromOptions(None, None) == None
       }
     }
