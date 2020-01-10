@@ -17,6 +17,7 @@ import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
@@ -724,7 +725,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    */
   fun unsafeRunSyncEither(): Either<E, A> =
     unsafeRunTimed(Duration.INFINITE)
-      .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
+      .fold({ throw IOTimedResultedException }, ::identity)
 
   /**
    * Run with a limitation on how long to await for *individual* async results.
@@ -1153,9 +1154,7 @@ fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A
 
 fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
   fix().unsafeRunSyncEither()
-    .fold({
-      TODO()
-    }, ::identity)
+    .fold({ throw IONothingYieldsError }, ::identity)
 
 fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
   fix().unsafeRunAsyncEither { result ->
@@ -1180,3 +1179,11 @@ fun <A, B> IOOf<Nothing, A>.repeat(schedule: Schedule<IOPartialOf<Nothing>, A, B
 
 fun <A, B> IOOf<Nothing, A>.retry(schedule: Schedule<IOPartialOf<Nothing>, Throwable, B>): IO<Nothing, A> =
   retry(IO.concurrent(), schedule).fix()
+
+internal object IONothingYieldsError : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IOTimedResultedException : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
