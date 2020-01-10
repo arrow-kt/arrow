@@ -254,6 +254,13 @@ interface WriterTAlternative<F, W> : Alternative<WriterTPartialOf<F, W>>, Writer
       }
     )
 
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.lazyOrElse(b: () -> Kind<WriterTPartialOf<F, W>, A>): Kind<WriterTPartialOf<F, W>, A> =
+    WriterT(
+      AL().run {
+        value().lazyOrElse { b().value() }
+      }
+    )
+
   override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
     orElse(y).fix()
 }

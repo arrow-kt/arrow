@@ -214,7 +214,7 @@ class StateT<F, S, A>(
   fun <B> transform(FF: Functor<F>, f: (Tuple2<S, A>) -> Tuple2<S, B>): StateT<F, S, B> = FF.run {
     invokeF(
       runF.map { sfsa ->
-        sfsa.andThen { fsa ->
+        AndThen(sfsa).andThen { fsa ->
           fsa.map(f)
         }
       })

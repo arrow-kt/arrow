@@ -122,7 +122,7 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
     })
 
   fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> WriterTOf<F, W, B>): WriterT<F, W, B> = MF.run {
-    WriterT(value.flatMap { value -> f(value.b).value().map { SG.run { it.a.combine(value.a) } toT it.b } })
+    WriterT(value.flatMap { value -> f(value.b).value().map { SG.run { value.a.combine(it.a) } toT it.b } })
   }
 
   fun <B, U> transform(MF: Monad<F>, f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = MF.run {

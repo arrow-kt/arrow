@@ -1,6 +1,12 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Eval
+import arrow.core.ForListK
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.fix
 import arrow.core.ListK
 import arrow.core.Nel
 import arrow.core.NonEmptyList
@@ -50,4 +56,37 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
   fun <A> Kind<F, A>.orElse(b: Kind<F, A>): Kind<F, A>
 
   override fun <A> Kind<F, A>.combineK(y: Kind<F, A>): Kind<F, A> = orElse(y)
+
+  /**
+   * Wraps the result in an optional. This never fails.
+   * @receiver computation to execute
+   * @return Option with either the result or none in case it failed
+   */
+  fun <A> Kind<F, A>.optional(): Kind<F, Option<A>> = map(::Some).orElse(just(None))
+
+  fun guard(b: Boolean): Kind<F, Unit> = if (b) just(Unit) else empty()
+
+  /**
+   * Lazy or else, useful when traversing a structure with asum which short circuits on success. In general this should be implemented
+   *  for every Alternative that models success and failure.
+   */
+  fun <A> Kind<F, A>.lazyOrElse(b: () -> Kind<F, A>): Kind<F, A> = orElse(b())
 }
+
+// TODO move back to alternative once arrow-meta is used to handle @extension because currently this breaks for lists and sequences
+fun <T, F, A> Kind<T, Kind<F, A>>.altSum(AF: Alternative<F>, FT: Foldable<T>): Kind<F, A> = AF.run {
+  FT.run {
+    foldRight(Eval.now(empty<A>())) { v, acc ->
+      Eval.later { v.lazyOrElse { acc.value() } }
+    }.value()
+  }
+}
+
+fun <T, F, A> Kind<T, A>.altFold(AF: Alternative<F>, FT: Foldable<T>): Kind<F, A> = FT.run { toList().altFromList(AF) }
+
+fun <F, A> List<A>.altFromList(AF: Alternative<F>): Kind<F, A> = map { AF.just(it) }.k().altSum(AF, object : Foldable<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
+  override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().foldRight(lb, f)
+})
+
+fun <F, A> Option<A>.altFromOption(AF: Alternative<F>): Kind<F, A> = fold({ AF.empty() }, { AF.just(it) })
