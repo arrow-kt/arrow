@@ -14,7 +14,7 @@ import arrow.fx.IO.Pure
  *
  * It's used to implement [attempt], [handleErrorWith] and [arrow.fx.internal.IOBracket]
  */
-internal interface IOFrame<in A, out R> : (A) -> R {
+interface IOFrame<in A, out R> : (A) -> R {
   override operator fun invoke(a: A): R
 
   fun recover(e: Throwable): R

@@ -1,8 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.Ior.Left
-import arrow.core.Ior.Right
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -146,7 +144,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<A, C>> = GA.run {
-    fold({ just(Left(it)) }, { f(it).map { Right<A, C>(it) } }, { _, b -> f(b).map { Right<A, C>(it) } })
+    fold({ just(Left(it)) }, { b -> f(b).map { Right.invoke(it) } }, { _, b -> f(b).map { Right(it) } })
   }
 
   fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
@@ -298,7 +296,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    */
   fun toValidated(): Validated<A, B> = fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
-  data class Left<out A, out B> @PublishedApi internal constructor(val value: A) : Ior<A, B>() {
+  data class Left<out A, out B> private constructor(val value: A) : Ior<A, B>() {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = true
     override val isBoth: Boolean get() = false
@@ -308,7 +306,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     }
   }
 
-  data class Right<out A, out B> @PublishedApi internal constructor(val value: B) : Ior<A, B>() {
+  data class Right<out A, out B> private constructor(val value: B) : Ior<A, B>() {
     override val isRight: Boolean get() = true
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = false
