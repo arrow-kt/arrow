@@ -12,9 +12,12 @@ import arrow.core.Some
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
+import arrow.fx.IO.Companion.async
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
@@ -392,7 +395,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @param cb an asynchronous computation that might fail.
      * @see async for wrapping impure APIs without cancelation
      */
-    fun <E, A> cancelable(cb: ((IOResult<E, A>) -> Unit) -> IO<Nothing, Unit>): IO<E, A> =
+    fun <E, A> cancelable(cb: ((IOResult<E, A>) -> Unit) -> IOOf<E, Unit>): IO<E, A> =
       Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
         onceOnly(conn, cbb).let { cbb2 ->
           val cancelable = ForwardCancelable()
@@ -460,7 +463,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * @param cb a deferred asynchronous computation that might fail.
      * @see asyncF for wrapping impure APIs without cancelation
      */
-    fun <E, A> cancelableF(cb: ((IOResult<E, A>) -> Unit) -> IOOf<Nothing, IO<Nothing, Unit>>): IO<E, A> =
+    fun <E, A> cancelableF(cb: ((IOResult<E, A>) -> Unit) -> IOOf<E, IOOf<E, Unit>>): IO<E, A> =
       Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
         val cancelable = ForwardCancelable()
         val conn2 = IOConnection()
@@ -468,7 +471,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
         conn.push(conn2.cancel())
 
         onceOnly(conn, cbb).let { cbb2 ->
-          val fa: IOOf<Nothing, IO<Nothing, Unit>> = try {
+          val fa: IOOf<E, IOOf<E, Unit>> = try {
             cb(cbb2)
           } catch (throwable: Throwable) {
             cbb2(IOResult.Exception(throwable.nonFatalOrThrow()))
@@ -477,7 +480,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
           IORunLoop.startCancelable(fa, conn2) { result ->
             conn.pop()
-            result.fold({}, {}, cancelable::complete)
+            result.fold({}, {}, { cancelable.complete(it) })
           }
         }
       }
@@ -652,39 +655,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     ContinueOn(this, ctx)
 
   /**
-   * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.*
-   * import arrow.fx.extensions.fx
-   * import kotlinx.coroutines.Dispatchers
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = IO.fx {
-   *     val (join, cancel) = !IO.effect {
-   *       println("Hello from a fiber on ${Thread.currentThread().name}")
-   *     }.fork(Dispatchers.Default)
-   *   }
-   *
-   *   //sampleEnd
-   *   result.unsafeRunSync()
-   * }
-   * ```
-   *
-   * @receiver [IO] to execute on [ctx] within a new suspended [IO].
-   * @param ctx [CoroutineContext] to execute the source [IO] on.
-   * @return [IO] with suspended execution of source [IO] on context [ctx].
-   */
-  fun fork(ctx: CoroutineContext): IO<Nothing, Fiber<ForIO, A>> = async { cb ->
-    val promise = UnsafePromise<A>()
-    // A new IOConnection, because its cancellation is now decoupled from our current one.
-    val conn = IOConnection()
-    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
-    cb(IOResult.Success(IOFiber(promise, conn)))
-  }
-
-  /**
    * Safely attempts the [IO] and lift any errors to the value side into [Either].
    *
    * ```kotlin:ank:playground
@@ -711,7 +681,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * The combinator can be used to define how several programs have to run in a safe manner.
    */
   fun runAsync(cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Unit> =
-    IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
+    IO { unsafeRunAsyncEither(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
   /**
    * [unsafeRunAsync] allows you to run any [IO] and receive the values in a callback [cb]
@@ -724,7 +694,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunAsync(cb: (IOResult<E, A>) -> Unit): Unit =
+  fun unsafeRunAsyncEither(cb: (IOResult<E, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
 
   /**
@@ -741,13 +711,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
     async { ccb ->
       val conn = IOConnection()
-      val onCancelCb =
-        when (onCancel) {
-          ThrowCancellationException ->
-            cb andThen { it.fix().unsafeRunAsync { } }
-          Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
-        }
+      val onCancelCb = when (onCancel) {
+        ThrowCancellationException -> cb andThen { it.fix().unsafeRunAsync { } }
+        Silent -> { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }, { cb(either) }) }
+      }
       ccb(IOResult.Success(conn.toDisposable()))
       IORunLoop.startCancelable(this, conn, onCancelCb)
     }
@@ -764,8 +731,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> Unit): Disposable =
-    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync().fold(::identity, ::identity)
+  fun unsafeRunAsyncCancellableEither(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> Unit): Disposable =
+    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync()
 
   /**
    * [unsafeRunSync] allows you to run any [IO] to its wrapped value [A].
@@ -779,9 +746,9 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsync] or [unsafeRunAsyncCancellable] that run the value as [Either].
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunSync(): Either<E, A> =
+  fun unsafeRunSyncEither(): Either<E, A> =
     unsafeRunTimed(Duration.INFINITE)
-      .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
+      .fold({ throw IOTimedResultedException }, ::identity)
 
   /**
    * Run with a limitation on how long to await for *individual* async results.
@@ -1173,3 +1140,73 @@ fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>
  */
 fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
   guaranteeCase { finalizer }
+
+/**
+ * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.extensions.fx
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.fx {
+ *     val (join, cancel) = !IO.effect {
+ *       println("Hello from a fiber on ${Thread.currentThread().name}")
+ *     }.fork(Dispatchers.Default)
+ *   }
+ *
+ *   //sampleEnd
+ *   result.unsafeRunSync()
+ * }
+ * ```
+ *
+ * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+ * @param ctx [CoroutineContext] to execute the source [IO] on.
+ * @return [IO] with suspended execution of source [IO] on context [ctx].
+ */
+fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A>> =
+  IO.async { cb ->
+    val promise = UnsafePromise<E, A>()
+    // A new IOConnection, because its cancellation is now decoupled from our current one.
+    val conn = IOConnection()
+    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
+    cb(IOResult.Success(IOFiber(promise, conn)))
+  }
+
+fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
+  fix().unsafeRunSyncEither()
+    .fold({ throw IONothingYieldsError }, ::identity)
+
+fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
+  fix().unsafeRunAsyncEither { result ->
+    when (result) {
+      is IOResult.Success -> f(Right(result.value))
+      is IOResult.Exception -> f(Left(result.exception))
+      is IOResult.Error -> result.error
+    }
+  }
+
+fun <A> IOOf<Nothing, A>.unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+  fix().unsafeRunAsyncCancellableEither(onCancel) { result ->
+    when (result) {
+      is IOResult.Success -> cb(Right(result.value))
+      is IOResult.Exception -> cb(Left(result.exception))
+      is IOResult.Error -> result.error
+    }
+  }
+
+fun <A, B> IOOf<Nothing, A>.repeat(schedule: Schedule<IOPartialOf<Nothing>, A, B>): IO<Nothing, B> =
+  repeat(IO.concurrent(), schedule).fix()
+
+fun <A, B> IOOf<Nothing, A>.retry(schedule: Schedule<IOPartialOf<Nothing>, Throwable, B>): IO<Nothing, A> =
+  retry(IO.concurrent(), schedule).fix()
+
+internal object IONothingYieldsError : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IOTimedResultedException : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}

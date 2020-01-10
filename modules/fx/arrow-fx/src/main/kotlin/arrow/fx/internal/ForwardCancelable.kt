@@ -19,12 +19,12 @@ import kotlinx.atomicfu.atomic
  */
 internal class ForwardCancelable {
 
-  private val state = atomic<State>(init)
+  private val state = atomic(init)
 
   fun cancel(): IO<Nothing, Unit> {
     fun loop(conn: IOConnection, cb: (IOResult<Nothing, Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
-        is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack)))
+        is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
 
         is Active -> {
@@ -38,21 +38,21 @@ internal class ForwardCancelable {
     return IO.Async { conn, cb -> loop(conn, cb) }
   }
 
-  fun complete(value: IOOf<Nothing, Unit>): Unit = state.value.let { current ->
+  fun <E> complete(value: IOOf<E, Unit>): Unit = state.value.let { current ->
     when (current) {
       is Active -> {
-        value.fix().unsafeRunAsync {}
+        value.fix().unsafeRunAsyncEither {}
         throw IllegalStateException(current.toString())
       }
       is Empty -> if (current == init) {
         // If `init`, then `cancel` was not triggered yet
-        if (!state.compareAndSet(current, Active(value)))
+        if (!state.compareAndSet(current, Active(value.rethrow)))
           complete(value)
       } else {
         if (!state.compareAndSet(current, finished))
           complete(value)
         else
-          execute(value, current.stack)
+          execute(value.rethrow, current.stack)
       }
     }
   }
@@ -79,8 +79,7 @@ internal class ForwardCancelable {
     private val finished: State = Active(IO.unit)
 
     private fun execute(token: IOOf<Nothing, Unit>, stack: List<(IOResult<Nothing, Unit>) -> Unit>): Unit =
-      // TODO this runs in an immediate execution context in cats-effect
-      token.fix().unsafeRunAsync { r ->
+      token.fix().unsafeRunAsyncEither { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
           try {
             cb(r)

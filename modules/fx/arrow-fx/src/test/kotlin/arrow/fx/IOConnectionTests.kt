@@ -84,9 +84,9 @@ class IOConnectionTests : UnitSpec() {
       val c = IOConnection()
       c.push(initial1)
       c.push(initial2)
-      c.pop() shouldBe initial2
-      c.pop() shouldBe initial1
-      c.cancel().fix().unsafeRunSync()
+      c.pop()
+      c.pop()
+      c.cancel().unsafeRunSync()
 
       effect shouldBe 0
     }

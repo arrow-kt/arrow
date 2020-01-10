@@ -19,8 +19,8 @@ import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
-import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
@@ -71,9 +71,9 @@ class WriterTTest : UnitSpec() {
         WriterT.genK(Const.genK(Gen.int()), Gen.int()),
         constEQK()
       ),
-      ConcurrentLaws.laws(
+      ConcurrentLaws.laws<WriterTPartialOf<IOPartialOf<Nothing>, Int>>(
         WriterT.concurrent(IO.concurrent(), Int.monoid()),
-        WriterT.functor<ForIO, Int>(IO.functor()),
+        WriterT.functor(IO.functor()),
         WriterT.applicative(IO.applicative(), Int.monoid()),
         WriterT.monad(IO.monad(), Int.monoid()),
         WriterT.genK(IO.genK(), Gen.int()),

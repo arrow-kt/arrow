@@ -4,6 +4,7 @@ import arrow.core.extensions.list.foldable.foldLeft
 import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.extensions.io.concurrent.parMapN
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork

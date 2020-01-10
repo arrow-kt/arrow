@@ -16,8 +16,8 @@ import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.semigroupK.semigroupK
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
@@ -47,7 +47,7 @@ class StateTTests : UnitSpec() {
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
   val optionStateEQK: EqK<StateTPartialOf<ForOption, Int>> = eqK(Option.eqK(), Int.eq(), Option.monad(), 1)
-  val ioStateEQK: EqK<StateTPartialOf<ForIO, Int>> = eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
+  val ioStateEQK: EqK<StateTPartialOf<IOPartialOf<Nothing>, Int>> = eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
   val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = eqK(Try.eqK(), Int.eq(), Try.monad(), 1)
 
   init {
@@ -61,7 +61,7 @@ class StateTTests : UnitSpec() {
         tryStateEqK
       ),
 
-      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(
+      AsyncLaws.laws<StateTPartialOf<IOPartialOf<Nothing>, Int>>(
         StateT.async(IO.async()),
         StateT.functor(IO.functor()),
         StateT.applicative(IO.monad()),

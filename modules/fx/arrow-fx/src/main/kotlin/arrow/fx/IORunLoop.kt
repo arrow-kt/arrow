@@ -31,7 +31,7 @@ internal object IORunLoop {
     var currentIO: Current? = source
     var bFirst: BindF? = null
     var bRest: CallStack? = null
-    var hasResult: Boolean = false
+    var hasResult = false
     var result: Any? = null
 
     do {
@@ -41,8 +41,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseException -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> return currentIO
             else -> {
@@ -53,8 +52,7 @@ internal object IORunLoop {
           }
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> return currentIO as IO<E, A>
             else -> {
@@ -173,7 +171,7 @@ internal object IORunLoop {
     var rcb: RestartCallback? = rcbRef
     // Values from Pure and Delay are unboxed in this var,
     // for code reuse between Pure and Delay
-    var hasResult: Boolean = false
+    var hasResult = false
     var result: Any? = null
 
     do {
@@ -187,8 +185,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseException -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> {
               cb(IOResult.Exception(currentIO.exception))
@@ -202,8 +199,7 @@ internal object IORunLoop {
           }
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, Any?, IOOf<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
             null -> {
               cb(IOResult.Error(currentIO.error))

@@ -7,7 +7,7 @@ import it.msec.kio.runtime.Runtime
 
 object DeepBind {
 
-  fun loop(n: Int): UIO<Nothing, Int> =
+  fun loop(n: Int): UIO<Int> =
     if (n <= 1) effect { n }
     else loop(n - 1).flatMap { a ->
       loop(n - 2).flatMap { b -> effect { a + b } }
