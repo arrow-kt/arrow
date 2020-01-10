@@ -5,8 +5,10 @@ dependencies {
     compile project(":arrow-fx")
 
     runtime "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
     runtime "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    runtime "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     kapt project(':arrow-meta')
 }
 
