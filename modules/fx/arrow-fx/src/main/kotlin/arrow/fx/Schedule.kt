@@ -432,7 +432,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
   infix fun <B> compose(other: Schedule<F, B, Input>): Schedule<F, B, Output> =
     other pipe this
 
-  class ScheduleImpl<F, State, Input, Output>(
+  internal class ScheduleImpl<F, State, Input, Output>(
     override val M: Monad<F>,
     val initialState: Kind<F, State>,
     val update: (a: Input, s: State) -> Kind<F, Decision<State, Output>>
