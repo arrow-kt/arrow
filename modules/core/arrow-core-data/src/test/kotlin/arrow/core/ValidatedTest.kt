@@ -129,8 +129,8 @@ class ValidatedTest : UnitSpec() {
     }
 
     "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
-      Valid(10).toIor() shouldBe Ior.Right<Int, Int>(10)
-      Invalid(13).toIor() shouldBe Ior.Left<Int, Int>(13)
+      Valid(10).toIor() shouldBe Ior.Right(10)
+      Invalid(13).toIor() shouldBe Ior.Left(13)
     }
 
     "toOption should return Some(value) if is Valid or None in otherwise" {
