@@ -45,11 +45,9 @@ interface NonEmptyListFFoldable<I> : Foldable<NonEmptyListFPartialOf<I>> {
 }
 
 @extension
-interface NonEmptyListFTraverse<I> : Traverse<NonEmptyListFPartialOf<I>>, NonEmptyListFFoldable<I> {
-  override fun <G, C, B> Kind<NonEmptyListFPartialOf<I>, C>.traverse(AP: Applicative<G>, f: (C) -> Kind<G, B>): Kind<G, Kind<NonEmptyListFPartialOf<I>, B>> =
-    fix().tail.fold({ AP.just(NonEmptyListF(fix().head, none())) }, {
-      AP.run { f(it).map { NonEmptyListF(fix().head, it.some()) } }
-    })
+interface NonEmptyListFTraverse<A1> : Traverse<NonEmptyListFPartialOf<A1>>, NonEmptyListFFoldable<A1> {
+  override fun <G, A2, B> Kind<NonEmptyListFPartialOf<A1>, A2>.traverse(AP: Applicative<G>, f: (A2) -> Kind<G, B>): Kind<G, Kind<NonEmptyListFPartialOf<A1>, B>> =
+    fix().traverse(AP, f)
 }
 
 @extension

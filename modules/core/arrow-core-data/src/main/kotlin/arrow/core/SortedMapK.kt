@@ -48,6 +48,12 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     }.value()
   }
 
+  fun <G, C> traverseIndexed(GA: Applicative<G>, f: (Int, B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
+    map.iterator().iterateRightIndexed(Eval.always { just(sortedMapOf<A, C>().k()) }) { index, kv, lbuf ->
+      Eval.later { f(index, kv.value).lazyAp { lbuf.value().map { xs -> { b: C -> (mapOf(kv.key to b).k() + xs).toSortedMap().k() } } } }
+    }.value()
+  }
+
   override fun equals(other: Any?): Boolean =
     when (other) {
       is SortedMapK<*, *> -> this.map == other.map

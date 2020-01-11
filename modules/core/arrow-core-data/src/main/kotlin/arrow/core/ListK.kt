@@ -137,12 +137,22 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
+  fun <B> foldLeftIndexed(b: B, f: (Int, B, A) -> B): B = foldIndexed(b, f)
+
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: ListK<A>): Eval<B> = when {
       fa_p.list.isEmpty() -> lb
       else -> f(fa_p.fix().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
     }
     return Eval.defer { loop(this) }
+  }
+
+  fun <B> foldRightIndexed(lb: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun loop(acc: Int, fa_p: ListK<A>): Eval<B> = when {
+      fa_p.list.isEmpty() -> lb
+      else -> f(acc, fa_p.fix().list.first(), Eval.defer { loop(acc.inc(), fa_p.list.drop(1).k()) })
+    }
+    return Eval.defer { loop(0, this) }
   }
 
   override fun equals(other: Any?): Boolean =
@@ -157,6 +167,11 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
       GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { a: B -> (listOf(a) + xs).k() } } } } }
+    }.value()
+
+  fun <B, G> traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>) =
+    foldRightIndexed(Eval.now(GA.just(emptyList<B>().k()))) { index, a, eval ->
+      GA.run { Eval.later { f(index, a).lazyAp { eval.value().map { xs -> { b: B -> listOf(b).plus(xs).k() } } } } }
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =

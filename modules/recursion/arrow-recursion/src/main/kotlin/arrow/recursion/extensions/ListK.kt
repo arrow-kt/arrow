@@ -44,10 +44,8 @@ interface ListFFoldable<I> : Foldable<ListFPartialOf<I>> {
 
 @extension
 interface ListFTraverse<I> : Traverse<ListFPartialOf<I>>, ListFFoldable<I> {
-  override fun <G, A, B> Kind<ListFPartialOf<I>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<ListFPartialOf<I>, B>> = when (val l = fix()) {
-    is ListF.NilF -> AP.just(ListF.NilF())
-    is ListF.ConsF -> AP.run { f(l.tail).map { ListF.ConsF(l.a, it) } }
-  }
+  override fun <G, A, B> Kind<ListFPartialOf<I>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<ListFPartialOf<I>, B>> =
+    fix().traverse(AP, f)
 }
 
 @extension

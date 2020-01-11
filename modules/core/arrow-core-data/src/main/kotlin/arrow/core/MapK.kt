@@ -35,6 +35,9 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 
   fun <B> foldRight(b: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.map.values.iterator().iterateRight(b, f)
 
+  fun <B> foldRightIndexed(b: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> =
+    this.map.values.iterator().iterateRightIndexed(b, f)
+
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.map.values.fold(b, f)
 
   fun <B> foldLeft(b: MapK<K, B>, f: (MapK<K, B>, Tuple2<K, A>) -> MapK<K, B>): MapK<K, B> =
@@ -43,6 +46,12 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
     map.iterator().iterateRight(Eval.always { just(emptyMap<K, B>().k()) }) { kv, lbuf ->
       Eval.later { f(kv.value).lazyAp { lbuf.value().map { m -> { b: B -> (mapOf(kv.key to b).k() + m).k() } } } }
+    }.value()
+  }
+
+  fun <G, B> traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
+    map.iterator().iterateRightIndexed(Eval.always { just(emptyMap<K, B>().k()) }) { index, kv, lbuf ->
+      Eval.later { f(index, kv.value).lazyAp { lbuf.value().map { m -> { b: B -> (mapOf(kv.key to b).k() + m).k() } } } }
     }.value()
   }
 

@@ -357,3 +357,9 @@ fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Ev
     Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
   return loop()
 }
+
+fun <A, B> Iterator<A>.iterateRightIndexed(lb: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> {
+  fun loop(acc: Int): Eval<B> =
+    Eval.defer { if (this.hasNext()) f(acc, this.next(), loop(acc.inc())) else lb }
+  return loop(0)
+}

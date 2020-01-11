@@ -19,6 +19,9 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   @Suppress("UNUSED_PARAMETER")
   fun <G, U> traverseFilter(GA: Applicative<G>, f: (T) -> Kind<G, Option<U>>): Kind<G, Const<A, U>> = GA.just(retag())
 
+  @Suppress("UNUSED_PARAMETER")
+  fun <G, U> traverseIndexed(GA: Applicative<G>, f: (Int, T) -> Kind<G, U>): Kind<G, Const<A, U>> = GA.just(retag())
+
   companion object {
     fun <A, T> just(a: A): Const<A, T> = Const(a)
   }

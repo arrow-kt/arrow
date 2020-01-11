@@ -66,6 +66,9 @@ interface MapKTraverse<K> : Traverse<MapKPartialOf<K>>, MapKFoldable<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
+
+  fun <G, A, B> MapKOf<K, A>.traverseIndexed(AP: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
+    fix().traverseIndexed(AP, f)
 }
 
 @extension

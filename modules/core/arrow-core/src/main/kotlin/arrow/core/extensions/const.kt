@@ -108,6 +108,9 @@ interface ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
 
   override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
     fix().traverse(AP, f)
+
+  fun <G, A, B> Kind<ConstPartialOf<X>, A>.traverseIndexed(AP: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, Kind<ConstPartialOf<X>, B>> =
+    fix().traverseIndexed(AP, f)
 }
 
 @extension

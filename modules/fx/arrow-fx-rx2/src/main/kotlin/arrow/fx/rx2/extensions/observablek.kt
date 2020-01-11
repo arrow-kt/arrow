@@ -114,6 +114,9 @@ interface ObservableKTraverse : Traverse<ForObservableK> {
 
   override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
+
+  fun <G, A, B> ObservableKOf<A>.traverseIndexed(AP: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
+    fix().traverseIndexed(AP, f)
 }
 
 @extension

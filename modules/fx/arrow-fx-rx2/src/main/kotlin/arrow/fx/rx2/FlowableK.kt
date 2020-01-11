@@ -6,10 +6,9 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
-import arrow.core.internal.AtomicRefW
 import arrow.core.identity
+import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-
 import arrow.fx.internal.Platform
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
@@ -131,9 +130,22 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
     return Eval.defer { loop(this) }
   }
 
+  fun <B> foldRightIndexed(lb: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun loop(acc: Int, fa_p: FlowableK<A>): Eval<B> = when {
+      fa_p.flowable.isEmpty.blockingGet() -> lb
+      else -> f(acc, fa_p.flowable.blockingFirst(), Eval.defer { loop(acc.inc(), fa_p.flowable.skip(1).k()) })
+    }
+    return Eval.defer { loop(0, this) }
+  }
+
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
     foldRight(Eval.always { GA.just(Flowable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
+    }.value()
+
+  fun <G, B> traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
+    foldRightIndexed(Eval.always { GA.just(Flowable.empty<B>().k()) }) { index, a, eval ->
+      GA.run { f(index, a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
 
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =

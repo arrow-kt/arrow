@@ -58,6 +58,9 @@ fun <A : Comparable<A>> SortedMapK.Companion.foldable(): SortedMapKFoldable<A> =
 interface SortedMapKTraverse<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A>>, SortedMapKFoldable<A> {
   override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
     fix().traverse(AP, f)
+
+  fun <G, B, C> SortedMapKOf<A, B>.traverseIndexed(AP: Applicative<G>, f: (Int, B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
+    fix().traverseIndexed(AP, f)
 }
 
 fun <A : Comparable<A>> SortedMapK.Companion.traverse(): SortedMapKTraverse<A> =

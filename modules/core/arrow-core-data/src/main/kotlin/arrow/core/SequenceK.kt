@@ -21,10 +21,21 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { this.iterator().loop() }
   }
 
+  fun <B> foldRightIndexed(lb: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun Iterator<A>.loop(acc: Int): Eval<B> =
+      if (hasNext()) f(acc, next(), Eval.defer { loop(acc.inc()) }) else lb
+    return Eval.defer { this.iterator().loop(0) }
+  }
+
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
-    foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (listOf(b) + xs).k() } } } } }
-    }.value().let { GA.run { it.map { it.asSequence().k() } } }
+    foldRight(Eval.now(GA.just(emptySequence<B>().k()))) { a, eval ->
+      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
+    }.value()
+
+  fun <G, B> traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
+    foldRightIndexed(Eval.now(GA.just(emptySequence<B>().k()))) { index, a, eval ->
+      GA.run { Eval.later { f(index, a).lazyAp { eval.value().map { xs -> { b: B -> (sequenceOf(b) + xs).k() } } } } }
+    }.value()
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     flatMap { a ->

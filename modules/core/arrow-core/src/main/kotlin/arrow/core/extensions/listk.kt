@@ -162,6 +162,9 @@ interface ListKTraverse : Traverse<ForListK> {
 
   override fun <A> Kind<ForListK, A>.isEmpty(): Boolean =
     fix().isEmpty()
+
+  fun <G, A, B> Kind<ForListK, A>.traverseIndexed(AP: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, ListK<B>> =
+    fix().traverseIndexed(AP, f)
 }
 
 @extension

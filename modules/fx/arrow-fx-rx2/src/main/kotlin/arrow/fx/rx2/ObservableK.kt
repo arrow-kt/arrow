@@ -135,9 +135,22 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     return Eval.defer { loop(this) }
   }
 
+  fun <B> foldRightIndexed(lb: Eval<B>, f: (Int, A, Eval<B>) -> Eval<B>): Eval<B> {
+    fun loop(acc: Int, fa_p: ObservableK<A>): Eval<B> = when {
+      fa_p.observable.isEmpty.blockingGet() -> lb
+      else -> f(acc, fa_p.observable.blockingFirst(), Eval.defer { loop(acc.inc(), fa_p.observable.skip(1).k()) })
+    }
+    return Eval.defer { loop(0, this) }
+  }
+
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
     foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
+    }.value()
+
+  fun <G, B> traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
+    foldRightIndexed(Eval.always { GA.just(Observable.empty<B>().k()) }) { index, a, eval ->
+      GA.run { f(index, a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
 
   fun continueOn(ctx: CoroutineContext): ObservableK<A> =

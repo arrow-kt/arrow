@@ -184,6 +184,9 @@ interface SequenceKFoldable : Foldable<ForSequenceK> {
 interface SequenceKTraverse : Traverse<ForSequenceK>, SequenceKFoldable {
   override fun <G, A, B> Kind<ForSequenceK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     fix().traverse(AP, f)
+
+  fun <G, A, B> Kind<ForSequenceK, A>.traverse(AP: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
+    fix().traverseIndexed(AP, f)
 }
 
 @extension

@@ -5,58 +5,57 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
-
+import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.FlowableKOf
 import arrow.fx.rx2.ForFlowableK
+import arrow.fx.rx2.asScheduler
 import arrow.fx.rx2.extensions.flowablek.async.async
+import arrow.fx.rx2.extensions.flowablek.dispatchers.dispatchers
 import arrow.fx.rx2.extensions.flowablek.effect.effect
 import arrow.fx.rx2.extensions.flowablek.monad.monad
 import arrow.fx.rx2.extensions.flowablek.monadDefer.monadDefer
 import arrow.fx.rx2.extensions.flowablek.monadError.monadError
 import arrow.fx.rx2.fix
+import arrow.fx.rx2.k
+import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.CancelToken
+import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.Effect
 import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.Timer
-import arrow.fx.typeclasses.Concurrent
-import arrow.fx.typeclasses.Fiber
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 import io.reactivex.functions.BiFunction
-import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.flowablek.dispatchers.dispatchers
-import arrow.fx.rx2.k
-import arrow.fx.rx2.value
-import arrow.fx.typeclasses.CancelToken
-import arrow.fx.typeclasses.ConcurrentSyntax
-import arrow.fx.typeclasses.Dispatchers
-import arrow.typeclasses.FunctorFilter
-import arrow.typeclasses.MonadFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
-import io.reactivex.disposables.Disposable as RxDisposable
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -119,6 +118,9 @@ interface FlowableKTraverse : Traverse<ForFlowableK> {
 
   override fun <A, B> FlowableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
+
+  fun <G, A, B> FlowableKOf<A>.traverseIndexed(GA: Applicative<G>, f: (Int, A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
+    fix().traverseIndexed(GA, f)
 }
 
 @extension
@@ -374,5 +376,6 @@ interface FlowableKMonadFilter : MonadFilter<ForFlowableK>, FlowableKMonad {
   override fun <A, B> Kind<ForFlowableK, A>.filterMap(f: (A) -> Option<B>): FlowableK<B> =
     fix().filterMap(f)
 }
+
 fun <A> FlowableK.Companion.fx(c: suspend ConcurrentSyntax<ForFlowableK>.() -> A): FlowableK<A> =
   defer { FlowableK.concurrent().fx.concurrent(c).fix() }
