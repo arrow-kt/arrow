@@ -1,6 +1,7 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.higherkind
@@ -17,14 +18,27 @@ typealias AccumTFunOf<W, M, A> = Kind<M, AccumTFun<W, M, A>>
 data class AccumT<W, M, A>(val accumT: AccumTFunOf<W, M, A>) : AccumTOf<W, M, A> {
 
   companion object {
+
+    fun <W, M, A> just(MM: Monad<M>, a: A): AccumT<W, M, A> =
+      AccumT(MM.just { w: W -> MM.just(a toT w) })
+
+    fun <W, M, A, B> tailRecM(MM: Monad<M>, a: A, fa: (A) -> Kind<AccumTPartialOf<W, M>, Either<A, B>>): AccumT<W, M, B> = MM.run {
+      val accumTFun = { w: W ->
+        tailRecM(Tuple2(a, w)) { (a0, w0) ->
+          fa(a0).fix().runAccumT(MM, w0).map { (ab, w1) ->
+            ab.bimap({ a1 -> a1 toT w1 }, { b -> b toT w1 })
+          }
+        }
+      }
+
+      AccumT(
+        MM.just(accumTFun)
+      )
+    }
   }
 
   fun runAccumT(MM: Monad<M>, w: W): Kind<M, Tuple2<A, W>> =
-    MM.run {
-      accumT.flatMap {
-        it(w)
-      }
-    }
+    runAccumT(MM, accumT, w)
 
   fun execAccumT(MM: Monad<M>, w: W): Kind<M, W> =
     MM.run {
@@ -73,14 +87,34 @@ data class AccumT<W, M, A>(val accumT: AccumTFunOf<W, M, A>) : AccumTOf<W, M, A>
       )
     }
 
-  fun <B> flatMap(MM: Monad<M>, fab: (A) -> AccumTOf<W, M, B>): AccumT<W, M, B> =
-    MM.run {
-      AccumT(accumT.flatMap { orig ->
-        MM.just { w: W ->
-          orig(w).flatMap {
-            fab(it.a).fix().runAccumT(MM, it.b)
+  fun <B> flatMap(MW: Monoid<W>, MM: Monad<M>, fa: (A) -> AccumTOf<W, M, B>): AccumT<W, M, B> {
+    val accumTFunc = { w: W ->
+      MM.run {
+        runAccumT(MM, w).flatMap { (a, w1) ->
+
+          val combinedW = MW.run { w.combine(w1) }
+
+          fa(a).fix().runAccumT(MM, combinedW).flatMap { (b, w2) ->
+            MM.just(b toT MW.run { w1.combine(w2) })
           }
         }
-      })
+      }
+    }
+
+    return AccumT(MM.just(accumTFunc))
+  }
+
+  fun <B> ap(MW: Monoid<W>, MM: Monad<M>, ff: AccumTOf<W, M, (A) -> B>): AccumT<W, M, B> =
+    flatMap(MW, MM) { a ->
+      ff.fix().map(MM) { f ->
+        f(a)
+      }
     }
 }
+
+fun <M, W, A> runAccumT(MM: Monad<M>, accumT: AccumTFunOf<W, M, A>, w: W): Kind<M, Tuple2<A, W>> =
+  MM.run {
+    accumT.flatMap {
+      it(w)
+    }
+  }

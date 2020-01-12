@@ -20,7 +20,7 @@ object ApplicativeLaws {
     val EQ = EQK.liftEq(Int.eq())
     val G = GENK.genK(Gen.int())
     return FunctorLaws.laws(A, GENK, EQK) + listOf(
-      Law("Applicative Laws: ap identity") { A.apIdentity(G, EQ) },
+      Law("f:Applicative Laws: ap identity") { A.apIdentity(G, EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
       Law("Applicative Laws: interchange") { A.interchange(GENK, EQ) },
       Law("Applicative Laws: map derived") { A.mapDerived(G, FF, EQ) },
