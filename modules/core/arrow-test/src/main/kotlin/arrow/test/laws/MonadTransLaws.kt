@@ -25,11 +25,10 @@ object MonadTransLaws {
     val eq = eqkTF.liftEq(Int.eq())
 
     return listOf(
-      Law("f:MonadTrans laws: Identity") {
-        // monadTrans.identity(Gen.int(), monadF, )
-        TODO()
+      Law("MonadTrans Laws: Identity") {
+        monadTrans.identity(Gen.int(), monadF, monadTF, eq)
       },
-      Law("MonadTrans laws: associativity") {
+      Law("MonadTrans Laws: associativity") {
         monadTrans.associativity(genFA, genFunAtoFB, monadF, monadTF, eq)
       }
     )
@@ -38,13 +37,14 @@ object MonadTransLaws {
   private fun <T, F, A> MonadTrans<T>.identity(
     genA: Gen<A>,
     MM: Monad<F>,
-    MF: Monad<T>
+    MF: Monad<Kind<T, F>>,
+    EQ: Eq<Kind2<T, F, A>>
   ) {
     forAll(genA) { a ->
-      val ls: Kind2<T, F, A> = lift(MM, MM.just(a))
-      val rs: Kind<T, A> = MF.just(a)
+      val ls = lift(MM, MM.just(a))
+      val rs = MF.just(a)
 
-      true
+      ls.equalUnderTheLaw(rs, EQ)
     }
   }
 
