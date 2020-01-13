@@ -15,6 +15,7 @@ interface MonadTrans<T> {
    *
    * ```kotlin:ank
    * import arrow.mtl.extensions.optiont.monadTrans.monadTrans
+   * import arrow.core.extensions.id.monad.monad
    * import arrow.core.extensions.*
    * import arrow.core.*
    * import arrow.mtl.*
