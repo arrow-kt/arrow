@@ -121,6 +121,9 @@ options:
       - title: MonadState
         url: /docs/arrow/mtl/typeclasses/monadstate/
 
+      - title: MonadTrans
+        url: /docs/arrow/mtl/typeclasses/monadtrans/
+
   - title: API Docs
 
     nested_options:

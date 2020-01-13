@@ -5,11 +5,11 @@ import arrow.Kind2
 import arrow.typeclasses.Monad
 
 /**
- * The `MonadTrans` typeclass abstracts the ability to create a monad transformer.
+ * MonadTrans is a typeclass that abstracts lifting arbitray monadic computations in another context.
  */
 interface MonadTrans<T> {
   /**
-   * transform a given monad `Kind<F, A>` to `Kind2<T, F, A>`
+   * transforms a given monad `Kind<F, A>` to `Kind2<T, F, A>`
    *
    * {: data-executable='true'}
    *
@@ -22,7 +22,7 @@ interface MonadTrans<T> {
    * fun main(args: Array<String>) {
    *    // sampleStart
    *    val result = OptionT.monadTrans().run {
-   *      lift(Id.monad(Id.just("hello"))
+   *      lift(Id.monad(), Id.just("hello"))
    *    }
    *    // sampleEnd
    *    println(result)
