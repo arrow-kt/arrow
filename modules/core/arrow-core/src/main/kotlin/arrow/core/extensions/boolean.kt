@@ -2,6 +2,7 @@ package arrow.core.extensions
 
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
+import arrow.typeclasses.Monoid
 import arrow.typeclasses.Show
 
 interface BooleanShow : Show<Boolean> {
@@ -25,3 +26,8 @@ fun Boolean.Companion.eq(): Eq<Boolean> =
 
 fun Boolean.Companion.hash(): Hash<Boolean> =
   object : BooleanHash {}
+
+object AndMonoid : Monoid<Boolean> {
+  override fun Boolean.combine(b: Boolean): Boolean = this && b
+  override fun empty(): Boolean = true
+}

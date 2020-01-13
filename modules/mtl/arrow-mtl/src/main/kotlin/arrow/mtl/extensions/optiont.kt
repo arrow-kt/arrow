@@ -280,6 +280,15 @@ interface OptionTAlternative<F> : Alternative<OptionTPartialOf<F>>, OptionTAppli
         else l
       }
     )
+
+  override fun <A> Kind<OptionTPartialOf<F>, A>.lazyOrElse(b: () -> Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, A> =
+    OptionT(
+      MF().fx.monad {
+        val l = !value()
+        if (l.isEmpty()) !b().value()
+        else l
+      }
+    )
 }
 
 @extension
