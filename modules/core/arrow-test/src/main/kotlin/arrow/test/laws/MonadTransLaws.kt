@@ -41,7 +41,7 @@ object MonadTransLaws {
     EQ: Eq<Kind2<T, F, A>>
   ) {
     forAll(genA) { a ->
-      val ls = lift(MM, MM.just(a))
+      val ls = MM.just(a).lift(MM)
       val rs = MF.just(a)
 
       ls.equalUnderTheLaw(rs, EQ)
@@ -55,8 +55,8 @@ object MonadTransLaws {
     monadTF: Monad<Kind<T, F>>,
     EQ: Eq<Kind2<T, F, B>>
   ) = forAll(genFA, genFunAtoFB) { fa, ffa ->
-    val ls = lift(monadF, monadF.run { fa.flatMap(ffa) })
-    val rs = monadTF.run { lift(monadF, fa).flatMap { a -> lift(monadF, ffa(a)) } }
+    val ls = monadF.run { fa.flatMap(ffa) }.lift(monadF)
+    val rs = monadTF.run { fa.lift(monadF).flatMap { a -> ffa(a).lift(monadF) } }
 
     ls.equalUnderTheLaw(rs, EQ)
   }

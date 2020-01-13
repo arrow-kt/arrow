@@ -17,7 +17,7 @@ import arrow.core.*
 import arrow.mtl.*
 
 val result = OptionT.monadTrans().run {
-  lift(Id.monad(), Id.just("hello"))
+  Id.just("hello").lift(Id.monad())
 }
 ```
 
