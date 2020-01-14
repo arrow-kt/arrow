@@ -93,7 +93,7 @@
             margin-right: ($base-point-grid * 5);
           }
 
-          a {
+          .menu-links {
             padding-bottom: 4px;
             text-transform: uppercase;
             font-size: ($base-point-grid * 2);
@@ -116,11 +116,17 @@
 
           .github-stars {
             display: inline-flex;
+
+            &:hover {
+              border-bottom: none;
+              text-decoration: none;
+              color: $gray-secondary;
+            }
           }
 
           .star-icon {
             font-size: ($base-point-grid * 4);
-            padding-right: $base-point-grid;
+            padding-right: 4px;
           }
         }
       }
@@ -180,6 +186,15 @@
 
             &:not(:last-child) {
               margin-right: 0;
+            }
+          }
+
+          .nav-stars {
+            margin: 16px 0 0 0;
+
+            .github-stars {
+              border-top: 1px solid $white;
+              padding-top: $base-point-grid;
             }
           }
         }
