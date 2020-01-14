@@ -7,9 +7,9 @@ import arrow.typeclasses.Monad
 /**
  * MonadTrans is a typeclass that abstracts lifting arbitray monadic computations in another context.
  */
-interface MonadTrans<T> {
+interface MonadTrans<F> {
   /**
-   * transforms a given monad `Kind<F, A>` to `Kind2<T, F, A>`
+   * Transforms a given monad `Kind<G, A>` to `Kind2<F, G, A>`
    *
    * {: data-executable='true'}
    *
@@ -23,12 +23,12 @@ interface MonadTrans<T> {
    * fun main(args: Array<String>) {
    *    // sampleStart
    *    val result = OptionT.monadTrans().run {
-   *      Id.just("hello").lift(Id.monad())
+   *      Id.just("hello").liftF(Id.monad())
    *    }
    *    // sampleEnd
    *    println(result)
    * }
    * ```
    */
-  fun <F, A> Kind<F, A>.lift(MF: Monad<F>): Kind2<T, F, A>
+  fun <G, A> Kind<G, A>.liftF(MF: Monad<G>): Kind2<F, G, A>
 }

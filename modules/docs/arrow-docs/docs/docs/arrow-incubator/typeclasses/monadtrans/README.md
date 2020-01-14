@@ -17,8 +17,8 @@ import arrow.core.extensions.*
 import arrow.core.*
 import arrow.mtl.*
 
-val result = OptionT.monadTrans().run {
-  Id.just("hello").lift(Id.monad())
+OptionT.monadTrans().run {
+  Id.just("hello").liftF(Id.monad())
 }
 ```
 
