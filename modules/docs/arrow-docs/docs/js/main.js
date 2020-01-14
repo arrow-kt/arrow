@@ -77,9 +77,23 @@ function mobileViewControl() {
 
 window.addEventListener("resize", mobileViewControl);
 
+/**
+ * Aux function to retrieve repository stars and watchers count info from
+ * GitHub API and set it on its proper nodes.
+ */
+async function loadGitHubStats() {
+
+    const ghAPI = `https://api.github.com/repos/arrow-kt/arrow`;
+    const ghDataResponse = await fetch(ghAPI);
+    const ghData = await ghDataResponse.json();
+    const starsElement = document.querySelector("#stars");
+    starsElement.textContent = ghData.stargazers_count;
+}
+
 // Init call
 function loadEvent() {
   mobileViewControl();
+  loadGitHubStats();
 
   document.addEventListener("scroll", scrollFunction);
 
