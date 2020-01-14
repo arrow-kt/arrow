@@ -60,3 +60,14 @@
         margin-right: ($base-point-grid / 2);
     }
 }
+
+// Responsive
+@include bp(medium) {
+  #doc-wrapper {
+    .doc-header {
+      .doc-stars-container {
+        display: none;
+      }
+    }
+  }
+}

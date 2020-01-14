@@ -8,3 +8,27 @@
   box-sizing: border-box;
   max-width: $bp-xlarge;
 }
+
+// Github stars
+.nav-stars {
+  margin-left: ($base-point-grid * 3);
+}
+
+.doc-stars-container {
+  margin-right: ($base-point-grid * 4);
+}
+
+.github-stars {
+  display: inline-flex;
+
+  &:hover {
+    border-bottom: none;
+    text-decoration: none;
+    color: $gray-secondary;
+  }
+}
+
+.star-icon {
+  font-size: ($base-point-grid * 4);
+  padding-right: 4px;
+}
