@@ -10,6 +10,7 @@ import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.tuple2.eq.eq
+import arrow.mtl.extensions.accumt.applicative.applicative
 import arrow.mtl.extensions.accumt.functor.functor
 import arrow.mtl.extensions.accumt.monad.monad
 import arrow.test.UnitSpec
@@ -17,6 +18,7 @@ import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
+import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.FunctorLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
@@ -28,6 +30,13 @@ class AccumTTest : UnitSpec() {
   init {
     testLaws(
       FunctorLaws.laws(
+        AccumT.functor<Int, ForId>(Id.functor()),
+        AccumT.genK(Id.genK(), Gen.intSmall()),
+        AccumT.eqK(Id.monad(), Id.eqK(), Int.eq(), 123)
+      ),
+
+      ApplicativeLaws.laws(
+        AccumT.applicative(Int.monoid(), Id.monad()),
         AccumT.functor<Int, ForId>(Id.functor()),
         AccumT.genK(Id.genK(), Gen.intSmall()),
         AccumT.eqK(Id.monad(), Id.eqK(), Int.eq(), 123)
