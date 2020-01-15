@@ -9,7 +9,6 @@ import arrow.unsafe
 import java.nio.file.Paths
 
 fun main(vararg args: String) {
-  println("This is a test because I have no idea what ank is doing atm")
   unsafe {
     runBlocking {
       when {
