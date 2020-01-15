@@ -23,12 +23,12 @@ interface MonadTrans<F> {
    * fun main(args: Array<String>) {
    *    // sampleStart
    *    val result = OptionT.monadTrans().run {
-   *      Id.just("hello").liftF(Id.monad())
+   *      Id.just("hello").liftT(Id.monad())
    *    }
    *    // sampleEnd
    *    println(result)
    * }
    * ```
    */
-  fun <G, A> Kind<G, A>.liftF(MF: Monad<G>): Kind2<F, G, A>
+  fun <G, A> Kind<G, A>.liftT(MF: Monad<G>): Kind2<F, G, A>
 }

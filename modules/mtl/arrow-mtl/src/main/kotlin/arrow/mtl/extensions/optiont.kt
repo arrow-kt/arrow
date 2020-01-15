@@ -309,6 +309,6 @@ interface OptionTEqK<F> : EqK<OptionTPartialOf<F>> {
 
 @extension
 interface OptionTMonadTrans : MonadTrans<ForOptionT> {
-  override fun <F, A> Kind<F, A>.liftF(MF: Monad<F>): Kind2<ForOptionT, F, A> =
+  override fun <F, A> Kind<F, A>.liftT(MF: Monad<F>): Kind2<ForOptionT, F, A> =
     OptionT.liftF(MF, this)
 }
