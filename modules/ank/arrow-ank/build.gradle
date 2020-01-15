@@ -2,11 +2,13 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(":arrow-core")
     compile project(":arrow-fx")
 
-    compile "org.jetbrains.kotlin:kotlin-compiler:$ankKotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-script-util:$ankKotlinVersion"
+    runtime "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
+    runtime "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    runtime "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     kapt project(':arrow-meta')
 }
 
