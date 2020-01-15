@@ -160,30 +160,30 @@ val interpreter: AnkOps = object : AnkOps {
     return result.b toT result.c
   }
 
-  override suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> {
-    val engineCache = getEngineCache(snippets.b, compilerArgs)
-    // run each snipped and handle its result
-    return snippets.b.mapIndexed { i, snip ->
-      Try {
-        if (snip.isPlaygroundExtension) ""
-        else engineCache.getOrElse(snip.lang) {
-          throw CompilationException(
-            path = snippets.a,
-            snippet = snip,
-            underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
-            msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
-          )
-        }.eval(snip.code)
-      }.fold<Snippet>({
-        // raise error and print to console
-        if (snip.isFail) {
-          val sw = StringWriter()
-          val pw = PrintWriter(sw)
-          it.printStackTrace(pw)
-          snip.copy(result = sw.toString().some())
-        } else {
-          println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
-          throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+  override suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> =
+    getEngineCache(snippets.b, compilerArgs).let { engineCache ->
+      // run each snipped and handle its result
+      snippets.b.mapIndexed { i, snip ->
+        Try {
+          if (snip.isPlaygroundExtension) ""
+          else engineCache.getOrElse(snip.lang) {
+            throw CompilationException(
+              path = snippets.a,
+              snippet = snip,
+              underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
+              msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
+            )
+          }.eval(snip.code)
+        }.fold<Snippet>({
+          // raise error and print to console
+          if (snip.isFail) {
+            val sw = StringWriter()
+            val pw = PrintWriter(sw)
+            it.printStackTrace(pw)
+            snip.copy(result = sw.toString().some())
+          } else {
+            println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
+            throw CompilationException(snippets.a, snip, it, msg = "\n" + """
                     | File located at: ${snippets.a}
                     |
                     |```
@@ -191,32 +191,32 @@ val interpreter: AnkOps = object : AnkOps {
                     |```
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
-        }
-      }, { result ->
-        // handle results, ignore silent snippets
-        if (snip.isSilent) snip
-        else {
-          val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
-            when {
-              // replace entire snippet with result
-              snip.isReplace -> Some("$it")
-              snip.isPlaygroundExtension -> Some("$it")
-              // write result to a new file
-              snip.isOutFile -> {
-                val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
-                val dir = snippets.a.parent
-                Files.write(dir.resolve(fileName), result.toString().toByteArray())
-                Some("")
+          }
+        }, { result ->
+          // handle results, ignore silent snippets
+          if (snip.isSilent) snip
+          else {
+            val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
+              when {
+                // replace entire snippet with result
+                snip.isReplace -> Some("$it")
+                snip.isPlaygroundExtension -> Some("$it")
+                // write result to a new file
+                snip.isOutFile -> {
+                  val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
+                  val dir = snippets.a.parent
+                  Files.write(dir.resolve(fileName), result.toString().toByteArray())
+                  Some("")
+                }
+                // simply append result
+                else -> Some("// $it")
               }
-              // simply append result
-              else -> Some("// $it")
-            }
-          })
-          snip.copy(result = resultString)
-        }
-      })
+            })
+            snip.copy(result = resultString)
+          }
+        })
+      }
     }
-  }
 
   override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
     sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { snippetContent, snippet ->
@@ -258,7 +258,7 @@ val interpreter: AnkOps = object : AnkOps {
       }.toMap()
       engineCache.putIfAbsent(compilerArgs, engines) ?: engines
     } else { // reset an engine. Non thread-safe
-      cache.forEach { _, engine ->
+      cache.forEach { (_, engine) ->
         engine.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE)
       }
       cache
