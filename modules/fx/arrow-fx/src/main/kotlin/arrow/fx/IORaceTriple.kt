@@ -16,6 +16,9 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IORaceTriple {
 
+  fun <A, B, C> raceTriple(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.raceTriple(IODispatchers.CommonPool, ioA, ioB, ioC)
+
   /**
    * Race three tasks concurrently within a new [IO].
    * Race results in a winner and the others, yet to finish task running in a [Fiber].
@@ -51,7 +54,7 @@ interface IORaceTriple {
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
   fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-    IO.Async { conn, cb ->
+    IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
