@@ -16,6 +16,9 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IORacePair {
 
+  fun <A, B> racePair(ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+    IO.racePair(IODispatchers.CommonPool, ioA, ioB)
+
   /**
    * Race two tasks concurrently within a new [IO].
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
@@ -50,7 +53,7 @@ interface IORacePair {
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
   fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.Async { conn, cb ->
+    IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
       val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
