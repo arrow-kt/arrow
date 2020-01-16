@@ -59,10 +59,28 @@
     .fa {
         margin-right: ($base-point-grid / 2);
     }
+
+    .menu-doc-search {
+      display: inline-flex;
+
+      .menu-links {
+        padding-bottom: 4px;
+        text-transform: uppercase;
+        font-weight: $font-semibold;
+
+        &:hover {
+          text-decoration: none;
+          border-bottom: 2px solid $brand-primary;
+        }
+      }
+      &:last-child {
+          margin-right: ($base-point-grid * 2);
+      }
+    }
 }
 
 // Responsive
-@include bp(medium) {
+@include bp(large) {
   #doc-wrapper {
     .doc-header {
       .doc-stars-container {

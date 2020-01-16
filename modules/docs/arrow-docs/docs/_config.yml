@@ -9,9 +9,12 @@ keywords: functional-programming, kotlin-library, monads, monad-transformers, fu
 #-------------------------
 url: https://arrow-kt.io
 #-------------------------
+github_repo: https://github.com/arrow-kt/arrow
+#-------------------------
 twitter_handle: "@arrow_kt"
 #-------------------------
-gitter_room: "arrow-kt/Lobby"
+slack_kotlin_channel: "https://slack.kotlinlang.org"
+slack_arrow_channel: "https://kotlinlang.slack.com/archives/C5UPMM0A0"
 #-------------------------
 sass:
     style: compressed

@@ -55,3 +55,31 @@
     transform: rotate(-45deg);
   }
 }
+
+// Slack channel link button
+.slack-link-container {
+  z-index: 100;
+  position: fixed;
+  bottom: $base-point-grid;
+  right: ($base-point-grid * 2);
+  padding: 0.5em 0.5em;
+  min-width: $github-modal-width;
+  border-radius: .2em;
+  font-size: 12px;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  transition: all .3s ease;
+  box-shadow: $box-shadow-button;
+  background: $white;
+  font-weight: $font-semibold;
+  color: #263238;
+
+  .slack-link {
+    color: lighten(#263238, 25%);
+
+    &:hover {
+      color: #263238;
+    }
+  }
+}
