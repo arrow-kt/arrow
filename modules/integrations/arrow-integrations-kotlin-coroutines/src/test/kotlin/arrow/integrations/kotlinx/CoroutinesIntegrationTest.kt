@@ -1,11 +1,12 @@
 package arrow.integrations.kotlinx
 
+import arrow.core.Left
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.dispatchers.dispatchers
-import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
+import arrow.test.generators.throwable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,17 @@ class CoroutinesIntegrationTest : UnitSpec() {
           !effect { scope.cancel() }
           !promise.get().waitFor(2.seconds)
         }.unsafeRunSync() == Unit
+      }
+    }
+
+    "given IO when exception occurs should return Either.Left" {
+      forAll(Gen.throwable()) { error ->
+        IO.fx {
+          val scope = CoroutineScope(IO.dispatchers().default())
+          !effect {
+            scope.launchIO { throw error }
+          }
+        }.attempt().unsafeRunSync() == Left(error)
       }
     }
   }
