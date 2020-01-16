@@ -37,7 +37,9 @@ class CoroutinesIntegrationTest : UnitSpec() {
         IO.fx {
           val scope = CoroutineScope(IO.dispatchers().default())
           !effect {
-            scope.launchIO { throw error }
+            scope.launchIO {
+              IO { throw error }.unsafeRunSync()
+            }
           }
         }.attempt().unsafeRunSync() == Left(error)
       }
