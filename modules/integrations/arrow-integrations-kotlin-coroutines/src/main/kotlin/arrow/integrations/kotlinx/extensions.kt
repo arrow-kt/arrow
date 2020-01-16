@@ -2,9 +2,7 @@ package arrow.integrations.kotlinx
 
 import arrow.core.identity
 import arrow.fx.IO
-import arrow.fx.IOOf
 import arrow.fx.extensions.io.async.shift
-import arrow.fx.extensions.io.bracket.guaranteeCase
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -29,21 +27,17 @@ fun CoroutineScope.launchIO(
   }
 }
 
-object KotlinXSyntax {
-  suspend fun <A> IO<A>.suspended(): A = suspendCancellableCoroutine<A> { cont ->
-    val disposable = cont.context.shift().followedBy(this)
-      .unsafeRunAsyncCancellable { result ->
-        result.fold({ throw it }, ::identity)
-      }
+//object KotlinXSyntax {
+//  suspend fun <A> IO<A>.suspended(): A = suspendCancellableCoroutine<A> { cont ->
+//    val disposable = cont.context.shift().followedBy(this)
+//      .unsafeRunAsyncCancellable { result ->
+//        result.fold({ throw it }, ::identity)
+//      }
+//
+//    cont.invokeOnCancellation { disposable.invoke() }
+//  }
+//}
 
-    cont.invokeOnCancellation { disposable.invoke() }
-  }
+fun <A> IO<A>.scoped(scope: CoroutineScope): IO<A> {
+  return this
 }
-
-fun <A> IOOf<A>.onCancel(token: IOOf<Unit>): IO<A> =
-  guaranteeCase { case ->
-    when (case) {
-      arrow.fx.typeclasses.ExitCase.Canceled -> token
-      else -> IO.unit
-    }
-  }
