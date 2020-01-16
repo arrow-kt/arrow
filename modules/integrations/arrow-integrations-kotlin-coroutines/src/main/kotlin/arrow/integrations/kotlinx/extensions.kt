@@ -44,6 +44,6 @@ fun <A> IOOf<A>.onCancel(token: IOOf<Unit>): IO<A> =
   guaranteeCase { case ->
     when (case) {
       arrow.fx.typeclasses.ExitCase.Canceled -> token
-      else -> arrow.fx.IO.unit
+      else -> IO.unit
     }
   }
