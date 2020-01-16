@@ -75,6 +75,7 @@ include {
         integrations {
             _ 'integrations-retrofit-adapter'
             _ 'integrations-jackson-module'
+            _ 'integrations-kotlin-coroutines'
         }
 
         recursion {

@@ -1,0 +1,22 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation project(':arrow-fx')
+//    implementation project(':arrow-core')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+//    compile project(':arrow-annotations')
+//    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+
+//    kapt project(':arrow-meta')
+//    kaptTest project(':arrow-meta')
+//    compileOnly project(':arrow-meta')
+//    testCompileOnly project(':arrow-meta')
+    testImplementation project(':arrow-test')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testImplementation "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
+    testImplementation project(':arrow-fx')
+//    testImplementation project(':arrow-core')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
