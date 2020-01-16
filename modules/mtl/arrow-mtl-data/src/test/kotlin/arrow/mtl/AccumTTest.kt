@@ -155,4 +155,3 @@ private fun <W, M> AccumT.Companion.eqK(MM: Monad<M>, EQK: EqK<M>, EQw: Eq<W>, w
         }
       }
   }
-
