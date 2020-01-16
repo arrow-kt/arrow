@@ -10,13 +10,13 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 
-typealias AccumTFun<W, M, A> = (W) -> Kind<M, Tuple2<A, W>>
+typealias AccumTFun<S, F, A> = (S) -> Kind<F, Tuple2<A, S>>
 
-typealias AccumTFunOf<W, M, A> = Kind<M, AccumTFun<W, M, A>>
+typealias AccumTFunOf<S, F, A> = Kind<F, AccumTFun<S, F, A>>
 
-typealias Listen<W, M, A> = (Kind<M, A>) -> Kind<M, Tuple2<A, W>>
+typealias Listen<S, F, A> = (Kind<F, A>) -> Kind<F, Tuple2<A, S>>
 
-typealias Pass<W, M, A> = (Kind<M, (W) -> W>) -> Kind<M, Tuple2<A, W>>
+typealias Pass<S, F, A> = (Kind<F, (S) -> S>) -> Kind<F, Tuple2<A, S>>
 
 @higherkind
 data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A> {
@@ -25,6 +25,11 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
 
     fun <S, F, A> just(MW: Monoid<S>, MM: Monad<F>, a: A): AccumT<S, F, A> =
       AccumT(MM.just { w: S -> MM.just(a toT MW.empty()) })
+
+    operator fun <S, F, A> invoke(AF: Applicative<F>, run: AccumTFun<S, F, A>) =
+      AF.run {
+        AccumT(just(run))
+      }
 
     fun <S, F, A, B> tailRecM(MM: Monad<F>, a: A, fa: (A) -> Kind<AccumTPartialOf<S, F>, Either<A, B>>): AccumT<S, F, B> = MM.run {
       val accumTFun = { w: S ->
@@ -39,6 +44,15 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
         MM.just(accumTFun)
       )
     }
+
+    fun <S, F> look(MW: Monoid<S>, MM: Monad<F>): AccumT<S, F, S> =
+      AccumT(MM.just { w: S -> MM.just(w toT MW.empty()) })
+
+    fun <S, F, A> looks(MW: Monoid<S>, MM: Monad<F>, fs: (S) -> A): AccumT<S, F, A> =
+      AccumT(MM.just { w: S -> MM.just(fs(w) toT MW.empty()) })
+
+    fun <S, F> add(MM: Monad<F>, s: S): AccumT<S, F, Unit> =
+      AccumT(MM.just { _: S -> MM.just(Unit toT s) })
   }
 
   fun runAccumT(MM: Monad<F>, w: S): Kind<F, Tuple2<A, S>> =
@@ -71,14 +85,6 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
     return AccumT(ap)
   }
 
-  fun look(MW: Monoid<S>, MM: Monad<F>): AccumT<S, F, S> =
-    AccumT(MM.just { w: S -> MM.just(w toT MW.empty()) })
-
-  fun looks(MW: Monoid<S>, MM: Monad<F>, f: (S) -> A): AccumT<S, F, A> =
-    AccumT(MM.just { w: S -> MM.just(f(w) toT MW.empty()) })
-
-  fun add(MM: Monad<F>, w: S): AccumT<S, F, Unit> =
-    AccumT(MM.just { _: S -> MM.just(Unit toT w) })
 
   fun <B> map(MF: Functor<F>, fab: (A) -> B): AccumT<S, F, B> =
     MF.run {
@@ -110,11 +116,11 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
 
   fun <B> ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, (A) -> B>): AccumT<S, F, B> =
     let { mv ->
-      AccumT(MF.just { w: S ->
+      AccumT(MF.just { s: S ->
         MF.run {
-          runAccumT(MF, mf.fix().accumT, w).flatMap { (f, w1) ->
-            runAccumT(MF, mv.accumT, MS.run { w.combine(w1) }).flatMap { (v, w2) ->
-              MF.just(f(v) toT MS.run { w1.combine(w2) })
+          runAccumT(MF, mv.accumT, s).flatMap { (v, s1) ->
+            runAccumT(MF, mf.fix().accumT, MS.run { s.combine(s1) }).flatMap { (f, s2) ->
+              MF.just(f(v) toT MS.run { s1.combine(s2) })
             }
           }
         }
@@ -144,11 +150,11 @@ fun <F, S, A> ReaderT<F, S, A>.toAccumT(AF: Applicative<F>, FF: Functor<F>, MS: 
 
 
 fun <F, W, A> WriterT<F, W, A>.toAccumT(FF: Functor<F>): AccumT<W, F, A> {
-  val accumTFunc = this.value().let {
-    m ->
+  val accumTFunc = this.value().let { m ->
     FF.run {
       m.map {
-        { _: W -> m.map { it.reverse() }
+        { _: W ->
+          m.map { it.reverse() }
         }
       }
     }
