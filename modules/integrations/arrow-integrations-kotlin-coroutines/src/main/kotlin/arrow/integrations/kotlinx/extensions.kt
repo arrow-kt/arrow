@@ -1,9 +1,15 @@
 package arrow.integrations.kotlinx
 
+import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.IO
+import arrow.fx.IOOf
 import arrow.fx.extensions.io.async.shift
-import kotlinx.coroutines.*
+import arrow.fx.fix
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.newCoroutineContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -11,7 +17,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 fun CoroutineScope.launchIO(
   ctx: CoroutineContext = EmptyCoroutineContext,
   block: () -> IO<Unit>
-) {
+): Unit {
   val newContext = newCoroutineContext(ctx)
   val job = newContext[Job]
 
@@ -27,17 +33,17 @@ fun CoroutineScope.launchIO(
   }
 }
 
-//object KotlinXSyntax {
-//  suspend fun <A> IO<A>.suspended(): A = suspendCancellableCoroutine<A> { cont ->
-//    val disposable = cont.context.shift().followedBy(this)
-//      .unsafeRunAsyncCancellable { result ->
-//        result.fold({ throw it }, ::identity)
-//      }
-//
-//    cont.invokeOnCancellation { disposable.invoke() }
-//  }
-//}
+fun <A> IOOf<A>.unsafeRunScoped(
+  scope: CoroutineScope,
+  f: (Either<Throwable, A>) -> Unit
+): Unit {
+  val newContext = scope.newCoroutineContext(EmptyCoroutineContext)
+  val job = newContext[Job]
 
-fun <A> IO<A>.scoped(scope: CoroutineScope): IO<A> {
-  return this
+  val disposable = fix().unsafeRunAsyncCancellable(cb = f)
+
+  job?.invokeOnCompletion { e ->
+    if (e is CancellationException) disposable()
+    else Unit
+  }
 }

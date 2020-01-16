@@ -13,7 +13,7 @@ import kotlinx.coroutines.cancel
 
 class CoroutinesIntegrationTest : UnitSpec() {
   init {
-    "scope cancelation should cancel given IO" {
+    "scope cancellation should cancel given IO" {
       // TODO currently failing with more iterations
       forAll(10, Gen.int()) {
         IO.fx {
