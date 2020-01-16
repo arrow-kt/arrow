@@ -171,12 +171,7 @@
           }
 
           .nav-stars {
-            margin: 16px 0 0 0;
-
-            .github-stars {
-              border-top: 1px solid $white;
-              padding-top: $base-point-grid;
-            }
+            margin-top: ($base-point-grid * 4);
           }
         }
         &.top-scroll {

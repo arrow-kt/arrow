@@ -10,25 +10,39 @@
 }
 
 // Github stars
-.nav-stars {
-  margin-left: ($base-point-grid * 3);
-}
-
 .doc-stars-container {
   margin-right: ($base-point-grid * 4);
 }
 
-.github-stars {
-  display: inline-flex;
+// Github stars modal
+#star-modal {
+    transition: transform $base-duration;
+    transform: scale(0);
+    border-radius: 2px;
+    position: fixed;
+    bottom: ($base-point-grid * 8);
+    right: ($base-point-grid * 2);
+    padding: 12px 40px 8px 12px;
+    background: #fff;
+    box-shadow: rgba(0,0,0,0.3) 0 2px 8px 0;
+    z-index: 100;
 
-  &:hover {
-    border-bottom: none;
-    text-decoration: none;
-    color: $gray-secondary;
-  }
-}
+    &.in {
+        transform: scale(1);
+    }
 
-.star-icon {
-  font-size: ($base-point-grid * 4);
-  padding-right: 4px;
+    &.out {
+        transform: translateX(400px);
+    }
+    p {
+        font-size: $base-font-size;
+        margin: 0 0 15px;
+    }
+    & .close-modal {
+        cursor: pointer;
+        position: absolute;
+        top: 12px;
+        right: ($base-point-grid * 2);
+        padding: 0 $base-point-grid;
+    }
 }
