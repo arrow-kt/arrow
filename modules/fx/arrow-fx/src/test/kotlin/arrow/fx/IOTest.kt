@@ -715,7 +715,7 @@ class IOTest : UnitSpec() {
         .attempt().unsafeRunSync() shouldBe Left(exception)
     }
 
-    "Cancelation is wired accross suspend" {
+    "Cancellation is wired across suspend" {
       fun infiniteLoop(): IO<Unit> {
         fun loop(iterations: Int): IO<Unit> =
           just(iterations).flatMap { i -> loop(i + 1) }
