@@ -804,7 +804,7 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    async { ccb ->
+    Async { _, ccb ->
       val conn = IOConnection()
       val onCancelCb =
         when (onCancel) {
