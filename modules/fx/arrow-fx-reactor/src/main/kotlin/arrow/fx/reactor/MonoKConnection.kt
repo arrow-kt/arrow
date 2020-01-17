@@ -5,9 +5,9 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-@Deprecated("Cancelation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancelable combinator")
 typealias MonoKProc<A> = (KindConnection<ForMonoK>, (Either<Throwable, A>) -> Unit) -> Unit
-@Deprecated("Cancelation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancelable combinator")
 typealias MonoKProcF<A> = (KindConnection<ForMonoK>, (Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>
 
 /**
