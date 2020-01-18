@@ -230,11 +230,8 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       a toT b
     }
 
-  // TODO is this fine?
   fun show(SA: Show<A>): String = "[" +
-    list.fold("") { acc, v ->
-      acc + "," + SA.run { v.show() }
-    }.drop(1) + "]"
+    list.joinToString(", ") { SA.run { it.show() } } + "]"
 
   override fun toString(): String = show(Show.any())
 

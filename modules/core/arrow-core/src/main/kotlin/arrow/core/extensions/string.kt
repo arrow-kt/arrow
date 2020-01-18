@@ -29,7 +29,7 @@ fun String.Companion.eq(): Eq<String> =
   object : StringEq {}
 
 interface StringShow : Show<String> {
-  override fun String.show(): String = this
+  override fun String.show(): String = "\"$this\""
 }
 
 fun String.Companion.show(): Show<String> =
