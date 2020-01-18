@@ -68,7 +68,7 @@ interface AccumtTMonadTrans<S> : MonadTrans<Kind<ForAccumT, S>> {
     AccumT(MF) { _: S ->
       MF.run {
         flatMap { a ->
-          MF.just(a toT MS().empty())
+          MF.just(MS().empty() toT a)
         }
       }
     }

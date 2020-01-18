@@ -150,11 +150,11 @@ private fun <S, F, A> apCombinesState(
   forAll(GENS, GENS, GENS, GENA) { s1, s2, s3, a ->
 
     val accumT = AccumT(MF) { _: S ->
-      MF.just(a toT s1)
+      MF.just(s1 toT a)
     }
 
     val mf = AccumT(MF) { _: S ->
-      MF.just({ a: A -> a } toT s2)
+      MF.just(s2 toT { a: A -> a })
     }
 
     val ls = accumT.ap(MS, MF, mf).execAccumT(MF, s3)
@@ -166,7 +166,7 @@ private fun <S, F, A> apCombinesState(
 private fun <S, F> AccumT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) =
   object : GenK<AccumTPartialOf<S, F>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<AccumTPartialOf<S, F>, A>> =
-      genkF.genK(genkF.genK(Gen.tuple2(gen, genS)).map {
+      genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map {
         { _: S -> it }
       }).map {
         AccumT(it)
@@ -179,14 +179,8 @@ private fun <S, F> AccumT.Companion.eqK(MF: Monad<F>, eqkF: EqK<F>, eqS: Eq<S>, 
       (this.fix() to other.fix()).let {
         it.first.runAccumT(MF, s) to it.second.runAccumT(MF, s)
       }.let {
-        eqkF.liftEq(Tuple2.eq(EQ, eqS)).run {
-          val result = it.first.eqv(it.second)
-
-          if (!result) {
-            println("${it.first} != ${it.second}}")
-          }
-
-          result
+        eqkF.liftEq(Tuple2.eq(eqS, EQ)).run {
+          it.first.eqv(it.second)
         }
       }
   }
