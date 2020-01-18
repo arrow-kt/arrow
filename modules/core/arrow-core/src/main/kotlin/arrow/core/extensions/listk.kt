@@ -77,7 +77,7 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
 @extension
 interface ListKShow<A> : Show<ListKOf<A>> {
   fun SA(): Show<A>
-  override fun ListKOf<A>.show(): String = show(SA())
+  override fun ListKOf<A>.show(): String = fix().show(SA())
 }
 
 @extension
