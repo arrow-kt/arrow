@@ -9,10 +9,14 @@ import arrow.mtl.AccumT
 import arrow.mtl.AccumTPartialOf
 import arrow.mtl.ForAccumT
 import arrow.mtl.fix
+import arrow.mtl.typeclasses.MonadState
 import arrow.mtl.typeclasses.MonadTrans
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 
 @extension
@@ -26,21 +30,21 @@ interface AccumTFunctor<S, F> : Functor<AccumTPartialOf<S, F>> {
 
 @extension
 interface AccumTApplicative<S, F> : Applicative<AccumTPartialOf<S, F>> {
-  fun MW(): Monoid<S>
+  fun MS(): Monoid<S>
   fun MF(): Monad<F>
 
   override fun <A> just(a: A): Kind<AccumTPartialOf<S, F>, A> =
-    AccumT.just(MW(), MF(), a)
+    AccumT.just(MS(), MF(), a)
 
   override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.ap(ff: Kind<AccumTPartialOf<S, F>, (A) -> B>): Kind<AccumTPartialOf<S, F>, B> =
-    fix().ap(MW(), MF(), ff)
+    fix().ap(MS(), MF(), ff)
 }
 
 @extension
-interface AccumTMonad<S, F> : Monad<AccumTPartialOf<S, F>> {
+interface AccumTMonad<S, F> : Monad<AccumTPartialOf<S, F>>, AccumTApplicative<S, F> {
 
-  fun MS(): Monoid<S>
-  fun MF(): Monad<F>
+  override fun MS(): Monoid<S>
+  override fun MF(): Monad<F>
 
   override fun <A> just(a: A): Kind<AccumTPartialOf<S, F>, A> =
     AccumT.just(MS(), MF(), a)
@@ -60,16 +64,75 @@ interface AccumtTMonadTrans<S> : MonadTrans<Kind<ForAccumT, S>> {
 
   fun MS(): Monoid<S>
 
-  override fun <G, A> Kind<G, A>.liftT(MF: Monad<G>): Kind2<Kind<ForAccumT, S>, G, A> {
-
-    val accumTFun = { _: S ->
+  override fun <G, A> Kind<G, A>.liftT(MF: Monad<G>): Kind2<Kind<ForAccumT, S>, G, A> =
+    AccumT(MF) { _: S ->
       MF.run {
         flatMap { a ->
           MF.just(a toT MS().empty())
         }
       }
     }
-
-    return AccumT(MF.just(accumTFun))
-  }
 }
+
+@extension
+interface AccumTMonadState<S, F> : MonadState<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+
+  override fun MS(): Monoid<S>
+  override fun MF(): Monad<F>
+
+  override fun get(): AccumT<S, F, S> =
+    AccumT.look(MS(), MF())
+
+  override fun set(s: S): Kind<AccumTPartialOf<S, F>, Unit> =
+    AccumT.add(MF(), s)
+}
+
+@extension
+interface AccumTAlternative<S, F> : Alternative<AccumTPartialOf<S, F>>, AccumTApplicative<S, F> {
+
+  fun AF(): Alternative<F>
+  override fun MF(): Monad<F>
+  override fun MS(): Monoid<S>
+
+  override fun <A> Kind<AccumTPartialOf<S, F>, A>.orElse(b: Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, A> =
+    (this.fix() to b.fix()).let { (ls, rs) ->
+      AccumT(AF()) { s: S ->
+        AF().run {
+          ls.runAccumT(MF(), s).orElse(rs.runAccumT(MF(), s))
+        }
+      }
+    }
+
+  override fun <A> empty(): Kind<AccumTPartialOf<S, F>, A> =
+    AccumT.liftF(AF(), AF().empty())
+}
+
+@extension
+interface AccumTApplicativeError<S, F, E> : ApplicativeError<AccumTPartialOf<S, F>, E>, AccumTApplicative<S, F> {
+  fun ME(): MonadError<F, E>
+
+  override fun MS(): Monoid<S>
+  override fun MF(): Monad<F> = ME()
+
+  override fun <A> raiseError(e: E): Kind<AccumTPartialOf<S, F>, A> =
+    AccumT.liftF(MF(), ME().raiseError(e))
+
+  override fun <A> Kind<AccumTPartialOf<S, F>, A>.handleErrorWith(f: (E) -> Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, A> =
+    this.fix().let { accumT ->
+      AccumT(MF()) { s: S ->
+        ME().run {
+          accumT.runAccumT(MF(), s).handleErrorWith { e ->
+            f(e).fix().runAccumT(MF(), s)
+          }
+        }
+      }
+    }
+}
+
+@extension
+interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, AccumTApplicativeError<S, F, E>, AccumTMonad<S, F> {
+  override fun MS(): Monoid<S>
+  override fun ME(): MonadError<F, E>
+  override fun MF(): Monad<F> = ME()
+}
+
