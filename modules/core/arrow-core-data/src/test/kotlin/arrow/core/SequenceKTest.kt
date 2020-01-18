@@ -40,7 +40,6 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
-import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
