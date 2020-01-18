@@ -38,9 +38,9 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 @higherkind
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
-  private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
+  private class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
 
-  private data class Concat<A, E, B>(val left: AndThen<A, E>, val right: AndThen<E, B>) : AndThen<A, B>() {
+  private class Concat<A, E, B>(val left: AndThen<A, E>, val right: AndThen<E, B>) : AndThen<A, B>() {
     override fun toString(): String = "AndThen.Concat(...)"
   }
 

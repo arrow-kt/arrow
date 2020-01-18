@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Show
 
 /**
  *
@@ -228,6 +229,14 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     this.rpadZipWith(other) { a, b ->
       a toT b
     }
+
+  // TODO is this fine?
+  fun show(SA: Show<A>): String = "[" +
+    list.fold("") { acc, v ->
+      acc + "," + SA.run { v.show() }
+    }.drop(1) + "]"
+
+  override fun toString(): String = show(Show.any())
 
   companion object {
 
