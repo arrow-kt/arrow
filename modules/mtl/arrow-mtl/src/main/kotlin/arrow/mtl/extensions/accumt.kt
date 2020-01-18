@@ -9,7 +9,6 @@ import arrow.mtl.AccumT
 import arrow.mtl.AccumTPartialOf
 import arrow.mtl.ForAccumT
 import arrow.mtl.fix
-import arrow.mtl.typeclasses.MonadState
 import arrow.mtl.typeclasses.MonadTrans
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -75,19 +74,6 @@ interface AccumtTMonadTrans<S> : MonadTrans<Kind<ForAccumT, S>> {
 }
 
 @extension
-interface AccumTMonadState<S, F> : MonadState<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
-
-  override fun MS(): Monoid<S>
-  override fun MF(): Monad<F>
-
-  override fun get(): AccumT<S, F, S> =
-    AccumT.look(MS(), MF())
-
-  override fun set(s: S): Kind<AccumTPartialOf<S, F>, Unit> =
-    AccumT.add(MF(), s)
-}
-
-@extension
 interface AccumTAlternative<S, F> : Alternative<AccumTPartialOf<S, F>>, AccumTApplicative<S, F> {
 
   fun AF(): Alternative<F>
@@ -135,4 +121,3 @@ interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, Accu
   override fun ME(): MonadError<F, E>
   override fun MF(): Monad<F> = ME()
 }
-

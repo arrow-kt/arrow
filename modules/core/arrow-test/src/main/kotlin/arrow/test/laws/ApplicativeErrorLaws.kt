@@ -66,48 +66,62 @@ object ApplicativeErrorLaws {
       raiseError<A>(e).handleError(f).equalUnderTheLaw(just(f(e)), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorHandleWith(genA: Gen<A>,
-                                                                  genE: Gen<E>,
-                                                                  EQ: Eq<Kind<F, A>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorHandleWith(
+    genA: Gen<A>,
+    genE: Gen<E>,
+    EQ: Eq<Kind<F, A>>
+  ): Unit =
     forAll(Gen.functionAToB<E, Kind<F, A>>(Gen.applicativeError(genA, genE, this)), genE) { f: (E) -> Kind<F, A>, e: E ->
       raiseError<A>(e).handleErrorWith(f).equalUnderTheLaw(f(e), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorHandleWithPure(genA: Gen<A>,
-                                                                      genE: Gen<E>,
-                                                                      EQ: Eq<Kind<F, A>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorHandleWithPure(
+    genA: Gen<A>,
+    genE: Gen<E>,
+    EQ: Eq<Kind<F, A>>
+  ): Unit =
     forAll(Gen.functionAToB<E, Kind<F, A>>(Gen.applicativeError(genA, genE, this)), genA) { f: (E) -> Kind<F, A>, a: A ->
       just(a).handleErrorWith(f).equalUnderTheLaw(just(a), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.redeemIsDerivedFromMapHandleError(genA: Gen<A>,
-                                                                         genE: Gen<E>,
-                                                                         EQ: Eq<Kind<F, A>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.redeemIsDerivedFromMapHandleError(
+    genA: Gen<A>,
+    genE: Gen<E>,
+    EQ: Eq<Kind<F, A>>
+  ): Unit =
     forAll(Gen.applicativeError(genA, genE, this), Gen.functionAToB<E, A>(genA), Gen.functionAToB<A, A>(genA)) { fa, fe, fb ->
       fa.redeem(fe, fb).equalUnderTheLaw(fa.map(fb).handleError(fe), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptError(genE: Gen<E>,
-                                                                    EQ: Eq<Kind<F, Either<E, A>>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptError(
+    genE: Gen<E>,
+    EQ: Eq<Kind<F, Either<E, A>>>
+  ): Unit =
     forAll(genE) { e: E ->
       raiseError<A>(e).attempt().equalUnderTheLaw(just(Left(e)), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptSuccess(genA: Gen<A>,
-                                                                      EQ: Eq<Kind<F, Either<E, A>>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptSuccess(
+    genA: Gen<A>,
+    EQ: Eq<Kind<F, Either<E, A>>>
+  ): Unit =
     forAll(genA) { a: A ->
       just(a).attempt().equalUnderTheLaw(just(Right(a)), EQ)
     }
 
-  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptFromEitherConsistentWithPure(genA: Gen<A>,
-                                                                                           genE: Gen<E>,
-                                                                                           EQ: Eq<Kind<F, Either<E, A>>>): Unit =
+  fun <F, E, A> ApplicativeError<F, E>.applicativeErrorAttemptFromEitherConsistentWithPure(
+    genA: Gen<A>,
+    genE: Gen<E>,
+    EQ: Eq<Kind<F, Either<E, A>>>
+  ): Unit =
     forAll(Gen.either(genE, genA)) { either: Either<E, A> ->
       either.fromEither { it }.attempt().equalUnderTheLaw(just(either), EQ)
     }
 
-  fun <F, A> ApplicativeError<F, Throwable>.applicativeErrorCatch(genA: Gen<A>,
-                                                                  EQ: Eq<Kind<F, A>>): Unit =
+  fun <F, A> ApplicativeError<F, Throwable>.applicativeErrorCatch(
+    genA: Gen<A>,
+    EQ: Eq<Kind<F, A>>
+  ): Unit =
     forAll(Gen.either(Gen.throwable(), genA)) { either: Either<Throwable, A> ->
       catch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<A>(it) }, { just(it) }), EQ)
     }

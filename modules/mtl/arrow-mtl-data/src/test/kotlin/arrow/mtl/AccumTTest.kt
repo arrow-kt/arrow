@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.EitherPartialOf
 import arrow.core.ForId
+import arrow.core.ForOption
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -77,7 +78,7 @@ class AccumTTest : UnitSpec() {
         AccumT.eqK(Id.monad(), Id.eqK(), String.eq(), "hello")
       ),
 
-      AlternativeLaws.laws(
+      AlternativeLaws.laws<AccumTPartialOf<Int, ForOption>>(
         AccumT.alternative(Option.alternative(), Option.monad(), Int.monoid()),
         AccumT.genK(Option.genK(), Gen.int()),
         AccumT.eqK(Option.monad(), Option.eqK(), Int.eq(), 10)
