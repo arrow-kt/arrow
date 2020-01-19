@@ -315,12 +315,12 @@ class QueueTest : UnitSpec() {
       allStrategyTests("UnboundedQueue", ctx, queue)
     }
 
-    boundedStrategyTests { capacity -> Queue.bounded<ForIO, Int>(capacity, IO.concurrent()).fix() }
+    boundedStrategyTests { capacity -> ConcurrentQueue.bounded<ForIO, Int>(capacity, IO.concurrent()).fix() }
 
-    slidingStrategyTests { capacity -> Queue.sliding<ForIO, Int>(capacity, IO.concurrent()).fix() }
+    slidingStrategyTests { capacity -> ConcurrentQueue.sliding<ForIO, Int>(capacity, IO.concurrent()).fix() }
 
-    droppingStrategyTests { capacity -> Queue.dropping<ForIO, Int>(capacity, IO.concurrent()).fix() }
+    droppingStrategyTests { capacity -> ConcurrentQueue.dropping<ForIO, Int>(capacity, IO.concurrent()).fix() }
 
-    unboundedStrategyTests { Queue.unbounded<ForIO, Int>(IO.concurrent()).fix() }
+    unboundedStrategyTests { ConcurrentQueue.unbounded<ForIO, Int>(IO.concurrent()).fix() }
   }
 }
