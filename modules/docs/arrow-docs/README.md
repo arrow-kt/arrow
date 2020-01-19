@@ -97,8 +97,9 @@ So, after making you doc changes as mentioned before, you would:
 
 ### 0. Requirements
 
-* Install Arrow Ank Gradle in your local repository:
+* Install Arrow Ank Gradle and Arrow Ank in your local repository:
 ```
+./gradlew :arrow-ank:publishToMavenLocal
 ./gradlew :arrow-ank-gradle:publishToMavenLocal
 ```
 * Add arrow-docs to `settings.gradle`:
