@@ -197,7 +197,7 @@ result.fold({ ex -> "Oh no, I was hungry!: $ex"}, { "Yum: $it" })
 
 Just like it does for `Option`, Arrow also provides `Monad` instances for `Try`, and we can use it exactly in the same way
 
-```kotlin:ank
+```kotlin
 import arrow.typeclasses.*
 import arrow.core.extensions.*
 
