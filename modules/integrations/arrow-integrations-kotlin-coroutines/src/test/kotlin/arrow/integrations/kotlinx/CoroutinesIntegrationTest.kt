@@ -109,5 +109,13 @@ class CoroutinesIntegrationTest : UnitSpec() {
           .unsafeRunAsync { scope.cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
+
+    "should complete when running a pure value with unsafeRunAsync" {
+      val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+      val expected = 0
+      IO.just(expected).unsafeRunScoped(scope) { either ->
+        either.fold({ fail("") }, { it shouldBe expected })
+      }
+    }
   }
 }
