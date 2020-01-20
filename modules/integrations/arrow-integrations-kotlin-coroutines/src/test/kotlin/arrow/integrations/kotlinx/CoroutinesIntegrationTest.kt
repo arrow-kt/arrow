@@ -1,10 +1,7 @@
 package arrow.integrations.kotlinx
 
 import arrow.fx.IO
-import arrow.fx.IOOf
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.bracket.guaranteeCase
-import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.generators.throwable
@@ -24,43 +21,15 @@ import kotlinx.coroutines.test.TestCoroutineScope
 @UseExperimental(ExperimentalCoroutinesApi::class)
 class CoroutinesIntegrationTest : UnitSpec() {
 
-  class MyException : Exception()
-
   init {
-    "scope cancellation should cancel given IO" {
-      // TODO currently failing with more iterations
-      forAll(10, Gen.int()) { i ->
-        IO.fx {
-          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          val promise = !Promise<Int>()
-          !effect {
-            scope.launchIO {
-              IO.cancelable { promise.complete(i) }
-            }
-          }
-//          !sleep(10.milliseconds)
-          !effect { scope.cancel() }
-          !promise.get().waitFor(1.seconds)
-        }.unsafeRunSync() == i
-      }
-    }
-
-    "launchIO should throw exceptions" {
-      val exception = MyException()
-      val ceh = TestCoroutineExceptionHandler()
-      val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
-      scope.launchIO {
-        IO { throw exception }
-      }
-      ceh.uncaughtExceptions[0] shouldBe exception
-    }
-
     "suspended should throw" {
       forAll(Gen.throwable()) { e ->
         val ceh = TestCoroutineExceptionHandler()
         val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+
+        suspend fun asd(): Unit = throw e
         scope.launch {
-          IO { throw e }.suspended()
+          asd()
         }
         ceh.uncaughtExceptions[0] shouldBe e
         true
