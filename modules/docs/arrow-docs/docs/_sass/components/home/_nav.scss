@@ -93,7 +93,7 @@
             margin-right: ($base-point-grid * 5);
           }
 
-          a {
+          .menu-links {
             padding-bottom: 4px;
             text-transform: uppercase;
             font-size: ($base-point-grid * 2);
@@ -151,7 +151,7 @@
         height: 100%;
         right: -100%;
         top: 0;
-        width: 50%;
+        width: 70%;
         z-index: 2;
         transition: right $base-duration $base-timing;
 
@@ -168,6 +168,10 @@
             &:not(:last-child) {
               margin-right: 0;
             }
+          }
+
+          .nav-stars {
+            margin-top: ($base-point-grid * 4);
           }
         }
         &.top-scroll {
