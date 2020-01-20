@@ -5,8 +5,8 @@ dependencies {
     compile project(':arrow-core')
     compile project(':arrow-fx')
     compile project(':arrow-syntax')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     compile project(':arrow-annotations')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')

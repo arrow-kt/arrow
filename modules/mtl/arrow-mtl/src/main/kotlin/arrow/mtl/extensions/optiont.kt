@@ -1,6 +1,7 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
@@ -19,12 +20,14 @@ import arrow.core.right
 import arrow.core.some
 import arrow.core.toT
 import arrow.extension
+import arrow.mtl.ForOptionT
 import arrow.mtl.OptionT
 import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.MonadTrans
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
@@ -280,6 +283,15 @@ interface OptionTAlternative<F> : Alternative<OptionTPartialOf<F>>, OptionTAppli
         else l
       }
     )
+
+  override fun <A> Kind<OptionTPartialOf<F>, A>.lazyOrElse(b: () -> Kind<OptionTPartialOf<F>, A>): Kind<OptionTPartialOf<F>, A> =
+    OptionT(
+      MF().fx.monad {
+        val l = !value()
+        if (l.isEmpty()) !b().value()
+        else l
+      }
+    )
 }
 
 @extension
@@ -293,4 +305,10 @@ interface OptionTEqK<F> : EqK<OptionTPartialOf<F>> {
         it.first.value().eqv(it.second.value())
       }
     }
+}
+
+@extension
+interface OptionTMonadTrans : MonadTrans<ForOptionT> {
+  override fun <F, A> Kind<F, A>.liftT(MF: Monad<F>): Kind2<ForOptionT, F, A> =
+    OptionT.liftF(MF, this)
 }

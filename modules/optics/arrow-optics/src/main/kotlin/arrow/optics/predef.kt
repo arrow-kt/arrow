@@ -5,12 +5,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.typeclasses.Monoid
 
-@PublishedApi
-internal object AndMonoid : Monoid<Boolean> {
-  override fun Boolean.combine(b: Boolean): Boolean = this && b
-  override fun empty(): Boolean = true
-}
-
 internal sealed class First
 internal sealed class Last
 

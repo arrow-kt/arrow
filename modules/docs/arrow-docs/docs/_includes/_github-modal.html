@@ -1,0 +1,16 @@
+<div id="star-modal">
+    <p>Do you like Arrow?</p>
+    <span class="close-modal">✖</span>
+    <a class="github-button" href="https://github.com/arrow-kt/arrow" data-color-scheme="no-preference: light; light: light; dark: light;" data-size="large" data-show-count="true" aria-label="Star arrow-kt/arrow on GitHub">Arrow Org</a>
+    <script>
+      if (sessionStorage.getItem("dismissed") !== "true") {
+        setTimeout(function () {
+            document.querySelector("#star-modal").classList.add("in");
+        }, 15000);
+        document.querySelector("#star-modal .close-modal").addEventListener("click", function () {
+            document.querySelector("#star-modal").classList.add("out");
+            sessionStorage.setItem("dismissed", "true");
+        });
+      }
+    </script>
+</div>

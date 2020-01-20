@@ -59,4 +59,33 @@
     .fa {
         margin-right: ($base-point-grid / 2);
     }
+
+    .menu-doc-search {
+      display: inline-flex;
+
+      .menu-links {
+        padding-bottom: 4px;
+        text-transform: uppercase;
+        font-weight: $font-semibold;
+        @include links($link-color, $link-color, lighten($link-color, 30%), lighten($link-color, 30%));
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      &:last-child {
+          margin-right: ($base-point-grid * 2);
+      }
+    }
+}
+
+// Responsive
+@include bp(large) {
+  #doc-wrapper {
+    .doc-header {
+      .doc-stars-container {
+        display: none;
+      }
+    }
+  }
 }

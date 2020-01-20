@@ -2,7 +2,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-fx')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile project(':arrow-annotations')
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     kapt project(':arrow-meta')
