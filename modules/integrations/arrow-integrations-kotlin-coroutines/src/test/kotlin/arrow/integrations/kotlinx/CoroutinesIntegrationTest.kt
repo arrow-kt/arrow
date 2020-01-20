@@ -145,11 +145,14 @@ class CoroutinesIntegrationTest : UnitSpec() {
       }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
 
-    "should complete when running a pure value with unsafeRunAsync" {
-      val scope = TestCoroutineScope(TestCoroutineDispatcher())
-      val expected = 0
-      IO.just(expected).unsafeRunScoped(scope) { either ->
-        either.fold({ fail("") }, { it shouldBe expected })
+    "should complete when running a pure value with unsafeRunScoped" {
+      forAll(Gen.int()) { i ->
+        val scope = TestCoroutineScope(TestCoroutineDispatcher())
+        IO.async<Int> { cb ->
+          IO.just(i).unsafeRunScoped(scope) { either ->
+            either.fold({ fail("") }, { cb(it.right()) })
+          }
+        }.unsafeRunSync() == i
       }
     }
   }
