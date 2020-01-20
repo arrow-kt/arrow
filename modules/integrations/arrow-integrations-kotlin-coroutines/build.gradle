@@ -17,6 +17,7 @@ dependencies {
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
     testImplementation project(':arrow-fx')
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.3"
 //    testImplementation project(':arrow-core')
 }
 

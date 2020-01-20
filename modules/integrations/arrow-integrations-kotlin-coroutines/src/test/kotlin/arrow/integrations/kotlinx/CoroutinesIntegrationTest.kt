@@ -1,20 +1,27 @@
 package arrow.integrations.kotlinx
 
 import arrow.fx.IO
+import arrow.fx.IOOf
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.io.bracket.guaranteeCase
+import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
-import io.kotlintest.fail
+import arrow.test.generators.throwable
+import io.kotlintest.matchers.types.shouldBeSameInstanceAs
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.CoroutineScope
+import io.kotlintest.shouldBe
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineExceptionHandler
+import kotlinx.coroutines.test.TestCoroutineScope
 
+@Suppress("IMPLICIT_NOTHING_AS_TYPE_PARAMETER")
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class CoroutinesIntegrationTest : UnitSpec() {
 
   class MyException : Exception()
@@ -22,53 +29,72 @@ class CoroutinesIntegrationTest : UnitSpec() {
   init {
     "scope cancellation should cancel given IO" {
       // TODO currently failing with more iterations
-      forAll(10, Gen.int()) {
+      forAll(10, Gen.int()) { i ->
         IO.fx {
-          val scope = CoroutineScope(IO.dispatchers().default())
-          val promise = !Promise<Unit>()
+          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+          val promise = !Promise<Int>()
           !effect {
             scope.launchIO {
-              IO.cancelable { promise.complete(Unit) }
+              IO.cancelable { promise.complete(i) }
             }
           }
 //          !sleep(10.milliseconds)
           !effect { scope.cancel() }
-          !promise.get().waitFor(2.seconds)
-        }.unsafeRunSync() == Unit
+          !promise.get().waitFor(1.seconds)
+        }.unsafeRunSync() == i
       }
     }
 
-    // TODO currently behaves the same way as coroutines
-    "should rethrow exceptions within launchIO" {
+    "launchIO should throw exceptions" {
       val exception = MyException()
-      try {
-        coroutineScope {
-          launchIO {
-            IO { throw exception }
-            fail("Should rethrow the exception")
-          }
+      val ceh = TestCoroutineExceptionHandler()
+      val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+      scope.launchIO {
+        IO { throw exception }
+      }
+      ceh.uncaughtExceptions[0] shouldBe exception
+    }
+
+    "suspended should throw" {
+      forAll(Gen.throwable()) { e ->
+        val ceh = TestCoroutineExceptionHandler()
+        val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+        scope.launch {
+          IO { throw e }.suspended()
         }
-      } catch (myException: MyException) {
-        // Success
-      } catch (throwable: Throwable) {
-        fail("Should only throw MyException but was $throwable")
+        ceh.uncaughtExceptions[0] shouldBe e
+        true
       }
     }
 
-    // DELETE
-    "coroutines test" {
-      val exception = MyException()
-      try {
-        coroutineScope {
-          launch {
-            suspend { throw exception }
-            fail("Should rethrow the exception")
-          }
+    "suspendedCancellable rethrows exceptions" {
+      forAll(Gen.throwable()) { e ->
+        val ceh = TestCoroutineExceptionHandler()
+        val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+
+        scope.launch {
+          IO { throw e }.suspendCancellable()
         }
-      } catch (myException: MyException) {
-        // Success
-      } catch (throwable: Throwable) {
-        fail("Should only throw MyException but was $throwable")
+        val caughtException = ceh.uncaughtExceptions[0]
+        println("$caughtException == $e")
+        caughtException shouldBeSameInstanceAs e
+        true
+      }
+    }
+
+    "scope cancellation should cancel suspendedCancellable IO" {
+      forAll(Gen.int()) { i ->
+        IO.fx {
+          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+          val promise = !Promise<Int>()
+          !effect {
+            scope.launch {
+              IO.cancelable<Unit> { promise.complete(i) }.suspendCancellable()
+            }
+          }
+          !effect { scope.cancel() }
+          !promise.get().waitFor(1.seconds)
+        }.unsafeRunSync() == i
       }
     }
   }
