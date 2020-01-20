@@ -22,7 +22,6 @@ suspend fun <A> IO<A>.suspendCancellable() = suspendCancellableCoroutine<A> { co
   cont.invokeOnCancellation { disposable() }
 }
 
-
 fun <A> IOOf<A>.unsafeRunScoped(
   scope: CoroutineScope,
   f: (Either<Throwable, A>) -> Unit
