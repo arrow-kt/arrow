@@ -472,7 +472,6 @@ class IOTest : UnitSpec() {
       }
     }
 
-    // TODO test seems broken
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =

@@ -16,7 +16,7 @@ import kotlin.coroutines.resumeWithException
 
 suspend fun <A> IO<A>.suspendCancellable() = suspendCancellableCoroutine<A> { cont ->
   val disposable = this.unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) { result ->
-    result.fold(cont::resumeWithException) { cont.resume(it) }//?.let(cont::completeResume)
+    result.fold(cont::resumeWithException) { cont.resume(it) }
   }
 
   cont.invokeOnCancellation { disposable() }
