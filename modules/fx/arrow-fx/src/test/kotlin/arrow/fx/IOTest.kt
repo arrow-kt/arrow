@@ -7,9 +7,8 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.identity
-import arrow.core.left
 import arrow.core.right
+import arrow.core.some
 import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
@@ -473,17 +472,24 @@ class IOTest : UnitSpec() {
       }
     }
 
+    // TODO test seems broken
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(all) { }
+          IO(all) { -1 }
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
+            .guaranteeCase { case ->
+              when (case) {
+                ExitCase.Canceled -> IO { cb(1.right()) }
+                else -> IO.unit
+              }
+            }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
         IO(other) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe None
+      }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
 
     "IO.binding should for comprehend over IO" {

@@ -3,8 +3,12 @@ package arrow.integrations.kotlinx
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.right
+import arrow.core.some
 import arrow.fx.IO
+import arrow.fx.IOOf
 import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.bracket.guaranteeCase
+import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -13,6 +17,7 @@ import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -49,16 +54,17 @@ class CoroutinesIntegrationTest : UnitSpec() {
 
     "suspendedCancellable should resume with right block" {
       forAll(Gen.int()) { i ->
-        IO.fx {
-          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          val promise = !Promise<Int>()
-          !effect {
-            scope.launch {
-              IO.just(i).flatMap { promise.complete(it) }.suspendCancellable()
-            }
-          }
-          !promise.get().waitFor(1.seconds)
-        }.unsafeRunSync() == i
+        val ceh = TestCoroutineExceptionHandler()
+        val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+        scope.launch {
+          val first = IO { i + 1 }.suspendCancellable()
+          val second = IO { first + 1 }.suspendCancellable()
+          val third = IO { second + 1 }.suspendCancellable()
+
+          third shouldBe i + 3
+        }
+
+        ceh.uncaughtExceptions.isEmpty()
       }
     }
 
@@ -78,12 +84,28 @@ class CoroutinesIntegrationTest : UnitSpec() {
       }
     }
 
+    "suspendCancellable can cancel even for infinite asyncs" {
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+        val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+        scope.launch {
+          IO.async<Int> { Thread.sleep(5000) }
+            .onCancel(IO { cb(1.right()) })
+            .suspendCancellable().let {
+              cb(it.right())
+            }
+        }
+        IO(other) { Thread.sleep(500) }
+          .unsafeRunAsync { scope.cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe 1.some()
+    }
+
+
     // --------------- unsafeRunScoped ---------------
 
     "should rethrow exceptions within run block with unsafeRunScoped" {
       forAll(Gen.throwable()) { e ->
         try {
-          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+          val scope = TestCoroutineScope(TestCoroutineDispatcher())
           val ioa = IO<Int> { throw e }
           ioa.unsafeRunScoped(scope) { either ->
             either.fold({ throw it }, { fail("") })
@@ -113,18 +135,19 @@ class CoroutinesIntegrationTest : UnitSpec() {
     "unsafeRunScoped can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-        IO(all) { }
-          .flatMap { IO.async<Int> { Thread.sleep(5000) } }
+        IO(all) { -1 }
+          .flatMap { IO.async<Int> { Thread.sleep(5000); } }
+          .onCancel(IO { cb(1.right()) })
           .unsafeRunScoped(scope) {
             cb(it)
           }
         IO(other) { Thread.sleep(500) }
           .unsafeRunAsync { scope.cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe None
+      }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
 
     "should complete when running a pure value with unsafeRunAsync" {
-      val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+      val scope = TestCoroutineScope(TestCoroutineDispatcher())
       val expected = 0
       IO.just(expected).unsafeRunScoped(scope) { either ->
         either.fold({ fail("") }, { it shouldBe expected })
@@ -132,3 +155,11 @@ class CoroutinesIntegrationTest : UnitSpec() {
     }
   }
 }
+
+fun <A> IOOf<A>.onCancel(token: IOOf<Unit>): IO<A> =
+  guaranteeCase { case ->
+    when (case) {
+      ExitCase.Canceled -> token
+      else -> IO.unit
+    }
+  }
