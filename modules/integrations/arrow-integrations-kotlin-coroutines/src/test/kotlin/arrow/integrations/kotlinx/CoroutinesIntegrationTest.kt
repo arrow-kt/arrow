@@ -42,10 +42,23 @@ class CoroutinesIntegrationTest : UnitSpec() {
         scope.launch {
           IO { throw e }.suspendCancellable()
         }
-        val caughtException = ceh.uncaughtExceptions[0]
-        println("$caughtException == $e")
-        // TODO exception seem to be rethrown internally, so equals comparison fails
-        caughtException::class == e::class
+        // suspendCancellableCoroutine re throws the exception so we need to compare the instance
+        ceh.uncaughtExceptions[0]::class == e::class
+      }
+    }
+
+    "suspendedCancellable should resume with right block" {
+      forAll(Gen.int()) { i ->
+        IO.fx {
+          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+          val promise = !Promise<Int>()
+          !effect {
+            scope.launch {
+              IO.just(i).flatMap { promise.complete(it) }.suspendCancellable()
+            }
+          }
+          !promise.get().waitFor(1.seconds)
+        }.unsafeRunSync() == i
       }
     }
 
@@ -100,12 +113,12 @@ class CoroutinesIntegrationTest : UnitSpec() {
     "unsafeRunScoped can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          IO(all) { }
-            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
-            .unsafeRunScoped(scope) {
-              cb(it)
-            }
-        IO(other) { Thread.sleep(500); }
+        IO(all) { }
+          .flatMap { IO.async<Int> { Thread.sleep(5000) } }
+          .unsafeRunScoped(scope) {
+            cb(it)
+          }
+        IO(other) { Thread.sleep(500) }
           .unsafeRunAsync { scope.cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
