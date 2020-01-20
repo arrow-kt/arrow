@@ -33,11 +33,14 @@ incubator:
     - title: Arrow Query Language
       url: /docs/aql/intro/
 
-    - title: Recursion Schemes
-      url: /docs/recursion/intro/
-
     - title: Arrow Generic
       url: /docs/generic/product/
 
     - title: Arrow Free
       url: /docs/free/free/
+
+    - title: Recursion Schemes
+      url: /docs/recursion/intro/
+
+    - title: MTL
+      url: /docs/apidocs/arrow-mtl/
