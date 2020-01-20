@@ -128,7 +128,7 @@ TODO
 
 - [`Moore`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-moore/' | relative_url }}) - a datatype that holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
-- [`Sum`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-moore/' | relative_url }}) - a datatype that holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+- [`Sum`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-sum/' | relative_url }}) - a datatype that holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
 - [`Day`]({{ '/docs/apidocs/arrow-ui-data/arrow.ui/-day/' | relative_url }}) - a datatype that holds two comonads which evolve independently.
 

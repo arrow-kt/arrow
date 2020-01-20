@@ -10,8 +10,15 @@ sourceSets {
     test.java.srcDirs += 'src/test/kotlin'
 }
 
+processResources {
+    filesMatching('**/plugin.properties') {
+        filter { it.replace('%CURRENT_VERSION%', VERSION_NAME) }
+        filter { it.replace('%KOTLIN_VERSION%', KOTLIN_VERSION) }
+    }
+}
+
 dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     testImplementation 'junit:junit:4.12'
 }
 
