@@ -68,7 +68,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
     }
 
     "scope cancellation should cancel suspendedCancellable IO" {
-      forAll(1, Gen.int()) { i ->
+      forAll(Gen.int()) { i ->
         IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
           val promise = !Promise<Int>()
@@ -78,7 +78,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
             }
           }
           !effect { scope.cancel() }
-          !promise.get().waitFor(1.seconds)
+          !promise.get()
         }.unsafeRunSync() == i
       }
     }
