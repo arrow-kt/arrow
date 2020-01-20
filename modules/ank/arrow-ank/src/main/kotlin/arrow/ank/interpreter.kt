@@ -150,7 +150,7 @@ val interpreter: AnkOps = object : AnkOps {
               } else { // accumulating code inside a fence
                 val modifiedSnippet = state.snippet.copy(
                   fence = state.snippet.fence + "\n" + line,
-                  code = state.snippet.code + "\n" + line
+                  code = state.snippet.code + (if (state.snippet.code.isEmpty()) "" else "\n") + line
                 )
                 Tuple3(state.copy(snippet = modifiedSnippet), lines + line, snippets)
               }
@@ -209,7 +209,7 @@ val interpreter: AnkOps = object : AnkOps {
                   Some("")
                 }
                 // simply append result
-                else -> Some("// $it")
+                else -> Some("// ${it.toString().replace("\n", "\n// ")}")
               }
             })
             snip.copy(result = resultString)
