@@ -466,23 +466,21 @@ While the typical usage of Deferred in Kotlin is different from the Monad patter
 ```kotlin
 class Future<T>(
     val instance: Deferred<T>
-): Kind<ForFuture, A> {
-    constructor(instance: T) {
-        this.instance = async(LAZY) { instance }
-    }
+): Kind<ForFuture, T> {
 
-    constructor(instance: Deferred<T>) {
-        this.instance = instance
-    }
+    constructor(instance: T) :
+            this(CoroutineScope(EmptyCoroutineContext).async(start=LAZY) { instance })
 
     fun <U> flatMap(func: (T) -> Future<U>): Future<U> =
-        Future(async(LAZY) {
+        Future(CoroutineScope(EmptyCoroutineContext).async(start=LAZY) {
             val t = instance.await()
             func(t).await()
         })
 
-    fun runSync(action: (Try<T>) -> Unit) =
-        runBlocking { action(Try { instance.await() }) }
+    fun runSync(action: (Either<Throwable, T>) -> Unit) =
+            runBlocking { action(Either.catch { instance.await() }) }
+
+    suspend fun await(): T = instance.await()
 }
 ```
 
@@ -493,11 +491,11 @@ repository
     .loadSpeaker()
     .flatMap { speaker -> speaker.nextTalk()
         .flatMap { talk -> talk.getConference() }
-        .flatMap { conference -> conference.getCity().map { it to speaker } }
+        .flatMap { conference -> conference.getCity().flatMap { city -> Future(city to speaker) } }
     }
-    .runSync { (city, speaker) -> city.fold(
-        { Logger.logError(it); reservations.cancel() },
-        { reservations.bookFlight(speaker, city) })
+    .runSync { maybePair -> maybePair.fold(
+        { Logger.logError(it) ; reservations.cancel() },
+        { (city, speaker) -> reservations.bookFlight(speaker, city) })
     }
 ```
 
@@ -600,7 +598,7 @@ repository
                 { reservations.bookFlight(speaker, city) })
             }
         )
-    }
+        }
 ```
 
 Obviously, this gets ugly very fast.
