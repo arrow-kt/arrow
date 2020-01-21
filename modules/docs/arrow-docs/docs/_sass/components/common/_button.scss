@@ -103,6 +103,7 @@
 }
 
 .show-slack-icon {
+  z-index: 101;
   color: $box-text-color;
   font-weight: $font-semibold;
   font-size: $base-font-size;
