@@ -203,7 +203,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it)
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
@@ -215,7 +215,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it)
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }.fix().maybe.subscribe({}, { e -> emitter.tryOnError(e) })
@@ -256,7 +256,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it).let { Unit }
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
@@ -277,7 +277,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it).let { Unit }
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
