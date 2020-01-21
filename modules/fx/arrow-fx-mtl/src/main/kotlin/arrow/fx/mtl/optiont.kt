@@ -6,6 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
@@ -17,13 +18,17 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.OptionT
 import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
+import arrow.mtl.extensions.OptionTMonad
 import arrow.mtl.extensions.OptionTMonadError
+import arrow.mtl.extensions.optiont.monadTrans.liftT
 import arrow.mtl.value
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -158,3 +163,12 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
   object : OptionTConcurrent<F> {
     override fun CF(): Concurrent<F> = CF
   }
+
+@extension
+interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<A>.liftIO(): Kind<OptionTPartialOf<F>, A> = FIO().run {
+    liftIO().liftT(this)
+  }
+}
