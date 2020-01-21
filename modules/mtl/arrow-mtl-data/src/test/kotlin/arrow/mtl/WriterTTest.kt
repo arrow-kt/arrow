@@ -37,6 +37,7 @@ import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.functor.functor
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
+import arrow.mtl.extensions.writert.monadTrans.monadTrans
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
@@ -47,6 +48,7 @@ import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import io.kotlintest.properties.Gen
@@ -64,6 +66,13 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
+      MonadTransLaws.laws(
+        WriterT.monadTrans(String.monoid()),
+        Option.monad(),
+        WriterT.monad(Option.monad(), String.monoid()),
+        Option.genK(),
+        WriterT.eqK(Option.eqK(), String.eq())
+      ),
       AlternativeLaws.laws(
         WriterT.alternative(ListK.monoid<Int>(), Option.alternative()),
         WriterT.genK(Option.genK(), Gen.list(Gen.int()).map { it.k() }),
