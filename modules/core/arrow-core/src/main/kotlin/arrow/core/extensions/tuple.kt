@@ -148,7 +148,7 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
     AP.run {
-      fix().let { tupled(f(it.a), g(it.b)) }
+      fix().let { tupledN(f(it.a), g(it.b)) }
     }
 }
 
