@@ -29,7 +29,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
+interface WriterTBracket<W, F> : Bracket<WriterTPartialOf<W, F>, Throwable>, WriterTMonadThrow<W, F> {
 
   fun MD(): MonadDefer<F>
 
@@ -37,10 +37,10 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
 
   override fun ME(): MonadError<F, Throwable> = MD()
 
-  override fun <A, B> WriterTOf<F, W, A>.bracketCase(
-    release: (A, ExitCase<Throwable>) -> WriterTOf<F, W, Unit>,
-    use: (A) -> WriterTOf<F, W, B>
-  ): WriterT<F, W, B> = MM().run {
+  override fun <A, B> WriterTOf<W, F, A>.bracketCase(
+    release: (A, ExitCase<Throwable>) -> WriterTOf<W, F, Unit>,
+    use: (A) -> WriterTOf<W, F, B>
+  ): WriterT<W, F, B> = MM().run {
     MD().run {
       WriterT(Ref(this, empty()).flatMap { ref ->
         value().bracketCase(use = { wa ->
@@ -61,19 +61,19 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
 
 @extension
 @undocumented
-interface WriterTMonadDefer<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBracket<F, W> {
+interface WriterTMonadDefer<W, F> : MonadDefer<WriterTPartialOf<W, F>>, WriterTBracket<W, F> {
 
   override fun MD(): MonadDefer<F>
 
   override fun MM(): Monoid<W>
 
-  override fun <A> defer(fa: () -> WriterTOf<F, W, A>): WriterTOf<F, W, A> =
+  override fun <A> defer(fa: () -> WriterTOf<W, F, A>): WriterTOf<W, F, A> =
     WriterT(MD().defer { fa().value() })
 }
 
 @extension
 @undocumented
-interface WriterTAsync<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDefer<F, W> {
+interface WriterTAsync<W, F> : Async<WriterTPartialOf<W, F>>, WriterTMonadDefer<W, F> {
 
   fun AS(): Async<F>
 
@@ -81,20 +81,20 @@ interface WriterTAsync<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDefer<
 
   override fun MD(): MonadDefer<F> = AS()
 
-  override fun <A> async(fa: Proc<A>): WriterT<F, W, A> = AS().run {
+  override fun <A> async(fa: Proc<A>): WriterT<W, F, A> = AS().run {
     WriterT.liftF(async(fa), MM(), this)
   }
 
-  override fun <A> asyncF(k: ProcF<WriterTPartialOf<F, W>, A>): WriterTOf<F, W, A> = AS().run {
+  override fun <A> asyncF(k: ProcF<WriterTPartialOf<W, F>, A>): WriterTOf<W, F, A> = AS().run {
     WriterT.liftF(asyncF { cb -> k(cb).value().unit() }, MM(), this)
   }
 
-  override fun <A> WriterTOf<F, W, A>.continueOn(ctx: CoroutineContext): WriterT<F, W, A> = AS().run {
+  override fun <A> WriterTOf<W, F, A>.continueOn(ctx: CoroutineContext): WriterT<W, F, A> = AS().run {
     WriterT(value().continueOn(ctx))
   }
 }
 
-interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTAsync<F, W> {
+interface WriterTConcurrent<W, F> : Concurrent<WriterTPartialOf<W, F>>, WriterTAsync<W, F> {
 
   fun CF(): Concurrent<F>
 
@@ -102,22 +102,22 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
 
   override fun AS(): Async<F> = CF()
 
-  override fun dispatchers(): Dispatchers<WriterTPartialOf<F, W>> =
-    CF().dispatchers() as Dispatchers<WriterTPartialOf<F, W>>
+  override fun dispatchers(): Dispatchers<WriterTPartialOf<W, F>> =
+    CF().dispatchers() as Dispatchers<WriterTPartialOf<W, F>>
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<WriterTPartialOf<F, W>>): WriterT<F, W, A> = CF().run {
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<WriterTPartialOf<W, F>>): WriterT<W, F, A> = CF().run {
     WriterT.liftF(cancelable { cb -> k(cb).value().unit() }, MM(), this)
   }
 
-  override fun <A> WriterTOf<F, W, A>.fork(ctx: CoroutineContext): WriterT<F, W, Fiber<WriterTPartialOf<F, W>, A>> = CF().run {
-    val fork: Kind<F, Tuple2<W, Fiber<WriterTPartialOf<F, W>, A>>> = value().fork(ctx).map { fiber: Fiber<F, Tuple2<W, A>> ->
+  override fun <A> WriterTOf<W, F, A>.fork(ctx: CoroutineContext): WriterT<W, F, Fiber<WriterTPartialOf<W, F>, A>> = CF().run {
+    val fork: Kind<F, Tuple2<W, Fiber<WriterTPartialOf<W, F>, A>>> = value().fork(ctx).map { fiber: Fiber<F, Tuple2<W, A>> ->
       Tuple2(MM().empty(), fiberT(fiber))
     }
     WriterT(fork)
   }
 
-  override fun <A, B> CoroutineContext.racePair(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>): WriterT<F, W, RacePair<WriterTPartialOf<F, W>, A, B>> = CF().run {
-    val racePair: Kind<F, Tuple2<W, RacePair<WriterTPartialOf<F, W>, A, B>>> = racePair(fa.value(), fb.value()).map { res: RacePair<F, Tuple2<W, A>, Tuple2<W, B>> ->
+  override fun <A, B> CoroutineContext.racePair(fa: WriterTOf<W, F, A>, fb: WriterTOf<W, F, B>): WriterT<W, F, RacePair<WriterTPartialOf<W, F>, A, B>> = CF().run {
+    val racePair: Kind<F, Tuple2<W, RacePair<WriterTPartialOf<W, F>, A, B>>> = racePair(fa.value(), fb.value()).map { res: RacePair<F, Tuple2<W, A>, Tuple2<W, B>> ->
       when (res) {
         is RacePair.First -> Tuple2(res.winner.a, RacePair.First(res.winner.b, fiberT(res.fiberB)))
         is RacePair.Second -> Tuple2(res.winner.a, RacePair.Second(fiberT(res.fiberA), res.winner.b))
@@ -126,8 +126,8 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
     WriterT(racePair)
   }
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, fc: WriterTOf<F, W, C>): WriterT<F, W, RaceTriple<WriterTPartialOf<F, W>, A, B, C>> = CF().run {
-    val raceTriple: Kind<F, Tuple2<W, RaceTriple<WriterTPartialOf<F, W>, A, B, C>>> = raceTriple(fa.value(), fb.value(), fc.value()).map { res: RaceTriple<F, Tuple2<W, A>, Tuple2<W, B>, Tuple2<W, C>> ->
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: WriterTOf<W, F, A>, fb: WriterTOf<W, F, B>, fc: WriterTOf<W, F, C>): WriterT<W, F, RaceTriple<WriterTPartialOf<W, F>, A, B, C>> = CF().run {
+    val raceTriple: Kind<F, Tuple2<W, RaceTriple<WriterTPartialOf<W, F>, A, B, C>>> = raceTriple(fa.value(), fb.value(), fc.value()).map { res: RaceTriple<F, Tuple2<W, A>, Tuple2<W, B>, Tuple2<W, C>> ->
       when (res) {
         is RaceTriple.First -> Tuple2(res.winner.a, RaceTriple.First(res.winner.b, fiberT(res.fiberB), fiberT(res.fiberC)))
         is RaceTriple.Second -> Tuple2(res.winner.a, RaceTriple.Second(fiberT(res.fiberA), res.winner.b, fiberT(res.fiberC)))
@@ -137,12 +137,12 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
     WriterT(raceTriple)
   }
 
-  fun <A> fiberT(fiber: Fiber<F, Tuple2<W, A>>): Fiber<WriterTPartialOf<F, W>, A> =
+  fun <A> fiberT(fiber: Fiber<F, Tuple2<W, A>>): Fiber<WriterTPartialOf<W, F>, A> =
     Fiber(WriterT(fiber.join()), WriterT.liftF(fiber.cancel(), MM(), CF()))
 }
 
-fun <F, W> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concurrent<WriterTPartialOf<F, W>> =
-  object : WriterTConcurrent<F, W> {
+fun <W, F> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concurrent<WriterTPartialOf<W, F>> =
+  object : WriterTConcurrent<W, F> {
     override fun CF(): Concurrent<F> = CF
     override fun MM(): Monoid<W> = MM
   }

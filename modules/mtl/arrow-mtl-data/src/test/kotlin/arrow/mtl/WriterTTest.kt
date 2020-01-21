@@ -53,13 +53,13 @@ import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  fun ioEQK(): WriterTEqK<ForIO, ListK<Int>> = WriterT.eqK(IO.eqK(), ListK.eq(Int.eq()))
+  fun ioEQK(): WriterTEqK<ListK<Int>, ForIO> = WriterT.eqK(IO.eqK(), ListK.eq(Int.eq()))
 
-  fun optionEQK(): WriterTEqK<ForOption, ListK<Int>> = WriterT.eqK(Option.eqK(), ListK.eq(Int.eq()))
+  fun optionEQK(): WriterTEqK<ListK<Int>, ForOption> = WriterT.eqK(Option.eqK(), ListK.eq(Int.eq()))
 
-  fun constEQK(): WriterTEqK<ConstPartialOf<Int>, ListK<Int>> = WriterT.eqK(Const.eqK(Int.eq()), ListK.eq(Int.eq()))
+  fun constEQK(): WriterTEqK<ListK<Int>, ConstPartialOf<Int>> = WriterT.eqK(Const.eqK(Int.eq()), ListK.eq(Int.eq()))
 
-  fun listEQK(): WriterTEqK<ForListK, ListK<Int>> = WriterT.eqK(ListK.eqK(), ListK.eq(Int.eq()))
+  fun listEQK(): WriterTEqK<ListK<Int>, ForListK> = WriterT.eqK(ListK.eqK(), ListK.eq(Int.eq()))
 
   init {
 
@@ -70,20 +70,20 @@ class WriterTTest : UnitSpec() {
         optionEQK()
       ),
       DivisibleLaws.laws(
-        WriterT.divisible<ConstPartialOf<Int>, ListK<Int>>(Const.divisible(Int.monoid())),
+        WriterT.divisible<ListK<Int>, ConstPartialOf<Int>>(Const.divisible(Int.monoid())),
         WriterT.genK(Const.genK(Gen.int()), Gen.list(Gen.int()).map { it.k() }),
         constEQK()
       ),
       ConcurrentLaws.laws(
         WriterT.concurrent(IO.concurrent(), ListK.monoid<Int>()),
-        WriterT.functor<ForIO, ListK<Int>>(IO.functor()),
+        WriterT.functor<ListK<Int>, ForIO>(IO.functor()),
         WriterT.applicative(IO.applicative(), ListK.monoid<Int>()),
         WriterT.monad(IO.monad(), ListK.monoid<Int>()),
         WriterT.genK(IO.genK(), Gen.list(Gen.int()).map { it.k() }),
         ioEQK()
       ),
       MonoidKLaws.laws(
-        WriterT.monoidK<ForListK, ListK<Int>>(ListK.monoidK()),
+        WriterT.monoidK<ListK<Int>, ForListK>(ListK.monoidK()),
         WriterT.genK(ListK.genK(), Gen.list(Gen.int()).map { it.k() }),
         listEQK()
       ),
@@ -92,7 +92,7 @@ class WriterTTest : UnitSpec() {
         WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         WriterT.monadWriter(Option.monad(), ListK.monoid<Int>()),
         ListK.monoid<Int>(),
-        WriterT.functor<ForOption, ListK<Int>>(Option.functor()),
+        WriterT.functor<ListK<Int>, ForOption>(Option.functor()),
         WriterT.applicative(Option.applicative(), ListK.monoid<Int>()),
         WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         Gen.list(Gen.int()).map { it.k() },
@@ -103,7 +103,7 @@ class WriterTTest : UnitSpec() {
 
       MonadFilterLaws.laws(
         WriterT.monadFilter(Option.monadFilter(), ListK.monoid<Int>()),
-        WriterT.functor<ForOption, ListK<Int>>(Option.functor()),
+        WriterT.functor<ListK<Int>, ForOption>(Option.functor()),
         WriterT.applicative(Option.applicative(), ListK.monoid<Int>()),
         WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         WriterT.genK(Option.genK(), Gen.list(Gen.int()).map { it.k() }),
@@ -113,10 +113,10 @@ class WriterTTest : UnitSpec() {
   }
 }
 
-private fun <F, W> WriterT.Companion.genK(
+private fun <W, F> WriterT.Companion.genK(
   GENKF: GenK<F>,
   GENW: Gen<W>
-) = object : GenK<WriterTPartialOf<F, W>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
+) = object : GenK<WriterTPartialOf<W, F>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<W, F>, A>> =
     GENKF.genK(Gen.tuple2(GENW, gen)).map(::WriterT)
 }
