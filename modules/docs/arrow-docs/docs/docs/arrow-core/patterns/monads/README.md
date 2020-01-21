@@ -597,7 +597,6 @@ repository
                 { Logger.logError(it); reservations.cancel() },
                 { reservations.bookFlight(speaker, city) })
             }
-        )
         }
 ```
 
