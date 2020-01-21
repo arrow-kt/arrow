@@ -98,7 +98,6 @@ class CoroutinesIntegrationTest : UnitSpec() {
       }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
 
-
     // --------------- unsafeRunScoped ---------------
 
     "should rethrow exceptions within run block with unsafeRunScoped" {
