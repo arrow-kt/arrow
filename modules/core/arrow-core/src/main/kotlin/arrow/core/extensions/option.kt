@@ -453,6 +453,10 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
   override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
     if (fix().isEmpty()) b
     else this
+
+  override fun <A> Kind<ForOption, A>.lazyOrElse(b: () -> Kind<ForOption, A>): Kind<ForOption, A> =
+    if (fix().isEmpty()) b()
+    else this
 }
 
 @extension

@@ -19,7 +19,6 @@ import com.github.benmanes.gradle.versions.reporter.PlainTextReporter
 buildscript {
     ext {
         // Constants
-        ankKotlinVersion = '1.3.11'
         dokka_version = '0.10.0'
         ktlint_version = "0.34.2"
         ktlint_gradle_version = '8.2.0'
@@ -29,7 +28,6 @@ buildscript {
         javaVersion = JavaVersion.VERSION_1_7
         kotlinPoetVersion = '1.1.0'
         kotlinTestVersion = '3.3.3'
-        kotlinVersion = '1.3.50'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinxCoroutinesVersion = '1.3.2'
         projectReactorVersion = '3.2.6.RELEASE'
@@ -50,9 +48,8 @@ buildscript {
 
     dependencies {
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:2.1.3'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"

@@ -8,6 +8,7 @@ import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.extensions.AndMonoid
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.listk.monoid.monoid

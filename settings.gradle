@@ -82,11 +82,6 @@ include {
             _ 'recursion'
         }
 
-        docs {
-            _ 'docs'
-            _ 'examples'
-        }
-
         optics {
             _ 'optics'
             _ 'optics-mtl'

@@ -168,7 +168,6 @@ interface Async<F> : MonadDefer<F> {
     }
 
   /**
->>>>>>> Fix extension processor suspend fun args (#1555)
    * Delay a suspended effect.
    *
    * ```kotlin:ank:playground:extension
