@@ -11,6 +11,7 @@ $white: rgb(255, 255, 255);
 $link-color: darken(#263238, 10%);
 $link-hover: darken(#263238, 15%);
 $background-color: #F5F7F8;
+$box-text-color: #263238;
 // core
 $core-color: #2D9DFF;
 $core-background: #354755;
@@ -54,6 +55,7 @@ $sidebar-doc-version-button: 200px;
 $height-home-code-block: 400px;
 $width-home-code-block: 580px;
 $github-modal-width: 178px;
+$text-box-icon-size: 27px;
 // Animation
 // -----------------------------------------------
 $short-duration: 150ms;
@@ -86,17 +88,14 @@ $column-12: (12/12*100%);
 $gutter-margin: ($base-point-grid * 4);
 // Border
 // -----------------------------------------------
-
+$border-color: rgba($gray-primary, 0.1);
+$doc-header-border: rgba($brand-secondary, 0.8);
+$sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
 // Code
 // -----------------------------------------------
 $code-border-color: rgba($gray-primary, 0.2);
 $code-padding: 16px;
 $code-margin: 30px;
-
-
-$border-color: rgba($gray-primary, 0.1);
-$doc-header-border: rgba($brand-secondary, 0.8);
-$sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
 // Sidebar Sizes
 // -----------------------------------------------
 $sidebar-width: 325px;
