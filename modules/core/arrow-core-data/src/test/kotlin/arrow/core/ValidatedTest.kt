@@ -200,7 +200,7 @@ class ValidatedTest : UnitSpec() {
     with(VAL_AP) {
 
       "Cartesian builder should build products over homogeneous Validated" {
-        map(
+        mapN(
           Valid("11th"),
           Valid("Doctor"),
           Valid("Who")
@@ -208,7 +208,7 @@ class ValidatedTest : UnitSpec() {
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
-        map(
+        mapN(
           Valid(13),
           Valid("Doctor"),
           Valid(false)
@@ -216,7 +216,7 @@ class ValidatedTest : UnitSpec() {
       }
 
       "Cartesian builder should build products over Invalid Validated" {
-        map(
+        mapN(
           Invalid("fail1"),
           Invalid("fail2"),
           Valid("Who")

@@ -44,6 +44,10 @@ interface Apply<F> : Functor<F> {
    */
   fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> = ap(ff())
 
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b) { (a,b) -> z }")
+  )
   fun <A, B, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -51,6 +55,17 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).map(lbd)
 
+  fun <A, B, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    lbd: (Tuple2<A, B>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c) { (a,b,c) -> z }")
+  )
   fun <A, B, C, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -59,6 +74,18 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).product(c).map(lbd)
 
+  fun <A, B, C, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    lbd: (Tuple3<A, B, C>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d) { (a,b,c,d) -> z }")
+  )
   fun <A, B, C, D, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -68,6 +95,19 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).product(c).product(d).map(lbd)
 
+  fun <A, B, C, D, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    lbd: (Tuple4<A, B, C, D>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e) { (a,b,c,d,e) -> z }")
+  )
   fun <A, B, C, D, E, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -78,6 +118,20 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).product(c).product(d).product(e).map(lbd)
 
+  fun <A, B, C, D, E, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    lbd: (Tuple5<A, B, C, D, E>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e, ff) { (a,b,c,d,e,ff) -> z }")
+  )
   fun <A, B, C, D, E, FF, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -89,6 +143,21 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).product(c).product(d).product(e).product(f).map(lbd)
 
+  fun <A, B, C, D, E, FF, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    f: Kind<F, FF>,
+    lbd: (Tuple6<A, B, C, D, E, FF>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).product(f).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e, ff, g) { (a,b,c,d,e,ff,g) -> z }")
+  )
   fun <A, B, C, D, E, FF, G, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -101,6 +170,22 @@ interface Apply<F> : Functor<F> {
   ): Kind<F, Z> =
     a.product(b).product(c).product(d).product(e).product(f).product(g).map(lbd)
 
+  fun <A, B, C, D, E, FF, G, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    f: Kind<F, FF>,
+    g: Kind<F, G>,
+    lbd: (Tuple7<A, B, C, D, E, FF, G>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).product(f).product(g).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h) { (a,b,c,d,e,ff,g,h) -> z }")
+  )
   fun <A, B, C, D, E, FF, G, H, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -115,6 +200,24 @@ interface Apply<F> : Functor<F> {
     a.product(b).product(c).product(d).product(e).product(f)
       .product(g).product(h).map(lbd)
 
+  fun <A, B, C, D, E, FF, G, H, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    f: Kind<F, FF>,
+    g: Kind<F, G>,
+    h: Kind<F, H>,
+    lbd: (Tuple8<A, B, C, D, E, FF, G, H>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).product(f)
+      .product(g).product(h).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i) { (a,b,c,d,e,ff,g,h,i) -> z }")
+  )
   fun <A, B, C, D, E, FF, G, H, I, Z> map(
     a: Kind<F, A>,
     b: Kind<F, B>,
@@ -130,7 +233,42 @@ interface Apply<F> : Functor<F> {
     a.product(b).product(c).product(d).product(e).product(f)
       .product(g).product(h).product(i).map(lbd)
 
+  fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    f: Kind<F, FF>,
+    g: Kind<F, G>,
+    h: Kind<F, H>,
+    i: Kind<F, I>,
+    lbd: (Tuple9<A, B, C, D, E, FF, G, H, I>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).product(f)
+      .product(g).product(h).product(i).map(lbd)
+
+  @Deprecated(
+    "map is being renamed to mapN",
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, j) { (a,b,c,d,e,ff,g,h,i,j) -> z }")
+  )
   fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
+    a: Kind<F, A>,
+    b: Kind<F, B>,
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    f: Kind<F, FF>,
+    g: Kind<F, G>,
+    h: Kind<F, H>,
+    i: Kind<F, I>,
+    j: Kind<F, J>,
+    lbd: (Tuple10<A, B, C, D, E, FF, G, H, I, J>) -> Z
+  ): Kind<F, Z> =
+    a.product(b).product(c).product(d).product(e).product(f)
+      .product(g).product(h).product(i).product(j).map(lbd)
+
+  fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
     a: Kind<F, A>,
     b: Kind<F, B>,
     c: Kind<F, C>,
@@ -329,7 +467,7 @@ interface Apply<F> : Functor<F> {
    * This is equivalent to *> in Haskell.
    */
   fun <A, B> Kind<F, A>.followedBy(fb: Kind<F, B>): Kind<F, B> =
-    map(this, fb) { (_, right) -> right }
+    mapN(this, fb) { (_, right) -> right }
 
   /**
    * Given two actions, it performs them sequentially.
@@ -338,5 +476,5 @@ interface Apply<F> : Functor<F> {
    * This is equivalent to <* in Haskell.
    */
   fun <A, B> Kind<F, A>.apTap(fb: Kind<F, B>): Kind<F, A> =
-    map(this, fb) { (left, _) -> left }
+    mapN(this, fb) { (left, _) -> left }
 }

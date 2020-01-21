@@ -462,7 +462,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     ): Schedule<F, A, Tuple2<Output, B>> = (other as ScheduleImpl<F, Any?, A, B>).let { other ->
       ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s: Tuple2<State, Any?> ->
         M.run {
-          M.map(
+          M.mapN(
             update(i, s.a),
             other.update(i, s.b)
           ) { it.a.combineWith(it.b, f, g) }
@@ -561,7 +561,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     override infix fun <A, B> tupled(other: Schedule<F, A, B>): Schedule<F, Tuple2<Input, A>, Tuple2<Output, B>> =
       (other as ScheduleImpl<F, Any?, A, B>).let { other ->
         ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s ->
-          M.map(update(i.a, s.a), other.update(i.b, s.b)) { (dec1, dec2) ->
+          M.mapN(update(i.a, s.a), other.update(i.b, s.b)) { (dec1, dec2) ->
             dec1.combineWith(dec2, { a, b -> a && b }, { a, b -> max(a.nanoseconds, b.nanoseconds).nanoseconds })
           }
         }
