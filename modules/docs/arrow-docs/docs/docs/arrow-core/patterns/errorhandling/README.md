@@ -158,74 +158,48 @@ While we could model this problem using `Option`, and forgetting about exception
 For this reason, using `Option` is only a good idea when we know that values may be absent, but we don't really care about the reason why.
 Additionally, `Option` is unable to capture exceptions. So, if an exception was thrown internally, it would still bubble up and result in a runtime exception.
 
-In the next example, we are going to use `Try` to deal with potentially thrown exceptions that are outside the control of the caller.
+In the next example, we are going to use `Either` to deal with potentially thrown exceptions that are outside the control of the caller.
 
-### Try
+### Either.catch
 
-We use [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception.
 
-How would our example look when implemented with `Try`?
+When dealing with a known alternate path, we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
+Either represents the presence of either a `Left` value or a `Right` value. 
+By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
 
-```kotlin:ank
-
-fun arm(): Try<Nuke> =
-  Try { throw RuntimeException("SystemOffline") }
-
-fun aim(): Try<Target> =
-  Try { throw RuntimeException("RotationNeedsOil") }
-
-fun launch(target: Target, nuke: Nuke): Try<Impacted> =
-  Try { throw RuntimeException("MissedByMeters") }
-```
-
-As you can see by the examples below, exceptions are now controlled and caught inside of a `Try`.
+Furthermore, `Either.catch` enables us to catch potentially thrown exceptions that are outside the control of the caller.
+When using `Either.catch`, our previous example might look like:
 
 ```kotlin:ank
-arm()
-```
+import arrow.*
+import arrow.core.*
 
-```kotlin:ank
-aim()
-```
+fun arm(): Either<Throwable, Nuke> = runBlocking { Either.catch { throw IllegalStateException("Unable to arm") } }
+fun aim(): Either<Throwable, Target> = runBlocking { Either.catch { throw IllegalStateException("Unable to aim") } }
+fun launch(target: Target, nuke: Nuke): Either<Throwable, Impacted> = Either.right(Impacted)
 
-Unlike in the `Option` example here, we can fold over the resulting value accessing the runtime exception.
 
-```kotlin:ank
-val result = arm()
-result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
-```
-
-Just like it does for `Option`, Arrow also provides `Monad` instances for `Try`, and we can use it exactly in the same way
-
-```kotlin
-import arrow.typeclasses.*
-import arrow.core.extensions.*
-
-fun attackTry(): Try<Impacted> =
-  fx.monad {
-    val (nuke) = arm()
-    val (target) = aim()
-    val (impact) = launch(target, nuke)
-    impact
+fun attackEither(): Either<Throwable, Impacted> =
+  Either.monad<Throwable>().fx.monad {
+      val nuke = runBlocking { arm() }.bind()
+      val target = runBlocking { aim() }.bind()
+      val impact = launch(target, nuke).bind()
+      impact
   }.fix()
 
-attackTry()
-//Failure(RuntimeException("SystemOffline"))
+attackEither()
+//Left(a=java.lang.IllegalStateException: Unable to arm)
 ```
 
-While `Try` gives us the ability to control both the `Success` and `Failure` cases, there is still nothing in the function signatures that indicate the type of exception.
+However, while `Either.catch` gives us the ability to control both the success and failure cases, there is still nothing in the function signatures that indicate a specific type of exception.
 We are still subject to guessing what the exception is using Kotlin `when` expressions or runtime lookups over the unsealed hierarchy of Throwable.
-
-It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
-`java.lang.Exception`
-
-We should redefine our functions to express that their result is not just a `Nuke`, `Target`, or `Impact`, but those potential values or other exceptional ones.
 
 ### Either
 
-When dealing with a known alternate path, we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
-Either represents the presence of either a `Left` value or a `Right` value.
-By convention, most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
+It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
+`java.lang.Exception`.
+
+We should redefine our functions to express that their result is not just a `Nuke`, `Target`, or `Impact`, but those potential values or other exceptional ones.
 
 We can now assign proper types and values to the exceptional cases.
 
@@ -252,7 +226,7 @@ fun aim(): Either<RotationNeedsOil, Target> = Right(Target)
 fun launch(target: Target, nuke: Nuke): Either<MissedByMeters, Impacted> = Left(MissedByMeters(5))
 ```
 
-Arrow also provides a `Monad` instance for `Either` in the same way it did for `Option` and `Try`.
+Arrow also provides a `Monad` instance for `Either` in the same way it did for `Option`.
 Except for the types signatures, our program remains unchanged when we compute over `Either`.
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
@@ -271,28 +245,22 @@ attackEither()
 //Left(MissedByMeters(5))
 ```
 
-So far, we have seen how we can use `Option`, `Try`, and `Either` to handle exceptions in a purely functional way.
+So far, we have seen how we can use `Option` and `Either` to handle exceptions in a purely functional way.
 
 The question now is, can we further generalize error handling and write this code in a way that is abstract from the actual datatypes that it uses?
 Since Arrow supports typeclasses, emulated higher kinds, and higher order abstractions, we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})
 
 ### MonadError
 
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try`, and `Option`.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either` and `Option`.
 Typeclasses allows us to code focusing on the behaviors, and not the datatypes that implement them.
 
-Arrow provides the following `MonadError` instances for `Option`, `Try`, and `Either`
+Arrow provides the following `MonadError` instances for `Option` and `Either`
 
 ```kotlin:ank
 import arrow.core.extensions.option.monadError.*
 
 Option.monadError()
-```
-
-```kotlin:ank
-import arrow.core.extensions.`try`.monadError.*
-
-Try.monadError()
 ```
 
 ```kotlin:ank

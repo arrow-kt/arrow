@@ -17,9 +17,7 @@ It is parametrized to an error type `E`, which means the datatype has at least a
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
 a sealed class UserNotFoundReason that contains three inheritors, for example.
 
-Some of the datatypes Λrrow provides can have these error types already fixed.
-That's the case with [`Try<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), which has its error type fixed to `Throwable`.
-Other datatypes like [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allow for the user to apply their error type of choice.
+A datatype like [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allows for the user to apply their error type of choice.
 
 ### Main Combinators
 
@@ -35,13 +33,6 @@ import arrow.core.*
 import arrow.core.extensions.either.applicativeError.*
 
 Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
-```
-
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.`try`.applicativeError.*
-
-Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank

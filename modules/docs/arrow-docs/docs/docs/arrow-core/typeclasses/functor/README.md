@@ -22,23 +22,25 @@ refers to `Option`, `List`, or any other type constructor whose contents can be 
 Oftentimes we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
 us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context.
 
-Consider both `Option` and `Try`:
+Consider both `Option` and `Either`:
 
 `Option<A>` allows us to model absence and has two possible states: `Some(a: A)` if the value is not absent, and `None` to represent an empty case.
 
-In a similar fashion, `Try<A>` may have two possible cases: `Success(a: A)` for computations that succeed, and `Failure(e: Throwable)` if they fail with an exception.
+In a similar fashion, `Either<A, B>` may have two possible cases: `Left(a: A)` for computations that succeed, and `Right(b: B)`.
 
-Both `Try` and `Option` are example datatypes that can be computed over transforming their inner results.
+By convention, the `Left` case is used to model the exceptional case.
+
+`Either` is an example datatype that can be computed over transforming its inner results.
 
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
 
-Try { "1".toInt() }.map { it * 2 }
+Either.right(1).map { it * 2 }
 Option(1).map { it * 2 }
 ```
 
-Both `Try` and `Option` include ready-to-use `Functor` instances:
+Both `Either` and `Option` include ready-to-use `Functor` instances:
 
 ```kotlin:ank
 import arrow.core.extensions.option.functor.*
@@ -47,17 +49,17 @@ val optionFunctor = Option.functor()
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.functor.*
+import arrow.core.extensions.either.functor.*
 
-val tryFunctor = Try.functor()
+val eitherFunctor = Either.functor()
 ```
 
-Mapping over the empty/failed cases is always safe since the `map` operation in both Try and Option operate under the bias of those containing success values.
+Mapping over the empty/failed cases is always safe since the `map` operation in both Either and Option operate under the bias of those containing success values.
 
 ```kotlin:ank
 
-Try { "x".toInt() }.map { it * 2 }
-none<Int>().map { it * 2 }
+(None as Option<Int>).map { it * 2 }
+(Either.left(IllegalArgumentException("")) as Either<Throwable, Int>).map { it * 2 }
 ```
 
 ### Main Combinators

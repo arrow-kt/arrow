@@ -41,10 +41,10 @@ eitherResult
 import arrow.core.*
 import arrow.core.extensions.`try`.applicativeError.*
 
-val tryResult: Try<Int> =
+val optionResult: Option<Int> =
   RuntimeException("BOOM!").raiseError()
 
-tryResult
+optionResult
 ```
 
 ```kotlin:ank

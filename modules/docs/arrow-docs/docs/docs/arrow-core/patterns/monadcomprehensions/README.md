@@ -49,7 +49,7 @@ With knowledge of `flatMap`, we can write sequential expressions that are run as
 The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}),
 for which we also have a [tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
-Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
+Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `IO` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 Let's see one example using a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of a university some student attend:
 
 ```kotlin
@@ -74,7 +74,7 @@ This feature is known with multiple names: async/await, coroutines, do notation,
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code into asynchronous sequences.
 Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass.
 
-This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux`, or `IO` all the same.
+This means that comprehensions are available for `Option`, `List`, `Reader`, `Observable`, `Flux`, or `IO` all the same.
 In the following examples, we'll use `IO`, as it's a simple concurrency primitive with straightforward behavior.
 
 Every instance of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.

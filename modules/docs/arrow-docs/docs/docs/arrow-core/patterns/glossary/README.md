@@ -24,7 +24,6 @@ These solutions have a canonical implementation that is generalized for all poss
 
 Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
 branching in code with [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes, where each inheritor is a `data` class.
