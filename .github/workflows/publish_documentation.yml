@@ -17,8 +17,10 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Install arrow-ank-gradle
-      run: ./gradlew :arrow-ank-gradle:publishToMavenLocal
+    - name: Install arrow-ank-gradle and arrow-ank
+      run: |
+        ./gradlew :arrow-ank:publishToMavenLocal
+        ./gradlew :arrow-ank-gradle:publishToMavenLocal
     - name: Add arrow-docs module
       run: sed -i "s/modules {/modules {\\ndocs {\\n_ 'docs'\\n_ 'examples'\\n}/g" settings.gradle
     - name: Dokka

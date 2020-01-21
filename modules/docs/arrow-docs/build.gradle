@@ -12,12 +12,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-//    compile('io.arrow-kt:ank-core:0.7.1') {
-//        exclude group: 'io.arrow-kt', module: 'arrow-core'
-//        exclude group: 'io.arrow-kt', module: 'arrow-extensions-core'
-//        exclude group: 'io.arrow-kt', module: 'arrow-free'
-//    }
-    compile project(':arrow-ank')
     compile project(':arrow-core-data')
     compile project(':arrow-test')
     compile project(':arrow-fx')
@@ -39,7 +33,7 @@ dependencies {
     kaptTest project(':arrow-meta')
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinxCoroutinesVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     testCompile("junit:junit:$jUnitVersion")
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
@@ -70,6 +64,10 @@ gitPublish {
     }
 
     commitMessage = 'update site'
+}
+
+repositories {
+    mavenLocal()
 }
 
 sourceCompatibility = javaVersion
