@@ -95,7 +95,7 @@ public class Throwable {
     * This method records within this Throwable object information
     * about the current state of the stack frames for the current thread.
     */
-    Throwable fillInStackTrace()
+    Throwable fillInStackTrace();
 }
 ```
 
