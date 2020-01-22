@@ -22,6 +22,7 @@ import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
+import arrow.core.extensions.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
@@ -61,7 +62,7 @@ class ListKTest : UnitSpec() {
         ListK.genK(),
         ListK.eqK()
       ),
-      ShowLaws.laws(ListK.show(), EQ, Gen.listK(Gen.int())),
+      ShowLaws.laws(ListK.show(Int.show()), EQ, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), ListK.genK(), ListK.eqK()),
       MonoidalLaws.laws(ListK.monoidal(),

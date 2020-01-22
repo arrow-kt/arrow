@@ -51,7 +51,7 @@ interface IOParMap3 {
     }
 
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
-      result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
+      result.fold({ Unit }, { (a, b, c) -> Option.applicative().mapN(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
     fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.

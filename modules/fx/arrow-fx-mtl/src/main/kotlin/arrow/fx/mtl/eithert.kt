@@ -151,15 +151,15 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
       raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Either<L, A>, Either<L, B>, Either<L, C>> ->
         when (res) {
           is RaceTriple.First -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberB.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.First(winner.b, fiberT(res.fiberB), fiberT(res.fiberC))))
           }
           is RaceTriple.Second -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberA.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.Second(fiberT(res.fiberA), winner.b, fiberT(res.fiberC))))
           }
           is RaceTriple.Third -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberB.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberA.cancel(), res.fiberB.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), winner.b)))
           }
         }

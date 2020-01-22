@@ -9,6 +9,7 @@ import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
+import arrow.fx.internal.Platform.onceOnly
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Disposable
@@ -38,7 +39,9 @@ fun <A> MonoKOf<A>.value(): Mono<A> =
 data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
 
   suspend fun suspended(): A? = suspendCoroutine { cont ->
-    value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
+    onceOnly(cont::resume).let { cb ->
+      value().subscribe({ cb(it) }, cont::resumeWithException) { cb(null) }
+    }
   }
 
   fun <B> map(f: (A) -> B): MonoK<B> =
@@ -209,13 +212,13 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      */
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): MonoK<A> =
       Mono.create<A> { sink ->
-          fa { either: Either<Throwable, A> ->
-            either.fold({
-              sink.error(it)
-            }, {
-              sink.success(it)
-            })
-          }
+        fa { either: Either<Throwable, A> ->
+          either.fold({
+            sink.error(it)
+          }, {
+            sink.success(it)
+          })
+        }
       }.k()
 
     @Deprecated(message =
