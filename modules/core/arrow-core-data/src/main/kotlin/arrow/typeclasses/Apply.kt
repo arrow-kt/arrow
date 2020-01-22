@@ -130,7 +130,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, lbd)")
+    ReplaceWith("mapN(a, b, c, d, e, f, lbd)")
   )
   fun <A, B, C, D, E, FF, Z> map(
     a: Kind<F, A>,
@@ -156,7 +156,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, lbd)")
+    ReplaceWith("mapN(a, b, c, d, e, f, g, lbd)")
   )
   fun <A, B, C, D, E, FF, G, Z> map(
     a: Kind<F, A>,
@@ -184,7 +184,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, lbd)")
+    ReplaceWith("mapN(a, b, c, d, e, f, g, h, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, Z> map(
     a: Kind<F, A>,
@@ -216,7 +216,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, lbd)")
+    ReplaceWith("mapN(a, b, c, d, e, f, g, h, i, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, I, Z> map(
     a: Kind<F, A>,
@@ -250,7 +250,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, j, lbd)")
+    ReplaceWith("mapN(a, b, c, d, e, f, g, h, i, j, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
     a: Kind<F, A>,
