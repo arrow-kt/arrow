@@ -127,7 +127,7 @@ interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
     fix().let {
       AP.run {
         it.fold({ f(it).map { Ior.Left(it) } }, { g(it).map { Ior.Right(it) } },
-          { a, b -> map(f(a), g(b)) { Ior.Both(it.a, it.b) } })
+          { a, b -> mapN(f(a), g(b)) { Ior.Both(it.a, it.b) } })
       }
     }
 }
