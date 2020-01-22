@@ -1,6 +1,8 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -21,7 +23,7 @@ open class Uncancellable {
   @Param("100")
   var size: Int = 0
 
-  fun ioUncancelableLoop(i: Int): IO<Int> =
+  fun ioUncancelableLoop(i: Int): IO<Nothing, Int> =
     if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
     else IO.just(i)
 

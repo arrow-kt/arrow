@@ -20,7 +20,7 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }

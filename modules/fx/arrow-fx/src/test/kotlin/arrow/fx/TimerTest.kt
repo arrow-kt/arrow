@@ -7,6 +7,6 @@ import arrow.test.laws.TimerLaws
 
 class TimerTest : UnitSpec() {
   init {
-    testLaws(TimerLaws.laws(IO.async(), Timer.invoke(IO.concurrent()), EQ()))
+    testLaws(TimerLaws.laws(IO.async<Nothing>(), Timer.invoke(IO.concurrent()), EQ()))
   }
 }

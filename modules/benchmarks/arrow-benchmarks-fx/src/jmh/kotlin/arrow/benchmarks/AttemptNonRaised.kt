@@ -1,6 +1,9 @@
 package arrow.benchmarks
 
+import arrow.core.extensions.either.foldable.fold
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -21,10 +24,10 @@ open class AttemptNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioLoopHappy(size: Int, i: Int): IO<Int> =
+  private fun ioLoopHappy(size: Int, i: Int): IO<Nothing, Int> =
     if (i < size) {
       IO { i + 1 }.attempt().flatMap {
-        it.fold(IO.Companion::raiseError) { n -> ioLoopHappy(size, n) }
+        it.fold(IO.Companion::raiseException) { n -> ioLoopHappy(size, n) }
       }
     } else IO.just(1)
 

@@ -28,10 +28,9 @@ import arrow.typeclasses.ApplicativeError
  * ported from [Scala ZIO Queue](https://zio.dev/docs/datatypes/datatypes_queue)
  * implementation
  */
-class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A>, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
-  Concurrent<F> by CF {
+class Queue<F, A> private constructor(private val capacity: Int, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) : Concurrent<F> by CF {
 
-  fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
+  fun size(): Kind<F, Int> = ref.get().flatMap(State<F, A>::size)
 
   fun offer(a: A): Kind<F, Unit> {
     val use: (Promise<F, Unit>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
@@ -121,8 +120,7 @@ class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A
       ifSurplus = { surplus ->
         if (surplus.putters.isEmpty()) State.Shutdown(CF) toT surplus.shutdownHook
         else {
-          val forked = surplus.putters.toList()
-            .parTraverse { (_, p) -> p.error(QueueShutdown) }
+          val forked = surplus.putters.toList().parTraverse { (_, p) -> p.error(QueueShutdown) }
           State.Shutdown(CF) toT (forked.followedBy(surplus.shutdownHook))
         }
       },

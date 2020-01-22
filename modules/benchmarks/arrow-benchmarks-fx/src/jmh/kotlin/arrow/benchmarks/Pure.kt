@@ -1,6 +1,8 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -21,7 +23,7 @@ open class Pure {
   @Param("3000")
   var size: Int = 0
 
-  private fun ioPureLoop(i: Int): IO<Int> =
+  private fun ioPureLoop(i: Int): IO<Nothing, Int> =
     IO.just(i).flatMap { j ->
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }

@@ -23,7 +23,7 @@ import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val promise: IO<Promise<ForIO, Int>> =
+val promise: IO<Nothing, Promise<ForIO, Int>> =
   Promise.uncancelable<ForIO, Int>(IO.async()).fix()
 //sampleEnd
 println(promise)

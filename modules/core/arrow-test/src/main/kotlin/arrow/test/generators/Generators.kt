@@ -132,8 +132,8 @@ fun <E, A> Gen.Companion.validated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E,
 fun <A> Gen.Companion.`try`(genA: Gen<A>, genThrowable: Gen<Throwable> = throwable()): Gen<Try<A>> =
   Gen.either(genThrowable, genA).map { it.fold({ Failure(it) }, { Success(it) }) }
 
-fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
-  gen.flatMap { head -> Gen.list(gen).map { NonEmptyList(head, it) } }
+fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>, maxSize: Int = 100): Gen<NonEmptyList<A>> =
+  gen.flatMap { head -> list(gen).map { NonEmptyList(head, it.take(maxSize - 1)) } }
 
 fun <K : Comparable<K>, V> Gen.Companion.sortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
   Gen.bind(genK, genV) { k: K, v: V -> sortedMapOf(k to v) }.map { it.k() }

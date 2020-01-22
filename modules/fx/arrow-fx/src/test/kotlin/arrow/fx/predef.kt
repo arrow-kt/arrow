@@ -1,8 +1,10 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.option.eq.eq
+import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
 import arrow.typeclasses.Eq
@@ -13,9 +15,15 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-fun <A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
-  arrow.core.Option.eq(arrow.core.Either.eq(Eq.any(), EQA)).run {
-    a.fix().attempt().unsafeRunTimed(timeout).eqv(b.fix().attempt().unsafeRunTimed(timeout))
+fun <E, A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<IOPartialOf<E>, A>> = Eq { a, b ->
+  arrow.core.Option.eq(Either.eq(Eq.any(), Either.eq(Eq.any(), EQA))).run {
+    a.attempt().unsafeRunTimed(timeout).eqv(b.attempt().unsafeRunTimed(timeout))
+  }
+}
+
+fun <A> IO_EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<IOPartialOf<Nothing>, A>> = Eq { a, b ->
+  arrow.core.Option.eq(Either.eq(Eq.any(), Either.eq(Eq.any(), EQA))).run {
+    a.attempt().unsafeRunTimed(timeout).eqv(b.attempt().unsafeRunTimed(timeout))
   }
 }
 
