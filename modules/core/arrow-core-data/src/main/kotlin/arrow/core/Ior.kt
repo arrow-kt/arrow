@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 
@@ -300,19 +301,31 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = true
     override val isBoth: Boolean get() = false
+
+    override fun toString(): String = show(Show.any(), Show.any())
   }
 
   data class Right<out B>(val value: B) : Ior<Nothing, B>() {
     override val isRight: Boolean get() = true
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = false
+
+    override fun toString(): String = show(Show.any(), Show.any())
   }
 
   data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
     override val isRight: Boolean get() = false
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = true
+
+    override fun toString(): String = show(Show.any(), Show.any())
   }
+
+  fun show(SL: Show<A>, SR: Show<B>): String = fold({
+    "Left(${SL.run { it.show() }})"
+  }, {
+    "Right(${SR.run { it.show() }})"
+  }, { a, b -> "Both(${SL.run { a.show() }}, ${SR.run { b.show() }})" })
 }
 
 /**

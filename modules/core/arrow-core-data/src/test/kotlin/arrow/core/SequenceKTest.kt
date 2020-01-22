@@ -19,9 +19,11 @@ import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
 import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
+import arrow.core.extensions.sequencek.show.show
 import arrow.core.extensions.sequencek.traverse.traverse
 import arrow.core.extensions.sequencek.unalign.unalign
 import arrow.core.extensions.sequencek.unzip.unzip
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.sequenceK
@@ -38,7 +40,6 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.UnalignLaws
 import arrow.test.laws.UnzipLaws
-import arrow.typeclasses.Show
 import io.kotlintest.matchers.sequences.shouldBeEmpty
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -49,11 +50,6 @@ class SequenceKTest : UnitSpec() {
 
   init {
     val EQ = SequenceK.eq(Int.eq())
-
-    val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
-      override fun Kind<ForSequenceK, Int>.show(): String =
-        fix().toList().toString()
-    }
 
     testLaws(
       MonadCombineLaws.laws(
@@ -66,7 +62,7 @@ class SequenceKTest : UnitSpec() {
       ),
 
       MonadCombineLaws.laws(SequenceK.monadCombine(), SequenceK.genK(), SequenceK.eqK()),
-      ShowLaws.laws(show, EQ, Gen.sequenceK(Gen.int())),
+      ShowLaws.laws(SequenceK.show(Int.show()), EQ, Gen.sequenceK(Gen.int())),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.genK(), SequenceK.eqK()),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), EQ),
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection),

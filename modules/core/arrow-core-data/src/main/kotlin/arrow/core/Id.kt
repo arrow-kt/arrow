@@ -2,6 +2,7 @@ package arrow.core
 
 import arrow.core.Id.Companion.just
 import arrow.higherkind
+import arrow.typeclasses.Show
 
 fun <A> IdOf<A>.value(): A = this.fix().extract()
 
@@ -73,13 +74,9 @@ data class Id<out A>(private val value: A) : IdOf<A> {
     fun <A> just(a: A): Id<A> = Id(a)
   }
 
-  override fun equals(other: Any?): Boolean =
-    when (other) {
-      is Id<*> -> other.value == value
-      else -> other == value
-    }
+  fun show(SA: Show<A>): String = "Id(${SA.run { value.show() }})"
 
-  override fun hashCode(): Int = value.hashCode()
+  override fun toString(): String = show(Show.any())
 }
 
 fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =
