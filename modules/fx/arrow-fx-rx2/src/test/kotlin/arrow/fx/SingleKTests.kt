@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
@@ -15,6 +16,7 @@ import arrow.fx.rx2.extensions.singlek.monad.monad
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
@@ -168,6 +170,26 @@ class SingleKTests : RxJavaSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "SingleK should suspend" {
+      fun getSingle(): Single<Int> = Single.just(1)
+
+      SingleK.fx {
+        val s = effect { getSingle().k().suspended() }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error SingleK should suspend" {
+      val error = IllegalArgumentException()
+
+      SingleK.fx {
+        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
     }
   }
 }
