@@ -35,11 +35,6 @@ class ObservableKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      /*
-      TODO: Traverse/Foldable instances are not lawful
-       https://github.com/arrow-kt/arrow/issues/1882
-            TraverseLaws.laws(ObservableK.traverse(), ObservableK.genk(), ObservableK.eqK()),
-       */
       ConcurrentLaws.laws(
         ObservableK.concurrent(),
         ObservableK.functor(),

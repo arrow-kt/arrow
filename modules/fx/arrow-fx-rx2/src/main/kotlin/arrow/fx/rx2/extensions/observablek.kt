@@ -102,21 +102,6 @@ interface ObservableKFoldable : Foldable<ForObservableK> {
 }
 
 @extension
-interface ObservableKTraverse : Traverse<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
-
-  override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
-    fix().traverse(AP, f)
-
-  override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
-    fix().foldLeft(b, f)
-
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().foldRight(lb, f)
-}
-
-@extension
 interface ObservableKApplicativeError :
   ApplicativeError<ForObservableK, Throwable>,
   ObservableKApplicative {
@@ -293,7 +278,7 @@ fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
-    ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    ObservableK(Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 
