@@ -46,7 +46,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b) { (a,b) -> z }")
+    ReplaceWith("mapN(a, b, lbd)")
   )
   fun <A, B, Z> map(
     a: Kind<F, A>,
@@ -64,7 +64,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c) { (a,b,c) -> z }")
+    ReplaceWith("mapN(a, b, c, lbd)")
   )
   fun <A, B, C, Z> map(
     a: Kind<F, A>,
@@ -84,7 +84,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d) { (a,b,c,d) -> z }")
+    ReplaceWith("mapN(a, b, c, d, lbd)")
   )
   fun <A, B, C, D, Z> map(
     a: Kind<F, A>,
@@ -106,7 +106,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e) { (a,b,c,d,e) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, lbd)")
   )
   fun <A, B, C, D, E, Z> map(
     a: Kind<F, A>,
@@ -130,7 +130,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff) { (a,b,c,d,e,ff) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, ff, lbd)")
   )
   fun <A, B, C, D, E, FF, Z> map(
     a: Kind<F, A>,
@@ -156,7 +156,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g) { (a,b,c,d,e,ff,g) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, lbd)")
   )
   fun <A, B, C, D, E, FF, G, Z> map(
     a: Kind<F, A>,
@@ -184,7 +184,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h) { (a,b,c,d,e,ff,g,h) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, Z> map(
     a: Kind<F, A>,
@@ -216,7 +216,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i) { (a,b,c,d,e,ff,g,h,i) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, I, Z> map(
     a: Kind<F, A>,
@@ -250,7 +250,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "map is being renamed to mapN",
-    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, j) { (a,b,c,d,e,ff,g,h,i,j) -> z }")
+    ReplaceWith("mapN(a, b, c, d, e, ff, g, h, i, j, lbd)")
   )
   fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
     a: Kind<F, A>,
@@ -405,7 +405,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c)")
+    ReplaceWith("tupledN(a, b, c, d)")
   )
   fun <A, B, C, D> tupled(
     a: Kind<F, A>,
@@ -425,7 +425,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d)")
+    ReplaceWith("tupledN(a, b, c, d, e)")
   )
   fun <A, B, C, D, E> tupled(
     a: Kind<F, A>,
@@ -447,7 +447,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d, e, ff)")
+    ReplaceWith("tupledN(a, b, c, d, e, f)")
   )
   fun <A, B, C, D, E, FF> tupled(
     a: Kind<F, A>,
@@ -471,7 +471,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d, e, ff, g)")
+    ReplaceWith("tupledN(a, b, c, d, e, f, g)")
   )
   fun <A, B, C, D, E, FF, G> tupled(
     a: Kind<F, A>,
@@ -497,7 +497,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d, e, ff, g, h)")
+    ReplaceWith("tupledN(a, b, c, d, e, f, g, h)")
   )
   fun <A, B, C, D, E, FF, G, H> tupled(
     a: Kind<F, A>,
@@ -525,7 +525,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d, e, ff, g, h, i)")
+    ReplaceWith("tupledN(a, b, c, d, e, f, g, h, i)")
   )
   fun <A, B, C, D, E, FF, G, H, I> tupled(
     a: Kind<F, A>,
@@ -555,7 +555,7 @@ interface Apply<F> : Functor<F> {
 
   @Deprecated(
     "tupled is being renamed to tupledN",
-    ReplaceWith("tupledN(a, b, c, d, e, ff, g, h, i, j)")
+    ReplaceWith("tupledN(a, b, c, d, e, f, g, h, i, j)")
   )
   fun <A, B, C, D, E, FF, G, H, I, J> tupled(
     a: Kind<F, A>,
