@@ -41,7 +41,6 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
@@ -288,9 +287,8 @@ interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKF
 }
 
 // TODO Could be revisited in the future. Right now it fails to pass the laws due to the notion of errors.
-//@extension
-//interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
-//  override fun <A> empty(): ObservableK<A> =
-//    Observable.empty<A>().k()
-//}
-
+// @extension
+// interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
+//   override fun <A> empty(): ObservableK<A> =
+//     Observable.empty<A>().k()
+// }
