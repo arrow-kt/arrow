@@ -11,6 +11,9 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `raceTriple` on IO's companion directly. */
 interface IORaceTriple {
 
+  fun <E, A, B, C> raceTriple(ioA: IOOf<E, A>, ioB: IOOf<E, B>, ioC: IOOf<E, C>): IO<E, RaceTriple<IOPartialOf<E>, A, B, C>> =
+    IO.raceTriple(IODispatchers.CommonPool, ioA, ioB, ioC)
+
   /**
    * Race three tasks concurrently within a new [IO].
    * Race results in a winner and the others, yet to finish task running in a [Fiber].
@@ -46,7 +49,7 @@ interface IORaceTriple {
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
   fun <E, A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>, ioC: IOOf<E, C>): IO<E, RaceTriple<IOPartialOf<E>, A, B, C>> =
-    IO.Async { conn, cb ->
+    IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
       val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }

@@ -313,7 +313,27 @@ fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<IOPa
   }
 
 @extension
-interface IODispatchers<E> : Dispatchers<IOPartialOf<E>> {
+interface IOUnsafeRun : UnsafeRun<ForIO> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+}
+
+@extension
+interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+
+  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
+}
+
+@extension
+interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
 

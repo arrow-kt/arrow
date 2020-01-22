@@ -254,9 +254,10 @@ interface StateTMonadState<F, S> : MonadState<StateTPartialOf<F, S>, S>, StateTM
 }
 
 @extension
-interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateTMonad<F, S>, StateTMonoidK<F, S> {
+interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateTMonad<F, S>, StateTAlternative<F, S> {
 
   fun MC(): MonadCombine<F>
+  override fun AF(): Alternative<F> = MC()
 
   override fun MF(): Monad<F> = MC()
 
@@ -267,15 +268,6 @@ interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateT
 
   fun <A> liftT(ma: Kind<F, A>): StateT<F, S, A> = FF().run {
     StateT(just({ s: S -> ma.map { a: A -> s toT a } }))
-  }
-
-  override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
-    fix().combineK(MF(), MO(), y)
-
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.orElse(b: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> {
-    val x = this.fix()
-    val y = b.fix()
-    return MC().run { StateT(just({ s: S -> x.run(this, s).orElse(y.run(this, s)) })) }
   }
 }
 
@@ -291,6 +283,13 @@ interface StateTAlternative<F, S> : Alternative<StateTPartialOf<F, S>>, StateTMo
     StateT(AF()) { s ->
       AF().run {
         runM(MF(), s).orElse(b.runM(MF(), s))
+      }
+    }
+
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.lazyOrElse(b: () -> Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> =
+    StateT(AF()) { s ->
+      AF().run {
+        runM(MF(), s).lazyOrElse { b().runM(MF(), s) }
       }
     }
 

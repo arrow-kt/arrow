@@ -1,14 +1,17 @@
+buildscript {
+  repositories {
+    mavenLocal()
+  }
+  dependencies {
+    classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
+  }
+}
+
 apply plugin: 'ank-gradle-plugin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-//    compile('io.arrow-kt:ank-core:0.7.1') {
-//        exclude group: 'io.arrow-kt', module: 'arrow-core'
-//        exclude group: 'io.arrow-kt', module: 'arrow-extensions-core'
-//        exclude group: 'io.arrow-kt', module: 'arrow-free'
-//    }
-    compile project(':arrow-ank')
     compile project(':arrow-core-data')
     compile project(':arrow-test')
     compile project(':arrow-fx')
@@ -28,16 +31,16 @@ dependencies {
     compile project(":arrow-reflect")
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinxCoroutinesVersion"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    testCompile("junit:junit:$jUnitVersion")
-    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    compile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    compile "io.projectreactor:reactor-core:$projectReactorVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$KOTLINX_COROUTINES_VERSION"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$KOTLINX_COLLECTIONS_IMMUTABLE_VERSION"
+    testCompile("junit:junit:$JUNIT_VERSION")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    compile "io.reactivex.rxjava2:rxjava:$RX_JAVA_VERSION"
+    compile "io.projectreactor:reactor-core:$PROJECT_REACTOR_VERSION"
 }
 
 task printcp {
@@ -63,8 +66,12 @@ gitPublish {
     commitMessage = 'update site'
 }
 
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+repositories {
+    mavenLocal()
+}
+
+sourceCompatibility = JAVA_VERSION
+targetCompatibility = JAVA_VERSION
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 

@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
@@ -14,6 +15,7 @@ import arrow.fx.rx2.extensions.maybek.monad.monad
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
@@ -180,6 +182,32 @@ class MaybeKTests : RxJavaSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "MaybeK should suspend" {
+      MaybeK.fx {
+        val s = effect { Maybe.just(1).k().suspended() }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error MaybeK should suspend" {
+      val error = IllegalArgumentException()
+
+      MaybeK.fx {
+        val s = effect { Maybe.error<Int>(error).k().suspended() }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
+    }
+
+    "Empty MaybeK should suspend" {
+      MaybeK.fx {
+        val s = effect { Maybe.empty<Int>().k().suspended() }.bind()
+
+        s shouldBe null
+      }.unsafeRunSync()
     }
   }
 }

@@ -172,7 +172,7 @@ We will list them by their hierarchy.
 
 - [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 
-- [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
+- [`Traverse`]({{ '/docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
 
 #### Effects
 

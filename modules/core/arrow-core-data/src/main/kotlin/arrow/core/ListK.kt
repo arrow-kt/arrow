@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Show
 
 /**
  *
@@ -50,7 +51,7 @@ import arrow.typeclasses.Applicative
  * }
  * ```
  *
- * The functions `traverse` and `sequence` come from [Traverse](/docs/arrow/typeclasses/traverse/).
+ * The functions `traverse` and `sequence` come from [Traverse](/docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/).
  *
  * Traversing a list creates a new container [Kind<F, A>](/docs/patterns/glossary/#type-constructors) by combining the result of a function applied to each element:
  *
@@ -228,6 +229,11 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     this.rpadZipWith(other) { a, b ->
       a toT b
     }
+
+  fun show(SA: Show<A>): String = "[" +
+    list.joinToString(", ") { SA.run { it.show() } } + "]"
+
+  override fun toString(): String = show(Show.any())
 
   companion object {
 

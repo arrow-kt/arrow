@@ -1,6 +1,7 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForValidated
@@ -21,6 +22,7 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -146,9 +148,20 @@ interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
 }
 
 @extension
+interface ValidatedEqK2 : EqK2<ForValidated> {
+  override fun <A, B> Kind2<ForValidated, A, B>.eqK(other: Kind2<ForValidated, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let {
+      Validated.eq(EQA, EQB).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+@extension
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
-  override fun Validated<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Validated<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension

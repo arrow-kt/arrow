@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.extensions.function1.applicative.applicative
 import arrow.core.extensions.function1.category.category
 import arrow.core.extensions.function1.divisible.divisible
@@ -13,6 +14,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
+import arrow.test.generators.GenK2
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadLaws
@@ -21,6 +23,7 @@ import arrow.test.laws.ProfunctorLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
@@ -38,11 +41,20 @@ class Function1Test : UnitSpec() {
     a(1) == b(1)
   }
 
-  fun <A> EQK(a: A) = object : EqK<Function1PartialOf<A>> {
+  fun <A> eqK(a: A) = object : EqK<Function1PartialOf<A>> {
     override fun <B> Kind<Function1PartialOf<A>, B>.eqK(other: Kind<Function1PartialOf<A>, B>, EQ: Eq<B>): Boolean =
       (this.fix() to other.fix()).let { (ls, rs) ->
         EQ.run {
           ls(a).eqv(rs(a))
+        }
+      }
+  }
+
+  fun eqK2() = object : EqK2<ForFunction1> {
+    override fun <A, B> Kind2<ForFunction1, A, B>.eqK(other: Kind2<ForFunction1, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+      (this.fix() to other.fix()).let { (ls, rs) ->
+        EQB.run {
+          ls(1).eqv(rs(1))
         }
       }
   }
@@ -54,8 +66,14 @@ class Function1Test : UnitSpec() {
       } as Gen<Kind<Conested<ForFunction1, Int>, A>>
   }
 
-  fun <A> genk() = object : GenK<Function1PartialOf<A>> {
+  fun <A> genK() = object : GenK<Function1PartialOf<A>> {
     override fun <B> genK(gen: Gen<B>): Gen<Kind<Function1PartialOf<A>, B>> = gen.map {
+      Function1.just<A, B>(it)
+    }
+  }
+
+  fun genK2() = object : GenK2<ForFunction1> {
+    override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<ForFunction1, A, B>> = genB.map {
       Function1.just<A, B>(it)
     }
   }
@@ -64,9 +82,9 @@ class Function1Test : UnitSpec() {
     testLaws(
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
       DivisibleLaws.laws(Function1.divisible(Int.monoid()), conestedGENK(), conestedEQK),
-      ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
-      MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), genk(), EQK(5150)),
-      CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
+      ProfunctorLaws.laws(Function1.profunctor(), genK2(), eqK2()),
+      MonadLaws.laws(Function1.monad(), Function1.functor(), Function1.applicative(), Function1.monad(), genK(), eqK(5150)),
+      CategoryLaws.laws(Function1.category(), genK2(), eqK2())
     )
 
     "Semigroup of Function1<A> is Function1<Semigroup<A>>" {

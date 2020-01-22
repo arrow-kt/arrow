@@ -185,12 +185,14 @@ This exception goes uncaught and finalizes the program with a crash. Knowing thi
 
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
 For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
+It allows us to raise and recover from errors.
+
+The typeclass [`Async`]({{ '/docs/apidocs/arrow-fx/arrow.fx.typeclasses/-async/index.html' | relative_url }}) allows us to wrap effectful operations, and it inherits all the operators from [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> =
-  IO.fx {
-    val (file) = getFile(path)
+fun <F> Async<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
+  fx.async {
+    val (file) = effect { getFile(path) }
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
@@ -241,4 +243,4 @@ Remember, this means that you have to precompute thread local values, like a thr
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-Check out the section on the Applicative Builder pattern for information about this.
+Check out the section on the [Applicative Builder]({{ '/docs/typeclasses/applicative' | relative_url }}) pattern for information about this.

@@ -91,7 +91,7 @@ class CofreeTest : UnitSpec() {
 
     "run with an stack-unsafe monad should blow up the stack" {
       try {
-        val limit = 10000
+        val limit = 20_000
         val counter = SideEffect()
         val startThousands: Cofree<ForOption, Int> = unfold(Option.functor(), counter.counter) {
           counter.increment()

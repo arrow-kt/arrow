@@ -12,13 +12,17 @@
         </button>
         <ul>
           {% for item in site.data.menu.nav%}
+          {% if item.title != 'Github' %}
           <li class="nav-menu-item">
-            <a href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+            <a class="menu-links" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
           </li>
+          {% endif %}
           {% endfor %}
+          <div class="nav-stars">
+            <a class="github-button" href="https://github.com/arrow-kt/arrow" data-color-scheme="no-preference: light; light: light; dark: light;" data-size="large" data-show-count="true" aria-label="Star arrow-kt/arrow on GitHub">Arrow Org</a>
+          </div>
         </ul>
       </div>
-
       <button class="button nav-icon-open" title="Open" onClick="toggleClass('.nav-menu', 'open');">
         <img id="nav-icon-open" src="{{ 'img/home/nav-icon-open-white.svg' | relative_url }}" alt="Open">
       </button>

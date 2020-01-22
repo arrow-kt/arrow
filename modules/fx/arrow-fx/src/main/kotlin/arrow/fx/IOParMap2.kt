@@ -12,7 +12,10 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IOParMap2 {
 
-  fun <E, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<E, A>, fb: IOOf<E, B>, f: (A, B) -> C): IO<E, C> = IO.Async { conn, cb ->
+  fun <E, A, B, C> parMapN(fa: IOOf<E, A>, fb: IOOf<E, B>, f: (A, B) -> C): IO<E, C> =
+    IO.parMapN(IODispatchers.CommonPool, fa, fb, f)
+
+  fun <E, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<E, A>, fb: IOOf<E, B>, f: (A, B) -> C): IO<E, C> = IO.Async(true) { conn, cb ->
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicRefW<Any?>(null)
 

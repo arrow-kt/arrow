@@ -16,13 +16,16 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 3-arity on IO's companion directly. */
 interface IOParMap3 {
 
+  fun <E, A, B, C, D> parMapN(fa: IOOf<E, A>, fb: IOOf<E, B>, fc: IOOf<E, C>, f: (A, B, C) -> D): IO<E, D> =
+    IO.parMapN(IODispatchers.CommonPool, fa, fb, fc, f)
+
   fun <E, A, B, C, D> parMapN(
     ctx: CoroutineContext,
     fa: IOOf<E, A>,
     fb: IOOf<E, B>,
     fc: IOOf<E, C>,
     f: (A, B, C) -> D
-  ): IO<E, D> = IO.Async { conn, cb ->
+  ): IO<E, D> = IO.Async(true) { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
     val active = AtomicBooleanW(true)

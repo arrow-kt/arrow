@@ -22,6 +22,7 @@ import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.id.unzip.unzip
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.id
@@ -44,7 +45,7 @@ class IdTest : UnitSpec() {
   init {
     testLaws(
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
-      ShowLaws.laws(Id.show(), Eq.any(), Gen.id(Gen.int())),
+      ShowLaws.laws(Id.show(Int.show()), Eq.any(), Gen.id(Gen.int())),
       TraverseLaws.laws(Id.traverse(), Id.genK(), Id.eqK()),
       BimonadLaws.laws(
         Id.bimonad(),

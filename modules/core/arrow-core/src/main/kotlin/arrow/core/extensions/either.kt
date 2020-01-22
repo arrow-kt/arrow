@@ -28,6 +28,7 @@ import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
@@ -223,9 +224,20 @@ interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
 }
 
 @extension
+interface EitherEqK2 : EqK2<ForEither> {
+  override fun <A, B> Kind2<ForEither, A, B>.eqK(other: Kind2<ForEither, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
+    (this.fix() to other.fix()).let {
+      Either.eq(EQA, EQB).run {
+        it.first.eqv(it.second)
+      }
+    }
+}
+
+@extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
-  override fun Either<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Either<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension

@@ -130,6 +130,9 @@ options:
       - title: EqK
         url: /docs/arrow/typeclasses/eqk/
 
+      - title: EqK2
+        url: /docs/arrow/typeclasses/eqk2/
+
       - title: Hash
         url: /docs/arrow/typeclasses/hash/
 
@@ -161,7 +164,7 @@ options:
         url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-bitraverse/
 
       - title: Traverse
-        url: /docs/arrow/typeclasses/traverse/
+        url: /docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/
 
       - title: Reducible
         url: /docs/arrow/typeclasses/reducible/

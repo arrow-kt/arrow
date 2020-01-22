@@ -156,8 +156,8 @@ interface OptionEq<A> : Eq<Option<A>> {
 
 @extension
 interface OptionShow<A> : Show<Option<A>> {
-  override fun Option<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun Option<A>.show(): String = show(SA())
 }
 
 @extension
@@ -452,6 +452,10 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
   override fun <A> empty(): Kind<ForOption, A> = None
   override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
     if (fix().isEmpty()) b
+    else this
+
+  override fun <A> Kind<ForOption, A>.lazyOrElse(b: () -> Kind<ForOption, A>): Kind<ForOption, A> =
+    if (fix().isEmpty()) b()
     else this
 }
 

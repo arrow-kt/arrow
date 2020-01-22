@@ -16,11 +16,15 @@ import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.io.monad.monad
 import arrow.fx.typeclasses.milliseconds
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
 import arrow.test.generators.tuple2
 import arrow.test.generators.tuple3
+import io.kotlintest.fail
+import io.kotlintest.matchers.types.shouldBeInstanceOf
 import arrow.test.laws.equalUnderTheLaw
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
@@ -183,7 +187,7 @@ class QueueTest : UnitSpec() {
         }
       }
 
-      "$label - joining a forked, incompleted take call on a shutdown queue creates a  QueueShutdown error" {
+      "$label - joining a forked, incomplete take call on a shutdown queue creates a QueueShutdown error" {
         fx.concurrent {
           val res = !fx.concurrent {
             val q = !queue(10)
@@ -245,11 +249,169 @@ class QueueTest : UnitSpec() {
       }
     }
 
+    fun boundedStrategyTests(
+      ctx: CoroutineContext = IO.dispatchers().default(),
+      queue: (Int) -> IO<Queue<ForIO, Int>>
+    ) {
+      val label = "BoundedQueue"
+      allStrategyTests(label, ctx, queue)
+
+      "$label - time out offering to a queue at capacity" {
+        IO.fx {
+          val q = !queue(1)
+          !q.offer(1)
+          val start = !effect { System.currentTimeMillis() }
+          val wontComplete = q.offer(2)
+          val received = !wontComplete.map { Some(it) }
+            .waitFor(100.milliseconds, default = just(None))
+          val elapsed = !effect { System.currentTimeMillis() - start }
+          !effect { received shouldBe None }
+          !effect { (elapsed >= 100) shouldBe true }
+        }.unsafeRunSync()
+      }
+
+      "$label - offering to a 0 capacity queue in deficit honours blocking strategy" {
+        IO.fx {
+          val q = !queue(0)
+          // flip from initial Surplus state to Deficit
+          val first = !q.take().fork(ctx)
+          // then clear previous taker while staying in Deficit
+          !q.offer(1)
+          !first.join()
+          val start = !effect { System.currentTimeMillis() }
+          val wontComplete = q.offer(2)
+          val received = !wontComplete.map { Some(it) }
+            .waitFor(100.milliseconds, default = just(None))
+          val elapsed = !effect { System.currentTimeMillis() - start }
+          !effect { received shouldBe None }
+          !effect { (elapsed >= 100) shouldBe true }
+        }.unsafeRunSync()
+      }
+
+      "$label - suspended offers called on an full queue complete when take calls made to queue" {
+        forAll(Gen.tuple2(Gen.int(), Gen.int())) { t ->
+          IO.fx {
+            val q = !queue(1)
+            !q.offer(t.a)
+            !q.offer(t.b).fork(ctx)
+            val first = !q.take()
+            val second = !q.take()
+            Tuple2(first, second)
+          }.unsafeRunSync() == t
+        }
+      }
+
+      "$label - multiple offer calls on an full queue complete when as many take calls are made to queue" {
+        forAll(Gen.tuple3(Gen.int(), Gen.int(), Gen.int())) { t ->
+          IO.fx {
+            val q = !queue(1)
+            !q.offer(t.a)
+            !q.offer(t.b).fork(ctx)
+            !q.offer(t.c).fork(ctx)
+            val first = !q.take()
+            val second = !q.take()
+            val third = !q.take()
+            setOf(first, second, third)
+          }.unsafeRunSync() == setOf(t.a, t.b, t.c)
+        }
+      }
+
+      "$label - joining a forked offer call made to a shut down queue creates a QueueShutdown error" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(1)
+            !q.offer(i)
+            val o = !q.offer(i).fork(ctx)
+            !q.shutdown()
+            !o.join()
+          }.attempt().unsafeRunSync() == Left(QueueShutdown)
+        }
+      }
+    }
+
+    fun slidingStrategyTests(
+      ctx: CoroutineContext = IO.dispatchers().default(),
+      queue: (Int) -> IO<Queue<ForIO, Int>>
+    ) {
+      val label = "SlidingQueue"
+      allStrategyTests(label, ctx, queue)
+
+      "$label - capacity must be a positive integer" {
+        queue(0).attempt().unsafeRunSync().fold(
+          { err -> err.shouldBeInstanceOf<IllegalArgumentException>() },
+          { fail("Expected Left<IllegalArgumentException>") }
+        )
+      }
+
+      "$label - removes first element after offering to a queue at capacity" {
+        forAll(Gen.int(), Gen.nonEmptyList(Gen.int())) { x, xs ->
+          IO.fx {
+            val q = !queue(xs.size)
+            !q.offer(x)
+            !xs.traverse(IO.applicative(), q::offer)
+            val taken = !(1..xs.size).toList().traverse(IO.applicative()) { q.take() }
+            taken.fix()
+          }.unsafeRunSync() == xs.toList()
+        }
+      }
+    }
+
+    fun droppingStrategyTests(
+      ctx: CoroutineContext = IO.dispatchers().default(),
+      queue: (Int) -> IO<Queue<ForIO, Int>>
+    ) {
+      val label = "DroppingQueue"
+
+      allStrategyTests(label, ctx, queue)
+
+      "$label - offering to a zero capacity queue with a pending taker" {
+        forAll(Gen.int()) { x ->
+          IO.fx {
+            val q = !queue(0)
+            val taker = !q.take().fork(ctx)
+            // Wait for the forked `take` to complete by checking the queue `size`,
+            // otherwise the test will suspend indefinitely if `take` occurs after `offer`.
+            !q.size().repeat<ForIO, Int, Int>(IO.concurrent(), Schedule.doUntil(IO.monad()) { it == -1 })
+            !q.offer(x)
+            !taker.join()
+          }.unsafeRunSync() == x
+        }
+      }
+
+      "$label - drops elements offered to a queue at capacity" {
+        forAll(Gen.int(), Gen.int(), Gen.nonEmptyList(Gen.int())) { x, x2, xs ->
+          IO.fx {
+            val q = !queue(xs.size)
+            !xs.traverse(IO.applicative(), q::offer)
+            !q.offer(x) // this `x` should be dropped
+            val taken = !(1..xs.size).toList().traverse(IO.applicative()) { q.take() }
+            !q.offer(x2)
+            val taken2 = !q.take()
+            taken.fix() + taken2
+          }.unsafeRunSync() == xs.toList() + x2
+        }
+      }
+    }
+
+    fun unboundedStrategyTests(
+      ctx: CoroutineContext = IO.dispatchers().default(),
+      queue: (Int) -> IO<Queue<ForIO, Int>>
+    ) {
+      allStrategyTests("UnboundedQueue", ctx, queue)
+    }
+
     MaybeK.concurrent().tests(
       label = "MaybeK: BoundedQueue",
       queue = { capacity -> Queue.bounded(capacity, MaybeK.concurrent()) },
       EQ = MaybeK.eq()
     )
+    boundedStrategyTests { capacity -> Queue.bounded<ForIO, Int>(capacity, IO.concurrent()).fix() }
+
+    slidingStrategyTests { capacity -> Queue.sliding<ForIO, Int>(capacity, IO.concurrent()).fix() }
+
+    droppingStrategyTests { capacity -> Queue.dropping<ForIO, Int>(capacity, IO.concurrent()).fix() }
+
+    unboundedStrategyTests { Queue.unbounded<ForIO, Int>(IO.concurrent()).fix() }
   }
 }
 

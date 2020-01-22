@@ -204,7 +204,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it)
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
@@ -216,7 +216,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it)
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }.fix().maybe.subscribe({}, { e -> emitter.tryOnError(e) })
@@ -257,7 +257,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it).let { Unit }
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
@@ -278,7 +278,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
           either.fold({
             emitter.tryOnError(it).let { Unit }
           }, {
-            emitter.onSuccess(it)
+            it?.let(emitter::onSuccess)
             emitter.onComplete()
           })
         }
@@ -316,6 +316,12 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
     }
   }
 }
+
+fun <A> MaybeK<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
+
+fun <A> MaybeK<A>.unsafeRunSync(): A =
+  value().blockingGet()
 
 fun <A> MaybeK<A>.handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
