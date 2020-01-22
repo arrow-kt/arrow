@@ -4,11 +4,14 @@ title: Quick Start
 permalink: /docs/core/
 ---
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core-data/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+<!-- Remove the following on when having just one WIP again -->
+[![Latest snapshot](https://img.shields.io/badge/latest%20snapshot-v0.10.5--SNAPSHOT-blue)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
+[![Latest snapshot](https://img.shields.io/maven-metadata/v?label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
+[![Release Status](https://github.com/arrow-kt/arrow/workflows/Release/badge.svg)](https://github.com/arrow-kt/arrow/actions?query=workflow%3ARelease+branch%3Amaster)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)]( http://stackoverflow.com/questions/tagged/arrow-kt)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 

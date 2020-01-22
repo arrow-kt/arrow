@@ -22,6 +22,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.either
 import arrow.test.generators.genK
@@ -54,7 +55,7 @@ class EitherTest : UnitSpec() {
       EqK2Laws.laws(Either.eqK2(), Either.genK2()),
       BifunctorLaws.laws(Either.bifunctor(), Either.genK2(), Either.eqK2()),
       MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
-      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
+      ShowLaws.laws(Either.show(String.show(), Int.show()), Either.eq(String.eq(), Int.eq()), Gen.either(Gen.string(), Gen.int())),
       MonadErrorLaws.laws(
         Either.monadError(),
         Either.functor(),
