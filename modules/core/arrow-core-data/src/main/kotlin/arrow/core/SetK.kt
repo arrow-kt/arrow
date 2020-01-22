@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.higherkind
+import arrow.typeclasses.Show
 
 @higherkind
 data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
@@ -21,6 +22,10 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
       is Set<*> -> this.set == other
       else -> false
     }
+
+  fun show(SA: Show<A>): String = "Set(${toList().k().show(SA)})"
+
+  override fun toString(): String = show(Show.any())
 
   companion object {
 

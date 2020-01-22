@@ -44,7 +44,7 @@ fun <A> Kind<OpsAp.F, A>.fix(): OpsAp<A> = this as OpsAp<A>
 
 class FreeApplicativeTest : UnitSpec() {
 
-  private val program = OpsAp.tupled(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).fix()
+  private val program = OpsAp.tupledN(OpsAp.value(1), OpsAp.add(3, 4), OpsAp.subtract(3, 4)).fix()
 
   init {
 

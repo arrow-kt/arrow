@@ -133,11 +133,11 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
       raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Option<A>, Option<B>, Option<C>> ->
         when (res) {
           is RaceTriple.First -> when (val winner = res.winner) {
-            None -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { None }
+            None -> tupledN(res.fiberB.cancel(), res.fiberC.cancel()).map { None }
             is Some -> just(Some(RaceTriple.First(winner.t, fiberT(res.fiberB), fiberT(res.fiberC))))
           }
           is RaceTriple.Second -> when (val winner = res.winner) {
-            is None -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { None }
+            is None -> tupledN(res.fiberA.cancel(), res.fiberC.cancel()).map { None }
             is Some -> just(Some(RaceTriple.Second(fiberT(res.fiberA), winner.t, fiberT(res.fiberC))))
           }
           is RaceTriple.Third -> when (val winner = res.winner) {

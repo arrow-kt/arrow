@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.higherkind
+import arrow.typeclasses.Show
 
 /**
  *
@@ -812,6 +813,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     override val isRight
       get() = false
 
+    override fun toString(): String = show(Show.any(), Show.any())
+
     companion object {
       operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
     }
@@ -827,10 +830,18 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     override val isRight
       get() = true
 
+    override fun toString(): String = show(Show.any(), Show.any())
+
     companion object {
       operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
     }
   }
+
+  fun show(SL: Show<A>, SR: Show<B>): String = fold({
+    "Left(${SL.run { it.show() }})"
+  }, {
+    "Right(${SR.run { it.show() }})"
+  })
 
   companion object {
 
