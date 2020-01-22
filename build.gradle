@@ -17,25 +17,6 @@
 import com.github.benmanes.gradle.versions.reporter.PlainTextReporter
 
 buildscript {
-    ext {
-        // Constants
-        dokka_version = '0.10.0'
-        ktlint_version = "0.34.2"
-        ktlint_gradle_version = '8.2.0'
-        gradleVersionsPluginVersion = '0.21.0'
-        jUnitVersion = '4.12'
-        jUnitVintageVersion = '5.5.2'
-        javaVersion = JavaVersion.VERSION_1_7
-        kotlinPoetVersion = '1.1.0'
-        kotlinTestVersion = '3.3.3'
-        kotlinVersion = '1.3.50'
-        kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinxCoroutinesVersion = '1.3.2'
-        projectReactorVersion = '3.2.6.RELEASE'
-        retrofitVersion = '2.5.0'
-        rxJavaVersion = '2.2.13'
-        atomicfuVersion = '0.13.2'
-    }
 
     repositories {
         maven {
@@ -48,17 +29,17 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.github.ben-manes:gradle-versions-plugin:$gradleVersionsPluginVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'org.ajoberstar:gradle-git-publish:2.1.3'
-        classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
-        classpath "me.champeau.gradle:jmh-gradle-plugin:0.5.0"
-        classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
-        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_gradle_version"
-        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$atomicfuVersion"
-        classpath 'ru.vyarus:gradle-animalsniffer-plugin:1.5.0'
+        classpath "com.github.ben-manes:gradle-versions-plugin:$GRADLE_VERSIONS_PLUGIN_VERSION"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$BINTRAY_PLUGIN_VERSION"
+        classpath "org.ajoberstar:gradle-git-publish:$GIT_PUBLISH_VERSION"
+        classpath "net.rdrei.android.buildtimetracker:gradle-plugin:$BUILD_TIME_TRACKER_VERSION"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$DOKKA_VERSION"
+        classpath "me.champeau.gradle:jmh-gradle-plugin:$JMH_PLUGIN_VERSION"
+        classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:$JMH_REPORT_PLUGIN_VERSION"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$KTLINT_GRADLE_VERSION"
+        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
+        classpath "ru.vyarus:gradle-animalsniffer-plugin:$ANIMALS_SNIFFER_VERSION"
     }
 }
 
@@ -105,7 +86,7 @@ subprojects { project ->
     apply plugin: 'kotlinx-atomicfu'
 
     ktlint {
-        version = ktlint_version
+        version = KTLINT_VERSION
     }
 
     archivesBaseName = POM_ARTIFACT_ID
@@ -163,8 +144,8 @@ subprojects { project ->
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
 
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+    sourceCompatibility = JAVA_VERSION
+    targetCompatibility = JAVA_VERSION
 
     apply plugin: "build-time-tracker"
 
