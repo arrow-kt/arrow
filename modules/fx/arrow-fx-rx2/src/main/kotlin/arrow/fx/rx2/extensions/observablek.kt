@@ -285,10 +285,3 @@ interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKF
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)
 }
-
-// TODO Could be revisited in the future. Right now it fails to pass the laws due to the notion of errors.
-// @extension
-// interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
-//   override fun <A> empty(): ObservableK<A> =
-//     Observable.empty<A>().k()
-// }
