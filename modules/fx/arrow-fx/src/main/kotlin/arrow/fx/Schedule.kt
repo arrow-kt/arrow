@@ -460,9 +460,9 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       f: (Boolean, Boolean) -> Boolean,
       g: (Duration, Duration) -> Duration
     ): Schedule<F, A, Tuple2<Output, B>> = (other as ScheduleImpl<F, Any?, A, B>).let { other ->
-      ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s: Tuple2<State, Any?> ->
+      ScheduleImpl(M, M.tupledN(initialState, other.initialState)) { i, s: Tuple2<State, Any?> ->
         M.run {
-          M.map(
+          M.mapN(
             update(i, s.a),
             other.update(i, s.b)
           ) { it.a.combineWith(it.b, f, g) }
@@ -537,7 +537,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       }
 
     override fun <C> foldM(initial: Kind<F, C>, f: (C, Output) -> Kind<F, C>): Schedule<F, Input, C> =
-      ScheduleImpl(M, M.tupled(initialState, initial)) { i, s ->
+      ScheduleImpl(M, M.tupledN(initialState, initial)) { i, s ->
         M.fx.monad {
           val dec = !update(i, s.a)
           val c = !f(s.b, dec.finish.value())
@@ -547,7 +547,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
     override infix fun <B> pipe(other: Schedule<F, Output, B>): Schedule<F, Input, B> =
       (other as ScheduleImpl<F, Any?, Output, B>).let { other ->
-        ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s ->
+        ScheduleImpl(M, M.tupledN(initialState, other.initialState)) { i, s ->
           M.run {
             update(i, s.a).flatMap { dec1 ->
               other.update(dec1.finish.value(), s.b).map { dec2 ->
@@ -560,8 +560,8 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
     override infix fun <A, B> tupled(other: Schedule<F, A, B>): Schedule<F, Tuple2<Input, A>, Tuple2<Output, B>> =
       (other as ScheduleImpl<F, Any?, A, B>).let { other ->
-        ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s ->
-          M.map(update(i.a, s.a), other.update(i.b, s.b)) { (dec1, dec2) ->
+        ScheduleImpl(M, M.tupledN(initialState, other.initialState)) { i, s ->
+          M.mapN(update(i.a, s.a), other.update(i.b, s.b)) { (dec1, dec2) ->
             dec1.combineWith(dec2, { a, b -> a && b }, { a, b -> max(a.nanoseconds, b.nanoseconds).nanoseconds })
           }
         }
@@ -569,7 +569,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
     override infix fun <A, B> choose(other: Schedule<F, A, B>): Schedule<F, Either<Input, A>, Either<Output, B>> =
       (other as ScheduleImpl<F, Any?, A, B>).let { other ->
-        ScheduleImpl(M, M.tupled(initialState, other.initialState)) { i, s ->
+        ScheduleImpl(M, M.tupledN(initialState, other.initialState)) { i, s ->
           M.run {
             i.fold({
               update(it, s.a).map { it.mapLeft { it toT s.b }.mapRight { it.left() } }
@@ -639,7 +639,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       f(cont, other.cont),
       g(delay, other.delay),
       Tuple2(state, other.state),
-      Eval.applicative().tupled(finish, other.finish).fix()
+      Eval.applicative().tupledN(finish, other.finish).fix()
     )
 
     companion object {
