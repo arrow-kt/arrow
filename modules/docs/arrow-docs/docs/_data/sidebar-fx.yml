@@ -41,6 +41,9 @@ options:
       - title: Resource
         url: /docs/apidocs/arrow-fx/arrow.fx/-resource/
 
+      - title: Schedule
+        url: docs/apidocs/arrow-fx/arrow.fx/-schedule/
+
       - title: Queue
         url: /docs/effects/queue/
 
@@ -50,6 +53,9 @@ options:
 
       - title: Bracket
         url: /docs/fx/typeclasses/bracket/
+
+      - title: MonadIO
+        url: /docs/apidocs/arrow-fx/arrow.fx.typeclasses/-monadio/
 
   - title: API Docs
 
