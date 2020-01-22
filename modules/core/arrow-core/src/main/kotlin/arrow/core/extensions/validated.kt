@@ -159,8 +159,9 @@ interface ValidatedEqK2 : EqK2<ForValidated> {
 
 @extension
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
-  override fun Validated<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Validated<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension
