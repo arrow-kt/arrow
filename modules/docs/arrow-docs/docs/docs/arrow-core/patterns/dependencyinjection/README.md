@@ -25,8 +25,8 @@ fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
 multiplyBy2(Option.functor(), Option(1))
 // Some(2)
 
-multiplyBy2(Try.functor(), Try.just(1))
-// Success(2)
+multiplyBy2(Either.functor(), Either.right(1))
+// Right(2)
 ```
 
 In the example above, we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
@@ -90,10 +90,10 @@ Option.functor().run {
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.either.functor.functor
 
-Try.functor().run {
-  multiplyBy2(Try.just(1))
+Either.functor<Throwable>().run {
+  multiplyBy2(Either.right(1))
 }
 ```
 
