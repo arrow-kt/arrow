@@ -22,7 +22,7 @@
     position: fixed;
     bottom: ($base-point-grid * 11);
     right: ($base-point-grid * 2);
-    padding: 12px 11px 8px 12px;
+    padding: $base-point-grid;
     background: #fff;
     box-shadow: $box-shadow-button;
     z-index: 100;
@@ -41,9 +41,18 @@
     }
     & .close-modal {
         cursor: pointer;
-        position: absolute;
-        top: 12px;
-        right: 6px;
-        padding: 0 $base-point-grid;
+        padding: 0 10.5px;
+        width: $text-box-icon-size;
+        height: $text-box-icon-size;
+        border-radius: ($base-point-grid * 3);
+
+        &:hover {
+          background-color: lighten($brand-tertiary, 15%);
+        }
+    }
+
+    .stars-text-line {
+      display: flex;
+      justify-content: space-between;
     }
 }

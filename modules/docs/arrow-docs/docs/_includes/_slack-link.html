@@ -1,6 +1,22 @@
+<div class="show-slack-icon" title="Show slack panel"><</div>
 <div class="slack-link-container" >
-  <span>Join us at</span>
-  <br>
+  <div class="slack-head-line">
+    <span>Join us at</span>
+    <div class="hide-slack-icon" title="Hide slack panel">
+      >
+    </div>
+  </div>
   <a class="slack-link" href="{{ site.slack_kotlin_channel }}" target="_blank" title="Slack Kotlin channel">slack.kotlinlang.org</a>
   <a class="slack-link" href="{{ site.slack_arrow_channel }}" target="_blank" title="Slack Arrow channel">#arrow</a>
+  <script>
+    document.querySelector(".hide-slack-icon").addEventListener("click", function () {
+      document.querySelector(".slack-link-container").classList.add("slack-text-out");
+      document.querySelector(".show-slack-icon").classList.add("show-slack-icon-visible");
+    });
+
+    document.querySelector(".show-slack-icon").addEventListener("click", function () {
+      document.querySelector(".slack-link-container").classList.remove("slack-text-out");
+      document.querySelector(".show-slack-icon").classList.remove("show-slack-icon-visible");
+    });
+  </script>
 </div>
