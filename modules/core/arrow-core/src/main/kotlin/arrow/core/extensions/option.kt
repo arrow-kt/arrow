@@ -156,8 +156,8 @@ interface OptionEq<A> : Eq<Option<A>> {
 
 @extension
 interface OptionShow<A> : Show<Option<A>> {
-  override fun Option<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun Option<A>.show(): String = show(SA())
 }
 
 @extension

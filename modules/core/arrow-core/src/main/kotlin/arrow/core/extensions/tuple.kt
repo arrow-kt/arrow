@@ -193,8 +193,10 @@ interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
 
 @extension
 interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
   override fun Tuple2<A, B>.show(): String =
-    toString()
+    show(SA(), SB())
 }
 
 @extension
@@ -228,8 +230,11 @@ interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 
 @extension
 interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
   override fun Tuple3<A, B, C>.show(): String =
-    toString()
+    show(SA(), SB(), SC())
 }
 
 @extension
@@ -289,8 +294,12 @@ interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D
 
 @extension
 interface Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
   override fun Tuple4<A, B, C, D>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD())
 }
 
 @extension
@@ -339,8 +348,13 @@ interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B
 
 @extension
 interface Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
   override fun Tuple5<A, B, C, D, E>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE())
 }
 
 @extension
@@ -395,8 +409,14 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6E
 
 @extension
 interface Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
+  fun SF(): Show<F>
   override fun Tuple6<A, B, C, D, E, F>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE(), SF())
 }
 
 @extension
@@ -457,8 +477,15 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, T
 
 @extension
 interface Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
+  fun SF(): Show<F>
+  fun SG(): Show<G>
   override fun Tuple7<A, B, C, D, E, F, G>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE(), SF(), SG())
 }
 
 @extension
@@ -525,8 +552,16 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
 
 @extension
 interface Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
+  fun SF(): Show<F>
+  fun SG(): Show<G>
+  fun SH(): Show<H>
   override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE(), SF(), SG(), SH())
 }
 
 @extension
@@ -599,8 +634,17 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
 
 @extension
 interface Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
+  fun SF(): Show<F>
+  fun SG(): Show<G>
+  fun SH(): Show<H>
+  fun SI(): Show<I>
   override fun Tuple9<A, B, C, D, E, F, G, H, I>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE(), SF(), SG(), SH(), SI())
 }
 
 @extension
@@ -679,6 +723,16 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
 
 @extension
 interface Tuple10Show<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
+  fun SA(): Show<A>
+  fun SB(): Show<B>
+  fun SC(): Show<C>
+  fun SD(): Show<D>
+  fun SE(): Show<E>
+  fun SF(): Show<F>
+  fun SG(): Show<G>
+  fun SH(): Show<H>
+  fun SI(): Show<I>
+  fun SJ(): Show<J>
   override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
-    toString()
+    show(SA(), SB(), SC(), SD(), SE(), SF(), SG(), SH(), SI(), SJ())
 }

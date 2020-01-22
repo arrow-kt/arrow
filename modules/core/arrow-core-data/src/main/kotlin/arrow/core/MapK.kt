@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Show
 
 @higherkind
 data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
@@ -45,6 +46,10 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
       Eval.later { f(kv.value).lazyAp { lbuf.value().map { m -> { b: B -> (mapOf(kv.key to b).k() + m).k() } } } }
     }.value()
   }
+
+  fun show(SK: Show<K>, SA: Show<A>): String = "Map(${toList().k().map { it.toTuple2() }.show(Show { show(SK, SA) })})"
+
+  override fun toString(): String = show(Show.any(), Show.any())
 
   override fun equals(other: Any?): Boolean =
     when (other) {
