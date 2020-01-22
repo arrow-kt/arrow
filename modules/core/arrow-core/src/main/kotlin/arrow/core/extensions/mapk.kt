@@ -124,8 +124,9 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
 
 @extension
 interface MapKShow<K, A> : Show<MapK<K, A>> {
-  override fun MapK<K, A>.show(): String =
-    toString()
+  fun SK(): Show<K>
+  fun SA(): Show<A>
+  override fun MapK<K, A>.show(): String = show(SK(), SA())
 }
 
 @extension

@@ -180,8 +180,9 @@ interface IorEqK2 : EqK2<ForIor> {
 
 @extension
 interface IorShow<L, R> : Show<Ior<L, R>> {
-  override fun Ior<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Ior<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension
