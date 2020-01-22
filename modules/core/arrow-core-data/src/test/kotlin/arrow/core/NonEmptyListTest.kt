@@ -17,6 +17,7 @@ import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.nonemptylist.unzip.unzip
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.nonEmptyList
@@ -39,7 +40,7 @@ class NonEmptyListTest : UnitSpec() {
     val EQ1 = NonEmptyList.eq(Int.eq())
 
     testLaws(
-      ShowLaws.laws(NonEmptyList.show(), EQ1, Gen.nonEmptyList(Gen.int())),
+      ShowLaws.laws(NonEmptyList.show(Int.show()), EQ1, Gen.nonEmptyList(Gen.int())),
       SemigroupKLaws.laws(
         NonEmptyList.semigroupK(),
         NonEmptyList.genK(),

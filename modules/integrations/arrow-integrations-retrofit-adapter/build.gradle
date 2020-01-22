@@ -4,15 +4,15 @@ dependencies {
     compile project(':arrow-fx')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile project(':arrow-annotations')
-    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
     testCompileOnly project(':arrow-meta')
     testCompile project(':arrow-test')
-    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
-    testCompile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     testCompile 'com.squareup.okhttp3:mockwebserver:3.13.1'
     testCompile project(':arrow-fx-rx2')
     testCompile project(':arrow-fx')

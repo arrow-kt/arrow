@@ -9,7 +9,7 @@ dependencies {
     compile project(":arrow-scala-benchmarks")
     compile project(":arrow-kio-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     compileOnly "org.openjdk.jmh:jmh-core:1.22"
 }
 

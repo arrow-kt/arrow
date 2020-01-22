@@ -49,8 +49,8 @@ interface SetKEq<A> : Eq<SetK<A>> {
 
 @extension
 interface SetKShow<A> : Show<SetK<A>> {
-  override fun SetK<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun SetK<A>.show(): String = show(SA())
 }
 
 @extension

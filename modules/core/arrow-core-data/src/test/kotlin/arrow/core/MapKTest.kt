@@ -16,6 +16,7 @@ import arrow.core.extensions.mapk.traverse.traverse
 import arrow.core.extensions.mapk.unalign.unalign
 import arrow.core.extensions.mapk.unzip.unzip
 import arrow.core.extensions.semigroup
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.mapK
@@ -44,7 +45,7 @@ class MapKTest : UnitSpec() {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
     val testLaws = testLaws(
-      ShowLaws.laws(MapK.show(), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
+      ShowLaws.laws(MapK.show(String.show(), Int.show()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
       TraverseLaws.laws(MapK.traverse(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
       FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.string())),
