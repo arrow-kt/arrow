@@ -55,27 +55,28 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  *
  * typealias Impacted = Boolean
  *
- * object Nuke
- * object Target
- * class MissedByMeters(private val meters: Int) : Throwable("Missed by $meters meters")
+ * object Lettuce
+ * object Knife
+ * object Salad
+ * class InsufficientAmount(val quantityInGrams : Int) : Throwable("You need $quantityInGrams more grams of ingredient")
  *
- * fun <F> MonadThrow<F>.arm(): Kind<F, Nuke> = just(Nuke)
- * fun <F> MonadThrow<F>.aim(): Kind<F, Target> = just(Target)
- * fun <F> MonadThrow<F>.launchImpure(target: Target, nuke: Nuke): Impacted {
- *   throw MissedByMeters(5)
+ * fun <F> MonadThrow<F>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
+ * fun <F> MonadThrow<F>.getKnife(): Kind<F, Knife> = just(Knife)
+ * fun <F> MonadThrow<F>.launchImpure(tool: Knife, ingredient: Lettuce): Salad {
+ *   throw InsufficientAmount(5)
  * }
  *
  * fun main(args: Array<String>) {
  *    //sampleStart
- *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
+ *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, Salad> =
  *      fx.monadThrow {
- *        val nuke = arm().bind()
- *        val target = aim().bind()
- *        val impact = launchImpure(target, nuke) // this throws!
- *        impact
+ *        val lettuce = takeFoodFromRefrigerator().bind()
+ *        val knife = getKnife().bind()
+ *        val salad = launchImpure(knife, lettuce) // this throws!
+ *        salad
  *      }
  *
- *    val result = _extensionFactory_.attack()
+ *    val result = _extensionFactory_.prepareLunch()
  *    //sampleEnd
  *    println(result)
  * }
@@ -103,29 +104,29 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * import arrow.Kind
    * import arrow.typeclasses.MonadThrow
    *
-   * typealias Impacted = Boolean
+   * typealias SaladPrepared = Boolean
    *
-   * object Nuke
-   * object Target
-   * class MissedByMeters(private val meters: Int) : Throwable("Missed by $meters meters")
+   * object Lettuce
+   * object Knife
+   * class InsufficientAmount(val quantityInGrams : Int) : Throwable("You need $quantityInGrams more grams of ingredient")
    *
-   * fun <F> MonadThrow<F>.arm(): Kind<F, Nuke> = just(Nuke)
-   * fun <F> MonadThrow<F>.aim(): Kind<F, Target> = just(Target)
-   * fun <F> MonadThrow<F>.launchImpure(target: Target, nuke: Nuke): Impacted {
-   *   throw MissedByMeters(5)
+   * fun <F> MonadThrow<F>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
+   * fun <F> MonadThrow<F>.getKnife(): Kind<F, Knife> = just(Knife)
+   * fun <F> MonadThrow<F>.launchImpure(tool: Knife, ingredient: Lettuce): Salad {
+   *   throw InsufficientAmount(5)
    * }
    *
    * fun main(args: Array<String>) {
    *    //sampleStart
-   *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
+   *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, SaladPrepared> =
    *      fx.monadThrow {
-   *        val nuke = arm().bind()
-   *        val target = aim().bind()
-   *        val impact = launchImpure(target, nuke) // this throws!
-   *        impact
+   *        val lettuce = takeFoodFromRefrigerator().bind()
+   *        val knife = getKnife().bind()
+   *        val salad = launchImpure(knife, lettuce) // this throws!
+   *        salad
    *      }
    *
-   *    val result = _extensionFactory_.attack()
+   *    val result = _extensionFactory_.prepareLunch()
    *    //sampleEnd
    *    println(result)
    * }
