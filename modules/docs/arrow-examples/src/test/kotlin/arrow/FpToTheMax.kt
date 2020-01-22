@@ -1,9 +1,6 @@
 package arrow
 
-import arrow.core.Option
-import arrow.core.Try
-import arrow.core.Tuple2
-import arrow.core.toT
+import arrow.core.*
 import arrow.mtl.State
 import arrow.mtl.StatePartialOf
 import arrow.mtl.StateApi
@@ -64,7 +61,7 @@ class TestIOConsole : Console<ForTestIO> {
 
 object FpToTheMax {
 
-  fun parseInt(s: String): Option<Int> = Try { s.toInt() }.toOption()
+  fun parseInt(s: String): Option<Int> = try { Option.just(s.toInt()) } catch(e: Throwable) { None }
 
   fun <F> MonadAndConsoleRandom<F>.checkContinue(name: String): Kind<F, Boolean> = fx.monad {
     val (_) = putStrLn("Do you want to continue, $name?")
