@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Show
 
 typealias Nel<A> = NonEmptyList<A>
 
@@ -263,7 +264,9 @@ class NonEmptyList<out A> private constructor(
 
   override fun hashCode(): Int = all.hashCode()
 
-  override fun toString(): String = "NonEmptyList(all=$all)"
+  fun show(SA: Show<A>): String = "NonEmptyList(${all.k().show(SA)})"
+
+  override fun toString(): String = show(Show.any())
 
   companion object {
     operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
