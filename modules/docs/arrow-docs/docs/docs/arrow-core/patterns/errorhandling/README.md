@@ -160,41 +160,12 @@ Additionally, `Option` is unable to capture exceptions. So, if an exception was 
 
 In the next example, we are going to use `Either` to deal with potentially thrown exceptions that are outside the control of the caller.
 
-### Either.catch
+### Either
 
 
 When dealing with a known alternate path, we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value. 
 By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
-
-Furthermore, `Either.catch` enables us to catch potentially thrown exceptions that are outside the control of the caller.
-When using `Either.catch`, our previous example might look like:
-
-```kotlin:ank
-import arrow.*
-import arrow.core.*
-
-fun arm(): Either<Throwable, Nuke> = runBlocking { Either.catch { throw IllegalStateException("Unable to arm") } }
-fun aim(): Either<Throwable, Target> = runBlocking { Either.catch { throw IllegalStateException("Unable to aim") } }
-fun launch(target: Target, nuke: Nuke): Either<Throwable, Impacted> = Either.right(Impacted)
-
-
-fun attackEither(): Either<Throwable, Impacted> =
-  Either.monad<Throwable>().fx.monad {
-      val nuke = runBlocking { arm() }.bind()
-      val target = runBlocking { aim() }.bind()
-      val impact = launch(target, nuke).bind()
-      impact
-  }.fix()
-
-attackEither()
-//Left(a=java.lang.IllegalStateException: Unable to arm)
-```
-
-However, while `Either.catch` gives us the ability to control both the success and failure cases, there is still nothing in the function signatures that indicate a specific type of exception.
-We are still subject to guessing what the exception is using Kotlin `when` expressions or runtime lookups over the unsealed hierarchy of Throwable.
-
-### Either
 
 It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
 `java.lang.Exception`.
