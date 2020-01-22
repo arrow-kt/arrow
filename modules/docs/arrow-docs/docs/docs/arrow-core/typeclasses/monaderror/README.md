@@ -38,16 +38,6 @@ eitherResult
 ```
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.`try`.applicativeError.*
-
-val optionResult: Option<Int> =
-  RuntimeException("BOOM!").raiseError()
-
-optionResult
-```
-
-```kotlin:ank
 import arrow.fx.*
 import arrow.fx.extensions.io.applicativeError.*
 

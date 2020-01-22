@@ -79,14 +79,14 @@ failure.handleError { t -> 0 }
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), recovering from any previous error state.
 
 ```kotlin:ank
-Try { "3".toInt() }.attempt()
+IO { "3".toInt() }.attempt()
 ```
 
 ```kotlin:ank
-Try { "nope".toInt() }.attempt()
+IO { "nope".toInt() }.attempt()
 ```
 
-#### fromEither/fromTry/fromOption
+#### fromEither/fromOption
 
 Constructor function from an [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), or [`Try<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) to the current datatype.
 
@@ -94,12 +94,6 @@ While `fromOption()` requires creating a new error value.
 
 ```kotlin:ank
 Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException("Boom") } }
-```
-
-In the case of `fromTry()`, converting from `Throwable` to the type of the error is required.
-
-```kotlin:ank
-Either.applicativeError<String>().run { Try { RuntimeException("Boom") }.fromTry { it.message!! } }
 ```
 
 In the case of `fromEither()`, converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E> is required. 

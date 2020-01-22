@@ -51,7 +51,7 @@ val optionFunctor = Option.functor()
 ```kotlin:ank
 import arrow.core.extensions.either.functor.*
 
-val eitherFunctor = Either.functor()
+val eitherFunctor = Either.functor<Int>()
 ```
 
 Mapping over the empty/failed cases is always safe since the `map` operation in both Either and Option operate under the bias of those containing success values.
