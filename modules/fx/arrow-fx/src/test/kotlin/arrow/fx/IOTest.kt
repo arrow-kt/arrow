@@ -605,27 +605,27 @@ class IOTest : UnitSpec() {
     }
 
     "IOParMap2 left handles null" {
-      parMapN(NonBlocking, just<Int?>(null), IO.unit) { _, unit -> unit }
+      IO.parMapN(just<Int?>(null), IO.unit) { _, unit -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap2 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+      IO.parMapN(IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 left handles null" {
-      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+      IO.parMapN(just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 middle handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+      IO.parMapN(IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+      IO.parMapN(IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
