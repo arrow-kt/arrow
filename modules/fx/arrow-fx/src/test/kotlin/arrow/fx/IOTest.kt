@@ -12,7 +12,6 @@ import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.applicative.unit
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
@@ -472,7 +471,7 @@ class IOTest : UnitSpec() {
 
     "IO.binding should for comprehend over IO" {
       val result = IO.fx {
-        val (x) = IO.just(1)
+        val x = !IO.just(1)
         val y = !IO { x + 1 }
         y
       }.fix()
@@ -605,27 +604,27 @@ class IOTest : UnitSpec() {
     }
 
     "IOParMap2 left handles null" {
-      parMapN(NonBlocking, just<Int?>(null), IO.unit) { _, unit -> unit }
+      IO.parMapN(just<Int?>(null), IO.unit) { _, unit -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap2 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+      IO.parMapN(IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 left handles null" {
-      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+      IO.parMapN(just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 middle handles null" {
-      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+      IO.parMapN(IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 
     "IOParMap3 right handles null" {
-      parMapN(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+      IO.parMapN(IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
         .unsafeRunSync() shouldBe Unit
     }
 

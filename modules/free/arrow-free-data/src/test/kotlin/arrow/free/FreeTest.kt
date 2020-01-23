@@ -50,13 +50,13 @@ sealed class Ops<out A> : OpsOf<A> {
 class FreeTest : UnitSpec() {
 
   private val program = Ops.fx.monad {
-    val (added) = Ops.add(10, 10)
+    val added = !Ops.add(10, 10)
     val subtracted = !Ops.subtract(added, 50)
     subtracted
   }.fix()
 
   private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.fx.monad {
-    val (v) = Ops.add(n, 1)
+    val v = !Ops.add(n, 1)
     val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v)
     r
   }.fix()

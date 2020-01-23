@@ -41,9 +41,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.Traverse
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -94,21 +92,6 @@ interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
 
 @extension
 interface ObservableKFoldable : Foldable<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
-    fix().foldLeft(b, f)
-
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().foldRight(lb, f)
-}
-
-@extension
-interface ObservableKTraverse : Traverse<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
-
-  override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
-    fix().traverse(AP, f)
-
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -293,21 +276,12 @@ fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
-    ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    ObservableK(Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 
 @extension
 interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKFunctor {
-  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
-    fix().filterMap(f)
-}
-
-@extension
-interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
-  override fun <A> empty(): ObservableK<A> =
-    Observable.empty<A>().k()
-
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)
 }

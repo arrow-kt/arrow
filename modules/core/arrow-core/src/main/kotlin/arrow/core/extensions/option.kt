@@ -507,7 +507,7 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
 @extension
 interface OptionZip : Zip<ForOption>, OptionSemialign {
   override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    Option.apply().tupled(this, other)
+    Option.apply().tupledN(this, other)
 }
 
 @extension
