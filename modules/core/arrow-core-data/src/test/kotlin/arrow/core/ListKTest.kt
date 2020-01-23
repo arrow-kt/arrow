@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.list.monad.flatten as monadFlatten
 import arrow.core.extensions.listk.align.align
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.crosswalk.crosswalk
@@ -11,6 +12,7 @@ import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
+import arrow.core.extensions.listk.monad.flatten as kMonadFlatten
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoid.monoid
@@ -23,7 +25,6 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.show
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.listK
@@ -44,6 +45,7 @@ import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.min
 
@@ -97,6 +99,18 @@ class ListKTest : UnitSpec() {
         ListK.eqK()
       )
     )
+
+    "stdlib list can flatten" {
+     val a: List<List<Int>> = listOf(listOf(0, 1), listOf(2), listOf(3, 4), listOf(5))
+
+      a.monadFlatten() shouldBe listOf(0, 1, 2, 3, 4, 5)
+    }
+
+    "can flatten" {
+     val a: ListK<ListK<Int>> = listOf(listOf(0, 1).k(), listOf(2).k(), listOf(3, 4).k(), listOf(5).k()).k()
+
+      a.kMonadFlatten() shouldBe listOf(0, 1, 2, 3, 4, 5)
+    }
 
     "can align lists with different lengths" {
       forAll(Gen.listK(Gen.bool()), Gen.listK(Gen.bool())) { a, b ->
