@@ -113,13 +113,7 @@ interface IOParMap {
     }
   }
 
-  fun <A, B, C, D> parMapN(
-    ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    f: (A, B, C) -> D
-  ): IO<D> = IO.Async(true) { conn, cb ->
+  fun <A, B, C, D> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (A, B, C) -> D): IO<D> = IO.Async(true) { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(None)
     val active = AtomicBooleanW(true)
@@ -206,9 +200,9 @@ interface IOParMap {
     fc: IOOf<C>,
     fd: IOOf<D>,
     f: (A, B, C, D) -> E
-  ): IOOf<E> = parMapN(ctx,
-    parMapN(ctx, fa, fb, ::Tuple2),
-    parMapN(ctx, fc, fd, ::Tuple2)
+  ): IOOf<E> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, ::Tuple2),
+    IO.parMapN(ctx, fc, fd, ::Tuple2)
   ) { (a, b), (c, d) ->
     f(a, b, c, d)
   }
@@ -224,9 +218,9 @@ interface IOParMap {
     fd: IOOf<D>,
     fe: IOOf<E>,
     f: (A, B, C, D, E) -> G
-  ): IO<G> = parMapN(ctx,
-    parMapN(ctx, fa, fb, fc, ::Tuple3),
-    parMapN(ctx, fd, fe, ::Tuple2)
+  ): IO<G> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, fc, ::Tuple3),
+    IO.parMapN(ctx, fd, fe, ::Tuple2)
   ) { (a, b, c), (d, e) ->
     f(a, b, c, d, e)
   }
@@ -243,9 +237,9 @@ interface IOParMap {
     fe: IOOf<E>,
     fg: IOOf<G>,
     f: (A, B, C, D, E, G) -> H
-  ): IO<H> = parMapN(ctx,
-    parMapN(ctx, fa, fb, fc, ::Tuple3),
-    parMapN(ctx, fd, fe, fg, ::Tuple3)
+  ): IO<H> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, fc, ::Tuple3),
+    IO.parMapN(ctx, fd, fe, fg, ::Tuple3)
   ) { (a, b, c), (d, e, g) ->
     f(a, b, c, d, e, g)
   }
@@ -263,10 +257,10 @@ interface IOParMap {
     fg: IOOf<G>,
     fh: IOOf<H>,
     f: (A, B, C, D, E, G, H) -> I
-  ): IO<I> = parMapN(ctx,
-    parMapN(ctx, fa, fb, fc, ::Tuple3),
-    parMapN(ctx, fd, fe, ::Tuple2),
-    parMapN(ctx, fg, fh, ::Tuple2)) { (a, b, c), (d, e), (g, h) ->
+  ): IO<I> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, fc, ::Tuple3),
+    IO.parMapN(ctx, fd, fe, ::Tuple2),
+    IO.parMapN(ctx, fg, fh, ::Tuple2)) { (a, b, c), (d, e), (g, h) ->
     f(a, b, c, d, e, g, h)
   }
 
@@ -284,10 +278,10 @@ interface IOParMap {
     fh: IOOf<H>,
     fi: IOOf<I>,
     f: (A, B, C, D, E, G, H, I) -> J
-  ): IO<J> = parMapN(ctx,
-    parMapN(ctx, fa, fb, fc, ::Tuple3),
-    parMapN(ctx, fd, fe, fg, ::Tuple3),
-    parMapN(ctx, fh, fi, ::Tuple2)) { (a, b, c), (d, e, g), (h, i) ->
+  ): IO<J> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, fc, ::Tuple3),
+    IO.parMapN(ctx, fd, fe, fg, ::Tuple3),
+    IO.parMapN(ctx, fh, fi, ::Tuple2)) { (a, b, c), (d, e, g), (h, i) ->
     f(a, b, c, d, e, g, h, i)
   }
 
@@ -306,10 +300,10 @@ interface IOParMap {
     fi: IOOf<I>,
     fj: IOOf<J>,
     f: (A, B, C, D, E, G, H, I, J) -> K
-  ): IO<K> = parMapN(ctx,
-    parMapN(ctx, fa, fb, fc, ::Tuple3),
-    parMapN(ctx, fd, fe, fg, ::Tuple3),
-    parMapN(ctx, fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
+  ): IO<K> = IO.parMapN(ctx,
+    IO.parMapN(ctx, fa, fb, fc, ::Tuple3),
+    IO.parMapN(ctx, fd, fe, fg, ::Tuple3),
+    IO.parMapN(ctx, fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
     f(a, b, c, d, e, g, h, i, j)
   }
 }
