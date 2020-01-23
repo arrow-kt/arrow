@@ -130,7 +130,7 @@ interface ListSnoc<A> : Snoc<List<A>, A> {
 
   override fun snoc() = object : Prism<List<A>, Tuple2<List<A>, A>> {
     override fun getOrModify(s: List<A>): Either<List<A>, Tuple2<List<A>, A>> =
-      Option.applicative().map(Try { s.dropLast(1) }.toOption(), s.lastOrNull().toOption(), ::identity)
+      Option.applicative().mapN(Try { s.dropLast(1) }.toOption(), s.lastOrNull().toOption(), ::identity)
         .fix()
         .toEither { s }
 

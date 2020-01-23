@@ -46,8 +46,8 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A>, DayKindedJ<F
   fun <B> ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, (A) -> B>): Day<F, G, B> =
     stepDay { left, right, get ->
       f.fix().stepDay { lf, rf, getf ->
-        val l = AF.run { tupled(left, lf) }
-        val r = AG.run { tupled(right, rf) }
+        val l = AF.run { tupledN(left, lf) }
+        val r = AG.run { tupledN(right, rf) }
         Day(l, r) { x, y ->
           getf(x.b, y.b).invoke(get(x.a, y.a))
         }
@@ -59,8 +59,8 @@ abstract class Day<F, G, A> private constructor() : DayOf<F, G, A>, DayKindedJ<F
     override fun <R> stepDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> B) -> R): R =
       this@Day.stepDay { left, right, get ->
         f.fix().stepDay { lf, rf, getf ->
-          val l = AF.run { tupled(left, lf) }
-          val r = AG.run { tupled(right, rf) }
+          val l = AF.run { tupledN(left, lf) }
+          val r = AG.run { tupledN(right, rf) }
           ff(l, r) { x, y ->
             // Kapachao? This is a safe cast because you can see l and r just above
             val xx = x as Tuple2<*, *>
