@@ -8,6 +8,8 @@ import arrow.fx.ResourcePartialOf
 import arrow.fx.fix
 import arrow.fx.typeclasses.Bracket
 import arrow.extension
+import arrow.fx.IO
+import arrow.fx.typeclasses.MonadIO
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -75,4 +77,13 @@ interface ResourceMonoid<F, E, A> : Monoid<Resource<F, E, A>>, ResourceSemigroup
   override fun BR(): Bracket<F, E>
   override fun SR(): Semigroup<A> = MR()
   override fun empty(): Resource<F, E, A> = Resource.empty(MR(), BR())
+}
+
+@extension
+interface ResourceMonadIO<F, E> : MonadIO<ResourcePartialOf<F, E>>, ResourceMonad<F, E> {
+  fun FIO(): MonadIO<F>
+  override fun BR(): Bracket<F, E>
+  override fun <A> IO<A>.liftIO(): Kind<ResourcePartialOf<F, E>, A> = FIO().run {
+    Resource.run { liftIO().liftF(BR()) }
+  }
 }
