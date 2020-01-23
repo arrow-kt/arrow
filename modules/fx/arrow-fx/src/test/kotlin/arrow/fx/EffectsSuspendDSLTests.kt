@@ -114,8 +114,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         IO.fx {
-          val (suspendedValue) = effect { suspend { 1 }() }
-          val (ioValue) = IO.just(1)
+          val suspendedValue = !effect { suspend { 1 }() }
+          val ioValue = !IO.just(1)
           suspendedValue == ioValue
         }
       } shouldBe true
@@ -191,7 +191,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         IO.fx {
           val fiber = !effect { const }.fork(dispatchers().default())
-          val (n) = fiber.join()
+          val n = !fiber.join()
           n
         }
       } shouldBe const
@@ -244,7 +244,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       }
       fxTest {
         IO.fx {
-          val (appliedPureEffect1: String) = effect { sideEffect() }
+          val appliedPureEffect1: String = !effect { sideEffect() }
           val appliedPureEffect2: String = !effect { sideEffect() }
           appliedPureEffect1
         }

@@ -12,7 +12,6 @@ import arrow.fx.IO.Companion.just
 import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.applicative.unit
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
@@ -472,7 +471,7 @@ class IOTest : UnitSpec() {
 
     "IO.binding should for comprehend over IO" {
       val result = IO.fx {
-        val (x) = IO.just(1)
+        val x = !IO.just(1)
         val y = !IO { x + 1 }
         y
       }.fix()
