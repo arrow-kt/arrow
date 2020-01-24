@@ -6,7 +6,6 @@ import arrow.core.Right
 import arrow.documented
 import arrow.fx.internal.asyncContinuation
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
