@@ -48,6 +48,7 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`.
 
 ```kotlin:ank
+import arrow.fx.IO
 import arrow.core.extensions.option.applicative.*
 
 ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
