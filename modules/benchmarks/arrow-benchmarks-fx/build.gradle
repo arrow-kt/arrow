@@ -1,3 +1,8 @@
+plugins {
+    id "me.champeau.gradle.jmh" version "$JMH_PLUGIN_VERSION"
+    id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
+}
+
 repositories {
     maven { url "https://jitpack.io" }
 }

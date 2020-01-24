@@ -9,7 +9,6 @@ buildscript {
 
 apply plugin: 'ank-gradle-plugin'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
     compile project(':arrow-core-data')
@@ -53,17 +52,6 @@ ank {
     source = file("${projectDir}/docs")
     target = file("${projectDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
-}
-
-gitPublish {
-    repoUri = 'git@github.com:arrow-kt/arrow.git'
-    branch = 'gh-pages'
-
-    contents {
-        from 'build/site'
-    }
-
-    commitMessage = 'update site'
 }
 
 repositories {
