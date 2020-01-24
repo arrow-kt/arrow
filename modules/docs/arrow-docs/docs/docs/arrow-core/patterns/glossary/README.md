@@ -60,7 +60,7 @@ Or, if I know how to aggregate objects together, I can add an extension function
 The number of extra extension functions that you get per typeclass can be from one in `Eq` to 17 (!) in `Foldable`.
 
 * Abstracting over behavior. Like any other interface, you can use them in your functions and classes as a way of talking about the capabilities of the implementation,
-without exposing the details. This way, you can create APIs that work the same for `Option`, `Try`, or `Observable`.
+without exposing the details. This way, you can create APIs that work the same for `Option` or `Observable`.
 
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
@@ -171,17 +171,17 @@ listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 ```kotlin:ank
 import arrow.core.extensions.fx
 
-Try.fx {
-  val (a) = Try { 1 }
-  val (b) = Try { a + 1 }
-  a + b
+Option.fx {
+    val a = Some(1).bind()
+    val b = Some(a+1).bind()
+    a + b
 }
 ```
 
 ```kotlin:ank:silent
-import arrow.core.extensions.`try`.apply.map
+import arrow.core.extensions.option.apply.map
 
-map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
+map(Some(1), Some(2), Some(3)) { (one, two, three) ->
   one + two + three
 }
 ```

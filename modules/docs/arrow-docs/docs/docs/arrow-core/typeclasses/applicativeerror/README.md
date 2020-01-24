@@ -88,7 +88,7 @@ IO { "nope".toInt() }.attempt()
 
 #### fromEither/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), or [`Try<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) or [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to the current datatype.
 
 While `fromOption()` requires creating a new error value.
 
