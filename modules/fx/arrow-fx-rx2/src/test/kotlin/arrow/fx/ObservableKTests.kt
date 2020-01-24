@@ -35,11 +35,6 @@ class ObservableKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      /*
-      TODO: Traverse/Foldable instances are not lawful
-       https://github.com/arrow-kt/arrow/issues/1882
-            TraverseLaws.laws(ObservableK.traverse(), ObservableK.genk(), ObservableK.eqK()),
-       */
       ConcurrentLaws.laws(
         ObservableK.concurrent(),
         ObservableK.functor(),
@@ -50,13 +45,6 @@ class ObservableKTests : RxJavaSpec() {
         testStackSafety = false
       ),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), ObservableK.eq())
-
-      /*
-      TODO: MonadFilter instances are not lawsful
-      https://github.com/arrow-kt/arrow/issues/1881
-
-      MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), GENK(), EQK())
-       */
     )
 
     "fx should defer evaluation until subscribed" {
@@ -173,14 +161,9 @@ private fun ObservableK.Companion.eqK() = object : EqK<ForObservableK> {
 private fun <A> Gen.Companion.observableK(gen: Gen<A>) =
   Gen.oneOf(
     Gen.constant(Observable.empty<A>()),
-
-    Gen.throwable().map {
-      Observable.error<A>(it)
-    },
-
-    Gen.list(gen).map {
-      Observable.fromIterable(it)
-    }).map { it.k() }
+    Gen.throwable().map { Observable.error<A>(it) },
+    Gen.list(gen).map { Observable.fromIterable(it) }
+  ).map { it.k() }
 
 private fun ObservableK.Companion.genk() = object : GenK<ForObservableK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForObservableK, A>> =

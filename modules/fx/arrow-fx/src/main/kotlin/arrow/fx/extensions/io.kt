@@ -30,6 +30,7 @@ import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeCancellableRun
@@ -278,6 +279,16 @@ interface IOUnsafeRun : UnsafeRun<IOPartialOf<Nothing>> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<IOPartialOf<Nothing>, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
     fa().unsafeRunAsync(cb)
 }
+
+interface IOMonadIO : MonadIO<IOPartialOf<Nothing>>, IOMonad<Nothing> {
+  override fun <A> IO<Nothing, A>.liftIO(): IO<Nothing, A> = this
+}
+
+private val MonadIO: MonadIO<IOPartialOf<Nothing>> =
+  object : IOMonadIO {}
+
+fun IO.Companion.monadIO(): MonadIO<IOPartialOf<Nothing>> =
+  MonadIO
 
 private val UnsafeRun: IOUnsafeRun =
   object : IOUnsafeRun {}

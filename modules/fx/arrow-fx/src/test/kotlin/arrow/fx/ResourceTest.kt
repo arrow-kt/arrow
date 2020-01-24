@@ -28,7 +28,7 @@ class ResourceTest : UnitSpec() {
     val EQ = Eq<Kind<ResourcePartialOf<IOPartialOf<Nothing>, Throwable>, Int>> { a, b ->
       val tested: IO<Nothing, Int> = a.fix().invoke { IO.just(1) }.fix()
       val expected = b.fix().invoke { IO.just(1) }.fix()
-      val compare = IO.applicative<Nothing>().map(tested, expected) { (t, e) -> t == e }.fix()
+      val compare = IO.applicative<Nothing>().mapN(tested, expected) { (t, e) -> t == e }.fix()
       compare.unsafeRunTimed(5.seconds) == Some(Right(true))
     }
 
@@ -62,7 +62,7 @@ private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<IOPartialO
     (this.fix() to other.fix()).let {
       val ls = it.first.invoke { IO.just(1) }.fix()
       val rs = it.second.invoke { IO.just(1) }.fix()
-      val compare = IO.applicative<Nothing>().map(ls, rs) { (l, r) -> l == r }.fix()
+      val compare = IO.applicative<Nothing>().mapN(ls, rs) { (l, r) -> l == r }.fix()
 
       compare.unsafeRunTimed(5.seconds) == Some(Right(true))
     }

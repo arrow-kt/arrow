@@ -117,7 +117,7 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
     transform(MF) { it.b toT it.a }
 
   fun <B> ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    WriterT(AF.map(value, ff.value()) { (a, b) ->
+    WriterT(AF.mapN(value, ff.value()) { (a, b) ->
       Tuple2(SG.run { a.a.combine(b.a) }, b.b(a.b))
     })
 
