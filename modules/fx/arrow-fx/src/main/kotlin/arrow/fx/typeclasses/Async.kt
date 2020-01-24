@@ -351,11 +351,12 @@ internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightU
 
 interface AsyncFx<F> : MonadThrowFx<F> {
   val async: Async<F>
-  override val ME: MonadThrow<F> get() = async
-  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> {
+  override val ME: MonadDefer<F> get() = async
+  // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context
+  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> = ME.defer {
     val continuation = AsyncContinuation<F, A>(async)
     val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
+    continuation.returnedMonad()
   }
 }
