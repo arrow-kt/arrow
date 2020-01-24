@@ -18,13 +18,16 @@ import kotlin.coroutines.CoroutineContext
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IOParMap3 {
 
+  fun <A, B, C, D> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (A, B, C) -> D): IO<D> =
+    IO.parMapN(IODispatchers.CommonPool, fa, fb, fc, f)
+
   fun <A, B, C, D> parMapN(
     ctx: CoroutineContext,
     fa: IOOf<A>,
     fb: IOOf<B>,
     fc: IOOf<C>,
     f: (A, B, C) -> D
-  ): IO<D> = IO.Async { conn, cb ->
+  ): IO<D> = IO.Async(true) { conn, cb ->
 
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(none())
     val active = AtomicBooleanW(true)
@@ -48,7 +51,7 @@ interface IOParMap3 {
     }
 
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
-      result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
+      result.fold({ Unit }, { (a, b, c) -> Option.applicative().mapN(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
     fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.

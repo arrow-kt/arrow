@@ -8,6 +8,7 @@ import arrow.core.extensions.const.show.show
 import arrow.core.extensions.const.traverseFilter.traverseFilter
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genConst
 import arrow.test.generators.genK
@@ -37,7 +38,7 @@ class ConstTest : UnitSpec() {
           EQK(Int.eq())),
         ApplicativeLaws.laws(Const.applicative(this), Const.functor(), Const.genK(Gen.int()), EQK(Int.eq())),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
-        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
+        ShowLaws.laws(Const.show(Int.show()), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
       )
     }
   }

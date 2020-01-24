@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
@@ -13,6 +14,7 @@ import arrow.fx.reactor.extensions.monok.monad.monad
 import arrow.fx.reactor.extensions.monok.timer.timer
 import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
+import arrow.fx.reactor.unsafeRunSync
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -200,6 +202,32 @@ class MonoKTest : UnitSpec() {
       }.value()
         .test()
         .expectError(ConnectionCancellationException::class)
+    }
+
+    "MonoK should suspend" {
+      MonoK.fx {
+        val s = effect { Mono.just(1).k().suspended()!! }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error MonoK should suspend" {
+      val error = IllegalArgumentException()
+
+      MonoK.fx {
+        val s = effect { Mono.error<Int>(error).k().suspended()!! }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
+    }
+
+    "Empty MonoK should suspend" {
+      MonoK.fx {
+        val s = effect { Mono.empty<Int>().k().suspended() }.bind()
+
+        s shouldBe null
+      }.unsafeRunSync()
     }
   }
 }
