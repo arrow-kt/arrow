@@ -8,6 +8,7 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
@@ -19,11 +20,13 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf
+import arrow.mtl.extensions.EitherTMonad
 import arrow.mtl.extensions.EitherTMonadThrow
 import arrow.mtl.value
 import arrow.typeclasses.ApplicativeError
@@ -175,3 +178,12 @@ fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPa
   object : EitherTConcurrent<F, L> {
     override fun CF(): Concurrent<F> = CF
   }
+
+@extension
+interface EitherTMonadIO<F, L> : MonadIO<EitherTPartialOf<F, L>>, EitherTMonad<F, L> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<A>.liftIO(): Kind<EitherTPartialOf<F, L>, A> = FIO().run {
+    EitherT.liftF(this, liftIO())
+  }
+}

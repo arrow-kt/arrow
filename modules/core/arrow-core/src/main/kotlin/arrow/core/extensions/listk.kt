@@ -9,6 +9,7 @@ import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.list.monad.flatten
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
@@ -121,11 +122,17 @@ interface ListKMonad : Monad<ForListK> {
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
+
+  // Special case, since the extension is built with List<List<A>>, then wrapped to ListK<List<A>>, there's no way for that to
+  // call the default flatten which is defined for ListK<ListK<A>> due to the inner list, therefore we need to map and redirect.
+  fun <A> Kind<ForListK, List<A>>.flatten(dummy: Unit = Unit): Kind<ForListK, A> =
+    // explicit cast for proper resolution as ListK extends List
+    (map { it.k() } as Kind<ForListK, Kind<ForListK, A>>).flatten()
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
@@ -142,7 +149,7 @@ interface ListKFoldable : Foldable<ForListK> {
   override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForListK, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForListK, A>.isEmpty(): Boolean =
     fix().isEmpty()
 }
 
@@ -228,7 +235,7 @@ interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
@@ -255,7 +262,7 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A, B> Kind<ForListK, A>.flatMap(f: (A) -> Kind<ForListK, B>): ListK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
+  override fun <A, B> tailRecM(a: A, f: Function1<A, ListKOf<Either<A, B>>>): ListK<B> =
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
