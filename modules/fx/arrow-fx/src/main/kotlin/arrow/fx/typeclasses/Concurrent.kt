@@ -63,7 +63,7 @@ interface Concurrent<F> : Async<F> {
    */
   override val fx: ConcurrentFx<F>
     get() = object : ConcurrentFx<F> {
-      override val concurrent: Concurrent<F> = this@Concurrent
+      override val M: Concurrent<F> = this@Concurrent
     }
 
   /**
@@ -973,11 +973,10 @@ interface Concurrent<F> : Async<F> {
 }
 
 interface ConcurrentFx<F> : AsyncFx<F> {
-  val concurrent: Concurrent<F>
-  override val async: Async<F> get() = concurrent
+  override val M: Concurrent<F>
   // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context
-  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> = async.defer {
-    val continuation = ConcurrentContinuation<F, A>(concurrent)
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> = M.defer {
+    val continuation = ConcurrentContinuation<F, A>(M)
     val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     continuation.returnedMonad()

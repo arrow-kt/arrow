@@ -40,7 +40,7 @@ interface Async<F> : MonadDefer<F> {
    */
   override val fx: AsyncFx<F>
     get() = object : AsyncFx<F> {
-      override val async: Async<F> get() = this@Async
+      override val M: Async<F> get() = this@Async
     }
 
   /**
@@ -350,11 +350,10 @@ internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
 interface AsyncFx<F> : MonadThrowFx<F> {
-  val async: Async<F>
-  override val ME: MonadDefer<F> get() = async
+  override val M: Async<F>
   // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context
-  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> = ME.defer {
-    val continuation = AsyncContinuation<F, A>(async)
+  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> = M.defer {
+    val continuation = AsyncContinuation<F, A>(M)
     val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     continuation.returnedMonad()
