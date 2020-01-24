@@ -375,4 +375,4 @@ interface FlowableKMonadFilter : MonadFilter<ForFlowableK>, FlowableKMonad {
     fix().filterMap(f)
 }
 fun <A> FlowableK.Companion.fx(c: suspend ConcurrentSyntax<ForFlowableK>.() -> A): FlowableK<A> =
-  defer { FlowableK.concurrent().fx.concurrent(c).fix() }
+  FlowableK.concurrent().fx.concurrent(c).fix()
