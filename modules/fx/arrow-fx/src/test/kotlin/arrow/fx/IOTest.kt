@@ -7,6 +7,7 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
+import arrow.core.identity
 import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
@@ -421,25 +422,12 @@ class IOTest : UnitSpec() {
         val cancel =
           IO(all) { }
             .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable(OnCancel.Silent) {
+            .unsafeRunAsyncCancellable {
               cb(it)
             }
         IO(other) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { cb ->
-        val cancel =
-          IO(all) { }
-            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              it.fold({ t -> cb(t.right()) }, { })
-            }
-        IO(other) { }
-          .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
     }
 
     "IOFrame should always be called when using IO.Bind" {
@@ -460,7 +448,7 @@ class IOTest : UnitSpec() {
         val cancel =
           IO(all) { }
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
-            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+            .unsafeRunAsyncCancellable {
               cb(it)
             }
         IO(other) { Thread.sleep(500); }
@@ -585,22 +573,22 @@ class IOTest : UnitSpec() {
     }
 
     // known issue
-//    "IORace4 should be stack safe" {
-//      val size = 5000
-//
-//      fun ioRace4(i: Int): IO<Int> =
-//        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
-//          .map {
-//            it.fold(
-//              ::identity,
-//              ::identity,
-//              ::identity,
-//              ::identity
-//            )
-//          }
-//
-//      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
-//    }
+    "IORace4 should be stack safe" {
+      val size = 5000
+
+      fun ioRace4(i: Int): IO<Int> =
+        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
+    }
 
     "IOParMap2 should be stack safe" {
       val size = 5000

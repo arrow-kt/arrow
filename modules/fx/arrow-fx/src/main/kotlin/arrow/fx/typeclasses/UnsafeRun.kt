@@ -2,7 +2,6 @@ package arrow.fx.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.fx.OnCancel
 import arrow.unsafe
 
 interface UnsafeRun<F> {
@@ -11,5 +10,5 @@ interface UnsafeRun<F> {
 }
 
 interface UnsafeCancellableRun<F> : UnsafeRun<F> {
-  suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<F, A>, cb: (Either<Throwable, A>) -> Unit): Disposable
+  suspend fun <A> unsafe.runNonBlockingCancellable(fa: () -> Kind<F, A>, cb: (Either<Throwable, A>) -> Unit): Disposable
 }

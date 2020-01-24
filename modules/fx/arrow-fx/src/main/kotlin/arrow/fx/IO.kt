@@ -10,9 +10,6 @@ import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
-import arrow.fx.OnCancel.Companion.CancellationException
-import arrow.fx.OnCancel.Silent
-import arrow.fx.OnCancel.ThrowCancellationException
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
@@ -803,18 +800,13 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsync] to run in an unsafe and non-cancellable manner.
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
-  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
+  fun runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     async { ccb ->
       val conn = IOConnection()
-      val onCancelCb =
-        when (onCancel) {
-          ThrowCancellationException ->
-            cb andThen { it.fix().unsafeRunAsync { } }
-          Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
-        }
       ccb(conn.toDisposable().right())
-      IORunLoop.startCancelable(this, conn, onCancelCb)
+      IORunLoop.startCancelable(this, conn) { either ->
+        either.fold({ if (!conn.isCanceled() || it != ConnectionCancellationException) cb(either) }, { cb(either) })
+      }
     }
 
   /**
@@ -829,8 +821,8 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
-    runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync()
+  fun unsafeRunAsyncCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable =
+    runAsyncCancellable(cb andThen { unit }).unsafeRunSync()
 
   /**
    * [unsafeRunSync] allows you to run any [IO] to its wrapped value [A].

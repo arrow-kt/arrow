@@ -169,7 +169,6 @@ internal object IORunLoop {
 
     do {
       if (conn.isCanceled()) {
-        cb(Left(OnCancel.CancellationException))
         return
       }
       when (currentIO) {
