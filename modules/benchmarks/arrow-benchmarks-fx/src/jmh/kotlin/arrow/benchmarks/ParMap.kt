@@ -4,6 +4,7 @@ import arrow.core.extensions.list.foldable.foldLeft
 import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.extensions.io.concurrent.parMapN
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -24,7 +25,7 @@ open class ParMap {
   @Param("100")
   var size: Int = 0
 
-  private fun ioHelper(): IO<Int> =
+  private fun ioHelper(): IO<Nothing, Int> =
     (0 until size).toList().foldLeft(IO { 0 }) { acc, i ->
       IODispatchers.CommonPool.parMapN(acc, IO { i }) { a, b -> a + b }
     }

@@ -3,6 +3,9 @@ package arrow.benchmarks
 import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.fix
+import arrow.fx.flatMap
+import arrow.fx.fork
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -23,7 +26,7 @@ open class ForkFiber {
   @Param("100")
   var size: Int = 0
 
-  private fun ioStartLoop(i: Int): IO<Int> =
+  private fun ioStartLoop(i: Int): IO<Nothing, Int> =
     if (i < size) {
       IO { i + 1 }.fork(IODispatchers.CommonPool).flatMap { fiber ->
         fiber.join().fix().flatMap { ioStartLoop(it) }

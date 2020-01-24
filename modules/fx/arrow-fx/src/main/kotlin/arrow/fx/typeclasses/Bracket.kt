@@ -22,6 +22,19 @@ sealed class ExitCase<out E> {
 fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
 
+sealed class ExitCase2<out E> {
+  object Completed : ExitCase2<Nothing>() {
+    override fun toString() = "ExitCase2.Completed"
+  }
+
+  object Canceled : ExitCase2<Nothing>() {
+    override fun toString() = "ExitCase2.Canceled"
+  }
+
+  data class Error<E>(val error: E) : ExitCase2<E>()
+  data class Exception(val exception: Throwable) : ExitCase2<Nothing>()
+}
+
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Bracket)
  *

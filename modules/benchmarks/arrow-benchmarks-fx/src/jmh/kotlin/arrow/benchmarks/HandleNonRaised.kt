@@ -1,6 +1,8 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -22,10 +24,10 @@ open class HandleNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioHappyPathLoop(i: Int): IO<Int> =
+  private fun ioHappyPathLoop(i: Int): IO<Nothing, Int> =
     if (i < size)
       IO.just(i + 1)
-        .ioHandleErrorWith { IO.raiseError(it) }
+        .ioHandleErrorWith { IO.raiseException(it) }
         .flatMap { ioHappyPathLoop(it) }
     else
       IO.just(i)

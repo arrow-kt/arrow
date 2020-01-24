@@ -18,8 +18,8 @@ import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.eqK.eqK
-import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
@@ -72,7 +72,7 @@ class KleisliTest : UnitSpec() {
 
     val optionEQK = Kleisli.eqK(Option.eqK(), 0)
 
-    val ioEQK: EqK<Kind<Kind<ForKleisli, ForIO>, Int>> = Kleisli.eqK(IO.eqK(), 1)
+    val ioEQK: EqK<Kind<Kind<ForKleisli, IOPartialOf<Nothing>>, Int>> = Kleisli.eqK(IO.eqK(), 1)
 
     val tryEQK: EqK<Kind<Kind<ForKleisli, ForTry>, Int>> =
       Kleisli.eqK(Try.eqK(), 1)
@@ -85,12 +85,12 @@ class KleisliTest : UnitSpec() {
         genK<ForOption, Int>(Option.genK()),
         optionEQK
       ),
-      ConcurrentLaws.laws(
-        Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
-        Kleisli.functor<ForIO, Int>(IO.functor()),
-        Kleisli.applicative<ForIO, Int>(IO.applicative()),
-        Kleisli.monad<ForIO, Int>(IO.monad()),
-        genK<ForIO, Int>(IO.genK()),
+      ConcurrentLaws.laws<KleisliPartialOf<IOPartialOf<Nothing>, Int>>(
+        Kleisli.concurrent(IO.concurrent()),
+        Kleisli.functor(IO.functor()),
+        Kleisli.applicative(IO.applicative()),
+        Kleisli.monad(IO.monad()),
+        genK(IO.genK()),
         ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), conestTryGENK(), conestTryEQK()),

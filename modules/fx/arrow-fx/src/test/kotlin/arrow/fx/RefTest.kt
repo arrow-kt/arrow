@@ -21,7 +21,7 @@ class RefTest : UnitSpec() {
 
     "concurrent modifications" {
       val finalValue = 100
-      val r = Ref.unsafe(0, IO.monadDefer())
+      val r = Ref.unsafe(0, IO.monadDefer<Nothing>())
       (0 until finalValue)
         .map { _ -> IO.unit.continueOn(Dispatchers.Default).flatMap { _ -> r.update { it + 1 } } }
         .sequence(IO.applicative())
@@ -32,7 +32,7 @@ class RefTest : UnitSpec() {
 
     "set get - successful" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
+        Ref(IO.monadDefer<Nothing>(), a).flatMap { ref ->
           ref.set(b).flatMap {
             ref.get()
           }
@@ -42,7 +42,7 @@ class RefTest : UnitSpec() {
 
     "getAndSet - successful" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
+        Ref(IO.monadDefer<Nothing>(), a).flatMap { ref ->
           ref.getAndSet(b).flatMap { old ->
             ref.get().map { new ->
               old == a && new == b
@@ -55,45 +55,45 @@ class RefTest : UnitSpec() {
     "access - successful" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
+          val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           val success = setter(b).bind()
           val result = ref.get().bind()
           success && result == b
-        }.equalUnderTheLaw(IO.just(true), EQ())
+        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
       }
     }
 
     "access - setter should fail if value is modified before setter is called" {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
         IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
+          val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           ref.set(b).bind()
           val success = setter(c).bind()
           val result = ref.get().bind()
           !success && result == b
-        }.equalUnderTheLaw(IO.just(true), EQ())
+        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
       }
     }
 
     "access - setter should fail if called twice" {
       forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
         IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
+          val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           val cond1 = setter(b).bind()
           ref.set(c).bind()
           val cond2 = setter(d).bind()
           val result = ref.get().bind()
           cond1 && !cond2 && result == c
-        }.equalUnderTheLaw(IO.just(true), EQ())
+        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
       }
     }
 
     "tryUpdate - modification occurs successfully" {
       forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
+        Ref(IO.monadDefer<Nothing>(), a).flatMap { ref ->
           ref.tryUpdate(f).flatMap {
             ref.get()
           }
@@ -103,7 +103,7 @@ class RefTest : UnitSpec() {
 
     "tryUpdate - should fail to update if modification has occurred" {
       forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
+        Ref(IO.monadDefer<Nothing>(), a).flatMap { ref ->
           ref.tryUpdate {
             ref.update(Int::inc).fix().unsafeRunSync()
             f(it)
@@ -114,8 +114,8 @@ class RefTest : UnitSpec() {
 
     "consistent set update" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        val set = Ref(IO.monadDefer(), a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
-        val update = Ref(IO.monadDefer(), a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
+        val set = Ref(IO.monadDefer<Nothing>(), a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
+        val update = Ref(IO.monadDefer<Nothing>(), a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
 
         set.flatMap { setA ->
           update.map { updateA ->
@@ -127,7 +127,7 @@ class RefTest : UnitSpec() {
 
     "access id" {
       forAll(Gen.int()) { a ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
+        Ref(IO.monadDefer<Nothing>(), a).flatMap { ref ->
           ref.access().map { (a, _) -> a }.flatMap {
             ref.get()
           }
@@ -137,8 +137,8 @@ class RefTest : UnitSpec() {
 
     "consistent access tryModify" {
       forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        val accessMap = Ref(IO.monadDefer(), a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
-        val tryUpdate = Ref(IO.monadDefer(), a).flatMap { ref -> ref.tryUpdate(f) }
+        val accessMap = Ref(IO.monadDefer<Nothing>(), a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
+        val tryUpdate = Ref(IO.monadDefer<Nothing>(), a).flatMap { ref -> ref.tryUpdate(f) }
 
         accessMap.equalUnderTheLaw(tryUpdate, EQ())
       }

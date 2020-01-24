@@ -79,11 +79,10 @@ interface ResourceMonoid<F, E, A> : Monoid<Resource<F, E, A>>, ResourceSemigroup
   override fun empty(): Resource<F, E, A> = Resource.empty(MR(), BR())
 }
 
-@extension
 interface ResourceMonadIO<F, E> : MonadIO<ResourcePartialOf<F, E>>, ResourceMonad<F, E> {
   fun FIO(): MonadIO<F>
   override fun BR(): Bracket<F, E>
-  override fun <A> IO<A>.liftIO(): Kind<ResourcePartialOf<F, E>, A> = FIO().run {
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<ResourcePartialOf<F, E>, A> = FIO().run {
     Resource.run { liftIO().liftF(BR()) }
   }
 }

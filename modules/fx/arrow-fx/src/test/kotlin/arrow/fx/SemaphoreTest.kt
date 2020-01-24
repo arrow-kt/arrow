@@ -21,7 +21,7 @@ class SemaphoreTest : UnitSpec() {
 
   init {
 
-    fun tests(label: String, semaphore: (Long) -> IOOf<Semaphore<ForIO>>) {
+    fun tests(label: String, semaphore: (Long) -> IOOf<Nothing, Semaphore<IOPartialOf<Nothing>>>) {
       "$label - acquire n synchronously" {
         val n = 20L
         semaphore(n).flatMap { s ->
@@ -138,7 +138,7 @@ class SemaphoreTest : UnitSpec() {
     tests("CancelableSemaphore") { Semaphore(it, IO.concurrent()) }
 
     "CancelableSemaphore - supports cancellation of acquire" {
-      Semaphore(0, IO.concurrent()).flatMap { s ->
+      Semaphore(0, IO.concurrent<Nothing>()).flatMap { s ->
         s.acquire()
       }.unsafeRunAsyncCancellable { }
         .invoke()

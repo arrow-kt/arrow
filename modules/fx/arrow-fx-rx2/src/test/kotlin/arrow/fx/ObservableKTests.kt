@@ -102,7 +102,7 @@ class ObservableKTests : RxJavaSpec() {
       ec shouldBe ExitCase.Canceled
     }
 
-    "ObservableK should cancel KindConnection on dispose" {
+    "ObservableK.cancelable should cancel CancelToken on dispose" {
       Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
           ObservableK.cancelable<Unit> {

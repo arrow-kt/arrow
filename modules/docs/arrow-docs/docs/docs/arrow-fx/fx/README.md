@@ -93,7 +93,7 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 
 #### Turning side effects into pure values with `effect`
 
-`effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user-declared side effect into an `IO<A>` value.
+`effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user-declared side effect into an `IO<Nothing, A>` value.
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -105,7 +105,7 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     val pureHello = effect { sayHello() }
     val pureGoodBye = effect { sayGoodBye() }
@@ -134,7 +134,7 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
@@ -157,7 +157,7 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     sayHello()
     sayGoodBye()
@@ -175,10 +175,10 @@ Composition using regular datatypes such as `IO` is still possible within `fx` b
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 //sampleStart
-fun sayInIO(s: String): IO<Unit> =
+fun sayInIO(s: String): IO<Nothing, Unit> =
   IO { println(s) }
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     sayInIO("Hello World").bind()
   }
@@ -211,7 +211,7 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
+fun greet(): IO<Nothing, Unit> =
   IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
