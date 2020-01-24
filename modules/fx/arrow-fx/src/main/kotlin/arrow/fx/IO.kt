@@ -50,7 +50,7 @@ typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 @Suppress("StringLiteralDuplication")
 sealed class IO<out A> : IOOf<A> {
 
-  companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
+  companion object : IOParMap, IORacePair, IORaceTriple {
 
     /**
      * Delay a suspended effect.

@@ -12,6 +12,7 @@ import arrow.core.extensions.setk.monoidK.monoidK
 import arrow.core.extensions.setk.monoidal.monoidal
 import arrow.core.extensions.setk.semigroupK.semigroupK
 import arrow.core.extensions.setk.show.show
+import arrow.core.extensions.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
@@ -42,7 +43,7 @@ class SetKTest : UnitSpec() {
     val EQ = SetK.eq(Int.eq())
 
     testLaws(
-      ShowLaws.laws(SetK.show(), EQ, Gen.genSetK(Gen.int())),
+      ShowLaws.laws(SetK.show(Int.show()), EQ, Gen.genSetK(Gen.int())),
       MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
       SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
       MonoidalLaws.laws(SetK.monoidal(),

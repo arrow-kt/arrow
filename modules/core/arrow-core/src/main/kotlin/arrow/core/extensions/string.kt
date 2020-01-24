@@ -29,7 +29,12 @@ fun String.Companion.eq(): Eq<String> =
   object : StringEq {}
 
 interface StringShow : Show<String> {
-  override fun String.show(): String = this
+  override fun String.show(): String = "\"${this.escape()}\""
+
+  private fun String.escape(): String =
+    replace("\n", "\\n").replace("\r", "\\r")
+      .replace("\"", "\\\"").replace("\'", "\\\'")
+      .replace("\t", "\\t").replace("\b", "\\b")
 }
 
 fun String.Companion.show(): Show<String> =

@@ -22,6 +22,7 @@ import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.option.unzip.unzip
+import arrow.core.extensions.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
@@ -69,7 +70,7 @@ class OptionTest : UnitSpec() {
         Option.genK(),
         Option.eqK()
       ),
-      ShowLaws.laws(Option.show(), Option.eq(Int.eq()), Gen.option(Gen.int())),
+      ShowLaws.laws(Option.show(Int.show()), Option.eq(Int.eq()), Gen.option(Gen.int())),
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), Option.genK(), Option.eqK()),

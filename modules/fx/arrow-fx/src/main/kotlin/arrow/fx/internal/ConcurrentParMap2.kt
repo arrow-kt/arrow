@@ -10,7 +10,7 @@ internal fun <F, A, B, C> Concurrent<F>.parMap2(
   fb: Kind<F, B>,
   f: (A, B) -> C
 ): Kind<F, C> = ctx.run {
-  tupled(fb.fork(this), fa.fork(this)).bracket(use = { (fiberB, fiberA) ->
+  tupledN(fb.fork(this), fa.fork(this)).bracket(use = { (fiberB, fiberA) ->
     racePair(fiberA.join().attempt(), fiberB.join().attempt()).flatMap { pairResult ->
       pairResult.fold({ attemptedA, fiberB ->
         attemptedA.fold({ error ->
