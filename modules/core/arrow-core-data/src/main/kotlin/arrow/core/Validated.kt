@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -632,9 +633,19 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       )
   }
 
-  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
+  fun show(SE: Show<E>, SA: Show<A>): String = fold({
+    "Invalid(${SE.run { it.show() }})"
+  }, {
+    "Valid(${SA.run { it.show() }})"
+  })
 
-  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
+  data class Valid<out A>(val a: A) : Validated<Nothing, A>() {
+    override fun toString(): String = show(Show.any(), Show.any())
+  }
+
+  data class Invalid<out E>(val e: E) : Validated<E, Nothing>() {
+    override fun toString(): String = show(Show.any(), Show.any())
+  }
 
   inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {

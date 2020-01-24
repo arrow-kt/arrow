@@ -1,0 +1,94 @@
+name: Sync release branch
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: release/0.11.0
+    - name: Check environment
+      id: check-env
+      run: |
+        LAST_COMMIT_HASH=$(git log -1 --pretty=%h)
+        echo ::set-output name=update-branch::$(git branch -a | grep -e "update/0.11.0-.\{7\}$")
+        echo ::set-output name=last-commit-hash::$LAST_COMMIT_HASH
+    - name: Merge master on release branch
+      id: merge
+      if: steps.check-env.outputs.update-branch == ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow.git
+        git config --global user.email "raulraja@users.noreply.github.com"
+        git config --global user.name "raulraja"
+        git checkout -b update/0.11.0-${{ steps.check-env.outputs.last-commit-hash }}
+        git merge origin/master -m "Merge master on release branch"
+        echo ::set-output name=changes::$(git diff release/0.11.0..HEAD)
+    - name: Set up JDK 1.8
+      if: steps.check-env.outputs.update-branch == '' && steps.merge.outputs.changes != ''
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        architecture: x64
+    - name: Validate Gradle Wrapper
+      if: steps.check-env.outputs.update-branch == '' && steps.merge.outputs.changes != ''
+      uses: gradle/wrapper-validation-action@v1
+    - name: Build with Gradle
+      if: steps.check-env.outputs.update-branch == '' && steps.merge.outputs.changes != ''
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+      run: |
+        ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+        ./gradlew check
+    - name: Push new branch
+      if: steps.check-env.outputs.update-branch == '' && steps.merge.outputs.changes != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: git push origin HEAD:update/0.11.0-${{ steps.check-env.outputs.last-commit-hash }}
+    - name: Create pull request
+      if: steps.check-env.outputs.update-branch == '' && steps.merge.outputs.changes != ''
+      uses: actions/github-script@0.3.0
+      with:
+        github-token: ${{github.token}}
+        script: |
+          await github.pulls.create({...context.repo,
+            title: "Update release/0.11.0 branch with master",
+            head: "update/0.11.0-${{ steps.check-env.outputs.last-commit-hash }}",
+            base: "release/0.11.0",
+            body: ":warning: **Don't wait for automatic checks** because they cannot be executed to prevent an infinite loop of GitHub Actions. If I created this pull request, everything is working as expected so you can merge it. Otherwise, I would have created an issue.\n\nHave a fantastic day using Arrow! :sparkles:"});
+    - name: Prepare environment to create the issue (new package)
+      if: failure()
+      run: |
+        echo -e "## Error log\nhttps://github.com/arrow-kt/arrow/commit/$GITHUB_SHA/checks\n" > issue.log
+        echo -e "## Conflicts\n\`\`\`\n$(git diff --diff-filter=U)\n\`\`\`\n" >> issue.log
+        rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
+        cd /home/runner/work/_actions/actions/github-script/0.3.0/
+        npm install
+        npm install xmlhttprequest
+    - name: Create the issue
+      if: failure()
+      uses: actions/github-script@0.3.0
+      with:
+        github-token: ${{github.token}}
+        script: |
+          var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+          function readFile(file) {
+            var content;
+            var rawFile = new XMLHttpRequest();
+            rawFile.open("GET", file, false);
+            rawFile.onreadystatechange = function () {
+                content = rawFile.responseText;
+            }
+            rawFile.send();
+            return content;
+          }
+          await github.issues.create({...context.repo, 
+            title: 'Error when sync release/0.11.0 with master', 
+            body: readFile("file:///home/runner/work/arrow/arrow/issue.log")});

@@ -34,13 +34,13 @@ interface Refinement<F, A> {
     applicativeError().run { refine(value).map(f) }
 
   fun <B> refine2(a: A, b: A, f: (Tuple2<A, A>) -> B): Kind<F, B> =
-    applicativeError().run { map(refine(a), refine(b), f) }
+    applicativeError().run { mapN(refine(a), refine(b), f) }
 
   fun <B> refine3(a: A, b: A, c: A, f: (Tuple3<A, A, A>) -> B): Kind<F, B> =
-    applicativeError().run { map(refine(a), refine(b), refine(c), f) }
+    applicativeError().run { mapN(refine(a), refine(b), refine(c), f) }
 
   fun <B> refine4(a: A, b: A, c: A, d: A, f: (Tuple4<A, A, A, A>) -> B): Kind<F, B> =
-    applicativeError().run { map(refine(a), refine(b), refine(c), refine(d), f) }
+    applicativeError().run { mapN(refine(a), refine(b), refine(c), refine(d), f) }
 
   fun <G, B> refineTraverse(value: Kind<G, A>, traverse: Traverse<G>, f: (A) -> B): Kind<F, Kind<G, B>> =
     traverse.run { value.traverse(applicativeError()) { refine(it, f) } }

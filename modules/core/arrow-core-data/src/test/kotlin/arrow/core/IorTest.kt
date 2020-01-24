@@ -16,6 +16,7 @@ import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.semigroup
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.genK2
@@ -46,7 +47,7 @@ class IorTest : UnitSpec() {
     testLaws(
       EqK2Laws.laws(Ior.eqK2(), Ior.genK2()),
       BifunctorLaws.laws(Ior.bifunctor(), Ior.genK2(), Ior.eqK2()),
-      ShowLaws.laws(Ior.show(), EQ, Gen.ior(Gen.string(), Gen.int())),
+      ShowLaws.laws(Ior.show(String.show(), Int.show()), EQ, Gen.ior(Gen.string(), Gen.int())),
       MonadLaws.laws(
         Ior.monad(Int.semigroup()),
         Ior.functor(),
