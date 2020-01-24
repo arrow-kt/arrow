@@ -11,7 +11,6 @@ import arrow.core.identity
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.applicative.unit
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
@@ -578,7 +577,7 @@ class IOTest : UnitSpec() {
     "IORacePair should be stack safe" {
       val size = 5000
 
-      fun ioRacePair(i: Int): IO<Int> =
+      fun ioRacePair(i: Int): IO<Nothing, Int> =
         IO.racePair(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
           .map { it.fold({ a, _ -> a }, { _, b -> b }) }
 
@@ -588,7 +587,7 @@ class IOTest : UnitSpec() {
     "IORaceTriple should be stack safe" {
       val size = 5000
 
-      fun ioRaceTriple(i: Int): IO<Int> =
+      fun ioRaceTriple(i: Int): IO<Nothing, Int> =
         IO.raceTriple(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
           .map { it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c }) }
 
@@ -598,7 +597,7 @@ class IOTest : UnitSpec() {
     "IOParMap2 should be stack safe" {
       val size = 5000
 
-      fun ioParMap2(i: Int): IO<Int> =
+      fun ioParMap2(i: Int): IO<Nothing, Int> =
         IO.parMapN(just(i), if (i < size) ioParMap2(i + 1) else just(i)) { _, ii -> ii }
 
       just(1).flatMap(::ioParMap2).unsafeRunSync() shouldBe size
@@ -607,7 +606,7 @@ class IOTest : UnitSpec() {
     "IOParMap3 should be stack safe" {
       val size = 5000
 
-      fun ioParMap3(i: Int): IO<Int> =
+      fun ioParMap3(i: Int): IO<Nothing, Int> =
         IO.parMapN(just(i), IO.unit, if (i < size) ioParMap3(i + 1) else just(i)) { _, _, ii -> ii }
 
       just(1).flatMap(::ioParMap3).unsafeRunSync() shouldBe size

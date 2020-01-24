@@ -107,21 +107,20 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
               release(a, Canceled).fix().maybe.subscribe({}, emitter::onError)
               Maybe.never<B>().k()
             } else {
-              defer { use(a) }
+              MaybeK.defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                  MaybeK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
                 }.doAfterSuccess {
-                  defer { release(a, Completed) }.fix().value().subscribe({}, emitter::onError)
+                  MaybeK.defer { release(a, Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
                 }
                 .doOnDispose {
-                  defer { release(a, Canceled) }.value().subscribe({}, {})
-                }.k()
+                  MaybeK.defer { release(a, Canceled) }.value().subscribe({}, {})
+                }
+                .k()
             }
           }
-          .value().subscribe({ b ->
-            Platform.trampoline { emitter.onSuccess(b) }
-          }, {}, { Platform.trampoline { emitter.onComplete() } })
+          .value().subscribe(emitter::onSuccess, {}, {})
       emitter.setCancellable { dispose.dispose() }
     }.k()
 

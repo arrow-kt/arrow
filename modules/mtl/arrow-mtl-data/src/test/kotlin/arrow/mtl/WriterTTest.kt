@@ -22,7 +22,6 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.core.k
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOPartialOf
 import arrow.fx.extensions.io.applicative.applicative
@@ -54,7 +53,7 @@ import io.kotlintest.properties.Gen
 
 class WriterTTest : UnitSpec() {
 
-  fun ioEQK(): WriterTEqK<ForIO, ListK<Int>> = WriterT.eqK(IO.eqK(), ListK.eq(Int.eq()))
+  fun ioEQK(): WriterTEqK<IOPartialOf<Nothing>, ListK<Int>> = WriterT.eqK(IO.eqK(), ListK.eq(Int.eq()))
 
   fun optionEQK(): WriterTEqK<ForOption, ListK<Int>> = WriterT.eqK(Option.eqK(), ListK.eq(Int.eq()))
 
@@ -75,11 +74,11 @@ class WriterTTest : UnitSpec() {
         WriterT.genK(Const.genK(Gen.int()), Gen.list(Gen.int()).map { it.k() }),
         constEQK()
       ),
-      ConcurrentLaws.lawsWriterTPartialOf<IOPartialOf<Nothing>, ListK<Int>>(
-        WriterT.concurrent(IO.concurrent(), ListK.monoid<Int>()),
-        WriterT.functor<ForIO, ListK<Int>>(IO.functor()),
-        WriterT.applicative(IO.applicative(), ListK.monoid<Int>()),
-        WriterT.monad(IO.monad(), ListK.monoid<Int>()),
+      ConcurrentLaws.laws<WriterTPartialOf<IOPartialOf<Nothing>, ListK<Int>>>(
+        WriterT.concurrent(IO.concurrent(), ListK.monoid()),
+        WriterT.functor(IO.functor()),
+        WriterT.applicative(IO.applicative(), ListK.monoid()),
+        WriterT.monad(IO.monad(), ListK.monoid()),
         WriterT.genK(IO.genK(), Gen.list(Gen.int()).map { it.k() }),
         ioEQK()
       ),

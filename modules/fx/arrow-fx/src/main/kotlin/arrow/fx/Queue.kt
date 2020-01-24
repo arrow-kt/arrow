@@ -28,9 +28,10 @@ import arrow.typeclasses.ApplicativeError
  * ported from [Scala ZIO Queue](https://zio.dev/docs/datatypes/datatypes_queue)
  * implementation
  */
-class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A>, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) : Concurrent<F> by CF {
+class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A>, private val ref: Ref<F, State<F, A>>, private val CF: Concurrent<F>) :
+  Concurrent<F> by CF {
 
-  fun size(): Kind<F, Int> = ref.get().flatMap(State<F, A>::size)
+  fun size(): Kind<F, Int> = ref.get().flatMap { it.size() }
 
   fun offer(a: A): Kind<F, Unit> {
     val use: (Promise<F, Unit>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
@@ -58,6 +59,9 @@ class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A
     val use: (Promise<F, A>, State<F, A>) -> Tuple2<Kind<F, Unit>, State<F, A>> = { p, state ->
       state.fold(
         ifSurplus = { surplus ->
+
+          println("I am in surplus: ${surplus.queue}")
+
           surplus.queue.dequeueOption().fold(
             ifEmpty = {
               surplus.putters.dequeueOption().fold(
@@ -72,15 +76,17 @@ class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A
               )
             },
             ifSome = { (a, q) ->
-              surplus.putters.dequeueOption().fold(
-                { p.complete(a) toT surplus.copy(queue = q) },
-                { (putter, putters) ->
-                  val (putVal, putProm) = putter
-                  (putProm.complete(Unit).followedBy(p.complete(a))) toT surplus.copy(
-                    queue = q.enqueue(putVal),
-                    putters = putters
-                  )
-                })
+              println("I got a value $a")
+              surplus.putters.dequeueOption().fold({
+                println("I am going to complete this...")
+                p.complete(a) toT surplus.copy(queue = q)
+              }, { (putter, putters) ->
+                val (putVal, putProm) = putter
+                (putProm.complete(Unit).followedBy(p.complete(a))) toT surplus.copy(
+                  queue = q.enqueue(putVal),
+                  putters = putters
+                )
+              })
             }
           )
         },
@@ -120,7 +126,8 @@ class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A
       ifSurplus = { surplus ->
         if (surplus.putters.isEmpty()) State.Shutdown(CF) toT surplus.shutdownHook
         else {
-          val forked = surplus.putters.toList().parTraverse { (_, p) -> p.error(QueueShutdown) }
+          val forked = surplus.putters.toList()
+            .parTraverse { (_, p) -> p.error(QueueShutdown) }
           State.Shutdown(CF) toT (forked.followedBy(surplus.shutdownHook))
         }
       },
@@ -259,6 +266,7 @@ class Queue<F, A> private constructor(private val strategy: SurplusStrategy<F, A
     data class Dropping<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {
       override fun handleSurplus(p: Promise<F, Unit>, surplus: State.Surplus<F, A>, a: A): Tuple2<Kind<F, Unit>, State<F, A>> =
         surplus.run {
+          println("I am going enqueue: ${queue.length()} < $capacity")
           val nextQueue = if (queue.length() < capacity) queue.enqueue(a) else queue
           p.complete(Unit) toT copy(queue = nextQueue)
         }

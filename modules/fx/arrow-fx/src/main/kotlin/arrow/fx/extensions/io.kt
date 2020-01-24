@@ -16,8 +16,8 @@ import arrow.fx.OnCancel
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
-import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.fix
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
@@ -207,7 +207,6 @@ interface IOAsync<E> : Async<IOPartialOf<E>>, IOMonadDefer<E> {
     IO.effect(f)
 }
 
-// FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent<EE> : Concurrent<IOPartialOf<EE>>, IOAsync<EE> {
   override fun <A> Kind<IOPartialOf<EE>, A>.fork(ctx: CoroutineContext): IO<EE, Fiber<IOPartialOf<EE>, A>> =
     Fork(ctx)
@@ -313,27 +312,7 @@ fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<IOPa
   }
 
 @extension
-interface IOUnsafeRun : UnsafeRun<ForIO> {
-
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
-
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
-    fa().fix().unsafeRunAsync(cb)
-}
-
-@extension
-interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
-
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
-    fa().fix().unsafeRunAsync(cb)
-
-  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
-    fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
-}
-
-@extension
-interface IODispatchers : Dispatchers<ForIO> {
+interface IODispatchers<E> : Dispatchers<IOPartialOf<E>> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
 
