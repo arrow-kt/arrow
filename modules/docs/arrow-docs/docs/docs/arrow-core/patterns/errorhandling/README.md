@@ -265,7 +265,7 @@ Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do n
 
 ```kotlin
 fun <F> MonadError<F, CookingException>.prepare1(ME): Kind<F, Salad> =
-    ME.tupled(getKnife(), takeFoodFromRefrigerator()).flatMap(ME, { (nuke, target) -> lunch<F>(nuke, target) })
+    ME.tupled(getKnife(), takeFoodFromRefrigerator()).flatMap(ME, { (knife, lettuce) -> lunch<F>(knife, lettuce) })
 
 val result = Either.monadError<CookingException>().prepare()
 result.fix()
@@ -278,7 +278,7 @@ result1.fix()
 Note that `MonadThrow` also has a function `fx.monadThrow` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-fun <F> MonadError<F, CookingException>.lunchImpure(target: Knife, nuke: Lettuce): Salad {
+fun <F> MonadError<F, CookingException>.lunchImpure(knife: Knife, lettuce: Lettuce): Salad {
     throw InsufficientAmountOfLettuce(5)
 }
 
