@@ -137,8 +137,8 @@ Try.applicative().run {
 import arrow.fx.*
 import arrow.fx.extensions.io.applicative.applicative
 
-val asyncBalance: IO<Int> = IO { 1000 }
-val asyncAvailable: IO<Int> = IO { 900 }
+val asyncBalance: IO<Nothing, Int> = IO { 1000 }
+val asyncAvailable: IO<Nothing, Int> = IO { 900 }
 
 IO.applicative().run {  
   mapToAccount(asyncBalance, asyncAvailable)

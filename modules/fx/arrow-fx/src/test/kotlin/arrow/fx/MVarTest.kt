@@ -1,7 +1,9 @@
 package arrow.fx
 
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
@@ -20,7 +22,7 @@ class MVarTest : UnitSpec() {
 
   init {
 
-    fun tests(label: String, mvar: MVarFactory<ForIO>) {
+    fun tests(label: String, mvar: MVarFactory<IOPartialOf<Nothing>>) {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           IO.fx {
@@ -32,7 +34,7 @@ class MVarTest : UnitSpec() {
             av.put(b).bind()
             val r2 = av.take().bind()
             Tuple4(isEmpty, isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), IO_EQ<Tuple4<Boolean, Boolean, Int, Int>>())
         }
       }
 
@@ -49,7 +51,10 @@ class MVarTest : UnitSpec() {
             av.put(c).bind()
             val r3 = av.take().bind()
             Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
-          }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), EQ())
+          }.equalUnderTheLaw(
+            IO.just(Tuple7(true, true, false, true, Some(a), None, c)),
+            IO_EQ<Tuple7<Boolean, Boolean, Boolean, Boolean, Option<Int>, Option<Int>, Int>>()
+          )
         }
       }
 
@@ -67,7 +72,7 @@ class MVarTest : UnitSpec() {
           val bb = f2.join().bind()
 
           setOf(aa, bb)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20)), EQ(timeout = 1.seconds))
+        }.equalUnderTheLaw(IO.just(setOf(10, 20)), IO_EQ<Set<Int>>(timeout = 1.seconds))
       }
 
       "$label - empty; put; put; put; take; take; take" {
@@ -87,7 +92,7 @@ class MVarTest : UnitSpec() {
           f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ(timeout = 1.seconds))
+        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), IO_EQ<Set<Int>>(timeout = 1.seconds))
       }
 
       "$label - empty; take; take; take; put; put; put" {
@@ -107,7 +112,7 @@ class MVarTest : UnitSpec() {
           val cc = f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ(timeout = 1.seconds))
+        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), IO_EQ<Set<Int>>(timeout = 1.seconds))
       }
 
       "$label - initial; isNotEmpty; take; put; take" {
@@ -120,7 +125,7 @@ class MVarTest : UnitSpec() {
             val r2 = av.take().bind()
 
             Tuple3(isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), IO_EQ<Tuple3<Boolean, Int, Int>>())
         }
       }
 
@@ -131,7 +136,7 @@ class MVarTest : UnitSpec() {
             val read = av.read().bind()
             val take = av.take().bind()
             read toT take
-          }.equalUnderTheLaw(IO.just(i toT i), EQ())
+          }.equalUnderTheLaw(IO.just(i toT i), IO_EQ<Tuple2<Int, Int>>())
         }
       }
 
@@ -144,7 +149,7 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - take/put test is stack safe" {
-        fun loop(n: Int, acc: Int, ch: MVar<ForIO, Int>): IO<Int> =
+        fun loop(n: Int, acc: Int, ch: MVar<IOPartialOf<Nothing>, Int>): IO<Nothing, Int> =
           if (n <= 0) IO.just(acc) else
             ch.take().flatMap { x ->
               ch.put(1).flatMap { loop(n - 1, acc + x, ch) }

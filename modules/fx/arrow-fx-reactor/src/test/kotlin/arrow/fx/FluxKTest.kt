@@ -29,7 +29,6 @@ import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
-import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -147,7 +146,7 @@ class FluxKTest : UnitSpec() {
 
       FluxK.just(Unit)
         .bracketCase(
-          use = { FluxK.async<Nothing> { _, _ -> } },
+          use = { FluxK.async<Nothing> { } },
           release = { _, exitCase ->
             FluxK {
               ec = exitCase
@@ -163,24 +162,11 @@ class FluxKTest : UnitSpec() {
       ec shouldBe ExitCase.Canceled
     }
 
-    "FluxK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
-        FluxK {
-          FluxK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.flux.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .expectNext(Unit)
-        .expectComplete()
-    }
-
     "FluxK async should be cancellable" {
       Promise.uncancelable<ForFluxK, Unit>(FluxK.async())
         .flatMap { latch ->
           FluxK {
-            FluxK.async<Unit> { _, _ -> }
+            FluxK.async<Unit> { }
               .value()
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -190,14 +176,6 @@ class FluxKTest : UnitSpec() {
         .test()
         .expectNext(Unit)
         .expectComplete()
-    }
-
-    "KindConnection can cancel upstream" {
-      FluxK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .expectError(ConnectionCancellationException::class)
     }
   }
 }

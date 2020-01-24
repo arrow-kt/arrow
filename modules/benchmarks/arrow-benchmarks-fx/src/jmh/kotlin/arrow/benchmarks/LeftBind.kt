@@ -1,6 +1,8 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -24,7 +26,7 @@ open class LeftBind {
   @Param("100")
   var depth: Int = 0
 
-  fun ioLoop(i: Int): IO<Int> =
+  fun ioLoop(i: Int): IO<Nothing, Int> =
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
     else if (i < size) ioLoop(i + 1).flatMap { IO.just(it) }
     else IO.just(i)

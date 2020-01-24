@@ -23,6 +23,7 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.extensions.listk.unalign.unalign
 import arrow.core.extensions.listk.unzip.unzip
 import arrow.core.extensions.show
+import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.generators.listK

@@ -8,6 +8,7 @@ import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.eq
 import arrow.core.identity
 import arrow.fx.IO
+import arrow.fx.unsafeRunSync
 import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either

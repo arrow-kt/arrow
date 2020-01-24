@@ -34,21 +34,21 @@ Executes and defers the result into a new `IO` that has captured any exceptions 
 Running this new `IO` will work over its result, rather than on the original `IO` content where `attempt()` was called on.
 
 ```kotlin
-IO<Int> { throw RuntimeException() }
+IO<Nothing, Int> { throw RuntimeException() }
   .attempt()
 ```
 
 ### runAsync
 
-Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `IO<Unit>` instance.
-All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Unit>` return.
+Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new `IO<Nothing, Unit>` instance.
+All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Nothing, Unit>` return.
 
 It runs the current `IO` asynchronously, calling the callback parameter on completion, and returning its result.
 
 The operation will not yield a result immediately; ultimately, to start running the suspended computation, you have to evaluate that new instance using an unsafe operator like `unsafeRunAsync` or `unsafeRunSync` for `IO`.
 
 ```kotlin
-IO<Int> { throw RuntimeException("Boom!") }
+IO<Nothing, Int> { throw RuntimeException("Boom!") }
   .runAsync { result ->
     result.fold({ IO { println("Error") } }, { IO { println(it.toString()) } })
   }
@@ -62,7 +62,7 @@ This callback is assumed to never throw any internal exceptions.
 It runs the current `IO` asynchronously, calling the callback parameter on completion.
 
 ```kotlin
-IO<Int> { throw RuntimeException("Boom!") }
+IO<Nothing, Int> { throw RuntimeException("Boom!") }
   .unsafeRunAsync { result ->
     result.fold({ println("Error") }, { println(it.toString()) })
   }
@@ -80,7 +80,7 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
 ```kotlin
-IO<Int> { throw RuntimeException("Boom!") }
+IO<Nothing, Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunTimed(100.milliseconds)
 ```
@@ -103,7 +103,7 @@ If your multithreaded program deadlocks, this function call is a good suspect.
 If your multithreaded program halts and never completes, this function call is a good suspect.
 
 ```kotlin
-IO<Int> { throw RuntimeException("Boom!") }
+IO<Nothing, Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```
@@ -150,7 +150,7 @@ IO { 1 }
 ```
 
 ```kotlin
-IO<Int> { throw RuntimeException("Boom!") }
+IO<Nothing, Int> { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```

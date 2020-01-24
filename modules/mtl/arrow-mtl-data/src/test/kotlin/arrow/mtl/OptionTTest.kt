@@ -20,6 +20,8 @@ import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
+import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
@@ -65,7 +67,7 @@ class OptionTTest : UnitSpec() {
     val nestedEQK = OptionT.eqK(Id.eqK()).nested(OptionT.eqK(NonEmptyList.eqK()))
 
     testLaws(
-      ConcurrentLaws.laws(
+      ConcurrentLaws.laws<OptionTPartialOf<IOPartialOf<Nothing>>>(
         OptionT.concurrent(IO.concurrent()),
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.monad()),

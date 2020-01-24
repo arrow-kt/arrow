@@ -13,5 +13,5 @@ import arrow.typeclasses.Monad
  *  If that is not enough use the fx-mtl package for better instances of the effect hierarchy.
  **/
 interface MonadIO<M> : Monad<M> {
-  fun <A> IO<A>.liftIO(): Kind<M, A>
+  fun <A> IO<Nothing, A>.liftIO(): Kind<M, A>
 }

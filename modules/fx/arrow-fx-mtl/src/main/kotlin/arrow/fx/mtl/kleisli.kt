@@ -156,11 +156,10 @@ fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPa
     override fun CF(): Concurrent<F> = CF
   }
 
-@extension
 interface KleisliMonadIO<F, R> : MonadIO<KleisliPartialOf<F, R>>, KleisliMonad<F, R> {
   fun FIO(): MonadIO<F>
   override fun MF(): Monad<F> = FIO()
-  override fun <A> IO<A>.liftIO(): Kind<KleisliPartialOf<F, R>, A> = FIO().run {
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<KleisliPartialOf<F, R>, A> = FIO().run {
     Kleisli.liftF(liftIO())
   }
 }

@@ -7,7 +7,6 @@ import arrow.core.NonFatal
 import arrow.core.internal.AtomicBooleanW
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.onceOnly
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -161,28 +160,6 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
-    @Deprecated(message =
-    "For wrapping cancelable operations you should use cancelable instead.\n" +
-      "For wrapping uncancelable operations you can use the non-deprecated async")
-    fun <A> async(fa: MonoKProc<A>): MonoK<A> =
-      Mono.create<A> { sink ->
-        val conn = MonoKConnection()
-        val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
-        sink.onCancel {
-          isCancelled.compareAndSet(false, true)
-          conn.cancel().value().subscribe()
-        }
-
-        fa(conn) { either: Either<Throwable, A> ->
-          either.fold({
-            sink.error(it)
-          }, {
-            sink.success(it)
-          })
-        }
-      }.k()
-
     /**
      * Constructor for wrapping uncancelable async operations.
      * It's safe to wrap unsafe operations in this constructor
@@ -219,28 +196,6 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
             sink.success(it)
           })
         }
-      }.k()
-
-    @Deprecated(message =
-    "For wrapping cancelable operations you should use cancelableF instead.\n" +
-      "For wrapping uncancelable operations you can use the non-deprecated asyncF")
-    fun <A> asyncF(fa: MonoKProcF<A>): MonoK<A> =
-      Mono.create { sink: MonoSink<A> ->
-        val conn = MonoKConnection()
-        val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
-        sink.onCancel {
-          isCancelled.compareAndSet(false, true)
-          conn.cancel().value().subscribe()
-        }
-
-        fa(conn) { either: Either<Throwable, A> ->
-          either.fold({
-            sink.error(it)
-          }, {
-            sink.success(it)
-          })
-        }.fix().mono.subscribe({}, sink::error)
       }.k()
 
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>): MonoK<A> =

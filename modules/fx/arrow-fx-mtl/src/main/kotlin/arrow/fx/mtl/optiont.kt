@@ -164,11 +164,10 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
     override fun CF(): Concurrent<F> = CF
   }
 
-@extension
 interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {
   fun FIO(): MonadIO<F>
   override fun MF(): Monad<F> = FIO()
-  override fun <A> IO<A>.liftIO(): Kind<OptionTPartialOf<F>, A> = FIO().run {
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<OptionTPartialOf<F>, A> = FIO().run {
     liftIO().liftT(this)
   }
 }

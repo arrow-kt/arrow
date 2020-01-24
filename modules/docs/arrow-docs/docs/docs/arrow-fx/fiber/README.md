@@ -21,21 +21,21 @@ import arrow.fx.extensions.fx
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.IO
 
-fun <A, B, C> parallelMap(first: IO<A>,
-                     second: IO<B>,
-                     f: (A, B) -> C): IO<C> =
+fun <A, B, C> parallelMap(first: IO<Nothing, A>,
+                     second: IO<Nothing, B>,
+                     f: (A, B) -> C): IO<Nothing, C> =
   IO.fx {
     val (fiberOne: Fiber<ForIO, A>) = first.fork(Default)
     val (fiberTwo: Fiber<ForIO, B>) = second.fork(Default)
     f(!fiberOne.join(), !fiberTwo.join())
   }
 
-val first = IO<Unit> { Thread.sleep(5000) }.map {
+val first = IO<Nothing, Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am first")
   1
 }
 
-val second = IO<Unit> { Thread.sleep(5000) }.map {
+val second = IO<Nothing, Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am second")
   2
 }
@@ -56,9 +56,9 @@ which allows us to register an operation to run on cancellation, error, or compl
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
 
-fun <A, B, C> parallelMap2(first: IO<A>,
-                          second: IO<B>,
-                          f: (A, B) -> C): IO<C> =
+fun <A, B, C> parallelMap2(first: IO<Nothing, A>,
+                          second: IO<Nothing, B>,
+                          f: (A, B) -> C): IO<Nothing, C> =
       first.fork(Default).bracket(use = { (joinA, _) ->
           second.fork(Default).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->

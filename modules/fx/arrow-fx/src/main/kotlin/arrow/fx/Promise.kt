@@ -293,6 +293,7 @@ interface Promise<F, A> {
         // creates a new promise for `use` and returns
         val (fc, pb) = !ref.modify { a ->
           val pb = unsafeCancelable<F, B>(this)
+          println("Hello")
           val (fc, a2) = use(pb, a)
           a2 toT (fc toT pb)
         }
