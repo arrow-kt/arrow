@@ -568,7 +568,7 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRacePair(i: Int): IO<Int> =
-        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
+        IO.racePair(IODispatchers.CommonPool, IO.never, if (i < size) ioRacePair(i + 1) else just(i))
           .map { it.fold({ a, _ -> a }, { _, b -> b }) }
 
       just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
@@ -578,7 +578,7 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRaceTriple(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
+        IO.raceTriple(IODispatchers.CommonPool, IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
           .map { it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c }) }
 
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size

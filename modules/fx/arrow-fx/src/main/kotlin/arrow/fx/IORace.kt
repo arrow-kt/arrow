@@ -15,11 +15,11 @@ import kotlin.coroutines.CoroutineContext
 
 interface IORace {
 
-  fun <A, B> raceN(ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.racePair(IODispatchers.CommonPool, ioA, ioB)
+  fun <A, B> raceN(ioA: IOOf<A>, ioB: IOOf<B>): IO<Race2<A, B>> =
+    IO.raceN(IODispatchers.CommonPool, ioA, ioB)
 
-  fun <A, B, C> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-    IO.raceTriple(IODispatchers.CommonPool, ioA, ioB, ioC)
+  fun <A, B, C> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<Race3<out A, out B, out C>> =
+    IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC)
 
   fun <A, B, C, D> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>): IO<Race4<out A, out B, out C, out D>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD)
@@ -268,7 +268,7 @@ interface IORace {
     }
 
   /**
-   * Race two tasks concurrently within a new [F] on [this@raceN].
+   * Race two tasks concurrently within a new [IO] on [this@raceN].
    * At the end of the race it automatically cancels the loser.
    *
    * ```kotlin:ank:playground
@@ -298,11 +298,11 @@ interface IORace {
    * }
    * ```
    *
-   * @param this@raceN [CoroutineContext] to execute the source [F] on.
-   * @param fa task to participate in the race
-   * @param fb task to participate in the race
-   * @return [F] either [Left] if [fa] won the race,
-   *   or [Right] if [fb] won the race.
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
+   * @param ioA task to participate in the race
+   * @param ioB task to participate in the race
+   * @return [IO] either [Left] if [ioA] won the race,
+   *   or [Right] if [ioB] won the race.
    *
    * @see racePair for a version that does not automatically cancel the loser.
    */
@@ -310,7 +310,7 @@ interface IORace {
     ctx: CoroutineContext,
     ioA: IOOf<A>,
     ioB: IOOf<B>
-  ): IO<Race2<out A, out B>> =
+  ): IO<Race2<A, B>> =
     racePair(ctx, ioA, ioB)
       .flatMap {
         it.fold(
