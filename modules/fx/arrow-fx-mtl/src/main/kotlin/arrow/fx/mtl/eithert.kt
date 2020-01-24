@@ -182,7 +182,7 @@ fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPa
 interface EitherTMonadIO<F, L> : MonadIO<EitherTPartialOf<F, L>>, EitherTMonad<F, L> {
   fun FIO(): MonadIO<F>
   override fun MF(): Monad<F> = FIO()
-  override fun <A> IO<Nothing,  A>.liftIO(): Kind<EitherTPartialOf<F, L>, A> = FIO().run {
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<EitherTPartialOf<F, L>, A> = FIO().run {
     EitherT.liftF(this, liftIO())
   }
 }
