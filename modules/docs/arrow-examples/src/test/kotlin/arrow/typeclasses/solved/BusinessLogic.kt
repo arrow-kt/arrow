@@ -1,8 +1,8 @@
 package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
-import arrow.core.Try
-import arrow.core.handleErrorWith
+import arrow.fx.IO
+import arrow.fx.handleErrorWith
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.MonadDefer
 import arrow.typeclasses.Index
@@ -12,7 +12,7 @@ import kotlin.coroutines.CoroutineContext
 // Step 0 - Compose operations
 
 interface RequestOperations : DaoOperations, NetworkOperations, DomainMapper {
-  fun Index.fetchUser(): Try<User> =
+  fun Index.fetchUser(): IO<User> =
     queryUser().toUserFromDatabase()
       .handleErrorWith { requestUser().toUserFromNetwork() }
 }
