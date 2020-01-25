@@ -1,7 +1,9 @@
 package arrow.fx.mtl
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.typeclasses.Async
@@ -12,13 +14,16 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.Kleisli
 import arrow.mtl.KleisliOf
 import arrow.mtl.KleisliPartialOf
+import arrow.mtl.extensions.KleisliMonad
 import arrow.mtl.extensions.KleisliMonadError
 import arrow.mtl.run
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -150,3 +155,12 @@ fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPa
   object : KleisliConcurrent<F, R> {
     override fun CF(): Concurrent<F> = CF
   }
+
+@extension
+interface KleisliMonadIO<F, R> : MonadIO<KleisliPartialOf<F, R>>, KleisliMonad<F, R> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<A>.liftIO(): Kind<KleisliPartialOf<F, R>, A> = FIO().run {
+    Kleisli.liftF(liftIO())
+  }
+}
