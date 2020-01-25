@@ -15,8 +15,6 @@ typealias AccumTFun<S, F, A> = (S) -> Kind<F, Tuple2<S, A>>
 
 typealias AccumTFunOf<S, F, A> = Kind<F, AccumTFun<S, F, A>>
 
-fun <S, F, A> AccumTOf<S, F, A>.runM(MF: Monad<F>, initial: S): Kind<F, Tuple2<S, A>> = runAccumT(MF, fix().accumT, initial)
-
 @higherkind
 data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A> {
 
