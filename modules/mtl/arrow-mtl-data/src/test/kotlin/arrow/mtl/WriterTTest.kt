@@ -3,13 +3,17 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
+import arrow.core.ForId
 import arrow.core.ForListK
 import arrow.core.ForOption
+import arrow.core.Id
 import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
+import arrow.core.extensions.id.eqK.eqK
+import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
 import arrow.core.extensions.listk.monoid.monoid
@@ -30,6 +34,7 @@ import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
 import arrow.mtl.extensions.WriterTEqK
+import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
@@ -37,6 +42,7 @@ import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.functor.functor
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
+import arrow.mtl.extensions.writert.monadState.monadState
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
@@ -47,6 +53,7 @@ import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import io.kotlintest.properties.Gen
@@ -89,7 +96,6 @@ class WriterTTest : UnitSpec() {
       ),
 
       MonadWriterLaws.laws(
-        WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         WriterT.monadWriter(Option.monad(), ListK.monoid<Int>()),
         ListK.monoid<Int>(),
         WriterT.functor<ForOption, ListK<Int>>(Option.functor()),
@@ -108,12 +114,18 @@ class WriterTTest : UnitSpec() {
         WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         WriterT.genK(Option.genK(), Gen.list(Gen.int()).map { it.k() }),
         optionEQK()
+      ),
+
+      MonadStateLaws.laws(
+        WriterT.monadState<StateTPartialOf<ForId, Int>, String, Int>(String.monoid(), StateT.monadState(Id.monad())),
+        WriterT.genK(StateT.genK(Id.genK(), Gen.int()), Gen.string()),
+        WriterT.eqK(StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0), String.eq())
       )
     )
   }
 }
 
-private fun <F, W> WriterT.Companion.genK(
+internal fun <F, W> WriterT.Companion.genK(
   GENKF: GenK<F>,
   GENW: Gen<W>
 ) = object : GenK<WriterTPartialOf<F, W>> {

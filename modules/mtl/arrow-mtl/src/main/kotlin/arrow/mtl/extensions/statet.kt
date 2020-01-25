@@ -1,6 +1,7 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
@@ -18,10 +19,14 @@ import arrow.mtl.StateTOf
 import arrow.mtl.StateTPartialOf
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.functor.functor
+import arrow.mtl.extensions.statet.monad.flatMap
 import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.runM
+import arrow.mtl.typeclasses.MonadReader
 import arrow.mtl.typeclasses.MonadState
+import arrow.mtl.typeclasses.MonadWriter
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -34,11 +39,9 @@ import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.mtl.extensions.statet.monad.flatMap
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented
@@ -295,4 +298,33 @@ interface StateTAlternative<F, S> : Alternative<StateTPartialOf<F, S>>, StateTMo
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
     orElse(y).fix()
+}
+
+@extension
+interface StateTMonadReader<F, S, D> : MonadReader<StateTPartialOf<F, S>, D>, StateTMonad<F, S> {
+  override fun MF(): Monad<F> = MR()
+  fun MR(): MonadReader<F, D>
+  override fun ask(): Kind<StateTPartialOf<F, S>, D> = StateT.liftF(MR(), MR().ask())
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.local(f: (D) -> D): Kind<StateTPartialOf<F, S>, A> = MR().run {
+    StateT(fix().runF.map { AndThen(it).andThen { it.local(f) } })
+  }
+}
+
+@extension
+interface StateTMonadWriter<F, S, W> : MonadWriter<StateTPartialOf<F, S>, W>, StateTMonad<F, S> {
+  override fun MF(): Monad<F> = MW()
+  fun MW(): MonadWriter<F, W>
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.listen(): Kind<StateTPartialOf<F, S>, Tuple2<W, A>> = MW().run {
+    StateT(fix().runF.map { AndThen(it).andThen { it.listen().map { (w, sa) ->
+      val (s, a) = sa
+      Tuple2(s, Tuple2(w, a))
+    } } })
+  }
+  override fun <A> Kind<StateTPartialOf<F, S>, Tuple2<(W) -> W, A>>.pass(): Kind<StateTPartialOf<F, S>, A> = MW().run {
+    StateT(fix().runF.map { AndThen(it).andThen { it.map { (s, fa) ->
+      val (f, a) = fa
+      Tuple2(f, Tuple2(s, a))
+    }.pass() } })
+  }
+  override fun <A> writer(aw: Tuple2<W, A>): Kind<StateTPartialOf<F, S>, A> = StateT.liftF(MW(), MW().writer(aw))
 }

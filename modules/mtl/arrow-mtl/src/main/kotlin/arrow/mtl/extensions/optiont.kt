@@ -25,9 +25,13 @@ import arrow.mtl.OptionT
 import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
+import arrow.mtl.extensions.optiont.monadTrans.liftT
 import arrow.mtl.fix
 import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.MonadReader
+import arrow.mtl.typeclasses.MonadState
 import arrow.mtl.typeclasses.MonadTrans
+import arrow.mtl.typeclasses.MonadWriter
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
@@ -311,4 +315,35 @@ interface OptionTEqK<F> : EqK<OptionTPartialOf<F>> {
 interface OptionTMonadTrans : MonadTrans<ForOptionT> {
   override fun <F, A> Kind<F, A>.liftT(MF: Monad<F>): Kind2<ForOptionT, F, A> =
     OptionT.liftF(MF, this)
+}
+
+@extension
+interface OptionTMonadReader<F, D> : MonadReader<OptionTPartialOf<F>, D>, OptionTMonad<F> {
+  override fun MF(): Monad<F> = MR()
+  fun MR(): MonadReader<F, D>
+  override fun ask(): Kind<OptionTPartialOf<F>, D> = MR().ask().liftT(MR())
+  override fun <A> Kind<OptionTPartialOf<F>, A>.local(f: (D) -> D): Kind<OptionTPartialOf<F>, A> = MR().run {
+    OptionT(value().local(f))
+  }
+}
+
+@extension
+interface OptionTMonadWriter<F, W> : MonadWriter<OptionTPartialOf<F>, W>, OptionTMonad<F> {
+  override fun MF(): Monad<F> = MW()
+  fun MW(): MonadWriter<F, W>
+  override fun <A> Kind<OptionTPartialOf<F>, A>.listen(): Kind<OptionTPartialOf<F>, Tuple2<W, A>> = MW().run {
+    OptionT(value().listen().map { (w, o) -> o.fold({ None }, { (w toT it).some() }) })
+  }
+  override fun <A> Kind<OptionTPartialOf<F>, Tuple2<(W) -> W, A>>.pass(): Kind<OptionTPartialOf<F>, A> = MW().run {
+    OptionT(value().map { it.fold({ { w: W -> w } toT None }, { (f, a) -> f toT a.some() }) }.pass())
+  }
+  override fun <A> writer(aw: Tuple2<W, A>): Kind<OptionTPartialOf<F>, A> = MW().writer(aw).liftT(MW())
+}
+
+@extension
+interface OptionTMonadState<F, S> : MonadState<OptionTPartialOf<F>, S>, OptionTMonad<F> {
+  override fun MF(): Monad<F> = MS()
+  fun MS(): MonadState<F, S>
+  override fun get(): Kind<OptionTPartialOf<F>, S> = MS().get().liftT(MS())
+  override fun set(s: S): Kind<OptionTPartialOf<F>, Unit> = MS().set(s).liftT(MS())
 }

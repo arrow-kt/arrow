@@ -22,6 +22,9 @@ import arrow.mtl.EitherTPartialOf
 import arrow.mtl.extensions.eithert.monadThrow.monadThrow
 import arrow.mtl.fix
 import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.MonadReader
+import arrow.mtl.typeclasses.MonadState
+import arrow.mtl.typeclasses.MonadWriter
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
@@ -352,4 +355,38 @@ interface EitherTEqK<F, L> : EqK<EitherTPartialOf<F, L>> {
         it.first.value().eqv(it.second.value())
       }
     }
+}
+
+@extension
+interface EitherTMonadReader<F, E, D> : MonadReader<EitherTPartialOf<F, E>, D>, EitherTMonad<F, E> {
+  override fun MF(): Monad<F> = MR()
+  fun MR(): MonadReader<F, D>
+  override fun ask(): Kind<EitherTPartialOf<F, E>, D> = EitherT.liftF(MR(), MR().ask())
+  override fun <A> Kind<EitherTPartialOf<F, E>, A>.local(f: (D) -> D): Kind<EitherTPartialOf<F, E>, A> = MR().run {
+    EitherT(value().local(f))
+  }
+}
+
+@extension
+interface EitherTMonadWriter<F, E, W> : MonadWriter<EitherTPartialOf<F, E>, W>, EitherTMonad<F, E> {
+  override fun MF(): Monad<F> = MW()
+  fun MW(): MonadWriter<F, W>
+
+  override fun <A> Kind<EitherTPartialOf<F, E>, A>.listen(): Kind<EitherTPartialOf<F, E>, Tuple2<W, A>> = MW().run {
+    EitherT(value().listen().map { (w, e) -> e.map { w toT it } })
+  }
+
+  override fun <A> Kind<EitherTPartialOf<F, E>, Tuple2<(W) -> W, A>>.pass(): Kind<EitherTPartialOf<F, E>, A> = MW().run {
+    EitherT(value().map { it.fold({ { w: W -> w } toT it.left() }, { (f, r) -> f toT r.right() }) }.pass())
+  }
+
+  override fun <A> writer(aw: Tuple2<W, A>): Kind<EitherTPartialOf<F, E>, A> = EitherT.liftF(MW(), MW().writer(aw))
+}
+
+@extension
+interface EitherTMonadState<F, E, S> : MonadState<EitherTPartialOf<F, E>, S>, EitherTMonad<F, E> {
+  override fun MF(): Monad<F> = MS()
+  fun MS(): MonadState<F, S>
+  override fun get(): Kind<EitherTPartialOf<F, E>, S> = EitherT.liftF(MS(), MS().get())
+  override fun set(s: S): Kind<EitherTPartialOf<F, E>, Unit> = EitherT.liftF(MS(), MS().set(s))
 }

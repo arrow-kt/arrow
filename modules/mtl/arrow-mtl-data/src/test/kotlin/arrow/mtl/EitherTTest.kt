@@ -31,13 +31,22 @@ import arrow.mtl.extensions.eithert.divisible.divisible
 import arrow.mtl.extensions.eithert.eqK.eqK
 import arrow.mtl.extensions.eithert.functor.functor
 import arrow.mtl.extensions.eithert.monad.monad
+import arrow.mtl.extensions.eithert.monadState.monadState
+import arrow.mtl.extensions.eithert.monadWriter.monadWriter
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
+import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.monad.monad
+import arrow.mtl.extensions.writert.monadWriter.monadWriter
+import arrow.mtl.typeclasses.MonadReader
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.MonadStateLaws
+import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -82,6 +91,20 @@ class EitherTTest : UnitSpec() {
         EitherT.semigroupK<ForId, Int>(Id.monad()),
         EitherT.genK(Id.genK(), Gen.int()),
         idEQK
+      ),
+
+      MonadStateLaws.laws(
+        EitherT.monadState<StateTPartialOf<ForId, Int>, String, Int>(StateT.monadState(Id.monad())),
+        EitherT.genK(StateT.genK(Id.genK(), Gen.int()), Gen.string()),
+        EitherT.eqK(StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0), String.eq())
+      ),
+      MonadWriterLaws.laws(
+        EitherT.monadWriter<WriterTPartialOf<ForId, String>, String, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
+        String.monoid(),
+        Gen.string(),
+        EitherT.genK<WriterTPartialOf<ForId, String>, String>(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
+        EitherT.eqK(WriterT.eqK(Id.eqK(), String.eq()), String.eq()),
+        String.eq()
       )
     )
 

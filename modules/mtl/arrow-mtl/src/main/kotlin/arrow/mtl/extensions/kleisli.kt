@@ -1,6 +1,7 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.Id
 import arrow.core.Tuple2
@@ -20,6 +21,8 @@ import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.run
 import arrow.mtl.typeclasses.MonadReader
+import arrow.mtl.typeclasses.MonadState
+import arrow.mtl.typeclasses.MonadWriter
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -207,6 +210,27 @@ interface KleisliMonadReader<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, Kle
   override fun ask(): Kleisli<F, D, D> = Kleisli { MF().just(it) }
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
+}
+
+@extension
+interface KleisliMonadWriter<F, D, W> : MonadWriter<KleisliPartialOf<F, D>, W>, KleisliMonad<F, D> {
+  override fun MF(): Monad<F> = MW()
+  fun MW(): MonadWriter<F, W>
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.listen(): Kind<KleisliPartialOf<F, D>, Tuple2<W, A>> = 
+    Kleisli(AndThen(fix().run).andThen { MW().run { it.listen() } })
+
+  override fun <A> Kind<KleisliPartialOf<F, D>, Tuple2<(W) -> W, A>>.pass(): Kind<KleisliPartialOf<F, D>, A> =
+    Kleisli(AndThen(fix().run).andThen { MW().run { it.pass() } })
+
+  override fun <A> writer(aw: Tuple2<W, A>): Kind<KleisliPartialOf<F, D>, A> = Kleisli.liftF(MW().writer(aw))
+}
+
+@extension
+interface KleisliMonadState<F, D, S> : MonadState<KleisliPartialOf<F, D>, S>, KleisliMonad<F, D> {
+  override fun MF(): Monad<F> = MS()
+  fun MS(): MonadState<F, S>
+  override fun get(): Kind<KleisliPartialOf<F, D>, S> = Kleisli.liftF(MS().get())
+  override fun set(s: S): Kind<KleisliPartialOf<F, D>, Unit> = Kleisli.liftF(MS().set(s))
 }
 
 class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReader<F, D>, KleisliMonadError<F, D, E> {

@@ -1,8 +1,10 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTry
+import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
@@ -10,6 +12,9 @@ import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.eq
+import arrow.core.extensions.id.eqK.eqK
+import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
@@ -28,7 +33,11 @@ import arrow.mtl.extensions.statet.functor.functor
 import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.statet.monadWriter.monadWriter
 import arrow.mtl.extensions.statet.semigroupK.semigroupK
+import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.monad.monad
+import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -36,6 +45,7 @@ import arrow.test.generators.tuple2
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
+import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -46,9 +56,9 @@ class StateTTests : UnitSpec() {
 
   val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
-  val optionStateEQK: EqK<StateTPartialOf<ForOption, Int>> = eqK(Option.eqK(), Int.eq(), Option.monad(), 1)
-  val ioStateEQK: EqK<StateTPartialOf<ForIO, Int>> = eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
-  val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = eqK(Try.eqK(), Int.eq(), Try.monad(), 1)
+  val optionStateEQK: EqK<StateTPartialOf<ForOption, Int>> = StateT.eqK(Option.eqK(), Int.eq(), Option.monad(), 1)
+  val ioStateEQK: EqK<StateTPartialOf<ForIO, Int>> = StateT.eqK(IO.eqK(), Int.eq(), IO.monad(), 1)
+  val tryStateEqK: EqK<Kind<Kind<ForStateT, ForTry>, Int>> = StateT.eqK(Try.eqK(), Int.eq(), Try.monad(), 1)
 
   init {
     testLaws(
@@ -81,12 +91,21 @@ class StateTTests : UnitSpec() {
         StateT.applicative<ForOption, Int>(Option.monad()),
         StateT.monad<ForOption, Int>(Option.monad()),
         StateT.genK(Option.genK(), Gen.int()),
-        optionStateEQK)
+        optionStateEQK
+      ),
+
+      MonadWriterLaws.laws(
+        StateT.monadWriter<WriterTPartialOf<ForId, String>, Int, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
+        String.monoid(), Gen.string(),
+        StateT.genK(WriterT.genK(Id.genK(), Gen.string()), Gen.int()),
+        StateT.eqK(WriterT.eqK(Id.eqK(), String.eq()), Int.eq(), WriterT.monad(Id.monad(), String.monoid()), 0),
+        String.eq()
+      )
     )
   }
 }
 
-private fun <F, S> eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
+internal fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
   override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
       val ls = it.first.runM(M, s)
@@ -98,7 +117,7 @@ private fun <F, S> eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : E
     }
 }
 
-private fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
+internal fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
     genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
       val stateTFun: StateTFun<F, S, A> = { _: S -> state }

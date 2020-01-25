@@ -31,13 +31,12 @@ object MonadWriterLaws {
 
     return listOf(
       Law("Monad Writer Laws: writer just") { MW.monadWriterWriterJust(MOW, EQ_INT) },
-      Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW) },
+      Law("Monad Writer Laws: tell fusion") { MW.monadWriterTellFusion(genW, MOW, EQK.liftEq(Eq.any())) },
       Law("Monad Writer Laws: listen just") { MW.monadWriterListenJust(MOW, EQ_TUPLE) },
       Law("Monad Writer Laws: listen writer") { MW.monadWriterListenWriter(GEN_TUPLE, EQ_TUPLE) })
   }
 
   fun <F, W> laws(
-    MF: Monad<F>,
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     genW: Gen<W>,
@@ -45,11 +44,10 @@ object MonadWriterLaws {
     EQK: EqK<F>,
     EQW: Eq<W>
   ): List<Law> =
-    MonadLaws.laws(MF, GENK, EQK) +
+    MonadLaws.laws(MW, GENK, EQK) +
       monadWriterLaws(MW, MOW, genW, EQK, EQW)
 
   fun <F, W> laws(
-    MF: Monad<F>,
     MW: MonadWriter<F, W>,
     MOW: Monoid<W>,
     FF: Functor<F>,
@@ -60,7 +58,7 @@ object MonadWriterLaws {
     EQK: EqK<F>,
     EQW: Eq<W>
   ): List<Law> =
-    MonadLaws.laws(MF, FF, AP, SL, GENK, EQK) + monadWriterLaws(MW, MOW, genW, EQK, EQW)
+    MonadLaws.laws(MW, FF, AP, SL, GENK, EQK) + monadWriterLaws(MW, MOW, genW, EQK, EQW)
 
   fun <F, W> MonadWriter<F, W>.monadWriterWriterJust(
     MOW: Monoid<W>,
@@ -73,10 +71,11 @@ object MonadWriterLaws {
 
   fun <F, W> MonadWriter<F, W>.monadWriterTellFusion(
     genW: Gen<W>,
-    MOW: Monoid<W>
+    MOW: Monoid<W>,
+    EQ: Eq<Kind<F, Unit>>
   ) {
     forAll(genW, genW) { x: W, y: W ->
-      tell(x).flatMap { tell(y) }.equalUnderTheLaw(tell(MOW.run { x.combine(y) }), Eq.any())
+      tell(x).flatMap { tell(y) }.equalUnderTheLaw(tell(MOW.run { x.combine(y) }), EQ)
     }
   }
 

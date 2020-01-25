@@ -2,6 +2,7 @@ package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Const
+import arrow.core.ForId
 import arrow.core.ForNonEmptyList
 import arrow.core.Id
 import arrow.core.NonEmptyList
@@ -11,6 +12,7 @@ import arrow.core.Some
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
+import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
@@ -32,10 +34,15 @@ import arrow.mtl.extensions.optiont.eqK.eqK
 import arrow.mtl.extensions.optiont.functor.functor
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monad.monad
+import arrow.mtl.extensions.optiont.monadState.monadState
 import arrow.mtl.extensions.optiont.monadTrans.monadTrans
+import arrow.mtl.extensions.optiont.monadWriter.monadWriter
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
+import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -44,7 +51,9 @@ import arrow.test.generators.option
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadTransLaws
+import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseFilterLaws
@@ -116,6 +125,20 @@ class OptionTTest : UnitSpec() {
         OptionT.monad(Id.monad()),
         Id.genK(),
         OptionT.eqK(Id.eqK())
+      ),
+
+      MonadStateLaws.laws(
+        OptionT.monadState<StateTPartialOf<ForId, Int>, Int>(StateT.monadState(Id.monad())),
+        OptionT.genK(StateT.genK(Id.genK(), Gen.int())),
+        OptionT.eqK(StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0))
+      ),
+
+      MonadWriterLaws.laws(
+        OptionT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid())),
+        String.monoid(), Gen.string(),
+        OptionT.genK(WriterT.genK(Id.genK(), Gen.string())),
+        OptionT.eqK(WriterT.eqK(Id.eqK(), String.eq())),
+        String.eq()
       )
     )
 

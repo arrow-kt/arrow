@@ -14,6 +14,7 @@ import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
+import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
@@ -32,6 +33,12 @@ import arrow.mtl.extensions.kleisli.divisible.divisible
 import arrow.mtl.extensions.kleisli.eqK.eqK
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
+import arrow.mtl.extensions.kleisli.monadState.monadState
+import arrow.mtl.extensions.kleisli.monadWriter.monadWriter
+import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.monad.monad
+import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -39,6 +46,8 @@ import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.MonadStateLaws
+import arrow.test.laws.MonadWriterLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -63,12 +72,14 @@ class KleisliTest : UnitSpec() {
     } as Gen<Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>>
   }
 
-  init {
-    fun <F, D> genK(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
-      override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
-        Kleisli { _: D -> k }
-      }
+  fun <F, D> Kleisli.Companion.genK(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
+      Kleisli { _: D -> k }
     }
+  }
+
+  init {
+
 
     val optionEQK = Kleisli.eqK(Option.eqK(), 0)
 
@@ -82,7 +93,7 @@ class KleisliTest : UnitSpec() {
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
-        genK<ForOption, Int>(Option.genK()),
+        Kleisli.genK<ForOption, Int>(Option.genK()),
         optionEQK
       ),
       ConcurrentLaws.laws(
@@ -90,14 +101,36 @@ class KleisliTest : UnitSpec() {
         Kleisli.functor<ForIO, Int>(IO.functor()),
         Kleisli.applicative<ForIO, Int>(IO.applicative()),
         Kleisli.monad<ForIO, Int>(IO.monad()),
-        genK<ForIO, Int>(IO.genK()),
+        Kleisli.genK<ForIO, Int>(IO.genK()),
         ioEQK
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), conestTryGENK(), conestTryEQK()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
-        genK<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
+        Kleisli.genK<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
         constEQK
+      ),
+      MonadStateLaws.laws(
+        Kleisli.monadState<StateTPartialOf<ForId, Int>, Int, Int>(StateT.monadState(Id.monad())),
+        Kleisli.genK<StateTPartialOf<ForId, Int>, Int>(StateT.genK(Id.genK(), Gen.int())),
+        object: EqK<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>> {
+          override fun <A> Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>.eqK(other: Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>, EQ: Eq<A>): Boolean =
+            StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0).run {
+              run(0).eqK(other.run(0), EQ)
+            }
+        }
+      ),
+      MonadWriterLaws.laws(
+        Kleisli.monadWriter<WriterTPartialOf<ForId, String>, Int, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
+        String.monoid(), Gen.string(),
+        Kleisli.genK<WriterTPartialOf<ForId, String>, Int>(WriterT.genK(Id.genK(), Gen.string())),
+        object: EqK<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>> {
+          override fun <A> Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>.eqK(other: Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>, EQ: Eq<A>): Boolean =
+            WriterT.eqK(Id.eqK(), String.eq()).run {
+              run(0).eqK(run(0), EQ)
+            }
+        },
+        String.eq()
       )
     )
 

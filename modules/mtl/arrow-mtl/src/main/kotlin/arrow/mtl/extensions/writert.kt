@@ -13,6 +13,8 @@ import arrow.mtl.WriterTOf
 import arrow.mtl.WriterTPartialOf
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.fix
+import arrow.mtl.typeclasses.MonadReader
+import arrow.mtl.typeclasses.MonadState
 import arrow.mtl.typeclasses.MonadWriter
 import arrow.mtl.value
 import arrow.typeclasses.Alternative
@@ -289,4 +291,24 @@ interface WriterTEqK<F, W> : EqK<WriterTPartialOf<F, W>> {
         it.first.value().eqv(it.second.value())
       }
     }
+}
+
+@extension
+interface WriterTMonadReader<F, W, D> : MonadReader<WriterTPartialOf<F, W>, D>, WriterTMonad<F, W> {
+  override fun MF(): Monad<F> = MR()
+  override fun MM(): Monoid<W>
+  fun MR(): MonadReader<F, D>
+  override fun ask(): Kind<WriterTPartialOf<F, W>, D> = WriterT.liftF(MR().ask(), MM(), MR())
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.local(f: (D) -> D): Kind<WriterTPartialOf<F, W>, A> = MR().run {
+    WriterT(value().local(f))
+  }
+}
+
+@extension
+interface WriterTMonadState<F, W, S> : MonadState<WriterTPartialOf<F, W>, S>, WriterTMonad<F, W> {
+  override fun MF(): Monad<F> = MS()
+  override fun MM(): Monoid<W>
+  fun MS(): MonadState<F, S>
+  override fun get(): Kind<WriterTPartialOf<F, W>, S> = WriterT.liftF(MS().get(), MM(), MS())
+  override fun set(s: S): Kind<WriterTPartialOf<F, W>, Unit> = WriterT.liftF(MS().set(s), MM(), MS())
 }
