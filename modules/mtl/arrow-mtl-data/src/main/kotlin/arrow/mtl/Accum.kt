@@ -10,13 +10,13 @@ import arrow.typeclasses.Monad
 
 typealias Accum<S, A> = AccumT<S, ForId, A>
 
-fun <S, F, A> accumF(MF: Monad<F>, f: (S) -> Tuple2<S, A>): AccumT<S, F, A> =
+private fun <S, F, A> accum(MF: Monad<F>, f: (S) -> Tuple2<S, A>): AccumT<S, F, A> =
   AccumT(MF) {
     MF.just(f(it))
   }
 
 fun <S, A> accum(f: (S) -> Tuple2<S, A>): Accum<S, A> =
-  accumF(Id.monad(), f)
+  accum(Id.monad(), f)
 
 fun <S, A> Accum<S, A>.runAccum(s: S): Tuple2<S, A> =
   runAccumT(Id.monad(), s).fix().extract()

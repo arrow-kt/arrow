@@ -3,6 +3,7 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -48,7 +49,7 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
     }
 
     fun <S, F> look(MS: Monoid<S>, MF: Monad<F>): AccumT<S, F, S> =
-      AccumT(MF.just { s: S -> MF.just(MS.empty() toT s) })
+      looks(MS, MF, ::identity)
 
     fun <S, F, A> looks(MS: Monoid<S>, MF: Monad<F>, fs: (S) -> A): AccumT<S, F, A> =
       AccumT(MF.just { s: S -> MF.just(MS.empty() toT fs(s)) })
