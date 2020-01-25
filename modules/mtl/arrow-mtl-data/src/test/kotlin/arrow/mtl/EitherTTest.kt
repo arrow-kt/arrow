@@ -39,7 +39,6 @@ import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
-import arrow.mtl.typeclasses.MonadReader
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws

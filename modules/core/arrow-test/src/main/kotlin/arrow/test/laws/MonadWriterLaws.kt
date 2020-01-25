@@ -10,7 +10,6 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import io.kotlintest.properties.Gen

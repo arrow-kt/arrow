@@ -216,7 +216,7 @@ interface KleisliMonadReader<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, Kle
 interface KleisliMonadWriter<F, D, W> : MonadWriter<KleisliPartialOf<F, D>, W>, KleisliMonad<F, D> {
   override fun MF(): Monad<F> = MW()
   fun MW(): MonadWriter<F, W>
-  override fun <A> Kind<KleisliPartialOf<F, D>, A>.listen(): Kind<KleisliPartialOf<F, D>, Tuple2<W, A>> = 
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.listen(): Kind<KleisliPartialOf<F, D>, Tuple2<W, A>> =
     Kleisli(AndThen(fix().run).andThen { MW().run { it.listen() } })
 
   override fun <A> Kind<KleisliPartialOf<F, D>, Tuple2<(W) -> W, A>>.pass(): Kind<KleisliPartialOf<F, D>, A> =

@@ -80,7 +80,6 @@ class KleisliTest : UnitSpec() {
 
   init {
 
-
     val optionEQK = Kleisli.eqK(Option.eqK(), 0)
 
     val ioEQK: EqK<Kind<Kind<ForKleisli, ForIO>, Int>> = Kleisli.eqK(IO.eqK(), 1)
@@ -113,7 +112,7 @@ class KleisliTest : UnitSpec() {
       MonadStateLaws.laws(
         Kleisli.monadState<StateTPartialOf<ForId, Int>, Int, Int>(StateT.monadState(Id.monad())),
         Kleisli.genK<StateTPartialOf<ForId, Int>, Int>(StateT.genK(Id.genK(), Gen.int())),
-        object: EqK<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>> {
+        object : EqK<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>> {
           override fun <A> Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>.eqK(other: Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>, EQ: Eq<A>): Boolean =
             StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0).run {
               run(0).eqK(other.run(0), EQ)
@@ -124,7 +123,7 @@ class KleisliTest : UnitSpec() {
         Kleisli.monadWriter<WriterTPartialOf<ForId, String>, Int, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
         String.monoid(), Gen.string(),
         Kleisli.genK<WriterTPartialOf<ForId, String>, Int>(WriterT.genK(Id.genK(), Gen.string())),
-        object: EqK<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>> {
+        object : EqK<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>> {
           override fun <A> Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>.eqK(other: Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>, EQ: Eq<A>): Boolean =
             WriterT.eqK(Id.eqK(), String.eq()).run {
               run(0).eqK(run(0), EQ)
