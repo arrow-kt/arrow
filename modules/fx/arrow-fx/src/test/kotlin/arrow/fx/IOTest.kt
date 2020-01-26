@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.identity
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
@@ -578,7 +577,7 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRacePair(i: Int): IO<Nothing, Int> =
-        IO.racePair(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
+        IO.racePair(IODispatchers.CommonPool, IO.never, if (i < size) ioRacePair(i + 1) else just(i))
           .map { it.fold({ a, _ -> a }, { _, b -> b }) }
 
       just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
@@ -588,11 +587,29 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRaceTriple(i: Int): IO<Nothing, Int> =
-        IO.raceTriple(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
+        IO.raceTriple(IODispatchers.CommonPool, IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
           .map { it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c }) }
 
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
     }
+
+    // known issue
+//    "IORace4 should be stack safe" {
+//      val size = 5000
+//
+//      fun ioRace4(i: Int): IO<Int> =
+//        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
+//          .map {
+//            it.fold(
+//              ::identity,
+//              ::identity,
+//              ::identity,
+//              ::identity
+//            )
+//          }
+//
+//      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
+//    }
 
     "IOParMap2 should be stack safe" {
       val size = 5000

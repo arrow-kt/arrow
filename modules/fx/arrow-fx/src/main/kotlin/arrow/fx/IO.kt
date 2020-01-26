@@ -68,7 +68,7 @@ typealias IOProcF<E, A> = ((IOResult<E, A>) -> Unit) -> IOOf<E, Unit>
 @Suppress("StringLiteralDuplication")
 sealed class IO<out E, out A> : IOOf<E, A> {
 
-  companion object : IOParMap, IORacePair, IORaceTriple {
+  companion object : IOParMap, IORace {
 
     /**
      * Delay a suspended effect.
