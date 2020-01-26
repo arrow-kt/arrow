@@ -4,9 +4,11 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
 
 typealias Accum<S, A> = AccumT<S, ForId, A>
 
@@ -29,3 +31,9 @@ fun <S, A> Accum<S, A>.evalAccum(s: S): A =
 
 fun <S, A, B> Accum<S, A>.mapAccum(f: (Tuple2<S, A>) -> Tuple2<S, B>): Accum<S, B> =
   mapAccumT(Id.monad(), Id.applicative()) { Id.just(f(it.fix().extract())) }
+
+fun <S, A, B> Accum<S, A>.map(fa: (A) -> B): Accum<S, B> =
+  map(Id.functor(), fa)
+
+fun <S, A, B> Accum<S, A>.flatMap(MS: Monoid<S>, fa: (A) -> Accum<S, B>) =
+  flatMap(MS, Id.monad(), fa)

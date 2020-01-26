@@ -11,10 +11,28 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 
+/**
+ * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.
+ */
 typealias AccumTFun<S, F, A> = (S) -> Kind<F, Tuple2<S, A>>
 
+/**
+ * Alias that represents wrapped stateful computation in context `F`.
+ */
 typealias AccumTFunOf<S, F, A> = Kind<F, AccumTFun<S, F, A>>
 
+/**
+ * `AccumT<S, F, A>` is a stateful computation within a context `F` yielding
+ * a value of type `A`. AccumT provides append-only accumulation during the computation.
+ * For more general access, use `StateT` instead.
+ *
+ * When flatMapping the resulting state of subcomputations is combined using `Monoid<S>`
+ *
+ * @param F the context that wraps the stateful computation.
+ * @param S the state we are performing computation upon.
+ * @param A current value of computation.
+ * @param accumF the stateful computation that is wrapped and managed by `AccumT`
+ */
 @higherkind
 data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A> {
 
@@ -23,7 +41,7 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
     fun <S, F, A> just(MS: Monoid<S>, MF: Monad<F>, a: A): AccumT<S, F, A> =
       AccumT(MF.just { w: S -> MF.just(MS.empty() toT a) })
 
-    operator fun <S, F, A> invoke(AF: Applicative<F>, accumTFun: AccumTFun<S, F, A>) =
+    operator fun <S, F, A> invoke(AF: Applicative<F>, accumTFun: AccumTFun<S, F, A>): AccumT<S, F, A> =
       AF.run {
         AccumT(just(accumTFun))
       }
@@ -32,7 +50,7 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
       MF: Monad<F>,
       a: A,
       fa: (A) -> Kind<AccumTPartialOf<S, F>, Either<A, B>>
-    ) = MF.run {
+    ): AccumT<S, F, B> = MF.run {
       AccumT(MF) { s: S ->
         tailRecM(Tuple2(s, a)) { (s1, a0) ->
           fa(a0).fix().runAccumT(MF, s1).map { (s2, ab) ->
@@ -46,19 +64,34 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
       AccumT(AF) { s -> fa.map { a -> Tuple2(s, a) } }
     }
 
+    /**
+     * look is an action that fetches all the previously accumulated output.
+     */
     fun <S, F> look(MS: Monoid<S>, MF: Monad<F>): AccumT<S, F, S> =
       looks(MS, MF, ::identity)
 
+    /**
+     * looks is an action that retrieves a function of the previously accumulated output.
+     */
     fun <S, F, A> looks(MS: Monoid<S>, MF: Monad<F>, fs: (S) -> A): AccumT<S, F, A> =
       AccumT(MF.just { s: S -> MF.just(MS.empty() toT fs(s)) })
 
+    /**
+     * add w is an action that produces the output w.
+     */
     fun <S, F> add(MF: Monad<F>, s: S): AccumT<S, F, Unit> =
       AccumT(MF.just { _: S -> MF.just(s toT Unit) })
   }
 
+  /**
+   * Unwrap an accumulation computation.
+   */
   fun runAccumT(MF: Monad<F>, s: S): Kind<F, Tuple2<S, A>> =
     runAccumT(MF, accumT, s)
 
+  /**
+   * Extract the output from an accumulation computation.
+   */
   fun execAccumT(MF: Monad<F>, s: S): Kind<F, S> =
     MF.run {
       runAccumT(MF, s).map {
@@ -66,6 +99,10 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
       }
     }
 
+  /**
+   * Evaluate an accumulation computation with the given initial output history
+   * and return the final value, discarding the final output.
+   */
   fun evalAccumT(MF: Monad<F>, s: S): Kind<F, A> =
     MF.run {
       runAccumT(MF, s).map {
@@ -73,6 +110,9 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
       }
     }
 
+  /**
+   * Map both the return value and output of a computation using the given function.
+   */
   fun <G, B> mapAccumT(
     MF: Monad<F>,
     AG: Applicative<G>,
@@ -117,6 +157,9 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
       }
     }
 
+  /**
+   * Convert an accumulation (append-only) computation into a fully stateful computation.
+   */
   fun toStateT(MF: Monad<F>, MS: Monoid<S>): StateT<F, S, A> =
     StateT(MF) { s: S ->
       MF.run {
@@ -127,13 +170,16 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
     }
 }
 
-fun <F, S, A> runAccumT(MF: Monad<F>, accumT: AccumTFunOf<S, F, A>, s: S): Kind<F, Tuple2<S, A>> =
+private fun <F, S, A> runAccumT(MF: Monad<F>, accumT: AccumTFunOf<S, F, A>, s: S): Kind<F, Tuple2<S, A>> =
   MF.run {
     accumT.flatMap {
       it(s)
     }
   }
 
+/**
+ * Convert a read-only computation into an accumulation computation.
+ */
 fun <F, S, A> ReaderT<F, S, A>.toAccumT(
   AF: Applicative<F>,
   FF: Functor<F>,
@@ -149,6 +195,9 @@ fun <F, S, A> ReaderT<F, S, A>.toAccumT(
     }
   }
 
+/**
+ * Convert a writer computation into an accumulation computation.
+ */
 fun <F, S, A> WriterT<F, S, A>.toAccumT(FF: Functor<F>): AccumT<S, F, A> =
   value().let { fsa ->
     FF.run {
