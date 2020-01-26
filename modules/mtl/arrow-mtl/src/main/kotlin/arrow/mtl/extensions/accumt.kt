@@ -121,4 +121,3 @@ interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, Accu
   override fun ME(): MonadError<F, E>
   override fun MF(): Monad<F> = ME()
 }
-
