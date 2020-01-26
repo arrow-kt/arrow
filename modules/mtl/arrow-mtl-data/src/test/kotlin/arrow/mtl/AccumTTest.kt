@@ -21,6 +21,11 @@ import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
+import arrow.fx.IO
+import arrow.fx.extensions.io.monad.monad
+import arrow.fx.extensions.io.monadIO.monadIO
+import arrow.fx.fix
+import arrow.fx.mtl.accumt.monadIO.monadIO
 import arrow.mtl.extensions.accumt.alternative.alternative
 import arrow.mtl.extensions.accumt.applicative.applicative
 import arrow.mtl.extensions.accumt.applicativeError.applicativeError
@@ -47,6 +52,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 
 class AccumTTest : UnitSpec() {
   init {
@@ -117,6 +123,16 @@ class AccumTTest : UnitSpec() {
         Gen.bool(),
         Id.eqK().liftEq(String.eq())
       )
+    }
+
+    "monadIO" {
+      val accumT = AccumT.monadIO(IO.monadIO(), String.monoid()).run {
+        IO.just(1).liftIO().fix()
+      }
+
+      val ls = accumT.runAccumT(IO.monad(), "1").fix().unsafeRunSync()
+
+      ls shouldBe ("" toT 1)
     }
   }
 }

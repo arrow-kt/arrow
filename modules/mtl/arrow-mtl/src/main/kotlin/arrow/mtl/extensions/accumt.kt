@@ -21,10 +21,10 @@ import arrow.typeclasses.Monoid
 @extension
 interface AccumTFunctor<S, F> : Functor<AccumTPartialOf<S, F>> {
 
-  fun MF(): Functor<F>
+  fun FF(): Functor<F>
 
   override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.map(f: (A) -> B): Kind<AccumTPartialOf<S, F>, B> =
-    this.fix().map(MF(), f)
+    this.fix().map(FF(), f)
 }
 
 @extension
@@ -63,11 +63,11 @@ interface AccumtTMonadTrans<S> : MonadTrans<Kind<ForAccumT, S>> {
 
   fun MS(): Monoid<S>
 
-  override fun <G, A> Kind<G, A>.liftT(MF: Monad<G>): Kind2<Kind<ForAccumT, S>, G, A> =
-    AccumT(MF) { _: S ->
-      MF.run {
+  override fun <G, A> Kind<G, A>.liftT(MG: Monad<G>): Kind2<Kind<ForAccumT, S>, G, A> =
+    AccumT(MG) { _: S ->
+      MG.run {
         flatMap { a ->
-          MF.just(MS().empty() toT a)
+          MG.just(MS().empty() toT a)
         }
       }
     }
@@ -121,3 +121,4 @@ interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, Accu
   override fun ME(): MonadError<F, E>
   override fun MF(): Monad<F> = ME()
 }
+

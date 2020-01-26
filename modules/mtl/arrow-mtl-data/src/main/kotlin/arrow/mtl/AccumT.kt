@@ -20,8 +20,8 @@ data class AccumT<S, F, A>(val accumT: AccumTFunOf<S, F, A>) : AccumTOf<S, F, A>
 
   companion object {
 
-    fun <S, F, A> just(MW: Monoid<S>, MM: Monad<F>, a: A): AccumT<S, F, A> =
-      AccumT(MM.just { w: S -> MM.just(MW.empty() toT a) })
+    fun <S, F, A> just(MS: Monoid<S>, MF: Monad<F>, a: A): AccumT<S, F, A> =
+      AccumT(MF.just { w: S -> MF.just(MS.empty() toT a) })
 
     operator fun <S, F, A> invoke(AF: Applicative<F>, accumTFun: AccumTFun<S, F, A>) =
       AF.run {
