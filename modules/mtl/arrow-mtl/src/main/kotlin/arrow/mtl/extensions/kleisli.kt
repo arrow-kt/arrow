@@ -32,8 +32,6 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -257,19 +255,3 @@ fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
 fun <F, D, A> Kleisli.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
   Kleisli.monad<F, D>(MF).fx.monad(c).fix()
-
-@extension
-interface KleisliEqK<F, D> : EqK<KleisliPartialOf<F, D>> {
-  fun EQKF(): EqK<F>
-  fun d(): D
-
-  override fun <A> Kind<KleisliPartialOf<F, D>, A>.eqK(other: Kind<KleisliPartialOf<F, D>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.run(d())
-      val rs = it.second.run(d())
-
-      EQKF().liftEq(EQ).run {
-        ls.eqv(rs)
-      }
-    }
-}

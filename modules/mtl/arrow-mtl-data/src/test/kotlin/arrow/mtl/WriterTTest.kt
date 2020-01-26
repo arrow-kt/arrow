@@ -1,6 +1,5 @@
 package arrow.mtl
 
-import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
 import arrow.core.ForId
@@ -46,9 +45,8 @@ import arrow.mtl.extensions.writert.monadState.monadState
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
-import arrow.test.generators.GenK
+import arrow.test.eq.eqK
 import arrow.test.generators.genK
-import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
@@ -123,12 +121,4 @@ class WriterTTest : UnitSpec() {
       )
     )
   }
-}
-
-internal fun <F, W> WriterT.Companion.genK(
-  GENKF: GenK<F>,
-  GENW: Gen<W>
-) = object : GenK<WriterTPartialOf<F, W>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
-    GENKF.genK(Gen.tuple2(GENW, gen)).map(::WriterT)
 }

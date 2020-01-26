@@ -12,7 +12,6 @@ import arrow.core.Some
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
-import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
@@ -44,10 +43,9 @@ import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
-import arrow.test.generators.GenK
+import arrow.test.eq.eqK
 import arrow.test.generators.genK
 import arrow.test.generators.nested
-import arrow.test.generators.option
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
@@ -169,11 +167,5 @@ class OptionTTest : UnitSpec() {
         OptionT.fromOption<ForNonEmptyList, String>(NELM, None).toRight(NELM) { a } == EitherT.left<ForNonEmptyList, Int, String>(NELM, a)
       }
     }
-  }
-}
-
-fun <F> OptionT.Companion.genK(genkF: GenK<F>) = object : GenK<Kind<ForOptionT, F>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<Kind<ForOptionT, F>, A>> = genkF.genK(Gen.option(gen)).map {
-    OptionT(it)
   }
 }

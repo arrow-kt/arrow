@@ -28,8 +28,19 @@ import arrow.core.Success
 import arrow.core.Try
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
+import arrow.fx.ForIO
+import arrow.fx.IO
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTPartialOf
+import arrow.mtl.Kleisli
+import arrow.mtl.KleisliPartialOf
+import arrow.mtl.OptionT
+import arrow.mtl.OptionTPartialOf
+import arrow.mtl.StateT
+import arrow.mtl.StateTFun
+import arrow.mtl.StateTPartialOf
+import arrow.mtl.WriterT
+import arrow.mtl.WriterTPartialOf
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.nest
 import io.kotlintest.properties.Gen
@@ -41,7 +52,7 @@ interface GenK<F> {
   fun <A> genK(gen: Gen<A>): Gen<Kind<F, A>>
 }
 
-private val DEFAULT_COLLECTION_MAX_SIZE = 100
+private const val DEFAULT_COLLECTION_MAX_SIZE = 100
 
 fun Option.Companion.genK() = object : GenK<ForOption> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForOption, A>> =
@@ -129,4 +140,42 @@ fun Try.Companion.genK() = object : GenK<ForTry> {
       gen.map {
         Success(it)
       }, Gen.throwable().map { Try.Failure(it) })
+}
+
+// FIXME This is a bad gen and should be replaced by a proper function generator as soon as we use arrow-check in places
+fun <F, D> Kleisli.Companion.genK(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
+    Kleisli { _: D -> k }
+  }
+}
+
+fun <F> OptionT.Companion.genK(genKF: GenK<F>): GenK<OptionTPartialOf<F>> = object : GenK<OptionTPartialOf<F>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<OptionTPartialOf<F>, A>> =
+    genKF.genK(Gen.option(gen)).map(::OptionT)
+}
+
+// FIXME This is a bad generator and should be replaced by a proper function generator as soon as we use arrow-check
+fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
+    genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
+      val stateTFun: StateTFun<F, S, A> = { _: S -> state }
+      stateTFun
+    }).map {
+      StateT(it)
+    }
+}
+
+fun <F, W> WriterT.Companion.genK(
+  GENKF: GenK<F>,
+  GENW: Gen<W>
+): GenK<WriterTPartialOf<F, W>> = object : GenK<WriterTPartialOf<F, W>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<WriterTPartialOf<F, W>, A>> =
+    GENKF.genK(Gen.tuple2(GENW, gen)).map(::WriterT)
+}
+
+fun IO.Companion.genK() = object : GenK<ForIO> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
+    gen.map {
+      IO.just(it)
+    }
 }

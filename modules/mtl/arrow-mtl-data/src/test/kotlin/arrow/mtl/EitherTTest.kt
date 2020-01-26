@@ -37,9 +37,9 @@ import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.writert.eqK.eqK
-import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
+import arrow.test.eq.eqK
 import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
@@ -101,7 +101,7 @@ class EitherTTest : UnitSpec() {
         EitherT.monadWriter<WriterTPartialOf<ForId, String>, String, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
         String.monoid(),
         Gen.string(),
-        EitherT.genK<WriterTPartialOf<ForId, String>, String>(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
+        EitherT.genK(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
         EitherT.eqK(WriterT.eqK(Id.eqK(), String.eq()), String.eq()),
         String.eq()
       )

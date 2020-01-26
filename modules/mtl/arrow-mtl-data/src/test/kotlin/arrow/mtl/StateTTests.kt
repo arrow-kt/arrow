@@ -7,7 +7,6 @@ import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
-import arrow.core.Tuple2
 import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.monad.monad
@@ -20,7 +19,6 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.semigroupK.semigroupK
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.extensions.io.async.async
@@ -39,17 +37,14 @@ import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
-import arrow.test.generators.GenK
+import arrow.test.eq.eqK
 import arrow.test.generators.genK
-import arrow.test.generators.tuple2
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.SemigroupKLaws
-import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
-import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 
 class StateTTests : UnitSpec() {
@@ -103,26 +98,4 @@ class StateTTests : UnitSpec() {
       )
     )
   }
-}
-
-internal fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.runM(M, s)
-      val rs = it.second.runM(M, s)
-
-      EQKF.liftEq(Tuple2.eq(EQS, EQ)).run {
-        ls.eqv(rs)
-      }
-    }
-}
-
-internal fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
-    genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
-      val stateTFun: StateTFun<F, S, A> = { _: S -> state }
-      stateTFun
-    }).map {
-      StateT(it)
-    }
 }

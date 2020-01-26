@@ -1,0 +1,14 @@
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile project(':arrow-annotations')
+    compile project(':arrow-core')
+    compile project(':arrow-mtl')
+    compile project(':arrow-test')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

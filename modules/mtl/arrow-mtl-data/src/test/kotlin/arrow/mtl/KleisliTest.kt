@@ -3,14 +3,12 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.ConstPartialOf
-import arrow.core.ForConst
 import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
-import arrow.core.extensions.`try`.eqK.eqK
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
@@ -30,16 +28,15 @@ import arrow.mtl.extensions.kleisli.alternative.alternative
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.contravariant.contravariant
 import arrow.mtl.extensions.kleisli.divisible.divisible
-import arrow.mtl.extensions.kleisli.eqK.eqK
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.mtl.extensions.kleisli.monadState.monadState
 import arrow.mtl.extensions.kleisli.monadWriter.monadWriter
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.mtl.extensions.writert.eqK.eqK
-import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
+import arrow.test.eq.eqK
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.laws.AlternativeLaws
@@ -79,21 +76,11 @@ class KleisliTest : UnitSpec() {
   }
 
   init {
-
-    val optionEQK = Kleisli.eqK(Option.eqK(), 0)
-
-    val ioEQK: EqK<Kind<Kind<ForKleisli, ForIO>, Int>> = Kleisli.eqK(IO.eqK(), 1)
-
-    val tryEQK: EqK<Kind<Kind<ForKleisli, ForTry>, Int>> =
-      Kleisli.eqK(Try.eqK(), 1)
-
-    val constEQK: EqK<Kind<Kind<ForKleisli, Kind<ForConst, Int>>, Int>> = Kleisli.eqK(Const.eqK(Int.eq()), 1)
-
     testLaws(
       AlternativeLaws.laws(
         Kleisli.alternative<ForOption, Int>(Option.alternative()),
         Kleisli.genK<ForOption, Int>(Option.genK()),
-        optionEQK
+        Kleisli.eqK(Option.eqK(), 0)
       ),
       ConcurrentLaws.laws(
         Kleisli.concurrent<ForIO, Int>(IO.concurrent()),
@@ -101,34 +88,24 @@ class KleisliTest : UnitSpec() {
         Kleisli.applicative<ForIO, Int>(IO.applicative()),
         Kleisli.monad<ForIO, Int>(IO.monad()),
         Kleisli.genK<ForIO, Int>(IO.genK()),
-        ioEQK
+        Kleisli.eqK(IO.eqK(), 0)
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), conestTryGENK(), conestTryEQK()),
       DivisibleLaws.laws(
         Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
         Kleisli.genK<ConstPartialOf<Int>, Int>(Const.genK(Gen.int())),
-        constEQK
+        Kleisli.eqK(Const.eqK(Int.eq()), 0)
       ),
       MonadStateLaws.laws(
         Kleisli.monadState<StateTPartialOf<ForId, Int>, Int, Int>(StateT.monadState(Id.monad())),
         Kleisli.genK<StateTPartialOf<ForId, Int>, Int>(StateT.genK(Id.genK(), Gen.int())),
-        object : EqK<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>> {
-          override fun <A> Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>.eqK(other: Kind<KleisliPartialOf<StateTPartialOf<ForId, Int>, Int>, A>, EQ: Eq<A>): Boolean =
-            StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0).run {
-              run(0).eqK(other.run(0), EQ)
-            }
-        }
+        Kleisli.eqK(StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 0), 0)
       ),
       MonadWriterLaws.laws(
         Kleisli.monadWriter<WriterTPartialOf<ForId, String>, Int, String>(WriterT.monadWriter(Id.monad(), String.monoid())),
         String.monoid(), Gen.string(),
         Kleisli.genK<WriterTPartialOf<ForId, String>, Int>(WriterT.genK(Id.genK(), Gen.string())),
-        object : EqK<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>> {
-          override fun <A> Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>.eqK(other: Kind<KleisliPartialOf<WriterTPartialOf<ForId, String>, Int>, A>, EQ: Eq<A>): Boolean =
-            WriterT.eqK(Id.eqK(), String.eq()).run {
-              run(0).eqK(run(0), EQ)
-            }
-        },
+        Kleisli.eqK(WriterT.eqK(Id.eqK(), String.eq()), 0),
         String.eq()
       )
     )
