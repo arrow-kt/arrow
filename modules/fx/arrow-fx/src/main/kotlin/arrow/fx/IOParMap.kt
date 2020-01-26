@@ -20,13 +20,13 @@ import arrow.core.internal.AtomicBooleanW
 /** Mix-in to enable `parMapN` 2-arity on IO's companion directly. */
 interface IOParMap {
 
-  fun <A, B, C> parMapN(fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> =
+  fun <EE, A, B, C> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, f: (A, B) -> C): IO<EE, C> =
     IO.parMapN(IODispatchers.CommonPool, fa, fb, f)
 
-  fun <A, B, C, D> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (A, B, C) -> D): IO<D> =
+  fun <EE, A, B, C, D> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, f: (A, B, C) -> D): IO<EE, D> =
     IO.parMapN(IODispatchers.CommonPool, fa, fb, fc, f)
 
-  fun <A, B, C, D, E> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, f: (A, B, C, D) -> E): IOOf<E> =
+  fun <EE, A, B, C, D, E> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, f: (A, B, C, D) -> E): IOOf<EE, E> =
     IO.parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, f)
 
   /**
