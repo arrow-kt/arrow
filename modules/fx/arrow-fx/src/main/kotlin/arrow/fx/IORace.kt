@@ -248,7 +248,6 @@ interface IORace {
    * as we no longer have to keep internal promises.
    */
   private fun <A, B> racePairCancellable(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<A, B>> {
-    // Signals successful results
     fun <T, U> onSuccess(
       isActive: AtomicBooleanW,
       main: IOConnection,
@@ -257,7 +256,6 @@ interface IORace {
       r: Either<T, U>
     ): Unit =
       if (isActive.getAndSet(false)) {
-        // First interrupts the other task
         other.cancel().fix().unsafeRunAsync { r2 ->
           main.pop()
           cb(Right(r))
@@ -280,15 +278,10 @@ interface IORace {
 
     val start = { conn: IOConnection, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
       val active = AtomicBooleanW(true)
-      // Cancelable connection for the left value
       val connA = IOConnection()
-      // Cancelable connection for the right value
       val connB = IOConnection()
-      // Registers both for cancellation — gets popped right
-      // before callback is invoked in onSuccess / onError
       conn.pushPair(connA, connB)
 
-      // Starts concurrent execution for the left value
       IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
           onError(active, cb, conn, connB, it)
@@ -297,7 +290,6 @@ interface IORace {
         })
       }
 
-      // Starts concurrent execution for the right value
       IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { result ->
         result.fold({
           onError(active, cb, conn, connA, it)
@@ -347,16 +339,10 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
-      // Cancelable connection for the left value
       val connA = IOConnection()
-      connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<A>()
 
-      // Cancelable connection for the right value
       val connB = IOConnection()
-      connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<B>()
 
       conn.pushPair(connA, connB)
@@ -440,18 +426,13 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
       val connA = IOConnection()
-      connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<A>()
 
       val connB = IOConnection()
-      connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<B>()
 
       val connC = IOConnection()
-      connC.push(upstreamCancelToken)
       val promiseC = UnsafePromise<C>()
 
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())

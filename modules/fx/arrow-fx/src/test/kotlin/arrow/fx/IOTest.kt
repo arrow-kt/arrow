@@ -572,7 +572,6 @@ class IOTest : UnitSpec() {
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
     }
 
-    // known issue
     "IORace4 should be stack safe" {
       val size = 5000
 
@@ -588,6 +587,62 @@ class IOTest : UnitSpec() {
           }
 
       just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
+    }
+
+    "IORace5 should be stack safe" {
+      val size = 5000
+
+      fun ioRace5(i: Int): IO<Int> =
+        IO.raceN(IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace5(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace5).unsafeRunSync() shouldBe size
+    }
+
+    "IORace6 should be stack safe" {
+      val size = 5000
+
+      fun ioRace6(i: Int): IO<Int> =
+        IO.raceN(IO.never, IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace6(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace6).unsafeRunSync() shouldBe size
+    }
+
+    "forked pair race should run" {
+        IO.fx {
+          dispatchers().io().raceN(
+            timer().sleep(10.seconds).followedBy(effect { 1 }),
+            effect { 2 }
+          ).fork().bind().join().bind()
+        }.unsafeRunSync() shouldBe 2.right()
+    }
+
+    "forked triple race should run" {
+        IO.fx {
+          dispatchers().io().raceN(
+            timer().sleep(10.seconds).followedBy(effect { 1 }),
+            timer().sleep(10.seconds).followedBy(effect { 3 }),
+            effect { 2 }
+          ).fork().bind().join().bind()
+        }.unsafeRunSync() shouldBe Race3.Third(2)
     }
 
     "IOParMap2 should be stack safe" {
