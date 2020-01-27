@@ -11,6 +11,7 @@ redirect_from:
 `AccumT` is a monad transformer, which adds accumulation capabilities to a given monad.
 
 ```kotlin:ank
+import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.*
 import arrow.core.*
 import arrow.mtl.*
