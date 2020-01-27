@@ -38,7 +38,7 @@ class TrampolineTest : UnitSpec() {
     }
   }
 
-  private fun tryfxsyntax(n: Int) : TrampolineF<Boolean> =
+  private fun tryfxsyntax(n: Int): TrampolineF<Boolean> =
     TrampolineF.fx {
       val x = Trampoline.defer { odd(10000) }.bind()
       val y = Trampoline.defer { even(10000) }.bind()
