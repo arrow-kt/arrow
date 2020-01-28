@@ -239,4 +239,4 @@ Arrow Fx offers direct style syntax and effect control without compromises, and 
 
 Despite some limitations of the Kotlin type system, like lack of Higher Kinded Types, the Kotlin language is excellent for encoding typed programs with a first-class imperative syntax for FP. These programs are approachable by the broader programming community, and arguably easier to encode than some solutions currently used in mainstream Kotlin and Scala FP communities.
 
-Come check out Arrow fx and join the discussion in the Kotlin Slack and Gitter at [arrow-kt.io]()
+Come check out Arrow fx and join the discussion in the [Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) and [Gitter](https://gitter.im/arrow-kt/Lobby)
