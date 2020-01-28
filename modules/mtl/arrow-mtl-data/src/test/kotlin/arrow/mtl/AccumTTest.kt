@@ -3,8 +3,6 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.EitherPartialOf
-import arrow.core.ForId
-import arrow.core.ForOption
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -13,7 +11,6 @@ import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.eq
 import arrow.core.extensions.id.eqK.eqK
-import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
@@ -27,23 +24,15 @@ import arrow.fx.extensions.io.monadIO.monadIO
 import arrow.fx.fix
 import arrow.fx.mtl.accumt.monadIO.monadIO
 import arrow.mtl.extensions.accumt.alternative.alternative
-import arrow.mtl.extensions.accumt.applicative.applicative
-import arrow.mtl.extensions.accumt.applicativeError.applicativeError
-import arrow.mtl.extensions.accumt.functor.functor
 import arrow.mtl.extensions.accumt.monad.monad
 import arrow.mtl.extensions.accumt.monadError.monadError
 import arrow.mtl.extensions.accumt.monadTrans.monadTrans
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
-import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.ApplicativeErrorLaws
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.FunctorLaws
 import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
@@ -57,24 +46,6 @@ import io.kotlintest.shouldBe
 class AccumTTest : UnitSpec() {
   init {
     testLaws(
-      FunctorLaws.laws(
-        AccumT.functor<Int, ForId>(Id.functor()),
-        AccumT.genK(Id.genK(), Gen.intSmall()),
-        AccumT.eqK(Id.monad(), Id.eqK(), Int.eq(), 123)
-      ),
-
-      ApplicativeLaws.laws(
-        AccumT.applicative(Int.monoid(), Id.monad()),
-        AccumT.functor<Int, ForId>(Id.functor()),
-        AccumT.genK(Id.genK(), Gen.intSmall()),
-        AccumT.eqK(Id.monad(), Id.eqK(), Int.eq(), 123)
-      ),
-
-      MonadLaws.laws(
-        AccumT.monad(Int.monoid(), Id.monad()),
-        AccumT.genK(Id.genK(), Gen.intSmall()),
-        AccumT.eqK(Id.monad(), Id.eqK(), Int.eq(), 4711)
-      ),
 
       MonadTransLaws.laws(
         AccumT.monadTrans(String.monoid()),
@@ -84,17 +55,10 @@ class AccumTTest : UnitSpec() {
         AccumT.eqK(Id.monad(), Id.eqK(), String.eq(), "hello")
       ),
 
-      AlternativeLaws.laws<AccumTPartialOf<Int, ForOption>>(
+      AlternativeLaws.laws(
         AccumT.alternative(Option.alternative(), Option.monad(), Int.monoid()),
         AccumT.genK(Option.genK(), Gen.int()),
         AccumT.eqK(Option.monad(), Option.eqK(), Int.eq(), 10)
-      ),
-
-      ApplicativeErrorLaws.laws(
-        AccumT.applicativeError(Either.monadError<String>(), Int.monoid()),
-        AccumT.genK(Either.genK(Gen.string()), Gen.int()),
-        Gen.string(),
-        AccumT.eqK(Either.monad(), Either.eqK(String.eq()), Int.eq(), 10)
       ),
 
       MonadErrorLaws.laws<AccumTPartialOf<Int, EitherPartialOf<String>>, String>(
@@ -105,7 +69,7 @@ class AccumTTest : UnitSpec() {
       )
     )
 
-    "flatMap combines State" {
+    "AccumT; flatMap combines State" {
       flatMapCombinesState(
         String.monoid(),
         Id.monad(),
@@ -115,7 +79,7 @@ class AccumTTest : UnitSpec() {
       )
     }
 
-    "ap combines State" {
+    "AccumT: ap combines State" {
       apCombinesState(
         String.monoid(),
         Id.monad(),
@@ -125,7 +89,7 @@ class AccumTTest : UnitSpec() {
       )
     }
 
-    "monadIO" {
+    "AccumT: monadIO" {
       val accumT = AccumT.monadIO(IO.monadIO(), String.monoid()).run {
         IO.just(1).liftIO().fix()
       }
