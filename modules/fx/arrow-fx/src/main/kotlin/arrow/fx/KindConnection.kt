@@ -8,6 +8,13 @@ import arrow.typeclasses.Applicative
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
+enum class OnCancel { ThrowCancellationException, Silent;
+
+  companion object {
+    val CancellationException = ConnectionCancellationException
+  }
+}
+
 object ConnectionCancellationException : JavaCancellationException("User cancellation")
 
 /**

@@ -7,7 +7,7 @@ import arrow.core.NonFatal
 import arrow.core.internal.AtomicBooleanW
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.ConnectionCancellationException
+import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.onceOnly
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -168,7 +168,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.value) sink.error(ConnectionCancellationException) })
+        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -228,7 +228,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBooleanW(false) // Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.value) sink.error(ConnectionCancellationException) })
+        conn.push(MonoK { if (!isCancelled.value) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()

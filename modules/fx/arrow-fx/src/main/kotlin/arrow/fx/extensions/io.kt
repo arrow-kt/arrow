@@ -9,6 +9,7 @@ import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.IOOf
+import arrow.fx.OnCancel
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
@@ -228,7 +229,7 @@ interface IOEffect : Effect<ForIO>, IOAsync {
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
 
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    fix().runAsyncCancellable(cb)
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
 fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
@@ -275,8 +276,8 @@ interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 
-  override suspend fun <A> unsafe.runNonBlockingCancellable(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
-    fa().fix().unsafeRunAsyncCancellable(cb)
+  override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
 }
 
 @extension

@@ -422,12 +422,25 @@ class IOTest : UnitSpec() {
         val cancel =
           IO(all) { }
             .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable {
+            .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
         IO(other) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
+    }
+
+    "unsafeRunAsyncCancellable should throw the appropriate exception" {
+      IO.async<Throwable> { cb ->
+        val cancel =
+          IO(all) { }
+            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+              it.fold({ t -> cb(t.right()) }, { })
+            }
+        IO(other) { }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
     }
 
     "IOFrame should always be called when using IO.Bind" {
@@ -448,7 +461,7 @@ class IOTest : UnitSpec() {
         val cancel =
           IO(all) { }
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
-            .unsafeRunAsyncCancellable {
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
         IO(other) { Thread.sleep(500); }

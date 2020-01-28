@@ -10,7 +10,7 @@ import arrow.core.Right
 import arrow.core.identity
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.ConnectionCancellationException
+import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.fx.typeclasses.CancelToken
@@ -215,7 +215,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         val conn = FluxKConnection()
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
@@ -248,7 +248,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         val conn = FluxKConnection()
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
