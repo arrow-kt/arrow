@@ -641,9 +641,9 @@ class IOTest : UnitSpec() {
       IO.fx {
         dispatchers().io().raceN(
           timer().sleep(10.seconds).followedBy(effect { 1 }),
-          effect { 2 }
+          effect { 3 }
         ).fork().bind().join().bind()
-      }.unsafeRunSync() shouldBe 2.right()
+      }.unsafeRunSync() shouldBe 3.right()
     }
 
     "forked triple race should run" {
