@@ -202,20 +202,6 @@ class IOTest : UnitSpec() {
       }
     }
 
-//    "should complete when running a pure value with runAsync" {
-//      val expected = 0
-//      just(expected).runAsync { either ->
-//        either.fold({ fail("") }, { IO { it shouldBe expected } })
-//      }.unsafeRunSync()
-//    }
-//
-//    "should complete when running a return value with runAsync" {
-//      val expected = 0
-//      IO { expected }.runAsync { either ->
-//        either.fold({ fail("") }, { IO { it shouldBe expected } })
-//      }.unsafeRunSync()
-//    }
-
     "should return an error when running an exception with runAsync" {
       IO.raiseError<Int>(MyException()).runAsync { either ->
         either.fold({
