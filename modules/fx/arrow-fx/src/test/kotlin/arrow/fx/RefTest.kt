@@ -54,7 +54,7 @@ class RefTest : UnitSpec() {
 
     "access - successful" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        IO.fx {
+        IO.fx<Nothing, Boolean> {
           val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           val success = setter(b).bind()
@@ -66,7 +66,7 @@ class RefTest : UnitSpec() {
 
     "access - setter should fail if value is modified before setter is called" {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-        IO.fx {
+        IO.fx<Nothing, Boolean> {
           val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           ref.set(b).bind()
@@ -79,7 +79,7 @@ class RefTest : UnitSpec() {
 
     "access - setter should fail if called twice" {
       forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
-        IO.fx {
+        IO.fx<Nothing, Boolean> {
           val ref = Ref(IO.monadDefer<Nothing>(), a).bind()
           val (_, setter) = ref.access().bind()
           val cond1 = setter(b).bind()

@@ -22,7 +22,7 @@ import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
-import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -308,11 +308,11 @@ class IOTest : UnitSpec() {
 
     "fx can switch execution context state across not/bind" {
       val program = IO.fx<Nothing, Unit> {
-        val ctx = !effect { kotlin.coroutines.coroutineContext }
-        !effect { ctx shouldBe EmptyCoroutineContext }
+        val ctx = !IO.effect { kotlin.coroutines.coroutineContext }
+        !IO.effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(all)
-        val ctx2 = !effect { Thread.currentThread().name }
-        !effect { ctx2 shouldBe "all" }
+        val ctx2 = !IO.effect { Thread.currentThread().name }
+        !IO.effect { ctx2 shouldBe "all" }
       }
 
       program.unsafeRunSync()
@@ -320,11 +320,11 @@ class IOTest : UnitSpec() {
 
     "fx can pass context state across not/bind" {
       val program = IO.fx<Nothing, Unit> {
-        val ctx = !effect { kotlin.coroutines.coroutineContext }
-        !effect { ctx shouldBe EmptyCoroutineContext }
+        val ctx = !IO.effect { kotlin.coroutines.coroutineContext }
+        !IO.effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(CoroutineName("Simon"))
-        val ctx2 = !effect { kotlin.coroutines.coroutineContext }
-        !effect { ctx2 shouldBe CoroutineName("Simon") }
+        val ctx2 = !IO.effect { kotlin.coroutines.coroutineContext }
+        !IO.effect { ctx2 shouldBe CoroutineName("Simon") }
       }
 
       program.unsafeRunSync()
@@ -333,9 +333,9 @@ class IOTest : UnitSpec() {
     "fx will respect thread switching across not/bind" {
       val program = IO.fx<Nothing, Unit> {
         continueOn(all)
-        val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> effect { i } }.parSequence()
-        val continuedThread = !effect { Thread.currentThread().name }
+        val initialThread = !IO.effect { Thread.currentThread().name }
+        !(0..130).map { i -> IO.effect { i } }.parSequence()
+        val continuedThread = !IO.effect { Thread.currentThread().name }
         continuedThread shouldBe initialThread
       }
 
@@ -488,8 +488,8 @@ class IOTest : UnitSpec() {
     }
 
     "IO bracket cancellation should release resource with cancel exit status" {
-      IO.fx<Nothing, ExitCase<Throwable>> {
-        val p = !Promise<ExitCase<Throwable>>()
+      IO.fx<Nothing, ExitCase2<Throwable>> {
+        val p = !Promise<ExitCase2<Throwable>>()
         IO.just(0L).bracketCase(
           use = { IO.never },
           release = { _, exitCase -> p.complete(exitCase) }
@@ -498,7 +498,7 @@ class IOTest : UnitSpec() {
           .invoke() // cancel immediately
 
         !p.get()
-      }.unsafeRunSync() shouldBe ExitCase.Canceled
+      }.unsafeRunSync() shouldBe ExitCase2.Canceled
     }
 
     "Cancelable should run CancelToken" {
@@ -720,15 +720,15 @@ class IOTest : UnitSpec() {
         IO.effect { infiniteLoop().suspended().fold(::identity, ::identity) }
 
       IO.fx<Nothing, Unit> {
-        val p = !Promise<ExitCase<Throwable>>()
+        val p = !Promise<ExitCase2<Nothing>>()
         val (_, cancel) = !IO.unit.bracketCase(
           release = { _, ec -> p.complete(ec) },
           use = { wrappedInfiniteLoop }
         ).fork()
-        !sleep(100.milliseconds)
+        !IO.sleep(100.milliseconds)
         !cancel
         val result = !p.get()
-        !effect { result shouldBe ExitCase.Canceled }
+        !IO.effect { result shouldBe ExitCase2.Canceled }
       }.suspended()
     }
   }
