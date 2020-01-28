@@ -7,6 +7,7 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.either.eqK.eqK
+import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.eq
@@ -24,12 +25,14 @@ import arrow.fx.extensions.io.monadIO.monadIO
 import arrow.fx.fix
 import arrow.fx.mtl.accumt.monadIO.monadIO
 import arrow.mtl.extensions.accumt.alternative.alternative
+import arrow.mtl.extensions.accumt.functor.functor
 import arrow.mtl.extensions.accumt.monad.monad
 import arrow.mtl.extensions.accumt.monadError.monadError
 import arrow.mtl.extensions.accumt.monadTrans.monadTrans
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
+import arrow.test.generators.throwable
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.MonadErrorLaws
@@ -61,12 +64,15 @@ class AccumTTest : UnitSpec() {
         AccumT.eqK(Option.monad(), Option.eqK(), Int.eq(), 10)
       ),
 
-      MonadErrorLaws.laws<AccumTPartialOf<Int, EitherPartialOf<String>>, String>(
+      MonadErrorLaws.laws<AccumTPartialOf<Int, EitherPartialOf<Throwable>>>(
         AccumT.monadError(Int.monoid(), Either.monadError()),
-        AccumT.genK(Either.genK(Gen.string()), Gen.int()),
-        Gen.string(),
-        AccumT.eqK(Either.monad(), Either.eqK(String.eq()), Int.eq(), 10)
+        AccumT.functor(Either.functor()),
+        AccumT.monad(Int.monoid(), Either.monad()),
+        AccumT.monad(Int.monoid(), Either.monad()),
+        AccumT.genK(Either.genK(Gen.throwable()), Gen.int()),
+        AccumT.eqK(Either.monad(), Either.eqK(Eq.any()) as EqK<EitherPartialOf<Throwable>>, Int.eq(), 10)
       )
+
     )
 
     "AccumT; flatMap combines State" {
