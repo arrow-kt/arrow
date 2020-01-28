@@ -556,8 +556,13 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRacePair(i: Int): IO<Int> =
-        IO.racePair(IODispatchers.CommonPool, IO.never, if (i < size) ioRacePair(i + 1) else just(i))
-          .map { it.fold({ a, _ -> a }, { _, b -> b }) }
+        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity
+            )
+          }
 
       just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
     }
@@ -566,8 +571,14 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRaceTriple(i: Int): IO<Int> =
-        IO.raceTriple(IODispatchers.CommonPool, IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
-          .map { it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c }) }
+        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
 
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
     }
@@ -627,22 +638,22 @@ class IOTest : UnitSpec() {
     }
 
     "forked pair race should run" {
-        IO.fx {
-          dispatchers().io().raceN(
-            timer().sleep(10.seconds).followedBy(effect { 1 }),
-            effect { 2 }
-          ).fork().bind().join().bind()
-        }.unsafeRunSync() shouldBe 2.right()
+      IO.fx {
+        dispatchers().io().raceN(
+          timer().sleep(10.seconds).followedBy(effect { 1 }),
+          effect { 2 }
+        ).fork().bind().join().bind()
+      }.unsafeRunSync() shouldBe 2.right()
     }
 
     "forked triple race should run" {
-        IO.fx {
-          dispatchers().io().raceN(
-            timer().sleep(10.seconds).followedBy(effect { 1 }),
-            timer().sleep(10.seconds).followedBy(effect { 3 }),
-            effect { 2 }
-          ).fork().bind().join().bind()
-        }.unsafeRunSync() shouldBe Race3.Third(2)
+      IO.fx {
+        dispatchers().io().raceN(
+          timer().sleep(10.seconds).followedBy(effect { 1 }),
+          timer().sleep(10.seconds).followedBy(effect { 3 }),
+          effect { 2 }
+        ).fork().bind().join().bind()
+      }.unsafeRunSync() shouldBe Race3.Third(2)
     }
 
     "IOParMap2 should be stack safe" {
