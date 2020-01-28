@@ -173,6 +173,14 @@ class IOTest : UnitSpec() {
       }
     }
 
+    "should return exceptions within main block with unsafeRunAsyncCancellable" {
+      val exception = MyException()
+      val ioa = IO<Int> { throw exception }
+      ioa.unsafeRunAsyncCancellable { either ->
+        either.fold({ it shouldBe exception }, { fail("") })
+      }
+    }
+
     "should rethrow exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
