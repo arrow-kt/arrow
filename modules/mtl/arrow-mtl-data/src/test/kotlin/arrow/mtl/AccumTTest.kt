@@ -75,7 +75,7 @@ class AccumTTest : UnitSpec() {
 
     )
 
-    "AccumT; flatMap combines State" {
+    "AccumT: flatMap combines State" {
       flatMapCombinesState(
         String.monoid(),
         Id.monad(),
