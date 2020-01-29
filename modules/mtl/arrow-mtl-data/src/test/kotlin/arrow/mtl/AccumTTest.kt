@@ -91,15 +91,14 @@ class AccumTTest : UnitSpec() {
       ),
 
       MonadWriterLaws.laws(
-        AccumT.monad(String.monoid(), Id.monad()),
+        AccumT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid()), String.monoid()),
         AccumT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid()), String.monoid()),
         String.monoid(),
         Gen.string(),
         AccumT.genK(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
-        AccumT.eqK(WriterT.monad(Id.monad(), String.monoid()), WriterT.eqK(Id.eqK(), String.eq()), String.eq(), "hello"),
+        AccumT.eqK(WriterT.monad(Id.monad(), String.monoid()), WriterT.eqK(Id.eqK(), String.eq()), String.eq(), ""),
         String.eq()
       )
-
     )
 
     "AccumT: flatMap combines State" {
