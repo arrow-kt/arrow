@@ -432,20 +432,7 @@ internal object IORunLoop {
     }
 
     override fun resumeWith(result: Result<Any?>) {
-      if (canCall) {
-        canCall = false
-        result.fold(
-          { a -> IO.Pure(a) },
-          { e -> IO.RaiseError(e) }
-        ).let { r ->
-          if (shouldTrampoline) {
-            this.value = r
-            Platform.trampoline { trampoline() }
-          } else {
-            signal(r)
-          }
-        }
-      }
+      invoke(result.fold(::Right, ::Left))
     }
 
     fun trampoline() {
