@@ -130,7 +130,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @see [bracket] for the more general operation
    */
   fun <A> Kind<F, A>.guarantee(finalizer: Kind<F, Unit>): Kind<F, A> =
-    bracket({ finalizer }, { this })
+    guaranteeCase { finalizer }
 
   /**
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
@@ -145,5 +145,5 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
-    bracketCase({ _, e -> finalizer(e) }, { this })
+    just<Unit>(Unit).bracketCase({ _, e -> finalizer(e) }, { this })
 }
