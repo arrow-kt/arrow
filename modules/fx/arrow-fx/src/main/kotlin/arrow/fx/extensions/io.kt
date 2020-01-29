@@ -12,9 +12,12 @@ import arrow.fx.IOResult
 import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.IODispatchers
 import arrow.fx.IOOf
+import arrow.fx.MVar
 import arrow.fx.OnCancel
+import arrow.fx.Promise
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -41,15 +44,23 @@ import arrow.fx.unsafeRunSync
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Continuation
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.stateStack
+import arrow.typeclasses.suspended.BindSyntax
 import arrow.unsafe
 import java.lang.AssertionError
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.resume
+import kotlin.coroutines.startCoroutine
 import arrow.fx.ap as Ap
 import arrow.fx.flatMap as FlatMap
 import arrow.fx.handleErrorWith as HandleErrorWith
@@ -349,8 +360,13 @@ interface IODefaultConcurrent<EE> : Concurrent<IOPartialOf<EE>>, IOConcurrent<EE
 
 fun <E> IO.Companion.timer(): Timer<IOPartialOf<E>> = Timer(IO.concurrent())
 
-fun <E, A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<E>>.() -> A): IO<E, A> =
-  defer { IO.concurrent<E>().fx.concurrent(c).fix() }
+fun <E, A> IO.Companion.fx(c: suspend IOSyntax<E>.() -> A): IO<E, A> =
+  defer {
+      val continuation = IOContinuation<E, A>()
+      val wrapReturn: suspend IOContinuation<E, *>.() -> IO<E, A> = { just(c()) }
+      wrapReturn.startCoroutine(continuation, continuation)
+      continuation.returnedMonad().fix()
+  }
 
 @JvmName("fxIO")
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> A): IO<Nothing, A> =
@@ -369,3 +385,95 @@ fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<Nothing, A> =
  */
 fun <A> Either<Throwable, A>.toIO(): IO<Nothing, A> =
   toIO(::identity)
+
+interface IOSyntax<E> : BindSyntax<IOPartialOf<E>> {
+  suspend fun continueOn(ctx: CoroutineContext): Unit =
+    IO.unit.continueOn(ctx).bind()
+
+  fun <A> Iterable<IOOf<E, A>>.parSequence(ctx: CoroutineContext): IO<E, List<A>> =
+    IO.concurrent<E>().run { parSequence(ctx).fix() }
+
+  fun <A> Iterable<IOOf<E, A>>.parSequence(): IO<E, List<A>> =
+    parSequence(IO.dispatchers<E>().default())
+
+  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> IOOf<E, B>): IO<E, List<B>> =
+    IO.concurrent<E>().run { parTraverse(ctx, f) }.fix()
+
+  fun <A, B> Iterable<A>.parTraverse(f: (A) -> IOOf<E, B>): IO<E, List<B>> =
+    parTraverse(IO.dispatchers<E>().default(), f)
+
+  /**
+   * Create a pure [Promise] that is empty and can be filled exactly once.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.Kind
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.typeclasses.Concurrent
+   * import arrow.fx.typeclasses.seconds
+   *
+   * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val promise = !Promise<String>()
+   *       val (join, cancel) = !sleep(1.seconds)
+   *         .followedBy(promise.complete("Hello World!"))
+   *         .fork()
+   *       val message = !join
+   *       message
+   *     }
+   *
+   *   //sampleEnd
+   *   IO.concurrent().promiseExample()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   *
+   * @see Promise for more details on usage
+   */
+  fun <A> Promise(): IO<Nothing, Promise<IOPartialOf<Nothing>, A>> =
+    Promise<IOPartialOf<Nothing>, A>(IO.concurrent<Nothing>()).fix()
+
+  fun Semaphore(n: Long): IO<Nothing, Semaphore<IOPartialOf<Nothing>>> =
+    Semaphore(n, IO.concurrent<Nothing>()).fix()
+
+  fun <A> MVar(a: A): IO<Nothing, MVar<IOPartialOf<Nothing>, A>> =
+    MVar(a, IO.concurrent<Nothing>()).fix()
+
+  /**
+   * Create an empty [MVar] or mutable variable structure to be used for thread-safe sharing.
+   *
+   * @see MVar
+   * @see [MVar] for more usage details.
+   */
+  fun <A> MVar(): IO<Nothing, MVar<IOPartialOf<Nothing>, A>> =
+    MVar.empty<IOPartialOf<Nothing>, A>(IO.concurrent<Nothing>()).fix()
+}
+
+open class IOContinuation<E, A>(override val context: CoroutineContext = EmptyCoroutineContext) : Continuation<IO<E, A>>, IOSyntax<E> {
+
+  override fun resume(value: IO<E, A>) {
+    returnedMonad = value
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  override fun resumeWithException(exception: Throwable) {
+    throw exception
+  }
+
+  protected lateinit var returnedMonad: IO<E, A>
+
+  open fun returnedMonad(): IO<E, A> = returnedMonad
+
+  override suspend fun <B> IOOf<E, B>.bind(): B =
+    suspendCoroutineUninterceptedOrReturn { c ->
+      val labelHere = c.stateStack // save the whole coroutine stack labels
+      returnedMonad = this.FlatMap { x: B ->
+        c.stateStack = labelHere
+        c.resume(x)
+        returnedMonad
+      }
+      COROUTINE_SUSPENDED
+    }
+}

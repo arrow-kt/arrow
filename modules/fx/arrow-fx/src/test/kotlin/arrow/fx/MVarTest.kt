@@ -1,9 +1,7 @@
 package arrow.fx
 
 import arrow.core.None
-import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
@@ -12,20 +10,23 @@ import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.monad.flatMap
-import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 
 class MVarTest : UnitSpec() {
 
   init {
 
     fun tests(label: String, mvar: MVarFactory<IOPartialOf<Nothing>>) {
+      fun IOOf<Nothing, Unit>.test(): Boolean =
+        equalUnderTheLaw(IO.unit, IO_EQ())
+
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          IO.fx {
+          IO.fx<Nothing, Unit> {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             av.put(a).bind()
@@ -33,14 +34,14 @@ class MVarTest : UnitSpec() {
             val r1 = av.take().bind()
             av.put(b).bind()
             val r2 = av.take().bind()
-            Tuple4(isEmpty, isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), IO_EQ<Tuple4<Boolean, Boolean, Int, Int>>())
+            !IO.effect { Tuple4(isEmpty, isNotEmpty, r1, r2) shouldBe Tuple4(true, true, a, b) }
+          }.test()
         }
       }
 
       "$label - empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-          IO.fx {
+          IO.fx<Nothing, Unit> {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             val p1 = av.tryPut(a).bind()
@@ -50,16 +51,16 @@ class MVarTest : UnitSpec() {
             val r2 = av.tryTake().bind()
             av.put(c).bind()
             val r3 = av.take().bind()
-            Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
-          }.equalUnderTheLaw(
-            IO.just(Tuple7(true, true, false, true, Some(a), None, c)),
-            IO_EQ<Tuple7<Boolean, Boolean, Boolean, Boolean, Option<Int>, Option<Int>, Int>>()
-          )
+            !IO.effect {
+              Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3) shouldBe
+                Tuple7(true, true, false, true, Some(a), None, c)
+            }
+          }.test()
         }
       }
 
       "$label - empty; take; put; take; put" {
-        IO.fx {
+        IO.fx<Nothing, Unit> {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fork().bind()
@@ -71,12 +72,12 @@ class MVarTest : UnitSpec() {
           val aa = f1.join().bind()
           val bb = f2.join().bind()
 
-          setOf(aa, bb)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20)), IO_EQ<Set<Int>>(timeout = 1.seconds))
+          !IO.effect { setOf(aa, bb) shouldBe setOf(10, 20) }
+        }.test()
       }
 
       "$label - empty; put; put; put; take; take; take" {
-        IO.fx {
+        IO.fx<Nothing, Unit> {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.put(10).fork().bind()
@@ -91,12 +92,12 @@ class MVarTest : UnitSpec() {
           f2.join().bind()
           f3.join().bind()
 
-          setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), IO_EQ<Set<Int>>(timeout = 1.seconds))
+          !IO.effect { setOf(aa, bb, cc) shouldBe setOf(10, 20, 30) }
+        }.test()
       }
 
       "$label - empty; take; take; take; put; put; put" {
-        IO.fx {
+        IO.fx<Nothing, Unit> {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fork().bind()
@@ -111,32 +112,32 @@ class MVarTest : UnitSpec() {
           val bb = f2.join().bind()
           val cc = f3.join().bind()
 
-          setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), IO_EQ<Set<Int>>(timeout = 1.seconds))
+          !IO.effect { setOf(aa, bb, cc) shouldBe setOf(10, 20, 30) }
+        }.test()
       }
 
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          IO.fx {
+          IO.fx<Nothing, Unit> {
             val av = mvar.just(a).bind()
             val isNotEmpty = av.isNotEmpty().bind()
             val r1 = av.take().bind()
             av.put(b).bind()
             val r2 = av.take().bind()
 
-            Tuple3(isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), IO_EQ<Tuple3<Boolean, Int, Int>>())
+            !IO.effect { Tuple3(isNotEmpty, r1, r2) shouldBe Tuple3(true, a, b) }
+          }.test()
         }
       }
 
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
-          IO.fx {
+          IO.fx<Nothing, Unit> {
             val av = mvar.just(i).bind()
             val read = av.read().bind()
             val take = av.take().bind()
-            read toT take
-          }.equalUnderTheLaw(IO.just(i toT i), IO_EQ<Tuple2<Int, Int>>())
+            !IO.effect { (read toT take) shouldBe (i toT i) }
+          }.test()
         }
       }
 

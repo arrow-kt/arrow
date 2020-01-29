@@ -17,6 +17,7 @@ import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.ForwardCancelable
 import arrow.fx.internal.IOBracket
@@ -1166,7 +1167,7 @@ fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
-fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext): IO<E, Fiber<IOPartialOf<E>, A>> =
+fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext = IO.dispatchers<Nothing>().default()): IO<E, Fiber<IOPartialOf<E>, A>> =
   IO.async { cb ->
     val promise = UnsafePromise<E, A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
