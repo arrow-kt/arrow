@@ -2,14 +2,20 @@ package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.core.AndThen
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.andThen
 import arrow.core.toT
 import arrow.extension
 import arrow.mtl.AccumT
 import arrow.mtl.AccumTPartialOf
 import arrow.mtl.ForAccumT
 import arrow.mtl.fix
+import arrow.mtl.typeclasses.MonadReader
+import arrow.mtl.typeclasses.MonadState
 import arrow.mtl.typeclasses.MonadTrans
+import arrow.mtl.typeclasses.MonadWriter
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -120,4 +126,68 @@ interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, Accu
   override fun MS(): Monoid<S>
   override fun ME(): MonadError<F, E>
   override fun MF(): Monad<F> = ME()
+}
+
+@extension
+interface AccumTMonadState<S, F> : MonadState<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+  fun MSF(): MonadState<F, S>
+  override fun MF(): Monad<F> = MSF()
+  override fun MS(): Monoid<S>
+
+  override fun get(): Kind<AccumTPartialOf<S, F>, S> =
+    AccumT.liftF(MSF(), MSF().get())
+
+  override fun set(s: S): Kind<AccumTPartialOf<S, F>, Unit> =
+    AccumT.liftF(MSF(), MSF().set(s))
+}
+
+@extension
+interface AccumTMonadReader<S, F> : MonadReader<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+  fun MR(): MonadReader<F, S>
+  override fun MF(): Monad<F> = MR()
+  override fun MS(): Monoid<S>
+
+  override fun ask(): Kind<AccumTPartialOf<S, F>, S> =
+    AccumT.liftF(MR(), MR().ask())
+
+  override fun <A> Kind<AccumTPartialOf<S, F>, A>.local(f: (S) -> S): Kind<AccumTPartialOf<S, F>, A> =
+    MR().run {
+      AccumT(fix().accumT.map { accumT ->
+        AndThen(accumT).andThen { it.local(f) }
+      })
+    }
+}
+
+@extension
+interface AccumTMonadWriter<S, F> : MonadWriter<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+  fun MW(): MonadWriter<F, S>
+  override fun MF(): Monad<F> = MW()
+  override fun MS(): Monoid<S>
+
+  override fun <A> writer(aw: Tuple2<S, A>): Kind<AccumTPartialOf<S, F>, A> =
+    AccumT.liftF(MW(), MW().writer(aw))
+
+  override fun <A> Kind<AccumTPartialOf<S, F>, A>.listen(): Kind<AccumTPartialOf<S, F>, Tuple2<S, A>> =
+    MW().run {
+      AccumT(fix().accumT.map {
+        AndThen(it.andThen {
+          it.listen().map { (w, sa) ->
+            val (s, a) = sa
+            Tuple2(s, Tuple2(w, a))
+          }
+        })
+      })
+    }
+
+  override fun <A> Kind<AccumTPartialOf<S, F>, Tuple2<(S) -> S, A>>.pass(): Kind<AccumTPartialOf<S, F>, A> =
+    MW().run {
+      AccumT(fix().accumT.map {
+        AndThen(it).andThen {
+          it.map { (s, fa) ->
+            val (f, a) = fa
+            Tuple2(f, Tuple2(s, a))
+          }.pass()
+        }
+      })
+    }
 }
