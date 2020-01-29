@@ -129,28 +129,28 @@ interface AccumTMonadError<S, F, E> : MonadError<AccumTPartialOf<S, F>, E>, Accu
 }
 
 @extension
-interface AccumTMonadState<S, F> : MonadState<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+interface AccumTMonadState<S, W, F> : MonadState<AccumTPartialOf<W, F>, S>, AccumTMonad<W, F> {
   fun MSF(): MonadState<F, S>
   override fun MF(): Monad<F> = MSF()
-  override fun MS(): Monoid<S>
+  override fun MS(): Monoid<W>
 
-  override fun get(): Kind<AccumTPartialOf<S, F>, S> =
+  override fun get(): Kind<AccumTPartialOf<W, F>, S> =
     AccumT.liftF(MSF(), MSF().get())
 
-  override fun set(s: S): Kind<AccumTPartialOf<S, F>, Unit> =
+  override fun set(s: S): Kind<AccumTPartialOf<W, F>, Unit> =
     AccumT.liftF(MSF(), MSF().set(s))
 }
 
 @extension
-interface AccumTMonadReader<S, F> : MonadReader<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+interface AccumTMonadReader<S, W, F> : MonadReader<AccumTPartialOf<W, F>, S>, AccumTMonad<W, F> {
   fun MR(): MonadReader<F, S>
   override fun MF(): Monad<F> = MR()
-  override fun MS(): Monoid<S>
+  override fun MS(): Monoid<W>
 
-  override fun ask(): Kind<AccumTPartialOf<S, F>, S> =
+  override fun ask(): Kind<AccumTPartialOf<W, F>, S> =
     AccumT.liftF(MR(), MR().ask())
 
-  override fun <A> Kind<AccumTPartialOf<S, F>, A>.local(f: (S) -> S): Kind<AccumTPartialOf<S, F>, A> =
+  override fun <A> Kind<AccumTPartialOf<W, F>, A>.local(f: (S) -> S): Kind<AccumTPartialOf<W, F>, A> =
     MR().run {
       AccumT(fix().accumT.map { accumT ->
         AndThen(accumT).andThen { it.local(f) }
@@ -159,15 +159,15 @@ interface AccumTMonadReader<S, F> : MonadReader<AccumTPartialOf<S, F>, S>, Accum
 }
 
 @extension
-interface AccumTMonadWriter<S, F> : MonadWriter<AccumTPartialOf<S, F>, S>, AccumTMonad<S, F> {
+interface AccumTMonadWriter<S, W, F> : MonadWriter<AccumTPartialOf<W, F>, S>, AccumTMonad<W, F> {
   fun MW(): MonadWriter<F, S>
   override fun MF(): Monad<F> = MW()
-  override fun MS(): Monoid<S>
+  override fun MS(): Monoid<W>
 
-  override fun <A> writer(aw: Tuple2<S, A>): Kind<AccumTPartialOf<S, F>, A> =
+  override fun <A> writer(aw: Tuple2<S, A>): Kind<AccumTPartialOf<W, F>, A> =
     AccumT.liftF(MW(), MW().writer(aw))
 
-  override fun <A> Kind<AccumTPartialOf<S, F>, A>.listen(): Kind<AccumTPartialOf<S, F>, Tuple2<S, A>> =
+  override fun <A> Kind<AccumTPartialOf<W, F>, A>.listen(): Kind<AccumTPartialOf<W, F>, Tuple2<S, A>> =
     MW().run {
       AccumT(fix().accumT.map {
         AndThen(it.andThen {
@@ -179,7 +179,7 @@ interface AccumTMonadWriter<S, F> : MonadWriter<AccumTPartialOf<S, F>, S>, Accum
       })
     }
 
-  override fun <A> Kind<AccumTPartialOf<S, F>, Tuple2<(S) -> S, A>>.pass(): Kind<AccumTPartialOf<S, F>, A> =
+  override fun <A> Kind<AccumTPartialOf<W, F>, Tuple2<(S) -> S, A>>.pass(): Kind<AccumTPartialOf<W, F>, A> =
     MW().run {
       AccumT(fix().accumT.map {
         AndThen(it).andThen {

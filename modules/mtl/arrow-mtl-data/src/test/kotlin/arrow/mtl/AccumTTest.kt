@@ -3,6 +3,7 @@ package arrow.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.EitherPartialOf
+import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -28,7 +29,14 @@ import arrow.mtl.extensions.accumt.alternative.alternative
 import arrow.mtl.extensions.accumt.functor.functor
 import arrow.mtl.extensions.accumt.monad.monad
 import arrow.mtl.extensions.accumt.monadError.monadError
+import arrow.mtl.extensions.accumt.monadState.monadState
 import arrow.mtl.extensions.accumt.monadTrans.monadTrans
+import arrow.mtl.extensions.accumt.monadWriter.monadWriter
+import arrow.mtl.extensions.statet.monad.monad
+import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.writert.eqK.eqK
+import arrow.mtl.extensions.writert.monad.monad
+import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
@@ -36,7 +44,9 @@ import arrow.test.generators.throwable
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadTransLaws
+import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -48,6 +58,7 @@ import io.kotlintest.shouldBe
 
 class AccumTTest : UnitSpec() {
   init {
+
     testLaws(
 
       MonadTransLaws.laws(
@@ -71,6 +82,22 @@ class AccumTTest : UnitSpec() {
         AccumT.monad(Int.monoid(), Either.monad()),
         AccumT.genK(Either.genK(Gen.throwable()), Gen.int()),
         AccumT.eqK(Either.monad(), Either.eqK(Eq.any()) as EqK<EitherPartialOf<Throwable>>, Int.eq(), 10)
+      ),
+
+      MonadStateLaws.laws(
+        AccumT.monadState<Int, Int, StateTPartialOf<ForId, Int>>(StateT.monadState(Id.monad()), Int.monoid()),
+        AccumT.genK(StateT.genK(Id.genK(), Gen.int()), Gen.int()),
+        AccumT.eqK<Int, StateTPartialOf<ForId, Int>>(StateT.monad(Id.monad()), StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 1), Int.eq(), 1)
+      ),
+
+      MonadWriterLaws.laws(
+        AccumT.monad(String.monoid(), Id.monad()),
+        AccumT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid()), String.monoid()),
+        String.monoid(),
+        Gen.string(),
+        AccumT.genK(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
+        AccumT.eqK(WriterT.monad(Id.monad(), String.monoid()), WriterT.eqK(Id.eqK(), String.eq()), String.eq(), "hello"),
+        String.eq()
       )
 
     )
