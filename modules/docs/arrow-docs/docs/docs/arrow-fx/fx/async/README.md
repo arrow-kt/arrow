@@ -257,4 +257,4 @@ On top of complementing the KotlinX Coroutines API, Arrow Fx provides interopera
 
 Arrow Fx integrates with the Arrow Effects IO runtime, Rx2, Reactor framework, and any library that models effectful async/concurrent computations and can provide a `@extension` to the `ConcurrentEffect<F>` type class defined in the `arrow-effects` module out of the box.
 
-If you are interested in providing your own runtime as a backend to the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/) with any questions and we'll help you along the way.
+If you are interested in providing your own runtime as a backend to the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
