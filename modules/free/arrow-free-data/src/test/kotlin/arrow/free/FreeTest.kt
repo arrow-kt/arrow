@@ -21,6 +21,7 @@ import arrow.free.extensions.free.foldable.foldable
 import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
 import arrow.free.extensions.free.traverse.traverse
+import arrow.free.extensions.fx
 import arrow.higherkind
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
@@ -50,13 +51,13 @@ sealed class Ops<out A> : OpsOf<A> {
 class FreeTest : UnitSpec() {
 
   private val program = Ops.fx.monad {
-    val (added) = Ops.add(10, 10)
+    val added = !Ops.add(10, 10)
     val subtracted = !Ops.subtract(added, 50)
     subtracted
   }.fix()
 
   private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.fx.monad {
-    val (v) = Ops.add(n, 1)
+    val v = !Ops.add(n, 1)
     val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v)
     r
   }.fix()
@@ -121,6 +122,16 @@ class FreeTest : UnitSpec() {
       val n = 50000
       val hugeProg = stackSafeTestProgram(0, n)
       hugeProg.foldMap(idInterpreter, IdMonad).value() shouldBe n
+    }
+
+    "free should support fx syntax" {
+      val n1 = 1
+      val n2 = 2
+      Free.fx<ForId, Int> {
+        val v1 = Free.just<ForId, Int>(n1).bind()
+        val v2 = Free.just<ForId, Int>(n2).bind()
+        v1 + v2
+      }.run(Id.monad()) shouldBe Id(n1 + n2)
     }
   }
 }
