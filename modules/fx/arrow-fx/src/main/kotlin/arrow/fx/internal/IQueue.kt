@@ -19,7 +19,7 @@ import arrow.core.extensions.list.foldable.nonEmpty
  *
  */
 
-internal class IQueue<A> private constructor(val lIn: List<A>, val lOut: List<A>) {
+class IQueue<A> private constructor(val lIn: List<A>, val lOut: List<A>) {
 
   private fun <A> Iterable<A>.head() = first()
   private fun <A> Iterable<A>.tail() = drop(1)
