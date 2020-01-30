@@ -1,6 +1,7 @@
 package arrow.mtl
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.identity
@@ -109,16 +110,15 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
   fun <G, B> mapAccumT(
     fas: (Kind<F, Tuple2<S, A>>) -> Kind<G, Tuple2<S, B>>
   ): AccumT<S, G, B> =
-    AccumT { s: S ->
-      fas(runAccumT(s))
-    }
+    AccumT(
+      AndThen(accumT).andThen(fas)
+    )
 
-  fun <B> map(MF: Functor<F>, fab: (A) -> B): AccumT<S, F, B> =
-    MF.run {
-      AccumT { s: S ->
-        accumT(s).map { it.a toT fab(it.b) }
-      }
+  fun <B> map(MF: Functor<F>, fab: (A) -> B): AccumT<S, F, B> = AccumT(
+    AndThen(accumT).andThen {
+      MF.run { it.map { it.a toT fab(it.b) } }
     }
+  )
 
   fun <B> flatMap(MS: Monoid<S>, MF: Monad<F>, fa: (A) -> AccumTOf<S, F, B>): AccumT<S, F, B> =
     AccumT { s: S ->
