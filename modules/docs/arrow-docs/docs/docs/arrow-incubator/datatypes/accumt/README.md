@@ -12,15 +12,14 @@ redirect_from:
 
 ```kotlin:ank
 import arrow.core.extensions.id.monad.monad
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.*
 import arrow.core.*
 import arrow.mtl.*
 
-val accumT1: AccumT<String, ForId, Int> = AccumT(Id.applicative()) {
+val accumT1: AccumT<String, ForId, Int> = AccumT {
     s: String -> Id.just("#1" toT 1)
 }
-val accumT2: AccumT<String, ForId, Int> = AccumT(Id.applicative()) {
+val accumT2: AccumT<String, ForId, Int> = AccumT {
     s: String -> Id.just("#2" toT 2)
 }
 
