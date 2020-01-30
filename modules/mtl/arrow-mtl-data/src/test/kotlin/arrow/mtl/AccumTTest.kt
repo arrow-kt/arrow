@@ -21,7 +21,6 @@ import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
 import arrow.fx.IO
-import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.io.monadIO.monadIO
 import arrow.fx.fix
 import arrow.fx.mtl.accumt.monadIO.monadIO
@@ -126,7 +125,7 @@ class AccumTTest : UnitSpec() {
         IO.just(1).liftIO().fix()
       }
 
-      val ls = accumT.runAccumT(IO.monad(), "1").fix().unsafeRunSync()
+      val ls = accumT.runAccumT("1").fix().unsafeRunSync()
 
       ls shouldBe ("" toT 1)
     }
@@ -162,11 +161,11 @@ private fun <S, F, A> apCombinesState(
 ): Unit =
   forAll(GENS, GENS, GENS, GENA) { s1, s2, s3, a ->
 
-    val accumT = AccumT(MF) { _: S ->
+    val accumT = AccumT { _: S ->
       MF.just(s1 toT a)
     }
 
-    val mf = AccumT(MF) { _: S ->
+    val mf = AccumT { _: S ->
       MF.just(s2 toT { a: A -> a })
     }
 
@@ -179,10 +178,8 @@ private fun <S, F, A> apCombinesState(
 private fun <S, F> AccumT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) =
   object : GenK<AccumTPartialOf<S, F>> {
     override fun <A> genK(gen: Gen<A>): Gen<Kind<AccumTPartialOf<S, F>, A>> =
-      genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map {
-        { _: S -> it }
-      }).map {
-        AccumT(it)
+      genkF.genK(Gen.tuple2(genS, gen)).map {
+        AccumT { _: S -> it }
       }
   }
 
@@ -190,7 +187,7 @@ private fun <S, F> AccumT.Companion.eqK(MF: Monad<F>, eqkF: EqK<F>, eqS: Eq<S>, 
   object : EqK<AccumTPartialOf<S, F>> {
     override fun <A> Kind<AccumTPartialOf<S, F>, A>.eqK(other: Kind<AccumTPartialOf<S, F>, A>, EQ: Eq<A>): Boolean =
       (this.fix() to other.fix()).let {
-        it.first.runAccumT(MF, s) to it.second.runAccumT(MF, s)
+        it.first.runAccumT(s) to it.second.runAccumT(s)
       }.let {
         eqkF.liftEq(Tuple2.eq(eqS, EQ)).run {
           it.first.eqv(it.second)
