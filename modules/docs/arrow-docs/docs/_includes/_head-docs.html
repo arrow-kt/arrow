@@ -56,12 +56,4 @@
   {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
   {% include _google-tag-manager.html %}
   {% endif %}
-
-  <!-- Gitter -->
-  <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" defer></script>
-  <script>
-    ((window.gitter = {}).chat = {}).options = {
-      room: "{{site.gitter_room}}"
-    };
-  </script>
 </head>

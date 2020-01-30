@@ -149,7 +149,7 @@ class QueueTest : UnitSpec() {
           !(q.awaitShutdown().followedBy(p1.complete(true))).fork()
           !(q.awaitShutdown().followedBy(p2.complete(true))).fork()
           !q.shutdown()
-          !map(p1.get(), p2.get()) { (p1, p2) -> p1 && p2 }
+          !mapN(p1.get(), p2.get()) { (p1, p2) -> p1 && p2 }
         }.unsafeRunSync()
       }
 

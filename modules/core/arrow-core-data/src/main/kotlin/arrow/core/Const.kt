@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
@@ -24,6 +25,10 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   }
 
   fun value(): A = value
+
+  fun show(SA: Show<A>): String = "$Const(${SA.run { value.show() }})"
+
+  override fun toString(): String = show(Show.any())
 }
 
 fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> = Const(SG.run { value().combine(that.value()) })

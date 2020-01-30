@@ -3,6 +3,7 @@ package arrow.ank
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
+import java.util.Properties
 
 class AnkPlugin : Plugin<Project> {
 
@@ -13,9 +14,14 @@ class AnkPlugin : Plugin<Project> {
 
   @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
   override fun apply(target: Project) {
+    val properties = Properties()
+    properties.load(this.javaClass.getResourceAsStream("plugin.properties"))
     val extension = AnkExtension()
     target.extensions.add(EXTENSION_NAME, extension)
     target.afterEvaluate {
+      target.dependencies.add("runtimeOnly", "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:${properties.getProperty("KOTLIN_VERSION")}")
+      target.dependencies.add("runtimeOnly", "org.jetbrains.kotlin:kotlin-compiler-embeddable:${properties.getProperty("KOTLIN_VERSION")}")
+      target.dependencies.add("runtimeOnly", "io.arrow-kt:arrow-ank:${properties.getProperty("CURRENT_VERSION")}")
       target.tasks.create(TASK_NAME, JavaExec::class.java).apply {
         classpath = extension.classpath
         main = "arrow.ank.main"

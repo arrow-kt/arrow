@@ -1,3 +1,8 @@
+plugins {
+    id "me.champeau.gradle.jmh" version "$JMH_PLUGIN_VERSION"
+    id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
+}
+
 repositories {
     maven { url "https://jitpack.io" }
 }
@@ -8,8 +13,8 @@ dependencies {
     compile project(":arrow-fx-reactor")
     compile project(":arrow-scala-benchmarks")
     compile project(":arrow-kio-benchmarks")
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     compileOnly "org.openjdk.jmh:jmh-core:1.22"
 }
 

@@ -1,5 +1,6 @@
 package arrow.fx.mtl
 
+import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -18,7 +19,11 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.extension
+import arrow.fx.IO
+import arrow.fx.typeclasses.MonadIO
+import arrow.mtl.extensions.StateTMonad
 import arrow.mtl.runM
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -90,5 +95,14 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
 
   override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {
     StateT(this) { s -> runM(this, s).continueOn(ctx) }
+  }
+}
+
+@extension
+interface StateTMonadIO<F, S> : MonadIO<StateTPartialOf<F, S>>, StateTMonad<F, S> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<A>.liftIO(): Kind<StateTPartialOf<F, S>, A> = FIO().run {
+    StateT.liftF(this, liftIO())
   }
 }

@@ -34,25 +34,25 @@ object MonadLaws {
       )
   }
 
-    fun <F> laws(
-      M: Monad<F>,
-      FF: Functor<F>,
-      AP: Apply<F>,
-      SL: Selective<F>,
-      GENK: GenK<F>,
-      EQK: EqK<F>
-    ): List<Law> {
-      val EQ = EQK.liftEq(Int.eq())
-      val G = GENK.genK(Gen.int())
+  fun <F> laws(
+    M: Monad<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>
+  ): List<Law> {
+    val EQ = EQK.liftEq(Int.eq())
+    val G = GENK.genK(Gen.int())
 
-      return laws(M, GENK, EQK) + listOf(
-        Law("Monad Laws: monad map should be consistent with functor map") { M.derivedMapConsistent(G, FF, EQ) },
-        Law("Monad Laws: monad ap should be consistent with applicative ap") { M.derivedApConsistent(GENK, AP, EQ) },
-        Law("Monad Laws: monad apTap should be consistent with applicative apTap") { M.derivedApTapConsistent(GENK, AP, EQ) },
-        Law("Monad Laws: monad followedBy should be consistent with applicative followedBy") { M.derivedFollowedByConsistent(GENK, AP, EQ) },
-        Law("Monad Laws: monad selective should be consistent with selective selective") { M.derivedSelectiveConsistent(GENK, SL, EQ) }
-      )
-    }
+    return laws(M, GENK, EQK) + listOf(
+      Law("Monad Laws: monad map should be consistent with functor map") { M.derivedMapConsistent(G, FF, EQ) },
+      Law("Monad Laws: monad ap should be consistent with applicative ap") { M.derivedApConsistent(GENK, AP, EQ) },
+      Law("Monad Laws: monad apTap should be consistent with applicative apTap") { M.derivedApTapConsistent(GENK, AP, EQ) },
+      Law("Monad Laws: monad followedBy should be consistent with applicative followedBy") { M.derivedFollowedByConsistent(GENK, AP, EQ) },
+      Law("Monad Laws: monad selective should be consistent with selective selective") { M.derivedSelectiveConsistent(GENK, SL, EQ) }
+    )
+  }
 
   fun <F> Monad<F>.leftIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Int, Kind<F, Int>>(G), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
@@ -86,9 +86,9 @@ object MonadLaws {
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
       fx.monad {
-        val (a) = just(num)
-        val (b) = just(a + 1)
-        val (c) = just(b + 1)
+        val a = !just(num)
+        val b = !just(a + 1)
+        val c = !just(b + 1)
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
     }

@@ -29,6 +29,7 @@ import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeCancellableRun
@@ -252,6 +253,11 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   fun SM(): Monoid<A>
 
   override fun empty(): IO<A> = IO.just(SM().empty())
+}
+
+@extension
+interface IOMonadIO : MonadIO<ForIO>, IOMonad {
+  override fun <A> IO<A>.liftIO(): Kind<ForIO, A> = this
 }
 
 @extension

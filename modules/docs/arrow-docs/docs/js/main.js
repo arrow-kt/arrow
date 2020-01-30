@@ -80,7 +80,7 @@ window.addEventListener("resize", mobileViewControl);
 // Init call
 function loadEvent() {
   mobileViewControl();
-
+  
   document.addEventListener("scroll", scrollFunction);
 
   function baseAnimation() {
