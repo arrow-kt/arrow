@@ -23,6 +23,7 @@ import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
+import arrow.fx.extensions.toIOException
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase2
@@ -793,31 +794,31 @@ class IOTest : UnitSpec() {
     }
 
     "can go from Either to IO directly when Left type is a Throwable" {
+      val exception = RuntimeException()
+      val left = Either.left(exception)
+      val right = Either.right("rightValue")
+
+      left
+        .toIO()
+        .unsafeRunSyncEither() shouldBe Left(exception)
+      right
+        .toIO()
+        .unsafeRunSync() shouldBe "rightValue"
+    }
+
+    "can go from Either to IO by mapping the Left value to a IO exception" {
 
       val exception = RuntimeException()
       val left = Either.left(exception)
       val right = Either.right("rightValue")
 
-      left.toIO()
-        .attempt().unsafeRunSync() shouldBe Left(exception)
-
-      right.toIO()
-        .unsafeRunSync() shouldBe "rightValue"
-    }
-
-    "can go from Either to IO by mapping the Left value to a Throwable" {
-
-      val exception = RuntimeException()
-      val left = Either.left("boom")
-      val right = Either.right("rightValue")
-
-      right
-        .toIO { exception }
-        .unsafeRunSync() shouldBe "rightValue"
-
       left
-        .toIO { exception }
-        .attempt().unsafeRunSync() shouldBe Left(exception)
+        .toIOException()
+        .attempt()
+        .unsafeRunSync() shouldBe Left(exception)
+      right
+        .toIOException()
+        .unsafeRunSync() shouldBe "rightValue"
     }
 
     "Cancellation is wired across suspend" {
