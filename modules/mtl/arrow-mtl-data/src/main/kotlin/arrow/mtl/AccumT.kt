@@ -168,13 +168,13 @@ fun <F, S, A> ReaderT<F, S, A>.toAccumT(
   MS: Monoid<S>
 ): AccumT<S, F, A> =
   this.run.let { f ->
-    AccumT { s: S ->
+    AccumT(AndThen(f).andThen {
       FF.run {
-        f(s).map { a ->
+        it.map { a ->
           MS.empty() toT a
         }
       }
-    }
+    })
   }
 
 /**
