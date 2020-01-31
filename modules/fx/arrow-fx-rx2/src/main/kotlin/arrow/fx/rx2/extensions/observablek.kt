@@ -271,7 +271,7 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 }
 
 fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() -> A): ObservableK<A> =
-  defer { ObservableK.concurrent().fx.concurrent(c).fix() }
+  ObservableK.concurrent().fx.concurrent(c).fix()
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {

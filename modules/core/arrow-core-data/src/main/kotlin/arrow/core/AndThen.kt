@@ -40,6 +40,10 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
 
+  private data class Join<A, B>(val fa: AndThen<A, AndThen<A, B>>) : AndThen<A, B>() {
+    override fun toString(): String = "AndThen.Join(...)"
+  }
+
   private data class Concat<A, E, B>(val left: AndThen<A, E>, val right: AndThen<E, B>) : AndThen<A, B>() {
     override fun toString(): String = "AndThen.Concat(...)"
   }
@@ -122,8 +126,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   fun <C> contramap(f: (C) -> A): AndThen<C, B> =
     this compose f
 
-  fun <C> flatMap(f: (B) -> AndThenOf<A, C>): AndThen<A, C> =
-    AndThen { a: A -> f(this.invoke(a)).fix().invoke(a) }
+  fun <C> flatMap(f: (B) -> AndThenOf<A, C>): AndThen<A, C> = Join(this.map(AndThen(f).andThen { it.fix() }))
 
   fun <C> ap(ff: AndThenOf<A, (B) -> C>): AndThen<A, C> =
     ff.fix().flatMap { f ->
@@ -150,7 +153,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    *
    **/
   @Suppress("UNCHECKED_CAST")
-  override fun invoke(a: A): B = loop(this as AndThen<Any?, Any?>, a)
+  override fun invoke(a: A): B = loop(this as AndThen<Any?, Any?>, a, 0)
 
   override fun toString(): String = "AndThen(...)"
 
@@ -218,18 +221,25 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   private fun <X> composeF(right: AndThen<X, A>): AndThen<X, B> = Concat(right, this)
 
   @Suppress("UNCHECKED_CAST")
-  private tailrec fun loop(self: AndThen<Any?, Any?>, current: Any?): B = when (self) {
-    is Single -> self.f(current) as B
+  private tailrec fun loop(self: AndThen<Any?, Any?>, current: Any?, joins: Int): B = when (self) {
+    is Single -> if (joins == 0) self.f(current) as B else loop(self.f(current) as AndThen<Any?, Any?>, null, joins - 1)
+    is Join -> loop(
+      self.fa.andThen { Concat(AndThen<Any?, Any?> { current }, it) },
+      current,
+      joins + 1
+    )
     is Concat<*, *, *> -> {
       when (val oldLeft = self.left) {
         is Single<*, *> -> {
           val left = oldLeft as Single<Any?, Any?>
           val newSelf = self.right as AndThen<Any?, Any?>
-          loop(newSelf, left.f(current))
+          loop(newSelf, left.f(current), joins)
         }
+        is Join<*, *>,
         is Concat<*, *, *> -> loop(
           rotateAccumulate(self.left as AndThen<Any?, Any?>, self.right as AndThen<Any?, Any?>),
-          current
+          current,
+          joins
         )
       }
     }
@@ -244,6 +254,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       left.left as AndThen<Any?, Any?>,
       (left.right as AndThen<Any?, Any?>).andThenF(right)
     )
+    is Join -> Join(left.fa.andThen { it.andThenF(right) })
     is Single<*, *> -> left.andThenF(right)
   }
 }
