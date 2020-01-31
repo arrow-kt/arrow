@@ -268,7 +268,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * ```
      *
      * @param k an asynchronous computation that might fail typed as [IOProc].
-     * @see cancelable for an operator that supports cancelation.
+     * @see cancelable for an operator that supports cancellation.
      * @see asyncF for a version that can suspend side effects in the registration function.
      */
     fun <E, A> async(k: IOProc<E, A>): IO<E, A> =
@@ -322,7 +322,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      *
      * @param k a deferred asynchronous computation that might fail typed as [IOProcF].
      * @see async for a version that can suspend side effects in the registration function.
-     * @see cancelableF for an operator that supports cancelation.
+     * @see cancelableF for an operator that supports cancellation.
      */
     fun <E, A> asyncF(k: IOProcF<E, A>): IO<E, A> =
       Async { conn: IOConnection, ff: (IOResult<E, A>) -> Unit ->
@@ -393,7 +393,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * ```
      *
      * @param cb an asynchronous computation that might fail.
-     * @see async for wrapping impure APIs without cancelation
+     * @see async for wrapping impure APIs without cancellation
      */
     fun <E, A> cancelable(cb: ((IOResult<E, A>) -> Unit) -> IOOf<E, Unit>): IO<E, A> =
       Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
@@ -461,7 +461,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      * ```
      *
      * @param cb a deferred asynchronous computation that might fail.
-     * @see asyncF for wrapping impure APIs without cancelation
+     * @see asyncF for wrapping impure APIs without cancellation
      */
     fun <E, A> cancelableF(cb: ((IOResult<E, A>) -> Unit) -> IOOf<E, IOOf<E, Unit>>): IO<E, A> =
       Async { conn: IOConnection, cbb: (IOResult<E, A>) -> Unit ->
@@ -709,7 +709,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (IOResult<E, A>) -> IOOf<Nothing, Unit>): IO<Nothing, Disposable> =
-    async { ccb ->
+    Async { _, ccb ->
       val conn = IOConnection()
       val onCancelCb = when (onCancel) {
         ThrowCancellationException -> cb andThen { it.fix().unsafeRunAsync { } }

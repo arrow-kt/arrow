@@ -441,14 +441,7 @@ internal object IORunLoop {
           is IOResult.Success -> IO.Pure(p1.value)
           is IOResult.Error -> IO.RaiseError(p1.error)
           is IOResult.Exception -> IO.RaiseException(p1.exception)
-        }.let { r ->
-          if (shouldTrampoline) {
-            this.value = r
-            Platform.trampoline { trampoline() }
-          } else {
-            signal(r)
-          }
-        }
+        }.let(::forward)
       }
     }
 
@@ -458,14 +451,16 @@ internal object IORunLoop {
         result.fold(
           { a -> IO.Pure(a) },
           { e -> IO.RaiseException(e) }
-        ).let { r ->
-          if (shouldTrampoline) {
-            this.value = r
-            Platform.trampoline { trampoline() }
-          } else {
-            signal(r)
-          }
-        }
+        ).let(::forward)
+      }
+    }
+
+    private fun forward(io: IO<Any?, Any?>) {
+      if (shouldTrampoline) {
+        this.value = io
+        Platform.trampoline { trampoline() }
+      } else {
+        signal(io)
       }
     }
 
