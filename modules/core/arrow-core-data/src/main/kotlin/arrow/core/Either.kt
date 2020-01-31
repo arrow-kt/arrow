@@ -1062,6 +1062,7 @@ fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
   null -> Either.right(null)
   else -> Either.left(default())
 }
+
 /**
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.

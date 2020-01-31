@@ -21,6 +21,7 @@ import arrow.free.extensions.free.foldable.foldable
 import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
 import arrow.free.extensions.free.traverse.traverse
+import arrow.free.extensions.fx
 import arrow.higherkind
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
@@ -121,6 +122,16 @@ class FreeTest : UnitSpec() {
       val n = 50000
       val hugeProg = stackSafeTestProgram(0, n)
       hugeProg.foldMap(idInterpreter, IdMonad).value() shouldBe n
+    }
+
+    "free should support fx syntax" {
+      val n1 = 1
+      val n2 = 2
+      Free.fx<ForId, Int> {
+        val v1 = Free.just<ForId, Int>(n1).bind()
+        val v2 = Free.just<ForId, Int>(n2).bind()
+        v1 + v2
+      }.run(Id.monad()) shouldBe Id(n1 + n2)
     }
   }
 }
