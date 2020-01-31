@@ -1,5 +1,7 @@
 package arrow.mtl
 
+import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
@@ -29,7 +31,7 @@ fun <S, A> Accum<S, A>.evalAccum(s: S): A =
   evalAccumT(Id.monad(), s).fix().extract()
 
 fun <S, A, B> Accum<S, A>.mapAccum(f: (Tuple2<S, A>) -> Tuple2<S, B>): Accum<S, B> =
-  mapAccumT(AndThen(f).compose { it.extract() }.andThen(::Id))
+  mapAccumT(AndThen(f).compose<Kind<ForId, Tuple2<S, A>>> { it.fix().extract() }.andThen(::Id))
 
 fun <S, A, B> Accum<S, A>.map(fa: (A) -> B): Accum<S, B> =
   map(Id.functor(), fa)
