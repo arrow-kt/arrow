@@ -213,7 +213,7 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
 }
 
 internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
-  override val ME: MonadThrow<ForTry> = Try.monadThrow()
+  override val M: MonadThrow<ForTry> = Try.monadThrow()
 }
 
 fun <A> Try.Companion.fx(c: suspend MonadThrowSyntax<ForTry>.() -> A): Try<A> =
