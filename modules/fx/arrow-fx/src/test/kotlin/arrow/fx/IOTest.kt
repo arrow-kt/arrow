@@ -132,6 +132,14 @@ class IOTest : UnitSpec() {
       received shouldBe Some(Right(null))
     }
 
+    "should return an Error value from unsafeRunTimed" {
+      val someError = "hello"
+      val failure = IO.raiseError<String, Int?>(someError)
+      val received = failure.unsafeRunTimed(100.milliseconds)
+
+      received shouldBe Some(Left(someError))
+    }
+
     "should return a null value from unsafeRunSync" {
       val value = just<Int?>(null).unsafeRunSync()
 
