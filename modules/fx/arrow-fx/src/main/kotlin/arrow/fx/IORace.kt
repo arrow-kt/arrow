@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.internal.AtomicBooleanW
-import arrow.fx.extensions.io.applicative.map
-import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
@@ -38,234 +36,6 @@ interface IORace {
 
   fun <A, B, C, D, E, F, G, H, I> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, ioH: IOOf<H>, ioI: IOOf<I>): IO<Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE, ioF, ioG, ioH, ioI)
-
-  /**
-   * Race two tasks concurrently within a new [IO].
-   * Race results in a winner and the other, yet to finish task running in a [Fiber].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.*
-   * import arrow.fx.extensions.fx
-   * import kotlinx.coroutines.Dispatchers
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = IO.fx {
-   *     val racePair = !IO.racePair(Dispatchers.Default, never<Int>(), just("Hello World!"))
-   *     racePair.fold(
-   *       { _, _ -> "never cannot win race" },
-   *       { _, winner -> winner }
-   *     )
-   *   }
-   *   //sampleEnd
-   *
-   *   val r = result.unsafeRunSync()
-   *   println("Race winner result is: $r")
-   * }
-   * ```
-   *
-   * @param ctx [CoroutineContext] to execute the source [IO] on.
-   * @param ioA task to participate in the race
-   * @param ioB task to participate in the race
-   * @return [IO] either [Left] with product of the winner's result [ioA] and still running task [ioB],
-   *   or [Right] with product of running task [ioA] and the winner's result [ioB].
-   *
-   * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
-   */
-  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.Async(true) { conn, cb ->
-      val active = AtomicBooleanW(true)
-
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
-      // Cancelable connection for the left value
-      val connA = IOConnection()
-      connA.push(upstreamCancelToken)
-      val promiseA = UnsafePromise<A>()
-
-      // Cancelable connection for the right value
-      val connB = IOConnection()
-      connB.push(upstreamCancelToken)
-      val promiseB = UnsafePromise<B>()
-
-      conn.pushPair(connA, connB)
-
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
-              conn.pop()
-              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
-            }
-          } else {
-            promiseA.complete(Left(error))
-          }
-        }, { a ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
-          } else {
-            promiseA.complete(Right(a))
-          }
-        })
-      }
-
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              conn.pop()
-              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
-            }
-          } else {
-            promiseB.complete(Left(error))
-          }
-        }, { b ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
-          } else {
-            promiseB.complete(Right(b))
-          }
-        })
-      }
-    }
-
-  /**
-   * Race three tasks concurrently within a new [IO].
-   * Race results in a winner and the others, yet to finish task running in a [Fiber].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.*
-   * import arrow.fx.extensions.fx
-   * import kotlinx.coroutines.Dispatchers
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = IO.fx {
-   *     val raceResult = !IO.raceTriple(Dispatchers.Default, never<Int>(), just("Hello World!"), never<Double>())
-   *     raceResult.fold(
-   *       { _, _, _ -> "never cannot win before complete" },
-   *       { _, winner, _ -> winner },
-   *       { _, _, _ -> "never cannot win before complete" }
-   *     )
-   *   }
-   *   //sampleEnd
-   *
-   *   val r = result.unsafeRunSync()
-   *   println("Race winner result is: $r")
-   * }
-   * ```
-   *
-   * @param ctx [CoroutineContext] to execute the source [IO] on.
-   * @param ioA task to participate in the race
-   * @param ioB task to participate in the race
-   * @param ioC task to participate in the race
-   * @return [RaceTriple]
-   *
-   * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
-   */
-  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-    IO.Async(true) { conn, cb ->
-      val active = AtomicBooleanW(true)
-
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
-      val connA = IOConnection()
-      connA.push(upstreamCancelToken)
-      val promiseA = UnsafePromise<A>()
-
-      val connB = IOConnection()
-      connB.push(upstreamCancelToken)
-      val promiseB = UnsafePromise<B>()
-
-      val connC = IOConnection()
-      connC.push(upstreamCancelToken)
-      val promiseC = UnsafePromise<C>()
-
-      conn.push(connA.cancel(), connB.cancel(), connC.cancel())
-
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
-              }
-            }
-          } else {
-            promiseA.complete(Left(error))
-          }
-        }, { a ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
-          } else {
-            promiseA.complete(Right(a))
-          }
-        })
-      }
-
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
-              }
-            }
-          } else {
-            promiseB.complete(Left(error))
-          }
-        }, { b ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
-          } else {
-            promiseB.complete(Right(b))
-          }
-        })
-      }
-
-      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connB.cancel().fix().unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
-              }
-            }
-          } else {
-            promiseC.complete(Left(error))
-          }
-        }, { c ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
-          } else {
-            promiseC.complete(Right(c))
-          }
-        })
-      }
-    }
 
   /**
    * Race two tasks concurrently within a new [IO] on [this@raceN].
@@ -311,13 +81,7 @@ interface IORace {
     ioA: IOOf<A>,
     ioB: IOOf<B>
   ): IO<Race2<A, B>> =
-    racePair(ctx, ioA, ioB)
-      .flatMap {
-        it.fold(
-          { a, (_, cancelB) -> cancelB.map { Left(a) } },
-          { (_, cancelA), b -> cancelA.map { Right(b) } }
-        )
-      }
+    racePairCancellable(ctx, ioA, ioB)
 
   /**
    * @see raceN
@@ -328,14 +92,15 @@ interface IORace {
     ioB: IOOf<B>,
     ioC: IOOf<C>
   ): IO<Race3<out A, out B, out C>> =
-    raceTriple(ctx, ioA, ioB, ioC)
-      .flatMap {
-        it.fold(
-          { a, fiberB, fiberC -> fiberB.cancel().flatMap { fiberC.cancel().map { Race3.First(a) } } },
-          { fiberA, b, fiberC -> fiberA.cancel().flatMap { fiberC.cancel().map { Race3.Second(b) } } },
-          { fiberA, fiberB, c -> fiberA.cancel().flatMap { fiberB.cancel().map { Race3.Third(c) } } }
-        )
-      }
+    raceN(ctx,
+      raceN(ctx, ioA, ioB),
+      ioC
+    ).map {
+      it.fold(
+        { it.fold({ a -> Race3.First(a) }, { b -> Race3.Second(b) }) },
+        { c -> Race3.Third(c) }
+      )
+    }
 
   /**
    * @see raceN
@@ -476,5 +241,281 @@ interface IORace {
         { race3 -> race3.fold({ d -> Race9.Fourth(d) }, { e -> Race9.Fifth(e) }, { f -> Race9.Sixth(f) }) },
         { race3 -> race3.fold({ g -> Race9.Seventh(g) }, { h -> Race9.Eighth(h) }, { i -> Race9.Ninth(i) }) }
       )
+    }
+
+  /**
+   * Implementation for `IO.racePair`, but this way it is more efficient,
+   * as we no longer have to keep internal promises.
+   */
+  private fun <A, B> racePairCancellable(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<A, B>> {
+    fun <T, U> onSuccess(
+      isActive: AtomicBooleanW,
+      main: IOConnection,
+      other: IOConnection,
+      cb: (Either<Throwable, Either<T, U>>) -> Unit,
+      r: Either<T, U>
+    ): Unit =
+      if (isActive.getAndSet(false)) {
+        other.cancel().fix().unsafeRunAsync { r2 ->
+          main.pop()
+          cb(Right(r))
+        }
+      } else Unit
+
+    fun <T> onError(
+      active: AtomicBooleanW,
+      cb: (Either<Throwable, T>) -> Unit,
+      main: IOConnection,
+      other: IOConnection,
+      err: Throwable
+    ): Unit =
+      if (active.getAndSet(false)) {
+        other.cancel().fix().unsafeRunAsync { r2 ->
+          main.pop()
+          cb(Left(r2.fold({ Platform.composeErrors(err, it) }, { err })))
+        }
+      } else Unit
+
+    val start = { conn: IOConnection, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
+      val active = AtomicBooleanW(true)
+      val connA = IOConnection()
+      val connB = IOConnection()
+      conn.pushPair(connA, connB)
+
+      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { result ->
+        result.fold({
+          onError(active, cb, conn, connB, it)
+        }, {
+          onSuccess(active, conn, connB, cb, Left(it))
+        })
+      }
+
+      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { result ->
+        result.fold({
+          onError(active, cb, conn, connA, it)
+        }, {
+          onSuccess(active, conn, connA, cb, Right(it))
+        })
+      }
+    }
+
+    return IO.Async(true, start)
+  }
+
+  /**
+   * Race two tasks concurrently within a new [IO].
+   * Race results in a winner and the other, yet to finish task running in a [Fiber].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.*
+   * import arrow.fx.extensions.fx
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = IO.fx {
+   *     val racePair = !IO.racePair(Dispatchers.Default, never<Int>(), just("Hello World!"))
+   *     racePair.fold(
+   *       { _, _ -> "never cannot win race" },
+   *       { _, winner -> winner }
+   *     )
+   *   }
+   *   //sampleEnd
+   *
+   *   val r = result.unsafeRunSync()
+   *   println("Race winner result is: $r")
+   * }
+   * ```
+   *
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
+   * @param ioA task to participate in the race
+   * @param ioB task to participate in the race
+   * @return [IO] either [Left] with product of the winner's result [ioA] and still running task [ioB],
+   *   or [Right] with product of running task [ioA] and the winner's result [ioB].
+   *
+   * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
+   */
+  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+    IO.Async(true) { conn, cb ->
+      val active = AtomicBooleanW(true)
+
+      val connA = IOConnection()
+      val promiseA = UnsafePromise<A>()
+
+      val connB = IOConnection()
+      val promiseB = UnsafePromise<B>()
+
+      conn.pushPair(connA, connB)
+
+      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
+        either.fold({ error ->
+          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+            connB.cancel().fix().unsafeRunAsync { r2 ->
+              conn.pop()
+              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+            }
+          } else {
+            promiseA.complete(Left(error))
+          }
+        }, { a ->
+          if (active.getAndSet(false)) {
+            conn.pop()
+            cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
+          } else {
+            promiseA.complete(Right(a))
+          }
+        })
+      }
+
+      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
+        either.fold({ error ->
+          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+            connA.cancel().fix().unsafeRunAsync { r2 ->
+              conn.pop()
+              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+            }
+          } else {
+            promiseB.complete(Left(error))
+          }
+        }, { b ->
+          if (active.getAndSet(false)) {
+            conn.pop()
+            cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
+          } else {
+            promiseB.complete(Right(b))
+          }
+        })
+      }
+    }
+
+  /**
+   * Race three tasks concurrently within a new [IO].
+   * Race results in a winner and the others, yet to finish task running in a [Fiber].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.*
+   * import arrow.fx.extensions.fx
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = IO.fx {
+   *     val raceResult = !IO.raceTriple(Dispatchers.Default, never<Int>(), just("Hello World!"), never<Double>())
+   *     raceResult.fold(
+   *       { _, _, _ -> "never cannot win before complete" },
+   *       { _, winner, _ -> winner },
+   *       { _, _, _ -> "never cannot win before complete" }
+   *     )
+   *   }
+   *   //sampleEnd
+   *
+   *   val r = result.unsafeRunSync()
+   *   println("Race winner result is: $r")
+   * }
+   * ```
+   *
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
+   * @param ioA task to participate in the race
+   * @param ioB task to participate in the race
+   * @param ioC task to participate in the race
+   * @return [RaceTriple]
+   *
+   * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
+   */
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.Async(true) { conn, cb ->
+      val active = AtomicBooleanW(true)
+
+      val connA = IOConnection()
+      val promiseA = UnsafePromise<A>()
+
+      val connB = IOConnection()
+      val promiseB = UnsafePromise<B>()
+
+      val connC = IOConnection()
+      val promiseC = UnsafePromise<C>()
+
+      conn.push(connA.cancel(), connB.cancel(), connC.cancel())
+
+      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
+        either.fold({ error ->
+          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+            connB.cancel().fix().unsafeRunAsync { r2 ->
+              connC.cancel().fix().unsafeRunAsync { r3 ->
+                conn.pop()
+                val errorResult = r2.fold({ e2 ->
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                }, {
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
+                cb(Left(errorResult))
+              }
+            }
+          } else {
+            promiseA.complete(Left(error))
+          }
+        }, { a ->
+          if (active.getAndSet(false)) {
+            conn.pop()
+            cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
+          } else {
+            promiseA.complete(Right(a))
+          }
+        })
+      }
+
+      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
+        either.fold({ error ->
+          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+            connA.cancel().fix().unsafeRunAsync { r2 ->
+              connC.cancel().fix().unsafeRunAsync { r3 ->
+                conn.pop()
+                val errorResult = r2.fold({ e2 ->
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                }, {
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
+                cb(Left(errorResult))
+              }
+            }
+          } else {
+            promiseB.complete(Left(error))
+          }
+        }, { b ->
+          if (active.getAndSet(false)) {
+            conn.pop()
+            cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
+          } else {
+            promiseB.complete(Right(b))
+          }
+        })
+      }
+
+      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
+        either.fold({ error ->
+          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+            connA.cancel().fix().unsafeRunAsync { r2 ->
+              connB.cancel().fix().unsafeRunAsync { r3 ->
+                conn.pop()
+                val errorResult = r2.fold({ e2 ->
+                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                }, {
+                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                })
+                cb(Left(errorResult))
+              }
+            }
+          } else {
+            promiseC.complete(Left(error))
+          }
+        }, { c ->
+          if (active.getAndSet(false)) {
+            conn.pop()
+            cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
+          } else {
+            promiseC.complete(Right(c))
+          }
+        })
+      }
     }
 }
