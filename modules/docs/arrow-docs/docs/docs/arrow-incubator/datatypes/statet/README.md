@@ -9,9 +9,6 @@ video: 1MJBXKaq0Hc
 
 ## StateT
 
-
-
-
 `StateT`, also known as the `State` monad transformer, allows computation inside the context when `State` is nested in a different monad.
 
 One issue we face with monads is that they don't compose. This can cause your code to get really hairy when trying to combine structures like `Either` and `State`. But there's a simple solution, and we're going to explain how you can use Monad Transformers to alleviate this problem.
@@ -235,7 +232,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
 import arrow.mtl.StateT
-import arrow.mtl.runM
+import arrow.mtl.run
 import arrow.mtl.fix
 
 typealias Stack = List<String>
@@ -264,7 +261,7 @@ fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
   }.fix()
 
 fun main() {
-  val value = stackOperationsS().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
+  val value = stackOperationsS().run(listOf("hello", "world", "!"))
   println(value)
 }
 //sampleEnd
@@ -278,7 +275,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
 import arrow.mtl.StateT
-import arrow.mtl.runM
+import arrow.mtl.run
 import arrow.mtl.fix
 
 typealias Stack = List<String>
@@ -309,7 +306,7 @@ fun stackOperationsS(): StateT<EitherPartialOf<StackError>, Stack, String> =
 fun main() {
   val value =
     //sampleStart
-    stackOperationsS().runM(Either.monad<StackError>(), listOf())
+    stackOperationsS().run(listOf())
   //sampleEnd
   println(value)
 }
@@ -355,7 +352,7 @@ fun stackOperationsS2() =
   }
 
 fun main() {
-  val value = stackOperationsS2().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
+  val value = stackOperationsS2().run(listOf("hello", "world", "!"))
   println(value)
 }
 //sampleEnd
@@ -401,7 +398,7 @@ fun stackOperationsS2() =
 fun main() {
   val value =
     //sampleStart
-    stackOperationsS2().runM(Either.monad<StackError>(), listOf())
+    stackOperationsS2().run(listOf())
   //sampleEnd
   println(value)
 }
