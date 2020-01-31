@@ -52,17 +52,6 @@ class SingleKTests : RxJavaSpec() {
       TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
     )
 
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = SingleK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
-
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
         SingleK.fx {

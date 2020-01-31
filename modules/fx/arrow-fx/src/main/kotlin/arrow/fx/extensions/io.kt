@@ -66,7 +66,10 @@ import arrow.fx.flatMap as FlatMap
 import arrow.fx.handleErrorWith as HandleErrorWith
 import arrow.fx.redeemWith as RedeemWith
 import arrow.fx.bracketCase as BracketCase
+import arrow.fx.bracket as Bracket
 import arrow.fx.fork as Fork
+import arrow.fx.guarantee as Guarantee
+import arrow.fx.guaranteeCase as GuaranteeCase
 
 @extension
 interface IOFunctor<E> : Functor<IOPartialOf<E>> {
@@ -75,15 +78,27 @@ interface IOFunctor<E> : Functor<IOPartialOf<E>> {
 }
 
 @extension
-interface IOApply<E> : Apply<IOPartialOf<E>>, IOFunctor<E> {
+interface IOApply<E> : Apply<IOPartialOf<E>> {
   override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
     Ap(ff)
+
+  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
+    FlatMap { a -> ff().map { f -> f(a) } }
+
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
+    fix().map(f)
 }
 
 @extension
-interface IOApplicative<E> : Applicative<IOPartialOf<E>>, IOApply<E> {
+interface IOApplicative<E> : Applicative<IOPartialOf<E>> {
   override fun <A> just(a: A): IO<E, A> =
     IO.just(a)
+
+  override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+    Ap(ff)
+
+  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
+    FlatMap { a -> ff().map { f -> f(a) } }
 
   override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
     fix().map(f)
@@ -102,6 +117,9 @@ interface IOMonad<E> : Monad<IOPartialOf<E>>, IOApplicative<E> {
 
   override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
     Ap(ff)
+
+  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
+    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -120,6 +138,9 @@ interface IOApplicativeError<E> : ApplicativeError<IOPartialOf<E>, Throwable>, I
 
   override fun <A> raiseError(e: Throwable): IO<E, A> =
     IO.raiseException(e)
+
+  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
+    FlatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -144,6 +165,9 @@ interface IOMonadError<E> : MonadError<IOPartialOf<E>, Throwable>, IOApplicative
 
   override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
     IO.raiseException(e)
+
+  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
+    FlatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -177,6 +201,29 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
           is Either.Left -> IO.raiseError<E, B>(res.a)
         }
       }
+
+  override fun <A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+    Bracket<E, A, B>(release, use)
+
+  override fun <A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> =
+    Guarantee(finalizer)
+
+  override fun <A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<E, Unit>): IO<E, A> {
+    val redeemed: IO<E, Either<E, A>> = RedeemWith({ t -> IO.raiseException<Either<E, A>>(t) }, { e -> IO.just(Left(e)) }, { a -> IO.just(Right(a)) }) // Capture `E` into `Either`
+    return redeemed.GuaranteeCase { case ->
+      when (case) {
+        ExitCase2.Completed -> finalizer(ExitCase.Completed)
+        ExitCase2.Canceled -> finalizer(ExitCase.Canceled)
+        is ExitCase2.Exception -> finalizer(ExitCase.Error(case.exception))
+        is ExitCase2.Error -> throw AssertionError("Unreachable") // E is `Nothing`.
+      }
+    }.flatMap { res: Either<E, A> ->
+      when (res) { // Lift Either back into IO
+        is Either.Right -> IO.just(res.b)
+        is Either.Left -> IO.raiseError<E, A>(res.a)
+      }
+    }
+  }
 }
 
 @extension
@@ -362,15 +409,15 @@ fun <E> IO.Companion.timer(): Timer<IOPartialOf<E>> = Timer(IO.concurrent())
 
 fun <E, A> IO.Companion.fx(c: suspend IOSyntax<E>.() -> A): IO<E, A> =
   defer {
-      val continuation = IOContinuation<E, A>()
-      val wrapReturn: suspend IOContinuation<E, *>.() -> IO<E, A> = { just(c()) }
-      wrapReturn.startCoroutine(continuation, continuation)
-      continuation.returnedMonad().fix()
+    val continuation = IOContinuation<E, A>()
+    val wrapReturn: suspend IOContinuation<E, *>.() -> IO<E, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    continuation.returnedMonad().fix()
   }
 
 @JvmName("fxIO")
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> A): IO<Nothing, A> =
-  defer { IO.concurrent<Nothing>().fx.concurrent(c).fix() }
+  IO.concurrent<Nothing>().fx.concurrent(c).fix()
 
 /**
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers
@@ -402,36 +449,6 @@ interface IOSyntax<E> : BindSyntax<IOPartialOf<E>> {
   fun <A, B> Iterable<A>.parTraverse(f: (A) -> IOOf<E, B>): IO<E, List<B>> =
     parTraverse(IO.dispatchers<E>().default(), f)
 
-  /**
-   * Create a pure [Promise] that is empty and can be filled exactly once.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.Kind
-   * import arrow.fx.*
-   * import arrow.fx.extensions.io.concurrent.concurrent
-   * import arrow.fx.typeclasses.Concurrent
-   * import arrow.fx.typeclasses.seconds
-   *
-   * fun main(args: Array<String>) {
-   *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
-   *     //sampleStart
-   *     fx.concurrent {
-   *       val promise = !Promise<String>()
-   *       val (join, cancel) = !sleep(1.seconds)
-   *         .followedBy(promise.complete("Hello World!"))
-   *         .fork()
-   *       val message = !join
-   *       message
-   *     }
-   *
-   *   //sampleEnd
-   *   IO.concurrent().promiseExample()
-   *     .fix().unsafeRunSync()
-   * }
-   * ```
-   *
-   * @see Promise for more details on usage
-   */
   fun <A> Promise(): IO<Nothing, Promise<IOPartialOf<Nothing>, A>> =
     Promise<IOPartialOf<Nothing>, A>(IO.concurrent<Nothing>()).fix()
 

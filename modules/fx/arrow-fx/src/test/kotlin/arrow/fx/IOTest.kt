@@ -8,6 +8,7 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.identity
+import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
@@ -295,17 +296,6 @@ class IOTest : UnitSpec() {
         .unsafeRunSync()
     }
 
-    "fx should defer evaluation until run" {
-      var run = false
-      val program = IO.fx<Nothing, Unit> {
-        run = true
-      }
-
-      run shouldBe false
-      program.unsafeRunSync()
-      run shouldBe true
-    }
-
     "fx can switch execution context state across not/bind" {
       val program = IO.fx<Nothing, Unit> {
         val ctx = !IO.effect { kotlin.coroutines.coroutineContext }
@@ -578,8 +568,13 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRacePair(i: Int): IO<Nothing, Int> =
-        IO.racePair(IODispatchers.CommonPool, IO.never, if (i < size) ioRacePair(i + 1) else just(i))
-          .map { it.fold({ a, _ -> a }, { _, b -> b }) }
+        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity
+            )
+          }
 
       just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
     }
@@ -588,29 +583,90 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRaceTriple(i: Int): IO<Nothing, Int> =
-        IO.raceTriple(IODispatchers.CommonPool, IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
-          .map { it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c }) }
+        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
 
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
     }
 
-    // known issue
-//    "IORace4 should be stack safe" {
-//      val size = 5000
-//
-//      fun ioRace4(i: Int): IO<Int> =
-//        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
-//          .map {
-//            it.fold(
-//              ::identity,
-//              ::identity,
-//              ::identity,
-//              ::identity
-//            )
-//          }
-//
-//      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
-//    }
+    "IORace4 should be stack safe" {
+      val size = 5000
+
+      fun ioRace4(i: Int): IO<Nothing, Int> =
+        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
+    }
+
+    "IORace5 should be stack safe" {
+      val size = 5000
+
+      fun ioRace5(i: Int): IO<Nothing, Int> =
+        IO.raceN(IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace5(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace5).unsafeRunSync() shouldBe size
+    }
+
+    "IORace6 should be stack safe" {
+      val size = 5000
+
+      fun ioRace6(i: Int): IO<Nothing, Int> =
+        IO.raceN(IO.never, IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace6(i + 1) else just(i))
+          .map {
+            it.fold(
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity,
+              ::identity
+            )
+          }
+
+      just(1).flatMap(::ioRace6).unsafeRunSync() shouldBe size
+    }
+
+    "forked pair race should run" {
+      IO.fx<Nothing, Race2<Int, Int>> {
+        IO.raceN(
+          IO.sleep(10.seconds).followedBy(IO.effect { 1 }),
+          IO.effect { 3 }
+        ).fork().bind().join().bind()
+      }.unsafeRunSync() shouldBe 3.right()
+    }
+
+    "forked triple race should run" {
+      IO.fx<Nothing, Race3<out Int, out Int, out Int>> {
+        IO.raceN(
+          IO.sleep(10.seconds).followedBy(IO.effect { 1 }),
+          IO.sleep(10.seconds).followedBy(IO.effect { 3 }),
+          IO.effect { 2 }
+        ).fork().bind().join().bind()
+      }.unsafeRunSync() shouldBe Race3.Third(2)
+    }
 
     "IOParMap2 should be stack safe" {
       val size = 5000
