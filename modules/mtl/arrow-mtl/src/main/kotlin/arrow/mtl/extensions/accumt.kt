@@ -71,8 +71,8 @@ interface AccumtTMonadTrans<S> : MonadTrans<Kind<ForAccumT, S>> {
   override fun <G, A> Kind<G, A>.liftT(MG: Monad<G>): Kind2<Kind<ForAccumT, S>, G, A> =
     AccumT { _: S ->
       MG.run {
-        flatMap { a ->
-          MG.just(MS().empty() toT a)
+        map { a ->
+          MS().empty() toT a
         }
       }
     }
