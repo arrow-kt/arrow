@@ -70,12 +70,12 @@ include {
             _ 'fx-mtl'
             _ 'fx-rx2'
             _ 'fx-reactor'
+            _ 'fx-kotlinx-coroutines'
         }
 
         integrations {
             _ 'integrations-retrofit-adapter'
             _ 'integrations-jackson-module'
-            _ 'integrations-kotlinx-coroutines'
         }
 
         recursion {
