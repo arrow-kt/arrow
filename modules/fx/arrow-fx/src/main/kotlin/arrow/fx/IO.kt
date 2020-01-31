@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Eval
 import arrow.core.NonFatal
-import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
