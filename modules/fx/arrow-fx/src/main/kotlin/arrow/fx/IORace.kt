@@ -366,7 +366,7 @@ interface IORace {
 
       IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { result ->
         result.fold({
-          onError(active, cb, conn, connA, connC, it)
+          onError(active, cb, conn, connA, connB, it)
         }, {
           onSuccess(active, conn, connA, connB, cb, Race3.Third(it))
         })
