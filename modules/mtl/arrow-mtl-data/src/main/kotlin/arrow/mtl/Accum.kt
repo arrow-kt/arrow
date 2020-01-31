@@ -36,5 +36,5 @@ fun <S, A, B> Accum<S, A>.mapAccum(f: (Tuple2<S, A>) -> Tuple2<S, B>): Accum<S, 
 fun <S, A, B> Accum<S, A>.map(fa: (A) -> B): Accum<S, B> =
   map(Id.functor(), fa)
 
-fun <S, A, B> Accum<S, A>.flatMap(MS: Monoid<S>, fa: (A) -> Accum<S, B>) =
+fun <S, A, B> Accum<S, A>.flatMap(MS: Monoid<S>, fa: (A) -> Accum<S, B>): Accum<S, B> =
   flatMap(MS, Id.monad(), fa)
