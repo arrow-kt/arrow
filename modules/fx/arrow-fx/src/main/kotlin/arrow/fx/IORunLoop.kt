@@ -420,14 +420,7 @@ internal object IORunLoop {
         when (either) {
           is Either.Left -> IO.RaiseError(either.a)
           is Either.Right -> IO.Pure(either.b)
-        }.let { r ->
-          if (shouldTrampoline) {
-            this.value = r
-            Platform.trampoline { trampoline() }
-          } else {
-            signal(r)
-          }
-        }
+        }.let(::forward)
       }
     }
 
@@ -437,14 +430,16 @@ internal object IORunLoop {
         result.fold(
           { a -> IO.Pure(a) },
           { e -> IO.RaiseError(e) }
-        ).let { r ->
-          if (shouldTrampoline) {
-            this.value = r
-            Platform.trampoline { trampoline() }
-          } else {
-            signal(r)
-          }
-        }
+        ).let(::forward)
+      }
+    }
+
+    private fun forward(io: IO<Any?>) {
+      if (shouldTrampoline) {
+        this.value = io
+        Platform.trampoline { trampoline() }
+      } else {
+        signal(io)
       }
     }
 
