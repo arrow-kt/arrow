@@ -135,7 +135,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    */
   override val fx: MonadThrowFx<F>
     get() = object : MonadThrowFx<F> {
-      override val ME: MonadThrow<F> = this@MonadThrow
+      override val M: MonadThrow<F> = this@MonadThrow
     }
 
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
@@ -143,10 +143,9 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
 }
 
 interface MonadThrowFx<F> : MonadFx<F> {
-  val ME: MonadThrow<F>
-  override val M: Monad<F> get() = ME
+  override val M: MonadThrow<F>
   fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = MonadThrowContinuation<F, A>(ME)
+    val continuation = MonadThrowContinuation<F, A>(M)
     val wrapReturn: suspend MonadThrowSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()

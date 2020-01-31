@@ -288,17 +288,6 @@ class IOTest : UnitSpec() {
         .unsafeRunSync()
     }
 
-    "fx should defer evaluation until run" {
-      var run = false
-      val program = IO.fx {
-        run = true
-      }
-
-      run shouldBe false
-      program.unsafeRunSync()
-      run shouldBe true
-    }
-
     "fx can switch execution context state across not/bind" {
       val program = IO.fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
