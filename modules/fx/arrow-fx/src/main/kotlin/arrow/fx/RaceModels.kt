@@ -36,7 +36,7 @@ sealed class RaceTriple<F, A, B, C> {
 /** Alias for `Either` structure to provide consistent signature for race methods. */
 typealias Race2<A, B> = Either<A, B>
 
-sealed class Race3 <A, B, C> {
+sealed class Race3 <out A, out B, out C> {
   data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
   data class Third<C>(val winner: C) : Race3<Nothing, Nothing, C>()
@@ -52,7 +52,7 @@ sealed class Race3 <A, B, C> {
   }
 }
 
-sealed class Race4 <A, B, C, D> {
+sealed class Race4 <out A, out B, out C, out D> {
   data class First<A>(val winner: A) : Race4<A, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race4<Nothing, B, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race4<Nothing, Nothing, C, Nothing>()
@@ -71,7 +71,7 @@ sealed class Race4 <A, B, C, D> {
   }
 }
 
-sealed class Race5 <A, B, C, D, E> {
+sealed class Race5 <out A, out B, out C, out D, out E> {
   data class First<A>(val winner: A) : Race5<A, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race5<Nothing, B, Nothing, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race5<Nothing, Nothing, C, Nothing, Nothing>()
@@ -93,7 +93,7 @@ sealed class Race5 <A, B, C, D, E> {
   }
 }
 
-sealed class Race6 <A, B, C, D, E, F> {
+sealed class Race6 <out A, out B, out C, out D, out E, out F> {
   data class First<A>(val winner: A) : Race6<A, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race6<Nothing, B, Nothing, Nothing, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race6<Nothing, Nothing, C, Nothing, Nothing, Nothing>()
@@ -118,7 +118,7 @@ sealed class Race6 <A, B, C, D, E, F> {
   }
 }
 
-sealed class Race7 <A, B, C, D, E, F, G> {
+sealed class Race7 <out A, out B, out C, out D, out E, out F, out G> {
   data class First<A>(val winner: A) : Race7<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race7<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race7<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing>()
@@ -146,7 +146,7 @@ sealed class Race7 <A, B, C, D, E, F, G> {
   }
 }
 
-sealed class Race8 <A, B, C, D, E, F, G, H> {
+sealed class Race8 <out A, out B, out C, out D, out E, out F, out G, out H> {
   data class First<A>(val winner: A) : Race8<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race8<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race8<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing>()
@@ -177,7 +177,7 @@ sealed class Race8 <A, B, C, D, E, F, G, H> {
   }
 }
 
-sealed class Race9 <A, B, C, D, E, F, G, H, I> {
+sealed class Race9 <out A, out B, out C, out D, out E, out F, out G, out H, out I> {
   data class First<A>(val winner: A) : Race9<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race9<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Third<C>(val winner: C) : Race9<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
