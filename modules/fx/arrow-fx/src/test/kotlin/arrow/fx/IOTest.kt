@@ -387,6 +387,32 @@ class IOTest : UnitSpec() {
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
 
+    "Races are scheduled in the correct order" {
+      val order = mutableListOf<Int>()
+
+      fun makePar(num: Int): IO<Int> =
+        IO.effect {
+          order.add(num)
+        }.followedBy(IO.sleep((num * 200L).milliseconds))
+          .map { num }
+
+      val result = IO.raceN(
+        all,
+        makePar(9),
+        makePar(8),
+        makePar(7),
+        makePar(6),
+        makePar(5),
+        makePar(4),
+        makePar(3),
+        makePar(2),
+        makePar(1)
+      ).unsafeRunSync()
+
+      result shouldBe Race9.Ninth(1)
+      order shouldBe listOf(9, 8, 7, 6, 5, 4, 3, 2, 1)
+    }
+
     "parallel mapping is done in the expected CoroutineContext" {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
