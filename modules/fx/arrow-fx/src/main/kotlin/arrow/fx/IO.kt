@@ -232,7 +232,7 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      *
      * @param k an asynchronous computation that might fail typed as [IOProc].
-     * @see cancelable for an operator that supports cancelation.
+     * @see cancelable for an operator that supports cancellation.
      * @see asyncF for a version that can suspend side effects in the registration function.
      */
     fun <A> async(k: IOProc<A>): IO<A> =
@@ -286,7 +286,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * @param k a deferred asynchronous computation that might fail typed as [IOProcF].
      * @see async for a version that can suspend side effects in the registration function.
-     * @see cancelableF for an operator that supports cancelation.
+     * @see cancelableF for an operator that supports cancellation.
      */
     fun <A> asyncF(k: IOProcF<A>): IO<A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
@@ -357,7 +357,7 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      *
      * @param cb an asynchronous computation that might fail.
-     * @see async for wrapping impure APIs without cancelation
+     * @see async for wrapping impure APIs without cancellation
      */
     fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
@@ -425,7 +425,7 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      *
      * @param cb a deferred asynchronous computation that might fail.
-     * @see asyncF for wrapping impure APIs without cancelation
+     * @see asyncF for wrapping impure APIs without cancellation
      */
     fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
@@ -804,7 +804,7 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    async { ccb ->
+    Async { _, ccb ->
       val conn = IOConnection()
       val onCancelCb =
         when (onCancel) {

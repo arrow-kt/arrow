@@ -5,9 +5,9 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-@Deprecated("Cancelation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancelable combinator")
 typealias FluxKProc<A> = (KindConnection<ForFluxK>, (Either<Throwable, A>) -> Unit) -> Unit
-@Deprecated("Cancelation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancelable combinator")
 typealias FluxKProcF<A> = (KindConnection<ForFluxK>, (Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>
 
 /**
