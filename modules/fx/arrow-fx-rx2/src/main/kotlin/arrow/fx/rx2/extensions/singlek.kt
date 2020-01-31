@@ -258,4 +258,4 @@ interface SingleKUnsafeRun : UnsafeRun<ForSingleK> {
 }
 
 fun <A> SingleK.Companion.fx(c: suspend ConcurrentSyntax<ForSingleK>.() -> A): SingleK<A> =
-  defer { SingleK.concurrent().fx.concurrent(c).fix() }
+  SingleK.concurrent().fx.concurrent(c).fix()

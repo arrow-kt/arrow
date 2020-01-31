@@ -954,7 +954,7 @@ fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(
  * @see [bracketCase] for the more general operation
  *
  */
-fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
+fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase2<E>) -> IOOf<E, Unit>): IO<E, A> =
   IOBracket.guaranteeCase(this, finalizer)
 
 /**
@@ -1066,7 +1066,7 @@ fun <E, A, E2, B> IOOf<E, A>.bimap(fe: (E) -> E2, fa: (A) -> B): IO<E2, B> =
  * }
  * ```
  */
-fun <A, B> IOOf<Nothing, A>.bracket(release: (A) -> IOOf<Nothing, Unit>, use: (A) -> IOOf<Nothing, B>): IO<Nothing, B> =
+fun <E, A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   bracketCase({ a, _ -> release(a) }, use)
 
 /**
@@ -1139,7 +1139,7 @@ fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>
  * @see [guaranteeCase] for the version that can discriminate between termination conditions
  * @see [bracket] for the more general operation
  */
-fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<Nothing, Unit>): IO<E, A> =
+fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> =
   guaranteeCase { finalizer }
 
 /**

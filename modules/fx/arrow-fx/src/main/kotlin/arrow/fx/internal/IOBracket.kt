@@ -8,7 +8,6 @@ import arrow.fx.IOOf
 import arrow.fx.IOResult
 import arrow.fx.IORunLoop
 import arrow.fx.fix
-import arrow.fx.flatMap
 import arrow.fx.handleErrorWith
 import arrow.fx.typeclasses.ExitCase2
 import kotlinx.atomicfu.atomic
@@ -72,11 +71,11 @@ internal object IOBracket {
     }
   }
 
-  fun <E, A> guaranteeCase(source: IOOf<E, A>, release: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
+  fun <E, A> guaranteeCase(source: IOOf<E, A>, release: (ExitCase2<E>) -> IOOf<E, Unit>): IO<E, A> =
     IO.Async { conn, cb ->
       Platform.trampoline {
         val frame = EnsureReleaseFrame<E, A>(release)
-        val onNext = source.flatMap(frame)
+        val onNext = IO.Bind(source, frame)
         // Registering our cancelable token ensures that in case
         // cancellation is detected, `release` gets called
         conn.push(frame.cancel.rethrow)
