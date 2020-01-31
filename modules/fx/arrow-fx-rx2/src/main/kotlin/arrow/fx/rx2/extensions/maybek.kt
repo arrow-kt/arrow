@@ -288,4 +288,4 @@ interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
 }
 
 fun <A> MaybeK.Companion.fx(c: suspend ConcurrentSyntax<ForMaybeK>.() -> A): MaybeK<A> =
-  defer { MaybeK.concurrent().fx.concurrent(c).fix() }
+  MaybeK.concurrent().fx.concurrent(c).fix()
