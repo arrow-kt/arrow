@@ -434,7 +434,7 @@ internal object IORunLoop {
       }
     }
 
-    private inline fun forward(io: IO<Any?>) {
+    private fun forward(io: IO<Any?>) {
       if (shouldTrampoline) {
         this.value = io
         Platform.trampoline { trampoline() }
