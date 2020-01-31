@@ -785,7 +785,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<E, B> = this
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = None
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Either<E, Nothing>> = Some(Left(error))
   }
 
   internal data class Delay<out A>(val thunk: () -> A) : IO<Nothing, A>() {
