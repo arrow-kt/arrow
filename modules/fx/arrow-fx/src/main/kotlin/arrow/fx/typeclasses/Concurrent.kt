@@ -385,7 +385,6 @@ interface Concurrent<F> : Async<F> {
    * ```
    *
    * Note: This uses [parTraverse] so the same caveats apply. Do not use this on huge collections or infinite sequences.
-   * 
    * @see parTraverse
    */
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
