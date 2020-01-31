@@ -7,6 +7,7 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
+import arrow.core.left
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
@@ -170,6 +171,14 @@ class IOTest : UnitSpec() {
       val exception = MyException()
       val ioa = IO<Int> { throw exception }
       ioa.unsafeRunAsync { either ->
+        either.fold({ it shouldBe exception }, { fail("") })
+      }
+    }
+
+    "should return exceptions within main block with unsafeRunAsyncCancellable" {
+      val exception = MyException()
+      val ioa = IO<Int> { throw exception }
+      ioa.unsafeRunAsyncCancellable { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
     }
@@ -378,6 +387,32 @@ class IOTest : UnitSpec() {
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
 
+    "Races are scheduled in the correct order" {
+      val order = mutableListOf<Int>()
+
+      fun makePar(num: Int): IO<Int> =
+        IO.effect {
+          order.add(num)
+        }.followedBy(IO.sleep((num * 200L).milliseconds))
+          .map { num }
+
+      val result = IO.raceN(
+        all,
+        makePar(9),
+        makePar(8),
+        makePar(7),
+        makePar(6),
+        makePar(5),
+        makePar(4),
+        makePar(3),
+        makePar(2),
+        makePar(1)
+      ).unsafeRunSync()
+
+      result shouldBe Race9.Ninth(1)
+      order shouldBe listOf(9, 8, 7, 6, 5, 4, 3, 2, 1)
+    }
+
     "parallel mapping is done in the expected CoroutineContext" {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
@@ -451,20 +486,14 @@ class IOTest : UnitSpec() {
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(all) { -1 }
+          IO(all) { }
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
-            .guaranteeCase { case ->
-              when (case) {
-                ExitCase.Canceled -> IO { cb(1.right()) }
-                else -> IO.unit
-              }
-            }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
         IO(other) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe 1.some()
+      }.unsafeRunTimed(2.seconds) shouldBe None
     }
 
     "IO.binding should for comprehend over IO" {

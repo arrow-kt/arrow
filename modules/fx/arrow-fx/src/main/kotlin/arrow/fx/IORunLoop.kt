@@ -369,6 +369,7 @@ internal object IORunLoop {
       get() = _context
 
     private var conn: IOConnection = connInit
+    private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
 
@@ -383,6 +384,7 @@ internal object IORunLoop {
     }
 
     private fun prepare(ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+      canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
       this._context = ctx
@@ -413,30 +415,31 @@ internal object IORunLoop {
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>) {
-      when (either) {
-        is Either.Left -> IO.RaiseError(either.a)
-        is Either.Right -> IO.Pure(either.b)
-      }.let { r ->
-        if (shouldTrampoline) {
-          this.value = r
-          Platform.trampoline { trampoline() }
-        } else {
-          signal(r)
-        }
+      if (canCall) {
+        canCall = false
+        when (either) {
+          is Either.Left -> IO.RaiseError(either.a)
+          is Either.Right -> IO.Pure(either.b)
+        }.let(::forward)
       }
     }
 
     override fun resumeWith(result: Result<Any?>) {
-      result.fold(
-        { a -> IO.Pure(a) },
-        { e -> IO.RaiseError(e) }
-      ).let { r ->
-        if (shouldTrampoline) {
-          this.value = r
-          Platform.trampoline { trampoline() }
-        } else {
-          signal(r)
-        }
+      if (canCall) {
+        canCall = false
+        result.fold(
+          { a -> IO.Pure(a) },
+          { e -> IO.RaiseError(e) }
+        ).let(::forward)
+      }
+    }
+
+    private fun forward(io: IO<Any?>) {
+      if (shouldTrampoline) {
+        this.value = io
+        Platform.trampoline { trampoline() }
+      } else {
+        signal(io)
       }
     }
 
