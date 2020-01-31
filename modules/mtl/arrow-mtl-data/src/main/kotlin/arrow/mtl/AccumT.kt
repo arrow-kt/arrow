@@ -147,14 +147,15 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
   /**
    * Convert an accumulation (append-only) computation into a fully stateful computation.
    */
-  fun toStateT(MF: Monad<F>, MS: Monoid<S>): StateT<F, S, A> =
-    StateT(MF) { s: S ->
-      MF.run {
-        runAccumT(s).map { (s1, a) ->
-          MS.run { s.combine(s1) } toT a
+  fun toStateT(MF: Monad<F>, MS: Monoid<S>): StateT<F, S, A> = StateT(MF,
+    AndThen { s: S -> s toT runAccumT(s) }
+      .andThen {
+        MF.run {
+          it.b.map { (s1, a) ->
+            MS.run { it.a.combine(s1) } toT a
+          }
         }
-      }
-    }
+      })
 }
 
 private fun <F, S, A> runAccumT(accumT: AccumTFun<S, F, A>, s: S): Kind<F, Tuple2<S, A>> =
