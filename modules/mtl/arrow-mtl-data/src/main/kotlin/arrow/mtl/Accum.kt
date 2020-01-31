@@ -29,7 +29,7 @@ fun <S, A> Accum<S, A>.evalAccum(s: S): A =
   evalAccumT(Id.monad(), s).fix().extract()
 
 fun <S, A, B> Accum<S, A>.mapAccum(f: (Tuple2<S, A>) -> Tuple2<S, B>): Accum<S, B> =
-  mapAccumT { Id.just(f(it.fix().extract())) }
+  mapAccumT(AndThen(f).compose { it.extract() }.andThen(::Id))
 
 fun <S, A, B> Accum<S, A>.map(fa: (A) -> B): Accum<S, B> =
   map(Id.functor(), fa)
