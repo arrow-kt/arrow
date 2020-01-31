@@ -9,10 +9,12 @@ import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.identity
 import arrow.core.right
+import arrow.core.some
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.bracket.guarantee
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
@@ -514,6 +516,14 @@ class IOTest : UnitSpec() {
             .invoke()
         }.flatMap { latch.get() }
       }.unsafeRunSync()
+    }
+
+    "guarantee should be called on finish with error" {
+      IO.fx {
+        val p = !Promise<Unit>()
+        effect { throw Exception() }.guarantee(p.complete(Unit)).attempt().bind()
+        !p.get()
+      }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
     }
 
     "Bracket should be stack safe" {
