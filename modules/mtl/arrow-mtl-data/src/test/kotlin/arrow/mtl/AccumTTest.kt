@@ -86,7 +86,12 @@ class AccumTTest : UnitSpec() {
       MonadStateLaws.laws(
         AccumT.monadState<Int, Int, StateTPartialOf<ForId, Int>>(StateT.monadState(Id.monad()), Int.monoid()),
         AccumT.genK(StateT.genK(Id.genK(), Gen.int()), Gen.int()),
-        AccumT.eqK<Int, StateTPartialOf<ForId, Int>>(StateT.monad(Id.monad()), StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 1), Int.eq(), 1)
+        AccumT.eqK<Int, StateTPartialOf<ForId, Int>>(
+          StateT.monad(Id.monad()),
+          StateT.eqK(Id.eqK(), Int.eq(), Id.monad(), 1),
+          Int.eq(),
+          1
+        )
       ),
 
       MonadWriterLaws.laws(

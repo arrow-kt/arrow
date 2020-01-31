@@ -35,7 +35,7 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
   companion object {
 
     fun <S, F, A> just(MS: Monoid<S>, MF: Monad<F>, a: A): AccumT<S, F, A> =
-      AccumT { _: S -> MF.just(MS.empty() toT a) }
+      AccumT { MF.just(MS.empty() toT a) }
 
     operator fun <S, F, A> invoke(accumTFun: AccumTFun<S, F, A>): AccumT<S, F, A> =
       AccumT(accumTFun)
@@ -55,7 +55,7 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
     }
 
     fun <F, S, A> liftF(MS: Monoid<S>, AF: Applicative<F>, fa: Kind<F, A>): AccumT<S, F, A> = AF.run {
-      AccumT { _ -> fa.map { a -> Tuple2(MS.empty(), a) } }
+      AccumT { fa.map { a -> Tuple2(MS.empty(), a) } }
     }
 
     /**
@@ -74,14 +74,14 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
      * add w is an action that produces the output w.
      */
     fun <S, F> add(MF: Monad<F>, s: S): AccumT<S, F, Unit> =
-      AccumT { _: S -> MF.just(s toT Unit) }
+      AccumT { MF.just(s toT Unit) }
   }
 
   /**
    * Unwrap an accumulation computation.
    */
   fun runAccumT(s: S): Kind<F, Tuple2<S, A>> =
-    runAccumT(accumT, s)
+    accumT(s)
 
   /**
    * Extract the output from an accumulation computation.
@@ -121,45 +121,50 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
   )
 
   fun <B> flatMap(MS: Monoid<S>, MF: Monad<F>, fa: (A) -> AccumTOf<S, F, B>): AccumT<S, F, B> =
-    AccumT { s: S ->
+    AccumT(
       MF.run {
-        runAccumT(s).flatMap { (s1, a) ->
-          fa(a).fix().runAccumT(MS.run { s.combine(s1) }).flatMap { (s2, b) ->
-            MF.just(MS.run { s1.combine(s2) } toT b)
-          }
-        }
-      }
-    }
-
-  fun <B> ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, (A) -> B>): AccumT<S, F, B> =
-    (this to mf.fix()).let { (mv, mf) ->
-      AccumT { s: S ->
-        MF.run {
-          runAccumT(mv.accumT, s).flatMap { (s1, v) ->
-            runAccumT(mf.accumT, MS.run { s.combine(s1) }).flatMap { (s2, f) ->
-              MF.just(MS.run { s1.combine(s2) } toT f(v))
+        AndThen.id<S>().flatMap { s ->
+          AndThen(accumT).andThen {
+            it.flatMap { (s1, a) ->
+              fa(a).fix().accumT(MS.run { s.combine(s1) }).flatMap { (s2, b) ->
+                MF.just(MS.run { s1.combine(s2) } toT b)
+              }
             }
           }
         }
-      }
+      })
+
+  fun <B> ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, (A) -> B>): AccumT<S, F, B> =
+    (this to mf.fix()).let { (mv, mf) ->
+      AccumT(
+        MF.run {
+          AndThen.id<S>().flatMap { s ->
+            AndThen(mv.accumT).andThen {
+              it.flatMap { (s1, v) ->
+                mf.accumT(MS.run { s.combine(s1) }).flatMap { (s2, f) ->
+                  MF.just(MS.run { s1.combine(s2) } toT f(v))
+                }
+              }
+            }
+          }
+        })
     }
 
   /**
    * Convert an accumulation (append-only) computation into a fully stateful computation.
    */
-  fun toStateT(MF: Monad<F>, MS: Monoid<S>): StateT<F, S, A> = StateT(MF,
-    AndThen { s: S -> s toT runAccumT(s) }
-      .andThen {
-        MF.run {
-          it.b.map { (s1, a) ->
-            MS.run { it.a.combine(s1) } toT a
+  fun toStateT(MF: Monad<F>, MS: Monoid<S>): StateT<F, S, A> =
+    StateT(MF,
+      AndThen.id<S>().flatMap { s: S ->
+        AndThen(accumT).andThen {
+          MF.run {
+            it.map { (s1, a) ->
+              MS.run { s.combine(s1) } toT a
+            }
           }
         }
       })
 }
-
-private fun <F, S, A> runAccumT(accumT: AccumTFun<S, F, A>, s: S): Kind<F, Tuple2<S, A>> =
-  accumT(s)
 
 /**
  * Convert a read-only computation into an accumulation computation.
