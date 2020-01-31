@@ -1,10 +1,15 @@
 package arrow.mtl
 
+import arrow.Kind
+import arrow.core.AndThen
+import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.andThen
+import arrow.core.extensions.id.monad.monad
 import arrow.core.value
+import arrow.typeclasses.Monad
 import arrow.typeclasses.internal.IdBimonad
 
 /**
@@ -76,7 +81,8 @@ fun <D, A, B> Reader<D, A>.map(f: (A) -> B): Reader<D, B> = map(IdBimonad, f)
  *
  * @param f the function to apply.
  */
-fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> = flatMap(IdBimonad, f)
+fun <D, A, B> Reader<D, A>.flatMap(f: (A) -> Reader<D, B>): Reader<D, B> =
+  Kleisli(AndThen(run).flatMap { AndThen(f(it.value()).run) })
 
 /**
  * Apply a function `(A) -> B` that operates within the context of [Reader].
@@ -122,4 +128,14 @@ object ReaderApi {
   fun <D> ask(): Reader<D, D> = ReaderT.ask(IdBimonad)
 
   fun <D, A> lift(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
+
+  fun <D> monad(): Monad<ReaderPartialOf<D>> = object : Monad<ReaderPartialOf<D>> {
+    override fun <A, B> Kind<ReaderPartialOf<D>, A>.flatMap(f: (A) -> Kind<ReaderPartialOf<D>, B>): Kind<ReaderPartialOf<D>, B> =
+      Kleisli(AndThen(fix().run).flatMap { AndThen(f(it.value()).fix().run) })
+
+    override fun <A> just(a: A): Kind<ReaderPartialOf<D>, A> = Reader { a }
+
+    override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ReaderPartialOf<D>, Either<A, B>>): Kind<ReaderPartialOf<D>, B> =
+      Kleisli.tailRecM(Id.monad(), a, f)
+  }
 }

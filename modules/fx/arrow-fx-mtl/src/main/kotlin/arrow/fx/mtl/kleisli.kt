@@ -1,6 +1,7 @@
 package arrow.fx.mtl
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.extension
 import arrow.fx.IO
@@ -22,6 +23,7 @@ import arrow.mtl.KleisliOf
 import arrow.mtl.KleisliPartialOf
 import arrow.mtl.extensions.KleisliMonad
 import arrow.mtl.extensions.KleisliMonadError
+import arrow.mtl.fix
 import arrow.mtl.run
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -99,7 +101,7 @@ interface KleisliAsync<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDefer<
     Kleisli { r -> ASF().asyncF { cb -> k(cb).run(r) } }
 
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
-    Kleisli { r -> run(r).continueOn(ctx) }
+    Kleisli(AndThen(fix().run).andThen { it.continueOn(ctx) })
   }
 }
 
