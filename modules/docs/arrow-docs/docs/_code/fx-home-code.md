@@ -2,7 +2,7 @@
 library: fx
 ---
 {: data-executable="true"}
-```kotlin:ank
+```kotlin
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import kotlinx.coroutines.newSingleThreadContext

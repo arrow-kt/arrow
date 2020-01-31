@@ -1,6 +1,5 @@
 package arrow.free
 
-import arrow.free.extensions.fx
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
 
@@ -14,13 +13,9 @@ class TrampolineTest : UnitSpec() {
     "trampoline over 10001 should return true and not break the stack" {
       odd(10001).runT() shouldBe true
     }
-
-    "trampoline should support fx syntax" {
-      tryfxsyntax(10000).runT() shouldBe true
-    }
   }
 
-  private fun odd(n: Int): TrampolineF<Boolean> {
+  fun odd(n: Int): TrampolineF<Boolean> {
     return when (n) {
       0 -> Trampoline.done(false)
       else -> {
@@ -29,7 +24,7 @@ class TrampolineTest : UnitSpec() {
     }
   }
 
-  private fun even(n: Int): TrampolineF<Boolean> {
+  fun even(n: Int): TrampolineF<Boolean> {
     return when (n) {
       0 -> Trampoline.done(true)
       else -> {
@@ -37,11 +32,4 @@ class TrampolineTest : UnitSpec() {
       }
     }
   }
-
-  private fun tryfxsyntax(n: Int): TrampolineF<Boolean> =
-    TrampolineF.fx {
-      val x = Trampoline.defer { odd(10000) }.bind()
-      val y = Trampoline.defer { even(10000) }.bind()
-      x xor y
-    }
 }

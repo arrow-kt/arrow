@@ -6,6 +6,7 @@ import arrow.core.Right
 import arrow.documented
 import arrow.fx.internal.asyncContinuation
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -39,7 +40,7 @@ interface Async<F> : MonadDefer<F> {
    */
   override val fx: AsyncFx<F>
     get() = object : AsyncFx<F> {
-      override val M: Async<F> get() = this@Async
+      override val async: Async<F> get() = this@Async
     }
 
   /**
@@ -349,12 +350,12 @@ internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
 interface AsyncFx<F> : MonadThrowFx<F> {
-  override val M: Async<F>
-  // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context
-  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> = M.defer {
-    val continuation = AsyncContinuation<F, A>(M)
+  val async: Async<F>
+  override val ME: MonadThrow<F> get() = async
+  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = AsyncContinuation<F, A>(async)
     val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
-    continuation.returnedMonad()
+    return continuation.returnedMonad()
   }
 }

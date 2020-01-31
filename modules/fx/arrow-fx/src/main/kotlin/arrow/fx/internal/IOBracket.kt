@@ -72,7 +72,7 @@ internal object IOBracket {
     }
   }
 
-  fun <E, A> guaranteeCase(source: IOOf<E, A>, release: (ExitCase2<E>) -> IOOf<E, Unit>): IO<E, A> =
+  fun <E, A> guaranteeCase(source: IOOf<E, A>, release: (ExitCase2<E>) -> IOOf<Nothing, Unit>): IO<E, A> =
     IO.Async { conn, cb ->
       Platform.trampoline {
         val frame = EnsureReleaseFrame<E, A>(release)
