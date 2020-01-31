@@ -7,6 +7,7 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
+import arrow.core.left
 import arrow.core.identity
 import arrow.core.right
 import arrow.fx.IO.Companion.just
@@ -182,40 +183,42 @@ class IOTest : UnitSpec() {
       }
     }
 
-    "should not catch exceptions within run block with unsafeRunAsync" {
+    "should return exceptions within main block with unsafeRunAsyncCancellable" {
+      val exception = MyException()
+      val ioa = IO<Int> { throw exception }
+      ioa.unsafeRunAsyncCancellable { either ->
+        either.fold({ it shouldBe exception }, { fail("") })
+      }
+    }
+
+    "should rethrow exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
         val ioa = IO<Int> { throw exception }
         ioa.unsafeRunAsync { either ->
-          either.fold({ throw exception }, { fail("") })
+          either.fold({ throw it }, { fail("") })
         }
         fail("Should rethrow the exception")
       } catch (myException: MyException) {
         // Success
       } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
+        fail("Should only throw MyException but was $throwable")
       }
     }
 
-    "should complete when running a pure value with runAsync" {
-      val expected = 0
-      just(expected).runAsync { either ->
-        either.fold({ fail("") }, { fail("") }, { IO { it shouldBe expected } })
-      }.unsafeRunSyncEither()
-    }
-
-    "should complete when running a return value with runAsync" {
-      val expected = 0
-      IO { expected }.runAsync { either ->
-        either.fold({ fail("") }, { fail("") }, { IO { it shouldBe expected } })
-      }.unsafeRunSyncEither()
-    }
-
-    "should complete when running a error vallue with runAsync" {
-      val expected = "Error"
-      IO.raiseError<String, Int>(expected).runAsync { result ->
-        result.fold({ fail("") }, { IO { it shouldBe expected } }, { fail("") })
-      }.unsafeRunSyncEither()
+    "should rethrow exceptions within run block with unsafeRunAsyncCancelable" {
+      try {
+        val exception = MyException()
+        val ioa = IO<Int> { throw exception }
+        ioa.unsafeRunAsyncCancellable { either ->
+          either.fold({ throw it }, { fail("") })
+        }
+        fail("Should rethrow the exception")
+      } catch (myException: MyException) {
+        // Success
+      } catch (throwable: Throwable) {
+        fail("Should only throw MyException but was $throwable")
+      }
     }
 
     "should return an error when running an exception with runAsync" {
@@ -239,7 +242,7 @@ class IOTest : UnitSpec() {
       }.unsafeRunSyncEither()
     }
 
-    "should catch exceptions within run block with runAsync" {
+    "should rethrow exceptions within run block with runAsync" {
       try {
         val exception = MyException()
         val ioa = IO { throw exception }
@@ -401,6 +404,32 @@ class IOTest : UnitSpec() {
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "Races are scheduled in the correct order" {
+      val order = mutableListOf<Int>()
+
+      fun makePar(num: Int): IO<Nothing, Int> =
+        IO.effect {
+          order.add(num)
+        }.followedBy(IO.sleep((num * 200L).milliseconds))
+          .map { num }
+
+      val result = IO.raceN(
+        all,
+        makePar(9),
+        makePar(8),
+        makePar(7),
+        makePar(6),
+        makePar(5),
+        makePar(4),
+        makePar(3),
+        makePar(2),
+        makePar(1)
+      ).unsafeRunSync()
+
+      result shouldBe Race9.Ninth(1)
+      order shouldBe listOf(9, 8, 7, 6, 5, 4, 3, 2, 1)
     }
 
     "parallel mapping is done in the expected CoroutineContext" {
@@ -791,7 +820,7 @@ class IOTest : UnitSpec() {
         .attempt().unsafeRunSync() shouldBe Left(exception)
     }
 
-    "Cancelation is wired accross suspend" {
+    "Cancellation is wired across suspend" {
       fun infiniteLoop(): IO<Nothing, Unit> {
         fun loop(iterations: Int): IO<Nothing, Unit> =
           just(iterations).flatMap { i -> loop(i + 1) }
