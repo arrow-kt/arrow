@@ -332,9 +332,8 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * Note: Be careful when using this on very large collections or infinite sequences as this needs to fold the entire collection first before
-   *  it can start executing anything. This may cause excessive memory usage, or even infinite looping (in case of infinite sequences).
-   *  Using [parTraverse] like this may imply that what you'd actually want is streaming, which will come to arrow in the future.
+   * Note: Be careful when using this on very large collections or infinite sequences as this needs to fold the entire collection first before it can start executing anything. This may cause excessive memory usage, or even infinite looping (in case of infinite sequences).
+   * Using [parTraverse] like this may imply that what you'd actually want is streaming, which will come to arrow in the future.
    */
   fun <G, A, B> Kind<G, A>.parTraverse(ctx: CoroutineContext, TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(ctx), f) }
