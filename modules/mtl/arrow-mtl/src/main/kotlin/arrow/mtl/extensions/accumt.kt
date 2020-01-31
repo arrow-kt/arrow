@@ -87,11 +87,11 @@ interface AccumTAlternative<S, F> : Alternative<AccumTPartialOf<S, F>>, AccumTAp
 
   override fun <A> Kind<AccumTPartialOf<S, F>, A>.orElse(b: Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, A> =
     (this.fix() to b.fix()).let { (ls, rs) ->
-      AccumT { s: S ->
+      AccumT(AndThen.id<S>().flatMap { s ->
         AF().run {
-          ls.runAccumT(s).orElse(rs.runAccumT(s))
+          AndThen(ls.accumT).andThen { it.orElse(rs.runAccumT(s)) }
         }
-      }
+      })
     }
 
   override fun <A> empty(): Kind<AccumTPartialOf<S, F>, A> =
@@ -110,13 +110,15 @@ interface AccumTApplicativeError<S, F, E> : ApplicativeError<AccumTPartialOf<S, 
 
   override fun <A> Kind<AccumTPartialOf<S, F>, A>.handleErrorWith(f: (E) -> Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, A> =
     this.fix().let { accumT ->
-      AccumT { s: S ->
-        ME().run {
-          accumT.runAccumT(s).handleErrorWith { e ->
-            f(e).fix().runAccumT(s)
+      AccumT(AndThen.id<S>().flatMap { s ->
+        AndThen(accumT.accumT).andThen {
+          ME().run {
+            it.handleErrorWith { e ->
+              f(e).fix().runAccumT(s)
+            }
           }
         }
-      }
+      })
     }
 }
 

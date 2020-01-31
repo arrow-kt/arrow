@@ -135,19 +135,10 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
       })
 
   fun <B> ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, (A) -> B>): AccumT<S, F, B> =
-    (this to mf.fix()).let { (mv, mf) ->
-      AccumT(
-        MF.run {
-          AndThen.id<S>().flatMap { s ->
-            AndThen(mv.accumT).andThen {
-              it.flatMap { (s1, v) ->
-                mf.accumT(MS.run { s.combine(s1) }).flatMap { (s2, f) ->
-                  MF.just(MS.run { s1.combine(s2) } toT f(v))
-                }
-              }
-            }
-          }
-        })
+    flatMap(MS, MF) { a ->
+      mf.fix().map(MF) { f ->
+        f(a)
+      }
     }
 
   /**
