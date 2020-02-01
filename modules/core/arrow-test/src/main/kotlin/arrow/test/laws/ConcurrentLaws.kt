@@ -65,6 +65,9 @@ object ConcurrentLaws {
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: cancel on guarantee runs finalizer") { CF.guaranteeFinalizerOnCancel(EQ, ctx) },
+      Law("Concurrent Laws: release is not cancelable") { CF.guaranteeFinalizerIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: cancel on onCancel runs finalizer") { CF.onCancelFinalizerOnCancel(EQ, ctx) },
       Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
       Law("Concurrent Laws: cancelable cancelableF coherence") { CF.cancelableCancelableFCoherence(EQ) },
       Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
@@ -127,11 +130,11 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     forAll(Gen.int()) { i ->
       fx.concurrent {
-        val startLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `use` was executed
+        val startLatch = Promise<F, Unit>(this@cancelOnBracketReleases).bind() // A promise that `use` was executed
         val exitLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `release` was executed
 
         val (_, cancel) = just(i).bracketCase(
-          use = { a -> startLatch.complete(a).flatMap { never<Int>() } },
+          use = { a -> startLatch.complete(Unit).flatMap { never<Int>() } },
           release = { r, exitCase ->
             when (exitCase) {
               is ExitCase.Canceled -> exitLatch.complete(r) // Fulfil promise that `release` was executed with Canceled
@@ -140,12 +143,12 @@ object ConcurrentLaws {
           }
         ).fork(ctx).bind() // Fork execution, allowing us to cancel it later
 
-        val waitStart = startLatch.get().bind() // Waits on promise of `use`
+        startLatch.get().bind() // Waits on promise of `use`
         cancel.fork(ctx).bind() // Cancel bracketCase
         val waitExit = exitLatch.get().bind() // Observes cancellation via bracket's `release`
 
-        waitStart + waitExit
-      }.equalUnderTheLaw(just(i + i), EQ)
+        waitExit
+      }.equalUnderTheLaw(just(i), EQ)
     }
   }
 
@@ -172,6 +175,59 @@ object ConcurrentLaws {
         val p = Promise.uncancelable<F, Unit>(this@releaseBracketIsNotCancelable).bind()
         val task = p.complete(Unit)
           .bracket(use = { never<Int>() }, release = { mvar.put(b) })
+        val (_, cancel) = task.fork(ctx).bind()
+        p.get().bind()
+        cancel.fork(ctx).bind()
+        continueOn(ctx)
+        mvar.take().bind()
+        mvar.take().bind()
+      }.equalUnderTheLaw(just(b), EQ)
+    }
+
+  fun <F> Concurrent<F>.guaranteeFinalizerOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      fx.concurrent {
+        val startLatch = Promise<F, Unit>(this@guaranteeFinalizerOnCancel).bind() // A promise that `use` was executed
+        val exitLatch = Promise<F, Int>(this@guaranteeFinalizerOnCancel).bind() // A promise that `release` was executed
+
+        val (_, cancel) = startLatch.complete(Unit).flatMap { never<Int>() }
+          .guaranteeCase { exitCase ->
+            when (exitCase) {
+              is ExitCase.Canceled -> exitLatch.complete(i) // Fulfil promise that `release` was executed with Canceled
+              else -> unit()
+            }
+          }.fork(ctx).bind() // Fork execution, allowing us to cancel it later
+
+        startLatch.get().bind() // Waits on promise of `use`
+        cancel.fork(ctx).bind() // Cancel bracketCase
+        val waitExit = exitLatch.get().bind() // Observes cancellation via bracket's `release`
+        waitExit
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.onCancelFinalizerOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      fx.concurrent {
+        val startLatch = Promise<F, Unit>(this@onCancelFinalizerOnCancel).bind() // A promise that `use` was executed
+        val exitLatch = Promise<F, Int>(this@onCancelFinalizerOnCancel).bind() // A promise that `release` was executed
+
+        val (_, cancel) = startLatch.complete(Unit).flatMap { never<Int>() }
+          .onCancel(exitLatch.complete(i)) // Fulfil promise that `release` was executed with Canceled
+          .fork(ctx).bind() // Fork execution, allowing us to cancel it later
+
+        startLatch.get().bind() // Waits on promise of `use`
+        cancel.fork(ctx).bind() // Cancel bracketCase
+        val waitExit = exitLatch.get().bind() // Observes cancellation via bracket's `release`
+        waitExit
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.guaranteeFinalizerIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.int()) { a, b ->
+      fx.concurrent {
+        val mvar = MVar(a, this@guaranteeFinalizerIsNotCancelable).bind()
+        val p = Promise.uncancelable<F, Unit>(this@guaranteeFinalizerIsNotCancelable).bind()
+        val task = p.complete(Unit).followedBy(never<Int>()).guaranteeCase { mvar.put(b) }
         val (_, cancel) = task.fork(ctx).bind()
         p.get().bind()
         cancel.fork(ctx).bind()
