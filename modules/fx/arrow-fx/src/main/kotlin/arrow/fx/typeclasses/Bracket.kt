@@ -146,4 +146,17 @@ interface Bracket<F, E> : MonadError<F, E> {
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
     just<Unit>(Unit).bracketCase({ _, e -> finalizer(e) }, { this })
+
+  /**
+   * Executes the given [finalizer] when the source is canceled, allowing registering a cancellation token.
+   *
+   * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
+   */
+  fun <A> Kind<F, A>.onCancel(finalizer: Kind<F, Unit>): Kind<F, A> =
+    guaranteeCase { case ->
+      when (case) {
+        ExitCase.Canceled -> finalizer
+        else -> just<Unit>(Unit)
+      }
+    }
 }
