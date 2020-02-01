@@ -74,7 +74,10 @@ object MonadWriterLaws {
     EQ: Eq<Kind<F, Unit>>
   ) {
     forAll(genW, genW) { x: W, y: W ->
-      tell(x).flatMap { tell(y) }.equalUnderTheLaw(tell(MOW.run { x.combine(y) }), EQ)
+      val ls = tell(x).flatMap { tell(y) }
+      val rs = tell(MOW.run { x.combine(y) })
+
+      ls.equalUnderTheLaw(rs, EQ)
     }
   }
 
