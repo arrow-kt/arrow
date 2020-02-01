@@ -69,6 +69,7 @@ import arrow.fx.bracket as Bracket
 import arrow.fx.fork as Fork
 import arrow.fx.guarantee as Guarantee
 import arrow.fx.guaranteeCase as GuaranteeCase
+import arrow.fx.onCancel as OnCancel
 
 @extension
 interface IOFunctor<E> : Functor<IOPartialOf<E>> {
@@ -223,6 +224,9 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
       }
     }
   }
+
+  override fun <A> IOOf<E, A>.onCancel(finalizer: IOOf<E, Unit>): IO<E, A> =
+    OnCancel(finalizer)
 }
 
 @extension
