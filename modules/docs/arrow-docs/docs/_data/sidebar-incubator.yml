@@ -108,6 +108,12 @@ options:
       - title: EitherT
         url: /docs/arrow/mtl/eithert/
 
+      - title: Accum
+        url: /docs/arrow/mtl/accum/
+
+      - title: AccumT
+        url: /docs/arrow/mtl/accumt/
+
   - title: Type Classes
 
     nested_options:
