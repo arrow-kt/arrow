@@ -680,22 +680,20 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.onErrorIsNotRunByDefault(EQ: Eq<Kind<F, Tuple2<Int, Boolean>>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
+
       val CF = this@onErrorIsNotRunByDefault
       fx.concurrent {
 
-        val startLatch = Promise<F, Unit>(CF).bind()
-        val completedLatch = Promise<F, Int>(CF).bind()
+        val startLatch = Promise<F, Int>(CF).bind()
         val onErrorRun = Ref(false).bind()
 
-        startLatch.complete(Unit)
+        val (completed, _) = startLatch.complete(i)
           .onError(onErrorRun.set(true))
-          .guarantee(completedLatch.complete(i))
           .fork(ctx).bind()
 
-        startLatch.get().bind() // Waits on promise of `use`
+        completed.bind()
 
-        val waitExit = completedLatch.get().bind()
-        waitExit toT onErrorRun.get().bind()
+        startLatch.get().bind() toT onErrorRun.get().bind()
       }.equalUnderTheLaw(just(i toT false), EQ)
     }
 }
