@@ -1,7 +1,6 @@
 package arrow.integrations.kotlinx
 
 import arrow.core.Either
-import arrow.core.None
 import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO
@@ -79,7 +78,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
           }
           !effect { scope.cancel() }
           !promise.get()
-        }.unsafeRunSync() == i
+        }.unsafeRunTimed(500.milliseconds) == i.some()
       }
     }
 
@@ -115,16 +114,15 @@ class CoroutinesIntegrationTest : UnitSpec() {
 
     "unsafeRunScoped should cancel correctly" {
       forAll(1, Gen.int()) { i ->
-        IO.async<Int> { cb ->
+        IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          IO(all) { }
-            .flatMap { IO.asyncF<Int> { cb -> IO.sleep(200.milliseconds).followedBy(IO { cb(i.right()) }) } }
-            .unsafeRunScoped(scope) {
-              cb(it)
-            }
-          IO(other) { }
-            .unsafeRunAsync { scope.cancel() }
-        }.unsafeRunTimed(500.milliseconds) == None
+          val promise = !Promise<Int>()
+          !effect {
+            IO.cancelable<Unit> { promise.complete(i) }.unsafeRunScoped(scope) { }
+          }
+          !effect { scope.cancel() }
+          !promise.get()
+        }.unsafeRunTimed(500.milliseconds) == i.some()
       }
     }
 
