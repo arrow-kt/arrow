@@ -225,7 +225,7 @@ class MVarTest : UnitSpec() {
         fun consumer(ch: Channel<Int>, sum: Long): IO<Long> =
           ch.take().flatMap {
             it.fold({
-              IO.just(sum)  // we are done!
+              IO.just(sum) // we are done!
             }, { x ->
               consumer(ch, sum + x) // next please
             })
