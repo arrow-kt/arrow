@@ -31,6 +31,7 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.CoroutineContext
 
 object ConcurrentLaws {
@@ -86,7 +87,7 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) },
       Law("Concurrent Laws: onError is run when error is raised") { CF.onErrorIsRunWhenErrorIsRaised(EQ, ctx) },
       Law("Concurrent Laws: onError is not run when completes normally") { CF.onErrorIsNotRunByDefault(EQK.liftEq(Tuple2.eq(Int.eq(), Boolean.eq())), ctx) },
-      Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.outerAndInnerOnErrorIsRun(EQK.liftEq(Eq.any()), ctx) }
+      Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.outerAndInnerOnErrorIsRun(EQK.liftEq(Int.eq()), ctx) }
     )
   }
 
@@ -698,18 +699,25 @@ object ConcurrentLaws {
       }.equalUnderTheLaw(just(i toT false), EQ)
     }
 
-  fun <F> Concurrent<F>.outerAndInnerOnErrorIsRun(EQ: Eq<Kind<F, Unit>>, ctx: CoroutineContext) =
+  fun <F> Concurrent<F>.outerAndInnerOnErrorIsRun(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     fx.concurrent {
-      val semaphore = Semaphore(0).bind()
+      val CF = this@outerAndInnerOnErrorIsRun
+      val latch = Promise<F, Unit>(CF).bind()
+      val counter = AtomicInteger(0)
+      val incrementCounter = CF.later {
+        counter.getAndIncrement()
+        Unit
+      }
 
       just(Unit).flatMap {
         raiseError<Unit>(RuntimeException("failed"))
-          .onError(semaphore.release())
-      }.onError(semaphore.release())
+          .onError(incrementCounter)
+      }.onError(incrementCounter)
+        .guarantee(latch.complete(Unit))
         .fork(ctx).bind()
 
-      semaphore.acquireN(2).bind()
+      latch.get().bind()
 
-      Unit
-    }.equalUnderTheLaw(just(Unit), EQ)
+      counter.get()
+    }.equalUnderTheLaw(just(2), EQ)
 }
