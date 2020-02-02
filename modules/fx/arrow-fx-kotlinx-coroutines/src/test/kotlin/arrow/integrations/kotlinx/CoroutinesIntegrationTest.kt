@@ -94,7 +94,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
             .onCancel(IO { cb(1.right()) })
             .suspendCancellable()
         }
-        IO(other) { Thread.sleep(500) }
+        IO.sleep(500.milliseconds)
           .unsafeRunAsync { scope.cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
@@ -121,7 +121,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
         IO.async<Int> { cb ->
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
           IO(all) { }
-            .flatMap { IO.async<Int> { cb -> Thread.sleep(200); cb(i.right()) } }
+            .flatMap { IO.asyncF<Int> { cb -> IO.sleep(200.milliseconds).followedBy(IO { cb(i.right()) }) } }
             .unsafeRunScoped(scope) {
               cb(it)
             }
@@ -135,12 +135,12 @@ class CoroutinesIntegrationTest : UnitSpec() {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
         IO(all) { -1 }
-          .flatMap { IO.async<Int> { Thread.sleep(5000); } }
+          .flatMap { IO.async<Int> { } }
           .onCancel(IO { cb(1.right()) })
           .unsafeRunScoped(scope) {
             cb(it)
           }
-        IO(other) { Thread.sleep(500) }
+        IO.sleep(500.milliseconds)
           .unsafeRunAsync { scope.cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
