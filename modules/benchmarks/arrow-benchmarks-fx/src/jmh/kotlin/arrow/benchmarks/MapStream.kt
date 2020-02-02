@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(1)
@@ -20,12 +21,15 @@ import java.util.concurrent.TimeUnit
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class MapStream {
 
+  @ExperimentalTime
   @Benchmark
   fun ioOne(): Long = IOStream.test(12000, 1).unsafeRunSync()
 
+  @ExperimentalTime
   @Benchmark
   fun io30(): Long = IOStream.test(1000, 30).unsafeRunSync()
 
+  @ExperimentalTime
   @Benchmark
   fun io120(): Long = IOStream.test(100, 120).unsafeRunSync()
 

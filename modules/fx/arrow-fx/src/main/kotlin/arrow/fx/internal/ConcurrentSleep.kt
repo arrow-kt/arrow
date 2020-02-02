@@ -8,12 +8,20 @@ import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
+import kotlin.time.ExperimentalTime
 
-internal fun <F> Concurrent<F>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
-  val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
+@ExperimentalTime
+@Deprecated("Duration will be removed after 0.10.5 in favor of kotlin.time.Duration to support MPP",
+  ReplaceWith("ConcurrentSleep(duration.duration)"))
+internal fun <F> Concurrent<F>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = ConcurrentSleep(duration.duration)
+
+@ExperimentalTime
+internal fun <F> Concurrent<F>.ConcurrentSleep(duration: kotlin.time.Duration): Kind<F, Unit> = cancelable { cb ->
+  val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.toLongNanoseconds(), TimeUnit.NANOSECONDS)
   later { cancelRef.cancel(false); Unit }
 }
 

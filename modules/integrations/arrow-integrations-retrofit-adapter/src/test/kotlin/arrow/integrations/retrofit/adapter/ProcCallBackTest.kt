@@ -20,7 +20,9 @@ import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class ProcCallBackTest : UnitSpec() {
 
   private fun server(): MockWebServer = MockWebServer().apply {

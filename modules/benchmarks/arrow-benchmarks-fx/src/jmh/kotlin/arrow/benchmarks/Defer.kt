@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -26,6 +27,7 @@ open class Defer {
       if (j > size) IO.defer { IO.just(j) } else ioDeferLoop(j + 1)
     }
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioDeferLoop(0).unsafeRunSync()

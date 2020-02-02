@@ -34,6 +34,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.time.ExperimentalTime
 
 class ForIO private constructor() {
   companion object
@@ -803,6 +804,7 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsync] to run in an unsafe and non-cancellable manner.
    * @see [unsafeRunAsyncCancellable] to run in a non-referential transparent manner.
    */
+  @ExperimentalTime
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     Async { _, ccb ->
       val conn = IOConnection()
@@ -829,6 +831,7 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsyncCancellable] to run in a cancellable manner.
    * @see [runAsync] to run in a referential transparent manner.
    */
+  @ExperimentalTime
   fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
     runAsyncCancellable(onCancel, cb andThen { unit }).unsafeRunSync()
 
@@ -844,8 +847,9 @@ sealed class IO<out A> : IOOf<A> {
    * @see [unsafeRunAsync] or [unsafeRunAsyncCancellable] that run the value as [Either].
    * @see [runAsync] to run in a referential transparent manner.
    */
+  @ExperimentalTime
   fun unsafeRunSync(): A =
-    unsafeRunTimed(Duration.INFINITE)
+    unsafeRunTimed(kotlin.time.Duration.INFINITE)
       .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
   /**
@@ -856,9 +860,20 @@ sealed class IO<out A> : IOOf<A> {
    *
    * @see unsafeRunSync
    */
-  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
+  @ExperimentalTime
+  @Deprecated("Duration will be removed after 0.10.5 in favor of kotlin.time.Duration to support MPP",
+    ReplaceWith("unsafeRunTimed(limit.duration)"))
+  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit.duration)
 
+  @ExperimentalTime
+  fun unsafeRunTimed(limit: kotlin.time.Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
+
+  @Deprecated("Duration will be removed after 0.10.5 in favor of kotlin.time.Duration to support MPP",
+    ReplaceWith("unsafeRunTimedTotal(limit.duration)"))
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+
+  @ExperimentalTime
+  internal abstract fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A>
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
@@ -1003,6 +1018,9 @@ sealed class IO<out A> : IOOf<A> {
     override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = Suspend { f(a).fix() }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = Some(a)
   }
 
   internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
@@ -1013,26 +1031,45 @@ sealed class IO<out A> : IOOf<A> {
     override fun <B> flatMap(f: (Nothing) -> IOOf<B>): IO<B> = this
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<Nothing> = throw exception
   }
 
   internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+    @ExperimentalTime
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = unsafeResync(this, limit)
   }
 
   internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
+    @ExperimentalTime
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = unsafeResync(this, limit)
   }
 
   internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
@@ -1040,6 +1077,8 @@ sealed class IO<out A> : IOOf<A> {
     override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class ContextSwitch<A>(
@@ -1048,6 +1087,9 @@ sealed class IO<out A> : IOOf<A> {
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
   ) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
       // Internal reusable reference.
@@ -1068,6 +1110,9 @@ sealed class IO<out A> : IOOf<A> {
       else Map(this, f, 0)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+
+    @ExperimentalTime
+    override fun unsafeRunTimedTotal(limit: kotlin.time.Duration): Option<A> = throw AssertionError("Unreachable")
   }
 }
 

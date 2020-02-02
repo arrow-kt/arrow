@@ -13,6 +13,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -34,6 +35,7 @@ open class RacePair {
     }
   }
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int = racePairHelper().unsafeRunSync()
 }

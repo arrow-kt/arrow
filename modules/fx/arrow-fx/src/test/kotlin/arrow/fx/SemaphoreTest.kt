@@ -16,7 +16,9 @@ import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class SemaphoreTest : UnitSpec() {
 
   init {

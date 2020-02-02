@@ -3,11 +3,12 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
-import arrow.fx.typeclasses.milliseconds
-import arrow.fx.typeclasses.seconds
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
 object TimerLaws {
 
@@ -27,12 +28,14 @@ object TimerLaws {
     }
   }
 
+  @ExperimentalTime
   fun <F> laws(AS: Async<F>, T: Timer<F>, EQ: Eq<Kind<F, Boolean>>): List<Law> =
     listOf(
       Law("Timer Laws: sleep should last specified time") { AS.sleepShouldLastSpecifiedTime(T, Clock(AS), EQ) },
       Law("Timer Laws: negative sleep should be immediate") { AS.negativeSleepShouldBeImmediate(T, EQ) }
     )
 
+  @ExperimentalTime
   fun <F> Async<F>.sleepShouldLastSpecifiedTime(
     T: Timer<F>,
     C: Clock<F>,
@@ -49,6 +52,7 @@ object TimerLaws {
     lhs.equalUnderTheLaw(just(true), EQ)
   }
 
+  @ExperimentalTime
   fun <F> Async<F>.negativeSleepShouldBeImmediate(
     T: Timer<F>,
     EQ: Eq<Kind<F, Boolean>>

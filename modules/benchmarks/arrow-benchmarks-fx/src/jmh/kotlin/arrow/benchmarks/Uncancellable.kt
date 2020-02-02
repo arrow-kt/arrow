@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -25,6 +26,7 @@ open class Uncancellable {
     if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
     else IO.just(i)
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int = ioUncancelableLoop(0).unsafeRunSync()
 }

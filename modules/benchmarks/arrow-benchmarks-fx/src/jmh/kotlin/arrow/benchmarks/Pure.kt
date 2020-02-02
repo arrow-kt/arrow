@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -26,6 +27,7 @@ open class Pure {
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioPureLoop(0).unsafeRunSync()

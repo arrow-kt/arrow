@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -27,6 +28,7 @@ open class DeepBind {
       ioFibLazy(n - 2).flatMap { b -> IO { a + b } }
     }
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioFibLazy(depth).unsafeRunSync()

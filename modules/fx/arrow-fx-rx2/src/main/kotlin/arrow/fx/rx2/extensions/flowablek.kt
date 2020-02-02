@@ -55,6 +55,7 @@ import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.MonadFilter
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
+import kotlin.time.ExperimentalTime
 import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as flowableHandleErrorWith
 
@@ -355,8 +356,13 @@ fun FlowableK.Companion.effectMissing(): FlowableKEffect = object : FlowableKEff
 
 @extension
 interface FlowableKTimer : Timer<ForFlowableK> {
+  @ExperimentalTime
   override fun sleep(duration: Duration): FlowableK<Unit> =
-    FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    sleep(duration.duration)
+
+  @ExperimentalTime
+  override fun sleep(duration: kotlin.time.Duration): FlowableK<Unit> =
+    FlowableK(Flowable.timer(duration.toLongNanoseconds(), TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 

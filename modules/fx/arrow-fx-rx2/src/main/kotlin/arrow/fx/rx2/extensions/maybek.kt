@@ -50,6 +50,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
 import io.reactivex.disposables.Disposable as RxDisposable
 
@@ -267,8 +268,13 @@ interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
 
 @extension
 interface MaybeKTimer : Timer<ForMaybeK> {
+  @ExperimentalTime
   override fun sleep(duration: Duration): MaybeK<Unit> =
-    MaybeK(Maybe.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    sleep(duration.duration)
+
+  @ExperimentalTime
+  override fun sleep(duration: kotlin.time.Duration): MaybeK<Unit> =
+    MaybeK(Maybe.timer(duration.toLongNanoseconds(), TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 

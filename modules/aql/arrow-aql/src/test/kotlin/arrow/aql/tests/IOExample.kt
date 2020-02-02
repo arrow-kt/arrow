@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
 import arrow.fx.handleErrorWith
+import kotlin.time.ExperimentalTime
 
 data class UserId(val value: String)
 data class User(val userId: UserId)
@@ -69,6 +70,7 @@ class Module {
 }
 
 object test {
+  @ExperimentalTime
   @JvmStatic
   fun main(args: Array<String>) {
     val user1 = User(UserId("user1"))

@@ -48,6 +48,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as singleHandleErrorWith
 
@@ -243,8 +244,13 @@ interface SingleKConcurrentEffect : ConcurrentEffect<ForSingleK>, SingleKEffect 
 
 @extension
 interface SingleKTimer : Timer<ForSingleK> {
+  @ExperimentalTime
   override fun sleep(duration: Duration): SingleK<Unit> =
-    SingleK(Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    sleep(duration.duration)
+
+  @ExperimentalTime
+  override fun sleep(duration: kotlin.time.Duration): SingleK<Unit> =
+    SingleK(Single.timer(duration.toLongNanoseconds(), TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 

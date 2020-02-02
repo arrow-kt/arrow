@@ -11,7 +11,6 @@ import arrow.fx.extensions.resource.functor.functor
 import arrow.fx.extensions.resource.monad.monad
 import arrow.fx.extensions.resource.monoid.monoid
 import arrow.fx.extensions.resource.selective.selective
-import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.generators.GenK
 import arrow.test.laws.MonadLaws
@@ -20,7 +19,10 @@ import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@ExperimentalTime
 class ResourceTest : UnitSpec() {
   init {
 
@@ -56,6 +58,7 @@ class ResourceTest : UnitSpec() {
   }
 }
 
+@ExperimentalTime
 private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
   override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {

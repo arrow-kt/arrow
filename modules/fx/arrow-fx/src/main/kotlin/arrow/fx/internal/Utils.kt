@@ -15,6 +15,7 @@ import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
 
@@ -150,7 +151,12 @@ object Platform {
     }
   }
 
-  fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
+  @ExperimentalTime
+  fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> =
+    unsafeResync(ioa, limit.duration)
+
+  @ExperimentalTime
+  fun <A> unsafeResync(ioa: IO<A>, limit: kotlin.time.Duration): Option<A> {
     val latch = OneShotLatch()
     var ref: Either<Throwable, A>? = null
     ioa.unsafeRunAsync { a ->
@@ -158,10 +164,10 @@ object Platform {
       latch.releaseShared(1)
     }
 
-    if (limit == Duration.INFINITE) {
+    if (limit == kotlin.time.Duration.INFINITE) {
       latch.acquireSharedInterruptibly(1)
     } else {
-      latch.tryAcquireSharedNanos(1, limit.nanoseconds)
+      latch.tryAcquireSharedNanos(1, limit.toLongNanoseconds())
     }
 
     return when (val eitherRef = ref) {

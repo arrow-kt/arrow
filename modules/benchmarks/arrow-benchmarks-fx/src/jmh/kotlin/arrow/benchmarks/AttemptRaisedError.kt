@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 val dummy = object : RuntimeException("dummy") {
   override fun fillInStackTrace(): Throwable =
@@ -33,6 +34,7 @@ open class AttemptRaisedError {
       }
     } else IO.just(1)
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioLoopNotHappy(size, 0).unsafeRunSync()

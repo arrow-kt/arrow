@@ -9,6 +9,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(1)
@@ -62,6 +63,7 @@ open class Map {
   fun kioBatch120(): Long =
     arrow.benchmarks.effects.kio.Map.kioMapTest(12000 / 120, 120)
 
+  @ExperimentalTime
   private fun ioTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
     var io = IO.just(0)

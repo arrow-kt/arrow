@@ -39,6 +39,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import arrow.fx.reactor.handleErrorWith as fluxHandleErrorWith
 
 @extension
@@ -203,8 +204,13 @@ fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
 
 @extension
 interface FluxKTimer : Timer<ForFluxK> {
+  @ExperimentalTime
   override fun sleep(duration: Duration): FluxK<Unit> =
-    FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+    sleep(duration.duration)
+
+  @ExperimentalTime
+  override fun sleep(duration: kotlin.time.Duration): FluxK<Unit> =
+    FluxK(Mono.delay(java.time.Duration.ofNanos(duration.toLongNanoseconds()))
       .map { Unit }.toFlux())
 }
 

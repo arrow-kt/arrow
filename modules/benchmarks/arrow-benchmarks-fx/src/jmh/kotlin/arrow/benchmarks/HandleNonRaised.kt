@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @State(Scope.Thread)
@@ -30,6 +31,7 @@ open class HandleNonRaised {
     else
       IO.just(i)
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioHappyPathLoop(0).unsafeRunSync()

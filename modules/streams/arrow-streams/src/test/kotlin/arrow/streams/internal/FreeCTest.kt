@@ -42,6 +42,7 @@ import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import kotlin.time.ExperimentalTime
 
 @higherkind
 sealed class Ops<out A> : OpsOf<A> {
@@ -95,6 +96,7 @@ private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.
   r
 }.fix()
 
+@ExperimentalTime
 class FreeCTest : UnitSpec() {
 
   init {

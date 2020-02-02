@@ -27,8 +27,6 @@ import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase
-import arrow.fx.typeclasses.milliseconds
-import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
@@ -44,7 +42,11 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
+@ExperimentalTime
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 

@@ -11,6 +11,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -27,6 +28,7 @@ open class Async {
       if (i > size) IO.just(i) else ioAsyncLoop(i + 1)
     )
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioAsyncLoop(0).unsafeRunSync()

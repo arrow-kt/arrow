@@ -22,9 +22,6 @@ import arrow.fx.extensions.schedule.applicative.applicative
 import arrow.fx.extensions.schedule.category.category
 import arrow.fx.extensions.schedule.profunctor.profunctor
 import arrow.fx.extensions.schedule.semiring.semiring
-import arrow.fx.typeclasses.Duration
-import arrow.fx.typeclasses.nanoseconds
-import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
@@ -45,8 +42,12 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlin.math.max
+import kotlin.time.nanoseconds
 import kotlin.math.pow
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@ExperimentalTime
 class ScheduleTest : UnitSpec() {
 
   fun decEqK(): EqK<DecisionPartialOf<Any?>> = object : EqK<DecisionPartialOf<Any?>> {
@@ -116,8 +117,10 @@ class ScheduleTest : UnitSpec() {
     return go(initialState.value(), n, emptyList())
   }
 
-  fun refTimer(ref: Ref<ForIO, Duration>): Timer<ForIO> = object : Timer<ForIO> {
-    override fun sleep(duration: Duration): Kind<ForIO, Unit> =
+  @ExperimentalTime
+  fun refTimer(ref: Ref<ForIO, kotlin.time.Duration>): Timer<ForIO> = object : Timer<ForIO> {
+    @ExperimentalTime
+    override fun sleep(duration: kotlin.time.Duration): Kind<ForIO, Unit> =
       ref.update { d -> d + duration }
   }
 
@@ -206,7 +209,7 @@ class ScheduleTest : UnitSpec() {
       forAll(Gen.intSmall().filter { it > 0 }, Gen.intSmall().filter { it > 0 }.filter { it < 1000 }) { i, n ->
         val res = Schedule.spaced<ForId, Any>(Id.monad(), i.seconds).runIdSchedule(0, n)
 
-        res.forAll { it.delay.nanoseconds == i.seconds.nanoseconds && it.cont }
+        res.forAll { it.delay.nanoseconds == i.seconds.toLongNanoseconds() && it.cont }
       }
     }
 
@@ -258,10 +261,10 @@ class ScheduleTest : UnitSpec() {
           .fix().unsafeRunSync()
 
         if (dec.fix().cont || n == 0) res.isLeft() &&
-          ref.get().fix().unsafeRunSync().nanoseconds == max(n - 1, 0) * dec.fix().delay.nanoseconds &&
+          ref.get().fix().unsafeRunSync().toLongNanoseconds() == max(n - 1, 0) * dec.fix().delay.nanoseconds &&
           eff.counter == n
         else res.isRight() && eff.counter == 1 &&
-          ref.get().fix().unsafeRunSync().nanoseconds == 0L &&
+          ref.get().fix().unsafeRunSync().toLongNanoseconds() == 0L &&
           (res as Either.Right).b == dec.fix().finish.value()
       }
     }
@@ -284,10 +287,10 @@ class ScheduleTest : UnitSpec() {
 
         if (dec.fix().cont) res.isRight() &&
           eff.counter == n + 1 &&
-          ref.get().fix().unsafeRunSync().nanoseconds == (n + 1) * dec.fix().delay.nanoseconds
+          ref.get().fix().unsafeRunSync().toLongNanoseconds() == (n + 1) * dec.fix().delay.nanoseconds
         else res.isLeft() &&
           eff.counter == 1 &&
-          ref.get().fix().unsafeRunSync().nanoseconds == 0L
+          ref.get().fix().unsafeRunSync().toLongNanoseconds() == 0L
       }
     }
   }

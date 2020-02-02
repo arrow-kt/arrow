@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.fx.internal.ConcurrentSleep
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
+import kotlin.time.ExperimentalTime
 
 /**
  * [Timer] allows to [sleep] for a [Duration] in [F].
@@ -33,11 +34,18 @@ interface Timer<F> {
    * }
    * ```
    **/
-  fun sleep(duration: Duration): Kind<F, Unit>
+  @ExperimentalTime
+  @Deprecated("Duration will be removed after 0.10.5 in favor of kotlin.time.Duration to support MPP", ReplaceWith("sleep(duration.duration)"))
+  fun sleep(duration: Duration): Kind<F, Unit> = sleep(duration.duration)
+
+  @ExperimentalTime
+  fun sleep(duration: kotlin.time.Duration): Kind<F, Unit>
 
   companion object {
+    @ExperimentalTime
     operator fun <F> invoke(CF: Concurrent<F>): Timer<F> = object : Timer<F> {
-      override fun sleep(duration: Duration): Kind<F, Unit> = CF.ConcurrentSleep(duration)
+      @ExperimentalTime
+      override fun sleep(duration: kotlin.time.Duration): Kind<F, Unit> = CF.ConcurrentSleep(duration)
     }
   }
 }

@@ -13,6 +13,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -29,6 +30,7 @@ open class ParMap {
       IODispatchers.CommonPool.parMapN(acc, IO { i }) { a, b -> a + b }
     }
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioHelper().unsafeRunSync()

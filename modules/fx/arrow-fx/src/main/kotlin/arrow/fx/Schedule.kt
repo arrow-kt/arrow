@@ -28,6 +28,7 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.random.Random
+import kotlin.time.ExperimentalTime
 
 class ForSchedule private constructor() {
   companion object
@@ -875,6 +876,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Returns the last output from the policy or raises an error if a repeat failed.
  */
+@ExperimentalTime
 fun <F, A, B> Kind<F, A>.repeat(
   CF: Concurrent<F>,
   schedule: Schedule<F, A, B>
@@ -884,6 +886,7 @@ fun <F, A, B> Kind<F, A>.repeat(
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Returns the last output from the policy or raises an error if a repeat failed.
  */
+@ExperimentalTime
 fun <F, E, A, B> Kind<F, A>.repeat(
   ME: MonadError<F, E>,
   T: Timer<F>,
@@ -894,6 +897,7 @@ fun <F, E, A, B> Kind<F, A>.repeat(
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@ExperimentalTime
 fun <F, A, B> Kind<F, A>.repeatOrElse(
   CF: Concurrent<F>,
   schedule: Schedule<F, A, B>,
@@ -904,6 +908,7 @@ fun <F, A, B> Kind<F, A>.repeatOrElse(
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@ExperimentalTime
 fun <F, E, A, B> Kind<F, A>.repeatOrElse(
   ME: MonadError<F, E>,
   T: Timer<F>,
@@ -915,6 +920,7 @@ fun <F, E, A, B> Kind<F, A>.repeatOrElse(
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@ExperimentalTime
 fun <F, A, B, C> Kind<F, A>.repeatOrElseEither(
   CF: Concurrent<F>,
   schedule: Schedule<F, A, B>,
@@ -925,6 +931,7 @@ fun <F, A, B, C> Kind<F, A>.repeatOrElseEither(
  * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@ExperimentalTime
 fun <F, E, A, B, C> Kind<F, A>.repeatOrElseEither(
   ME: MonadError<F, E>,
   T: Timer<F>,
@@ -950,6 +957,7 @@ fun <F, E, A, B, C> Kind<F, A>.repeatOrElseEither(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
  */
+@ExperimentalTime
 fun <F, A, B> Kind<F, A>.retry(
   CF: Concurrent<F>,
   schedule: Schedule<F, Throwable, B>
@@ -959,6 +967,7 @@ fun <F, A, B> Kind<F, A>.retry(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
  */
+@ExperimentalTime
 fun <F, E, A, B> Kind<F, A>.retry(
   ME: MonadError<F, E>,
   T: Timer<F>,
@@ -969,6 +978,7 @@ fun <F, E, A, B> Kind<F, A>.retry(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
+@ExperimentalTime
 fun <F, A, B> Kind<F, A>.retryOrElse(
   CF: Concurrent<F>,
   schedule: Schedule<F, Throwable, B>,
@@ -979,6 +989,7 @@ fun <F, A, B> Kind<F, A>.retryOrElse(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
+@ExperimentalTime
 fun <F, E, A, B> Kind<F, A>.retryOrElse(
   ME: MonadError<F, E>,
   T: Timer<F>,
@@ -990,6 +1001,7 @@ fun <F, E, A, B> Kind<F, A>.retryOrElse(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
+@ExperimentalTime
 fun <F, A, B, C> Kind<F, A>.retryOrElseEither(
   CF: Concurrent<F>,
   schedule: Schedule<F, Throwable, B>,
@@ -1000,6 +1012,7 @@ fun <F, A, B, C> Kind<F, A>.retryOrElseEither(
  * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
+@ExperimentalTime
 fun <F, E, A, B, C> Kind<F, A>.retryOrElseEither(
   ME: MonadError<F, E>,
   T: Timer<F>,

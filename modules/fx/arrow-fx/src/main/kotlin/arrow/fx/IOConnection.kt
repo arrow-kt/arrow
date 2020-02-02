@@ -8,8 +8,10 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import arrow.fx.handleErrorWith as handleErrorW
 
+@ExperimentalTime
 fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 typealias IOConnection = KindConnection<ForIO>
 

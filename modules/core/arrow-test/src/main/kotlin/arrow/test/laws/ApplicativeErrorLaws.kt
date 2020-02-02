@@ -18,6 +18,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlin.time.ExperimentalTime
 
 object ApplicativeErrorLaws {
 
@@ -79,6 +80,7 @@ object ApplicativeErrorLaws {
       catch { either.fold({ throw it }, ::identity) }.equalUnderTheLaw(either.fold({ raiseError<Int>(it) }, { just(it) }), EQ)
     }
 
+  @ExperimentalTime
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorEffectCatch(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { either: Either<Throwable, Int> ->
       IO.effect {

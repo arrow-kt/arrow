@@ -28,6 +28,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
 
 @extension
@@ -131,8 +132,13 @@ interface MonoKConcurrentEffect : ConcurrentEffect<ForMonoK>, MonoKEffect {
 
 @extension
 interface MonoKTimer : Timer<ForMonoK> {
+  @ExperimentalTime
   override fun sleep(duration: Duration): MonoK<Unit> =
-    MonoK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+    sleep(duration.duration)
+
+  @ExperimentalTime
+  override fun sleep(duration: kotlin.time.Duration): MonoK<Unit> =
+    MonoK(Mono.delay(java.time.Duration.ofNanos(duration.toLongNanoseconds()))
       .map { Unit })
 }
 

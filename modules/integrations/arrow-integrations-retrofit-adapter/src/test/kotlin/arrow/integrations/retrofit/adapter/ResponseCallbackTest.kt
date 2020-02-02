@@ -10,7 +10,9 @@ import io.kotlintest.fail
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class ResponseCallbackTest : UnitSpec() {
   private val server = MockWebServer().apply {
     enqueue(MockResponse().setBody("{response:  \"hello, world!\"}").setResponseCode(200))

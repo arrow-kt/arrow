@@ -45,6 +45,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.ExperimentalTime
 import arrow.fx.handleError as ioHandleError
 import arrow.fx.handleErrorWith as ioHandleErrorWith
 
@@ -216,6 +217,7 @@ fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> 
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
+@ExperimentalTime
 fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
   Timer(CF)
 
@@ -228,6 +230,7 @@ interface IOEffect : Effect<ForIO>, IOAsync {
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
 
+  @ExperimentalTime
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
@@ -263,6 +266,7 @@ interface IOMonadIO : MonadIO<ForIO>, IOMonad {
 @extension
 interface IOUnsafeRun : UnsafeRun<ForIO> {
 
+  @ExperimentalTime
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
@@ -271,11 +275,13 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 
 @extension
 interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
+  @ExperimentalTime
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 
+  @ExperimentalTime
   override suspend fun <A> unsafe.runNonBlockingCancellable(onCancel: OnCancel, fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit): Disposable =
     fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
 }
@@ -305,6 +311,7 @@ interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
     IO.dispatchers()
 }
 
+@ExperimentalTime
 fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 
 @extension

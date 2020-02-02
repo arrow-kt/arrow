@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -29,6 +30,7 @@ open class LeftBind {
     else if (i < size) ioLoop(i + 1).flatMap { IO.just(it) }
     else IO.just(i)
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     IO.just(0).flatMap { ioLoop(it) }.unsafeRunSync()

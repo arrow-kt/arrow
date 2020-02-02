@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
 
 @State(Scope.Thread)
 @Fork(2)
@@ -30,6 +31,7 @@ open class ForkFiber {
       }
     } else IO.just(i)
 
+  @ExperimentalTime
   @Benchmark
   fun io(): Int =
     ioStartLoop(0).unsafeRunSync()

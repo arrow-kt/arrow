@@ -7,14 +7,11 @@ import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.internal.AtomicRefW
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.internal.AtomicRefW
 import arrow.core.k
-import arrow.fx.internal.parMap2
-import arrow.fx.internal.parMap3
-import arrow.typeclasses.Applicative
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Race2
@@ -30,9 +27,13 @@ import arrow.fx.RaceTriple
 import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
+import arrow.fx.internal.parMap2
+import arrow.fx.internal.parMap3
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
+import kotlin.time.ExperimentalTime
 
 typealias CancelToken<F> = Kind<F, Unit>
 
@@ -45,6 +46,7 @@ interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
 
+  @ExperimentalTime
   fun timer(): Timer<F> = Timer(this)
 
   fun parApplicative(): Applicative<F> = ParApplicative(null)
@@ -916,7 +918,11 @@ interface Concurrent<F> : Async<F> {
    *
    * @see Timer
    **/
-  fun sleep(duration: Duration): Kind<F, Unit> = timer().sleep(duration)
+  @ExperimentalTime
+  fun sleep(duration: Duration): Kind<F, Unit> = sleep(duration.duration)
+
+  @ExperimentalTime
+  fun sleep(duration: kotlin.time.Duration): Kind<F, Unit> = timer().sleep(duration)
 
   /**
    * Returns the result of [this] within the specified [duration] or the [default] value.
@@ -940,7 +946,16 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    **/
+  @ExperimentalTime
+  @Deprecated(
+    "Duration will be removed after 0.10.5 in favor of kotlin.time.Duration to support MPP",
+    ReplaceWith("waitFor(duration.duration, default)")
+  )
   fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A>): Kind<F, A> =
+    waitFor(duration.duration, default)
+
+  @ExperimentalTime
+  fun <A> Kind<F, A>.waitFor(duration: kotlin.time.Duration, default: Kind<F, A>): Kind<F, A> =
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
@@ -969,6 +984,7 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    **/
+  @ExperimentalTime
   fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
