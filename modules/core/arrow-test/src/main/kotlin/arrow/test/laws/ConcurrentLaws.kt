@@ -85,7 +85,8 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
       Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) },
       Law("Concurrent Laws: onError is run when error is raised") { CF.onErrorIsRunWhenErrorIsRaised(EQ, ctx) },
-      Law("Concurrent Laws: onError is not run when completes normally") { CF.onErrorIsNotRunByDefault(EQK.liftEq(Tuple2.eq(Int.eq(), Boolean.eq())), ctx) }
+      Law("Concurrent Laws: onError is not run when completes normally") { CF.onErrorIsNotRunByDefault(EQK.liftEq(Tuple2.eq(Int.eq(), Boolean.eq())), ctx) },
+      Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.outerAndInnerOnErrorIsRun(EQK.liftEq(Eq.any()), ctx) }
     )
   }
 
@@ -696,4 +697,19 @@ object ConcurrentLaws {
         startLatch.get().bind() toT onErrorRun.get().bind()
       }.equalUnderTheLaw(just(i toT false), EQ)
     }
+
+  fun <F> Concurrent<F>.outerAndInnerOnErrorIsRun(EQ: Eq<Kind<F, Unit>>, ctx: CoroutineContext) =
+    fx.concurrent {
+      val semaphore = Semaphore(0).bind()
+
+      just(Unit).flatMap {
+        raiseError<Unit>(RuntimeException("failed"))
+          .onError(semaphore.release())
+      }.onError(semaphore.release())
+        .fork(ctx).bind()
+
+      semaphore.acquireN(2).bind()
+
+      Unit
+    }.equalUnderTheLaw(just(Unit), EQ)
 }
