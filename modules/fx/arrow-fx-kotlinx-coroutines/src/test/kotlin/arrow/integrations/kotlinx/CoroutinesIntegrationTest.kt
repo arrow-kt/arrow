@@ -5,10 +5,7 @@ import arrow.core.None
 import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO
-import arrow.fx.IOOf
 import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.bracket.guaranteeCase
-import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -157,11 +154,3 @@ class CoroutinesIntegrationTest : UnitSpec() {
     }
   }
 }
-
-fun <A> IOOf<A>.onCancel(token: IOOf<Unit>): IO<A> =
-  guaranteeCase { case ->
-    when (case) {
-      ExitCase.Canceled -> token
-      else -> IO.unit
-    }
-  }
