@@ -39,15 +39,18 @@ class CoroutinesIntegrationTest : UnitSpec() {
     // --------------- suspendCancellable ---------------
 
     "suspendedCancellable should throw" {
-      forAll(Gen.throwable()) { e ->
+      forAll(Gen.throwable()) { expected ->
         val ceh = TestCoroutineExceptionHandler()
         val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
 
         scope.launch {
-          IO { throw e }.suspendCancellable()
+          IO { throw expected }.suspendCancellable()
         }
-        // suspendCancellableCoroutine re throws the exception so we need to compare the instance
-        ceh.uncaughtExceptions[0]::class == e::class
+
+        val actual = ceh.uncaughtExceptions[0]
+        // suspendCancellableCoroutine copy and re-throws the exception so we need to compare the type
+        // see https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/src/internal/StackTraceRecovery.kt#L68
+        actual::class == expected::class
       }
     }
 
@@ -87,11 +90,9 @@ class CoroutinesIntegrationTest : UnitSpec() {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
         scope.launch {
-          IO.async<Int> { Thread.sleep(5000) }
+          IO.async<Int> { }
             .onCancel(IO { cb(1.right()) })
-            .suspendCancellable().let {
-              cb(it.right())
-            }
+            .suspendCancellable()
         }
         IO(other) { Thread.sleep(500) }
           .unsafeRunAsync { scope.cancel() }
