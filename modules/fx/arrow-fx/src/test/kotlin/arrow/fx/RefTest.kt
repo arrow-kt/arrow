@@ -60,7 +60,7 @@ class RefTest : UnitSpec() {
           val success = setter(b).bind()
           val result = ref.get().bind()
           success && result == b
-        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
+        }.equalUnderTheLaw(IO.just(true), EQ())
       }
     }
 
@@ -73,7 +73,7 @@ class RefTest : UnitSpec() {
           val success = setter(c).bind()
           val result = ref.get().bind()
           !success && result == b
-        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
+        }.equalUnderTheLaw(IO.just(true), EQ())
       }
     }
 
@@ -87,7 +87,7 @@ class RefTest : UnitSpec() {
           val cond2 = setter(d).bind()
           val result = ref.get().bind()
           cond1 && !cond2 && result == c
-        }.equalUnderTheLaw(IO.just(true), IO_EQ<Boolean>())
+        }.equalUnderTheLaw(IO.just(true), EQ())
       }
     }
 

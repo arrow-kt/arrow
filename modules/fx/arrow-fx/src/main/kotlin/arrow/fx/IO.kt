@@ -51,6 +51,8 @@ sealed class IOResult<out E, out A> {
       is Error -> ifLeft(this.error)
       is Exception -> ifException(this.exception)
     }
+
+  companion object
 }
 
 class ForIO private constructor() {
@@ -673,6 +675,9 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    */
   fun attempt(): IO<E, Either<Throwable, A>> =
     Bind(this, IOFrame.attempt())
+
+  fun result(): IO<Nothing, IOResult<E, A>> =
+    Bind(this, IOFrame.result())
 
   /**
    * [runAsync] allows you to run any [IO] in a referential transparent manner.

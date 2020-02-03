@@ -1,6 +1,9 @@
 name: Build Documentation
 
-on: pull_request
+on:
+  pull_request:
+    branches-ignore:
+    - release/0.11.0
 
 jobs:
   build_documentation:

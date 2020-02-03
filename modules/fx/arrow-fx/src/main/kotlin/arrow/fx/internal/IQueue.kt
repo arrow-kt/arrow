@@ -19,7 +19,7 @@ import arrow.core.extensions.list.foldable.nonEmpty
  *
  */
 
-class IQueue<A> private constructor(val lIn: List<A>, val lOut: List<A>) {
+class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iterable<A> {
 
   private fun <A> Iterable<A>.head() = first()
   private fun <A> Iterable<A>.tail() = drop(1)
@@ -79,9 +79,13 @@ class IQueue<A> private constructor(val lIn: List<A>, val lOut: List<A>) {
   override fun toString(): String = "Queue(${lIn.joinToString(separator = ", ")}, ${lOut.joinToString(separator = ", ")})"
 
   companion object {
-    fun <A> empty(): IQueue<A> = IQueue(emptyList(), emptyList())
+    fun <A> empty(): IQueue<A> = EmptyQueue as IQueue<A>
     fun <A> invoke(vararg a: A): IQueue<A> = IQueue(emptyList(), a.toList())
   }
 
+  override fun iterator(): Iterator<A> = toList().iterator()
+
   fun toList(): List<A> = lOut + lIn.reversed()
 }
+
+private val EmptyQueue: IQueue<Nothing> = IQueue(emptyList(), emptyList())
