@@ -70,6 +70,7 @@ include {
             _ 'fx-mtl'
             _ 'fx-rx2'
             _ 'fx-reactor'
+            _ 'fx-kotlinx-coroutines'
         }
 
         integrations {
