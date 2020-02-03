@@ -62,12 +62,15 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
         val reads = current.reads
         val takes = current.takes
         var first: Listener<A>? = null
-        val update: State<A> = if (takes.isEmpty()) WaitForTake(a, IQueue.empty()) else {
-          val (x, rest) = takes.dequeue()
-          first = x
-          if (rest.isEmpty()) State.empty()
-          else WaitForPut(IQueue.empty(), rest)
-        }
+        val update: State<A> =
+          if (takes.isEmpty()) {
+            WaitForTake(a, IQueue.empty())
+          } else {
+            val (x, rest) = takes.dequeue()
+            first = x
+            if (rest.isEmpty()) State.empty()
+            else WaitForPut(IQueue.empty(), rest)
+          }
 
         if (!stateRef.compareAndSet(current, update)) unsafeTryPut(a) // retry
         else if ((first != null) || reads.nonEmpty()) streamPutAndReads(a, reads, first)
@@ -87,7 +90,9 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
         val takes = current.takes
         var first: Listener<A>? = null
         val update: State<A> =
-          if (takes.isEmpty()) WaitForTake(a, IQueue.empty()) else {
+          if (takes.isEmpty()) {
+            WaitForTake(a, IQueue.empty())
+          } else {
             val (x, rest) = takes.dequeue()
             first = x
             if (rest.isEmpty()) State.empty()
