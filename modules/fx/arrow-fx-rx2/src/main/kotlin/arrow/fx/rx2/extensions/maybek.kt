@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.extension
@@ -70,8 +71,8 @@ interface MaybeKApplicative : Applicative<ForMaybeK> {
   override fun <A> just(a: A): MaybeK<A> =
     MaybeK.just(a)
 
-  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: Eval<Kind<ForMaybeK, (A) -> B>>): Eval<Kind<ForMaybeK, B>> =
+    fix().flatMap { a -> ff.value().fix().map { f -> f(a) } }.let(::Now)
 }
 
 @extension
@@ -87,9 +88,6 @@ interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> =
     MaybeK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForMaybeK, A>.lazyAp(ff: () -> Kind<ForMaybeK, (A) -> B>): Kind<ForMaybeK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Option
 import arrow.core.Tuple2
 
@@ -75,8 +76,8 @@ interface FlowableKApplicative : Applicative<ForFlowableK> {
   override fun <A> just(a: A): FlowableK<A> =
     FlowableK.just(a)
 
-  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: Eval<Kind<ForFlowableK, (A) -> B>>): Eval<Kind<ForFlowableK, B>> =
+    fix().flatMap { a -> ff.value().fix().map { f -> f(a) } }.let(::Now)
 }
 
 @extension
@@ -92,9 +93,6 @@ interface FlowableKMonad : Monad<ForFlowableK>, FlowableKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForFlowableK, A>.lazyAp(ff: () -> Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

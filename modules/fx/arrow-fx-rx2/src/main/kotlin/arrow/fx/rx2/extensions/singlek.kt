@@ -2,6 +2,8 @@ package arrow.fx.rx2.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Tuple2
 
 import arrow.fx.RacePair
@@ -68,8 +70,8 @@ interface SingleKApplicative : Applicative<ForSingleK> {
   override fun <A> just(a: A): SingleK<A> =
     SingleK.just(a)
 
-  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: Eval<Kind<ForSingleK, (A) -> B>>): Eval<Kind<ForSingleK, B>> =
+    fix().flatMap { a -> ff.value().fix().map { f -> f(a) } }.let(::Now)
 }
 
 @extension
@@ -85,9 +87,6 @@ interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
     SingleK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForSingleK, A>.lazyAp(ff: () -> Kind<ForSingleK, (A) -> B>): Kind<ForSingleK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

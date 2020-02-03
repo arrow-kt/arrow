@@ -3,6 +3,7 @@ package arrow.fx.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Option
 import arrow.extension
 import arrow.fx.Timer
@@ -58,8 +59,8 @@ interface FluxKApplicative : Applicative<ForFluxK> {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 
-  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: Eval<Kind<ForFluxK, (A) -> B>>): Eval<Kind<ForFluxK, B>> =
+    fix().flatMap { a -> ff.value().fix().map { f -> f(a) } }.let(::Now)
 }
 
 @extension
@@ -75,9 +76,6 @@ interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<arrow.core.Either<A, B>>>): FluxK<B> =
     FluxK.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForFluxK, A>.lazyAp(ff: () -> Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

@@ -1,7 +1,10 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.extensions.id.applicative.applicative
@@ -113,8 +116,12 @@ interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
     Kleisli { AF().run { run(it).product(fb.run(it)) } }
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
-    Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: Eval<Kind<KleisliPartialOf<F, D>, (A) -> B>>): Eval<Kind<KleisliPartialOf<F, D>, B>> =
+    Kleisli(AndThen.id<D>().flatMap { d ->
+      AndThen(fix().run).andThen { fa ->
+        AF().run { fa.lazyAp(ff.map { it.run(d) }) }.value()
+      }
+    }).let(::Now)
 }
 
 @extension
@@ -149,9 +156,6 @@ interface KleisliMonad<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
     Kleisli.tailRecM(MF(), a, f)
-
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
-    Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
 }
 
 @extension

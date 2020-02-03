@@ -56,11 +56,23 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
-    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
-
   override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
     fix().ap(SL(), ff)
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: Eval<Kind<IorPartialOf<L>, (A) -> B>>): Eval<Kind<IorPartialOf<L>, B>> =
+    fix().fold({ l ->
+      Eval.now(l.leftIor())
+    }, { r ->
+      ff.map { it.fix().map { f -> f(r) } }
+    }, { l, r ->
+      ff.map { it.fix().fold({ ll ->
+        SL().run { l + ll }.leftIor()
+      }, { f ->
+        Ior.Both(l, f(r))
+      }, { ll, f ->
+        Ior.Both(SL().run { l + ll }, f(r))
+      }) }
+    })
 }
 
 @extension
@@ -91,9 +103,6 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())
-
-  override fun <A, B> Kind<IorPartialOf<L>, A>.lazyAp(ff: () -> Kind<IorPartialOf<L>, (A) -> B>): Kind<IorPartialOf<L>, B> =
-    fix().flatMap(SL()) { a -> ff().fix().map { f -> f(a) } }
 }
 
 @extension

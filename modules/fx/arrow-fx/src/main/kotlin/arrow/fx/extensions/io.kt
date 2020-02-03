@@ -2,6 +2,8 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.identity
 import arrow.extension
 
@@ -62,8 +64,8 @@ interface IOApply : Apply<ForIO> {
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: Eval<Kind<ForIO, (A) -> B>>): Eval<Kind<ForIO, B>> =
+    fix().flatMap { a -> ff.value().fix().map { f -> f(a) } }.let(::Now)
 }
 
 @extension
@@ -76,9 +78,6 @@ interface IOApplicative : Applicative<ForIO> {
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
     fix().ap(ff)
-
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -94,9 +93,6 @@ interface IOMonad : Monad<ForIO> {
 
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
-
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension
@@ -139,9 +135,6 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
-
-  override fun <A, B> Kind<ForIO, A>.lazyAp(ff: () -> Kind<ForIO, (A) -> B>): Kind<ForIO, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
 }
 
 @extension

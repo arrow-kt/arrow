@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.AndThen
 import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.extension
@@ -42,6 +44,9 @@ interface AccumTApplicative<S, F> : Applicative<AccumTPartialOf<S, F>> {
 
   override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.ap(ff: Kind<AccumTPartialOf<S, F>, (A) -> B>): Kind<AccumTPartialOf<S, F>, B> =
     fix().ap(MS(), MF(), ff)
+
+  override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.lazyAp(ff: Eval<Kind<AccumTPartialOf<S, F>, (A) -> B>>): Eval<Kind<AccumTPartialOf<S, F>, B>> =
+    fix().flatMap(MS(), MF()) { a -> ff.value().map { f -> f(a) }.fix() }.let(::Now)
 }
 
 @extension

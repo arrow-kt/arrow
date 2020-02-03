@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
@@ -25,7 +27,9 @@ object ApplicativeLaws {
       Law("Applicative Laws: interchange") { A.interchange(GENK, EQ) },
       Law("Applicative Laws: map derived") { A.mapDerived(G, FF, EQ) },
       Law("Applicative Laws: cartesian builder map") { A.cartesianBuilderMap(EQ) },
-      Law("Applicative Laws: cartesian builder tupled") { A.cartesianBuilderTupled(EQ) }
+      Law("Applicative Laws: cartesian builder tupled") { A.cartesianBuilderTupled(EQ) },
+      Law("Ap == LazyAp") { A.apEqLazyAp(GENK, EQ) },
+      Law("map2 == map2Eval") { A.map2EqMap2Eval(GENK, EQ) }
     )
   }
 
@@ -57,5 +61,15 @@ object ApplicativeLaws {
   fun <F> Applicative<F>.cartesianBuilderTupled(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
       tupledN(just(a), just(b), just(c), just(d), just(e), just(f)).map { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
+    }
+
+  fun <F> Applicative<F>.apEqLazyAp(G: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(G.genK(Gen.int()), G.genK(Gen.functionAToB<Int, Int>(Gen.int()))) { a, f ->
+      a.ap(f).equalUnderTheLaw(a.lazyAp(Eval.now(f)).value(), EQ)
+    }
+
+  fun <F> Applicative<F>.map2EqMap2Eval(G: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(G.genK(Gen.int()), G.genK(Gen.int()), Gen.functionAToB<Tuple2<Int, Int>, Int>(Gen.int())) { a, b, f ->
+      a.map2(b, f).equalUnderTheLaw(a.map2Eval(Eval.now(b), f).value(), EQ)
     }
 }
