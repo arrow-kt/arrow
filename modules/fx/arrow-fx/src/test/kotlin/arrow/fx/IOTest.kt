@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.left
 import arrow.core.identity
 import arrow.core.right
 import arrow.fx.IO.Companion.just
@@ -20,6 +19,7 @@ import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
+import arrow.fx.extensions.toIOException
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase2
@@ -579,6 +579,14 @@ class IOTest : UnitSpec() {
       }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
     }
 
+    "onException should be called on finish with error" {
+      IO.fx<Nothing, Unit> {
+        val p = !Promise<Unit>()
+        !IO.effect<Int> { throw Exception() }.onException(p.complete(Unit)).attempt()
+        !p.get()
+      }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
+    }
+
     "Bracket should be stack safe" {
       val size = 5000
 
@@ -841,31 +849,31 @@ class IOTest : UnitSpec() {
     }
 
     "can go from Either to IO directly when Left type is a Throwable" {
+      val exception = RuntimeException()
+      val left = Either.left(exception)
+      val right = Either.right("rightValue")
+
+      left
+        .toIO()
+        .unsafeRunSyncEither() shouldBe Left(exception)
+      right
+        .toIO()
+        .unsafeRunSync() shouldBe "rightValue"
+    }
+
+    "can go from Either to IO by mapping the Left value to a IO exception" {
 
       val exception = RuntimeException()
       val left = Either.left(exception)
       val right = Either.right("rightValue")
 
-      left.toIO()
-        .attempt().unsafeRunSync() shouldBe Left(exception)
-
-      right.toIO()
-        .unsafeRunSync() shouldBe "rightValue"
-    }
-
-    "can go from Either to IO by mapping the Left value to a Throwable" {
-
-      val exception = RuntimeException()
-      val left = Either.left("boom")
-      val right = Either.right("rightValue")
-
-      right
-        .toIO { exception }
-        .unsafeRunSync() shouldBe "rightValue"
-
       left
-        .toIO { exception }
-        .attempt().unsafeRunSync() shouldBe Left(exception)
+        .toIOException()
+        .attempt()
+        .unsafeRunSync() shouldBe Left(exception)
+      right
+        .toIOException()
+        .unsafeRunSync() shouldBe "rightValue"
     }
 
     "Cancellation is wired across suspend" {

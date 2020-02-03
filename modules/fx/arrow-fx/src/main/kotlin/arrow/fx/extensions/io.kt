@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.identity
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.IOPartialOf
@@ -70,6 +69,7 @@ import arrow.fx.bracket as Bracket
 import arrow.fx.fork as Fork
 import arrow.fx.guarantee as Guarantee
 import arrow.fx.guaranteeCase as GuaranteeCase
+import arrow.fx.onCancel as OnCancel
 
 @extension
 interface IOFunctor<E> : Functor<IOPartialOf<E>> {
@@ -224,6 +224,9 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
       }
     }
   }
+
+  override fun <A> IOOf<E, A>.onCancel(finalizer: IOOf<E, Unit>): IO<E, A> =
+    OnCancel(finalizer)
 }
 
 @extension
@@ -423,15 +426,15 @@ fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> 
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers
  * Right value or alternatively to the result of applying the specified function to this Left value.
  */
-fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<Nothing, A> =
-  fold({ IO.raiseException(f(it)) }, { IO.just(it) })
+fun <A> Either<Throwable, A>.toIOException(): IO<Nothing, A> =
+  fold({ IO.raiseException(it) }, { IO.just(it) })
 
 /**
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers
- * Right value or Left exception.
+ * Right value or Left error value
  */
-fun <A> Either<Throwable, A>.toIO(): IO<Nothing, A> =
-  toIO(::identity)
+fun <E, A> Either<E, A>.toIO(): IO<E, A> =
+  fold({ IO.raiseError(it) }, { IO.just(it) })
 
 interface IOSyntax<E> : BindSyntax<IOPartialOf<E>> {
   suspend fun continueOn(ctx: CoroutineContext): Unit =

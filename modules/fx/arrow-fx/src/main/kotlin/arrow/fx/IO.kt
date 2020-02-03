@@ -1142,6 +1142,30 @@ fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> =
   guaranteeCase { finalizer }
 
 /**
+ * Executes the given [finalizer] when the source is canceled, allowing registering a cancellation token.
+ *
+ * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
+ */
+fun <E, A> IOOf<E, A>.onCancel(finalizer: IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      ExitCase2.Canceled -> finalizer
+      else -> IO.unit
+    }
+  }
+
+/**
+ * Executes the given [finalizer] when the source is finishes with an error.
+ */
+fun <E, A> IOOf<E, A>.onException(finalizer: IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      is ExitCase2.Exception -> finalizer
+      else -> IO.unit
+    }
+  }
+
+/**
  * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
  *
  * ```kotlin:ank:playground
