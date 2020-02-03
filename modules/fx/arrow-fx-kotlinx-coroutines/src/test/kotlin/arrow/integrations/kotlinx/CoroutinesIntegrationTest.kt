@@ -113,7 +113,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
     }
 
     "unsafeRunScoped should cancel correctly" {
-      forAll(1, Gen.int()) { i ->
+      forAll(Gen.int()) { i ->
         IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
           val promise = !Promise<Int>()
@@ -127,17 +127,15 @@ class CoroutinesIntegrationTest : UnitSpec() {
     }
 
     "unsafeRunScoped can cancel even for infinite asyncs" {
-      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
-        val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-        IO(all) { -1 }
-          .flatMap { IO.async<Int> { } }
-          .onCancel(IO { cb(1.right()) })
-          .unsafeRunScoped(scope) {
-            cb(it)
+        IO.fx {
+          val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
+          val promise = !Promise<Int>()
+          !effect {
+            IO(all) { -1 }.flatMap { IO.async<Int> { } }.onCancel(promise.complete(1)).unsafeRunScoped(scope) { }
           }
-        IO.sleep(500.milliseconds)
-          .unsafeRunAsync { scope.cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe 1.some()
+          !sleep(500.milliseconds).flatMap { IO { scope.cancel() } }
+          !promise.get()
+        }.unsafeRunTimed(2.seconds) shouldBe 1.some()
     }
 
     "should complete when running a pure value with unsafeRunScoped" {
