@@ -7,14 +7,12 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.left
 import arrow.core.identity
 import arrow.core.right
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
-import arrow.fx.extensions.io.bracket.guarantee
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
@@ -580,6 +578,14 @@ class IOTest : UnitSpec() {
       IO.fx<Nothing, Unit> {
         val p = !Promise<Unit>()
         IO.effect { throw Exception() }.guarantee(p.complete(Unit)).attempt().bind()
+        !p.get()
+      }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
+    }
+
+    "onException should be called on finish with error" {
+      IO.fx<Nothing, Unit> {
+        val p = !Promise<Unit>()
+        !IO.effect<Int> { throw Exception() }.onException(p.complete(Unit)).attempt()
         !p.get()
       }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
     }

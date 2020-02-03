@@ -172,4 +172,15 @@ interface Bracket<F, E> : MonadError<F, E> {
         else -> just<Unit>(Unit)
       }
     }
+
+  /**
+   * Executes the given `finalizer` when the source is finished in error.
+   */
+  fun <A> Kind<F, A>.onError(finalizer: Kind<F, Unit>): Kind<F, A> =
+    guaranteeCase { case ->
+      when (case) {
+        is Error -> finalizer
+        else -> just<Unit>(Unit)
+      }
+    }
 }
