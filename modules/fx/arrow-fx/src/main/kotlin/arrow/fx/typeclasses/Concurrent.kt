@@ -32,6 +32,7 @@ import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 typealias CancelToken<F> = Kind<F, Unit>
@@ -941,10 +942,10 @@ interface Concurrent<F> : Async<F> {
    * ```
    **/
   fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A>): Kind<F, A> =
-    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+    EmptyCoroutineContext.raceN(sleep(duration), this).flatMap {
       it.fold(
-        { a -> just(a) },
-        { default }
+        { default },
+        { a -> just(a) }
       )
     }
 
@@ -970,10 +971,10 @@ interface Concurrent<F> : Async<F> {
    * ```
    **/
   fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
-    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+    EmptyCoroutineContext.raceN(sleep(duration), this).flatMap {
       it.fold(
-        { a -> just(a) },
-        { raiseError(TimeoutException(duration.toString())) }
+        { raiseError<A>(TimeoutException(duration.toString())) },
+        { a -> just(a) }
       )
     }
 }
