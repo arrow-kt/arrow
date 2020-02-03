@@ -17,8 +17,6 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.functor.functor
-import arrow.fx.extensions.io.monad.flatMap
-import arrow.fx.extensions.io.monad.map
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.toIO
 import arrow.fx.extensions.toIOException
@@ -392,8 +390,7 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long): IO<Nothing, Long> =
-        IO.concurrent<Nothing>()
-          .sleep((num * 100).milliseconds)
+        IO.sleep((num * 100).milliseconds)
           .map { num }.order()
 
       val result =
@@ -632,11 +629,11 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRacePair(i: Int): IO<Nothing, Int> =
-        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity
+        IO.racePair(IO.dispatchers<Nothing>().default(), IO.never, if (i < size) ioRacePair(i + 1) else just(i))
+          .map { res ->
+            res.fold(
+              { a, _ -> a },
+              { _, b -> b }
             )
           }
 
@@ -647,16 +644,36 @@ class IOTest : UnitSpec() {
       val size = 5000
 
       fun ioRaceTriple(i: Int): IO<Nothing, Int> =
-        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity
+        IO.raceTriple(IO.dispatchers<Nothing>().default(), IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
+          .map { res ->
+            res.fold(
+              { a, _, _ -> a },
+              { _, b, _ -> b },
+              { _, _, c -> c }
             )
           }
 
       just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
+    }
+
+    "race2 should be stack safe" {
+      val size = 5000
+
+      fun ioRace2(i: Int): IO<Nothing, Int> =
+        IO.raceN(IO.never, if (i < size) ioRace2(i + 1) else just(i))
+          .map { it.fold(::identity, ::identity) }
+
+      just(1).flatMap(::ioRace2).unsafeRunSync() shouldBe size
+    }
+
+    "race3 should be stack safe" {
+      val size = 5000
+
+      fun ioRace3(i: Int): IO<Nothing, Int> =
+        IO.raceN(IO.never, IO.never, if (i < size) ioRace3(i + 1) else just(i))
+          .map { it.fold(::identity, ::identity, ::identity) }
+
+      just(1).flatMap(::ioRace3).unsafeRunSync() shouldBe size
     }
 
     "IORace4 should be stack safe" {
@@ -712,7 +729,7 @@ class IOTest : UnitSpec() {
       just(1).flatMap(::ioRace6).unsafeRunSync() shouldBe size
     }
 
-    "forked pair race should run" {
+    "forked race2 should run" {
       IO.fx<Nothing, Either<Int, Int>> {
         IO.raceN(
           IO.sleep(10.seconds).followedBy(IO.effect { 1 }),
@@ -721,7 +738,7 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync() shouldBe 3.right()
     }
 
-    "forked triple race should run" {
+    "forked race3 should run" {
       IO.fx<Nothing, Race3<out Int, out Int, out Int>> {
         IO.raceN(
           IO.sleep(10.seconds).followedBy(IO.effect { 1 }),
@@ -729,6 +746,38 @@ class IOTest : UnitSpec() {
           IO.effect { 2 }
         ).fork().bind().join().bind()
       }.unsafeRunSync() shouldBe Race3.Third(2)
+    }
+
+    "forked racePair should run" {
+      IO.fx<Nothing, Int> {
+        val res = IO.racePair(
+          IO.dispatchers<Nothing>().default(),
+          IO.sleep(10.seconds).followedBy(IO.effect { 2 }),
+          IO.effect { 1 }
+        ).fork().bind().join().bind()
+
+        res.fold(
+          { a, _ -> a },
+          { _, b -> b }
+        )
+      }.suspended() shouldBe Right(1)
+    }
+
+    "forked triple racePair should run" {
+      IO.fx<Nothing, Int> {
+        val res = IO.raceTriple(
+          IO.dispatchers<Nothing>().default(),
+          IO.sleep(1.seconds).followedBy(IO.effect { 1 }),
+          IO.sleep(2.seconds).followedBy(IO.effect { 3 }),
+          IO.effect { 2 }
+        ).fork().bind().join().bind()
+
+        res.fold(
+          { a, _, _ -> a },
+          { _, b, _ -> b },
+          { _, _, c -> c }
+        )
+      }.suspended() shouldBe Right(2)
     }
 
     "IOParMap2 should be stack safe" {
