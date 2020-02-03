@@ -860,19 +860,16 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun IO.Companion.eqK() = object : EqK<IOPartialOf<Nothing>> {
-  override fun <A> Kind<IOPartialOf<Nothing>, A>.eqK(other: Kind<IOPartialOf<Nothing>, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      IO_EQ(EQ).run {
-        it.first.eqv(it.second)
-      }
-    }
+private fun <E> IO.Companion.eqK() = object : EqK<IOPartialOf<E>> {
+  override fun <A> Kind<IOPartialOf<E>, A>.eqK(other: Kind<IOPartialOf<E>, A>, EQ: Eq<A>): Boolean = EQ<E, A>(EQ).run {
+    fix().eqv(other.fix())
+  }
 }
 
 private fun IO.Companion.genK() = object : GenK<IOPartialOf<Nothing>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<IOPartialOf<Nothing>, A>> =
     Gen.oneOf(
-      gen.map { just(it) },
+      gen.map(IO.Companion::just),
       Gen.throwable().map { raiseException<A>(it) }
     )
 }

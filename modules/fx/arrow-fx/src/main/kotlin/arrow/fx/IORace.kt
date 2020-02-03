@@ -457,16 +457,12 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
       // Cancelable connection for the left value
       val connA = IOConnection()
-      connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<E, A>()
 
       // Cancelable connection for the right value
       val connB = IOConnection()
-      connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<E, B>()
 
       conn.pushPair(connA, connB)
@@ -570,18 +566,13 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
-
       val connA = IOConnection()
-      connA.push(upstreamCancelToken)
       val promiseA = UnsafePromise<E, A>()
 
       val connB = IOConnection()
-      connB.push(upstreamCancelToken)
       val promiseB = UnsafePromise<E, B>()
 
       val connC = IOConnection()
-      connC.push(upstreamCancelToken)
       val promiseC = UnsafePromise<E, C>()
 
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())

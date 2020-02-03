@@ -48,10 +48,19 @@ internal interface IOFrame<in E, in A, out B> : (A) -> B {
     @Suppress("UNCHECKED_CAST")
     fun <E, A> attempt(): (A) -> IO<E, Either<Throwable, A>> = AttemptIO as (A) -> IO<E, Either<Throwable, A>>
 
+    @Suppress("UNCHECKED_CAST")
+    fun <E, A> result(): (A) -> IO<Nothing, IOResult<E, A>> = ResultIO as (A) -> IO<Nothing, IOResult<E, A>>
+
     private object AttemptIO : IOFrame<Any?, Any?, IO<Any?, Either<Throwable, Any?>>> {
       override operator fun invoke(a: Any?): IO<Any?, Either<Throwable, Any?>> = Pure(Either.Right(a))
       override fun recover(e: Throwable): IO<Any?, Either<Throwable, Any?>> = Pure(Either.Left(e))
       override fun handleError(e: Any?): IO<Any?, Either<Throwable, Any?>> = IO.RaiseError(e)
+    }
+
+    private object ResultIO : IOFrame<Any?, Any?, IO<Any?, IOResult<Any?, Any?>>> {
+      override fun invoke(a: Any?): IO<Any?, IOResult<Any?, Any?>> = Pure(IOResult.Success(a))
+      override fun recover(e: Throwable): IO<Any?, IOResult<Any?, Any?>> = Pure(IOResult.Exception(e))
+      override fun handleError(e: Any?): IO<Any?, IOResult<Any?, Any?>> = Pure(IOResult.Error(e))
     }
   }
 }
