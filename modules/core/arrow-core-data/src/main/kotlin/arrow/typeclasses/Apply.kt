@@ -42,7 +42,7 @@ interface Apply<F> : Functor<F> {
    * Lazy version of ap, useful for datatypes which can short circuit.
    * This will at some point be removed for a compiler plugin
    */
-  fun <A, B> Kind<F, A>.lazyAp(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> = Eval.now(ap(ff.value()))
+  fun <A, B> Kind<F, A>.lazyAp(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> = ff.map { this.ap(it) }
 
   fun <A, B, Z> Kind<F, A>.map2Eval(fb: Eval<Kind<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<Kind<F, Z>> =
     lazyAp(fb.map { it.map { b -> { a: A -> f(Tuple2(a, b)) } } })

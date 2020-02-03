@@ -15,6 +15,7 @@ import arrow.fx.extensions.io.concurrent.parSequence
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.followedBy
 import arrow.fx.typeclasses.milliseconds
+import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
@@ -184,7 +185,7 @@ class MVarTest : UnitSpec() {
         task.equalUnderTheLaw(IO.just(count), EQ())
       }
 
-      "!$label - stack overflow test" {
+      "$label - stack overflow test" {
         // Ignored currently StackOverflows due to ListTraverse
         val count = 10000
 
@@ -323,7 +324,7 @@ class MVarTest : UnitSpec() {
           val r1 = !t1.join()
           val r3 = !t3.join()
           setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ())
+        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ(timeout = 20.seconds))
       }
 
       "$label - read is cancelable" {
