@@ -839,7 +839,7 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun IO.Companion.eqK() = object : EqK<ForIO> {
+internal fun IO.Companion.eqK() = object : EqK<ForIO> {
   override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
     fix().eqv(other.fix())
   }
