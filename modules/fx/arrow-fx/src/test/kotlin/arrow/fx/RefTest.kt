@@ -25,7 +25,7 @@ class RefTest : UnitSpec() {
 
       "set get - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref(this@tests, a).flatMap { ref ->
+          RF.just(a).flatMap { ref ->
             ref.set(b).flatMap {
               ref.get().map { it shouldBe b }
             }
@@ -36,7 +36,7 @@ class RefTest : UnitSpec() {
       "getAndSet - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx.monad {
-            val ref = !Ref(this@tests, a)
+            val ref = !RF.just(a)
             val old = !ref.getAndSet(b)
             val new = !ref.get()
             old shouldBe a
@@ -48,7 +48,7 @@ class RefTest : UnitSpec() {
       "access - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx.monad {
-            val ref = !Ref(this@tests, a)
+            val ref = !RF.just(a)
             val (_, setter) = !ref.access()
             val success = !setter(b)
             val result = !ref.get()
@@ -61,7 +61,7 @@ class RefTest : UnitSpec() {
       "access - setter should fail if value is modified before setter is called" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
           fx.monad {
-            val ref = !Ref(this@tests, a)
+            val ref = !RF.just(a)
             val (_, setter) = !ref.access()
             !ref.set(b)
             val success = !setter(c)
@@ -75,7 +75,7 @@ class RefTest : UnitSpec() {
       "access - setter should fail if called twice" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
           fx.monad {
-            val ref = Ref(this@tests, a).bind()
+            val ref = RF.just(a).bind()
             val (_, setter) = ref.access().bind()
             val cond1 = setter(b).bind()
             ref.set(c).bind()
@@ -91,7 +91,7 @@ class RefTest : UnitSpec() {
       "tryUpdate - modification occurs successfully" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
           fx.monad {
-            val ref = !Ref(this@tests, a)
+            val ref = !RF.just(a)
             !ref.tryUpdate(f)
             val res = !ref.get()
             res shouldBe f(a)
@@ -101,7 +101,7 @@ class RefTest : UnitSpec() {
 
       "tryUpdate - should fail to update if modification has occurred" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-          Ref(this@tests, a).flatMap { ref ->
+          RF.just(a).flatMap { ref ->
             ref.tryUpdate {
               ref.update(Int::inc).unsafeRunSync()
               f(it)
@@ -114,8 +114,8 @@ class RefTest : UnitSpec() {
 
       "consistent set update" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          val set = Ref(this@tests, a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
-          val update = Ref(this@tests, a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
+          val set = RF.just(a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
+          val update = RF.just(a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
 
           set.flatMap { setA ->
             update.map { updateA ->
@@ -127,7 +127,7 @@ class RefTest : UnitSpec() {
 
       "access id" {
         forAll(Gen.int()) { a ->
-          Ref(this@tests, a).flatMap { ref ->
+          RF.just(a).flatMap { ref ->
             ref.access().map { (a, _) -> a }.flatMap {
               ref.get().map { it shouldBe a }
             }
@@ -135,10 +135,10 @@ class RefTest : UnitSpec() {
         }
       }
 
-      "consistent access tryModify" {
+      "consistent access tryUpdate" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-          val accessMap = Ref(this@tests, a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
-          val tryUpdate = Ref(this@tests, a).flatMap { ref -> ref.tryUpdate(f) }
+          val accessMap = RF.just(a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
+          val tryUpdate = RF.just(a).flatMap { ref -> ref.tryUpdate(f) }
 
           mapN(accessMap, tryUpdate) { (a, b) -> a shouldBe b }.test()
         }
@@ -148,11 +148,11 @@ class RefTest : UnitSpec() {
     fun <F> Concurrent<F>.concurrentTests(EQF: EqK<F>, RF: RefFactory<F>): Unit {
       "concurrent modifications" {
         val finalValue = 1000
-        val r = Ref.unsafe(0, this@concurrentTests)
-        (0 until finalValue)
-          .parTraverse { r.update { it + 1 } }
-          .flatMap { r.get() }
-          .equalUnderTheLaw(just(finalValue), EQF.liftEq(Int.eq()))
+        RF.just(0).flatMap { r ->
+          (0 until finalValue)
+            .parTraverse { r.update { it + 1 } }
+            .flatMap { r.get() }
+        }.equalUnderTheLaw(just(finalValue), EQF.liftEq(Int.eq()))
       }
     }
 
