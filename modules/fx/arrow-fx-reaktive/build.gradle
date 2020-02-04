@@ -1,0 +1,21 @@
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+    compile project(':arrow-fx')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile project(':arrow-annotations')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+    testCompileOnly project(':arrow-meta')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile project(':arrow-test')
+
+    implementation "com.badoo.reaktive:reaktive-jvm:$REAKTIVE_VERSION"
+    implementation "com.badoo.reaktive:coroutines-interop-jvm:$REAKTIVE_VERSION"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    testImplementation "com.badoo.reaktive:reaktive-testing-jvm:$REAKTIVE_VERSION"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

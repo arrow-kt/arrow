@@ -69,6 +69,7 @@ include {
             _ 'fx'
             _ 'fx-mtl'
             _ 'fx-rx2'
+            _ 'fx-reaktive'
             _ 'fx-reactor'
             _ 'fx-kotlinx-coroutines'
         }
