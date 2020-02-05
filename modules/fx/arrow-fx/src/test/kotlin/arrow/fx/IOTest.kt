@@ -51,7 +51,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK(), testStackSafety = false))
 
     "should defer evaluation until run" {
       var run = false
@@ -569,7 +569,7 @@ class IOTest : UnitSpec() {
     }
 
     "Bracket should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioBracketLoop(i: Int): IO<Int> =
         IO.unit.bracket(use = { just(i + 1) }, release = { IO.unit }).flatMap { ii ->
@@ -581,7 +581,7 @@ class IOTest : UnitSpec() {
     }
 
     "GuaranteeCase should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioGuaranteeCase(i: Int): IO<Int> =
         IO.unit.guaranteeCase { IO.unit }.flatMap {
@@ -594,7 +594,7 @@ class IOTest : UnitSpec() {
     }
 
     "Async should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioAsync(i: Int): IO<Int> = IO.async<Int> { cb ->
         cb(Right(i))
@@ -839,13 +839,13 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun IO.Companion.eqK() = object : EqK<ForIO> {
+internal fun IO.Companion.eqK() = object : EqK<ForIO> {
   override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
     fix().eqv(other.fix())
   }
 }
 
-private fun IO.Companion.genK() = object : GenK<ForIO> {
+internal fun IO.Companion.genK() = object : GenK<ForIO> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
     gen.map(IO.Companion::just),
     Gen.throwable().map(IO.Companion::raiseError)
