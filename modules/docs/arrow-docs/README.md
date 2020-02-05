@@ -11,7 +11,7 @@ We prefer Kdocs only for documenting data types or type classes. Only use tutori
 
 ### 1. Add a menu entry to your docs
 
-Go to `modules/docs/arrow-docs/docs/_data/sidebar.yml` and add a menu entry in the proper section, as in:
+Go to `modules/docs/arrow-docs/docs/_data/`, choose the sidebar file belonging to the desired group (core, fx, incubator, optics), and add a menu entry in the proper section, as in:
 
 ```
 - title: Applicative
@@ -25,7 +25,7 @@ Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real ex
 Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections
 available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
-Let's say you want to add docs for a Type class, for extension `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
+Let's say you want to add docs for a Type class, for example `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
 
 You'll find all the sections available in the [docs side menu](https://arrow-kt.io/docs/). As you can see, there's:
 * **Quick start:** Basically how to start using Arrow, including links to libraries, posts, talks, and sample projects.
