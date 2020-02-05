@@ -372,10 +372,7 @@ internal object IORunLoop {
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
-
-    private var contIndex: Int = 0
     private var trampolineAfter: Boolean = false
-    private inline val shouldTrampoline inline get() = trampolineAfter || contIndex == Platform.maxStackDepthSize
 
     private var value: IO<Any?>? = null
 
@@ -388,7 +385,6 @@ internal object IORunLoop {
       this.bFirst = bFirst
       this.bRest = bRest
       this._context = ctx
-      contIndex++
     }
 
     fun start(async: IO.Async<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
@@ -427,15 +423,16 @@ internal object IORunLoop {
     override fun resumeWith(result: Result<Any?>) {
       if (canCall) {
         canCall = false
-        result.fold(
+        val res = result.fold(
           { a -> IO.Pure(a) },
           { e -> IO.RaiseError(e) }
-        ).let(::forward)
+        )
+        Platform.trampoline { forward(res) }
       }
     }
 
     private fun forward(io: IO<Any?>) {
-      if (shouldTrampoline) {
+      if (trampolineAfter) {
         this.value = io
         Platform.trampoline { trampoline() }
       } else {
@@ -446,7 +443,6 @@ internal object IORunLoop {
     fun trampoline() {
       val v = value
       value = null
-      contIndex = 0
       signal(v!!)
     }
   }

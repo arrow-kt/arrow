@@ -51,7 +51,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK(), testStackSafety = true))
 
     "should defer evaluation until run" {
       var run = false

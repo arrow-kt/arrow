@@ -134,7 +134,7 @@ object Platform {
 
     return { a ->
       if (!wasCalled.getAndSet(true)) {
-        f(a)
+        trampoline { f(a) }
       }
     }
   }
@@ -145,7 +145,7 @@ object Platform {
     return { a ->
       if (!wasCalled.getAndSet(true)) {
         conn.pop()
-        f(a)
+        trampoline { f(a) }
       }
     }
   }
