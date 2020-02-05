@@ -26,10 +26,14 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
 import arrow.core.Success
 import arrow.core.Try
+import arrow.core.Tuple2
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.mtl.AccumT
+import arrow.mtl.AccumTPartialOf
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTPartialOf
 import arrow.mtl.Kleisli
@@ -43,6 +47,9 @@ import arrow.mtl.WriterT
 import arrow.mtl.WriterTPartialOf
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.nest
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
+import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {
@@ -179,3 +186,11 @@ fun IO.Companion.genK() = object : GenK<ForIO> {
       IO.just(it)
     }
 }
+
+fun <S, F> AccumT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) =
+  object : GenK<AccumTPartialOf<S, F>> {
+    override fun <A> genK(gen: Gen<A>): Gen<Kind<AccumTPartialOf<S, F>, A>> =
+      genkF.genK(Gen.tuple2(genS, gen)).map {
+        AccumT { _: S -> it }
+      }
+  }

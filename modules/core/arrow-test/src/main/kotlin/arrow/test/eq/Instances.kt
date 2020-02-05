@@ -12,6 +12,8 @@ import arrow.fx.IO
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
+import arrow.mtl.AccumT
+import arrow.mtl.AccumTPartialOf
 import arrow.mtl.Kleisli
 import arrow.mtl.KleisliPartialOf
 import arrow.mtl.StateT
@@ -59,3 +61,15 @@ fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
       }
     }
 }
+
+fun <S, F> AccumT.Companion.eqK(MF: Monad<F>, eqkF: EqK<F>, eqS: Eq<S>, s: S) =
+  object : EqK<AccumTPartialOf<S, F>> {
+    override fun <A> Kind<AccumTPartialOf<S, F>, A>.eqK(other: Kind<AccumTPartialOf<S, F>, A>, EQ: Eq<A>): Boolean =
+      (this.fix() to other.fix()).let {
+        it.first.runAccumT(s) to it.second.runAccumT(s)
+      }.let {
+        eqkF.liftEq(Tuple2.eq(eqS, EQ)).run {
+          it.first.eqv(it.second)
+        }
+      }
+  }

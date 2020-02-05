@@ -37,6 +37,7 @@ import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
+import arrow.test.eq.eqK
 import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.generators.throwable
@@ -95,7 +96,6 @@ class AccumTTest : UnitSpec() {
       ),
 
       MonadWriterLaws.laws(
-        AccumT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid()), String.monoid()),
         AccumT.monadWriter(WriterT.monadWriter(Id.monad(), String.monoid()), String.monoid()),
         String.monoid(),
         Gen.string(),
@@ -178,24 +178,4 @@ private fun <S, F, A> apCombinesState(
     val rs = MF.just(MS.run { s1.combine(s2) })
 
     ls.equalUnderTheLaw(rs, eq)
-  }
-
-private fun <S, F> AccumT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) =
-  object : GenK<AccumTPartialOf<S, F>> {
-    override fun <A> genK(gen: Gen<A>): Gen<Kind<AccumTPartialOf<S, F>, A>> =
-      genkF.genK(Gen.tuple2(genS, gen)).map {
-        AccumT { _: S -> it }
-      }
-  }
-
-private fun <S, F> AccumT.Companion.eqK(MF: Monad<F>, eqkF: EqK<F>, eqS: Eq<S>, s: S) =
-  object : EqK<AccumTPartialOf<S, F>> {
-    override fun <A> Kind<AccumTPartialOf<S, F>, A>.eqK(other: Kind<AccumTPartialOf<S, F>, A>, EQ: Eq<A>): Boolean =
-      (this.fix() to other.fix()).let {
-        it.first.runAccumT(s) to it.second.runAccumT(s)
-      }.let {
-        eqkF.liftEq(Tuple2.eq(eqS, EQ)).run {
-          it.first.eqv(it.second)
-        }
-      }
   }
