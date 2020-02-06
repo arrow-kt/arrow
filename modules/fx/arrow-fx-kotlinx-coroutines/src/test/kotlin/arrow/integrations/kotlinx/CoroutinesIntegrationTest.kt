@@ -5,6 +5,7 @@ import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import arrow.fx.extensions.io.bracket.onCancel
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
