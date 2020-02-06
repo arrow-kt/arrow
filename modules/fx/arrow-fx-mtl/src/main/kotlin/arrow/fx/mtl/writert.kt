@@ -3,11 +3,11 @@ package arrow.fx.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.internal.AtomicRefW
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
-import arrow.fx.Ref
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -46,18 +46,17 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
     use: (A) -> WriterTOf<F, W, B>
   ): WriterT<F, W, B> = MM().run {
     MD().run {
-      WriterT(Ref(this, empty()).flatMap { ref ->
-        value().bracketCase(use = { wa ->
-          WriterT(wa.just()).flatMap(use).value()
-        }, release = { wa, exitCase ->
-          val r = release(wa.b, exitCase).value()
-          when (exitCase) {
-            is ExitCase.Completed -> r.flatMap { (l, _) -> ref.set(l) }
-            else -> r.unit()
-          }
-        }).flatMap { (w, b) ->
-          ref.get().map { ww -> Tuple2(w.combine(ww), b) }
+      val atomic: AtomicRefW<W> = AtomicRefW(empty())
+      WriterT(value().bracketCase(use = { wa ->
+        WriterT(wa.just()).flatMap(use).value()
+      }, release = { wa, exitCase ->
+        val r = release(wa.b, exitCase).value()
+        when (exitCase) {
+          is ExitCase.Completed -> r.flatMap { (l, _) -> later { atomic.value = l } }
+          else -> r.unit()
         }
+      }).map { (w, b) ->
+        Tuple2(w.combine(atomic.value), b)
       })
     }
   }
