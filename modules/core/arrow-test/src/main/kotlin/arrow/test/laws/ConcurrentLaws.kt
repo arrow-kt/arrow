@@ -98,25 +98,26 @@ object ConcurrentLaws {
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgram(EQ) },
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgramWithDefault(EQ) }
     ) + (if (testStackSafety) {
+      val iterations = 20_000
       listOf(
-        Law("Concurrent Laws: ParMapN arity-2 should be stack safe") { CF.parMap2StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-3 should be stack safe") { CF.parMap3StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-4 should be stack safe") { CF.parMap4StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-5 should be stack safe") { CF.parMap5StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-6 should be stack safe") { CF.parMap6StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-7 should be stack safe") { CF.parMap7StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-8 should be stack safe") { CF.parMap8StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-9 should be stack safe") { CF.parMap9StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RacePair should be stack safe") { CF.racePairStackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceTriple should be stack safe") { CF.raceTripleStackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-2 should be stack safe") { CF.race2StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-3 should be stack safe") { CF.race3StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-4 should be stack safe") { CF.race4StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-5 should be stack safe") { CF.race5StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-6 should be stack safe") { CF.race6StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-7 should be stack safe") { CF.race7StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(5_000, EQK.liftEq(Int.eq()), ctx) }
+        Law("Concurrent Laws: ParMapN arity-2 should be stack safe") { CF.parMap2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-3 should be stack safe") { CF.parMap3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-4 should be stack safe") { CF.parMap4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-5 should be stack safe") { CF.parMap5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-6 should be stack safe") { CF.parMap6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-7 should be stack safe") { CF.parMap7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-8 should be stack safe") { CF.parMap8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: ParMapN arity-9 should be stack safe") { CF.parMap9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RacePair should be stack safe") { CF.racePairStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceTriple should be stack safe") { CF.raceTripleStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-2 should be stack safe") { CF.race2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-3 should be stack safe") { CF.race3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-4 should be stack safe") { CF.race4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-5 should be stack safe") { CF.race5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-6 should be stack safe") { CF.race6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-7 should be stack safe") { CF.race7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+        Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) }
       )
     } else emptyList()) + TimerLaws.laws(CF, CF.timer(), EQK.liftEq(Boolean.eq()))
   }
