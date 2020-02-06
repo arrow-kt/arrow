@@ -998,10 +998,10 @@ sealed class IO<out A> : IOOf<A> {
   /**
    * Executes the given [finalizer] when the source is finishes with an error.
    */
-  fun onError(finalizer: IOOf<Unit>): IO<A> =
+  fun onError(finalizer: (Throwable) -> IOOf<Unit>): IO<A> =
     guaranteeCase { case ->
       when (case) {
-        is ExitCase.Error -> finalizer
+        is ExitCase.Error -> finalizer(case.e)
         else -> unit
       }
     }

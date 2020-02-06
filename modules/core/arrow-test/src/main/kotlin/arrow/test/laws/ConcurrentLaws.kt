@@ -670,7 +670,7 @@ object ConcurrentLaws {
         val errorLatch = Promise<F, Int>(this@onErrorIsRunWhenErrorIsRaised).bind()
 
         startLatch.complete(Unit).flatMap { raiseError<Exception>(RuntimeException("Boom")) }
-          .onError(errorLatch.complete(i))
+          .onError {errorLatch.complete(i)}
           .fork(ctx).bind()
 
         startLatch.get().bind() // Waits on promise of `use`
@@ -690,7 +690,7 @@ object ConcurrentLaws {
         val onErrorRun = Ref(false).bind()
 
         val (completed, _) = startLatch.complete(i)
-          .onError(onErrorRun.set(true))
+          .onError {onErrorRun.set(true)}
           .fork(ctx).bind()
 
         completed.bind()
@@ -711,8 +711,8 @@ object ConcurrentLaws {
 
       just(Unit).flatMap {
         raiseError<Unit>(RuntimeException("failed"))
-          .onError(incrementCounter)
-      }.onError(incrementCounter)
+          .onError {incrementCounter}
+      }.onError {incrementCounter}
         .guarantee(latch.complete(Unit))
         .fork(ctx).bind()
 

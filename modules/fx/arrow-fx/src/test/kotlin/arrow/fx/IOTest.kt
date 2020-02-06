@@ -563,7 +563,7 @@ class IOTest : UnitSpec() {
     "onError should be called on finish with error" {
       IO.fx {
         val p = !Promise<Unit>()
-        effect { throw Exception() }.onError(p.complete(Unit)).attempt().bind()
+        effect { throw Exception() }.onError {p.complete(Unit)}.attempt().bind()
         !p.get()
       }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
     }
