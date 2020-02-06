@@ -839,13 +839,13 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-internal fun IO.Companion.eqK() = object : EqK<ForIO> {
+private fun IO.Companion.eqK() = object : EqK<ForIO> {
   override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
     fix().eqv(other.fix())
   }
 }
 
-internal fun IO.Companion.genK() = object : GenK<ForIO> {
+private fun IO.Companion.genK() = object : GenK<ForIO> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
     gen.map(IO.Companion::just),
     Gen.throwable().map(IO.Companion::raiseError)
