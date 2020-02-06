@@ -25,7 +25,8 @@ object ApplicativeLaws {
       Law("Applicative Laws: interchange") { A.interchange(GENK, EQ) },
       Law("Applicative Laws: map derived") { A.mapDerived(G, FF, EQ) },
       Law("Applicative Laws: cartesian builder map") { A.cartesianBuilderMap(EQ) },
-      Law("Applicative Laws: cartesian builder tupled") { A.cartesianBuilderTupled(EQ) }
+      Law("Applicative Laws: cartesian builder tupled2") { A.cartesianBuilderTupled2(EQ) },
+      Law("Applicative Laws: cartesian builder tupled3") { A.cartesianBuilderTupled3(EQ) }
     )
   }
 
@@ -50,12 +51,17 @@ object ApplicativeLaws {
     }
 
   fun <F> Applicative<F>.cartesianBuilderMap(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-      mapN(just(a), just(b), just(c), just(d), just(e), just(f)) { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
+    forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int ->
+      mapN(just(a), just(b), just(c)) { (x, y, z) -> x + y + z }.equalUnderTheLaw(just(a + b + c), EQ)
     }
 
-  fun <F> Applicative<F>.cartesianBuilderTupled(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-      tupledN(just(a), just(b), just(c), just(d), just(e), just(f)).map { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
+  fun <F> Applicative<F>.cartesianBuilderTupled2(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int ->
+      tupledN(just(a), just(b)).map { (x, y) -> x + y }.equalUnderTheLaw(just(a + b), EQ)
+    }
+
+  fun <F> Applicative<F>.cartesianBuilderTupled3(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int ->
+      tupledN(just(a), just(b), just(c)).map { (x, y, z) -> x + y + z }.equalUnderTheLaw(just(a + b + c), EQ)
     }
 }

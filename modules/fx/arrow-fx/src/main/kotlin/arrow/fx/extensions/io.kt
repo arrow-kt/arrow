@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
