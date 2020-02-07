@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
@@ -43,6 +42,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.handleError as ioHandleError
@@ -326,3 +326,11 @@ fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
  */
 fun <A> Either<Throwable, A>.toIO(): IO<A> =
   toIO(::identity)
+
+@extension
+interface IOSemigroupK : SemigroupK<ForIO> {
+  override fun <A> Kind<ForIO, A>.combineK(y: Kind<ForIO, A>): Kind<ForIO, A> =
+    (this.fix() to y.fix()).let { (l, r) ->
+      l.ioHandleErrorWith { r }
+    }
+}
