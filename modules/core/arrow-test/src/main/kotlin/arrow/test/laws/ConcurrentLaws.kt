@@ -667,10 +667,10 @@ object ConcurrentLaws {
       fx.concurrent {
 
         val startLatch = Promise<F, Unit>(this@onErrorIsRunWhenErrorIsRaised).bind()
-        val errorLatch = Promise<F, Int>(this@onErrorIsRunWhenErrorIsRaised).bind()
+        val errorLatch = Promise<F, Throwable>(this@onErrorIsRunWhenErrorIsRaised).bind()
 
         startLatch.complete(Unit).flatMap { raiseError<Exception>(RuntimeException("Boom")) }
-          .onError { errorLatch.complete(i) }
+          .onError(errorLatch::complete)
           .fork(ctx).bind()
 
         startLatch.get().bind() // Waits on promise of `use`
