@@ -9,7 +9,6 @@ import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.extensions.list.monad.flatten
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
@@ -32,6 +31,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
@@ -354,4 +354,19 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
         }
       }
     }
+}
+
+@extension
+interface ListKMonadPlus : MonadPlus<ForListK>, ListKMonad, ListKAlternative {
+  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): ListK<A> =
+    ListK.just(a)
 }

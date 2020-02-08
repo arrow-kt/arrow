@@ -49,19 +49,19 @@ object MonadPlusLaws {
 
   fun <F, A> MonadPlus<F>.leftZero(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
-      val ls = mzero<A>().flatMap {
+      val r = mzero<A>().flatMap {
         a
       }
 
-      ls.equalUnderTheLaw(mzero(), EQ)
+      r.equalUnderTheLaw(mzero(), EQ)
     }
 
   fun <F, A> MonadPlus<F>.rightZero(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
-      val ls = a.flatMap {
+      val r = a.flatMap {
         mzero<A>()
       }
 
-      ls.equalUnderTheLaw(mzero(), EQ)
+      r.equalUnderTheLaw(mzero(), EQ)
     }
 }

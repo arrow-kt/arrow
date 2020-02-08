@@ -13,6 +13,7 @@ import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.listk.monadPlus.monadPlus
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.monoidal.monoidal
@@ -31,6 +32,7 @@ import arrow.test.laws.CrosswalkLaws
 import arrow.test.laws.EqKLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonadPlusLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
@@ -97,7 +99,8 @@ class ListKTest : UnitSpec() {
       CrosswalkLaws.laws(ListK.crosswalk(),
         ListK.genK(),
         ListK.eqK()
-      )
+      ),
+      MonadPlusLaws.laws(ListK.monadPlus(), ListK.genK(), ListK.eqK())
     )
 
     "stdlib list can flatten" {
