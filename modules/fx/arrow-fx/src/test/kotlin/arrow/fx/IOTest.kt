@@ -54,7 +54,6 @@ class IOTest : UnitSpec() {
 
   init {
     testLaws(
-      // AlternativeLaws.laws(IO.alternative(), IO.genK(), IO.eqK()),
       SemigroupKLaws.laws(IO.semigroupK(), IO.genK(), IO.eqK()),
       ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
 
