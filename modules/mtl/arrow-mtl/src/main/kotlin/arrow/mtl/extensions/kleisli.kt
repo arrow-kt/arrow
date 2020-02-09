@@ -3,10 +3,12 @@ package arrow.mtl.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Id
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.core.toT
 import arrow.extension
 import arrow.mtl.ForKleisli
 import arrow.mtl.Kleisli
@@ -34,6 +36,8 @@ import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadLogic
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.conest
@@ -246,6 +250,31 @@ interface KleisliEqK<F, D> : EqK<KleisliPartialOf<F, D>> {
 
       EQKF().liftEq(EQ).run {
         ls.eqv(rs)
+      }
+    }
+}
+
+@extension
+interface KleisliMonadPlus<F, D> : MonadPlus<KleisliPartialOf<F, D>>, KleisliMonad<F, D>, KleisliAlternative<F, D> {
+  override fun MF(): Monad<F>
+  override fun AL(): Alternative<F>
+  override fun AF(): Applicative<F> = AL()
+}
+
+@extension
+interface KleisliMonadLogic<F, D> : MonadLogic<KleisliPartialOf<F, D>>, KleisliMonadPlus<F, D> {
+  fun ML(): MonadLogic<F>
+  override fun MF(): Monad<F> = ML()
+  override fun AL(): Alternative<F> = ML()
+
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.msplit(): Kind<KleisliPartialOf<F, D>, Option<Tuple2<Kind<KleisliPartialOf<F, D>, A>, A>>> =
+    this.fix().let { rm ->
+      Kleisli { d: D ->
+        ML().run {
+          rm.run(d).msplit().flatMap { option ->
+            option.fold({ just(Option.empty<Tuple2<Kind<KleisliPartialOf<F, D>, A>, A>>()) }, { (fa, a) -> just(Option.just(Kleisli.liftF<F, D, A>(fa) toT a)) })
+          }
+        }
       }
     }
 }

@@ -31,6 +31,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadLogic
 import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
@@ -369,4 +370,19 @@ interface ListKMonadPlus : MonadPlus<ForListK>, ListKMonad, ListKAlternative {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
+}
+
+@extension
+interface ListKMonadLogic : MonadLogic<ForListK>, ListKMonadPlus {
+
+  private fun <E> ListK<E>.tail(): ListK<E> = this.drop(1).k()
+
+  override fun <A> Kind<ForListK, A>.msplit(): Kind<ForListK, Option<Tuple2<Kind<ForListK, A>, A>>> =
+    this.fix().let { list ->
+      if (list.isEmpty()) {
+        just(Option.empty())
+      } else {
+        just(Option.just(Tuple2(list.tail(), list.first())))
+      }
+    }
 }

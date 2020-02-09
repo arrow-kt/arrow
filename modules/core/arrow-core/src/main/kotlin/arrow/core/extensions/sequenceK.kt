@@ -42,6 +42,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadLogic
 import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
@@ -412,4 +413,18 @@ interface SequenceKMonadPlus : MonadPlus<ForSequenceK>, SequenceKMonad, Sequence
 
   override fun <A> just(a: A): SequenceK<A> =
     SequenceK.just(a)
+}
+
+@extension
+interface SequenceKMonadLogic : MonadLogic<ForSequenceK>, SequenceKMonadPlus {
+  override fun <A> Kind<ForSequenceK, A>.msplit(): Kind<ForSequenceK, Option<Tuple2<Kind<ForSequenceK, A>, A>>> {
+    val seqA = this.fix().sequence
+    val iterA = seqA.iterator()
+
+    return if (iterA.hasNext()) {
+      just(Option.just(seqA.drop(1).k() toT iterA.next()))
+    } else {
+      just(Option.empty())
+    }
+  }
 }
