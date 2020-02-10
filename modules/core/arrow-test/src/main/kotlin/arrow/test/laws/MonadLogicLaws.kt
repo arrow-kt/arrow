@@ -53,17 +53,28 @@ object MonadLogicLaws {
       Law("MonadLogic Laws: ifte picks second on failure") {
         ML.iftePicksSecondOnFailure(iterations, Gen.int(), genFunAToFB, genFB, eqS)
       },
-      Law("MonadLogic Laws: ifte") {
-        ML.ifteComposition(iterations, Gen.int(), genFA, genFunAToFB, genFB, eqS)
+      Law("MonadLogic Laws: ifte returns remaining computation") {
+        ML.ifteReturnsRemainingComputation(iterations, Gen.int(), genFA, genFunAToFB, genFB, eqS)
       },
       Law("MonadLogic Laws: reflect is inverse of msplit") {
         ML.msplitReflect(iterations, genFA, EQK.liftEq(Int.eq()))
+      },
+
+      Law("MonadLogic Laws: once of just is just") {
+        ML.onceJust<F, Int>(Gen.int(), EQK.liftEq(Int.eq()))
       }
     )
   }
 
   fun <F, A> MonadLogic<F>.msplitZeroIsNone(EQ: Eq<Kind<F, Option<Tuple2<Kind<F, A>, A>>>>) =
     mzero<A>().msplit().equalUnderTheLaw(just(Option.empty()), EQ) shouldBe true
+
+  fun <F, A> MonadLogic<F>.onceJust(
+    genA: Gen<A>,
+    EQ: Eq<Kind<F, A>>
+  ) = forAll(genA) { a ->
+    just(a).once().equalUnderTheLaw(just(a), EQ)
+  }
 
   fun <F, A> MonadLogic<F>.msplitGivesAccessToFirstResult(
     genA: Gen<A>,
@@ -101,7 +112,7 @@ object MonadLogicLaws {
       mzero<A>().ifte(fb, funA).equalUnderTheLaw(fb, EQ)
     }
 
-  fun <F, A, B> MonadLogic<F>.ifteComposition(
+  fun <F, A, B> MonadLogic<F>.ifteReturnsRemainingComputation(
     iterations: Int,
     genA: Gen<A>,
     genFA: Gen<Kind<F, A>>,

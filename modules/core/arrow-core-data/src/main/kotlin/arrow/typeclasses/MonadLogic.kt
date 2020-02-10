@@ -11,11 +11,11 @@ interface MonadLogic<F> : MonadPlus<F> {
 
   fun <A> Kind<F, A>.msplit(): Kind<F, Option<Tuple2<Kind<F, A>, A>>>
 
-  fun <A> Kind<F, A>.interleave(fb: Kind<F, A>): Kind<F, A> =
+  fun <A> Kind<F, A>.interleave(fa: Kind<F, A>): Kind<F, A> =
     this.msplit().flatMap { option ->
       option.map { (fa, a) ->
-        just(a).mplus(fb.interleave(fa))
-      }.fold({ fb }, ::identity)
+        just(a).mplus(fa.interleave(fa))
+      }.fold({ fa }, ::identity)
     }
 
   fun <A, B> Kind<F, A>.fairConjunction(ffa: (A) -> Kind<F, B>): Kind<F, B> =
@@ -25,11 +25,11 @@ interface MonadLogic<F> : MonadPlus<F> {
       ffa(a).interleave(fa.flatMap(ffa))
     }
 
-  fun <A, B> Kind<F, A>.ifte(mb: Kind<F, B>, ffa: (A) -> Kind<F, B>): Kind<F, B> =
+  fun <A, B> Kind<F, A>.ifte(fb: Kind<F, B>, ffa: (A) -> Kind<F, B>): Kind<F, B> =
     msplit().flatMap { option ->
       option.map { (fa, a) ->
         ffa(a).mplus(fa.flatMap { ffa(it) })
-      }.fold({ mb }, ::identity)
+      }.fold({ fb }, ::identity)
     }
 
   fun <A> Kind<F, A>.once(): Kind<F, A> =
