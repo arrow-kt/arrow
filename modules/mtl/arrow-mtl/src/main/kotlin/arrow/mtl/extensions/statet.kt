@@ -350,8 +350,8 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.fairConjunction(ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
     this.fix().let { fa ->
-      ML().run {
-        StateT(
+      StateT(
+        ML().run {
           fa.runF.flatMap { stateTFun ->
             just(AndThen(stateTFun).andThen {
               it.fairConjunction { (s1, a) ->
@@ -359,8 +359,8 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
               }
             })
           }
-        )
-      }
+        }
+      )
     }
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ifte(fb: Kind<StateTPartialOf<F, S>, B>, ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
