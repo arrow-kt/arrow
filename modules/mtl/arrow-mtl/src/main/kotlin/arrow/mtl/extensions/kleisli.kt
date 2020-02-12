@@ -268,12 +268,12 @@ interface KleisliMonadLogic<F, D> : MonadLogic<KleisliPartialOf<F, D>>, KleisliM
   override fun MF(): Monad<F> = ML()
   override fun AL(): Alternative<F> = ML()
 
-  override fun <A> Kind<KleisliPartialOf<F, D>, A>.msplit(): Kind<KleisliPartialOf<F, D>, Option<Tuple2<Kind<KleisliPartialOf<F, D>, A>, A>>> =
+  override fun <A> Kind<KleisliPartialOf<F, D>, A>.splitM(): Kind<KleisliPartialOf<F, D>, Option<Tuple2<Kind<KleisliPartialOf<F, D>, A>, A>>> =
     this.fix().let { fa ->
       Kleisli(
         AndThen(fa.run).andThen {
           ML().run {
-            it.msplit().flatMap { option ->
+            it.splitM().flatMap { option ->
               option.fold({ just(Option.empty<Tuple2<Kind<KleisliPartialOf<F, D>, A>, A>>()) }, { (fa, a) -> just(Option.just(Kleisli.liftF<F, D, A>(fa) toT a)) })
             }
           }

@@ -417,7 +417,7 @@ interface SequenceKMonadPlus : MonadPlus<ForSequenceK>, SequenceKMonad, Sequence
 
 @extension
 interface SequenceKMonadLogic : MonadLogic<ForSequenceK>, SequenceKMonadPlus {
-  override fun <A> Kind<ForSequenceK, A>.msplit(): Kind<ForSequenceK, Option<Tuple2<Kind<ForSequenceK, A>, A>>> {
+  override fun <A> Kind<ForSequenceK, A>.splitM(): Kind<ForSequenceK, Option<Tuple2<Kind<ForSequenceK, A>, A>>> {
     val seqA = this.fix().sequence
     val iterA = seqA.iterator()
 

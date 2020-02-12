@@ -313,14 +313,14 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
   override fun MF(): Monad<F> = ML()
   override fun AF(): Alternative<F> = ML()
 
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.msplit(): Kind<StateTPartialOf<F, S>, Option<Tuple2<Kind<StateTPartialOf<F, S>, A>, A>>> =
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.splitM(): Kind<StateTPartialOf<F, S>, Option<Tuple2<Kind<StateTPartialOf<F, S>, A>, A>>> =
     this.fix().let { fa ->
       StateT(
         ML().run {
           fa.runF.flatMap { stateTFun ->
             just(AndThen.id<S>().flatMap { s ->
               AndThen(stateTFun).andThen {
-                it.msplit().flatMap { option ->
+                it.splitM().flatMap { option ->
                   option.fold({ just(s toT Option.empty<Tuple2<Kind<StateTPartialOf<F, S>, A>, A>>()) }, { (fa, tupleSA) ->
                     val (s1, a) = tupleSA
                     just(s1 toT Option.just(StateT(AF()) { _: S -> fa } toT a))
@@ -348,13 +348,13 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
       )
     }
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.fairConjunction(ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.unweave(ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
     this.fix().let { fa ->
       StateT(
         ML().run {
           fa.runF.flatMap { stateTFun ->
             just(AndThen(stateTFun).andThen {
-              it.fairConjunction { (s1, a) ->
+              it.unweave { (s1, a) ->
                 ffa(a).runM(ML(), s1)
               }
             })
@@ -363,14 +363,14 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
       )
     }
 
-  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ifte(fb: Kind<StateTPartialOf<F, S>, B>, ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ifThen(fb: Kind<StateTPartialOf<F, S>, B>, ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
     (this.fix() to fb.fix()).let { (fa, fb) ->
       StateT(
         ML().run {
           fa.runF.flatMap { stateTFun ->
             just(AndThen.id<S>().flatMap { s ->
               AndThen(stateTFun).andThen {
-                it.ifte(fb.runM(ML(), s)) { (s1, a) ->
+                it.ifThen(fb.runM(ML(), s)) { (s1, a) ->
                   ffa(a).runM(ML(), s1)
                 }
               }

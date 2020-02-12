@@ -31,37 +31,37 @@ object MonadPlusLaws {
 
   fun <F, A> MonadPlus<F>.leftIdentity(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
-      (mzero<A>().mplus(a)).equalUnderTheLaw(a, EQ)
+      (zeroM<A>().plusM(a)).equalUnderTheLaw(a, EQ)
     }
 
   fun <F, A> MonadPlus<F>.rightIdentity(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
-      a.mplus(mzero<A>()).equalUnderTheLaw(a, EQ)
+      a.plusM(zeroM<A>()).equalUnderTheLaw(a, EQ)
     }
 
   fun <F, A> MonadPlus<F>.associativity(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(G, G, G) { m, n, o ->
-      val ls = m.mplus(n.mplus(o))
-      val rs = m.mplus(n).mplus(o)
+      val ls = m.plusM(n.plusM(o))
+      val rs = m.plusM(n).plusM(o)
 
       ls.equalUnderTheLaw(rs, EQ)
     }
 
   fun <F, A> MonadPlus<F>.leftZero(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
-      val r = mzero<A>().flatMap {
+      val r = zeroM<A>().flatMap {
         a
       }
 
-      r.equalUnderTheLaw(mzero(), EQ)
+      r.equalUnderTheLaw(zeroM(), EQ)
     }
 
   fun <F, A> MonadPlus<F>.rightZero(GEN: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>): Unit =
     forAll(GEN) { a ->
       val r = a.flatMap {
-        mzero<A>()
+        zeroM<A>()
       }
 
-      r.equalUnderTheLaw(mzero(), EQ)
+      r.equalUnderTheLaw(zeroM(), EQ)
     }
 }

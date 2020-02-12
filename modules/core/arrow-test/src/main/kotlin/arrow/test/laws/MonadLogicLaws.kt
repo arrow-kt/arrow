@@ -24,8 +24,8 @@ object MonadLogicLaws {
     EQK: EqK<F>,
     iterations: Int = 1000
   ): List<Law> =
-    monadLogicLaws(ML, GK, EQK, iterations) +
-      MonadPlusLaws.laws(ML, GK, EQK)
+    MonadPlusLaws.laws(ML, GK, EQK) +
+      monadLogicLaws(ML, GK, EQK, iterations)
 
   private fun <F> monadLogicLaws(
     ML: MonadLogic<F>,
@@ -67,7 +67,7 @@ object MonadLogicLaws {
   }
 
   fun <F, A> MonadLogic<F>.msplitZeroIsNone(EQ: Eq<Kind<F, Option<Tuple2<Kind<F, A>, A>>>>) =
-    mzero<A>().msplit().equalUnderTheLaw(just(Option.empty()), EQ) shouldBe true
+    zeroM<A>().splitM().equalUnderTheLaw(just(Option.empty()), EQ) shouldBe true
 
   fun <F, A> MonadLogic<F>.onceJust(
     genA: Gen<A>,
@@ -82,7 +82,7 @@ object MonadLogicLaws {
     EQ: Eq<Kind<F, Option<Tuple2<Kind<F, A>, A>>>>
   ) =
     forAll(genA, genFA) { a, fa ->
-      val ls = just(a).mplus(fa).msplit()
+      val ls = just(a).plusM(fa).splitM()
       val rs = just(Option.just(Tuple2(fa, a)))
 
       ls.equalUnderTheLaw(rs, EQ)
@@ -96,7 +96,7 @@ object MonadLogicLaws {
     EQ: Eq<Kind<F, B>>
   ) =
     forAll(iterations, genA, genFunAToFB, genFB) { a, funA, fb ->
-      val ls = just(a).ifte(fb, funA)
+      val ls = just(a).ifThen(fb, funA)
       val rs = funA(a)
       ls.equalUnderTheLaw(rs, EQ)
     }
@@ -109,7 +109,7 @@ object MonadLogicLaws {
     EQ: Eq<Kind<F, B>>
   ) =
     forAll(iterations, genA, genFunAToFB, genFB) { a, funA, fb ->
-      mzero<A>().ifte(fb, funA).equalUnderTheLaw(fb, EQ)
+      zeroM<A>().ifThen(fb, funA).equalUnderTheLaw(fb, EQ)
     }
 
   fun <F, A, B> MonadLogic<F>.ifteReturnsRemainingComputation(
@@ -121,15 +121,15 @@ object MonadLogicLaws {
     EQ: Eq<Kind<F, B>>
   ) =
     forAll(iterations, genA, genFA, genFunAToFB, genFB) { a, fa, funA, fb ->
-      val ls = just(a).mplus(fa).ifte(fb, funA)
-      val rs = funA(a).mplus(fa.flatMap { funA(it) })
+      val ls = just(a).plusM(fa).ifThen(fb, funA)
+      val rs = funA(a).plusM(fa.flatMap { funA(it) })
 
       ls.equalUnderTheLaw(rs, EQ)
     }
 
   fun <F, A> MonadLogic<F>.msplitReflect(iterations: Int, genFA: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>) =
     forAll(iterations, genFA) { fa ->
-      fa.msplit().flatMap {
+      fa.splitM().flatMap {
         it.reflect(this@msplitReflect)
       }.equalUnderTheLaw(fa, EQ)
     }

@@ -377,7 +377,7 @@ interface ListKMonadLogic : MonadLogic<ForListK>, ListKMonadPlus {
 
   private fun <E> ListK<E>.tail(): ListK<E> = this.drop(1).k()
 
-  override fun <A> Kind<ForListK, A>.msplit(): Kind<ForListK, Option<Tuple2<Kind<ForListK, A>, A>>> =
+  override fun <A> Kind<ForListK, A>.splitM(): Kind<ForListK, Option<Tuple2<Kind<ForListK, A>, A>>> =
     this.fix().let { list ->
       if (list.isEmpty()) {
         just(Option.empty())
