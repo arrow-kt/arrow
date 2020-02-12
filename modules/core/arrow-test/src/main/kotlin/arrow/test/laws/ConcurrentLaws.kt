@@ -85,7 +85,7 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parTraverse results in the correct error") { CF.parTraverseResultsInTheCorrectError(EQ_UNIT) },
       Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
       Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) },
-      Law("Concurrent Laws: onError is run when error is raised") { CF.onErrorIsRunWhenErrorIsRaised(EQ, ctx) },
+      Law("Concurrent Laws: onError is run when error is raised") { CF.onErrorIsRunWhenErrorIsRaised(EQ_UNIT, ctx) },
       Law("Concurrent Laws: onError is not run when completes normally") { CF.onErrorIsNotRunByDefault(EQK.liftEq(Tuple2.eq(Int.eq(), Boolean.eq())), ctx) },
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.outerAndInnerOnErrorIsRun(EQK.liftEq(Int.eq()), ctx) }
     )
@@ -662,22 +662,22 @@ object ConcurrentLaws {
       }.equalUnderTheLaw(unit(), EQ)
     }
 
-  fun <F> Concurrent<F>.onErrorIsRunWhenErrorIsRaised(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int()) { i ->
+  fun <F> Concurrent<F>.onErrorIsRunWhenErrorIsRaised(EQ: Eq<Kind<F, Unit>>, ctx: CoroutineContext) =
+    forAll(Gen.throwable()) { expected ->
       fx.concurrent {
 
         val startLatch = Promise<F, Unit>(this@onErrorIsRunWhenErrorIsRaised).bind()
-        val errorLatch = Promise<F, Int>(this@onErrorIsRunWhenErrorIsRaised).bind()
+        val errorLatch = Promise<F, Throwable>(this@onErrorIsRunWhenErrorIsRaised).bind()
 
-        startLatch.complete(Unit).flatMap { raiseError<Exception>(RuntimeException("Boom")) }
-          .onError(errorLatch.complete(i))
+        startLatch.complete(Unit).flatMap { raiseError<Exception>(expected) }
+          .onError(errorLatch::complete)
           .fork(ctx).bind()
 
         startLatch.get().bind() // Waits on promise of `use`
 
         val waitExit = errorLatch.get().bind()
-        waitExit
-      }.equalUnderTheLaw(just(i), EQ)
+        !effect { waitExit shouldBe expected }
+      }.equalUnderTheLaw(Unit.just(), EQ)
     }
 
   fun <F> Concurrent<F>.onErrorIsNotRunByDefault(EQ: Eq<Kind<F, Tuple2<Int, Boolean>>>, ctx: CoroutineContext) =
@@ -690,7 +690,7 @@ object ConcurrentLaws {
         val onErrorRun = Ref(false).bind()
 
         val (completed, _) = startLatch.complete(i)
-          .onError(onErrorRun.set(true))
+          .onError { onErrorRun.set(true) }
           .fork(ctx).bind()
 
         completed.bind()
@@ -711,8 +711,8 @@ object ConcurrentLaws {
 
       just(Unit).flatMap {
         raiseError<Unit>(RuntimeException("failed"))
-          .onError(incrementCounter)
-      }.onError(incrementCounter)
+          .onError { incrementCounter }
+      }.onError { incrementCounter }
         .guarantee(latch.complete(Unit))
         .fork(ctx).bind()
 
