@@ -316,6 +316,8 @@ For example, imagine that we need to keep track of whether our data-fetching ope
 
 ```kotlin:ank:playground
 import arrow.fx.IO
+import arrow.fx.extensions.io.bracket.onCancel
+import arrow.fx.extensions.io.bracket.onError
 
 // Some important operation
 fun myOp() = IO { 42 }
