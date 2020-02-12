@@ -77,8 +77,6 @@ object FunctorLaws {
       gg(ff(fa)).equalUnderTheLaw(fg(fa), EQ)
     }
 
-  // TODO: Comments going on: https://github.com/arrow-kt/arrow/issues/2001
-  // fun <A> Kind<F, A>.unit(): Kind<F, Unit> = map { Unit }
   fun <F> Functor<F>.unitIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Unit>>): Unit =
     forAll(G) { fa: Kind<F, Int> ->
       fa.unit().equalUnderTheLaw(fa.map { Unit }, EQ)
@@ -94,7 +92,6 @@ object FunctorLaws {
       fa.fproduct { _ -> b }.equalUnderTheLaw(fa.map { a -> Tuple2(a, b) }, EQ)
     }
 
-  // fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, f(a)) }
   fun <F> Functor<F>.fproductComposition(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Tuple2<Tuple2<Int, String>, String>>>): Unit =
     forAll(G, Gen.functionAToB<Int, String>(Gen.string()), Gen.functionAToB<Tuple2<Int, String>, String>(Gen.string())) { fa: Kind<F, Int>, f, g ->
       val ff: Kind<F, Tuple2<Int, String>> = fa.fproduct(f)
@@ -144,7 +141,6 @@ object FunctorLaws {
       fa.tupleRight(b).tupleRight(c).equalUnderTheLaw(t, EQ)
     }
 
-  // fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> = this
   fun widenIdentity(): Unit =
     forAll(Gen.int()) { a: Int ->
       val list: List<Some<Int>> = listOf(Some(a))
