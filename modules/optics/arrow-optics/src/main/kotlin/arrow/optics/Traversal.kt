@@ -19,7 +19,6 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.mapN
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
