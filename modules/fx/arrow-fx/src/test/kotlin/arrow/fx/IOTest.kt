@@ -560,14 +560,6 @@ class IOTest : UnitSpec() {
       }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
     }
 
-    "onError should be called on finish with error" {
-      IO.fx {
-        val p = !Promise<Unit>()
-        effect { throw Exception() }.onError(p.complete(Unit)).attempt().bind()
-        !p.get()
-      }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
-    }
-
     "Bracket should be stack safe" {
       val size = 5000
 
