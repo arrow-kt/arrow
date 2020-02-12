@@ -28,16 +28,23 @@ The * marked ops are available within this integration module, offering differen
 
 If you'd like to introduce `IO` in your project, you might want to keep using the Coroutines style of cancellation with scopes. This is specially useful on *Android* projects where the Architecture Components [already provide handy scopes for you](https://developer.android.com/topic/libraries/architecture/coroutines#lifecycle-aware).
 
-### unsafeRunScoped
+### unsafeRunScoped & unsafeRunIO
 
-Runs the specific `IO` with a [CoroutineScope](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html), so it will be automatically canceled when the scope does as well:
+`IO.unsafeRunScoped(scope, cb)` runs the specific `IO` with a [CoroutineScope](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html), so it will be automatically canceled when the scope does as well.
 
+Similarly to this, there's `scope.unsafeRunIO(IO, cb)` which works in the same way with different syntax: 
 
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
+import arrow.integrations.kotlinx.unsafeRunScoped
+import arrow.integrations.kotlinx.unsafeRunIO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+
+val scope = CoroutineScope(SupervisorJob())
+
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -53,7 +60,10 @@ fun greet(): IO<Unit> =
 
 fun main() { 
   // This IO would stop as soon as the scope is cancelled
-  greet().unsafeRunScoped(scope)
+  greet().unsafeRunScoped(scope) { }
+
+  // alternatively, you could also do
+  scope.unsafeRunIO(greet()) { }
 }
 //sampleEnd
 ```
@@ -73,8 +83,12 @@ The `suspendCancellable` function will turn an `IO` into a cancellable coroutine
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 import arrow.integrations.kotlinx.suspendCancellable
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.SupervisorJob
+
+val scope = CoroutineScope(SupervisorJob())
+
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -119,9 +133,13 @@ But luckily, we're able to solve this for both combinators presented above using
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import arrow.fx.handleErrorWith
 import arrow.integrations.kotlinx.suspendCancellable
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.SupervisorJob
+
+val scope = CoroutineScope(SupervisorJob())
 
 class NameNotFoundException(val id: Int): Exception("Name not found for id $id")
 val userId = 1
