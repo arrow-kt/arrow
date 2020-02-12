@@ -325,8 +325,8 @@ fun myOp() = IO { 42 }
 fun main(args: Array<String>) {
 //sampleStart
 val safeComputation = myOp()
-  .onCancel(IO { /* perform tracking about cancellation */ })
-  .onError(IO { /* perform tracking about error */ })
+  .onCancel(IO { println("cancelled!") })
+  .onError { e -> IO { println("error: $e!") } }
 //sampleEnd
 println(safeComputation)
 }
