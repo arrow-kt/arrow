@@ -10,7 +10,7 @@ But we have not given up support for suspend functions! If you would like to use
 
 # Kotlin Coroutines and runtime support
 
-Due to the current nature of Kotlin Coroutines' implementation we need to make a differentiation between the Coroutines feature in the language and the runtime, in order to understand their differences and this module altogether:
+Due to the current nature of Kotlin Coroutines' implementation we need to make a differentiation between the Coroutines feature in the language and the kotlinx.coroutines runtime, in order to understand their differences and this module altogether:
 
 * Suspend functions and continuations (kotlin.coroutines package) are built in the language, meaning that you don't need extra dependencies to use them.
 * Coroutines runtime and cancellation (kotlinx.coroutines package) are built as a separate module and dependency, which is used to actually execute your Coroutines.
@@ -52,19 +52,18 @@ fun greet(): IO<Unit> =
   }
 
 fun main() { 
-  greet().unsafeRunScoped(viewModelScope) // Android example, any other scope is possible as well.
-
-  // when viewModelScope.cancel() is invoked, it will cancel the operation above
+  // This IO would stop as soon as the scope is cancelled
+  greet().unsafeRunScoped(scope)
 }
 //sampleEnd
 ```
 
 
-## Alternatively, integrating IO with Coroutines
+## Alternatively, integrating IO with kotlinx.coroutines
 
 Sometimes you might want to not switch the runtime of your project and slowly integrate `IO` instead. For this use case we've added some extensions to make `IO` work with the Coroutines runtime.
 
-*IMPORTANT NOTE*: The way Coroutines handle errors is by throwing exceptions after you run your operations. Because of this it's important to clarify that your operation might crash your app if you're not handling errors (in case of IO, `handleError`) or try-catching the execution.
+*IMPORTANT NOTE*: The way kotlinx.coroutines handle errors is by throwing exceptions after you run your operations. Because of this it's important to clarify that your operation might crash your app if you're not handling errors (in case of IO, `handleError`) or try-catching the execution.
 
 ### suspendCancellable
 
@@ -90,8 +89,8 @@ fun greet(): IO<Unit> =
   }
 
 fun main() {
-  // or any other scope. This IO would stop as soon as the scope is cancelled
-  GlobalScope.launch {
+  // This IO would stop as soon as the scope is cancelled
+  scope.launch {
     greet().suspendCancellable()
   }
 }
@@ -116,7 +115,6 @@ suspend fun sayGoodBye(): Unit =
 Because we're using a suspend function, we know that this operation will either give us the name or throw an exception, which could cause our app to crash. 
 
 But luckily, we're able to solve this for both combinators presented above using `handleErrorWith`:
-
 
 ```kotlin:ank:playground
 import arrow.fx.IO
@@ -151,4 +149,4 @@ fun main() {
 //sampleEnd
 ```
 
-With this, we make sure that our greet program doesn't crash due to recoverable errors, *no matter which runtime we use*!
+With the power of IO, we can make sure that our program doesn't crash due to recoverable errors, *no matter which runtime we use*!
