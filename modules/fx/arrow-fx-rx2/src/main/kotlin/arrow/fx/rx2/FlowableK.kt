@@ -79,7 +79,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -98,7 +98,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
           .value()
           .concatMap { a ->
             if (emitter.isCancelled) {
-              release(a, ExitCase.Canceled).value().subscribe({}, emitter::onError)
+              release(a, ExitCase.Cancelled).value().subscribe({}, emitter::onError)
               Flowable.never<B>()
             } else {
               Flowable.defer { use(a).value() }
@@ -107,7 +107,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
                 }.doOnComplete {
                   Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
                 }.doOnCancel {
-                  Flowable.defer { release(a, ExitCase.Canceled).value() }.subscribe({}, {})
+                  Flowable.defer { release(a, ExitCase.Cancelled).value() }.subscribe({}, {})
                 }
             }
           }.subscribe(emitter::onNext, {}, {})
@@ -224,7 +224,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         emitter.setCancellable { dispose.dispose() }
       }, mode).k()
 
-    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+    fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
         val token = fa { either: Either<Throwable, A> ->
           either.fold({ e ->
@@ -237,7 +237,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }, mode).k()
 
-    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+    fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold({

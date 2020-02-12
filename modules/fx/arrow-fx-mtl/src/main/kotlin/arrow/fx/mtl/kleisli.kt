@@ -49,8 +49,8 @@ interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliM
     }
   }
 
-  override fun <A> KleisliOf<F, R, A>.uncancelable(): Kleisli<F, R, A> = BF().run {
-    Kleisli { r -> this@uncancelable.run(r).uncancelable() }
+  override fun <A> KleisliOf<F, R, A>.uncancellable(): Kleisli<F, R, A> = BF().run {
+    Kleisli { r -> this@uncancellable.run(r).uncancellable() }
   }
 }
 
@@ -74,8 +74,8 @@ interface KleisliMonadDefer<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliB
     Kleisli { d -> defer { run(d).flatMap { a -> f(a).run(d) } } }
   }
 
-  override fun <A> KleisliOf<F, R, A>.uncancelable(): Kleisli<F, R, A> = MDF().run {
-    Kleisli { d -> defer { run(d).uncancelable() } }
+  override fun <A> KleisliOf<F, R, A>.uncancellable(): Kleisli<F, R, A> = MDF().run {
+    Kleisli { d -> defer { run(d).uncancellable() } }
   }
 }
 
@@ -116,8 +116,8 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
   override fun dispatchers(): Dispatchers<KleisliPartialOf<F, R>> =
     CF().dispatchers() as Dispatchers<KleisliPartialOf<F, R>>
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<KleisliPartialOf<F, R>>): Kleisli<F, R, A> = CF().run {
-    Kleisli { d -> cancelable { cb -> k(cb).run(d).map { Unit } } }
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<KleisliPartialOf<F, R>>): Kleisli<F, R, A> = CF().run {
+    Kleisli { d -> cancellable { cb -> k(cb).run(d).map { Unit } } }
   }
 
   override fun <A> KleisliOf<F, R, A>.fork(ctx: CoroutineContext): Kleisli<F, R, Fiber<KleisliPartialOf<F, R>, A>> = CF().run {

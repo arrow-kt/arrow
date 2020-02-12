@@ -244,7 +244,7 @@ println(safeComputation)
 #### Kind<F, A>#bracketCase
 
 It's a generalized version of `bracket()` that uses `ExitCase` to distinguish between different exit cases when
-releasing the acquired resource. `ExitCase` can take the values `Completed`, `Canceled`, or `Error(e)`.  So, depending
+releasing the acquired resource. `ExitCase` can take the values `Completed`, `Cancelled`, or `Error(e)`.  So, depending
 how the `use` execution finalizes, the corresponding `ExitCase` value will be passed to the `release` lambda.
 
 It requires passing `release` and `use` lambdas. It ensures acquiring, using, and releasing the resource at the end.
@@ -273,7 +273,7 @@ val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
         is ExitCase.Completed -> { /* do something */ }
-        is ExitCase.Canceled -> { /* do something */ }
+        is ExitCase.Cancelled -> { /* do something */ }
         is ExitCase.Error -> { /* do something */ }
       }
       closeFile(file)

@@ -13,7 +13,7 @@ import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.Platform
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
-import arrow.fx.typeclasses.ExitCase.Canceled
+import arrow.fx.typeclasses.ExitCase.Cancelled
 import arrow.fx.typeclasses.ExitCase.Completed
 import arrow.fx.typeclasses.ExitCase.Error
 import io.reactivex.Maybe
@@ -86,7 +86,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -104,7 +104,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.error<A>(t) }.k() }
           .flatMap { a ->
             if (emitter.isDisposed) {
-              release(a, Canceled).fix().maybe.subscribe({}, emitter::onError)
+              release(a, Cancelled).fix().maybe.subscribe({}, emitter::onError)
               Maybe.never<B>().k()
             } else {
               MaybeK.defer { use(a) }
@@ -115,7 +115,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
                   MaybeK.defer { release(a, Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
                 }
                 .doOnDispose {
-                  MaybeK.defer { release(a, Canceled) }.value().subscribe({}, {})
+                  MaybeK.defer { release(a, Cancelled) }.value().subscribe({}, {})
                 }
                 .k()
             }
@@ -240,7 +240,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = MaybeK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = MaybeK.cancellable { cb: (Either<Throwable, String>) -> Unit ->
      *     val nw = NetworkApi()
      *     val disposable = nw.async { result -> cb(Right(result)) }
      *     MaybeK { disposable.invoke() }
@@ -250,7 +250,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
      * }
      * ```
      */
-    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
+    fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold({
@@ -271,7 +271,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
-    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
+    fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold({

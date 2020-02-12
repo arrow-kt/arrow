@@ -96,7 +96,7 @@ interface Async<F> : MonadDefer<F> {
    *   //sampleStart
    *   fun <F> Async<F>.makeCompleteAndGetPromiseInAsync() =
    *     asyncF<String> { cb: (Either<Throwable, String>) -> Unit ->
-   *       Promise.uncancelable<F, String>(this).flatMap { promise ->
+   *       Promise.uncancellable<F, String>(this).flatMap { promise ->
    *         promise.complete("Hello World!").flatMap {
    *           promise.get().map { str -> cb(Right(str)) }
    *         }
