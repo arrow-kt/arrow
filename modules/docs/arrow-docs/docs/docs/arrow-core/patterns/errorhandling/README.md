@@ -243,10 +243,10 @@ Let's now rewrite our program as a polymorphic function that will work over any 
 Polymorphic code in Arrow is based on emulated `Higher Kinds`, as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
-fun <F> takeFoodFromRefrigerator(ME: MonadError<F, CookingException>): Kind<F, Lettuce> = ME.just(Lettuce)
-fun <F> getKnife(ME: MonadError<F, CookingException>): Kind<F, Knife> = ME.just(Knife)
-fun <F> lunch(knife: Knife, food: Lettuce, ME: MonadError<F, CookingException>):
-        Kind<F, Salad> = ME.raiseError(InsufficientAmountOfLettuce(5))
+fun <F> MonadError<F, CookingException>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
+fun <F> MonadError<F, CookingException>.getKnife(): Kind<F, Knife> = just(Knife)
+fun <F> MonadError<F, CookingException>.lunch(knife: Knife, food: Lettuce):
+        Kind<F, Salad> = raiseError(InsufficientAmountOfLettuce(5))
 ```
 
 We can now express the same program as before in a fully polymorphic context
@@ -264,8 +264,8 @@ fun <F> MonadError<F, CookingException>.prepare():Kind<F, Salad> =
 Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
 
 ```kotlin
-fun <F> MonadError<F, CookingException>.prepare1(ME): Kind<F, Salad> =
-    ME.tupled(getKnife(), takeFoodFromRefrigerator()).flatMap(ME, { (nuke, target) -> lunch<F>(nuke, target) })
+fun <F> MonadError<F, CookingException>.prepare1(): Kind<F, Salad> =
+    tupledN(getKnife(), takeFoodFromRefrigerator()).flatMap({ (nuke, target) -> lunch<F>(nuke, target) })
 
 val result = Either.monadError<CookingException>().prepare()
 result.fix()
