@@ -779,8 +779,18 @@ fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>):
     { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 
+@Deprecated(
+  "To keep API consistent with Either and Option please use `handleErrorWith` instead",
+  ReplaceWith("handleErrorWith(f)")
+)
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
+  handleErrorWith(f)
+
+fun <E, A> ValidatedOf<E, A>.handleErrorWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   fix().fold({ f(it).fix() }, ::Valid)
+
+fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<E, A> =
+  fix().handleErrorWith { Valid(f(it)) }
 
 fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
   fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })

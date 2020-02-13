@@ -170,8 +170,8 @@ Exceptions work like old goto that can happen at any point during execution and 
 Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> =
-  IO.fx {
+fun Monad<F>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
+  fx.monad {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
