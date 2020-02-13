@@ -56,7 +56,7 @@ object MonadLogicLaws {
       Law("MonadLogic Laws: ifte returns remaining computation") {
         ML.ifteReturnsRemainingComputation(iterations, Gen.int(), genFA, genFunAToFB, genFB, eqS)
       },
-      Law("f:MonadLogic Laws: reflect is inverse of msplit") {
+      Law("MonadLogic Laws: reflect is inverse of msplit") {
         ML.msplitReflect(iterations, genFA, EQK.liftEq(Int.eq()))
       },
       Law("MonadLogic Laws: once of just is just") {
