@@ -9,6 +9,7 @@ import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.identity
 import arrow.core.right
+import arrow.core.some
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
@@ -172,32 +173,41 @@ class IOTest : UnitSpec() {
       }
     }
 
-    "should not catch exceptions within run block with unsafeRunAsync" {
+    "should return exceptions within main block with unsafeRunAsyncCancellable" {
+      val exception = MyException()
+      val ioa = IO<Int> { throw exception }
+      ioa.unsafeRunAsyncCancellable { either ->
+        either.fold({ it shouldBe exception }, { fail("") })
+      }
+    }
+
+    "should rethrow exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
         val ioa = IO<Int> { throw exception }
         ioa.unsafeRunAsync { either ->
-          either.fold({ throw exception }, { fail("") })
+          either.fold({ throw it }, { fail("") })
         }
         fail("Should rethrow the exception")
       } catch (myException: MyException) {
         // Success
       } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
+        fail("Should only throw MyException but was $throwable")
       }
     }
 
-    "should complete when running a pure value with runAsync" {
-      val expected = 0
-      just(expected).runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
-      }
-    }
-
-    "should complete when running a return value with runAsync" {
-      val expected = 0
-      IO { expected }.runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
+    "should rethrow exceptions within run block with unsafeRunAsyncCancelable" {
+      try {
+        val exception = MyException()
+        val ioa = IO<Int> { throw exception }
+        ioa.unsafeRunAsyncCancellable { either ->
+          either.fold({ throw it }, { fail("") })
+        }
+        fail("Should rethrow the exception")
+      } catch (myException: MyException) {
+        // Success
+      } catch (throwable: Throwable) {
+        fail("Should only throw MyException but was $throwable")
       }
     }
 
@@ -219,10 +229,10 @@ class IOTest : UnitSpec() {
       val ioa = IO<Int> { throw exception }
       ioa.runAsync { either ->
         either.fold({ IO { it shouldBe exception } }, { fail("") })
-      }
+      }.unsafeRunSync()
     }
 
-    "should catch exceptions within run block with runAsync" {
+    "should rethrow exceptions within run block with runAsync" {
       try {
         val exception = MyException()
         val ioa = IO<Int> { throw exception }
@@ -286,17 +296,6 @@ class IOTest : UnitSpec() {
         .continueOn(ctxB)
         .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxB } }
         .unsafeRunSync()
-    }
-
-    "fx should defer evaluation until run" {
-      var run = false
-      val program = IO.fx {
-        run = true
-      }
-
-      run shouldBe false
-      program.unsafeRunSync()
-      run shouldBe true
     }
 
     "fx can switch execution context state across not/bind" {
@@ -384,6 +383,32 @@ class IOTest : UnitSpec() {
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "Races are scheduled in the correct order" {
+      val order = mutableListOf<Int>()
+
+      fun makePar(num: Int): IO<Int> =
+        IO.effect {
+          order.add(num)
+        }.followedBy(IO.sleep((num * 200L).milliseconds))
+          .map { num }
+
+      val result = IO.raceN(
+        all,
+        makePar(9),
+        makePar(8),
+        makePar(7),
+        makePar(6),
+        makePar(5),
+        makePar(4),
+        makePar(3),
+        makePar(2),
+        makePar(1)
+      ).unsafeRunSync()
+
+      result shouldBe Race9.Ninth(1)
+      order shouldBe listOf(9, 8, 7, 6, 5, 4, 3, 2, 1)
     }
 
     "parallel mapping is done in the expected CoroutineContext" {
@@ -525,6 +550,14 @@ class IOTest : UnitSpec() {
             .invoke()
         }.flatMap { latch.get() }
       }.unsafeRunSync()
+    }
+
+    "guarantee should be called on finish with error" {
+      IO.fx {
+        val p = !Promise<Unit>()
+        effect { throw Exception() }.guarantee(p.complete(Unit)).attempt().bind()
+        !p.get()
+      }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
     }
 
     "Bracket should be stack safe" {
@@ -765,7 +798,7 @@ class IOTest : UnitSpec() {
         .attempt().unsafeRunSync() shouldBe Left(exception)
     }
 
-    "Cancelation is wired accross suspend" {
+    "Cancellation is wired across suspend" {
       fun infiniteLoop(): IO<Unit> {
         fun loop(iterations: Int): IO<Unit> =
           just(iterations).flatMap { i -> loop(i + 1) }
@@ -798,23 +831,15 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun IO.Companion.eqK() = object : EqK<ForIO> {
-  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      EQ(EQ).run {
-        it.first.eqv(it.second)
-      }
-    }
+internal fun IO.Companion.eqK() = object : EqK<ForIO> {
+  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
+    fix().eqv(other.fix())
+  }
 }
 
-private fun IO.Companion.genK() = object : GenK<ForIO> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
-    Gen.oneOf(
-      gen.map {
-        IO.just(it)
-      },
-      Gen.throwable().map {
-        IO.raiseError<A>(it)
-      }
-    )
+internal fun IO.Companion.genK() = object : GenK<ForIO> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
+    gen.map(IO.Companion::just),
+    Gen.throwable().map(IO.Companion::raiseError)
+  )
 }

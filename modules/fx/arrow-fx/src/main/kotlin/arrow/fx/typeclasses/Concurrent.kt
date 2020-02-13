@@ -32,6 +32,7 @@ import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.Traverse
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 typealias CancelToken<F> = Kind<F, Unit>
@@ -63,7 +64,7 @@ interface Concurrent<F> : Async<F> {
    */
   override val fx: ConcurrentFx<F>
     get() = object : ConcurrentFx<F> {
-      override val concurrent: Concurrent<F> = this@Concurrent
+      override val M: Concurrent<F> = this@Concurrent
     }
 
   /**
@@ -331,6 +332,9 @@ interface Concurrent<F> : Async<F> {
    *      .unsafeRunSync()
    * }
    * ```
+   *
+   * Note: Be careful when using this on very large collections or infinite sequences as this needs to fold the entire collection first before it can start executing anything. This may cause excessive memory usage, or even infinite looping (in case of infinite sequences).
+   * Using [parTraverse] like this may imply that what you'd actually want is streaming, which will come to arrow in the future.
    */
   fun <G, A, B> Kind<G, A>.parTraverse(ctx: CoroutineContext, TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(ctx), f) }
@@ -380,6 +384,9 @@ interface Concurrent<F> : Async<F> {
    *     .fix().unsafeRunSync()
    * }
    * ```
+   *
+   * Note: This uses [parTraverse] so the same caveats apply. Do not use this on huge collections or infinite sequences.
+   * @see parTraverse
    */
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
     parTraverse(ctx, TG, ::identity)
@@ -935,10 +942,10 @@ interface Concurrent<F> : Async<F> {
    * ```
    **/
   fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A>): Kind<F, A> =
-    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+    EmptyCoroutineContext.raceN(sleep(duration), this).flatMap {
       it.fold(
-        { a -> just(a) },
-        { default }
+        { default },
+        { a -> just(a) }
       )
     }
 
@@ -964,24 +971,21 @@ interface Concurrent<F> : Async<F> {
    * ```
    **/
   fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
-    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+    EmptyCoroutineContext.raceN(sleep(duration), this).flatMap {
       it.fold(
-        { a -> just(a) },
-        { raiseError(TimeoutException(duration.toString())) }
+        { raiseError<A>(TimeoutException(duration.toString())) },
+        { a -> just(a) }
       )
     }
 }
 
 interface ConcurrentFx<F> : AsyncFx<F> {
-  val concurrent: Concurrent<F>
-
-  override val async: Async<F>
-    get() = concurrent
-
-  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = ConcurrentContinuation<F, A>(concurrent)
+  override val M: Concurrent<F>
+  // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> = M.defer {
+    val continuation = ConcurrentContinuation<F, A>(M)
     val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
+    continuation.returnedMonad()
   }
 }

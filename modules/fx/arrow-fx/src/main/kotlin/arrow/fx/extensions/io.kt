@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
@@ -311,7 +310,7 @@ fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
-  defer { IO.concurrent().fx.concurrent(c).fix() }
+  IO.concurrent().fx.concurrent(c).fix()
 
 /**
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers

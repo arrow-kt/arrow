@@ -2,7 +2,7 @@
 library: core
 ---
 {: data-executable="true"}
-```kotlin
+```kotlin:ank
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right

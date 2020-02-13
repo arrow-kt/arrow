@@ -1,147 +1,162 @@
 package arrow.fx
 
-import arrow.core.extensions.list.traverse.sequence
-import arrow.fx.extensions.fx
-import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.monad.flatMap
-import arrow.fx.extensions.io.monad.flatten
-import arrow.fx.extensions.io.monad.map
+import arrow.Kind
+import arrow.core.extensions.eq
+import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.MonadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.laws.equalUnderTheLaw
+import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
-import kotlinx.coroutines.Dispatchers
 
 class RefTest : UnitSpec() {
 
   init {
+    fun <F> MonadDefer<F>.tests(EQF: EqK<F>, RF: RefFactory<F>): Unit {
+      val eq: Eq<Kind<F, Unit>> = EQF.liftEq(Eq.any())
+      fun Kind<F, Unit>.test(): Boolean = equalUnderTheLaw(unit(), eq)
+      fun Kind<F, Unit>.unsafeRunSync(): Boolean = test()
 
-    "concurrent modifications" {
-      val finalValue = 100
-      val r = Ref.unsafe(0, IO.monadDefer())
-      (0 until finalValue)
-        .map { _ -> IO.unit.continueOn(Dispatchers.Default).flatMap { _ -> r.update { it + 1 } } }
-        .sequence(IO.applicative())
-        .flatMap { r.get() }
-        .fix()
-        .unsafeRunSync() shouldBe finalValue
-    }
-
-    "set get - successful" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
-          ref.set(b).flatMap {
-            ref.get()
-          }
-        }.equalUnderTheLaw(IO.just(b), EQ())
+      "set get - successful" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          RF.just(a).flatMap { ref ->
+            ref.set(b).flatMap {
+              ref.get().map { it shouldBe b }
+            }
+          }.test()
+        }
       }
-    }
 
-    "getAndSet - successful" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
-          ref.getAndSet(b).flatMap { old ->
-            ref.get().map { new ->
-              old == a && new == b
+      "getAndSet - successful" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          fx.monad {
+            val ref = !RF.just(a)
+            val old = !ref.getAndSet(b)
+            val new = !ref.get()
+            old shouldBe a
+            new shouldBe b
+          }.test()
+        }
+      }
+
+      "access - successful" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          fx.monad {
+            val ref = !RF.just(a)
+            val (_, setter) = !ref.access()
+            val success = !setter(b)
+            val result = !ref.get()
+            success shouldBe true
+            result shouldBe b
+          }.test()
+        }
+      }
+
+      "access - setter should fail if value is modified before setter is called" {
+        forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
+          fx.monad {
+            val ref = !RF.just(a)
+            val (_, setter) = !ref.access()
+            !ref.set(b)
+            val success = !setter(c)
+            val result = !ref.get()
+            success shouldBe false
+            result shouldBe b
+          }.test()
+        }
+      }
+
+      "access - setter should fail if called twice" {
+        forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
+          fx.monad {
+            val ref = RF.just(a).bind()
+            val (_, setter) = ref.access().bind()
+            val cond1 = setter(b).bind()
+            ref.set(c).bind()
+            val cond2 = setter(d).bind()
+            val result = ref.get().bind()
+            cond1 shouldBe true
+            cond2 shouldBe false
+            result shouldBe c
+          }.test()
+        }
+      }
+
+      "tryUpdate - modification occurs successfully" {
+        forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
+          fx.monad {
+            val ref = !RF.just(a)
+            !ref.tryUpdate(f)
+            val res = !ref.get()
+            res shouldBe f(a)
+          }.test()
+        }
+      }
+
+      "tryUpdate - should fail to update if modification has occurred" {
+        forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
+          RF.just(a).flatMap { ref ->
+            ref.tryUpdate {
+              ref.update(Int::inc).unsafeRunSync()
+              f(it)
             }
           }
-        }.equalUnderTheLaw(IO.just(true), EQ())
+            .map { it shouldBe false }
+            .test()
+        }
+      }
+
+      "consistent set update" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          val set = RF.just(a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
+          val update = RF.just(a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
+
+          set.flatMap { setA ->
+            update.map { updateA ->
+              setA shouldBe updateA
+            }
+          }.test()
+        }
+      }
+
+      "access id" {
+        forAll(Gen.int()) { a ->
+          RF.just(a).flatMap { ref ->
+            ref.access().map { (a, _) -> a }.flatMap {
+              ref.get().map { it shouldBe a }
+            }
+          }.test()
+        }
+      }
+
+      "consistent access tryUpdate" {
+        forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
+          val accessMap = RF.just(a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
+          val tryUpdate = RF.just(a).flatMap { ref -> ref.tryUpdate(f) }
+
+          mapN(accessMap, tryUpdate) { (a, b) -> a shouldBe b }.test()
+        }
       }
     }
 
-    "access - successful" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
-          val (_, setter) = ref.access().bind()
-          val success = setter(b).bind()
-          val result = ref.get().bind()
-          success && result == b
-        }.equalUnderTheLaw(IO.just(true), EQ())
+    fun <F> Concurrent<F>.concurrentTests(EQF: EqK<F>, RF: RefFactory<F>): Unit {
+      "concurrent modifications" {
+        val finalValue = 1000
+        RF.just(0).flatMap { r ->
+          (0 until finalValue)
+            .parTraverse { r.update { it + 1 } }
+            .flatMap { r.get() }
+        }.equalUnderTheLaw(just(finalValue), EQF.liftEq(Int.eq()))
       }
     }
 
-    "access - setter should fail if value is modified before setter is called" {
-      forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-        IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
-          val (_, setter) = ref.access().bind()
-          ref.set(b).bind()
-          val success = setter(c).bind()
-          val result = ref.get().bind()
-          !success && result == b
-        }.equalUnderTheLaw(IO.just(true), EQ())
-      }
-    }
-
-    "access - setter should fail if called twice" {
-      forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
-        IO.fx {
-          val ref = Ref(IO.monadDefer(), a).bind()
-          val (_, setter) = ref.access().bind()
-          val cond1 = setter(b).bind()
-          ref.set(c).bind()
-          val cond2 = setter(d).bind()
-          val result = ref.get().bind()
-          cond1 && !cond2 && result == c
-        }.equalUnderTheLaw(IO.just(true), EQ())
-      }
-    }
-
-    "tryUpdate - modification occurs successfully" {
-      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
-          ref.tryUpdate(f).flatMap {
-            ref.get()
-          }
-        }.equalUnderTheLaw(IO.just(f(a)), EQ())
-      }
-    }
-
-    "tryUpdate - should fail to update if modification has occurred" {
-      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
-          ref.tryUpdate {
-            ref.update(Int::inc).fix().unsafeRunSync()
-            f(it)
-          }
-        }.equalUnderTheLaw(IO.just(false), EQ())
-      }
-    }
-
-    "consistent set update" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        val set = Ref(IO.monadDefer(), a).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
-        val update = Ref(IO.monadDefer(), a).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
-
-        set.flatMap { setA ->
-          update.map { updateA ->
-            setA == updateA
-          }
-        }.equalUnderTheLaw(IO.just(true), EQ())
-      }
-    }
-
-    "access id" {
-      forAll(Gen.int()) { a ->
-        Ref(IO.monadDefer(), a).flatMap { ref ->
-          ref.access().map { (a, _) -> a }.flatMap {
-            ref.get()
-          }
-        }.equalUnderTheLaw(IO.just(a), EQ())
-      }
-    }
-
-    "consistent access tryModify" {
-      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-        val accessMap = Ref(IO.monadDefer(), a).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
-        val tryUpdate = Ref(IO.monadDefer(), a).flatMap { ref -> ref.tryUpdate(f) }
-
-        accessMap.equalUnderTheLaw(tryUpdate, EQ())
-      }
-    }
+    IO.concurrent().tests(IO.eqK(), Ref.factory(IO.monadDefer()))
+    IO.concurrent().concurrentTests(IO.eqK(), Ref.factory(IO.monadDefer()))
   }
 }

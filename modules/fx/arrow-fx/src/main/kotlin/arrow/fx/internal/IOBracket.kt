@@ -83,7 +83,7 @@ internal object IOBracket {
     IO.Async { conn, cb ->
       Platform.trampoline {
         val frame = EnsureReleaseFrame<A>(release)
-        val onNext = source.flatMap(frame)
+        val onNext = IO.Bind(source, frame)
         // Registering our cancelable token ensures that in case
         // cancellation is detected, `release` gets called
         conn.push(frame.cancel)

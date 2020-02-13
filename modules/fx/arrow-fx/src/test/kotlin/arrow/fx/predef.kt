@@ -2,7 +2,9 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.extensions.either.eq.eq
-import arrow.core.extensions.option.eq.eq
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.concurrent.waitFor
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
 import arrow.typeclasses.Eq
@@ -13,9 +15,11 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-fun <A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
-  arrow.core.Option.eq(arrow.core.Either.eq(Eq.any(), EQA)).run {
-    a.fix().attempt().unsafeRunTimed(timeout).eqv(b.fix().attempt().unsafeRunTimed(timeout))
+fun <A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
+  arrow.core.Either.eq(Eq.any(), EQA).run {
+    IO.applicative().mapN(a.attempt(), b.attempt()) { (a, b) -> a.eqv(b) }
+      .waitFor(timeout)
+      .unsafeRunSync()
   }
 }
 

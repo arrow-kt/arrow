@@ -33,6 +33,7 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class SingleKTests : RxJavaSpec() {
 
@@ -51,17 +52,6 @@ class SingleKTests : RxJavaSpec() {
       ),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = SingleK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
@@ -213,6 +203,8 @@ private fun <T> SingleK.Companion.eq(): Eq<SingleKOf<T>> = object : Eq<SingleKOf
     val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
     return res1.fold({ t1 ->
       res2.fold({ t2 ->
+        if (t1::class.java == TimeoutException::class.java) throw t1
+        if (t2::class.java == TimeoutException::class.java) throw t2
         (t1::class.java == t2::class.java)
       }, { false })
     }, { v1 ->

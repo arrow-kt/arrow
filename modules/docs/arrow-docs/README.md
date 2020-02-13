@@ -11,7 +11,7 @@ We prefer Kdocs only for documenting data types or type classes. Only use tutori
 
 ### 1. Add a menu entry to your docs
 
-Go to `modules/docs/arrow-docs/docs/_data/sidebar.yml` and add a menu entry in the proper section, as in:
+Go to `modules/docs/arrow-docs/docs/_data/`, choose the sidebar file belonging to the desired group (core, fx, incubator, optics), and add a menu entry in the proper section, as in:
 
 ```
 - title: Applicative
@@ -25,7 +25,7 @@ Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real ex
 Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections
 available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
-Let's say you want to add docs for a Type class, for extension `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
+Let's say you want to add docs for a Type class, for example `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
 
 You'll find all the sections available in the [docs side menu](https://arrow-kt.io/docs/). As you can see, there's:
 * **Quick start:** Basically how to start using Arrow, including links to libraries, posts, talks, and sample projects.
@@ -147,26 +147,9 @@ If you should get an error while installing the Ruby gem _http_parser_, please c
 
 ## Blog section contribution
 
-If you had given a talk, written a post, or spread the word on Arrow in any other way, please don't hesitate to include it in the [blog section of the Arrow website](//arrow-kt.io/blog).
+If you had given a talk, written a post, or spread the word on Arrow in any other way, please don't hesitate to include it in the [MEDIA section of the Arrow website](https://media.arrow-kt.io/).
 
-To do so, please add a Markdown file inside the `_posts` directory and include the relevant info to your contribution. As standard for Jekyll posts, please name it as follows:
-
-`yyyy-mm-dd-title-in-kebab-case`
-
-The Front Matter values available to these files are:
-
-* `title`: A short title for your contribution.
-* `header-image`: You can link an external relevant image to be set as a header. Take into account that it will be mostly dynamically trimmed into a ~16:9 ratio. If you have no image you can always set one ready for it, i.e. `/img/blog-image-header.png`.
-* `icon`: An icon to be shown at the top-right of the header. In the same way as the image, you can select one of `/img/icon-podcast.svg`, `/img/icon-news.svg`, or `/img/icon-video.svg`.
-* `version`: Arrow version relevant to this contribution, e.g. `version 0.9.0`. You can leave it empty if it's something generic.
-* `category`: `news` or `media` mainly. It will affect the tab section where your contribution will appear in.
-* `link`: An external link pointing to where more info about your contribution can be found.
-* `event`: Optional field, add it if the contribution happened at some event or conference, useful for talks or workshops.
-
-Then in the content section you can write a small description following Markdown format as usual, including links. Please refrain of setting a long chunk of text here, as it probably won't fit well between the other ones.
-
-To check how it will actually look there, please refer to the [run the docs in your local server](#2-run-the-docs-in-your-local-server) section.
-
+To do so, please take a look at [Arrow Media](https://github.com/arrow-kt/arrow-media) repository.
 
 ## How to test links
 

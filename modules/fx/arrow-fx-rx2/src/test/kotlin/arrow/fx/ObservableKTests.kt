@@ -30,6 +30,7 @@ import io.reactivex.observers.TestObserver
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeoutException
 
 class ObservableKTests : RxJavaSpec() {
 
@@ -46,17 +47,6 @@ class ObservableKTests : RxJavaSpec() {
       ),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), ObservableK.eq())
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = ObservableK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
@@ -139,6 +129,8 @@ private fun <T> ObservableK.Companion.eq(): Eq<ObservableKOf<T>> = object : Eq<O
     val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
     return res1.fold({ t1 ->
       res2.fold({ t2 ->
+        if (t1::class.java == TimeoutException::class.java) throw t1
+        if (t2::class.java == TimeoutException::class.java) throw t2
         (t1::class.java == t2::class.java)
       }, { false })
     }, { v1 ->
