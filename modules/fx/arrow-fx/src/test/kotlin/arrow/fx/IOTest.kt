@@ -837,7 +837,7 @@ internal fun IO.Companion.eqK() = object : EqK<ForIO> {
   }
 }
 
-private fun IO.Companion.genK() = object : GenK<ForIO> {
+internal fun IO.Companion.genK() = object : GenK<ForIO> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
     gen.map(IO.Companion::just),
     Gen.throwable().map(IO.Companion::raiseError)
