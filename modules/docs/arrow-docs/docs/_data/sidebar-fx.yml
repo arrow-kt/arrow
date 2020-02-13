@@ -1,4 +1,3 @@
-
 options:
   - title: Quick Start
 
@@ -56,6 +55,19 @@ options:
 
       - title: MonadIO
         url: /docs/apidocs/arrow-fx/arrow.fx.typeclasses/-monad-i-o/
+
+  - title: Integrations
+
+    nested_options:
+
+      - title: RxJava2
+        url: /docs/integrations/rx2/
+
+      - title: Reactor
+        url: /docs/integrations/reactor/
+
+      - title: kotlinx.coroutines
+        url: /docs/integrations/kotlinxcoroutines/
 
   - title: API Docs
 
