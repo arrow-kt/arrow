@@ -37,6 +37,7 @@ import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class FlowableKTests : RxJavaSpec() {
 
@@ -46,6 +47,8 @@ class FlowableKTests : RxJavaSpec() {
       val res2 = Try { b.value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
       return res1.fold({ t1 ->
         res2.fold({ t2 ->
+          if (t1::class.java == TimeoutException::class.java) throw t1
+          if (t2::class.java == TimeoutException::class.java) throw t2
           (t1::class.java == t2::class.java)
         }, { false })
       }, { v1 ->

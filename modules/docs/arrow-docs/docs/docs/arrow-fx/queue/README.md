@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: docs-fx
 title: Queue
 permalink: /docs/effects/queue/
 ---
