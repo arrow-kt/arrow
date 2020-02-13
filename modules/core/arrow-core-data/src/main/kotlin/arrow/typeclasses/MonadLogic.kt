@@ -39,5 +39,7 @@ interface MonadLogic<F> : MonadPlus<F> {
     once().ifThen(unit()) { zeroM() }
 }
 
+// TODO: this should be direct part of the MonadLogic typeclass (https://github.com/arrow-kt/arrow/pull/2047#discussion_r378201777).
+//  Couldn't add it due to issues with the generated code. Should be reworked when arrow-meta is available.
 fun <F, A> Kind<ForOption, Tuple2<Kind<F, A>, A>>.reflect(ML: MonadLogic<F>): Kind<F, A> =
   fix().fold({ ML.zeroM() }, { ML.run { just(it.b).plusM(it.a) } })
