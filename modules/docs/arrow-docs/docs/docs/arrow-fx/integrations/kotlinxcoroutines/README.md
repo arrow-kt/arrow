@@ -4,22 +4,24 @@ title: kotlinx.coroutines
 permalink: /docs/integrations/kotlinxcoroutines/
 ---
 
-*Note* that as of Arrow 0.9.0, we have deprecated support for `Deferred` from `kotlinx.coroutines`. Using `Deferred` as a return type is considered a smell by the library owners (see [here](https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/composing-suspending-functions.md#async-style-functions) and [here](http://youtrack.jetbrains.com/issue/KT-25620)), and we were not able to make it work consistently against some of the Laws. 
-
-But we have not given up support for suspend functions! If you would like to use `suspend fun`, you can do so using the `arrow-fx` and this module.
-
 # Kotlin Coroutines and runtime support
 
-Due to the current nature of Kotlin Coroutines' implementation we need to make a differentiation between the Coroutines feature in the language and the kotlinx.coroutines runtime, in order to understand their differences and this module altogether:
+Kotlin offer's a `suspend` system in the language, and it offers intrinsics in the standard library to build a library on top. These `intrinsic` functions allow you to `startCoroutine`s, `suspendCoroutine`s, build `CoroutineContext`s and so on.
 
-* Suspend functions and continuations (kotlin.coroutines package) are built in the language, meaning that you don't need extra dependencies to use them.
-* Coroutines runtime and cancellation (kotlinx.coroutines package) are built as a separate module and dependency, which is used to actually execute your Coroutines.
+Kotlin's language suspension support can be found in the [kotlin.coroutines](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines/index.html) package.
 
-Due to this differentiation there are different alternatives consindering each tool and runtime:
+There are currently two libraries that provide a runtime for the language's suspension system.
+
+- [Arrow Fx](https://arrow-kt.io/docs/fx/)
+- [KotlinX Coroutines](https://github.com/Kotlin/kotlinx.coroutines)
+
+They can easily interop with each-other and Arrow Fx's integration module offers certain combinators to use Arrow Fx's with KotlinX structured concurrency in frameworks that have chosen to incorporate the KotlinX Coroutines library such as Android and Ktor.
+
+Due to this differentiation there are different alternatives considering each tool and runtime:
 
 | Tool →<br>Runtime ↓ | IO                                          | suspend function    |
 |--------------------|----------------------------------------------|---------------------|
-| Kotlinx Coroutines | `suspended`<br>`suspendCancellable`*         | `async`<br>`launch` |
+| KotlinX Coroutines | `suspended`<br>`suspendCancellable`*         | `async`<br>`launch` |
 | Arrow              | `unsafeRunAsync`<br>`unsafeRunAsyncCancellable`<br>`unsafeRunAsyncScoped`* | Has to be wrapped in `IO.effect` and then run with any of the operations on the left.<br><br>Alternatively it can be wrapped with `Fx.effect` and be executed [polymorphically](/docs/fx/polymorphism/). |
 
 The * marked ops are available within this integration module, offering different alternatives depending on the project's needs. Both options offered in this integration module are described below:
