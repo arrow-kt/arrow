@@ -150,13 +150,13 @@ class FlowableKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
-    "FlowableK.cancelable should cancel CancelToken on dispose" {
-      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
+    "FlowableK.cancellable should cancel CancelToken on dispose" {
+      Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
         FlowableK {
-          FlowableK.cancelable<Unit>(fa = {
+          FlowableK.cancellable<Unit>(fa = {
             latch.complete(Unit)
           }).flowable.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -167,7 +167,7 @@ class FlowableKTests : RxJavaSpec() {
     }
 
     "FlowableK async should be cancellable" {
-      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async())
+      Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async())
         .flatMap { latch ->
           FlowableK {
             FlowableK.async<Unit>(fa = { })

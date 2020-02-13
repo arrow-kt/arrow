@@ -23,10 +23,10 @@ open class Uncancellable {
   @Param("100")
   var size: Int = 0
 
-  fun ioUncancelableLoop(i: Int): IO<Nothing, Int> =
-    if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
+  fun ioUncancellableLoop(i: Int): IO<Nothing, Int> =
+    if (i < size) IO { i + 1 }.uncancellable().flatMap { ioUncancellableLoop(it) }
     else IO.just(i)
 
   @Benchmark
-  fun io(): Int = ioUncancelableLoop(0).unsafeRunSync()
+  fun io(): Int = ioUncancellableLoop(0).unsafeRunSync()
 }

@@ -18,10 +18,10 @@ enum class OnCancel {
 object ConnectionCancellationException : JavaCancellationException("User cancellation")
 
 /**
- * An UnhandledError occurs when `E` is raised during cancelation.
- * These errors `E` will be thrown as `UnhandledError` upon cancelation.
+ * An UnhandledError occurs when `E` is raised during cancellation.
+ * These errors `E` will be thrown as `UnhandledError` upon cancellation.
  */
-class UnhandledError(val error: Any?) : Throwable(message = "Encountered UnhandledError during cancelation: $error") {
+class UnhandledError(val error: Any?) : Throwable(message = "Encountered UnhandledError during cancellation: $error") {
   override fun fillInStackTrace(): Throwable = this
 }
 
@@ -32,8 +32,8 @@ internal class IOContext(val connection: IOConnection) : AbstractCoroutineContex
 internal sealed class IOConnection {
 
   abstract fun cancel(): IOOf<Nothing, Unit>
-  abstract fun isCanceled(): Boolean
-  fun isNotCanceled(): Boolean = !isCanceled()
+  abstract fun isCancelled(): Boolean
+  fun isNotCancelled(): Boolean = !isCancelled()
   abstract fun <E> push(token: IOOf<E, Unit>): Unit
   abstract fun <E> push(vararg token: IOOf<E, Unit>): Unit
   fun pushPair(lh: IOConnection, rh: IOConnection): Unit = push(lh.cancel(), rh.cancel())
@@ -46,19 +46,19 @@ internal sealed class IOConnection {
   }
 
   companion object {
-    val uncancelable: IOConnection = Uncancelable
+    val uncancellable: IOConnection = Uncancellable
     operator fun invoke(): IOConnection = DefaultConnection()
   }
 }
 
-private object Uncancelable : IOConnection() {
+private object Uncancellable : IOConnection() {
   override fun cancel(): IOOf<Nothing, Unit> = IO.unit
-  override fun isCanceled(): Boolean = false
+  override fun isCancelled(): Boolean = false
   override fun <E> push(token: IOOf<E, Unit>): Unit = Unit
   override fun <E> push(vararg token: IOOf<E, Unit>): Unit = Unit
   override fun pop(): IOOf<Nothing, Unit> = IO.unit
   override fun tryReactivate(): Boolean = true
-  override fun toString(): String = "UncancelableConnection"
+  override fun toString(): String = "UncancellableConnection"
 }
 
 private class DefaultConnection : IOConnection() {
@@ -73,7 +73,7 @@ private class DefaultConnection : IOConnection() {
     }
   }
 
-  override fun isCanceled(): Boolean = state.value == null
+  override fun isCancelled(): Boolean = state.value == null
 
   override tailrec fun <E> push(token: IOOf<E, Unit>): Unit = when (val list = state.value) {
     // If connection is already cancelled cancel token immediately.

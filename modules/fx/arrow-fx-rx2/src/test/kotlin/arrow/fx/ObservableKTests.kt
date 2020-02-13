@@ -89,13 +89,13 @@ class ObservableKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
-    "ObservableK.cancelable should cancel CancelToken on dispose" {
-      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
+    "ObservableK.cancellable should cancel CancelToken on dispose" {
+      Promise.uncancellable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
-          ObservableK.cancelable<Unit> {
+          ObservableK.cancellable<Unit> {
             latch.complete(Unit)
           }.observable.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -106,7 +106,7 @@ class ObservableKTests : RxJavaSpec() {
     }
 
     "ObservableK async should be cancellable" {
-      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
+      Promise.uncancellable<ForObservableK, Unit>(ObservableK.async())
         .flatMap { latch ->
           ObservableK {
             ObservableK.async<Unit> { }

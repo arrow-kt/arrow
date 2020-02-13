@@ -17,24 +17,24 @@ class IOConnectionTests : UnitSpec() {
       effect shouldBe 1
     }
 
-    "empty; isCanceled" {
+    "empty; isCancelled" {
       val c = IOConnection()
-      c.isCanceled() shouldBe false
+      c.isCancelled() shouldBe false
     }
 
-    "empty; isNotCanceled" {
+    "empty; isNotCancelled" {
       val c = IOConnection()
-      c.isNotCanceled() shouldBe true
+      c.isNotCancelled() shouldBe true
     }
 
-    "empty; push; cancel; isCanceled" {
+    "empty; push; cancel; isCancelled" {
       val c = IOConnection()
       c.push(IO {})
       c.cancel().fix().unsafeRunSync()
-      c.isCanceled() shouldBe true
+      c.isCancelled() shouldBe true
     }
 
-    "cancel immediately if already canceled" {
+    "cancel immediately if already cancelled" {
       var effect = 0
       val initial = IO { effect += 1 }
       val c = IOConnection()
@@ -103,29 +103,29 @@ class IOConnectionTests : UnitSpec() {
       effect shouldBe 3
     }
 
-    "uncancelable returns same reference" {
-      val ref1 = IOConnection.uncancelable
-      val ref2 = IOConnection.uncancelable
+    "uncancellable returns same reference" {
+      val ref1 = IOConnection.uncancellable
+      val ref2 = IOConnection.uncancellable
       ref1 shouldBe ref2
     }
 
-    "uncancelable reference cannot be canceled" {
-      val ref = IOConnection.uncancelable
-      ref.isCanceled() shouldBe false
+    "uncancellable reference cannot be cancelled" {
+      val ref = IOConnection.uncancellable
+      ref.isCancelled() shouldBe false
       ref.cancel().fix().unsafeRunSync()
-      ref.isCanceled() shouldBe false
+      ref.isCancelled() shouldBe false
     }
 
-    "uncancelable.pop" {
-      val ref = IOConnection.uncancelable
+    "uncancellable.pop" {
+      val ref = IOConnection.uncancellable
       ref.pop() shouldBe IO.unit
 
       ref.push(IO.just(Unit))
       ref.pop() shouldBe IO.unit
     }
 
-    "uncancelable.push never cancels the given cancelable" {
-      val ref = IOConnection.uncancelable
+    "uncancellable.push never cancels the given cancellable" {
+      val ref = IOConnection.uncancellable
       ref.cancel().fix().unsafeRunSync()
 
       var effect = 0

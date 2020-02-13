@@ -26,17 +26,17 @@ open class Cancellable {
   @Param("100")
   var size: Int = 0
 
-  fun evalCancelable(n: Int): IO<Nothing, Int> =
-    IO.concurrent<Nothing>().cancelable<Int> { cb ->
+  fun evalCancellable(n: Int): IO<Nothing, Int> =
+    IO.concurrent<Nothing>().cancellable<Int> { cb ->
       cb(Right(n))
       IO.unit
     }.fix()
 
-  fun cancelableLoop(i: Int): IO<Nothing, Int> =
-    if (i < size) evalCancelable(i + 1).flatMap { cancelableLoop(it) }
-    else evalCancelable(i)
+  fun cancellableLoop(i: Int): IO<Nothing, Int> =
+    if (i < size) evalCancellable(i + 1).flatMap { cancellableLoop(it) }
+    else evalCancellable(i)
 
   @Benchmark
   fun io(): Int =
-    cancelableLoop(0).unsafeRunSync()
+    cancellableLoop(0).unsafeRunSync()
 }

@@ -118,7 +118,7 @@ object AsyncLaws {
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
-      Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
+      Promise.uncancellable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = later { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {
             is ExitCase.Completed -> r.complete(b)

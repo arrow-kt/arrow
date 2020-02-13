@@ -78,7 +78,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
           val promise = !Promise<Int>()
           !IO.effect {
             scope.launch {
-              IO.cancelable<Nothing, Unit> { promise.complete(i) }.suspendCancellable()
+              IO.cancellable<Nothing, Unit> { promise.complete(i) }.suspendCancellable()
             }
           }
           !IO.effect { scope.cancel() }
@@ -123,7 +123,7 @@ class CoroutinesIntegrationTest : UnitSpec() {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
           val promise = !Promise<Int>()
           !IO.effect {
-            IO.cancelable<Nothing, Unit> { promise.complete(i) }.unsafeRunScoped(scope) { }
+            IO.cancellable<Nothing, Unit> { promise.complete(i) }.unsafeRunScoped(scope) { }
           }
           !IO.effect { scope.cancel() }
           !promise.get()
