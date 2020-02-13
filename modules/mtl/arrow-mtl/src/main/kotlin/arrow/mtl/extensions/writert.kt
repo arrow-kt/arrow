@@ -2,6 +2,7 @@ package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.left
@@ -28,6 +29,8 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadLogic
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
@@ -154,11 +157,11 @@ interface WriterTSemigroupK<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 @undocumented
 interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupK<F, W> {
 
-  fun MF(): MonoidK<F>
+  fun MK(): MonoidK<F>
 
-  override fun SS(): SemigroupK<F> = MF()
+  override fun SS(): SemigroupK<F> = MK()
 
-  override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
+  override fun <A> empty(): WriterT<F, W, A> = WriterT(MK().empty())
 }
 
 @extension
@@ -254,7 +257,7 @@ interface WriterTMonadWriter<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, Wri
 @extension
 interface WriterTAlternative<F, W> : Alternative<WriterTPartialOf<F, W>>, WriterTApplicative<F, W>, WriterTMonoidK<F, W> {
   override fun AF(): Applicative<F> = AL()
-  override fun MF(): MonoidK<F> = AL()
+  override fun MK(): MonoidK<F> = AL()
   override fun MM(): Monoid<W>
   fun AL(): Alternative<F>
 
@@ -289,4 +292,66 @@ interface WriterTEqK<F, W> : EqK<WriterTPartialOf<F, W>> {
         it.first.value().eqv(it.second.value())
       }
     }
+}
+
+@extension
+interface WriterTMonadPlus<F, W> : MonadPlus<WriterTPartialOf<F, W>>, WriterTMonad<F, W>, WriterTAlternative<F, W> {
+  override fun MF(): Monad<F>
+  override fun MM(): Monoid<W>
+  override fun AL(): Alternative<F>
+  override fun AF(): Applicative<F> = AL()
+}
+
+@extension
+interface WriterTMonadLogic<F, W> : MonadLogic<WriterTPartialOf<F, W>>, WriterTMonadPlus<F, W> {
+  fun ML(): MonadLogic<F>
+  override fun MM(): Monoid<W>
+  override fun MF(): Monad<F> = ML()
+  override fun AL(): Alternative<F> = ML()
+
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.splitM(): Kind<WriterTPartialOf<F, W>, Option<Tuple2<Kind<WriterTPartialOf<F, W>, A>, A>>> =
+    this.fix().let { writerT ->
+      WriterT<F, W, Option<Tuple2<Kind<WriterTPartialOf<F, W>, A>, A>>>(ML().run {
+        writerT.value().splitM().flatMap { option ->
+          option.fold({
+            just(MM().empty() toT Option.empty<Tuple2<Kind<WriterTPartialOf<F, W>, A>, A>>())
+          }, { (m, tuple) ->
+            val (w, a) = tuple
+
+            just(w toT Option.just(WriterT(m) toT a))
+          })
+        }
+      })
+    }
+
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.interleave(other: Kind<WriterTPartialOf<F, W>, A>): Kind<WriterTPartialOf<F, W>, A> =
+    (this to other).let { (ma, mb) ->
+      WriterT(
+        ML().run {
+          ma.value().interleave(mb.value())
+        }
+      )
+    }
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.unweave(ffa: (A) -> Kind<WriterTPartialOf<F, W>, B>): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      ML().run {
+        this@unweave.fix().value().unweave { (w, a) -> WriterT.tell(ML(), w).followedBy(ffa(a)).value() }
+      }
+    )
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ifThen(fb: Kind<WriterTPartialOf<F, W>, B>, ffa: (A) -> Kind<WriterTPartialOf<F, W>, B>): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      ML().run {
+        this@ifThen.fix().value().ifThen(fb.fix().value()) { (w, a) ->
+          WriterT.tell(ML(), w).followedBy(ffa(a)).value()
+        }
+      }
+    )
+
+  override fun <A> Kind<WriterTPartialOf<F, W>, A>.once(): Kind<WriterTPartialOf<F, W>, A> = WriterT(
+    ML().run {
+      this@once.value().once()
+    }
+  )
 }

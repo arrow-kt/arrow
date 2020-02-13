@@ -12,6 +12,7 @@ import arrow.core.extensions.const.eqK.eqK
 import arrow.core.extensions.eq
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.eqK.eqK
+import arrow.core.extensions.listk.monadLogic.monadLogic
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.monoid
@@ -37,6 +38,7 @@ import arrow.mtl.extensions.writert.eqK.eqK
 import arrow.mtl.extensions.writert.functor.functor
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
+import arrow.mtl.extensions.writert.monadLogic.monadLogic
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.test.UnitSpec
@@ -47,6 +49,7 @@ import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonadLogicLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import io.kotlintest.properties.Gen
@@ -108,6 +111,11 @@ class WriterTTest : UnitSpec() {
         WriterT.monad(Option.monad(), ListK.monoid<Int>()),
         WriterT.genK(Option.genK(), Gen.list(Gen.int()).map { it.k() }),
         optionEQK()
+      ),
+      MonadLogicLaws.laws<WriterTPartialOf<ForListK, String>>(
+        WriterT.monadLogic(ListK.monadLogic(), String.monoid()),
+        WriterT.genK(ListK.genK(), Gen.string()),
+        WriterT.eqK(ListK.eqK(), String.eq())
       )
     )
   }
