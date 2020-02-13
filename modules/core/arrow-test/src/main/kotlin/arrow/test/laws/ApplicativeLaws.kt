@@ -14,7 +14,6 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -30,8 +29,6 @@ object ApplicativeLaws {
     val EQTuple3: Eq<Kind<F, Tuple3<Int, Int, Int>>> = EQK.liftEq(Tuple3.eq(Int.eq(), Int.eq(), Int.eq()))
     val EQBoolean: Eq<Kind<F, Boolean>> = EQK.liftEq(Boolean.eq())
 
-    val M: Monoid<Int> = Int.monoid()
-
     return FunctorLaws.laws(A, GENK, EQK) + listOf(
       Law("Applicative Laws: ap identity") { A.apIdentity(G, EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
@@ -42,7 +39,7 @@ object ApplicativeLaws {
       Law("Applicative Laws: cartesian builder tupled3") { A.cartesianBuilderTupled3(EQTuple3) },
       Law("Applicative Laws: replicate check size") { A.replicateSize(EQ) },
       Law("Applicative Laws: replicate check list == 1") { A.replicateListOf1(EQBoolean) },
-      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(M, EQ) }
+      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(EQ) }
     )
   }
 
@@ -82,17 +79,17 @@ object ApplicativeLaws {
     }
 
   fun <F> Applicative<F>.replicateSize(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.intSmall()) { n ->
+    forAll(Gen.choose(0, 100)) { n ->
       just(1).replicate(n).map { it.size }.equalUnderTheLaw(just(n), EQ)
     }
 
   fun <F> Applicative<F>.replicateListOf1(EQ: Eq<Kind<F, Boolean>>): Unit =
-    forAll(Gen.intSmall()) { n ->
+    forAll(Gen.choose(0, 100)) { n ->
       just(1).replicate(n).map { list -> list.all { it == 1 } }.equalUnderTheLaw(just(true), EQ)
     }
 
-  fun <F> Applicative<F>.replicateMonoid(M: Monoid<Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.intSmall()) { n ->
-      just(1).replicate(n, M).map { it }.equalUnderTheLaw(just(n), EQ)
+  fun <F> Applicative<F>.replicateMonoid(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.choose(0, 100)) { n ->
+      just(1).replicate(n, Int.monoid()).equalUnderTheLaw(just(n), EQ)
     }
 }
