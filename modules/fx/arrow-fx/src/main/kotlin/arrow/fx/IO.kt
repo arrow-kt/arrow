@@ -982,30 +982,6 @@ sealed class IO<out A> : IOOf<A> {
   fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
     IOBracket.guaranteeCase(this, finalizer)
 
-  /**
-   * Executes the given [finalizer] when the source is canceled, allowing registering a cancellation token.
-   *
-   * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
-   */
-  fun onCancel(finalizer: IOOf<Unit>): IO<A> =
-    guaranteeCase { case ->
-      when (case) {
-        ExitCase.Canceled -> finalizer
-        else -> unit
-      }
-    }
-
-  /**
-   * Executes the given [finalizer] when the source is finishes with an error.
-   */
-  fun onError(finalizer: IOOf<Unit>): IO<A> =
-    guaranteeCase { case ->
-      when (case) {
-        is ExitCase.Error -> finalizer
-        else -> unit
-      }
-    }
-
   internal data class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
     override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
