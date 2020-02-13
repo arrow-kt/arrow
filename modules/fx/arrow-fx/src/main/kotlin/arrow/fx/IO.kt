@@ -1159,13 +1159,21 @@ fun <E, A> IOOf<E, A>.onCancel(finalizer: IOOf<E, Unit>): IO<E, A> =
     }
   }
 
+fun <E, A> IOOf<E, A>.onError(finalizer: (E) -> IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      is ExitCase2.Error<E> -> finalizer(case.error)
+      else -> IO.unit
+    }
+  }
+
 /**
  * Executes the given [finalizer] when the source is finishes with an error.
  */
-fun <E, A> IOOf<E, A>.onException(finalizer: IOOf<E, Unit>): IO<E, A> =
+fun <E, A> IOOf<E, A>.onException(finalizer: (Throwable) -> IOOf<E, Unit>): IO<E, A> =
   guaranteeCase { case ->
     when (case) {
-      is ExitCase2.Exception -> finalizer
+      is ExitCase2.Exception -> finalizer(case.exception)
       else -> IO.unit
     }
   }

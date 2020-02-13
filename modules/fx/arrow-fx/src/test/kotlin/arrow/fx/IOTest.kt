@@ -579,14 +579,6 @@ class IOTest : UnitSpec() {
       }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
     }
 
-    "onException should be called on finish with error" {
-      IO.fx<Nothing, Unit> {
-        val p = !Promise<Unit>()
-        !IO.effect<Int> { throw Exception() }.onException(p.complete(Unit)).attempt()
-        !p.get()
-      }.unsafeRunTimed(1.seconds) shouldBe Some(Right(Unit))
-    }
-
     "Bracket should be stack safe" {
       val size = 5000
 
@@ -909,7 +901,7 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun <E> IO.Companion.eqK() = object : EqK<IOPartialOf<E>> {
+internal fun <E> IO.Companion.eqK() = object : EqK<IOPartialOf<E>> {
   override fun <A> Kind<IOPartialOf<E>, A>.eqK(other: Kind<IOPartialOf<E>, A>, EQ: Eq<A>): Boolean = EQ<E, A>(EQ).run {
     fix().eqv(other.fix())
   }
