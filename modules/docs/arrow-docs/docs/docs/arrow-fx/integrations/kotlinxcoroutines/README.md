@@ -71,7 +71,7 @@ fun main() {
 
 ## Alternatively, integrating IO with kotlinx.coroutines
 
-Sometimes you might want to not switch the runtime of your project and slowly integrate `IO` instead. For this use case we've added some extensions to make `IO` work with the Coroutines runtime.
+Sometimes you might want to not switch the runtime of your project and slowly integrate `IO` instead. For this use case we've added some extensions to make `IO` work with the KotlinX Coroutines runtime.
 
 *IMPORTANT NOTE*: The way kotlinx.coroutines handle errors is by throwing exceptions after you run your operations. Because of this it's important to clarify that your operation might crash your app if you're not handling errors (in case of IO, `handleError`) or try-catching the execution.
 
