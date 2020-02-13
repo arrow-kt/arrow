@@ -299,5 +299,3 @@ interface WriterTMonadPlus<F, W> : MonadPlus<WriterTPartialOf<F, W>>, WriterTMon
   override fun AL(): Alternative<F>
   override fun AF(): Applicative<F> = AL()
 }
-
-1
