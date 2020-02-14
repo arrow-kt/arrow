@@ -12,8 +12,10 @@ import arrow.mtl.Kleisli
 import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.either
+import arrow.test.generators.eval
 import arrow.test.generators.functionAToB
 import arrow.test.generators.functionToA
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -59,9 +61,9 @@ object MonadLaws {
       Law("Monad Laws: monad followedBy should be consistent with applicative followedBy") { M.derivedFollowedByConsistent(GENK, AP, EQ) },
       Law("Monad Laws: monad selective should be consistent with selective selective") { M.derivedSelectiveConsistent(GENK, SL, EQ) },
       Law("Monad Laws: monad flatten should be consistent") { M.derivedFlattenConsistent(GENK, EQ) },
-      Law("Monad Laws: monad followedByEval should be consistent") { M.derivedFollowedByEvalConsistent(GENK, EQ) },
+      Law("Monad Laws: monad followedByEval should be consistent") { M.derivedFollowedByEvalConsistent(GENK, SL, EQ) },
       Law("Monad Laws: monad productL should be consistent") { M.derivedProductLConsistent(GENK, EQ) },
-      Law("Monad Laws: monad productLEval should be consistent") { M.derivedProductLEvalConsistent(GENK, EQ) },
+      Law("Monad Laws: monad productLEval should be consistent") { M.derivedProductLEvalConsistent(GENK, SL, EQ) },
       Law("Monad Laws: monad product should be consistent with applicative product") { M.derivedProductConsistent(GENK, AP, EQTuple2) },
       Law("Monad Laws: monad mproduct should be consistent") { M.derivedMProductConsistent(GENK, EQTuple2) },
       Law("Monad Laws: monad ifM should be consistent") { M.derivedIfMConsistent(GENK, EQ) }
@@ -137,11 +139,9 @@ object MonadLaws {
       fa.flatten().equalUnderTheLaw(fa.flatMap(::identity), EQ)
     }
 
-  fun <F> Monad<F>.derivedFollowedByEvalConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
-//    forAll(GK.genK(Gen.int()), Gen.int().eval()) { fa, fb: Eval<Kind<Any, Int>> ->
-    forAll(GK.genK(Gen.int()), GK.genK(Gen.int())) { fa, fb ->
-      // fa.followedByEval(fb).equalUnderTheLaw(fa.flatMap { fb.value() }, EQ)
-      fa.followedByEval(Eval.just(fb)).equalUnderTheLaw(fa.followedByEval(Eval.just(fb)), EQ)
+  fun <F> Monad<F>.derivedFollowedByEvalConsistent(GK: GenK<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(GK.genK(Gen.int()), Gen.int().eval(AP)) { fa, fb: Eval<Kind<F, Int>> ->
+      fa.followedByEval(fb).equalUnderTheLaw(fa.flatMap { fb.value() }, EQ)
     }
 
   fun <F> Monad<F>.derivedProductLConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
@@ -149,9 +149,9 @@ object MonadLaws {
       fa.productL(fb).equalUnderTheLaw(fa.flatMap { a -> fb.map { a } }, EQ)
     }
 
-  fun <F> Monad<F>.derivedProductLEvalConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(GK.genK(Gen.int()), GK.genK(Gen.int())) { fa, fb ->
-      fa.productLEval(Eval.just(fb)).equalUnderTheLaw(fa.productLEval(Eval.just(fb)), EQ)
+  fun <F> Monad<F>.derivedProductLEvalConsistent(GK: GenK<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(GK.genK(Gen.int()), Gen.int().eval(AP)) { fa, fb: Eval<Kind<F, Int>> ->
+      fa.productLEval(fb).equalUnderTheLaw(fa.flatMap { a -> fb.value().map { a } }, EQ)
     }
 
   fun <F> Monad<F>.derivedProductConsistent(GK: GenK<F>, AP: Apply<F>, EQ: Eq<Kind<F, Tuple2<Int, Int>>>): Unit =
