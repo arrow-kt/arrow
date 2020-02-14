@@ -49,9 +49,6 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()
 
-  fun <B> apPipe(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).value() }.k()
 

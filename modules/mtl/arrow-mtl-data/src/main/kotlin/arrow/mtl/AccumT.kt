@@ -134,13 +134,6 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
         }
       })
 
-  fun <B> ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, (A) -> B>): AccumT<S, F, B> =
-    flatMap(MS, MF) { a ->
-      mf.fix().map(MF) { f ->
-        f(a)
-      }
-    }
-
   /**
    * Convert an accumulation (append-only) computation into a fully stateful computation.
    */
@@ -156,6 +149,9 @@ data class AccumT<S, F, A>(val accumT: AccumTFun<S, F, A>) : AccumTOf<S, F, A> {
         }
       })
 }
+
+fun <S, F, A, B> AccumTOf<S, F, (A) -> B>.ap(MS: Monoid<S>, MF: Monad<F>, mf: AccumTOf<S, F, A>): AccumT<S, F, B> =
+  fix().flatMap(MS, MF) { f -> mf.fix().map(MF, f) }
 
 /**
  * Convert a read-only computation into an accumulation computation.

@@ -25,8 +25,6 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
   companion object {
     fun <F, A> just(a: A): FreeApplicative<F, A> = Pure(a)
 
-    fun <F, P, A> apPipe(fp: FreeApplicative<F, P>, fn: FreeApplicative<F, (P) -> A>): FreeApplicative<F, A> = Ap(fn, fp)
-
     fun <F, A> liftF(fa: Kind<F, A>): FreeApplicative<F, A> = Lift(fa)
 
     internal fun <F, G> functionKF(f: FunctionK<F, G>): FunctionK<F, FreeApplicativePartialOf<G>> =

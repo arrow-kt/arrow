@@ -41,9 +41,6 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
-  fun <B> apPipe(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.flatMap { f(it).value() }.k()
 

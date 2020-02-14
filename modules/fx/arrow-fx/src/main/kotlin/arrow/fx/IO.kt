@@ -1024,8 +1024,8 @@ fun <E, A, B, E2 : E> IOOf<E, A>.followedBy(fb: IOOf<E2, B>): IO<E2, B> =
  * }
  * ```
  */
-fun <E, A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
-  flatMap { a -> ff.fix().map { it(a) } }
+fun <E, A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+  flatMap { f -> ff.fix().map(f) }
 
 fun <E, A, E2, B : A> IOOf<E, A>.flatMapLeft(f: (E) -> IOOf<E2, A>): IO<E2, A> =
   when (val bio = fix()) {

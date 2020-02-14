@@ -151,12 +151,9 @@ interface IOMonadError<E> : MonadError<IOPartialOf<E>, Throwable>, IOApplicative
 
   override fun <A> just(a: A): IO<Nothing, A> = IO.just(a)
 
-  override fun <A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
-    Ap(ff)
   override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
     Ap(ff)
 
-  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
   override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
     FlatMap { f -> ff().map(f) }
 
@@ -172,11 +169,6 @@ interface IOMonadError<E> : MonadError<IOPartialOf<E>, Throwable>, IOApplicative
   override fun <A, B> IOOf<E, A>.redeemWith(fe: (Throwable) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<E, B> =
     RedeemWith({ t -> fe(t) }, { e -> IO.raiseError(e) }, { a -> fb(a) })
 
-  override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
-    IO.raiseException(e)
-
-  override fun <A, B> IOOf<E, A>.lazyAp(ff: () -> IOOf<E, (A) -> B>): IO<E, B> =
-    FlatMap { a -> ff().map { f -> f(a) } }
   override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
     IO.raiseException(e)
 }

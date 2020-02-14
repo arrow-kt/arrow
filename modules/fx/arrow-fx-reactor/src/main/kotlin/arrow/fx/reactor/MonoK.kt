@@ -46,9 +46,6 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
-  fun <B> apPipe(fa: MonoKOf<(A) -> B>): MonoK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     mono.flatMap { f(it).fix().mono }.k()
 

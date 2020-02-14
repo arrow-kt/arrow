@@ -22,6 +22,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
+import arrow.mtl.ap as accumTAp
 
 @extension
 interface AccumTFunctor<S, F> : Functor<AccumTPartialOf<S, F>> {
@@ -40,8 +41,8 @@ interface AccumTApplicative<S, F> : Applicative<AccumTPartialOf<S, F>> {
   override fun <A> just(a: A): Kind<AccumTPartialOf<S, F>, A> =
     AccumT.just(MS(), MF(), a)
 
-  override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.ap(ff: Kind<AccumTPartialOf<S, F>, (A) -> B>): Kind<AccumTPartialOf<S, F>, B> =
-    fix().ap(MS(), MF(), ff)
+  override fun <A, B> Kind<AccumTPartialOf<S, F>, (A) -> B>.ap(ff: Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, B> =
+    fix().accumTAp(MS(), MF(), ff)
 }
 
 @extension
@@ -59,8 +60,8 @@ interface AccumTMonad<S, F> : Monad<AccumTPartialOf<S, F>>, AccumTApplicative<S,
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<AccumTPartialOf<S, F>, Either<A, B>>): Kind<AccumTPartialOf<S, F>, B> =
     AccumT.tailRecM(MF(), a, f)
 
-  override fun <A, B> Kind<AccumTPartialOf<S, F>, A>.ap(ff: Kind<AccumTPartialOf<S, F>, (A) -> B>): Kind<AccumTPartialOf<S, F>, B> =
-    fix().ap(MS(), MF(), ff)
+  override fun <A, B> Kind<AccumTPartialOf<S, F>, (A) -> B>.ap(ff: Kind<AccumTPartialOf<S, F>, A>): Kind<AccumTPartialOf<S, F>, B> =
+    fix().accumTAp(MS(), MF(), ff)
 }
 
 @extension

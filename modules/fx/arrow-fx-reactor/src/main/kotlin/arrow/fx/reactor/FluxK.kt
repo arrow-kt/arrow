@@ -40,9 +40,6 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
-  fun <B> apPipe(fa: FluxKOf<(A) -> B>): FluxK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.flatMap { f(it).fix().flux }.k()
 

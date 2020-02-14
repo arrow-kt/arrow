@@ -46,9 +46,6 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
 
-  fun <B> apPipe(fa: SingleKOf<(A) -> B>): SingleK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).value() }.k()
 

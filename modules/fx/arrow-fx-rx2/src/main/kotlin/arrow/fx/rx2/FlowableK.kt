@@ -42,9 +42,6 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
   fun <B> map(f: (A) -> B): FlowableK<B> =
     flowable.map(f).k()
 
-  fun <B> apPipe(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
-    flatMap { a -> fa.fix().map { ff -> ff(a) } }
-
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.flatMap { f(it).value() }.k()
 
