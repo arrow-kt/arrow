@@ -57,22 +57,22 @@ object MonadDeferLaws {
   }
 
   fun <F> laws(
-      SC: MonadDefer<F>,
-      GENK: GenK<F>,
-      EQK: EqK<F>,
-      testStackSafety: Boolean = true
+    SC: MonadDefer<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
   ): List<Law> =
       BracketLaws.laws(SC, GENK, EQK) +
           monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> laws(
-      SC: MonadDefer<F>,
-      FF: Functor<F>,
-      AP: Apply<F>,
-      SL: Selective<F>,
-      GENK: GenK<F>,
-      EQK: EqK<F>,
-      testStackSafety: Boolean = true
+    SC: MonadDefer<F>,
+    FF: Functor<F>,
+    AP: Apply<F>,
+    SL: Selective<F>,
+    GENK: GenK<F>,
+    EQK: EqK<F>,
+    testStackSafety: Boolean = true
   ): List<Law> =
       BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
           monadDeferLaws(SC, GENK, EQK, testStackSafety)
