@@ -1,6 +1,7 @@
 package arrow.fx.mtl
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -22,7 +23,7 @@ import arrow.extension
 import arrow.fx.IO
 import arrow.fx.typeclasses.MonadIO
 import arrow.mtl.extensions.StateTMonad
-import arrow.mtl.runM
+import arrow.mtl.run
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented
@@ -42,9 +43,9 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
   ): StateT<F, S, B> = MD().run {
 
     StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref(this, None)).flatMap { ref ->
-      StateT<F, S, B>(this) { startS ->
-        runM(this, startS).bracketCase(use = { (s, a) ->
-          use(a).runM(this, s).flatMap { sa ->
+      StateT<F, S, B> { startS ->
+        run(startS).bracketCase(use = { (s, a) ->
+          use(a).run(s).flatMap { sa ->
             ref.set(Some(sa.a)).map { sa }
           }
         }, release = { (s0, a), exitCase ->
@@ -55,7 +56,7 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
                   ref.set(Some(s2))
                 }
               }
-            else -> release(a, exitCase).runM(this, s0).unit()
+            else -> release(a, exitCase).run(s0).unit()
           }
         }).flatMap { (s, b) -> ref.get().map { it.getOrElse { s } }.tupleRight(b) }
       }
@@ -70,7 +71,7 @@ interface StateTMonadDefer<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBrac
   override fun MD(): MonadDefer<F>
 
   override fun <A> defer(fa: () -> StateTOf<F, S, A>): StateT<F, S, A> = MD().run {
-    StateT(this) { s -> defer { fa().runM(this, s) } }
+    StateT { s -> defer { fa().run(s) } }
   }
 }
 
@@ -87,14 +88,14 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
   }
 
   override fun <A> asyncF(k: ProcF<StateTPartialOf<F, S>, A>): StateT<F, S, A> = AS().run {
-    StateT.invoke(this) { s ->
+    StateT { s ->
       asyncF<A> { cb -> k(cb).fix().runA(this, s) }
         .map { Tuple2(s, it) }
     }
   }
 
   override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {
-    StateT(this) { s -> runM(this, s).continueOn(ctx) }
+    StateT(AndThen(fix().runF).andThen { it.continueOn(ctx) })
   }
 }
 
