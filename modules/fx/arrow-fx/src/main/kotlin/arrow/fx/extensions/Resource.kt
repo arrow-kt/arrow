@@ -43,7 +43,7 @@ interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, Reso
 interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>>, ResourceApplicative<F, E> {
   override fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).apPipe(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
+    fix().flatMap { it.fold({ a -> f.fix().ap(Resource.just(a, BR())) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension
@@ -62,7 +62,7 @@ interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>>, ResourceSelectiv
     fix().resAp(BR(), ff)
 
   override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
-    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).apPipe(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
+    fix().flatMap { it.fold({ a -> f.fix().ap(Resource.just(a, BR())) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension
