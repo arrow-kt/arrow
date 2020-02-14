@@ -4,12 +4,13 @@ import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.core.extensions.id.functor.functor
+import arrow.core.extensions.list.foldable.foldLeft
 import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
 
 class StateTests : UnitSpec() {
 
-  private val addOne = State<Int, Int> { n -> n * 2 toT n }
+  private val addOne = State { n: Int -> n * 2 toT n }
 
   val add1 = State { n: Int -> n + 1 toT n }
 
@@ -52,6 +53,12 @@ class StateTests : UnitSpec() {
       val s1 = StateApi.modify<String> { "bar" }
       val s2 = StateApi.set("bar")
       s1.run("foo") shouldBe s2.run("foo")
+    }
+
+    "flatMap is stacksafe" {
+      (0..50000).toList().foldLeft(State<Int, Unit> { 0 toT Unit }) { acc, v ->
+        acc.flatMap { StateApi.set(v) }
+      }.runS(0) shouldBe 50000
     }
   }
 }

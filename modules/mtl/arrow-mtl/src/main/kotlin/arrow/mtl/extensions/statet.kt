@@ -1,6 +1,7 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
@@ -18,10 +19,12 @@ import arrow.mtl.StateTOf
 import arrow.mtl.StateTPartialOf
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.functor.functor
+import arrow.mtl.extensions.statet.monad.flatMap
 import arrow.mtl.extensions.statet.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.runM
+import arrow.mtl.run
 import arrow.mtl.typeclasses.MonadState
+import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant
@@ -34,11 +37,9 @@ import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
-import arrow.mtl.extensions.statet.monad.flatMap
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.MonoidK
 
 @extension
 @undocumented
@@ -62,7 +63,7 @@ interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFu
     fix().map(MF(), f)
 
   override fun <A> just(a: A): StateT<F, S, A> =
-    StateT(MF().just({ s: S -> MF().just(Tuple2(s, a)) }))
+    StateT.just(MF(), a)
 
   override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
     fix().ap(MF(), ff)
@@ -90,25 +91,28 @@ interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F,
     fix().ap(MF(), ff.fix())
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.lazyAp(ff: () -> Kind<StateTPartialOf<F, S>, (A) -> B>): Kind<StateTPartialOf<F, S>, B> =
-    flatMap(MF()) { a -> ff().map { f -> f(a) } }
+    StateT(AndThen.id<S>().flatMap { s ->
+      AndThen(fix().runF).andThen { fa ->
+        MF().run {
+          fa.lazyAp { ff().run(s).map { (s, f) -> { (_, a): Tuple2<S, A> -> s toT f(a) } } }
+        }
+      }
+    })
 }
 
 @extension
 @undocumented
 interface StateTSemigroupK<F, S> : SemigroupK<StateTPartialOf<F, S>> {
-
-  fun MF(): Monad<F>
-
   fun SS(): SemigroupK<F>
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
-    fix().combineK(MF(), SS(), y)
+    fix().combineK(SS(), y)
 }
 
 @extension
 @undocumented
 interface StateTMonoidK<F, S> : MonoidK<StateTPartialOf<F, S>>, StateTSemigroupK<F, S> {
-  override fun MF(): Monad<F>
+  fun MF(): Monad<F>
   fun MO(): MonoidK<F>
   override fun SS(): SemigroupK<F> = MO()
 
@@ -129,13 +133,14 @@ interface StateTApplicativeError<F, S, E> : ApplicativeError<StateTPartialOf<F, 
     StateT.liftF(this, raiseError(e))
   }
 
-  override fun <A> StateTOf<F, S, A>.handleErrorWith(f: (E) -> StateTOf<F, S, A>): StateT<F, S, A> = ME().run {
-    State(this) { s ->
-      runM(this, s).handleErrorWith { e ->
-        f(e).runM(this, s)
+  override fun <A> StateTOf<F, S, A>.handleErrorWith(f: (E) -> StateTOf<F, S, A>): StateT<F, S, A> =
+    StateT(AndThen.id<S>().flatMap { s ->
+      AndThen(fix().runF).andThen {
+        ME().run {
+          it.handleErrorWith { e -> f(e).run(s) }
+        }
       }
-    }
-  }
+    })
 }
 
 @extension
@@ -159,16 +164,8 @@ interface StateTContravariantInstance<F, S> : Contravariant<StateTPartialOf<F, S
 
   fun CF(): Contravariant<F>
 
-  fun MF(): Monad<F>
-
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.contramap(f: (B) -> A): Kind<StateTPartialOf<F, S>, B> =
-    StateT(MF()) { s ->
-      CF().run {
-        runM(MF(), s).contramap { (s, b) ->
-          s toT f(b)
-        }
-      }
-    }
+    StateT(AndThen(fix().runF).andThen { fa -> CF().run { fa.contramap { (s, b): Tuple2<S, B> -> s toT f(b) } } })
 }
 
 @extension
@@ -178,16 +175,15 @@ interface StateTDivideInstance<F, S> : Divide<StateTPartialOf<F, S>>, StateTCont
   fun DF(): Divide<F>
   override fun CF(): Contravariant<F> = DF()
 
-  fun MFF(): Monad<F>
-  override fun MF(): Monad<F> = MFF()
-
   override fun <A, B, Z> divide(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Tuple2<A, B>): Kind<StateTPartialOf<F, S>, Z> =
-    StateT(MF()) { s ->
-      DF().divide(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
-        val (a, b) = f(z)
-        (s toT a) toT (s toT b)
+    StateT(AndThen(fa.fix().runF).flatMap { fa ->
+      AndThen(fb.fix().runF).andThen { fb ->
+        DF().divide(fa, fb) { (s, z): Tuple2<S, Z> ->
+          val (a, b) = f(z)
+          (s toT a) toT (s toT b)
+        }
       }
-    }
+    })
 }
 
 @extension
@@ -195,11 +191,9 @@ interface StateTDivideInstance<F, S> : Divide<StateTPartialOf<F, S>>, StateTCont
 interface StateTDivisibleInstance<F, S> : Divisible<StateTPartialOf<F, S>>, StateTDivideInstance<F, S> {
   fun DFF(): Divisible<F>
   override fun DF(): Divide<F> = DFF()
-  fun MFFF(): Monad<F>
-  override fun MFF(): Monad<F> = MFFF()
 
   override fun <A> conquer(): Kind<StateTPartialOf<F, S>, A> =
-    StateT(MF()) { DFF().conquer() }
+    StateT { DFF().conquer() }
 }
 
 @extension
@@ -207,19 +201,19 @@ interface StateTDivisibleInstance<F, S> : Divisible<StateTPartialOf<F, S>>, Stat
 interface StateTDecidableInstante<F, S> : Decidable<StateTPartialOf<F, S>>, StateTDivisibleInstance<F, S> {
   fun DFFF(): Decidable<F>
   override fun DFF(): Divisible<F> = DFFF()
-  fun MFFFF(): Monad<F>
-  override fun MFFF(): Monad<F> = MFFFF()
 
   override fun <A, B, Z> choose(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Either<A, B>): Kind<StateTPartialOf<F, S>, Z> =
-    StateT(MF()) { s ->
-      DFFF().choose(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
-        f(z).fold({ a ->
-          (s toT a).left()
-        }, { b ->
-          (s toT b).right()
-        })
+    StateT(AndThen(fa.fix().runF).flatMap { fa ->
+      AndThen(fb.fix().runF).andThen { fb ->
+        DFFF().choose(fa, fb) { (s, z): Tuple2<S, Z> ->
+          f(z).fold({ a ->
+            (s toT a).left()
+          }, { b ->
+            (s toT b).right()
+          })
+        }
       }
-    }
+    })
 }
 
 /**
@@ -267,7 +261,7 @@ interface StateTMonadCombine<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateT
   override fun <A> empty(): Kind<StateTPartialOf<F, S>, A> = liftT(MC().empty())
 
   fun <A> liftT(ma: Kind<F, A>): StateT<F, S, A> = FF().run {
-    StateT(just({ s: S -> ma.map { a: A -> s toT a } }))
+    StateT { s: S -> ma.map { a: A -> s toT a } }
   }
 }
 
@@ -280,18 +274,19 @@ interface StateTAlternative<F, S> : Alternative<StateTPartialOf<F, S>>, StateTMo
   override fun <A> empty(): Kind<StateTPartialOf<F, S>, A> = StateT.liftF(AF(), AF().empty<A>())
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.orElse(b: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> =
-    StateT(AF()) { s ->
-      AF().run {
-        runM(MF(), s).orElse(b.runM(MF(), s))
+    StateT(AndThen(fix().runF).flatMap { fa ->
+      AndThen(b.fix().runF).andThen { fb ->
+        AF().run { fa.orElse(fb) }
       }
-    }
+    })
 
+  // Note: This can stackoverflow if `F` is not stacksafe, which is a tradeoff for having true short-circuit
   override fun <A> Kind<StateTPartialOf<F, S>, A>.lazyOrElse(b: () -> Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> =
-    StateT(AF()) { s ->
-      AF().run {
-        runM(MF(), s).lazyOrElse { b().runM(MF(), s) }
+    StateT(AndThen.id<S>().flatMap { s ->
+      AndThen(fix().runF).andThen { fa ->
+        AF().run { fa.lazyOrElse { b().fix().run(s) } }
       }
-    }
+    })
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
     orElse(y).fix()
