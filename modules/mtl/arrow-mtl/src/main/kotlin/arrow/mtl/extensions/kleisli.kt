@@ -1,6 +1,7 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.core.Id
 import arrow.core.Tuple2
@@ -151,7 +152,11 @@ interface KleisliMonad<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicative
     Kleisli.tailRecM(MF(), a, f)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.lazyAp(ff: () -> Kind<KleisliPartialOf<F, D>, (A) -> B>): Kind<KleisliPartialOf<F, D>, B> =
-    Kleisli { AF().run { run(it).lazyAp { ff().run(it) } } }
+    Kleisli(AndThen.id<D>().flatMap { d ->
+      AndThen(fix().run).andThen { fa ->
+        MF().run { fa.lazyAp { ff().run(d) } }
+      }
+    })
 }
 
 @extension
@@ -193,10 +198,16 @@ interface KleisliAlternative<F, D> : Alternative<KleisliPartialOf<F, D>>, Kleisl
 
   override fun <A> empty(): Kind<KleisliPartialOf<F, D>, A> = Kleisli { AL().empty() }
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.orElse(b: Kind<KleisliPartialOf<F, D>, A>): Kind<KleisliPartialOf<F, D>, A> =
-    Kleisli { d -> AL().run { run(d).orElse(b.run(d)) } }
+    Kleisli(AndThen(fix().run).flatMap { fa ->
+      AndThen(b.fix().run).andThen { fb -> AL().run { fa.orElse(fb) } }
+    })
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.lazyOrElse(b: () -> Kind<KleisliPartialOf<F, D>, A>): Kind<KleisliPartialOf<F, D>, A> =
-    Kleisli { d -> AL().run { run(d).lazyOrElse { b().run(d) } } }
+    Kleisli(AndThen.id<D>().flatMap { d ->
+      AndThen(fix().run).andThen { fa ->
+        AL().run { fa.lazyOrElse { b().run(d) } }
+      }
+    })
 }
 
 @extension
