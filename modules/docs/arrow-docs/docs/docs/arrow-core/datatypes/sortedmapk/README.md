@@ -1,9 +1,9 @@
 ---
 layout: docs-core
 title: SortedMapK
-permalink: /docs/arrow/core/sortedmapk/
+permalink: /arrow/core/sortedmapk/
 redirect_from:
-  - /docs/datatypes/sortedmapk/
+  - /datatypes/sortedmapk/
 ---
 
 ## SortedMapK
@@ -11,4 +11,4 @@ redirect_from:
 
 
 
-`SortedMapK` is pretty much the same as [`MapK`]({{ '/docs/arrow/core/mapk' | relative_url }}) except that it is sorted.
+`SortedMapK` is pretty much the same as [`MapK`]({{ '/arrow/core/mapk' | relative_url }}) except that it is sorted.

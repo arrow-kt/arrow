@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Fold
-permalink: /docs/optics/fold/
+permalink: /optics/fold/
 ---
 
 ## Fold

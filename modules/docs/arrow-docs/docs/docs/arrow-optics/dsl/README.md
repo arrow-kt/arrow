@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Syntax DSL
-permalink: /docs/optics/dsl/
+permalink: /optics/dsl/
 ---
 
 ## Optics DSL
@@ -62,7 +62,7 @@ We can rewrite this code with our generated DSL.
 NetworkResult.networkError.httpError.message.modify(networkResult, f)
 ```
 
-The DSL also has special support for [Each]({{ '/docs/optics/each' | relative_url }}), [At]({{ '/docs/optics/at' | relative_url }}), and [Index]({{ '/docs/optics/index' | relative_url }}).
+The DSL also has special support for [Each]({{ '/optics/each' | relative_url }}), [At]({{ '/optics/at' | relative_url }}), and [Index]({{ '/optics/index' | relative_url }}).
 
 ### Each
 
@@ -140,7 +140,7 @@ ListK.index<Employee>().run {
 }
 ```
 
-Since [Index]({{ '/docs/optics/index' | relative_url }}) returns an [Optional]({{ '/docs/optics/optional' | relative_url }}), `index` and `[]` are safe operations.
+Since [Index]({{ '/optics/index' | relative_url }}) returns an [Optional]({{ '/optics/optional' | relative_url }}), `index` and `[]` are safe operations.
 
 ```kotlin:ank
 ListK.index<Employee>().run {

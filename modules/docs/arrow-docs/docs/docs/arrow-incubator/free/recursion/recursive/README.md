@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Recursive
-permalink: /docs/recursion/recursive/
+permalink: /recursion/recursive/
 ---
 
 ## Recursive
@@ -10,7 +10,7 @@ permalink: /docs/recursion/recursive/
 
 
 The recursive typeclass abstracts out the ability to recursively fold a structure.
-See [Intro to Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}) for
+See [Intro to Recursion Schemes]({{ '/recursion/intro/' | relative_url }}) for
 an introduction to how it works.
 
 ### Main Combinators

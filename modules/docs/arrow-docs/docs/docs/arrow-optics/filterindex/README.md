@@ -1,13 +1,13 @@
 ---
 layout: docs-optics
 title: FilterIndex
-permalink: /docs/optics/filterindex/
+permalink: /optics/filterindex/
 ---
 
 ## FilterIndex
 
 
-`FilterIndex` provides a [Traversal]({{ '/docs/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set, or modify 0 to N foci whose index `I` satisfies a predicate.
+`FilterIndex` provides a [Traversal]({{ '/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set, or modify 0 to N foci whose index `I` satisfies a predicate.
 
 If the foci `A` for a structure `S` can be indexed by `I`, then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
 

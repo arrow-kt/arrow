@@ -1,9 +1,9 @@
 ---
 layout: docs-incubator
 title: State
-permalink: /docs/arrow/mtl/state/
+permalink: /arrow/mtl/state/
 redirect_from:
-  - /docs/datatypes/state/
+  - /datatypes/state/
 video: GcXC0xARSXg
 ---
 

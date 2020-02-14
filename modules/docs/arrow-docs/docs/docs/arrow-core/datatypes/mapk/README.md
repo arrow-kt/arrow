@@ -1,9 +1,9 @@
 ---
 layout: docs-core
 title: MapK
-permalink: /docs/arrow/core/mapk/
+permalink: /arrow/core/mapk/
 redirect_from:
-  - /docs/datatypes/mapk/
+  - /datatypes/mapk/
 ---
 
 ## MapK
@@ -20,10 +20,10 @@ import arrow.core.*
 DataType(MapK::class).tcMarkdownList()
 ```
 
-`MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }})
+`MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/patterns/glossary/#type-constructors' | relative_url }})
 and to work with `Map` in more functional way.
 
-It can be created by calling `k()` function on Map: 
+It can be created by calling `k()` function on Map:
 
 ```kotlin:ank
 import arrow.core.MapK
@@ -53,7 +53,7 @@ val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secon
 }
 ```
 
-`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval/' | relative_url }}) type.
+`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`]({{ '/apidocs/arrow-core-data/arrow.core/-eval/' | relative_url }}) type.
 
 `ap` function is used when you want to apply map of transformations from `Map<K, (A)-> B>` to `Map<K,A>`. For example:
 

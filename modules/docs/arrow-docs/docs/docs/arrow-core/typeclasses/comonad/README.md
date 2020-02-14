@@ -1,9 +1,9 @@
 ---
 layout: docs-core
 title: Comonad
-permalink: /docs/arrow/typeclasses/comonad/
+permalink: /arrow/typeclasses/comonad/
 redirect_from:
-  - /docs/typeclasses/comonad/
+  - /typeclasses/comonad/
 ---
 
 ## Comonad
@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 ### Data types
 

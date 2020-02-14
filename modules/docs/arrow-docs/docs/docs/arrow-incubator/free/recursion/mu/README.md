@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Mu
-permalink: /docs/recursion/mu/
+permalink: /recursion/mu/
 ---
 
 ## Mu

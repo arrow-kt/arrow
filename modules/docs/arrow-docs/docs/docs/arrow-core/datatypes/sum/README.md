@@ -1,16 +1,16 @@
 ---
 layout: docs-core
 title: Sum
-permalink: /docs/arrow/ui/sum/
+permalink: /arrow/ui/sum/
 redirect_from:
-  - /docs/datatypes/sum/
+  - /datatypes/sum/
 ---
 
 ## Sum
 
 > The sum of two Comonads is also a Comonad.
 
-A Sum is a data structure that holds two [`Comonads`]({{ '/docs/arrow/typeclasses/comonad' | relative_url }}) and a flag for selecting which one is "active".
+A Sum is a data structure that holds two [`Comonads`]({{ '/arrow/typeclasses/comonad' | relative_url }}) and a flag for selecting which one is "active".
 
 A common pattern used when building user interfaces is showing two tabs and allowing the user to change between them. We can achieve this behavior with Sum.
 

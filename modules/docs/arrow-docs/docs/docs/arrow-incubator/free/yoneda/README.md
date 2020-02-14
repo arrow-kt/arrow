@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Yoneda
-permalink: /docs/free/yoneda/
+permalink: /free/yoneda/
 ---
 
 ## Yoneda
@@ -10,4 +10,4 @@ permalink: /docs/free/yoneda/
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/datatypes/intro/' | relative_url }}).

@@ -1,9 +1,9 @@
 ---
 layout: docs-incubator
 title: MonadTrans
-permalink: /docs/arrow/mtl/typeclasses/monadtrans/
+permalink: /arrow/mtl/typeclasses/monadtrans/
 redirect_from:
-  - /docs/typeclasses/monadtrans/
+  - /typeclasses/monadtrans/
 ---
 
 ## MonadTrans
@@ -32,7 +32,7 @@ verification of lawful instances and third party apps creating their own `MonadT
 Arrow already provides MonadTrans instances for OptionT. See the implementation
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
 ### Data types
 

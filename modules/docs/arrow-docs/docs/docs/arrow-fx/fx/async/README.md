@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Arrow Fx - Asynchronous & Concurrent Programming
-permalink: /docs/fx/async/
+permalink: /fx/async/
 ---
 
 # Asynchronous & Concurrent Programming
@@ -41,7 +41,7 @@ In addition to `continueOn`, Arrow Fx allows users to override the executions co
 
 ## Fibers
 
-A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data type starting concurrently that can be either `join`ed or `cancel`ed.
+A [Fiber]({{'/effects/fiber' | relative_url }}) represents the pure result of a [Concurrent] data type starting concurrently that can be either `join`ed or `cancel`ed.
 
 ```kotlin:ank:playground
 import arrow.fx.IO

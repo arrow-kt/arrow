@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Setup
-permalink: /docs/quickstart/setup/
+permalink: /quickstart/setup/
 ---
 
 ## Setup
@@ -92,7 +92,7 @@ dependencies {
 }
 ```
 
-Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
+Here is the complete [library list]({{ '/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
 #### Additional Setup
 
@@ -219,4 +219,4 @@ Enable annotation processing using Kotlin plugin:
 
 ### Linting
 
-Some linters might complaint about some code practices that are common when working with functional programming. You can read more about how to solve this problem in the [Linting]({{ '/docs/quickstart/linting/' | relative_url }}) section.
+Some linters might complaint about some code practices that are common when working with functional programming. You can read more about how to solve this problem in the [Linting]({{ '/quickstart/linting/' | relative_url }}) section.

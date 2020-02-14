@@ -1,9 +1,9 @@
 ---
 layout: docs-incubator
 title: Accum
-permalink: /docs/arrow/mtl/accum/
+permalink: /arrow/mtl/accum/
 redirect_from:
-  - /docs/datatypes/accum/
+  - /datatypes/accum/
 ---
 
 ## Accum

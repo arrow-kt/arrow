@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Queue
-permalink: /docs/effects/queue/
+permalink: /effects/queue/
 ---
 
 ## Queue

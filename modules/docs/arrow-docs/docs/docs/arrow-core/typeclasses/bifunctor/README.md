@@ -1,9 +1,9 @@
 ---
 layout: docs-core
 title: Bifunctor
-permalink: /docs/arrow/typeclasses/bifunctor/
+permalink: /arrow/typeclasses/bifunctor/
 redirect_from:
-  - /docs/typeclasses/bifunctor/
+  - /typeclasses/bifunctor/
 ---
 
 ## Bifunctor
@@ -11,7 +11,7 @@ redirect_from:
 
 
 
-`Bifunctor` is a lot like [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}). It offers a nice solution for those times when you don’t want to ignore the leftmost type argument of a binary type constructor, such as `Either` or `Tuple2`.
+`Bifunctor` is a lot like [`Functor`]({{ '/arrow/typeclasses/functor' | relative_url }}). It offers a nice solution for those times when you don’t want to ignore the leftmost type argument of a binary type constructor, such as `Either` or `Tuple2`.
 
 Its core operation, `bimap`, closely resembles `map`, except it lifts two functions into the new context, allowing you to apply one or both.
 

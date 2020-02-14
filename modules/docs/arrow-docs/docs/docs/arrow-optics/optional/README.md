@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Optional
-permalink: /docs/optics/optional/
+permalink: /optics/optional/
 ---
 
 ## Optional

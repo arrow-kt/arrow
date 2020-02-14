@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: IO
-permalink: /docs/effects/io/
+permalink: /effects/io/
 ---
 
 ## IO
@@ -208,8 +208,8 @@ IO.async<Int> { callback ->
 
 ## Effect Comprehensions
 
-`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
-[Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
+`IO` is usually best paired with [comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
+[Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
 import arrow.typeclasses.*
@@ -232,4 +232,4 @@ IO.fx {
 
 ## Common operators
 
-IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
+IO implements all the operators common to all instances of [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.

@@ -12,11 +12,6 @@ docVersions:
       url: https://next.arrow-kt.io/
       previous: https://arrow-kt.io/
 
-docMenu:
-    title: Documentation
-    url: /docs
-    icon: "fa-book"
-
 # Literals
 previous: PREVIOUS
 stable: STABLE

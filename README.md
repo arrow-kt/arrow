@@ -129,7 +129,7 @@ dependencies {
 
 ##### Other libraries
 
-Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
+Here is the complete [library list]({{ '/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
 #### Additional Setup
 

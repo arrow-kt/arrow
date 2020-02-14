@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: FreeApplicative
-permalink: /docs/free/freeapplicative/
+permalink: /free/freeapplicative/
 ---
 
 ## FreeApplicative
@@ -10,4 +10,4 @@ permalink: /docs/free/freeapplicative/
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/datatypes/intro/' | relative_url }}).

@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Sync
-permalink: /docs/effects/monaddefer/
+permalink: /effects/monaddefer/
 ---
 
 ## MonadDefer
@@ -27,7 +27,7 @@ later.unsafeRunAsync { }
 
 ### Main Combinators
 
-All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}).
 
 #### invoke
 
@@ -60,7 +60,7 @@ This can be used to wrap synchronous APIs that already return the expected datat
 #### lazy
 
 Suspends a function returning `Unit`.
-Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
+Useful in cases like [Monad Comprehension]({{ '/patterns/monad_comprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
 
 ```kotlin
 val SC = IO.monadDefer()
@@ -91,7 +91,7 @@ lazyResult
 #### laterOrRaise
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) represents an error in the execution.
+The left side of the [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) represents an error in the execution.
 This function is assumed to never throw any internal exceptions.
 
 ```kotlin

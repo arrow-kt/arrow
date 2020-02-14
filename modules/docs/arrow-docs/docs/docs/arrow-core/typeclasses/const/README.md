@@ -1,9 +1,9 @@
 ---
 layout: docs-core
 title: Const
-permalink: /docs/arrow/typeclasses/const/
+permalink: /arrow/typeclasses/const/
 redirect_from:
-  - /docs/datatypes/const/
+  - /datatypes/const/
 ---
 
 ## Const
@@ -20,4 +20,4 @@ import arrow.core.Const
 DataType(Const::class).tcMarkdownList()
 ```
 
-TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/datatypes/intro/' | relative_url }}).

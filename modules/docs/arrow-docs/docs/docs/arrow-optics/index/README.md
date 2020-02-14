@@ -1,13 +1,13 @@
 ---
 layout: docs-optics
 title: Index
-permalink: /docs/optics/index/
+permalink: /optics/index/
 ---
 
 ## Index
 
 
-`Index` provides an [Optional]({{ '/docs/optics/optional' | relative_url }}) for a structure `S` to focus in optional `A` at a given index `I`.
+`Index` provides an [Optional]({{ '/optics/optional' | relative_url }}) for a structure `S` to focus in optional `A` at a given index `I`.
 
 ### Example
 
@@ -37,7 +37,7 @@ You can look them up by calling `Index.index()`.
 
 You may create instances of `Index` for your own datatypes, which you will be able to use as demonstrated in the [example](#example) above.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Index` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Index` instances for custom datatypes.
 
 ### Data types
 

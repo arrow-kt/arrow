@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Quick Start
-permalink: /docs/core/
+permalink: /core/
 ---
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
@@ -20,18 +20,18 @@ For this, it includes the most popular data types, type classes and abstractions
 
 Use the list below to learn more about Λrrow's main features.
 
-- [Patterns]({{ '/docs/patterns/glossary/' | relative_url }}): tutorials and approaches to day-to-day challenges using FP
-- [Libraries]({{ '/docs/quickstart/libraries/' | relative_url }}): all the libraries provided by Λrrow
-- [Type classes]({{ '/docs/typeclasses/intro/' | relative_url }}): defining behaviors for data
-- [Data types]({{ '/docs/datatypes/intro/' | relative_url }}): common abstractions
-- [Effects]({{ '/docs/effects/io/' | relative_url }}): interfacing with external systems
-- [Optics]({{ '/docs/optics/iso/' | relative_url }}): inspecting and modifying data structures
+- [Patterns]({{ '/patterns/glossary/' | relative_url }}): tutorials and approaches to day-to-day challenges using FP
+- [Libraries]({{ '/quickstart/libraries/' | relative_url }}): all the libraries provided by Λrrow
+- [Type classes]({{ '/typeclasses/intro/' | relative_url }}): defining behaviors for data
+- [Data types]({{ '/datatypes/intro/' | relative_url }}): common abstractions
+- [Effects]({{ '/effects/io/' | relative_url }}): interfacing with external systems
+- [Optics]({{ '/optics/iso/' | relative_url }}): inspecting and modifying data structures
 
 ## Curated external links
 
-- [Projects and Examples]({{ '/docs/quickstart/projects/' | relative_url }})
+- [Projects and Examples]({{ '/quickstart/projects/' | relative_url }})
 - [Media](https://media.arrow-kt.io)
 
 ## Setup
 
-Take a look at [Setup]({{ '/docs/quickstart/setup/' | relative_url }}) where you'll find the instructions to configure a project with `Gradle` or `Maven` to use `Arrow` library.
+Take a look at [Setup]({{ '/quickstart/setup/' | relative_url }}) where you'll find the instructions to configure a project with `Gradle` or `Maven` to use `Arrow` library.

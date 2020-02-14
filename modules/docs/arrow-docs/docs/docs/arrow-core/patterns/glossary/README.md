@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Glossary
-permalink: /docs/patterns/glossary/
+permalink: /patterns/glossary/
 ---
 
 ## Functional Programming Glossary
@@ -22,10 +22,10 @@ can be found for examples [in JavaScript](https://github.com/hemanth/functional-
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalized for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
-branching in code with [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}),
-or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
+branching in code with [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
+catching exceptions with [`Try`]({{ '/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}),
+or interacting with the platform the program runs in using [`IO`]({{ '/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes, where each inheritor is a `data` class.
 For example, the internal representation of an `Option` is a `sealed` class with two `data` classes: `Some<A>(val a: A)`, and `None`.
@@ -41,7 +41,7 @@ IO { 0 }
  .map { it + 1 }
 ```
 
-You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
+You can read more about all the [datatypes]({{ '/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/datatypes/intro' | relative_url }}).
 
 ### Typeclasses
 
@@ -49,10 +49,10 @@ Typeclasses are interface abstractions that define a set of extension functions 
 These extension functions are canonical and consistent across languages and libraries.
 And they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-Examples of behaviors abstracted by typeclasses are: Comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
-composability ([`Monoid`]({{ '/docs/arrow/typeclasses/monoid' | relative_url }})),
-its contents can be mapped from one type to another ([`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }})),
-or error recovery ([`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})).
+Examples of behaviors abstracted by typeclasses are: Comparability ([`Eq`]({{ '/arrow/typeclasses/eq' | relative_url }})),
+composability ([`Monoid`]({{ '/arrow/typeclasses/monoid' | relative_url }})),
+its contents can be mapped from one type to another ([`Functor`]({{ '/arrow/typeclasses/functor' | relative_url }})),
+or error recovery ([`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }})).
 
 Typeclasses have two main uses:
 
@@ -63,7 +63,7 @@ The number of extra extension functions that you get per typeclass can be from o
 * Abstracting over behavior. Like any other interface, you can use them in your functions and classes as a way of talking about the capabilities of the implementation,
 without exposing the details. This way, you can create APIs that work the same for `Option`, `Try`, or `Observable`.
 
-You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
+You can read more about all the [typeclasses]({{ '/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/typeclasses/intro' | relative_url }}).
 
 Let's dive into one example. The typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
 
@@ -199,12 +199,12 @@ listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/arrow/core/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}).
+[`ListK<A>`]({{ '/arrow/core/listk' | relative_url }}) or [`Option<A>`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors only work for types.
 So, we could say that, after applying the parameter `Int` to the type constructor `ListK<A>`, it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value, it is not considered a type constructor anymore, just a regular type.
 
-As with functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+As with functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
 For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.
@@ -259,13 +259,13 @@ you can do so by simply annotating it as `@higherkind`, and the Λrrow's [annota
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
 
-Note that the annotation `@higherkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
+Note that the annotation `@higherkind` will also generate the integration typealiases required by [KindedJ]({{ '/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
 Now that we have a way of representing generic constructors for any type, we can write typeclasses that are parametrised for containers.
 
-Let's use as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
+Let's use as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin:ank:silent
 interface Functor<F> {
@@ -317,7 +317,7 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require a datatype to implement a typeclass. This way, you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) that contains the constructor function `just()`.
+Let's use the typeclass [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}) that contains the constructor function `just()`.
 
 ```kotlin:ank:silent
 interface Applicative<F>: Functor<F> {
@@ -344,7 +344,7 @@ interface ListKApplicative : Applicative<ForListK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>`, the caller is responsible for calling `fix()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>`, the caller is responsible for calling `fix()` to downcast it to the expected value.
 
 ```kotlin
 val list = ListK.applicative().randomUserStructure(::User).fix()
@@ -361,7 +361,7 @@ val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 //Right(User(221))
 ```
 
-Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
+Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}), we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
 ```kotlin
 with (ListK.applicative()) {
@@ -381,7 +381,7 @@ Option.applicative().run {
 // Some(value = Tuple2(a = User(765), b = User(127)))
 ```
 
-It is also possible to use a form of [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) to make the typeclass scope available to a whole class. For example, using simple delegation:
+It is also possible to use a form of [`Dependency Injection`]({{ '/patterns/dependency_injection' | relative_url }}) to make the typeclass scope available to a whole class. For example, using simple delegation:
 
 ```kotlin
 class UserFetcher<F>(AP: Applicative<F>): Applicative<F> by AP {
@@ -392,7 +392,7 @@ UserFetcher(Option.applicative()).genUser().fix()
 // Some(value = User(943))
 ```
 
-To learn more about this `Typeclassless` technique, you should head to the [`Dependency Injection`]({{ '/docs/patterns/dependency_injection' | relative_url }}) documentation.
+To learn more about this `Typeclassless` technique, you should head to the [`Dependency Injection`]({{ '/patterns/dependency_injection' | relative_url }}) documentation.
 
 ### Side-effects and Effects
 
@@ -404,6 +404,6 @@ Side-effects are too general to be unit tested for because they depend on the en
 
 Because side-effects are unavoidable in any program, FP provides several datatypes for dealing with them! One way is by abstracting their behavior. The simplest examples of this are the `Writer`datatype, which allows you to write to an information sink like a log or a file buffer; or `State` datatype, which simulates scoped mutable state for the duration of an operation.
 
-For more complicated side-effects that can throw or jump threads, we need more advanced datatypes, called Effects, that wrap over impure operations. Some of these datatypes may already be familiar to you, like [`rx.Observable`]({{ '/docs/integrations/rx2/' | relative_url }}), [`kotlinx.coroutines.Deferred`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}), or Arrow's [`IO`]({{ '/docs/effects/io/' | relative_url }}). These Effects compose, catch exceptions, control asynchrony, and, most importantly, can be run lazily. This gets rid of the issues with side-effects.
+For more complicated side-effects that can throw or jump threads, we need more advanced datatypes, called Effects, that wrap over impure operations. Some of these datatypes may already be familiar to you, like [`rx.Observable`]({{ '/integrations/rx2/' | relative_url }}), [`kotlinx.coroutines.Deferred`]({{ '/integrations/kotlinxcoroutines/' | relative_url }}), or Arrow's [`IO`]({{ '/effects/io/' | relative_url }}). These Effects compose, catch exceptions, control asynchrony, and, most importantly, can be run lazily. This gets rid of the issues with side-effects.
 
 Although one can also write the whole program in an imperative way inside a single Effect wrapper, that wouldn't be very efficient, as you don't get any of its benefits. :D

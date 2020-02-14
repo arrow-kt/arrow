@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Effect
-permalink: /docs/effects/effect/
+permalink: /effects/effect/
 ---
 
 ## Effect
@@ -14,7 +14,7 @@ permalink: /docs/effects/effect/
 
 If you want to use callbacks or run suspended datatypes, then `Effect` is the typeclass to use. It contains a single function `runAsync` that takes a callback and returns a new instance of the datatype. The operation will not yield a result immediately; to start running the suspended computation, you have to evaluate that new instance using its own start operator: `unsafeRunAsync` or `unsafeRunSync` for `IO`, `subscribe` or `blocking` for `Observable`, and `await` or `runBlocking` for `Deferred`.
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 ### Data types
 

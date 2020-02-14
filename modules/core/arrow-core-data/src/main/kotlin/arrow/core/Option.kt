@@ -272,7 +272,7 @@ import arrow.typeclasses.Show
  *
  * Arrow contains `Option` instances for many useful typeclasses that allow you to use and transform optional values
  *
- * [Functor](/docs/arrow/typeclasses/functor/)
+ * [Functor]({{'/arrow/typeclasses/functor/' | relative_url }})
  *
  * Transforming the inner contents
  *
@@ -288,7 +288,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * [Applicative](/docs/arrow/typeclasses/applicative/)
+ * [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }})
  *
  * Computing over independent values
  *
@@ -305,7 +305,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * [Monad](/docs/arrow/typeclasses/monad/)
+ * [Monad]({{'/arrow/typeclasses/monad/' | relative_url }})
  *
  * Computing over dependent values ignoring absence
  *

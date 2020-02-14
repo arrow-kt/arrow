@@ -10,7 +10,7 @@ import arrow.typeclasses.Show
  * ank_macro_hierarchy(arrow.core.ListK)
  *
  *
- * ListK wraps over the platform `List` type to make it a [type constructor](/docs/patterns/glossary/#type-constructors).
+ * ListK wraps over the platform `List` type to make it a [type constructor]({{'/patterns/glossary/#type-constructors' | relative_url }}).
  *
  * It can be created from Kotlin List type with a convenient `k()` function.
  *
@@ -32,7 +32,7 @@ import arrow.typeclasses.Show
  *
  * The @extension type class processor expands all type class combinators that `ListK` provides automatically over `List`
  *
- * For instance, it has `combineK` from the [SemigroupK](/docs/arrow/typeclasses/semigroupk/) typeclass.
+ * For instance, it has `combineK` from the [SemigroupK]({{'/arrow/typeclasses/semigroupk/' | relative_url }}) typeclass.
  *
  * It can be used to cheaply combine two lists:
  *
@@ -51,9 +51,9 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * The functions `traverse` and `sequence` come from [Traverse](/docs/apidocs/arrow-core-data/arrow.typeclasses/-traverse/).
+ * The functions `traverse` and `sequence` come from [Traverse]({{'/apidocs/arrow-core-data/arrow.typeclasses/-traverse/' | relative_url }}).
  *
- * Traversing a list creates a new container [Kind<F, A>](/docs/patterns/glossary/#type-constructors) by combining the result of a function applied to each element:
+ * Traversing a list creates a new container [Kind<F, A>]({{'/patterns/glossary/#type-constructors' | relative_url }}) by combining the result of a function applied to each element:
  *
  * ```kotlin:ank:playground
  * import arrow.core.None
@@ -88,7 +88,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [Foldable](/docs/arrow/typeclasses/foldable).
+ * If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [Foldable]({{'/arrow/typeclasses/foldable' | relative_url }}).
  *
  * Folding a list into a new value, `String` in this case, starting with an initial value and a combine function:
  *
@@ -104,7 +104,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * Or you can apply a list of transformations using `ap` from [Applicative](/docs/arrow/typeclasses/applicative/).
+ * Or you can apply a list of transformations using `ap` from [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }}).
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.list.apply.ap

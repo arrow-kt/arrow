@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Corecursive
-permalink: /docs/recursion/corecursive/
+permalink: /recursion/corecursive/
 ---
 
 ## Corecursive
@@ -10,7 +10,7 @@ permalink: /docs/recursion/corecursive/
 
 
 The corecursive typeclass abstracts out the ability to corecursively unfold a structure.
-See [Intro to Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}) for
+See [Intro to Recursion Schemes]({{ '/recursion/intro/' | relative_url }}) for
 an introduction to how it works.
 
 ### Main Combinators

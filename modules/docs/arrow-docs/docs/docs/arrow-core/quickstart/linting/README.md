@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Linting
-permalink: /docs/quickstart/linting/
+permalink: /quickstart/linting/
 ---
 
 ## Arrow Linting
@@ -10,7 +10,7 @@ Some linters might complain about some code practices that are common when worki
 
 ### Working with ArrowFx
 
-When working with [Arrow Fx]({{ '/docs/fx' | relative_url }}), side effects are expressed as `suspend` functions.
+When working with [Arrow Fx]({{ '/fx' | relative_url }}), side effects are expressed as `suspend` functions.
 
 However, IDEA will show *redundant suspend modifiers* warning if a function does not invoke other suspended functions. For ArrowFx, we want to be explicit about impure functions, so this warning is not useful.
 

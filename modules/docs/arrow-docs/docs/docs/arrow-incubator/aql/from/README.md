@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: from
-permalink: /docs/aql/from/
+permalink: /aql/from/
 ---
 
 ## from
@@ -36,13 +36,13 @@ println(result)
 
 Learn more about the `AQL` combinators
 
-- [_select_](/docs/aql/select/)
-- [_from_](/docs/aql/from/)
-- [_where_](/docs/aql/where/)
-- [_groupBy_](/docs/aql/groupby/)
-- [_orderBy_](/docs/aql/orderby/)
-- [_sum_](/docs/aql/sum/)
-- [_union_](/docs/aql/union/)
+- [_select_]({{'/aql/select/' | relative_url }})
+- [_from_]({{'/aql/select/' | relative_url }})
+- [_where_]({{'/aql/where/' | relative_url }})
+- [_groupBy_]({{'/aql/groupby/' | relative_url }})
+- [_orderBy_]({{'/aql/orderby/' | relative_url }})
+- [_sum_]({{'/aql/sum/' | relative_url }})
+- [_union_]({{'/aql/union/' | relative_url }})
 
 ### Supported Data types
 
@@ -56,4 +56,4 @@ TypeClass(From::class).dtMarkdownList()
 
 
 
-[Adapt AQL to your own _custom data types_](/docs/aql/custom/)
+[Adapt AQL to your own _custom data types_]({{'/aql/custom/' | relative_url }})

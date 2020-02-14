@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: At
-permalink: /docs/optics/at/
+permalink: /optics/at/
 ---
 
 ## At
@@ -9,7 +9,7 @@ permalink: /docs/optics/at/
 
 
 
-`At` provides a [Lens]({{ '/docs/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
+`At` provides a [Lens]({{ '/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
 
 ### Example
 
@@ -46,7 +46,7 @@ Arrow provides `At` instances for some common datatypes in Arrow that can be ind
 
 You may create instances of `At` for your own datatypes which you will be able to use as demonstrated in the [example](#example) above.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `At` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `At` instances for custom datatypes.
 
 ### Data types
 

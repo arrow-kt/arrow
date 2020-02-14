@@ -16,7 +16,7 @@ import arrow.core.ValidatedNel
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Traverse)
  *
- * In functional programming it is very common to encode "behaviors" as data types - common behaviors include [Option] for possibly missing values, [Either] and [Validated] for possible errors, and [Ref]({{ '/docs/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
+ * In functional programming it is very common to encode "behaviors" as data types - common behaviors include [Option] for possibly missing values, [Either] and [Validated] for possible errors, and [Ref]({{ '/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
  *
  * These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single [String] into an [Int], validating a login, or asynchronously fetching website information for a user.
  *
@@ -504,7 +504,7 @@ import arrow.core.ValidatedNel
  * - `fold` in common ADTs from Computer Science like in a Binary tree
  * - the `reduce` method
  *
- * One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}).
+ * One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/recursion/intro/' | relative_url }}).
  *
  * ### Data types
  *

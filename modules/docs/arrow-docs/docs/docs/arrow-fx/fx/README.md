@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Fx
-permalink: /docs/fx/
+permalink: /fx/
 ---
 
 # Arrow Fx. Typed FP for the masses

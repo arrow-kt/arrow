@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Licenses
-permalink: /docs/legal/licenses/
+permalink: /legal/licenses/
 ---
 
 ## Licenses
