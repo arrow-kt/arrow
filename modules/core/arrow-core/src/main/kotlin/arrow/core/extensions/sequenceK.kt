@@ -418,5 +418,5 @@ interface SequenceKMonadPlus : MonadPlus<ForSequenceK>, SequenceKMonad, Sequence
 @extension
 interface SequenceKMonadLogic : MonadLogic<ForSequenceK>, SequenceKMonadPlus {
   override fun <A> Kind<ForSequenceK, A>.splitM(): Kind<ForSequenceK, Option<Tuple2<Kind<ForSequenceK, A>, A>>> =
-    SequenceK.just(firstOption().map { a -> fix().sequence.drop(1).k() toT a})
+    SequenceK.just(firstOption().map { a -> fix().sequence.drop(1).k() toT a })
 }
