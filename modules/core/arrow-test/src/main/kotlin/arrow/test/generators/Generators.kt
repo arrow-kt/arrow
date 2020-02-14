@@ -28,6 +28,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.Validated
+import arrow.core.extensions.either.applicativeError.raiseError
 import arrow.core.extensions.sequence.functorFilter.filterMap
 import arrow.core.extensions.sequencek.apply.apply
 import arrow.core.extensions.sequencek.functorFilter.filterMap
@@ -46,6 +47,9 @@ fun Gen.Companion.byte(): Gen<Byte> =
 
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }
+
+fun <F, A, E> Gen<E>.raiseError(AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
+  map { AP.raiseError<A>(it) }
 
 fun <F, A, E> Gen.Companion.applicativeError(genA: Gen<A>, errorGen: Gen<E>, AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
   Gen.oneOf<Either<E, A>>(genA.map(::Right), errorGen.map(::Left)).map {
