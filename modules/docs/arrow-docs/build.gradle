@@ -28,6 +28,7 @@ dependencies {
     compile project(':arrow-generic')
     compile project(':arrow-aql')
     compile project(":arrow-reflect")
+    compile project(":arrow-fx-kotlinx-coroutines")
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"

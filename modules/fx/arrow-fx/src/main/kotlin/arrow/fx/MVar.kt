@@ -296,10 +296,10 @@ interface MVar<F, A> {
     fun <F> factoryUncancelable(AS: Async<F>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
-        UncancelableMVar(a, AS)
+        uncancelableOf(a, AS)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
-        UncancelableMVar.empty(AS)
+        uncancelableEmpty(AS)
     }
 
     /**
@@ -309,10 +309,10 @@ interface MVar<F, A> {
      */
     fun <F> factoryCancelable(CF: Concurrent<F>) = object : MVarFactory<F> {
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
-        CancelableMVar(a, CF)
+        cancelable(a, CF)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
-        CancelableMVar.empty(CF)
+        empty(CF)
     }
   }
 }

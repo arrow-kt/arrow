@@ -7,8 +7,10 @@ import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.identity
 import arrow.core.k
+import arrow.core.toT
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
@@ -19,25 +21,6 @@ import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
-import arrow.test.laws.ConcurrentLaws.acquireBracketIsNotCancelable
-import arrow.test.laws.ConcurrentLaws.asyncFRegisterCanBeCancelled
-import arrow.test.laws.ConcurrentLaws.cancelOnBracketReleases
-import arrow.test.laws.ConcurrentLaws.cancelableFReceivesCancelSignal
-import arrow.test.laws.ConcurrentLaws.cancelableReceivesCancelSignal
-import arrow.test.laws.ConcurrentLaws.joinIsIdempotent
-import arrow.test.laws.ConcurrentLaws.parMapCancelCancelsBoth
-import arrow.test.laws.ConcurrentLaws.raceCancelCancelsBoth
-import arrow.test.laws.ConcurrentLaws.raceCancelsLoser
-import arrow.test.laws.ConcurrentLaws.racePairCanCancelsLoser
-import arrow.test.laws.ConcurrentLaws.racePairCanJoinLeft
-import arrow.test.laws.ConcurrentLaws.racePairCanJoinRight
-import arrow.test.laws.ConcurrentLaws.racePairCancelCancelsBoth
-import arrow.test.laws.ConcurrentLaws.raceTripleCanCancelsLoser
-import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinLeft
-import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinMiddle
-import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinRight
-import arrow.test.laws.ConcurrentLaws.raceTripleCancelCancelsAll
-import arrow.test.laws.ConcurrentLaws.releaseBracketIsNotCancelable
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -48,6 +31,7 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.CoroutineContext
 
 object ConcurrentLaws {
@@ -100,7 +84,10 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parTraverse can traverse effectful computations") { CF.parTraverseCanTraverseEffectfullComputations(EQ) },
       Law("Concurrent Laws: parTraverse results in the correct error") { CF.parTraverseResultsInTheCorrectError(EQ_UNIT) },
       Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
-      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
+      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) },
+      Law("Concurrent Laws: onError is run when error is raised") { CF.onErrorIsRunWhenErrorIsRaised(EQ_UNIT, ctx) },
+      Law("Concurrent Laws: onError is not run when completes normally") { CF.onErrorIsNotRunByDefault(EQK.liftEq(Tuple2.eq(Int.eq(), Boolean.eq())), ctx) },
+      Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.outerAndInnerOnErrorIsRun(EQK.liftEq(Int.eq()), ctx) }
     )
   }
 
@@ -674,4 +661,63 @@ object ConcurrentLaws {
         )).parSequence(ListK.traverse()).unit()
       }.equalUnderTheLaw(unit(), EQ)
     }
+
+  fun <F> Concurrent<F>.onErrorIsRunWhenErrorIsRaised(EQ: Eq<Kind<F, Unit>>, ctx: CoroutineContext) =
+    forAll(Gen.throwable()) { expected ->
+      fx.concurrent {
+
+        val startLatch = Promise<F, Unit>(this@onErrorIsRunWhenErrorIsRaised).bind()
+        val errorLatch = Promise<F, Throwable>(this@onErrorIsRunWhenErrorIsRaised).bind()
+
+        startLatch.complete(Unit).flatMap { raiseError<Exception>(expected) }
+          .onError(errorLatch::complete)
+          .fork(ctx).bind()
+
+        startLatch.get().bind() // Waits on promise of `use`
+
+        val waitExit = errorLatch.get().bind()
+        !effect { waitExit shouldBe expected }
+      }.equalUnderTheLaw(Unit.just(), EQ)
+    }
+
+  fun <F> Concurrent<F>.onErrorIsNotRunByDefault(EQ: Eq<Kind<F, Tuple2<Int, Boolean>>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+
+      val CF = this@onErrorIsNotRunByDefault
+      fx.concurrent {
+
+        val startLatch = Promise<F, Int>(CF).bind()
+        val onErrorRun = Ref(false).bind()
+
+        val (completed, _) = startLatch.complete(i)
+          .onError { onErrorRun.set(true) }
+          .fork(ctx).bind()
+
+        completed.bind()
+
+        startLatch.get().bind() toT onErrorRun.get().bind()
+      }.equalUnderTheLaw(just(i toT false), EQ)
+    }
+
+  fun <F> Concurrent<F>.outerAndInnerOnErrorIsRun(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    fx.concurrent {
+      val CF = this@outerAndInnerOnErrorIsRun
+      val latch = Promise<F, Unit>(CF).bind()
+      val counter = AtomicInteger(0)
+      val incrementCounter = CF.later {
+        counter.getAndIncrement()
+        Unit
+      }
+
+      just(Unit).flatMap {
+        raiseError<Unit>(RuntimeException("failed"))
+          .onError { incrementCounter }
+      }.onError { incrementCounter }
+        .guarantee(latch.complete(Unit))
+        .fork(ctx).bind()
+
+      latch.get().bind()
+
+      counter.get()
+    }.equalUnderTheLaw(just(2), EQ)
 }

@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.left
 import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
@@ -15,7 +14,6 @@ import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
-import arrow.fx.extensions.io.bracket.guarantee
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.dispatchers.dispatchers
@@ -833,23 +831,15 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
 
-private fun IO.Companion.eqK() = object : EqK<ForIO> {
-  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      EQ(EQ).run {
-        it.first.eqv(it.second)
-      }
-    }
+internal fun IO.Companion.eqK() = object : EqK<ForIO> {
+  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
+    fix().eqv(other.fix())
+  }
 }
 
-private fun IO.Companion.genK() = object : GenK<ForIO> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> =
-    Gen.oneOf(
-      gen.map {
-        IO.just(it)
-      },
-      Gen.throwable().map {
-        IO.raiseError<A>(it)
-      }
-    )
+internal fun IO.Companion.genK() = object : GenK<ForIO> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
+    gen.map(IO.Companion::just),
+    Gen.throwable().map(IO.Companion::raiseError)
+  )
 }
