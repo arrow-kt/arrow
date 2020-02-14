@@ -26,10 +26,8 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
 import arrow.core.Success
 import arrow.core.Try
-import arrow.core.Tuple2
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.mtl.AccumT
@@ -47,9 +45,6 @@ import arrow.mtl.WriterT
 import arrow.mtl.WriterTPartialOf
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.nest
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
-import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {

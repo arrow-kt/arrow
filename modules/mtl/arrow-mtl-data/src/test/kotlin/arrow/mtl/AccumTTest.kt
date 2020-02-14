@@ -6,7 +6,6 @@ import arrow.core.EitherPartialOf
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.core.extensions.either.eqK.eqK
 import arrow.core.extensions.either.functor.functor
 import arrow.core.extensions.either.monad.monad
@@ -18,7 +17,6 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.alternative.alternative
 import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.toT
 import arrow.fx.IO
 import arrow.fx.extensions.io.monadIO.monadIO
@@ -38,23 +36,19 @@ import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.eq.eqK
-import arrow.test.generators.GenK
 import arrow.test.generators.genK
 import arrow.test.generators.throwable
-import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonadWriterLaws
-import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.shouldBe
 
 class AccumTTest : UnitSpec() {
   init {
