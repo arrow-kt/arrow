@@ -11,6 +11,7 @@ import arrow.ui.DayOf
 import arrow.ui.DayPartialOf
 import arrow.ui.fix
 import arrow.undocumented
+import arrow.ui.ap as dayAp
 
 @extension
 @undocumented
@@ -45,7 +46,7 @@ interface DayApply<F, G> : Apply<DayPartialOf<F, G>>, DayFunctor<F, G> {
   fun AG(): Applicative<G>
 
   override fun <A, B> Kind<DayPartialOf<F, G>, (A) -> B>.ap(ff: Kind<DayPartialOf<F, G>, A>): Day<F, G, B> =
-    fix().apPipe(AF(), AG(), ff.map { a -> { f: (A) -> B -> f(a) } })
+    dayAp(AF(), AG(), ff)
 }
 
 @extension

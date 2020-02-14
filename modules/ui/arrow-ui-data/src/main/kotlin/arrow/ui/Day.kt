@@ -80,8 +80,8 @@ abstract class Day<F, G, A> internal constructor() : DayOf<F, G, A>, DayKindedJ<
   }
 }
 
-fun <F, G, A, B> Day<F, G, (A) -> B>.ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, A>): Day<F, G, B> =
-  stepDay { left, right, get ->
+fun <F, G, A, B> DayOf<F, G, (A) -> B>.ap(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, A>): Day<F, G, B> =
+  fix().stepDay { left, right, get ->
     f.fix().stepDay { lf, rf, getf ->
       val l = AF.run { tupledN(left, lf) }
       val r = AG.run { tupledN(right, rf) }
@@ -92,9 +92,9 @@ fun <F, G, A, B> Day<F, G, (A) -> B>.ap(AF: Applicative<F>, AG: Applicative<G>, 
   }
 
 @Suppress("UNCHECKED_CAST")
-fun <F, G, A, B> Day<F, G, (A) -> B>.apLazy(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, A>): Day<F, G, B> = object : Day<F, G, B>() {
+fun <F, G, A, B> DayOf<F, G, (A) -> B>.apLazy(AF: Applicative<F>, AG: Applicative<G>, f: DayOf<F, G, A>): Day<F, G, B> = object : Day<F, G, B>() {
   override fun <R> stepDay(ff: (Kind<F, *>, Kind<G, *>, (Any?, Any?) -> B) -> R): R =
-    this@apLazy.stepDay { left, right, get ->
+    this@apLazy.fix().stepDay { left, right, get ->
       f.fix().stepDay { lf, rf, getf ->
         val l = AF.run { tupledN(left, lf) }
         val r = AG.run { tupledN(right, rf) }
