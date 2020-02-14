@@ -111,7 +111,6 @@ internal interface FiberFactory<F> {
   operator fun <A> invoke(join: Maybe<A>, disposable: Disposable): Fiber<F, A>
 }
 
-
 internal sealed class RacePairResult<out A, out B> {
   class First<A>(val value: A) : RacePairResult<A, Nothing>()
   class Second<B>(val value: B) : RacePairResult<Nothing, B>()
