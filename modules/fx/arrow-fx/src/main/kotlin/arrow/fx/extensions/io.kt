@@ -6,7 +6,6 @@ import arrow.core.Eval
 import arrow.core.Eval.Now
 import arrow.core.identity
 import arrow.extension
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers

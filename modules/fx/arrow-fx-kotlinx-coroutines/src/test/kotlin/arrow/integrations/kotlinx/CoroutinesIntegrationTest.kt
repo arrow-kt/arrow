@@ -5,6 +5,8 @@ import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO
 import arrow.fx.extensions.fx
+import arrow.fx.handleErrorWith
+import arrow.fx.extensions.io.bracket.onCancel
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -47,6 +49,21 @@ class CoroutinesIntegrationTest : UnitSpec() {
         // suspendCancellableCoroutine copy and re-throws the exception so we need to compare the type
         // see https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/src/internal/StackTraceRecovery.kt#L68
         actual::class == expected::class
+      }
+    }
+
+    "suspendedCancellable can handle errors through IO" {
+      forAll(Gen.throwable(), Gen.int()) { e, expected ->
+        val ceh = TestCoroutineExceptionHandler()
+        val scope = TestCoroutineScope(ceh + TestCoroutineDispatcher())
+
+        scope.launch {
+          val actual = IO { throw e }.handleErrorWith { IO.just(expected) }.suspendCancellable()
+
+          actual shouldBe expected
+        }
+
+        ceh.uncaughtExceptions.isEmpty()
       }
     }
 
