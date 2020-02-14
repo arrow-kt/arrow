@@ -260,15 +260,6 @@ options:
 
     nested_options:
 
-      - title: Rx2
-        url: /docs/integrations/rx2/
-
-      - title: Reactor
-        url: /docs/integrations/reactor/
-
-      - title: kotlinx.coroutines
-        url: /docs/integrations/kotlinxcoroutines/
-
       - title: Retrofit
         url: /docs/integrations/retrofit/
 
