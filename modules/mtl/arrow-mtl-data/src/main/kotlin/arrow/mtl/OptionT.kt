@@ -62,9 +62,6 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
 
   fun <B> cata(FF: Functor<F>, default: () -> B, f: (A) -> B): Kind<F, B> = fold(FF, default, f)
 
-  fun <B> apPipe(MF: Monad<F>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
-    flatMap(MF) { a -> ff.fix().map(MF) { it(a) } }
-
   fun <B> flatMap(MF: Monad<F>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = flatMapF(MF) { f(it).value() }
 
   fun <B> flatMapF(MF: Monad<F>, f: (A) -> Kind<F, Option<B>>): OptionT<F, B> = MF.run {

@@ -20,9 +20,6 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     if (fc.value().isEmpty()) Eval.now(sortedMapOf<A, Z>().k())
     else fc.map { c -> this.map2(c, f) }
 
-  fun <C> apPipe(ff: SortedMapK<A, (B) -> C>): SortedMapK<A, C> =
-    flatMap { a -> ff.map { it(a) } }
-
   fun <C, Z> ap2(f: SortedMapK<A, (B, C) -> Z>, fc: SortedMapK<A, C>): SortedMap<A, Z> =
     f.map.flatMap { (k, f) ->
       this.flatMap { a -> fc.flatMap { c -> sortedMapOf(k to f(a, c)).k() } }

@@ -240,8 +240,6 @@ sealed class Eval<out A> : EvalOf<A> {
 
   fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
 
-  fun <B> apPipe(ff: EvalOf<(A) -> B>): Eval<B> = flatMap { a -> ff.fix().map { it(a) } }
-
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
   fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     when (this) {

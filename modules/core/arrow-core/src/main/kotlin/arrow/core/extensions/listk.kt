@@ -10,6 +10,7 @@ import arrow.core.ListKOf
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.monad.ap
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroup.plus
 import arrow.core.fix
@@ -89,9 +90,6 @@ interface ListKFunctor : Functor<ForListK> {
 
 @extension
 interface ListKApply : Apply<ForListK>, ListKFunctor {
-  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
     listAp(ff)
 
@@ -113,9 +111,6 @@ interface ListKApplicative : Applicative<ForListK>, ListKApply {
 
 @extension
 interface ListKMonad : Monad<ForListK>, ListKApplicative {
-  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
     listAp(ff)
 
@@ -174,7 +169,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
-    fb.fix().apPipe(fix().map { a: A -> { b: B -> Tuple2(a, b) } })
+    fix().map { a: A -> { b: B -> Tuple2(a, b) } }.ap(fb)
 }
 
 @extension
@@ -223,9 +218,6 @@ interface ListKMonadCombine : MonadCombine<ForListK>, ListKAlternative {
   override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
     listAp(ff)
 
@@ -252,9 +244,6 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
 
   override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForListK, A>.apPipe(ff: Kind<ForListK, (A) -> B>): ListK<B> =
-    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForListK, (A) -> B>.ap(ff: Kind<ForListK, A>): Kind<ForListK, B> =
     listAp(ff)

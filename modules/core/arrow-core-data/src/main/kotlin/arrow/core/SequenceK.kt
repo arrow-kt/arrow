@@ -9,8 +9,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()
 
-  fun <B> apPipe(ff: SequenceKOf<(A) -> B>): SequenceK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
-
   fun <B> map(f: (A) -> B): SequenceK<B> = sequence.map(f).k()
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)

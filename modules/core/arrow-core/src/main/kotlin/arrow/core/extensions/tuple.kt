@@ -52,12 +52,8 @@ interface Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
 
 @extension
 interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
-
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
-
-  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
-    fix().apPipe(ff.fix())
 
   override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
     tupAp(ff)
@@ -69,9 +65,6 @@ interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
-
-  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
-    fix().apPipe(ff.fix())
 
   override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
     tupAp(ff)
@@ -87,9 +80,6 @@ interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
-
-  override fun <A, B> Tuple2Of<F, A>.apPipe(ff: Tuple2Of<F, (A) -> B>) =
-    fix().apPipe(ff.fix())
 
   override fun <A, B> Kind<Tuple2PartialOf<F>, (A) -> B>.ap(ff: Kind<Tuple2PartialOf<F>, A>): Kind<Tuple2PartialOf<F>, B> =
     tupAp(ff)

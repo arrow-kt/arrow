@@ -24,17 +24,6 @@ fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
  */
 @higherkind
 class Kleisli<F, D, A>(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
-
-  /**
-   * Apply a function `(A) -> B` that operates within the [Kleisli] context.
-   *
-   * @param ff function with the [Kleisli] context.
-   * @param AF [Applicative] for the context [F].
-   */
-  fun <B> apPipe(AF: Apply<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> = AF.run {
-    Kleisli { d -> run(d).apPipe(ff.run(d)) }
-  }
-
   /**
    * Map the end of the arrow [A] to [B] given a function [f].
    *

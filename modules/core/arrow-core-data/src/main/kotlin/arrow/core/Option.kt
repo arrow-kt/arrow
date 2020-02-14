@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Option.Companion.just
 import arrow.higherkind
 
 /**
@@ -477,9 +478,6 @@ sealed class Option<out A> : OptionOf<A> {
       is Some -> f(t).fix()
     }
 
-  fun <B> apPipe(ff: OptionOf<(A) -> B>): Option<B> =
-    flatMap { a -> ff.fix().map { it(a) } }
-
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
    * this $option's value returns true. Otherwise, return $none.
@@ -605,6 +603,6 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  flatMap { it.fold({ l -> Option.just(l).apPipe(f) }, { r -> Option.just(r) }) }
+  flatMap { it.fold({ l -> f.ap(just(l)) }, { r -> just(r) }) }
 
 fun <A, B> OptionOf<(A) -> B>.ap(ff: OptionOf<A>): Option<B> = fix().flatMap { f -> ff.fix().map(f) }

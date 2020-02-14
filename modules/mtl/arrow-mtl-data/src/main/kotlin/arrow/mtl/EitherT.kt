@@ -117,13 +117,6 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
       }
     })
   }
-
-  fun <C> apPipe(MF: Monad<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> =
-    EitherT(
-      MF.fx.monad {
-        value().bind().fold({ it.left() }, { a -> ff.value().bind().map { it(a) } })
-      }
-    )
 }
 
 fun <F, E, A, B> EitherTOf<F, E, (A) -> B>.ap(MF: Monad<F>, ff: EitherTOf<F, E, A>): EitherT<F, E, B> = EitherT(

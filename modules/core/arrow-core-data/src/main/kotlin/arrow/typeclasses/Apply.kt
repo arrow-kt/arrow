@@ -41,28 +41,6 @@ interface Apply<F> : Functor<F> {
   fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B>
 
   /**
-   * Given both the value and the function are within [F], **ap**ply the function to the value.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.core.Option
-   * import arrow.core.Some
-   * import arrow.core.none
-   *
-   * fun main() {
-   *   //sampleStart
-   *   val someF: Option<(Int) -> Long> = Some { i: Int -> i.toLong() + 1 }
-   *
-   *   val a = Some(3).apPipe(someF)
-   *   val b = none<Int>().apPipe(someF)
-   *   val c = Some(3).apPipe(none<(Int) -> Long>())
-   *   //sampleEnd
-   *   println("a: $a, b: $b, c: $c")
-   * }
-   * ```
-   */
-  fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B> = map(this, ff) { (a, f) -> f(a) }
-
-  /**
    * Lazy version of ap, useful for datatypes which can short circuit.
    * This will at some point be removed for a compiler plugin
    */

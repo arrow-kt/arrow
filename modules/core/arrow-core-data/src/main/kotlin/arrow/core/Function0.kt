@@ -17,8 +17,6 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
   fun <B> coflatMap(f: (Function0Of<A>) -> B): Function0<B> = { f(this) }.k()
 
-  fun <B> apPipe(ff: Function0Of<(A) -> B>): Function0<B> = flatMap { a -> ff.fix().map { it(a) } }
-
   fun extract(): A = f()
 
   companion object {
@@ -38,6 +36,6 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 }
 
 fun <A, B> Function0<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0<B> =
-  flatMap { it.fold({ l -> just(l).apPipe(f) }, { r -> just(r) }) }
+  flatMap { it.fold({ l -> f.fix().ap(just(l)) }, { r -> just(r) }) }
 
 fun <A, B> Function0Of<(A) -> B>.ap(ff: Function0Of<A>): Function0<B> = fix().flatMap { f -> ff.fix().map(f) }

@@ -91,9 +91,6 @@ interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
 
 @extension
 interface MapKApply<K> : Apply<MapKPartialOf<K>> {
-  override fun <A, B> Kind<MapKPartialOf<K>, A>.apPipe(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
-    fix().apPipe(ff.fix())
-
   override fun <A, B> Kind<MapKPartialOf<K>, (A) -> B>.ap(ff: Kind<MapKPartialOf<K>, A>): Kind<MapKPartialOf<K>, B> =
     mapKAp(ff)
 

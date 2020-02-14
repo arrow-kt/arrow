@@ -152,8 +152,6 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       else -> false
     }
 
-  fun <B> apPipe(ff: ListKOf<(A) -> B>): ListK<B> = flatMap { a -> ff.fix().map { f -> f(a) } }
-
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
       GA.run { Eval.later { f(a).map { a: B -> { xs: ListK<B> -> (listOf(a) + xs).k() } }.lazyAp { eval.value() } } }

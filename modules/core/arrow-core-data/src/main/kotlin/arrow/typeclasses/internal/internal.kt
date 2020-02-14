@@ -17,9 +17,6 @@ val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
   override fun <A> just(a: A): Kind<ForId, A> =
     Id(a)
 
-  override fun <A, B> Kind<ForId, A>.apPipe(ff: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Kind<ForId, B> =
     fix().map(f)
 

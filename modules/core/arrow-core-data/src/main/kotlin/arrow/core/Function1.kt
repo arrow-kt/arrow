@@ -15,8 +15,6 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
   fun <B> flatMap(f: (O) -> Function1Of<I, B>): Function1<I, B> = { p: I -> f(this.f(p))(p) }.k()
 
-  fun <B> apPipe(ff: Function1Of<I, (O) -> B>): Function1<I, B> = flatMap { a -> ff.fix().map { it(a) } }
-
   fun local(f: (I) -> I): Function1<I, O> = f.andThen { this(it) }.k()
 
   fun <B> compose(g: Function1<B, I>): Function1<B, O> = f.compose(g.f).k()

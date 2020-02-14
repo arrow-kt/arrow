@@ -163,15 +163,6 @@ class StateT<F, S, A>(
   fun <B> map(FF: Functor<F>, f: (A) -> B): StateT<F, S, B> = transform(FF) { (s, a) -> Tuple2(s, f(a)) }
 
   /**
-   * Apply a function `(S) -> B` that operates within the [StateT] context.
-   *
-   * @param MF [Monad] for the context [F].
-   * @param ff function with the [StateT] context.
-   */
-  fun <B> apPipe(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    flatMap(MF) { a -> ff.fix().map(MF) { f -> f(a) } }
-
-  /**
    * Map the value [A] to another [StateT] object for the same state [S] and context [F] and flatten the structure.
    *
    * @param MF [Monad] for the context [F].

@@ -66,7 +66,7 @@ interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
 @extension
 interface SequenceKSemigroupal : Semigroupal<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.product(fb: Kind<ForSequenceK, B>): Kind<ForSequenceK, Tuple2<A, B>> =
-    fb.fix().apPipe(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    fix().map { a: A -> { b: B -> Tuple2(a, b) } }.seqAp(fb)
 }
 
 @extension
@@ -109,9 +109,6 @@ interface SequenceKFunctor : Functor<ForSequenceK> {
 
 @extension
 interface SequenceKApply : Apply<ForSequenceK>, SequenceKFunctor {
-  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForSequenceK, (A) -> B>.ap(ff: Kind<ForSequenceK, A>): Kind<ForSequenceK, B> = seqAp(ff)
 
   override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
@@ -132,9 +129,6 @@ interface SequenceKApplicative : Applicative<ForSequenceK>, SequenceKApply {
 
 @extension
 interface SequenceKMonad : Monad<ForSequenceK> {
-  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForSequenceK, (A) -> B>.ap(ff: Kind<ForSequenceK, A>): Kind<ForSequenceK, B> = seqAp(ff)
 
   override fun <A, B> Kind<ForSequenceK, A>.flatMap(f: (A) -> Kind<ForSequenceK, B>): SequenceK<B> =
@@ -224,9 +218,6 @@ interface SequenceKMonadFilter : MonadFilter<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
     fix().filterMap(f)
 
-  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForSequenceK, (A) -> B>.ap(ff: Kind<ForSequenceK, A>): Kind<ForSequenceK, B> = seqAp(ff)
 
   override fun <A, B> Kind<ForSequenceK, A>.flatMap(f: (A) -> Kind<ForSequenceK, B>): SequenceK<B> =
@@ -252,9 +243,6 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK>, SequenceKAlternati
 
   override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
     fix().filterMap(f)
-
-  override fun <A, B> Kind<ForSequenceK, A>.apPipe(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
-    fix().apPipe(ff)
 
   override fun <A, B> Kind<ForSequenceK, (A) -> B>.ap(ff: Kind<ForSequenceK, A>): Kind<ForSequenceK, B> = seqAp(ff)
 

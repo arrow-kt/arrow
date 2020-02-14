@@ -26,9 +26,6 @@ interface EvalFunctor : Functor<ForEval> {
 
 @extension
 interface EvalApply : Apply<ForEval> {
-  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
     fix().evalAp(ff.fix())
 
@@ -47,9 +44,6 @@ interface EvalApplicative : Applicative<ForEval>, EvalApply {
 
 @extension
 interface EvalMonad : Monad<ForEval>, EvalApplicative {
-  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
     fix().evalAp(ff.fix())
 
@@ -89,9 +83,6 @@ interface EvalComonad : Comonad<ForEval> {
 
 @extension
 interface EvalBimonad : Bimonad<ForEval> {
-  override fun <A, B> EvalOf<A>.apPipe(ff: EvalOf<(A) -> B>): Eval<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForEval, (A) -> B>.ap(ff: Kind<ForEval, A>): Kind<ForEval, B> =
     fix().evalAp(ff.fix())
 

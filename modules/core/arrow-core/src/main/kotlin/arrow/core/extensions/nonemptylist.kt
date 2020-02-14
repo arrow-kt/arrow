@@ -70,9 +70,6 @@ interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListApply : Apply<ForNonEmptyList>, NonEmptyListFunctor {
-  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
     nelAp(ff)
 }
@@ -88,9 +85,6 @@ interface NonEmptyListApplicative : Applicative<ForNonEmptyList>, NonEmptyListAp
 
 @extension
 interface NonEmptyListMonad : Monad<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
     nelAp(ff)
 
@@ -121,9 +115,6 @@ interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
-  override fun <A, B> NonEmptyListOf<A>.apPipe(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForNonEmptyList, (A) -> B>.ap(ff: Kind<ForNonEmptyList, A>): Kind<ForNonEmptyList, B> =
     nelAp(ff)
 

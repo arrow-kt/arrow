@@ -46,9 +46,6 @@ interface Monad<F> : Selective<F> {
   override fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> =
     flatMap { f -> ff.map(f) }
 
-  override fun <A, B> Kind<F, A>.apPipe(ff: Kind<F, (A) -> B>): Kind<F, B> =
-    flatMap { a -> ff.map { f -> f(a) } }
-
   fun <A> Kind<F, Kind<F, A>>.flatten(): Kind<F, A> =
     flatMap(::identity)
 

@@ -19,9 +19,6 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
     if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
     else fb.map { b -> this.map2(b, f) }
 
-  fun <B> apPipe(ff: MapK<K, (A) -> B>): MapK<K, B> =
-    flatMap { a -> ff.map { it(a) } }
-
   fun <B, Z> ap2(f: MapK<K, (A, B) -> Z>, fb: MapK<K, B>): Map<K, Z> =
     f.map.flatMap { (k, f) ->
       this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }

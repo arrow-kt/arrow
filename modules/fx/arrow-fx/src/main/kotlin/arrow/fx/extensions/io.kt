@@ -55,12 +55,12 @@ interface IOFunctor : Functor<ForIO> {
 }
 
 @extension
-interface IOApply : Apply<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
-    fix().map(f)
+interface IOApply<E> : Apply<IOPartialOf<E>> {
+  override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+    Ap(ff)
 
-  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
-    fix().ioAp(ff.fix())
+  override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
+    FlatMap { f -> ff().map(f) }
 
   override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
     fix().flatMap { f -> ff().map(f) }
@@ -74,11 +74,14 @@ interface IOApplicative : Applicative<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
-    fix().ioAp(ff.fix())
+  override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+    Ap(ff)
 
-  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
-    fix().flatMap { f -> ff().map(f) }
+  override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
+    FlatMap { f -> ff().map(f) }
+
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
+    fix().map(f)
 }
 
 @extension
@@ -89,19 +92,22 @@ interface IOMonad : Monad<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
-    IO.tailRecM(a, f)
+  override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+    Ap(ff)
 
-  override fun <A> just(a: A): IO<A> =
-    IO.just(a)
-
-  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
-    fix().flatMap { f -> ff().map(f) }
+  override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
+    FlatMap { f -> ff().map(f) }
 }
 
 @extension
-interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
-  override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
+interface IOApplicativeError<E> : ApplicativeError<IOPartialOf<E>, Throwable>, IOApplicative<E> {
+  override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+    Ap(ff)
+
+  override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
+    FlatMap { f -> ff().map(f) }
+
+  override fun <A> IOOf<E, A>.attempt(): IO<E, Either<Throwable, A>> =
     fix().attempt()
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
@@ -113,8 +119,8 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
   override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
     fix().redeem(fe, fb)
 
-  override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+  override fun <A> raiseError(e: Throwable): IO<E, A> =
+    IO.raiseException(e)
 }
 
 @extension
@@ -122,13 +128,13 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
-  override fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
-    fix().ioAp(ff.fix())
+  override fun <A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+    Ap(ff)
 
-  override fun <A, B> Kind<ForIO, (A) -> B>.lazyAp(ff: () -> Kind<ForIO, A>): Kind<ForIO, B> =
-    fix().flatMap { f -> ff().map(f) }
+  override fun <A, B> IOOf<E, (A) -> B>.lazyAp(ff: () -> IOOf<E, A>): IO<E, B> =
+    FlatMap { f -> ff().map(f) }
 
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
+  override fun <A, B> IOOf<E, A>.map(f: (A) -> B): IO<E, B> =
     fix().map(f)
 
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
@@ -140,8 +146,8 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
   override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
     fix().redeemWith(fe, fb)
 
-  override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+  override fun <A> raiseError(e: Throwable): IO<Nothing, A> =
+    IO.raiseException(e)
 }
 
 @extension

@@ -99,10 +99,7 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
   override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
-    fix().flatMap { f -> ff().map(f) }
-
-  override fun <A, B> EitherOf<L, A>.apPipe(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().flatMap { a -> ff.map { it(a) } }
+    fix().eitherFlatMap { f -> ff().map(f) }
 
   override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.ap(ff: Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
     fix().eitherAp(ff)
@@ -129,9 +126,6 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.lazyAp(ff: () -> Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
     fix().flatMap { f -> ff().map(f) }
-
-  override fun <A, B> EitherOf<L, A>.apPipe(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().flatMap { a -> ff.map { it(a) } }
 
   override fun <A, B> Kind<EitherPartialOf<L>, (A) -> B>.ap(ff: Kind<EitherPartialOf<L>, A>): Kind<EitherPartialOf<L>, B> =
     fix().eitherAp(ff)

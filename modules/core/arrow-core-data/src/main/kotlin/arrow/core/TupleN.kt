@@ -12,9 +12,6 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
   fun <C, D> bimap(fl: (A) -> C, fr: (B) -> D) =
     fl(a) toT fr(b)
 
-  fun <C> apPipe(f: Tuple2Of<*, (B) -> C>) =
-    map(f.fix().b)
-
   fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
     f(b).fix()
 

@@ -81,9 +81,6 @@ interface IdFunctor : Functor<ForId> {
 
 @extension
 interface IdApply : Apply<ForId>, IdFunctor {
-  override fun <A, B> IdOf<A>.apPipe(ff: IdOf<(A) -> B>): Id<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForId, (A) -> B>.ap(ff: Kind<ForId, A>): Kind<ForId, B> =
     idAp(ff)
 }
@@ -105,9 +102,6 @@ interface IdSelective : Selective<ForId>, IdApplicative {
 
 @extension
 interface IdMonad : Monad<ForId>, IdSelective {
-  override fun <A, B> IdOf<A>.apPipe(ff: IdOf<(A) -> B>): Id<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForId, (A) -> B>.ap(ff: Kind<ForId, A>): Kind<ForId, B> =
     idAp(ff)
 
@@ -147,9 +141,6 @@ interface IdComonad : Comonad<ForId> {
 
 @extension
 interface IdBimonad : Bimonad<ForId> {
-  override fun <A, B> IdOf<A>.apPipe(ff: IdOf<(A) -> B>): Id<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForId, (A) -> B>.ap(ff: Kind<ForId, A>): Kind<ForId, B> =
     idAp(ff)
 

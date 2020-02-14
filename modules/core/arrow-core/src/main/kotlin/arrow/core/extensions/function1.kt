@@ -120,9 +120,6 @@ interface Function1Profunctor : Profunctor<ForFunction1> {
 
 @extension
 interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
-  override fun <A, B> Function1Of<I, A>.apPipe(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<Function1PartialOf<I>, (A) -> B>.ap(ff: Kind<Function1PartialOf<I>, A>): Kind<Function1PartialOf<I>, B> =
     fix().funcAp(ff.fix())
 }
@@ -142,9 +139,6 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
 
   override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
-
-  override fun <A, B> Function1Of<I, A>.apPipe(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
-    fix().apPipe(ff)
 
   override fun <A, B> Kind<Function1PartialOf<I>, (A) -> B>.ap(ff: Kind<Function1PartialOf<I>, A>): Kind<Function1PartialOf<I>, B> =
     fix().funcAp(ff.fix())

@@ -27,7 +27,6 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
-import arrow.core.apPipe as constApPipe
 import arrow.core.ap as constAp
 import arrow.core.combine as combineAp
 
@@ -76,9 +75,6 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
 
   override fun <B, C> Kind<ConstPartialOf<A>, (B) -> C>.ap(ff: Kind<ConstPartialOf<A>, B>): Kind<ConstPartialOf<A>, C> =
     fix().constAp(MA(), ff.fix())
-
-  override fun <B, C> Kind<ConstPartialOf<A>, B>.apPipe(ff: Kind<ConstPartialOf<A>, (B) -> C>): Kind<ConstPartialOf<A>, C> =
-    constApPipe(MA(), ff.fix())
 }
 
 @extension

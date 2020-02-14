@@ -52,9 +52,6 @@ interface AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
 
 @extension
 interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
-  override fun <A, B> AndThenOf<X, A>.apPipe(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<AndThenPartialOf<X>, (A) -> B>.ap(ff: Kind<AndThenPartialOf<X>, A>): Kind<AndThenPartialOf<X>, B> =
     apAndThen(ff)
 
@@ -81,9 +78,6 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
 
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
-
-  override fun <A, B> AndThenOf<X, A>.apPipe(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
-    fix().apPipe(ff)
 
   override fun <A, B> Kind<AndThenPartialOf<X>, (A) -> B>.ap(ff: Kind<AndThenPartialOf<X>, A>): Kind<AndThenPartialOf<X>, B> =
     apAndThen(ff)

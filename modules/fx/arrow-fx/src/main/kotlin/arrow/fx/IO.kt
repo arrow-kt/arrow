@@ -1106,3 +1106,327 @@ fun <A, B> IOOf<(A) -> B>.ap(ff: IOOf<A>): IO<B> =
  */
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
   IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+
+/**
+ * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.just("1")
+ *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, E2 : E, B> IOOf<E, A>.redeemWith(
+  ft: (Throwable) -> IOOf<E2, B>,
+  fe: (E) -> IOOf<E2, B>,
+  fb: (A) -> IOOf<E2, B>
+): IO<E2, B> =
+  IO.Bind(this, IOFrame.Companion.RedeemWith(ft, fe, fb))
+
+/**
+ * Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
+ * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
+ *
+ * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
+ * Prefer [bracketCase] for the acquisition and release of resources.
+ *
+ * @see [guarantee] for the simpler version
+ * @see [bracketCase] for the more general operation
+ *
+ */
+fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase2<E>) -> IOOf<E, Unit>): IO<E, A> =
+  IOBracket.guaranteeCase(this, finalizer)
+
+/**
+ * Transform the [IO] value of [A] by sequencing an effect [IO] that results in [B].
+ *
+ * @param f function that returns the [IO] effect resulting in [B] based on the input [A].
+ * @returns an effect that results in [B].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.just("Hello").flatMap { IO { "$it World" } }
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, B, E2 : E> IOOf<E, A>.flatMap(f: (A) -> IOOf<E2, B>): IO<E2, B> =
+  when (val current = fix()) {
+    is IO.RaiseException -> current
+    is IO.RaiseError<E> -> current as IO<E2, B>
+    is IO.Pure<A> -> IO.Suspend { f(current.a) }
+    else -> IO.Bind(current, f)
+  }
+
+/**
+ * Compose this [IO] with another [IO] [fb] while ignoring the output.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.effect { println("Hello World!") }
+ *     .followedBy(IO.effect { println("Goodbye World!") })
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ *
+ * @see flatMap if you need to act on the output of the original [IO].
+ */
+fun <E, A, B, E2 : E> IOOf<E, A>.followedBy(fb: IOOf<E2, B>): IO<E2, B> =
+  flatMap { fb }
+
+/**
+ * Given both the value and the function are within [IO], **ap**ply the function to the value.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main() {
+ *   //sampleStart
+ *   val someF: IO<(Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
+ *   val a = IO.just(3).ap(someF)
+ *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
+ *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
+ *   //sampleEnd
+ *   println("a: $a, b: $b, c: $c")
+ * }
+ * ```
+ */
+fun <E, A, B> IOOf<E, (A) -> B>.ap(ff: IOOf<E, A>): IO<E, B> =
+  flatMap { f -> ff.fix().map(f) }
+
+fun <E, A, E2, B : A> IOOf<E, A>.flatMapLeft(f: (E) -> IOOf<E2, A>): IO<E2, A> =
+  when (val bio = fix()) {
+    is IO.RaiseError -> f(bio.error).fix()
+    is IO.Pure,
+    is IO.RaiseException -> bio as IO<E2, B>
+    else -> IO.Bind(bio, IOFrame.Companion.MapError(f))
+  }
+
+fun <E, A, E2> IOOf<E, A>.mapError(f: (E) -> E2): IO<E2, A> =
+  flatMapLeft { e -> IO.RaiseError(f(e)) }
+
+fun <E, A, E2, B> IOOf<E, A>.bimap(fe: (E) -> E2, fa: (A) -> B): IO<E2, B> =
+  mapError(fe).map(fa)
+
+/**
+ * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
+ * It would be the the equivalent of `try/catch/finally` statements in mainstream imperative languages for resource
+ * acquisition and release.
+ *
+ * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
+ * of its exit condition.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * class File(url: String) {
+ *   fun open(): File = this
+ *   fun close(): Unit {}
+ *   override fun toString(): String = "This file contains some interesting content!"
+ * }
+ *
+ * fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
+ * fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
+ * fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val safeComputation = openFile("data.json").bracket({ file: File -> closeFile(file) }, { file -> fileToString(file) })
+ *   //sampleEnd
+ *   println(safeComputation.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+  bracketCase({ a, _ -> release(a) }, use)
+
+/**
+ * A way to safely acquire a resource and release in the face of errors and cancellation.
+ * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+ *
+ * [Bracket] exists out of a three stages:
+ *   1. acquisition
+ *   2. consumption
+ *   3. releasing
+ *
+ * 1. Resource acquisition is **NON CANCELLABLE**.
+ *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
+ *   Reason being, we cannot [release] what we did not `acquire` first. Same reason we cannot call [use].
+ *   If it is successful we pass the result to stage 2 [use].
+ *
+ * 2. Resource consumption is like any other [IO] effect. The key difference here is that it's wired in such a way that
+ *   [release] **will always** be called either on [ExitCase.Cancelled], [ExitCase.Error] or [ExitCase.Completed].
+ *   If it failed than the resulting [IO] from [bracketCase] will be `IO.raiseError(e)`, otherwise the result of [use].
+ *
+ * 3. Resource releasing is **NON CANCELLABLE**, otherwise it could result in leaks.
+ *   In the case it throws the resulting [IO] will be either the error or a composed error if one occurred in the [use] stage.
+ *
+ * @param use is the action to consume the resource and produce an [IO] with the result.
+ * Once the resulting [IO] terminates, either successfully, error or disposed,
+ * the [release] function will run to clean up the resources.
+ *
+ * @param release the allocated resource after the resulting [IO] of [use] is terminates.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.typeclasses.ExitCase
+ *
+ * class File(url: String) {
+ *   fun open(): File = this
+ *   fun close(): Unit {}
+ *   fun content(): IO<Nothing, String> =
+ *     IO.just("This file contains some interesting content!")
+ * }
+ *
+ * fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
+ * fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val safeComputation = openFile("data.json").bracketCase(
+ *     release = { file, exitCase ->
+ *       when (exitCase) {
+ *         is ExitCase.Completed -> { /* do something */ }
+ *         is ExitCase.Cancelled -> { /* do something */ }
+ *         is ExitCase.Error -> { /* do something */ }
+ *       }
+ *       closeFile(file)
+ *     },
+ *     use = { file -> file.content() }
+ *   )
+ *   //sampleEnd
+ *   println(safeComputation.unsafeRunSync())
+ * }
+ *  ```
+ */
+fun <A, E, B> IOOf<E, A>.bracketCase(release: (A, ExitCase2<E>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
+  IOBracket(this, release, use)
+
+/**
+ * Executes the given [finalizer] when the source is finished, either in success or in error, or if cancelled.
+ *
+ * As best practice, prefer [bracket] for the acquisition and release of resources.
+ *
+ * @see [guaranteeCase] for the version that can discriminate between termination conditions
+ * @see [bracket] for the more general operation
+ */
+fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { finalizer }
+
+/**
+ * Executes the given [finalizer] when the source is cancelled, allowing registering a cancellation token.
+ *
+ * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
+ */
+fun <E, A> IOOf<E, A>.onCancel(finalizer: IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      ExitCase2.Cancelled -> finalizer
+      else -> IO.unit
+    }
+  }
+
+fun <E, A> IOOf<E, A>.onError(finalizer: (E) -> IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      is ExitCase2.Error<E> -> finalizer(case.error)
+      else -> IO.unit
+    }
+  }
+
+/**
+ * Executes the given [finalizer] when the source is finishes with an error.
+ */
+fun <E, A> IOOf<E, A>.onException(finalizer: (Throwable) -> IOOf<E, Unit>): IO<E, A> =
+  guaranteeCase { case ->
+    when (case) {
+      is ExitCase2.Exception -> finalizer(case.exception)
+      else -> IO.unit
+    }
+  }
+
+/**
+ * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.extensions.fx
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.fx {
+ *     val (join, cancel) = !IO.effect {
+ *       println("Hello from a fiber on ${Thread.currentThread().name}")
+ *     }.fork(Dispatchers.Default)
+ *   }
+ *
+ *   //sampleEnd
+ *   result.unsafeRunSync()
+ * }
+ * ```
+ *
+ * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+ * @param ctx [CoroutineContext] to execute the source [IO] on.
+ * @return [IO] with suspended execution of source [IO] on context [ctx].
+ */
+fun <E, A> IOOf<E, A>.fork(ctx: CoroutineContext = IO.dispatchers<Nothing>().default()): IO<E, Fiber<IOPartialOf<E>, A>> =
+  IO.async { cb ->
+    val promise = UnsafePromise<E, A>()
+    // A new IOConnection, because its cancellation is now decoupled from our current one.
+    val conn = IOConnection()
+    IORunLoop.startCancellable(IOForkedStart(this, ctx), conn, promise::complete)
+    cb(IOResult.Success(IOFiber(promise, conn)))
+  }
+
+fun <A> IOOf<Nothing, A>.unsafeRunSync(): A =
+  fix().unsafeRunSyncEither()
+    .fold({ throw IONothingYieldsError }, ::identity)
+
+fun <A> IOOf<Nothing, A>.unsafeRunAsync(f: (Either<Throwable, A>) -> Unit): Unit =
+  fix().unsafeRunAsyncEither { result ->
+    when (result) {
+      is IOResult.Success -> f(Right(result.value))
+      is IOResult.Exception -> f(Left(result.exception))
+      is IOResult.Error -> result.error
+    }
+  }
+
+fun <A> IOOf<Nothing, A>.unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+  fix().unsafeRunAsyncCancellableEither(onCancel) { result ->
+    when (result) {
+      is IOResult.Success -> cb(Right(result.value))
+      is IOResult.Exception -> cb(Left(result.exception))
+      is IOResult.Error -> result.error
+    }
+  }
+
+fun <A, B> IOOf<Nothing, A>.repeat(schedule: Schedule<IOPartialOf<Nothing>, A, B>): IO<Nothing, B> =
+  repeat(IO.concurrent(), schedule).fix()
+
+fun <A, B> IOOf<Nothing, A>.retry(schedule: Schedule<IOPartialOf<Nothing>, Throwable, B>): IO<Nothing, A> =
+  retry(IO.concurrent(), schedule).fix()
+
+internal object IONothingYieldsError : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IOTimedResultedException : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}

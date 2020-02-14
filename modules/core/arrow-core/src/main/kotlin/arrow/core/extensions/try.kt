@@ -116,9 +116,6 @@ interface TryFunctor : Functor<ForTry> {
 
 @extension
 interface TryApply : Apply<ForTry> {
-  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
 
   override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =
@@ -130,9 +127,6 @@ interface TryApply : Apply<ForTry> {
 
 @extension
 interface TryApplicative : Applicative<ForTry> {
-  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
 
   override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =
@@ -147,9 +141,6 @@ interface TryApplicative : Applicative<ForTry> {
 
 @extension
 interface TryMonad : Monad<ForTry> {
-  override fun <A, B> TryOf<A>.apPipe(ff: TryOf<(A) -> B>): Try<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForTry, (A) -> B>.ap(ff: Kind<ForTry, A>): Kind<ForTry, B> = tryAp(ff)
 
   override fun <A, B> Kind<ForTry, (A) -> B>.lazyAp(ff: () -> Kind<ForTry, A>): Kind<ForTry, B> =

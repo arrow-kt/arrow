@@ -48,9 +48,6 @@ interface Function0Functor : Functor<ForFunction0> {
 
 @extension
 interface Function0Apply : Apply<ForFunction0>, Function0Functor {
-  override fun <A, B> Function0Of<A>.apPipe(ff: Function0Of<(A) -> B>): Function0<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForFunction0, (A) -> B>.ap(ff: Kind<ForFunction0, A>): Kind<ForFunction0, B> = fix().funcAp(ff.fix())
 }
 
@@ -71,9 +68,6 @@ interface Function0Selective : Selective<ForFunction0>, Function0Applicative {
 
 @extension
 interface Function0Monad : Monad<ForFunction0>, Function0Applicative {
-  override fun <A, B> Function0Of<A>.apPipe(ff: Function0Of<(A) -> B>): Function0<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForFunction0, (A) -> B>.ap(ff: Kind<ForFunction0, A>): Kind<ForFunction0, B> = fix().funcAp(ff.fix())
 
   override fun <A, B> Function0Of<A>.flatMap(f: (A) -> Function0Of<B>): Function0<B> =
@@ -112,9 +106,6 @@ interface Function0Comonad : Comonad<ForFunction0> {
 
 @extension
 interface Function0Bimonad : Bimonad<ForFunction0> {
-  override fun <A, B> Function0Of<A>.apPipe(ff: Function0Of<(A) -> B>): Function0<B> =
-    fix().apPipe(ff)
-
   override fun <A, B> Kind<ForFunction0, (A) -> B>.ap(ff: Kind<ForFunction0, A>): Kind<ForFunction0, B> = fix().funcAp(ff.fix())
 
   override fun <A, B> Function0Of<A>.flatMap(f: (A) -> Function0Of<B>): Function0<B> =
