@@ -17,7 +17,6 @@ import arrow.fx.Semaphore
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
-import arrow.fx.typeclasses.Fiber
 import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
