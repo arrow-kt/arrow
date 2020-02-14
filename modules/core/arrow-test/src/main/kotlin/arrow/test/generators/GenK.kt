@@ -39,7 +39,6 @@ import arrow.mtl.KleisliPartialOf
 import arrow.mtl.OptionT
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.StateT
-import arrow.mtl.StateTFun
 import arrow.mtl.StateTPartialOf
 import arrow.mtl.WriterT
 import arrow.mtl.WriterTPartialOf
