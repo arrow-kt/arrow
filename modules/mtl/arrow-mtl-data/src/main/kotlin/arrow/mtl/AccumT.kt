@@ -175,4 +175,4 @@ fun <F, S, A> ReaderT<F, S, A>.toAccumT(
 /**
  * Convert a writer computation into an accumulation computation.
  */
-fun <F, S, A> WriterT<F, S, A>.toAccumT(): AccumT<S, F, A> = AccumT { value() }
+fun <S, F, A> WriterT<S, F, A>.toAccumT(): AccumT<S, F, A> = AccumT { value() }
