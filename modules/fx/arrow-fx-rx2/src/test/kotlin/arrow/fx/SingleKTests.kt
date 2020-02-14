@@ -43,14 +43,14 @@ class SingleKTests : RxJavaSpec() {
     testLaws(
       ConcurrentLaws.laws(
         SingleK.concurrent(),
+        SingleK.timer(),
         SingleK.functor(),
         SingleK.applicative(),
         SingleK.monad(),
         SingleK.genK(),
         SingleK.eqK(),
         testStackSafety = false
-      ),
-      TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
+      )
     )
 
     "Multi-thread Singles finish correctly" {

@@ -38,14 +38,14 @@ class ObservableKTests : RxJavaSpec() {
     testLaws(
       ConcurrentLaws.laws(
         ObservableK.concurrent(),
+        ObservableK.timer(),
         ObservableK.functor(),
         ObservableK.applicative(),
         ObservableK.monad(),
         ObservableK.genk(),
         ObservableK.eqK(),
         testStackSafety = false
-      ),
-      TimerLaws.laws(ObservableK.async(), ObservableK.timer(), ObservableK.eq())
+      )
     )
 
     "Multi-thread Observables finish correctly" {

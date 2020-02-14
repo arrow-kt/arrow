@@ -8,6 +8,7 @@ import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -150,6 +151,9 @@ fun <F, W> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concu
     override fun CF(): Concurrent<F> = CF
     override fun MM(): Monoid<W> = MM
   }
+
+fun <F, W> WriterT.Companion.timer(CF: Concurrent<F>, MM: Monoid<W>): Timer<WriterTPartialOf<F, W>> =
+  Timer(concurrent(CF, MM))
 
 @extension
 interface WriterTMonadIO<F, W> : MonadIO<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {

@@ -38,10 +38,9 @@ class MaybeKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      TimerLaws.laws(MaybeK.async(), MaybeK.timer(), MaybeK.eq()),
-
       ConcurrentLaws.laws(
         MaybeK.concurrent(),
+        MaybeK.timer(),
         MaybeK.functor(),
         MaybeK.applicative(),
         MaybeK.monad(),

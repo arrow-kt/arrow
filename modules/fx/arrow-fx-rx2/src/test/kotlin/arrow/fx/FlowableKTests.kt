@@ -77,8 +77,7 @@ class FlowableKTests : RxJavaSpec() {
   }
 
   init {
-    testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.timer(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
