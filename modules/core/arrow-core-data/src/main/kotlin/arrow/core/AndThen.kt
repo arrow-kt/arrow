@@ -217,8 +217,8 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     private const val maxStackDepthSize = 127
   }
 
-  private fun <X> andThenF(right: AndThen<B, X>): AndThen<A, X> = Concat(this, right)
-  private fun <X> composeF(right: AndThen<X, A>): AndThen<X, B> = Concat(right, this)
+  fun <X> andThenF(right: AndThen<B, X>): AndThen<A, X> = Concat(this, right)
+  fun <X> composeF(right: AndThen<X, A>): AndThen<X, B> = Concat(right, this)
 
   @Suppress("UNCHECKED_CAST")
   private tailrec fun loop(self: AndThen<Any?, Any?>, current: Any?, joins: Int): B = when (self) {

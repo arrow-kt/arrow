@@ -76,7 +76,7 @@ class StateTTests : UnitSpec() {
       ),
 
       SemigroupKLaws.laws(
-        StateT.semigroupK<ForOption, Int>(Option.monad(), Option.semigroupK()),
+        StateT.semigroupK<ForOption, Int>(Option.semigroupK()),
         StateT.genK(Option.genK(), Gen.int()),
         optionStateEQK),
 

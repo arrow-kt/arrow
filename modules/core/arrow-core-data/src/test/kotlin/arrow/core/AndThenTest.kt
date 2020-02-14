@@ -112,9 +112,6 @@ class AndThenTest : UnitSpec() {
     }
 
     "flatMap is stacksafe" {
-      val res = AndThen<Int, Int>(::identity).flatMap { i -> AndThen<Int, Int> { j -> i + j } }
-        .invoke(3)
-
       val result = (0 until count).toList().foldLeft(AndThen<Int, Int>(::identity)) { acc, _ ->
         acc.flatMap { i -> AndThen<Int, Int> { i + it } }
       }.invoke(1)
