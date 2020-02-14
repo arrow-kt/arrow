@@ -10,6 +10,7 @@ import arrow.free.FreeOf
 import arrow.free.FreePartialOf
 import arrow.free.extensions.free.foldable.foldLeft
 import arrow.free.extensions.free.foldable.foldRight
+import arrow.free.extensions.free.monad.monad
 import arrow.free.fix
 import arrow.free.foldMap
 import arrow.typeclasses.Applicative
@@ -18,6 +19,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Traverse
 import arrow.undocumented
 import arrow.free.ap as freeAp
@@ -129,3 +131,6 @@ interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
   override fun <A, B> Kind<FreePartialOf<F>, A>.map(f: (A) -> B): Kind<FreePartialOf<F>, B> =
     fix().freeMap(f)
 }
+
+fun <F, A> Free.Companion.fx(f: suspend MonadSyntax<FreePartialOf<F>>.() -> A): Free<F, A> =
+  Free.monad<F>().fx.monad(f).fix()

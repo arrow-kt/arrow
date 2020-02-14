@@ -69,8 +69,8 @@ interface IdEq<A> : Eq<Id<A>> {
 
 @extension
 interface IdShow<A> : Show<Id<A>> {
-  override fun Id<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun Id<A>.show(): String = show(SA())
 }
 
 @extension

@@ -10,7 +10,6 @@ import arrow.core.Right
 import arrow.core.identity
 import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
-import arrow.fx.OnCancel
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.fx.typeclasses.CancelToken
@@ -79,7 +78,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -94,13 +93,13 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     FluxK(Flux.create<B> { sink ->
       flux.subscribe({ a ->
-        if (sink.isCancelled) release(a, ExitCase.Canceled).fix().flux.subscribe({}, sink::error)
+        if (sink.isCancelled) release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error)
         else try {
           sink.onDispose(use(a).fix()
             .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
             .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FluxK.raiseError<B>(e) } }
             .flux
-            .doOnCancel { release(a, ExitCase.Canceled).fix().flux.subscribe({}, sink::error) }
+            .doOnCancel { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error) }
             .subscribe({ sink.next(it) }, sink::error, { }, {
               sink.onRequest(it::request)
             })
@@ -207,27 +206,6 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
      * }
      * ```
      */
-    @Deprecated(message =
-    "For wrapping cancelable operations you should use cancelable instead.\n" +
-      "For wrapping uncancelable operations you can use the non-deprecated async")
-    fun <A> async(fa: FluxKProc<A>): FluxK<A> =
-      Flux.create<A> { sink ->
-        val conn = FluxKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
-        sink.onCancel { conn.cancel().value().subscribe() }
-
-        fa(conn) { callback: Either<Throwable, A> ->
-          callback.fold({
-            sink.error(it)
-          }, {
-            sink.next(it)
-            sink.complete()
-          })
-        }
-      }.k()
-
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): FluxK<A> =
       Flux.create<A> { sink ->
         fa { callback: Either<Throwable, A> ->
@@ -238,27 +216,6 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
             sink.complete()
           })
         }
-      }.k()
-
-    @Deprecated(message =
-    "For wrapping cancelable operations you should use cancelableF instead.\n" +
-      "For wrapping uncancelable operations you can use the non-deprecated asyncF")
-    fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
-      Flux.create { sink: FluxSink<A> ->
-        val conn = FluxKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
-        sink.onCancel { conn.cancel().value().subscribe() }
-
-        fa(conn) { callback: Either<Throwable, A> ->
-          callback.fold({
-            sink.error(it)
-          }, {
-            sink.next(it)
-            sink.complete()
-          })
-        }.fix().flux.subscribe({}, sink::error)
       }.k()
 
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>): FluxK<A> =
@@ -273,7 +230,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         }.fix().flux.subscribe({}, sink::error)
       }.k()
 
-    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
+    fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
       Flux.create<A> { sink ->
         val token = fa { either: Either<Throwable, A> ->
           either.fold({ e ->
@@ -286,7 +243,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         sink.onDispose { token.value().subscribe({}, sink::error) }
       }.k()
 
-    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
+    fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
       Flux.create<A> { sink ->
         val cb = { either: Either<Throwable, A> ->
           either.fold({ e ->

@@ -51,11 +51,11 @@ object ApplicativeLaws {
 
   fun <F> Applicative<F>.cartesianBuilderMap(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-      map(just(a), just(b), just(c), just(d), just(e), just(f)) { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
+      mapN(just(a), just(b), just(c), just(d), just(e), just(f)) { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
     }
 
   fun <F> Applicative<F>.cartesianBuilderTupled(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { a: Int, b: Int, c: Int, d: Int, e: Int, f: Int ->
-      tupled(just(a), just(b), just(c), just(d), just(e), just(f)).map { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
+      tupledN(just(a), just(b), just(c), just(d), just(e), just(f)).map { (x, y, z, u, v, w) -> x + y + z - u - v - w }.equalUnderTheLaw(just(a + b + c - d - e - f), EQ)
     }
 }

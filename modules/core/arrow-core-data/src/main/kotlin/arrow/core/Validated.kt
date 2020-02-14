@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -632,9 +633,19 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       )
   }
 
-  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
+  fun show(SE: Show<E>, SA: Show<A>): String = fold({
+    "Invalid(${SE.run { it.show() }})"
+  }, {
+    "Valid(${SA.run { it.show() }})"
+  })
 
-  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
+  data class Valid<out A>(val a: A) : Validated<Nothing, A>() {
+    override fun toString(): String = show(Show.any(), Show.any())
+  }
+
+  data class Invalid<out E>(val e: E) : Validated<E, Nothing>() {
+    override fun toString(): String = show(Show.any(), Show.any())
+  }
 
   inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
@@ -764,8 +775,18 @@ fun <E, A, B> ValidatedOf<E, (A) -> B>.ap(SE: Semigroup<E>, ff: ValidatedOf<E, A
     { f -> ff.fix().fold(::Invalid) { Valid(f(it)) } }
   )
 
+@Deprecated(
+  "To keep API consistent with Either and Option please use `handleErrorWith` instead",
+  ReplaceWith("handleErrorWith(f)")
+)
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
+  handleErrorWith(f)
+
+fun <E, A> ValidatedOf<E, A>.handleErrorWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   fix().fold({ f(it).fix() }, ::Valid)
+
+fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<E, A> =
+  fix().handleErrorWith { Valid(f(it)) }
 
 fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
   fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })

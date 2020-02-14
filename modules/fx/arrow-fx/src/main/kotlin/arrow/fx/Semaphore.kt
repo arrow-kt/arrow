@@ -29,7 +29,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.available()
@@ -51,7 +51,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.count()
@@ -73,11 +73,11 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(6)
-   *   } //Never ends since is uncancelable
+   *   } //Never ends since is uncancellable
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap {
@@ -109,7 +109,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.tryAcquireN(6)
@@ -142,7 +142,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap {
@@ -175,7 +175,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.withPermit(IO { "Use controlled resource" })
@@ -212,7 +212,7 @@ interface Semaphore<F> {
 
     /**
      * Construct a [Semaphore] initialized with [n] available permits.
-     * Since it's based on [Async] it's constrained with an uncancelable [acquire] operation.
+     * Since it's based on [Async] it's constrained with an uncancellable [acquire] operation.
      *
      * ```kotlin:ank:playground
      * import arrow.fx.*
@@ -220,14 +220,14 @@ interface Semaphore<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+     *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
      *   //sampleEnd
      * }
      */
-    fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
+    fun <F> uncancellable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
         Ref<F, State<F>>(AS, Right(n)).map { ref ->
-          DefaultSemaphore(ref, Promise.uncancelable(this), this)
+          DefaultSemaphore(ref, Promise.uncancellable(this), this)
         }
       }
     }

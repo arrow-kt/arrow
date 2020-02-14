@@ -11,6 +11,7 @@ import arrow.fx.rx2.extensions.observablek.applicativeError.applicativeError
 import arrow.fx.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.value
+import arrow.fx.unsafeRunSync
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
@@ -34,8 +35,7 @@ class ProcCallBackTest : UnitSpec() {
     "should be able to parse answer with ForIO" {
       createApiClientTest(baseUrl())
         .testCallK()
-        .async(IO.async())
-        .fix()
+        .async(IO.async<Nothing>())
         .unsafeRunSync()
         .unwrapBody(Either.applicativeError())
         .fix()
@@ -64,8 +64,7 @@ class ProcCallBackTest : UnitSpec() {
     "should be able to run a POST with UNIT as response" {
       createApiClientTest(baseUrl())
         .testIOResponsePost()
-        .async(IO.async())
-        .fix()
+        .async(IO.async<Nothing>())
         .unsafeRunSync()
     }
   }

@@ -12,8 +12,8 @@ sealed class ExitCase<out E> {
     override fun toString() = "ExitCase.Completed"
   }
 
-  object Canceled : ExitCase<Nothing>() {
-    override fun toString() = "ExitCase.Canceled"
+  object Cancelled : ExitCase<Nothing>() {
+    override fun toString() = "ExitCase.Cancelled"
   }
 
   data class Error<out E>(val e: E) : ExitCase<E>()
@@ -21,6 +21,19 @@ sealed class ExitCase<out E> {
 
 fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
+
+sealed class ExitCase2<out E> {
+  object Completed : ExitCase2<Nothing>() {
+    override fun toString() = "ExitCase2.Completed"
+  }
+
+  object Cancelled : ExitCase2<Nothing>() {
+    override fun toString() = "ExitCase2.Cancelled"
+  }
+
+  data class Error<E>(val error: E) : ExitCase2<E>()
+  data class Exception(val exception: Throwable) : ExitCase2<Nothing>()
+}
 
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Bracket)
@@ -64,7 +77,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   val release: (File, ExitCase<Throwable>) -> Kind<F, Unit> = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -116,11 +129,11 @@ interface Bracket<F, E> : MonadError<F, E> {
   /**
    * Meant for ensuring a given task continues execution even when interrupted.
    */
-  fun <A> Kind<F, A>.uncancelable(): Kind<F, A> =
+  fun <A> Kind<F, A>.uncancellable(): Kind<F, A> =
     bracket({ just<Unit>(Unit) }, { just(it) })
 
   /**
-   * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled.
+   * Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled.
    *
    * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
    * Prefer [bracket] for the acquisition and release of resources.
@@ -130,10 +143,10 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @see [bracket] for the more general operation
    */
   fun <A> Kind<F, A>.guarantee(finalizer: Kind<F, Unit>): Kind<F, A> =
-    bracket({ finalizer }, { this })
+    guaranteeCase { finalizer }
 
   /**
-   * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
+   * Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
    * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
    *
    * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
@@ -145,5 +158,29 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
-    bracketCase({ _, e -> finalizer(e) }, { this })
+    just<Unit>(Unit).bracketCase({ _, e -> finalizer(e) }, { this })
+
+  /**
+   * Executes the given [finalizer] when the source is cancelled, allowing registering a cancellation token.
+   *
+   * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
+   */
+  fun <A> Kind<F, A>.onCancel(finalizer: Kind<F, Unit>): Kind<F, A> =
+    guaranteeCase { case ->
+      when (case) {
+        ExitCase.Cancelled -> finalizer
+        else -> just<Unit>(Unit)
+      }
+    }
+
+  /**
+   * Executes the given `finalizer` with the given error when the source is finished in error.
+   */
+  fun <A> Kind<F, A>.onError(finalizer: (E) -> Kind<F, Unit>): Kind<F, A> =
+      guaranteeCase { case ->
+        when (case) {
+          is ExitCase.Error -> finalizer(case.e)
+          else -> just<Unit>(Unit)
+        }
+      }
 }

@@ -2,42 +2,42 @@
 library: core
 ---
 {: data-executable="true"}
-```kotlin
+```kotlin:ank
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.fx
 
-object Nuke
-object Target
-object Impacted
+object Lettuce
+object Knife
+object Salad
 
-sealed class NukeException {
-  object SystemOffline: NukeException()
-  object RotationNeedsOil: NukeException()
-  data class MissedByMeters(val meters : Int): NukeException()
+sealed class CookingException {
+  object LettuceIsRotten: CookingException()
+  object KnifeNeedsSharpening: CookingException()
+  data class InsufficientAmount(val quantityInGrams : Int): CookingException()
 }
 
-typealias SystemOffline = NukeException.SystemOffline
-typealias RotationNeedsOil = NukeException.RotationNeedsOil
-typealias MissedByMeters = NukeException.MissedByMeters
+typealias NastyLettuce = CookingException.LettuceIsRotten
+typealias KnifeIsDull = CookingException.KnifeNeedsSharpening
+typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
 
-fun arm(): Either<SystemOffline, Nuke> = Right(Nuke)
-fun aim(): Either<RotationNeedsOil, Target> = Right(Target)
-fun launch(target: Target, nuke: Nuke): Either<MissedByMeters, Impacted> = Left(MissedByMeters(5))
+fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
+fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
+fun prepare(tool: Knife, ingredient: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
 fun main() {
 //sampleStart
 
 
-fun launchNuke(): Either<NukeException, Impacted> =
-  Either.fx<NukeException, Impacted> {
-    val nuke = !arm()
-    val target = !aim()
-    val impact = !launch(target, nuke)
-    impact
+fun prepareLunch(): Either<CookingException, Salad> =
+  Either.fx<CookingException, Salad> {
+    val lettuce = !takeFoodFromRefrigerator()
+    val knife = !getKnife()
+    val lunch = !prepare(knife, lettuce)
+    lunch
   }
 
-println(launchNuke())
+println(prepareLunch())
 //sampleEnd
 }
 ```

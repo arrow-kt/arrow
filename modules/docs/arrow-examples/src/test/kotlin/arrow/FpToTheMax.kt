@@ -11,6 +11,7 @@ import arrow.fx.IO
 import arrow.fx.extensions.io.monadDefer.monadDefer
 import arrow.fx.fix
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.unsafeRunSync
 import arrow.mtl.extensions.monad
 import arrow.mtl.fix
 import arrow.mtl.run
@@ -97,11 +98,11 @@ object FpToTheMax {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    val module = IO.monadDefer().run {
+    val module = IO.monadDefer<Nothing>().run {
       MonadAndConsoleRandom(this, ConsoleImpl(this), FRandomImpl(this))
     }
     val r = module.fMain()
-    r.fix().unsafeRunSync()
+    r.unsafeRunSync()
   }
 
   fun test(): List<String> = run {

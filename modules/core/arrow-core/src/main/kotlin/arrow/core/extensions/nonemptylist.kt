@@ -58,8 +58,8 @@ interface NonEmptyListEq<A> : Eq<NonEmptyList<A>> {
 
 @extension
 interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
-  override fun NonEmptyList<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun NonEmptyList<A>.show(): String = show(SA())
 }
 
 @extension

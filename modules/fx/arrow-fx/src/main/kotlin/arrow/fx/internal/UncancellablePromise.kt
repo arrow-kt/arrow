@@ -12,7 +12,7 @@ import arrow.fx.typeclasses.Async
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
-internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, A>, Async<F> by AS {
+internal class UncancellablePromise<F, A>(private val AS: Async<F>) : Promise<F, A>, Async<F> by AS {
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()

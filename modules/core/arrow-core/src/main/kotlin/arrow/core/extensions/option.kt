@@ -156,8 +156,8 @@ interface OptionEq<A> : Eq<Option<A>> {
 
 @extension
 interface OptionShow<A> : Show<Option<A>> {
-  override fun Option<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun Option<A>.show(): String = show(SA())
 }
 
 @extension
@@ -472,7 +472,7 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
 @extension
 interface OptionZip : Zip<ForOption>, OptionSemialign {
   override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    Option.apply().tupled(this, other)
+    Option.apply().tupledN(this, other)
 }
 
 @extension

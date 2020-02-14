@@ -1,6 +1,8 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -26,7 +28,7 @@ open class AttemptRaisedError {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioLoopNotHappy(size: Int, i: Int): IO<Int> =
+  private fun ioLoopNotHappy(size: Int, i: Int): IO<Nothing, Int> =
     if (i < size) {
       IO { throw dummy }.attempt().flatMap {
         it.fold({ ioLoopNotHappy(size, i + 1) }, IO.Companion::just)

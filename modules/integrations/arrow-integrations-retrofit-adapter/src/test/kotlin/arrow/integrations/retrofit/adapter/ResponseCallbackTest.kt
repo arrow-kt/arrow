@@ -3,6 +3,7 @@ package arrow.integrations.retrofit.adapter
 import arrow.fx.IO
 import arrow.fx.extensions.io.async.async
 import arrow.fx.fix
+import arrow.fx.unsafeRunSync
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
@@ -23,7 +24,7 @@ class ResponseCallbackTest : UnitSpec() {
     "bad deserialization should return Either.Left" {
       createApiClientTest(baseUrl)
         .testCallK()
-        .async(IO.async())
+        .async(IO.async<Nothing>())
         .fix()
         .attempt()
         .unsafeRunSync()

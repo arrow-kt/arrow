@@ -20,6 +20,7 @@ import arrow.core.extensions.option.eqK.eqK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
@@ -33,6 +34,7 @@ import arrow.mtl.extensions.optiont.eqK.eqK
 import arrow.mtl.extensions.optiont.functor.functor
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monad.monad
+import arrow.mtl.extensions.optiont.monadTrans.monadTrans
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
@@ -44,6 +46,7 @@ import arrow.test.generators.option
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseFilterLaws
@@ -64,7 +67,7 @@ class OptionTTest : UnitSpec() {
     val nestedEQK = OptionT.eqK(Id.eqK()).nested(OptionT.eqK(NonEmptyList.eqK()))
 
     testLaws(
-      ConcurrentLaws.laws(
+      ConcurrentLaws.laws<OptionTPartialOf<IOPartialOf<Nothing>>>(
         OptionT.concurrent(IO.concurrent()),
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.monad()),
@@ -107,6 +110,14 @@ class OptionTTest : UnitSpec() {
         ),
         OptionT.genK(Const.genK(Gen.int())),
         OptionT.eqK(Const.eqK(Int.eq()))
+      ),
+
+      MonadTransLaws.laws(
+        OptionT.monadTrans(),
+        Id.monad(),
+        OptionT.monad(Id.monad()),
+        Id.genK(),
+        OptionT.eqK(Id.eqK())
       )
     )
 

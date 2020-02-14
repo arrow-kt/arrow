@@ -1,6 +1,7 @@
 package arrow.typeclasses.suspended
 
 import arrow.Kind
+import kotlin.reflect.KProperty
 
 /**
  * All possible approaches to running [Kind] in the context of [Fx]
@@ -17,9 +18,15 @@ interface BindSyntax<F> {
 
   suspend fun <A> Kind<F, A>.bind(): A
 
+  @Deprecated("This operator can have problems when you do not capture the value, please use ! or bind() instead", ReplaceWith("bind()"))
   suspend operator fun <A> Kind<F, A>.component1(): A =
     bind()
 
   suspend operator fun <A> Kind<F, A>.not(): A =
     bind()
+
+  suspend fun <A> Kind<F, A>.getValue(thisRef: Any?, property: KProperty<*>): A =
+    bind()
 }
+
+operator fun String.getValue(thisRef: Any?, property: KProperty<*>): Char = 'c'

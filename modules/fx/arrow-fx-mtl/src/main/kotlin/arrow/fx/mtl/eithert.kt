@@ -8,6 +8,7 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
@@ -19,11 +20,13 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf
+import arrow.mtl.extensions.EitherTMonad
 import arrow.mtl.extensions.EitherTMonadThrow
 import arrow.mtl.value
 import arrow.typeclasses.Monad
@@ -117,8 +120,8 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
   override fun dispatchers(): Dispatchers<EitherTPartialOf<F, L>> =
     CF().dispatchers() as Dispatchers<EitherTPartialOf<F, L>>
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<EitherTPartialOf<F, L>>): EitherT<F, L, A> = CF().run {
-    EitherT.liftF(this, cancelable { cb -> k(cb).value().map { Unit } })
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<EitherTPartialOf<F, L>>): EitherT<F, L, A> = CF().run {
+    EitherT.liftF(this, cancellable { cb -> k(cb).value().map { Unit } })
   }
 
   override fun <A> EitherTOf<F, L, A>.fork(ctx: CoroutineContext): EitherT<F, L, Fiber<EitherTPartialOf<F, L>, A>> = CF().run {
@@ -151,15 +154,15 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
       raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Either<L, A>, Either<L, B>, Either<L, C>> ->
         when (res) {
           is RaceTriple.First -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberB.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.First(winner.b, fiberT(res.fiberB), fiberT(res.fiberC))))
           }
           is RaceTriple.Second -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberA.cancel(), res.fiberC.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.Second(fiberT(res.fiberA), winner.b, fiberT(res.fiberC))))
           }
           is RaceTriple.Third -> when (val winner = res.winner) {
-            is Either.Left -> tupled(res.fiberA.cancel(), res.fiberB.cancel()).map { Left(winner.a) }
+            is Either.Left -> tupledN(res.fiberA.cancel(), res.fiberB.cancel()).map { Left(winner.a) }
             is Either.Right -> just(Right(RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), winner.b)))
           }
         }
@@ -175,3 +178,11 @@ fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPa
   object : EitherTConcurrent<F, L> {
     override fun CF(): Concurrent<F> = CF
   }
+
+interface EitherTMonadIO<F, L> : MonadIO<EitherTPartialOf<F, L>>, EitherTMonad<F, L> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<EitherTPartialOf<F, L>, A> = FIO().run {
+    EitherT.liftF(this, liftIO())
+  }
+}

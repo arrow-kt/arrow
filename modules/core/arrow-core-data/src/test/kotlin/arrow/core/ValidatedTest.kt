@@ -3,6 +3,7 @@ package arrow.core
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
+import arrow.core.extensions.show
 import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
@@ -42,7 +43,7 @@ class ValidatedTest : UnitSpec() {
     testLaws(
       EqK2Laws.laws(Validated.eqK2(), Validated.genK2()),
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
-      ShowLaws.laws(Validated.show(), EQ, Gen.validated(Gen.string(), Gen.int())),
+      ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       TraverseLaws.laws(Validated.traverse(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(
@@ -200,7 +201,7 @@ class ValidatedTest : UnitSpec() {
     with(VAL_AP) {
 
       "Cartesian builder should build products over homogeneous Validated" {
-        map(
+        mapN(
           Valid("11th"),
           Valid("Doctor"),
           Valid("Who")
@@ -208,7 +209,7 @@ class ValidatedTest : UnitSpec() {
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
-        map(
+        mapN(
           Valid(13),
           Valid("Doctor"),
           Valid(false)
@@ -216,7 +217,7 @@ class ValidatedTest : UnitSpec() {
       }
 
       "Cartesian builder should build products over Invalid Validated" {
-        map(
+        mapN(
           Invalid("fail1"),
           Invalid("fail2"),
           Valid("Who")

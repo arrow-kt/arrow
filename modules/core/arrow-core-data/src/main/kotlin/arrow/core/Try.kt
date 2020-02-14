@@ -583,7 +583,7 @@ sealed class Try<out A> : TryOf<A> {
 
     @Deprecated(
       "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or an effect handler like IO",
-      ReplaceWith("Either.just(a)")
+      ReplaceWith("Either.right(a)")
     )
     fun <A> just(a: A): Try<A> = Success(a)
 

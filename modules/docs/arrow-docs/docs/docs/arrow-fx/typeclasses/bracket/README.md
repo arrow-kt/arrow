@@ -15,7 +15,18 @@ video: EUqg3fSahhk
 The `Bracket` Type class abstracts the ability to safely **acquire**, **use**, and then **release** a resource.
 
 Essentially, it could be considered the functional programming equivalent to the well known imperative
-`try/catch/finally` structure.
+`try/catch/finally` structure:
+
+```kotlin
+val resource = acquire() // See note below
+try {
+  use(resource)
+} finally {
+  release(resource)
+}
+```
+
+Note here that acquiring is not a safe op and thus it might fail. An alternative use of Bracket in this sense would be the `guarantee` function explained below.
 
 `Bracket` extends [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
@@ -43,11 +54,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 ```
 
 Note that we wrapped them into [`IO`]({{ '/docs/effects/io' | relative_url }}). [`IO`]({{ '/docs/effects/io' | relative_url }})
@@ -68,11 +79,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -210,7 +221,7 @@ This is the style you'd usually use in a Functional Program.
 
 ### Combinators
 
-#### Kind<F, A>#bracket
+#### bracket
 
 Requires passing `release` and `use` lambdas. It ensures acquiring, using, and releasing the resource at the end.
 
@@ -225,11 +236,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -241,10 +252,10 @@ println(safeComputation)
 }
 ```
 
-#### Kind<F, A>#bracketCase
+#### bracketCase
 
 It's a generalized version of `bracket()` that uses `ExitCase` to distinguish between different exit cases when
-releasing the acquired resource. `ExitCase` can take the values `Completed`, `Canceled`, or `Error(e)`.  So, depending
+releasing the acquired resource. `ExitCase` can take the values `Completed`, `Cancelled`, or `Error(e)`.  So, depending
 how the `use` execution finalizes, the corresponding `ExitCase` value will be passed to the `release` lambda.
 
 It requires passing `release` and `use` lambdas. It ensures acquiring, using, and releasing the resource at the end.
@@ -261,11 +272,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -273,7 +284,7 @@ val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
         is ExitCase.Completed -> { /* do something */ }
-        is ExitCase.Canceled -> { /* do something */ }
+        is ExitCase.Cancelled -> { /* do something */ }
         is ExitCase.Error -> { /* do something */ }
       }
       closeFile(file)
@@ -284,6 +295,42 @@ val safeComputation = openFile("data.json").bracketCase(
 //sampleEnd
 println(safeComputation)
 }
+```
+
+#### guarantee/guaranteeCase - onCancel/onError
+
+Ignores the acquisition and focuses on using a resource and performing an action whenever it finishes in any way (completed, error, cancelled).
+
+Similarly as for `bracketCase`, `guaranteeCase` works in the same way as `guarantee` but uses `ExitCase` to distinguish between different exit cases when
+releasing the acquired resource. 
+
+Although you would normally not need to use `guarantee`, since there are 2 combinators (onCancel/onError) that exist now to fulfill typical control flow handling:
+
+`fun <A> Kind<F, A>.onCancel(finalizer: Kind<F, Unit>): Kind<F, A>`
+
+`fun <A> Kind<F, A>.onError(finalizer: Kind<F, Unit>): Kind<F, A>`
+
+Note how the finalizer's return type is `Unit` because it won't change the result type of our initial operation, but rather execute another in a specific case.
+
+For example, imagine that we need to keep track of whether our data-fetching operation fails or is cancelled due to some event, we would simply do:
+
+```kotlin:ank:playground
+import arrow.fx.IO
+import arrow.fx.extensions.io.bracket.onCancel
+import arrow.fx.extensions.io.bracket.onError
+
+// Some important operation
+fun myOp() = IO { 42 }
+
+fun main(args: Array<String>) {
+//sampleStart
+val safeComputation = myOp()
+  .onCancel(IO { println("cancelled!") })
+  .onError { e -> IO { println("error: $e!") } }
+//sampleEnd
+println(safeComputation)
+}
+
 ```
 
 #### Other combinators

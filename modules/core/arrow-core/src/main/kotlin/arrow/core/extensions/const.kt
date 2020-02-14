@@ -160,8 +160,8 @@ interface ConstEqK<A> : EqK<ConstPartialOf<A>> {
 
 @extension
 interface ConstShow<A, T> : Show<Const<A, T>> {
-  override fun Const<A, T>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun Const<A, T>.show(): String = show(SA())
 }
 
 @extension

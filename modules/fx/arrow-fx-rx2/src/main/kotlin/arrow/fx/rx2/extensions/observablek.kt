@@ -41,9 +41,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.Traverse
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -95,21 +93,6 @@ interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
 
 @extension
 interface ObservableKFoldable : Foldable<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
-    fix().foldLeft(b, f)
-
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().foldRight(lb, f)
-}
-
-@extension
-interface ObservableKTraverse : Traverse<ForObservableK> {
-  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
-
-  override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
-    fix().traverse(AP, f)
-
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -194,11 +177,11 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       f(a, tuple.a, tuple.b)
     }).subscribeOn(asScheduler()))
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
-    ObservableK.cancelable(k)
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
+    ObservableK.cancellable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
-    ObservableK.cancelableF(k)
+  override fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
+    ObservableK.cancellableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
     asScheduler().let { scheduler ->
@@ -289,26 +272,17 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 }
 
 fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() -> A): ObservableK<A> =
-  defer { ObservableK.concurrent().fx.concurrent(c).fix() }
+  ObservableK.concurrent().fx.concurrent(c).fix()
 
 @extension
 interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
-    ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+    ObservableK(Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
 }
 
 @extension
 interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKFunctor {
-  override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
-    fix().filterMap(f)
-}
-
-@extension
-interface ObservableKMonadFilter : MonadFilter<ForObservableK>, ObservableKMonad {
-  override fun <A> empty(): ObservableK<A> =
-    Observable.empty<A>().k()
-
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)
 }

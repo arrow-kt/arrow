@@ -37,6 +37,7 @@ import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class FlowableKTests : RxJavaSpec() {
 
@@ -46,6 +47,8 @@ class FlowableKTests : RxJavaSpec() {
       val res2 = Try { b.value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
       return res1.fold({ t1 ->
         res2.fold({ t2 ->
+          if (t1::class.java == TimeoutException::class.java) throw t1
+          if (t2::class.java == TimeoutException::class.java) throw t2
           (t1::class.java == t2::class.java)
         }, { false })
       }, { v1 ->
@@ -104,17 +107,6 @@ class FlowableKTests : RxJavaSpec() {
 
     testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK()))
 
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = FlowableK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
-
     "Multi-thread Flowables finish correctly" {
       val value: Flowable<Long> = FlowableK.fx {
         val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
@@ -158,13 +150,13 @@ class FlowableKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
-    "FlowableK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
+    "FlowableK.cancellable should cancel CancelToken on dispose" {
+      Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
         FlowableK {
-          FlowableK.cancelable<Unit>(fa = {
+          FlowableK.cancellable<Unit>(fa = {
             latch.complete(Unit)
           }).flowable.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -175,7 +167,7 @@ class FlowableKTests : RxJavaSpec() {
     }
 
     "FlowableK async should be cancellable" {
-      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async())
+      Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async())
         .flatMap { latch ->
           FlowableK {
             FlowableK.async<Unit>(fa = { })

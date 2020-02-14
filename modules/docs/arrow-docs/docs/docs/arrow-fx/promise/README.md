@@ -14,7 +14,7 @@ A `Promise` guarantees (promises) `A` at some point in the future within the con
 
 ## Constructing a Promise
 
-A promise can easily be made by calling `uncancelable`.
+A promise can easily be made by calling `uncancellable`.
 Since the allocation of mutable state is not referentially transparent, this side-effect is contained within `F`.
 
 ```kotlin:ank:playground
@@ -23,14 +23,14 @@ import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val promise: IO<Promise<ForIO, Int>> =
-  Promise.uncancelable<ForIO, Int>(IO.async()).fix()
+val promise: IO<Nothing, Promise<ForIO, Int>> =
+  Promise.uncancellable<ForIO, Int>(IO.async()).fix()
 //sampleEnd
 println(promise)
 }
 ```
 
-In case you want the side-effect to execute immediately and return the `Promise` instance, you can use the `unsafeUncancelable` function.
+In case you want the side-effect to execute immediately and return the `Promise` instance, you can use the `unsafeUncancellable` function.
 
 ```kotlin:ank:playground
 import arrow.fx.*
@@ -38,7 +38,7 @@ import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancelable(IO.async())
+val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancellable(IO.async())
 //sampleEnd
 println(unsafePromise)
 }
@@ -55,7 +55,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.get()
 } //never ends because `get` keeps waiting for p to be fulfilled.
 //sampleEnd
@@ -69,7 +69,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.get()
   }
@@ -90,7 +90,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(2).flatMap {
     p.get()
   }
@@ -107,7 +107,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.complete(2)
   }
@@ -130,7 +130,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.error(RuntimeException("Break promise"))
 }
   .attempt()
@@ -147,7 +147,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.error(RuntimeException("Break promise"))
   }

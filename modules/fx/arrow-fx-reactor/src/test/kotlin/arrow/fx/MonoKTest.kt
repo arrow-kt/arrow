@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
@@ -13,6 +14,7 @@ import arrow.fx.reactor.extensions.monok.monad.monad
 import arrow.fx.reactor.extensions.monok.timer.timer
 import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
+import arrow.fx.reactor.unsafeRunSync
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -28,7 +30,6 @@ import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
@@ -74,17 +75,6 @@ class MonoKTest : UnitSpec() {
       AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.monad(), MonoK.genK(), EQK(), testStackSafety = false),
       TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = MonoK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = MonoK.fx {
@@ -149,7 +139,7 @@ class MonoKTest : UnitSpec() {
 
       MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.async<Nothing> { _, _ -> } },
+          use = { MonoK.async<Nothing> { } },
           release = { _, exitCase ->
             MonoK {
               ec = exitCase
@@ -162,27 +152,14 @@ class MonoKTest : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
-    }
-
-    "MonoK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
-        MonoK {
-          MonoK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.mono.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .expectNext(Unit)
-        .expectComplete()
+      ec shouldBe ExitCase.Cancelled
     }
 
     "MonoK async should be cancellable" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
+      Promise.uncancellable<ForMonoK, Unit>(MonoK.async())
         .flatMap { latch ->
           MonoK {
-            MonoK.async<Unit> { _, _ -> }
+            MonoK.async<Unit> { }
               .value()
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -194,12 +171,30 @@ class MonoKTest : UnitSpec() {
         .expectComplete()
     }
 
-    "KindConnection can cancel upstream" {
-      MonoK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .expectError(ConnectionCancellationException::class)
+    "MonoK should suspend" {
+      MonoK.fx {
+        val s = effect { Mono.just(1).k().suspended()!! }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error MonoK should suspend" {
+      val error = IllegalArgumentException()
+
+      MonoK.fx {
+        val s = effect { Mono.error<Int>(error).k().suspended()!! }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
+    }
+
+    "Empty MonoK should suspend" {
+      MonoK.fx {
+        val s = effect { Mono.empty<Int>().k().suspended() }.bind()
+
+        s shouldBe null
+      }.unsafeRunSync()
     }
   }
 }

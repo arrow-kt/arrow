@@ -19,19 +19,19 @@ It is possible to use extension functions for Retrofit's `Call` so the code for 
 ```kotlin
 val call : Call<Response<String>>
 call.runAsync(IO.async()) // Kind<ForIO, Response<String>>
-    .fix() // IO<Response<String>> 		    
+    .fix() // IO<Nothing, Response<String>> 		    
 ```
 
 ```kotlin
 val call : Call<Response<String>>
 call.runSyncDeferred(IO.monadDefer()) // Kind<ForIO, Response<String>>
-    .fix() // IO<Response<String>> 		    
+    .fix() // IO<Nothing, Response<String>> 		    
 ```
 
 ```kotlin
 val call : Call<Response<String>>
 call.runSyncCatch(IO.monadError()) // Kind<ForIO, Response<String>>
-    .fix() // IO<Response<String>> 		    
+    .fix() // IO<Nothing, Response<String>> 		    
 ```
 
 ### Using the wrapper `CallK`
@@ -61,7 +61,7 @@ You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}
 createApiClientTest(baseUrl)
   .testCallK() // CallK
   .async(IO.async()) // Kind<ForIO, Response<ResponseMock>>
-  .fix() // IO<Response<ResponseMock>>
+  .fix() // IO<Nothing, Response<ResponseMock>>
 ```
 
 ### Using `CallK` with `ObservableK`
@@ -78,7 +78,7 @@ createApiClientTest(baseUrl)
 Arrow provides the extension function `unwrapBody()` for `Response<A>` to handle it using [`ApplicativeError<F, Throwable>`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}). It wraps any failed response into an `HttpException`, and a missing body with `IllegalStateException`.
 
 ```kotlin
-val ioResponse: IO<Response<ResponseMock>>
+val ioResponse: IO<Nothing, Response<ResponseMock>>
 ioResponse
   .unsafeRunSync() //Response<ResponseMock>
   .unwrapBody(Either.applicativeError()) // Either<Throwable, ResponseMock>

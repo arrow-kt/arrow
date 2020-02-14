@@ -16,8 +16,10 @@ import arrow.core.fix
 import arrow.core.toT
 import arrow.core.value
 import arrow.fx.IO
+import arrow.fx.Ref
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.unsafeRunSync
 import arrow.mtl.typeclasses.ComposedApplicative
 import arrow.mtl.typeclasses.nest
 import arrow.mtl.typeclasses.unnest
@@ -47,17 +49,6 @@ class TIF {
 }
 
 object TraverseLaws {
-  // FIXME(paco): this implementation will crash the inliner. Wait for fix: https://youtrack.jetbrains.com/issue/KT-18660
-  /*
-  inline fun <F> laws(TF: Traverse<F>, AF: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-      FoldableLaws.laws(TF, { AF.just(it) }, Eq.any()) + FunctorLaws.laws(AF, EQ) + listOf(
-              Law("Traverse Laws: Identity", { identityTraverse(TF, AF, { AF.just(it) }, EQ) }),
-              Law("Traverse Laws: Sequential composition", { sequentialComposition(TF, { AF.just(it) }, EQ) }),
-              Law("Traverse Laws: Parallel composition", { parallelComposition(TF, { AF.just(it) }, EQ) }),
-              Law("Traverse Laws: FoldMap derived", { foldMapDerived(TF, { AF.just(it) }) })
-      )
-  */
-
   fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val GEN = GENK.genK(Gen.intSmall())
     val EQ = EQK.liftEq(Int.eq())
@@ -126,7 +117,7 @@ object TraverseLaws {
       mapped.equalUnderTheLaw(traversed, Eq.any())
     }
 
-  fun <F, A> Traverse<F>.effectOrderPreserved(GEN: Gen<Kind<F, A>>) = IO.concurrent().run {
+  fun <F, A> Traverse<F>.effectOrderPreserved(GEN: Gen<Kind<F, A>>) = IO.concurrent<Nothing>().run {
     forAll(GEN) { fa: Kind<F, A> ->
       val foldableOrder = fa.foldLeft(emptyList()) { xs: List<A>, x: A -> xs + x }
       val effectOrder = Ref<List<A>>(emptyList()).flatMap { ref ->

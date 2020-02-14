@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.Option.Companion.just
 import arrow.higherkind
+import arrow.typeclasses.Show
 
 /**
  *
@@ -539,18 +540,24 @@ sealed class Option<out A> : OptionOf<A> {
   } else {
     value
   }
+
+  fun show(SA: Show<A>): String = fold({
+    "None"
+  }, {
+    "Some(${SA.run { it.show() }})"
+  })
 }
 
 object None : Option<Nothing>() {
   override fun isEmpty() = true
 
-  override fun toString(): String = "None"
+  override fun toString(): String = show(Show.any())
 }
 
 data class Some<out T>(val t: T) : Option<T>() {
   override fun isEmpty() = false
 
-  override fun toString(): String = "Some($t)"
+  override fun toString(): String = show(Show.any())
 }
 
 /**

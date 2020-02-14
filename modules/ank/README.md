@@ -33,11 +33,6 @@ Then apply it to each individual module where you want to use Λnk:
 ```groovy
 apply plugin: 'ank-gradle-plugin'
 
-dependencies {
-    implementation 'io.arrow-kt:arrow-ank:<version>'
-    // ...
-}
-
 ank {
     source = file("src/main/docs")
     target = file("build/site")

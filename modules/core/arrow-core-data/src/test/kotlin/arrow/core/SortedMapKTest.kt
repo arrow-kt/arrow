@@ -38,7 +38,7 @@ class SortedMapKTest : UnitSpec() {
   init {
     testLaws(
       HashLaws.laws(SortedMapK.hash(String.hash(), Int.hash()), SortedMapK.eq(String.eq(), Int.eq()), Gen.sortedMapK(Gen.string(), Gen.int())),
-      ShowLaws.laws(SortedMapK.show(), SortedMapK.eq(String.eq(), Int.eq()), Gen.sortedMapK(Gen.string(), Gen.int())),
+      ShowLaws.laws(SortedMapK.show(String.show(), Int.show()), SortedMapK.eq(String.eq(), Int.eq()), Gen.sortedMapK(Gen.string(), Gen.int())),
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),

@@ -70,6 +70,7 @@ include {
             _ 'fx-mtl'
             _ 'fx-rx2'
             _ 'fx-reactor'
+            _ 'fx-kotlinx-coroutines'
         }
 
         integrations {
@@ -80,11 +81,6 @@ include {
         recursion {
             _ 'recursion-data'
             _ 'recursion'
-        }
-
-        docs {
-            _ 'docs'
-            _ 'examples'
         }
 
         optics {

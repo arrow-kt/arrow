@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
@@ -14,6 +15,7 @@ import arrow.fx.rx2.extensions.maybek.monad.monad
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
@@ -30,6 +32,7 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class MaybeKTests : RxJavaSpec() {
 
@@ -61,17 +64,6 @@ class MaybeKTests : RxJavaSpec() {
       )
        */
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = MaybeK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Maybes finish correctly" {
       val value: Maybe<Long> = MaybeK.fx {
@@ -150,13 +142,13 @@ class MaybeKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
-    "MaybeK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
+    "MaybeK.cancellable should cancel CancelToken on dispose" {
+      Promise.uncancellable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
-          MaybeK.cancelable<Unit> {
+          MaybeK.cancellable<Unit> {
             latch.complete(Unit)
           }.maybe.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -167,7 +159,7 @@ class MaybeKTests : RxJavaSpec() {
     }
 
     "MaybeK async should be cancellable" {
-      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
+      Promise.uncancellable<ForMaybeK, Unit>(MaybeK.async())
         .flatMap { latch ->
           MaybeK {
             MaybeK.async<Unit> { }
@@ -181,6 +173,32 @@ class MaybeKTests : RxJavaSpec() {
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
+
+    "MaybeK should suspend" {
+      MaybeK.fx {
+        val s = effect { Maybe.just(1).k().suspended() }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error MaybeK should suspend" {
+      val error = IllegalArgumentException()
+
+      MaybeK.fx {
+        val s = effect { Maybe.error<Int>(error).k().suspended() }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
+    }
+
+    "Empty MaybeK should suspend" {
+      MaybeK.fx {
+        val s = effect { Maybe.empty<Int>().k().suspended() }.bind()
+
+        s shouldBe null
+      }.unsafeRunSync()
+    }
   }
 }
 
@@ -190,6 +208,8 @@ private fun <T> MaybeK.Companion.eq(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>
     val res2 = arrow.core.Try { b.value().timeout(5, TimeUnit.SECONDS).blockingGet() }
     return res1.fold({ t1 ->
       res2.fold({ t2 ->
+        if (t1::class.java == TimeoutException::class.java) throw t1
+        if (t2::class.java == TimeoutException::class.java) throw t2
         (t1::class.java == t2::class.java)
       }, { false })
     }, { v1 ->

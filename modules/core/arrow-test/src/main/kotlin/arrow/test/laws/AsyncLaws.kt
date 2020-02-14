@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.eq
+import arrow.core.internal.AtomicBooleanW
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
@@ -14,7 +15,6 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
-import arrow.test.laws.AsyncLaws.bracketReleaseIscalledOnCompletedOrError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -31,6 +31,7 @@ object AsyncLaws {
 
   private fun <F> asyncLaws(AC: Async<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
+    val EQB = EQK.liftEq(Boolean.eq())
 
     return listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
@@ -41,7 +42,8 @@ object AsyncLaws {
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
       Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
       Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
-      Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
+      Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) },
+      Law("Async Laws: fx block runs lazily") { AC.fxLazyEvaluation(Boolean.eq(), EQB) }
     )
   }
 
@@ -116,7 +118,7 @@ object AsyncLaws {
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
-      Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
+      Promise.uncancellable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = later { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {
             is ExitCase.Completed -> r.complete(b)
@@ -147,6 +149,18 @@ object AsyncLaws {
       val continueOn = effect(two) { f(Unit) }
 
       effect.equalUnderTheLaw(continueOn, EQ)
+    }
+
+  fun <F> Async<F>.fxLazyEvaluation(EQ: Eq<Boolean>, EQK: Eq<Kind<F, Boolean>>): Unit =
+    forAll(Gen.functionAToB<Unit, Int>(Gen.constant(0))) { f ->
+      val run = AtomicBooleanW(false)
+      val p = fx.async {
+        run.getAndSet(true)
+        run.value
+      }
+
+      run.value.equalUnderTheLaw(false, EQ) &&
+        p.equalUnderTheLaw(just(true), EQK)
     }
 
   // Turns out that kotlinx.coroutines decides to rewrite thread names

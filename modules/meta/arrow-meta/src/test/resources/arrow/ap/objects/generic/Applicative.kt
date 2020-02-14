@@ -1,8 +1,6 @@
 package `arrow`.`ap`.`objects`.`generic`
 
 import arrow.core.*
-import arrow.core.extensions.*
-import arrow.typeclasses.*
 
 fun `arrow`.`ap`.`objects`.`generic`.`Applicative`.tupled(): arrow.core.Tuple2<`kotlin`.`String`, `arrow`.`core`.`Option`<`kotlin`.`String`>> =
   arrow.core.Tuple2(this.`field`, this.`option`)
@@ -19,5 +17,5 @@ fun arrow.core.Tuple2<`kotlin`.`String`, `arrow`.`core`.`Option`<`kotlin`.`Strin
   `arrow`.`ap`.`objects`.`generic`.`Applicative`(this.a, this.b)
 
 fun <F> arrow.typeclasses.Applicative<F>.mapToApplicative(field: arrow.Kind<F, `kotlin`.`String`>, option: arrow.Kind<F, `arrow`.`core`.`Option`<`kotlin`.`String`>>): arrow.Kind<F, `arrow`.`ap`.`objects`.`generic`.`Applicative`> =
-  this.map(field, option) { it.toApplicative() }
+  this.mapN(field, option) { it.toApplicative() }
 

@@ -170,11 +170,11 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
       f(a, tuple.a, tuple.b)
     }).subscribeOn(asScheduler()))
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
-    SingleK.cancelable(k)
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
+    SingleK.cancellable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
-    SingleK.cancelableF(k)
+  override fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
+    SingleK.cancellableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<RacePair<ForSingleK, A, B>> =
     asScheduler().let { scheduler ->
@@ -257,4 +257,4 @@ interface SingleKUnsafeRun : UnsafeRun<ForSingleK> {
 }
 
 fun <A> SingleK.Companion.fx(c: suspend ConcurrentSyntax<ForSingleK>.() -> A): SingleK<A> =
-  defer { SingleK.concurrent().fx.concurrent(c).fix() }
+  SingleK.concurrent().fx.concurrent(c).fix()

@@ -23,15 +23,15 @@ import io.kotlintest.properties.Gen
 class FiberTest : UnitSpec() {
 
   init {
-    fun EQ(): Eq<FiberOf<ForIO, Int>> = object : Eq<FiberOf<ForIO, Int>> {
-      override fun FiberOf<ForIO, Int>.eqv(b: FiberOf<ForIO, Int>): Boolean = EQ<Int>().run {
+    fun EQ(): Eq<FiberOf<IOPartialOf<Nothing>, Int>> = object : Eq<FiberOf<IOPartialOf<Nothing>, Int>> {
+      override fun FiberOf<IOPartialOf<Nothing>, Int>.eqv(b: FiberOf<IOPartialOf<Nothing>, Int>): Boolean = EQ<Nothing, Int>().run {
         fix().join().eqv(b.fix().join())
       }
     }
 
-    fun EQK() = object : EqK<FiberPartialOf<ForIO>> {
-      override fun <A> Kind<FiberPartialOf<ForIO>, A>.eqK(other: Kind<FiberPartialOf<ForIO>, A>, EQ: Eq<A>): Boolean =
-        EQ<A>().run {
+    fun EQK() = object : EqK<FiberPartialOf<IOPartialOf<Nothing>>> {
+      override fun <A> Kind<FiberPartialOf<IOPartialOf<Nothing>>, A>.eqK(other: Kind<FiberPartialOf<IOPartialOf<Nothing>>, A>, EQ: Eq<A>): Boolean =
+        EQ<Nothing, A>(EQ).run {
           this@eqK.fix().join().eqv(other.fix().join())
         }
     }
@@ -43,8 +43,8 @@ class FiberTest : UnitSpec() {
     }
 
     testLaws(
-      ApplicativeLaws.laws<FiberPartialOf<ForIO>>(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), GENK(IO.applicative()), EQK()),
-      MonoidLaws.laws(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
+      ApplicativeLaws.laws<FiberPartialOf<IOPartialOf<Nothing>>>(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), GENK(IO.applicative()), EQK()),
+      MonoidLaws.laws(Fiber.monoid(IO.concurrent<Nothing>(), Int.monoid()), Gen.int().map { i ->
         Fiber(IO.just(i), IO.unit)
       }, EQ())
     )

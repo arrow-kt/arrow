@@ -235,8 +235,9 @@ interface EitherEqK2 : EqK2<ForEither> {
 
 @extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
-  override fun Either<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Either<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension

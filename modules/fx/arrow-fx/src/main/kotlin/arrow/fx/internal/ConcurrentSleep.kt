@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.fx.IOResult
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executors
@@ -12,7 +13,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-internal fun <F> Concurrent<F>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancelable { cb ->
+internal fun <F> Concurrent<F>.ConcurrentSleep(duration: Duration): Kind<F, Unit> = cancellable { cb ->
   val cancelRef = scheduler.schedule(ShiftTick(dispatchers().default(), cb), duration.amount, duration.timeUnit)
   later { cancelRef.cancel(false); Unit }
 }
@@ -42,6 +43,17 @@ internal class ShiftTick(
   override fun run() {
     suspend { Unit }.startCoroutine(Continuation(ctx) {
       it.fold({ unit -> cb(Right(unit)) }, { e -> cb(Left(e)) })
+    })
+  }
+}
+
+internal class IOTick<E>(
+  private val ctx: CoroutineContext,
+  private val cb: (IOResult<E, Unit>) -> Unit
+) : Runnable {
+  override fun run() {
+    suspend { Unit }.startCoroutine(Continuation(ctx) {
+      it.fold({ unit -> cb(IOResult.Success(unit)) }, { e -> cb(IOResult.Exception(e)) })
     })
   }
 }

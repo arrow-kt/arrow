@@ -6,6 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
@@ -17,13 +18,17 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.OptionT
 import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
+import arrow.mtl.extensions.OptionTMonad
 import arrow.mtl.extensions.OptionTMonadError
+import arrow.mtl.extensions.optiont.monadTrans.liftT
 import arrow.mtl.value
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -103,8 +108,8 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
   override fun dispatchers(): Dispatchers<OptionTPartialOf<F>> =
     CF().dispatchers() as Dispatchers<OptionTPartialOf<F>>
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<OptionTPartialOf<F>>): OptionT<F, A> = CF().run {
-    OptionT.liftF(this, cancelable { cb -> k(cb).value().map { Unit } })
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<OptionTPartialOf<F>>): OptionT<F, A> = CF().run {
+    OptionT.liftF(this, cancellable { cb -> k(cb).value().map { Unit } })
   }
 
   override fun <A> OptionTOf<F, A>.fork(ctx: CoroutineContext): OptionT<F, Fiber<OptionTPartialOf<F>, A>> = CF().run {
@@ -133,11 +138,11 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
       raceTriple(fa.value(), fb.value(), fc.value()).flatMap { res: RaceTriple<F, Option<A>, Option<B>, Option<C>> ->
         when (res) {
           is RaceTriple.First -> when (val winner = res.winner) {
-            None -> tupled(res.fiberB.cancel(), res.fiberC.cancel()).map { None }
+            None -> tupledN(res.fiberB.cancel(), res.fiberC.cancel()).map { None }
             is Some -> just(Some(RaceTriple.First(winner.t, fiberT(res.fiberB), fiberT(res.fiberC))))
           }
           is RaceTriple.Second -> when (val winner = res.winner) {
-            is None -> tupled(res.fiberA.cancel(), res.fiberC.cancel()).map { None }
+            is None -> tupledN(res.fiberA.cancel(), res.fiberC.cancel()).map { None }
             is Some -> just(Some(RaceTriple.Second(fiberT(res.fiberA), winner.t, fiberT(res.fiberC))))
           }
           is RaceTriple.Third -> when (val winner = res.winner) {
@@ -158,3 +163,11 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
   object : OptionTConcurrent<F> {
     override fun CF(): Concurrent<F> = CF
   }
+
+interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun <A> IO<Nothing, A>.liftIO(): Kind<OptionTPartialOf<F>, A> = FIO().run {
+    liftIO().liftT(this)
+  }
+}

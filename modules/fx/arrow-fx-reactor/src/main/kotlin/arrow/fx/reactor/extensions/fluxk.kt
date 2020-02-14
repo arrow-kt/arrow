@@ -149,10 +149,10 @@ interface FluxKAsync :
   Async<ForFluxK>,
   FluxKMonadDefer {
   override fun <A> async(fa: Proc<A>): FluxK<A> =
-    FluxK.async { _, cb -> fa(cb) }
+    FluxK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForFluxK, A>): FluxK<A> =
-    FluxK.asyncF { _, cb -> k(cb) }
+    FluxK.asyncF(k)
 
   override fun <A> FluxKOf<A>.continueOn(ctx: CoroutineContext): FluxK<A> =
     fix().continueOn(ctx)
@@ -200,7 +200,7 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadErr
 
 // TODO FluxK does not yet have a Concurrent instance
 fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
-  defer { FluxK.async().fx.async(c).fix() }
+  FluxK.async().fx.async(c).fix()
 
 @extension
 interface FluxKTimer : Timer<ForFluxK> {

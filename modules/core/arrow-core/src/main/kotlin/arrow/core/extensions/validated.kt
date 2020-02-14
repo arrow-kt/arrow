@@ -13,7 +13,6 @@ import arrow.core.ValidatedPartialOf
 import arrow.core.combineK
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.fix
-import arrow.core.handleLeftWith
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -31,6 +30,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
+import arrow.core.handleErrorWith as validatedHandleErrorWith
 import arrow.core.traverse as validatedTraverse
 import arrow.core.ap as valAp
 
@@ -69,7 +69,7 @@ interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>,
   override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
   override fun <A> Kind<ValidatedPartialOf<E>, A>.handleErrorWith(f: (E) -> Kind<ValidatedPartialOf<E>, A>): Validated<E, A> =
-    fix().handleLeftWith(f)
+    fix().validatedHandleErrorWith(f)
 }
 
 @extension
@@ -159,8 +159,9 @@ interface ValidatedEqK2 : EqK2<ForValidated> {
 
 @extension
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
-  override fun Validated<L, R>.show(): String =
-    toString()
+  fun SL(): Show<L>
+  fun SR(): Show<R>
+  override fun Validated<L, R>.show(): String = show(SL(), SR())
 }
 
 @extension

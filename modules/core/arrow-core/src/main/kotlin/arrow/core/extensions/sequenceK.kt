@@ -97,8 +97,8 @@ interface SequenceKEq<A> : Eq<SequenceK<A>> {
 
 @extension
 interface SequenceKShow<A> : Show<SequenceK<A>> {
-  override fun SequenceK<A>.show(): String =
-    toString()
+  fun SA(): Show<A>
+  override fun SequenceK<A>.show(): String = show(SA())
 }
 
 @extension

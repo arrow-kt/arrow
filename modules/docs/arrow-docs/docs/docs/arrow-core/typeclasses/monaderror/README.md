@@ -51,7 +51,7 @@ tryResult
 import arrow.fx.*
 import arrow.fx.extensions.io.applicativeError.*
 
-val ioResult: IO<Int> =
+val ioResult: IO<Nothing, Int> =
   RuntimeException("BOOM!").raiseError()
 
 ioResult.attempt().unsafeRunSync()

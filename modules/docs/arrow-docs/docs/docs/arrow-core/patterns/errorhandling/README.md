@@ -13,25 +13,25 @@ When dealing with errors in a purely functional way, we try as much as we can to
 Exceptions break referential transparency and lead to bugs when callers are unaware that they may happen until it's too late at runtime.
 
 In the following example, we are going to model a basic program and go over the different options we have for dealing with errors in Arrow.
-The program simulates the typical game scenario where we have to shoot a target, and a series of preconditions needs to be met in order to actually shoot and hit it.
+The program simulates the typical lunch scenario where we have to get the ingredient, and a series of preconditions needs to be met in order to actually prepare and eat it.
 
 ### Requirements
 
-- Arm a Nuke launcher
-- Aim towards a Target
-- Launch a Nuke and impact the Target
+- Take food out of the refrigerator
+- Get your cutting tool
+- Cut up the lettuce to make lunch
 
 ### Requirements
 
 ```kotlin:ank
 /** model */
-object Nuke
-object Target
-object Impacted
+object Lettuce
+object Knife
+object Salad
 
-fun arm(): Nuke = TODO()
-fun aim(): Target = TODO()
-fun launch(target: Target, nuke: Nuke): Impacted = TODO()
+fun takeFoodFromRefrigerator(): Lettuce = TODO()
+fun getKnife(): Knife = TODO()
+fun prepare(tool: Knife, ingredient: Lettuce): Salad = TODO()
 ```
 
 ### Exceptions
@@ -39,12 +39,12 @@ fun launch(target: Target, nuke: Nuke): Impacted = TODO()
 A naive implementation that uses exceptions may look like this
 
 ```kotlin:ank
-fun arm(): Nuke = throw RuntimeException("SystemOffline")
-fun aim(): Target = throw RuntimeException("RotationNeedsOil")
-fun launch(target: Target, nuke: Nuke): Impacted = Impacted
+fun takeFoodFromRefrigerator(): Lettuce = throw RuntimeException("You need to go to the store and buy some ingredients")
+fun getKnife(): Knife = throw RuntimeException("Your knife needs to be sharpened")
+fun prepare(tool: Knife, ingredient: Lettuce): Salad = Salad
 ```
 
-As you may have noticed, the function signatures include no clue that, when asking for `arm()` or `aim()`,
+As you may have noticed, the function signatures include no clue that, when asking for `takeFoodFromRefrigerator()` or `getKnife()`,
 an exception may be thrown.
 
 #### The issues with exceptions
@@ -129,9 +129,9 @@ When using `Option`, our previous example may look like:
 import arrow.*
 import arrow.core.*
 
-fun arm(): Option<Nuke> = None
-fun aim(): Option<Target> = None
-fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
+fun takeFoodFromRefrigerator(): Option<Lettuce> = None
+fun getKnife(): Option<Knife> = None
+fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
 ```
 
 It's easy to work with [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
@@ -142,103 +142,47 @@ import arrow.typeclasses.*
 import arrow.core.extensions.*
 import arrow.core.extensions.option.monad.binding
 
-fun attackOption(): Option<Impacted> =
+fun prepareLunchOption(): Option<Salad> =
   fx.monad {
-    val (nuke) = arm()
-    val (target) = aim()
-    val (impact) = launch(target, nuke)
-    impact
+    val lettuce = takeFoodFromRefrigerator().bind()
+    val knife = getKnife().bind()
+    val salad = prepare(knife, lettuce).bind()
+    salad
   }
 
-attackOption()
+prepareLunchOption()
 //None
 ```
 
-While we could model this problem using `Option`, and forgetting about exceptions, we are still unable to determine the reasons why `arm()` and `aim()` returned empty values in the form of `None`.
+While we could model this problem using `Option`, and forgetting about exceptions, we are still unable to determine the reasons why `takeFoodFromRefrigerator()` and `getKnife()` returned empty values in the form of `None`.
 For this reason, using `Option` is only a good idea when we know that values may be absent, but we don't really care about the reason why.
 Additionally, `Option` is unable to capture exceptions. So, if an exception was thrown internally, it would still bubble up and result in a runtime exception.
 
-In the next example, we are going to use `Try` to deal with potentially thrown exceptions that are outside the control of the caller.
-
-### Try
-
-We use [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception.
-
-How would our example look when implemented with `Try`?
-
-```kotlin:ank
-
-fun arm(): Try<Nuke> =
-  Try { throw RuntimeException("SystemOffline") }
-
-fun aim(): Try<Target> =
-  Try { throw RuntimeException("RotationNeedsOil") }
-
-fun launch(target: Target, nuke: Nuke): Try<Impacted> =
-  Try { throw RuntimeException("MissedByMeters") }
-```
-
-As you can see by the examples below, exceptions are now controlled and caught inside of a `Try`.
-
-```kotlin:ank
-arm()
-```
-
-```kotlin:ank
-aim()
-```
-
-Unlike in the `Option` example here, we can fold over the resulting value accessing the runtime exception.
-
-```kotlin:ank
-val result = arm()
-result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
-```
-
-Just like it does for `Option`, Arrow also provides `Monad` instances for `Try`, and we can use it exactly in the same way
-
-```kotlin
-import arrow.typeclasses.*
-import arrow.core.extensions.*
-
-fun attackTry(): Try<Impacted> =
-  fx.monad {
-    val (nuke) = arm()
-    val (target) = aim()
-    val (impact) = launch(target, nuke)
-    impact
-  }.fix()
-
-attackTry()
-//Failure(RuntimeException("SystemOffline"))
-```
-
-While `Try` gives us the ability to control both the `Success` and `Failure` cases, there is still nothing in the function signatures that indicate the type of exception.
-We are still subject to guessing what the exception is using Kotlin `when` expressions or runtime lookups over the unsealed hierarchy of Throwable.
-
-It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
-`java.lang.Exception`
-
-We should redefine our functions to express that their result is not just a `Nuke`, `Target`, or `Impact`, but those potential values or other exceptional ones.
+In the next example, we are going to use `Either` to deal with potentially thrown exceptions that are outside the control of the caller.
 
 ### Either
 
 When dealing with a known alternate path, we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
-Either represents the presence of either a `Left` value or a `Right` value.
-By convention, most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
+Either represents the presence of either a `Left` value or a `Right` value. 
+By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
+
+It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
+`java.lang.Exception`.
+
+We should redefine our functions to express that their result is not just a `Lettuce`, `Knife`, or `Salad`, but those potential values or other exceptional ones.
 
 We can now assign proper types and values to the exceptional cases.
 
 ```kotlin:ank
-sealed class NukeException {
-  object SystemOffline: NukeException()
-  object RotationNeedsOil: NukeException()
-  data class MissedByMeters(val meters : Int): NukeException()
+sealed class CookingException {
+    object LettuceIsRotten: CookingException()
+    object KnifeNeedsSharpening: CookingException()
+    data class InsufficientAmount(val quantityInGrams : Int): CookingException()
 }
 
-typealias SystemOffline = NukeException.SystemOffline
-typealias RotationNeedsOil = NukeException.RotationNeedsOil
-typealias MissedByMeters = NukeException.MissedByMeters
+typealias NastyLettuce = CookingException.LettuceIsRotten
+typealias KnifeIsDull = CookingException.KnifeNeedsSharpening
+typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
 ```
 
 This type of definition is commonly known as an Algebraic Data Type or Sum Type in most FP capable languages.
@@ -247,41 +191,41 @@ In Kotlin, it is encoded using sealed hierarchies. We can think of sealed hierar
 Once we have an ADT defined to model our known errors, we can redefine our functions.
 
 ```kotlin:ank
-fun arm(): Either<SystemOffline, Nuke> = Right(Nuke)
-fun aim(): Either<RotationNeedsOil, Target> = Right(Target)
-fun launch(target: Target, nuke: Nuke): Either<MissedByMeters, Impacted> = Left(MissedByMeters(5))
+fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
+fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
+fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
 ```
 
-Arrow also provides a `Monad` instance for `Either` in the same way it did for `Option` and `Try`.
+Arrow also provides a `Monad` instance for `Either` in the same way it did for `Option`.
 Except for the types signatures, our program remains unchanged when we compute over `Either`.
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
 ```kotlin
 import arrow.core.extensions.either.monad.binding
 
-fun attackEither(): Either<NukeException, Impacted> =
+fun prepareEither(): Either<CookingException, Salad> =
   fx.monad {
-    val (nuke) = arm()
-    val (target) = aim()
-    val (impact) = launch(target, nuke)
-    impact
+    val lettuce = takeFoodFromRefrigerator().bind()
+    val knife = getKnife().bind()
+    val salad = lunch(knife, lettuce).bind()
+    salad
   }
 
-attackEither()
-//Left(MissedByMeters(5))
+prepareEither()
+//Left(InsufficientAmountOfLettuce(5))
 ```
 
-So far, we have seen how we can use `Option`, `Try`, and `Either` to handle exceptions in a purely functional way.
+So far, we have seen how we can use `Option` and `Either` to handle exceptions in a purely functional way.
 
 The question now is, can we further generalize error handling and write this code in a way that is abstract from the actual datatypes that it uses?
 Since Arrow supports typeclasses, emulated higher kinds, and higher order abstractions, we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})
 
 ### MonadError
 
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either`, `Try`, and `Option`.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either` and `Option`.
 Typeclasses allows us to code focusing on the behaviors, and not the datatypes that implement them.
 
-Arrow provides the following `MonadError` instances for `Option`, `Try`, and `Either`
+Arrow provides the following `MonadError` instances for `Option` and `Either`
 
 ```kotlin:ank
 import arrow.core.extensions.option.monadError.*
@@ -290,67 +234,61 @@ Option.monadError()
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monadError.*
-
-Try.monadError()
-```
-
-```kotlin:ank
 import arrow.core.extensions.either.monadError.*
 
-Either.monadError<NukeException>()
+Either.monadError<CookingException>()
 ```
 
 Let's now rewrite our program as a polymorphic function that will work over any datatype for which a `MonadError` instance exists.
 Polymorphic code in Arrow is based on emulated `Higher Kinds`, as described in [Lightweight higher-kinded polymorphism](https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf) and applied to Kotlin, a lang which does not yet support Higher Kinded Types.
 
 ```kotlin
-fun <f> arm(ME: MonadError<F, NukeException>): Kind<F, Nuke> = ME.just(Nuke)
-fun <f> aim(ME: MonadError<F, NukeException>): Kind<F, Target> = ME.just(Target)
-fun <f> launch(target: Target, nuke: Nuke, ME: MonadError<F, NukeException>):
-  Kind<F, Impacted> = ME.raiseError(MissedByMeters(5))
+fun <F> MonadError<F, CookingException>.takeFoodFromRefrigerator(): Kind<F, Lettuce> = just(Lettuce)
+fun <F> MonadError<F, CookingException>.getKnife(): Kind<F, Knife> = just(Knife)
+fun <F> MonadError<F, CookingException>.lunch(knife: Knife, food: Lettuce):
+        Kind<F, Salad> = raiseError(InsufficientAmountOfLettuce(5))
 ```
 
 We can now express the same program as before in a fully polymorphic context
 
 ```kotlin
-fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
-  fx.monad {
-    val (nuke) = arm<F>()
-    val (target) = aim<F>()
-    val (impact) = launch<F>(target, nuke)
-    impact
-  }
+fun <F> MonadError<F, CookingException>.prepare():Kind<F, Salad> =
+    fx.monad {
+        val lettuce = takeFoodFromRefrigerator<F>().bind()
+        val knife = getKnife<F>().bind()
+        val salad = lunch<F>(knife, lettuce).bind()
+        salad
+    }
 ```
 
-Or, since `arm()` and `bind()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
+Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
 
 ```kotlin
-fun <F> MonadError<F, NukeException>.attack1(ME): Kind<F, Impacted> =
-  ME.tupled(aim(), arm()).flatMap(ME, { (nuke, target) -> launch<F>(nuke, target) })
+fun <F> MonadError<F, CookingException>.prepare1(): Kind<F, Salad> =
+    tupledN(getKnife(), takeFoodFromRefrigerator()).flatMap({ (nuke, target) -> lunch<F>(nuke, target) })
 
-val result = Either.monadError<NukeException>.attack()
+val result = Either.monadError<CookingException>().prepare()
 result.fix()
-//Left(MissedByMeters(5))
+//Left(InsufficientAmountOfLettuce(5))
 // or
-val result1 = Either.monadError<NukeException>.attack1()
+val result1 = Either.monadError<CookingException>().prepare1()
 result1.fix()
 ```
 
 Note that `MonadThrow` also has a function `fx.monadThrow` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): Impacted {
-  throw MissedByMeters(5)
+fun <F> MonadError<F, CookingException>.lunchImpure(target: Knife, nuke: Lettuce): Salad {
+    throw InsufficientAmountOfLettuce(5)
 }
 
-fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
-  fx.monadThrow {
-    val (nuke) = arm<F>()
-    val (target) = aim<F>()
-    val impact = launchImpure<F>(target, nuke)
-    impact
-  }
+fun <F> MonadError<F, CookingException>.prepare(): Kind<F, Salad> =
+    fx.monadThrow {
+        val lettuce = takeFoodFromRefrigerator<F>().bind()
+        val knife = getKnife<F>().bind()
+        val salad = lunchImpure<F>(knife, lettuce).bind()
+        salad
+    }
 ```
 
 ### Example : Alternative validation strategies using `ApplicativeError`

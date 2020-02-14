@@ -30,16 +30,12 @@ import io.reactivex.observers.TestObserver
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeoutException
 
 class ObservableKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      /*
-      TODO: Traverse/Foldable instances are not lawful
-       https://github.com/arrow-kt/arrow/issues/1882
-            TraverseLaws.laws(ObservableK.traverse(), ObservableK.genk(), ObservableK.eqK()),
-       */
       ConcurrentLaws.laws(
         ObservableK.concurrent(),
         ObservableK.functor(),
@@ -50,25 +46,7 @@ class ObservableKTests : RxJavaSpec() {
         testStackSafety = false
       ),
       TimerLaws.laws(ObservableK.async(), ObservableK.timer(), ObservableK.eq())
-
-      /*
-      TODO: MonadFilter instances are not lawsful
-      https://github.com/arrow-kt/arrow/issues/1881
-
-      MonadFilterLaws.laws(ObservableK.monadFilter(), ObservableK.functor(), ObservableK.applicative(), ObservableK.monad(), GENK(), EQK())
-       */
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = ObservableK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
@@ -111,13 +89,13 @@ class ObservableKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
-    "ObservableK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
+    "ObservableK.cancellable should cancel CancelToken on dispose" {
+      Promise.uncancellable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
-          ObservableK.cancelable<Unit> {
+          ObservableK.cancellable<Unit> {
             latch.complete(Unit)
           }.observable.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -128,7 +106,7 @@ class ObservableKTests : RxJavaSpec() {
     }
 
     "ObservableK async should be cancellable" {
-      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
+      Promise.uncancellable<ForObservableK, Unit>(ObservableK.async())
         .flatMap { latch ->
           ObservableK {
             ObservableK.async<Unit> { }
@@ -151,6 +129,8 @@ private fun <T> ObservableK.Companion.eq(): Eq<ObservableKOf<T>> = object : Eq<O
     val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
     return res1.fold({ t1 ->
       res2.fold({ t2 ->
+        if (t1::class.java == TimeoutException::class.java) throw t1
+        if (t2::class.java == TimeoutException::class.java) throw t2
         (t1::class.java == t2::class.java)
       }, { false })
     }, { v1 ->
@@ -173,14 +153,9 @@ private fun ObservableK.Companion.eqK() = object : EqK<ForObservableK> {
 private fun <A> Gen.Companion.observableK(gen: Gen<A>) =
   Gen.oneOf(
     Gen.constant(Observable.empty<A>()),
-
-    Gen.throwable().map {
-      Observable.error<A>(it)
-    },
-
-    Gen.list(gen).map {
-      Observable.fromIterable(it)
-    }).map { it.k() }
+    Gen.throwable().map { Observable.error<A>(it) },
+    Gen.list(gen).map { Observable.fromIterable(it) }
+  ).map { it.k() }
 
 private fun ObservableK.Companion.genk() = object : GenK<ForObservableK> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForObservableK, A>> =

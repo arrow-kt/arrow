@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation project(':arrow-fx')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+
+    testCompile project(':arrow-test')
+    testImplementation project(':arrow-test')
+    testImplementation project(':arrow-fx')
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

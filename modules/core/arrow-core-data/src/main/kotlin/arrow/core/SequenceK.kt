@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Show
 
 @higherkind
 data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
@@ -35,6 +36,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     map(f).filter { it.isDefined() }.map { it.orNull()!! }.k()
 
   fun toList(): List<A> = this.fix().sequence.toList()
+
+  fun show(SA: Show<A>): String = "Sequence(${toList().k().show(SA)})"
+
+  override fun toString(): String = show(Show.any())
 
   companion object {
 

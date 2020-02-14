@@ -78,7 +78,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -96,7 +96,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         handleErrorWith { t -> Observable.fromCallable { emitter.tryOnError(t) }.flatMap { Observable.error<A>(t) }.k() }
           .concatMap { a ->
             if (emitter.isDisposed) {
-              release(a, ExitCase.Canceled).fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
+              release(a, ExitCase.Cancelled).fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
               Observable.never<B>().k()
             } else {
               defer { use(a) }
@@ -109,7 +109,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
                   })
                 }
                 .doOnDispose {
-                  defer { release(a, ExitCase.Canceled) }.value().subscribe({}, {})
+                  defer { release(a, ExitCase.Cancelled) }.value().subscribe({}, {})
                 }
                 .k()
             }
@@ -229,7 +229,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
       }.k()
 
     /**
-     * Creates a [ObservableK] that'll run a cancelable operation.
+     * Creates a [ObservableK] that'll run a cancellable operation.
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
@@ -245,7 +245,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = ObservableK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = ObservableK.cancellable { cb: (Either<Throwable, String>) -> Unit ->
      *     val nw = NetworkApi()
      *     val disposable = nw.async { result -> cb(Right(result)) }
      *     ObservableK { disposable.invoke() }
@@ -255,7 +255,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
      * }
      * ```
      */
-    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
+    fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
       Observable.create<A> { emitter ->
         val token = fa { either: Either<Throwable, A> ->
           either.fold({ e ->
@@ -268,7 +268,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
-    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
+    fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold({
