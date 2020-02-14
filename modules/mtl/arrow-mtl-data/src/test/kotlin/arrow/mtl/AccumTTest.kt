@@ -168,14 +168,14 @@ private fun <S, F, A> apCombinesState(
   forAll(GENS, GENS, GENS, GENA) { s1, s2, s3, a ->
 
     val accumT = AccumT { _: S ->
-      MF.just(s1 toT a)
+      MF.just(s2 toT a)
     }
 
     val mf = AccumT { _: S ->
-      MF.just(s2 toT { a: A -> a })
+      MF.just(s1 toT { a: A -> a })
     }
 
-    val ls = accumT.ap(MS, MF, mf).execAccumT(MF, s3)
+    val ls = mf.ap(MS, MF, accumT).execAccumT(MF, s3)
     val rs = MF.just(MS.run { s1.combine(s2) })
 
     ls.equalUnderTheLaw(rs, eq)
