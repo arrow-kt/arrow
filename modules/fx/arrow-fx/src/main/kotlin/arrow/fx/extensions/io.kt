@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
 import arrow.extension
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODispatchers
@@ -29,6 +28,7 @@ import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.fx.typeclasses.UnsafeCancellableRun
@@ -255,6 +255,11 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
 }
 
 @extension
+interface IOMonadIO : MonadIO<ForIO>, IOMonad {
+  override fun <A> IO<A>.liftIO(): Kind<ForIO, A> = this
+}
+
+@extension
 interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
@@ -305,7 +310,7 @@ fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
-  defer { IO.concurrent().fx.concurrent(c).fix() }
+  IO.concurrent().fx.concurrent(c).fix()
 
 /**
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers

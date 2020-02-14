@@ -9,7 +9,6 @@ buildscript {
 
 apply plugin: 'ank-gradle-plugin'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
     compile project(':arrow-core-data')
@@ -29,18 +28,19 @@ dependencies {
     compile project(':arrow-generic')
     compile project(':arrow-aql')
     compile project(":arrow-reflect")
+    compile project(":arrow-fx-kotlinx-coroutines")
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinxCoroutinesVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$KOTLINX_COROUTINES_VERSION"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
-    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    testCompile("junit:junit:$jUnitVersion")
-    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    compile "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    compile "io.projectreactor:reactor-core:$projectReactorVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$KOTLINX_COLLECTIONS_IMMUTABLE_VERSION"
+    testCompile("junit:junit:$JUNIT_VERSION")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    compile "io.reactivex.rxjava2:rxjava:$RX_JAVA_VERSION"
+    compile "io.projectreactor:reactor-core:$PROJECT_REACTOR_VERSION"
 }
 
 task printcp {
@@ -55,23 +55,12 @@ ank {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-gitPublish {
-    repoUri = 'git@github.com:arrow-kt/arrow.git'
-    branch = 'gh-pages'
-
-    contents {
-        from 'build/site'
-    }
-
-    commitMessage = 'update site'
-}
-
 repositories {
     mavenLocal()
 }
 
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+sourceCompatibility = JAVA_VERSION
+targetCompatibility = JAVA_VERSION
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 

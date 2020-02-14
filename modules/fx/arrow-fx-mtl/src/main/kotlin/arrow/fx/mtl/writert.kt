@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.extension
+import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
@@ -15,13 +16,16 @@ import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadIO
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
 import arrow.mtl.WriterT
 import arrow.mtl.WriterTOf
 import arrow.mtl.WriterTPartialOf
+import arrow.mtl.extensions.WriterTMonad
 import arrow.mtl.extensions.WriterTMonadThrow
 import arrow.mtl.value
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.undocumented
@@ -146,3 +150,13 @@ fun <W, F> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concu
     override fun CF(): Concurrent<F> = CF
     override fun MM(): Monoid<W> = MM
   }
+
+@extension
+interface WriterTMonadIO<F, W> : MonadIO<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {
+  fun FIO(): MonadIO<F>
+  override fun MF(): Monad<F> = FIO()
+  override fun MM(): Monoid<W>
+  override fun <A> IO<A>.liftIO(): Kind<WriterTPartialOf<F, W>, A> = FIO().run {
+    WriterT.liftF(liftIO(), MM(), this)
+  }
+}

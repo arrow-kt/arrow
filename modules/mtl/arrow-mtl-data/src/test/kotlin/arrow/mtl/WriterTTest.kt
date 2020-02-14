@@ -122,7 +122,7 @@ class WriterTTest : UnitSpec() {
   }
 }
 
-private fun <W, F> WriterT.Companion.genK(
+fun <W, F> WriterT.Companion.genK(
   GENKF: GenK<F>,
   GENW: Gen<W>
 ) = object : GenK<WriterTPartialOf<W, F>> {

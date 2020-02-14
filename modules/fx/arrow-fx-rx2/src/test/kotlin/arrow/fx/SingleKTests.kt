@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.left
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
@@ -15,6 +16,7 @@ import arrow.fx.rx2.extensions.singlek.monad.monad
 import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
+import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
@@ -31,6 +33,7 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class SingleKTests : RxJavaSpec() {
 
@@ -49,17 +52,6 @@ class SingleKTests : RxJavaSpec() {
       ),
       TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
     )
-
-    "fx should defer evaluation until subscribed" {
-      var run = false
-      val value = SingleK.fx {
-        run = true
-      }.value()
-
-      run shouldBe false
-      value.subscribe()
-      run shouldBe true
-    }
 
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
@@ -169,6 +161,26 @@ class SingleKTests : RxJavaSpec() {
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
+
+    "SingleK should suspend" {
+      fun getSingle(): Single<Int> = Single.just(1)
+
+      SingleK.fx {
+        val s = effect { getSingle().k().suspended() }.bind()
+
+        s shouldBe 1
+      }.unsafeRunSync()
+    }
+
+    "Error SingleK should suspend" {
+      val error = IllegalArgumentException()
+
+      SingleK.fx {
+        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().bind()
+
+        s shouldBe error.left()
+      }.unsafeRunSync()
+    }
   }
 }
 
@@ -191,6 +203,8 @@ private fun <T> SingleK.Companion.eq(): Eq<SingleKOf<T>> = object : Eq<SingleKOf
     val res2 = b.attempt().value().timeout(5, TimeUnit.SECONDS).blockingGet()
     return res1.fold({ t1 ->
       res2.fold({ t2 ->
+        if (t1::class.java == TimeoutException::class.java) throw t1
+        if (t2::class.java == TimeoutException::class.java) throw t2
         (t1::class.java == t2::class.java)
       }, { false })
     }, { v1 ->
