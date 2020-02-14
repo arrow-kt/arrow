@@ -159,11 +159,8 @@ fun <F> OptionT.Companion.genK(genKF: GenK<F>): GenK<OptionTPartialOf<F>> = obje
 // FIXME This is a bad generator and should be replaced by a proper function generator as soon as we use arrow-check
 fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
-    genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
-      val stateTFun: StateTFun<F, S, A> = { _: S -> state }
-      stateTFun
-    }).map {
-      StateT(it)
+    genkF.genK(Gen.tuple2(genS, gen)).map { state ->
+      StateT { _: S -> state }
     }
 }
 

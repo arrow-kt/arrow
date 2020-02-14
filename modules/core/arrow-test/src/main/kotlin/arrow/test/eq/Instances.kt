@@ -20,7 +20,6 @@ import arrow.mtl.StateT
 import arrow.mtl.StateTPartialOf
 import arrow.mtl.fix
 import arrow.mtl.run
-import arrow.mtl.runM
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
@@ -41,8 +40,8 @@ fun <F, D> Kleisli.Companion.eqK(eqKF: EqK<F>, ctx: D): EqK<KleisliPartialOf<F, 
 fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
   override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
-      val ls = it.first.runM(M, s)
-      val rs = it.second.runM(M, s)
+      val ls = it.first.run(s)
+      val rs = it.second.run(s)
 
       EQKF.liftEq(Tuple2.eq(EQS, EQ)).run {
         ls.eqv(rs)

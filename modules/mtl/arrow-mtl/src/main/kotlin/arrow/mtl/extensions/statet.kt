@@ -300,7 +300,7 @@ interface StateTMonadReader<F, S, D> : MonadReader<StateTPartialOf<F, S>, D>, St
   fun MR(): MonadReader<F, D>
   override fun ask(): Kind<StateTPartialOf<F, S>, D> = StateT.liftF(MR(), MR().ask())
   override fun <A> Kind<StateTPartialOf<F, S>, A>.local(f: (D) -> D): Kind<StateTPartialOf<F, S>, A> = MR().run {
-    StateT(fix().runF.map { AndThen(it).andThen { it.local(f) } })
+    StateT(AndThen(fix().runF).andThen { it.local(f) })
   }
 }
 
@@ -309,16 +309,16 @@ interface StateTMonadWriter<F, S, W> : MonadWriter<StateTPartialOf<F, S>, W>, St
   override fun MF(): Monad<F> = MW()
   fun MW(): MonadWriter<F, W>
   override fun <A> Kind<StateTPartialOf<F, S>, A>.listen(): Kind<StateTPartialOf<F, S>, Tuple2<W, A>> = MW().run {
-    StateT(fix().runF.map { AndThen(it).andThen { it.listen().map { (w, sa) ->
+    StateT(AndThen(fix().runF).andThen { it.listen().map { (w, sa) ->
       val (s, a) = sa
       Tuple2(s, Tuple2(w, a))
-    } } })
+    } })
   }
   override fun <A> Kind<StateTPartialOf<F, S>, Tuple2<(W) -> W, A>>.pass(): Kind<StateTPartialOf<F, S>, A> = MW().run {
-    StateT(fix().runF.map { AndThen(it).andThen { it.map { (s, fa) ->
+    StateT(AndThen(fix().runF).andThen { it.map { (s, fa) ->
       val (f, a) = fa
       Tuple2(f, Tuple2(s, a))
-    }.pass() } })
+    }.pass() })
   }
   override fun <A> writer(aw: Tuple2<W, A>): Kind<StateTPartialOf<F, S>, A> = StateT.liftF(MW(), MW().writer(aw))
 }
