@@ -6,7 +6,7 @@ import arrow.higherkind
 
 /**
  * [Fiber] represents the pure result of an [Async] data type
- * being started concurrently and that can be either joined or canceled.
+ * being started concurrently and that can be either joined or cancelled.
  *
  * You can think of fibers as being lightweight threads, a Fiber being a
  * concurrency primitive for doing cooperative multi-tasking.

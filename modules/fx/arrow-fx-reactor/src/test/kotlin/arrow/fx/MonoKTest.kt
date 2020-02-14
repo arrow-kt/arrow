@@ -152,11 +152,11 @@ class MonoKTest : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
     "MonoK async should be cancellable" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
+      Promise.uncancellable<ForMonoK, Unit>(MonoK.async())
         .flatMap { latch ->
           MonoK {
             MonoK.async<Unit> { }

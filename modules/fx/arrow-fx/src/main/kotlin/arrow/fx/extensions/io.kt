@@ -183,7 +183,7 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
           is Either.Right -> { // Release resource.
             when (ex) {
               ExitCase2.Completed -> release(a.b, ExitCase.Completed).fix()
-              ExitCase2.Canceled -> release(a.b, ExitCase.Canceled).fix()
+              ExitCase2.Cancelled -> release(a.b, ExitCase.Cancelled).fix()
               is ExitCase2.Exception -> release(a.b, ExitCase.Error(ex.exception)).fix()
               is ExitCase2.Error -> throw AssertionError("Unreachable") // E is `Nothing`.
             }
@@ -213,7 +213,7 @@ interface IOBracket<E> : Bracket<IOPartialOf<E>, Throwable>, IOMonadThrow<E> {
     return redeemed.GuaranteeCase { case ->
       when (case) {
         ExitCase2.Completed -> finalizer(ExitCase.Completed)
-        ExitCase2.Canceled -> finalizer(ExitCase.Canceled)
+        ExitCase2.Cancelled -> finalizer(ExitCase.Cancelled)
         is ExitCase2.Exception -> finalizer(ExitCase.Error(case.exception))
         is ExitCase2.Error -> throw AssertionError("Unreachable") // E is `Nothing`.
       }
@@ -273,8 +273,8 @@ interface IOConcurrent<EE> : Concurrent<IOPartialOf<EE>>, IOAsync<EE> {
   override fun <A> Kind<IOPartialOf<EE>, A>.fork(ctx: CoroutineContext): IO<EE, Fiber<IOPartialOf<EE>, A>> =
     Fork(ctx)
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<EE>>): IO<EE, A> =
-    IO.cancelable { cb ->
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<EE>>): IO<EE, A> =
+    IO.cancellable { cb ->
       k { result ->
         when (result) {
           is Either.Left -> cb(IOResult.Exception(result.a))
@@ -283,8 +283,8 @@ interface IOConcurrent<EE> : Concurrent<IOPartialOf<EE>>, IOAsync<EE> {
       }
     }
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<EE, CancelToken<IOPartialOf<EE>>>): IO<EE, A> =
-    IO.cancelableF { cb ->
+  override fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<EE, CancelToken<IOPartialOf<EE>>>): IO<EE, A> =
+    IO.cancellableF { cb ->
       k { result ->
         when (result) {
           is Either.Left -> cb(IOResult.Exception(result.a))

@@ -107,8 +107,8 @@ class IOTest : UnitSpec() {
       }
     }
 
-    "should return immediate value by uncancelable" {
-      val run = just(1).uncancelable().unsafeRunSync()
+    "should return immediate value by uncancellable" {
+      val run = just(1).uncancellable().unsafeRunSync()
 
       val expected = 1
 
@@ -203,7 +203,7 @@ class IOTest : UnitSpec() {
       }
     }
 
-    "should rethrow exceptions within run block with unsafeRunAsyncCancelable" {
+    "should rethrow exceptions within run block with unsafeRunAsyncCancellable" {
       try {
         val exception = MyException()
         val ioa = IO<Int> { throw exception }
@@ -533,13 +533,13 @@ class IOTest : UnitSpec() {
           .invoke() // cancel immediately
 
         !p.get()
-      }.unsafeRunSync() shouldBe ExitCase2.Canceled
+      }.unsafeRunSync() shouldBe ExitCase2.Cancelled
     }
 
-    "Cancelable should run CancelToken" {
+    "Cancellable should run CancelToken" {
       IO.fx<Nothing, Unit> {
         val p = !Promise<Unit>()
-        IO.cancelable<Nothing, Unit> {
+        IO.cancellable<Nothing, Unit> {
           p.complete(Unit)
         }.unsafeRunAsyncCancellable { }
           .invoke()
@@ -548,10 +548,10 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync() shouldBe Unit
     }
 
-    "CancelableF should run CancelToken" {
+    "CancellableF should run CancelToken" {
       IO.fx<Nothing, Unit> {
         val p = !Promise<Unit>()
-        IO.cancelableF<Nothing, Unit> {
+        IO.cancellableF<Nothing, Unit> {
           IO { p.complete(Unit) }
         }.unsafeRunAsyncCancellable { }
           .invoke()
@@ -560,10 +560,10 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync() shouldBe Unit
     }
 
-    "IO should cancel cancelable on dispose" {
-      Promise.uncancelable<IOPartialOf<Nothing>, Unit>(IO.async()).flatMap { latch ->
+    "IO should cancel cancellable on dispose" {
+      Promise.uncancellable<IOPartialOf<Nothing>, Unit>(IO.async()).flatMap { latch ->
         IO {
-          IO.cancelable<Nothing, Unit> {
+          IO.cancellable<Nothing, Unit> {
             latch.complete(Unit)
           }.unsafeRunAsyncCancellable { }
             .invoke()
@@ -888,7 +888,7 @@ class IOTest : UnitSpec() {
         !IO.sleep(100.milliseconds)
         !cancel
         val result = !p.get()
-        !IO.effect { result shouldBe ExitCase2.Canceled }
+        !IO.effect { result shouldBe ExitCase2.Cancelled }
       }.suspended()
     }
   }

@@ -96,7 +96,7 @@ interface IOParMap {
         }
       }
 
-      IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+      IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
         resultA.fold({ e ->
           sendException(connB, e)
         }, { e ->
@@ -111,7 +111,7 @@ interface IOParMap {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+      IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
         resultB.fold({ e ->
           sendException(connA, e)
         }, { e ->
@@ -137,7 +137,7 @@ interface IOParMap {
       val connB = IOConnection()
       val connC = IOConnection()
 
-      // Composite cancelable that cancels all ops.
+      // Composite cancellable that cancels all ops.
       // NOTE: conn.pop() called when cb gets called below in complete.
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
@@ -173,13 +173,13 @@ interface IOParMap {
           other.cancel().fix().unsafeRunAsync { r1 ->
             other2.cancel().fix().unsafeRunAsync { r2 ->
               conn.pop()
-              // Send r1 & r2 to asyncErrorHandler if cancelation failed
+              // Send r1 & r2 to asyncErrorHandler if cancellation failed
               cb(IOResult.Error(e))
             }
           }
         } else Unit
 
-      IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+      IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
         resultA.fold({ e ->
           sendException(connB, connC, e)
         }, { e ->
@@ -193,7 +193,7 @@ interface IOParMap {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+      IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
         resultB.fold({ e ->
           sendException(connA, connC, e)
         }, { e ->
@@ -207,7 +207,7 @@ interface IOParMap {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) { resultC ->
+      IORunLoop.startCancellable(IOForkedStart(fc, ctx), connC) { resultC ->
         resultC.fold({ e ->
           sendException(connA, connB, e)
         }, { e ->

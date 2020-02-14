@@ -8,9 +8,9 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.fx.Promise
-import arrow.fx.internal.CancelablePromise.State.Complete
-import arrow.fx.internal.CancelablePromise.State.Error
-import arrow.fx.internal.CancelablePromise.State.Pending
+import arrow.fx.internal.CancellablePromise.State.Complete
+import arrow.fx.internal.CancellablePromise.State.Error
+import arrow.fx.internal.CancellablePromise.State.Pending
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
@@ -18,7 +18,7 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
+internal class CancellablePromise<F, A>(private val CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: Map<Token, (Either<Throwable, A>) -> Unit>) : State<A>()
@@ -31,7 +31,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
   override fun get(): Kind<F, A> = defer {
     when (val current = state.value) {
       is State.Complete -> just(current.value)
-      is State.Pending -> cancelable { cb ->
+      is State.Pending -> cancellable { cb ->
         val id = unsafeRegister(cb)
         later { unregister(id) }
       }

@@ -84,7 +84,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -98,17 +98,17 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
    */
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     MonoK(Mono.create<B> { sink ->
-      val isCanceled = AtomicBooleanW(false)
-      sink.onCancel { isCanceled.value = true }
+      val isCancelled = AtomicBooleanW(false)
+      sink.onCancel { isCancelled.value = true }
       val a: A? = mono.block()
       if (a != null) {
-        if (isCanceled.value) release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error)
+        if (isCancelled.value) release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error)
         else try {
           sink.onDispose(use(a).fix()
             .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
             .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MonoK.raiseError<B>(e) } }
             .mono
-            .doOnCancel { release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error) }
+            .doOnCancel { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
             .subscribe(sink::success, sink::error)
           )
         } catch (e: Throwable) {
@@ -161,7 +161,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       Mono.defer { fa().value() }.k()
 
     /**
-     * Constructor for wrapping uncancelable async operations.
+     * Constructor for wrapping uncancellable async operations.
      * It's safe to wrap unsafe operations in this constructor
      *
      * ```kotlin:ank:playground
@@ -210,7 +210,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       }.k()
 
     /**
-     * Creates a [MonoK] that'll wraps/runs a cancelable operation.
+     * Creates a [MonoK] that'll wraps/runs a cancellable operation.
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
@@ -226,7 +226,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = SingleK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = SingleK.cancellable { cb: (Either<Throwable, String>) -> Unit ->
      *     val nw = NetworkApi()
      *     val disposable = nw.async { result -> cb(Right(result)) }
      *     SingleK { disposable.invoke() }
@@ -236,7 +236,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      * }
      * ```
      */
-    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMonoK>): MonoK<A> =
+    fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMonoK>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold(sink::error, sink::success)
@@ -252,7 +252,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
         sink.onDispose { token.value().subscribe({}, sink::error) }
       }.k()
 
-    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<CancelToken<ForMonoK>>): MonoK<A> =
+    fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<CancelToken<ForMonoK>>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val cb = { either: Either<Throwable, A> ->
           either.fold(sink::error, sink::success)

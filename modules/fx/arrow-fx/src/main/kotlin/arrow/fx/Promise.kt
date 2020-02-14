@@ -1,8 +1,8 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.fx.internal.CancelablePromise
-import arrow.fx.internal.UncancelablePromise
+import arrow.fx.internal.CancellablePromise
+import arrow.fx.internal.UncancellablePromise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Concurrent
 import arrow.core.Tuple2
@@ -32,11 +32,11 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
    *     p.get()
-   *   }  //Never ends since is uncancelable
+   *   }  //Never ends since is uncancellable
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
@@ -62,7 +62,7 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
    *     p.tryGet()
@@ -90,7 +90,7 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
@@ -121,7 +121,7 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
    *     p.tryComplete(1)
@@ -149,7 +149,7 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
    *     p.error(RuntimeException("Boom"))
@@ -180,7 +180,7 @@ interface Promise<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   *   val promise = Promise.uncancellable<ForIO, Int>(IO.async())
    *   val throwable = RuntimeException("Boom")
    *
    *   promise.flatMap { p ->
@@ -216,7 +216,7 @@ interface Promise<F, A> {
      * ```
      */
     operator fun <F, A> invoke(CF: Concurrent<F>): Kind<F, Promise<F, A>> =
-      CF.later { CancelablePromise<F, A>(CF) }
+      CF.later { CancellablePromise<F, A>(CF) }
 
     /**
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
@@ -228,12 +228,12 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancelable(IO.concurrent())
+     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.concurrent())
      *   //sampleEnd
      * }
      * ```
      */
-    fun <F, A> unsafeCancelable(CF: Concurrent<F>): Promise<F, A> = CancelablePromise(CF)
+    fun <F, A> unsafeCancellable(CF: Concurrent<F>): Promise<F, A> = CancellablePromise(CF)
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
@@ -245,13 +245,13 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.uncancelable(IO.async())
+     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.uncancellable(IO.async())
      *   //sampleEnd
      * }
      * ```
      */
-    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> =
-      AS.later { UncancelablePromise<F, A>(AS) }
+    fun <F, A> uncancellable(AS: Async<F>): Kind<F, Promise<F, A>> =
+      AS.later { UncancellablePromise<F, A>(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
@@ -264,12 +264,12 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancelable(IO.async())
+     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancellable(IO.async())
      *   //sampleEnd
      * }
      * ```
      */
-    fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS)
+    fun <F, A> unsafeUncancellable(AS: Async<F>): Promise<F, A> = UncancellablePromise(AS)
 
     /**
      *
@@ -292,13 +292,13 @@ interface Promise<F, A> {
 
         // creates a new promise for `use` and returns
         val (fc, pb) = !ref.modify { a ->
-          val pb = unsafeCancelable<F, B>(this)
+          val pb = unsafeCancellable<F, B>(this)
           println("Hello")
           val (fc, a2) = use(pb, a)
           a2 toT (fc toT pb)
         }
         val c = !fc
-        !(releaseRef.set(Some(c toT pb)).followedBy(just(pb))).uncancelable()
+        !(releaseRef.set(Some(c toT pb)).followedBy(just(pb))).uncancellable()
         !pb.get()
       }.guarantee(releaseRef.get().flatMap { it.map { (c, fb) -> release(c, fb) }.getOrElse { just(Unit) } })
     }
