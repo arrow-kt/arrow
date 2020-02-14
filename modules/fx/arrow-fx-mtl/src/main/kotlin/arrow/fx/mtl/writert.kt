@@ -152,11 +152,11 @@ fun <W, F> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concu
   }
 
 @extension
-interface WriterTMonadIO<F, W> : MonadIO<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {
+interface WriterTMonadIO<W, F> : MonadIO<WriterTPartialOf<W, F>>, WriterTMonad<W, F> {
   fun FIO(): MonadIO<F>
   override fun MF(): Monad<F> = FIO()
   override fun MM(): Monoid<W>
-  override fun <A> IO<A>.liftIO(): Kind<WriterTPartialOf<F, W>, A> = FIO().run {
+  override fun <A> IO<A>.liftIO(): Kind<WriterTPartialOf<W, F>, A> = FIO().run {
     WriterT.liftF(liftIO(), MM(), this)
   }
 }
