@@ -43,12 +43,14 @@ import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonadWriterLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 
 class AccumTTest : UnitSpec() {
   init {
