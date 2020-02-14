@@ -15,6 +15,7 @@ dependencies {
     compile project(':arrow-test')
     compile project(':arrow-fx')
     compile project(':arrow-fx-rx2')
+    compile project(':arrow-fx-reaktive')
     compile project(':arrow-fx-reactor')
     compile project(':arrow-optics-mtl')
     compile project(':arrow-validation')
