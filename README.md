@@ -1,4 +1,4 @@
-<img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
+[![Arrow](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/img/home/header-image.png)](https://arrow-kt.io)
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 <!-- Remove the following on when having just one WIP again -->
@@ -27,7 +27,7 @@ Use the list below to learn more about Λrrow's main features.
 #### Curated external links
 
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
-- [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
+- [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
 ## Join Us
 
