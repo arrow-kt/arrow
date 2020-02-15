@@ -324,9 +324,8 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
         })
     }
 
-
-  override fun <A> Kind<StateTPartialOf<F, S>, A>.interleave(fa: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> =
-    (this.fix() to fa.fix()).let { (left, right) ->
+  override fun <A> Kind<StateTPartialOf<F, S>, A>.interleave(other: Kind<StateTPartialOf<F, S>, A>): Kind<StateTPartialOf<F, S>, A> =
+    (this.fix() to other.fix()).let { (left, right) ->
       StateT(
         ML().run {
           AndThen.id<S>().flatMap { s ->
@@ -350,7 +349,6 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
         })
     }
 
-
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ifThen(fb: Kind<StateTPartialOf<F, S>, B>, ffa: (A) -> Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, B> =
     (this.fix() to fb.fix()).let { (fa, fb) ->
       StateT(
@@ -365,7 +363,6 @@ interface StateTMonadLogic<F, S> : MonadLogic<StateTPartialOf<F, S>>, StateTMona
         }
       )
     }
-
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.once(): Kind<StateTPartialOf<F, S>, A> =
     this.fix().let { fa ->
