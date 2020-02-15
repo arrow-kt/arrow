@@ -166,7 +166,7 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
   }
 
 fun <F> OptionT.Companion.timer(CF: Concurrent<F>): Timer<OptionTPartialOf<F>> =
-  Timer(companion(CF))
+  Timer(concurrent(CF))
 
 @extension
 interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {
