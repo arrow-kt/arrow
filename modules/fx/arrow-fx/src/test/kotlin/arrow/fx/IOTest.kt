@@ -598,91 +598,6 @@ class IOTest : UnitSpec() {
       just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
 
-    "IORacePair should be stack safe" {
-      val size = 5000
-
-      fun ioRacePair(i: Int): IO<Int> =
-        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
-    }
-
-    "IORaceTriple should be stack safe" {
-      val size = 5000
-
-      fun ioRaceTriple(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
-    }
-
-    "IORace4 should be stack safe" {
-      val size = 5000
-
-      fun ioRace4(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
-    }
-
-    "IORace5 should be stack safe" {
-      val size = 5000
-
-      fun ioRace5(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace5(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace5).unsafeRunSync() shouldBe size
-    }
-
-    "IORace6 should be stack safe" {
-      val size = 5000
-
-      fun ioRace6(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace6(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace6).unsafeRunSync() shouldBe size
-    }
-
     "forked pair race should run" {
       IO.fx {
         dispatchers().io().raceN(
@@ -700,24 +615,6 @@ class IOTest : UnitSpec() {
           effect { 2 }
         ).fork().bind().join().bind()
       }.unsafeRunSync() shouldBe Race3.Third(2)
-    }
-
-    "IOParMap2 should be stack safe" {
-      val size = 5000
-
-      fun ioParMap2(i: Int): IO<Int> =
-        IO.parMapN(just(i), if (i < size) ioParMap2(i + 1) else just(i)) { _, ii -> ii }
-
-      just(1).flatMap(::ioParMap2).unsafeRunSync() shouldBe size
-    }
-
-    "IOParMap3 should be stack safe" {
-      val size = 5000
-
-      fun ioParMap3(i: Int): IO<Int> =
-        IO.parMapN(just(i), IO.unit, if (i < size) ioParMap3(i + 1) else just(i)) { _, _, ii -> ii }
-
-      just(1).flatMap(::ioParMap3).unsafeRunSync() shouldBe size
     }
 
     "IOParMap2 left handles null" {
