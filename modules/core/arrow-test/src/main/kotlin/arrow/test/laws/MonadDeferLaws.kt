@@ -63,6 +63,7 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
       BracketLaws.laws(SC, GENK, EQK) +
+        MonadThrowLaws.laws(SC, GENK, EQK) +
           monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> laws(
@@ -75,6 +76,7 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
       BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
+        MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
           monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
