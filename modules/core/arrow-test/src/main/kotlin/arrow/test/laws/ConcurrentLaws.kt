@@ -23,7 +23,6 @@ import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
-import arrow.test.generators.unit
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -44,7 +43,8 @@ object ConcurrentLaws {
     CF: Concurrent<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext,
-    testStackSafety: Boolean
+    testStackSafety: Boolean,
+    iterations: Int = 20_000
   ): List<Law> {
 
     val EQ = EQK.liftEq(Int.eq())
@@ -98,7 +98,6 @@ object ConcurrentLaws {
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgram(EQ) },
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgramWithDefault(EQ) }
     ) + (if (testStackSafety) {
-      val iterations = 20_000
       listOf(
         Law("Concurrent Laws: ParMapN arity-2 should be stack safe") { CF.parMap2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
         Law("Concurrent Laws: ParMapN arity-3 should be stack safe") { CF.parMap3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
@@ -127,9 +126,10 @@ object ConcurrentLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
-    AsyncLaws.laws(CF, GENK, EQK, testStackSafety) + concurrentLaws(CF, EQK, ctx, testStackSafety)
+    AsyncLaws.laws(CF, GENK, EQK, testStackSafety, iterations) + concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
 
   fun <F> laws(
     CF: Concurrent<F>,
@@ -139,9 +139,10 @@ object ConcurrentLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
-    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety) + concurrentLaws(CF, EQK, ctx, testStackSafety)
+    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety, iterations) + concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
 
   private val single: CoroutineContext = newSingleThreadContext("single")
 

@@ -51,9 +51,10 @@ object AsyncLaws {
     AC: Async<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
-    MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety) +
+    MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety, iterations) +
       asyncLaws(AC, EQK)
 
   fun <F> laws(
@@ -63,9 +64,10 @@ object AsyncLaws {
     SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
-    MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety) +
+    MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
       asyncLaws(AC, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =

@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO.Companion.just
