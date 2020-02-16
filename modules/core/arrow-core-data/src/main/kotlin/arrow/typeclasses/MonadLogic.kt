@@ -98,7 +98,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.monadLogic().run {
-   *    listOf(1,2,3).k().itThen(ListK.just("empty")) {
+   *    listOf(1,2,3).k().ifThen(ListK.just("empty")) {
    *      ListK.just("$it")
    *    }
    *   }
