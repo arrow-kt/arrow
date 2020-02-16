@@ -39,7 +39,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * import arrow.core.extensions.sequenceK.monadLogic.monadLogic
+   * import arrow.core.extensions.sequencek.monadLogic.monadLogic
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -64,7 +64,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * import arrow.core.extensions.listK.monadLogic.monadLogic
+   * import arrow.core.extensions.listk.monadLogic.monadLogic
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -92,7 +92,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * import arrow.core.extensions.listK.monadLogic.monadLogic
+   * import arrow.core.extensions.listk.monadLogic.monadLogic
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -118,7 +118,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * import arrow.core.extensions.listK.monadLogic.monadLogic
+   * import arrow.core.extensions.listk.monadLogic.monadLogic
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -142,7 +142,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *
    * ```kotlin:ank
    * import arrow.core.extensions.*
-   * import arrow.core.extensions.listK.monadLogic.monadLogic
+   * import arrow.core.extensions.listk.monadLogic.monadLogic
    * import arrow.core.*
    *
    * fun main(args: Array<String>) {
@@ -165,7 +165,7 @@ interface MonadLogic<F> : MonadPlus<F> {
  *
  * ```kotlin:ank
  * import arrow.core.extensions.*
- * import arrow.core.extensions.listK.monadLogic.monadLogic
+ * import arrow.core.extensions.listk.monadLogic.monadLogic
  * import arrow.core.*
  *
  * fun main(args: Array<String>) {
