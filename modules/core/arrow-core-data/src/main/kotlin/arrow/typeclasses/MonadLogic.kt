@@ -45,7 +45,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val infinite = generateSequence { "#" }.k()
-   *   val result = SeqeuenceK.monadLogic().run {
+   *   val result = SequenceK.monadLogic().run {
    *    infinite.interleave(sequenceOf("A", "B", "C").k())
    *   }.take(3).toList()
    *   //sampleEnd
@@ -100,6 +100,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *   val result = ListK.monadLogic().run {
    *    listOf(1,2,3).k().itThen(ListK.just("empty")) {
    *      ListK.just("$it")
+   *    }
    *   }
    *   //sampleEnd
    *   println(result)
@@ -171,7 +172,7 @@ interface MonadLogic<F> : MonadPlus<F> {
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result = ListK.monadLogic().run {
- *    listOf(1,2,3).k().msplit().reflect(this)
+ *    listOf(1,2,3).k().splitM().reflect(this)
  *   }
  *   //sampleEnd
  *   println(result)
