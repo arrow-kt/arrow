@@ -1,33 +1,20 @@
 package arrow.core.extensions
 
 import arrow.test.UnitSpec
+import arrow.test.generators.byte
+import arrow.test.generators.short
 import arrow.test.laws.SemiringLaws
+import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
 class NumberSemiringTest : UnitSpec() {
 
-    companion object {
-        private const val A = 2
-        private const val B = 3
-        private const val C = 4
-    }
-
     init {
-        testLaws(SemiringLaws.laws(Byte.semiring(), A.toByte(), B.toByte(), C.toByte(), Byte.eq()))
-        testLaws(SemiringLaws.laws(Double.semiring(), A.toDouble(), B.toDouble(), C.toDouble(), Double.eq()))
-        testLaws(SemiringLaws.laws(Int.semiring(), A, B, C, Int.eq()))
-        testLaws(SemiringLaws.laws(Short.semiring(), A.toShort(), B.toShort(), C.toShort(), Short.eq()))
-        testLaws(SemiringLaws.laws(Float.semiring(), A.toFloat(), B.toFloat(), C.toFloat(), Float.eq()))
-
-        /**
-         * maybeCombineMultiplicate()
-         */
-
-        "maybeCombineMultiplicate() should return one() when called on null receiver" {
-            Int.semiring().run {
-                null.maybeCombineMultiplicate(1).shouldBe(Int.semiring().one())
-            }
-        }
+        testLaws(SemiringLaws.laws(Byte.semiring(), Gen.byte(), Byte.eq()))
+        testLaws(SemiringLaws.laws(Double.semiring(), Gen.double(), Double.eq()))
+        testLaws(SemiringLaws.laws(Int.semiring(), Gen.int(), Int.eq()))
+        testLaws(SemiringLaws.laws(Short.semiring(), Gen.short(), Short.eq()))
+        testLaws(SemiringLaws.laws(Float.semiring(), Gen.float(), Float.eq()))
 
         "maybeCombineMultiplicate() should calculate 6 when called on 2 and 3" {
             Int.semiring().run {
@@ -35,45 +22,9 @@ class NumberSemiringTest : UnitSpec() {
             }
         }
 
-        "maybeCombineMultiplicate() should return receiver value when argument is null" {
-            Int.semiring().run {
-                val receiverValue = 2
-                receiverValue.maybeCombineMultiplicate(null).shouldBe(receiverValue)
-            }
-        }
-
-        "maybeCombineMultiplicate() should return one() when receiver and argument are both null" {
-            Int.semiring().run {
-                null.maybeCombineMultiplicate(null).shouldBe(Int.semiring().one())
-            }
-        }
-
-        /**
-         * maybeCombineAddition()
-         */
-
-        "maybeCombineAddition() should return zero() when called on null receiver" {
-            Int.semiring().run {
-                null.maybeCombineAddition(1).shouldBe(Int.semiring().zero())
-            }
-        }
-
         "maybeCombineAddition() should calculate 3 when called on 1 and 2" {
             Int.semiring().run {
                 1.maybeCombineAddition(2).shouldBe(3)
-            }
-        }
-
-        "maybeCombineAddition() should return receiver value when argument is null" {
-            Int.semiring().run {
-                val receiverValue = 2
-                receiverValue.maybeCombineAddition(null).shouldBe(receiverValue)
-            }
-        }
-
-        "maybeCombineAddition() should return zero() when receiver and argument are both null" {
-            Int.semiring().run {
-                null.maybeCombineAddition(null).shouldBe(Int.semiring().zero())
             }
         }
     }
