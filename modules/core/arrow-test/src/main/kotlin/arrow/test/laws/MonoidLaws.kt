@@ -8,6 +8,7 @@ import io.kotlintest.properties.forAll
 object MonoidLaws {
 
   fun <F> laws(M: Monoid<F>, GEN: Gen<F>, EQ: Eq<F>): List<Law> =
+    SemigroupLaws.laws(M, GEN, EQ) +
     listOf(
       Law("Monoid Laws: Left identity") { M.monoidLeftIdentity(GEN, EQ) },
       Law("Monoid Laws: Right identity") { M.monoidRightIdentity(GEN, EQ) }

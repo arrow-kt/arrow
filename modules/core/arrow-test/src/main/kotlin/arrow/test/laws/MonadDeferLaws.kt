@@ -31,17 +31,19 @@ object MonadDeferLaws {
     val EQ = EQK.liftEq(Int.eq())
 
     return BracketLaws.laws(SC, GENK, EQK) + listOf(
-      Law("MonadDefer laws: later constant equals pure") { SC.delayConstantEqualsPure(EQ) },
-      Law("MonadDefer laws: later throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQ) },
+      Law("MonadDefer laws: later constant equals pure") { SC.laterConstantEqualsPure(EQ) },
+      Law("MonadDefer laws: later throw equals raiseError") { SC.laterThrowEqualsRaiseError(EQ) },
       Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },
-      Law("MonadDefer laws: laterOrRaise constant right equals pure") { SC.delayOrRaiseConstantRightEqualsPure(EQ) },
-      Law("MonadDefer laws: laterOrRaise constant left equals raiseError") { SC.delayOrRaiseConstantLeftEqualsRaiseError(EQ) },
+      Law("MonadDefer laws: laterOrRaise constant right equals pure") { SC.laterOrRaiseConstantRightEqualsPure(EQ) },
+      Law("MonadDefer laws: laterOrRaise constant left equals raiseError") { SC.laterOrRaiseConstantLeftEqualsRaiseError(EQ) },
       Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQ) },
       Law("MonadDefer laws: defer suspends evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("MonadDefer laws: later suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("MonadDefer laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
       Law("MonadDefer laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
-      Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
+      Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) },
+      Law("MonadDefer laws: later should be consistent") { SC.derivedLaterConsistent(GENK, EQ) },
+      Law("MonadDefer laws: lazy should be consistent") { SC.derivedLazyConsistent(GENK, EQ) }
     ) + if (testStackSafety) {
       listOf(
         Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(20_000, EQ) },
@@ -60,8 +62,9 @@ object MonadDeferLaws {
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, GENK, EQK) +
-      monadDeferLaws(SC, GENK, EQK, testStackSafety)
+      BracketLaws.laws(SC, GENK, EQK) +
+        MonadThrowLaws.laws(SC, GENK, EQK) +
+          monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
   fun <F> laws(
     SC: MonadDefer<F>,
@@ -72,10 +75,23 @@ object MonadDeferLaws {
     EQK: EqK<F>,
     testStackSafety: Boolean = true
   ): List<Law> =
-    BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
-      monadDeferLaws(SC, GENK, EQK, testStackSafety)
+      BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
+        MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
+          monadDeferLaws(SC, GENK, EQK, testStackSafety)
 
-  fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
+  fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
+    forAll(GK.genK(Gen.int()), Gen.intSmall()) { fa: Kind<F, Int>, x: Int ->
+      later(fa).equalUnderTheLaw(defer { fa }, EQ)
+    }
+  }
+
+  fun <F> MonadDefer<F>.derivedLazyConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
+    forAll(GK.genK(Gen.int())) { fa: Kind<F, Int> ->
+      lazy().flatMap { fa }.equalUnderTheLaw(later { }.flatMap { fa }, EQ)
+    }
+  }
+
+  fun <F> MonadDefer<F>.laterConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
       later { x }.equalUnderTheLaw(just(x), EQ)
     }
@@ -87,19 +103,19 @@ object MonadDeferLaws {
     }
   }
 
-  fun <F> MonadDefer<F>.delayOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>) {
+  fun <F> MonadDefer<F>.laterOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
       laterOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
-  fun <F> MonadDefer<F>.delayOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
+  fun <F> MonadDefer<F>.laterOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
       laterOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
-  fun <F> MonadDefer<F>.delayThrowEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
+  fun <F> MonadDefer<F>.laterThrowEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
       later { throw t }.equalUnderTheLaw(raiseError(t), EQERR)
     }
