@@ -38,7 +38,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 @higherkind
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
-  private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
+  private data class Single<A, B>(val f: (A) -> B) : AndThen<A, B>()
 
   private data class Join<A, B>(val fa: AndThen<A, AndThen<A, B>>) : AndThen<A, B>() {
     override fun toString(): String = "AndThen.Join(...)"
@@ -71,13 +71,13 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * @return a composed [AndThen] function that first applies this function to its input,
    * and then applies [g] to the result.
    */
-  fun <X> andThen(g: (B) -> X): AndThen<A, X> =
-    when (this) {
+  fun <X> andThen(g: (B) -> X): AndThen<A, X> = andThenF(AndThen(g))
+    // when (this) {
       // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
-      is Single -> if (index != maxStackDepthSize) Single(f andThen g, index + 1)
-      else andThenF(AndThen(g))
-      else -> andThenF(AndThen(g))
-    }
+      // is Single -> if (index != maxStackDepthSize) Single(f andThen g, index + 1)
+      // else andThenF(AndThen(g))
+      // else -> andThenF(AndThen(g))
+    // }
 
   /**
    * Compose a function to be invoked before the current function is invoked.
@@ -102,13 +102,13 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * @return a composed [AndThen] function that first applies [g] to its input,
    * and then applies this function to the result.
    */
-  infix fun <C> compose(g: (C) -> A): AndThen<C, B> =
-    when (this) {
+  infix fun <C> compose(g: (C) -> A): AndThen<C, B> = composeF(AndThen(g))
+    // when (this) {
       // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
-      is Single -> if (index != maxStackDepthSize) Single(f compose g, index + 1)
-      else composeF(AndThen(g))
-      else -> composeF(AndThen(g))
-    }
+      // is Single -> if (index != maxStackDepthSize) Single(f compose g, index + 1)
+      // else composeF(AndThen(g))
+      // else -> composeF(AndThen(g))
+    // }
 
   /**
    * Alias for [andThen]
@@ -186,7 +186,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
      */
     operator fun <A, B> invoke(f: (A) -> B): AndThen<A, B> = when (f) {
       is AndThen<A, B> -> f
-      else -> Single(f, 0)
+      else -> Single(f)
     }
 
     fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
