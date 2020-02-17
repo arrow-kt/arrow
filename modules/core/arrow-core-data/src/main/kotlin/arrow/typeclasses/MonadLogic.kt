@@ -7,7 +7,8 @@ import arrow.core.Tuple2
 import arrow.core.fix
 
 /**
- * MonadLog is a typeclass that extends a MonadPlus.
+ * MonadLog is a typeclass that extends a MonadPlus. It provides functions to control
+ * when computations should be performed.
  */
 interface MonadLogic<F> : MonadPlus<F> {
 

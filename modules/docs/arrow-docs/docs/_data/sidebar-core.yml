@@ -256,6 +256,12 @@ options:
       - title: Bicrosswalk
         url: /docs/arrow/typeclasses/bicrosswalk/
 
+      - title: MonadPlus
+        url: /docs/arrow/typeclasses/monadplus/
+
+      - title: MonadLogic
+        url: /docs/arrow/typeclasses/monadlogic
+
   - title: Integrations
 
     nested_options:

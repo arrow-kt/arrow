@@ -41,7 +41,7 @@ interface MonadPlus<F> : Monad<F>, Alternative<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = ListK.monadPlus().run {
-   *    listOf("A", "B").k().plusM(listOf(1, 2, 3).k())
+   *    listOf(1, 2).k().plusM(listOf(3, 4, 5).k())
    *   }
    *   //sampleEnd
    *   println(result)
