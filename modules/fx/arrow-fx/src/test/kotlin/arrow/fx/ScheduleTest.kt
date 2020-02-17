@@ -131,9 +131,9 @@ class ScheduleTest : UnitSpec() {
         eqK(Id.eqK(), Id.monad(), 0)
       ),
       SemiringLaws.laws(
-        Schedule.semiring<ForId, Any?, Int>(Int.monoid(), Id.monad()),
-        Schedule.genK<ForId, Int>(Id.monad()),
-        eqK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq())
+        Schedule.semiring<ForId, Int, Int>(Int.monoid(), Id.monad()),
+        Schedule.genK<ForId, Int>(Id.monad()).genK(Gen.int()).map { it.fix() },
+        eqK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
       ),
       AlternativeLaws.laws(
         Schedule.alternative<ForId, Int>(Id.monad()),
