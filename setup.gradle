@@ -14,13 +14,40 @@
  * limitations under the License.
  */
 
+ext.showBanner = {
+    println "                         .&"
+    println "                        .@&."
+    println "                       .@@&&."
+    println "                      .@@@&&&."
+    println "                     .@@@@&&&&."
+    println "                    .@@@@@&&&&&."
+    println "                   .@@@@@@&&&&&&."
+    println "                  .@@@@@@@&&&&&&&."
+    println "                 .@@@@@@@@&&&&&&&&."
+    println "                .@@@@@@@@@&&&&&&&&&."
+    println "               .@@@@@@@@@@&&&&&&&&&&."
+    println "              .@@@@@@@@@@@&&&&&&&&&&&."
+    println "             .@@@@@@@@@@@@&&&&&&&&&&&&."
+    println "            .@@@@@@@@@@%.  .%&&&&&&&&&&."
+    println "           .@@@@@@@%. %.    .% .%&&&&&&&."
+    println "          .@@@%.        .%%.        .#&&&."
+    println "         .@%.             `            .%&."
+    println ""
+    println "     ARROW"
+    println ""
+    println "     A library for Typed Functional Programming in Kotlin"
+    println ""
+    println "     Version $VERSION_NAME"
+    println ""
+}
+
 ext.setupArrowModule = {
     def customProperties = new Properties()
     def customPropertiesURL = new URL("https://raw.githubusercontent.com/arrow-kt/arrow/master/gradle.properties")
     def customPropertiesStream = customPropertiesURL.openStream()
     customProperties.load(customPropertiesStream)
     customProperties.each { key, value -> ext.set(key, value) }
-    customProperties.each { key, value -> println key }
 }
 
 setupArrowModule()
+showBanner()
