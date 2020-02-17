@@ -126,6 +126,14 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
     Kleisli { r -> run(r).fork(ctx).map(::fiberT) }
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, f: (A, B) -> C): Kleisli<F, R, C> = CF().run {
+    Kleisli { r -> parMapN(fa.run(r), fb.run(r), f) }
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, fc: KleisliOf<F, R, C>, f: (A, B, C) -> D): Kleisli<F, R, D> = CF().run {
+    Kleisli { r -> parMapN(fa.run(r), fb.run(r), fc.run(c), f) }
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>): Kleisli<F, R, RacePair<KleisliPartialOf<F, R>, A, B>> = CF().run {
     Kleisli { r ->
       racePair(fa.run(r), fb.run(r)).map { res: RacePair<F, A, B> ->
