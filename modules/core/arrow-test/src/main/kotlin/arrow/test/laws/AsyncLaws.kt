@@ -33,7 +33,6 @@ object AsyncLaws {
   private fun <F> asyncLaws(AC: Async<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
     val EQB = EQK.liftEq(Boolean.eq())
-    val EQUnit: Eq<Kind<F, Unit>> = EQK.liftEq(Eq.any())
 
     return listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
@@ -48,8 +47,8 @@ object AsyncLaws {
       Law("Async Laws: fx block runs lazily") { AC.fxLazyEvaluation(Boolean.eq(), EQB) },
       Law("Async Laws: defer should be consistent with defer on provided coroutine context") { AC.derivedDefer(GENK, EQ) },
       Law("Async Laws: laterOrRaise should be consistent with laterOrRaise on provided coroutine context") { AC.derivedLaterOrRaise(EQ) },
-      Law("Async Laws: continueOn should be consistent with continueOn on provided coroutine context") { AC.derivedContinueOn(Eq.any()) },
-      Law("Async Laws: shift should be consistent with shift given a coroutine context") { AC.derivedShift(EQUnit) },
+      Law("Async Laws: continueOn should be consistent with continueOn on provided coroutine context") { AC.derivedContinueOn(EQ) },
+      Law("Async Laws: shift should be consistent with shift given a coroutine context") { AC.derivedShift(EQ) },
       Law("Async Laws: effectMap constructs a suspend effect") { AC.effectMapSuspendEffect(GENK, EQ) }
     )
   }
@@ -180,15 +179,24 @@ object AsyncLaws {
       laterOrRaise(one, f).equalUnderTheLaw(defer(one) { f().fold({ raiseError<Int>(it) }, { just(it) }) }, EQK)
     }
 
-  fun <F> Async<F>.derivedContinueOn(EQK: Eq<Unit>) {
-    fx.async {
-      continueOn(one).equalUnderTheLaw(one.shift().bind(), EQK)
+  fun <F> Async<F>.derivedContinueOn(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
+      fx.async {
+        continueOn(newSingleThreadContext(threadId1.toString()))
+        val t1: Int = getCurrentThread()
+        newSingleThreadContext(threadId2.toString()).shift().bind()
+        t1 + getCurrentThread()
+      }.equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }
-  }
 
-  fun <F> Async<F>.derivedShift(EQK: Eq<Kind<F, Unit>>) {
-    one.shift().equalUnderTheLaw(one.run { effect(this) { Unit } }, EQK)
-  }
+  fun <F> Async<F>.derivedShift(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
+      newSingleThreadContext(threadId1.toString()).shift().map { getCurrentThread() }
+        .flatMap {
+          effect(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+        }
+        .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
+    }
 
   fun <F> Async<F>.effectMapSuspendEffect(GK: GenK<F>, EQK: Eq<Kind<F, Int>>): Unit =
     forAll(GK.genK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
