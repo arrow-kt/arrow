@@ -46,7 +46,7 @@ interface MonadLogic<F> : MonadPlus<F> {
    *   //sampleStart
    *   val infinite = generateSequence { "#" }.k()
    *   val result = SequenceK.monadLogic().run {
-   *    infinite.interleave(sequenceOf("A", "B", "C").k())
+   *    infinite.interleave(sequenceOf("A", "B", "C").k()).fix()
    *   }.take(3).toList()
    *   //sampleEnd
    *   println(result)
@@ -168,14 +168,17 @@ interface MonadLogic<F> : MonadPlus<F> {
  * import arrow.core.extensions.*
  * import arrow.core.extensions.listk.monadLogic.monadLogic
  * import arrow.core.*
+ * import arrow.typeclasses.reflect
  *
  * fun main(args: Array<String>) {
- *   //sampleStart
- *   val result = ListK.monadLogic().run {
- *    listOf(1,2,3).k().splitM().reflect(this)
- *   }
- *   //sampleEnd
- *   println(result)
+ *  //sampleStart
+ *  val result = ListK.monadLogic().run {
+ *    listOf(1, 2, 3).k().splitM().flatMap {
+ *      it.reflect(this)
+ *    }
+ *  }
+ *  //sampleEnd
+ *  println(result)
  * }
  */
 // TODO: this should be direct part of the MonadLogic typeclass (https://github.com/arrow-kt/arrow/pull/2047#discussion_r378201777).
