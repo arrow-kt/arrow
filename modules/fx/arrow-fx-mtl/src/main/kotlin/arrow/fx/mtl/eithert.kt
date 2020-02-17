@@ -12,6 +12,7 @@ import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -178,6 +179,9 @@ fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPa
   object : EitherTConcurrent<F, L> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F, L> EitherT.Companion.timer(CF: Concurrent<F>): Timer<EitherTPartialOf<F, L>> =
+  Timer(concurrent<F, L>(CF))
 
 @extension
 interface EitherTMonadIO<F, L> : MonadIO<EitherTPartialOf<F, L>>, EitherTMonad<F, L> {

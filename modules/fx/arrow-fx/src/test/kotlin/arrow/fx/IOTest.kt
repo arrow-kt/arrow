@@ -21,6 +21,7 @@ import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
 import arrow.fx.extensions.io.monad.monad
+import arrow.fx.extensions.timer
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
@@ -51,7 +52,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
 
     "should defer evaluation until run" {
       var run = false

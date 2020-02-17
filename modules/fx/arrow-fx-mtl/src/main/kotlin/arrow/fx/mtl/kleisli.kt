@@ -7,6 +7,7 @@ import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -157,6 +158,9 @@ fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPa
   object : KleisliConcurrent<F, R> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F, R> Kleisli.Companion.timer(CF: Concurrent<F>): Timer<KleisliPartialOf<F, R>> =
+  Timer(concurrent<F, R>(CF))
 
 @extension
 interface KleisliMonadIO<F, R> : MonadIO<KleisliPartialOf<F, R>>, KleisliMonad<F, R> {

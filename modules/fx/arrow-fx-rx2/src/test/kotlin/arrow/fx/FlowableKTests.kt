@@ -27,7 +27,6 @@ import arrow.test.generators.GenK
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -77,8 +76,7 @@ class FlowableKTests : RxJavaSpec() {
   }
 
   init {
-    testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.timer(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
