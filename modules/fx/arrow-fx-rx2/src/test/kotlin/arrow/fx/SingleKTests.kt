@@ -22,7 +22,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
 import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.TimerLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -43,14 +42,14 @@ class SingleKTests : RxJavaSpec() {
     testLaws(
       ConcurrentLaws.laws(
         SingleK.concurrent(),
+        SingleK.timer(),
         SingleK.functor(),
         SingleK.applicative(),
         SingleK.monad(),
         SingleK.genK(),
         SingleK.eqK(),
         testStackSafety = false
-      ),
-      TimerLaws.laws(SingleK.async(), SingleK.timer(), SingleK.eq())
+      )
     )
 
     "Multi-thread Singles finish correctly" {

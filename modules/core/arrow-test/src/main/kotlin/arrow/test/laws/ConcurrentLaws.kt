@@ -14,6 +14,7 @@ import arrow.core.toT
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
+import arrow.fx.Timer
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
@@ -118,21 +119,25 @@ object ConcurrentLaws {
         Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
         Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) }
       )
-    } else emptyList()) + TimerLaws.laws(CF, CF.timer(), EQK.liftEq(Boolean.eq()))
+    } else emptyList()) + TimerLaws.laws(CF, CF.timer(), EQK)
   }
 
   fun <F> laws(
     CF: Concurrent<F>,
+    T: Timer<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-    AsyncLaws.laws(CF, GENK, EQK, testStackSafety, iterations) + concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
+    AsyncLaws.laws(CF, GENK, EQK, testStackSafety, iterations) +
+      TimerLaws.laws(CF, T, EQK) +
+      concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
 
   fun <F> laws(
     CF: Concurrent<F>,
+    T: Timer<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
@@ -142,7 +147,9 @@ object ConcurrentLaws {
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety, iterations) + concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
+    AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
+      TimerLaws.laws(CF, T, EQK) +
+      concurrentLaws(CF, EQK, ctx, testStackSafety, iterations)
 
   private val single: CoroutineContext = newSingleThreadContext("single")
 

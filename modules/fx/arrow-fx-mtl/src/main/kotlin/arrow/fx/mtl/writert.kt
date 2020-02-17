@@ -8,6 +8,7 @@ import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -119,6 +120,18 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
     WriterT(fork)
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, f: (A, B) -> C): WriterT<F, W, C> = CF().run {
+    WriterT(parMapN(fa.value(), fb.value()) { (w, a), (ww, b) ->
+      Tuple2(MM().run { w.combine(ww) }, f(a, b))
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, fc: WriterTOf<F, W, C>, f: (A, B, C) -> D): WriterT<F, W, D> = CF().run {
+    WriterT(parMapN(fa.value(), fb.value(), fc.value()) { (w, a), (ww, b), (www, c) ->
+      Tuple2(MM().run { w.combine(ww).combine(www) }, f(a, b, c))
+    })
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>): WriterT<F, W, RacePair<WriterTPartialOf<F, W>, A, B>> = CF().run {
     val racePair: Kind<F, Tuple2<W, RacePair<WriterTPartialOf<F, W>, A, B>>> = racePair(fa.value(), fb.value()).map { res: RacePair<F, Tuple2<W, A>, Tuple2<W, B>> ->
       when (res) {
@@ -149,6 +162,9 @@ fun <F, W> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concu
     override fun CF(): Concurrent<F> = CF
     override fun MM(): Monoid<W> = MM
   }
+
+fun <F, W> WriterT.Companion.timer(CF: Concurrent<F>, MM: Monoid<W>): Timer<WriterTPartialOf<F, W>> =
+  Timer(concurrent(CF, MM))
 
 @extension
 interface WriterTMonadIO<F, W> : MonadIO<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {

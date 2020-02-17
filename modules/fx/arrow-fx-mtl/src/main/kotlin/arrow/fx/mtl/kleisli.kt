@@ -7,6 +7,7 @@ import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -127,11 +128,22 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
   }
 
   override fun <A, B, C> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, f: (A, B) -> C): Kleisli<F, R, C> = CF().run {
-    Kleisli { r -> parMapN(fa.run(r), fb.run(r), f) }
+    Kleisli(AndThen(fa::run).flatMap { fa ->
+      AndThen(fb::run).andThen { fb ->
+        parMapN(fa, fb, f)
+      }
+    })
   }
 
   override fun <A, B, C, D> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, fc: KleisliOf<F, R, C>, f: (A, B, C) -> D): Kleisli<F, R, D> = CF().run {
-    Kleisli { r -> parMapN(fa.run(r), fb.run(r), fc.run(r), f) }
+    Kleisli(AndThen(fa::run).flatMap { fa ->
+      AndThen(fb::run).flatMap { fb ->
+        AndThen(fc::run).andThen { fc ->
+          trampoline()
+            .followedBy(parMapN(fa, fb, fc, f))
+        }
+      }
+    })
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>): Kleisli<F, R, RacePair<KleisliPartialOf<F, R>, A, B>> = CF().run {
@@ -165,6 +177,9 @@ fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPa
   object : KleisliConcurrent<F, R> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F, R> Kleisli.Companion.timer(CF: Concurrent<F>): Timer<KleisliPartialOf<F, R>> =
+  Timer(concurrent<F, R>(CF))
 
 @extension
 interface KleisliMonadIO<F, R> : MonadIO<KleisliPartialOf<F, R>>, KleisliMonad<F, R> {
