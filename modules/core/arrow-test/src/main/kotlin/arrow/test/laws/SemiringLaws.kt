@@ -11,6 +11,7 @@ object SemiringLaws {
   fun <F> laws(SG: Semiring<F>, GEN: Gen<F>, EQ: Eq<F>): List<Law> =
     MonoidLaws.laws(SG, GEN, EQ) +
       listOf(
+        // additive commutativity is tested through monoid
         Law("Semiring: Multiplicative commutativity") { SG.semiringMultiplicativeCommutativity(GEN, EQ) },
         Law("Semiring: Right distributivity") { SG.semiringRightDistributivity(GEN, EQ) },
         Law("Semiring: Left distributivity") { SG.semiringLeftDistributivity(GEN, EQ) },
@@ -27,39 +28,46 @@ object SemiringLaws {
         Law("Semiring: maybeCombineMultiplicate is derived") { SG.maybeCombineMultiplicateIsDerived(GEN, EQ) },
         Law("Semiring: maybeCombineMultiplicate left null") { SG.maybeCombineMultiplicateLeftNull(GEN, EQ) },
         Law("Semiring: maybeCombineMultiplicate right null") { SG.maybeCombineMultiplicateRightNull(GEN, EQ) },
-        Law("Semiring: maybeCombineMultiplicate Both null") { SG.maybeCombineMultiplicateBothNull(EQ) }
+        Law("Semiring: maybeCombineMultiplicate both null") { SG.maybeCombineMultiplicateBothNull(EQ) }
       )
 
+  // a · (b · c) = (a · b) · c
   fun <F> Semiring<F>.semiringMultiplicativeCommutativity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN, GEN) { A, B ->
       A.combineMultiplicate(B).equalUnderTheLaw(B.combineMultiplicate(A), EQ)
     }
 
+  // (a + b) · c = a · c + b · c
   fun <F> Semiring<F>.semiringRightDistributivity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN, GEN, GEN) { A, B, C ->
       (A.combine(B)).combineMultiplicate(C).equalUnderTheLaw((A.combineMultiplicate(C)).combine(B.combineMultiplicate(C)), EQ)
     }
 
+  // a · (b + c) = a · b + a · c
   fun <F> Semiring<F>.semiringLeftDistributivity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN, GEN, GEN) { A, B, C ->
-      A.combine(B.combineMultiplicate(C)).equalUnderTheLaw((A.combineMultiplicate(B)).combine(A.combineMultiplicate(C)), EQ)
+      A.combineMultiplicate(B.combine(C)).equalUnderTheLaw((A.combineMultiplicate(B)).combine(A.combineMultiplicate(C)), EQ)
     }
 
+  // 1 · a = a
   fun <F> Semiring<F>.semiringMultiplicativeLeftIdentity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
       (one().combineMultiplicate(A)).equalUnderTheLaw(A, EQ)
     }
 
+  // a · 1 = a
   fun <F> Semiring<F>.semiringMultiplicativeRightIdentity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
       A.combineMultiplicate(one()).equalUnderTheLaw(A, EQ)
     }
-
+  
+  // 0 · a = 0
   fun <F> Semiring<F>.semiringMultiplicativeLeftAbsorption(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
       (zero().combineMultiplicate(A)).equalUnderTheLaw(zero(), EQ)
     }
 
+  // a · 0 = 0
   fun <F> Semiring<F>.semiringMultiplicativeRightAbsorption(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
       A.combineMultiplicate(zero()).equalUnderTheLaw(zero(), EQ)
