@@ -128,6 +128,8 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
     EitherT.liftF(this, value().fork(ctx).map(::fiberT))
   }
 
+
+
   override fun <A, B> CoroutineContext.racePair(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>): EitherT<F, L, RacePair<EitherTPartialOf<F, L>, A, B>> = CF().run {
     val racePair: Kind<F, Either<L, RacePair<EitherTPartialOf<F, L>, A, B>>> =
       racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Either<L, A>, Either<L, B>> ->
