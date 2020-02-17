@@ -133,7 +133,7 @@ object ReaderApi {
     override fun <A, B> Kind<ReaderPartialOf<D>, A>.flatMap(f: (A) -> Kind<ReaderPartialOf<D>, B>): Kind<ReaderPartialOf<D>, B> =
       Kleisli(AndThen(fix().run).flatMap { AndThen(f(it.value()).fix().run) })
 
-    override fun <A> just(a: A): Kind<ReaderPartialOf<D>, A> = Reader { Id(a) }
+    override fun <A> just(a: A): Kind<ReaderPartialOf<D>, A> = Reader { a }
 
     override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ReaderPartialOf<D>, Either<A, B>>): Kind<ReaderPartialOf<D>, B> =
       Kleisli.tailRecM(Id.monad(), a, f)
