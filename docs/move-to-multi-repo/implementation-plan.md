@@ -8,6 +8,14 @@
 
 :white_large_square: Repositories > `Settings` > `Secrets`: [How to create secrets](how-to-create-secrets.md)
 
+* :white_large_square: `AWS_ACCESS_KEY_ID`
+* :white_large_square: `AWS_CLOUDFRONT_ID`
+* :white_large_square: `AWS_SECRET_ACCESS_KEY`
+* :white_large_square: `S3_BUCKET`
+* :white_large_square: `BINTRAY_API_KEY`
+* :white_large_square: `BINTRAY_USER`
+* :heavy_check_mark: `BOT_GITHUB_TOKEN`
+
 :white_large_square: Check if there are new artifacts to consider.
 
 :white_large_square: **Block the contributions!!**
