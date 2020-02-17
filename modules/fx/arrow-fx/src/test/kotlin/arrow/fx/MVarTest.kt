@@ -276,20 +276,20 @@ class MVarTest : UnitSpec() {
         }.equalUnderTheLaw(IO.unit, EQ())
       }
 
-      "$label - concurrent take and put" {
-        val count = 10000
-        IO.fx {
-          val mvar = !mvar.empty<Int>()
-          val ref = !Ref(0)
-          val takes = (0 until count).map { mvar.read().map2(mvar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
-          val puts = (0 until count).map { mvar.put(1) }.parSequence()
-          val f1 = !takes.fork()
-          val f2 = !puts.fork()
-          !f1.join()
-          !f2.join()
-          !ref.get()
-        }.equalUnderTheLaw(IO.just(count), EQ())
-      }
+      // "$label - concurrent take and put" {
+      //   val count = 10000
+      //   IO.fx {
+      //     val mvar = !mvar.empty<Int>()
+      //     val ref = !Ref(0)
+      //     val takes = (0 until count).map { mvar.read().map2(mvar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
+      //     val puts = (0 until count).map { mvar.put(1) }.parSequence()
+      //     val f1 = !takes.fork()
+      //     val f2 = !puts.fork()
+      //     !f1.join()
+      //     !f2.join()
+      //     !ref.get()
+      //   }.equalUnderTheLaw(IO.just(count), EQ())
+      // }
     }
 
     fun concurrentTests(label: String, mvar: MVarFactory<ForIO>) {
