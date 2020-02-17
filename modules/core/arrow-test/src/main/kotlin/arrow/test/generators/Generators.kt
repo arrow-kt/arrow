@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
-import arrow.core.Eval
 import arrow.core.Failure
 import arrow.core.Id
 import arrow.core.Ior
@@ -47,9 +46,6 @@ fun Gen.Companion.byte(): Gen<Byte> =
 
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }
-
-fun <F, A> Gen<A>.eval(AP: Applicative<F>): Gen<Eval<Kind<F, A>>> =
-  map { Eval.just(AP.just(it)) }
 
 fun <F, A, E> Gen.Companion.applicativeError(genA: Gen<A>, errorGen: Gen<E>, AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
   Gen.oneOf<Either<E, A>>(genA.map(::Right), errorGen.map(::Left)).map {
