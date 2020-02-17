@@ -19,8 +19,7 @@ interface ByteMonoid : Monoid<Byte>, ByteSemigroup {
   override fun empty(): Byte = 0
 }
 
-interface ByteSemiring : Semiring<Byte> {
-  override fun zero(): Byte = 0
+interface ByteSemiring : Semiring<Byte>, ByteMonoid {
   override fun one(): Byte = 1
 
   override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
@@ -76,8 +75,7 @@ interface DoubleMonoid : Monoid<Double>, DoubleSemigroup {
   override fun empty(): Double = .0
 }
 
-interface DoubleSemiring : Semiring<Double> {
-  override fun zero(): Double = .0
+interface DoubleSemiring : Semiring<Double>, DoubleMonoid {
   override fun one(): Double = 1.0
 
   override fun Double.combine(b: Double): Double = this + b
@@ -132,8 +130,7 @@ interface IntMonoid : Monoid<Int>, IntSemigroup {
   override fun empty(): Int = 0
 }
 
-interface IntSemiring : Semiring<Int> {
-  override fun zero(): Int = 0
+interface IntSemiring : Semiring<Int>, IntMonoid {
   override fun one(): Int = 1
 
   override fun Int.combine(b: Int): Int = this + b
@@ -189,8 +186,7 @@ interface LongMonoid : Monoid<Long>, LongSemigroup {
   override fun empty(): Long = 0L
 }
 
-interface LongSemiring : Semiring<Long> {
-  override fun zero(): Long = 0
+interface LongSemiring : Semiring<Long>, LongMonoid {
   override fun one(): Long = 1
 
   override fun Long.combine(b: Long): Long = this + b
@@ -246,8 +242,7 @@ interface ShortMonoid : Monoid<Short>, ShortSemigroup {
   override fun empty(): Short = 0
 }
 
-interface ShortSemiring : Semiring<Short> {
-  override fun zero(): Short = 0
+interface ShortSemiring : Semiring<Short>, ShortMonoid {
   override fun one(): Short = 1
 
   override fun Short.combine(b: Short): Short = (this + b).toShort()
@@ -303,8 +298,7 @@ interface FloatMonoid : Monoid<Float>, FloatSemigroup {
   override fun empty(): Float = 0f
 }
 
-interface FloatSemiring : Semiring<Float> {
-  override fun zero(): Float = 0f
+interface FloatSemiring : Semiring<Float>, FloatMonoid {
   override fun one(): Float = 1f
 
   override fun Float.combine(b: Float): Float = this + b

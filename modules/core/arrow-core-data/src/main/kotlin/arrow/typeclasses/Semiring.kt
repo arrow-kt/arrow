@@ -142,7 +142,8 @@ interface Semiring<A> : Monoid<A> {
     /**
      * A zero value for this A
      */
-    fun zero(): A
+    fun zero(): A =
+      empty()
 
     /**
      * A one value for this A
@@ -153,8 +154,6 @@ interface Semiring<A> : Monoid<A> {
      * Multiplicatively combine two [A] values.
      */
     fun A.combineMultiplicate(b: A): A
-
-    override fun empty(): A = zero()
 
     operator fun A.times(b: A): A =
             this.combineMultiplicate(b)

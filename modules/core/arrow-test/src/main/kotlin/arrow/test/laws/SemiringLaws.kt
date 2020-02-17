@@ -19,7 +19,7 @@ object SemiringLaws {
         Law("Semiring: Multiplicative left absorption") { SG.semiringMultiplicativeLeftAbsorption(GEN, EQ) },
         Law("Semiring: Multiplicative right absorption") { SG.semiringMultiplicativeRightAbsorption(GEN, EQ) },
         Law("Semiring: times is derived") { SG.timesIsDerived(GEN, EQ) },
-        Law("Semiring: empty is derived") { SG.emptyIsDerived(EQ) },
+        Law("Semiring: zero is derived") { SG.zeroIsDerived(EQ) },
         Law("Semiring: maybeCombineAddition is derived") { SG.maybeCombineAdditionIsDerived(GEN, EQ) },
         Law("Semiring: maybeCombineAddition left null") { SG.maybeCombineAdditionLeftNull(GEN, EQ) },
         Law("Semiring: maybeCombineAddition right null") { SG.maybeCombineAdditionRightNull(GEN, EQ) },
@@ -70,8 +70,8 @@ object SemiringLaws {
       A.times(B).equalUnderTheLaw(A.combineMultiplicate(B), EQ)
     }
 
-  fun <F> Semiring<F>.emptyIsDerived(EQ: Eq<F>): Unit =
-    empty().equalUnderTheLaw(zero(), EQ) shouldBe true
+  fun <F> Semiring<F>.zeroIsDerived(EQ: Eq<F>): Unit =
+    zero().equalUnderTheLaw(empty(), EQ) shouldBe true
 
   fun <F> Semiring<F>.maybeCombineAdditionIsDerived(GEN: Gen<F>, EQ: Eq<F>): Unit =
     forAll(GEN, GEN) { A, B ->

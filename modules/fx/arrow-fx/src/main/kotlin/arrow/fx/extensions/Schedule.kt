@@ -51,34 +51,28 @@ interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input
 
 @extension
 interface ScheduleSemigroup<F, Input, Output> : Semigroup<Schedule<F, Input, Output>> {
-  fun SA(): Semigroup<Output>
+  fun OI(): Semigroup<Output>
 
   override fun Schedule<F, Input, Output>.combine(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
-    and(b).map { (a, b) -> SA().run { a + b } }
+    and(b).map { (a, b) -> OI().run { a + b } }
 }
 
 @extension
 interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>, ScheduleSemigroup<F, Input, Output> {
-  override fun SA(): Semigroup<Output> = MA()
-  fun MA(): Monoid<Output>
+  override fun OI(): Monoid<Output>
   fun MF(): Monad<F>
 
   override fun empty(): Schedule<F, Input, Output> =
-    Schedule.forever<F, Input>(MF()).const(MA().empty())
+    Schedule.once<F, Input>(MF()).const(OI().empty())
 }
 
 @extension
 interface ScheduleSemiring<F, Input, Output> : Semiring<Schedule<F, Input, Output>>, ScheduleMonoid<F, Input, Output> {
-  override fun MA(): Monoid<Output>
+  override fun OI(): Semiring<Output>
   override fun MF(): Monad<F>
 
-  override fun one(): Schedule<F, Input, Output> = empty()
-
-  override fun empty(): Schedule<F, Input, Output> =
-    Schedule.forever<F, Input>(MF()).const(MA().empty())
-
-  override fun zero(): Schedule<F, Input, Output> =
-    Schedule.never<F, Input>(MF()).const(MA().empty())
+  override fun one(): Schedule<F, Input, Output> =
+    Schedule.once<F, Input>(MF()).const(OI().one())
 
   override fun Schedule<F, Input, Output>.combineMultiplicate(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
     andThen(b).map { it.fold(::identity, ::identity) }

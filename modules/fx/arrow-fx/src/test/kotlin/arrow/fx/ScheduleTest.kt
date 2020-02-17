@@ -10,7 +10,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.foldable.forAll
-import arrow.core.extensions.monoid
+import arrow.core.extensions.semiring
 import arrow.core.toT
 import arrow.core.value
 import arrow.fx.extensions.io.applicativeError.attempt
@@ -131,7 +131,7 @@ class ScheduleTest : UnitSpec() {
         eqK(Id.eqK(), Id.monad(), 0)
       ),
       SemiringLaws.laws(
-        Schedule.semiring<ForId, Int, Int>(Int.monoid(), Id.monad()),
+        Schedule.semiring<ForId, Int, Int>(Int.semiring(), Id.monad()),
         Schedule.genK<ForId, Int>(Id.monad()).genK(Gen.int()).map { it.fix() },
         eqK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
       ),
