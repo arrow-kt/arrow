@@ -139,8 +139,7 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
     Kleisli(AndThen(fa::run).flatMap { fa ->
       AndThen(fb::run).flatMap { fb ->
         AndThen(fc::run).andThen { fc ->
-          trampoline()
-            .followedBy(parMapN(fa, fb, fc, f))
+          parMapN(fa, fb, fc, f)
         }
       }
     })
