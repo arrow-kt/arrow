@@ -60,7 +60,7 @@ object SemiringLaws {
     forAll(GEN) { A ->
       A.combineMultiplicate(one()).equalUnderTheLaw(A, EQ)
     }
-  
+
   // 0 · a = 0
   fun <F> Semiring<F>.semiringMultiplicativeLeftAbsorption(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->

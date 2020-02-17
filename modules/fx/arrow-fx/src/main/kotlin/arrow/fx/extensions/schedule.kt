@@ -43,7 +43,7 @@ interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input
   fun MF(): Monad<F>
 
   override fun <A> just(a: A): Kind<SchedulePartialOf<F, Input>, A> =
-    Schedule.forever<F, A>(MF()).const(a) as Schedule<F, Input, A>
+    Schedule.once<F, A>(MF()).const(a) as Schedule<F, Input, A>
 
   override fun <A, B> Kind<SchedulePartialOf<F, Input>, A>.map(f: (A) -> B): Kind<SchedulePartialOf<F, Input>, B> =
     fix().map(f)
@@ -75,7 +75,7 @@ interface ScheduleSemiring<F, Input, Output> : Semiring<Schedule<F, Input, Outpu
     Schedule.once<F, Input>(MF()).const(OI().one())
 
   override fun Schedule<F, Input, Output>.combineMultiplicate(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
-    andThen(b).map { it.fold(::identity, ::identity) }
+    and(b).map { (a, b) -> OI().run { a * b } }
 }
 
 @extension
@@ -122,7 +122,8 @@ interface ScheduleProfunctor<F> : Profunctor<Kind<ForSchedule, F>> {
 interface ScheduleCategory<F> : Category<Kind<ForSchedule, F>> {
   fun MM(): Monad<F>
 
-  override fun <A> id(): Kind2<Kind<ForSchedule, F>, A, A> = Schedule.identity(MM())
+  override fun <A> id(): Kind2<Kind<ForSchedule, F>, A, A> =
+    Schedule.identity(MM())
 
   override fun <A, B, C> Kind2<Kind<ForSchedule, F>, B, C>.compose(arr: Kind2<Kind<ForSchedule, F>, A, B>): Kind2<Kind<ForSchedule, F>, A, C> =
     fix().compose(arr.fix())
