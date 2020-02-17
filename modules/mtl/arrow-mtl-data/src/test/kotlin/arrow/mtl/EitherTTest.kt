@@ -25,6 +25,7 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
+import arrow.fx.mtl.timer
 import arrow.mtl.extensions.eithert.alternative.alternative
 import arrow.mtl.extensions.eithert.applicative.applicative
 import arrow.mtl.extensions.eithert.divisible.divisible
@@ -67,12 +68,15 @@ class EitherTTest : UnitSpec() {
         idEQK
       ),
 
-      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(EitherT.concurrent(IO.concurrent()),
+      ConcurrentLaws.laws<EitherTPartialOf<ForIO, String>>(
+        EitherT.concurrent(IO.concurrent()),
+        EitherT.timer<ForIO, String>(IO.concurrent()),
         EitherT.functor(IO.functor()),
         EitherT.applicative(IO.applicative()),
         EitherT.monad(IO.monad()),
         EitherT.genK(IO.genK(), Gen.string()),
-        ioEQK),
+        ioEQK
+      ),
 
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()),
         EitherT.genK(Id.genK(), Gen.int()),

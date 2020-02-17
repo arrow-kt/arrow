@@ -10,6 +10,7 @@ import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -163,6 +164,9 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
   object : OptionTConcurrent<F> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F> OptionT.Companion.timer(CF: Concurrent<F>): Timer<OptionTPartialOf<F>> =
+  Timer(concurrent(CF))
 
 @extension
 interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {
