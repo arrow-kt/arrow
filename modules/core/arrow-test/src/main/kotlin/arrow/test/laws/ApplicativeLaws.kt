@@ -40,9 +40,9 @@ object ApplicativeLaws {
       Law("Applicative Laws: cartesian builder tupled3") { A.cartesianBuilderTupled3(EQTuple3) },
       Law("Applicative Laws: replicate check size") { A.replicateSize(EQ) },
       Law("Applicative Laws: replicate check list == 1") { A.replicateListOf1(EQBoolean) },
-      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(EQ) }
-      Law("map2 == map2Eval") { A.map2EqMap2Eval(GENK, EQ) }
-      Law("Ap == LazyAp") { A.apEqLazyAp(GENK, EQ) },
+      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(EQ) },
+      Law("map2 == map2Eval") { A.map2EqMap2Eval(GENK, EQ) },
+      Law("Ap == LazyAp") { A.apEqLazyAp(GENK, EQ) }
     )
   }
 
