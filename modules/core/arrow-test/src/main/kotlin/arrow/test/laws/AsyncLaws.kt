@@ -181,22 +181,20 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.derivedContinueOn(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
+    forFew(5, Gen.intSmall()) { threadId1: Int ->
+      val ctx = newSingleThreadContext(threadId1.toString())
       fx.async {
-        continueOn(newSingleThreadContext(threadId1.toString()))
-        val t1: Int = getCurrentThread()
-        newSingleThreadContext(threadId2.toString()).shift().bind()
-        t1 + getCurrentThread()
-      }.equalUnderTheLaw(just(threadId1 + threadId2), EQ)
+        continueOn(ctx)
+        getCurrentThread()
+      }
+      .equalUnderTheLaw(fx.async { ctx.shift().bind(); getCurrentThread() }, EQ)
     }
 
   fun <F> Async<F>.derivedShift(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      newSingleThreadContext(threadId1.toString()).shift().map { getCurrentThread() }
-        .flatMap {
-          effect(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
-        }
-        .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
+    forFew(5, Gen.intSmall()) { threadId1: Int ->
+      val ctx = newSingleThreadContext(threadId1.toString())
+      ctx.shift().map { getCurrentThread() }
+        .equalUnderTheLaw(ctx.run { effect(this) { getCurrentThread() } }, EQ)
     }
 
   fun <F> Async<F>.effectMapSuspendEffect(GK: GenK<F>, EQK: Eq<Kind<F, Int>>): Unit =
