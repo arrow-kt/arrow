@@ -15,7 +15,7 @@ If these files are changed, a full check for all the libraries will be executed 
 
 ## Build order
 
-It's necessary to keep a [build order](https://github.com/arrow-kt/arrow/blob/master/lists/build.txt) according to the dependencies among libraries.
+It's necessary to keep a [build order](../../lists/build.txt) according to the dependencies among libraries.
 
 That order is used when doing full checks for all the Λrrow libraries. In those checks, external Λrrow dependencies for a library come from the **local** repository.
 
@@ -35,7 +35,7 @@ Every library has these checks:
     * **Full build check** for all the libraries (external Λrrow dependencies come from **local** repository).
     * **Full doc check** for all the libraries (external Λrrow dependencies come from **local** repository).
 
-Those checks just call the commands included in the [`scripts`](https://github.com/arrow-kt/arrow/tree/master/scripts) directory.
+Those checks just call the commands included in the [`scripts`](../../scripts) directory.
 
 If these files are changed, a full check for all the libraries will be executed to approve the pull request.
 
