@@ -21,7 +21,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.GenK
 import arrow.test.generators.throwable
 import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -38,10 +37,9 @@ class MaybeKTests : RxJavaSpec() {
 
   init {
     testLaws(
-      TimerLaws.laws(MaybeK.async(), MaybeK.timer(), MaybeK.eq()),
-
       ConcurrentLaws.laws(
         MaybeK.concurrent(),
+        MaybeK.timer(),
         MaybeK.functor(),
         MaybeK.applicative(),
         MaybeK.monad(),
