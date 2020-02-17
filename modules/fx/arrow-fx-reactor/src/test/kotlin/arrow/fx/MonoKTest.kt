@@ -74,7 +74,7 @@ class MonoKTest : UnitSpec() {
   init {
     testLaws(
       AsyncLaws.laws(MonoK.async(), MonoK.functor(), MonoK.applicative(), MonoK.monad(), MonoK.genK(), EQK(), testStackSafety = false),
-      TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
+      TimerLaws.laws(MonoK.async(), MonoK.timer(), EQK())
     )
 
     "Multi-thread Monos finish correctly" {

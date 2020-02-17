@@ -14,6 +14,7 @@ import arrow.core.toT
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
+import arrow.fx.Timer
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
@@ -93,16 +94,19 @@ object ConcurrentLaws {
 
   fun <F> laws(
     CF: Concurrent<F>,
+    T: Timer<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
     ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
     AsyncLaws.laws(CF, GENK, EQK, testStackSafety) +
+      TimerLaws.laws(CF, T, EQK) +
       concurrentLaws(CF, EQK, ctx)
 
   fun <F> laws(
     CF: Concurrent<F>,
+    T: Timer<F>,
     FF: Functor<F>,
     AP: Apply<F>,
     SL: Selective<F>,
@@ -112,6 +116,7 @@ object ConcurrentLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
     AsyncLaws.laws(CF, FF, AP, SL, GENK, EQK, testStackSafety) +
+      TimerLaws.laws(CF, T, EQK) +
       concurrentLaws(CF, EQK, ctx)
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
