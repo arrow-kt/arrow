@@ -6,17 +6,17 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compile project(':arrow-annotations')
-    compile 'me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0'
+    compile "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:$KOTLIN_METADATA_VERSION"
     compile("com.squareup:kotlinpoet:$KOTLIN_POET_VERSION") {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
     }
     compile "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
-    compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
-    kapt 'com.google.auto.service:auto-service:1.0-rc4'
+    compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
+    kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
 
     //To generate stubs for data classes
-    kaptTest 'com.google.auto.service:auto-service:1.0-rc4'
-    testCompile "com.google.testing.compile:compile-testing:0.15"
+    kaptTest "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
+    testCompile "com.google.testing.compile:compile-testing:$GOOGLE_COMPILE_TESTING_VERSION"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-meta-test-models")
     testCompile project(":arrow-optics")
