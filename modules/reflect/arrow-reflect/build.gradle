@@ -1,7 +1,7 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile 'io.github.classgraph:classgraph:4.8.14'
+    compile "io.github.classgraph:classgraph:$CLASSGRAPH_VERSION"
     compile project(':arrow-core')
     compile project(':arrow-fx')
     compile project(':arrow-syntax')
