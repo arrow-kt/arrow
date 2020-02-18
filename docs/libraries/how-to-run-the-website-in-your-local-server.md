@@ -20,7 +20,7 @@ cd site
 cp <arrow-library-repository>/build/site/* build/site/
 ```
 
-### 3. 
+### 3. Run the website in your local server
 
 ```bash
 bundle install --gemfile Gemfile --path vendor/bundle
