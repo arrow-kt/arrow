@@ -36,7 +36,8 @@ Arrow is an inclusive community powered by awesome individuals like you. As an a
 If you’re looking to contribute, have questions, or want to keep up-to-date about what’s happening, please follow us here and say hello!
 
 - [Arrow on Twitter](https://twitter.com/arrow_kt)
-- [#Arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0)
+- [#arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0)
+- [#arrow-contributors on Kotlin Slack](https://kotlinlang.slack.com/archives/C8UK6RTHU
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
 ## Setup
