@@ -117,6 +117,26 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
     OptionT.liftF(this, value().fork(ctx).map(::fiberT))
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>, f: (A, B) -> C): OptionT<F, C> = CF().run {
+    OptionT(parMapN(fa.value(), fb.value()) { a, b ->
+      a.flatMap { aa ->
+        b.map { bb ->
+          f(aa, bb)
+        }
+      }
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>, fc: OptionTOf<F, C>, f: (A, B, C) -> D): OptionT<F, D> = CF().run {
+    OptionT(parMapN(fa.value(), fb.value(), fc.value()) { a, b, c ->
+      a.flatMap { aa ->
+        b.flatMap { bb ->
+          c.map { cc -> f(aa, bb, cc) }
+        }
+      }
+    })
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>): OptionT<F, RacePair<OptionTPartialOf<F>, A, B>> = CF().run {
     val racePair: Kind<F, Option<RacePair<OptionTPartialOf<F>, A, B>>> =
       racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Option<A>, Option<B>> ->

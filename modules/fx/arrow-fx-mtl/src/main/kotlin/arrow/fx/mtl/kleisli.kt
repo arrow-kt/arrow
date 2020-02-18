@@ -127,12 +127,30 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
     Kleisli { r -> run(r).fork(ctx).map(::fiberT) }
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, f: (A, B) -> C): Kleisli<F, R, C> = CF().run {
+    Kleisli { r ->
+      just(r).flatMap { rr ->
+        parMapN(fa.run(rr), fb.run(rr), f)
+      }
+    }
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, fc: KleisliOf<F, R, C>, f: (A, B, C) -> D): Kleisli<F, R, D> = CF().run {
+    Kleisli { r ->
+      just(r).flatMap { rr ->
+        parMapN(fa.run(rr), fb.run(rr), fc.run(rr), f)
+      }
+    }
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>): Kleisli<F, R, RacePair<KleisliPartialOf<F, R>, A, B>> = CF().run {
     Kleisli { r ->
-      racePair(fa.run(r), fb.run(r)).map { res: RacePair<F, A, B> ->
-        when (res) {
-          is RacePair.First -> RacePair.First(res.winner, fiberT(res.fiberB))
-          is RacePair.Second -> RacePair.Second(fiberT(res.fiberA), res.winner)
+      just(r).flatMap { rr ->
+        racePair(fa.run(rr), fb.run(rr)).map { res: RacePair<F, A, B> ->
+          when (res) {
+            is RacePair.First -> RacePair.First(res.winner, fiberT(res.fiberB))
+            is RacePair.Second -> RacePair.Second(fiberT(res.fiberA), res.winner)
+          }
         }
       }
     }
@@ -140,11 +158,13 @@ interface KleisliConcurrent<F, R> : Concurrent<KleisliPartialOf<F, R>>, KleisliA
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: KleisliOf<F, R, A>, fb: KleisliOf<F, R, B>, fc: KleisliOf<F, R, C>): Kleisli<F, R, RaceTriple<KleisliPartialOf<F, R>, A, B, C>> = CF().run {
     Kleisli { r ->
-      raceTriple(fa.run(r), fb.run(r), fc.run(r)).map { res: RaceTriple<F, A, B, C> ->
-        when (res) {
-          is RaceTriple.First -> RaceTriple.First(res.winner, fiberT(res.fiberB), fiberT(res.fiberC))
-          is RaceTriple.Second -> RaceTriple.Second(fiberT(res.fiberA), res.winner, fiberT(res.fiberC))
-          is RaceTriple.Third -> RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), res.winner)
+      just(r).flatMap { rr ->
+        raceTriple(fa.run(rr), fb.run(rr), fc.run(rr)).map { res: RaceTriple<F, A, B, C> ->
+          when (res) {
+            is RaceTriple.First -> RaceTriple.First(res.winner, fiberT(res.fiberB), fiberT(res.fiberC))
+            is RaceTriple.Second -> RaceTriple.Second(fiberT(res.fiberA), res.winner, fiberT(res.fiberC))
+            is RaceTriple.Third -> RaceTriple.Third(fiberT(res.fiberA), fiberT(res.fiberB), res.winner)
+          }
         }
       }
     }
