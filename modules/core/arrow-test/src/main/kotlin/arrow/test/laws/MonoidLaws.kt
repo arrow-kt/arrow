@@ -28,7 +28,7 @@ object MonoidLaws {
     }
 
   fun <F> Monoid<F>.combineAllIsDerived(GEN: Gen<F>, EQ: Eq<F>): Unit =
-    forAll(Gen.list(GEN)) { list ->
+    forAll(5, Gen.list(GEN)) { list ->
       list.combineAll().equalUnderTheLaw(if (list.isEmpty()) empty() else list.reduce { acc, f -> acc.combine(f) }, EQ)
     }
 

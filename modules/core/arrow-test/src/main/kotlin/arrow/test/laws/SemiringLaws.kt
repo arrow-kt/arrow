@@ -71,8 +71,8 @@ object SemiringLaws {
 
   // a · (b · c) = (a · b) · c
   fun <F> Semiring<F>.semiringMultiplicativeAssociativity(GEN: Gen<F>, EQ: Eq<F>) =
-    forAll(GEN, GEN) { A, B ->
-      A.combineMultiplicate(B).equalUnderTheLaw(B.combineMultiplicate(A), EQ)
+    forAll(GEN, GEN, GEN) { A, B, C ->
+      A.combineMultiplicate(B.combineMultiplicate(C)).equalUnderTheLaw((B.combineMultiplicate(A)).combineMultiplicate(C), EQ)
     }
 
   // (a + b) · c = a · c + b · c

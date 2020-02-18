@@ -19,6 +19,8 @@ import arrow.core.extensions.semigroup
 import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
+import arrow.test.generators.intSmall
+import arrow.test.generators.longSmall
 import arrow.test.generators.mapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
@@ -47,7 +49,7 @@ class MapKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(MapK.show(Long.show(), Int.show()), EQ_TC, Gen.mapK(Gen.long(), Gen.int())),
       TraverseLaws.laws(MapK.traverse(), MapK.genK(Gen.long()), MapK.eqK(Long.eq())),
-      MonoidLaws.laws(MapK.monoid<Long, Int>(Int.semigroup()), Gen.mapK(Gen.long(), Gen.int()), EQ),
+      MonoidLaws.laws(MapK.monoid<Long, Int>(Int.semigroup()), Gen.mapK(Gen.longSmall(), Gen.intSmall()), EQ),
       FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.long())),
       EqLaws.laws(MapK.eq(Long.eq(), Int.eq()), Gen.mapK(Gen.long(), Gen.int())),
       FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.long()), MapK.eqK(Long.eq())),
