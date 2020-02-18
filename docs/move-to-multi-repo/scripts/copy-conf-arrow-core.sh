@@ -16,8 +16,11 @@ mv arrow-meta/models arrow-meta/arrow-meta-test-models
 cp $BASEDIR/d-arrow-module/arrow-core-repository/arrow-meta/arrow-meta-test-models/build.gradle arrow-meta/arrow-meta-test-models/
 rm arrow-meta/arrow-meta-test-models/gradle.properties
 cp $BASEDIR/d-arrow-module/.gitignore .
+cp $BASEDIR/d-arrow-module/LICENSE.md .
+cp $BASEDIR/d-arrow-module/CONTRIBUTING.md .
 
 mkdir -p .github/workflows/
+cp -r $BASEDIR/d-arrow-module/.github/ISSUE_TEMPLATE .github/
 cp $BASEDIR/d-arrow-module/.github/workflows/*arrow-core* .github/workflows/
 cp $BASEDIR/d-arrow-module/.github/workflows/check* .github/workflows/
 sed -i "s/d-arrow-module/arrow-core/g" .github/workflows/*

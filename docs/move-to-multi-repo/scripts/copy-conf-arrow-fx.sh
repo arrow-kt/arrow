@@ -17,8 +17,11 @@ cp $BASEDIR/d-arrow-module/arrow-fx-repository/arrow-benchmarks-fx/arrow-scala-b
 rm arrow-benchmarks-fx/arrow-kio-benchmarks/gradle.properties
 rm arrow-benchmarks-fx/arrow-scala-benchmarks/gradle.properties
 cp $BASEDIR/d-arrow-module/.gitignore .
+cp $BASEDIR/d-arrow-module/LICENSE.md .
+cp $BASEDIR/d-arrow-module/CONTRIBUTING.md .
 
 mkdir -p .github/workflows/
+cp -r $BASEDIR/d-arrow-module/.github/ISSUE_TEMPLATE .github/
 cp $BASEDIR/d-arrow-module/.github/workflows/*arrow-fx* .github/workflows/
 cp $BASEDIR/d-arrow-module/.github/workflows/check* .github/workflows/
 sed -i "s/d-arrow-module/arrow-core/g" .github/workflows/*

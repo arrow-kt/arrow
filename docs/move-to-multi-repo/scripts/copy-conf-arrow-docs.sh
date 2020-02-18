@@ -17,8 +17,11 @@ rm arrow-docs/.gitignore
 rm -rf arrow-docs/docs/*
 cp -r $BASEDIR/d-arrow-module/arrow-docs-repository/arrow-docs/docs/static arrow-docs/docs/
 cp $BASEDIR/d-arrow-module/.gitignore .
+cp $BASEDIR/d-arrow-module/LICENSE.md .
+cp $BASEDIR/d-arrow-module/CONTRIBUTING.md .
 
 mkdir -p .github/workflows/
+cp -r $BASEDIR/d-arrow-module/.github/ISSUE_TEMPLATE .github/
 cp $BASEDIR/d-arrow-module/.github/workflows/*arrow-docs* .github/workflows/
 cp $BASEDIR/d-arrow-module/.github/workflows/check* .github/workflows/
 sed -i "s/d-arrow-module/arrow-core/g" .github/workflows/*

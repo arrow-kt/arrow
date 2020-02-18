@@ -12,8 +12,11 @@ for module in arrow-*; do
     cp $BASEDIR/d-arrow-module/arrow-integrations-repository/$module/build.gradle $module/
 done
 cp $BASEDIR/d-arrow-module/.gitignore .
+cp $BASEDIR/d-arrow-module/LICENSE.md .
+cp $BASEDIR/d-arrow-module/CONTRIBUTING.md .
 
 mkdir -p .github/workflows/
+cp -r $BASEDIR/d-arrow-module/.github/ISSUE_TEMPLATE .github/
 cp $BASEDIR/d-arrow-module/.github/workflows/*arrow-integrations* .github/workflows/
 cp $BASEDIR/d-arrow-module/.github/workflows/check* .github/workflows/
 sed -i "s/d-arrow-module/arrow-core/g" .github/workflows/*

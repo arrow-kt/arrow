@@ -6,6 +6,8 @@ export BASEDIR=$(pwd)
 echo "arrow-site ..."
 cd $BASEDIR/arrow-site
 cp $BASEDIR/d-arrow-site/README.md .
+cp $BASEDIR/d-arrow-site/LICENSE.md .
+cp $BASEDIR/d-arrow-site/CONTRIBUTING.md .
 cp -r $BASEDIR/d-arrow-site/*gradle* .
 sed -i "s/d-arrow/arrow/g" gradle.properties
 cp $BASEDIR/d-arrow-site/update-versions.txt .
