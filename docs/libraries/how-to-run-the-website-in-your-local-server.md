@@ -1,28 +1,46 @@
 # Arrow library: How to run the website in your local server
 
-Previous step: [How to generate and validate the documentation](how-to-generate-and-validate-documentation.md)
-
 ## Steps
 
 ### 1. Prepare the site
 
 ```
-git clone https://github.com/arrow-kt/arrow-site.git site
-cd site
+git clone https://github.com/arrow-kt/arrow-site.git
+cd arrow-site
 ./gradlew runAnk
 ```
 
 `build/site` will be created.
 
-### 2. Copy `build/site` content from Arrow library
+### 2. Copy static docs from Arrow Docs (pending task: re-organization)
 
 ```
-cp -r <arrow-library-repository>/build/site/* build/site/
+git clone https://github.com/arrow-kt/arrow-docs.git
+cd arrow-docs
+./gradlew runAnk
+cp build/site/static/* arrow-site/build/site/
 ```
 
-### 3. Run the website in your local server
+### 3. Copy `apidocs` from Arrow library
+
+They were created by the steps included in [How to generate and validate the documentation](how-to-generate-and-validate-documentation.md):
+
+```
+cd <arrow-library-repository>
+./gradlew clean dokka
+./gradlew runAnk
+```
+
+and then:
+
+```
+cp -r <arrow-library-repository>/build/site/* arrow-site/build/site/
+```
+
+### 4. Run the website in your local server
 
 ```bash
+cd arrow-site
 bundle install --gemfile Gemfile --path vendor/bundle
 bundle exec jekyll serve -s build/site/
 ```
