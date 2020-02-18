@@ -36,7 +36,7 @@ buildscript {
     }
 }
 
-def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
+def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/apidocs"
 allprojects {
     apply plugin: 'base'
 

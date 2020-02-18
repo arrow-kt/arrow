@@ -115,9 +115,9 @@ dependencies {
 
 Each of these modules provides wrappers over the datatypes in each of the libraries that implement all the typeclasses provided by arrow-fx
 
-[Rx]({{ 'docs/integrations/rx2/' | relative_url }})
+[Rx]({{ 'integrations/rx2/' | relative_url }})
 
-[Reactor]({{ 'docs/integrations/reactor/' | relative_url }})
+[Reactor]({{ 'integrations/reactor/' | relative_url }})
 
 Dependency: `arrow-fx`
 
@@ -187,7 +187,7 @@ dependencies {
 }
 ```
 
-The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
+The [adapter]({{ 'integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
 
 Dependency: `arrow-fx`
 

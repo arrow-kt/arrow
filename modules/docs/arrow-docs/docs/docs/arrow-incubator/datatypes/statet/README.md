@@ -22,7 +22,7 @@ Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-
 
 In the most basic of scenarios, we'll only be dealing with one monad at a time, making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `Either<Error, A>`, and others will return `State<S, A>`.
 
-So let's rewrite the example of [`State` docs]({{ '/arrow/data/state' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList`, let's represent it as a `List`.
+So let's rewrite the example of [`State` docs]({{ '/arrow/mtl/state/' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList`, let's represent it as a `List`.
 
 ```kotlin:ank
 import arrow.core.Tuple2

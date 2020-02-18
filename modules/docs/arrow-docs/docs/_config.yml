@@ -97,16 +97,6 @@ defaults:
     values:
       layout: "docs-incubator"
   - scope:
-      path: "apidocs/arrow-meta"
-      type: "pages"
-    values:
-      layout: "docs-meta"
-  - scope:
-      path: "apidocs/arrow-meta-test-models"
-      type: "pages"
-    values:
-      layout: "docs-meta"
-  - scope:
       path: "apidocs"
       type: "pages"
     values:

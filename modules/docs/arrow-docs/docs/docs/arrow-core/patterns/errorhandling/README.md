@@ -121,7 +121,7 @@ Arrow provides proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
-We use [`Option`]({{'/arrow/core/option' | relative_url }}) to model the potential absence of a value.
+We use [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to model the potential absence of a value.
 
 When using `Option`, our previous example may look like:
 

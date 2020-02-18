@@ -9,7 +9,7 @@ permalink: /integrations/retrofit/
 
 
 
-Arrow contains an integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/arrow/core/try' | relative_url }}), [`ObservableK`]({{ '/integrations/rx2' | relative_url }}), or [`IO`]({{ '/effects/io' | relative_url }}).
+Arrow contains an integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), [`ObservableK`]({{ '/integrations/rx2' | relative_url }}), or [`IO`]({{ '/effects/io' | relative_url }}).
 
 
 ### Using `Call` directly with extensions functions
