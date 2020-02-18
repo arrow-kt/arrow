@@ -2,8 +2,6 @@
 layout: docs-core
 title: Profunctor
 permalink: /arrow/typeclasses/profunctor/
-redirect_from:
-  - /typeclasses/profunctor/
 ---
 
 ## Profunctor

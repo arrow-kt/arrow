@@ -2,8 +2,6 @@
 layout: docs-core
 title: Selective
 permalink: /arrow/typeclasses/selective/
-redirect_from:
-  - /typeclasses/selective/
 ---
 
 ## Selective

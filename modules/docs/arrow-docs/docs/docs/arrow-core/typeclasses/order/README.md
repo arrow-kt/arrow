@@ -2,8 +2,6 @@
 layout: docs-core
 title: Order
 permalink: /arrow/typeclasses/order/
-redirect_from:
-  - /typeclasses/order/
 ---
 
 ## Order

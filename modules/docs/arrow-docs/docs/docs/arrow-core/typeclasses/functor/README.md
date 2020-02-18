@@ -2,8 +2,6 @@
 layout: docs-core
 title: Functor
 permalink: /arrow/typeclasses/functor/
-redirect_from:
-  - /typeclasses/functor/
 video: EUqg3fSahhk
 ---
 

@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: MonadState
 permalink: /arrow/mtl/typeclasses/monadstate/
-redirect_from:
-  - /typeclasses/monadstate/
 ---
 
 ## MonadState

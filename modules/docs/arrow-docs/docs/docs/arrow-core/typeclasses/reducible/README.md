@@ -2,8 +2,6 @@
 layout: docs-core
 title: Reducible
 permalink: /arrow/typeclasses/reducible/
-redirect_from:
-  - /typeclasses/reducible/
 ---
 
 ## Reducible

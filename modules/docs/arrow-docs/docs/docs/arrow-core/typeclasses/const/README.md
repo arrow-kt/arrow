@@ -2,8 +2,6 @@
 layout: docs-core
 title: Const
 permalink: /arrow/typeclasses/const/
-redirect_from:
-  - /datatypes/const/
 ---
 
 ## Const

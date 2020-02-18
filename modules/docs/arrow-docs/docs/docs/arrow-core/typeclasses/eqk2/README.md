@@ -2,8 +2,6 @@
 layout: docs-core
 title: EqK2
 permalink: /arrow/typeclasses/eqk2/
-redirect_from:
-  - /typeclasses/eqk2/
 ---
 
 ## EqK2

@@ -2,8 +2,6 @@
 layout: docs-core
 title: Divisible
 permalink: /arrow/typeclasses/divisible/
-redirect_from:
-  - /typeclasses/divisible
 ---
 
 ## Divisible

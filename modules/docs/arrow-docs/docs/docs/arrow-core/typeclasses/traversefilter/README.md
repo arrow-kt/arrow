@@ -2,8 +2,6 @@
 layout: docs-core
 title: TraverseFilter
 permalink: /arrow/typeclasses/traversefilter/
-redirect_from:
-  - /typeclasses/traversefilter/
 ---
 
 ## TraverseFilter

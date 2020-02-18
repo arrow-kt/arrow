@@ -130,7 +130,7 @@ disposable.dispose()
 While [`MonadDefer`]({{ '/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types.
 This is a limitation on reactor's side. See the corresponding GitHub [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
 
-To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe`, which is provided for every instance of [`Monad`]({{ '/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe`, which is provided for every instance of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
 ```kotlin:ank:playground
 import arrow.Kind

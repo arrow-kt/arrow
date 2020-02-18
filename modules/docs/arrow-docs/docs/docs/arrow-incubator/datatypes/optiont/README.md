@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: OptionT
 permalink: /arrow/mtl/optiont/
-redirect_from:
-  - /datatypes/optiont/
 video: EWfxL9yBUJo
 ---
 

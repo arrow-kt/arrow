@@ -2,8 +2,6 @@
 layout: docs-core
 title: Applicative
 permalink: /arrow/typeclasses/applicative/
-redirect_from:
-  - /typeclasses/applicative/
 ---
 
 ## Applicative

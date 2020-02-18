@@ -2,8 +2,6 @@
 layout: docs-core
 title: MonadCombine
 permalink: /arrow/typeclasses/monadcombine/
-redirect_from:
-  - /typeclasses/monadcombine/
 ---
 
 ## MonadCombine

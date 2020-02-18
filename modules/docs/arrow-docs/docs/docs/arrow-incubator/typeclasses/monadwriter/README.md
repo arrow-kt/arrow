@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: MonadWriter
 permalink: /arrow/mtl/typeclasses/monadwriter/
-redirect_from:
-  - /typeclasses/monadwriter/
 ---
 
 ## MonadWriter

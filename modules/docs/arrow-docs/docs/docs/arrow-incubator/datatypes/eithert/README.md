@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: EitherT
 permalink: /arrow/mtl/eithert/
-redirect_from:
-  - /datatypes/eithert/
 video: 1h4X8CrMjVs
 ---
 

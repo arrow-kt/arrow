@@ -2,8 +2,6 @@
 layout: docs-core
 title: Divide
 permalink: /arrow/typeclasses/divide/
-redirect_from:
-  - /typeclasses/divide
 ---
 
 ## Divide

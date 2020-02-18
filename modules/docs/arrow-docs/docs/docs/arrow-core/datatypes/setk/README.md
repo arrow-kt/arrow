@@ -2,8 +2,6 @@
 layout: docs-core
 title: SetK
 permalink: /arrow/core/setk/
-redirect_from:
-  - /datatypes/setk/
 video: xtnyCqeLI_4
 ---
 

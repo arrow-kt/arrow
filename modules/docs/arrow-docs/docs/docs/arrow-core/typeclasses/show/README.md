@@ -2,8 +2,6 @@
 layout: docs-core
 title: Show
 permalink: /arrow/typeclasses/show/
-redirect_from:
-  - /typeclasses/show/
 ---
 
 ## Show

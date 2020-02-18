@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: State
 permalink: /arrow/mtl/state/
-redirect_from:
-  - /datatypes/state/
 video: GcXC0xARSXg
 ---
 

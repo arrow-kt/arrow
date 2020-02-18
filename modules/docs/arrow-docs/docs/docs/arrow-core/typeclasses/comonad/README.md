@@ -2,8 +2,6 @@
 layout: docs-core
 title: Comonad
 permalink: /arrow/typeclasses/comonad/
-redirect_from:
-  - /typeclasses/comonad/
 ---
 
 ## Comonad

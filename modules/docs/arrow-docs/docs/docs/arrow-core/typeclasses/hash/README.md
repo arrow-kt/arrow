@@ -2,8 +2,6 @@
 layout: docs-core
 title: Hash
 permalink: /arrow/typeclasses/hash/
-redirect_from:
-  - /typeclasses/hash/
 ---
 
 ## Hash

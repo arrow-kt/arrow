@@ -2,8 +2,6 @@
 layout: docs-core
 title: MonoidK
 permalink: /arrow/typeclasses/monoidk/
-redirect_from:
-  - /typeclasses/monoidk/
 ---
 
 ## MonoidK

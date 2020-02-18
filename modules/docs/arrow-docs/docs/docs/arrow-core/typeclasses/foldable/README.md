@@ -2,8 +2,6 @@
 layout: docs-core
 title: Foldable
 permalink: /arrow/typeclasses/foldable/
-redirect_from:
-  - /typeclasses/foldable/
 ---
 
 ## Foldable

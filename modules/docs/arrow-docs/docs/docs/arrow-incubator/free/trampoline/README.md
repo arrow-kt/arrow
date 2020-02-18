@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: Trampoline
 permalink: /free/trampoline/
-redirect_from:
-  - /datatypes/trampoline/
 ---
 
 ## Trampoline

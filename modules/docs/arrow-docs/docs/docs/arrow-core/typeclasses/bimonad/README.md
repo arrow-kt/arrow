@@ -2,8 +2,6 @@
 layout: docs-core
 title: Bimonad
 permalink: /arrow/typeclasses/bimonad/
-redirect_from:
-  - /typeclasses/bimonad/
 ---
 
 ## Bimonad

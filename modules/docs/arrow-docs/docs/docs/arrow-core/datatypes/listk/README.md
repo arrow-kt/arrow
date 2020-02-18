@@ -2,8 +2,6 @@
 layout: docs-core
 title: ListK
 permalink: /arrow/core/listk/
-redirect_from:
-  - /datatypes/listk/
 ---
 
 ## ListK

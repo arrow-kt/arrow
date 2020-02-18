@@ -2,8 +2,6 @@
 layout: docs-core
 title: Monad
 permalink: /arrow/typeclasses/monad/
-redirect_from:
-  - /typeclasses/monad/
 ---
 
 ## Monad

@@ -2,8 +2,6 @@
 layout: docs-core
 title: Bicrosswalk
 permalink: /arrow/typeclasses/bicrosswalk/
-redirect_from:
-  - /typeclasses/bicrosswalk/
 ---
 
 ## Bicrosswalk

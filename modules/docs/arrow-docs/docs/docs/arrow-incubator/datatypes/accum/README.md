@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: Accum
 permalink: /arrow/mtl/accum/
-redirect_from:
-  - /datatypes/accum/
 ---
 
 ## Accum

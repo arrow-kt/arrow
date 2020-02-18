@@ -2,8 +2,6 @@
 layout: docs-core
 title: SequenceK
 permalink: /arrow/core/sequencek/
-redirect_from:
-  - /datatypes/sequencek/
 ---
 
 ## SequenceK

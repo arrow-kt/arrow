@@ -2,8 +2,6 @@
 layout: docs-core
 title: FunctorFilter
 permalink: /arrow/typeclasses/functorfilter/
-redirect_from:
-  - /typeclasses/functorfilter/
 ---
 
 ## FunctorFilter

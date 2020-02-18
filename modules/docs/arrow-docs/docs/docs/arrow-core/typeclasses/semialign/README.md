@@ -2,8 +2,6 @@
 layout: docs-core
 title: Semialign
 permalink: /arrow/typeclasses/semialign/
-redirect_from:
-  - /typeclasses/semialign/
 ---
 
 ## Semialign

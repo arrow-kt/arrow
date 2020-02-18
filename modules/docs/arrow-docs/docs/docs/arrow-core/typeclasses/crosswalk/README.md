@@ -2,8 +2,6 @@
 layout: docs-core
 title: Crosswalk
 permalink: /arrow/typeclasses/crosswalk/
-redirect_from:
-  - /typeclasses/crosswalk/
 ---
 
 ## Crosswalk

@@ -2,8 +2,6 @@
 layout: docs-core
 title: ApplicativeError
 permalink: /arrow/typeclasses/applicativeerror/
-redirect_from:
-  - /typeclasses/applicativeerror/
 ---
 
 ## ApplicativeError

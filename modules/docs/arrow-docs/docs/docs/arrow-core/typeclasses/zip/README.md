@@ -2,8 +2,6 @@
 layout: docs-core
 title: Zip
 permalink: /arrow/typeclasses/zip/
-redirect_from:
-  - /typeclasses/zip/
 ---
 
 ## Zip

@@ -2,8 +2,6 @@
 layout: docs-core
 title: Semigroup
 permalink: /arrow/typeclasses/semigroup/
-redirect_from:
-  - /typeclasses/semigroup/
 ---
 
 ## Semigroup

@@ -2,8 +2,6 @@
 layout: docs-core
 title: Day
 permalink: /arrow/ui/day/
-redirect_from:
-  - /datatypes/day/
 ---
 
 ## Day

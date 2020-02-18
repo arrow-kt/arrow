@@ -2,8 +2,6 @@
 layout: docs-core
 title: NonEmptyList
 permalink: /arrow/core/nonemptylist/
-redirect_from:
-  - /datatypes/nonemptylist/
 video: TC6IzE61OyE
 ---
 

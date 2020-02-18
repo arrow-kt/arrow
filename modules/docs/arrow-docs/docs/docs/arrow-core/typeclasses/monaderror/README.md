@@ -2,8 +2,6 @@
 layout: docs-core
 title: MonadError
 permalink: /arrow/typeclasses/monaderror/
-redirect_from:
-  - /typeclasses/monaderror/
 ---
 
 ## MonadError

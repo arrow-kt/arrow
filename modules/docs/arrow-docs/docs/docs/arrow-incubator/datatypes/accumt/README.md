@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: AccumT
 permalink: /arrow/mtl/accumt/
-redirect_from:
-  - /datatypes/accumt/
 ---
 
 ## AccumT

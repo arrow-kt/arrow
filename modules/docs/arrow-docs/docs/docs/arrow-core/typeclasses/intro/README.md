@@ -200,7 +200,7 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadWriter`]({{ '/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/arrow/mtl/writert/' | relative_url }})
 
-- [`MonadState`]({{ '/arrow/mtl/typeclasses/monadstate' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/datatypes/state/' | relative_url }})
+- [`MonadState`]({{ '/arrow/mtl/typeclasses/monadstate' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/arrow/mtl/state/' | relative_url }})
 
 #### Optics
 

@@ -2,8 +2,6 @@
 layout: docs-core
 title: Sum
 permalink: /arrow/ui/sum/
-redirect_from:
-  - /datatypes/sum/
 ---
 
 ## Sum

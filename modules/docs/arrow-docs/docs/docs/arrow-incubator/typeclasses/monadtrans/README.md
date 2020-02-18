@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: MonadTrans
 permalink: /arrow/mtl/typeclasses/monadtrans/
-redirect_from:
-  - /typeclasses/monadtrans/
 ---
 
 ## MonadTrans
@@ -24,7 +22,7 @@ OptionT.monadTrans().run {
 
 ### Laws
 
-Arrow provides [`MonadTransLaws`][laws_source]{:target="_blank"} in the form of test cases for internal 
+Arrow provides [`MonadTransLaws`][laws_source]{:target="_blank"} in the form of test cases for internal
 verification of lawful instances and third party apps creating their own `MonadTrans` instances.
 
 #### Creating your own `MonadTrans` instances

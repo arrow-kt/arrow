@@ -2,8 +2,6 @@
 layout: docs-core
 title: Unalign
 permalink: /arrow/typeclasses/unalign/
-redirect_from:
-  - /typeclasses/unalign/
 ---
 
 ## Unalign

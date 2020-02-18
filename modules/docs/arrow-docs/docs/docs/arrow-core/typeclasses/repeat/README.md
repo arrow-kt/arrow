@@ -2,8 +2,6 @@
 layout: docs-core
 title: Repeat
 permalink: /arrow/typeclasses/repeat/
-redirect_from:
-  - /typeclasses/repeat/
 ---
 
 ## Repeat

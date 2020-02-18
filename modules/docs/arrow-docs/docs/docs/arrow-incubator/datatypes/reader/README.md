@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: Reader
 permalink: /arrow/mtl/reader/
-redirect_from:
-  - /datatypes/reader/
 ---
 
 ## Reader

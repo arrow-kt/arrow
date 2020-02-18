@@ -2,8 +2,6 @@
 layout: docs-core
 title: Bifunctor
 permalink: /arrow/typeclasses/bifunctor/
-redirect_from:
-  - /typeclasses/bifunctor/
 ---
 
 ## Bifunctor

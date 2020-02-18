@@ -2,8 +2,6 @@
 layout: docs-core
 title: Alternative
 permalink: /arrow/typeclasses/alternative/
-redirect_from:
-  - /typeclasses/alternative/
 ---
 
 ## Alternative

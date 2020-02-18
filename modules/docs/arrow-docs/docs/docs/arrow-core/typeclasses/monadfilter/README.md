@@ -2,8 +2,6 @@
 layout: docs-core
 title: MonadFilter
 permalink: /arrow/typeclasses/monadfilter/
-redirect_from:
-  - /typeclasses/monadfilter/
 ---
 
 ## MonadFilter

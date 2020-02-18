@@ -2,8 +2,6 @@
 layout: docs-core
 title: Moore
 permalink: /arrow/ui/moore/
-redirect_from:
-  - /datatypes/moore/
 ---
 
 ## Moore

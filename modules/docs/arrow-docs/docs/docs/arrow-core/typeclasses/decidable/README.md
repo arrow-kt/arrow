@@ -2,8 +2,6 @@
 layout: docs-core
 title: Decidable
 permalink: /arrow/typeclasses/decidable/
-redirect_from:
-  - /typeclasses/decidable
 ---
 
 ## Decidable

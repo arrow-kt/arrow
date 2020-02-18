@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: WriterT
 permalink: /arrow/mtl/writert/
-redirect_from:
-  - /datatypes/writert/
 ---
 
 ## WriterT

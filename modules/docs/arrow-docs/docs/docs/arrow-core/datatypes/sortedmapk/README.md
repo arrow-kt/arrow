@@ -2,8 +2,6 @@
 layout: docs-core
 title: SortedMapK
 permalink: /arrow/core/sortedmapk/
-redirect_from:
-  - /datatypes/sortedmapk/
 ---
 
 ## SortedMapK

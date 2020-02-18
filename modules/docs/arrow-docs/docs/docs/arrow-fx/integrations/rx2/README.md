@@ -192,7 +192,7 @@ disposable.dispose()
 While [`MonadDefer`]({{ '/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types.
 This is a limitation on rx2's side. See the corresponding github [issue]({{ 'https://github.com/ReactiveX/RxJava/issues/6322' }}).
 
-To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
 ```kotlin:ank:playground
 import arrow.Kind

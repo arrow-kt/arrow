@@ -2,8 +2,6 @@
 layout: docs-incubator
 title: MonadReader
 permalink: /arrow/mtl/typeclasses/monadreader/
-redirect_from:
-  - /typeclasses/monadreader/
 ---
 
 ## MonadReader

@@ -243,4 +243,4 @@ Remember, this means that you have to precompute thread local values, like a thr
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-Check out the section on the [Applicative Builder]({{ '/typeclasses/applicative' | relative_url }}) pattern for information about this.
+Check out the section on the [Applicative Builder]({{ '/arrow/typeclasses/applicative' | relative_url }}) pattern for information about this.

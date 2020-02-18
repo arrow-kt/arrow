@@ -2,8 +2,6 @@
 layout: docs-core
 title: Align
 permalink: /arrow/typeclasses/align/
-redirect_from:
-  - /typeclasses/align/
 ---
 
 ## Align

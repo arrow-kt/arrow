@@ -2,8 +2,6 @@
 layout: docs-core
 title: MapK
 permalink: /arrow/core/mapk/
-redirect_from:
-  - /datatypes/mapk/
 ---
 
 ## MapK

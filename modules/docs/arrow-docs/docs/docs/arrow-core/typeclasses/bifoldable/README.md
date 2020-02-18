@@ -2,8 +2,6 @@
 layout: docs-core
 title: Bifoldable
 permalink: /arrow/typeclasses/bifoldable/
-redirect_from:
-  - /typeclasses/bifoldable/
 ---
 
 ## Bifoldable

@@ -2,8 +2,6 @@
 layout: docs-core
 title: SemigroupK
 permalink: /arrow/typeclasses/semigroupk/
-redirect_from:
-  - /typeclasses/semigroupk/
 ---
 
 ## SemigroupK

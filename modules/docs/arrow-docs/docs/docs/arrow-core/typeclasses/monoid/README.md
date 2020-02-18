@@ -2,8 +2,6 @@
 layout: docs-core
 title: Monoid
 permalink: /arrow/typeclasses/monoid/
-redirect_from:
-  - /typeclasses/monoid/
 ---
 
 ## Monoid

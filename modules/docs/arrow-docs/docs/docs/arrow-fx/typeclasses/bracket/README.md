@@ -2,8 +2,6 @@
 layout: docs-fx
 title: Bracket
 permalink: /fx/typeclasses/bracket/
-redirect_from:
-  - /typeclasses/bracket/
 video: EUqg3fSahhk
 ---
 

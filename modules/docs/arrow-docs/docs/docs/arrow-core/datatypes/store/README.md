@@ -2,8 +2,6 @@
 layout: docs-core
 title: Store
 permalink: /arrow/ui/store/
-redirect_from:
-  - /datatypes/store/
 ---
 
 ## Store

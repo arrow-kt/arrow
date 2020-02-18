@@ -2,8 +2,6 @@
 layout: docs-core
 title: Eq
 permalink: /arrow/typeclasses/eq/
-redirect_from:
-  - /typeclasses/eq/
 ---
 
 ## Eq
