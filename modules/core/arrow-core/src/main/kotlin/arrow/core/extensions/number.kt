@@ -19,8 +19,9 @@ interface ByteMonoid : Monoid<Byte>, ByteSemigroup {
   override fun empty(): Byte = 0
 }
 
-interface ByteSemiring : Semiring<Byte>, ByteMonoid {
+interface ByteSemiring : Semiring<Byte> {
   override fun one(): Byte = 1
+  override fun zero(): Byte = 0
 
   override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
   override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
@@ -75,8 +76,9 @@ interface DoubleMonoid : Monoid<Double>, DoubleSemigroup {
   override fun empty(): Double = .0
 }
 
-interface DoubleSemiring : Semiring<Double>, DoubleMonoid {
+interface DoubleSemiring : Semiring<Double> {
   override fun one(): Double = 1.0
+  override fun zero(): Double = 0.0
 
   override fun Double.combine(b: Double): Double = this + b
   override fun Double.combineMultiplicate(b: Double): Double = this * b
@@ -130,8 +132,9 @@ interface IntMonoid : Monoid<Int>, IntSemigroup {
   override fun empty(): Int = 0
 }
 
-interface IntSemiring : Semiring<Int>, IntMonoid {
+interface IntSemiring : Semiring<Int> {
   override fun one(): Int = 1
+  override fun zero(): Int = 0
 
   override fun Int.combine(b: Int): Int = this + b
   override fun Int.combineMultiplicate(b: Int): Int = this * b
@@ -186,8 +189,9 @@ interface LongMonoid : Monoid<Long>, LongSemigroup {
   override fun empty(): Long = 0L
 }
 
-interface LongSemiring : Semiring<Long>, LongMonoid {
+interface LongSemiring : Semiring<Long> {
   override fun one(): Long = 1
+  override fun zero(): Long = 0
 
   override fun Long.combine(b: Long): Long = this + b
   override fun Long.combineMultiplicate(b: Long): Long = this * b
@@ -242,8 +246,9 @@ interface ShortMonoid : Monoid<Short>, ShortSemigroup {
   override fun empty(): Short = 0
 }
 
-interface ShortSemiring : Semiring<Short>, ShortMonoid {
+interface ShortSemiring : Semiring<Short> {
   override fun one(): Short = 1
+  override fun zero(): Short = 0
 
   override fun Short.combine(b: Short): Short = (this + b).toShort()
   override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
@@ -298,8 +303,9 @@ interface FloatMonoid : Monoid<Float>, FloatSemigroup {
   override fun empty(): Float = 0f
 }
 
-interface FloatSemiring : Semiring<Float>, FloatMonoid {
+interface FloatSemiring : Semiring<Float> {
   override fun one(): Float = 1f
+  override fun zero(): Float = 0f
 
   override fun Float.combine(b: Float): Float = this + b
   override fun Float.combineMultiplicate(b: Float): Float = this * b

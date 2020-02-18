@@ -43,7 +43,7 @@ interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input
   fun MF(): Monad<F>
 
   override fun <A> just(a: A): Kind<SchedulePartialOf<F, Input>, A> =
-    Schedule.once<F, A>(MF()).const(a) as Schedule<F, Input, A>
+    Schedule.forever<F, A>(MF()).const(a) as Schedule<F, Input, A>
 
   override fun <A, B> Kind<SchedulePartialOf<F, Input>, A>.map(f: (A) -> B): Kind<SchedulePartialOf<F, Input>, B> =
     fix().map(f)
@@ -63,19 +63,7 @@ interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>,
   fun MF(): Monad<F>
 
   override fun empty(): Schedule<F, Input, Output> =
-    Schedule.once<F, Input>(MF()).const(OI().empty())
-}
-
-@extension
-interface ScheduleSemiring<F, Input, Output> : Semiring<Schedule<F, Input, Output>>, ScheduleMonoid<F, Input, Output> {
-  override fun OI(): Semiring<Output>
-  override fun MF(): Monad<F>
-
-  override fun one(): Schedule<F, Input, Output> =
-    Schedule.once<F, Input>(MF()).const(OI().one())
-
-  override fun Schedule<F, Input, Output>.combineMultiplicate(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
-    and(b).map { (a, b) -> OI().run { a * b } }
+    Schedule.forever<F, Input>(MF()).const(OI().empty())
 }
 
 @extension

@@ -6,9 +6,9 @@ import arrow.documented
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Semiring)
  *
- * The [Semiring] type class for a given type `A` extends the [Monoid] type class by adding a `combineMultiplicate` and an
- * [one] function. [combineMultiplicate] also takes two values and returns a value of type `A` and guarantees to be
- * associative:
+ * The [Semiring] type class for a given type `A` combines both a commutative additive [Monoid] and a multiplicative [Monoid].
+ *  It requires the multiplicative [Monoid] to distribute over the additive one. The operations of the multiplicative [Monoid] have been renamed to
+ *  [one] and [combineMultiplicate] for easier use.
  *
  * ```kotlin
  * (a.combineMultiplicate(b)).combineMultiplicate(c) == a.combineMultiplicate(b.combineMultiplicate(c))
@@ -137,40 +137,42 @@ import arrow.documented
  * ```
  */
 @documented
-interface Semiring<A> : Monoid<A> {
+interface Semiring<A> {
 
-    /**
-     * A zero value for this A
-     */
-    fun zero(): A =
-      empty()
+  /**
+   * A zero value for this A
+   */
+  fun zero(): A
 
-    /**
-     * A one value for this A
-     */
-    fun one(): A
+  /**
+   * A one value for this A
+   */
+  fun one(): A
 
-    /**
-     * Multiplicatively combine two [A] values.
-     */
-    fun A.combineMultiplicate(b: A): A
+  fun A.combine(b: A): A
 
-    operator fun A.times(b: A): A =
-            this.combineMultiplicate(b)
+  operator fun A.plus(b: A): A = combine(b)
 
-    /**
-     * Maybe additively combine two [A] values.
-     */
-    fun A?.maybeCombineAddition(b: A?): A {
-        if (this == null) return zero()
-        return Option.fromNullable(b).fold({ this }, { combine(it) })
-    }
+  /**
+   * Multiplicatively combine two [A] values.
+   */
+  fun A.combineMultiplicate(b: A): A
 
-    /**
-     * Maybe multiplicatively combine two [A] values.
-     */
-    fun A?.maybeCombineMultiplicate(b: A?): A {
-        if (this == null) return one()
-        return Option.fromNullable(b).fold({ this }, { combineMultiplicate(it) })
-    }
+  operator fun A.times(b: A): A = this.combineMultiplicate(b)
+
+  /**
+   * Maybe additively combine two [A] values.
+   */
+  fun A?.maybeCombineAddition(b: A?): A {
+    if (this == null) return zero()
+    return Option.fromNullable(b).fold({ this }, { combine(it) })
+  }
+
+  /**
+   * Maybe multiplicatively combine two [A] values.
+   */
+  fun A?.maybeCombineMultiplicate(b: A?): A {
+    if (this == null) return one()
+    return Option.fromNullable(b).fold({ this }, { combineMultiplicate(it) })
+  }
 }
