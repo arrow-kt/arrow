@@ -21,7 +21,6 @@ import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Semiring
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 

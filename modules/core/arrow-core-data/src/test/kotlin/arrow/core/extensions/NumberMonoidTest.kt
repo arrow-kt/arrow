@@ -10,7 +10,6 @@ import arrow.test.generators.longSmall
 import arrow.test.generators.short
 import arrow.test.generators.shortSmall
 import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemiringLaws
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

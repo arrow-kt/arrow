@@ -16,7 +16,6 @@ import arrow.core.Tuple2
 import arrow.core.extensions.option.apply.apply
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
-import arrow.core.extensions.option.monoid.monoid
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
@@ -51,7 +50,6 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
