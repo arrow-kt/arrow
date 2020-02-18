@@ -3,11 +3,11 @@ package arrow.fx.mtl
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.internal.AtomicRefW
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
-import arrow.fx.Ref
 import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
@@ -47,18 +47,17 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
     use: (A) -> WriterTOf<F, W, B>
   ): WriterT<F, W, B> = MM().run {
     MD().run {
-      WriterT(Ref(this, empty()).flatMap { ref ->
-        value().bracketCase(use = { wa ->
-          WriterT(wa.just()).flatMap(use).value()
-        }, release = { wa, exitCase ->
-          val r = release(wa.b, exitCase).value()
-          when (exitCase) {
-            is ExitCase.Completed -> r.flatMap { (l, _) -> ref.set(l) }
-            else -> r.unit()
-          }
-        }).flatMap { (w, b) ->
-          ref.get().map { ww -> Tuple2(w.combine(ww), b) }
+      val atomic: AtomicRefW<W> = AtomicRefW(empty())
+      WriterT(value().bracketCase(use = { wa ->
+        WriterT(wa.just()).flatMap(use).value()
+      }, release = { wa, exitCase ->
+        val r = release(wa.b, exitCase).value()
+        when (exitCase) {
+          is ExitCase.Completed -> r.flatMap { (l, _) -> later { atomic.value = l } }
+          else -> r.unit()
         }
+      }).map { (w, b) ->
+        Tuple2(w.combine(atomic.value), b)
       })
     }
   }
@@ -119,6 +118,18 @@ interface WriterTConcurrent<F, W> : Concurrent<WriterTPartialOf<F, W>>, WriterTA
       Tuple2(MM().empty(), fiberT(fiber))
     }
     WriterT(fork)
+  }
+
+  override fun <A, B, C> CoroutineContext.parMapN(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, f: (A, B) -> C): WriterT<F, W, C> = CF().run {
+    WriterT(parMapN(fa.value(), fb.value()) { (w, a), (ww, b) ->
+      Tuple2(MM().run { w.combine(ww) }, f(a, b))
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>, fc: WriterTOf<F, W, C>, f: (A, B, C) -> D): WriterT<F, W, D> = CF().run {
+    WriterT(parMapN(fa.value(), fb.value(), fc.value()) { (w, a), (ww, b), (www, c) ->
+      Tuple2(MM().run { w.combine(ww).combine(www) }, f(a, b, c))
+    })
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: WriterTOf<F, W, A>, fb: WriterTOf<F, W, B>): WriterT<F, W, RacePair<WriterTPartialOf<F, W>, A, B>> = CF().run {

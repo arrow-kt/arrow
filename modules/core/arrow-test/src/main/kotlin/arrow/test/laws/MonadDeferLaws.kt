@@ -26,7 +26,8 @@ object MonadDeferLaws {
     SC: MonadDefer<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
@@ -46,10 +47,10 @@ object MonadDeferLaws {
       Law("MonadDefer laws: lazy should be consistent") { SC.derivedLazyConsistent(GENK, EQ) }
     ) + if (testStackSafety) {
       listOf(
-        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(20_000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(20_000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(20_000, EQ) },
-        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(20_000, EQ) }
+        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(iterations, EQ) },
+        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(iterations, EQ) },
+        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(iterations, EQ) },
+        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(iterations, EQ) }
       )
     } else {
       emptyList()
@@ -60,11 +61,12 @@ object MonadDeferLaws {
     SC: MonadDefer<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
       BracketLaws.laws(SC, GENK, EQK) +
         MonadThrowLaws.laws(SC, GENK, EQK) +
-          monadDeferLaws(SC, GENK, EQK, testStackSafety)
+          monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> laws(
     SC: MonadDefer<F>,
@@ -73,7 +75,8 @@ object MonadDeferLaws {
     SL: Selective<F>,
     GENK: GenK<F>,
     EQK: EqK<F>,
-    testStackSafety: Boolean = true
+    testStackSafety: Boolean = true,
+    iterations: Int = 20_000
   ): List<Law> =
       BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
         MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
