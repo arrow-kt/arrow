@@ -6,15 +6,17 @@
 
 :heavy_check_mark: Repositories > `Settings` > `Manage access`
 
-:white_large_square: Repositories > `Settings` > `Secrets`: [How to create secrets](how-to-create-secrets.md)
+:heavy_check_mark: Repositories > `Settings` > `Secrets`: [How to create secrets](how-to-create-secrets.md)
 
 * :heavy_check_mark: `AWS_ACCESS_KEY_ID`
 * :heavy_check_mark: `AWS_CLOUDFRONT_ID`
 * :heavy_check_mark: `AWS_SECRET_ACCESS_KEY`
 * :heavy_check_mark: `S3_BUCKET`
-* :white_large_square: `BINTRAY_API_KEY`
-* :white_large_square: `BINTRAY_USER`
+* :heavy_check_mark: `BINTRAY_API_KEY`
+* :heavy_check_mark: `BINTRAY_USER`
 * :heavy_check_mark: `BOT_GITHUB_TOKEN`
+
+:white_large_square: Adapt paths to the new S3 organization (pending of receiving the new organization).
 
 :white_large_square: Check if there are new artifacts to consider.
 
