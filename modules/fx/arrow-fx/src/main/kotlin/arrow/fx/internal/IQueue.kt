@@ -56,11 +56,11 @@ class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iter
 
   fun dequeue(): Tuple2<A, IQueue<A>> =
     when {
-      lOut.isEmpty() && !lIn.isEmpty() -> {
+      lOut.isEmpty() && lIn.isNotEmpty() -> {
         val rev = lIn.reversed()
         rev.head() toT IQueue(emptyList(), rev.tail())
       }
-      lOut.nonEmpty() -> lOut.head() toT IQueue(lIn, lOut.tail())
+      lOut.isNotEmpty() -> lOut.head() toT IQueue(lIn, lOut.tail())
       else -> throw NoSuchElementException("dequeue on empty queue")
     }
 

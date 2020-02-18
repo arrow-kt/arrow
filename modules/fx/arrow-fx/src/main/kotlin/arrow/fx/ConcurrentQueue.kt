@@ -208,4 +208,12 @@ class ConcurrentQueue<F, A> internal constructor(
         }
     }
   }
+
+  companion object {
+    fun <F, A> empty(CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      Ref<Queue.State<F, A>>(Queue.State.Surplus(IQueue.empty(), IQueue.empty(), this, unit())).map {
+        ConcurrentQueue(ConcurrentQueue.SurplusStrategy.Unbounded(this), it, this)
+      }
+    }
+  }
 }

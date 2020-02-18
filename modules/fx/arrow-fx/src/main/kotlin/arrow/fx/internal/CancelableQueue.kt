@@ -8,6 +8,7 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.internal.AtomicRefW
+import arrow.core.left
 
 import arrow.fx.Queue
 import arrow.fx.QueueShutdown
@@ -19,14 +20,13 @@ import arrow.fx.typeclasses.rightUnit
 import arrow.typeclasses.Applicative
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelableQueue<F, A> internal constructor(
+class CancelableQueue<F, A> internal constructor(
   initial: State<F, A>?,
   private val strategy: SurplusStrategy<F, A>,
   private val CF: Concurrent<F>
 ) : Concurrent<F> by CF, Queue<F, A> {
 
-  private val empty: State.Deficit<F, A> = State.Deficit(linkedMapOf(), linkedMapOf(), linkedMapOf())
-  private val state: AtomicRefW<State<F, A>> = AtomicRefW(initial ?: empty)
+  private val state: AtomicRefW<State<F, A>> = AtomicRefW(initial ?: State.empty())
 
   companion object {
     operator fun <F, A> invoke(initial: List<A>, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.later {
@@ -40,20 +40,22 @@ internal class CancelableQueue<F, A> internal constructor(
 
     internal sealed class State<F, out A> {
       data class Deficit<F, A>(
-        val reads: Map<Token, (Either<Nothing, A>) -> Unit>,
-        val takes: Map<Token, (Either<Nothing, A>) -> Unit>,
-        val shutdownHook: Map<Token, (Either<Nothing, Unit>) -> Unit>
+        val reads: Map<Token, (Either<Throwable, A>) -> Unit>,
+        val takes: Map<Token, (Either<Throwable, A>) -> Unit>,
+        val shutdownHook: Map<Token, (Either<Throwable, Unit>) -> Unit>
       ) : State<F, A>()
 
       data class Surplus<F, A>(
         val value: IQueue<A>,
-        val offers: Map<Token, Tuple2<A, (Either<Nothing, Unit>) -> Unit>>,
-        val shutdownHook: Map<Token, (Either<Nothing, Unit>) -> Unit>
+        val offers: Map<Token, Tuple2<A, (Either<Throwable, Unit>) -> Unit>>,
+        val shutdownHook: Map<Token, (Either<Throwable, Unit>) -> Unit>
       ) : State<F, A>()
 
       object Shutdown : State<Any?, Nothing>()
 
       companion object {
+        private val empty: State.Deficit<Any?, Any?> = State.Deficit(linkedMapOf(), linkedMapOf(), linkedMapOf())
+        fun <F, A> empty(): State.Deficit<F, A> = empty as State.Deficit<F, A>
         fun <F, A> shutdown(): State<F, A> =
           Shutdown as State<F, A>
       }
@@ -120,7 +122,7 @@ internal class CancelableQueue<F, A> internal constructor(
       is State.Shutdown -> raiseError(QueueShutdown)
     }
 
-  private tailrec fun unsafeRegisterAwaitShutdown(shutdown: (Either<Nothing, Unit>) -> Unit): Kind<F, CancelToken<F>> =
+  private tailrec fun unsafeRegisterAwaitShutdown(shutdown: (Either<Throwable, Unit>) -> Unit): Kind<F, CancelToken<F>> =
     when (val curr = state.value) {
       is State.Deficit -> {
         val token = Token()
@@ -176,11 +178,16 @@ internal class CancelableQueue<F, A> internal constructor(
     when (val current = state.value) {
       is State.Shutdown -> raiseError(QueueShutdown)
       is State.Surplus ->
-        if (state.compareAndSet(current, State.shutdown())) later { current.shutdownHook.values.forEach(mapUnit) }
-        else unsafeShutdown()
+        if (state.compareAndSet(current, State.shutdown())) later {
+          current.offers.values.forEach { (_, cb) -> cb(QueueShutdown.left()) }
+          current.shutdownHook.values.forEach { cb -> cb(rightUnit) }
+        } else unsafeShutdown()
       is State.Deficit ->
-        if (state.compareAndSet(current, State.shutdown())) later { current.shutdownHook.values.forEach(mapUnit) }
-        else unsafeShutdown()
+        if (state.compareAndSet(current, State.shutdown())) later {
+          current.takes.forEach { (_, cb) -> cb(QueueShutdown.left()) }
+          current.reads.forEach { (_, cb) -> cb(QueueShutdown.left()) }
+          current.shutdownHook.values.forEach { cb -> cb(rightUnit) }
+        } else unsafeShutdown()
     }
 
   private tailrec fun unsafeCancelAwaitShutdown(id: Token): Unit =
@@ -213,7 +220,7 @@ internal class CancelableQueue<F, A> internal constructor(
       is State.Surplus -> {
         val (head, tail) = current.value.dequeue()
         if (current.offers.isEmpty()) {
-          val update = if (tail.isEmpty()) empty.copy(shutdownHook = current.shutdownHook) else current.copy(value = tail)
+          val update = if (tail.isEmpty()) State.empty<F, A>().copy(shutdownHook = current.shutdownHook) else current.copy(value = tail)
           if (state.compareAndSet(current, update)) just(Some(head))
           else unsafeTryTake()
         } else {
@@ -233,7 +240,7 @@ internal class CancelableQueue<F, A> internal constructor(
       is State.Surplus -> {
         val (head, tail) = current.value.dequeue()
         if (current.offers.isEmpty()) {
-          val update = if (tail.isEmpty()) empty.copy(shutdownHook = current.shutdownHook) else current.copy(value = tail)
+          val update = if (tail.isEmpty()) State.empty<F, A>().copy(shutdownHook = current.shutdownHook) else current.copy(value = tail)
           if (state.compareAndSet(current, update)) {
             onTake(Right(head))
             just(unit())
@@ -242,7 +249,7 @@ internal class CancelableQueue<F, A> internal constructor(
           }
         } else {
           val (ax, notify) = current.offers.values.first()
-          val xs = current.offers.toList().drop(0)        // TODO ADD STRATEGY
+          val xs = current.offers.toList().drop(0) // TODO ADD STRATEGY
           if (state.compareAndSet(current, State.Surplus(tail.enqueue(ax), xs.toMap(), current.shutdownHook))) {
             later { notify(rightUnit) }.fork(EmptyCoroutineContext).map {
               onTake(Either.Right(head))
@@ -274,7 +281,7 @@ internal class CancelableQueue<F, A> internal constructor(
       else -> Unit
     }
 
-  private tailrec fun unsafeRead(onRead: (Either<Nothing, A>) -> Unit): Kind<F, Unit> =
+  private tailrec fun unsafeRead(onRead: (Either<Throwable, A>) -> Unit): Kind<F, Unit> =
     when (val current = state.value) {
       is State.Surplus -> {
         onRead(Right(current.value.head()))
@@ -323,7 +330,7 @@ internal class CancelableQueue<F, A> internal constructor(
     this@map.map(f)
   }
 
-  sealed class SurplusStrategy<F, A> {
+  internal sealed class SurplusStrategy<F, A> {
     abstract fun unsafeTryHandleSurplus(state: AtomicRefW<State<F, A>>, a: A, surplus: State.Surplus<F, A>): Kind<F, Boolean>?
 
     data class Bounded<F, A>(val capacity: Int, val AP: Applicative<F>) : SurplusStrategy<F, A>() {

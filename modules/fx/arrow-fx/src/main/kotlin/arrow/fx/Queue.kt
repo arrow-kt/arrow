@@ -66,6 +66,13 @@ interface Queue<F, A> :
   }
 
   companion object {
+    private fun <F> ensureCapacity(capacity: Int, CF: Concurrent<F>): Kind<F, Int> = CF.run {
+      just(capacity).ensure(
+        { IllegalArgumentException("Sliding queue must have a capacity greater than 0") },
+        { it > 0 }
+      )
+    }
+
     /**
      * A Queue can be in three states
      * Deficit:
@@ -78,37 +85,26 @@ interface Queue<F, A> :
      *  Holds no values or promises for suspended calls,
      *  an offer or take in Shutdown state creates a QueueShutdown error
      */
-    fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.later {
-      val state: CancelableQueue.Companion.State<F, A> =
-        if (capacity == 0) CancelableQueue.Companion.State.Surplus<F, A>(IQueue.empty(), linkedMapOf(), linkedMapOf())
-        else CancelableQueue.Companion.State.Deficit<F, A>(linkedMapOf(), linkedMapOf(), linkedMapOf())
-
-      CancelableQueue<F, A>(state, CancelableQueue.SurplusStrategy.Bounded(capacity, CF), CF)
-    }
-
-    fun <F, A> sliding(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
-      just(capacity).ensure(
-        { IllegalArgumentException("Sliding queue must have a capacity greater than 0") },
-        { it > 0 }
-      ).map { n ->
-        val state: CancelableQueue.Companion.State<F, A> =
-          if (capacity == 0) CancelableQueue.Companion.State.Surplus<F, A>(IQueue.empty(), linkedMapOf(), linkedMapOf())
-          else CancelableQueue.Companion.State.Deficit<F, A>(linkedMapOf(), linkedMapOf(), linkedMapOf())
-
-        CancelableQueue<F, A>(state, CancelableQueue.SurplusStrategy.Sliding(n, CF), CF)
+    fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      ensureCapacity(capacity, CF).map {
+        CancelableQueue<F, A>(CancelableQueue.Companion.State.empty(), CancelableQueue.SurplusStrategy.Bounded(capacity, CF), CF)
       }
     }
 
-    fun <F, A> dropping(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.later {
-      val state: CancelableQueue.Companion.State<F, A> =
-        if (capacity == 0) CancelableQueue.Companion.State.Surplus<F, A>(IQueue.empty(), linkedMapOf(), linkedMapOf())
-        else CancelableQueue.Companion.State.Deficit<F, A>(linkedMapOf(), linkedMapOf(), linkedMapOf())
+    fun <F, A> sliding(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      ensureCapacity(capacity, CF).map { n ->
+        CancelableQueue<F, A>(CancelableQueue.Companion.State.empty(), CancelableQueue.SurplusStrategy.Sliding(n, CF), CF)
+      }
+    }
 
-      CancelableQueue<F, A>(state, CancelableQueue.SurplusStrategy.Dropping(capacity, CF), CF)
+    fun <F, A> dropping(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
+      ensureCapacity(capacity, CF).map {
+        CancelableQueue<F, A>(CancelableQueue.Companion.State.empty(), CancelableQueue.SurplusStrategy.Dropping(capacity, CF), CF)
+      }
     }
 
     fun <F, A> unbounded(CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.later {
-      CancelableQueue<F, A>(CancelableQueue.Companion.State.Deficit(linkedMapOf(), linkedMapOf(), linkedMapOf()), CancelableQueue.SurplusStrategy.Unbounded(CF), CF)
+      CancelableQueue<F, A>(CancelableQueue.Companion.State.empty(), CancelableQueue.SurplusStrategy.Unbounded(CF), CF)
     }
   }
 }
