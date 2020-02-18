@@ -44,7 +44,7 @@ apply plugin: 'ank-gradle-plugin'
 
 ank {
     source = file("${projectDir}/docs")
-    target = file("${projectDir}/build/site")
+    target = file("${rootDir}/build/site")
     classpath = sourceSets.main.runtimeClasspath
 }
 
