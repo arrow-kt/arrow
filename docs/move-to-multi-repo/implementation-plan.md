@@ -42,7 +42,10 @@
 
 :white_large_square: **arrow** repository: move issues to the correspondent repositories
 
-:white_large_square: New repositories > Add issues about KTLint and Animals Sniffer
+:white_large_square: New repositories > Add issues about KTLint (xxenabled=false):
+* `arrow-fx/arrow-fx-kotlinx-coroutines/build.gradle`
+* `arrow-fx/build.gradle`
+* `arrow-ank/build.gradle`
 
 :white_large_square: Check that everything is working OK
 
