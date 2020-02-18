@@ -71,7 +71,7 @@ class StateTTests : UnitSpec() {
       ),
 
       SemigroupKLaws.laws(
-        StateT.semigroupK<ForOption, Int>(Option.monad(), Option.semigroupK()),
+        StateT.semigroupK<ForOption, Int>(Option.semigroupK()),
         StateT.genK(Option.genK(), Gen.int()),
         optionStateEQK),
 
@@ -89,8 +89,8 @@ class StateTTests : UnitSpec() {
 internal fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = object : EqK<StateTPartialOf<F, S>> {
   override fun <A> Kind<StateTPartialOf<F, S>, A>.eqK(other: Kind<StateTPartialOf<F, S>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
-      val ls = it.first.runM(M, s)
-      val rs = it.second.runM(M, s)
+      val ls = it.first.run(s)
+      val rs = it.second.run(s)
 
       EQKF.liftEq(Tuple2.eq(EQS, EQ)).run {
         ls.eqv(rs)
@@ -100,10 +100,7 @@ internal fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, 
 
 internal fun <F, S> StateT.Companion.genK(genkF: GenK<F>, genS: Gen<S>) = object : GenK<StateTPartialOf<F, S>> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<StateTPartialOf<F, S>, A>> =
-    genkF.genK(genkF.genK(Gen.tuple2(genS, gen)).map { state ->
-      val stateTFun: StateTFun<F, S, A> = { _: S -> state }
-      stateTFun
-    }).map {
-      StateT(it)
+    genkF.genK(Gen.tuple2(genS, gen)).map { state ->
+      StateT { _: S -> state }
     }
 }

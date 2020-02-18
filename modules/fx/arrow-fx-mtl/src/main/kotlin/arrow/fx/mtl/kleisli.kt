@@ -1,11 +1,13 @@
 package arrow.fx.mtl
 
 import arrow.Kind
+import arrow.core.AndThen
 import arrow.core.Either
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -22,6 +24,7 @@ import arrow.mtl.KleisliOf
 import arrow.mtl.KleisliPartialOf
 import arrow.mtl.extensions.KleisliMonad
 import arrow.mtl.extensions.KleisliMonadError
+import arrow.mtl.fix
 import arrow.mtl.run
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -99,7 +102,7 @@ interface KleisliAsync<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDefer<
     Kleisli { r -> ASF().asyncF { cb -> k(cb).run(r) } }
 
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
-    Kleisli { r -> run(r).continueOn(ctx) }
+    Kleisli(AndThen(fix().run).andThen { it.continueOn(ctx) })
   }
 }
 
@@ -155,6 +158,9 @@ fun <F, R> Kleisli.Companion.concurrent(CF: Concurrent<F>): Concurrent<KleisliPa
   object : KleisliConcurrent<F, R> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F, R> Kleisli.Companion.timer(CF: Concurrent<F>): Timer<KleisliPartialOf<F, R>> =
+  Timer(concurrent<F, R>(CF))
 
 @extension
 interface KleisliMonadIO<F, R> : MonadIO<KleisliPartialOf<F, R>>, KleisliMonad<F, R> {

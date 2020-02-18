@@ -13,6 +13,7 @@ import arrow.test.generators.GenK
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
+import arrow.test.generators.functionToA
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
 import arrow.typeclasses.Apply
@@ -29,9 +30,10 @@ object AsyncLaws {
   private val one = newSingleThreadContext("1")
   private val two = newSingleThreadContext("2")
 
-  private fun <F> asyncLaws(AC: Async<F>, EQK: EqK<F>): List<Law> {
+  private fun <F> asyncLaws(AC: Async<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
     val EQB = EQK.liftEq(Boolean.eq())
+    val EQString = EQK.liftEq(String.eq())
 
     return listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
@@ -43,7 +45,12 @@ object AsyncLaws {
       Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
       Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
       Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) },
-      Law("Async Laws: fx block runs lazily") { AC.fxLazyEvaluation(Boolean.eq(), EQB) }
+      Law("Async Laws: fx block runs lazily") { AC.fxLazyEvaluation(Boolean.eq(), EQB) },
+      Law("Async Laws: defer should be consistent with defer on provided coroutine context") { AC.derivedDefer(EQString) },
+      Law("Async Laws: laterOrRaise should be consistent with laterOrRaise on provided coroutine context") { AC.derivedLaterOrRaise(EQ) },
+      Law("Async Laws: continueOn should be consistent with continueOn on provided coroutine context") { AC.derivedContinueOn(EQ) },
+      Law("Async Laws: shift should be consistent with shift given a coroutine context") { AC.derivedShift(EQ) },
+      Law("Async Laws: effectMap constructs a suspend effect") { AC.effectMapSuspendEffect(GENK, EQ) }
     )
   }
 
@@ -54,7 +61,7 @@ object AsyncLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
     MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety) +
-      asyncLaws(AC, EQK)
+      asyncLaws(AC, GENK, EQK)
 
   fun <F> laws(
     AC: Async<F>,
@@ -66,7 +73,7 @@ object AsyncLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
     MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety) +
-      asyncLaws(AC, EQK)
+      asyncLaws(AC, GENK, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
@@ -161,6 +168,38 @@ object AsyncLaws {
 
       run.value.equalUnderTheLaw(false, EQ) &&
         p.equalUnderTheLaw(just(true), EQK)
+    }
+
+  fun <F> Async<F>.derivedDefer(EQK: Eq<Kind<F, String>>) {
+    val f: () -> Kind<F, String> = { effect { Thread.currentThread().name } }
+    defer(one, f).equalUnderTheLaw(just(Unit).continueOn(one).flatMap { defer(f) }, EQK)
+  }
+
+  fun <F> Async<F>.derivedLaterOrRaise(EQK: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.functionToA(Gen.either(Gen.throwable(), Gen.int()))) { f: () -> Either<Throwable, Int> ->
+      laterOrRaise(one, f).equalUnderTheLaw(defer(one) { f().fold({ raiseError<Int>(it) }, { just(it) }) }, EQK)
+    }
+
+  fun <F> Async<F>.derivedContinueOn(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.intSmall()) { threadId1: Int ->
+      val ctx = newSingleThreadContext(threadId1.toString())
+      fx.async {
+        continueOn(ctx)
+        getCurrentThread()
+      }
+      .equalUnderTheLaw(fx.async { ctx.shift().bind(); getCurrentThread() }, EQ)
+    }
+
+  fun <F> Async<F>.derivedShift(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(5, Gen.intSmall()) { threadId1: Int ->
+      val ctx = newSingleThreadContext(threadId1.toString())
+      ctx.shift().map { getCurrentThread() }
+        .equalUnderTheLaw(ctx.run { effect(this) { getCurrentThread() } }, EQ)
+    }
+
+  fun <F> Async<F>.effectMapSuspendEffect(GK: GenK<F>, EQK: Eq<Kind<F, Int>>): Unit =
+    forAll(GK.genK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
+      fa.effectMap { f(it) }.equalUnderTheLaw(fa.flatMap { a -> effect { f(a) } }, EQK)
     }
 
   // Turns out that kotlinx.coroutines decides to rewrite thread names
