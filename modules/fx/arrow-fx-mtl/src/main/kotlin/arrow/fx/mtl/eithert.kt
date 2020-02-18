@@ -7,6 +7,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
+import arrow.core.flatMap
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
@@ -127,6 +128,26 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
 
   override fun <A> EitherTOf<F, L, A>.fork(ctx: CoroutineContext): EitherT<F, L, Fiber<EitherTPartialOf<F, L>, A>> = CF().run {
     EitherT.liftF(this, value().fork(ctx).map(::fiberT))
+  }
+
+  override fun <A, B, C> CoroutineContext.parMapN(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>, f: (A, B) -> C): Kind<EitherTPartialOf<F, L>, C> = CF().run {
+    EitherT(parMapN(fa.value(), fb.value()) { a, b ->
+      a.flatMap { aa ->
+        b.map { bb -> f(aa, bb) }
+      }
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>, fc: EitherTOf<F, L, C>, f: (A, B, C) -> D): EitherT<F, L, D> = CF().run {
+    EitherT(parMapN(fa.value(), fb.value(), fc.value()) { a, b, c ->
+      a.flatMap { aa ->
+        b.flatMap { bb ->
+          c.map { cc ->
+            f(aa, bb, cc)
+          }
+        }
+      }
+    })
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>): EitherT<F, L, RacePair<EitherTPartialOf<F, L>, A, B>> = CF().run {

@@ -9,6 +9,8 @@ import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.IOOf
 import arrow.fx.OnCancel
+import arrow.fx.Race2
+import arrow.fx.Race3
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
@@ -209,6 +211,12 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>, f: (A, B, C) -> D): Kind<ForIO, D> =
     IO.parMapN(this@parMapN, fa, fb, fc, f)
+
+  override fun <A, B> CoroutineContext.raceN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<Race2<A, B>> =
+    IO.raceN(this@raceN, fa, fb)
+
+  override fun <A, B, C> CoroutineContext.raceN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<Race3<A, B, C>> =
+    IO.raceN(this@raceN, fa, fb, fc)
 }
 
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
