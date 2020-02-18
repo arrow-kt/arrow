@@ -37,7 +37,7 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 
 - [Arrow on Twitter](https://twitter.com/arrow_kt)
 - [#arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0)
-- [#arrow-contributors on Kotlin Slack](https://kotlinlang.slack.com/archives/C8UK6RTHU
+- [#arrow-contributors on Kotlin Slack](https://kotlinlang.slack.com/archives/C8UK6RTHU)
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
 ## Setup
