@@ -1,7 +1,8 @@
 ---
-layout: docs-core
-title: Rx2
+layout: docs-fx
+title: RxJava 2
 permalink: /integrations/rx2/
+
 ---
 
 ## RxJava 2
