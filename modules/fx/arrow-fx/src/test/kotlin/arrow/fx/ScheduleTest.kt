@@ -131,7 +131,7 @@ class ScheduleTest : UnitSpec() {
         eqK(Id.eqK(), Id.monad(), 0)
       ),
       MonoidLaws.laws(
-        Schedule.monoid<ForId, Int, Int>(Id.monad(), Int.monoid()),
+        Schedule.monoid<ForId, Int, Int>(Int.monoid(), Id.monad()),
         Schedule.genK<ForId, Int>(Id.monad()).genK(Gen.int()).map { it.fix() },
         eqK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
       ),

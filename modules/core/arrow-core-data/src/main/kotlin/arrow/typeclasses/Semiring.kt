@@ -53,67 +53,17 @@ import arrow.documented
  * }
  * ```
  *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.*
- * import arrow.core.extensions.option.semiring.semiring
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Option.semiring(Int.semiring()).run {
- *      Option(1).combine(Option(2))
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.extensions.*
- * import arrow.core.extensions.option.semiring.semiring
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Option.semiring(Int.semiring()).run {
- *      Option(2).combineMultiplicate(Option(3))
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.Option
- * import arrow.core.None
- * import arrow.core.extensions.*
- * import arrow.core.extensions.option.semiring.semiring
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   Option.semiring(Int.semiring()).run {
- *      Option(1).combine(None)
- *   }
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
  * The type class `Semiring` also has support for the `+` `*` syntax:
  *
  * ```kotlin:ank:playground
  * import arrow.core.Option
  * import arrow.core.extensions.*
- * import arrow.core.extensions.option.semiring.semiring
  *
  * fun main(args: Array<String>) {
  *   val result =
  *   //sampleStart
- *   Option.semiring(Int.semiring()).run {
- *      Option(1) + Option(2)
+ *   Int.semiring().run {
+ *      1 + 2
  *   }
  *   //sampleEnd
  *   println(result)
@@ -123,13 +73,12 @@ import arrow.documented
  * ```kotlin:ank:playground
  * import arrow.core.Option
  * import arrow.core.extensions.*
- * import arrow.core.extensions.option.semiring.semiring
  *
  * fun main(args: Array<String>) {
  *   val result =
  *   //sampleStart
- *   Option.semiring(Int.semiring()).run {
- *      Option(2) * Option(3)
+ *   Int.semiring().run {
+ *      2 * 3
  *   }
  *   //sampleEnd
  *   println(result)
