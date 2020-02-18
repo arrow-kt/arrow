@@ -35,10 +35,6 @@ project(':arrow-meta-test-models').projectDir = new File('modules/meta/arrow-met
 //noinspection GroovyAssignabilityCheck
 include {
     modules {
-    docs {
-           _ 'docs'
-           _ 'examples'
-       }
 
         meta {
             _ 'annotations'
