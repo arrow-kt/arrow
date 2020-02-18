@@ -7,11 +7,13 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
+import arrow.core.flatMap
 import arrow.extension
 import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -128,6 +130,26 @@ interface EitherTConcurrent<F, L> : Concurrent<EitherTPartialOf<F, L>>, EitherTA
     EitherT.liftF(this, value().fork(ctx).map(::fiberT))
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>, f: (A, B) -> C): Kind<EitherTPartialOf<F, L>, C> = CF().run {
+    EitherT(parMapN(fa.value(), fb.value()) { a, b ->
+      a.flatMap { aa ->
+        b.map { bb -> f(aa, bb) }
+      }
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>, fc: EitherTOf<F, L, C>, f: (A, B, C) -> D): EitherT<F, L, D> = CF().run {
+    EitherT(parMapN(fa.value(), fb.value(), fc.value()) { a, b, c ->
+      a.flatMap { aa ->
+        b.flatMap { bb ->
+          c.map { cc ->
+            f(aa, bb, cc)
+          }
+        }
+      }
+    })
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: EitherTOf<F, L, A>, fb: EitherTOf<F, L, B>): EitherT<F, L, RacePair<EitherTPartialOf<F, L>, A, B>> = CF().run {
     val racePair: Kind<F, Either<L, RacePair<EitherTPartialOf<F, L>, A, B>>> =
       racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Either<L, A>, Either<L, B>> ->
@@ -178,6 +200,9 @@ fun <F, L> EitherT.Companion.concurrent(CF: Concurrent<F>): Concurrent<EitherTPa
   object : EitherTConcurrent<F, L> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F, L> EitherT.Companion.timer(CF: Concurrent<F>): Timer<EitherTPartialOf<F, L>> =
+  Timer(concurrent<F, L>(CF))
 
 @extension
 interface EitherTMonadIO<F, L> : MonadIO<EitherTPartialOf<F, L>>, EitherTMonad<F, L> {
