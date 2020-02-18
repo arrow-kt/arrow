@@ -17,7 +17,7 @@ cd site
 ### 2. Copy `build/site` content from Arrow library
 
 ```
-cp <arrow-library-repository>/build/site/* build/site/
+cp -r <arrow-library-repository>/build/site/* build/site/
 ```
 
 ### 3. Run the website in your local server
