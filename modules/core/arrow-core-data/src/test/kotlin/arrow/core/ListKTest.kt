@@ -74,7 +74,7 @@ class ListKTest : UnitSpec() {
       MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
       TraverseLaws.laws(ListK.traverse(), ListK.genK(), ListK.eqK()),
 
-      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq()), Gen.listK(Gen.int())),
+      HashLaws.laws(ListK.hash(Int.hash()), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       EqKLaws.laws(
         ListK.eqK(),
         ListK.genK()
