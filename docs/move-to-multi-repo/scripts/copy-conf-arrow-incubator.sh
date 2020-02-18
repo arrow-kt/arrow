@@ -6,6 +6,7 @@ export BASEDIR=$(pwd)
 echo "arrow-incubator ..."
 cd $BASEDIR/arrow-incubator
 cp $BASEDIR/d-arrow-module/arrow-incubator-repository/README.md .
+cp $BASEDIR/d-arrow-module/arrow-incubator-repository/.editorconfig .
 cp -r $BASEDIR/d-arrow-module/arrow-incubator-repository/*gradle* .
 sed -i "s/d-arrow/arrow/g" gradle.properties
 for module in arrow-*; do

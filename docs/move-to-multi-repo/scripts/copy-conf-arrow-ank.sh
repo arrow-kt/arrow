@@ -6,6 +6,7 @@ export BASEDIR=$(pwd)
 echo "arrow-ank ..."
 cd $BASEDIR/arrow-ank
 cp $BASEDIR/d-arrow-module/arrow-ank-repository/README.md .
+cp $BASEDIR/d-arrow-module/arrow-ank-repository/.editorconfig .
 cp -r $BASEDIR/d-arrow-module/arrow-ank-repository/*gradle* .
 sed -i "s/d-arrow/arrow/g" gradle.properties
 for module in arrow-*; do

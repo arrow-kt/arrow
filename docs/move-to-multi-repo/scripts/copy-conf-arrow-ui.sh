@@ -6,6 +6,7 @@ export BASEDIR=$(pwd)
 echo "arrow-ui ..."
 cd $BASEDIR/arrow-ui
 cp $BASEDIR/d-arrow-module/arrow-ui-repository/README.md .
+cp $BASEDIR/d-arrow-module/arrow-ui-repository/.editorconfig .
 cp -r $BASEDIR/d-arrow-module/arrow-ui-repository/*gradle* .
 sed -i "s/d-arrow/arrow/g" gradle.properties
 for module in arrow-*; do
