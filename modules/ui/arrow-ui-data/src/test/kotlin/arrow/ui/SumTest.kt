@@ -63,7 +63,7 @@ class SumTest : UnitSpec() {
         sumConstEQK
       ), */
       ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), genkSumId, sumIdEQK),
-      HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), genSum())
+      HashLaws.laws(Sum.hash(IDH, IDH), genSum(), Sum.eq(IDEQ, IDEQ))
     )
 
     val abSum = Sum.left(Id.just("A"), Id.just("B"))

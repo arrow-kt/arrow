@@ -20,8 +20,8 @@ import arrow.fx.extensions.io.monadThrow.monadThrow
 import arrow.fx.extensions.schedule.alternative.alternative
 import arrow.fx.extensions.schedule.applicative.applicative
 import arrow.fx.extensions.schedule.category.category
+import arrow.fx.extensions.schedule.monoid.monoid
 import arrow.fx.extensions.schedule.profunctor.profunctor
-import arrow.fx.extensions.schedule.semiring.semiring
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.nanoseconds
 import arrow.fx.typeclasses.seconds
@@ -34,8 +34,8 @@ import arrow.test.generators.intSmall
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.CategoryLaws
+import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
-import arrow.test.laws.SemiringLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -130,12 +130,10 @@ class ScheduleTest : UnitSpec() {
         Schedule.genK<ForId, Int>(Id.monad()),
         eqK(Id.eqK(), Id.monad(), 0)
       ),
-      SemiringLaws.laws(
-        Schedule.semiring<ForId, Any?, Int>(Int.monoid(), Id.monad()),
-        Schedule.forever(Id.monad()),
-        Schedule.forever(Id.monad()),
-        Schedule.forever(Id.monad()),
-        eqK(Id.eqK(), Id.monad(), 0 as Any?).liftEq(Int.eq())
+      MonoidLaws.laws(
+        Schedule.monoid<ForId, Int, Int>(Int.monoid(), Id.monad()),
+        Schedule.genK<ForId, Int>(Id.monad()).genK(Gen.int()).map { it.fix() },
+        eqK(Id.eqK(), Id.monad(), 0).liftEq(Int.eq())
       ),
       AlternativeLaws.laws(
         Schedule.alternative<ForId, Int>(Id.monad()),

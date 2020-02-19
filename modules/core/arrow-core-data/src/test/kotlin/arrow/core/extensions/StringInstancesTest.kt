@@ -9,7 +9,7 @@ class StringInstancesTest : UnitSpec() {
   init {
     testLaws(
       ShowLaws.laws(String.show(), String.eq(), Gen.string()),
-      HashLaws.laws(String.hash(), String.eq(), Gen.string())
+      HashLaws.laws(String.hash(), Gen.string(), String.eq())
     )
   }
 }

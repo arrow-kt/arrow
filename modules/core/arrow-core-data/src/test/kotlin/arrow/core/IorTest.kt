@@ -60,7 +60,7 @@ class IorTest : UnitSpec() {
         Ior.genK(Gen.int()),
         Ior.eqK(Int.eq())
       ),
-      HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Ior.eq(String.eq(), Int.eq()), Gen.ior(Gen.string(), Gen.int())),
+      HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Gen.ior(Gen.string(), Gen.int()), Ior.eq(String.eq(), Int.eq())),
       BitraverseLaws.laws(Ior.bitraverse(), Ior.genK2(), Ior.eqK2()),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK2(), Ior.eqK2())
