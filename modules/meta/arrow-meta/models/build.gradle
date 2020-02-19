@@ -3,8 +3,8 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
-    kapt 'com.google.auto.service:auto-service:1.0-rc4'
+    compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
+    kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     compile project(':arrow-annotations')
     compile project(":arrow-optics")
     compile project(":arrow-core")

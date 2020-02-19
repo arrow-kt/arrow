@@ -1,12 +1,14 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.extensions.eq
 import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
 object TimerLaws {
@@ -27,11 +29,14 @@ object TimerLaws {
     }
   }
 
-  fun <F> laws(AS: Async<F>, T: Timer<F>, EQ: Eq<Kind<F, Boolean>>): List<Law> =
-    listOf(
+  fun <F> laws(AS: Async<F>, T: Timer<F>, EQK: EqK<F>): List<Law> {
+    val EQ = EQK.liftEq(Boolean.eq())
+
+    return listOf(
       Law("Timer Laws: sleep should last specified time") { AS.sleepShouldLastSpecifiedTime(T, Clock(AS), EQ) },
       Law("Timer Laws: negative sleep should be immediate") { AS.negativeSleepShouldBeImmediate(T, EQ) }
     )
+  }
 
   fun <F> Async<F>.sleepShouldLastSpecifiedTime(
     T: Timer<F>,

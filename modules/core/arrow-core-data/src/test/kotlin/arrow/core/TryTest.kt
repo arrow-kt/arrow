@@ -46,7 +46,7 @@ class TryTest : UnitSpec() {
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
       MonadErrorLaws.laws(Try.monadError(), Try.functor(), Try.applicative(), Try.monad(), Try.genK(), Try.eqK()),
       TraverseLaws.laws(Try.traverse(), Try.genK(), Try.eqK()),
-      HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int()))
+      HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Gen.`try`(Gen.int()), Try.eq(Int.eq(), Eq.any()))
     )
 
     "empty should return a Success of the empty of the inner type" {

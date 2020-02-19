@@ -37,6 +37,9 @@ import arrow.core.toOption
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.shrinking.DoubleShrinker
+import io.kotlintest.properties.shrinking.FloatShrinker
+import io.kotlintest.properties.shrinking.Shrinker
 import java.util.concurrent.TimeUnit
 
 fun Gen.Companion.short(): Gen<Short> =
@@ -63,11 +66,32 @@ fun <A, B> Gen.Companion.functionAToB(gen: Gen<B>): Gen<(A) -> B> = gen.map { b:
 
 fun <A> Gen.Companion.functionAAToA(gen: Gen<A>): Gen<(A, A) -> A> = gen.map { a: A -> { _: A, _: A -> a } }
 
+fun <A> Gen.Companion.functionToA(gen: Gen<A>): Gen<() -> A> = gen.map { a: A -> { a } }
+
 fun Gen.Companion.throwable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
 
 fun Gen.Companion.fatalThrowable(): Gen<Throwable> = Gen.from(listOf(ThreadDeath(), StackOverflowError(), OutOfMemoryError(), InterruptedException()))
 
+fun Gen.Companion.doubleSmall(): Gen<Double> = object : Gen<Double> {
+  override fun constants(): Iterable<Double> = emptyList()
+  override fun random(): Sequence<Double> = (0 until 10_000).asSequence().map { it / 100.0 }
+  override fun shrinker(): Shrinker<Double> = DoubleShrinker
+}
+
+fun Gen.Companion.floatSmall(): Gen<Float> = object : Gen<Float> {
+  val literals = listOf(0F)
+  override fun constants(): Iterable<Float> = literals
+  override fun random(): Sequence<Float> = (0 until 10_000).asSequence().map { it / 100.0f }
+  override fun shrinker() = FloatShrinker
+}
+
 fun Gen.Companion.intSmall(): Gen<Int> = Gen.oneOf(Gen.choose(Int.MIN_VALUE / 10000, -1), Gen.choose(0, Int.MAX_VALUE / 10000))
+
+fun Gen.Companion.byteSmall(): Gen<Byte> = Gen.oneOf(Gen.choose(Byte.MIN_VALUE / 10, -1), Gen.choose(0, Byte.MAX_VALUE / 10)).map { it.toByte() }
+
+fun Gen.Companion.shortSmall(): Gen<Short> = Gen.oneOf(Gen.choose(Short.MIN_VALUE / 1000, -1), Gen.choose(0, Short.MAX_VALUE / 1000)).map { it.toShort() }
+
+fun Gen.Companion.longSmall(): Gen<Long> = Gen.oneOf(Gen.choose(Long.MIN_VALUE / 100000L, -1L), Gen.choose(0L, Long.MAX_VALUE / 100000L))
 
 fun <A, B> Gen.Companion.tuple2(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> = Gen.bind(genA, genB) { a: A, b: B -> Tuple2(a, b) }
 
@@ -119,6 +143,7 @@ fun Gen.Companion.intPredicate(): Gen<(Int) -> Boolean> =
   }
 
 fun <A> Gen.Companion.endo(gen: Gen<A>): Gen<Endo<A>> = gen.map { a: A -> Endo<A> { a } }
+
 fun <B> Gen.Companion.option(gen: Gen<B>): Gen<Option<B>> =
   gen.orNull().map { it.toOption() }
 

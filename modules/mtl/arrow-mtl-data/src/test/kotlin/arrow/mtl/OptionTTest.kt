@@ -24,6 +24,7 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
+import arrow.fx.mtl.timer
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.nested
 import arrow.mtl.extensions.optiont.applicative.applicative
@@ -67,6 +68,7 @@ class OptionTTest : UnitSpec() {
     testLaws(
       ConcurrentLaws.laws(
         OptionT.concurrent(IO.concurrent()),
+        OptionT.timer(IO.concurrent()),
         OptionT.functor(IO.functor()),
         OptionT.applicative(IO.monad()),
         OptionT.monad(IO.monad()),

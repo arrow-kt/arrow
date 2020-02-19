@@ -24,7 +24,7 @@ fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
  * @property run the arrow from [D] to `Kind<F, A>`.
  */
 @higherkind
-class Kleisli<F, D, A>private constructor(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
+class Kleisli<F, D, A> private constructor(val run: (D) -> Kind<F, A>) : KleisliOf<F, D, A>, KleisliKindedJ<F, D, A> {
 
   /**
    * Apply a function `(A) -> B` that operates within the [Kleisli] context.

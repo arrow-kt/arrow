@@ -50,7 +50,6 @@ import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
@@ -91,32 +90,6 @@ interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
-}
-
-@extension
-interface OptionSemiring<A> : Semiring<Option<A>> {
-
-  fun SG(): Semiring<A>
-  override fun zero(): Option<A> = None
-  override fun one(): Option<A> = None
-
-  override fun Option<A>.combine(b: Option<A>): Option<A> =
-    when (this) {
-      is Some<A> -> when (b) {
-        is Some<A> -> Some(SG().run { t.combine(b.t) })
-        None -> this
-      }
-      None -> b
-    }
-
-  override fun Option<A>.combineMultiplicate(b: Option<A>): Option<A> =
-    when (this) {
-      is Some<A> -> when (b) {
-        is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
-        None -> this
-      }
-      None -> b
-    }
 }
 
 @extension
