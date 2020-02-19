@@ -14,6 +14,7 @@ object SemiringLaws {
         Law("Semiring: Additive left identity") { SG.semiringAdditiveLeftIdentity(GEN, EQ) },
         Law("Semiring: Additive right identity") { SG.semiringAdditiveRightIdentity(GEN, EQ) },
         Law("Semiring: Additive associativity") { SG.semiringAdditiveAssociativity(GEN, EQ) },
+        Law("Semiring: Multiplicative commutativity") { SG.semiringMultiplicativeCommutativity(GEN, EQ) },
         Law("Semiring: Multiplicative left identity") { SG.semiringMultiplicativeLeftIdentity(GEN, EQ) },
         Law("Semiring: Multiplicative right identity") { SG.semiringMultiplicativeRightIdentity(GEN, EQ) },
         Law("Semiring: Multiplicative associativity") { SG.semiringMultiplicativeAssociativity(GEN, EQ) },
@@ -42,19 +43,25 @@ object SemiringLaws {
   // 0 + a = a
   fun <F> Semiring<F>.semiringAdditiveLeftIdentity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
-      (one().combineMultiplicate(A)).equalUnderTheLaw(A, EQ)
+      (zero().combine(A)).equalUnderTheLaw(A, EQ)
     }
 
   // a + 0 = a
   fun <F> Semiring<F>.semiringAdditiveRightIdentity(GEN: Gen<F>, EQ: Eq<F>) =
     forAll(GEN) { A ->
-      A.combineMultiplicate(one()).equalUnderTheLaw(A, EQ)
+      A.combine(zero()).equalUnderTheLaw(A, EQ)
     }
 
   // a + (b + c) = (a + b) + c
   fun <F> Semiring<F>.semiringAdditiveAssociativity(GEN: Gen<F>, EQ: Eq<F>) =
-    forAll(GEN, GEN) { A, B ->
-      A.combineMultiplicate(B).equalUnderTheLaw(B.combineMultiplicate(A), EQ)
+    forAll(GEN, GEN, GEN) { A, B, C ->
+      A.combine(B.combine(C)).equalUnderTheLaw((A.combine(B)).combine(C), EQ)
+    }
+
+  // a · b = b · a
+  fun <F> Semiring<F>.semiringMultiplicativeCommutativity(GEN: Gen<F>, EQ: Eq<F>) =
+    forAll(GEN, GEN) { a, b ->
+      a.combineMultiplicate(b).equalUnderTheLaw(b.combineMultiplicate(a), EQ)
     }
 
   // 1 · a = a
