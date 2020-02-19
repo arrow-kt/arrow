@@ -31,12 +31,12 @@
           {% assign aqlUrl = item.url %}
           {% endif %}
           <li class="incubator-items">
-            <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+            <a class="incubator-link" href="{{ item.url | relative_url }}" title="{{ item.title }}">{{ item.title }}</a>
           </li>
           {% endfor %}
         </ul>
       </div>
-      <a class="incubator-image" href="{{ aqlUrl }}">
+      <a class="incubator-image" href="{{ aqlUrl | relative_url }}">
         <div id="incubator-base-animation" alt="Incubator"></div>
         <div id="incubator-core-animation" alt="Incubator"></div>
         <div id="incubator-fx-animation" alt="Incubator"></div>
