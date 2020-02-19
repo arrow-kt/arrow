@@ -8,7 +8,7 @@ import arrow.documented
  * ank_macro_hierarchy(arrow.typeclasses.Functor)
  *
  * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
- * Examples of type constructors that can implement instances of the Functor type class include [_dataType_],
+ * Examples of type constructors that can implement instances of the Functor type class include
  * [arrow.core.Option], [arrow.core.NonEmptyList], [List] and many other data types that include a [map] function with the shape
  * `fun <F, A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` where `F` refers to any type constructor whose contents can be transformed.
  *
@@ -109,7 +109,9 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> = { fa: Kind<F, A> -> fa.map(f) }
+  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> = { fa: Kind<F, A> ->
+    fa.map(f)
+  }
 
   /**
    * Discards the [A] value inside [F] signaling this container may be pointing to a noop
@@ -130,7 +132,8 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A> Kind<F, A>.unit(): Kind<F, Unit> = map { Unit }
+  fun <A> Kind<F, A>.unit(): Kind<F, Unit> =
+    map { Unit }
 
   /**
    * Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
@@ -151,7 +154,8 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, f(a)) }
+  fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> =
+    map { a -> Tuple2(a, f(a)) }
 
   /**
    * Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -171,12 +175,14 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.mapConst(b: B): Kind<F, B> = map { b }
+  fun <A, B> Kind<F, A>.mapConst(b: B): Kind<F, B> =
+    map { b }
 
   /**
    * Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
    */
-  fun <A, B> A.mapConst(fb: Kind<F, B>): Kind<F, A> = fb.mapConst(this)
+  fun <A, B> A.mapConst(fb: Kind<F, B>): Kind<F, A> =
+    fb.mapConst(this)
 
   /**
    * Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
@@ -196,7 +202,8 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.tupleLeft(b: B): Kind<F, Tuple2<B, A>> = map { a -> Tuple2(b, a) }
+  fun <A, B> Kind<F, A>.tupleLeft(b: B): Kind<F, Tuple2<B, A>> =
+    map { a -> Tuple2(b, a) }
 
   /**
    * Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -216,7 +223,8 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.tupleRight(b: B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, b) }
+  fun <A, B> Kind<F, A>.tupleRight(b: B): Kind<F, Tuple2<A, B>> =
+    map { a -> Tuple2(a, b) }
 
   /**
    * Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>
@@ -237,5 +245,6 @@ interface Functor<F> : Invariant<F> {
    * }
    * ```
    */
-  fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> = this
+  fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> =
+    this
 }
