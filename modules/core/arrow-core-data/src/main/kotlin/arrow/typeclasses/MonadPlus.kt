@@ -30,7 +30,7 @@ interface MonadPlus<F> : Monad<F>, Alternative<F> {
   fun <A> zeroM(): Kind<F, A> = empty()
 
   /**
-   * an associative operation to combine two structures.
+   * Associative operation to combine two structures. [MonadPlus] variant of [orElse].
    *
    *  {: data-executable='true'}
    *
