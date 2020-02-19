@@ -1,6 +1,5 @@
 package arrow.typeclasses
 
-import arrow.core.Option
 import arrow.documented
 
 /**
