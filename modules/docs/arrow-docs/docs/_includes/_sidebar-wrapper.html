@@ -5,7 +5,7 @@
     </button>
   </div>
   <div class="sidebar-brand">
-    <a href="/">
+    <a href="{{ '/' | relative_url }}">
       {% assign img_url = '/img/' | append: cat_id | append: '/arrow-' | append: cat_id | append: '-brand-sidebar.svg' %}
       <img src="{{ img_url | relative_url}}" alt="Arrow {{ cat_id }}">
     </a>
