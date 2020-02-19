@@ -197,7 +197,7 @@ object BracketLaws {
       fe.onError { ff(it) }.equalUnderTheLaw(fe.guaranteeCase {
         when (it) {
           is ExitCase.Error -> ff(it.e)
-          else -> fail("")
+          else -> unit()
         }
       }, EQ)
     }
