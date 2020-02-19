@@ -246,20 +246,17 @@ fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEf
 @extension
 interface IOSemigroup<A> : Semigroup<IO<A>> {
 
-  fun SG(): Semigroup<A>
+  fun AI(): Semigroup<A>
 
   override fun IO<A>.combine(b: IO<A>): IO<A> =
-    flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
+    flatMap { a1: A -> b.map { a2: A -> AI().run { a1.combine(a2) } } }
 }
 
 @extension
 interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
+  override fun AI(): Monoid<A>
 
-  override fun SG(): Semigroup<A> = SM()
-
-  fun SM(): Monoid<A>
-
-  override fun empty(): IO<A> = IO.just(SM().empty())
+  override fun empty(): IO<A> = IO.just(AI().empty())
 }
 
 @extension

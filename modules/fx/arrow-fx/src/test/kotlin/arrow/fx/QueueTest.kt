@@ -11,7 +11,6 @@ import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
-import arrow.fx.extensions.io.monad.monad
 import arrow.fx.typeclasses.milliseconds
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
@@ -150,7 +149,7 @@ class QueueTest : UnitSpec() {
           !(q.awaitShutdown().followedBy(p2.complete(true))).fork()
           !q.shutdown()
           !mapN(p1.get(), p2.get()) { (p1, p2) -> p1 && p2 }
-        }.unsafeRunSync()
+        }.suspended()
       }
 
       "$label - shut it down, create a shutdown hook completing a promise, the promise should be completed immediately" {
@@ -185,22 +184,11 @@ class QueueTest : UnitSpec() {
         }.unsafeRunSync()
       }
 
-      "$label - offering to a 0 capacity queue in deficit honours blocking strategy" {
-        IO.fx {
-          val q = !queue(0)
-          // flip from initial Surplus state to Deficit
-          val first = !q.take().fork(ctx)
-          // then clear previous taker while staying in Deficit
-          !q.offer(1)
-          !first.join()
-          val start = !effect { System.currentTimeMillis() }
-          val wontComplete = q.offer(2)
-          val received = !wontComplete.map { Some(it) }
-            .waitFor(100.milliseconds, default = just(None))
-          val elapsed = !effect { System.currentTimeMillis() - start }
-          !effect { received shouldBe None }
-          !effect { (elapsed >= 100) shouldBe true }
-        }.unsafeRunSync()
+      "$label - capacity must be a positive integer" {
+        queue(0).attempt().suspended().fold(
+          { err -> err.shouldBeInstanceOf<IllegalArgumentException>() },
+          { fail("Expected Left<IllegalArgumentException>") }
+        )
       }
 
       "$label - suspended offers called on an full queue complete when take calls made to queue" {
@@ -252,7 +240,7 @@ class QueueTest : UnitSpec() {
       allStrategyTests(label, ctx, queue)
 
       "$label - capacity must be a positive integer" {
-        queue(0).attempt().unsafeRunSync().fold(
+        queue(0).attempt().suspended().fold(
           { err -> err.shouldBeInstanceOf<IllegalArgumentException>() },
           { fail("Expected Left<IllegalArgumentException>") }
         )
@@ -279,18 +267,11 @@ class QueueTest : UnitSpec() {
 
       allStrategyTests(label, ctx, queue)
 
-      "$label - offering to a zero capacity queue with a pending taker" {
-        forAll(Gen.int()) { x ->
-          IO.fx {
-            val q = !queue(0)
-            val taker = !q.take().fork(ctx)
-            // Wait for the forked `take` to complete by checking the queue `size`,
-            // otherwise the test will suspend indefinitely if `take` occurs after `offer`.
-            !q.size().repeat<ForIO, Int, Int>(IO.concurrent(), Schedule.doUntil(IO.monad()) { it == -1 })
-            !q.offer(x)
-            !taker.join()
-          }.unsafeRunSync() == x
-        }
+      "$label - capacity must be a positive integer" {
+        queue(0).attempt().suspended().fold(
+          { err -> err.shouldBeInstanceOf<IllegalArgumentException>() },
+          { fail("Expected Left<IllegalArgumentException>") }
+        )
       }
 
       "$label - drops elements offered to a queue at capacity" {
