@@ -72,5 +72,5 @@ TypeClass(Bicrosswalk::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Bicrosswalk)
 
-[functor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Bicrosswalk.kt
+[functor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core-data/src/main/kotlin/arrow/typeclasses/Bicrosswalk.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BicrosswalkLaws.kt

@@ -94,5 +94,5 @@ TypeClass(Profunctor::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Profunctor)
 
-[profunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Profunctor.kt
+[profunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core-data/src/main/kotlin/arrow/typeclasses/Profunctor.kt
 [profunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ProfunctorLaws.kt
