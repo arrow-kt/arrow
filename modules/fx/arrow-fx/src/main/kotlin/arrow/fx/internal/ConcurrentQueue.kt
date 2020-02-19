@@ -93,7 +93,7 @@ internal class ConcurrentQueue<F, A> internal constructor(
           callPutAndAllReaders(a, firstTake, current.reads)
         } else just(true)
       }
-      is State.Shutdown -> raiseError(QueueShutdown)
+      is State.Shutdown -> just(false)
     }
 
   private tailrec fun unsafeOffer(a: A, onPut: (Either<Throwable, Unit>) -> Unit): Kind<F, CancelToken<F>> =
@@ -149,8 +149,7 @@ internal class ConcurrentQueue<F, A> internal constructor(
         } else {
           val (ax, notify) = current.offers.values.first()
           val xs = current.offers.toList().drop(1)
-          // TODO ADD STRATEGY
-          if (state.compareAndSet(current, State.Surplus<F, A>(tail.enqueue(ax), xs.toMap(), current.shutdownHook))) later { notify(rightUnit) }.fork(EmptyCoroutineContext).map { Some(head) }
+          if (state.compareAndSet(current, State.Surplus(tail.enqueue(ax), xs.toMap(), current.shutdownHook))) later { notify(rightUnit) }.fork(EmptyCoroutineContext).map { Some(head) }
           else unsafeTryTake()
         }
       }
@@ -204,26 +203,29 @@ internal class ConcurrentQueue<F, A> internal constructor(
       else -> Unit
     }
 
-  private tailrec fun unsafeTryPeek(): Kind<F, Option<A>> =
+  private fun unsafeTryPeek(): Kind<F, Option<A>> =
     when (val current = state.value) {
       is State.Surplus -> just(Some(current.value.head()))
       is State.Deficit -> just(None)
       is State.Shutdown -> just(None)
     }
 
-  private tailrec fun unsafePeek(onRead: (Either<Throwable, A>) -> Unit): Kind<F, CancelToken<F>> =
+  private tailrec fun unsafePeek(onPeek: (Either<Throwable, A>) -> Unit): Kind<F, CancelToken<F>> =
     when (val current = state.value) {
       is State.Surplus -> {
-        onRead(Right(current.value.head()))
+        onPeek(Right(current.value.head()))
         just(unit())
       }
       is State.Deficit -> {
         val id = Token()
-        val newReads = current.reads + Pair(id, onRead)
+        val newReads = current.reads + Pair(id, onPeek)
         if (state.compareAndSet(current, State.Deficit(newReads, current.takes, current.shutdownHook))) just(later { unsafeCancelRead(id) })
-        else unsafePeek(onRead)
+        else unsafePeek(onPeek)
       }
-      is State.Shutdown -> raiseError(QueueShutdown)
+      is State.Shutdown -> {
+        onPeek(Either.Left(QueueShutdown))
+        just(unit())
+      }
     }
 
   private tailrec fun unsafeCancelRead(id: Token): Unit =

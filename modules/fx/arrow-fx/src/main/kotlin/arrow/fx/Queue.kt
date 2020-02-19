@@ -73,6 +73,8 @@ interface Enqueue<F, A> {
   /**
    * Tries to offer a value to the [Queue], it ignores the [Queue.BackpressureStrategy]
    * and returns false if the [Queue.BackpressureStrategy] does not have room for the value.
+   *
+   * Use [tryOffer] if you do not want to block or lose a value and return immediately.
    */
   fun tryOffer(a: A): Kind<F, Boolean>
 }

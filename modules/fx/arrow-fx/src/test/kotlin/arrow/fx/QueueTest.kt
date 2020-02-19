@@ -5,6 +5,7 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Left
+import arrow.core.Tuple4
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.fix
 import arrow.fx.extensions.fx
@@ -16,6 +17,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
 import arrow.test.generators.tuple2
 import arrow.test.generators.tuple3
+import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.fail
 import io.kotlintest.matchers.types.shouldBeInstanceOf
 import io.kotlintest.properties.Gen
@@ -111,6 +113,71 @@ class QueueTest : UnitSpec() {
         }
       }
 
+      "$label - time out peeking from an empty queue" {
+        IO.fx {
+          val wontComplete = queue(10).flatMap(Queue<ForIO, Int>::peek)
+          val start = !effect { System.currentTimeMillis() }
+          val received = !wontComplete.map { Some(it) }
+            .waitFor(100.milliseconds, default = just(None))
+          val elapsed = !effect { System.currentTimeMillis() - start }
+          !effect { received shouldBe None }
+          !effect { (elapsed >= 100) shouldBe true }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
+
+      "$label - suspended peek calls on an empty queue complete when offer calls made to queue" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(3)
+            val first = !q.peek().fork(ctx)
+            !q.offer(i)
+            val res = !first.join()
+            !effect { res shouldBe i }
+          }.equalUnderTheLaw(IO.unit, EQ())
+        }
+      }
+
+      "$label - multiple peek calls on an empty queue all complete with the first value is received" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(1)
+            val first = !q.peek().fork(ctx)
+            val second = !q.peek().fork(ctx)
+            val third = !q.peek().fork(ctx)
+            !q.offer(i)
+            val firstValue = !first.join()
+            val secondValue = !second.join()
+            val thirdValue = !third.join()
+            !effect { setOf(firstValue, secondValue, thirdValue) shouldBe setOf(i, i, i) }
+          }.equalUnderTheLaw(IO.unit, EQ())
+        }
+      }
+
+      "$label - peeking a shutdown queue creates a QueueShutdown error" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(10)
+            !q.offer(i)
+            !q.shutdown()
+            !q.peek()
+          }.attempt().unsafeRunSync() == Left(QueueShutdown)
+        }
+      }
+
+      "$label - peek does not remove value from Queue" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(10)
+            val size1 = !q.size()
+            !q.offer(i)
+            val size2 = !q.size()
+            val peeked = !q.peek()
+            val size3 = !q.size()
+            !effect { Tuple4(size1, size2, peeked, size3) shouldBe Tuple4(0, 1, i, 1) }
+          }.equalUnderTheLaw(IO.unit, EQ())
+        }
+      }
+
       "$label - offering to a shutdown queue creates a QueueShutdown error" {
         forAll(Gen.int()) { i ->
           IO.fx {
@@ -161,6 +228,51 @@ class QueueTest : UnitSpec() {
           !p.get()
         }.unsafeRunSync()
       }
+
+      "$label - tryOffer on a shutdown Queue returns false" {
+        forAll(Gen.int()) { i ->
+          IO.fx {
+            val q = !queue(10)
+            !q.shutdown()
+            val offered = !q.tryOffer(i)
+            !effect { offered shouldBe false }
+          }.equalUnderTheLaw(IO.unit, EQ())
+        }
+      }
+
+      "$label - tryTake on a shutdown Queue returns false" {
+        IO.fx {
+          val q = !queue(10)
+          !q.shutdown()
+          val took = !q.tryTake()
+          !effect { took shouldBe None }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
+
+      "$label - tryPeek on a shutdown Queue returns false" {
+        IO.fx {
+          val q = !queue(10)
+          !q.shutdown()
+          val peeked = !q.tryPeek()
+          !effect { peeked shouldBe None }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
+
+      "$label - tryTake on an empty Queue returns false" {
+        IO.fx {
+          val q = !queue(10)
+          val took = !q.tryTake()
+          !effect { took shouldBe None }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
+
+      "$label - tryPeek on an empty Queue returns false" {
+        IO.fx {
+          val q = !queue(10)
+          val peeked = !q.tryPeek()
+          !effect { peeked shouldBe None }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
     }
 
     fun boundedStrategyTests(
@@ -181,6 +293,15 @@ class QueueTest : UnitSpec() {
           val elapsed = !effect { System.currentTimeMillis() - start }
           !effect { received shouldBe None }
           !effect { (elapsed >= 100) shouldBe true }
+        }.unsafeRunSync()
+      }
+
+      "$label - tryOffer returns false at capacity" {
+        IO.fx {
+          val q = !queue(1)
+          !q.offer(1)
+          val offered = !q.tryOffer(2)
+          !effect { offered shouldBe false }
         }.unsafeRunSync()
       }
 
@@ -246,6 +367,15 @@ class QueueTest : UnitSpec() {
         )
       }
 
+      "!$label - tryOffer returns false at capacity" {
+        IO.fx {
+          val q = !queue(1)
+          !q.offer(1)
+          val offered = !q.tryOffer(2)
+          !effect { offered shouldBe false }
+        }.unsafeRunSync()
+      }
+
       "$label - removes first element after offering to a queue at capacity" {
         forAll(Gen.int(), Gen.nonEmptyList(Gen.int())) { x, xs ->
           IO.fx {
@@ -272,6 +402,15 @@ class QueueTest : UnitSpec() {
           { err -> err.shouldBeInstanceOf<IllegalArgumentException>() },
           { fail("Expected Left<IllegalArgumentException>") }
         )
+      }
+
+      "!$label - tryOffer returns false at capacity" {
+        IO.fx {
+          val q = !queue(1)
+          !q.offer(1)
+          val offered = !q.tryOffer(2)
+          !effect { offered shouldBe false }
+        }.unsafeRunSync()
       }
 
       "$label - drops elements offered to a queue at capacity" {
