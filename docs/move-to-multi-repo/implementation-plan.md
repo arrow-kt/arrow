@@ -28,19 +28,13 @@
 
 :white_large_square: **arrow** repository: [PR to update the documentation](https://github.com/arrow-kt/arrow/pull/2079)
 
-:white_large_square: New repositories > Extract and push content: [How to extract the content](how-to-extract-content.md); use [`extract-content.sh`](scripts/extract-content.sh)
+:white_large_square: New repositories > Extract and push content on `master` branch: [How to extract the content](how-to-extract-content.md); use [`extract-content.sh`](scripts/extract-content.sh)
 
-:white_large_square: New repositories > Add the additional configuration and checks: [`copy-conf.sh`](scripts/copy-conf.sh) will add a branch in every repository to create the first pull request.
+:white_large_square: New repositories > Add the additional configuration and checks: [`copy-conf.sh`](scripts/copy-conf.sh) will add 2 branches in every repository to create the first pull requests. First pull request with `new-conf` branch. Then, a second pull request with `global-checks` branch (except for `arrow-site`).
 
 :white_large_square: New repositories > `Settings` > `Branches` > Create branch protection rules
 
 :white_large_square: **Unblock the contributions!!**
-
-:white_large_square: New repositories: add badges.
-
-:white_large_square: New repositories > `Settings` > `Webhooks` - Analyze!
-
-:white_large_square: **arrow** repository > `Settings` > `Secrets`: update secrets about S3 bucket
 
 :white_large_square: **arrow** repository: move issues to the correspondent repositories
 
@@ -48,6 +42,12 @@
 * `arrow-fx/arrow-fx-kotlinx-coroutines/build.gradle`
 * `arrow-fx/build.gradle`
 * `arrow-ank/build.gradle`
+
+:white_large_square: New repositories: add badges.
+
+:white_large_square: New repositories > `Settings` > `Webhooks` - Analyze!
+
+:white_large_square: **arrow** repository > `Settings` > `Secrets`: update secrets about S3 bucket (it will be used for release flow)
 
 :white_large_square: Check that everything is working OK
 

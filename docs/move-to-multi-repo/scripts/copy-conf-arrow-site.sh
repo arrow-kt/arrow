@@ -15,7 +15,6 @@ cp $BASEDIR/d-arrow-site/Gemfile .
 cp $BASEDIR/d-arrow-site/.gitignore .
 cp -r $BASEDIR/d-arrow-site/sidebar .
 cp -r $BASEDIR/d-arrow-site/.github .
-rm docs/_data/sidebar* 
 rm -rf docs/docs
 git co -b new-conf
 git add .
