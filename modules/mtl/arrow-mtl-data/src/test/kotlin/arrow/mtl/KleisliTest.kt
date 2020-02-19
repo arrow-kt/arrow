@@ -70,12 +70,6 @@ class KleisliTest : UnitSpec() {
     } as Gen<Kind<Conested<Kind<ForKleisli, ForTry>, Int>, A>>
   }
 
-  fun <F, D> Kleisli.Companion.genK(genkF: GenK<F>) = object : GenK<KleisliPartialOf<F, D>> {
-    override fun <A> genK(gen: Gen<A>): Gen<Kind<KleisliPartialOf<F, D>, A>> = genkF.genK(gen).map { k ->
-      Kleisli { _: D -> k }
-    }
-  }
-
   init {
     testLaws(
       AlternativeLaws.laws(
