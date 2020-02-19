@@ -163,7 +163,7 @@ fun <W, F> WriterT.Companion.concurrent(CF: Concurrent<F>, MM: Monoid<W>): Concu
     override fun MM(): Monoid<W> = MM
   }
 
-fun <F, W> WriterT.Companion.timer(CF: Concurrent<F>, MM: Monoid<W>): Timer<WriterTPartialOf<F, W>> =
+fun <W, F> WriterT.Companion.timer(CF: Concurrent<F>, MM: Monoid<W>): Timer<WriterTPartialOf<W, F>> =
   Timer(concurrent(CF, MM))
 
 @extension
