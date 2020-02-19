@@ -2,10 +2,8 @@ package arrow.test.eq
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.either.eq.eq
-import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
