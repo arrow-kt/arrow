@@ -100,28 +100,28 @@ interface Semiring<A> {
 
   fun A.combine(b: A): A
 
-  operator fun A.plus(b: A): A = combine(b)
+  operator fun A.plus(b: A): A =
+    combine(b)
 
   /**
    * Multiplicatively combine two [A] values.
    */
   fun A.combineMultiplicate(b: A): A
 
-  operator fun A.times(b: A): A = this.combineMultiplicate(b)
+  operator fun A.times(b: A): A =
+    this.combineMultiplicate(b)
 
   /**
    * Maybe additively combine two [A] values.
    */
-  fun A?.maybeCombineAddition(b: A?): A {
-    if (this == null) return zero()
-    return Option.fromNullable(b).fold({ this }, { combine(it) })
-  }
+  fun A?.maybeCombineAddition(b: A?): A =
+    if (this == null) zero()
+    else b?.let { combine(it) } ?: this
 
   /**
    * Maybe multiplicatively combine two [A] values.
    */
-  fun A?.maybeCombineMultiplicate(b: A?): A {
-    if (this == null) return one()
-    return Option.fromNullable(b).fold({ this }, { combineMultiplicate(it) })
-  }
+  fun A?.maybeCombineMultiplicate(b: A?): A =
+    if (this == null) one()
+    else b?.let { combineMultiplicate(it) } ?: this
 }
