@@ -16,7 +16,7 @@ However, IDEA will show *redundant suspend modifiers* warning if a function does
 
 You can disable this warning in Preferences > Editor > Inspections. Then search for the option Kotlin > Redundant constructs > Redundant suspend modifier.
 
-![gif](/img/linting/linting_suspend_modifier.gif)
+![gif]({{ '/img/linting/linting_suspend_modifier.gif' | relative_url }})
 
 ### Working with purity
 
@@ -26,7 +26,7 @@ To make this explicit, these functions can return Unit. However, IDEA will show 
 
 You can disable this warning in Preferences > Editor > Inspections. Then search for the option Kotlin > Redundant constructs > Redundant Unit return type.
 
-![gif](/img/linting/linting_unit_return_type.gif)
+![gif]({{ '/img/linting/linting_unit_return_type.gif' | relative_url }})
 
 If you are using [ktlint](https://ktlint.github.io/) as the linter of choice for your project, this scenario will be reported as an error, making builds fail.
 

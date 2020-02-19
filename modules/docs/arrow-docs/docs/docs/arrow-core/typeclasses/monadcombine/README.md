@@ -9,7 +9,7 @@ permalink: /arrow/typeclasses/monadcombine/
 
 
 
-If [`Alternative`]({{ '/arrow/typeclasses/alternative' }}) is for [`Applicative` functors]({{ '/arrow/typeclasses/applicative' }}) that also have a [`Monoid`]({{ '/arrow/typeclasses/monoid' }}) structure, `MonadCombine` is for [`Monads`]({{ '/arrow/typeclasses/monad' }}) with monoid capabilities.
+If [`Alternative`]({{ '/arrow/typeclasses/alternative' | relative_url }}) is for [`Applicative` functors]({{ '/arrow/typeclasses/applicative' | relative_url }}) that also have a [`Monoid`]({{ '/arrow/typeclasses/monoid' | relative_url }}) structure, `MonadCombine` is for [`Monads`]({{ '/arrow/typeclasses/monad' | relative_url }}) with monoid capabilities.
 
 `MonadCombine` is just a claim indicating something is both an `Alternative` and a `Monad`.
 
