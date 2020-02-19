@@ -7,8 +7,6 @@ video: CR5h2Wq1yPE
 
 If you would like to know about using the [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
-If you'd like to follow along with a video, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
-
 ## Dependency Injection using the `Typeclassless` technique
 
 
