@@ -22,7 +22,7 @@ internal fun <F> Concurrent<F>.ParApplicative(ctx: CoroutineContext? = null): Ap
     _ctx.parMapN(this@product, fb, ::Tuple2)
 
   override fun <A, B> Kind<F, A>.lazyAp(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> =
-    _ctx.parMapN(this@lazyAp, eval(ff))  { a, f -> f(a) }.let(::Now)
+    _ctx.parMapN(this@lazyAp, eval(ff)) { a, f -> f(a) }.let(::Now)
 
   fun <A, B> eval(eval: Eval<Kind<F, (A) -> B>>): Kind<F, (A) -> B> =
     when (eval) {
