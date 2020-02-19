@@ -9,6 +9,8 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.concurrent.waitFor
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.seconds
@@ -51,13 +53,10 @@ fun <F, S> StateT.Companion.eqK(EQKF: EqK<F>, EQS: Eq<S>, M: Monad<F>, s: S) = o
 
 fun IO.Companion.eqK(timeout: Duration = 60.seconds) = object : EqK<ForIO> {
   override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
-    (this.fix() to other.fix()).let {
-      val ls = it.first.attempt().unsafeRunTimed(timeout)
-      val rs = it.second.attempt().unsafeRunTimed(timeout)
-
-      Option.eq(Either.eq(Eq.any(), EQ)).run {
-        ls.eqv(rs)
-      }
+    Either.eq(Eq.any(), EQ).run {
+      IO.applicative().mapN(fix().attempt(), other.fix().attempt()) { (a, b) -> a.eqv(b) }
+        .waitFor(timeout)
+        .unsafeRunSync()
     }
 }
 
