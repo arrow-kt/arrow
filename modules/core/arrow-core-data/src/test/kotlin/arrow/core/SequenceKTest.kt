@@ -15,7 +15,6 @@ import arrow.core.extensions.sequencek.hash.hash
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.extensions.sequencek.monadCombine.monadCombine
 import arrow.core.extensions.sequencek.monadLogic.monadLogic
-import arrow.core.extensions.sequencek.monadPlus.monadPlus
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
@@ -35,7 +34,6 @@ import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadLogicLaws
-import arrow.test.laws.MonadPlusLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
@@ -56,11 +54,6 @@ class SequenceKTest : UnitSpec() {
     val EQ = SequenceK.eq(Int.eq())
 
     testLaws(
-      MonadPlusLaws.laws(
-        SequenceK.monadPlus(),
-        SequenceK.genK(),
-        SequenceK.eqK()
-      ),
       MonadCombineLaws.laws(
         SequenceK.monadCombine(),
         SequenceK.functor(),
