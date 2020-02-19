@@ -40,8 +40,6 @@ object BracketLaws {
       Law("Bracket: bracket must run release task on use error") { BF.bracketMustRunReleaseTaskOnUseError(EQ) },
       Law("Bracket: bracket must not run release task on acquire error") { BF.bracketMustNotRunReleaseTaskOnAcquireError(EQ) },
       Law("Bracket: guaranteeCase must run finalizer task") { BF.guaranteeCaseMustRunFinalizerOnError(EQ) },
-      Law("Bracket: onCancel must run finalizer task") { BF.guaranteeCaseMustRunFinalizerOnError(EQ) },
-      Law("Bracket: guarantee must run finalizer task") { BF.guaranteeCaseMustRunFinalizerOnError(EQ) },
       Law("Bracket: bracket is derived from bracketCase") { BF.bracketIsDerivedFromBracketCase(EQ) },
       Law("Bracket: guarantee is derived from bracket") { BF.guaranteeIsDerivedFromBracket(BF.just(Unit), EQ) },
       Law("Bracket: guaranteeCase is derived from bracketCase") { BF.guaranteeCaseIsDerivedFromBracketCase({ BF.just(Unit) }, EQ) },
