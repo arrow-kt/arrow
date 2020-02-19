@@ -17,7 +17,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Selective
-import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -86,7 +85,6 @@ object BracketLaws {
     forAll(Gen.throwable()) { e ->
       raiseError<Int>(e).bracketCase(release = { _, _ -> just<Unit>(Unit) }, use = { just(it) }).equalUnderTheLaw(raiseError(e), EQ)
     }
-
 
   fun <F> Bracket<F, Throwable>.uncancelablePreventsCanceledCase(
     onCancel: Kind<F, Unit>,
