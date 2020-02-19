@@ -16,15 +16,17 @@
 * :heavy_check_mark: `BINTRAY_USER`
 * :heavy_check_mark: `BOT_GITHUB_TOKEN`
 
-:white_large_square: Adapt paths to the new S3 organization (pending of receiving the new organization).
+:heavy_check_mark: Adapt paths to the new S3 organization (pending of receiving the new organization).
 
-:white_large_square: Check if there are new artifacts to consider.
+:heavy_check_mark: Check if there are new artifacts to consider.
 
 :white_large_square: **Block the contributions!!**
 
 :white_large_square: **arrow** repository > `Settings` > `Branches` > Update branch protection rules
 
 :white_large_square: **arrow** repository: [PR to add new content + remove current checks](https://github.com/arrow-kt/arrow/pull/2066)
+
+:white_large_square: **arrow** repository: [PR to update the documentation](https://github.com/arrow-kt/arrow/pull/2079)
 
 :white_large_square: New repositories > Extract and push content: [How to extract the content](how-to-extract-content.md); use [`extract-content.sh`](scripts/extract-content.sh)
 
