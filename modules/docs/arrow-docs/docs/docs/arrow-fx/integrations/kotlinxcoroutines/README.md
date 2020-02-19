@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-fx
 title: kotlinx.coroutines
 permalink: /docs/integrations/kotlinxcoroutines/
 ---

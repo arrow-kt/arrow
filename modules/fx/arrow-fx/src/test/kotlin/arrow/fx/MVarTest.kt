@@ -277,12 +277,12 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - concurrent take and put" {
-        val count = 10000
+        val count = 5000
         IO.fx {
-          val mvar = !mvar.empty<Int>()
+          val mVar = !mvar.empty<Int>()
           val ref = !Ref(0)
-          val takes = (0 until count).map { mvar.read().map2(mvar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
-          val puts = (0 until count).map { mvar.put(1) }.parSequence()
+          val takes = (0 until count).map { mVar.read().map2(mVar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
+          val puts = (0 until count).map { mVar.put(1) }.parSequence()
           val f1 = !takes.fork()
           val f2 = !puts.fork()
           !f1.join()

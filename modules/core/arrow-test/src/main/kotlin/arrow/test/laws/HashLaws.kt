@@ -7,7 +7,7 @@ import io.kotlintest.properties.forAll
 
 object HashLaws {
 
-  fun <F> laws(HF: Hash<F>, EQ: Eq<F>, G: Gen<F>): List<Law> =
+  fun <F> laws(HF: Hash<F>, G: Gen<F>, EQ: Eq<F>): List<Law> =
     EqLaws.laws(EQ, G) + listOf(
       Law("Hash Laws: Equality implies equal hash") { equalHash(HF, EQ, G) },
       Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, G) }

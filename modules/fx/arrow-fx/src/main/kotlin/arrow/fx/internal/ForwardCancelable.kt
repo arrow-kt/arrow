@@ -29,8 +29,7 @@ internal class ForwardCancelable {
 
         is Active -> {
           state.lazySet(finished) // GC purposes
-          // TODO this runs in an immediate execution context in cats-effect
-          IORunLoop.startCancelable(current.token, conn, cb)
+          Platform.trampoline { IORunLoop.startCancelable(current.token, conn, cb) }
         }
       }
     }
@@ -79,23 +78,24 @@ internal class ForwardCancelable {
     private val finished: State = Active(IO.unit)
 
     private fun execute(token: CancelToken<ForIO>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
-      // TODO this runs in an immediate execution context in cats-effect
-      token.fix().unsafeRunAsync { r ->
-        val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
-          try {
-            cb(r)
-            acc
-          } catch (t: Throwable) {
-            if (NonFatal(t)) {
-              acc + t
-            } else {
-              throw t
+      Platform.trampoline {
+        token.fix().unsafeRunAsync { r ->
+          val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
+            try {
+              cb(r)
+              acc
+            } catch (t: Throwable) {
+              if (NonFatal(t)) {
+                acc + t
+              } else {
+                throw t
+              }
             }
           }
-        }
 
-        if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
-        else Unit
+          if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
+          else Unit
+        }
       }
   }
 }

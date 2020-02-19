@@ -68,7 +68,7 @@ class SequenceKTest : UnitSpec() {
       MonoidalLaws.laws(SequenceK.monoidal(), SequenceK.genK(), SequenceK.eqK(), this::bijection),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
-      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq()), Gen.sequenceK(Gen.int())),
+      HashLaws.laws(SequenceK.hash(Int.hash()), Gen.sequenceK(Gen.int()), SequenceK.eq(Int.eq())),
       AlignLaws.laws(SequenceK.align(),
         SequenceK.genK(),
         SequenceK.eqK(),

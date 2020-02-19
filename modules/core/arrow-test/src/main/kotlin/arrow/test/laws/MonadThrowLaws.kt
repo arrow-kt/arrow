@@ -28,6 +28,10 @@ object MonadThrowLaws {
     )
   }
 
+  fun <F> laws(M: MonadThrow<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> =
+    MonadErrorLaws.laws(M, GENK, EQK) +
+      monadThrowLaws(M, EQK)
+
   fun <F> laws(
     M: MonadThrow<F>,
     FF: Functor<F>,
