@@ -8,7 +8,7 @@ import arrow.Kind
  */
 interface MonadPlus<F> : Monad<F>, Alternative<F> {
   /**
-   * the identity of `mPlus`
+   * Identity for `mPlus`. [MonadPlus] variant of [empty]
    *
    *  {: data-executable='true'}
    *
