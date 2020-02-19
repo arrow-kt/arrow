@@ -10,6 +10,7 @@ import arrow.fx.IO
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Ref
+import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.CancelToken
@@ -116,6 +117,26 @@ interface OptionTConcurrent<F> : Concurrent<OptionTPartialOf<F>>, OptionTAsync<F
     OptionT.liftF(this, value().fork(ctx).map(::fiberT))
   }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>, f: (A, B) -> C): OptionT<F, C> = CF().run {
+    OptionT(parMapN(fa.value(), fb.value()) { a, b ->
+      a.flatMap { aa ->
+        b.map { bb ->
+          f(aa, bb)
+        }
+      }
+    })
+  }
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>, fc: OptionTOf<F, C>, f: (A, B, C) -> D): OptionT<F, D> = CF().run {
+    OptionT(parMapN(fa.value(), fb.value(), fc.value()) { a, b, c ->
+      a.flatMap { aa ->
+        b.flatMap { bb ->
+          c.map { cc -> f(aa, bb, cc) }
+        }
+      }
+    })
+  }
+
   override fun <A, B> CoroutineContext.racePair(fa: OptionTOf<F, A>, fb: OptionTOf<F, B>): OptionT<F, RacePair<OptionTPartialOf<F>, A, B>> = CF().run {
     val racePair: Kind<F, Option<RacePair<OptionTPartialOf<F>, A, B>>> =
       racePair(fa.value(), fb.value()).flatMap { res: RacePair<F, Option<A>, Option<B>> ->
@@ -163,6 +184,9 @@ fun <F> OptionT.Companion.concurrent(CF: Concurrent<F>): Concurrent<OptionTParti
   object : OptionTConcurrent<F> {
     override fun CF(): Concurrent<F> = CF
   }
+
+fun <F> OptionT.Companion.timer(CF: Concurrent<F>): Timer<OptionTPartialOf<F>> =
+  Timer(concurrent(CF))
 
 @extension
 interface OptionTMonadIO<F> : MonadIO<OptionTPartialOf<F>>, OptionTMonad<F> {

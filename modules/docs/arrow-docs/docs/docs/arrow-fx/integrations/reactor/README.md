@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-fx
 title: Reactor
 permalink: /docs/integrations/reactor/
 ---

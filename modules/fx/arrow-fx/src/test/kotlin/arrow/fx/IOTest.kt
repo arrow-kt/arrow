@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
-import arrow.core.identity
 import arrow.core.right
 import arrow.core.some
 import arrow.fx.IO.Companion.just
@@ -21,6 +20,7 @@ import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
 import arrow.fx.extensions.io.monad.monad
+import arrow.fx.extensions.timer
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
@@ -51,7 +51,7 @@ class IOTest : UnitSpec() {
   private val NonBlocking = IO.dispatchers().default()
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
 
     "should defer evaluation until run" {
       var run = false
@@ -561,7 +561,7 @@ class IOTest : UnitSpec() {
     }
 
     "Bracket should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioBracketLoop(i: Int): IO<Int> =
         IO.unit.bracket(use = { just(i + 1) }, release = { IO.unit }).flatMap { ii ->
@@ -573,7 +573,7 @@ class IOTest : UnitSpec() {
     }
 
     "GuaranteeCase should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioGuaranteeCase(i: Int): IO<Int> =
         IO.unit.guaranteeCase { IO.unit }.flatMap {
@@ -586,7 +586,7 @@ class IOTest : UnitSpec() {
     }
 
     "Async should be stack safe" {
-      val size = 5000
+      val size = 20_000
 
       fun ioAsync(i: Int): IO<Int> = IO.async<Int> { cb ->
         cb(Right(i))
@@ -596,91 +596,6 @@ class IOTest : UnitSpec() {
       }
 
       just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
-    }
-
-    "IORacePair should be stack safe" {
-      val size = 5000
-
-      fun ioRacePair(i: Int): IO<Int> =
-        IO.raceN(IO.never, if (i < size) ioRacePair(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRacePair).unsafeRunSync() shouldBe size
-    }
-
-    "IORaceTriple should be stack safe" {
-      val size = 5000
-
-      fun ioRaceTriple(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, if (i < size) ioRaceTriple(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRaceTriple).unsafeRunSync() shouldBe size
-    }
-
-    "IORace4 should be stack safe" {
-      val size = 5000
-
-      fun ioRace4(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, if (i < size) ioRace4(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace4).unsafeRunSync() shouldBe size
-    }
-
-    "IORace5 should be stack safe" {
-      val size = 5000
-
-      fun ioRace5(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace5(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace5).unsafeRunSync() shouldBe size
-    }
-
-    "IORace6 should be stack safe" {
-      val size = 5000
-
-      fun ioRace6(i: Int): IO<Int> =
-        IO.raceN(IO.never, IO.never, IO.never, IO.never, IO.never, if (i < size) ioRace6(i + 1) else just(i))
-          .map {
-            it.fold(
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity,
-              ::identity
-            )
-          }
-
-      just(1).flatMap(::ioRace6).unsafeRunSync() shouldBe size
     }
 
     "forked pair race should run" {
@@ -700,24 +615,6 @@ class IOTest : UnitSpec() {
           effect { 2 }
         ).fork().bind().join().bind()
       }.unsafeRunSync() shouldBe Race3.Third(2)
-    }
-
-    "IOParMap2 should be stack safe" {
-      val size = 5000
-
-      fun ioParMap2(i: Int): IO<Int> =
-        IO.parMapN(just(i), if (i < size) ioParMap2(i + 1) else just(i)) { _, ii -> ii }
-
-      just(1).flatMap(::ioParMap2).unsafeRunSync() shouldBe size
-    }
-
-    "IOParMap3 should be stack safe" {
-      val size = 5000
-
-      fun ioParMap3(i: Int): IO<Int> =
-        IO.parMapN(just(i), IO.unit, if (i < size) ioParMap3(i + 1) else just(i)) { _, _, ii -> ii }
-
-      just(1).flatMap(::ioParMap3).unsafeRunSync() shouldBe size
     }
 
     "IOParMap2 left handles null" {

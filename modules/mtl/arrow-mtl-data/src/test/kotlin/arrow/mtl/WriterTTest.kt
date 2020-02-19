@@ -29,6 +29,7 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.concurrent
+import arrow.fx.mtl.timer
 import arrow.mtl.extensions.WriterTEqK
 import arrow.mtl.extensions.writert.alternative.alternative
 import arrow.mtl.extensions.writert.applicative.applicative
@@ -85,6 +86,7 @@ class WriterTTest : UnitSpec() {
       ),
       ConcurrentLaws.laws(
         WriterT.concurrent(IO.concurrent(), ListK.monoid<Int>()),
+        WriterT.timer(IO.concurrent(), ListK.monoid<Int>()),
         WriterT.functor<ListK<Int>, ForIO>(IO.functor()),
         WriterT.applicative(IO.applicative(), ListK.monoid<Int>()),
         WriterT.monad(IO.monad(), ListK.monoid<Int>()),

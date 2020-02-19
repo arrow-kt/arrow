@@ -2,12 +2,40 @@ package arrow.core.extensions
 
 import arrow.test.UnitSpec
 import arrow.test.generators.byte
+import arrow.test.generators.byteSmall
+import arrow.test.generators.doubleSmall
+import arrow.test.generators.floatSmall
+import arrow.test.generators.intSmall
+import arrow.test.generators.longSmall
 import arrow.test.generators.short
+import arrow.test.generators.shortSmall
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemiringLaws
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semiring
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
-class NumberMonoidTest : UnitSpec() {
+class NumberInstancesTest : UnitSpec() {
+
+  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, HF: Hash<F>, GEN: Gen<F>, EQ: Eq<F>) {
+    testLaws(SemiringLaws.laws(SG, GEN, EQ))
+    testLaws(MonoidLaws.laws(M, GEN, EQ))
+    testLaws(HashLaws.laws(HF, GEN, EQ))
+  }
+
   init {
+    testAllLaws(Byte.semiring(), Byte.monoid(), Byte.hash(), Gen.byteSmall(), Byte.eq())
+    testAllLaws(Double.semiring(), Double.monoid(), Double.hash(), Gen.doubleSmall(), Double.eq())
+    testAllLaws(Int.semiring(), Int.monoid(), Int.hash(), Gen.intSmall(), Int.eq())
+    testAllLaws(Short.semiring(), Short.monoid(), Short.hash(), Gen.shortSmall(), Short.eq())
+    testAllLaws(Float.semiring(), Float.monoid(), Float.hash(), Gen.floatSmall(), Float.eq())
+    testAllLaws(Long.semiring(), Long.monoid(), Long.hash(), Gen.longSmall(), Long.eq())
+
+    /** Semigroup specific instance check */
 
     "should semigroup with the instance passed - int" {
       forAll { value: Int ->
