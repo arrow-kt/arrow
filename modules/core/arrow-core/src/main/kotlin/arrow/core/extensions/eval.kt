@@ -107,4 +107,4 @@ interface EvalBimonad : Bimonad<ForEval> {
 }
 
 fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
-  Eval.monad().fx.monad(c).fix()
+  defer { Eval.monad().fx.monad(c).fix() }

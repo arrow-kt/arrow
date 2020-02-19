@@ -1,15 +1,20 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Eval.Companion.just
+import arrow.core.extensions.eq
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad
 import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
+import arrow.core.extensions.fx
+import arrow.core.internal.AtomicBooleanW
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.GenK
 import arrow.test.laws.BimonadLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.fail
@@ -35,6 +40,17 @@ class EvalTest : UnitSpec() {
     testLaws(
       BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), Eval.functor(), Eval.applicative(), Eval.monad(), GENK, EQK)
     )
+
+    "fx block runs lazily" {
+      val run = AtomicBooleanW(false)
+      val p = Eval.fx {
+        run.getAndSet(true)
+        run.value
+      }
+
+      run.value shouldBe false
+      p.equalUnderTheLaw(just(true), EQK.liftEq(Boolean.eq())) shouldBe true
+    }
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
