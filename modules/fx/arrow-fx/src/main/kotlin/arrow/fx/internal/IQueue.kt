@@ -26,7 +26,7 @@ class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iter
   private fun cons(a: A, l: List<A>): List<A> = listOf(a) + l
 
   fun isEmpty(): Boolean = lIn.isEmpty() && lOut.isEmpty()
-  fun nonEmpty(): Boolean = lIn.nonEmpty() || lOut.nonEmpty()
+  fun isNotEmpty(): Boolean = lIn.nonEmpty() || lOut.nonEmpty()
 
   fun head(): A =
     when {
@@ -56,11 +56,11 @@ class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iter
 
   fun dequeue(): Tuple2<A, IQueue<A>> =
     when {
-      lOut.isEmpty() && !lIn.isEmpty() -> {
+      lOut.isEmpty() && lIn.isNotEmpty() -> {
         val rev = lIn.reversed()
         rev.head() toT IQueue(emptyList(), rev.tail())
       }
-      lOut.nonEmpty() -> lOut.head() toT IQueue(lIn, lOut.tail())
+      lOut.isNotEmpty() -> lOut.head() toT IQueue(lIn, lOut.tail())
       else -> throw NoSuchElementException("dequeue on empty queue")
     }
 
@@ -80,7 +80,9 @@ class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iter
 
   companion object {
     fun <A> empty(): IQueue<A> = EmptyQueue as IQueue<A>
-    fun <A> invoke(vararg a: A): IQueue<A> = IQueue(emptyList(), a.toList())
+    operator fun <A> invoke(vararg a: A): IQueue<A> = IQueue(emptyList(), a.toList())
+    operator fun <A> invoke(a: A): IQueue<A> = IQueue(emptyList(), listOf(a))
+    operator fun <A> invoke(a: List<A>): IQueue<A> = IQueue(emptyList(), a)
   }
 
   override fun iterator(): Iterator<A> = toList().iterator()
