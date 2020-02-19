@@ -1,6 +1,6 @@
 package arrow.benchmarks
 
-import arrow.fx.ConcurrentQueue
+import arrow.fx.internal.ConcurrentQueue
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOOf
