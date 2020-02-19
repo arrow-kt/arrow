@@ -28,6 +28,7 @@ import arrow.mtl.extensions.accumt.alternative.alternative
 import arrow.mtl.extensions.accumt.functor.functor
 import arrow.mtl.extensions.accumt.monad.monad
 import arrow.mtl.extensions.accumt.monadError.monadError
+import arrow.mtl.extensions.accumt.monadPlus.monadPlus
 import arrow.mtl.extensions.accumt.monadState.monadState
 import arrow.mtl.extensions.accumt.monadTrans.monadTrans
 import arrow.mtl.extensions.accumt.monadWriter.monadWriter
@@ -43,6 +44,7 @@ import arrow.test.generators.throwable
 import arrow.test.generators.tuple2
 import arrow.test.laws.AlternativeLaws
 import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonadPlusLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonadWriterLaws
@@ -102,6 +104,12 @@ class AccumTTest : UnitSpec() {
         AccumT.genK(WriterT.genK(Id.genK(), Gen.string()), Gen.string()),
         AccumT.eqK(WriterT.monad(Id.monad(), String.monoid()), WriterT.eqK(Id.eqK(), String.eq()), String.eq(), ""),
         String.eq()
+      ),
+
+      MonadPlusLaws.laws(
+        AccumT.monadPlus(Option.monad(), Int.monoid(), Option.alternative()),
+        AccumT.genK(Option.genK(), Gen.int()),
+        AccumT.eqK(Option.monad(), Option.eqK(), Int.eq(), 10)
       )
     )
 

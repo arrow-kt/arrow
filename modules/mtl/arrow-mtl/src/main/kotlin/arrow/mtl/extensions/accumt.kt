@@ -21,6 +21,7 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.Monoid
 
 @extension
@@ -185,4 +186,11 @@ interface AccumTMonadWriter<S, W, F> : MonadWriter<AccumTPartialOf<W, F>, S>, Ac
         }.pass()
       })
     }
+}
+
+@extension
+interface AccumTMonadPlus<W, F> : MonadPlus<AccumTPartialOf<W, F>>, AccumTMonad<W, F>, AccumTAlternative<W, F> {
+  override fun MF(): Monad<F>
+  override fun MS(): Monoid<W>
+  override fun AF(): Alternative<F>
 }
