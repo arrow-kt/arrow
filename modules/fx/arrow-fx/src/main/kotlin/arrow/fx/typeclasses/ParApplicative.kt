@@ -1,6 +1,8 @@
 package arrow.fx.typeclasses
 
 import arrow.Kind
+import arrow.core.Eval
+import arrow.core.Eval.Now
 import arrow.core.Tuple2
 import arrow.typeclasses.Applicative
 import kotlin.coroutines.CoroutineContext
@@ -18,4 +20,13 @@ internal fun <F> Concurrent<F>.ParApplicative(ctx: CoroutineContext? = null): Ap
 
   override fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
     _ctx.parMapN(this@product, fb, ::Tuple2)
+
+  override fun <A, B> Kind<F, A>.lazyAp(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> =
+    _ctx.parMapN(this@lazyAp, eval(ff))  { a, f -> f(a) }.let(::Now)
+
+  fun <A, B> eval(eval: Eval<Kind<F, (A) -> B>>): Kind<F, (A) -> B> =
+    when (eval) {
+      is Now -> eval.value
+      else -> defer { eval.value() }
+    }
 }
