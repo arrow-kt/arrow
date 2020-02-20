@@ -39,14 +39,6 @@ subprojects { project ->
 
     compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
-    test {
-        useJUnitPlatform()
-        testLogging {
-            exceptionFormat 'full'
-            events "passed", "skipped", "failed", "standardOut", "standardError"
-        }
-    }
-
     tasks.withType(Test) {
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
