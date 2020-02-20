@@ -1,0 +1,4 @@
+rootProject.name = 'arrow'
+
+include 'arrow-integrations-jackson-module'
+include 'arrow-integrations-retrofit-adapter'

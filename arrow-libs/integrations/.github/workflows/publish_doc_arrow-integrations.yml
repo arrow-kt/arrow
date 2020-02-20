@@ -1,0 +1,96 @@
+name: "arrow-integrations: publish documentation"
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  arrow-integrations_publish_documentation:
+
+    env:
+      BASEDIR: ${{github.workspace}}
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        architecture: x64
+    - name: Checkout orchestrator
+      run: git clone https://github.com/arrow-kt/arrow.git
+    - name: Run Ank for site
+      run:  |
+        ./arrow/scripts/site-download.sh
+        ./arrow/scripts/site-run-ank.sh
+    - name: Run Dokka for arrow-integrations
+      run: |
+        git clone https://github.com/arrow-kt/arrow-integrations.git
+        ./arrow/scripts/project-run-dokka.sh arrow-integrations
+    - name: Run Ank for arrow-integrations
+      run: ./arrow/scripts/project-run-ank.sh arrow-integrations
+    - name: Join docs to site
+      run: ./arrow/scripts/project-locate-doc.sh arrow-integrations
+    - name: Prepare environment
+      run: |
+        ./arrow/scripts/site-prepare-env.sh
+        ./arrow/scripts/install-aws.sh
+    - name: Build site
+      run: ./arrow/scripts/site-build.sh
+    - name: Deploy
+      env:
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: ./arrow/scripts/site-publish.sh
+    - name: Prepare environment to create the issue (new package)
+      if: failure()
+      id: create-issue
+      run: |
+        echo $(git log -1 --pretty=format:%s)
+        echo ::set-output name=title::$(git log -1 --pretty=format:%s)
+        echo -e "## Details\n" > issue.log
+        echo -e "* **Commit hash**: \`$(git log -1 --pretty=format:%h)\`\n" >> issue.log
+        echo -e "* **Author**: $(git log -1 --pretty=format:%an)\n" >> issue.log
+        echo -e "* **Committer**: $(git log -1 --pretty=format:%cn)\n" >> issue.log
+        echo -e "* **More info**: [error log](https://github.com/arrow-kt/arrow-integrations/commit/$GITHUB_SHA/checks)\n" >> issue.log
+        cat issue.log
+        rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
+        cd /home/runner/work/_actions/actions/github-script/0.3.0/
+        npm install
+        npm install xmlhttprequest
+    - name: Create the issue
+      if: failure()
+      uses: actions/github-script@0.3.0
+      with:
+        github-token: ${{github.token}}
+        script: |
+          var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+          function readFile(file) {
+            var content;
+            var rawFile = new XMLHttpRequest();
+            rawFile.open("GET", file, false);
+            rawFile.onreadystatechange = function () {
+                content = rawFile.responseText;
+            }
+            rawFile.send();
+            return content;
+          }
+          await github.issues.create({...context.repo,
+            title: "DOC: error when merging '${{ steps.create-issue.outputs.title }}' on master branch",
+            body: readFile("file://${{github.workspace}}/issue.log")});
+    - name: Save content
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > site-content.log
+    - uses: actions/upload-artifact@v1
+      with:
+        name: site-content
+        path: site-content.log
