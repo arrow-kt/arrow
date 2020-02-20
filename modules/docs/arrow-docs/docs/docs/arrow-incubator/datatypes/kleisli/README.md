@@ -1,9 +1,7 @@
 ---
 layout: docs-incubator
 title: Kleisli
-permalink: /docs/arrow/mtl/kleisli/
-redirect_from:
-  - /docs/datatypes/kleisli/
+permalink: /arrow/mtl/kleisli/
 video: vAdhMJWnBUI
 ---
 

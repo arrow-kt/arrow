@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Bimonad
-permalink: /docs/arrow/typeclasses/bimonad/
-redirect_from:
-  - /docs/typeclasses/bimonad/
+permalink: /arrow/typeclasses/bimonad/
 ---
 
 ## Bimonad
@@ -13,7 +11,7 @@ redirect_from:
 
 A datatype that's both a Monad and a Comonad.
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 ### Data types
 

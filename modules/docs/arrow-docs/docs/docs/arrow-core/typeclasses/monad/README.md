@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Monad
-permalink: /docs/arrow/typeclasses/monad/
-redirect_from:
-  - /docs/typeclasses/monad/
+permalink: /arrow/typeclasses/monad/
 ---
 
 ## Monad
@@ -14,11 +12,11 @@ redirect_from:
 `Monad` is a typeclass that abstracts over sequential execution of code.
 This doc focuses on the methods provided by the typeclass.
 If you'd like a long explanation of its origins with simple examples with nullable, `Option`, and `List`,
-head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
+head to [The Monad Tutorial]({{ '/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
-`Monad` includes all combinators present in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}) and [`Selective`]({{ '/docs/arrow/typeclasses/selective/' | relative_url }}).
+`Monad` includes all combinators present in [`Applicative`]({{ '/arrow/typeclasses/applicative/' | relative_url }}) and [`Selective`]({{ '/arrow/typeclasses/selective/' | relative_url }}).
 
 #### Kind<F, A>#flatMap
 
@@ -85,7 +83,7 @@ Some(5).mproduct {
 #### followedBy/followedByEval
 
 Sequentially executes two elements that are independent from one another.
-The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.followedBy
@@ -108,7 +106,7 @@ IO.just(1).flatTap(::logValue).fix().unsafeRunSync()
 #### productL/productLEval (formerly ~~forEffect~~/~~forEffectEval~~)
 
 Sequentially executes two elements that are independent from one another, ignoring the value of the second one.
-The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.*
@@ -124,7 +122,7 @@ Arrow provides [`MonadLaws`][monad_law_source]{:target="_blank"} in the form of 
 
 Arrow already provides `Monad` instances for most common datatypes both in Arrow and the Kotlin stdlib.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Monad` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Monad` instances for custom datatypes.
 
 ### Data types
 

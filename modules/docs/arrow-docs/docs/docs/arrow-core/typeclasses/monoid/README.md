@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Monoid
-permalink: /docs/arrow/typeclasses/monoid/
-redirect_from:
-  - /docs/typeclasses/monoid/
+permalink: /arrow/typeclasses/monoid/
 ---
 
 ## Monoid

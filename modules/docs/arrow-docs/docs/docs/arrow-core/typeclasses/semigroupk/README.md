@@ -1,14 +1,12 @@
 ---
 layout: docs-core
 title: SemigroupK
-permalink: /docs/arrow/typeclasses/semigroupk/
-redirect_from:
-  - /docs/typeclasses/semigroupk/
+permalink: /arrow/typeclasses/semigroupk/
 ---
 
 ## SemigroupK
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 
 ### Data types

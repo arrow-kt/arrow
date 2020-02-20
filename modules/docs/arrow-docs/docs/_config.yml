@@ -27,87 +27,77 @@ collections:
 # Default Front Matter values to be set
 defaults:
   - scope:
-      path: "docs/apidocs/arrow-optics-mtl"
+      path: "apidocs/arrow-optics-mtl"
       type: "pages"
     values:
       layout: "docs-optics"
   - scope:
-      path: "docs/apidocs/arrow-optics"
+      path: "apidocs/arrow-optics"
       type: "pages"
     values:
       layout: "docs-optics"
   - scope:
-      path: "docs/apidocs/arrow-fx-mtl"
+      path: "apidocs/arrow-fx-mtl"
       type: "pages"
     values:
       layout: "docs-fx"
   - scope:
-      path: "docs/apidocs/arrow-fx-reactor"
+      path: "apidocs/arrow-fx-reactor"
       type: "pages"
     values:
       layout: "docs-fx"
   - scope:
-      path: "docs/apidocs/arrow-fx-rx2"
+      path: "apidocs/arrow-fx-rx2"
       type: "pages"
     values:
       layout: "docs-fx"
   - scope:
-      path: "docs/apidocs/arrow-fx"
+      path: "apidocs/arrow-fx"
       type: "pages"
     values:
       layout: "docs-fx"
   - scope:
-      path: "docs/apidocs/arrow-aql"
+      path: "apidocs/arrow-aql"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-mtl"
+      path: "apidocs/arrow-mtl"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-mtl-data"
+      path: "apidocs/arrow-mtl-data"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-recursion"
+      path: "apidocs/arrow-recursion"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-recursion-data"
+      path: "apidocs/arrow-recursion-data"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-generic"
+      path: "apidocs/arrow-generic"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-free"
+      path: "apidocs/arrow-free"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-free-data"
+      path: "apidocs/arrow-free-data"
       type: "pages"
     values:
       layout: "docs-incubator"
   - scope:
-      path: "docs/apidocs/arrow-meta"
-      type: "pages"
-    values:
-      layout: "docs-meta"
-  - scope:
-      path: "docs/apidocs/arrow-meta-test-models"
-      type: "pages"
-    values:
-      layout: "docs-meta"
-  - scope:
-      path: "docs/apidocs"
+      path: "apidocs"
       type: "pages"
     values:
       layout: "docs-core"

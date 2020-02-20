@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Promise
-permalink: /docs/effects/promise/
+permalink: /effects/promise/
 ---
 
 ## Promise

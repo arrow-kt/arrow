@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Adapting custom data types for AQL
-permalink: /docs/aql/custom/
+permalink: /aql/custom/
 ---
 
 ## Adapting custom data types for AQL
@@ -21,7 +21,7 @@ For simplicity the type in the example below is called `Box` and it mirrors the 
 /**
 * Represents a box that can be empty or contain a value
 */
-@higherkind 
+@higherkind
 sealed class Box<out A> : BoxOf<A> {
 
   object Empty : Box<Nothing>()
@@ -31,7 +31,7 @@ sealed class Box<out A> : BoxOf<A> {
   companion object {
     fun <A> empty(): Box<A> = Empty
   }
-  
+
 }
 ```
 
@@ -68,7 +68,7 @@ import arrow.aql.*
 import arrow.aql.box.select.*
 fun main(args: Array<String>) {
 //sampleStart
-val result: Box<Int> = 
+val result: Box<Int> =
   Box.Full(1).query {
     select { this + 1 }
   }.value()
@@ -77,7 +77,7 @@ println(result)
 }
 ```
 
-[More on __select__](/docs/aql/select/)
+[More on __select__]({{'/aql/select/' | relative_url }})
 
 ## Enabling __where__ on a custom data type
 
@@ -146,7 +146,7 @@ println(result)
 }
 ```
 
-[More on __where__](/docs/aql/where/)
+[More on __where__]({{'/aql/where/' | relative_url }})
 
 ## Enabling __count, groupBy, orderBy, sum & union__ on a custom data type
 
@@ -234,14 +234,14 @@ fun main(args: Array<String>) {
 //sampleStart
 val result =
   Box.Full(1).query {
-    selectAll() groupBy { "selected" } 
+    selectAll() groupBy { "selected" }
   }.value()
 //sampleEnd
 println(result)
 }
 ```
 
-[More on __groupBy__](/docs/aql/groupby/)
+[More on __groupBy__]({{'/aql/groupby/' | relative_url }})
 
 ### orderBy
 
@@ -264,7 +264,7 @@ println(result)
 }
 ```
 
-[More on __orderBy__](/docs/aql/orderby/)
+[More on __orderBy__]({{'/aql/orderby/' | relative_url }})
 
 ### sum
 
@@ -284,7 +284,7 @@ println(result)
 }
 ```
 
-[More on __sum__](/docs/aql/sum/)
+[More on __sum__]({{'/aql/sum/' | relative_url }})
 
 ### union
 
@@ -309,14 +309,14 @@ println(composition.value())
 }
 ```
 
-[More on __union__](/docs/aql/union/)
+[More on __union__]({{'/aql/union/' | relative_url }})
 
 Learn more about the `AQL` combinators
 
-- [_select_](/docs/aql/select/)
-- [_from_](/docs/aql/from/)
-- [_where_](/docs/aql/where/)
-- [_groupBy_](/docs/aql/groupby/)
-- [_orderBy_](/docs/aql/orderby/)
-- [_sum_](/docs/aql/sum/)
-- [_union_](/docs/aql/union/)
+- [_select_]({{'/aql/select/' | relative_url }})
+- [_from_]({{'/aql/select/' | relative_url }})
+- [_where_]({{'/aql/where/' | relative_url }})
+- [_groupBy_]({{'/aql/groupby/' | relative_url }})
+- [_orderBy_]({{'/aql/orderby/' | relative_url }})
+- [_sum_]({{'/aql/sum/' | relative_url }})
+- [_union_]({{'/aql/union/' | relative_url }})

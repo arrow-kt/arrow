@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Getter
-permalink: /docs/optics/getter/
+permalink: /optics/getter/
 ---
 
 ## Getter
@@ -42,7 +42,7 @@ val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
 ```
 
-`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
+`Getter` also has some convenience methods to make working with [Reader]({{ '/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*
@@ -60,7 +60,7 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*

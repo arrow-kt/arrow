@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: SequenceK
-permalink: /docs/arrow/core/sequencek/
-redirect_from:
-  - /docs/datatypes/sequencek/
+permalink: /arrow/core/sequencek/
 ---
 
 ## SequenceK
@@ -22,7 +20,7 @@ import arrow.core.*
 sequenceOf(1, 2, 3).k()
 ```
 
-SequenceK derives many useful typeclasses. For instance, it has a [`SemigroupK`](/docs/arrow/typeclasses/semigroupk/) instance.
+SequenceK derives many useful typeclasses. For instance, it has a [`SemigroupK`]({{'/arrow/typeclasses/semigroupk/' | relative_url }}) instance.
 
 ```kotlin:ank
 val hello = sequenceOf('h', 'e', 'l', 'l', 'o').k()
@@ -32,7 +30,7 @@ val world = sequenceOf('w', 'o', 'r', 'l', 'd').k()
 hello.combineK(commaSpace.combineK(world)).toList() == hello.combineK(commaSpace).combineK(world).toList()
 ```
 
-[`Functor`](/docs/arrow/typeclasses/functor/)
+[`Functor`]({{'/arrow/typeclasses/functor/' | relative_url }})
 
 Transforming a sequence:
 ```kotlin:ank
@@ -40,7 +38,7 @@ val fibonacci = generateSequence(0 to 1) { it.second to it.first + it.second }.m
 fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 ```
 
-[`Applicative`](/docs/arrow/typeclasses/applicative/)
+[`Applicative`]({{'/arrow/typeclasses/applicative/' | relative_url }})
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
@@ -52,7 +50,7 @@ sequenceOf(1, 2, 3)
  .toList()
 ```
 
-SequenceK is a [`Monad`](/docs/arrow/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
+SequenceK is a [`Monad`]({{'/arrow/typeclasses/monad/' | relative_url }}) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
 
 ```kotlin:ank
 import arrow.typeclasses.*

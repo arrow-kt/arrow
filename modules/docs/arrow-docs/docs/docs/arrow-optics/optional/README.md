@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Optional
-permalink: /docs/optics/optional/
+permalink: /optics/optional/
 ---
 
 ## Optional
@@ -106,7 +106,7 @@ val optionalAddress: Optional<Person, Address> = Person.address
 
 ### Polymorphic optional
 
-A `POptional` is very similar to [PLens](/docs/optics/lens#Plens) and [PPrism](/docs/optics/prism#PPrism). So let's see if we can combine both examples shown in their documentation.
+A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }}) and [PPrism]({{'/optics/prism#PPrism' | relative_url }}). So let's see if we can combine both examples shown in their documentation.
 
 Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
 

@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Eq
-permalink: /docs/arrow/typeclasses/eq/
-redirect_from:
-  - /docs/typeclasses/eq/
+permalink: /arrow/typeclasses/eq/
 ---
 
 ## Eq
@@ -78,7 +76,7 @@ Eq.any().run { Eval.later { 1 }.eqv(Eval.later { 1 }) }
 val intEq = Eq<Int> { a, b -> a == b }
 ```
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
 
 ### Data types
 
@@ -89,6 +87,6 @@ import arrow.typeclasses.Eq
 TypeClass(Eq::class).dtMarkdownList()
 ```
 
-Additionally, all instances of [`Order`]({{ '/docs/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`.
+Additionally, all instances of [`Order`]({{ '/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`.
 
 ank_macro_hierarchy(arrow.typeclasses.Eq)

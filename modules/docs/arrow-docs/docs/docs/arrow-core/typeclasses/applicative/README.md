@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Applicative
-permalink: /docs/arrow/typeclasses/applicative/
-redirect_from:
-  - /docs/typeclasses/applicative/
+permalink: /arrow/typeclasses/applicative/
 ---
 
 ## Applicative
@@ -15,7 +13,7 @@ The `Applicative` typeclass abstracts the ability to lift values and apply funct
 Examples of type constructors that can implement instances of the Applicative typeclass include `Option`, `NonEmptyList`,
 `List`, and many other datatypes that include a `just` and either `ap` function. `ap` may be derived for monadic types that include a `Monad` instance via `flatMap`.
 
-`Applicative` includes all combinators present in [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}).
+`Applicative` includes all combinators present in [`Functor`]({{ '/arrow/typeclasses/functor/' | relative_url }}).
 
 ### Applicative Builder examples
 
@@ -111,7 +109,7 @@ Option.applicative().run { Some(1).followedBy(Some(2)) }
 This is a reverse for `followedBy`. Sequences actions but discarding the value of the second argument.
 
 ```kotlin:ank
-Option.applicative().run { Some(1).apTap(Some(2)) } 
+Option.applicative().run { Some(1).apTap(Some(2)) }
 ```
 
 ### Apply
@@ -119,14 +117,14 @@ Option.applicative().run { Some(1).apTap(Some(2)) }
 A closely related type class is Apply, which is identical to Applicative, modulo the ``just`` method. Indeed, Applicative is a subclass of Apply with the addition of this method.
 
 ```kotlin:ank
-import arrow.typeclasses.Functor 
+import arrow.typeclasses.Functor
 
 interface Apply<F> : Functor<F> {
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 }
 
 interface Applicative<F> : Apply<F> {
-  fun <A> just(a: A): Kind<F, A> 
+  fun <A> just(a: A): Kind<F, A>
 }
 ```
 
@@ -140,7 +138,7 @@ Arrow provides [`ApplicativeLaws`][applicative_law_source]{:target="_blank"} in 
 
 Arrow already provides Applicative instances for most common datatypes both in Arrow and the Kotlin stdlib.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own Applicative instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own Applicative instances for custom datatypes.
 
 ### Data types
 
@@ -151,7 +149,7 @@ import arrow.typeclasses.Applicative
 TypeClass(Applicative::class).dtMarkdownList()
 ```
 
-Additionally, all instances of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
+Additionally, all instances of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
 ank_macro_hierarchy(arrow.typeclasses.Applicative)

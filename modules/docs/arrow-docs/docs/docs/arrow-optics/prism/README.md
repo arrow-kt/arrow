@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Prism
-permalink: /docs/optics/prism/
+permalink: /optics/prism/
 ---
 
 ## Prism

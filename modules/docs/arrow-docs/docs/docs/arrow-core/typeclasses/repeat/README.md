@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Repeat
-permalink: /docs/arrow/typeclasses/repeat/
-redirect_from:
-  - /docs/typeclasses/repeat/
+permalink: /arrow/typeclasses/repeat/
 ---
 
 ## Repeat
@@ -42,9 +40,9 @@ Arrow provides [`RepeatLaws`][functor_laws_source]{:target="_blank"} in the form
 Arrow already provides Repeat instances for common datatypes (e.g. Option, SequenceK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Repeat`]({{ '/docs/arrow/typeclasses/repeat' | relative_url }}) implement the `Zip` typeclass directly
+Additionally all instances of [`Repeat`]({{ '/arrow/typeclasses/repeat' | relative_url }}) implement the `Zip` typeclass directly
 since they are all subtypes of `Zip`
 
 ### Data types

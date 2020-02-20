@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Monad Comprehensions
-permalink: /docs/patterns/monad_comprehensions/
+permalink: /patterns/monad_comprehensions/
 ---
 
 ## Monad Comprehensions
@@ -14,7 +14,7 @@ The purpose of monad comprehensions is to compose sequential chains of actions i
 They're similar to coroutines or async/await, but extensible to existing and new types!
 
 Let's walk through the evolution of how code was written, up to where comprehensions are today.
-It'll take a couple of sections to get there, so if you're familiar with `flatMap`, feel free to skip to [Comprehensions over coroutines]({{ '/docs/patterns/monad_comprehensions/#comprehensions-over-coroutines' | relative_url }}).
+It'll take a couple of sections to get there, so if you're familiar with `flatMap`, feel free to skip to [Comprehensions over coroutines]({{ '/patterns/monad_comprehensions/#comprehensions-over-coroutines' | relative_url }}).
 
 ### Synchronous sequences of actions
 
@@ -46,11 +46,11 @@ although you may find it referred to in other languages as `andThen`, `then`, `b
 It takes one function as a parameter to be called after the current operation completes, and that function has to return another value to continue with the operation.
 With knowledge of `flatMap`, we can write sequential expressions that are run asynchronously, even over multiple threads.
 
-The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}),
-for which we also have a [tutorial]({{ '/docs/patterns/monads' | relative_url }}).
+The [typeclass]({{ '/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}),
+for which we also have a [tutorial]({{ '/patterns/monads' | relative_url }}).
 
-Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
-Let's see one example using a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of a university some student attend:
+Implementations of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/integrations/kotlinxcoroutines' | relative_url }}).
+Let's see one example using a [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/effects/io' | relative_url }}), where we fetch from a database the information about the dean of a university some student attend:
 
 ```kotlin
 val university: IO<University> =
@@ -72,12 +72,12 @@ Computer science can bring us a construct to get the best of both styles.
 
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions, etc. Each version contains certain unique points, but all derive from the same principles.
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code into asynchronous sequences.
-Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass.
+Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) typeclass.
 
 This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux`, or `IO` all the same.
 In the following examples, we'll use `IO`, as it's a simple concurrency primitive with straightforward behavior.
 
-Every instance of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
+Every instance of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
 Let's see a minimal example.
 
@@ -93,7 +93,7 @@ IO.fx {
 ```
 
 Anything in the function inside `binding` can be imperative and sequential code that'll be executed when the data type decides.
-In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
+In the case of [`IO`]({{ '/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
 IO.fx {
@@ -103,7 +103,7 @@ IO.fx {
 // Compiler error: the type of a is IO<Int>, cannot add 1 to it
 ```
 
-This is our first challenge. We've created an instance of [`IO`]({{ '/docs/effects/io' | relative_url }}) that'll run a block asynchronously, and we cannot get the value from inside it.
+This is our first challenge. We've created an instance of [`IO`]({{ '/effects/io' | relative_url }}) that'll run a block asynchronously, and we cannot get the value from inside it.
 From the previous snippet, the first intuition would be to call `unsafeRunSync()` on `a` to get the value.
 This will block the current thread until the operation completes. What we want instead is to run and wait until `a` completes before yielding the result.
 For that, we have two versions of the function `bind()`, which is a function only available inside the function passed to `binding()`.
@@ -145,7 +145,7 @@ val university: IO<University> =
   }
 ```
 
-And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of [`IO`]({{ '/docs/effects/io' | relative_url }}).
+And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of [`IO`]({{ '/effects/io' | relative_url }}).
 
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> =
@@ -164,7 +164,7 @@ While this looks like a great improvement to manually raise errors, sometimes yo
 
 ### Error propagation in comprehensions
 
-While [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
+While [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
 Exceptions work like old goto that can happen at any point during execution and stop the current block to jump to a catch block.
 
 Let's take a somewhat common mistake and expand on it:
@@ -184,10 +184,10 @@ What would happen if the file contains 0 lines? The chain throws ArithmeticExcep
 This exception goes uncaught and finalizes the program with a crash. Knowing this, it is obvious we can do better.
 
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
-For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
+For this purpose, the typeclass [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}) was created.
 It allows us to raise and recover from errors.
 
-The typeclass [`Async`]({{ '/docs/apidocs/arrow-fx/arrow.fx.typeclasses/-async/index.html' | relative_url }}) allows us to wrap effectful operations, and it inherits all the operators from [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
+The typeclass [`Async`]({{ '/apidocs/arrow-fx/arrow.fx.typeclasses/-async/index.html' | relative_url }}) allows us to wrap effectful operations, and it inherits all the operators from [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}).
 
 ```kotlin
 fun <F> Async<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<String>> =
@@ -203,7 +203,7 @@ fun <F> Async<F, Throwable>.getLineLengthAverage(path: FilePath): Kind<F, List<S
 With a small change, we get handling of exceptions even within the binding block.
 This wrapping works the same way as if we raised an error as the return from `getFile()` or `readLines()`, short-circuiting and stopping the sequence early.
 
-Note that, while most data types include an instance of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is somewhat less common.
+Note that, while most data types include an instance of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}) is somewhat less common.
 
 ### What about those threads?
 
@@ -212,10 +212,10 @@ There are multiple default values and wrappers for common cases in both the stan
 
 #### Non-blocking thread jumps
 
-Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/async' | relative_url }}).
+Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/effects/async' | relative_url }}).
 Thus, it's only logical that these datatypes allow for non-blocking thread jumping.
 
-The typeclass [`Async`]({{ '/docs/effects/async' | relative_url }}) defines an extension function for comprehensions that enables continuing the execution on a new thread.
+The typeclass [`Async`]({{ '/effects/async' | relative_url }}) defines an extension function for comprehensions that enables continuing the execution on a new thread.
 This function, called `continueOn()`, takes a `CoroutineContext` and applies the effect of jumping to it, without any value returned.
 The rest of the continuation will be executed on that `CoroutineContext`. Simple as that.
 
@@ -243,4 +243,4 @@ Remember, this means that you have to precompute thread local values, like a thr
 
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
-Check out the section on the [Applicative Builder]({{ '/docs/typeclasses/applicative' | relative_url }}) pattern for information about this.
+Check out the section on the [Applicative Builder]({{ '/arrow/typeclasses/applicative' | relative_url }}) pattern for information about this.

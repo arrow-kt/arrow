@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Retrofit
-permalink: /docs/integrations/retrofit/
+permalink: /integrations/retrofit/
 ---
 
 ## Retrofit
@@ -9,7 +9,7 @@ permalink: /docs/integrations/retrofit/
 
 
 
-Arrow contains an integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/docs/arrow/core/try' | relative_url }}), [`ObservableK`]({{ '/docs/integrations/rx2' | relative_url }}), or [`IO`]({{ '/docs/effects/io' | relative_url }}).
+Arrow contains an integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), [`ObservableK`]({{ '/integrations/rx2' | relative_url }}), or [`IO`]({{ '/effects/io' | relative_url }}).
 
 
 ### Using `Call` directly with extensions functions
@@ -53,7 +53,7 @@ interface ApiClientTest {
 }
 ```
 
-You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}) instances as your data wrapper.
+You can use `CallK` to have [`Async`]({{ '/effects/async' | relative_url }}), [`MonadDefer`]({{ '/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/arrow/typeclasses/monaderror/' | relative_url }}) instances as your data wrapper.
 
 ### Using `CallK` with `IO`
 
@@ -75,7 +75,7 @@ createApiClientTest(baseUrl)
 
 ### Handling `Response` with Arrow
 
-Arrow provides the extension function `unwrapBody()` for `Response<A>` to handle it using [`ApplicativeError<F, Throwable>`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}). It wraps any failed response into an `HttpException`, and a missing body with `IllegalStateException`.
+Arrow provides the extension function `unwrapBody()` for `Response<A>` to handle it using [`ApplicativeError<F, Throwable>`]({{ '/arrow/typeclasses/applicativeerror/' | relative_url }}). It wraps any failed response into an `HttpException`, and a missing body with `IllegalStateException`.
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>

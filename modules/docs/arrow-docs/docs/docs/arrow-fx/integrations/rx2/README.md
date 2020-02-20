@@ -1,7 +1,8 @@
 ---
 layout: docs-fx
 title: RxJava 2
-permalink: /docs/integrations/rx2/
+permalink: /integrations/rx2/
+
 ---
 
 ## RxJava 2
@@ -26,7 +27,7 @@ Observable.from(7, 4, 11, 3)
 
 ### Integration with your existing Observable chains
 
-The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
+The largest quality of life improvement when using Observables in Arrow is the introduction of the [Monad Comprehension]({{ '/patterns/monad_comprehensions' | relative_url }}). This library construct allows expressing asynchronous Observable sequences as synchronous code using binding/bind.
 
 #### Arrow Wrapper
 
@@ -112,9 +113,9 @@ FlowableK.async().effect {
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/effects/monaddefer' | relative_url }}).
 
-[`Async`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK`, or `SingleK`.
+[`Async`]({{ '/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK`, or `SingleK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
@@ -126,7 +127,7 @@ val songSingle: SingleKOf<Url> = getSongUrlAsync(SingleK.monadDefer())
 val songMaybe: MaybeKOf<Url> = getSongUrlAsync(MaybeK.monadDefer())
 ```
 
-[`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `fx`, with all its benefits.
+[`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/patterns/monad_comprehensions' | relative_url }}) using the method `fx`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -189,10 +190,10 @@ disposable.dispose()
 
 ### Stack safety
 
-While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types.
+While [`MonadDefer`]({{ '/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types.
 This is a limitation on rx2's side. See the corresponding github [issue]({{ 'https://github.com/ReactiveX/RxJava/issues/6322' }}).
 
-To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+To overcome this limitation and run code in a stack in a safe way, one can make use of `fx.stackSafe` which is provided for every instance of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
 ```kotlin:ank:playground
 import arrow.Kind

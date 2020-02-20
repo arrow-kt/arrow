@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Libraries
-permalink: /docs/quickstart/libraries/
+permalink: /quickstart/libraries/
 ---
 
 ## Core Libraries
@@ -15,23 +15,23 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 In this doc, we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 #### Table of Content
-* [arrow-core]({{ '/docs/quickstart/libraries/#arrow-core' | relative_url }})
-* [arrow-core-data]({{ '/docs/quickstart/libraries/#arrow-core-data' | relative_url }})
-* [arrow-optics]({{ '/docs/quickstart/libraries/#arrow-optics' | relative_url }})
-* [arrow-fx]({{ '/docs/quickstart/libraries/#arrow-fx' | relative_url }})
-* [arrow-syntax]({{ '/docs/quickstart/libraries/#arrow-syntax' | relative_url }})
-* [arrow-fx-rx2 & arrow-fx-reactor]({{ '/docs/quickstart/libraries/#arrow-fx-rx2&arrow-fx-reactor' | relative_url }})
-* [arrow-mtl]({{ '/docs/quickstart/libraries/#arrow-mtl' | relative_url }})
-* [arrow-mtl-data]({{ '/docs/quickstart/libraries/#arrow-mtl-data' | relative_url }})
-* [arrow-optics-mtl]({{ '/docs/quickstart/libraries/#arrow-optics-mtl' | relative_url }})
-* [arrow-recursion]({{ '/docs/quickstart/libraries/#arrow-recursion' | relative_url }})
-* [arrow-recursion-data]({{ '/docs/quickstart/libraries/#arrow-recursion-data' | relative_url }})
-* [arrow-integration-retrofit-adapter]({{ '/docs/quickstart/libraries/#arrow-integration-retrofit-adapter' | relative_url }})
-* [arrow-free]({{ '/docs/quickstart/libraries/#arrow-free' | relative_url }})
-* [arrow-free-data]({{ '/docs/quickstart/libraries/#arrow-free-data' | relative_url }})
-* [arrow-aql]({{ '/docs/quickstart/libraries/#arrow-aql' | relative_url }})
-* [arrow-meta]({{ '/docs/quickstart/libraries/#arrow-meta' | relative_url }})
-* [arrow-generic]({{ '/docs/quickstart/libraries/#arrow-generic' | relative_url }})
+* [arrow-core]({{ '/quickstart/libraries/#arrow-core' | relative_url }})
+* [arrow-core-data]({{ '/quickstart/libraries/#arrow-core-data' | relative_url }})
+* [arrow-optics]({{ '/quickstart/libraries/#arrow-optics' | relative_url }})
+* [arrow-fx]({{ '/quickstart/libraries/#arrow-fx' | relative_url }})
+* [arrow-syntax]({{ '/quickstart/libraries/#arrow-syntax' | relative_url }})
+* [arrow-fx-rx2 & arrow-fx-reactor]({{ '/quickstart/libraries/#arrow-fx-rx2&arrow-fx-reactor' | relative_url }})
+* [arrow-mtl]({{ '/quickstart/libraries/#arrow-mtl' | relative_url }})
+* [arrow-mtl-data]({{ '/quickstart/libraries/#arrow-mtl-data' | relative_url }})
+* [arrow-optics-mtl]({{ '/quickstart/libraries/#arrow-optics-mtl' | relative_url }})
+* [arrow-recursion]({{ '/quickstart/libraries/#arrow-recursion' | relative_url }})
+* [arrow-recursion-data]({{ '/quickstart/libraries/#arrow-recursion-data' | relative_url }})
+* [arrow-integration-retrofit-adapter]({{ '/quickstart/libraries/#arrow-integration-retrofit-adapter' | relative_url }})
+* [arrow-free]({{ '/quickstart/libraries/#arrow-free' | relative_url }})
+* [arrow-free-data]({{ '/quickstart/libraries/#arrow-free-data' | relative_url }})
+* [arrow-aql]({{ '/quickstart/libraries/#arrow-aql' | relative_url }})
+* [arrow-meta]({{ '/quickstart/libraries/#arrow-meta' | relative_url }})
+* [arrow-generic]({{ '/quickstart/libraries/#arrow-generic' | relative_url }})
 
 ### arrow-core
 
@@ -41,7 +41,7 @@ dependencies {
 }
 ```
 
-This library include the possible [typeclass extensions]({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }}) including datatypes and typeclasses from `arrow-core-data` that can be implemented for the datatypes in their respective libraries.
+This library include the possible [typeclass extensions]({{ '/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }}) including datatypes and typeclasses from `arrow-core-data` that can be implemented for the datatypes in their respective libraries.
 
 Dependency: `arrow-core-data`
 
@@ -53,7 +53,7 @@ dependencies {
 }
 ```
 
-The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) and all basic [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
+The smallest set of [datatypes]({{ '/datatypes/intro/' | relative_url }}) and all basic [typeclasses]({{ '/typeclasses/intro' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
 ### arrow-optics
@@ -66,7 +66,7 @@ dependencies {
 
 Optics is the functional way of handling immutable data and collections in a way that's boilerplate free and efficient.
 
-Arrow Optics offers a way of declaring how to focus deeply into immutable structure without boilerplate. It also offers an [Optics DSL]({{ '/docs/optics/dsl/' | relative_url }})  to elegantly describe complex use-cases in an elegant and simple manner without requiring to understand the underlying theory.
+Arrow Optics offers a way of declaring how to focus deeply into immutable structure without boilerplate. It also offers an [Optics DSL]({{ '/optics/dsl/' | relative_url }})  to elegantly describe complex use-cases in an elegant and simple manner without requiring to understand the underlying theory.
 
 For all the new typeclasses, it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
@@ -80,7 +80,7 @@ dependencies {
 }
 ```
 
-The [fx library]({{ '/docs/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
+The [fx library]({{ '/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
 
 Dependency: `arrow-core`
 
@@ -115,9 +115,9 @@ dependencies {
 
 Each of these modules provides wrappers over the datatypes in each of the libraries that implement all the typeclasses provided by arrow-fx
 
-[Rx]({{ 'docs/integrations/rx2/' | relative_url }})
+[Rx]({{ 'integrations/rx2/' | relative_url }})
 
-[Reactor]({{ 'docs/integrations/reactor/' | relative_url }})
+[Reactor]({{ 'integrations/reactor/' | relative_url }})
 
 Dependency: `arrow-fx`
 
@@ -129,7 +129,7 @@ dependencies {
 }
 ```
 
-Advanced [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) to be used in programs using the Tagless-final architecture.
+Advanced [typeclasses]({{ '/typeclasses/intro' | relative_url }}) to be used in programs using the Tagless-final architecture.
 
 It also includes the extensions available for datatypes in arrow-core
 
@@ -187,7 +187,7 @@ dependencies {
 }
 ```
 
-The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
+The [adapter]({{ 'integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes through the use of typeclasses.
 
 Dependency: `arrow-fx`
 
@@ -199,7 +199,7 @@ dependencies {
 }
 ```
 
-The [Free datatype]({{ '/docs/free/free/' | relative_url }}) is a way of interpreting domain-specific languages from inside your program, including a configurable runner and flexible algebras.
+The [Free datatype]({{ '/free/free/' | relative_url }}) is a way of interpreting domain-specific languages from inside your program, including a configurable runner and flexible algebras.
 This allows optimization of operations like operator fusion or parallelism, while remaining on your business domain.
 
 Dependency: `arrow-free-data`
@@ -224,7 +224,7 @@ dependencies {
 }
 ```
 
-This [Arrow Query Library]({{ '/docs/aql/intro/' | relative_url }}) focuses on bringing SQL-like syntax to Arrow datatypes.
+This [Arrow Query Library]({{ '/aql/intro/' | relative_url }}) focuses on bringing SQL-like syntax to Arrow datatypes.
 
 Dependency: `arrow-core`
 
@@ -243,7 +243,7 @@ dependencies {
 }
 ```
 
-Allows boilerplate generation for [`@extension`]({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces/' | relative_url }}) instances and [`@higherkind`]({{ '/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
+Allows boilerplate generation for [`@extension`]({{ '/patterns/glossary/#instances-and-extensions-interfaces/' | relative_url }}) instances and [`@higherkind`]({{ '/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
 
@@ -256,4 +256,4 @@ dependencies {
 }
 ```
 
-It allows annotating data classes with [`@product`]({{ '/docs/generic/product/' | relative_url }}) to enable them to be structurally deconstructed in tuples and heterogeneous lists.
+It allows annotating data classes with [`@product`]({{ '/generic/product/' | relative_url }}) to enable them to be structurally deconstructed in tuples and heterogeneous lists.

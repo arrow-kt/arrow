@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Lens
-permalink: /docs/optics/lens/
+permalink: /optics/lens/
 ---
 
 ## Lens
@@ -58,7 +58,7 @@ val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (
 liftF(player)
 ```
 
-There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/mtl/reader/' | relative_url }}) easier.
+There are also some convenience methods to make working with [Reader]({{ '/arrow/mtl/reader/' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.optics.mtl.*
@@ -76,7 +76,7 @@ playerLens.asks(Int::inc)
   .runId(Player(50))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/apidocs/arrow-mtl-data/arrow.mtl/-state.html' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank

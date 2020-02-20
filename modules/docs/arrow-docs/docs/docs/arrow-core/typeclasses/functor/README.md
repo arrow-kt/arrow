@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Functor
-permalink: /docs/arrow/typeclasses/functor/
-redirect_from:
-  - /docs/typeclasses/functor/
+permalink: /arrow/typeclasses/functor/
 video: EUqg3fSahhk
 ---
 
@@ -99,7 +97,7 @@ Oftentimes, you may find the need to provide your own for unsupported datatypes.
 You may create or automatically derive instances of Functor for your own datatypes which you will be able to use in the context of abstract polymorphic code
 as demonstrated in the [example](#example) above.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
 ### Data types
 
@@ -110,7 +108,7 @@ import arrow.typeclasses.Functor
 TypeClass(Functor::class).dtMarkdownList()
 ```
 
-Additionally, all instances of [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}), and their MTL variants, implement the `Functor` typeclass directly
+Additionally, all instances of [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}), and their MTL variants, implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
 ank_macro_hierarchy(arrow.typeclasses.Functor)

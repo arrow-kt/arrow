@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Order
-permalink: /docs/arrow/typeclasses/order/
-redirect_from:
-  - /docs/typeclasses/order/
+permalink: /arrow/typeclasses/order/
 ---
 
 ## Order
@@ -104,7 +102,7 @@ Order { a: Int, b: Int -> b - a }.run {
 }
 ```
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.
 
 ### Data types
 

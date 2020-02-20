@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Align
-permalink: /docs/arrow/typeclasses/align/
-redirect_from:
-  - /docs/typeclasses/align/
+permalink: /arrow/typeclasses/align/
 ---
 
 ## Align
@@ -40,9 +38,9 @@ Arrow provides [`AlignLaws`][functor_laws_source]{:target="_blank"} in the form 
 Arrow already provides Align instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Align`]({{ '/docs/arrow/typeclasses/align' | relative_url }}) implement the `Semialign` typeclass directly
+Additionally all instances of [`Align`]({{ '/arrow/typeclasses/align' | relative_url }}) implement the `Semialign` typeclass directly
 since they are all subtypes of `Semialign`
 
 ### Data types

@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: EqK2
-permalink: /docs/arrow/typeclasses/eqk2/
-redirect_from:
-  - /docs/typeclasses/eqk2/
+permalink: /arrow/typeclasses/eqk2/
 ---
 
 ## EqK2
@@ -32,7 +30,7 @@ Either.eqK2().run {
 Arrow provides `EqK2Laws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `EqK2` instances.
 See the existing EqK2 instances implementations and accompanying tests for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `EqK2` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `EqK2` instances for custom datatypes.
 
 ### Data types
 

@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: FunctorFilter
-permalink: /docs/arrow/typeclasses/functorfilter/
-redirect_from:
-  - /docs/typeclasses/functorfilter/
+permalink: /arrow/typeclasses/functorfilter/
 ---
 
 ## FunctorFilter
@@ -22,4 +20,4 @@ TypeClass(FunctorFilter::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).

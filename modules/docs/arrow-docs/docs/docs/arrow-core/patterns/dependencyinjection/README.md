@@ -1,20 +1,20 @@
 ---
 layout: docs-core
 title: Dependency Injection
-permalink: /docs/patterns/dependency_injection/
+permalink: /patterns/dependency_injection/
 video: CR5h2Wq1yPE
 ---
 
-If you would like to know about using the [`Reader`]({{ '/docs/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/arrow/mtl/reader/' | relative_url }}) datatype instead, visit [this article](https://jorgecastillo.dev/kotlin-dependency-injection-with-the-reader-monad) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
 ## Dependency Injection using the `Typeclassless` technique
 
 
 
 
-Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
+Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
-The technique for writing polymorphic code demonstrated below is available for all other typeclasses besides [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
+The technique for writing polymorphic code demonstrated below is available for all other typeclasses besides [`Functor`]({{ '/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
@@ -27,13 +27,13 @@ multiplyBy2(Try.functor(), Try.just(1))
 // Success(2)
 ```
 
-In the example above, we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
+In the example above, we've defined a function that can operate over any data type for which a [`Functor`]({{ '/arrow/typeclasses/functor' | relative_url }}) instance is available.
 And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
 This technique applied to other Typeclasses allows users to describe entire programs in terms of behaviors typeclasses removing
 dependencies to concrete data types and how they operate.
 
 This technique does not enforce inheritance or any kind of subtyping relationship, and is frequently known as [`ad-hoc polymorphism`](https://en.wikipedia.org/wiki/Ad_hoc_polymorphism)
-and frequently used in programming languages that support [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) and [typeclass]({{ '/docs/patterns/glossary' | relative_url }}).
+and frequently used in programming languages that support [typeclass]({{ '/typeclasses/intro' | relative_url }}) and [typeclass]({{ '/patterns/glossary' | relative_url }}).
 
 Entire libraries and applications can be written without forcing consumers to use the lib author provided datatypes, but rather letting
 users provide their own typeclass instances for their datatypes.

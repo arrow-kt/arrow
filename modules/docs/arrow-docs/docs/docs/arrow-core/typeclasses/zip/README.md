@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Zip
-permalink: /docs/arrow/typeclasses/zip/
-redirect_from:
-  - /docs/typeclasses/zip/
+permalink: /arrow/typeclasses/zip/
 ---
 
 ## Zip
@@ -60,9 +58,9 @@ Arrow provides [`ZipLaws`][functor_laws_source]{:target="_blank"} in the form of
 Arrow already provides Zip instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Zip`]({{ '/docs/arrow/typeclasses/zip' | relative_url }}) implement the `Semialign` typeclass directly
+Additionally all instances of [`Zip`]({{ '/arrow/typeclasses/zip' | relative_url }}) implement the `Semialign` typeclass directly
 since they are all subtypes of `Semialign`
 
 ### Data types

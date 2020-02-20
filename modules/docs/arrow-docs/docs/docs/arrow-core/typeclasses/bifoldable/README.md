@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Bifoldable
-permalink: /docs/arrow/typeclasses/bifoldable/
-redirect_from:
-  - /docs/typeclasses/bifoldable/
+permalink: /arrow/typeclasses/bifoldable/
 ---
 
 ## Bifoldable
@@ -22,4 +20,4 @@ TypeClass(Bifoldable::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Bifoldable)
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).

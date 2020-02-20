@@ -4,83 +4,83 @@ options:
     nested_options:
 
       - title: Getting Started
-        url: /docs/fx/
+        url: /fx/
 
       - title: Asynchronous & Concurrent Programming
-        url: /docs/fx/async/
+        url: /fx/async/
 
       - title: Polymorphism. One Program multiple runtimes
-        url: /docs/fx/polymorphism/
+        url: /fx/polymorphism/
 
   - title: Effects
 
     nested_options:
 
       - title: IO
-        url: /docs/effects/io/
+        url: /effects/io/
 
       - title: MonadDefer
-        url: /docs/effects/monaddefer/
+        url: /effects/monaddefer/
 
       - title: Async
-        url: /docs/effects/async/
+        url: /effects/async/
 
       - title: Effect
-        url: /docs/effects/effect/
+        url: /effects/effect/
 
       - title: Promise
-        url: /docs/effects/promise/
+        url: /effects/promise/
 
       - title: Ref
-        url: /docs/effects/ref/
+        url: /effects/ref/
 
       - title: Fiber
-        url: /docs/effects/fiber/
+        url: /effects/fiber/
 
       - title: Resource
-        url: /docs/apidocs/arrow-fx/arrow.fx/-resource/
+        url: /apidocs/arrow-fx/arrow.fx/-resource/
 
       - title: Schedule
-        url: /docs/apidocs/arrow-fx/arrow.fx/-schedule/
+        url: /apidocs/arrow-fx/arrow.fx/-schedule/
 
       - title: Queue
-        url: /docs/effects/queue/
+        url: /effects/queue/
 
   - title: Type Classes
 
     nested_options:
 
       - title: Bracket
-        url: /docs/fx/typeclasses/bracket/
+        url: /fx/typeclasses/bracket/
 
       - title: MonadIO
-        url: /docs/apidocs/arrow-fx/arrow.fx.typeclasses/-monad-i-o/
+        url: /apidocs/arrow-fx/arrow.fx.typeclasses/-monad-i-o/
 
   - title: Integrations
 
     nested_options:
 
       - title: RxJava2
-        url: /docs/integrations/rx2/
+        url: /integrations/rx2/
 
       - title: Reactor
-        url: /docs/integrations/reactor/
+        url: /integrations/reactor/
 
       - title: kotlinx.coroutines
-        url: /docs/integrations/kotlinxcoroutines/
+        url: /integrations/kotlinxcoroutines/
 
   - title: API Docs
 
     nested_options:
 
       - title: Effects
-        url: /docs/apidocs/arrow-fx/
+        url: /apidocs/arrow-fx/
 
       - title: Effects MTL
-        url: /docs/apidocs/arrow-fx-mtl/
+        url: /apidocs/arrow-fx-mtl/
 
       - title: Effects Reactor
-        url: /docs/apidocs/arrow-fx-reactor/
+        url: /apidocs/arrow-fx-reactor/
 
       - title: Effects Rx2
-        url: /docs/apidocs/arrow-fx-rx2/
+        url: /apidocs/arrow-fx-rx2/

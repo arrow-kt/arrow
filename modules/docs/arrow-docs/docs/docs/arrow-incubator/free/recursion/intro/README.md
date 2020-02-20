@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Intro to Recursion Schemes
-permalink: /docs/recursion/intro/
+permalink: /recursion/intro/
 ---
 
 ## Recursion Schemes
@@ -141,10 +141,10 @@ The solution to this initially seems a bit strange. First, we must define a type
 the recursive type is replaced with a type parameter.
 
 ```
-@higherkind sealed class IntListPattern<out A> : IntListPatternOf<A> { 
+@higherkind sealed class IntListPattern<out A> : IntListPatternOf<A> {
   object NilPattern : IntListPattern<Nothing>()
   @higherkind data class ConsPattern<out A>(val head: Int, val tail: A) : IntListPattern<A>()
-  companion object 
+  companion object
 }
 fun IntListPattern.Companion.functor(): IntListPatternFunctor = object : IntListPatternFunctor{}
 ```
@@ -167,7 +167,7 @@ import arrow.recursion.data.*
 typealias IntFixList = Fix<ForIntListPattern>
 ```
 
-So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance for 
+So why do this? We can now define a [Functor]({{ '/arrow/typeclasses/functor' | relative_url }}) instance for
 `IntListPattern`, allowing us to traverse into the structure.
 
 ```
@@ -187,8 +187,8 @@ for any recursive data structure) by using `map` to recursively descend into the
 
 #### Recursive and Corecursive
 
-The [Recursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `cata`, and the 
-[Corecursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `ana`, which are very
+The [Recursive]({{ '/recursion/recursive' | relative_url }}) typeclass provides `cata`, and the
+[Corecursive]({{ '/recursion/recursive' | relative_url }}) typeclass provides `ana`, which are very
 similar to fold and unfold.
 
 ```
@@ -244,15 +244,15 @@ safe.
 
 #### Typeclasses
 
-- [Recursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Corecursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Birecursive]({{ '/docs/recursion/recursive' | relative_url }})
+- [Recursive]({{ '/recursion/recursive' | relative_url }})
+- [Corecursive]({{ '/recursion/recursive' | relative_url }})
+- [Birecursive]({{ '/recursion/recursive' | relative_url }})
 
 #### Datatypes
 
-- [Fix]({{ 'docs/recursion/fix' | relative_url }})
-- [Mu]({{ 'docs/recursion/mu' | relative_url }})
-- [Nu]({{ 'docs/recursion/nu' | relative_url }})
+- [Fix]({{ '/recursion/fix' | relative_url }})
+- [Mu]({{ '/recursion/mu' | relative_url }})
+- [Nu]({{ '/recursion/nu' | relative_url }})
 
 ## Credits
 

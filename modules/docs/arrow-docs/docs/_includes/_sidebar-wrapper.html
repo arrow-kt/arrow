@@ -5,7 +5,7 @@
     </button>
   </div>
   <div class="sidebar-brand">
-    <a href="/">
+    <a href="{{ '/' | relative_url }}">
       {% assign img_url = '/img/' | append: cat_id | append: '/arrow-' | append: cat_id | append: '-brand-sidebar.svg' %}
       <img src="{{ img_url | relative_url}}" alt="Arrow {{ cat_id }}">
     </a>
@@ -18,7 +18,7 @@
     {% assign path = 'sidebar-' | append: cat_id | %}
     {% for item in site.data[path]options %}
     <li class="sidebar-nav-item">
-      <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}" class="{{ cat_id }}">
+      <a href="{% if item.url %}{{ item.url | relative_url }}{% else %}#{% endif %}" class="{{ cat_id }}">
         <span>{{ item.title }}</span>
         {% if item.nested_options %}
         <i class="fa fa-angle-right"></i>
@@ -28,7 +28,7 @@
       <ul>
         {% for nested_item in item.nested_options %}
         <li>
-          <a href="{{ nested_item.url }}">
+          <a href="{{ nested_item.url | relative_url }}">
             <span>{{ nested_item.title }}</span>
           </a>
         </li>

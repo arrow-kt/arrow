@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: kotlinx.coroutines
-permalink: /docs/integrations/kotlinxcoroutines/
+permalink: /integrations/kotlinxcoroutines/
 ---
 
 # Kotlin Coroutines and runtime support
@@ -22,7 +22,7 @@ Due to this differentiation, there are different alternatives considering each t
 | Tool →<br>Runtime ↓ | IO                                          | suspend function    |
 |--------------------|----------------------------------------------|---------------------|
 | KotlinX Coroutines | `suspended`<br>`suspendCancellable`*         | `async`<br>`launch` |
-| Arrow              | `unsafeRunAsync`<br>`unsafeRunAsyncCancellable`<br>`unsafeRunAsyncScoped`* | Has to be wrapped in `IO.effect` and then run with any of the operations on the left.<br><br>Alternatively, it can be wrapped with `Fx.effect` and be executed [polymorphically](/docs/fx/polymorphism/). |
+| Arrow              | `unsafeRunAsync`<br>`unsafeRunAsyncCancellable`<br>`unsafeRunAsyncScoped`* | Has to be wrapped in `IO.effect` and then run with any of the operations on the left.<br><br>Alternatively, it can be wrapped with `Fx.effect` and be executed [polymorphically]({{'/fx/polymorphism/' | relative_url }}). |
 
 The * marked ops are available within this integration module, offering different alternatives depending on the project's needs. Both options offered in this integration module are described below:
 

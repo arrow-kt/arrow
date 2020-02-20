@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: EqK
-permalink: /docs/arrow/typeclasses/eqk/
-redirect_from:
-  - /docs/typeclasses/eqk/
+permalink: /arrow/typeclasses/eqk/
 ---
 
 ## EqK
@@ -35,7 +33,7 @@ Option.eqK().run {
 Arrow provides `EqKLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `EqK` instances.
 See the existing EqK instances implementations and accompanying tests for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `EqK` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `EqK` instances for custom datatypes.
 
 ### Data types
 

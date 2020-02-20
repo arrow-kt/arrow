@@ -106,7 +106,7 @@ fun String.toKebabCase(): String {
 }
 
 fun <A : Any> KClass<A>.docsMarkdownLink(moduleName: String?, packageName: String): String =
-  "[$simpleName]({{ '/docs/apidocs/$moduleName/${packageName.toKebabCase()}/${simpleName?.toKebabCase()}' | relative_url }})"
+  "[$simpleName]({{ '/apidocs/$moduleName/${packageName.toKebabCase()}/${simpleName?.toKebabCase()}' | relative_url }})"
 
 fun TypeClass.hierarchyGraph(): String =
   """

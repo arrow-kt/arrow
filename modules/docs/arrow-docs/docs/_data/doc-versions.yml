@@ -1,21 +1,16 @@
 docVersions:
 
     - title: "v0.9.0"
-      url: https://0-9-0.arrow-kt.io/
-      previous: https://0-8-2.arrow-kt.io/
+      url: https://arrow-kt.io/docs/0.9/
+      previous: https://arrow-kt.io/docs/0.8/
 
     - title: "v0.10.4"
       url: https://arrow-kt.io/
-      previous: https://0-9-0.arrow-kt.io/
+      previous: https://arrow-kt.io/docs/0.9/
 
     - title: "v0.10.5-SNAPSHOT"
-      url: https://next.arrow-kt.io/
+      url: https://arrow-kt.io/docs/next/
       previous: https://arrow-kt.io/
-
-docMenu:
-    title: Documentation
-    url: /docs
-    icon: "fa-book"
 
 # Literals
 previous: PREVIOUS

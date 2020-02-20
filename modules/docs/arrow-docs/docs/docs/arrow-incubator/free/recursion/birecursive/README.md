@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Birecursive
-permalink: /docs/recursion/birecursive/
+permalink: /recursion/birecursive/
 ---
 
 ## Birecursive

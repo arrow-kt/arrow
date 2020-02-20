@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: The Monad Tutorial
-permalink: /docs/patterns/monads/
+permalink: /patterns/monads/
 ---
 
 ## Monads explained in Kotlin (again)
@@ -13,7 +13,7 @@ permalink: /docs/patterns/monads/
 
 This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples showing how they relate to standard library constructs.
 
-If you're just interested in the API, head down to the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass page.
+If you're just interested in the API, head down to the [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) typeclass page.
 
 ### Intro
 
@@ -375,7 +375,7 @@ interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
 }
 ```
 
-See that, instead of `WorkflowThatReturns<A>`, our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}).
+See that, instead of `WorkflowThatReturns<A>`, our containers are called `Kind<F, A>`, where `F` is the generic parameter of the container and `A` the generic parameter of the content. We talk more about them in the [glossary]({{ '/patterns/glossary/#type-constructors' | relative_url }}).
 
 The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
 
@@ -401,7 +401,7 @@ Keep going and let's have a look at several sample implementations of Monad patt
 
 My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it might have a value, but might not).
 
-Option is another approach to dealing with "no value" value, an alternative to the concept of null. You can read more about [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) to see how Arrow implements it.
+Option is another approach to dealing with "no value" value, an alternative to the concept of null. You can read more about [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to see how Arrow implements it.
 
 When null is not allowed, any API contract gets more explicit: Either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.
@@ -507,7 +507,7 @@ We are back to the familiar structure. Time for some more complications.
 
 We're going to dispel one common misconception.
 Sometimes the word Monad is used to refer to types like Option, Future, Either, and so on, and that's not correct.
-Those are called [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
+Those are called [datatypes]({{ '/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
 
 As you have seen, neither Future nor Option implement Monad directly.
 This is intentional, as you can potentially have several Monad implementations for a single type.
@@ -570,7 +570,7 @@ This pattern is specially useful for libraries that must remain agnostic to impl
 
 Using the Monad and other similar abstractions, Arrow can provide a rich collection of extension functions and new language extensions that can be reused by other codebases.
 
-You can read more about generalizing code in the [glossary]({{ '/docs/patterns/glossary' | relative_url }}) and [typeclasses intro]({{ '/docs/typeclasses/intro' | relative_url }}).
+You can read more about generalizing code in the [glossary]({{ '/patterns/glossary' | relative_url }}) and [typeclasses intro]({{ '/typeclasses/intro' | relative_url }}).
 
 ### Non-Sequential Workflows
 
@@ -639,7 +639,7 @@ bookSpeakersFlights(OptionMonad).fix() // Option<Reservation>
 bookSpeakersFlights(ListMonad).fix() // List<Reservation>
 ```
 
-These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
+These are called [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.
 
 ### Monad Laws
 

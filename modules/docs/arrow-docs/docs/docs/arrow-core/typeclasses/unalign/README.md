@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Unalign
-permalink: /docs/arrow/typeclasses/unalign/
-redirect_from:
-  - /docs/typeclasses/unalign/
+permalink: /arrow/typeclasses/unalign/
 ---
 
 ## Unalign
@@ -55,9 +53,9 @@ Arrow provides [`UnalignLaws`][functor_laws_source]{:target="_blank"} in the for
 Arrow already provides Unalign instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Unalign`]({{ '/docs/arrow/typeclasses/unalign' | relative_url }}) implement the `Semialign` typeclass directly
+Additionally all instances of [`Unalign`]({{ '/arrow/typeclasses/unalign' | relative_url }}) implement the `Semialign` typeclass directly
 since they are all subtypes of `Semialign`
 
 ### Data types

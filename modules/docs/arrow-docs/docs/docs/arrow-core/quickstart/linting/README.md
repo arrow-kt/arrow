@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Linting
-permalink: /docs/quickstart/linting/
+permalink: /quickstart/linting/
 ---
 
 ## Arrow Linting
@@ -10,13 +10,13 @@ Some linters might complain about some code practices that are common when worki
 
 ### Working with ArrowFx
 
-When working with [Arrow Fx]({{ '/docs/fx' | relative_url }}), side effects are expressed as `suspend` functions.
+When working with [Arrow Fx]({{ '/fx' | relative_url }}), side effects are expressed as `suspend` functions.
 
 However, IDEA will show *redundant suspend modifiers* warning if a function does not invoke other suspended functions. For ArrowFx, we want to be explicit about impure functions, so this warning is not useful.
 
 You can disable this warning in Preferences > Editor > Inspections. Then search for the option Kotlin > Redundant constructs > Redundant suspend modifier.
 
-![gif](/img/linting/linting_suspend_modifier.gif)
+![gif]({{ '/img/linting/linting_suspend_modifier.gif' | relative_url }})
 
 ### Working with purity
 
@@ -26,7 +26,7 @@ To make this explicit, these functions can return Unit. However, IDEA will show 
 
 You can disable this warning in Preferences > Editor > Inspections. Then search for the option Kotlin > Redundant constructs > Redundant Unit return type.
 
-![gif](/img/linting/linting_unit_return_type.gif)
+![gif]({{ '/img/linting/linting_unit_return_type.gif' | relative_url }})
 
 If you are using [ktlint](https://ktlint.github.io/) as the linter of choice for your project, this scenario will be reported as an error, making builds fail.
 

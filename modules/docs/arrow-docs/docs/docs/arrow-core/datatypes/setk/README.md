@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: SetK
-permalink: /docs/arrow/core/setk/
-redirect_from:
-  - /docs/datatypes/setk/
+permalink: /arrow/core/setk/
 video: xtnyCqeLI_4
 ---
 
@@ -41,7 +39,7 @@ val integers = setOf(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5).k()
 ```
 SetK derives the following typeclasses:
 
-[`Semigroup`](/docs/arrow/typeclasses/semigroup/) and [`SemigroupK`](/docs/arrow/typeclasses/semigroupk/):
+[`Semigroup`]({{'/arrow/typeclasses/semigroup/' | relative_url }}) and [`SemigroupK`]({{'/arrow/typeclasses/semigroupk/' | relative_url }}):
 
 ```kotlin:ank
 val numbers = oddNumbers.combineK(evenNumbers.combineK(integers))
@@ -51,12 +49,12 @@ numbers
 evenNumbers.combineK(integers).combineK(oddNumbers)
 ```
 
-[`Monoid`](/docs/arrow/typeclasses/monoid/) and [`MonoidK`](/docs/arrow/typeclasses/monoidk/):
+[`Monoid`]({{'/arrow/typeclasses/monoid/' | relative_url }}) and [`MonoidK`]({{'/arrow/typeclasses/monoidk/' | relative_url }}):
 ```kotlin:ank
 numbers.combineK(SetK.empty())
 ```
 
-[`Foldable`](/docs/arrow/typeclasses/foldable/):
+[`Foldable`]({{'/arrow/typeclasses/foldable/' | relative_url }}):
 ```kotlin:ank
 numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 ```

@@ -50,9 +50,7 @@ Add the proper permalink to your docs at the top of your README file, as in:
 ---
 layout: docs
 title: Applicative
-permalink: /docs/arrow/typeclasses/applicative/
-redirect_from:
-  - /docs/typeclasses/applicative/
+permalink: /arrow/typeclasses/applicative/
 ---
 ```
 

@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Alternative
-permalink: /docs/arrow/typeclasses/alternative/
-redirect_from:
-  - /docs/typeclasses/alternative/
+permalink: /arrow/typeclasses/alternative/
 ---
 
 ## Alternative
@@ -11,9 +9,9 @@ redirect_from:
 
 
 
-We use [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' }}) to indicate a computation can fail somehow (that is, it can have either zero results or one result), and we use lists for computations that can have many possible results (ranging from zero to arbitrarily many results). In both of these cases, one useful operation is combining all possible results from multiple computations into a single computation. The `Alternative` type class captures this combination.
+We use [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to indicate a computation can fail somehow (that is, it can have either zero results or one result), and we use lists for computations that can have many possible results (ranging from zero to arbitrarily many results). In both of these cases, one useful operation is combining all possible results from multiple computations into a single computation. The `Alternative` type class captures this combination.
 
-`Alternative` is for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' }}) functors which also have a [`Monoid`]({{ '/docs/arrow/typeclasses/monoid' }}) structure.
+`Alternative` is for [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}) functors which also have a [`Monoid`]({{ '/arrow/typeclasses/monoid' | relative_url }}) structure.
 
 ### Main Combinators
 
@@ -116,6 +114,6 @@ import arrow.typeclasses.Alternative
 TypeClass(Alternative::class).dtMarkdownList()
 ```
 
-Additionally all the instances of [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine' | relative_url }}) implement the `Alternative` directly since it is subtype of `Alternative`.
+Additionally all the instances of [`MonadCombine`]({{ '/arrow/typeclasses/monadcombine' | relative_url }}) implement the `Alternative` directly since it is subtype of `Alternative`.
 
 ank_macro_hierarchy(arrow.typeclasses.Alternative)

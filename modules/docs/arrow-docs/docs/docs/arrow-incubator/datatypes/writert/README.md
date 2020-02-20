@@ -1,9 +1,7 @@
 ---
 layout: docs-incubator
 title: WriterT
-permalink: /docs/arrow/mtl/writert/
-redirect_from:
-  - /docs/datatypes/writert/
+permalink: /arrow/mtl/writert/
 ---
 
 ## WriterT
@@ -12,4 +10,4 @@ redirect_from:
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/docs/datatypes/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to datatypes]({{ '/datatypes/intro/' | relative_url }}).

@@ -1,7 +1,7 @@
 ---
 layout: docs-optics
 title: Fold
-permalink: /docs/optics/fold/
+permalink: /optics/fold/
 ---
 
 ## Fold
@@ -10,7 +10,7 @@ permalink: /docs/optics/fold/
 Note: Don't confuse this with the collection aggregate operation [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce).
 
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
-It is a generalization of an instance of [`Foldable`](/docs/arrow/typeclasses/foldable).
+It is a generalization of an instance of [`Foldable`]({{'/arrow/typeclasses/foldable' | relative_url }}).
 
 Creating a `Fold` can be done by manually defining `foldMap`.
 

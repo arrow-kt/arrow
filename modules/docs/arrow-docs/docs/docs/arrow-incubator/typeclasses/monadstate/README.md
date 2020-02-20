@@ -1,9 +1,7 @@
 ---
 layout: docs-incubator
 title: MonadState
-permalink: /docs/arrow/mtl/typeclasses/monadstate/
-redirect_from:
-  - /docs/typeclasses/monadstate/
+permalink: /arrow/mtl/typeclasses/monadstate/
 ---
 
 ## MonadState
@@ -11,7 +9,7 @@ redirect_from:
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 
 ### Data types

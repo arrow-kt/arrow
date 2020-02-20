@@ -1,7 +1,7 @@
 ---
 layout: docs-core
 title: Functional Error Handling
-permalink: /docs/patterns/error_handling/
+permalink: /patterns/error_handling/
 ---
 
 ## Functional Error Handling
@@ -121,7 +121,7 @@ Arrow provides proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
-We use [`Option`](/docs/arrow/core/option) to model the potential absence of a value.
+We use [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to model the potential absence of a value.
 
 When using `Option`, our previous example may look like:
 
@@ -134,8 +134,8 @@ fun getKnife(): Option<Knife> = None
 fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
 ```
 
-It's easy to work with [`Option`](/docs/apidocs/arrow-core-data/arrow.core/-option/) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
-Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/arrow/typeclasses/monad) instance exists built atop coroutines.
+It's easy to work with [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) if your lang supports [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+Arrow provides [monadic comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`]({{'/arrow/typeclasses/monad' | relative_url }}) instance exists built atop coroutines.
 
 ```kotlin
 import arrow.typeclasses.*
@@ -162,8 +162,8 @@ In the next example, we are going to use `Either` to deal with potentially throw
 
 ### Either
 
-When dealing with a known alternate path, we model return types as [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
-Either represents the presence of either a `Left` value or a `Right` value. 
+When dealing with a known alternate path, we model return types as [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
+Either represents the presence of either a `Left` value or a `Right` value.
 By convention, most functional programming libraries choose `Left` as the exceptional case and `Right` as the success value.
 
 It turns out that all exceptions thrown in our example are actually known to the system, so there is no point in modeling these exceptional cases as
@@ -218,11 +218,11 @@ prepareEither()
 So far, we have seen how we can use `Option` and `Either` to handle exceptions in a purely functional way.
 
 The question now is, can we further generalize error handling and write this code in a way that is abstract from the actual datatypes that it uses?
-Since Arrow supports typeclasses, emulated higher kinds, and higher order abstractions, we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})
+Since Arrow supports typeclasses, emulated higher kinds, and higher order abstractions, we can rewrite this in a fully polymorphic way thanks to [`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }})
 
 ### MonadError
 
-[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either` and `Option`.
+[`MonadError`]({{ '/arrow/typeclasses/monaderror' | relative_url }}) is a typeclass that allows us to handle error cases inside monadic contexts such as the ones we have seen with `Either` and `Option`.
 Typeclasses allows us to code focusing on the behaviors, and not the datatypes that implement them.
 
 Arrow provides the following `MonadError` instances for `Option` and `Either`
@@ -261,7 +261,7 @@ fun <F> MonadError<F, CookingException>.prepare():Kind<F, Salad> =
     }
 ```
 
-Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
+Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
 
 ```kotlin
 fun <F> MonadError<F, CookingException>.prepare1(): Kind<F, Salad> =

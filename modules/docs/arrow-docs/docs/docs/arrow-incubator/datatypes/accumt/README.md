@@ -1,9 +1,7 @@
 ---
 layout: docs-incubator
 title: AccumT
-permalink: /docs/arrow/mtl/accumt/
-redirect_from:
-  - /docs/datatypes/accumt/
+permalink: /arrow/mtl/accumt/
 ---
 
 ## AccumT

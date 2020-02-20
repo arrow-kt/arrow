@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Crosswalk
-permalink: /docs/arrow/typeclasses/crosswalk/
-redirect_from:
-  - /docs/typeclasses/crosswalk/
+permalink: /arrow/typeclasses/crosswalk/
 ---
 
 ## Crosswalk
@@ -61,9 +59,9 @@ Arrow provides [`CrosswalkLaws`][functor_laws_source]{:target="_blank"} in the f
 Arrow already provides Crosswalk instances for common datatypes (e.g. Option, ListK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Crosswalk`]({{ '/docs/arrow/typeclasses/crosswalk' | relative_url }}) implement the `Functor` and `Foldable`  typeclass directly.
+Additionally all instances of [`Crosswalk`]({{ '/arrow/typeclasses/crosswalk' | relative_url }}) implement the `Functor` and `Foldable`  typeclass directly.
 
 ### Data types
 

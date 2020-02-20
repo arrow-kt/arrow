@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: MonadCombine
-permalink: /docs/arrow/typeclasses/monadcombine/
-redirect_from:
-  - /docs/typeclasses/monadcombine/
+permalink: /arrow/typeclasses/monadcombine/
 ---
 
 ## MonadCombine
@@ -11,7 +9,7 @@ redirect_from:
 
 
 
-If [`Alternative`]({{ '/docs/arrow/typeclasses/alternative' }}) is for [`Applicative` functors]({{ '/docs/arrow/typeclasses/applicative' }}) that also have a [`Monoid`]({{ '/docs/arrow/typeclasses/monoid' }}) structure, `MonadCombine` is for [`Monads`]({{ '/docs/arrow/typeclasses/monad' }}) with monoid capabilities.
+If [`Alternative`]({{ '/arrow/typeclasses/alternative' | relative_url }}) is for [`Applicative` functors]({{ '/arrow/typeclasses/applicative' | relative_url }}) that also have a [`Monoid`]({{ '/arrow/typeclasses/monoid' | relative_url }}) structure, `MonadCombine` is for [`Monads`]({{ '/arrow/typeclasses/monad' | relative_url }}) with monoid capabilities.
 
 `MonadCombine` is just a claim indicating something is both an `Alternative` and a `Monad`.
 

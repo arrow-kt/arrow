@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Fix
-permalink: /docs/recursion/fix/
+permalink: /recursion/fix/
 ---
 
 ## Fix

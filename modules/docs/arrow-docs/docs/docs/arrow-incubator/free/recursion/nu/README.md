@@ -1,7 +1,7 @@
 ---
 layout: docs-incubator
 title: Nu
-permalink: /docs/recursion/nu/
+permalink: /recursion/nu/
 ---
 
 ## Nu

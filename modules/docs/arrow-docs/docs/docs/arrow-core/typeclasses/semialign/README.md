@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Semialign
-permalink: /docs/arrow/typeclasses/semialign/
-redirect_from:
-  - /docs/typeclasses/semialign/
+permalink: /arrow/typeclasses/semialign/
 ---
 
 ## Semialign
@@ -61,9 +59,9 @@ Arrow provides [`SemialignLaws`][functor_laws_source]{:target="_blank"} in the f
 Arrow already provides Semialign instances for common datatypes (e.g. Option, ListK, MapK). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Semialign`]({{ '/docs/arrow/typeclasses/semialign' | relative_url }}) implement the `Functor` typeclass directly
+Additionally all instances of [`Semialign`]({{ '/arrow/typeclasses/semialign' | relative_url }}) implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
 ### Data types

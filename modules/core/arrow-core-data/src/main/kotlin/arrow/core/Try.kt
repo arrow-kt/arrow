@@ -468,7 +468,7 @@ typealias Success<A> = Try.Success<A>
  *
  * Lastly, Arrow contains `Try` instances for many useful typeclasses that allow you to use and transform fallibale values:
  *
- * [Functor](/docs/arrow/typeclasses/functor/)
+ * [Functor]({{'/arrow/typeclasses/functor/' | relative_url }})
  *
  * Transforming the value, if the computation is a success:
  *
@@ -484,7 +484,7 @@ typealias Success<A> = Try.Success<A>
  * }
  * ```
  *
- * [Applicative](/docs/arrow/typeclasses/applicative/)
+ * [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }})
  *
  * Computing over independent values:
  *
@@ -501,7 +501,7 @@ typealias Success<A> = Try.Success<A>
  * }
  * ```
  *
- * [Monad](/docs/arrow/typeclasses/monad/)
+ * [Monad]({{'/arrow/typeclasses/monad/' | relative_url }})
  *
  * Computing over dependent values ignoring failure:
  *

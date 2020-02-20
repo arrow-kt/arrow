@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Bicrosswalk
-permalink: /docs/arrow/typeclasses/bicrosswalk/
-redirect_from:
-  - /docs/typeclasses/bicrosswalk/
+permalink: /arrow/typeclasses/bicrosswalk/
 ---
 
 ## Bicrosswalk
@@ -57,9 +55,9 @@ Arrow provides [`BicrosswalkLaws`][functor_laws_source]{:target="_blank"} in the
 Arrow already provides Bicrosswalk instances for common datatypes (e.g. Either, Ior). See their implementations
 and accompanying testcases for reference.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-Additionally all instances of [`Bicrosswalk`]({{ '/docs/arrow/typeclasses/bicrosswalk' | relative_url }}) implement the `Bifunctor` and `Bifoldable` typeclass directly.
+Additionally all instances of [`Bicrosswalk`]({{ '/arrow/typeclasses/bicrosswalk' | relative_url }}) implement the `Bifunctor` and `Bifoldable` typeclass directly.
 
 ### Data types
 

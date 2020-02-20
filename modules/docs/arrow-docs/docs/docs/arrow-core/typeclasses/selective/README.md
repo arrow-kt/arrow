@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Selective
-permalink: /docs/arrow/typeclasses/selective/
-redirect_from:
-  - /docs/typeclasses/selective/
+permalink: /arrow/typeclasses/selective/
 ---
 
 ## Selective
@@ -15,7 +13,7 @@ redirect_from:
 
 ### Main Combinators
 
-`Selective` includes all combinators present in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}).
+`Selective` includes all combinators present in [`Applicative`]({{ '/arrow/typeclasses/applicative/' | relative_url }}).
 
 #### Kind<F, Either<A, B>>#select
 
@@ -67,7 +65,7 @@ Arrow provides [`SelectiveLaws`][selective_law_source]{:target="_blank"} in the 
 
 Arrow already provides `Selective` instances for most common datatypes both in Arrow and the Kotlin stdlib.
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Selective` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Selective` instances for custom datatypes.
 
 ### Data types
 

@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: TraverseFilter
-permalink: /docs/arrow/typeclasses/traversefilter/
-redirect_from:
-  - /docs/typeclasses/traversefilter/
+permalink: /arrow/typeclasses/traversefilter/
 ---
 
 ## TraverseFilter
@@ -11,7 +9,7 @@ redirect_from:
 
 
 
-TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
+TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/typeclasses/intro/' | relative_url }}).
 
 
 ### Data types

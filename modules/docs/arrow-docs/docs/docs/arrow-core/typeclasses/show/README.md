@@ -1,9 +1,7 @@
 ---
 layout: docs-core
 title: Show
-permalink: /docs/arrow/typeclasses/show/
-redirect_from:
-  - /docs/typeclasses/show/
+permalink: /arrow/typeclasses/show/
 ---
 
 ## Show
@@ -54,7 +52,7 @@ class Person(val firstName: String, val lastName: String)
 val personShow = Show<Person> { "Hello $firstName $lastName" }
 ```
 
-See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
+See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
 
 
 ### Data types
