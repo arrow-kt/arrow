@@ -1,6 +1,6 @@
 # Λrrow Λnk
 
-[![Arrow Core logo](https://github.com/arrow-kt/arrow-site/tree/master/docs/img/core/arrow-core-brand-sidebar.svg)](https://arrow-kt.io)
+[![Arrow Core logo](https://raw.githubusercontent.com/arrow-kt/arrow-site/master/docs/img/core/arrow-core-brand-sidebar.svg?sanitize=true)](https://arrow-kt.io)
 
 _Compile time docs verification and evaluation for Kotlin and Java._
 
