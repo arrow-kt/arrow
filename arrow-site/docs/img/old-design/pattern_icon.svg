@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>pattern_icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="arrow-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons" transform="translate(-249.000000, -39.000000)">
+            <g id="pattern_icon" transform="translate(249.000000, 39.000000)">
+                <polygon id="background" fill="#61A8FF"
+                         points="32 0 59.7128129 16 59.7128129 48 32 64 4.28718708 48 4.28718708 16"></polygon>
+                <g id="Page-1" transform="translate(14.000000, 18.000000)" stroke="#FFFFFF" stroke-width="1.6"
+                   stroke-linecap="round" stroke-linejoin="round">
+                    <polyline id="Stroke-1" points="0.8 11.1291 4.998 17.3801 9.826 11.6001"></polyline>
+                    <path d="M4.9821,17.3044 C3.2241,9.9494 7.9721,2.7714 14.8541,1.1474 C19.6071,0.0224 24.3691,1.7064 27.3941,5.1244"
+                          id="Stroke-3"></path>
+                    <polyline id="Stroke-5" points="34.8 16.1037 30.602 9.8497 25.774 15.6307"></polyline>
+                    <path d="M30.6179,9.9289 C32.3759,17.2839 27.6279,24.4589 20.7459,26.0859 C15.9929,27.2109 11.2309,25.5239 8.2059,22.1089"
+                          id="Stroke-7"></path>
+                    <path d="M17.8,16.6276 C16.138,16.6276 14.789,15.2806 14.789,13.6186 C14.789,11.9526 16.138,10.6056 17.803,10.6026 C19.464,10.6056 20.812,11.9526 20.812,13.6146 C20.812,15.2806 19.464,16.6276 17.8,16.6276 Z"
+                          id="Stroke-9"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

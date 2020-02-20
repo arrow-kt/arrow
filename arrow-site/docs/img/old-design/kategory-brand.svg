@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="102px" height="109px" viewBox="0 0 102 109" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow-brand</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="22.815668%" x2="50%" y2="73.7282539%" id="linearGradient-1">
+            <stop stop-color="#F99406" offset="0%"></stop>
+            <stop stop-color="#DB7190" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#00B5E2" offset="0%"></stop>
+            <stop stop-color="#4D72E5" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#05CDFF" offset="0%"></stop>
+            <stop stop-color="#6A8EFF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-4">
+            <stop stop-color="#61A8FF" offset="0%"></stop>
+            <stop stop-color="#4B74E5" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="arrow-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="arrow-brand" transform="translate(0.000000, -1.000000)">
+            <polygon id="path" fill="url(#linearGradient-1)" points="0 1 34 20.63 0 40.26"></polygon>
+            <polygon id="path" fill="url(#linearGradient-1)"
+                     points="102.0024 0.9996 68.0024 20.6296 102.0024 40.2596"></polygon>
+            <polygon id="path" fill="url(#linearGradient-2)" points="51 11 0 40.445 0 79.705 51 109.15"></polygon>
+            <polygon id="path" fill="url(#linearGradient-3)" points="51 11 102 40.445 102 79.705 51 109.15"></polygon>
+            <polygon id="path" fill="url(#linearGradient-4)"
+                     points="17.0005 30.4361 16.9985 30.4371 0.0025 0.9991 0.0025 40.2491 0.0005 40.2511 0.0005 79.5111 17.0035 89.3341 42.5005 74.5741"></polygon>
+            <polygon id="path" fill="url(#linearGradient-4)"
+                     points="102.0024 40.2574 102.0024 0.9994 85.0024 30.4444 85.7234 30.8614 85.0024 30.4444 59.5024 74.5814 85.0024 89.3334 102.0024 79.5194"></polygon>
+            <polygon id="shadow" fill="#000000" opacity="0.38841712"
+                     points="59.4962006 74.5799866 79.1693929 92.7030182 85.0061646 89.3350067"></polygon>
+            <polygon id="shadow" fill="#000000" opacity="0.38841712"
+                     transform="translate(29.754982, 83.641502) scale(-1, 1) translate(-29.754982, -83.641502) "
+                     points="17 74.5799866 36.6731923 92.7030182 42.509964 89.3350067"></polygon>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,84 @@
+name: Publish site
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  publish_site:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        architecture: x64
+    - name: Validate Gradle Wrapper
+      uses: gradle/wrapper-validation-action@v1
+    - name: Run Ank
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+      run: ./gradlew runAnk
+    - name: Prepare environment
+      run: |
+        set -ex
+        sudo pip install awscli
+        aws --version
+        sudo apt-get update
+        sudo apt-get install ruby-dev
+        sudo gem install bundler --force
+        sudo gem update --system
+        gem --version
+        echo "$( gem list | grep bundler )"
+        bundle install --gemfile Gemfile --path vendor/bundle
+    - name: Build site
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+        JEKYLL_ENV: production
+      run: bundle exec jekyll build -s build/site -d build/_site
+    - name: Publish site
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: |
+        aws s3 sync build/_site/img s3://$S3_BUCKET/docs/next/img >> aws_sync_jekyll.log
+        aws s3 sync build/_site/js s3://$S3_BUCKET/docs/next/js >> aws_sync_jekyll.log
+        aws s3 sync build/_site/css s3://$S3_BUCKET/docs/next/css >> aws_sync_jekyll.log
+        #cd build/_site
+        #echo "Publish in S3..."
+        #for version in *; do
+        #    echo "- Version $version ..."
+        #    cd $version
+        #    for file in *; do
+        #        if [ -f "$file" ]; then
+        #            echo "Copying $file ..."
+        #            aws s3 cp $file s3://$S3_BUCKET/docs/$version/$file >> aws_sync_jekyll.log
+        #        else
+        #            echo "Sync $file ..."
+        #            aws s3 sync $file s3://$S3_BUCKET/docs/$version/$file >> aws_sync_jekyll.log
+        #        fi
+        #    done
+        #    cd ..
+        #done
+        #aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*" > aws_sync_jekyll.log
+    - name: Save content
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > site-content.log
+    - uses: actions/upload-artifact@v1
+      with:
+        name: site-content
+        path: site-content.log
+    - uses: actions/upload-artifact@v1
+      with:
+        name: log
+        path: aws_sync_jekyll.log

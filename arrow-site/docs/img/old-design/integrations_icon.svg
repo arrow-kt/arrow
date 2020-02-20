@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64px" height="64px" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>integrations_icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="arrow-ui" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons" transform="translate(-341.000000, -39.000000)">
+            <g id="integrations_icon" transform="translate(341.000000, 39.000000)">
+                <polygon id="background" fill="#00B5E2"
+                         points="32 0 59.7128129 16 59.7128129 48 32 64 4.28718708 48 4.28718708 16"></polygon>
+                <g id="icon" transform="translate(19.000000, 16.000000)" stroke="#FFFFFF" stroke-width="1.6"
+                   stroke-linecap="round" stroke-linejoin="round">
+                    <g id="Group-7" transform="translate(3.000000, 0.600000)">
+                        <polyline id="Stroke-1" points="22.3713 19.8695 5.7983 19.8695 5.7983 0.2005"></polyline>
+                        <polyline id="Stroke-3" points="0.8884 5.4174 5.7984 0.2004 10.7094 5.4174"></polyline>
+                        <path d="M18.0559,22.9877 L18.0559,30.1997" id="Stroke-5"></path>
+                    </g>
+                    <polyline id="Stroke-8" points="11.8483 9.4207 21.0563 9.4207 21.0563 17.4497"></polyline>
+                    <g id="Group-13" transform="translate(0.000000, 8.600000)">
+                        <path d="M0.8,0.8207 L5.711,0.8207" id="Stroke-9"></path>
+                        <polyline id="Stroke-11" points="25.9411 16.9828 21.0561 22.1998 16.1201 16.9828"></polyline>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
