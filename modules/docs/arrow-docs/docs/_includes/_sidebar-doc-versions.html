@@ -1,10 +1,10 @@
-{% assign doc-link = 'docs/core/' %}
+{% assign doc-link = 'core/' %}
 {% if cat_id == 'incubator' %}
-{% assign doc-link = 'docs/aql/intro/' %}
+{% assign doc-link = 'aql/intro/' %}
 {% elsif cat_id  == 'fx' %}
-{% assign doc-link = 'docs/fx/' %}
+{% assign doc-link = 'fx/' %}
 {% elsif cat_id  == 'optics' %}
-{% assign doc-link = 'docs/optics/dsl/' %}
+{% assign doc-link = 'optics/dsl/' %}
 {% endif %}
 
 <ul class="sidebar-nav sidebar-doc-versions">
@@ -32,10 +32,9 @@
       </li>
 
       <li>
-        <a href="{{ previous_version.url | append: 'docs/' }}">
+        <a href="{{ previous_version.url }}">
           <span>
-            {{ previous_version.title }} -
-            {{ site.data.doc-versions.previous }}
+            {{ previous_version.title }} - {{ site.data.doc-versions.previous }}
           </span>
         </a>
       </li>
@@ -45,7 +44,7 @@
             and item.url != next_version.url
             and item.url != previous_version.url %}
       <li>
-        <a href="{{ item.url | append: 'docs/' }}">
+        <a href="{{ item.url }}">
           <span>{{ item.title }}</span>
         </a>
       </li>
