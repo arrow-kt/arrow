@@ -1,0 +1,16 @@
+name: "Check Build Integration"
+
+on:
+  pull_request:
+    paths-ignore:
+    - 'docs/**'
+
+jobs:
+  check-build-integration:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Check
+      run: ./scripts/check-build-integration.sh
