@@ -57,7 +57,7 @@ class NonEmptyListTest : UnitSpec() {
       ),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Gen.nonEmptyList(Gen.int()), EQ1),
-      HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1, Gen.nonEmptyList(Gen.int())),
+      HashLaws.laws(NonEmptyList.hash(Int.hash()), Gen.nonEmptyList(Gen.int()), EQ1),
       EqKLaws.laws(
         NonEmptyList.eqK(),
         NonEmptyList.genK()

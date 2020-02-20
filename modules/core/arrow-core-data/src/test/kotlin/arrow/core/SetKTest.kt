@@ -53,7 +53,7 @@ class SetKTest : UnitSpec() {
       ),
       MonoidKLaws.laws(SetK.monoidK(), SetK.genK(), SetK.eqK()),
       FoldableLaws.laws(SetK.foldable(), SetK.genK()),
-      HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq()), Gen.genSetK(Gen.int())),
+      HashLaws.laws(SetK.hash(Int.hash()), Gen.genSetK(Gen.int()), SetK.eq(Int.eq())),
       EqKLaws.laws(
         SetK.eqK(),
         SetK.genK()

@@ -9,7 +9,7 @@ import io.kotlintest.properties.Gen
 
 class EndoTest : UnitSpec() {
   val EQ: Eq<Endo<Int>> = Eq { a, b ->
-    a.f(9) == b.f(1)
+    a.f(1) == b.f(1)
   }
 
   init {
