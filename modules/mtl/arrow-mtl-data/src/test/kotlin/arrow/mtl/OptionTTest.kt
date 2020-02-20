@@ -33,6 +33,7 @@ import arrow.mtl.extensions.optiont.eqK.eqK
 import arrow.mtl.extensions.optiont.functor.functor
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.monad.monad
+import arrow.mtl.extensions.optiont.monadPlus.monadPlus
 import arrow.mtl.extensions.optiont.monadTrans.monadTrans
 import arrow.mtl.extensions.optiont.monoidK.monoidK
 import arrow.mtl.extensions.optiont.semigroupK.semigroupK
@@ -45,6 +46,7 @@ import arrow.test.generators.option
 import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonadPlusLaws
 import arrow.test.laws.MonadTransLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
@@ -117,6 +119,12 @@ class OptionTTest : UnitSpec() {
         Id.monad(),
         OptionT.monad(Id.monad()),
         Id.genK(),
+        OptionT.eqK(Id.eqK())
+      ),
+
+      MonadPlusLaws.laws(
+        OptionT.monadPlus(Id.monad()),
+        OptionT.genK(Id.genK()),
         OptionT.eqK(Id.eqK())
       )
     )

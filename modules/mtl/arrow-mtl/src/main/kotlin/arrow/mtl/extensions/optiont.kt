@@ -46,6 +46,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
@@ -311,4 +312,9 @@ interface OptionTEqK<F> : EqK<OptionTPartialOf<F>> {
 interface OptionTMonadTrans : MonadTrans<ForOptionT> {
   override fun <F, A> Kind<F, A>.liftT(MF: Monad<F>): Kind2<ForOptionT, F, A> =
     OptionT.liftF(MF, this)
+}
+
+@extension
+interface OptionTMonadPlus<F> : MonadPlus<OptionTPartialOf<F>>, OptionTMonad<F>, OptionTAlternative<F> {
+  override fun MF(): Monad<F>
 }
