@@ -1,6 +1,5 @@
 package arrow.benchmarks
 
-import arrow.fx.internal.ConcurrentQueue
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOOf
@@ -9,7 +8,6 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.unit
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.fix
-import arrow.fx.internal.CancelableQueue
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -34,12 +32,10 @@ open class Queue {
   var size: Int = 0
 
   var ConcurQueue by Delegates.notNull<Queue<ForIO, Int>>()
-  var CancelQueue by Delegates.notNull<Queue<ForIO, Int>>()
 
   @Setup(Level.Trial)
   fun createQueues(): Unit {
-    ConcurQueue = ConcurrentQueue.empty<ForIO, Int>(IO.concurrent()).fix().unsafeRunSync()
-    CancelQueue = CancelableQueue.empty<ForIO, Int>(IO.concurrent()).fix().unsafeRunSync()
+    ConcurQueue = Queue.unbounded<ForIO, Int>(IO.concurrent()).fix().unsafeRunSync()
   }
 
   fun <A> IOOf<A>.repeat(n: Int): IO<A> =
@@ -52,7 +48,4 @@ open class Queue {
 
   @Benchmark
   fun concurrentQueue(): Unit = loop(ConcurQueue)
-
-  @Benchmark
-  fun cancelableQueue(): Unit = loop(CancelQueue)
 }
