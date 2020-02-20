@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 echo "Build site ..."
 export JEKYLL_ENV=production
 cd $BASEDIR/site

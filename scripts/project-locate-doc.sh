@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 INITIAL_PATH=""
 if [ $# -eq 1 ]; then

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -e 
+set -ex 
 cd $BASEDIR/$1
 git checkout .

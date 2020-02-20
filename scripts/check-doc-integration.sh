@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 export JAVA_OPTS="-Xms512m -Xmx1024m"
 cd $(dirname $0)/..
 . ./scripts/commons.sh
