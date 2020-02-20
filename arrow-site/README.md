@@ -1,5 +1,7 @@
 # Arrow Site
 
+[![Arrow logo](https://raw.githubusercontent.com/arrow-kt/arrow-site/master/docs/img/home/arrow-brand-error.svg?sanitize=true)](https://arrow-kt.io)
+
 This repository includes the [Arrow website](https://arrow-kt.io/) main files:
 
 * Landing page
