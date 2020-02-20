@@ -20,25 +20,25 @@
 
 :heavy_check_mark: Check if there are new artifacts to consider.
 
-:white_large_square: **Block the contributions!!**
+:heavy_check_mark: **Block the contributions!!**
 
-:white_large_square: **arrow** repository > `Settings` > `Branches` > Update branch protection rules
+:heavy_check_mark: **arrow** repository > `Settings` > `Branches` > Update branch protection rules
 
-:white_large_square: **arrow** repository: [PR to add new content + remove current checks](https://github.com/arrow-kt/arrow/pull/2066)
+:heavy_check_mark: **arrow** repository: [PR to add new content + remove current checks](https://github.com/arrow-kt/arrow/pull/2066)
 
-:white_large_square: **arrow** repository: [PR to update the documentation](https://github.com/arrow-kt/arrow/pull/2079)
+:heavy_check_mark: **arrow** repository: [PR to update the documentation](https://github.com/arrow-kt/arrow/pull/2079)
 
-:white_large_square: New repositories > Extract and push content on `master` branch: [How to extract the content](how-to-extract-content.md); use [`extract-content.sh`](scripts/extract-content.sh)
+:heavy_check_mark: New repositories > Extract and push content on `master` branch: [How to extract the content](how-to-extract-content.md); use [`extract-content.sh`](scripts/extract-content.sh)
 
-:white_large_square: New repositories > Add the additional configuration and checks: [`copy-conf.sh`](scripts/copy-conf.sh) will add 2 branches in every repository to create the first pull requests. First pull request with `new-conf` branch. Then, a second pull request with `global-checks` branch (except for `arrow-site`).
+:heavy_check_mark: New repositories > Add the additional configuration and checks: [`copy-conf.sh`](scripts/copy-conf.sh) will add 2 branches in every repository to create the first pull requests. First pull request with `new-conf` branch. Then, a second pull request with `global-checks` branch (except for `arrow-site`).
 
-:white_large_square: New repositories > `Settings` > `Branches` > Create branch protection rules
+:heavy_check_mark: New repositories > `Settings` > `Branches` > Create branch protection rules
 
-:white_large_square: **Unblock the contributions!!**
+:heavy_check_mark: **Unblock the contributions!!**
 
 :white_large_square: **arrow** repository: move issues to the correspondent repositories
 
-:white_large_square: New repositories > Add issues about KTLint (xxenabled=false):
+:heavy_check_mark: New repositories > Add issues about KTLint (xxenabled=false):
 * `arrow-fx/arrow-fx-kotlinx-coroutines/build.gradle`
 * `arrow-fx/build.gradle`
 * `arrow-ank/build.gradle`

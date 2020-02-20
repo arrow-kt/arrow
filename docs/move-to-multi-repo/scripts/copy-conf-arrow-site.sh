@@ -13,7 +13,6 @@ sed -i "s/d-arrow/arrow/g" gradle.properties
 cp $BASEDIR/d-arrow-site/update-versions.txt .
 cp $BASEDIR/d-arrow-site/Gemfile .
 cp $BASEDIR/d-arrow-site/.gitignore .
-cp -r $BASEDIR/d-arrow-site/sidebar .
 cp -r $BASEDIR/d-arrow-site/.github .
 rm -rf docs/docs
 git co -b new-conf
