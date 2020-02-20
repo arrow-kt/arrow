@@ -1,0 +1,36 @@
+plugins {
+    id "maven-publish"
+    id "base"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+    id "net.rdrei.android.buildtimetracker"
+    id "org.jetbrains.dokka"
+    id "org.jlleitschuh.gradle.ktlint"
+    id "ru.vyarus.animalsniffer"
+}
+
+apply from: "$DOC_CONF"
+apply from: "$PUBLISH_CONF"
+
+dependencies {
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+
+    testCompile "junit:junit:$JUNIT_VERSION"
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-optics-mtl")
+}
+
+// Note: please, don't add configuration after ank! (reason: automatic tasks)
+ank {
+    dependencies {
+        compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
+        compile "io.arrow-kt:arrow-docs:$VERSION_NAME"
+    }
+}
+// Note: please, don't add configuration after ank! (reason: automatic tasks)
