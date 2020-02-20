@@ -9,6 +9,7 @@ plugins {
     id "ru.vyarus.animalsniffer"
 }
 
+apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
