@@ -5,6 +5,7 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Left
+import arrow.core.Right
 import arrow.core.Tuple4
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.fix
@@ -273,6 +274,36 @@ class QueueTest : UnitSpec() {
           !effect { peeked shouldBe None }
         }.equalUnderTheLaw(IO.unit, EQ())
       }
+
+      "$label - take is cancelable" {
+        IO.fx {
+          val q = !queue(1)
+          val t1 = !q.take().fork()
+          val t2 = !q.take().fork()
+          val t3 = !q.take().fork()
+          !IO.sleep(10.milliseconds) // Give take callbacks a chance to register
+          !t2.cancel()
+          !q.offer(1)
+          !q.offer(3)
+          val r1 = !t1.join()
+          val r3 = !t3.join()
+          !effect { setOf(r1, r3) shouldBe setOf(1, 3) }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
+
+      "$label - peek is cancelable" {
+        IO.fx {
+          val q = !queue(1)
+          val finished = !Promise<Int>()
+          val fiber = !q.peek().flatMap(finished::complete).fork()
+          !IO.sleep(100.milliseconds) // Give read callback a chance to register
+          !fiber.cancel()
+          !q.offer(10)
+          val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
+          val res = !IO.raceN(finished.get(), fallback)
+          !effect { res shouldBe Right(0) }
+        }.equalUnderTheLaw(IO.unit, EQ())
+      }
     }
 
     fun boundedStrategyTests(
@@ -294,6 +325,27 @@ class QueueTest : UnitSpec() {
           !effect { received shouldBe None }
           !effect { (elapsed >= 100) shouldBe true }
         }.unsafeRunSync()
+      }
+
+      // Offer only gets scheduled for Bounded Queues, others apply strategy.
+      "$label - offer is cancelable" {
+        IO.fx {
+          val q = !queue(1)
+          !q.offer(0)
+          !q.offer(1).fork()
+          val p2 = !q.offer(2).fork()
+          !q.offer(3).fork()
+
+          !IO.sleep(10.milliseconds) // Give put callbacks a chance to register
+
+          !p2.cancel()
+
+          !q.take()
+          val r1 = !q.take()
+          val r3 = !q.take()
+
+          !effect { setOf(r1, r3) shouldBe setOf(1, 3) }
+        }.equalUnderTheLaw(IO.unit, EQ())
       }
 
       "$label - tryOffer returns false at capacity" {
@@ -367,7 +419,7 @@ class QueueTest : UnitSpec() {
         )
       }
 
-      "!$label - tryOffer returns false at capacity" {
+      "$label - tryOffer returns false at capacity" {
         IO.fx {
           val q = !queue(1)
           !q.offer(1)
@@ -404,11 +456,11 @@ class QueueTest : UnitSpec() {
         )
       }
 
-      "!$label - tryOffer returns false at capacity" {
+      "$label - tryOffer returns false at capacity" {
         IO.fx {
           val q = !queue(1)
           !q.offer(1)
-          val offered = !q.tryOffer(2)
+          val offered = !q.tryOffer(5000)
           !effect { offered shouldBe false }
         }.unsafeRunSync()
       }

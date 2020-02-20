@@ -40,7 +40,7 @@ internal class ConcurrentQueue<F, A> internal constructor(
     defer { unsafeTryOffer(a) }
 
   override fun offer(a: A): Kind<F, Unit> =
-    tryOffer(a).flatMap { didPut ->
+    defer { unsafeTryOffer(a, false) }.flatMap { didPut ->
       if (didPut) unit() else cancelableF { cb -> unsafeOffer(a, cb) }
     }
 
@@ -75,9 +75,9 @@ internal class ConcurrentQueue<F, A> internal constructor(
   override fun shutdown(): Kind<F, Unit> =
     defer { unsafeShutdown() }
 
-  private tailrec fun unsafeTryOffer(a: A): Kind<F, Boolean> =
+  private tailrec fun unsafeTryOffer(a: A, tryStrategy: Boolean = true): Kind<F, Boolean> =
     when (val current = state.value) {
-      is State.Surplus -> unsafeOfferSurplusForStrategy(a, current) ?: unsafeTryOffer(a)
+      is State.Surplus -> unsafeOfferSurplusForStrategy(a, tryStrategy, current) ?: unsafeTryOffer(a)
       is State.Deficit -> {
         val firstTake = current.takes.values.firstOrNull()
 
@@ -340,12 +340,14 @@ internal class ConcurrentQueue<F, A> internal constructor(
 
   /**
    * Unsafely handle offer at State.Surplus.
+   *
    * Return:
    *  - `just(true)` when handled
    *  - `just(false)` when offer should be scheduled (only used for bounded).
+   *     or when [tryStrategy] is true to signal no room in the [Queue].
    *  - null when needs to recurse and try again
    */
-  private fun unsafeOfferSurplusForStrategy(a: A, surplus: State.Surplus<F, A>): Kind<F, Boolean>? =
+  private fun unsafeOfferSurplusForStrategy(a: A, tryStrategy: Boolean, surplus: State.Surplus<F, A>): Kind<F, Boolean>? =
     when (strategy) {
       is BackpressureStrategy.Bounded ->
         when {
@@ -355,13 +357,21 @@ internal class ConcurrentQueue<F, A> internal constructor(
         }
       is BackpressureStrategy.Sliding -> {
         val nextQueue = if (surplus.value.length() < strategy.capacity) surplus.value.enqueue(a) else surplus.value.dequeue().b.enqueue(a)
-        if (!state.compareAndSet(surplus, surplus.copy(value = nextQueue))) null
-        else just(true)
+
+        when {
+          surplus.value.length() >= strategy.capacity && tryStrategy -> just(false)
+          state.compareAndSet(surplus, surplus.copy(value = nextQueue)) -> just(true)
+          else -> null
+        }
       }
       is BackpressureStrategy.Dropping -> {
         val nextQueue = if (surplus.value.length() < strategy.capacity) surplus.value.enqueue(a) else surplus.value
-        if (!state.compareAndSet(surplus, surplus.copy(value = nextQueue))) null
-        else just(true)
+
+        when {
+          surplus.value.length() >= strategy.capacity && tryStrategy -> just(false)
+          state.compareAndSet(surplus, surplus.copy(value = nextQueue)) -> just(true)
+          else -> null
+        }
       }
       is BackpressureStrategy.Unbounded ->
         if (!state.compareAndSet(surplus, surplus.copy(value = surplus.value.enqueue(a)))) null

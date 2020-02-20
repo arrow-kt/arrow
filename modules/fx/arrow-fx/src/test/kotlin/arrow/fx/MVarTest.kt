@@ -287,8 +287,9 @@ class MVarTest : UnitSpec() {
           val f2 = !puts.fork()
           !f1.join()
           !f2.join()
-          !ref.get()
-        }.equalUnderTheLaw(IO.just(count), EQ())
+          val res = !ref.get()
+          !effect { count shouldBe res }
+        }.equalUnderTheLaw(IO.unit, EQ())
       }
     }
 
@@ -306,8 +307,8 @@ class MVarTest : UnitSpec() {
           !mVar.take()
           val r1 = !mVar.take()
           val r3 = !mVar.take()
-          setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ())
+          !effect { setOf(r1, r3) shouldBe setOf(1, 3) }
+        }.equalUnderTheLaw(IO.unit, EQ())
       }
 
       "$label - take is cancelable" {
@@ -322,8 +323,8 @@ class MVarTest : UnitSpec() {
           !mVar.put(3)
           val r1 = !t1.join()
           val r3 = !t3.join()
-          setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ())
+          !effect { setOf(r1, r3) shouldBe setOf(1, 3) }
+        }.equalUnderTheLaw(IO.unit, EQ())
       }
 
       "$label - read is cancelable" {
@@ -335,8 +336,9 @@ class MVarTest : UnitSpec() {
           !fiber.cancel()
           !mVar.put(10)
           val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
-          !IO.raceN(finished.get(), fallback)
-        }.equalUnderTheLaw(IO.just(Right(0)), EQ())
+          val res = !IO.raceN(finished.get(), fallback)
+          !effect { res shouldBe Right(0) }
+        }.equalUnderTheLaw(IO.unit, EQ())
       }
     }
 
