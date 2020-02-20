@@ -57,7 +57,7 @@ class IdTest : UnitSpec() {
         Id.genK(),
         Id.eqK()
       ),
-      HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq()), Gen.id(Gen.int())),
+      HashLaws.laws(Id.hash(Int.hash()), Gen.id(Gen.int()), Id.eq(Int.eq())),
       EqKLaws.laws(
         Id.eqK(),
         Id.genK()

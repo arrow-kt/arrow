@@ -19,6 +19,8 @@ import arrow.core.extensions.semigroup
 import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.generators.genK
+import arrow.test.generators.intSmall
+import arrow.test.generators.longSmall
 import arrow.test.generators.mapK
 import arrow.test.laws.AlignLaws
 import arrow.test.laws.EqLaws
@@ -36,42 +38,42 @@ import io.kotlintest.properties.forAll
 
 class MapKTest : UnitSpec() {
 
-  val EQ: Eq<Kind2<ForMapK, String, Int>> = object : Eq<Kind2<ForMapK, String, Int>> {
-    override fun Kind2<ForMapK, String, Int>.eqv(b: Kind2<ForMapK, String, Int>): Boolean =
-      fix()["key"] == b.fix()["key"]
+  val EQ: Eq<Kind2<ForMapK, Long, Int>> = object : Eq<Kind2<ForMapK, Long, Int>> {
+    override fun Kind2<ForMapK, Long, Int>.eqv(b: Kind2<ForMapK, Long, Int>): Boolean =
+      fix() == b.fix()
   }
 
   init {
-    val EQ_TC = MapK.eq(String.eq(), Int.eq())
+    val EQ_TC = MapK.eq(Long.eq(), Int.eq())
 
-    val testLaws = testLaws(
-      ShowLaws.laws(MapK.show(String.show(), Int.show()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
-      TraverseLaws.laws(MapK.traverse(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
-      MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
-      FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.string())),
-      EqLaws.laws(MapK.eq(String.eq(), Int.eq()), Gen.mapK(Gen.string(), Gen.int())),
-      FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.string()), MapK.eqK(String.eq())),
-      HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC, Gen.mapK(Gen.string(), Gen.int())),
+    testLaws(
+      ShowLaws.laws(MapK.show(Long.show(), Int.show()), EQ_TC, Gen.mapK(Gen.long(), Gen.int())),
+      TraverseLaws.laws(MapK.traverse(), MapK.genK(Gen.long()), MapK.eqK(Long.eq())),
+      MonoidLaws.laws(MapK.monoid<Long, Int>(Int.semigroup()), Gen.mapK(Gen.longSmall(), Gen.intSmall()), EQ),
+      FoldableLaws.laws(MapK.foldable(), MapK.genK(Gen.long())),
+      EqLaws.laws(MapK.eq(Long.eq(), Int.eq()), Gen.mapK(Gen.long(), Gen.int())),
+      FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.long()), MapK.eqK(Long.eq())),
+      HashLaws.laws(MapK.hash(Long.hash(), Int.hash()), Gen.mapK(Gen.long(), Gen.int()), EQ_TC),
       AlignLaws.laws(MapK.align(),
-        MapK.genK(Gen.string()),
-        MapK.eqK(String.eq()),
+        MapK.genK(Gen.long()),
+        MapK.eqK(Long.eq()),
         MapK.foldable()
       ),
       UnalignLaws.laws(MapK.unalign(),
-        MapK.genK(Gen.string()),
-        MapK.eqK(String.eq()),
+        MapK.genK(Gen.long()),
+        MapK.eqK(Long.eq()),
         MapK.foldable()),
       UnzipLaws.laws(MapK.unzip(),
-        MapK.genK(Gen.string()),
-        MapK.eqK(String.eq()),
+        MapK.genK(Gen.long()),
+        MapK.eqK(Long.eq()),
         MapK.foldable()
       )
     )
 
     "can align maps" {
       // aligned keySet is union of a's and b's keys
-      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
-        MapK.semialign<String>().run {
+      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+        MapK.semialign<Long>().run {
           val aligned = align(a, b).fix()
 
           aligned.size == (a.keys + b.keys).size
@@ -79,8 +81,8 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Both for all entries existing in a and b
-      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
-        MapK.semialign<String>().run {
+      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+        MapK.semialign<Long>().run {
           val aligned = align(a, b).fix()
           a.keys.intersect(b.keys).all {
             aligned[it]?.isBoth ?: false
@@ -89,8 +91,8 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Left for all entries existing only in a
-      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
-        MapK.semialign<String>().run {
+      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+        MapK.semialign<Long>().run {
           val aligned = align(a, b).fix()
           (a.keys - b.keys).all { key ->
             aligned[key]?.let { it.isLeft } ?: false
@@ -99,8 +101,8 @@ class MapKTest : UnitSpec() {
       }
 
       // aligned map contains Right for all entries existing only in b
-      forAll(Gen.mapK(Gen.string(), Gen.bool()), Gen.mapK(Gen.string(), Gen.bool())) { a, b ->
-        MapK.semialign<String>().run {
+      forAll(Gen.mapK(Gen.long(), Gen.bool()), Gen.mapK(Gen.long(), Gen.bool())) { a, b ->
+        MapK.semialign<Long>().run {
           val aligned = align(a, b).fix()
           (b.keys - a.keys).all { key ->
             aligned[key]?.let { it.isRight } ?: false

@@ -21,7 +21,6 @@ import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Semiring
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
@@ -51,37 +50,19 @@ interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input
 
 @extension
 interface ScheduleSemigroup<F, Input, Output> : Semigroup<Schedule<F, Input, Output>> {
-  fun SA(): Semigroup<Output>
+  fun OI(): Semigroup<Output>
 
   override fun Schedule<F, Input, Output>.combine(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
-    and(b).map { (a, b) -> SA().run { a + b } }
+    and(b).map { (a, b) -> OI().run { a + b } }
 }
 
 @extension
 interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>, ScheduleSemigroup<F, Input, Output> {
-  override fun SA(): Semigroup<Output> = MA()
-  fun MA(): Monoid<Output>
+  override fun OI(): Monoid<Output>
   fun MF(): Monad<F>
 
   override fun empty(): Schedule<F, Input, Output> =
-    Schedule.forever<F, Input>(MF()).const(MA().empty())
-}
-
-@extension
-interface ScheduleSemiring<F, Input, Output> : Semiring<Schedule<F, Input, Output>>, ScheduleMonoid<F, Input, Output> {
-  override fun MA(): Monoid<Output>
-  override fun MF(): Monad<F>
-
-  override fun one(): Schedule<F, Input, Output> = empty()
-
-  override fun empty(): Schedule<F, Input, Output> =
-    Schedule.forever<F, Input>(MF()).const(MA().empty())
-
-  override fun zero(): Schedule<F, Input, Output> =
-    Schedule.never<F, Input>(MF()).const(MA().empty())
-
-  override fun Schedule<F, Input, Output>.combineMultiplicate(b: Schedule<F, Input, Output>): Schedule<F, Input, Output> =
-    andThen(b).map { it.fold(::identity, ::identity) }
+    Schedule.forever<F, Input>(MF()).const(OI().empty())
 }
 
 @extension
@@ -128,7 +109,8 @@ interface ScheduleProfunctor<F> : Profunctor<Kind<ForSchedule, F>> {
 interface ScheduleCategory<F> : Category<Kind<ForSchedule, F>> {
   fun MM(): Monad<F>
 
-  override fun <A> id(): Kind2<Kind<ForSchedule, F>, A, A> = Schedule.identity(MM())
+  override fun <A> id(): Kind2<Kind<ForSchedule, F>, A, A> =
+    Schedule.identity(MM())
 
   override fun <A, B, C> Kind2<Kind<ForSchedule, F>, B, C>.compose(arr: Kind2<Kind<ForSchedule, F>, A, B>): Kind2<Kind<ForSchedule, F>, A, C> =
     fix().compose(arr.fix())
