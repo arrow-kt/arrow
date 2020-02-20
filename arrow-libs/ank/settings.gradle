@@ -1,0 +1,4 @@
+rootProject.name = 'arrow'
+
+include 'arrow-ank'
+include 'arrow-ank-gradle'

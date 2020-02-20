@@ -1,0 +1,34 @@
+buildscript {
+    repositories {
+        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    }
+    dependencies {
+        classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
+    }
+}
+
+plugins {
+    id "maven-publish"
+    id "base"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+    id "net.rdrei.android.buildtimetracker"
+    id "org.jetbrains.dokka"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply from: "$DOC_CONF"
+apply from: "$PUBLISH_CONF"
+
+ktlintMainSourceSetCheck.enabled = false
+
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
+
+    runtime "org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION"
+    runtime "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"
+    runtime "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+}
