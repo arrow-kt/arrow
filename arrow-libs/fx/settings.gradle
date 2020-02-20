@@ -1,0 +1,10 @@
+rootProject.name = 'arrow'
+
+include 'arrow-fx'
+include 'arrow-streams'
+include 'arrow-fx-reactor'
+include 'arrow-fx-rx2'
+include 'arrow-fx-kotlinx-coroutines'
+include 'arrow-benchmarks-fx:arrow-scala-benchmarks'
+include 'arrow-benchmarks-fx:arrow-kio-benchmarks'
+include 'arrow-benchmarks-fx'
