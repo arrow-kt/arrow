@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
     - name: Check
       run: |
         git clone https://github.com/arrow-kt/arrow.git arrow
@@ -20,6 +19,8 @@ jobs:
       if: failure()
       id: create-issue
       run: |
+        git clone https://github.com/arrow-kt/arrow-integrations.git
+        cd arrow-integrations
         echo $(git log -1 --pretty=format:%s)
         echo ::set-output name=title::$(git log -1 --pretty=format:%s)
         echo -e "## Details\n" > issue.log
