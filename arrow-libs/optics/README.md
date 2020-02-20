@@ -1,6 +1,6 @@
 # Arrow Optics
 
-[![Arrow Optics logo](https://github.com/arrow-kt/arrow-site/tree/master/docs/img/optics/arrow-optics-brand-sidebar.svg)](https://arrow-kt.io)
+[![Arrow Optics logo](https://raw.githubusercontent.com/arrow-kt/arrow-site/master/docs/img/optics/arrow-optics-brand-sidebar.svg?sanitize=true)](https://arrow-kt.io)
 
 Λrrow Optics is part of [**Λrrow**](https://arrow-kt.io).
 
