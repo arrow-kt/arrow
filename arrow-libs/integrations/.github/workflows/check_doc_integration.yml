@@ -52,4 +52,4 @@ jobs:
           }
           await github.issues.create({...context.repo,
             title: "DOC: error when integrating '${{ steps.create-issue.outputs.title }}' with the rest of Arrow libraries",
-            body: readFile("file://${{github.workspace}}/issue.log")});
+            body: readFile("file://${{github.workspace}}/arrow-integrations/issue.log")});
