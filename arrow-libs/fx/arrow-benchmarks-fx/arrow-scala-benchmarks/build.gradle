@@ -9,6 +9,7 @@ plugins {
     id "scala"
 }
 
+apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 
 dependencies {

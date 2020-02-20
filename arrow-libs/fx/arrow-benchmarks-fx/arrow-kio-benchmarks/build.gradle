@@ -7,6 +7,7 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
+apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 
 dependencies {

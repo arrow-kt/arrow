@@ -12,6 +12,7 @@ plugins {
     id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
 }
 
+apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 
 ktlintJmhSourceSetCheck.enabled = false
