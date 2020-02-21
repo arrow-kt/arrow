@@ -18,7 +18,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
-        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt-optics/arrow.git
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-optics.git
         git config --global user.email "raulraja@users.noreply.github.com"
         git config --global user.name "raulraja"
         git merge origin/master -m "Merge master on release branch"
