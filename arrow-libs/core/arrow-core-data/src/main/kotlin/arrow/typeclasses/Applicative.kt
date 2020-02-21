@@ -14,7 +14,8 @@ interface Applicative<F> : Apply<F> {
   fun <A> A.just(dummy: Unit = Unit): Kind<F, A> =
     just(this)
 
-  fun unit(): Kind<F, Unit> = just(Unit)
+  fun unit(): Kind<F, Unit> =
+    just(Unit)
 
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     ap(just(f))

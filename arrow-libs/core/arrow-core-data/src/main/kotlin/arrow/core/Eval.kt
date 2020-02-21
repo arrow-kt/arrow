@@ -69,7 +69,8 @@ sealed class Eval<out A> : EvalOf<A> {
         }
       }
 
-    fun <A> just(a: A): Eval<A> = now(a)
+    fun <A> just(a: A): Eval<A> =
+      now(a)
 
     /**
      * Creates an Eval instance from an already constructed value but still defers evaluation when chaining expressions with `map` and `flatMap`
@@ -89,7 +90,8 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * It will return 2.
      */
-    fun <A> now(a: A) = Now(a)
+    fun <A> now(a: A): Eval<A> =
+      Now(a)
 
     /**
      * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked memoizing the computed value.
@@ -109,7 +111,8 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
-    fun <A> later(f: () -> A) = Later(f)
+    fun <A> later(f: () -> A): Later<A> =
+      Later(f)
 
     /**
      * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked recomputing each time `.value()` is invoked.
@@ -129,11 +132,14 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */
-    fun <A> always(f: () -> A) = Always(f)
+    fun <A> always(f: () -> A) =
+      Always(f)
 
-    fun <A> defer(f: () -> Eval<A>): Eval<A> = Defer(f)
+    fun <A> defer(f: () -> Eval<A>): Eval<A> =
+      Defer(f)
 
-    fun raise(t: Throwable): Eval<Nothing> = defer { throw t }
+    fun raise(t: Throwable): Eval<Nothing> =
+      defer { throw t }
 
     val Unit: Eval<Unit> = Now(kotlin.Unit)
 
