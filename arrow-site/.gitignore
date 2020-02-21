@@ -115,6 +115,9 @@ fabric.properties
 _site
 .sass-cache
 
+#Ruby
+Gemfile.lock
+
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 

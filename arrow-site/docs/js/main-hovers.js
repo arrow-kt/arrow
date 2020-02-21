@@ -194,13 +194,13 @@ function commonHoverStyle(id, incubatorHover) {
   setOpacity(arrayCategoryIconColor, id, 0);
   animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id);
 
-  siteFooter.style.background = "url('../img/home/hover-lines-footer.svg') repeat-x";
+  siteFooter.style.background = "url('img/home/hover-lines-footer.svg') repeat-x";
 }
 
 function coreHoverStyle() {
-  body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
+  body.style.background = "#354755 url('img/home/hover-lines-header.svg') repeat-x";
   coreArrowLogo.style.opacity = 1;
-  incubatorList.style.listStyleImage = "url('../img/core/core-bullet.svg')";
+  incubatorList.style.listStyleImage = "url('img/core/core-bullet.svg')";
   incubatorCoreLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'core');
@@ -211,9 +211,9 @@ function coreHoverStyle() {
 }
 
 function fxHoverStyle() {
-  body.style.background = "#33393f url('../img/home/hover-lines-header.svg') repeat-x";
+  body.style.background = "#33393f url('img/home/hover-lines-header.svg') repeat-x";
   fxArrowLogo.style.opacity = 1;
-  incubatorList.style.listStyleImage = "url('../img/fx/fx-bullet.svg')";
+  incubatorList.style.listStyleImage = "url('img/fx/fx-bullet.svg')";
   incubatorFxLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'fx');
@@ -224,9 +224,9 @@ function fxHoverStyle() {
 }
 
 function opticsHoverStyle() {
-  body.style.background = "#35565F url('../img/home/hover-lines-header.svg') repeat-x";
+  body.style.background = "#35565F url('img/home/hover-lines-header.svg') repeat-x";
   opticsArrowLogo.style.opacity = 1;
-  incubatorList.style.listStyleImage = "url('../img/optics/optics-bullet.svg')";
+  incubatorList.style.listStyleImage = "url('img/optics/optics-bullet.svg')";
   incubatorOpticsLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'optics');
@@ -237,9 +237,9 @@ function opticsHoverStyle() {
 }
 
 function metaHoverStyle() {
-  body.style.background = "#2E3B44 url('../img/home/hover-lines-header.svg') repeat-x";
+  body.style.background = "#2E3B44 url('img/home/hover-lines-header.svg') repeat-x";
   metaArrowLogo.style.opacity = 1;
-  incubatorList.style.listStyleImage = "url('../img/meta/meta-bullet.svg')";
+  incubatorList.style.listStyleImage = "url('img/meta/meta-bullet.svg')";
   incubatorMetaLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'meta');
@@ -250,9 +250,9 @@ function metaHoverStyle() {
 }
 
 function incubatorHoverStyle() {
-  body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
+  body.style.background = "#354755 url('img/home/hover-lines-header.svg') repeat-x";
   incubatorArrowLogo.style.opacity = 1;
-  incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
+  incubatorList.style.listStyleImage = "url('img/incubator/incubator-bullet.svg')";
   incubatorHoverLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'incubator');
@@ -272,7 +272,7 @@ function resetHovers() {
 
   if (!activeFeature) {
     body.style.setProperty('--color-primary', '#263238');
-    body.style.background = "#F5F7F8 url('../img/home/lines-header-bg.svg') repeat-x";
+    body.style.background = "#F5F7F8 url('img/home/lines-header-bg.svg') repeat-x";
     navBrandWhite.style.opacity = 0;
     navBrandDark.style.opacity = 1;
     headerText.style.opacity = 1;
@@ -284,7 +284,7 @@ function resetHovers() {
     arrayNavLinks.map(obj => obj.classList.remove('hover-mode'));
     arrayFooterLinks.map(obj => obj.classList.remove('hover-mode'));
     arrayIncubatorLinks.map(obj => obj.classList.remove('hover-mode'));
-    incubatorList.style.listStyleImage = "url('../img/home/bullet.svg')";
+    incubatorList.style.listStyleImage = "url('img/home/bullet.svg')";
     incubatorArrowLogo.style.opacity = 0;
     siteNav.classList.remove('core');
     arrayHeaderAnimation.map(el => el.id.includes('base-arrow-animation') ? el.style.opacity = 1 : el.style.opacity = 0);
@@ -295,9 +295,9 @@ function resetHovers() {
 
 function mobileMode() {
   body.style.setProperty('--color-primary', '#F5F7F8');
-  body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
-  siteFooter.style.background = "url('../img/home/hover-lines-footer.svg') repeat-x";
-  incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
+  body.style.background = "#354755 url('img/home/hover-lines-header.svg') repeat-x";
+  siteFooter.style.background = "url('img/home/hover-lines-footer.svg') repeat-x";
+  incubatorList.style.listStyleImage = "url('img/incubator/incubator-bullet.svg')";
   headerText.style.opacity = 1;
   navBrandWhite.style.opacity = 1;
   navBrandDark.style.opacity = 0;
