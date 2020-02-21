@@ -85,7 +85,7 @@ git-filter-repo --path modules/core/arrow-core \
  --path modules/core/arrow-extras-extensions
 
 git remote add upstream git@github.com:arrow-kt/arrow-core.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-fx
@@ -121,7 +121,7 @@ git-filter-repo --path modules/fx/arrow-fx \
  --path arrow-effects
 
 git remote add upstream git@github.com:arrow-kt/arrow-fx.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-ank
@@ -137,7 +137,7 @@ git-filter-repo --path modules/ank/arrow-ank \
  --path ank-core
 
 git remote add upstream git@github.com:arrow-kt/arrow-ank.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-incubator
@@ -191,7 +191,7 @@ git-filter-repo --path modules/aql/arrow-aql \
  --path modules/core/arrow-mtl
 
 git remote add upstream git@github.com:arrow-kt/arrow-incubator.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-docs
@@ -214,7 +214,7 @@ git-filter-repo --path modules/docs/arrow-docs \
  --path modules/docs/arrow-examples
 
 git remote add upstream git@github.com:arrow-kt/arrow-docs.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-integrations
@@ -229,7 +229,7 @@ git-filter-repo --path modules/integrations/arrow-integrations-retrofit-adapter 
  --path-rename modules/integrations/arrow-integrations-jackson-module:arrow-integrations-jackson-module
 
 git remote add upstream git@github.com:arrow-kt/arrow-integrations.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-ui
@@ -247,7 +247,7 @@ git-filter-repo --path modules/ui/arrow-ui \
  --path modules/core/arrow-extras
 
 git remote add upstream git@github.com:arrow-kt/arrow-ui.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-optics
@@ -265,7 +265,7 @@ git-filter-repo --path modules/optics/arrow-optics \
  --path modules/optics/arrow-optics
 
 git remote add upstream git@github.com:arrow-kt/arrow-optics.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-test
@@ -280,7 +280,7 @@ git-filter-repo --path modules/core/arrow-test \
  --path arrow-effects-test
 
 git remote add upstream git@github.com:arrow-kt/arrow-test.git
-git push upstream master
+git push --all upstream
 ```
 
 ### arrow-site
@@ -298,7 +298,7 @@ git-filter-repo --path modules/docs/arrow-docs/docs \
  --path kategory-docs
 
 git remote add upstream git@github.com:arrow-kt/arrow-site.git
-git push upstream master
+git push --all upstream
 ```
 
 ## Final step
