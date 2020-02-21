@@ -3,10 +3,10 @@ name: "arrow-integrations: build"
 on: pull_request
 
 jobs:
-  arrow-integrations-build:
+  arrow-integrations_build:
 
     env:
-      BASEDIR: ${{github.workspace}}
+      BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: ubuntu-latest
@@ -21,6 +21,8 @@ jobs:
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
-      run: git clone https://github.com/arrow-kt/arrow.git arrow
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
-      run: ./arrow/scripts/project-build.sh
+      run: $BASEDIR/arrow/scripts/project-build.sh arrow-integrations

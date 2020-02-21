@@ -10,7 +10,7 @@ jobs:
   arrow-integrations_publish:
 
     env:
-      BASEDIR: ${{github.workspace}}
+      BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: ubuntu-latest
@@ -25,14 +25,16 @@ jobs:
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
-      run: git clone https://github.com/arrow-kt/arrow.git arrow
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
-      run: ./arrow/scripts/project-build.sh
+      run: $BASEDIR/arrow/scripts/project-build.sh arrow-integrations
     - name: Publish artifacts
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: ./arrow/scripts/project-publish.sh
+      run: $BASEDIR/arrow/scripts/project-publish.sh arrow-integrations
     - name: Prepare environment to create the issue (new package)
       if: failure()
       id: create-issue

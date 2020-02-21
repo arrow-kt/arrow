@@ -8,19 +8,23 @@ on:
 jobs:
   check-doc-integration:
 
+    env:
+      BASEDIR: ${{github.workspace}}/..
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v1
     - name: Check
       run: |
-        git clone https://github.com/arrow-kt/arrow.git arrow
-        ./arrow/scripts/check-doc-integration.sh
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
+        $BASEDIR/arrow/scripts/check-doc-integration.sh
     - name: Prepare environment to create the issue (new package)
       if: failure()
       id: create-issue
       run: |
-        git clone https://github.com/arrow-kt/arrow-integrations.git
-        cd arrow-integrations
         echo $(git log -1 --pretty=format:%s)
         echo ::set-output name=title::$(git log -1 --pretty=format:%s)
         echo -e "## Details\n" > issue.log
@@ -52,4 +56,4 @@ jobs:
           }
           await github.issues.create({...context.repo,
             title: "DOC: error when integrating '${{ steps.create-issue.outputs.title }}' with the rest of Arrow libraries",
-            body: readFile("file://${{github.workspace}}/arrow-integrations/issue.log")});
+            body: readFile("file://${{github.workspace}}/issue.log")});
