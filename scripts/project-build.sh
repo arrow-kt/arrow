@@ -12,7 +12,7 @@ if [ "$1" != "arrow-test" ]; then
     addLocalRepository generic-conf.gradle
 
     cd $BASEDIR
-    git clone git@github.com:arrow-kt/arrow-test.git
+    git clone https://github.com/arrow-kt/arrow-test.git
     cd arrow-test
     useLocalGenericConf gradle.properties
     $BASEDIR/arrow/scripts/project-install.sh arrow-test
