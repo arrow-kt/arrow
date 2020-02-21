@@ -8,14 +8,19 @@ on:
 jobs:
   check-build-integration:
 
+    env:
+      BASEDIR: ${{github.workspace}}/..
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
     - name: Check
       run: |
-        git clone https://github.com/arrow-kt/arrow.git arrow
-        ./arrow/scripts/check-build-integration.sh
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
+        $BASEDIR/arrow/scripts/check-build-integration.sh
     - name: Prepare environment to create the issue (new package)
       if: failure()
       id: create-issue
