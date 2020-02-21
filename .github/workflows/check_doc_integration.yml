@@ -4,6 +4,7 @@ on:
   pull_request:
     paths-ignore:
     - 'docs/**'
+    - 'templates/**'
     - '**.md'
 
 jobs:
