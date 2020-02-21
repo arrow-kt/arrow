@@ -3,7 +3,7 @@ name: "arrow-integrations: publish in OSS"
 on:
   push:
     branches:
-    - master
+    - release/0.11.0
 
 jobs:
   arrow-integrations_publish:
@@ -26,7 +26,7 @@ jobs:
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
+        git clone -b release/0.11.0 https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
       run: $BASEDIR/arrow/scripts/project-build.sh arrow-integrations
     - name: Publish artifacts
@@ -68,5 +68,5 @@ jobs:
             return content;
           }
           await github.issues.create({...context.repo,
-            title: "BUILD: error when merging '${{ steps.create-issue.outputs.title }}' on master branch",
+            title: "BUILD: error when merging '${{ steps.create-issue.outputs.title }}' on release/0.11.0 branch",
             body: readFile("file://${{github.workspace}}/issue.log")});
