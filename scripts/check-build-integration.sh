@@ -24,5 +24,5 @@ for repository in $(cat lists/build.txt); do
 done
 
 for repository in $(cat lists/build.txt); do
-    ./scripts/project-build.sh $repository
+    ./scripts/project-simple-build.sh $repository
 done
