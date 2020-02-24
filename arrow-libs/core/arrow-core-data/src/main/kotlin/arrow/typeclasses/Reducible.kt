@@ -132,9 +132,14 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
     return p(a) || ga.exists(p)
   }
 
+  @Deprecated("In favor of having a more Kotlin idiomatic API", ReplaceWith("all(p)"))
   override fun <A> Kind<F, A>.forAll(p: (A) -> Boolean): Boolean = FG().run {
+    return all(p)
+  }
+
+  override fun <A> Kind<F, A>.all(p: (A) -> Boolean): Boolean = FG().run {
     val (a, ga) = split()
-    return p(a) && ga.forAll(p)
+    return p(a) && ga.all(p)
   }
 
   override fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long = FG().run {
