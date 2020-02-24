@@ -1,4 +1,4 @@
-<a href="https://arrow-kt.io" title="Arrow website"><img src="https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/img/home/header-image.png" width="200" alt=""></a>
+<a href="https://arrow-kt.io" title="Arrow website"><img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/header-image.png" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 <!-- Remove the following on when having just one WIP again -->
