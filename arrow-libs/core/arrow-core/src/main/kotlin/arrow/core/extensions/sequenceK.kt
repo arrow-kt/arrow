@@ -25,7 +25,6 @@ import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
-import arrow.core.toOption
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Align
@@ -173,11 +172,6 @@ interface SequenceKFoldable : Foldable<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.get(idx: Long): Option<A> =
     if (idx < 0) None
     else fix().drop(idx.toInt()).firstOption()
-
-  override fun <A> Kind<ForSequenceK, A>.firstOption(): Option<A> = fix().firstOrNull().toOption()
-
-  override fun <A> Kind<ForSequenceK, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
-    fix().firstOrNull(predicate).toOption()
 }
 
 @extension

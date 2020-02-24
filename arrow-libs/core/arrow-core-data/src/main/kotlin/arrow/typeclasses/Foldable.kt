@@ -205,22 +205,23 @@ interface Foldable<F> {
   /**
    * Get the first element of the foldable or none
    */
-  fun <A> Kind<F, A>.firstOption(): Option<A> = get(0)
+  fun <A> Kind<F, A>.firstOption(): Option<A> =
+    find { true }
 
   /**
-   * Get the first element of the foldable or none if empty or the predicate does not match
+   * Get the first element matching the predicate or none
    */
   fun <A> Kind<F, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
-    get(0).filter(predicate)
+    find { predicate(it) }
 
   fun <A> Kind<F, A>.toList(): List<A> = foldRight(Eval.now(emptyList<A>())) { v, acc -> acc.map { listOf(v) + it } }.value()
 
   companion object {
     @Deprecated("This function will be removed soon. Use Iterator.iterateRight from Eval.kt instead")
     fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = { f: (A, Eval<B>) -> Eval<B> ->
-        fun loop(): Eval<B> =
-          Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
-        loop()
-      }
+      fun loop(): Eval<B> =
+        Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
+      loop()
+    }
   }
 }
