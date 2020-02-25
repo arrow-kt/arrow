@@ -22,7 +22,7 @@ dependencies {
     kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
     compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-integrations-test")
     testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
     testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"

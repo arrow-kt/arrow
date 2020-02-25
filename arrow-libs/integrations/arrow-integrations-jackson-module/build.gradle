@@ -19,7 +19,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_MODULE_KOTLIN_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-integrations-test")
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
     testCompile "io.kotlintest:kotlintest-assertions-json:$KOTLIN_TEST_VERSION"
 }
