@@ -1,4 +1,5 @@
-rootProject.name = 'arrow'
+rootProject.name = 'arrow-ank'
 
 include 'arrow-ank'
 include 'arrow-ank-gradle'
+include 'arrow-docs'
