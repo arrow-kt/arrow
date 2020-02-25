@@ -6,4 +6,3 @@ arrow-optics
 arrow-ank
 arrow-integrations
 arrow-docs
-arrow-test

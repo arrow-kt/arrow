@@ -3,4 +3,4 @@
 set -ex
 echo "For $1 ..."
 cd $BASEDIR/$1
-./gradlew runAnk
+./gradlew :arrow-docs:runAnk

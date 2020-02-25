@@ -17,7 +17,7 @@
 //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
 dokka {
     outputFormat = 'jekyll'
-    outputDirectory = "${projectDir}/docs/apidocs"
+    outputDirectory = "${rootDir}/arrow-docs/docs/apidocs"
     configuration {
         includes = ['README.md']
         reportUndocumented = false
@@ -36,16 +36,3 @@ dokka {
         }
     }
 }
-
-
-// Note: please, don't add configuration after ank! (reason: automatic tasks)
-
-apply plugin: 'ank-gradle-plugin'
-
-ank {
-    source = file("${projectDir}/docs")
-    target = file("${projectDir}/build/site")
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-// Note: please, don't add configuration after ank! (reason: automatic tasks)

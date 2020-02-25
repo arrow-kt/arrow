@@ -16,11 +16,10 @@ function replaceOSSbyLocalRepository()
     sed -i "s/maven { url \"https:\/\/oss.jfrog.org\/artifactory\/oss-snapshot-local\/\" }//g" $1
 }
 
-function removeAnkFromCommonBuild()
+function removeArrowDocs()
 {
-    echo "Removing ANK from common build ($1) ..."
-    while read -r line; do if [[ ! "$line" =~ ^.*ank-gradle-plugin.*$ ]]; then echo "$line" >> doc-conf.gradle.tmp; else break; fi; done < $1
-    mv doc-conf.gradle.tmp $1
+    echo "Removing Arrow Docs ($1)..."
+    sed -i "s/include 'arrow-docs'//g" $1
 }
 
 function replaceGlobalPropertiesbyLocalConf()
@@ -29,9 +28,9 @@ function replaceGlobalPropertiesbyLocalConf()
     sed -i "s/GENERIC_CONF/#GENERIC_CONF/g" $1
     sed -i "s/PUBLISH_CONF/#PUBLISH_CONF/g" $1
     sed -i "s/DOC_CONF/#DOC_CONF/g" $1
-    echo "GENERIC_CONF=file://$BASEDIR/generic-conf.gradle" >> $1
-    echo "PUBLISH_CONF=file://$BASEDIR/publish-conf.gradle" >> $1
-    echo "DOC_CONF=file://$BASEDIR/doc-conf.gradle" >> $1
+    echo "GENERIC_CONF=file://$BASEDIR/arrow/generic-conf.gradle" >> $1
+    echo "PUBLISH_CONF=file://$BASEDIR/arrow/publish-conf.gradle" >> $1
+    echo "DOC_CONF=file://$BASEDIR/arrow/doc-conf.gradle" >> $1
 }
 
 function addLocalRepository()
