@@ -9,7 +9,10 @@ export BASEDIR=$(pwd)
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 
 for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
-    git clone https://github.com/arrow-kt/$repository.git
+    if [ ! -d $BASEDIR/$repository ]; then
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/$repository.git
+    fi
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
     removeArrowDocs $BASEDIR/$repository/settings.gradle
