@@ -1,4 +1,6 @@
-rootProject.name = 'arrow'
+rootProject.name = 'arrow-optics'
 
 include 'arrow-optics'
 include 'arrow-optics-mtl'
+include 'arrow-optics-test'
+include 'arrow-docs'

@@ -23,15 +23,6 @@ dependencies {
     testCompile "junit:junit:$JUNIT_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-optics-test")
     testCompile project(":arrow-optics-mtl")
 }
-
-// Note: please, don't add configuration after ank! (reason: automatic tasks)
-ank {
-    dependencies {
-        compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-        compile "io.arrow-kt:arrow-docs:$VERSION_NAME"
-    }
-}
-// Note: please, don't add configuration after ank! (reason: automatic tasks)

@@ -1,11 +1,5 @@
 buildscript {
     apply from: "$COMMON_SETUP"
-    repositories {
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
-    }
-    dependencies {
-        classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
-    }
 }
 
 plugins {
