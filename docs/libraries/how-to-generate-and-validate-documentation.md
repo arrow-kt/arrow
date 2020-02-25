@@ -13,7 +13,7 @@ Dokka is responsible for generating documentation based on source code annotatio
 ### 2. Run Ank
 
 ```bash
-./gradlew runAnk
+./gradlew :arrow-docs:runAnk
 ```
 
 ## Doc snippets policies
