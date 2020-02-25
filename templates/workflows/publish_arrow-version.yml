@@ -3,7 +3,7 @@ name: "<arrow-library>: publish in OSS"
 on:
   push:
     branches:
-    - master
+    - <version-branch>
 
 jobs:
   <arrow-library>_publish:
@@ -26,7 +26,7 @@ jobs:
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
+        git clone -b <version-branch> https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
       run: $BASEDIR/arrow/scripts/project-build.sh <arrow-library>
     - name: Publish artifacts
@@ -68,5 +68,5 @@ jobs:
             return content;
           }
           await github.issues.create({...context.repo,
-            title: "BUILD: error when merging '${{ steps.create-issue.outputs.title }}' on master branch",
+            title: "BUILD: error when merging '${{ steps.create-issue.outputs.title }}' on <version-branch> branch",
             body: readFile("file://${{github.workspace}}/issue.log")});
