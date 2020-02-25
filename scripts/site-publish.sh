@@ -3,7 +3,7 @@
 set -e
 echo "Publish $1 in S3 ..."
 
-if [[ "$1" == "arrow-docs-repository" ]]; then
+if [[ "$1" == "arrow-docs" ]]; then
     for file in $BASEDIR/site/build/_site/*; do
         echo "Sync with docs/next/$(basename $file)"
         if [ -f "$file" ]; then
