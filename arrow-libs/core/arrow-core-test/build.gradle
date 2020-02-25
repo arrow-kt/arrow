@@ -1,4 +1,5 @@
 plugins {
+    id "maven-publish"
     id "base"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.kapt"
@@ -8,6 +9,7 @@ plugins {
 }
 
 apply from: "$SUBPROJECT_CONF"
+apply from: "$PUBLISH_CONF"
 
 dependencies {
     compile project(":arrow-core")
