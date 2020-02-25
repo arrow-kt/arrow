@@ -25,5 +25,5 @@ dependencies {
     testCompile("io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION") {
          exclude group: "io.arrow-kt", module: "arrow-core"
     }
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-core-test")
 }

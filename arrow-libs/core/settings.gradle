@@ -1,4 +1,4 @@
-rootProject.name = 'arrow'
+rootProject.name = 'arrow-core'
 
 include 'arrow-meta:arrow-meta-test-models'
 include 'arrow-meta'
@@ -6,3 +6,5 @@ include 'arrow-annotations'
 include 'arrow-syntax'
 include 'arrow-core'
 include 'arrow-core-data'
+include 'arrow-core-test'
+include 'arrow-docs'

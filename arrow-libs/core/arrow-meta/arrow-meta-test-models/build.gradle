@@ -13,7 +13,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+    compile project(":arrow-annotations")
     compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+    compile project(":arrow-core")
 }

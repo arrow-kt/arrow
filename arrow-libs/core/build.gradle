@@ -5,10 +5,8 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
     }
     dependencies {
-        classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
     }
 }
