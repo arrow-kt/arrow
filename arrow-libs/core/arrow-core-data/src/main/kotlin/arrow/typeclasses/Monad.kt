@@ -99,9 +99,6 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
-
-  override fun <A, B> Kind<F, A>.lazyAp(ff: () -> Kind<F, (A) -> B>): Kind<F, B> =
-    flatMap { a -> ff().map { f -> f(a) } }
 }
 
 interface MonadFx<F> {

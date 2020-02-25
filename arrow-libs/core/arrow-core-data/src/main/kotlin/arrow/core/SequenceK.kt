@@ -24,7 +24,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { b: B -> (listOf(b) + xs).k() } } } } }
+      GA.run { f(a).apEval(eval.map { it.map { xs -> { b: B -> (listOf(b) + xs).k() } } }) }
     }.value().let { GA.run { it.map { it.asSequence().k() } } }
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =

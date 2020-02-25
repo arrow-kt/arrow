@@ -2,6 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Const
+import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
@@ -9,18 +10,13 @@ import arrow.core.Tuple2
 import arrow.core.const
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.eq
+import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.monoid
 import arrow.core.fix
 import arrow.core.toT
 import arrow.core.value
-import arrow.fx.IO
-import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.mtl.typeclasses.ComposedApplicative
-import arrow.mtl.typeclasses.nest
-import arrow.mtl.typeclasses.unnest
 import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
@@ -42,8 +38,17 @@ fun <A> TIK<A>.fix(): TIC<A> =
 
 data class TIC<out A>(val ti: TI<A>) : TIK<A>
 
-class TIF {
-  private constructor()
+class TIF private constructor()
+
+interface Nested<out F, out G>
+
+fun <F, G, A> Kind<F, Kind<G, A>>.nest(): Kind<Nested<F, G>, A> = this as Kind<Nested<F, G>, A>
+fun <F, G, A> Kind<Nested<F, G>, A>.unnest(): Kind<F, Kind<G, A>> = this as Kind<F, Kind<G, A>>
+
+fun <F, G> ComposedApplicative(apF: Applicative<F>, apG: Applicative<G>): Applicative<Nested<F, G>> = object : Applicative<Nested<F, G>> {
+  override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
+    apF.run { unnest().ap(ff.unnest().map { gf -> { ga: Kind<G, A> -> apG.run { ga.ap(gf) } } }).nest() }
+  override fun <A> just(a: A): Kind<Nested<F, G>, A> = apF.just(apG.just(a)).nest()
 }
 
 object TraverseLaws {
@@ -57,7 +62,7 @@ object TraverseLaws {
         Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
         Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
         Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
-        Law("Traverse Laws: Effect order preserved") { TF.effectOrderPreserved(GEN) }
+        Law("Traverse Laws: Traverse is left to right") { TF.leftToRight(GEN) }
       )
   }
 
@@ -115,13 +120,11 @@ object TraverseLaws {
       mapped.equalUnderTheLaw(traversed, Eq.any())
     }
 
-  fun <F, A> Traverse<F>.effectOrderPreserved(GEN: Gen<Kind<F, A>>) = IO.concurrent().run {
-    forAll(GEN) { fa: Kind<F, A> ->
-      val foldableOrder = fa.foldLeft(emptyList()) { xs: List<A>, x: A -> xs + x }
-      val effectOrder = Ref<List<A>>(emptyList()).flatMap { ref ->
-        fa.traverse(IO.applicative()) { a -> ref.update { it + a } }.followedBy(ref.get())
-      }.unsafeRunSync()
-      effectOrder.equalUnderTheLaw(foldableOrder, Eq.any())
+  fun <F> Traverse<F>.leftToRight(GEN: Gen<Kind<F, Int>>) =
+    forAll(GEN) { fa ->
+      val mutable = mutableListOf<Int>()
+      fa.traverse(Eval.applicative()) { mutable.add(it); Eval.now(Unit) }.value()
+
+      mutable.equalUnderTheLaw(fa.toList(), Eq.any())
     }
-  }
 }

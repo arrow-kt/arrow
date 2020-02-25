@@ -30,7 +30,6 @@ dependencies {
     testCompile "com.google.testing.compile:compile-testing:$GOOGLE_COMPILE_TESTING_VERSION"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
     testCompile project(":arrow-meta:arrow-meta-test-models")
-    testCompile "io.arrow-kt:arrow-optics:$VERSION_NAME"
     testCompile("junit:junit:$JUNIT_VERSION")
     testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION"

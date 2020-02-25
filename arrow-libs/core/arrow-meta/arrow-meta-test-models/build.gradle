@@ -14,6 +14,5 @@ dependencies {
     compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     compile project(":arrow-annotations")
-    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
     compile project(":arrow-core")
 }

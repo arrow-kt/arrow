@@ -8,7 +8,6 @@ import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.identity
-import arrow.mtl.Kleisli
 import arrow.test.generators.GenK
 import arrow.test.generators.applicative
 import arrow.test.generators.either
@@ -33,8 +32,6 @@ object MonadLaws {
       listOf(
         Law("Monad Laws: left identity") { M.leftIdentity(G, EQ) },
         Law("Monad Laws: right identity") { M.rightIdentity(G, EQ) },
-        Law("Monad Laws: kleisli left identity") { M.kleisliLeftIdentity(G, EQ) },
-        Law("Monad Laws: kleisli right identity") { M.kleisliRightIdentity(G, EQ) },
         Law("Monad Laws: monad comprehensions") { M.monadComprehensions(EQ) },
         Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) }
       )
@@ -77,20 +74,6 @@ object MonadLaws {
     forAll(G) { fa: Kind<F, Int> ->
       fa.flatMap { just(it) }.equalUnderTheLaw(fa, EQ)
     }
-
-  fun <F> Monad<F>.kleisliLeftIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) {
-    val M = this
-    forAll(Gen.functionAToB<Int, Kind<F, Int>>(G), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli { n: Int -> just(n) }.andThen(M, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
-    }
-  }
-
-  fun <F> Monad<F>.kleisliRightIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) {
-    val M = this
-    forAll(Gen.functionAToB<Int, Kind<F, Int>>(G), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli(f).andThen(M, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
-    }
-  }
 
   fun <F> Monad<F>.stackSafety(iter: Int = 5000, EQ: Eq<Kind<F, Int>>) {
     val res = tailRecM(0) { i -> just(if (i < iter) Left(i + 1) else Right(i)) }

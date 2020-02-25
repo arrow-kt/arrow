@@ -16,7 +16,6 @@ apply from: "$PUBLISH_CONF"
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile project(":arrow-annotations")
-    //compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
     kapt project(":arrow-meta")
     kaptTest project(":arrow-meta")
     compileOnly project(":arrow-meta")
@@ -26,5 +25,7 @@ dependencies {
     testCompile project(":arrow-core-test")
     testCompile project(":arrow-syntax")
     testCompile project(":arrow-core")
-    testCompile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
+    testCompile ("io.arrow-kt:arrow-mtl-data:$VERSION_NAME") {
+        exclude group: "io.arrow-kt"
+    }
 }

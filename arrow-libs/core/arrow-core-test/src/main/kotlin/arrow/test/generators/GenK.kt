@@ -28,8 +28,6 @@ import arrow.core.Success
 import arrow.core.Try
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
-import arrow.mtl.EitherT
-import arrow.mtl.EitherTPartialOf
 import io.kotlintest.properties.Gen
 
 interface GenK<F> {
@@ -107,14 +105,6 @@ fun <A> Const.Companion.genK(genA: Gen<A>) = object : GenK<ConstPartialOf<A>> {
       Const<A, T>(it)
     }
 }
-
-fun <F, L> EitherT.Companion.genK(genkF: GenK<F>, genL: Gen<L>) =
-  object : GenK<EitherTPartialOf<F, L>> {
-    override fun <R> genK(gen: Gen<R>): Gen<Kind<EitherTPartialOf<F, L>, R>> =
-      genkF.genK(Gen.either(genL, gen)).map {
-        EitherT(it)
-      }
-  }
 
 fun Try.Companion.genK() = object : GenK<ForTry> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =

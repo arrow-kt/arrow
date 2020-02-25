@@ -12,17 +12,6 @@ apply from: "$SUBPROJECT_CONF"
 dependencies {
     compile project(":arrow-core")
     compile project(":arrow-core-data")
-    compile ("io.arrow-kt:arrow-optics:$VERSION_NAME") {
-        exclude group: "io.arrow-kt", module: "arrow-core"
-    }
-    compile ("io.arrow-kt:arrow-fx:$VERSION_NAME") {
-        exclude group: "io.arrow-kt", module: "arrow-core"
-    }
-    compile ("io.arrow-kt:arrow-mtl-data:$VERSION_NAME") {
-        exclude group: "io.arrow-kt", module: "arrow-core"
-    }
-    compile "io.arrow-kt:arrow-free-data:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

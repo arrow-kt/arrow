@@ -1,6 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
+import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.extensions.eq
@@ -39,7 +40,8 @@ object ApplicativeLaws {
       Law("Applicative Laws: cartesian builder tupled3") { A.cartesianBuilderTupled3(EQTuple3) },
       Law("Applicative Laws: replicate check size") { A.replicateSize(EQ) },
       Law("Applicative Laws: replicate check list == 1") { A.replicateListOf1(EQBoolean) },
-      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(EQ) }
+      Law("Applicative Laws: replicate monoid") { A.replicateMonoid(EQ) },
+      Law("Applicative Laws: apEval consistent with ap") { A.apEvalConsistent(GENK, EQ) }
     )
   }
 
@@ -91,5 +93,10 @@ object ApplicativeLaws {
   fun <F> Applicative<F>.replicateMonoid(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.choose(0, 100)) { n ->
       just(1).replicate(n, Int.monoid()).equalUnderTheLaw(just(n), EQ)
+    }
+
+  fun <F> Applicative<F>.apEvalConsistent(G: GenK<F>, EQ: Eq<Kind<F, Int>>) =
+    forAll(G.genK(Gen.int()), G.genK(Gen.functionAToB<Int, Int>(Gen.int()))) { fa, ff ->
+      fa.ap(ff).equalUnderTheLaw(fa.apEval(Eval.now(ff)).value(), EQ)
     }
 }

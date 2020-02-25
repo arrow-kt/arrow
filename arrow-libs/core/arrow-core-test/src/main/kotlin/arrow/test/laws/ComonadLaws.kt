@@ -2,7 +2,6 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.mtl.Cokleisli
 import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Comonad
@@ -22,9 +21,7 @@ object ComonadLaws {
         Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(GEN, EQ) },
         Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(GEN, EQ) },
         Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(GEN, EQ) },
-        Law("Comonad Laws: right identity") { CM.comonadRightIdentity(GEN, EQ) },
-        Law("Comonad Laws: cokleisli left identity") { CM.cokleisliLeftIdentity(GEN, EQ) },
-        Law("Comonad Laws: cokleisli right identity") { CM.cokleisliRightIdentity(GEN, EQ) }
+        Law("Comonad Laws: right identity") { CM.comonadRightIdentity(GEN, EQ) }
         // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
         // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
       )
@@ -54,20 +51,6 @@ object ComonadLaws {
     forAll(G, Gen.functionAToB<Kind<F, Int>, Kind<F, Int>>(G)) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
       fa.coflatMap(f).extract().equalUnderTheLaw(f(fa), EQ)
     }
-
-  fun <F> Comonad<F>.cokleisliLeftIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) {
-    val MM = this
-    forAll(G, Gen.functionAToB<Kind<F, Int>, Kind<F, Int>>(G)) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-      Cokleisli(MM) { hk: Kind<F, Int> -> hk.extract() }.andThen(Cokleisli(MM, f)).run(fa).equalUnderTheLaw(f(fa), EQ)
-    }
-  }
-
-  fun <F> Comonad<F>.cokleisliRightIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) {
-    val MM = this
-    forAll(G, Gen.functionAToB<Kind<F, Int>, Kind<F, Int>>(G)) { fa: Kind<F, Int>, f: (Kind<F, Int>) -> Kind<F, Int> ->
-      Cokleisli(MM, f).andThen(Cokleisli(MM) { hk: Kind<F, Kind<F, Int>> -> hk.extract() }).run(fa).equalUnderTheLaw(f(fa), EQ)
-    }
-  }
 
   fun <F> Comonad<F>.cobinding(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(G) { fa: Kind<F, Int> ->

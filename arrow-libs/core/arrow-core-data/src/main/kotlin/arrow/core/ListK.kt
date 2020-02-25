@@ -157,7 +157,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.now(GA.just(emptyList<B>().k()))) { a, eval ->
-      GA.run { Eval.later { f(a).lazyAp { eval.value().map { xs -> { a: B -> (listOf(a) + xs).k() } } } } }
+      GA.run { f(a).apEval(eval.map { it.map { xs -> { a: B -> (listOf(a) + xs).k() } } }) }
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
