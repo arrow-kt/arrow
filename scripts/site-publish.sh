@@ -2,10 +2,6 @@
 
 set -e
 echo "Publish $1 in S3 ..."
-for module in $BASEDIR/site/build/_site/apidocs/*; do
-    echo "Sync with docs/next/apidocs/$(basename $module)"
-    aws s3 sync $module s3://$S3_BUCKET/docs/next/apidocs/$(basename $module) > aws_sync_jekyll.log
-done
 
 if [[ "$1" == "arrow-docs-repository" ]]; then
     for file in $BASEDIR/site/build/_site/*; do
@@ -17,5 +13,10 @@ if [[ "$1" == "arrow-docs-repository" ]]; then
             echo "Sync $file ..."
             aws s3 sync $file s3://$S3_BUCKET/docs/next/$(basename $file) >> aws_sync_jekyll.log
         fi
+    done
+else
+    for module in $BASEDIR/site/build/_site/apidocs/*; do
+        echo "Sync with docs/next/apidocs/$(basename $module)"
+        aws s3 sync $module s3://$S3_BUCKET/docs/next/apidocs/$(basename $module) > aws_sync_jekyll.log
     done
 fi
