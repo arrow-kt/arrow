@@ -1,4 +1,4 @@
-rootProject.name = 'arrow'
+rootProject.name = 'arrow-fx'
 
 include 'arrow-fx'
 include 'arrow-streams'
@@ -8,3 +8,5 @@ include 'arrow-fx-kotlinx-coroutines'
 include 'arrow-benchmarks-fx:arrow-scala-benchmarks'
 include 'arrow-benchmarks-fx:arrow-kio-benchmarks'
 include 'arrow-benchmarks-fx'
+include 'arrow-fx-test'
+include 'arrow-docs'

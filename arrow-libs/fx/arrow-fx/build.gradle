@@ -27,14 +27,5 @@ dependencies {
     testCompile("io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION") {
          exclude group: "io.arrow-kt", module: "arrow-core"
     }
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-fx-test")
 }
-
-// Note: please, don't add configuration after ank! (reason: automatic tasks)
-ank {
-    dependencies {
-        compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-        compile "io.arrow-kt:arrow-docs:$VERSION_NAME"
-    }
-}
-// Note: please, don't add configuration after ank! (reason: automatic tasks)

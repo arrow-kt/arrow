@@ -22,7 +22,7 @@ dependencies {
     testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
-    testCompile "io.arrow-kt:arrow-test:$VERSION_NAME"
+    testCompile project(":arrow-fx-test")
 
     compile "io.projectreactor:reactor-core:$PROJECT_REACTOR_VERSION"
     testCompile "io.projectreactor:reactor-test:$PROJECT_REACTOR_VERSION"
