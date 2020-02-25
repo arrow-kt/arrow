@@ -64,17 +64,6 @@
             activate($(this), 300);
         });
 
-        // This detects the path to activate the current link accordingly
-        var current = location.pathname;
-        $('.sidebar-nav > li > ul a').each(function() {
-            var $this = $(this);
-            // If the current path is like this link, make it active
-            if ($this.attr('href') === current){
-                $this.addClass('active');
-                activate($this.closest('.sidebar-nav > li').children('a'), 0);
-            }
-        })
-
         var anchorForId = function (id) {
           var anchor = document.createElement("a");
           anchor.className = "header-link";
@@ -107,3 +96,23 @@
         linkifyAllLevels(".doc-content, .blog-content");
     });
 })(jQuery);
+
+/**
+ * Remove active class from siblings DOM elements and apply it to event target.
+ * @param {Element}		element The element receiving the class, and whose siblings will lose it.
+ * @param {string}		[activeClass='active'] The class to be applied.
+ */
+function activate(element, activeClass = 'active') {
+  [...element.parentNode.children].map((elem) => elem.classList.remove(activeClass));
+  element.classList.add(activeClass);
+}
+
+/**
+ * Remove active class from siblings parent DOM elements and apply it to element target parent.
+ * @param {Element}		element The element receiving the class, and whose siblings will lose it.
+ * @param {string}		[activeClass='active'] The class to be applied.
+ */
+function activateParent(element, activeClass = 'active') {
+  const elemParent = element.parentNode;
+  activate(elemParent, activeClass);
+}

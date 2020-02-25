@@ -77,6 +77,67 @@
     }
 }
 
+.sidebar-nav {
+    font-size: $base-docs-font-size;
+
+    .sidebar-nav-item {
+        > a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            @include links($white, $white, $white, $white);
+            padding: ($base-point-grid * 1.5) ($base-point-grid * 4);
+
+            &:hover {
+                text-decoration: none;
+
+            }
+
+            .fa {
+                  margin-left: ($base-point-grid * 2);
+                  font-size: 18px;
+                  transition: all .3s;
+                  -moz-osx-font-smoothing: unset;
+            }
+        }
+
+        &.active {
+            > a {
+                padding-left: 28px;
+                .fa {
+                     @include rotate(90deg);
+                }
+            }
+        }
+
+
+        ul {
+            display: none;
+
+
+            li {
+                a {
+                    display: flex;
+                    align-items: flex-start;
+                    @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+                    padding: $base-point-grid ($base-point-grid * 2);
+                    font-size: 15px;
+
+
+                    &.active {
+                        color: $gray-primary;
+                    }
+
+                    &:hover {
+                        text-decoration: none;
+                    }
+
+                }
+            }
+        }
+    }
+}
+
 @include bp(medium) {
     #wrapper {
         padding-left: 0;

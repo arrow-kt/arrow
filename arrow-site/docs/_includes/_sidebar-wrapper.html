@@ -13,31 +13,45 @@
     {% include _sidebar-cat-dropdown.html %}
   </div>
 
-  <ul id="{{ cat_id }}-sidebar-nav" class="sidebar-nav">
+  {% assign path = 'sidebar-' | append: cat_id | %}
+  <div id="{{ cat_id }}-sidebar-nav" class="sidebar-menu">
+      {% for item in site.data[path]options %}
 
-    {% assign path = 'sidebar-' | append: cat_id | %}
-    {% for item in site.data[path]options %}
-    <li class="sidebar-nav-item">
-      <a href="{% if item.url %}{{ item.url | relative_url }}{% else %}#{% endif %}" class="{{ cat_id }}">
-        <span>{{ item.title }}</span>
+        {% comment %}
+        <!-- Needed logic to show the submenu open when the active entry is an inner element -->
+        {% endcomment %}
+        {% assign open_submenu = '' %}
         {% if item.nested_options %}
-        <i class="fa fa-angle-right"></i>
-        {% endif%}
-      </a>
-      {% if item.nested_options %}
-      <ul>
         {% for nested_item in item.nested_options %}
-        <li>
-          <a href="{{ nested_item.url | relative_url }}">
-            <span>{{ nested_item.title }}</span>
-          </a>
-        </li>
+        {% if nested_item.url == page.url %}
+        {% assign open_submenu = 'open' %}
+        {% endif %}
         {% endfor %}
-      </ul>
-      {% endif%}
-    </li>
-    {% endfor %}
-  </ul>
+        {% endif %}
+
+        <div class="sidebar-menu-item {% if item.url == page.url or open_submenu == 'open' %}active{% endif %} {{ open_submenu }}">
+          {% if item.nested_options %}
+          <button type="button" title="Open {{ item.title }}" class="button" onClick="activateParent(event.target, 'open');">
+            {{ item.title }}
+            <i class="fa fa-angle-right"></i>
+          </button>
+          <ul class="sub-menu">
+            {% for nested_item in item.nested_options %}
+            <li>
+              <a class="sidebar-menu-item {% if nested_item.url == page.url %}active{% endif %}" href="{{ nested_item.url | relative_url }}" title="{{ nested_item.title }}">
+                {{ nested_item.title }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <a href="{{ item.url | relative_url }}" title="{{ item.title }}">
+            <span>{{ item.title }}</span>
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+  </div>
 
   <div id="doc-{{ cat_id }}-version-button" class="doc-version-container">
     {% include _sidebar-doc-versions.html %}

@@ -1,35 +1,26 @@
 .incubator {
     background: $incubator-background;
-}
 
-#incubator-sidebar-nav {
-    .sidebar-nav-item {
-        > a {
-            transition: background $base-duration $base-timing;
-            &:hover {
-                background: $incubator-hover;
-            }
+  .sidebar-menu {
+    .sidebar-menu-item {
+      &.active {
+
+        & > button {
+          border-left: 4px solid $incubator-color;
+        }
+      }
+
+      &.open {
+        a {
+          background: $incubator-hover;
         }
 
-        &.active {
-            > a {
-                background: $incubator-hover;
-                border-left: 4px solid $incubator-color;
-            }
+        & > button {
+          background: $incubator-hover;
         }
-
-        ul {
-            background: $incubator-hover;
-            li {
-                a {
-                    &:before {
-                        content: "•";
-                        margin-right: ($base-point-grid * 2);
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 #cat-incubator-dropdown {

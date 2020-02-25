@@ -1,37 +1,26 @@
 .core {
     background: $core-background;
-}
 
-#core-sidebar-nav {
-    .sidebar-nav-item {
-        > a {
-            transition: background $base-duration $base-timing;
+  .sidebar-menu {
+    .sidebar-menu-item {
+      &.active {
 
-            &:hover {
-                background: $core-hover;
-            }
+        & > button {
+          border-left: 4px solid $core-color;
+        }
+      }
+
+      &.open {
+        a {
+          background: $core-hover;
         }
 
-        &.active {
-            > a {
-                background: $core-hover;
-                border-left: 4px solid $core-color;
-            }
+        & > button {
+          background: $core-hover;
         }
-
-        ul {
-            background: $core-hover;
-
-            li {
-                a {
-                    &:before {
-                        content: "•";
-                        margin-right: ($base-point-grid * 2);
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 #cat-core-dropdown {
@@ -39,10 +28,8 @@
 
     .sidebar-nav {
         .sidebar-nav-item {
-
             > a {
                 transition: background $base-duration $base-timing;
-
                 &:hover {
                     background: $core-hover;
                     box-shadow: $sidebar-cat-dropdow;
@@ -65,7 +52,6 @@
                 a {
                     color: $white;
                     transition: all $base-duration $base-timing;
-
 
                     &:hover {
                         background: rgba($white, 0.05);

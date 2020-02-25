@@ -1,36 +1,26 @@
 .fx {
     background: $fx-background;
-}
 
-#fx-sidebar-nav {
-    .sidebar-nav-item {
-        > a {
-            transition: background $base-duration $base-timing;
-            &:hover {
-                background: $fx-hover;
-            }
+  .sidebar-menu {
+    .sidebar-menu-item {
+      &.active {
+
+        & > button {
+          border-left: 4px solid $fx-color;
+        }
+      }
+
+      &.open {
+        a {
+          background: $fx-hover;
         }
 
-        &.active {
-            > a {
-                background: $fx-hover;
-                border-left: 4px solid $fx-color;
-            }
+        & > button {
+          background: $fx-hover;
         }
-
-        ul {
-            background: $fx-hover;
-
-            li {
-                a {
-                    &:before {
-                        content: "•";
-                        margin-right: ($base-point-grid * 2);
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 #cat-fx-dropdown {
@@ -77,8 +67,10 @@
     .sidebar-doc-versions {
         .sidebar-nav-item {
             background: $fx-background;
+
             > a {
                 transition: background $base-duration $base-timing;
+
                 &:hover {
                     background: $fx-hover;
                     box-shadow: $sidebar-cat-dropdow;

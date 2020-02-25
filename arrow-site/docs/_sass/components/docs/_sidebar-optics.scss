@@ -1,35 +1,26 @@
 .optics {
     background: $optics-background;
-}
 
-#optics-sidebar-nav {
-    .sidebar-nav-item {
-        > a {
-            transition: background $base-duration $base-timing;
-            &:hover {
-                background: $optics-hover;
-            }
+  .sidebar-menu {
+    .sidebar-menu-item {
+      &.active {
+
+        & > button {
+          border-left: 4px solid $optics-color;
+        }
+      }
+
+      &.open {
+        a {
+          background: $optics-hover;
         }
 
-        &.active {
-            > a {
-                background: $optics-hover;
-                border-left: 4px solid $optics-color;
-            }
+        & > button {
+          background: $optics-hover;
         }
-
-        ul {
-            background: $optics-hover;
-            li {
-                a {
-                    &:before {
-                        content: "•";
-                        margin-right: ($base-point-grid * 2);
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }
 
 #cat-optics-dropdown {

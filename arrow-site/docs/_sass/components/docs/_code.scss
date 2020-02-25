@@ -31,7 +31,7 @@ ul {
     .cm-s-arrow span.cm-keyword {
         font-weight: $font-regular;
     }
-    
+
         pre {
 
         &.highlight {
@@ -42,6 +42,25 @@ ul {
                 padding: $code-padding;
             }
         }
+    }
+
+    .executable-fragment {
+      .console-close,
+      .run-button {
+        width: 24px;
+        height: 24px;
+        right: 10px;
+        top: 10px;
+      }
+
+      .run-button {
+        background: url("../img/icon_play.svg") no-repeat;
+      }
+
+      .console-close {
+        background: url("../img/icon_close.svg") no-repeat;
+        cursor: pointer;
+      }
     }
 }
 
