@@ -68,8 +68,8 @@ interface ObservableKApplicative : Applicative<ForObservableK> {
   override fun <A> just(a: A): ObservableK<A> =
     ObservableK.just(a)
 
-  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForObservableK, A>.apEval(ff: Eval<Kind<ForObservableK, (A) -> B>>): Eval<Kind<ForObservableK, B>> =
+    Eval.now(fix().ap(ObservableK.defer { ff.value() }))
 }
 
 @extension
@@ -86,8 +86,8 @@ interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
   override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForObservableK, A>.lazyAp(ff: () -> Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForObservableK, A>.apEval(ff: Eval<Kind<ForObservableK, (A) -> B>>): Eval<Kind<ForObservableK, B>> =
+    Eval.now(fix().ap(ObservableK.defer { ff.value() }))
 }
 
 @extension

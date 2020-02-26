@@ -18,9 +18,6 @@ import arrow.core.value
 import arrow.fx.IO
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.mtl.typeclasses.ComposedApplicative
-import arrow.mtl.typeclasses.nest
-import arrow.mtl.typeclasses.unnest
 import arrow.test.generators.GenK
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
@@ -44,6 +41,17 @@ data class TIC<out A>(val ti: TI<A>) : TIK<A>
 
 class TIF {
   private constructor()
+}
+
+interface Nested<out F, out G>
+
+fun <F, G, A> Kind<F, Kind<G, A>>.nest(): Kind<Nested<F, G>, A> = this as Kind<Nested<F, G>, A>
+fun <F, G, A> Kind<Nested<F, G>, A>.unnest(): Kind<F, Kind<G, A>> = this as Kind<F, Kind<G, A>>
+
+fun <F, G> ComposedApplicative(apF: Applicative<F>, apG: Applicative<G>): Applicative<Nested<F, G>> = object : Applicative<Nested<F, G>> {
+  override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
+    apF.run { unnest().ap(ff.unnest().map { gf -> { ga: Kind<G, A> -> apG.run { ga.ap(gf) } } }).nest() }
+  override fun <A> just(a: A): Kind<Nested<F, G>, A> = apF.just(apG.just(a)).nest()
 }
 
 object TraverseLaws {

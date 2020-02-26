@@ -2,6 +2,7 @@ package arrow.fx.reactor.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
 import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
@@ -47,8 +48,8 @@ interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
   override fun <A> just(a: A): MonoK<A> =
     MonoK.just(a)
 
-  override fun <A, B> Kind<ForMonoK, A>.lazyAp(ff: () -> Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForMonoK, A>.apEval(ff: Eval<Kind<ForMonoK, (A) -> B>>): Eval<Kind<ForMonoK, B>> =
+    Eval.now(fix().ap(MonoK.defer { ff.value() }))
 }
 
 @extension
@@ -65,8 +66,8 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<Either<A, B>>>): MonoK<B> =
     MonoK.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForMonoK, A>.lazyAp(ff: () -> Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
-    fix().flatMap { a -> ff().map { f -> f(a) } }
+  override fun <A, B> Kind<ForMonoK, A>.apEval(ff: Eval<Kind<ForMonoK, (A) -> B>>): Eval<Kind<ForMonoK, B>> =
+    Eval.now(fix().ap(MonoK.defer { ff.value() }))
 }
 
 @extension
