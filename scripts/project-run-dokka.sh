@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 if [ "$1" != "arrow-docs" ]; then
     echo "For $1 ..."

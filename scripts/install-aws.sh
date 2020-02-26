@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -ex
+set -e
 sudo pip install awscli
 aws --version

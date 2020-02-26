@@ -1,15 +1,15 @@
 #!/bin/bash
 
-set -ex
 export JAVA_OPTS="-Xms512m -Xmx1024m"
 cd $(dirname $0)/../..
 export BASEDIR=$(pwd)
-. ./arrow/scripts/commons.sh
+. $BASEDIR/arrow/scripts/commons4gradle.sh
+. $BASEDIR/arrow/scripts/commons4filesystem.sh
 
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 
 $BASEDIR/arrow/scripts/site-download.sh
-$BASEDIR/arrow/scripts/site-run-ank.sh
+runAndSaveResult "Site" "Run Ank" "$BASEDIR/arrow/scripts/site-run-ank.sh"
 
 for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
     if [ ! -d $BASEDIR/$repository ]; then
@@ -20,8 +20,8 @@ for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
     removeArrowDocs $BASEDIR/$repository/settings.gradle
 
-    $BASEDIR/arrow/scripts/project-install.sh $repository
-    $BASEDIR/arrow/scripts/project-undo-local-changes.sh $repository
+    runAndSaveResult $repository "Local install" "$BASEDIR/arrow/scripts/project-install.sh $repository"
+    runAndSaveResult $repository "Undo local changes" "$BASEDIR/arrow/scripts/project-undo-local-changes.sh $repository"
 done
 
 for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
@@ -31,12 +31,14 @@ for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
     fi
 done
 
-echo "Run Dokka and Ank ..."
 for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
-    $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
-    $BASEDIR/arrow/scripts/project-run-ank.sh $repository
-    $BASEDIR/arrow/scripts/project-locate-doc.sh $repository
+    runAndSaveResult $repository "Run Dokka and Ank" "$BASEDIR/arrow/scripts/project-run-dokka.sh $repository"
+    runAndSaveResult $repository "Run Ank" "$BASEDIR/arrow/scripts/project-run-ank.sh $repository"
+    runAndSaveResult $repository "Locate doc" "$BASEDIR/arrow/scripts/project-locate-doc.sh $repository"
 done
 
-$BASEDIR/arrow/scripts/site-prepare-env.sh
-$BASEDIR/arrow/scripts/site-build.sh
+runAndSaveResult "Site" "Prepare env" "$BASEDIR/arrow/scripts/site-prepare-env.sh"
+runAndSaveResult "Site" "Run Dokka and Ank" "$BASEDIR/arrow/scripts/site-build.sh"
+
+showFiles
+exitForResult

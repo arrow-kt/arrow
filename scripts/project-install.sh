@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -ex        
+set -e        
 cd $BASEDIR/$1
 ./gradlew publishToMavenLocal

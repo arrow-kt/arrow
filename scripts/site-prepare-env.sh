@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 echo "Prepare environment ..."
 sudo rm -rf /etc/apt/sources.list.d/microsoft*
 sudo rm -rf /etc/apt/sources.list.d/azure*
