@@ -13,7 +13,7 @@ This repository includes the [Arrow website](https://arrow-kt.io/) main files:
 The rest of the website content comes from:
 
 * Every Arrow library generates its own `apidocs`. For instance, take a look at [Arrow Core](https://github.com/arrow-kt/arrow-core).
-* [Arrow Docs](https://github.com/arrow-kt/arrow-docs) still includes some [static files](https://github.com/arrow-kt/d-arrow-module/tree/master/arrow-docs-repository/arrow-docs/docs/static).
+* [Arrow Docs](https://github.com/arrow-kt/arrow-docs) still includes some [static files](https://github.com/arrow-kt/arrow-docs/tree/master/arrow-docs/docs/docs).
 * [Arrow Media](https://github.com/arrow-kt/arrow-media): the showcase of tutorials, conference presentations and other Arrow-related content. If you have given a talk, written a post, or spread the word about Arrow in any other way, please don't hesitate to include it in the [MEDIA section of the Arrow website](https://media.arrow-kt.io/). To do so, take a look at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repository.
 
 
