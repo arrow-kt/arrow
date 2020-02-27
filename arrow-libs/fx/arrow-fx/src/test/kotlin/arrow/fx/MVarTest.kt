@@ -276,7 +276,7 @@ class MVarTest : UnitSpec() {
         }.equalUnderTheLaw(IO.unit, EQ())
       }
 
-      "$label - concurrent take and put" {
+      "!$label - concurrent take and put" {
         val count = 5000
         IO.fx {
           val mVar = !mvar.empty<Int>()
