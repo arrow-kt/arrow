@@ -811,7 +811,7 @@ sealed class IO<out A> : IOOf<A> {
           ThrowCancellationException ->
             cb andThen { it.fix().unsafeRunAsync { } }
           Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
+            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either); Unit }) }
         }
       ccb(conn.toDisposable().right())
       IORunLoop.startCancelable(this, conn, onCancelCb)
