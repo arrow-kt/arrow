@@ -413,10 +413,10 @@ import arrow.core.ValidatedNel
  * import arrow.mtl.extensions.kleisli.applicative.applicative
  * import arrow.mtl.fix
  *
- * val JobForContext = Job.applicative<ForId, Context>(Id.applicative())
+ * val JobForContext = Job.applicative<Context, ForId>(Id.applicative())
  *
  * fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
- *   topics.traverse<KleisliPartialOf<ForId, Context>, Result>(JobForContext) {
+ *   topics.traverse<KleisliPartialOf<Context, ForId>, Result>(JobForContext) {
  *     processTopic(it)
  *   }.fix()
  * ```
