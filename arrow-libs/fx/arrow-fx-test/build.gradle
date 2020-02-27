@@ -11,6 +11,7 @@ apply from: "$SUBPROJECT_CONF"
 
 dependencies {
     compile project(":arrow-fx")
+    compile "io.arrow-kt:arrow-core-test:$VERSION_NAME"
     compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
     compile "io.arrow-kt:arrow-free-data:$VERSION_NAME"
     compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
