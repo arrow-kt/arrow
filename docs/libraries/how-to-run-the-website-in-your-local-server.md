@@ -10,25 +10,16 @@ cd arrow-site
 ./gradlew runAnk
 ```
 
-`build/site` will be created.
+Then `build/site` will be created.
 
-### 2. Copy static docs from Arrow Docs (pending task: re-organization)
-
-```
-git clone https://github.com/arrow-kt/arrow-docs.git
-cd arrow-docs
-./gradlew runAnk
-cp build/site/static/* arrow-site/build/site/
-```
-
-### 3. Copy `apidocs` from Arrow library
+### 2. Copy API Doc from Arrow library
 
 They were created by the steps included in [How to generate and validate the documentation](how-to-generate-and-validate-documentation.md):
 
 ```
 cd <arrow-library-repository>
 ./gradlew clean dokka
-./gradlew runAnk
+./gradlew :arrow-docs:runAnk
 ```
 
 and then:
@@ -37,7 +28,7 @@ and then:
 cp -r <arrow-library-repository>/**/build/site/* arrow-site/build/site/
 ```
 
-### 4. Run the website in your local server
+### 3. Run the website in your local server
 
 ```bash
 cd arrow-site
