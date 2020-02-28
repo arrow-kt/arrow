@@ -21,6 +21,10 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 done
 
 for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
+    if [ ! -d $BASEDIR/$repository ]; then
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/$repository.git
+    fi
     runAndSaveResult $repository "Test" "$BASEDIR/arrow/scripts/project-test.sh $repository"
 done
 
