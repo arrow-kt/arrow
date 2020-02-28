@@ -8,7 +8,7 @@ export BASEDIR=$(pwd)
 
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 
-for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
+for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     if [ ! -d $BASEDIR/$repository ]; then
         cd $BASEDIR
         git clone https://github.com/arrow-kt/$repository.git
@@ -20,8 +20,8 @@ for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
     runAndSaveResult $repository "Local install" "$BASEDIR/arrow/scripts/project-install.sh $repository"
 done
 
-for repository in $(cat $BASEDIR/arrow/lists/build.txt); do
-    runAndSaveResult $repository "Build" "$BASEDIR/arrow/scripts/project-build.sh $repository"
+for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
+    runAndSaveResult $repository "Test" "$BASEDIR/arrow/scripts/project-test.sh $repository"
 done
 
 showFiles

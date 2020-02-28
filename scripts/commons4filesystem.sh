@@ -19,12 +19,14 @@ function printHeaderSeparator()
 
 function showFile()
 {
-    echo ""
-    printFileHeaderSeparator
-    echo $1
-    printFileHeaderSeparator
-    echo ""
-    cat $2
+    if [ -f $2 ]; then
+        echo ""
+        printFileHeaderSeparator
+        echo $1
+        printFileHeaderSeparator
+        echo ""
+        cat $2
+    fi
 }
 
 function showFiles()
@@ -34,13 +36,21 @@ function showFiles()
     showFile "RESULT" $RESULT_FILE 
 }
 
+function saveTmpFile()
+{
+    printHeader "$1" "$2" >> $3
+    cat $3.tmp >> $3
+}
+
 function saveResult()
 {
+    saveTmpFile "$2" "$3" $OUTPUT_FILE
     if [[ $1 -eq 0 ]]; then
-        printf "%-20s\t%-20s\t%-20s\n" "$3" "$2" "OK" >> $RESULT_FILE
+        printf "%-30s\t%-20s\t%-20s\n" "$3" "$2" "OK" >> $RESULT_FILE
     else
         EXIT_CODE=$1
-        printf "%-20s\t%-20s\t%-20s\n" "$3" "$2" "KO !!" >> $RESULT_FILE
+        saveTmpFile "$2" "$3" $ERRORLOG_FILE
+        printf "%-30s\t%-20s\t%-20s\n" "$3" "$2" "KO !!" >> $RESULT_FILE
     fi
 }
 
@@ -53,12 +63,6 @@ function printHeader()
     echo ""
 }
 
-function addHeaders()
-{
-    printHeader "$1" "$2" >> $OUTPUT_FILE
-    printHeader "$1" "$2" >> $ERRORLOG_FILE
-}
-
 function exitForResult()
 {
     exit $EXIT_CODE
@@ -66,7 +70,6 @@ function exitForResult()
 
 function runAndSaveResult()
 {
-    addHeaders "$1" "$2"
-    $3 >> $OUTPUT_FILE 2>> $ERRORLOG_FILE
+    $3 > $OUTPUT_FILE.tmp 2> $ERRORLOG_FILE.tmp
     saveResult $? "$1" "$2"
 }
