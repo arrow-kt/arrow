@@ -62,9 +62,6 @@ options:
       - title: Either
         url: /apidocs/arrow-core-data/arrow.core/-either/
 
-      - title: Try
-        url: /apidocs/arrow-core-data/arrow.core/-try/
-
       - title: Validated
         url: /apidocs/arrow-core-data/arrow.core/-validated/
 
