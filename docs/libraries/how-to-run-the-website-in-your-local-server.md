@@ -25,7 +25,7 @@ cd <arrow-library-repository>
 and then:
 
 ```
-cp -r <arrow-library-repository>/**/build/site/* arrow-site/build/site/
+cp -r <arrow-library-repository>/arrow-docs/build/site/* arrow-site/build/site/
 ```
 
 ### 3. Run the website in your local server
