@@ -1,0 +1,66 @@
+buildscript {
+    apply from: "$COMMON_SETUP"
+}
+
+plugins {
+    id "base"
+    id "org.jetbrains.kotlin.jvm" version "$KOTLIN_VERSION"
+    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION"
+    id "net.rdrei.android.buildtimetracker" version "$BUILD_TIME_TRACKER_VERSION"
+    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION"
+    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION"
+    id "idea"
+}
+
+apply from: "$GENERIC_CONF"
+apply from: "$SUBPROJECT_CONF"
+
+ktlintTestSourceSetCheck.enabled = false
+
+subprojects {
+    apply plugin: 'ru.vyarus.animalsniffer'
+    apply plugin: 'java'
+    dependencies {
+        signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
+    }
+}
+
+idea {
+    module {
+        sourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+        generatedSourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+    }
+}
+
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-ui:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-validation:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
+
+    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+}
