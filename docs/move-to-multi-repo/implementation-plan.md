@@ -45,10 +45,12 @@
 
 :white_large_square: New repositories: add badges.
 
-:white_large_square: New repositories > `Settings` > `Webhooks` - Analyze!
+:heavy_check_mark: New repositories > `Settings` > `Webhooks` - Analyze!
+
+:white_large_square: Change documentation to the new S3
 
 :white_large_square: **arrow** repository > `Settings` > `Secrets`: update secrets about S3 bucket (it will be used for release flow)
 
 :white_large_square: Check that everything is working OK
 
-:white_large_square: **arrow** repository: PR to remove `modules` directory
+:heavy_check_mark: **arrow** repository: PR to remove `modules` directory
