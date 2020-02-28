@@ -31,7 +31,7 @@ object MonadDeferLaws {
   ): List<Law> {
     val EQ = EQK.liftEq(Int.eq())
 
-    return BracketLaws.laws(SC, GENK, EQK) + listOf(
+    return listOf(
       Law("MonadDefer laws: later constant equals pure") { SC.laterConstantEqualsPure(EQ) },
       Law("MonadDefer laws: later throw equals raiseError") { SC.laterThrowEqualsRaiseError(EQ) },
       Law("MonadDefer laws: later constant equals pure") { SC.deferConstantEqualsPure(EQ) },
@@ -64,7 +64,7 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-      BracketLaws.laws(SC, GENK, EQK) +
+      BracketLaws.laws(SC, GENK, EQK, testStackSafety, iterations) +
         MonadThrowLaws.laws(SC, GENK, EQK) +
           monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
@@ -78,9 +78,9 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-      BracketLaws.laws(SC, FF, AP, SL, GENK, EQK) +
+      BracketLaws.laws(SC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
         MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
-          monadDeferLaws(SC, GENK, EQK, testStackSafety)
+          monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
     forAll(GK.genK(Gen.int()), Gen.intSmall()) { fa: Kind<F, Int>, x: Int ->

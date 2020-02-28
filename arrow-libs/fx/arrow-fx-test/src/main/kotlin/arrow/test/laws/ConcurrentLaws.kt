@@ -45,7 +45,7 @@ object ConcurrentLaws {
     EQK: EqK<F>,
     ctx: CoroutineContext,
     testStackSafety: Boolean,
-    iterations: Int = 20_000
+    iterations: Int
   ): List<Law> {
 
     val EQ = EQK.liftEq(Int.eq())
@@ -119,7 +119,7 @@ object ConcurrentLaws {
         Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
         Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) }
       )
-    } else emptyList()) + TimerLaws.laws(CF, CF.timer(), EQK)
+    } else emptyList())
   }
 
   fun <F> laws(
@@ -772,12 +772,12 @@ object ConcurrentLaws {
       latch.get().bind()
 
       counter.get()
-    }.equalUnderTheLaw(just(2), EQ)
+    }.shouldBeEq(just(2), EQ)
 
   fun <F> Concurrent<F>.waitForShouldStayOnOriginalContext(EQ: Eq<Kind<F, String>>) {
     single.shift().followedBy(
       effect { Thread.currentThread().name }.waitFor(1.seconds)
-    ).equalUnderTheLaw(just("single"), EQ)
+    ).shouldBeEq(just("single"), EQ)
   }
 
   fun <F> Concurrent<F>.waitForTimesOutProgram(EQ: Eq<Kind<F, Int>>) {
@@ -797,49 +797,49 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.parMap2StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t) { a, b -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap3StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit()) { a, b, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap4StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit()) { a, b, _, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap5StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit(), unit()) { a, b, _, _, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap6StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit(), unit(), unit()) { a, b, _, _, _, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap7StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit(), unit(), unit(), unit()) { a, b, _, _, _, _, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap8StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
       (0 until iterations).map { just(1) }
         .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit(), unit(), unit(), unit(), unit()) { a, b, _, _, _, _, _, _ -> a + b } }
-        .equalUnderTheLaw(just(iterations), EQ)
+        .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.parMap9StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }
       .fold(just(0)) { acc, t -> ctx.parMapN(acc, t, unit(), unit(), unit(), unit(), unit(), unit(), unit()) { a, b, _, _, _, _, _, _, _ -> a + b } }
-      .equalUnderTheLaw(just(iterations), EQ)
+      .shouldBeEq(just(iterations), EQ)
   }
 
   fun <F> Concurrent<F>.racePairStackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
@@ -847,7 +847,7 @@ object ConcurrentLaws {
       ctx.racePair(acc, t).map {
         it.fold({ a, _ -> a }, { _, b -> b })
       }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.raceTripleStackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
@@ -855,60 +855,60 @@ object ConcurrentLaws {
       ctx.raceTriple(acc, t, never<Int>()).map {
         it.fold({ a, _, _ -> a }, { _, b, _ -> b }, { _, _, c -> c })
       }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race2StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t).map { it.fold(::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race3StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>()).map { it.fold(::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race4StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race5StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race6StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>(), never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race7StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race8StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 
   fun <F> Concurrent<F>.race9StackSafe(iterations: Int, EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     (0 until iterations).map { just(1) }.fold(never<Int>()) { acc, t ->
       ctx.raceN(acc, t, never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>(), never<Int>())
         .map { it.fold(::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity, ::identity) }
-    }.equalUnderTheLaw(just(1), EQ)
+    }.shouldBeEq(just(1), EQ)
   }
 }
