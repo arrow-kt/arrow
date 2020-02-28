@@ -25,4 +25,4 @@ jobs:
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
-      run: $BASEDIR/arrow/scripts/project-build.sh
+      run: $BASEDIR/arrow/scripts/project-build.sh arrow-examples
