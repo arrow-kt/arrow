@@ -49,5 +49,9 @@ ext.setupArrowModule = {
     customProperties.each { key, value -> ext.set(key, value) }
 }
 
+ext {
+    excludeArrow = { exclude group: "io.arrow-kt" }
+}
+
 setupArrowModule()
 showBanner()
