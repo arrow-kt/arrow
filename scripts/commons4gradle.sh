@@ -25,12 +25,11 @@ function removeArrowDocs()
 function replaceGlobalPropertiesbyLocalConf()
 {
     echo "Replacing global properties by local conf ($1) ..."
-    sed -i "s/GENERIC_CONF/#GENERIC_CONF/g" $1
-    sed -i "s/PUBLISH_CONF/#PUBLISH_CONF/g" $1
-    sed -i "s/DOC_CONF/#DOC_CONF/g" $1
+    sed -i "s/.*_CONF/#/g" $1
     echo "GENERIC_CONF=file://$BASEDIR/arrow/generic-conf.gradle" >> $1
-    echo "PUBLISH_CONF=file://$BASEDIR/arrow/publish-conf.gradle" >> $1
+    echo "SUBPROJECT_CONF=file://$BASEDIR/arrow/subproject-conf.gradle" >> $1
     echo "DOC_CONF=file://$BASEDIR/arrow/doc-conf.gradle" >> $1
+    echo "PUBLISH_CONF=file://$BASEDIR/arrow/publish-conf.gradle" >> $1
 }
 
 function addLocalRepository()
