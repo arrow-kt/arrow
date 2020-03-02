@@ -1,11 +1,4 @@
-{% assign doc-link = 'core/' %}
-{% if cat_id == 'incubator' %}
-{% assign doc-link = 'aql/intro/' %}
-{% elsif cat_id  == 'fx' %}
-{% assign doc-link = 'fx/' %}
-{% elsif cat_id  == 'optics' %}
-{% assign doc-link = 'optics/dsl/' %}
-{% endif %}
+{% assign current_url = page.url | remove_first: '/' %}
 
 <ul class="sidebar-nav sidebar-doc-versions">
   <li id="doc-version-dropdown" class="sidebar-nav-item">
@@ -16,7 +9,7 @@
     </a>
     <ul>
       <li>
-        <a href="{{ site.data.commons.stable_version | append: doc-link }}">
+        <a href="{{ site.data.commons.stable_version | append: current_url }}">
           <span>
             {{ stable_version.title }} - {{ site.data.doc-versions.stable }}
           </span>
@@ -24,7 +17,7 @@
       </li>
 
       <li>
-        <a href="{{ next_version.url | append: doc-link }}">
+        <a href="{{ next_version.url | append: current_url }}">
           <span>
             {{ next_version.title }} - {{ site.data.doc-versions.next }}
           </span>
