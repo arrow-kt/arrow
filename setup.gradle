@@ -33,11 +33,14 @@ ext.showBanner = {
     println "          .@@@%.        .%%.        .#&&&."
     println "         .@%.             `            .%&."
     println ""
+    println ""
     println "     ARROW"
     println ""
     println "     A library for Typed Functional Programming in Kotlin"
     println ""
-    println "     Version $VERSION_NAME"
+    println "     v$VERSION_NAME"
+    println ""
+    println "     $rootProject.name $project.gradle.startParameter.taskNames"
     println ""
 }
 
