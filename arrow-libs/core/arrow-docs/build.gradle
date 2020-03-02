@@ -27,7 +27,9 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
     compile "io.arrow-kt:arrow-ui:$VERSION_NAME", excludeArrow
     compile "io.arrow-kt:arrow-ui-data:$VERSION_NAME", excludeArrow
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     kapt project(":arrow-meta")
+    implementation "io.github.classgraph:classgraph:$CLASSGRAPH_VERSION"
 }
 
 apply plugin: 'ank-gradle-plugin'
