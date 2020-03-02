@@ -12,16 +12,16 @@ plugins {
 apply from: "$SUBPROJECT_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-free-data:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-optics:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-free-data:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME", excludeArrow
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    compile("io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION") {
-        exclude group: "io.arrow-kt"
-    }
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
 }

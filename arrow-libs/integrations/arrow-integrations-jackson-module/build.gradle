@@ -14,12 +14,14 @@ apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-syntax:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-syntax:$VERSION_NAME", excludeArrow
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_MODULE_KOTLIN_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile project(":arrow-integrations-test")
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile "io.kotlintest:kotlintest-assertions-json:$KOTLIN_TEST_VERSION"
 }
