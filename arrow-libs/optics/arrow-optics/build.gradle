@@ -14,15 +14,16 @@ apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
 
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
 
     testCompile "junit:junit:$JUNIT_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile project(":arrow-optics-test")
     testCompile project(":arrow-optics-mtl")
 }
