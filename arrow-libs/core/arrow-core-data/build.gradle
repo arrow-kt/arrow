@@ -21,11 +21,9 @@ dependencies {
     compileOnly project(":arrow-meta")
     testCompileOnly project(":arrow-meta")
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile project(":arrow-core-test")
     testCompile project(":arrow-syntax")
     testCompile project(":arrow-core")
-    testCompile ("io.arrow-kt:arrow-mtl-data:$VERSION_NAME") {
-        exclude group: "io.arrow-kt"
-    }
+    testCompile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
 }

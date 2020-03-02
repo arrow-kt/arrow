@@ -1,4 +1,4 @@
-rootProject.name = 'arrow-core'
+rootProject.name = 'arrow-core-lib'
 
 include 'arrow-meta:arrow-meta-test-models'
 include 'arrow-meta'

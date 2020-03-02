@@ -32,7 +32,7 @@ dependencies {
     testCompile project(":arrow-meta:arrow-meta-test-models")
     testCompile("junit:junit:$JUNIT_VERSION")
     testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow
     def toolsJar = Jvm.current().getToolsJar()
 
     if (!toolsJar)
