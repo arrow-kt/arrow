@@ -5,6 +5,9 @@ on: pull_request
 jobs:
   build_site:
 
+    env:
+      BASEDIR: ${{github.workspace}}/..
+
     runs-on: ubuntu-latest
 
     steps:
@@ -16,22 +19,66 @@ jobs:
         architecture: x64
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
+    - name: Checkout orchestrator
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
+    - name: Prepare environment
+      run: |
+        set -ex
+        $BASEDIR/arrow/scripts/site-prepare-env.sh
+        sudo apt-get install tree
+        bundle install --gemfile Gemfile --path vendor/bundle
     - name: Run Ank
       env:
         JAVA_OPTS: -Xms512m -Xmx1024m
       run: ./gradlew runAnk
-    - name: Prepare environment
-      run: |
-        set -ex
-        sudo apt-get update
-        sudo apt-get install ruby-dev
-        sudo gem install bundler --force
-        sudo gem update --system
-        gem --version
-        echo "$( gem list | grep bundler )"
-        bundle install --gemfile Gemfile --path vendor/bundle
     - name: Build site
       env:
         JAVA_OPTS: -Xms512m -Xmx1024m
         JEKYLL_ENV: production
-      run: bundle exec jekyll build -s build/site -d build/_site
+      run: |
+        bundle exec jekyll build -b docs -s build/site -d build/_site
+        mkdir $BASEDIR/logs
+        tree build/_site > $BASEDIR/logs/docs.log
+    - name: Generate and validate docs for all the libraries
+      run: |
+        for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
+            $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
+            $BASEDIR/arrow/scripts/project-run-ank.sh $repository
+            #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
+            cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
+        done
+    - name: Build site
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+        JEKYLL_ENV: production
+      run: |
+        bundle exec jekyll build -b docs/next -s build/site -d build/_site
+        tree build/_site > $BASEDIR/logs/docs-next.log
+    - name: Other versions
+      run: |
+        if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
+            for version in $(cat update-other-versions.txt); do
+                echo "Update $version ..."
+                SHORT_VERSION=$(echo $version | cut -d. -f1-2)
+                cd $BASEDIR/arrow-site
+                ./gradlew clean runAnk
+                cd $BASEDIR
+                git clone -b $version https://github.com/arrow-kt/arrow.git arrow-$version
+                cd arrow-$version
+                sed -i "s/modules {/modules {\\ndocs {\\n_ 'docs'\\n_ 'examples'\\n}/g" settings.gradle
+                find modules/docs/arrow-docs/docs/docs/ -name "*.md" -exec sh -c 'sed -i "s/\/docs//g" $0' {} ';'
+                ./gradlew clean dokka
+                ./gradlew :arrow-docs:runAnk
+                cp -r modules/docs/arrow-docs/build/site/docs/* $BASEDIR/arrow-site/build/site/
+                cd $BASEDIR/arrow-site
+                bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
+                tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
+            done            
+        fi
+    - uses: actions/upload-artifact@v1
+      with:
+        name: logs
+        path: ../logs

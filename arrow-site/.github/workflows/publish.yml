@@ -8,6 +8,9 @@ on:
 jobs:
   publish_site:
 
+    env:
+      BASEDIR: ${{github.workspace}}/..
+
     runs-on: ubuntu-latest
 
     steps:
@@ -19,27 +22,30 @@ jobs:
         architecture: x64
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
-    - name: Run Ank
-      env:
-        JAVA_OPTS: -Xms512m -Xmx1024m
-      run: ./gradlew runAnk
+    - name: Checkout orchestrator
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
     - name: Prepare environment
       run: |
         set -ex
         sudo pip install awscli
         aws --version
-        sudo apt-get update
-        sudo apt-get install ruby-dev
-        sudo gem install bundler --force
-        sudo gem update --system
-        gem --version
-        echo "$( gem list | grep bundler )"
+        $BASEDIR/arrow/scripts/site-prepare-env.sh
+        sudo apt-get install tree
         bundle install --gemfile Gemfile --path vendor/bundle
+    - name: Run Ank
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+      run: ./gradlew runAnk
     - name: Build site
       env:
         JAVA_OPTS: -Xms512m -Xmx1024m
         JEKYLL_ENV: production
-      run: bundle exec jekyll build -s build/site -d build/_site
+      run: |
+        bundle exec jekyll build -b docs -s build/site -d build/_site
+        mkdir $BASEDIR/logs
+        tree build/_site > $BASEDIR/logs/docs.log
     - name: Publish site
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -47,26 +53,73 @@ jobs:
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
         AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
-        aws s3 sync build/_site/img s3://$S3_BUCKET/docs/next/img >> aws_sync_jekyll.log
-        aws s3 sync build/_site/js s3://$S3_BUCKET/docs/next/js >> aws_sync_jekyll.log
-        aws s3 sync build/_site/css s3://$S3_BUCKET/docs/next/css >> aws_sync_jekyll.log
-        #cd build/_site
-        #echo "Publish in S3..."
-        #for version in *; do
-        #    echo "- Version $version ..."
-        #    cd $version
-        #    for file in *; do
-        #        if [ -f "$file" ]; then
-        #            echo "Copying $file ..."
-        #            aws s3 cp $file s3://$S3_BUCKET/docs/$version/$file >> aws_sync_jekyll.log
-        #        else
-        #            echo "Sync $file ..."
-        #            aws s3 sync $file s3://$S3_BUCKET/docs/$version/$file >> aws_sync_jekyll.log
-        #        fi
-        #    done
-        #    cd ..
-        #done
-        #aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*" > aws_sync_jekyll.log
+        echo ">>> SITE" > aws_sync_jekyll.log
+        cd build/_site/
+        for file in *; do
+            if [ -f "$file" ]; then
+                echo "Copying $file ..."
+                aws s3 cp $file s3://$S3_BUCKET/$file >> aws_sync_jekyll.log
+            else
+                echo "Sync $file ..."
+                aws s3 sync $file s3://$S3_BUCKET/$file >> aws_sync_jekyll.log
+            fi
+        done
+        #aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+    - name: Generate and validate docs for all the libraries
+      run: |
+        for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
+            $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
+            $BASEDIR/arrow/scripts/project-run-ank.sh $repository
+            #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
+            cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
+        done
+    - name: Build site
+      env:
+        JAVA_OPTS: -Xms512m -Xmx1024m
+        JEKYLL_ENV: production
+      run: |
+        bundle exec jekyll build -b docs/next -s build/site -d build/_site
+        tree build/_site > $BASEDIR/logs/docs-next.log
+    - name: Publish site
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: |
+        echo ">>> NEXT VERSION" >> aws_sync_jekyll.log
+        aws s3 sync build/_site s3://$S3_BUCKET/docs/next >> aws_sync_jekyll.log
+        #aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+    - name: Other versions
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      run: |
+        if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
+            for version in $(cat update-other-versions.txt); do
+                echo "Update $version ..."
+                SHORT_VERSION=$(echo $version | cut -d. -f1-2)
+                cd $BASEDIR/arrow-site
+                ./gradlew clean runAnk
+                cd $BASEDIR
+                git clone -b $version https://github.com/arrow-kt/arrow.git arrow-$version
+                cd arrow-$version
+                sed -i "s/modules {/modules {\\ndocs {\\n_ 'docs'\\n_ 'examples'\\n}/g" settings.gradle
+                find modules/docs/arrow-docs/docs/docs/ -name "*.md" -exec sh -c 'sed -i "s/\/docs//g" $0' {} ';'
+                ./gradlew clean dokka
+                ./gradlew :arrow-docs:runAnk
+                cp -r modules/docs/arrow-docs/build/site/docs/* $BASEDIR/arrow-site/build/site/
+                cd $BASEDIR/arrow-site
+                bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
+                tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
+                echo ">>> $SHORT_VERSION VERSION" >> aws_sync_jekyll.log
+                aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION >> aws_sync_jekyll.log
+                #aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+            done            
+        fi
     - name: Save content
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
