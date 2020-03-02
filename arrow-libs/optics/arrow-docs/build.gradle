@@ -34,7 +34,9 @@ dependencies {
     compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME", excludeArrow
     compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME", excludeArrow
     compile "io.arrow-kt:arrow-free-data:$VERSION_NAME", excludeArrow
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    implementation "io.github.classgraph:classgraph:$CLASSGRAPH_VERSION"
 }
 
 apply plugin: 'ank-gradle-plugin'
