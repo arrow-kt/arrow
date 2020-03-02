@@ -39,7 +39,9 @@ dependencies {
     compile project(":arrow-fx-rx2")
     compile project(":arrow-fx-reactor")
     compile project(":arrow-fx-kotlinx-coroutines")
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    implementation "io.github.classgraph:classgraph:$CLASSGRAPH_VERSION"
 }
 
 apply plugin: 'ank-gradle-plugin'
