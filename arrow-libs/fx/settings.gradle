@@ -1,4 +1,4 @@
-rootProject.name = 'arrow-fx'
+rootProject.name = 'arrow-fx-lib'
 
 include 'arrow-fx'
 include 'arrow-streams'
