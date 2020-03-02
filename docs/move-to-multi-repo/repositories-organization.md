@@ -13,7 +13,9 @@ to:
   - arrow-core-data
   - arrow-meta (it includes arrow-meta-test-models)
   - arrow-annotations
-  - arrow-syntax 
+  - arrow-syntax
+  - arrow-core-test
+  - arrow-docs
 
 * **arrow-fx** repository - NEW!
   - arrow-fx
@@ -22,10 +24,13 @@ to:
   - arrow-benchmarks-fx (it includes arrow-kio-benchmarks and arrow-scala-benchmarks)
   - arrow-streams
   - arrow-fx-kotlinx-coroutines
+  - arrow-fx-test
+  - arrow-docs
 
 * **arrow-ank** repository - NEW!
   - arrow-ank
   - arrow-ank-gradle
+  - arrow-docs
 
 * **arrow-incubator** repository - NEW!
   - arrow-aql
@@ -40,24 +45,27 @@ to:
   - arrow-reflect
   - arrow-kindedj
   - arrow-validation
-
-* **arrow-docs** repository - NEW!
-  - arrow-docs (previous arrow-docs module minus the part of the site and it's no longer the reponsible of generating the documentation)
-  - arrow-examples
+  - arrow-incubator-test
+  - arrow-docs
 
 * **arrow-integrations** repository - NEW!
   - arrow-integrations-jackson-module
   - arrow-integrations-retrofit-adapter
+  - arrow-integrations-test
+  - arrow-docs
 
 * **arrow-ui** repository - NEW!
   - arrow-ui
-  - arrow-ui-data 
+  - arrow-ui-data
+  - arrow-ui-test
+  - arrow-docs
 
 * **arrow-optics** repository - NEW!
   - arrow-optics 
   - arrow-optics-mtl
-
-* **arrow-test** repository - NEW!
-  - arrow-test
+  - arrow-optics-test
+  - arrow-docs
 
 * **arrow-site** repository - NEW!
+
+* **arrow-examples** repository - NEW!
