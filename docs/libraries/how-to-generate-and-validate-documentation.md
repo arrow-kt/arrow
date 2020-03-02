@@ -2,9 +2,9 @@
 
 ## Steps
 
-Dokka is responsible for generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
-
 ### 1. Run Dokka
+
+Dokka is responsible for generating documentation based on source code annotations:
 
 ```bash
 ./gradlew clean dokka
@@ -12,8 +12,26 @@ Dokka is responsible for generating documentation based on source code annotatio
 
 ### 2. Run Ank
 
+Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those:
+
 ```bash
 ./gradlew :arrow-docs:runAnk
+```
+
+## Note
+
+Don't run:
+
+```bash
+./gradlew clean dokka :arrow-docs:runAnk
+```
+
+because Gradle will mix those tasks and the whole documentation may not be validated.
+
+It you're looking for just one line:
+
+```bash
+./gradlew clean dokka; ./gradlew :arrow-docs:runAnk
 ```
 
 ## Doc snippets policies
