@@ -38,7 +38,7 @@ jobs:
         JAVA_OPTS: -Xms512m -Xmx1024m
         JEKYLL_ENV: production
       run: |
-        bundle exec jekyll build -b docs -s build/site -d build/_site
+        bundle exec jekyll build -s build/site -d build/_site
         mkdir $BASEDIR/logs
         tree build/_site > $BASEDIR/logs/docs.log
     - name: Generate and validate docs for all the libraries
