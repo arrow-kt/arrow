@@ -1,11 +1,12 @@
 @file:Suppress("unused")
 
-package com.pacoworks.typeclasses.basics.solved
+package arrow.typeclasses.solved
 
 import arrow.Kind
 import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
+import arrow.fx.IO
 import arrow.fx.typeclasses.Async
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -20,18 +21,18 @@ import arrow.typeclasses.UserDto
 interface NetworkOperations {
   val network: NetworkModule
 
-  fun Index.requestUser(): Try<UserDto> =
-    Try { network.fetch(this, mapOf("1" to "2")) }
+  fun Index.requestUser(): IO<UserDto> =
+      IO.effect { network.fetch(this, mapOf("1" to "2")) }
 }
 
 interface DaoOperations {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): Try<UserDao> =
-    Try { dao.query("SELECT * from Users where userId = $this") }
+  fun Index.queryUser(): IO<UserDao> =
+      IO.effect { dao.query("SELECT * from Users where userId = $this") }
 
-  fun Index.queryCompany(): Try<UserDao> =
-    Try { dao.query("SELECT * from Companies where companyId = $this") }
+  fun Index.queryCompany(): IO<UserDao> =
+      IO.effect { dao.query("SELECT * from Companies where companyId = $this") }
 }
 
 // We should probably abstract the Mapper too

@@ -2,6 +2,7 @@ package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
 import arrow.core.Try
+import arrow.fx.IO
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.User
 import arrow.typeclasses.UserDao
@@ -11,11 +12,11 @@ import arrow.typeclasses.realWorld
 // Step 0
 
 interface DomainMapper {
-  fun Try<UserDto>.toUserFromNetwork(): Try<User> =
-    flatMap { user -> Try { realWorld { User(user.id) } } }
+  fun IO<UserDto>.toUserFromNetwork(): IO<User> =
+    flatMap { user -> IO.effect { realWorld { User(user.id) } } }
 
-  fun Try<UserDao>.toUserFromDatabase(): Try<User> =
-    flatMap { user -> Try { realWorld { User(user.id) } } }
+  fun IO<UserDao>.toUserFromDatabase(): IO<User> =
+    flatMap { user -> IO.effect { realWorld { User(user.id) } } }
 }
 
 // See how the Business Logic has to be updated!

@@ -12,6 +12,7 @@ import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
 import arrow.typeclasses.NetworkModule
 import arrow.typeclasses.User
+import arrow.typeclasses.solved.RequestOperationsAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
