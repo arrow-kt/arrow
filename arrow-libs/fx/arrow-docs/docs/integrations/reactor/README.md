@@ -154,14 +154,14 @@ fun main() {
 ```
 
 ```kotlin:ank:fail
-import arrow.core.Try
+import arrow.fx.IO
 
 // This will result in a stack overflow
-Try {
+IO {
   MonoK.monad().fx.monad {
     (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
   }.fix().mono.block()
-}
+}.attempt().unsafeRunSync()
 ```

@@ -85,16 +85,16 @@ fun main() {
 }
 ```
 
-*Fx over `Try`*
+*Fx over `Either`*
 ```kotlin:ank:playground
-import arrow.core.Try
+import arrow.core.Either
 import arrow.core.extensions.fx
 
 //sampleStart
 val result =
-  Try.fx {
-    val (one) = Try { 1 }
-    val (two) = Try { one + one }
+  Either.fx<Throwable, Int> {
+    val (one) = Either.right(1)
+    val (two) = Either.right(one + one)
     two
   }
 //sampleEnd

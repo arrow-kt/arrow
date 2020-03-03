@@ -217,14 +217,18 @@ fun main() {
 ```
 
 ```kotlin:ank:fail
-import arrow.core.Try
+import arrow.Kind
+import arrow.fx.IO
+import arrow.fx.rx2.*
+import arrow.fx.rx2.extensions.flowablek.monad.monad
+
 // This will result in a stack overflow
 
-Try {
+IO {
   FlowableK.monad().fx.monad {
     (1..50000).fold(just(0)) { acc: Kind<ForFlowableK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
   }.fix().flowable.blockingFirst()
-}
+}.attempt().unsafeRunSync()
 ```
