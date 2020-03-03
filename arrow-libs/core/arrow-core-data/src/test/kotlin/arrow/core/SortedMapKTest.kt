@@ -42,7 +42,7 @@ class SortedMapKTest : UnitSpec() {
       MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       TraverseLaws.laws(
         SortedMapK.traverse<String>(),
-              SortedMapK.genK(Gen.string()),
+        SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq())
       ),
       AlignLaws.laws(SortedMapK.align<String>(),

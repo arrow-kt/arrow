@@ -717,7 +717,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     when (this) {
-      is Valid -> f(this.a, lb)
+      is Valid -> Eval.defer { f(this.a, lb) }
       is Invalid -> lb
     }
 

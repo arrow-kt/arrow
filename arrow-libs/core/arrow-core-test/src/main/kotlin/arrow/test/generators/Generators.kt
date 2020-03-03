@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
+import arrow.core.Eval
 import arrow.core.Failure
 import arrow.core.Id
 import arrow.core.Ior
@@ -60,6 +61,10 @@ fun <F, A> Gen<A>.applicativeError(AP: ApplicativeError<F, Throwable>): Gen<Kind
 fun <A, B> Gen.Companion.functionAToB(gen: Gen<B>): Gen<(A) -> B> = gen.map { b: B -> { _: A -> b } }
 
 fun <A> Gen.Companion.functionAAToA(gen: Gen<A>): Gen<(A, A) -> A> = gen.map { a: A -> { _: A, _: A -> a } }
+
+fun <A, B> Gen.Companion.functionBAToB(gen: Gen<B>): Gen<(B, A) -> B> = gen.map { b: B -> { _: B, _: A -> b } }
+
+fun <A, B> Gen.Companion.functionABToB(gen: Gen<B>): Gen<(A, B) -> B> = gen.map { b: B -> { _: A, _: B -> b } }
 
 fun <A> Gen.Companion.functionToA(gen: Gen<A>): Gen<() -> A> = gen.map { a: A -> { a } }
 
@@ -193,3 +198,6 @@ fun <A, B> Gen.Companion.genConst(gen: Gen<A>): Gen<Const<A, B>> =
   gen.map {
     Const<A, B>(it)
   }
+
+fun <A> Gen<A>.genEval(): Gen<Eval<A>> =
+  map { Eval.just(it) }

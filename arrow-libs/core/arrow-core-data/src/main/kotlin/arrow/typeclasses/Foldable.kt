@@ -44,7 +44,7 @@ interface Foldable<F> {
   fun <A, B> Kind<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B>
 
   /**
-   * Fold implemented using the given Monoid<A> instance.
+   * Fold/combine elements into a single value using the given Monoid<A>
    */
   fun <A> Kind<F, A>.fold(MN: Monoid<A>): A = MN.run {
     foldLeft(empty()) { acc, a -> acc.combine(a) }
@@ -62,7 +62,7 @@ interface Foldable<F> {
     f: (A) -> B,
     g: (A, Eval<B>) -> Eval<B>
   ): Eval<Option<B>> =
-    foldRight(Eval.Now(Option.empty())) { a, lb ->
+    foldRight(Eval.Now<Option<B>>(Option.empty())) { a: A, lb: Eval<Option<B>> ->
       lb.flatMap { option ->
         when (option) {
           is Some<B> -> g(a, Eval.Now(option.t)).map { Some(it) }
@@ -123,8 +123,8 @@ interface Foldable<F> {
    *
    * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
    */
-  fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> =
-    traverse_(ag, ::identity)
+  fun <G, A> Kind<F, Kind<G, A>>.sequence_(GA: Applicative<G>): Kind<G, Unit> =
+    traverse_(GA, ::identity)
 
   /**
    * Find the first element matching the predicate, if one exists.
@@ -241,7 +241,8 @@ interface Foldable<F> {
   fun <A> Kind<F, A>.firstOrNone(predicate: (A) -> Boolean): Option<A> =
     find { predicate(it) }
 
-  fun <A> Kind<F, A>.toList(): List<A> = foldRight(Eval.now(emptyList<A>())) { v, acc -> acc.map { listOf(v) + it } }.value()
+  fun <A> Kind<F, A>.toList(): List<A> =
+    foldRight(Eval.now(emptyList<A>())) { v, acc -> acc.map { listOf(v) + it } }.value()
 
   companion object {
     @Deprecated("This function will be removed soon. Use Iterator.iterateRight from Eval.kt instead")

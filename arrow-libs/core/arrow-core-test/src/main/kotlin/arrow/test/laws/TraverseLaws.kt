@@ -48,22 +48,37 @@ fun <F, G, A> Kind<Nested<F, G>, A>.unnest(): Kind<F, Kind<G, A>> = this as Kind
 fun <F, G> ComposedApplicative(apF: Applicative<F>, apG: Applicative<G>): Applicative<Nested<F, G>> = object : Applicative<Nested<F, G>> {
   override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
     apF.run { unnest().ap(ff.unnest().map { gf -> { ga: Kind<G, A> -> apG.run { ga.ap(gf) } } }).nest() }
+
   override fun <A> just(a: A): Kind<Nested<F, G>, A> = apF.just(apG.just(a)).nest()
 }
 
 object TraverseLaws {
+  fun <F> laws(TF: Traverse<F>, GA: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
+    val GEN = GENK.genK(Gen.intSmall())
+    val EQ = EQK.liftEq(Int.eq())
+
+    return FoldableLaws.laws(TF, GA, GENK, EQK) +
+      FunctorLaws.laws(TF, GENK, EQK) + listOf(
+      Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
+      Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
+      Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
+      Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
+      Law("Traverse Laws: Traverse is left to right") { TF.leftToRight(GEN) }
+    )
+  }
+
   fun <F> laws(TF: Traverse<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
     val GEN = GENK.genK(Gen.intSmall())
     val EQ = EQK.liftEq(Int.eq())
 
     return FoldableLaws.laws(TF, GENK) +
-        FunctorLaws.laws(TF, GENK, EQK) + listOf(
-        Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
-        Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
-        Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
-        Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
-        Law("Traverse Laws: Traverse is left to right") { TF.leftToRight(GEN) }
-      )
+      FunctorLaws.laws(TF, GENK, EQK) + listOf(
+      Law("Traverse Laws: Identity") { TF.identityTraverse(TF, GEN, EQ) },
+      Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(GEN, EQ) },
+      Law("Traverse Laws: Parallel composition") { TF.parallelComposition(GEN, EQ) },
+      Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(GEN) },
+      Law("Traverse Laws: Traverse is left to right") { TF.leftToRight(GEN) }
+    )
   }
 
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {

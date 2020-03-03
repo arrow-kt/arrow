@@ -527,7 +527,7 @@ sealed class Option<out A> : OptionOf<A> {
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().let { option ->
       when (option) {
-        is Some -> operation(option.t, initial)
+        is Some -> Eval.defer { operation(option.t, initial) }
         is None -> initial
       }
     }

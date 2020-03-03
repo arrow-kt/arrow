@@ -45,7 +45,7 @@ class TryTest : UnitSpec() {
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), Try.eq(Int.eq(), Eq.any()), Gen.`try`(Gen.int())),
       MonadErrorLaws.laws(Try.monadError(), Try.functor(), Try.applicative(), Try.monad(), Try.genK(), Try.eqK()),
-      TraverseLaws.laws(Try.traverse(), Try.genK(), Try.eqK()),
+      TraverseLaws.laws(Try.traverse(), Try.applicative(), Try.genK(), Try.eqK()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Gen.`try`(Gen.int()), Try.eq(Int.eq(), Eq.any()))
     )
 

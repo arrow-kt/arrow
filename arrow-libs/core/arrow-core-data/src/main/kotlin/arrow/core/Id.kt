@@ -53,7 +53,7 @@ data class Id<out A>(private val value: A) : IdOf<A> {
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = operation(initial, value)
 
-  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = operation(value, initial)
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = Eval.defer { operation(value, initial) }
 
   fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map { f(this) }
 

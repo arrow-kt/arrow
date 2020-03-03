@@ -26,7 +26,7 @@ object TraverseFilterLaws {
     val EQ = EQK.liftEq(Int.eq())
     val EQ_NESTED = EQK.liftEq(EQ)
 
-    return TraverseLaws.laws(TF, GENK, EQK) +
+    return TraverseLaws.laws(TF, GA, GENK, EQK) +
       listOf(
         Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
         Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, genBool, GA, EQ_NESTED) }

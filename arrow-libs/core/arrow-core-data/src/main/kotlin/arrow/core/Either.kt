@@ -722,7 +722,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().let { either ->
       when (either) {
-        is Right -> rightOperation(either.b, initial)
+        is Right -> Eval.defer { rightOperation(either.b, initial) }
         is Left -> initial
       }
     }

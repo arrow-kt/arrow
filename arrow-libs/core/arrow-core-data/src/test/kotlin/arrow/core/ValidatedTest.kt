@@ -45,7 +45,7 @@ class ValidatedTest : UnitSpec() {
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
-      TraverseLaws.laws(Validated.traverse(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
+      TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.semigroup()), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),

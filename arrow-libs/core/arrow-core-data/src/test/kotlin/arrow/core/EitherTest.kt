@@ -64,7 +64,7 @@ class EitherTest : UnitSpec() {
         Either.genK(Gen.throwable()),
         Either.eqK(throwableEQ)
       ),
-      TraverseLaws.laws(Either.traverse(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
+      TraverseLaws.laws(Either.traverse(), Either.applicative(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       BitraverseLaws.laws(Either.bitraverse(), Either.genK2(), Either.eqK2()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), Gen.either(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
