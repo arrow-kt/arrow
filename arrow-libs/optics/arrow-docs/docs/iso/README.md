@@ -60,16 +60,16 @@ We can do the same with a Functor mapping.
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.core.extensions.`try`.functor.*
+import arrow.core.extensions.either.functor.*
 
-pointIsoTuple.modifyF(Try.functor(), point) {
-    Try { (tuple.a / 2) toT (tuple.b / 2) }
+pointIsoTuple.modifyF(Either.functor(), point) {
+    try { Either.right((tuple.a / 2) toT (tuple.b / 2)) } catch(e: Exception) { Either.left(e) }
 }
 ```
 
 ```kotlin:ank
-val liftF: (Point2D) -> TryOf<Point2D> = pointIsoTuple.liftF(Try.functor()) {
-    Try { (tuple.a / 2) toT (tuple.b / 0) }
+val liftF: (Point2D) -> EitherOf<Throwable, Point2D> = pointIsoTuple.liftF(Either.functor()) {
+    try { Either.right((tuple.a / 2) toT (tuple.b / 0)) } catch(e:Throwable) { Either.left(e) }
 }
 
 liftF(point)

@@ -1,4 +1,4 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.ListK
 import arrow.core.Option
@@ -15,6 +15,10 @@ import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.tuple2.monoid.monoid
+import arrow.optics.first
+import arrow.optics.second
+import arrow.optics.third
+import arrow.optics.traversal
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.tuple10

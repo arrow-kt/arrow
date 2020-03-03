@@ -1,4 +1,4 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.Either
 import arrow.core.Right
@@ -7,6 +7,8 @@ import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.fix
 import arrow.core.Validated
+import arrow.optics.toEither
+import arrow.optics.toTry
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.generators.either

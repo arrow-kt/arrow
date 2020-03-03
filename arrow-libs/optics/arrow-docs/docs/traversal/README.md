@@ -23,17 +23,17 @@ import arrow.optics.*
 import arrow.core.*
 import arrow.mtl.*
 import arrow.core.extensions.listk.traverse.*
-import arrow.core.extensions.`try`.applicative.*
+import arrow.core.extensions.option.applicative.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable(ListK.traverse())
 
-listTraversal.modifyF(Try.applicative(), listOf(1, 2, 3).k()) {
-    Try { it / 2 }
+listTraversal.modifyF(Option.applicative(), listOf(1, 2, 3).k()) {
+    Option.just(it / 2)
 }
 ```
 ```kotlin:ank
-listTraversal.modifyF(Try.applicative(), listOf(0, 2, 3).k()) {
-    Try { throw TryException.UnsupportedOperationException("Any arbitrary exception") }
+listTraversal.modifyF(Option.applicative(), listOf(0, 2, 3).k()) {
+    try { Option.just(it / 0) } catch(e: Throwable) { None } 
 }
 ```
 

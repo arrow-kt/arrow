@@ -1,8 +1,9 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.SetExtensions
 import arrow.core.SetK
 import arrow.core.extensions.setk.monoid.monoid
+import arrow.optics.toSetK
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.genSetK

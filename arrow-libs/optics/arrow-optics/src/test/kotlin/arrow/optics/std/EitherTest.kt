@@ -1,9 +1,10 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.Either
 import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
+import arrow.optics.toValidated
 import arrow.test.UnitSpec
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB

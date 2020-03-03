@@ -48,26 +48,32 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`.
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.applicative.*
+import arrow.fx.IO
+import arrow.core.extensions.option.applicative.*
 
-ListK.head<Int>().modifyF(Try.applicative(), listOf(1, 3, 6).k()) { head ->
-    Try { head / 2 }
+ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
+    Option.just(head/2)
 }
 ```
 ```kotlin:ank
-val liftedF = ListK.head<Int>().liftF(Try.applicative()) { head ->
-    Try { head / 0 }
+import arrow.fx.extensions.io.applicative.*
+import arrow.fx.fix
+
+val liftedFO = ListK.head<Int>().liftF(IO.applicative()) { head ->
+    IO.effect { head / 0 }
 }
-liftedF(listOf(1, 3, 6).k())
+liftedFO(listOf(1, 3, 6).k()).fix().attempt().unsafeRunSync()
 ```
 
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens`, or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
 
 ### Composition
 
-We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Try<User>`. So, we first want to look into `Try`, which **optionally** could be a `Success`. And then we want to look into `User`, which optionally filled in his email.
+We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Option<User>`. So, we first want to look into `Option`, which **optionally** could be a `Some`. And then we want to look into `User`, which optionally filled in his email.
 
 ```kotlin:ank
+import arrow.optics.some
+
 data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
@@ -75,12 +81,15 @@ val participantEmail: Optional<Participant, String> = Optional(
         set = { participant, email -> participant.copy(email = email) }
 )
 
-val triedEmail: Optional<Try<Participant>, String> = Try.success<Participant>() compose participantEmail
+val optEmail: Optional<Option<Participant>, String> = Option.some<Participant>() compose participantEmail
 
-triedEmail.getOption(Try.Success(Participant("test", "email")))
+optEmail.getOption(Some(Participant("test", "email")))
 ```
 ```kotlin:ank
-triedEmail.getOption(Try.Failure(IllegalStateException("Something wrong with network")))
+optEmail.getOption(None)
+```
+```kotlin:ank
+optEmail.getOption(Some(Participant("test", null)))
 ```
 
 `Optional` can be composed with all optics, resulting in the following optics:
@@ -108,20 +117,19 @@ val optionalAddress: Optional<Person, Address> = Person.address
 
 A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }}) and [PPrism]({{'/optics/prism#PPrism' | relative_url }}). So let's see if we can combine both examples shown in their documentation.
 
-Given a `PPrism` with a focus into `Success` of `Try<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Try` and morph the first type of the `Tuple2` within.
+Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-val pprism = Try.pSuccess<Tuple2<Int, String>, Tuple2<String, String>>()
+val pprism = Option.PSome<Tuple2<Int, String>, Tuple2<String, String>>()
 val plens = Tuple2.pFirst<Int, String, String>()
 
-val successTuple2: POptional<Try<Tuple2<Int, String>>, Try<Tuple2<String, String>>, Int, String> =
-        pprism compose plens
+val someTuple2: POptional<Option<Tuple2<Int, String>>, Option<Tuple2<String, String>>, Int, String> =
+    pprism compose plens
 
-val lifted: (Try<Tuple2<Int, String>>) -> Try<Tuple2<String, String>> = successTuple2.lift { _ -> "Hello, " }
-lifted(Try.Success(5 toT "World!"))
+val lifted: (Option<Tuple2<Int, String>>) -> Option<Tuple2<String, String>> = someTuple2.lift { _ -> "Hello, " }
 ```
 ```kotlin:ank
-lifted(Try.Failure(IllegalStateException("something went wrong")))
+lifted(None)
 ```
 
 ### Laws

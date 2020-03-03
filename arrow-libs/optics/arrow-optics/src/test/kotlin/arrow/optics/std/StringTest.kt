@@ -1,6 +1,7 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.extensions.monoid
+import arrow.optics.toList
 import arrow.test.UnitSpec
 import arrow.test.generators.char
 import arrow.test.laws.IsoLaws

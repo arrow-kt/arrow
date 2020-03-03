@@ -1,4 +1,4 @@
-package arrow.optics
+package arrow.optics.std
 
 import arrow.core.ListExtensions
 import arrow.core.Option
@@ -8,6 +8,10 @@ import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.optics.head
+import arrow.optics.tail
+import arrow.optics.toListK
+import arrow.optics.toOptionNel
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.nonEmptyList

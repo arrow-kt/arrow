@@ -134,19 +134,19 @@ val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```
 
 ### Polymorphic prisms <a id="PPrism"></a>
-When dealing with polymorphic sum types like `Try<A>`, we can also have polymorphic prisms that allow us to polymorphically change the type of the focus of our `PPrism`. The following method is also available as `pTrySuccess<A, B>()` in the `arrow.optics` package:
+When dealing with polymorphic sum types like `Option<A>`, we can also have polymorphic prisms that allow us to polymorphically change the type of the focus of our `PPrism`. The following method is also available as `PSome<A, B>()` in the `arrow.optics` package:
 
 ```kotlin
-fun <A, B> trySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
-        getOrModify = { aTry -> aTry.fold({ Try.Failure(it).left() }, { it.right() }) },
-        reverseGet = { b -> Try.Success(b) }
+fun <A, B> optionSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
+    getOrModify = { option -> option.fold({ Either.Left(None) }, { Either.Right(it) }) },
+    reverseGet = { b -> Some(b) }
 )
 
-val liftSuccess: (Try<Int>) -> Try<String> = pTrySuccess<Int, String>().lift(Int::toString)
-liftSuccess(Try.Success(5))
+val liftSome: (Option<Int>) -> Option<String> = PSome<Int, String>().lift(Int::toString)
+liftSome(Some(5))
 ```
 ```kotlin
-liftSuccess(Try.Failure(ArithmeticException("/ by zero")))
+liftSuccess(None)
 ```
 
 ### Laws

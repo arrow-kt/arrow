@@ -32,7 +32,7 @@ typealias PrismKindedJ<S, A> = PPrismKindedJ<S, S, A, A>
  * Mostly used for finding a focus that is only present under certain conditions i.e. list head Prism<List<Int>, Int>
  *
  * A (polymorphic) [PPrism] is useful when setting or modifying a value for a polymorphic sum type
- * i.e. PPrism<Try<Sting>, Try<Int>, String, Int>
+ * i.e. PPrism<Option<String>, Option<Int>, String, Int>
  *
  * A [PPrism] gathers the two concepts of pattern matching and constructor and thus can be seen as a pair of functions:
  * - `getOrModify: A -> Either<A, B>` meaning it returns the focus of a [PPrism] OR the original value
