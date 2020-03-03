@@ -23,25 +23,11 @@ jobs:
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
-    - name: Prepare environment
-      run: |
-        set -ex
-        $BASEDIR/arrow/scripts/site-prepare-env.sh
-        sudo apt-get install tree
-        bundle install --gemfile Gemfile --path vendor/bundle
-    - name: Run Ank
+    - name: "Site: run Ank"
       env:
         JAVA_OPTS: -Xms512m -Xmx1024m
       run: ./gradlew runAnk
-    - name: Build site
-      env:
-        JAVA_OPTS: -Xms512m -Xmx1024m
-        JEKYLL_ENV: production
-      run: |
-        bundle exec jekyll build -s build/site -d build/_site
-        mkdir $BASEDIR/logs
-        tree build/_site > $BASEDIR/logs/docs.log
-    - name: Generate and validate docs for all the libraries
+    - name: "Next version: generate and validate docs for all the libraries"
       run: |
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
@@ -50,14 +36,7 @@ jobs:
             #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
             cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
         done
-    - name: Build site
-      env:
-        JAVA_OPTS: -Xms512m -Xmx1024m
-        JEKYLL_ENV: production
-      run: |
-        bundle exec jekyll build -b docs/next -s build/site -d build/_site
-        tree build/_site > $BASEDIR/logs/docs-next.log
-    - name: Other versions
+    - name: "Other versions: generate and validate docs"
       run: |
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
@@ -73,12 +52,5 @@ jobs:
                 ./gradlew clean dokka
                 ./gradlew :arrow-docs:runAnk
                 cp -r modules/docs/arrow-docs/build/site/docs/* $BASEDIR/arrow-site/build/site/
-                cd $BASEDIR/arrow-site
-                bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
-                tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
             done            
         fi
-    - uses: actions/upload-artifact@v1
-      with:
-        name: logs
-        path: ../logs
