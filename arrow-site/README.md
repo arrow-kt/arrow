@@ -10,7 +10,7 @@ This repository **just** includes the [Arrow website](https://arrow-kt.io/) main
 * sidebar
 * etc.
 
-The rest of the website content comes from:
+The **rest** of the website content comes from:
 
 * [Every Arrow library generates its own API Doc](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md)
 * Some Arrow libraries include static documentation:
@@ -19,7 +19,6 @@ The rest of the website content comes from:
   * [Arrow Incubator](https://github.com/arrow-kt/arrow-incubator/tree/master/arrow-docs/docs)
   * [Arrow Optics](https://github.com/arrow-kt/arrow-optics/tree/master/arrow-docs/docs)
 * [Arrow Media](https://github.com/arrow-kt/arrow-media): the showcase of tutorials, conference presentations and other Arrow-related content. If you have given a talk, written a post, or spread the word about Arrow in any other way, please don't hesitate to include it in the [MEDIA section of the Arrow website](https://media.arrow-kt.io/). To do so, take a look at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repository.
-
 
 ## Table of contents
 
@@ -30,7 +29,13 @@ The rest of the website content comes from:
 
 ### Release flow
 
-This repository has its own release flow. Every change that is pushed on `master` branch will be shown directly at the website.
+This repository has its own release flow.
+
+Every change that is pushed on `master` branch will be shown directly at the website:
+
+* Main files: landing page, JS, CSS, etc.
+* Next version will be re-generated with the styles and sidebars in this repository. For instance, for Arrow Core: https://arrow-kt.io/docs/next/core/.
+* Previous versions that are included in [`update-other-versions.txt`](update-other-versions.txt) will be re-generated with the styles and sidebars in this repository. Those versions must match with the related tags. For instance, `0.10.4`. However, the version in the website (URL) will just consider `major.minor` version. Following the example, `0.10.4` in [`update-other-versions.txt`](update-other-versions.txt) file, it will re-generate the website under `docs/0.10/...`.
 
 ### How to add a menu entry
 
@@ -47,6 +52,8 @@ Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real ex
 
 We use Jekyll so you can deploy your docs to a local server to test your changes and see how those would look once released.
 
+These steps **just** run the website with the main files: landing page, JS, CSS, etc. If you want to browse more content, find the required steps in [How to generate and validate documentation](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md) for every Arrow library.
+
 #### 1. Ank to compile and validate code snippets
 
 Ank is in charge of compiling and validating your code snippets and deploying the proper binaries for those. Run the following command:
@@ -54,6 +61,8 @@ Ank is in charge of compiling and validating your code snippets and deploying th
 ```bash
 ./gradlew runAnk
 ```
+
+In this case, it will compile and validate the code snippets that are shown in the landing page.
 
 #### 2. Run the docs in your local server
 

@@ -1,6 +1,9 @@
 name: Build site
 
-on: pull_request
+on:
+  pull_request:
+    paths-ignore:
+    - 'README.md'
 
 jobs:
   build_site:
