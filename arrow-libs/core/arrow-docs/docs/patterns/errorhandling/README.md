@@ -95,7 +95,7 @@ public class Throwable {
     * This method records within this Throwable object information
     * about the current state of the stack frames for the current thread.
     */
-    Throwable fillInStackTrace()
+    Throwable fillInStackTrace();
 }
 ```
 
@@ -264,8 +264,7 @@ fun <F> MonadError<F, CookingException>.prepare():Kind<F, Salad> =
 Or, since `takeFoodFromRefrigerator()` and `getKnife()` are operations that do not depend on each other, we don't need the [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) here, and we can express our logic as:
 
 ```kotlin
-fun <F> MonadError<F, CookingException>.prepare1(): Kind<F, Salad> =
-    tupledN(getKnife(), takeFoodFromRefrigerator()).flatMap({ (nuke, target) -> lunch<F>(nuke, target) })
+ME.tupled(getKnife(), takeFoodFromRefrigerator()).flatMap(ME, { (knife, lettuce) -> lunch<F>(knife, lettuce) })
 
 val result = Either.monadError<CookingException>().prepare()
 result.fix()
@@ -278,7 +277,7 @@ result1.fix()
 Note that `MonadThrow` also has a function `fx.monadThrow` that automatically captures and wraps exceptions in its binding block.
 
 ```kotlin
-fun <F> MonadError<F, CookingException>.lunchImpure(target: Knife, nuke: Lettuce): Salad {
+fun <F> MonadError<F, CookingException>.lunchImpure(knife: Knife, lettuce: Lettuce): Salad {
     throw InsufficientAmountOfLettuce(5)
 }
 

@@ -30,22 +30,22 @@ import arrow.documented
  * [map] allows us to safely compute over values under the assumption that they'll be there returning the
  * transformation encapsulated in the same context.
  *
- * Consider both [arrow.core.Option] and [arrow.core.Try]:
+ * Consider [arrow.core.Option] and [arrow.core.Either]:
  *
  * `Option<A>` allows us to model absence and has two possible states, `Some(a: A)` if the value is not absent and `None` to represent an empty case.
- * In a similar fashion `Try<A>` may have two possible cases `Success(a: A)` for computations that succeed and `Failure(e: Throwable)` if they fail
- * with an exception.
+ * In a similar fashion `Either<L, R>` may have two possible cases `Left(l: L)` and `Right(r: R)`. By convention, `Left` is used to model the exceptional
+ * case and `Right` for the successful case.
  *
- * Both [arrow.core.Try] and [arrow.core.Option] are examples of data types that can be computed over transforming their inner results.
+ * Both [arrow.core.Either] and [arrow.core.Option] are examples of data types that can be computed over transforming their inner results.
  *
  * ```kotlin:ank:playground
  * import arrow.*
  * import arrow.core.*
  *
- * fun main(args: Array<String>) {
+ * suspend fun main(args: Array<String>) {
  *   val result =
  *   //sampleStart
- *   Try { "1".toInt() }.map { it * 2 }
+ *   Either.catch { "1".toInt() }.map { it * 2 }
  *   //sampleEnd
  *   println(result)
  * }

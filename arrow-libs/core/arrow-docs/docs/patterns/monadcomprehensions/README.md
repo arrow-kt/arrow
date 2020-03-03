@@ -49,7 +49,7 @@ With knowledge of `flatMap`, we can write sequential expressions that are run as
 The [typeclass]({{ '/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}),
 for which we also have a [tutorial]({{ '/patterns/monads' | relative_url }}).
 
-Implementations of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/integrations/kotlinxcoroutines' | relative_url }}).
+Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `IO` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 Let's see one example using a [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/effects/io' | relative_url }}), where we fetch from a database the information about the dean of a university some student attend:
 
 ```kotlin

@@ -15,9 +15,7 @@ It is parametrized to an error type `E`, which means the datatype has at least a
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
 a sealed class UserNotFoundReason that contains three inheritors, for example.
 
-Some of the datatypes Λrrow provides can have these error types already fixed.
-That's the case with [`Try<A>`]({{ '/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), which has its error type fixed to `Throwable`.
-Other datatypes like [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allow for the user to apply their error type of choice.
+A datatype like [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allows for the user to apply their error type of choice.
 
 ### Main Combinators
 
@@ -33,13 +31,6 @@ import arrow.core.*
 import arrow.core.extensions.either.applicativeError.*
 
 Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
-```
-
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.`try`.applicativeError.*
-
-Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
@@ -86,27 +77,21 @@ failure.handleError { t -> 0 }
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), recovering from any previous error state.
 
 ```kotlin:ank
-Try { "3".toInt() }.attempt()
+IO { "3".toInt() }.attempt()
 ```
 
 ```kotlin:ank
-Try { "nope".toInt() }.attempt()
+IO { "nope".toInt() }.attempt()
 ```
 
-#### fromEither/fromTry/fromOption
+#### fromEither/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Option<A>`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), or [`Try<A>`]({{ '/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) or [`Option<A>`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) to the current datatype.
 
 While `fromOption()` requires creating a new error value.
 
 ```kotlin:ank
 Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException("Boom") } }
-```
-
-In the case of `fromTry()`, converting from `Throwable` to the type of the error is required.
-
-```kotlin:ank
-Either.applicativeError<String>().run { Try { RuntimeException("Boom") }.fromTry { it.message!! } }
 ```
 
 In the case of `fromEither()`, converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E> is required.

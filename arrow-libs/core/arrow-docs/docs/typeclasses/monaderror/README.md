@@ -36,16 +36,6 @@ eitherResult
 ```
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.`try`.applicativeError.*
-
-val tryResult: Try<Int> =
-  RuntimeException("BOOM!").raiseError()
-
-tryResult
-```
-
-```kotlin:ank
 import arrow.fx.*
 import arrow.fx.extensions.io.applicativeError.*
 
