@@ -16,7 +16,8 @@
     </a>
     <ul>
       <li>
-        <a href="{{ site.data.commons.stable_version | append: doc-link }}">
+        {% assign stable_base_doc_link = site.data.commons.stable_version | append: 'docs/' %}
+        <a href="{{ stable_base_doc_link | append: doc-link }}">
           <span>
             {{ stable_version.title }} - {{ site.data.doc-versions.stable }}
           </span>

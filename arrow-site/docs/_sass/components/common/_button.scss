@@ -59,6 +59,7 @@
 
 // Slack channel link button
 .slack-link-container {
+  z-index: 2;
   position: fixed;
   bottom: $base-point-grid;
   right: ($base-point-grid * 2);
