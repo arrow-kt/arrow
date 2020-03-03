@@ -80,6 +80,7 @@ jobs:
         JEKYLL_ENV: production
       run: |
         bundle exec jekyll build -b docs/next -s build/site -d build/_site
+        rm -f build/_site/index.*
         tree build/_site > $BASEDIR/logs/docs-next.log
     - name: Publish site
       env:
@@ -114,6 +115,7 @@ jobs:
                 cp -r modules/docs/arrow-docs/build/site/docs/* $BASEDIR/arrow-site/build/site/
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
+                rm -f build/_site/index.*
                 tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
                 echo ">>> $SHORT_VERSION VERSION" >> aws_sync_jekyll.log
                 aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION >> aws_sync_jekyll.log
