@@ -36,8 +36,16 @@ interface Apply<F> : Functor<F> {
    * }
    * ```
    */
+  @Deprecated(
+    "ap will have its type signature changed to fun <A, B> Kind<F, (A) -> B>.ap(ff: Kind<F, A>): Kind<F, B> in future versions. You can either keep it as is and change it then, or use mapN as a stable replacement",
+    ReplaceWith("mapN(this, ff) { (a, f) -> f(a) }")
+  )
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
+  @Deprecated(
+    "apEval will have its type signature changed to fun <A, B> Kind<F, (A) -> B>.ap(ff: Eval<Kind<F, A>>): Eval<Kind<F, B>> in future versions. You can either keep it as is and change it then, or use map2Eval as a stable replacement",
+    ReplaceWith("map2Eval(ff) { (a, f) -> f(a) }")
+  )
   fun <A, B> Kind<F, A>.apEval(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> = ff.map { this.ap(it) }
 
   fun <A, B, Z> Kind<F, A>.map2Eval(fb: Eval<Kind<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<Kind<F, Z>> =
