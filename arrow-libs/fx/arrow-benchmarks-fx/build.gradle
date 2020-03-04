@@ -15,8 +15,6 @@ plugins {
 apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 
-ktlintJmhSourceSetCheck.enabled = false
-
 dependencies {
     compile project(":arrow-fx")
     compile project(":arrow-fx-rx2")

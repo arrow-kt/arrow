@@ -13,8 +13,6 @@ apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
-ktlintMainSourceSetCheck.enabled = false
-
 dependencies {
     implementation project(':arrow-fx')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"

@@ -13,8 +13,6 @@ apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
-ktlintTestSourceSetCheck.enabled = false
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
