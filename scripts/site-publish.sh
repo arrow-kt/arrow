@@ -1,22 +1,29 @@
 #!/bin/bash
 
 set -e
+MAIN_CONTENT=(CNAME  code  css  error.html  fonts  img  index.html  js  redirects.json)
+
+
 echo "Publish in S3 ..."
+cd $BASEDIR/site/build/_site
 
-if [ -d $BASEDIR/site/build/_site/apidocs ]; then
-    for module in $BASEDIR/site/build/_site/apidocs/*; do
-        echo "Sync with docs/next/apidocs/$(basename $module)"
-        aws s3 sync $module s3://$S3_BUCKET/docs/next/apidocs/$(basename $module) > aws_sync_jekyll.log
-    done
-fi
+for file in ${MAIN_CONTENT[*]}; do
+    rm -rf $file
+done
 
-#    for file in $BASEDIR/site/build/_site/*; do
-#        echo "Sync with docs/next/$(basename $file)"
-#        if [ -f "$file" ]; then
-#            echo "Copying $file ..."
-#            aws s3 cp $file s3://$S3_BUCKET/docs/next/$(basename $file) >> aws_sync_jekyll.log
-#        else
-#            echo "Sync $file ..."
-#            aws s3 sync $file s3://$S3_BUCKET/docs/next/$(basename $file) >> aws_sync_jekyll.log
-#        fi
-#    done
+for file in *; do
+    if [ -f "$file" ]; then
+        echo "Copying $file into docs/next/$file ..."
+        aws s3 cp $file s3://$S3_BUCKET/docs/next/$file
+    else
+        if [ "$file" == "apidocs" ]; then
+            for module in apidocs/*; do
+                echo "Sync $module with docs/next/apidocs/$(basename $module) ..."
+                aws s3 sync $module s3://$S3_BUCKET/docs/next/apidocs/$(basename $module)
+            done
+        else
+            echo "Sync $file with docs/next/$file ..."
+            aws s3 sync $file s3://$S3_BUCKET/docs/next/$file
+        fi
+    fi
+done
