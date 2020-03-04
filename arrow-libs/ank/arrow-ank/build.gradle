@@ -11,8 +11,6 @@ plugins {
 apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
-ktlintMainSourceSetCheck.enabled = false
-
 dependencies {
     compile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
     compile "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
