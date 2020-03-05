@@ -18,7 +18,7 @@ Ank is in charge of compiling and validating your doc snippets and deploying the
 ./gradlew :arrow-docs:runAnk
 ```
 
-## Note
+### Note
 
 Don't run:
 
@@ -52,3 +52,15 @@ If your snippet is showing examples on how to use the public APIs in a broader s
 For the mentioned cases, you should double-check which `Ank` modifiers you want to use for the snippets (`silent`, `replace`, or `outFile(<file>)`). You'll find more details about each one of those in [Ank docs](https://github.com/arrow-kt/arrow-ank). See some real examples [on this docs PR](https://github.com/arrow-kt/arrow/pull/1134/files).
 
 Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add this `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making them runnable).
+
+## "Type Class Hierarchy" sections
+
+**Type Class Hierarchy** section can be included in a Type Class page via:
+
+```
+ank_macro_hierarchy(<class>)
+```
+
+When running Ank, that line will be replaced and a new `diagram.nomnol` will be created in the same directory.
+
+Please, take into account that `permalink` directive in Jekyll header can change the location of the `index.html` file that will be generated for that page. If `permalink` includes a different path, the `diagram.nomnol` won't be found.
