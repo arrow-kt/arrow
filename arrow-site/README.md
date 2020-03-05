@@ -52,7 +52,7 @@ Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real ex
 
 We use Jekyll so you can deploy your docs to a local server to test your changes and see how those would look once released.
 
-These steps **just** run the website with the main files: landing page, JS, CSS, etc. If you want to browse more content, find the required steps in [How to generate and validate documentation](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md) for every Arrow library.
+These steps **just** run the website with the main files: landing page, JS, CSS, etc. If you want to browse more content, find the required steps in [Arrow library: How to run the website in your local server](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-run-the-website-in-your-local-server.md) for every Arrow library.
 
 #### 1. Ank to compile and validate code snippets
 
