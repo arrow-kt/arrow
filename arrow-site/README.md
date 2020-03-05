@@ -22,10 +22,10 @@ The **rest** of the website content comes from:
 
 ## Table of contents
 
-* [Release flow](Release-flow)
-* [How to add a menu entry](How-to-add-a-menu-entry)
-* [How to deploy the site to a local server](How-to-deploy-the-site-to-a-local-server)
-* [How to test links](How-to-test-links)
+* [Release flow](#Release-flow)
+* [How to add a menu entry](#How-to-add-a-menu-entry)
+* [How to deploy the site to a local server](#How-to-deploy-the-site-to-a-local-server)
+* [How to test links](#How-to-test-links)
 
 ### Release flow
 
