@@ -3,6 +3,8 @@ package arrow.fx.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
+import arrow.core.Tuple3
 import arrow.core.identity
 import arrow.extension
 import arrow.fx.ForIO
@@ -207,11 +209,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
 
-  override fun <A, B, C> CoroutineContext.parMapN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, f: (A, B) -> C): Kind<ForIO, C> =
-    IO.parMapN(this@parMapN, fa, fb, f)
+  override fun <A, B> parTupledN(ctx: CoroutineContext, fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<Tuple2<A, B>> =
+    IO.parTupledN(ctx, fa, fb)
 
-  override fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>, f: (A, B, C) -> D): Kind<ForIO, D> =
-    IO.parMapN(this@parMapN, fa, fb, fc, f)
+  override fun <A, B, C> parTupledN(ctx: CoroutineContext, fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<Tuple3<A, B, C>> =
+    IO.parTupledN(ctx, fa, fb, fc)
 
   override fun <A, B> CoroutineContext.raceN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<Race2<A, B>> =
     IO.raceN(this@raceN, fa, fb)

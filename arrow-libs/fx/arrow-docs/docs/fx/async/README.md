@@ -101,7 +101,8 @@ data class ThreadInfo(
 
 val program = IO.fx {
   val (threadA: String, threadB: String) =
-    !dispatchers().default().parMapN(
+    !IO.parMapN(
+      dispatchers().default(),
       effect { threadName() },
       effect { threadName() },
       ::ThreadInfo

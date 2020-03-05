@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.Tuple3
 import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -43,7 +44,6 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import io.reactivex.Observable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
@@ -168,13 +168,11 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       }.k()
     }
 
-  override fun <A, B, C> CoroutineContext.parMapN(fa: ObservableKOf<A>, fb: ObservableKOf<B>, f: (A, B) -> C): ObservableK<C> =
-    ObservableK(fa.value().zipWith(fb.value(), BiFunction(f)).subscribeOn(asScheduler()))
+  override fun <A, B> parTupledN(ctx: CoroutineContext, fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<Tuple2<A, B>> =
+    fa.value().zipWith(fb.value(), tupled2()).subscribeOn(ctx.asScheduler()).k()
 
-  override fun <A, B, C, D> CoroutineContext.parMapN(fa: ObservableKOf<A>, fb: ObservableKOf<B>, fc: ObservableKOf<C>, f: (A, B, C) -> D): ObservableK<D> =
-    ObservableK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
-      f(a, tuple.a, tuple.b)
-    }).subscribeOn(asScheduler()))
+  override fun <A, B, C> parTupledN(ctx: CoroutineContext, fa: ObservableKOf<A>, fb: ObservableKOf<B>, fc: ObservableKOf<C>): ObservableK<Tuple3<A, B, C>> =
+    Observable.zip(fa.value(), fb.value(), fc.value(), tupled3()).subscribeOn(ctx.asScheduler()).k()
 
   override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
     ObservableK.cancellable(k)

@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.Tuple2
 import arrow.core.internal.AtomicIntW
 import arrow.core.identity
 import arrow.fx.extensions.fx
@@ -68,13 +69,15 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
       val program = IO.fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and non-blocking parallel computations
-        val result: List<String> = !textContext.parMapN(
-          effect { getThreadName() },
-          effect { getThreadName() }
-        ) { a, b -> listOf(a, b) }
+        val result = !parTupledN(
+          textContext,
+          // we only care to know the name of the thread, ignore the number
+          effect { getThreadName().split("-")[0] },
+          effect { getThreadName().split("-")[0] }
+        )
         result
       }
-      unsafe { runBlocking { program } }.distinct().size shouldBe 2
+      unsafe { runBlocking { program } } shouldBe Tuple2("test", "test")
     }
 
     "raiseError" {

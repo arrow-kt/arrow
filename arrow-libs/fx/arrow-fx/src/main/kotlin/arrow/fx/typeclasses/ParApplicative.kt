@@ -12,17 +12,17 @@ internal fun <F> Concurrent<F>.ParApplicative(ctx: CoroutineContext? = null): Ap
   val _ctx = ctx ?: dispatchers().default()
 
   override fun <A, B, Z> Kind<F, A>.map2(fb: Kind<F, B>, f: (Tuple2<A, B>) -> Z): Kind<F, Z> =
-    _ctx.parMapN(this@map2, fb) { a, b -> f(Tuple2(a, b)) }
+    parMapN(_ctx, this@map2, fb, f)
 
   override fun <A, B, Z> Kind<F, A>.map2Eval(fb: Eval<Kind<F, B>>, f: (Tuple2<A, B>) -> Z): Eval<Kind<F, Z>> =
-    fb.map { fc -> _ctx.parMapN(this@map2Eval, fc) { a, b -> f(Tuple2(a, b)) } }
+    fb.map { fc -> parMapN(_ctx, this@map2Eval, fc, f) }
 
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
-    _ctx.parMapN(ff, this@ap) { f, a -> f(a) }
+    parMapN(_ctx, ff, this@ap) { (f, a) -> f(a) }
 
   override fun <A, B> Kind<F, A>.apEval(ff: Eval<Kind<F, (A) -> B>>): Eval<Kind<F, B>> =
-    Eval.now(_ctx.parMapN(defer { ff.value() }, this@apEval) { f, a -> f(a) })
+    Eval.now(parMapN(_ctx, defer { ff.value() }, this@apEval) { (f, a) -> f(a) })
 
   override fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-    _ctx.parMapN(this@product, fb, ::Tuple2)
+    parTupledN(_ctx, this@product, fb)
 }

@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.Tuple3
 import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -44,7 +45,6 @@ import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadThrow
 import arrow.unsafe
 import io.reactivex.Maybe
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
@@ -171,8 +171,8 @@ interface MaybeKEffect :
 }
 
 interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
-  override fun <A> Kind<ForMaybeK, A>.fork(coroutineContext: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
-    coroutineContext.asScheduler().let { scheduler ->
+  override fun <A> Kind<ForMaybeK, A>.fork(ctx: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
+    ctx.asScheduler().let { scheduler ->
       Maybe.create<Fiber<ForMaybeK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
@@ -184,13 +184,11 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
       }.k()
     }
 
-  override fun <A, B, C> CoroutineContext.parMapN(fa: MaybeKOf<A>, fb: MaybeKOf<B>, f: (A, B) -> C): MaybeK<C> =
-    MaybeK(fa.value().zipWith(fb.value(), BiFunction(f)).subscribeOn(asScheduler()))
+  override fun <A, B> parTupledN(ctx: CoroutineContext, fa: MaybeKOf<A>, fb: MaybeKOf<B>): MaybeK<Tuple2<A, B>> =
+    fa.value().zipWith(fb.value(), tupled2()).subscribeOn(ctx.asScheduler()).k()
 
-  override fun <A, B, C, D> CoroutineContext.parMapN(fa: MaybeKOf<A>, fb: MaybeKOf<B>, fc: MaybeKOf<C>, f: (A, B, C) -> D): MaybeK<D> =
-    MaybeK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
-      f(a, tuple.a, tuple.b)
-    }).subscribeOn(asScheduler()))
+  override fun <A, B, C> parTupledN(ctx: CoroutineContext, fa: MaybeKOf<A>, fb: MaybeKOf<B>, fc: MaybeKOf<C>): MaybeK<Tuple3<A, B, C>> =
+    Maybe.zip(fa.value(), fb.value(), fc.value(), tupled3()).subscribeOn(ctx.asScheduler()).k()
 
   override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
     MaybeK.cancellable(k)
