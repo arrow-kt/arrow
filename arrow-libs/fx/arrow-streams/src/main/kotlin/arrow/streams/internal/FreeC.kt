@@ -172,11 +172,11 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     }
   }
 
-  @PublishedApi internal data class Pure<F, R>(val r: R) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
+  @PublishedApi internal class Pure<F, R>(val r: R) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
     override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = this.asFreeC()
   }
 
-  @PublishedApi internal data class Fail<F, R>(val error: Throwable) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
+  @PublishedApi internal class Fail<F, R>(val error: Throwable) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
     override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = this.asFreeC()
   }
 
@@ -197,7 +197,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
   }
 
   @PublishedApi
-  internal data class Suspend<F, R>(val fr: Kind<F, R>) : FreeC<F, R>() {
+  internal class Suspend<F, R>(val fr: Kind<F, R>) : FreeC<F, R>() {
     override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = try {
       Suspend(f(fr))
     } catch (t: Throwable) {
@@ -210,7 +210,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
   }
 
   @PublishedApi
-  internal data class FlatMapped<F, X, out R>(val fx: FreeC<F, X>, val f: (Result<X>) -> FreeCOf<F, R>) : FreeC<F, R>()
+  internal class FlatMapped<F, X, out R>(val fx: FreeC<F, X>, val f: (Result<X>) -> FreeCOf<F, R>) : FreeC<F, R>()
 
   override fun toString(): String = "FreeC(...) : toString is not stack-safe"
 }

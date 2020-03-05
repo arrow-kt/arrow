@@ -1,18 +1,24 @@
 package arrow.fx
 
 import arrow.test.UnitSpec
+import arrow.test.laws.shouldBeEq
+import arrow.typeclasses.Eq
 import io.kotlintest.shouldBe
 
 class KindConnectionTests : UnitSpec() {
 
   init {
-    "initial push" {
+    val EQ = IO.eqK().liftEq(Eq.any())
+
+    "cancellation is only executed once" {
       var effect = 0
       val initial = IO { effect += 1 }
       val c = IOConnection()
       c.push(initial)
+
       c.cancel().fix().unsafeRunSync()
       effect shouldBe 1
+
       c.cancel().fix().unsafeRunSync()
       effect shouldBe 1
     }
@@ -43,9 +49,6 @@ class KindConnectionTests : UnitSpec() {
       c.cancel().fix().unsafeRunSync()
       effect shouldBe 1
 
-      c.cancel().fix().unsafeRunSync()
-      effect shouldBe 1
-
       c.push(initial)
       effect shouldBe 2
     }
@@ -64,18 +67,6 @@ class KindConnectionTests : UnitSpec() {
       effect shouldBe 1
     }
 
-    "cancel the second time is a no-op" {
-      var effect = 0
-      val bc = IO { effect += 1 }
-      val c = IOConnection()
-      c.push(bc)
-
-      c.cancel().fix().unsafeRunSync()
-      effect shouldBe 1
-      c.cancel().fix().unsafeRunSync()
-      effect shouldBe 1
-    }
-
     "push two, pop two" {
       var effect = 0
       val initial1 = IO { effect += 1 }
@@ -84,11 +75,26 @@ class KindConnectionTests : UnitSpec() {
       val c = IOConnection()
       c.push(initial1)
       c.push(initial2)
-      c.pop() shouldBe initial2
-      c.pop() shouldBe initial1
+      c.pop()
+      c.pop()
       c.cancel().fix().unsafeRunSync()
 
       effect shouldBe 0
+    }
+
+    "pop removes tokens in LIFO order" {
+      var effect = 0
+      val initial1 = IO { effect += 1 }
+      val initial2 = IO { effect += 2 }
+      val initial3 = IO { effect += 3 }
+
+      val c = IOConnection()
+      c.push(initial1)
+      c.push(initial2)
+      c.push(initial3)
+      c.pop() shouldBe initial3
+      c.pop() shouldBe initial2
+      c.pop() shouldBe initial1
     }
 
     "pushPair" {
@@ -118,10 +124,10 @@ class KindConnectionTests : UnitSpec() {
 
     "uncancellable.pop" {
       val ref = IOConnection.uncancellable
-      ref.pop() shouldBe IO.unit
+      ref.pop().shouldBeEq(IO.unit, EQ)
 
       ref.push(IO.just(Unit))
-      ref.pop() shouldBe IO.unit
+      ref.pop().shouldBeEq(IO.unit, EQ)
     }
 
     "uncancellable.push never cancels the given cancellable" {

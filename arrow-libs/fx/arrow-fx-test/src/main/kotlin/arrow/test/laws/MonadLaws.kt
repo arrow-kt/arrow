@@ -92,7 +92,7 @@ object MonadLaws {
     }
   }
 
-  fun <F> Monad<F>.stackSafety(iter: Int = 5000, EQ: Eq<Kind<F, Int>>) {
+  fun <F> Monad<F>.stackSafety(iter: Int, EQ: Eq<Kind<F, Int>>) {
     val res = tailRecM(0) { i -> just(if (i < iter) Left(i + 1) else Right(i)) }
     res.equalUnderTheLaw(just(iter), EQ)
   }

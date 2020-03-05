@@ -34,7 +34,7 @@ class SemaphoreTest : UnitSpec() {
       "$label - tryAcquire with available permits" {
         val n = 20
         semaphore(20).flatMap { s ->
-          (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
+          (0 until n).toList().traverse(IO.applicative()) { IO.unit }.flatMap {
             s.tryAcquire()
           }
         }.equalUnderTheLaw(IO.just(true), EQ())

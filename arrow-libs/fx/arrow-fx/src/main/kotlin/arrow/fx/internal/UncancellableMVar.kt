@@ -7,6 +7,7 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.fx.Listener
 import arrow.fx.MVar
 import arrow.fx.internal.UncancellableMVar.Companion.State.WaitForPut
 import arrow.fx.internal.UncancellableMVar.Companion.State.WaitForTake
@@ -91,7 +92,7 @@ internal class UncancellableMVar<F, A> private constructor(initial: State<A>, pr
         var first: Listener<A>? = null
         val update: State<A> =
           if (takes.isEmpty()) {
-            WaitForTake(a, IQueue.empty())
+            State(a)
           } else {
             val (x, rest) = takes.dequeue()
             first = x
@@ -146,11 +147,11 @@ internal class UncancellableMVar<F, A> private constructor(initial: State<A>, pr
           val update = WaitForTake(ax, xs)
           if (stateRef.compareAndSet(current, update)) {
             // Complete the `put` request waiting on a notification
-            asyncBoundary.map { _ ->
+            asyncBoundary.map {
               try {
                 awaitPut(rightUnit)
               } finally {
-                onTake(Either.Right(value))
+                onTake(Right(value))
               }
             }
           } else {
@@ -238,4 +239,3 @@ internal class UncancellableMVar<F, A> private constructor(initial: State<A>, pr
 }
 
 private val EmptyState: WaitForPut<Any> = WaitForPut(IQueue.empty(), IQueue.empty())
-private typealias Listener<A> = (Either<Nothing, A>) -> Unit

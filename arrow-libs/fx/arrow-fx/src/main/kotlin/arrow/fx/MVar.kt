@@ -1,6 +1,7 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Option
 import arrow.fx.internal.CancellableMVar
 import arrow.fx.internal.UncancellableMVar
@@ -117,7 +118,7 @@ interface MVar<F, A> {
   fun tryPut(a: A): Kind<F, Boolean>
 
   /**
-   * Takes the value out of the [MVar] if full, or blocks until a value is available.
+   * Empties the [MVar] if full, returning the value, or blocks otherwise until a value is available.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -168,7 +169,7 @@ interface MVar<F, A> {
   fun tryTake(): Kind<F, Option<A>>
 
   /**
-   * Tries reading the current value, or blocks until there is a value available.
+   * Reads the current value without emptying the MVar, assuming there is one, or otherwise it blocks until there is a value available.
    *
    * ```kotlin:ank:playground
    * import arrow.core.toT
@@ -390,3 +391,5 @@ interface MVarFactory<F> {
    */
   fun <A> empty(): Kind<F, MVar<F, A>>
 }
+
+internal typealias Listener<A> = (Either<Nothing, A>) -> Unit

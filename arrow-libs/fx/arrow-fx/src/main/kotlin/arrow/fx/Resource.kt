@@ -1,8 +1,10 @@
 package arrow.fx
 
+import arrow.HkJ3
 import arrow.Kind
 import arrow.core.Either
-import arrow.HkJ3
+import arrow.core.andThen
+import arrow.core.identity
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Monoid
@@ -24,7 +26,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
  *  need to be acquired and later released in reverse order.
- * When a resource is created one can make use of [invoke] to run a computation with the resource. The finalizers are then
+ * When a resource is created one can make use of [use] to run a computation with the resource. The finalizers are then
  *  guaranteed to run afterwards in reverse order of acquisition.
  *
  * Consider the following use case:
@@ -132,7 +134,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *   val consumer = Resource(::createConsumer, ::closeConsumer, IO.bracket()).bind()
  *   val handle = Resource(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
  *   Resource({ createFancyService(consumer, handle) }, ::shutDownFancyService, IO.bracket()).bind()
- * }.fix().invoke { service ->
+ * }.fix().use { service ->
  *   // use service
  *   // <...>
  *
@@ -148,7 +150,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  * All three programs do exactly the same with varying levels of simplicity and overhead. `Resource` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
  *
  **/
-interface Resource<F, E, A> : ResourceOf<F, E, A> {
+sealed class Resource<F, E, A> : ResourceOf<F, E, A> {
 
   /**
    * Use the created resource
@@ -165,7 +167,7 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
    *
    * fun main() {
    *   //sampleStart
-   *   val program = Resource(::acquireResource, ::releaseResource, IO.bracket()).invoke {
+   *   val program = Resource(::acquireResource, ::releaseResource, IO.bracket()).use {
    *     IO { println("Expensive resource under use! $it") }
    *   }
    *   //sampleEnd
@@ -173,48 +175,104 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
    * }
    * ```
    */
-  operator fun <C> invoke(use: (A) -> Kind<F, C>): Kind<F, C>
+  fun <B> use(f: (A) -> Kind<F, B>): Kind<F, B> =
+    fold(f, ::identity)
 
-  fun <B> map(BR: Bracket<F, E>, f: (A) -> B): Resource<F, E, B> = flatMap { just(f(it), BR) }
+  @Deprecated("Api is being renamed to `use` for explicitness", ReplaceWith("use(use)"))
+  operator fun <C> invoke(use: (A) -> Kind<F, C>): Kind<F, C> =
+    use(use)
 
-  fun <B> ap(BR: Bracket<F, E>, ff: ResourceOf<F, E, (A) -> B>): Resource<F, E, B> = flatMap { res -> ff.fix().map(BR) { it(res) } }
+  fun <B> map(BR: Bracket<F, E>, f: (A) -> B): Resource<F, E, B> =
+    flatMap { just(f(it), BR) }
 
-  fun <B> flatMap(f: (A) -> ResourceOf<F, E, B>): Resource<F, E, B> = object : Resource<F, E, B> {
-    override fun <C> invoke(use: (B) -> Kind<F, C>): Kind<F, C> = this@Resource { a ->
-      f(a).fix().invoke { b ->
-        use(b)
-      }
+  fun <B> ap(BR: Bracket<F, E>, ff: ResourceOf<F, E, (A) -> B>): Resource<F, E, B> =
+    flatMap { res -> ff.fix().map(BR) { it(res) } }
+
+  fun <B> flatMap(f: (A) -> ResourceOf<F, E, B>): Resource<F, E, B> =
+    Bind(this, f)
+
+  fun combine(other: ResourceOf<F, E, A>, SR: Semigroup<A>, BR: Bracket<F, E>): Resource<F, E, A> =
+    flatMap { r ->
+      other.fix().map(BR) { r2 -> SR.run { r.combine(r2) } }
     }
-  }
 
-  fun combine(other: ResourceOf<F, E, A>, SR: Semigroup<A>, BR: Bracket<F, E>): Resource<F, E, A> = flatMap { r ->
-    other.fix().map(BR) { r2 -> SR.run { r.combine(r2) } }
+  internal class Bind<F, E, A, B>(val source: Resource<F, E, A>, val f: (A) -> ResourceOf<F, E, B>) : Resource<F, E, B>()
+
+  internal class Allocate<F, E, A>(
+    val acquire: () -> Kind<F, A>,
+    val release: (A, ExitCase<E>) -> Kind<F, Unit>,
+    val BR: Bracket<F, E>
+  ) : Resource<F, E, A>()
+
+  internal class Suspend<F, E, A>(val resource: Kind<F, Resource<F, E, A>>, val BR: Bracket<F, E>) : Resource<F, E, A>()
+
+  private fun <B> fold(
+    onOutput: (A) -> Kind<F, B>,
+    onRelease: (Kind<F, Unit>) -> Kind<F, Unit>
+  ): Kind<F, B> {
+    // Interpreter that knows how to evaluate a Resource data structure
+    // Maintains its own stack for dealing with Bind chains
+    tailrec fun loop(current: Resource<F, E, A>, stack: List<(A) -> Resource<F, E, A>>): Kind<F, B> =
+      when (current) {
+        is Suspend -> current.BR.run { current.resource.flatMap { loop(it, stack) } }
+        is Bind<*, *, *, *> ->
+          loop(current.source as Resource<F, E, A>, listOf(current.f as (A) -> Resource<F, E, A>) + stack)
+        is Allocate ->
+          current.BR.run {
+            current.acquire().bracketCase(
+              { a, exitCase -> onRelease(current.release(a, exitCase)) },
+              { a ->
+                when {
+                  stack.isEmpty() -> onOutput(a)
+                  else -> loop(stack.first()(a), stack.drop(1))
+                }
+              })
+          }
+      }
+
+    return loop(this, emptyList())
   }
 
   companion object {
     /**
      * Lift a value in context [F] into a [Resource]. Use with caution as the value will have no finalizers added.
      */
-    fun <F, E, A> Kind<F, A>.liftF(BR: Bracket<F, E>): Resource<F, E, A> = Resource({ this }, { _, _ -> BR.unit() }, BR)
+    fun <F, E, A> Kind<F, A>.liftF(BR: Bracket<F, E>): Resource<F, E, A> =
+      Suspend(BR.run { this@liftF.map { just(it, BR) } }, BR)
 
     /**
      * [Monoid] empty. Creates an empty [Resource] using a given [Monoid] for [A]. Use with caution as the value will have no finalizers added.
      */
-    fun <F, E, A> empty(MR: Monoid<A>, BR: Bracket<F, E>): Resource<F, E, A> = just(MR.empty(), BR)
+    fun <F, E, A> empty(MR: Monoid<A>, BR: Bracket<F, E>): Resource<F, E, A> =
+      just(MR.empty(), BR)
 
     /**
      * Create a [Resource] from a value [A]. Use with caution as the value will have no finalizers added.
      */
-    fun <F, E, A> just(r: A, BR: Bracket<F, E>): Resource<F, E, A> = Resource({ BR.just(r) }, { _, _ -> BR.just(Unit) }, BR)
+    fun <F, E, A> just(r: A, BR: Bracket<F, E>): Resource<F, E, A> =
+      Resource({ BR.just(r) }, { _, _ -> BR.unit() }, BR)
 
-    fun <F, E, A, B> tailRecM(BR: Bracket<F, E>, a: A, f: (A) -> ResourceOf<F, E, Either<A, B>>): Resource<F, E, B> =
-      f(a).fix().flatMap {
-        it.fold({ a ->
-          tailRecM(BR, a, f).fix()
-        }, { b ->
-          just(b, BR)
-        })
+    fun <F, E, A, B> tailRecM(BR: Bracket<F, E>, a: A, f: (A) -> ResourceOf<F, E, Either<A, B>>): Resource<F, E, B> {
+      fun loop(r: Resource<F, E, Either<A, B>>): Resource<F, E, B> = when (r) {
+        is Bind<*, *, *, *> -> Bind(r.source as Resource<F, E, A>, (r.f as (A) -> ResourceOf<F, E, Either<A, B>>).andThen { loop(it.fix()) })
+        is Allocate -> {
+          Suspend(
+            BR.run {
+              r.acquire().flatMap { res ->
+                when (res) {
+                  is Either.Left -> r.release(res, ExitCase.Completed).map { tailRecM(BR, res.a, f) }
+                  is Either.Right -> just(Allocate({ just(res.b) }, { _, ec -> r.release(res, ec) }, BR))
+                }
+              }
+            },
+            BR
+          )
+        }
+        is Suspend -> Suspend(r.BR.run { r.resource.map(::loop) }, r.BR)
       }
+
+      return loop(f(a).fix())
+    }
 
     /**
      * Construct a [Resource] from a allocating function [acquire] and a release function [release].
@@ -232,7 +290,7 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
      *   //sampleStart
      *   val resource = Resource(::acquireResource, ::releaseResource, IO.bracket())
      *   //sampleEnd
-     *   resource.invoke {
+     *   resource.use {
      *     IO { println("Expensive resource under use! $it") }
      *   }.fix().unsafeRunSync()
      * }
@@ -242,15 +300,12 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
       acquire: () -> Kind<F, A>,
       release: (A, ExitCase<E>) -> Kind<F, Unit>,
       BR: Bracket<F, E>
-    ): Resource<F, E, A> = object : Resource<F, E, A> {
-      override operator fun <C> invoke(use: (A) -> Kind<F, C>): Kind<F, C> =
-        BR.run { acquire().bracketCase(release, use) }
-    }
+    ): Resource<F, E, A> = Allocate(acquire, release, BR)
 
     /**
      * Construct a [Resource] from a allocating function [acquire] and a release function [release].
      *
-     * @see [invoke] For a version that provides an [ExitCase] to [release]
+     * @see [use] For a version that provides an [ExitCase] to [release]
      */
     operator fun <F, E, A> invoke(
       acquire: () -> Kind<F, A>,

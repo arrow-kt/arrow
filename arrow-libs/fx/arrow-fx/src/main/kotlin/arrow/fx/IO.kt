@@ -994,7 +994,7 @@ sealed class IO<out A> : IOOf<A> {
   fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
     IOBracket.guaranteeCase(this, finalizer)
 
-  internal data class Pure<out A>(val a: A) : IO<A>() {
+  internal class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
     override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
 
@@ -1004,7 +1004,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
 
-  internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
+  internal class RaiseError(val exception: Throwable) : IO<Nothing>() {
     // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<B> = this
 
@@ -1014,34 +1014,34 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
   }
 
-  internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
+  internal class Delay<out A>(val thunk: () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
+  internal class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
+  internal class Async<out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
+  internal class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
+  internal class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
+  internal class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
     // If a ContinueOn follows another ContinueOn, execute only the latest
     override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContextSwitch<A>(
+  internal class ContextSwitch<A>(
     val source: IO<A>,
     val modify: (IOConnection) -> IOConnection,
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
@@ -1057,7 +1057,7 @@ sealed class IO<out A> : IOOf<A> {
     }
   }
 
-  internal data class Map<E, out A>(val source: IOOf<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
+  internal class Map<E, out A>(val source: IOOf<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {
     override fun invoke(value: E): IO<A> = just(g(value))
 
     override fun <B> map(f: (A) -> B): IO<B> =

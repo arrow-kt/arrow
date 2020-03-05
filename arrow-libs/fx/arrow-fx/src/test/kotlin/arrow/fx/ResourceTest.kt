@@ -2,6 +2,7 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Some
+import arrow.core.extensions.eq
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.fx.extensions.io.applicative.applicative
@@ -24,12 +25,7 @@ import io.kotlintest.properties.Gen
 class ResourceTest : UnitSpec() {
   init {
 
-    val EQ = Eq<Kind<ResourcePartialOf<ForIO, Throwable>, Int>> { a, b ->
-      val tested: IO<Int> = a.fix().invoke { IO.just(1) }.fix()
-      val expected = b.fix().invoke { IO.just(1) }.fix()
-      val compare = IO.applicative().mapN(tested, expected) { (t, e) -> t == e }.fix()
-      compare.unsafeRunTimed(5.seconds) == Some(true)
-    }
+    val EQ = Resource.eqK().liftEq(Int.eq())
 
     testLaws(
       MonadLaws.laws(
@@ -48,7 +44,7 @@ class ResourceTest : UnitSpec() {
         val released = mutableListOf<String>()
         l.traverse(Resource.applicative(IO.bracket())) {
           Resource({ IO { it } }, { r -> IO { released.add(r); Unit } }, IO.bracket())
-        }.fix().invoke { IO.unit }.fix().unsafeRunSync()
+        }.fix().use { IO.unit }.fix().unsafeRunSync()
 
         l == released.reversed()
       }
@@ -59,8 +55,8 @@ class ResourceTest : UnitSpec() {
 private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<ForIO, Throwable>> {
   override fun <A> Kind<ResourcePartialOf<ForIO, Throwable>, A>.eqK(other: Kind<ResourcePartialOf<ForIO, Throwable>, A>, EQ: Eq<A>): Boolean =
     (this.fix() to other.fix()).let {
-      val ls = it.first.invoke { IO.just(1) }.fix()
-      val rs = it.second.invoke { IO.just(1) }.fix()
+      val ls = it.first.use(IO.Companion::just).fix().attempt()
+      val rs = it.second.use(IO.Companion::just).fix().attempt()
       val compare = IO.applicative().mapN(ls, rs) { (l, r) -> l == r }.fix()
 
       compare.unsafeRunTimed(5.seconds) == Some(true)
@@ -68,7 +64,16 @@ private fun Resource.Companion.eqK() = object : EqK<ResourcePartialOf<ForIO, Thr
 }
 
 private fun Resource.Companion.genK() = object : GenK<ResourcePartialOf<ForIO, Throwable>> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ResourcePartialOf<ForIO, Throwable>, A>> = gen.map {
-    Resource.just(it, IO.bracket())
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<ResourcePartialOf<ForIO, Throwable>, A>> {
+    val allocate = gen.map { Resource({ IO.just(it) }, { _ -> IO.unit }, IO.bracket()) }
+
+    return Gen.oneOf(
+      // Allocate
+      allocate,
+      // Suspend
+      allocate.map { Resource.Suspend(IO.just(it), IO.bracket()) },
+      // Bind
+      allocate.map { it.flatMap { a -> just(a, IO.bracket()) } }
+    )
   }
 }

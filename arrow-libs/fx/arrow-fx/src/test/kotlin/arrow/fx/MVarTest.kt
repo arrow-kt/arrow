@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
+import arrow.core.extensions.eq
 import arrow.core.toT
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
@@ -17,6 +18,7 @@ import arrow.fx.extensions.io.monad.followedBy
 import arrow.fx.typeclasses.milliseconds
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
+import arrow.test.laws.shouldBeEq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -72,7 +74,7 @@ class MVarTest : UnitSpec() {
           val bb = f2.join().bind()
 
           setOf(aa, bb)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20)), EQ())
       }
 
       "$label - empty; put; put; put; take; take; take" {
@@ -92,7 +94,7 @@ class MVarTest : UnitSpec() {
           f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), EQ())
       }
 
       "$label - empty; take; take; take; put; put; put" {
@@ -112,7 +114,7 @@ class MVarTest : UnitSpec() {
           val cc = f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), EQ())
       }
 
       "$label - initial; isNotEmpty; take; put; take" {
@@ -169,7 +171,7 @@ class MVarTest : UnitSpec() {
           mvar.put(null).flatMap { mvar.read() }
         }
 
-        task.equalUnderTheLaw(IO.just(null), EQ())
+        task.shouldBeEq(IO.just(null), EQ())
       }
 
       "$label - take/put test is stack safe" {
@@ -181,12 +183,11 @@ class MVarTest : UnitSpec() {
 
         val count = 10000
         val task = mvar.just(1).flatMap { ch -> loop(count, 0, ch) }
-        task.equalUnderTheLaw(IO.just(count), EQ())
+        task.shouldBeEq(IO.just(count), EQ())
       }
 
-      "!$label - stack overflow test" {
-        // Ignored currently StackOverflows due to ListTraverse
-        val count = 10000
+      "$label - stack overflow test" {
+        val count = 10_000
 
         fun consumer(ch: Channel<Int>, sum: Long): IO<Long> =
           ch.take().flatMap {
@@ -216,13 +217,13 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - producer-consumer parallel loop" {
-        fun producer(ch: Channel<Int>, list: List<Int>): IO<Unit> =
+        fun producer(ch: Channel<Long>, list: List<Long>): IO<Unit> =
           when {
             list.isEmpty() -> ch.put(None).fix() // we are done!
             else -> ch.put(Some(list.first())).flatMap { producer(ch, list.drop(1)) } // next please
           }
 
-        fun consumer(ch: Channel<Int>, sum: Long): IO<Long> =
+        fun consumer(ch: Channel<Long>, sum: Long): IO<Long> =
           ch.take().flatMap {
             it.fold({
               IO.just(sum) // we are done!
@@ -231,14 +232,14 @@ class MVarTest : UnitSpec() {
             })
           }
 
-        val count = 10000
-        val sumTask = IO.fx {
-          val channel = !mvar.just(Option(0))
-          val producerFiber = !producer(channel, (0 until count).toList()).fork()
+        val count = 10000L
+        IO.fx {
+          val channel = !mvar.just(Option(0L))
+          val producerFiber = !producer(channel, (0L until count).toList()).fork()
           val consumerFiber = !consumer(channel, 0L).fork()
           !producerFiber.join()
           !consumerFiber.join()
-        }.equalUnderTheLaw(IO.just(count * (count - 1) / 2), EQ())
+        }.shouldBeEq(IO.just(count * (count - 1) / 2), EQ(Long.eq()))
       }
 
       fun testStackSequential(channel: MVar<ForIO, Int>): Tuple3<Int, IO<Int>, IO<Unit>> {
@@ -260,9 +261,9 @@ class MVarTest : UnitSpec() {
           val channel = !mvar.empty<Int>()
           val (count, reads, writes) = testStackSequential(channel)
           !writes.fork()
-          !reads
-          !effect { reads shouldBe count }
-        }.equalUnderTheLaw(IO.unit, EQ())
+          val r = !reads
+          !effect { r shouldBe count }
+        }.shouldBeEq(IO.unit, EQ())
       }
 
       "$label - take is stack safe when repeated sequentially" {
@@ -273,11 +274,11 @@ class MVarTest : UnitSpec() {
           !writes
           val r = !fr.join()
           !effect { r shouldBe count }
-        }.equalUnderTheLaw(IO.unit, EQ())
+        }.shouldBeEq(IO.unit, EQ())
       }
 
-      "!$label - concurrent take and put" {
-        val count = 5000
+      "$label - concurrent take and put" {
+        val count = 1_000
         IO.fx {
           val mVar = !mvar.empty<Int>()
           val ref = !Ref(0)
@@ -288,7 +289,7 @@ class MVarTest : UnitSpec() {
           !f1.join()
           !f2.join()
           !ref.get()
-        }.equalUnderTheLaw(IO.just(count), EQ())
+        }.shouldBeEq(IO.just(count * 2), EQ())
       }
     }
 
@@ -307,7 +308,7 @@ class MVarTest : UnitSpec() {
           val r1 = !mVar.take()
           val r3 = !mVar.take()
           setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ())
+        }.shouldBeEq(IO.just(setOf(1, 3)), EQ())
       }
 
       "$label - take is cancellable" {
@@ -323,7 +324,7 @@ class MVarTest : UnitSpec() {
           val r1 = !t1.join()
           val r3 = !t3.join()
           setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)), EQ())
+        }.shouldBeEq(IO.just(setOf(1, 3)), EQ())
       }
 
       "$label - read is cancellable" {
@@ -336,7 +337,7 @@ class MVarTest : UnitSpec() {
           !mVar.put(10)
           val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
           !IO.raceN(finished.get(), fallback)
-        }.equalUnderTheLaw(IO.just(Right(0)), EQ())
+        }.shouldBeEq(IO.just(Right(0)), EQ())
       }
     }
 
