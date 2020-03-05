@@ -2,14 +2,13 @@ package arrow.fx.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
-
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IORunLoop
 import arrow.fx.fix
-import arrow.fx.internal.ForwardCancelable.Companion.State.Active
-import arrow.fx.internal.ForwardCancelable.Companion.State.Empty
+import arrow.fx.internal.ForwardCancellable.Companion.State.Active
+import arrow.fx.internal.ForwardCancellable.Companion.State.Empty
 import arrow.fx.typeclasses.CancelToken
 import kotlinx.atomicfu.atomic
 
@@ -17,19 +16,19 @@ import kotlinx.atomicfu.atomic
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
  * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
-internal class ForwardCancelable {
+internal class ForwardCancellable {
 
   private val state = atomic<State>(init)
 
   fun cancel(): CancelToken<ForIO> {
     fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
-        is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack)))
+        is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
 
         is Active -> {
           state.lazySet(finished) // GC purposes
-          Platform.trampoline { IORunLoop.startCancelable(current.token, conn, cb) }
+          Platform.trampoline { IORunLoop.startCancellable(current.token, conn, cb) }
         }
       }
     }
@@ -59,7 +58,7 @@ internal class ForwardCancelable {
   companion object {
 
     /**
-     * Models the internal state of [ForwardCancelable]:
+     * Models the internal state of [ForwardCancellable]:
      *
      *  - on start, the state is [Empty] of `Nil`, aka [init]
      *  - on `cancel`, if no token was assigned yet, then the state will

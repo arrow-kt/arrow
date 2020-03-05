@@ -149,7 +149,7 @@ class PromiseTest : UnitSpec() {
       }
     }
 
-    tests("CancelablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
-    tests("UncancelablePromise", promise = Promise.uncancelable<ForIO, Int>(IO.async()).fix())
+    tests("cancellablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
+    tests("UncancellablePromise", promise = Promise.uncancellable<ForIO, Int>(IO.async()).fix())
   }
 }

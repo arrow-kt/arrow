@@ -8,8 +8,8 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.fx.MVar
-import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForPut
-import arrow.fx.internal.UncancelableMVar.Companion.State.WaitForTake
+import arrow.fx.internal.UncancellableMVar.Companion.State.WaitForPut
+import arrow.fx.internal.UncancellableMVar.Companion.State.WaitForTake
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.rightUnit
 import arrow.fx.typeclasses.unitCallback
@@ -17,7 +17,7 @@ import kotlinx.atomicfu.atomic
 
 // [MVar] implementation for [Async] data types.
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
-internal class UncancelableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F>) : MVar<F, A>, Async<F> by AS {
+internal class UncancellableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F>) : MVar<F, A>, Async<F> by AS {
 
   private val stateRef = atomic(initial)
 
@@ -193,14 +193,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
   private val asyncBoundary = async(unitCallback)
 
   companion object {
-    /** Builds an [UncancelableMVar] instance with an [initial] value. */
+    /** Builds an [UncancellableMVar] instance with an [initial] value. */
     operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
-      UncancelableMVar(State(initial), AS)
+      UncancellableMVar(State(initial), AS)
     }
 
-    /** Returns an empty [UncancelableMVar] instance. */
+    /** Returns an empty [UncancellableMVar] instance. */
     fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
-      UncancelableMVar(State.empty<A>(), AS)
+      UncancellableMVar(State.empty<A>(), AS)
     }
 
     /** Internal state of [MVar]. */
@@ -214,7 +214,7 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
       }
 
       /**
-       * [UncancelableMVar] state signaling it has [take] callbacks registered
+       * [UncancellableMVar] state signaling it has [take] callbacks registered
        * and we are waiting for one or multiple [put] operations.
        *
        * @param takes are the rest of the requests waiting in line,
@@ -223,7 +223,7 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
       class WaitForPut<A>(val reads: IQueue<Listener<A>>, val takes: IQueue<Listener<A>>) : State<A>()
 
       /**
-       * [UncancelableMVar] state signaling it has one or more values enqueued,
+       * [UncancellableMVar] state signaling it has one or more values enqueued,
        * to be signaled on the next [take].
        *
        * @param value is the first value to signal

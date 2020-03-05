@@ -18,9 +18,9 @@ internal class IOContext(val connection: IOConnection) : AbstractCoroutineContex
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
 
-private val _uncancelable = KindConnection.uncancelable(MD)
-internal inline val KindConnection.Companion.uncancelable: IOConnection
-  inline get() = _uncancelable
+private val _uncancellable = KindConnection.uncancellable(MD)
+internal inline val KindConnection.Companion.uncancellable: IOConnection
+  inline get() = _uncancellable
 
 private object MD : MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =

@@ -5,9 +5,9 @@ import arrow.fx.KindConnection
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 
-@Deprecated("Cancellation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancellable combinator")
 typealias FluxKProc<A> = (KindConnection<ForFluxK>, (Either<Throwable, A>) -> Unit) -> Unit
-@Deprecated("Cancellation should be done with the cancelable combinator")
+@Deprecated("Cancellation should be done with the cancellable combinator")
 typealias FluxKProcF<A> = (KindConnection<ForFluxK>, (Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>
 
 /**
@@ -22,7 +22,7 @@ typealias FluxKProcF<A> = (KindConnection<ForFluxK>, (Either<Throwable, A>) -> U
  */
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 @Deprecated(message = "Cancelling operations through FluxKConnection will not be supported anymore." +
-  "In case you need to cancel multiple processes can do so by using cancelable and composing cancel operations using zipWith or other parallel operators")
+  "In case you need to cancel multiple processes can do so by using cancellable and composing cancel operations using zipWith or other parallel operators")
 fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnection(object : MonadDefer<ForFluxK> {
   override fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
     FluxK.defer(fa)

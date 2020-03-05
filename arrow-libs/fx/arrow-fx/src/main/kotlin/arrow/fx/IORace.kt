@@ -50,7 +50,7 @@ interface IORace {
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
-   *     val never: Kind<F, Int> = cancelable { effect { println("Never got canelled for losing.") } }
+   *     val never: Kind<F, Int> = cancellable { effect { println("Never got cancelled for losing.") } }
    *
    *     //sampleStart
    *     val result = fx.concurrent {
@@ -271,7 +271,7 @@ interface IORace {
       val connB = IOConnection()
       conn.pushPair(connA, connB)
 
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { result ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
           onError(active, cb, conn, connB, it)
         }, {
@@ -279,7 +279,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { result ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
         result.fold({
           onError(active, cb, conn, connA, it)
         }, {
@@ -346,7 +346,7 @@ interface IORace {
       val connC = IOConnection()
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { result ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
           onError(active, cb, conn, connB, connC, it)
         }, {
@@ -354,7 +354,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { result ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
         result.fold({
           onError(active, cb, conn, connA, connC, it)
         }, {
@@ -362,7 +362,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { result ->
+      IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { result ->
         result.fold({
           onError(active, cb, conn, connA, connB, it)
         }, {
@@ -419,7 +419,7 @@ interface IORace {
 
       conn.pushPair(connA, connB)
 
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connB.cancel().fix().unsafeRunAsync { r2 ->
@@ -439,7 +439,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connA.cancel().fix().unsafeRunAsync { r2 ->
@@ -509,7 +509,7 @@ interface IORace {
 
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connB.cancel().fix().unsafeRunAsync { r2 ->
@@ -536,7 +536,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connA.cancel().fix().unsafeRunAsync { r2 ->
@@ -563,7 +563,7 @@ interface IORace {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
+      IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connA.cancel().fix().unsafeRunAsync { r2 ->

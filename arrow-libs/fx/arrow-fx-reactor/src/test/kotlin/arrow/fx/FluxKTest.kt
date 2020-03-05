@@ -149,11 +149,11 @@ class FluxKTest : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
     "FluxK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
+      Promise.uncancellable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
         FluxK {
           FluxK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
@@ -166,7 +166,7 @@ class FluxKTest : UnitSpec() {
     }
 
     "FluxK async should be cancellable" {
-      Promise.uncancelable<ForFluxK, Unit>(FluxK.async())
+      Promise.uncancellable<ForFluxK, Unit>(FluxK.async())
         .flatMap { latch ->
           FluxK {
             FluxK.async<Unit> { _, _ -> }

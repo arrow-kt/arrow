@@ -86,7 +86,7 @@ interface IOParMap {
       }
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+    IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
       resultA.fold({ e ->
         sendError(connB, e)
       }, { a ->
@@ -99,7 +99,7 @@ interface IOParMap {
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+    IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
       resultB.fold({ e ->
         sendError(connA, e)
       }, { b ->
@@ -122,7 +122,7 @@ interface IOParMap {
     val connB = IOConnection()
     val connC = IOConnection()
 
-    // Composite cancelable that cancels all ops.
+    // Composite cancellable that cancels all ops.
     // NOTE: conn.pop() called when cb gets called below in complete.
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
@@ -153,7 +153,7 @@ interface IOParMap {
         }
       } else Unit
 
-    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+    IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
       resultA.fold({ e ->
         sendError(connB, connC, e)
       }, { a ->
@@ -165,7 +165,7 @@ interface IOParMap {
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+    IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
       resultB.fold({ e ->
         sendError(connA, connC, e)
       }, { b ->
@@ -177,7 +177,7 @@ interface IOParMap {
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) { resultC ->
+    IORunLoop.startCancellable(IOForkedStart(fc, ctx), connC) { resultC ->
       resultC.fold({ e ->
         sendError(connA, connB, e)
       }, { c ->

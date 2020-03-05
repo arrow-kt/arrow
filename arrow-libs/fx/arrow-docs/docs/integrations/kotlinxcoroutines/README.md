@@ -32,7 +32,7 @@ If you'd like to introduce `IO` in your project, you might want to keep using th
 
 ### unsafeRunScoped & unsafeRunIO
 
-`IO.unsafeRunScoped(scope, cb)` runs the specific `IO` with a [CoroutineScope](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html), so it will be automatically canceled when the scope does as well.
+`IO.unsafeRunScoped(scope, cb)` runs the specific `IO` with a [CoroutineScope](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html), so it will be automatically cancelled when the scope does as well.
 
 Similarly, there's `scope.unsafeRunIO(IO, cb)`, which works in the same way with different syntax:
 

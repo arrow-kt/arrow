@@ -129,13 +129,13 @@ class SingleKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
     "SingleK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
+      Promise.uncancellable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
         SingleK {
-          SingleK.cancelable<Unit> {
+          SingleK.cancellable<Unit> {
             latch.complete(Unit)
           }.single.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -146,7 +146,7 @@ class SingleKTests : RxJavaSpec() {
     }
 
     "SingleK async should be cancellable" {
-      Promise.uncancelable<ForSingleK, Unit>(SingleK.async())
+      Promise.uncancellable<ForSingleK, Unit>(SingleK.async())
         .flatMap { latch ->
           SingleK {
             SingleK.async<Unit> { }

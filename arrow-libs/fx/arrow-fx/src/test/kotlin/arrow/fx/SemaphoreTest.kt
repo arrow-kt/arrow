@@ -134,10 +134,10 @@ class SemaphoreTest : UnitSpec() {
       }
     }
 
-    tests("UncancelableSemaphore") { Semaphore.uncancelable(it, IO.async()) }
-    tests("CancelableSemaphore") { Semaphore(it, IO.concurrent()) }
+    tests("UncancellableSemaphore") { Semaphore.uncancellable(it, IO.async()) }
+    tests("cancellableSemaphore") { Semaphore(it, IO.concurrent()) }
 
-    "CancelableSemaphore - supports cancellation of acquire" {
+    "cancellableSemaphore - supports cancellation of acquire" {
       Semaphore(0, IO.concurrent()).flatMap { s ->
         s.acquire()
       }.unsafeRunAsyncCancellable { }

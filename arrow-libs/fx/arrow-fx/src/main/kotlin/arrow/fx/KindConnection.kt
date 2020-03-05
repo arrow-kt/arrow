@@ -26,7 +26,7 @@ object ConnectionCancellationException : JavaCancellationException("User cancell
  * The cancellation functions are maintained in a stack and executed in a FIFO order.
  */
 @Deprecated(message = "Cancelling operations through KindConnection will not be supported anymore." +
-  "In case you need to cancel multiple processes can do so by using cancelable and composing cancel operations using parMapN")
+  "In case you need to cancel multiple processes can do so by using cancellable and composing cancel operations using parMapN")
 sealed class KindConnection<F> {
 
   /**
@@ -53,7 +53,7 @@ sealed class KindConnection<F> {
   abstract fun cancel(): CancelToken<F>
 
   /**
-   * Check if the [KindConnection] is canceled
+   * Check if the [KindConnection] is cancelled
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -62,22 +62,25 @@ sealed class KindConnection<F> {
    *   //sampleStart
    *   val conn = IOConnection()
    *
-   *   val isNotCanceled = conn.isCanceled()
+   *   val isNotCancelled = conn.isCancelled()
    *
    *   conn.cancel().fix().unsafeRunSync()
    *
-   *   val isCanceled = conn.isCanceled()
+   *   val isCancelled = conn.isCancelled()
    *   //sampleEnd
-   *   println("isNotCanceled: $isNotCanceled, isCanceled: $isCanceled")
+   *   println("isNotCancelled: $isNotCancelled, isCancelled: $isCancelled")
    * }
    * ```
    *
-   * @see isNotCanceled
+   * @see isNotCancelled
    */
-  abstract fun isCanceled(): Boolean
+  abstract fun isCancelled(): Boolean
+
+  @Deprecated("Renaming this api for consistency", ReplaceWith("isCancelled()"))
+  fun isCanceled(): Boolean = isCancelled()
 
   /**
-   * Check if the [KindConnection] is not canceled
+   * Check if the [KindConnection] is not cancelled
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -86,19 +89,22 @@ sealed class KindConnection<F> {
    *   //sampleStart
    *   val conn = IOConnection()
    *
-   *   val isNotCanceled = conn.isNotCanceled()
+   *   val isNotCancelled = conn.isNotCancelled()
    *
    *   conn.cancel().fix().unsafeRunSync()
    *
-   *   val isCanceled = conn.isNotCanceled()
+   *   val isCancelled = conn.isNotCancelled()
    *   //sampleEnd
-   *   println("isNotCanceled: $isNotCanceled, isCanceled: $isCanceled")
+   *   println("isNotCancelled: $isNotCancelled, isCancelled: $isCancelled")
    * }
    * ```
    *
-   * @see isCanceled
+   * @see isCancelled
    */
-  fun isNotCanceled(): Boolean = !isCanceled()
+  fun isNotCancelled(): Boolean = !isCancelled()
+
+  @Deprecated("Renaming this api for consistency", ReplaceWith("isNotCancelled()"))
+  fun isNotCanceled(): Boolean = !isCancelled()
 
   /**
    * Pushes a cancellation function, or token, meant to cancel and cleanup resources.
@@ -147,7 +153,7 @@ sealed class KindConnection<F> {
   /**
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
-   * cancelable that's stack unsafe.
+   * cancellable that's stack unsafe.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -172,7 +178,7 @@ sealed class KindConnection<F> {
   /**
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
-   * cancelable that's stack unsafe.
+   * cancellable that's stack unsafe.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -195,10 +201,10 @@ sealed class KindConnection<F> {
     push(lh, rh)
 
   /**
-   * Pops a cancelable reference from the FIFO stack of references for this connection.
-   * A cancelable reference is meant to cancel and cleanup resources.
+   * Pops a cancellable reference from the FIFO stack of references for this connection.
+   * A cancellable reference is meant to cancel and cleanup resources.
    *
-   * @return the cancelable reference that was removed.
+   * @return the cancellable reference that was removed.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.*
@@ -232,10 +238,10 @@ sealed class KindConnection<F> {
    *   val conn = IOConnection()
    *
    *   conn.cancel().fix().unsafeRunSync()
-   *   val isCanceled = conn.isCanceled()
+   *   val isCancelled = conn.isCancelled()
    *   val couldReactive = conn.tryReactivate()
    *
-   *   val isReactivated = conn.isCanceled()
+   *   val isReactivated = conn.isCancelled()
    *   //sampleEnd
    * }
    * ```
@@ -262,7 +268,7 @@ sealed class KindConnection<F> {
       DefaultKindConnection(MD, run)
 
     /**
-     * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
+     * Construct an uncancellable [KindConnection] for a kind [F] based on [MonadDefer].
      *
      * ```kotlin:ank:playground
      * import arrow.fx.*
@@ -270,25 +276,28 @@ sealed class KindConnection<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val conn: IOConnection = KindConnection.uncancelable(IO.applicative())
+     *   val conn: IOConnection = KindConnection.uncancellable(IO.applicative())
      *   //sampleEnd
      * }
      * ```
      **/
-    fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
+    fun <F> uncancellable(FA: Applicative<F>): KindConnection<F> = Uncancellable(FA)
+
+    @Deprecated("Renaming this api for consistency", ReplaceWith("uncancellable<F>(FA)"))
+    fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancellable(FA)
   }
 
   /**
-   * [KindConnection] reference that cannot be canceled.
+   * [KindConnection] reference that cannot be cancelled.
    */
-  private class Uncancelable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
+  private class Uncancellable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
     override fun cancel(): CancelToken<F> = unit()
-    override fun isCanceled(): Boolean = false
+    override fun isCancelled(): Boolean = false
     override fun push(token: CancelToken<F>) = Unit
     override fun push(vararg token: CancelToken<F>) = Unit
     override fun pop(): CancelToken<F> = unit()
     override fun tryReactivate(): Boolean = true
-    override fun toString(): String = "UncancelableConnection"
+    override fun toString(): String = "UncancellableConnection"
   }
 
   /**
@@ -306,7 +315,7 @@ sealed class KindConnection<F> {
       }
     }
 
-    override fun isCanceled(): Boolean = state.value == null
+    override fun isCancelled(): Boolean = state.value == null
 
     override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.value) {
       null -> run(token) // If connection is already cancelled cancel token immediately.

@@ -13,7 +13,6 @@ import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
 import arrow.fx.rx2.asScheduler
-import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.extensions.maybek.dispatchers.dispatchers
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
@@ -193,11 +192,11 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
       f(a, tuple.a, tuple.b)
     }).subscribeOn(asScheduler()))
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
-    MaybeK.cancelable(k)
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
+    MaybeK.cancellable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
-    MaybeK.cancelableF(k)
+  override fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
+    MaybeK.cancellableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: MaybeKOf<A>, fb: MaybeKOf<B>): MaybeK<RacePair<ForMaybeK, A, B>> =
     asScheduler().let { scheduler ->

@@ -140,13 +140,13 @@ class MaybeKTests : RxJavaSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
     "MaybeK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
+      Promise.uncancellable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
-          MaybeK.cancelable<Unit> {
+          MaybeK.cancellable<Unit> {
             latch.complete(Unit)
           }.maybe.subscribe().dispose()
         }.flatMap { latch.get() }
@@ -157,7 +157,7 @@ class MaybeKTests : RxJavaSpec() {
     }
 
     "MaybeK async should be cancellable" {
-      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
+      Promise.uncancellable<ForMaybeK, Unit>(MaybeK.async())
         .flatMap { latch ->
           MaybeK {
             MaybeK.async<Unit> { }

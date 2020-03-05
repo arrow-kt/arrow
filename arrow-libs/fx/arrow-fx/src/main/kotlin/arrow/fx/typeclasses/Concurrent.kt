@@ -40,7 +40,7 @@ typealias CancelToken<F> = Kind<F, Unit>
 /**
  * ank_macro_hierarchy(arrow.fx.typeclasses.Concurrent)
  *
- * Type class for async data types that are cancelable and can be started concurrently.
+ * Type class for async data types that are cancellable and can be started concurrently.
  */
 interface Concurrent<F> : Async<F> {
 
@@ -179,7 +179,7 @@ interface Concurrent<F> : Async<F> {
   fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>): Kind<F, RaceTriple<F, A, B, C>>
 
   /**
-   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Creates a cancellable [F] instance that executes an asynchronous process on evaluation.
    * Derived from [async] and [bracketCase].
    *
    * ```kotlin:ank:playground:extension
@@ -206,7 +206,7 @@ interface Concurrent<F> : Async<F> {
    *   }
    *
    *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
-   *     println("Canceled, closing NetworkApi")
+   *     println("Cancelled, closing NetworkApi")
    *     kotlinx.coroutines.delay(500)
    *     println("Closed NetworkApi")
    *   }
@@ -215,7 +215,7 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val getAccounts = Default._shift_().flatMap {
-   *     _extensionFactory_.cancelable<List<Account>> { cb ->
+   *     _extensionFactory_.cancellable<List<Account>> { cb ->
    *       val service = NetworkService()
    *       service.getAccounts(
    *         successCallback = { accs -> cb(Right(accs)) },
@@ -228,16 +228,20 @@ interface Concurrent<F> : Async<F> {
    *   //sampleEnd
    * }
    * ```
-   * @see cancelableF for a version that can safely suspend impure callback registration code.
+   * @see cancellableF for a version that can safely suspend impure callback registration code.
    */
-  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb ->
+  fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+    cancellableF { cb ->
       val token = k(cb)
       later { token }
     }
 
+  @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(k))"))
+  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+    cancellable(k)
+
   /**
-   * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Builder to create a cancellable [F] instance that executes an asynchronous process on evaluation.
    * Function derived from [async] and [bracketCase].
    *
    * ```kotlin:ank:playground:extension
@@ -247,7 +251,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = _extensionFactory_.cancelableF<String> { cb ->
+   *   val result = _extensionFactory_.cancellableF<String> { cb ->
    *     effect {
    *       val deferred = kotlinx.coroutines.GlobalScope.async {
    *         kotlinx.coroutines.delay(1000)
@@ -260,7 +264,7 @@ interface Concurrent<F> : Async<F> {
    *
    *   println(result) //Run with `fix().unsafeRunSync()`
    *
-   *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
+   *   val result2 = _extensionFactory_.cancellableF<Unit> { cb ->
    *     effect {
    *       println("Doing something that can be cancelled.")
    *       effect  { println("Cancelling the task") }
@@ -272,9 +276,9 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @see cancelable for a simpler non-suspending version.
+   * @see cancellable for a simpler non-suspending version.
    */
-  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+  fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
       val state = AtomicRefW<((Either<Throwable, Unit>) -> Unit)?>(null)
       val cb1 = { r: Either<Throwable, A> ->
@@ -297,11 +301,15 @@ interface Concurrent<F> : Async<F> {
         }
       }, release = { token, exitCase ->
         when (exitCase) {
-          is ExitCase.Canceled -> token
+          is ExitCase.Cancelled -> token
           else -> just(Unit)
         }
       })
     }
+
+  @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(k)"))
+  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+    cancellableF(k)
 
   /**
    * Given a function which returns an [F] effect, run this effect in parallel for all the values in [G].
@@ -583,7 +591,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
-   *     val never: Kind<F, Int> = cancelable { effect { println("Never got canelled for losing.") } }
+   *     val never: Kind<F, Int> = cancellable { effect { println("Never got cancelled for losing.") } }
    *
    *     //sampleStart
    *     val result = fx.concurrent {

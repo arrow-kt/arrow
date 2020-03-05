@@ -13,7 +13,7 @@ import arrow.core.right
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
-import arrow.fx.internal.ForwardCancelable
+import arrow.fx.internal.ForwardCancellable
 import arrow.fx.internal.IOBracket
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
@@ -153,7 +153,7 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      **/
     fun sleep(duration: Duration, continueOn: CoroutineContext = IODispatchers.CommonPool): IO<Unit> =
-      cancelable { cb ->
+      cancellable { cb ->
         val cancelRef = scheduler.schedule(ShiftTick(continueOn, cb), duration.amount, duration.timeUnit)
         later { cancelRef.cancel(false); Unit }
       }
@@ -232,7 +232,7 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      *
      * @param k an asynchronous computation that might fail typed as [IOProc].
-     * @see cancelable for an operator that supports cancellation.
+     * @see cancellable for an operator that supports cancellation.
      * @see asyncF for a version that can suspend side effects in the registration function.
      */
     fun <A> async(k: IOProc<A>): IO<A> =
@@ -286,7 +286,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * @param k a deferred asynchronous computation that might fail typed as [IOProcF].
      * @see async for a version that can suspend side effects in the registration function.
-     * @see cancelableF for an operator that supports cancellation.
+     * @see cancellableF for an operator that supports cancellation.
      */
     fun <A> asyncF(k: IOProcF<A>): IO<A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
@@ -303,14 +303,14 @@ sealed class IO<out A> : IOOf<A> {
             }
           }
 
-          IORunLoop.startCancelable(fa, conn2) { result ->
+          IORunLoop.startCancellable(fa, conn2) { result ->
             result.fold({ e -> callback(Left(e)) }, mapUnit)
           }
         }
       }
 
     /**
-     * Creates a cancelable instance of [IO] that executes an asynchronous process on evaluation.
+     * Creates a cancellable instance of [IO] that executes an asynchronous process on evaluation.
      * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
      *
      * ```kotlin:ank:playground
@@ -338,7 +338,7 @@ sealed class IO<out A> : IOOf<A> {
      * fun main(args: Array<String>) {
      *   //sampleStart
      *   fun getUsernames(): IO<List<String>> =
-     *     IO.cancelable { cb: (Either<Throwable, List<String>>) -> Unit ->
+     *     IO.cancellable { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       val id = GithubService.getUsernames { names, throwable ->
      *         when {
      *           names != null -> cb(Right(names))
@@ -359,13 +359,13 @@ sealed class IO<out A> : IOOf<A> {
      * @param cb an asynchronous computation that might fail.
      * @see async for wrapping impure APIs without cancellation
      */
-    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
+    fun <A> cancellable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
         onceOnly(conn, cbb).let { cbb2 ->
-          val cancelable = ForwardCancelable()
-          conn.push(cancelable.cancel())
-          if (conn.isNotCanceled()) {
-            cancelable.complete(try {
+          val cancellable = ForwardCancellable()
+          conn.push(cancellable.cancel())
+          if (conn.isNotCancelled()) {
+            cancellable.complete(try {
               cb(cbb2)
             } catch (throwable: Throwable) {
               cbb2(Left(throwable.nonFatalOrThrow()))
@@ -375,8 +375,12 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
+    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(cb)"))
+    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
+      cancellable(cb)
+
     /**
-     * Creates a cancelable instance of [IO] that executes an asynchronous process on evaluation.
+     * Creates a cancellable instance of [IO] that executes an asynchronous process on evaluation.
      * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
      *
      * ```kotlin:ank:playground
@@ -404,7 +408,7 @@ sealed class IO<out A> : IOOf<A> {
      * fun main(args: Array<String>) {
      *   //sampleStart
      *   fun getUsernames(): IO<List<String>> =
-     *     IO.cancelableF { cb: (Either<Throwable, List<String>>) -> Unit ->
+     *     IO.cancellableF { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       IO {
      *         val id = GithubService.getUsernames { names, throwable ->
      *           when {
@@ -427,11 +431,11 @@ sealed class IO<out A> : IOOf<A> {
      * @param cb a deferred asynchronous computation that might fail.
      * @see asyncF for wrapping impure APIs without cancellation
      */
-    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+    fun <A> cancellableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
       Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
-        val cancelable = ForwardCancelable()
+        val cancellable = ForwardCancellable()
         val conn2 = IOConnection()
-        conn.push(cancelable.cancel())
+        conn.push(cancellable.cancel())
         conn.push(conn2.cancel())
 
         onceOnly(conn, cbb).let { cbb2 ->
@@ -442,12 +446,16 @@ sealed class IO<out A> : IOOf<A> {
             just(unit)
           }
 
-          IORunLoop.startCancelable(fa, conn2) { result ->
+          IORunLoop.startCancellable(fa, conn2) { result ->
             conn.pop()
-            result.fold({ }, cancelable::complete)
+            result.fold({ }, cancellable::complete)
           }
         }
       }
+
+    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(cb)"))
+    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+      cancellableF(cb)
 
     /**
      * A pure [IO] value of [Unit].
@@ -567,9 +575,9 @@ sealed class IO<out A> : IOOf<A> {
    * ```
    */
   suspend fun suspended(): A = suspendCoroutine { cont ->
-    val connection = cont.context[IOContext]?.connection ?: IOConnection.uncancelable
+    val connection = cont.context[IOContext]?.connection ?: IOConnection.uncancellable
 
-    IORunLoop.startCancelable(this, connection) {
+    IORunLoop.startCancellable(this, connection) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }
@@ -688,7 +696,7 @@ sealed class IO<out A> : IOOf<A> {
     val promise = UnsafePromise<A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
-    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
+    IORunLoop.startCancellable(IOForkedStart(this, ctx), conn, promise::complete)
     cb(Either.Right(IOFiber(promise, conn)))
   }
 
@@ -793,7 +801,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb)
 
   /**
-   * A pure version of [unsafeRunAsyncCancellable], it defines how an [IO] is ran in a cancelable manner but it doesn't run yet.
+   * A pure version of [unsafeRunAsyncCancellable], it defines how an [IO] is ran in a cancellable manner but it doesn't run yet.
    *
    * It receives the values in a callback [cb] and thus **has** the ability to run `NonBlocking` but that depends on the implementation.
    * When the underlying effects/program runs blocking on the callers thread this method will run blocking.
@@ -811,14 +819,14 @@ sealed class IO<out A> : IOOf<A> {
           ThrowCancellationException ->
             cb andThen { it.fix().unsafeRunAsync { } }
           Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either); Unit }) }
+            { either -> either.fold({ if (!conn.isCancelled() || it != CancellationException) cb(either) }, { cb(either); Unit }) }
         }
       ccb(conn.toDisposable().right())
-      IORunLoop.startCancelable(this, conn, onCancelCb)
+      IORunLoop.startCancellable(this, conn, onCancelCb)
     }
 
   /**
-   * [unsafeRunAsyncCancellable] allows you to run any [IO] and receive the values in a callback [cb] while being cancelable.
+   * [unsafeRunAsyncCancellable] allows you to run any [IO] and receive the values in a callback [cb] while being cancellable.
    * It **has** the ability to run `NonBlocking` but that depends on the implementation, when the underlying
    * effects/program runs blocking on the callers thread this method will run blocking.
    *
@@ -860,9 +868,13 @@ sealed class IO<out A> : IOOf<A> {
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-  /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
+  /** Makes the source [IO] uncancellable such that a [Fiber.cancel] signal has no effect. */
+  fun uncancellable(): IO<A> =
+    ContextSwitch(this, ContextSwitch.makeUncancellable, ContextSwitch.disableUncancellable)
+
+  @Deprecated("Renaming this api for consistency", ReplaceWith("uncancellable()"))
   fun uncancelable(): IO<A> =
-    ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
+    uncancellable()
 
   /**
    * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
@@ -905,16 +917,16 @@ sealed class IO<out A> : IOOf<A> {
    *   2. consumption
    *   3. releasing
    *
-   * 1. Resource acquisition is **NON CANCELABLE**.
+   * 1. Resource acquisition is **NON CANCELLABLE**.
    *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
    *   Reason being, we cannot [release] what we did not `acquire` first. Same reason we cannot call [use].
    *   If it is successful we pass the result to stage 2 [use].
    *
    * 2. Resource consumption is like any other [IO] effect. The key difference here is that it's wired in such a way that
-   *   [release] **will always** be called either on [ExitCase.Canceled], [ExitCase.Error] or [ExitCase.Completed].
+   *   [release] **will always** be called either on [ExitCase.Cancelled], [ExitCase.Error] or [ExitCase.Completed].
    *   If it failed than the resulting [IO] from [bracketCase] will be `IO.raiseError(e)`, otherwise the result of [use].
    *
-   * 3. Resource releasing is **NON CANCELABLE**, otherwise it could result in leaks.
+   * 3. Resource releasing is **NON CANCELLABLE**, otherwise it could result in leaks.
    *   In the case it throws the resulting [IO] will be either the error or a composed error if one occurred in the [use] stage.
    *
    * @param use is the action to consume the resource and produce an [IO] with the result.
@@ -943,7 +955,7 @@ sealed class IO<out A> : IOOf<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -959,7 +971,7 @@ sealed class IO<out A> : IOOf<A> {
     IOBracket(this, release, use)
 
   /**
-   * Executes the given [finalizer] when the source is finished, either in success or in error, or if canceled.
+   * Executes the given [finalizer] when the source is finished, either in success or in error, or if cancelled.
    *
    * As best practice, prefer [bracket] for the acquisition and release of resources.
    *
@@ -969,7 +981,7 @@ sealed class IO<out A> : IOOf<A> {
   fun guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
 
   /**
-   * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
+   * Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
    * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
    *
    * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
@@ -1038,9 +1050,9 @@ sealed class IO<out A> : IOOf<A> {
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancelable: (IOConnection) -> IOConnection = { KindConnection.uncancelable }
+      internal val makeUncancellable: (IOConnection) -> IOConnection = { KindConnection.uncancellable }
 
-      internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
+      internal val disableUncancellable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }
     }
   }

@@ -21,13 +21,13 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 internal object IORunLoop {
 
   fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, KindConnection.uncancelable, cb as Callback, null, null, null, IOContext(KindConnection.uncancelable))
+    loop(source, KindConnection.uncancellable, cb as Callback, null, null, null, IOContext(KindConnection.uncancellable))
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <A> startCancelable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <A> startCancellable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null, IOContext(conn))
 
   fun <A> step(source: IO<A>): IO<A> {
@@ -150,7 +150,7 @@ internal object IORunLoop {
 
   private fun loop(
     source: Current,
-    cancelable: IOConnection,
+    cancellable: IOConnection,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
@@ -158,7 +158,7 @@ internal object IORunLoop {
     ctx: CoroutineContext
   ) {
     var currentIO: Current? = source
-    var conn: IOConnection = cancelable
+    var conn: IOConnection = cancellable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -168,7 +168,7 @@ internal object IORunLoop {
     var result: Any? = null
 
     do {
-      if (conn.isCanceled()) {
+      if (conn.isCancelled()) {
         cb(Left(OnCancel.CancellationException))
         return
       }
@@ -358,7 +358,7 @@ internal object IORunLoop {
   }
 
   /**
-   * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
+   * A `RestartCallback` gets created only once, per [startCancellable] (`unsafeRunAsync`) invocation, once an `Async`
    * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
    */
   private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback, kotlin.coroutines.Continuation<Any?> {

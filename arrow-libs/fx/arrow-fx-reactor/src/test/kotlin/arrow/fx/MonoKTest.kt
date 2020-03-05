@@ -153,11 +153,11 @@ class MonoKTest : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Canceled
+      ec shouldBe ExitCase.Cancelled
     }
 
     "MonoK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
+      Promise.uncancellable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
         MonoK {
           MonoK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
@@ -170,7 +170,7 @@ class MonoKTest : UnitSpec() {
     }
 
     "MonoK async should be cancellable" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
+      Promise.uncancellable<ForMonoK, Unit>(MonoK.async())
         .flatMap { latch ->
           MonoK {
             MonoK.async<Unit> { _, _ -> }

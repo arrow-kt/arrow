@@ -195,11 +195,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A> Kind<ForIO, A>.fork(coroutineContext: CoroutineContext): IO<Fiber<ForIO, A>> =
     fix().fork(coroutineContext)
 
-  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
-    IO.cancelable(k)
+  override fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
+    IO.cancellable(k)
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
-    IO.cancelableF(k)
+  override fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+    IO.cancellableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<RacePair<ForIO, A, B>> =
     IO.racePair(this, fa, fb)
