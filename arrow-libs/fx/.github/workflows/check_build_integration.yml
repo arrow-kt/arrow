@@ -26,7 +26,7 @@ jobs:
       id: create-issue
       run: |
         echo $(git log -1 --pretty=format:%s)
-        echo ::set-output name=title::$(git log -1 --pretty=format:%s)
+        echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
         echo -e "## Details\n" > issue.log
         echo -e "* **Commit hash**: \`$(git log -1 --pretty=format:%h)\`\n" >> issue.log
         echo -e "* **Author**: $(git log -1 --pretty=format:%an)\n" >> issue.log
