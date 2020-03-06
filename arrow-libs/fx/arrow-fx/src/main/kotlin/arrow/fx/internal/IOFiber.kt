@@ -6,14 +6,10 @@ import arrow.fx.IOConnection
 import arrow.fx.typeclasses.Fiber
 
 internal fun <A> IOFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
-  val join: IO<A> = IO.Async { conn2, cb ->
-    conn2.push(IO { promise.remove(cb) })
+  val join: IO<A> = IO.cancellable { cb ->
+    promise.get(cb)
 
-    promise.get { a ->
-      cb(a)
-      conn2.pop()
-      conn.pop()
-    }
+    IO { promise.remove(cb) }
   }
 
   return Fiber(join, conn.cancel())

@@ -4,7 +4,7 @@ import arrow.core.Either
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
-internal class UnsafePromise<A> {
+class UnsafePromise<A> {
 
   private sealed class State<out A> {
     object Empty : State<Nothing>()
