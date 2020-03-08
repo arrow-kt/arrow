@@ -41,6 +41,8 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadFilter
+import arrow.typeclasses.MonadLogic
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
@@ -390,4 +392,25 @@ interface SequenceKCrosswalk : Crosswalk<ForSequenceK>, SequenceKFunctor, Sequen
 interface SequenceKEqK : EqK<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.eqK(other: Kind<ForSequenceK, A>, EQ: Eq<A>): Boolean =
     SequenceK.eq(EQ).run { this@eqK.fix().eqv(other.fix()) }
+}
+
+@extension
+interface SequenceKMonadPlus : MonadPlus<ForSequenceK>, SequenceKMonad, SequenceKAlternative {
+  override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+    fix().map2(fb, f)
+
+  override fun <A> just(a: A): SequenceK<A> =
+    SequenceK.just(a)
+}
+
+@extension
+interface SequenceKMonadLogic : MonadLogic<ForSequenceK>, SequenceKMonadPlus {
+  override fun <A> Kind<ForSequenceK, A>.splitM(): Kind<ForSequenceK, Option<Tuple2<Kind<ForSequenceK, A>, A>>> =
+    SequenceK.just(firstOption().map { a -> fix().sequence.drop(1).k() toT a })
 }

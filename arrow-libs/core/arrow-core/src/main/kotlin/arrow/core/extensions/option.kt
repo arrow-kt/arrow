@@ -40,6 +40,7 @@ import arrow.typeclasses.MonadCombine
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadPlus
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
@@ -498,3 +499,6 @@ interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable 
       is Some -> ALIGN.run { fa(e.t).map { Option.just(it) } }
     }
 }
+
+@extension
+interface OptionMonadPlus : MonadPlus<ForOption>, OptionMonad, OptionAlternative

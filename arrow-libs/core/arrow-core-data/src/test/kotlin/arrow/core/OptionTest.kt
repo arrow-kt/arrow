@@ -14,6 +14,7 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monadCombine.monadCombine
+import arrow.core.extensions.option.monadPlus.monadPlus
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.repeat.repeat
@@ -33,6 +34,7 @@ import arrow.test.laws.EqKLaws
 import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonadPlusLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.RepeatLaws
@@ -104,7 +106,10 @@ class OptionTest : UnitSpec() {
       CrosswalkLaws.laws(Option.crosswalk(),
         Option.genK(),
         Option.eqK()
-      )
+      ),
+      MonadPlusLaws.laws(Option.monadPlus(),
+        Option.genK(),
+        Option.eqK())
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
