@@ -199,5 +199,8 @@ fun <A, B> Gen.Companion.genConst(gen: Gen<A>): Gen<Const<A, B>> =
     Const<A, B>(it)
   }
 
-fun <A> Gen<A>.genEval(): Gen<Eval<A>> =
+fun <A> Gen<A>.eval(): Gen<Eval<A>> =
   map { Eval.just(it) }
+
+fun Gen.Companion.char(): Gen<Char> =
+  Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())

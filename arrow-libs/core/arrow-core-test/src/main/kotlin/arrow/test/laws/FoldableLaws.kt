@@ -35,7 +35,7 @@ import arrow.test.generators.functionAAToA
 import arrow.test.generators.functionABToB
 import arrow.test.generators.functionAToB
 import arrow.test.generators.functionBAToB
-import arrow.test.generators.genEval
+import arrow.test.generators.eval
 import arrow.test.generators.genK
 import arrow.test.generators.intPredicate
 import arrow.test.generators.intSmall
@@ -247,7 +247,7 @@ object FoldableLaws {
   fun <F> Foldable<F>.`reduceRightToOption returns Option value`(G: Gen<Kind<F, Boolean>>, EQ: Eq<Option<Int>>) =
     forAll(
       Gen.functionAToB<Boolean, Int>(Gen.intSmall()),
-      Gen.functionABToB<Boolean, Eval<Int>>(Gen.intSmall().genEval()),
+      Gen.functionABToB<Boolean, Eval<Int>>(Gen.intSmall().eval()),
       G) { f: (Boolean) -> Int, g: (Boolean, Eval<Int>) -> Eval<Int>, fa: Kind<F, Boolean> ->
 
       val expected = fa.foldRight(Eval.Now<Option<Int>>(Option.empty())) { a: Boolean, lb: Eval<Option<Int>> ->
@@ -267,7 +267,7 @@ object FoldableLaws {
     }
 
   fun <F> Foldable<F>.`reduceRightOption returns Option value`(G: Gen<Kind<F, Int>>, EQ: Eq<Option<Int>>) =
-    forAll(Gen.functionABToB<Int, Eval<Int>>(Gen.intSmall().genEval()), G) { f: (Int, Eval<Int>) -> Eval<Int>, fa ->
+    forAll(Gen.functionABToB<Int, Eval<Int>>(Gen.intSmall().eval()), G) { f: (Int, Eval<Int>) -> Eval<Int>, fa ->
       fa.reduceRightOption(f).value().equalUnderTheLaw(fa.reduceRightToOption({ a -> a }, f).value(), EQ)
     }
 
