@@ -157,7 +157,8 @@ interface MonadLogic<F> : MonadPlus<F> {
    * }
    */
   fun <A> Kind<F, A>.voidIfValue(): Kind<F, Unit> =
-    once().ifThen(unit()) { zeroM() }
+    once().ifThen(Unit.just()) { zeroM() }
+  // TODO fix this when the name ambiguities of unit() are removed and not just deprecated.
 }
 
 /**
