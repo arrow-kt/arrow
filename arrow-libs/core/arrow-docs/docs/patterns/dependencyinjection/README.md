@@ -135,7 +135,7 @@ object FunctorLaws {
 
 ...
 
-import arrow.test.FunctorLaws.test
+import arrow.core.test.FunctorLaws.test
 
 Option.functor.run {
   test { it.some() }

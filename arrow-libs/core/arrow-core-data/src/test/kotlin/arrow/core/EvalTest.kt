@@ -10,11 +10,11 @@ import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.fx
 import arrow.core.internal.AtomicBooleanW
-import arrow.test.UnitSpec
-import arrow.test.concurrency.SideEffect
-import arrow.test.generators.GenK
-import arrow.test.laws.BimonadLaws
-import arrow.test.laws.equalUnderTheLaw
+import arrow.core.test.UnitSpec
+import arrow.core.test.concurrency.SideEffect
+import arrow.core.test.generators.GenK
+import arrow.core.test.laws.BimonadLaws
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.fail

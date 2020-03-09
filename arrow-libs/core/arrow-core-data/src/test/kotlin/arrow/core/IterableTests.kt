@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.syntax.collections.collect
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 
 class IterableTests : UnitSpec() {

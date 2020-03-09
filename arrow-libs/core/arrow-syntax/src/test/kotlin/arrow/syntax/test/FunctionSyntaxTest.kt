@@ -22,7 +22,7 @@ import arrow.syntax.function.unpaired
 import arrow.syntax.function.untripled
 import arrow.syntax.function.untupled
 import arrow.core.Tuple2
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 import java.util.Random
 

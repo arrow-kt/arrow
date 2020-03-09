@@ -12,9 +12,9 @@ import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.eqK.eqK
 import arrow.core.extensions.semigroup
 import arrow.core.fix
-import arrow.test.UnitSpec
-import arrow.test.generators.genK
-import arrow.test.laws.ReducibleLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.genK
+import arrow.core.test.laws.ReducibleLaws
 import io.kotlintest.shouldBe
 
 class ReducibleTests : UnitSpec() {

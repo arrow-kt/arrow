@@ -11,10 +11,10 @@ import arrow.core.extensions.function0.selective.selective
 import arrow.core.extensions.function0.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.test.UnitSpec
-import arrow.test.generators.GenK
-import arrow.test.laws.BimonadLaws
-import arrow.test.laws.MonoidLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.GenK
+import arrow.core.test.laws.BimonadLaws
+import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen

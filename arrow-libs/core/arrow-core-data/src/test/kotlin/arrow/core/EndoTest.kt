@@ -1,9 +1,9 @@
 package arrow.core
 
 import arrow.core.extensions.endo.monoid.monoid
-import arrow.test.UnitSpec
-import arrow.test.generators.endo
-import arrow.test.laws.MonoidLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.endo
+import arrow.core.test.laws.MonoidLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

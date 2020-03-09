@@ -8,11 +8,11 @@ import arrow.core.fix
 import arrow.mtl.typeclasses.Nested
 import arrow.mtl.typeclasses.binest
 import arrow.mtl.typeclasses.compose
-import arrow.test.UnitSpec
-import arrow.test.generators.GenK2
-import arrow.test.generators.either
-import arrow.test.generators.intSmall
-import arrow.test.laws.BifoldableLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.GenK2
+import arrow.core.test.generators.either
+import arrow.core.test.generators.intSmall
+import arrow.core.test.laws.BifoldableLaws
 import io.kotlintest.properties.Gen
 
 class BifoldableTests : UnitSpec() {

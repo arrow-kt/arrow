@@ -1,8 +1,8 @@
 package arrow.core.extensions
 
-import arrow.test.UnitSpec
-import arrow.test.laws.HashLaws
-import arrow.test.laws.ShowLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.laws.HashLaws
+import arrow.core.test.laws.ShowLaws
 import io.kotlintest.properties.Gen
 
 class StringInstancesTest : UnitSpec() {

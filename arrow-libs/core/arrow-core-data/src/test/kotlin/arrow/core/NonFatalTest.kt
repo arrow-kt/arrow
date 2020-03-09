@@ -1,6 +1,6 @@
 package arrow.core
 
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrowAny
 

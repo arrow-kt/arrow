@@ -3,10 +3,10 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.extensions.monoid
 import arrow.core.extensions.monoid.invariant.invariant
-import arrow.test.UnitSpec
-import arrow.test.generators.GenK
-import arrow.test.laws.InvariantLaws
-import arrow.test.laws.equalUnderTheLaw
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.GenK
+import arrow.core.test.laws.InvariantLaws
+import arrow.core.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 
 class MonoidTest : UnitSpec() {
