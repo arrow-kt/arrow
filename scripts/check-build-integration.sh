@@ -15,7 +15,6 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     fi
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
-    removeArrowDocs $BASEDIR/$repository/settings.gradle
 
     runAndSaveResult $repository "Local install" "$BASEDIR/arrow/scripts/project-install.sh $repository"
 done
