@@ -16,15 +16,15 @@ import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
 import arrow.optics.extensions.sequencek.filterIndex.filterIndex
-import arrow.test.UnitSpec
-import arrow.test.generators.char
-import arrow.test.generators.functionAToB
-import arrow.test.generators.intSmall
-import arrow.test.generators.listK
-import arrow.test.generators.mapK
-import arrow.test.generators.nonEmptyList
-import arrow.test.generators.sequenceK
-import arrow.test.laws.TraversalLaws
+import arrow.optics.test.generators.char
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.intSmall
+import arrow.core.test.generators.listK
+import arrow.core.test.generators.mapK
+import arrow.core.test.generators.nonEmptyList
+import arrow.core.test.generators.sequenceK
+import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

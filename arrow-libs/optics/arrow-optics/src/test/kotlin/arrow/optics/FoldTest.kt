@@ -7,7 +7,7 @@ import arrow.core.ListK
 import arrow.core.extensions.list.foldable.nonEmpty
 import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.k
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

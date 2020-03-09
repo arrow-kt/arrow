@@ -8,11 +8,11 @@ import arrow.core.extensions.option.eq.eq
 import arrow.optics.extensions.nonemptylist.each.each
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
 import arrow.optics.extensions.nonemptylist.index.index
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.nonEmptyList
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.TraversalLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.nonEmptyList
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

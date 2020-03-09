@@ -12,10 +12,10 @@ import arrow.mtl.State
 import arrow.mtl.run
 import arrow.optics.mtl.assign_
 import arrow.optics.mtl.update_
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.option
-import arrow.test.laws.SetterLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.option
+import arrow.optics.test.laws.SetterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

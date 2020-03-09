@@ -1,4 +1,4 @@
-package arrow.test.laws
+package arrow.optics.test.laws
 
 import arrow.core.Const
 import arrow.core.Id
@@ -12,6 +12,8 @@ import arrow.core.identity
 import arrow.core.orElse
 import arrow.core.value
 import arrow.optics.Prism
+import arrow.core.test.laws.Law
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen

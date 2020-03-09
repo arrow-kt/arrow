@@ -1,4 +1,4 @@
-package arrow.test.laws
+package arrow.optics.test.laws
 
 import arrow.core.Option
 import arrow.core.compose
@@ -6,6 +6,8 @@ import arrow.core.identity
 import arrow.core.toOption
 import arrow.core.ListK
 import arrow.optics.Traversal
+import arrow.core.test.laws.Law
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

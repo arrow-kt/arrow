@@ -22,8 +22,10 @@ dependencies {
     kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
 
     testCompile "junit:junit:$JUNIT_VERSION"
+
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+
     testCompile project(":arrow-optics-test")
     testCompile project(":arrow-optics-mtl")
 }

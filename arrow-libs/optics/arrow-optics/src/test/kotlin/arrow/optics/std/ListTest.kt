@@ -12,12 +12,12 @@ import arrow.optics.head
 import arrow.optics.tail
 import arrow.optics.toListK
 import arrow.optics.toOptionNel
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.nonEmptyList
-import arrow.test.generators.option
-import arrow.test.laws.IsoLaws
-import arrow.test.laws.OptionalLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.nonEmptyList
+import arrow.core.test.generators.option
+import arrow.optics.test.laws.IsoLaws
+import arrow.optics.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

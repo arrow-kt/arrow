@@ -17,8 +17,8 @@ import arrow.optics.mtl.extract
 import arrow.optics.mtl.extractMap
 import arrow.optics.mtl.toReader
 import arrow.optics.mtl.toState
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

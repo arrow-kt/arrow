@@ -9,7 +9,7 @@ import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.mapk.at.at
 import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.traversal
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
 
 @optics

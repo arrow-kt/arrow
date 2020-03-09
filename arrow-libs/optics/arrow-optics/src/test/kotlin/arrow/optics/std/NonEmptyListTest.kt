@@ -4,10 +4,10 @@ import arrow.core.NonEmptyList
 import arrow.core.extensions.monoid
 import arrow.optics.head
 import arrow.optics.tail
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.nonEmptyList
-import arrow.test.laws.LensLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.nonEmptyList
+import arrow.optics.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen

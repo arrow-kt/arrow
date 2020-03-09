@@ -4,10 +4,10 @@ import arrow.core.extensions.eq
 import arrow.core.SequenceK
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.index.index
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.sequenceK
-import arrow.test.laws.OptionalLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.sequenceK
+import arrow.optics.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

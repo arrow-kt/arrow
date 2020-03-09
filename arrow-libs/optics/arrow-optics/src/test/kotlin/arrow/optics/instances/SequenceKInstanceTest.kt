@@ -10,11 +10,11 @@ import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.each.each
 import arrow.optics.extensions.sequencek.filterIndex.filterIndex
 import arrow.optics.extensions.sequencek.index.index
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.sequenceK
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.TraversalLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.sequenceK
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.TraversalLaws
 import io.kotlintest.properties.Gen
 
 class SequenceKInstanceTest : UnitSpec() {

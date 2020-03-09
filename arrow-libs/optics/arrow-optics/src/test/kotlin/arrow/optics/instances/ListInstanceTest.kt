@@ -16,13 +16,13 @@ import arrow.optics.extensions.listk.each.each
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.listk.snoc.snoc
-import arrow.test.UnitSpec
-import arrow.test.generators.functionAToB
-import arrow.test.generators.listK
-import arrow.test.generators.tuple2
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.PrismLaws
-import arrow.test.laws.TraversalLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.listK
+import arrow.core.test.generators.tuple2
+import arrow.optics.test.laws.OptionalLaws
+import arrow.optics.test.laws.PrismLaws
+import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 

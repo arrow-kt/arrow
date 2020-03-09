@@ -5,11 +5,11 @@ import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
 import arrow.optics.toValidated
-import arrow.test.UnitSpec
-import arrow.test.generators.either
-import arrow.test.generators.functionAToB
-import arrow.test.generators.validated
-import arrow.test.laws.IsoLaws
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.either
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.validated
+import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
