@@ -16,11 +16,11 @@ apply from: "$PUBLISH_CONF"
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile project(":arrow-fx")
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile project(":arrow-fx-test")
     testCompile project(":arrow-fx")
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
-    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }
