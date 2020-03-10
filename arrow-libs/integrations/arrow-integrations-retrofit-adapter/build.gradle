@@ -14,21 +14,19 @@ apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
-    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
-    compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
-    testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testCompile "io.arrow-kt:arrow-core-test:$VERSION_NAME"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     testCompile "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
-    testCompile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME", excludeArrow
-    testCompile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
+    testCompile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
+    testCompile "io.arrow-kt:arrow-fx:$VERSION_NAME"
 }
