@@ -12,15 +12,12 @@ apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
 
     runtime "org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION"
     runtime "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"
     runtime "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
