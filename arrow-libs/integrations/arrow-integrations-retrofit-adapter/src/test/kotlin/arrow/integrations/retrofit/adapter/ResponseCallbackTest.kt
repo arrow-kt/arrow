@@ -1,11 +1,11 @@
 package arrow.integrations.retrofit.adapter
 
+import arrow.core.test.UnitSpec
 import arrow.fx.IO
 import arrow.fx.extensions.io.async.async
 import arrow.fx.fix
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
-import arrow.test.UnitSpec
 import io.kotlintest.fail
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse

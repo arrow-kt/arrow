@@ -1,8 +1,8 @@
 package arrow.integrations.retrofit.adapter
 
+import arrow.core.test.UnitSpec
 import arrow.fx.IO
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
-import arrow.test.UnitSpec
 import com.google.gson.reflect.TypeToken
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow

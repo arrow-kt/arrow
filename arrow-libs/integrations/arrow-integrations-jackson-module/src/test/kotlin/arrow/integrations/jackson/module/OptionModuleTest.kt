@@ -1,9 +1,9 @@
 package arrow.integrations.jackson.module
 
 import arrow.core.Option
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.option
 import arrow.syntax.function.pipe
-import arrow.test.UnitSpec
-import arrow.test.generators.option
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule

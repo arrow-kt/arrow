@@ -3,6 +3,7 @@ package arrow.integrations.retrofit.adapter
 import arrow.core.Either
 import arrow.core.extensions.either.applicativeError.applicativeError
 import arrow.core.fix
+import arrow.core.test.UnitSpec
 import arrow.fx.IO
 import arrow.fx.extensions.io.async.async
 import arrow.fx.fix
@@ -14,7 +15,6 @@ import arrow.fx.rx2.value
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
-import arrow.test.UnitSpec
 import io.kotlintest.fail
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
