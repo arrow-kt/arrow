@@ -21,15 +21,12 @@ apply from: "$SUBPROJECT_CONF"
 dependencies {
     compile project(":arrow-core-data")
     compile project(":arrow-syntax")
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-reflect:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-ui:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-ui-data:$VERSION_NAME", excludeArrow
-    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+    compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-ui:$VERSION_NAME"
+    compile project(":arrow-meta")
     kapt project(":arrow-meta")
-    implementation "io.github.classgraph:classgraph:$CLASSGRAPH_VERSION"
 }
 
 apply plugin: 'ank-gradle-plugin'

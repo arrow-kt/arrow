@@ -25,5 +25,5 @@ dependencies {
     testCompile project(":arrow-core-test")
     testCompile project(":arrow-syntax")
     testCompile project(":arrow-core")
-    testCompile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
+    testCompile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
 }
