@@ -4,6 +4,8 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.throwable
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.apply.product
 import arrow.fx.extensions.io.async.async
@@ -11,8 +13,6 @@ import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.tupleLeft
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monadDefer.monadDefer
-import arrow.test.UnitSpec
-import arrow.test.generators.throwable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

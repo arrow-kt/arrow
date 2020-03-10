@@ -1,4 +1,5 @@
 plugins {
+    id "maven-publish"
     id "base"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.kapt"
@@ -8,15 +9,11 @@ plugins {
 }
 
 apply from: "$SUBPROJECT_CONF"
+apply from: "$PUBLISH_CONF"
 
 dependencies {
     compile project(":arrow-fx")
-    compile "io.arrow-kt:arrow-core-test:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-free:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-free-data:$VERSION_NAME", excludeArrow
-    compile "io.arrow-kt:arrow-recursion-data:$VERSION_NAME", excludeArrow
+    api "io.arrow-kt:arrow-core-test:$VERSION_NAME", excludeArrow
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

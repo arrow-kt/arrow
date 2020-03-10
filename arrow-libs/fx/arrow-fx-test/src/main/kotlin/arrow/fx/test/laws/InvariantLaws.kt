@@ -1,11 +1,12 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.compose
 import arrow.core.extensions.eq
 import arrow.core.identity
-import arrow.test.generators.GenK
-import arrow.test.generators.functionAToB
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.laws.Law
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Invariant
@@ -19,9 +20,9 @@ object InvariantLaws {
     val EQ = EQK.liftEq(Int.eq())
 
     return listOf(
-        Law("Invariant Laws: Invariant Identity") { IF.identity(G1, EQ) },
-        Law("Invariant Laws: Invariant Composition") { IF.composition(G1, EQ) }
-      )
+      Law("Invariant Laws: Invariant Identity") { IF.identity(G1, EQ) },
+      Law("Invariant Laws: Invariant Composition") { IF.composition(G1, EQ) }
+    )
   }
 
   fun <F> Invariant<F>.identity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

@@ -1,12 +1,13 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
+import arrow.core.test.generators.intSmall
+import arrow.core.test.laws.Law
 import arrow.fx.Timer
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
-import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen

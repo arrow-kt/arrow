@@ -1,15 +1,17 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.internal.AtomicIntW
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.applicativeError
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.throwable
+import arrow.core.test.laws.Law
+import arrow.core.test.laws.MonadErrorLaws
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.generators.GenK
-import arrow.test.generators.applicativeError
-import arrow.test.generators.functionAToB
-import arrow.test.generators.raiseError
-import arrow.test.generators.throwable
+import arrow.fx.test.generators.raiseError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -148,9 +150,9 @@ object BracketLaws {
     forAll(Gen.int()) { i ->
       val msg = AtomicIntW(0)
       just(i).bracket<Int, Int>(
-        release = { ii -> unit().map { msg.value = ii } },
-        use = { throw Throwable("Expected failure!") }
-      )
+          release = { ii -> unit().map { msg.value = ii } },
+          use = { throw Throwable("Expected failure!") }
+        )
         .attempt()
         .map { msg.value }
         .equalUnderTheLaw(just(i), EQ)
@@ -160,9 +162,9 @@ object BracketLaws {
     forAll(Gen.int(), Gen.int()) { expected, other ->
       val actual = AtomicIntW(expected)
       raiseError<Int>(Throwable("Expected failure!")).bracket(
-        release = { unit().map { actual.value = other } },
-        use = { just(it) }
-      )
+          release = { unit().map { actual.value = other } },
+          use = { just(it) }
+        )
         .attempt()
         .map { actual.value }
         .equalUnderTheLaw(just(expected), EQ)

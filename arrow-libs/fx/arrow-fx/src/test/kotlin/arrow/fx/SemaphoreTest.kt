@@ -2,6 +2,8 @@ package arrow.fx
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.list.traverse.traverse
+import arrow.core.test.UnitSpec
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.core.toT
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.applicativeError.handleError
@@ -11,8 +13,7 @@ import arrow.fx.extensions.io.concurrent.parMapN
 import arrow.fx.extensions.io.functor.unit
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
-import arrow.test.UnitSpec
-import arrow.test.laws.equalUnderTheLaw
+import arrow.fx.test.eq.eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,7 @@ class SemaphoreTest : UnitSpec() {
           (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
             s.available()
           }
-        }.equalUnderTheLaw(IO.just(0L), EQ())
+        }.equalUnderTheLaw(IO.just(0L), IO.eq())
       }
 
       "$label - tryAcquire with available permits" {
@@ -37,7 +38,7 @@ class SemaphoreTest : UnitSpec() {
           (0 until n).toList().traverse(IO.applicative()) { IO.unit }.flatMap {
             s.tryAcquire()
           }
-        }.equalUnderTheLaw(IO.just(true), EQ())
+        }.equalUnderTheLaw(IO.just(true), IO.eq())
       }
 
       "$label - tryAcquire with no available permits" {
@@ -46,7 +47,7 @@ class SemaphoreTest : UnitSpec() {
           (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
             s.tryAcquire()
           }
-        }.equalUnderTheLaw(IO.just(false), EQ())
+        }.equalUnderTheLaw(IO.just(false), IO.eq())
       }
 
       "$label - available with available permits" {
@@ -54,7 +55,7 @@ class SemaphoreTest : UnitSpec() {
           s.acquireN(19).flatMap {
             s.available()
           }
-        }.equalUnderTheLaw(IO.just(1L), EQ())
+        }.equalUnderTheLaw(IO.just(1L), IO.eq())
       }
 
       "$label - available with no available permits" {
@@ -62,7 +63,7 @@ class SemaphoreTest : UnitSpec() {
           s.acquireN(20).flatMap {
             s.available()
           }
-        }.equalUnderTheLaw(IO.just(0L), EQ())
+        }.equalUnderTheLaw(IO.just(0L), IO.eq())
       }
 
       "$label - tryAcquireN with no available permits" {
@@ -70,18 +71,18 @@ class SemaphoreTest : UnitSpec() {
           s.acquireN(20).flatMap {
             s.tryAcquireN(1)
           }
-        }.equalUnderTheLaw(IO.just(false), EQ())
+        }.equalUnderTheLaw(IO.just(false), IO.eq())
       }
 
       "$label - count with available permits" {
         val n = 18
         semaphore(20).flatMap { s ->
-          (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
-            s.available().flatMap { available ->
-              s.count().map { count -> available toT count }
+            (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
+              s.available().flatMap { available ->
+                s.count().map { count -> available toT count }
+              }
             }
           }
-        }
           .map { (available, count) -> available == count }
           .unsafeRunSync()
       }
@@ -91,7 +92,7 @@ class SemaphoreTest : UnitSpec() {
           s.acquireN(20).flatMap {
             s.count()
           }
-        }.equalUnderTheLaw(IO.just(0L), EQ())
+        }.equalUnderTheLaw(IO.just(0L), IO.eq())
       }
 
       "$label - negative number of permits" {
@@ -122,14 +123,14 @@ class SemaphoreTest : UnitSpec() {
       "$label - offsetting acquires/releases - acquires parallel with releases" {
         val permits: List<Long> = listOf(1, 0, 20, 4, 0, 5, 2, 1, 1, 3)
         semaphore(0).flatMap { s ->
-          Dispatchers.Default.parMapN(
-            permits.traverse(IO.applicative()) { s.acquireN(it) }.unit(),
-            permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.unit()
-          ) { _, _ -> Unit }
-            .flatMap {
-              s.count()
-            }
-        }.map { count -> count.equalUnderTheLaw(0L, Long.eq()) }
+            Dispatchers.Default.parMapN(
+                permits.traverse(IO.applicative()) { s.acquireN(it) }.unit(),
+                permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.unit()
+              ) { _, _ -> Unit }
+              .flatMap {
+                s.count()
+              }
+          }.map { count -> count.equalUnderTheLaw(0L, Long.eq()) }
           .unsafeRunSync()
       }
     }
@@ -139,8 +140,8 @@ class SemaphoreTest : UnitSpec() {
 
     "cancellableSemaphore - supports cancellation of acquire" {
       Semaphore(0, IO.concurrent()).flatMap { s ->
-        s.acquire()
-      }.unsafeRunAsyncCancellable { }
+          s.acquire()
+        }.unsafeRunAsyncCancellable { }
         .invoke()
     }
   }

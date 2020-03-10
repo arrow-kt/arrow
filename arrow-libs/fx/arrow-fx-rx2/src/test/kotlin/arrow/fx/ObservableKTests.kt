@@ -17,9 +17,9 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.generators.GenK
-import arrow.test.generators.throwable
-import arrow.test.laws.ConcurrentLaws
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.throwable
+import arrow.fx.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen

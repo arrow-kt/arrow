@@ -3,7 +3,6 @@ package arrow.fx
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
-import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.eq
@@ -11,6 +10,17 @@ import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.foldable.forAll
 import arrow.core.extensions.monoid
+import arrow.core.test.UnitSpec
+import arrow.core.test.concurrency.SideEffect
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.GenK2
+import arrow.core.test.generators.applicative
+import arrow.core.test.generators.intSmall
+import arrow.core.test.laws.AlternativeLaws
+import arrow.core.test.laws.ApplicativeLaws
+import arrow.core.test.laws.CategoryLaws
+import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.laws.ProfunctorLaws
 import arrow.core.toT
 import arrow.core.value
 import arrow.fx.extensions.io.applicativeError.attempt
@@ -22,21 +32,11 @@ import arrow.fx.extensions.schedule.applicative.applicative
 import arrow.fx.extensions.schedule.category.category
 import arrow.fx.extensions.schedule.monoid.monoid
 import arrow.fx.extensions.schedule.profunctor.profunctor
+import arrow.fx.test.eq.eqK
+import arrow.fx.test.generators.genK
+import arrow.fx.test.laws.forFew
 import arrow.fx.typeclasses.Duration
-import arrow.fx.typeclasses.nanoseconds
 import arrow.fx.typeclasses.seconds
-import arrow.test.UnitSpec
-import arrow.test.concurrency.SideEffect
-import arrow.test.generators.GenK
-import arrow.test.generators.GenK2
-import arrow.test.generators.applicative
-import arrow.test.generators.intSmall
-import arrow.test.laws.AlternativeLaws
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.CategoryLaws
-import arrow.test.laws.MonoidLaws
-import arrow.test.laws.ProfunctorLaws
-import arrow.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import arrow.typeclasses.EqK2
@@ -49,16 +49,6 @@ import kotlin.math.pow
 
 class ScheduleTest : UnitSpec() {
 
-  fun decEqK(): EqK<DecisionPartialOf<Any?>> = object : EqK<DecisionPartialOf<Any?>> {
-    override fun <A> Kind<DecisionPartialOf<Any?>, A>.eqK(other: Kind<DecisionPartialOf<Any?>, A>, EQ: Eq<A>): Boolean =
-      (fix() to other.fix()).let { (l, r) ->
-        l.cont == r.cont &&
-          l.delay.nanoseconds == r.delay.nanoseconds &&
-          // don't force end result if we don't continue as it may contain Nothing
-          (if (l.cont) EQ.run { l.finish.value().eqv(r.finish.value()) } else true)
-      }
-  }
-
   fun <F, I> eqK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object : EqK<SchedulePartialOf<F, I>> {
     override fun <A> Kind<SchedulePartialOf<F, I>, A>.eqK(other: Kind<SchedulePartialOf<F, I>, A>, EQ: Eq<A>): Boolean {
       val t = fix() as Schedule.ScheduleImpl<F, Any?, I, A>
@@ -68,7 +58,7 @@ class ScheduleTest : UnitSpec() {
         val lhs = t.initialState.flatMap { s -> t.update(i, s) }
         val rhs = other.initialState.flatMap { s -> other.update(i, s) }
 
-        fEqK.liftEq(decEqK().liftEq(EQ)).run { lhs.eqv(rhs) }
+        fEqK.liftEq(Schedule.Decision.eqK().liftEq(EQ)).run { lhs.eqv(rhs) }
       }
     }
   }
@@ -91,15 +81,6 @@ class ScheduleTest : UnitSpec() {
   fun <F> Schedule.Companion.genK2(MF: Monad<F>) = object : GenK2<Kind<ForSchedule, F>> {
     override fun <A, B> genK(genA: Gen<A>, genB: Gen<B>): Gen<Kind2<Kind<ForSchedule, F>, A, B>> =
       Schedule.genK<F, A>(MF).genK(genB)
-  }
-
-  fun Schedule.Decision.Companion.genK(): GenK<DecisionPartialOf<Any?>> = object : GenK<DecisionPartialOf<Any?>> {
-    override fun <A> genK(gen: Gen<A>): Gen<Kind<DecisionPartialOf<Any?>, A>> =
-      Gen.bind(
-        Gen.bool(),
-        Gen.intSmall(),
-        gen
-      ) { cont, delay, res -> Schedule.Decision(cont, delay.nanoseconds, 0 as Any?, Eval.now(res)) }
   }
 
   fun <I, A> Schedule<ForId, I, A>.runIdSchedule(i: I): Schedule.Decision<Any?, A> =

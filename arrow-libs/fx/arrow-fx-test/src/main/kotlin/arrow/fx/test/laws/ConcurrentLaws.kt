@@ -1,4 +1,4 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.Left
@@ -12,6 +12,11 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.extensions.tuple6.eq.eq
 import arrow.core.identity
 import arrow.core.k
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.applicativeError
+import arrow.core.test.generators.either
+import arrow.core.test.generators.throwable
+import arrow.core.test.laws.Law
 import arrow.core.toT
 import arrow.fx.MVar
 import arrow.fx.Promise
@@ -22,10 +27,6 @@ import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
-import arrow.test.generators.GenK
-import arrow.test.generators.applicativeError
-import arrow.test.generators.either
-import arrow.test.generators.throwable
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -696,9 +697,9 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.parTraverseResultsInTheCorrectError(EQ: Eq<Kind<F, Unit>>): Unit =
     forAll(Gen.choose(0, 10)) { killOn ->
       (10 downTo 0).toList().k().parTraverse(ListK.traverse()) { i ->
-        if (i == killOn) raiseError(TestError)
-        else unit()
-      }.unit().attempt()
+          if (i == killOn) raiseError(TestError)
+          else unit()
+        }.unit().attempt()
         .map { it shouldBe Left(TestError) }
         .equalUnderTheLaw(unit(), EQ)
     }
@@ -765,9 +766,9 @@ object ConcurrentLaws {
       }
 
       just(Unit).flatMap {
-        raiseError<Unit>(RuntimeException("failed"))
-          .onError { incrementCounter }
-      }.onError { incrementCounter }
+          raiseError<Unit>(RuntimeException("failed"))
+            .onError { incrementCounter }
+        }.onError { incrementCounter }
         .guarantee(latch.complete(Unit))
         .fork(ctx).bind()
 

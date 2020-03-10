@@ -1,15 +1,13 @@
 package arrow.fx
 
-import arrow.test.UnitSpec
-import arrow.test.laws.shouldBeEq
-import arrow.typeclasses.Eq
+import arrow.core.test.UnitSpec
+import arrow.fx.test.eq.eq
+import arrow.fx.test.laws.shouldBeEq
 import io.kotlintest.shouldBe
 
 class KindConnectionTests : UnitSpec() {
 
   init {
-    val EQ = IO.eqK().liftEq(Eq.any())
-
     "cancellation is only executed once" {
       var effect = 0
       val initial = IO { effect += 1 }
@@ -124,10 +122,10 @@ class KindConnectionTests : UnitSpec() {
 
     "uncancellable.pop" {
       val ref = IOConnection.uncancellable
-      ref.pop().shouldBeEq(IO.unit, EQ)
+      ref.pop().shouldBeEq(IO.unit, IO.eq())
 
       ref.push(IO.just(Unit))
-      ref.pop().shouldBeEq(IO.unit, EQ)
+      ref.pop().shouldBeEq(IO.unit, IO.eq())
     }
 
     "uncancellable.push never cancels the given cancellable" {

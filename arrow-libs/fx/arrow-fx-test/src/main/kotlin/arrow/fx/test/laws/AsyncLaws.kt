@@ -1,4 +1,4 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.Either
@@ -6,16 +6,17 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.eq
 import arrow.core.internal.AtomicBooleanW
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.applicativeError
+import arrow.core.test.generators.either
+import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.functionToA
+import arrow.core.test.generators.intSmall
+import arrow.core.test.generators.throwable
+import arrow.core.test.laws.Law
 import arrow.fx.Promise
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.generators.GenK
-import arrow.test.generators.applicativeError
-import arrow.test.generators.either
-import arrow.test.generators.functionAToB
-import arrow.test.generators.functionToA
-import arrow.test.generators.intSmall
-import arrow.test.generators.throwable
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -186,9 +187,9 @@ object AsyncLaws {
     forFew(5, Gen.intSmall()) { threadId1: Int ->
       val ctx = newSingleThreadContext(threadId1.toString())
       fx.async {
-        continueOn(ctx)
-        getCurrentThread()
-      }
+          continueOn(ctx)
+          getCurrentThread()
+        }
         .equalUnderTheLaw(fx.async { ctx.shift().bind(); getCurrentThread() }, EQ)
     }
 

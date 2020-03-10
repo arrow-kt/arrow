@@ -8,6 +8,8 @@ import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
 import arrow.core.extensions.eq
+import arrow.core.test.UnitSpec
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.core.toT
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
@@ -16,9 +18,8 @@ import arrow.fx.extensions.io.concurrent.parSequence
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.followedBy
 import arrow.fx.typeclasses.milliseconds
-import arrow.test.UnitSpec
-import arrow.test.laws.equalUnderTheLaw
-import arrow.test.laws.shouldBeEq
+import arrow.fx.test.eq.eq
+import arrow.fx.test.laws.shouldBeEq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -39,7 +40,7 @@ class MVarTest : UnitSpec() {
             av.put(b).bind()
             val r2 = av.take().bind()
             Tuple4(isEmpty, isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), IO.eq())
         }
       }
 
@@ -56,7 +57,7 @@ class MVarTest : UnitSpec() {
             av.put(c).bind()
             val r3 = av.take().bind()
             Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
-          }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), IO.eq())
         }
       }
 
@@ -74,7 +75,7 @@ class MVarTest : UnitSpec() {
           val bb = f2.join().bind()
 
           setOf(aa, bb)
-        }.shouldBeEq(IO.just(setOf(10, 20)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20)), IO.eq())
       }
 
       "$label - empty; put; put; put; take; take; take" {
@@ -94,7 +95,7 @@ class MVarTest : UnitSpec() {
           f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.shouldBeEq(IO.just(setOf(10, 20, 30)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
       }
 
       "$label - empty; take; take; take; put; put; put" {
@@ -114,7 +115,7 @@ class MVarTest : UnitSpec() {
           val cc = f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.shouldBeEq(IO.just(setOf(10, 20, 30)), EQ())
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
       }
 
       "$label - initial; isNotEmpty; take; put; take" {
@@ -127,7 +128,7 @@ class MVarTest : UnitSpec() {
             val r2 = av.take().bind()
 
             Tuple3(isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), IO.eq())
         }
       }
 
@@ -140,7 +141,7 @@ class MVarTest : UnitSpec() {
             !av.put(b)
             val r2 = !av.take()
             Tuple3(isEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(false, a, b)), EQ())
+          }.equalUnderTheLaw(IO.just(Tuple3(false, a, b)), IO.eq())
         }
       }
 
@@ -151,7 +152,7 @@ class MVarTest : UnitSpec() {
             val read = av.read().bind()
             val take = av.take().bind()
             read toT take
-          }.equalUnderTheLaw(IO.just(i toT i), EQ())
+          }.equalUnderTheLaw(IO.just(i toT i), IO.eq())
         }
       }
 
@@ -162,7 +163,7 @@ class MVarTest : UnitSpec() {
             val read = !av.read().fork()
             !av.put(a)
             !read.join()
-          }.equalUnderTheLaw(IO.just(a), EQ())
+          }.equalUnderTheLaw(IO.just(a), IO.eq())
         }
       }
 
@@ -171,7 +172,7 @@ class MVarTest : UnitSpec() {
           mvar.put(null).flatMap { mvar.read() }
         }
 
-        task.shouldBeEq(IO.just(null), EQ())
+        task.shouldBeEq(IO.just(null), IO.eq())
       }
 
       "$label - take/put test is stack safe" {
@@ -183,7 +184,7 @@ class MVarTest : UnitSpec() {
 
         val count = 10000
         val task = mvar.just(1).flatMap { ch -> loop(count, 0, ch) }
-        task.shouldBeEq(IO.just(count), EQ())
+        task.shouldBeEq(IO.just(count), IO.eq())
       }
 
       "$label - stack overflow test" {
@@ -239,7 +240,7 @@ class MVarTest : UnitSpec() {
           val consumerFiber = !consumer(channel, 0L).fork()
           !producerFiber.join()
           !consumerFiber.join()
-        }.shouldBeEq(IO.just(count * (count - 1) / 2), EQ(Long.eq()))
+        }.shouldBeEq(IO.just(count * (count - 1) / 2), IO.eq(Long.eq()))
       }
 
       fun testStackSequential(channel: MVar<ForIO, Int>): Tuple3<Int, IO<Int>, IO<Unit>> {
@@ -263,7 +264,7 @@ class MVarTest : UnitSpec() {
           !writes.fork()
           val r = !reads
           !effect { r shouldBe count }
-        }.shouldBeEq(IO.unit, EQ())
+        }.shouldBeEq(IO.unit, IO.eq())
       }
 
       "$label - take is stack safe when repeated sequentially" {
@@ -274,7 +275,7 @@ class MVarTest : UnitSpec() {
           !writes
           val r = !fr.join()
           !effect { r shouldBe count }
-        }.shouldBeEq(IO.unit, EQ())
+        }.shouldBeEq(IO.unit, IO.eq())
       }
 
       "$label - concurrent take and put" {
@@ -289,7 +290,7 @@ class MVarTest : UnitSpec() {
           !f1.join()
           !f2.join()
           !ref.get()
-        }.shouldBeEq(IO.just(count * 2), EQ())
+        }.shouldBeEq(IO.just(count * 2), IO.eq())
       }
     }
 
@@ -308,7 +309,7 @@ class MVarTest : UnitSpec() {
           val r1 = !mVar.take()
           val r3 = !mVar.take()
           setOf(r1, r3)
-        }.shouldBeEq(IO.just(setOf(1, 3)), EQ())
+        }.shouldBeEq(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - take is cancellable" {
@@ -324,7 +325,7 @@ class MVarTest : UnitSpec() {
           val r1 = !t1.join()
           val r3 = !t3.join()
           setOf(r1, r3)
-        }.shouldBeEq(IO.just(setOf(1, 3)), EQ())
+        }.shouldBeEq(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - read is cancellable" {
@@ -337,7 +338,7 @@ class MVarTest : UnitSpec() {
           !mVar.put(10)
           val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
           !IO.raceN(finished.get(), fallback)
-        }.shouldBeEq(IO.just(Right(0)), EQ())
+        }.shouldBeEq(IO.just(Right(0)), IO.eq())
       }
     }
 

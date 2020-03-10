@@ -1,10 +1,13 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.test.generators.GenK
-import arrow.test.generators.fatalThrowable
-import arrow.test.generators.throwable
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.fatalThrowable
+import arrow.core.test.generators.throwable
+import arrow.core.test.laws.Law
+import arrow.core.test.laws.MonadErrorLaws
+import arrow.fx.test.eq.throwableEq
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK

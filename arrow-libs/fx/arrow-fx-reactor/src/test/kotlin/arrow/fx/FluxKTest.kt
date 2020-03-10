@@ -1,6 +1,9 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.test.UnitSpec
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.throwable
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
@@ -15,11 +18,8 @@ import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
 import arrow.fx.reactor.value
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.UnitSpec
-import arrow.test.generators.GenK
-import arrow.test.generators.throwable
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.TimerLaws
+import arrow.fx.test.laws.AsyncLaws
+import arrow.fx.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.matchers.startWith
@@ -154,12 +154,12 @@ class FluxKTest : UnitSpec() {
 
     "FluxK should cancel KindConnection on dispose" {
       Promise.uncancellable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
-        FluxK {
-          FluxK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.flux.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
+          FluxK {
+            FluxK.async<Unit> { conn, _ ->
+              conn.push(latch.complete(Unit))
+            }.flux.subscribe().dispose()
+          }.flatMap { latch.get() }
+        }.value()
         .test()
         .expectNext(Unit)
         .expectComplete()
@@ -183,8 +183,8 @@ class FluxKTest : UnitSpec() {
 
     "KindConnection can cancel upstream" {
       FluxK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
+          connection.cancel().value().subscribe()
+        }.value()
         .test()
         .expectError(ConnectionCancellationException::class)
     }

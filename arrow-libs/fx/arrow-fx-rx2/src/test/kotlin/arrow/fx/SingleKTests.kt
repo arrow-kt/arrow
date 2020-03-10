@@ -19,10 +19,10 @@ import arrow.fx.rx2.k
 import arrow.fx.rx2.unsafeRunSync
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.generators.GenK
-import arrow.test.generators.throwable
-import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.forFew
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.throwable
+import arrow.fx.test.laws.ConcurrentLaws
+import arrow.fx.test.laws.forFew
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -55,9 +55,9 @@ class SingleKTests : RxJavaSpec() {
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
         SingleK.fx {
-          val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().bind()
-          a
-        }.value()
+            val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().bind()
+            a
+          }.value()
           .test()
           .awaitDone(delay + awaitDelay, TimeUnit.MILLISECONDS)
           .assertTerminated()

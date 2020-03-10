@@ -1,6 +1,5 @@
 package arrow.fx
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
@@ -11,6 +10,9 @@ import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.right
 import arrow.core.some
+import arrow.core.test.UnitSpec
+import arrow.core.test.concurrency.SideEffect
+import arrow.core.test.laws.SemigroupKLaws
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
@@ -29,14 +31,9 @@ import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
-import arrow.test.UnitSpec
-import arrow.test.concurrency.SideEffect
-import arrow.test.generators.GenK
-import arrow.test.generators.throwable
-import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.SemigroupKLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.EqK
+import arrow.fx.test.eq.eqK
+import arrow.fx.test.generators.genK
+import arrow.fx.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -360,7 +357,7 @@ class IOTest : UnitSpec() {
 
       val result =
         IO.parMapN(all,
-          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+            makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 3, 2, 4, 1, 5)
@@ -383,7 +380,7 @@ class IOTest : UnitSpec() {
 
       val result =
         IO.parMapN(all,
-          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+            makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -395,8 +392,8 @@ class IOTest : UnitSpec() {
 
       fun makePar(num: Int): IO<Int> =
         IO.effect {
-          order.add(num)
-        }.followedBy(IO.sleep((num * 200L).milliseconds))
+            order.add(num)
+          }.followedBy(IO.sleep((num * 200L).milliseconds))
           .map { num }
 
       val result = IO.raceN(
@@ -437,10 +434,10 @@ class IOTest : UnitSpec() {
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
         IO.parTupledN(all,
-          IO { Thread.currentThread().name },
-          IO.defer { just(Thread.currentThread().name) },
-          IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
-          IO(other) { Thread.currentThread().name })
+            IO { Thread.currentThread().name },
+            IO.defer { just(Thread.currentThread().name) },
+            IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
+            IO(other) { Thread.currentThread().name })
           .unsafeRunSync()
 
       result shouldBe Tuple4("all", "all", "all", "other")
@@ -524,8 +521,8 @@ class IOTest : UnitSpec() {
     "Cancellable should run CancelToken" {
       Promise.uncancellable<ForIO, Unit>(IO.async()).flatMap { p ->
         IO.concurrent().cancellable<Unit> {
-          p.complete(Unit)
-        }.fix()
+            p.complete(Unit)
+          }.fix()
           .unsafeRunAsyncCancellable { }
           .invoke()
 
@@ -536,8 +533,8 @@ class IOTest : UnitSpec() {
     "CancellableF should run CancelToken" {
       Promise.uncancellable<ForIO, Unit>(IO.async()).flatMap { p ->
         IO.concurrent().cancellableF<Unit> {
-          IO { p.complete(Unit) }
-        }.fix()
+            IO { p.complete(Unit) }
+          }.fix()
           .unsafeRunAsyncCancellable { }
           .invoke()
 
@@ -549,8 +546,8 @@ class IOTest : UnitSpec() {
       Promise.uncancellable<ForIO, Unit>(IO.async()).flatMap { latch ->
         IO {
           IO.cancellable<Unit> {
-            latch.complete(Unit)
-          }.unsafeRunAsyncCancellable { }
+              latch.complete(Unit)
+            }.unsafeRunAsyncCancellable { }
             .invoke()
         }.flatMap { latch.get() }
       }.unsafeRunSync()
@@ -705,17 +702,4 @@ internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
 
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
-}
-
-internal fun IO.Companion.eqK() = object : EqK<ForIO> {
-  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = EQ(EQ).run {
-    fix().eqv(other.fix())
-  }
-}
-
-internal fun IO.Companion.genK() = object : GenK<ForIO> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
-    gen.map(IO.Companion::just),
-    Gen.throwable().map(IO.Companion::raiseError)
-  )
 }

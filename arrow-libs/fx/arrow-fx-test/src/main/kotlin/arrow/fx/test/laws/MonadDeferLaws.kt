@@ -1,4 +1,4 @@
-package arrow.test.laws
+package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
@@ -6,11 +6,12 @@ import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.k
 import arrow.core.left
 import arrow.core.right
+import arrow.core.test.concurrency.SideEffect
+import arrow.core.test.generators.GenK
+import arrow.core.test.generators.intSmall
+import arrow.core.test.generators.throwable
+import arrow.core.test.laws.Law
 import arrow.fx.typeclasses.MonadDefer
-import arrow.test.concurrency.SideEffect
-import arrow.test.generators.GenK
-import arrow.test.generators.intSmall
-import arrow.test.generators.throwable
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -64,9 +65,9 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-      BracketLaws.laws(SC, GENK, EQK, testStackSafety, iterations) +
-        MonadThrowLaws.laws(SC, GENK, EQK) +
-          monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
+    BracketLaws.laws(SC, GENK, EQK, testStackSafety, iterations) +
+      MonadThrowLaws.laws(SC, GENK, EQK) +
+      monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> laws(
     SC: MonadDefer<F>,
@@ -78,9 +79,9 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true,
     iterations: Int = 20_000
   ): List<Law> =
-      BracketLaws.laws(SC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
-        MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
-          monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
+    BracketLaws.laws(SC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
+      MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
+      monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
     forAll(GK.genK(Gen.int()), Gen.intSmall()) { fa: Kind<F, Int>, x: Int ->

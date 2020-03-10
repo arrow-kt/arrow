@@ -1,6 +1,6 @@
 package arrow.fx
 
-import arrow.test.UnitSpec
+import arrow.core.test.UnitSpec
 import io.kotlintest.Spec
 import io.reactivex.plugins.RxJavaPlugins
 

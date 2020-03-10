@@ -2,6 +2,9 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Try
+import arrow.core.test.generators.GenK
+import arrow.core.test.laws.MonadFilterLaws
+import arrow.core.test.laws.TraverseLaws
 import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.FlowableKOf
 import arrow.fx.rx2.ForFlowableK
@@ -23,11 +26,8 @@ import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
-import arrow.test.generators.GenK
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.TraverseLaws
+import arrow.fx.test.laws.AsyncLaws
+import arrow.fx.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -153,12 +153,12 @@ class FlowableKTests : RxJavaSpec() {
 
     "FlowableK should cancel KindConnection on dispose" {
       Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
-        FlowableK {
-          FlowableK.cancellable<Unit>(fa = {
-            latch.complete(Unit)
-          }).flowable.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
+          FlowableK {
+            FlowableK.cancellable<Unit>(fa = {
+              latch.complete(Unit)
+            }).flowable.subscribe().dispose()
+          }.flatMap { latch.get() }
+        }.value()
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
