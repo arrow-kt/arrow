@@ -24,7 +24,8 @@ interface Alternative<F> : Applicative<F>, MonoidK<F> {
    * @receiver computation to repeat.
    * @returns the collection of results with at least 1 repetition.
    */
-  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> = apEval(Eval.later { many().map { { a: A -> (sequenceOf(a) + it).k() } } }).value()
+  fun <A> Kind<F, A>.some(): Kind<F, SequenceK<A>> =
+    apEval(Eval.later { many().map { { a: A -> (sequenceOf(a) + it).k() } } }).value()
 
   /**
    * Repeats the computation until it fails. Does not requires it to succeed.

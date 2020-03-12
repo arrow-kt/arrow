@@ -303,6 +303,11 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isBoth: Boolean get() = false
 
     override fun toString(): String = show(Show.any(), Show.any())
+
+    companion object {
+      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Left(a)"))
+      operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
+    }
   }
 
   data class Right<out B>(val value: B) : Ior<Nothing, B>() {
@@ -311,6 +316,11 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isBoth: Boolean get() = false
 
     override fun toString(): String = show(Show.any(), Show.any())
+
+    companion object {
+      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Right(a)"))
+      operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
+    }
   }
 
   data class Both<out A, out B>(val leftValue: A, val rightValue: B) : Ior<A, B>() {
