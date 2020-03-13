@@ -2,4 +2,3 @@ rootProject.name = 'arrow-ank-lib'
 
 include 'arrow-ank'
 include 'arrow-ank-gradle'
-include 'arrow-docs'
