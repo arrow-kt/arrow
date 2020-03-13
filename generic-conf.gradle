@@ -79,6 +79,8 @@ task buildArrowDoc(type:Exec) {
     group = ARROW_GROUP
     description = "Generate API doc and run validation"
     commandLine "${rootDir}/../arrow/scripts/repository-build-doc.sh", "${rootProject.name}"
+    mustRunAfter 'checkoutOrchestrator'
+    dependsOn 'checkoutOrchestrator'
 }
 
 task checkoutOrchestrator(type:Exec) {
