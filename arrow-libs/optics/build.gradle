@@ -1,5 +1,8 @@
 buildscript {
     apply from: "$COMMON_SETUP"
+    dependencies {
+        classpath "org.jetbrains.kotlinx:binary-compatibility-validator:$KOTLINX_VALIDATOR_VERSION"
+    }
 }
 
 plugins {
@@ -14,6 +17,12 @@ plugins {
 }
 
 apply from: "$GENERIC_CONF"
+
+apply plugin: 'binary-compatibility-validator'
+
+apiValidation {
+    ignoredProjects += ["arrow-docs", "arrow-optics-test"]
+}
 
 subprojects {
     apply plugin: 'ru.vyarus.animalsniffer'
