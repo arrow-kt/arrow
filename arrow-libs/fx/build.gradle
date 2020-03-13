@@ -8,7 +8,6 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
-        classpath "org.jetbrains.kotlinx:binary-compatibility-validator:$KOTLINX_VALIDATOR_VERSION"
     }
 }
 
@@ -29,13 +28,7 @@ subprojects {
     apply plugin: 'kotlinx-atomicfu'
 }
 
-apply plugin: 'binary-compatibility-validator'
-
-apiValidation {
-    ignoredProjects += ["arrow-docs", "arrow-fx-test"]
-}
-
-configure(subprojects 
+configure(subprojects
             - project("arrow-fx-reactor") 
             - project("arrow-benchmarks-fx:arrow-kio-benchmarks")) 
 {
