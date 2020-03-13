@@ -70,6 +70,61 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+ext {
+    ARROW_GROUP = "Arrow"
+    ARROW_GIT_GROUP = "Arrow (Git)"
+}
+
+task buildArrowDoc(type:Exec) {
+    group = ARROW_GROUP
+    description = "Generate API doc and run validation"
+    commandLine "${rootDir}/../arrow/scripts/repository-build-doc.sh", "${rootProject.name}"
+}
+
+task checkoutOrchestrator(type:Exec) {
+    commandLine './scripts/checkout-orchestrator.sh', "${rootDir}"
+}
+
+task installArrowLibs(type:Exec) {
+    group = ARROW_GROUP
+    description = "Install all the artifacts using local Arrow dependencies (no tests execution)"
+    commandLine "${rootDir}/../arrow/scripts/libs-install.sh", "${rootProject.name}"
+    mustRunAfter 'checkoutOrchestrator'
+    dependsOn 'checkoutOrchestrator'
+}
+
+task testArrowProject(type:Exec) {
+    mustRunAfter 'installArrowLibs'
+    commandLine "${rootDir}/../arrow/scripts/repository-test.sh", "${rootProject.name}"
+}
+
+task testArrowProjects(type:Exec) {
+    mustRunAfter 'installArrowLibs'
+    commandLine "${rootDir}/../arrow/scripts/repositories-test.sh"
+}
+
+task buildArrowProject {
+    group = ARROW_GROUP
+    description = "Build with local Arrow dependencies (tests execution included)"
+    dependsOn 'installArrowLibs'
+    dependsOn 'testArrowProject'
+}
+
+task buildArrowProjects {
+    group = ARROW_GROUP
+    description = "Build libs and examples with local Arrow dependencies (tests execution included)"
+    dependsOn 'installArrowLibs'
+    dependsOn 'testArrowProjects'
+}
+
+task gitPull(type:Exec) {
+    group = ARROW_GIT_GROUP
+    description = "Run git-pull for all the repositories"
+    commandLine "${rootDir}/../arrow/scripts/repositories-git-pull.sh"
+}
+
+task gitPullOthers(type:Exec) {
+    group = ARROW_GIT_GROUP
+    description = "Run git-pull for the rest of the repositories"
+    commandLine "${rootDir}/../arrow/scripts/repositories-others-git-pull.sh", "${rootProject.name}"
 }

@@ -21,3 +21,7 @@ test {
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}

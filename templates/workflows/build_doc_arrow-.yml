@@ -25,17 +25,5 @@ jobs:
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
-    - name: Run Ank for site
-      run: |
-        $BASEDIR/arrow/scripts/site-download.sh
-        $BASEDIR/arrow/scripts/site-run-ank.sh
-    - name: Run Dokka for <arrow-library>
-      run: $BASEDIR/arrow/scripts/project-run-dokka.sh <arrow-library>
-    - name: Run Ank for <arrow-library>
-      run: $BASEDIR/arrow/scripts/project-run-ank.sh <arrow-library>
-    - name: Join docs to site
-      run: $BASEDIR/arrow/scripts/project-locate-doc.sh <arrow-library>
-    - name: Prepare environment
-      run: $BASEDIR/arrow/scripts/site-prepare-env.sh
-    - name: Build site
-      run: $BASEDIR/arrow/scripts/site-build.sh
+    - name: Generate API doc and validate
+      run: $BASEDIR/arrow/scripts/project-build-doc.sh <arrow-library>

@@ -18,7 +18,6 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     fi
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
-    removeArrowDocs $BASEDIR/$repository/settings.gradle
 
     runAndSaveResult $repository "Local install" "$BASEDIR/arrow/scripts/project-install.sh $repository"
     runAndSaveResult $repository "Undo local changes" "$BASEDIR/arrow/scripts/project-undo-local-changes.sh $repository"
@@ -29,11 +28,12 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     if [ -f $BASEDIR/$repository/arrow-docs/build.gradle ]; then
         replaceOSSbyLocalRepository $BASEDIR/$repository/arrow-docs/build.gradle
     fi
+    addArrowDocs $BASEDIR/$repository/settings.gradle
     runAndSaveResult $repository "Generate and validate doc" "$BASEDIR/arrow/scripts/project-generate-and-validate-doc.sh $repository"
 done
 
-runAndSaveResult "Site" "Prepare env" "$BASEDIR/arrow/scripts/site-prepare-env.sh"
-runAndSaveResult "Site" "Site build" "$BASEDIR/arrow/scripts/site-build.sh"
+#runAndSaveResult "Site" "Prepare env" "$BASEDIR/arrow/scripts/site-prepare-env.sh"
+#runAndSaveResult "Site" "Site build" "$BASEDIR/arrow/scripts/site-build.sh"
 
 showFiles
 exitForResult
