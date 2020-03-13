@@ -2,6 +2,8 @@
 
 Dokka is responsible for generating documentation based on source code annotations. Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
 
+In order to generate the documentation and validate it:
+
 ```bash
 ./gradlew buildArrowDoc
 ```
