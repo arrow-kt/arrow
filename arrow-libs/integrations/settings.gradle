@@ -2,4 +2,3 @@ rootProject.name = 'arrow-integrations-lib'
 
 include 'arrow-integrations-jackson-module'
 include 'arrow-integrations-retrofit-adapter'
-include 'arrow-docs'

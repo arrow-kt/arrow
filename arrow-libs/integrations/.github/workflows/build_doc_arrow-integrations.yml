@@ -21,21 +21,5 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Checkout orchestrator
-      run: |
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
-    - name: Run Ank for site
-      run: |
-        $BASEDIR/arrow/scripts/site-download.sh
-        $BASEDIR/arrow/scripts/site-run-ank.sh
-    - name: Run Dokka for arrow-integrations
-      run: $BASEDIR/arrow/scripts/project-run-dokka.sh arrow-integrations
-    - name: Run Ank for arrow-integrations
-      run: $BASEDIR/arrow/scripts/project-run-ank.sh arrow-integrations
-    - name: Join docs to site
-      run: $BASEDIR/arrow/scripts/project-locate-doc.sh arrow-integrations
-    - name: Prepare environment
-      run: $BASEDIR/arrow/scripts/site-prepare-env.sh
-    - name: Build site
-      run: $BASEDIR/arrow/scripts/site-build.sh
+    - name: Generate API doc and validate
+      run: ./gradlew buildArrowDoc

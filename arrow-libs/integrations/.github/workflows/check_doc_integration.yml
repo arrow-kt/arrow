@@ -25,14 +25,8 @@ jobs:
       if: failure()
       id: create-issue
       run: |
-        echo $(git log -1 --pretty=format:%s)
+        $BASEDIR/arrow/scripts/issue-create-description.sh > issue.log
         echo ::set-output name=title::$(git log -1 --pretty=format:%s)
-        echo -e "## Details\n" > issue.log
-        echo -e "* **Commit hash**: \`$(git log -1 --pretty=format:%h)\`\n" >> issue.log
-        echo -e "* **Author**: $(git log -1 --pretty=format:%an)\n" >> issue.log
-        echo -e "* **Committer**: $(git log -1 --pretty=format:%cn)\n" >> issue.log
-        echo -e "* **More info**: [error log](https://github.com/arrow-kt/arrow-integrations/commit/$GITHUB_SHA/checks)\n" >> issue.log
-        cat issue.log
         rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
         cd /home/runner/work/_actions/actions/github-script/0.3.0/
         npm install
