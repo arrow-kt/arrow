@@ -70,8 +70,6 @@ function manageExitCode()
     if [[ $EXIT_CODE -ne 0 ]]; then
         cat $ERROR_LOG
         rm $ERROR_LOG
-        undoLocalConfChange $PROJECT
-        #undoGlobalConfChange
         exit $EXIT_CODE
     fi
 }

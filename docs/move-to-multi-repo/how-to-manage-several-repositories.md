@@ -25,13 +25,13 @@ Tasks runnable from root project
 
 Arrow tasks
 -----------
-buildArrowProject - Build with local Arrow dependencies (tests execution included)
-buildArrowProjects - Build libs and examples with local Arrow dependencies (tests execution included)
-installArrowLibs - Install all the artifacts using local Arrow dependencies (no tests execution)
+buildWithLocalDeps - Build with local Arrow dependencies (tests execution included)
+buildAllWithLocalDeps - Build libs and examples with local Arrow dependencies (tests execution included)
+installAllWithLocalDeps - Install all the artifacts using local Arrow dependencies (no tests execution)
 
 Arrow (Git) tasks
 -----------------
-gitPull - Run git-pull for all the repositories
+gitPullAll - Run git-pull for all the repositories
 gitPullOthers - Run git-pull for the rest of the repositories
 ```
 

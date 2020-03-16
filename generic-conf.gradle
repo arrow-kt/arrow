@@ -87,7 +87,7 @@ task checkoutOrchestrator(type:Exec) {
     commandLine './scripts/checkout-orchestrator.sh', "${rootDir}"
 }
 
-task installArrowLibs(type:Exec) {
+task installAllWithLocalDeps(type:Exec) {
     group = ARROW_GROUP
     description = "Install all the artifacts using local Arrow dependencies (no tests execution)"
     commandLine "${rootDir}/../arrow/scripts/libs-install.sh", "${rootProject.name}"
@@ -96,30 +96,30 @@ task installArrowLibs(type:Exec) {
 }
 
 task testArrowProject(type:Exec) {
-    mustRunAfter 'installArrowLibs'
+    mustRunAfter 'installAllWithLocalDeps'
     commandLine "${rootDir}/../arrow/scripts/repository-test.sh", "${rootProject.name}"
 }
 
 task testArrowProjects(type:Exec) {
-    mustRunAfter 'installArrowLibs'
+    mustRunAfter 'installAllWithLocalDeps'
     commandLine "${rootDir}/../arrow/scripts/repositories-test.sh"
 }
 
-task buildArrowProject {
+task buildWithLocalDeps {
     group = ARROW_GROUP
     description = "Build with local Arrow dependencies (tests execution included)"
-    dependsOn 'installArrowLibs'
+    dependsOn 'installAllWithLocalDeps'
     dependsOn 'testArrowProject'
 }
 
-task buildArrowProjects {
+task buildAllWithLocalDeps {
     group = ARROW_GROUP
     description = "Build libs and examples with local Arrow dependencies (tests execution included)"
-    dependsOn 'installArrowLibs'
+    dependsOn 'installAllWithLocalDeps'
     dependsOn 'testArrowProjects'
 }
 
-task gitPull(type:Exec) {
+task gitPullAll(type:Exec) {
     group = ARROW_GIT_GROUP
     description = "Run git-pull for all the repositories"
     commandLine "${rootDir}/../arrow/scripts/repositories-git-pull.sh"
