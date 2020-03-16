@@ -4,6 +4,8 @@ INCLUDE_ARROW_DOCS="include 'arrow-docs'"
 OSS_REPOSITORY="maven { url \"https:\/\/oss.jfrog.org\/artifactory\/oss-snapshot-local\/\" }"
 MAVEN_LOCAL_REPOSITORY="mavenLocal()"
 ERROR_LOG=error.log
+OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
+NEW_DIR="file://$BASEDIR/arrow"
 
 function escapeURL()
 {
@@ -48,26 +50,24 @@ function checkAndDownload()
 
 function replaceGlobalPropertiesbyLocalConf()
 {
-    NEW_DIR="file://$BASEDIR/arrow"
-
     echo "Replacing global properties by local conf ($1) ..."
     sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" $1
     sed -i "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $NEW_DIR)\/generic-conf.gradle/g" $1
     sed -i "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $NEW_DIR)\/subproject-conf.gradle/g" $1
     sed -i "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $NEW_DIR)\/doc-conf.gradle/g" $1
     sed -i "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $NEW_DIR)\/publish-conf.gradle/g" $1
+    sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
 }
 
 function replaceLocalConfbyGlobalProperties()
 {
-    OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
-
     echo "Replacing local conf by global properties ($1) ..."
     sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $OLD_DIR)\/setup.gradle/g" $1
     sed -i "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $OLD_DIR)\/generic-conf.gradle/g" $1
     sed -i "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $OLD_DIR)\/subproject-conf.gradle/g" $1
     sed -i "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $OLD_DIR)\/doc-conf.gradle/g" $1
     sed -i "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $OLD_DIR)\/publish-conf.gradle/g" $1
+    sed -i "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" $BASEDIR/arrow/setup.gradle
 }
 
 function manageExitCode()
