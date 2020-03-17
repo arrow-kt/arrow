@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INCLUDE_ARROW_DOCS="include 'arrow-docs'"
-OSS_REPOSITORY="maven { url \"https://oss.jfrog.org/artifactory/oss-snapshot-local/\" }"
+OSS_REPOSITORY="https://oss.jfrog.org/artifactory/oss-snapshot-local/"
 MAVEN_LOCAL_REPOSITORY="mavenLocal()"
 ERROR_LOG=error.log
 OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
@@ -16,13 +16,13 @@ function escapeURL()
 function replaceOSSbyLocalRepository()
 {
     echo "Replacing OSS by local repository ($1)..."
-    sed -e "s/$(escapeURL $OSS_REPOSITORY)/$MAVEN_LOCAL_REPOSITORY/g" $1 > $1.tmp ; mv $1.tmp $1
+    sed -e "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY/g" $1 > $1.tmp ; mv $1.tmp $1
 }
 
 function replaceLocalRepositorybyOSS()
 {
     echo "Replacing local repository by OSS ($1) ..."
-    sed -e "s/$MAVEN_LOCAL_REPOSITORY/$(escapeURL $OSS_REPOSITORY)/g" $1 > $1.tmp ; mv $1.tmp $1
+    sed -e "s/$MAVEN_LOCAL_REPOSITORY/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/g" $1 > $1.tmp ; mv $1.tmp $1
 }
 
 function removeArrowDocs()
