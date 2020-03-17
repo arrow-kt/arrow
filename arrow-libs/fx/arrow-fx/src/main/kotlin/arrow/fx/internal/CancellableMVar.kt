@@ -7,7 +7,6 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.toT
 import arrow.fx.Listener
 
 import arrow.fx.MVar
@@ -69,10 +68,10 @@ internal class CancellableMVar<F, A> private constructor(
         val update: State<A> = if (current.takes.isEmpty()) {
           State(a)
         } else {
-          val (x, rest) = current.takes.dequeue()
-          first = x
+          first = current.takes.values.first()
+          val rest = current.takes.entries.drop(1)
           if (rest.isEmpty()) State.empty()
-          else WaitForPut(LinkedMap.empty(), rest)
+          else WaitForPut(emptyMap(), rest.toMap())
         }
 
         if (!state.compareAndSet(current, update)) {
@@ -87,7 +86,7 @@ internal class CancellableMVar<F, A> private constructor(
     when (val current = state.value) {
       is WaitForTake -> {
         val id = Token()
-        val newMap = current.listeners + (id toT Tuple2(a, onPut))
+        val newMap = current.listeners + Pair(id, Tuple2(a, onPut))
         if (state.compareAndSet(current, WaitForTake(current.value, newMap))) just(later { unsafeCancelPut(id) })
         else unsafePut(a, onPut)
       }
@@ -96,10 +95,10 @@ internal class CancellableMVar<F, A> private constructor(
         val update = if (current.takes.isEmpty()) {
           State(a)
         } else {
-          val (x, rest) = current.takes.dequeue()
-          first = x
+          first = current.takes.values.first()
+          val rest = current.takes.entries.drop(1)
           if (rest.isEmpty()) State.empty()
-          else WaitForPut(LinkedMap.empty(), rest)
+          else WaitForPut(emptyMap(), rest.toMap())
         }
 
         if (state.compareAndSet(current, update)) {
@@ -133,9 +132,9 @@ internal class CancellableMVar<F, A> private constructor(
           if (state.compareAndSet(current, State.empty())) just(Some(current.value))
           else unsafeTryTake()
         } else {
-          val (v, xs) = current.listeners.dequeue()
-          val (ax, notify) = v
-          val update = WaitForTake(ax, xs)
+          val (ax, notify) = current.listeners.values.first()
+          val xs = current.listeners.entries.drop(1)
+          val update = WaitForTake(ax, xs.toMap())
           if (state.compareAndSet(current, update)) {
             later { notify(rightUnit) }.fork(EmptyCoroutineContext).map { Some(current.value) }
           } else {
@@ -157,9 +156,9 @@ internal class CancellableMVar<F, A> private constructor(
             unsafeTake(onTake)
           }
         } else {
-          val (v, xs) = current.listeners.dequeue()
-          val (ax, notify) = v
-          if (state.compareAndSet(current, WaitForTake(ax, xs))) {
+          val (ax, notify) = current.listeners.values.first()
+          val xs = current.listeners.entries.drop(1)
+          if (state.compareAndSet(current, WaitForTake(ax, xs.toMap()))) {
             later { notify(rightUnit) }.fork(EmptyCoroutineContext).map {
               onTake(Right(current.value))
               unit()
@@ -169,7 +168,7 @@ internal class CancellableMVar<F, A> private constructor(
       }
       is WaitForPut -> {
         val id = Token()
-        val newQueue = current.takes + (id toT onTake)
+        val newQueue = current.takes + Pair(id, onTake)
         if (state.compareAndSet(current, WaitForPut(current.reads, newQueue))) just(later { unsafeCancelTake(id) })
         else unsafeTake(onTake)
       }
@@ -194,7 +193,7 @@ internal class CancellableMVar<F, A> private constructor(
       }
       is WaitForPut -> {
         val id = Token()
-        val newReads = current.reads + (id toT onRead)
+        val newReads = current.reads + Pair(id, onRead)
         if (state.compareAndSet(current, WaitForPut(newReads, current.takes))) later { unsafeCancelRead(id) }
         else unsafeRead(onRead)
       }
@@ -214,7 +213,7 @@ internal class CancellableMVar<F, A> private constructor(
   private fun callPutAndAllReaders(
     a: A,
     put: Listener<A>?,
-    reads: LinkedMap<Token, Listener<A>>
+    reads: Map<Token, Listener<A>>
   ): Kind<F, Boolean> {
     val value = Right(a)
     return reads.values.callAll(value).flatMap {
@@ -248,14 +247,15 @@ internal class CancellableMVar<F, A> private constructor(
 
     internal sealed class State<out A> {
       companion object {
-        private val ref = WaitForPut<Any>(LinkedMap.empty(), LinkedMap.empty())
-        operator fun <A> invoke(a: A): State<A> = WaitForTake(a, LinkedMap.empty())
+        private val ref = WaitForPut<Any>(emptyMap(), emptyMap())
+        operator fun <A> invoke(a: A): State<A> = WaitForTake(a, emptyMap())
+
         @Suppress("UNCHECKED_CAST")
         fun <A> empty(): State<A> = ref as State<A>
       }
 
-      data class WaitForPut<A>(val reads: LinkedMap<Token, Listener<A>>, val takes: LinkedMap<Token, Listener<A>>) : State<A>()
-      data class WaitForTake<A>(val value: A, val listeners: LinkedMap<Token, Tuple2<A, Listener<Unit>>>) : State<A>()
+      data class WaitForPut<A>(val reads: Map<Token, Listener<A>>, val takes: Map<Token, Listener<A>>) : State<A>()
+      data class WaitForTake<A>(val value: A, val listeners: Map<Token, Tuple2<A, Listener<Unit>>>) : State<A>()
     }
   }
 }

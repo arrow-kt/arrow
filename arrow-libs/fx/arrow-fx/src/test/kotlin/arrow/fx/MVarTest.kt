@@ -337,8 +337,9 @@ class MVarTest : UnitSpec() {
           !fiber.cancel()
           !mVar.put(10)
           val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
-          !IO.raceN(finished.get(), fallback)
-        }.shouldBeEq(IO.just(Right(0)), IO.eq())
+          val res = !IO.raceN(finished.get(), fallback)
+          !effect { res shouldBe Right(0) }
+        }.shouldBeEq(IO.unit, IO.eq())
       }
     }
 

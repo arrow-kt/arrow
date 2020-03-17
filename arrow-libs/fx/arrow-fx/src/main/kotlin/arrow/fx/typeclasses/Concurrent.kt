@@ -20,6 +20,7 @@ import arrow.core.internal.AtomicRefW
 import arrow.core.k
 import arrow.fx.MVar
 import arrow.fx.Promise
+import arrow.fx.Queue
 import arrow.fx.Race2
 import arrow.fx.Race3
 import arrow.fx.Race4
@@ -1178,6 +1179,22 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A> MVar(): Kind<F, MVar<F, A>> =
     MVar.empty(this)
+
+  /** @see [Queue.Companion.bounded] **/
+  fun <A> Queue.Companion.bounded(capacity: Int): Kind<F, Queue<F, A>> =
+    Queue.bounded(capacity, this@Concurrent)
+
+  /** @see [Queue.Companion.sliding] **/
+  fun <A> Queue.Companion.sliding(capacity: Int): Kind<F, Queue<F, A>> =
+    Queue.sliding(capacity, this@Concurrent)
+
+  /** @see [Queue.Companion.dropping] **/
+  fun <A> Queue.Companion.dropping(capacity: Int): Kind<F, Queue<F, A>> =
+    Queue.dropping(capacity, this@Concurrent)
+
+  /** @see [Queue.Companion.unbounded] **/
+  fun <A> Queue.Companion.unbounded(): Kind<F, Queue<F, A>> =
+    Queue.unbounded(this@Concurrent)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
