@@ -22,7 +22,7 @@ import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
 import arrow.fx.Timer
-import arrow.fx.typeclasses.CancelToken
+import arrow.fx.internal.UnsafePromise
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
@@ -36,8 +36,6 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.newSingleThreadContext
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.CoroutineContext
 
@@ -282,18 +280,14 @@ object ConcurrentLaws {
     forAll(Gen.int()) { i ->
       fx.concurrent {
         val release = Promise.uncancellable<F, Int>(this@cancellableReceivesCancelSignal).bind()
-        val cancelToken: CancelToken<F> = release.complete(i)
-        val latch = CountDownLatch(1)
+        val latch = UnsafePromise<Unit>()
 
         val (_, cancel) = cancellable<Unit> {
-          latch.countDown()
-          cancelToken
+          latch.complete(Right(Unit))
+          release.complete(i)
         }.fork(ctx).bind()
 
-        ctx.shift().followedBy(asyncF<Unit> { cb ->
-          later { latch.await(500, MILLISECONDS) }
-            .map { cb(Right(Unit)) }
-        }).bind()
+        async<Unit> { cb -> latch.get(cb) }.bind()
 
         cancel.bind()
         release.get().bind()
@@ -305,12 +299,14 @@ object ConcurrentLaws {
       fx.concurrent {
         val release = Promise<F, Int>(this@cancellableFReceivesCancelSignal).bind()
         val latch = Promise<F, Unit>(this@cancellableFReceivesCancelSignal).bind()
-        val async = cancellableF<Unit> {
+
+        val (_, cancel) = cancellableF<Unit> {
           latch.complete(Unit)
             .map { release.complete(i) }
-        }
-        val (_, cancel) = async.fork(ctx).bind()
+        }.fork(ctx).bind()
+
         asyncF<Unit> { cb -> latch.get().map { cb(Right(it)) } }.bind()
+
         cancel.bind()
         release.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
