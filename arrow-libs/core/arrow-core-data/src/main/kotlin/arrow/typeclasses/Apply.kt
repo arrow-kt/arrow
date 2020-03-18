@@ -301,14 +301,14 @@ interface Apply<F> : Functor<F> {
     other: Kind<F, Z>,
     dummyImplicit: Unit = Unit
   ): Kind<F, Tuple3<A, B, Z>> =
-    other.product(this).map { Tuple3(it.b.a, it.b.b, it.a) }
+    map2(other) { (ab, c) -> Tuple3(ab.a, ab.b, c) }
 
   fun <A, B, C, Z> Kind<F, Tuple3<A, B, C>>.product(
     other: Kind<F, Z>,
     dummyImplicit: Unit = Unit,
     dummyImplicit2: Unit = Unit
   ): Kind<F, Tuple4<A, B, C, Z>> =
-    other.product(this).map { Tuple4(it.b.a, it.b.b, it.b.c, it.a) }
+    map2(other) { (abc, d) -> Tuple4(abc.a, abc.b, abc.c, d) }
 
   fun <A, B, C, D, Z> Kind<F, Tuple4<A, B, C, D>>.product(
     other: Kind<F, Z>,
@@ -316,7 +316,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit2: Unit = Unit,
     dummyImplicit3: Unit = Unit
   ): Kind<F, Tuple5<A, B, C, D, Z>> =
-    other.product(this).map { Tuple5(it.b.a, it.b.b, it.b.c, it.b.d, it.a) }
+    map2(other) { (abcd, e) -> Tuple5(abcd.a, abcd.b, abcd.c, abcd.d, e) }
 
   fun <A, B, C, D, E, Z> Kind<F, Tuple5<A, B, C, D, E>>.product(
     other: Kind<F, Z>,
@@ -325,7 +325,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit3: Unit = Unit,
     dummyImplicit4: Unit = Unit
   ): Kind<F, Tuple6<A, B, C, D, E, Z>> =
-    other.product(this).map { Tuple6(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.a) }
+    map2(other) { (abcde, f) -> Tuple6(abcde.a, abcde.b, abcde.c, abcde.d, abcde.e, f) }
 
   fun <A, B, C, D, E, FF, Z> Kind<F, Tuple6<A, B, C, D, E, FF>>.product(
     other: Kind<F, Z>,
@@ -335,7 +335,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit4: Unit = Unit,
     dummyImplicit5: Unit = Unit
   ): Kind<F, Tuple7<A, B, C, D, E, FF, Z>> =
-    other.product(this).map { Tuple7(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.a) }
+    map2(other) { (abcdef, g) -> Tuple7(abcdef.a, abcdef.b, abcdef.c, abcdef.d, abcdef.e, abcdef.f, g) }
 
   fun <A, B, C, D, E, FF, G, Z> Kind<F, Tuple7<A, B, C, D, E, FF, G>>.product(
     other: Kind<F, Z>,
@@ -346,7 +346,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit5: Unit = Unit,
     dummyImplicit6: Unit = Unit
   ): Kind<F, Tuple8<A, B, C, D, E, FF, G, Z>> =
-    other.product(this).map { Tuple8(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.a) }
+    map2(other) { (abcdefg, h) -> Tuple8(abcdefg.a, abcdefg.b, abcdefg.c, abcdefg.d, abcdefg.e, abcdefg.f, abcdefg.g, h) }
 
   fun <A, B, C, D, E, FF, G, H, Z> Kind<F, Tuple8<A, B, C, D, E, FF, G, H>>.product(
     other: Kind<F, Z>,
@@ -358,7 +358,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit6: Unit = Unit,
     dummyImplicit7: Unit = Unit
   ): Kind<F, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    other.product(this).map { Tuple9(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.a) }
+    map2(other) { (abcdefgh, i) -> Tuple9(abcdefgh.a, abcdefgh.b, abcdefgh.c, abcdefgh.d, abcdefgh.e, abcdefgh.f, abcdefgh.g, abcdefgh.h, i) }
 
   fun <A, B, C, D, E, FF, G, H, I, Z> Kind<F, Tuple9<A, B, C, D, E, FF, G, H, I>>.product(
     other: Kind<F, Z>,
@@ -371,7 +371,7 @@ interface Apply<F> : Functor<F> {
     dummyImplicit7: Unit = Unit,
     dummyImplicit9: Unit = Unit
   ): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    other.product(this).map { Tuple10(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.b.i, it.a) }
+    map2(other) { (abcdefghi, j) -> Tuple10(abcdefghi.a, abcdefghi.b, abcdefghi.c, abcdefghi.d, abcdefghi.e, abcdefghi.f, abcdefghi.g, abcdefghi.h, abcdefghi.i, j) }
 
   @Deprecated(
     "tupled is being renamed to tupledN",
