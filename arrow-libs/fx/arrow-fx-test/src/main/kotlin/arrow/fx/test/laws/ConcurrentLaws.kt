@@ -279,7 +279,7 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.cancellableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       fx.concurrent {
-        val release = Promise.uncancellable<F, Int>(this@cancellableReceivesCancelSignal).bind()
+        val release = Promise<F, Int>(this@cancellableReceivesCancelSignal).bind()
         val latch = UnsafePromise<Unit>()
 
         val (_, cancel) = cancellable<Unit> {
