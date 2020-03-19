@@ -54,7 +54,7 @@ ext.setupArrowModule = {
 
 ext {
     excludeArrow = { exclude group: "io.arrow-kt" }
-    excludeOldKotlinVersions = {
+    excludeKotlinModules = {
         exclude group: "org.jetbrains.kotlin", module: "kotlin-reflect"
         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib"
         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-common"
