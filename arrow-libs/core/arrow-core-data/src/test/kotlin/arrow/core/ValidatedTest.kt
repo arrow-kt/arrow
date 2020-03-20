@@ -5,6 +5,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.core.extensions.show
 import arrow.core.extensions.validated.applicative.applicative
+import arrow.core.extensions.validated.bifunctor.bifunctor
 import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.extensions.validated.eqK.eqK
@@ -18,6 +19,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
 import arrow.core.test.generators.validated
+import arrow.core.test.laws.BifunctorLaws
 import arrow.core.test.laws.BitraverseLaws
 import arrow.core.test.laws.EqK2Laws
 import arrow.core.test.laws.EqLaws
@@ -42,6 +44,7 @@ class ValidatedTest : UnitSpec() {
 
     testLaws(
       EqK2Laws.laws(Validated.eqK2(), Validated.genK2()),
+      BifunctorLaws.laws(Validated.bifunctor(), Validated.genK2(), Validated.eqK2()),
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
