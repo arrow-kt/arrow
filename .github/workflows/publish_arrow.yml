@@ -66,6 +66,7 @@ jobs:
         sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
         cat $BASEDIR/arrow/setup.gradle
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR/$lib
             echo "Use local properties ..."
             sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" gradle.properties
             cat gradle.properties
