@@ -1,15 +1,15 @@
-name: "Publish into OSS"
+name: "Publish Arrow"
 
-on:
-  push:
-    branches:
-    - master
-    paths:
-    - 'gradle.properties'
-    - '**.gradle'
+on: pull_request
+#  push:
+#    branches:
+#    - master
+#    paths:
+#    - 'gradle.properties'
+#    - '**.gradle'
 
 jobs:
-  publish-into-oss:
+  publish-arrow:
 
     env:
       BASEDIR: ${{github.workspace}}/..
@@ -24,12 +24,23 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Publish artifacts
+    - name: "Get target: OSS or Bintray"
+      id: versions
+      run: |
+        LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        echo "::set-output name=new-version::$([ \"$LATEST_PUBLISHED_VERSION\" == \"$LATEST_VERSION\" ] && echo \"0\")"
+    - name: Publish into OSS
+      if: steps.versions.outputs.new-version == "0"
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib 
-            $BASEDIR/arrow/scripts/project-publish.sh $lib
+            #$BASEDIR/arrow/scripts/project-publish.sh $lib
         done
+    - name: Publish into Bintray
+      if: steps.versions.outputs.new-version == "1"
+      run: |
+        echo "Publish..."
