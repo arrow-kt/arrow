@@ -31,7 +31,7 @@ jobs:
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         echo "::set-output name=new-version::$([ \"$LATEST_PUBLISHED_VERSION\" == \"$LATEST_VERSION\" ] && echo \"0\")"
     - name: Publish into OSS
-      if: steps.versions.outputs.new-version == "0"
+      if: steps.versions.outputs.new-version == '0'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
@@ -41,6 +41,6 @@ jobs:
             #$BASEDIR/arrow/scripts/project-publish.sh $lib
         done
     - name: Publish into Bintray
-      if: steps.versions.outputs.new-version == "1"
+      if: steps.versions.outputs.new-version == '1'
       run: |
         echo "Publish..."
