@@ -35,7 +35,6 @@ jobs:
         LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
-        echo $NEW_VERSION_EXISTS
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
     - name: Publish into OSS
       if: steps.versions.outputs.new-version-exists == '0'
@@ -56,7 +55,6 @@ jobs:
         echo "Update version ..."
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
-        grep VERSION_NAME gradle.properties
         echo "Update local properties URL ..."
         OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
         NEW_DIR="file://$BASEDIR/arrow"
@@ -64,12 +62,10 @@ jobs:
             echo $1 | sed "s/\//\\\\\//g"
         }
         sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
-        cat $BASEDIR/arrow/setup.gradle
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             echo "Use local properties ..."
             sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" gradle.properties
-            cat gradle.properties
             #$BASEDIR/arrow/scripts/project-publish.sh $lib
         done
     - name: Create tags
@@ -83,6 +79,6 @@ jobs:
             git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
             git config --global user.email "arrow-kt@users.noreply.github.com"
             git config --global user.name "arrow-kt"
-            git tag -a $LATEST_VERSION -m "$LATEST_VERSION"
+            git tag -a $LATEST_VERSION -m "Release $LATEST_VERSION"
             #git push origin HEAD:master
         done
