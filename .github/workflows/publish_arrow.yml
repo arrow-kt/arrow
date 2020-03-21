@@ -24,25 +24,62 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
+    - name: Download Arrow libraries
+      run: |
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib 
+        done
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
         LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        NEW_VERSION=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
-        echo $NEW_VERSION
-        echo "::set-output name=new-version::$NEW_VERSION"
+        NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
+        echo $NEW_VERSION_EXISTS
+        echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
     - name: Publish into OSS
-      if: steps.versions.outputs.new-version == '0'
+      if: steps.versions.outputs.new-version-exists == '0'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib 
+            echo "TODO"
             #$BASEDIR/arrow/scripts/project-publish.sh $lib
         done
     - name: Publish into Bintray
-      if: steps.versions.outputs.new-version == '1'
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
-        echo "Publish..."
+        echo "Update version ..."
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
+        grep VERSION_NAME gradle.properties
+        echo "Update local properties URL ..."
+        OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
+        NEW_DIR="file://$BASEDIR/arrow"
+        function escapeURL() { echo $1 | sed "s/\//\\\\\//g" }
+        sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
+        cat $BASEDIR/arrow/setup.gradle
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            echo "Use local properties ..."
+            sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" gradle.properties
+            cat gradle.properties
+            #$BASEDIR/arrow/scripts/project-publish.sh $lib
+        done
+    - name: Create tags
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR/$lib
+            git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
+            git config --global user.email "arrow-kt@users.noreply.github.com"
+            git config --global user.name "arrow-kt"
+            git tag -a $LATEST_VERSION -m "$LATEST_VERSION"
+            #git push origin HEAD:master
+        done
