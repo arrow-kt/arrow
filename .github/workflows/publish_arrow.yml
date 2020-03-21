@@ -60,7 +60,9 @@ jobs:
         echo "Update local properties URL ..."
         OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
         NEW_DIR="file://$BASEDIR/arrow"
-        function escapeURL() { echo $1 | sed "s/\//\\\\\//g" }
+        function escapeURL() {
+            echo $1 | sed "s/\//\\\\\//g"
+        }
         sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
         cat $BASEDIR/arrow/setup.gradle
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
