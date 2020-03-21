@@ -29,7 +29,7 @@ jobs:
       run: |
         LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        NEW_VERSION=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0')
+        NEW_VERSION=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
         echo $NEW_VERSION
         echo "::set-output name=new-version::$NEW_VERSION"
     - name: Publish into OSS
