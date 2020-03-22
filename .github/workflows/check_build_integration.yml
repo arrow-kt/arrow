@@ -1,11 +1,11 @@
 name: "Check Build Integration"
 
-on:
-  pull_request:
-    paths-ignore:
-    - 'docs/**'
-    - 'templates/**'
-    - '**.md'
+#on:
+#  pull_request:
+#    paths-ignore:
+#    - 'docs/**'
+#    - 'templates/**'
+#    - '**.md'
 
 jobs:
   check-build-integration:

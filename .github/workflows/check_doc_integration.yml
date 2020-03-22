@@ -1,11 +1,11 @@
 name: "Check Doc Integration"
 
-on:
-  pull_request:
-    paths-ignore:
-    - 'docs/**'
-    - 'templates/**'
-    - '**.md'
+#on:
+#  pull_request:
+#    paths-ignore:
+#    - 'docs/**'
+#    - 'templates/**'
+#    - '**.md'
 
 jobs:
   check-doc-integration:
