@@ -36,7 +36,9 @@ jobs:
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: $BASEDIR/arrow/scripts/libs-publish.sh
+      run: |
+        echo "Publishing Arrow libraries into OSS ..." 
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -46,7 +48,7 @@ jobs:
         echo "Update version ..."
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
-        $BASEDIR/arrow/scripts/libs-publish.sh
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish next SNAPSHOT into OSS
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -54,7 +56,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         git checkout gradle.properties
-        $BASEDIR/arrow/scripts/libs-publish.sh
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Create tags
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -79,7 +81,7 @@ jobs:
       run: |
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         FROM_VERSION=$(git describe --abbrev=0 --tags)
-        brew install hub
+        sudo snap install hub --classic
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" > release-notes.txt
@@ -92,5 +94,4 @@ jobs:
         echo -e "## arrow\n" >> release-notes-all.txt
         git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" >> release-notes-all.txt
         cat release-notes-all.txt
-        #hub release create --copy -F release-notes-all.txt $LATEST_VERSION 
-         
+        #hub release create --copy -F release-notes-all.txt $LATEST_VERSION
