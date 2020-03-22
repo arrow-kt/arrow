@@ -10,5 +10,8 @@ done
 
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
     echo $lib
+    echo $FROM_VERSION
+    git log $FROM_VERSION..HEAD
+    git log -n1 
     git log $FROM_VERSION..HEAD --pretty='format:- %s [%an]'
 done
