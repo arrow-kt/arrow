@@ -47,7 +47,7 @@ jobs:
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
         $BASEDIR/arrow/scripts/libs-publish.sh
-    - name: Publish into OSS the next version
+    - name: Publish next SNAPSHOT into OSS
       if: steps.versions.outputs.new-version-exists == '1'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
