@@ -83,7 +83,10 @@ jobs:
         FROM_VERSION=$(git describe --abbrev=0 --tags)
         sudo snap install hub --classic
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            echo $lib
             cd $BASEDIR/$lib
+            git log $FROM_VERSION...HEAD --pretty=format:"- %s [%an]"
+            git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]"
             git log $FROM_VERSION...HEAD --pretty=format:"- %s [%an]" > release-notes.txt
             #git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" > release-notes.txt
             echo -e "## $lib\n" >> release-notes-all.txt
@@ -93,6 +96,8 @@ jobs:
         done
         cd $BASEDIR/arrow
         echo -e "## arrow\n" >> release-notes-all.txt
+        git log $FROM_VERSION...HEAD --pretty=format:"- %s [%an]"
+        git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]"
         git log $FROM_VERSION...HEAD --pretty=format:"- %s [%an]" >> release-notes-all.txt
         #git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" >> release-notes-all.txt
         cat release-notes-all.txt
