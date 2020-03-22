@@ -61,6 +61,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        git tag -a $LATEST_VERSION -m "Release $LATEST_VERSION"
+        #git push origin HEAD:master
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
@@ -69,3 +74,23 @@ jobs:
             git tag -a $LATEST_VERSION -m "Release $LATEST_VERSION"
             #git push origin HEAD:master
         done
+    - name: Create release notes
+      if: steps.versions.outputs.new-version-exists == '1'
+      run: |
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        FROM_VERSION=$(git describe --abbrev=0 --tags)
+        brew install hub
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR/$lib
+            git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" > release-notes.txt
+            echo -e "## $lib\n" >> release-notes-all.txt
+            cat release-notes.txt >> release-notes-all.txt
+            cat release-notes.txt
+            #hub release create --copy -F release-notes.txt $LATEST_VERSION 
+        done
+        cd $BASEDIR/arrow
+        echo -e "## arrow\n" >> release-notes-all.txt
+        git log $FROM_VERSION...$LATEST_VERSION --pretty=format:"- %s [%an]" >> release-notes-all.txt
+        cat release-notes-all.txt
+        #hub release create --copy -F release-notes-all.txt $LATEST_VERSION 
+         
