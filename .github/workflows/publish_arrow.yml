@@ -85,7 +85,7 @@ jobs:
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
-            echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
+            echo -e "## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
             cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
             echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" > release-notes.txt
             cat local-release-notes.txt >> release-notes.txt
@@ -94,7 +94,7 @@ jobs:
             #hub release create --copy -F release-notes.txt $LATEST_VERSION
         done
         cd $BASEDIR/arrow
-        echo -e "\n## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
+        echo -e "## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
         git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' >> $BASEDIR/arrow/release-notes-all.txt
         echo -e "\n--- RELEASE NOTES ALL ---\n"
         cat $BASEDIR/arrow/release-notes-all.txt
