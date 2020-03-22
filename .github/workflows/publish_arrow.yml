@@ -81,16 +81,18 @@ jobs:
       run: |
         sudo snap install hub --classic
         hub version
+        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" > release-notes-all.txt
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
-            git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > release-notes.txt
-            echo -e "## $lib\n" >> release-notes-all.txt
+            echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" > release-notes.txt
+            git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' >> release-notes.txt
+            echo -e "\n## $lib\n" >> release-notes-all.txt
             cat release-notes.txt >> release-notes-all.txt
             cat release-notes.txt
-            #hub release create --copy -F release-notes.txt $LATEST_VERSION 
+            #hub release create --copy -F release-notes.txt $LATEST_VERSION
         done
         cd $BASEDIR/arrow
-        echo -e "## arrow\n" >> release-notes-all.txt
+        echo -e "\n## arrow\n" >> release-notes-all.txt
         git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' >> release-notes-all.txt
         cat release-notes-all.txt
         #hub release create --copy -F release-notes-all.txt $LATEST_VERSION
