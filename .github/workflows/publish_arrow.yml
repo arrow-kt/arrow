@@ -30,6 +30,8 @@ jobs:
         LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
+        echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
+        echo "::set-output name=release-version::$LATEST_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
     - name: Publish into OSS
       if: steps.versions.outputs.new-version-exists == '0'
@@ -46,8 +48,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         echo "Update version ..."
-        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
+        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
         $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish next SNAPSHOT into OSS
       if: steps.versions.outputs.new-version-exists == '1'
@@ -62,45 +63,34 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
-        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
-        git tag -a $LATEST_VERSION -m "Release $LATEST_VERSION"
+        git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
         #git push origin HEAD:master
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
             git config --global user.email "arrow-kt@users.noreply.github.com"
             git config --global user.name "arrow-kt"
-            git tag -a $LATEST_VERSION -m "Release $LATEST_VERSION"
+            git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
             #git push origin HEAD:master
         done
     - name: Create release notes
       if: steps.versions.outputs.new-version-exists == '1'
       run: |
-        export LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        export FROM_VERSION=$(git describe --abbrev=0 --tags)
-        $BASEDIR/arrow/scripts/libs-release-notes.sh
         sudo snap install hub --classic
         hub version
-        #for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-        #    echo $lib
-        #    cd $BASEDIR/$lib
-        #    git log ${FROM_VERSION}..HEAD --pretty='format:- %s [%an]'
-        #    git log ${FROM_VERSION}..${LATEST_VERSION} --pretty='format:- %s [%an]'
-        #    git log ${FROM_VERSION}..HEAD --pretty='format:- %s [%an]' > release-notes.txt
-        #    #git log ${FROM_VERSION}..${LATEST_VERSION} --pretty='format:- %s [%an]' > release-notes.txt
-        #    echo -e " $lib\n" >> release-notes-all.txt
-        #    cat release-notes.txt >> release-notes-all.txt
-        #    cat release-notes.txt
-        #    #hub release create --copy -F release-notes.txt $LATEST_VERSION 
-        #done
-        #cd $BASEDIR/arrow
-        #echo -e " arrow\n" >> release-notes-all.txt
-        #git log $FROM_VERSION..HEAD --pretty='format:- %s [%an]'
-        #git log $FROM_VERSION..$LATEST_VERSION --pretty='format:- %s [%an]'
-        #git log $FROM_VERSION..HEAD --pretty='format:- %s [%an]' >> release-notes-all.txt
-        ##git log $FROM_VERSION..$LATEST_VERSION --pretty='format:- %s [%an]' >> release-notes-all.txt
-        #cat release-notes-all.txt
-        ##hub release create --copy -F release-notes-all.txt $LATEST_VERSION
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR/$lib
+            git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > release-notes.txt
+            echo -e "## $lib\n" >> release-notes-all.txt
+            cat release-notes.txt >> release-notes-all.txt
+            cat release-notes.txt
+            #hub release create --copy -F release-notes.txt $LATEST_VERSION 
+        done
+        cd $BASEDIR/arrow
+        echo -e "## arrow\n" >> release-notes-all.txt
+        git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' >> release-notes-all.txt
+        cat release-notes-all.txt
+        #hub release create --copy -F release-notes-all.txt $LATEST_VERSION
