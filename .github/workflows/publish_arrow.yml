@@ -24,11 +24,6 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Download Arrow libraries
-      run: |
-        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib 
-        done
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
@@ -41,11 +36,7 @@ jobs:
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: |
-        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            echo "TODO"
-            #$BASEDIR/arrow/scripts/project-publish.sh $lib
-        done
+      run: $BASEDIR/scripts/libs-publish.sh
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -55,19 +46,7 @@ jobs:
         echo "Update version ..."
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$LATEST_VERSION/g" gradle.properties
-        echo "Update local properties URL ..."
-        OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
-        NEW_DIR="file://$BASEDIR/arrow"
-        function escapeURL() {
-            echo $1 | sed "s/\//\\\\\//g"
-        }
-        sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
-        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            cd $BASEDIR/$lib
-            echo "Use local properties ..."
-            sed -i "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" gradle.properties
-            #$BASEDIR/arrow/scripts/project-publish.sh $lib
-        done
+        $BASEDIR/scripts/libs-publish.sh
     - name: Create tags
       if: steps.versions.outputs.new-version-exists == '1'
       env:
