@@ -79,8 +79,8 @@ jobs:
     - name: Create release notes
       if: steps.versions.outputs.new-version-exists == '1'
       run: |
-        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        FROM_VERSION=$(git describe --abbrev=0 --tags)
+        export LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        export FROM_VERSION=$(git describe --abbrev=0 --tags)
         $BASEDIR/arrow/scripts/libs-release-notes.sh
         sudo snap install hub --classic
         hub version
