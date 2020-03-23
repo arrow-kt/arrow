@@ -109,7 +109,7 @@ jobs:
             #hub release create --copy -F release-notes.txt $LATEST_VERSION
         done
         cd $BASEDIR/arrow
-        echo -e "## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
+        echo -e "\n## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
         git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' >> $BASEDIR/arrow/release-notes-all.txt
         echo -e "\n--- RELEASE NOTES ALL ---\n"
         cat $BASEDIR/arrow/release-notes-all.txt
