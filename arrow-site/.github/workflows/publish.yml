@@ -71,6 +71,7 @@ jobs:
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
             $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
+            echo "include 'arrow-docs'" >> $repository/settings.gradle
             $BASEDIR/arrow/scripts/project-run-ank.sh $repository
             #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
             cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
