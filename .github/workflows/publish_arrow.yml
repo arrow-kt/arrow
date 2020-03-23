@@ -100,7 +100,7 @@ jobs:
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
-            echo -e "## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
+            echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
             cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
             echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" > release-notes.txt
             cat local-release-notes.txt >> release-notes.txt
