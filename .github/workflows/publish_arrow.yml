@@ -62,6 +62,8 @@ jobs:
         $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Update versions for documentation
       if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
         cd $BASEDIR/arrow-core
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
@@ -93,6 +95,8 @@ jobs:
         done
     - name: Create release notes
       if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
         sudo snap install hub --classic
         hub version
