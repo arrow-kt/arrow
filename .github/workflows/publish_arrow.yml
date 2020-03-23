@@ -68,6 +68,7 @@ jobs:
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
         sed -i "s/[0-9\.]\+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" arrow-docs/docs/quickstart/setup/README.md
+        sed -i "s/${{ steps.versions.outputs.latest-published-version }}/${{ steps.versions.outputs.release-version }}/g" arrow-docs/docs/quickstart/setup/README.md
         git add arrow-docs/docs/quickstart/setup/README.md
         git diff --staged
         git commit -m "Documentation: update versions"
