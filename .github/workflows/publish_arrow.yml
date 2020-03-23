@@ -29,9 +29,11 @@ jobs:
       run: |
         LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
         NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
         echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
         echo "::set-output name=release-version::$LATEST_VERSION"
+        echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
     - name: Publish into OSS
       if: steps.versions.outputs.new-version-exists == '0'
@@ -58,6 +60,18 @@ jobs:
       run: |
         git checkout gradle.properties
         $BASEDIR/arrow/scripts/libs-publish.sh
+    - name: Update versions for documentation
+      if: steps.versions.outputs.new-version-exists == '1'
+      run: |
+        cd $BASEDIR/arrow-core
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        sed -i "s/[0-9\.]\+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" arrow-docs/docs/quickstart/setup/README.md
+        git add arrow-docs/docs/quickstart/setup/README.md
+        git diff --staged
+        git commit -m "Documentation: update versions"
+        #git push origin HEAD:master
     - name: Create tags
       if: steps.versions.outputs.new-version-exists == '1'
       env:
