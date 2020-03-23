@@ -100,17 +100,19 @@ jobs:
       run: |
         sudo snap install hub --classic
         hub version
-        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" > $BASEDIR/arrow/release-notes-all.txt
+        echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > $BASEDIR/arrow/release-notes-all.txt
+        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
             echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
             cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
-            echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" > release-notes.txt
+            echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > release-notes.txt
+            echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" >> release-notes.txt
             cat local-release-notes.txt | grep -v Rachel >> release-notes.txt
             echo -e "\n--- RELEASE NOTES ---\n"
             cat release-notes.txt
-            #hub release create --copy -F release-notes.txt $LATEST_VERSION
+            #hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
         done
         cd $BASEDIR/arrow
         git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
@@ -118,4 +120,4 @@ jobs:
         cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
         echo -e "\n--- RELEASE NOTES ALL ---\n"
         cat $BASEDIR/arrow/release-notes-all.txt
-        #hub release create --copy -F release-notes-all.txt $LATEST_VERSION
+        #hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
