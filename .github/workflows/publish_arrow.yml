@@ -59,7 +59,8 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         git checkout gradle.properties
-        $BASEDIR/arrow/scripts/libs-publish.sh
+        echo "This step is disabled because next SNAPSHOT is already in OSS"
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Update versions for documentation
       if: steps.versions.outputs.new-version-exists == '1'
       env:
