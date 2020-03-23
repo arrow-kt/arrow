@@ -1,12 +1,12 @@
 name: "Publish Arrow"
 
-on: pull_request
-#  push:
-#    branches:
-#    - master
-#    paths:
-#    - 'gradle.properties'
-#    - '**.gradle'
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'gradle.properties'
+    - '**.gradle'
 
 jobs:
   publish-arrow:
@@ -74,7 +74,7 @@ jobs:
         git add arrow-docs/docs/quickstart/setup/README.md
         git diff --staged
         git commit -m "Documentation: update versions"
-        #git push origin HEAD:master
+        git push origin HEAD:master
     - name: Create tags
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -84,14 +84,14 @@ jobs:
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
         git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
-        #git push origin ${{ steps.versions.outputs.release-version }}
+        git push origin ${{ steps.versions.outputs.release-version }}
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
             git config --global user.email "arrow-kt@users.noreply.github.com"
             git config --global user.name "arrow-kt"
             git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
-            #git push origin ${{ steps.versions.outputs.release-version }}
+            git push origin ${{ steps.versions.outputs.release-version }}
         done
     - name: Create release notes
       if: steps.versions.outputs.new-version-exists == '1'
@@ -112,7 +112,7 @@ jobs:
             cat local-release-notes.txt | grep -v Rachel >> release-notes.txt
             echo -e "\n--- RELEASE NOTES ---\n"
             cat release-notes.txt
-            #hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
+            hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
         done
         cd $BASEDIR/arrow
         git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
@@ -120,4 +120,4 @@ jobs:
         cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
         echo -e "\n--- RELEASE NOTES ALL ---\n"
         cat $BASEDIR/arrow/release-notes-all.txt
-        #hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
+        hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
