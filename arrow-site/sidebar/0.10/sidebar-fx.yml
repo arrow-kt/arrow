@@ -1,0 +1,64 @@
+options:
+  - title: Quick Start
+
+    nested_options:
+
+      - title: Getting Started
+        url: /fx/
+
+      - title: Asynchronous & Concurrent Programming
+        url: /fx/async/
+
+      - title: Polymorphism. One Program multiple runtimes
+        url: /fx/polymorphism/
+
+  - title: Effects
+
+    nested_options:
+
+      - title: IO
+        url: /effects/io/
+
+      - title: MonadDefer
+        url: /effects/monaddefer/
+
+      - title: Async
+        url: /effects/async/
+
+      - title: Effect
+        url: /effects/effect/
+
+      - title: Promise
+        url: /effects/promise/
+
+      - title: Ref
+        url: /effects/ref/
+
+      - title: Fiber
+        url: /effects/fiber/
+
+      - title: Resource
+        url: /apidocs/arrow-fx/arrow.fx/-resource/
+
+  - title: Type Classes
+
+    nested_options:
+
+      - title: Bracket
+        url: /fx/typeclasses/bracket/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Effects
+        url: /apidocs/arrow-fx/
+
+      - title: Effects MTL
+        url: /apidocs/arrow-fx-mtl/
+
+      - title: Effects Reactor
+        url: /apidocs/arrow-fx-reactor/
+
+      - title: Effects Rx2
+        url: /apidocs/arrow-fx-rx2/

@@ -105,6 +105,7 @@ jobs:
                 echo "Update $version ..."
                 SHORT_VERSION=$(echo $version | cut -d. -f1-2)
                 cd $BASEDIR/arrow-site
+                cp sidebar/$SHORT_VERSION/* docs/_data/
                 ./gradlew clean runAnk
                 cd $BASEDIR
                 git clone -b $version https://github.com/arrow-kt/arrow.git arrow-$version
