@@ -40,6 +40,23 @@ Those checks just call the commands included in the [`scripts`](../../scripts) d
 
 If these files are changed, a full check for all the libraries will be executed to approve the pull request.
 
-# Release
+## Release
 
-TODO
+Every Arrow library publishes SNAPSHOT versions from its repository. However, RELEASE versions mush be published at the same time.
+
+In order to publish a RELEASE version, prepare a pull request for `arrow` repository with these changes:
+
+* Update versions in `gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
+```
+VERSION_NAME=0.11.0-SNAPSHOT
+LATEST_VERSION=0.10.5
+```
+* Update versions in `README.md`
+
+When merging that pull request:
+
+* New RELEASE version will be published into Bintray for all the Arrow libraries.
+* A first SNAPSHOT version will be published into OSS for all the Arrow libraries (because they depend on SNAPSHOT versions for other Arrow libraries by default).
+* Documentation website will be updated as well.
+
+Then, it will be necessary to sync Bintray with Maven (pending task: automating it).

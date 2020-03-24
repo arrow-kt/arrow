@@ -13,8 +13,7 @@ runAndSaveResult "Site" "Run Ank" "$BASEDIR/arrow/scripts/site-run-ank.sh"
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     if [ ! -d $BASEDIR/$repository ]; then
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/$repository.git
+        git clone https://github.com/arrow-kt/$repository.git $BASEDIR/$repository
     fi
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties

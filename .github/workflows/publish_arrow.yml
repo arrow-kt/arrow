@@ -1,4 +1,4 @@
-name: "Publish into OSS"
+name: "Publish Arrow"
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     - '**.gradle'
 
 jobs:
-  publish-into-oss:
+  publish-arrow:
 
     env:
       BASEDIR: ${{github.workspace}}/..
@@ -24,12 +24,101 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Publish artifacts
+    - name: "Get target: OSS or Bintray"
+      id: versions
+      run: |
+        LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
+        NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
+        echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
+        echo "::set-output name=release-version::$LATEST_VERSION"
+        echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
+        echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: Publish into OSS
+      if: steps.versions.outputs.new-version-exists == '0'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
+        echo "Publishing Arrow libraries into OSS ..." 
+        $BASEDIR/arrow/scripts/libs-publish.sh
+    - name: Publish into Bintray
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        echo "Update version ..."
+        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
+        $BASEDIR/arrow/scripts/libs-publish.sh
+    - name: Publish next SNAPSHOT into OSS
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        git checkout gradle.properties
+        echo "This step is disabled because next SNAPSHOT is already in OSS"
+        #$BASEDIR/arrow/scripts/libs-publish.sh
+    - name: Update versions for documentation
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        cd $BASEDIR/arrow-core
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        sed -i "s/[0-9\.]\+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" arrow-docs/docs/quickstart/setup/README.md
+        sed -i "s/${{ steps.versions.outputs.latest-published-version }}/${{ steps.versions.outputs.release-version }}/g" arrow-docs/docs/quickstart/setup/README.md
+        git add arrow-docs/docs/quickstart/setup/README.md
+        git diff --staged
+        git commit -m "Documentation: update versions"
+        git push origin HEAD:master
+    - name: Create tags
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
+        git push origin ${{ steps.versions.outputs.release-version }}
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib 
-            $BASEDIR/arrow/scripts/project-publish.sh $lib
+            cd $BASEDIR/$lib
+            git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
+            git config --global user.email "arrow-kt@users.noreply.github.com"
+            git config --global user.name "arrow-kt"
+            git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
+            git push origin ${{ steps.versions.outputs.release-version }}
         done
+    - name: Create release notes
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        sudo snap install hub --classic
+        hub version
+        echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > $BASEDIR/arrow/release-notes-all.txt
+        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
+        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            cd $BASEDIR/$lib
+            git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
+            echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
+            cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
+            echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > release-notes.txt
+            echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" >> release-notes.txt
+            cat local-release-notes.txt | grep -v Rachel >> release-notes.txt
+            echo -e "\n--- RELEASE NOTES ---\n"
+            cat release-notes.txt
+            hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
+        done
+        cd $BASEDIR/arrow
+        git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
+        echo -e "\n## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
+        cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
+        echo -e "\n--- RELEASE NOTES ALL ---\n"
+        cat $BASEDIR/arrow/release-notes-all.txt
+        hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
