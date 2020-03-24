@@ -19,8 +19,6 @@ class AnkPlugin : Plugin<Project> {
     val extension = AnkExtension()
     target.extensions.add(EXTENSION_NAME, extension)
     target.afterEvaluate {
-      target.dependencies.add("runtimeOnly", "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:${properties.getProperty("KOTLIN_VERSION")}")
-      target.dependencies.add("runtimeOnly", "org.jetbrains.kotlin:kotlin-compiler-embeddable:${properties.getProperty("KOTLIN_VERSION")}")
       target.dependencies.add("runtimeOnly", "io.arrow-kt:arrow-ank:${properties.getProperty("CURRENT_VERSION")}")
       target.tasks.create(TASK_NAME, JavaExec::class.java).apply {
         classpath = extension.classpath
