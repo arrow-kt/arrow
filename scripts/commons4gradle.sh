@@ -73,7 +73,6 @@ function replaceLocalConfbyGlobalProperties()
 function manageExitCode()
 {
     EXIT_CODE=$1
-    PROJECT=$2
 
     if [[ $EXIT_CODE -ne 0 ]]; then
         cat $ERROR_LOG
@@ -89,8 +88,9 @@ function runAndManageExitCode()
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$PROJECT/gradle.properties
     $COMMAND $PROJECT 2> $ERROR_LOG
-    manageExitCode $? $PROJECT
+    EXIT_CODE=$?
     #replaceLocalConfbyGlobalProperties $BASEDIR/$PROJECT/gradle.properties
+    manageExitCode $EXIT_CODE
 }
 
 function installProject()
@@ -111,6 +111,7 @@ function buildDoc()
 
     addArrowDocs $BASEDIR/$PROJECT/settings.gradle
     $BASEDIR/arrow/scripts/project-build-doc.sh $PROJECT 2> $ERROR_LOG
-    manageExitCode $? $PROJECT
+    EXIT_CODE=$?
     removeArrowDocs $BASEDIR/$PROJECT/settings.gradle
+    manageExitCode $EXIT_CODE
 }
