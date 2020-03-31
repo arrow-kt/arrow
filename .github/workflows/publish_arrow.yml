@@ -42,7 +42,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         echo "Publishing Arrow libraries into OSS ..." 
-        #$BASEDIR/arrow/scripts/libs-publish.sh
+        $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -51,7 +51,7 @@ jobs:
       run: |
         echo "Update version ..."
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
-        #$BASEDIR/arrow/scripts/libs-publish.sh
+        $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish next SNAPSHOT into OSS
       if: steps.versions.outputs.new-version-exists == '1'
       env:
