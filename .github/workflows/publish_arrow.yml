@@ -1,12 +1,12 @@
 name: "Publish Arrow"
 
-on:
-  push:
-    branches:
-    - master
-    paths:
-    - 'gradle.properties'
-    - '**.gradle'
+on: pull_request
+#  push:
+#    branches:
+#    - master
+#    paths:
+#    - 'gradle.properties'
+#    - '**.gradle'
 
 jobs:
   publish-arrow:
@@ -42,7 +42,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         echo "Publishing Arrow libraries into OSS ..." 
-        $BASEDIR/arrow/scripts/libs-publish.sh
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -51,7 +51,7 @@ jobs:
       run: |
         echo "Update version ..."
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
-        $BASEDIR/arrow/scripts/libs-publish.sh
+        #$BASEDIR/arrow/scripts/libs-publish.sh
     - name: Publish next SNAPSHOT into OSS
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -75,7 +75,7 @@ jobs:
         git add arrow-docs/docs/quickstart/setup/README.md
         git diff --staged
         git commit -m "Documentation: update versions"
-        git push origin HEAD:master
+        #git push origin HEAD:master
     - name: Create tags
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -85,14 +85,14 @@ jobs:
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
         git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
-        git push origin ${{ steps.versions.outputs.release-version }}
+        #git push origin ${{ steps.versions.outputs.release-version }}
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
             git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$lib.git
             git config --global user.email "arrow-kt@users.noreply.github.com"
             git config --global user.name "arrow-kt"
             git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
-            git push origin ${{ steps.versions.outputs.release-version }}
+            #git push origin ${{ steps.versions.outputs.release-version }}
         done
     - name: Create release notes
       if: steps.versions.outputs.new-version-exists == '1'
@@ -105,20 +105,32 @@ jobs:
         echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
         for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR/$lib
-            git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
+            TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
+            hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
+            while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
+            cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
+            while read contributor; do 
+                echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
+            done < contributors.txt > local-release-notes.txt
             echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
-            cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
+            cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
             echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > release-notes.txt
             echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" >> release-notes.txt
-            cat local-release-notes.txt | grep -v Rachel >> release-notes.txt
+            cat local-release-notes.txt >> release-notes.txt
             echo -e "\n--- RELEASE NOTES ---\n"
             cat release-notes.txt
-            hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
+            #hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
         done
         cd $BASEDIR/arrow
-        git log ${{ steps.versions.outputs.latest-published-version }}..${{ steps.versions.outputs.release-version }} --pretty='format:- %s [%an]' > local-release-notes.txt
+        TAG_TIMESTAMP=$(git log 0.10.4 --pretty="format:%ct" | head -1)
+        hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
+        while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
+        cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
+        while read contributor; do
+            echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
+        done < contributors.txt > local-release-notes.txt
         echo -e "\n## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
-        cat local-release-notes.txt | grep -v Rachel >> $BASEDIR/arrow/release-notes-all.txt
+        cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
         echo -e "\n--- RELEASE NOTES ALL ---\n"
         cat $BASEDIR/arrow/release-notes-all.txt
-        hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
+        #hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
