@@ -122,7 +122,7 @@ jobs:
             hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
         done
         cd $BASEDIR/arrow
-        TAG_TIMESTAMP=$(git log 0.10.4 --pretty="format:%ct" | head -1)
+        TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
         hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
         while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
         cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
