@@ -42,7 +42,7 @@ import arrow.core.ValidatedNel
  *
  * ### Sequencing
  *
- * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<IO<Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `IO<List<Profile>>`. Given `Option` and `IO` have an [Applicative] instance, we can [sequence] the list to reverse the types.
+ * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<IO<Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `IO<Nothing, List<Profile>>`. Given `Option` and `IO` have an [Applicative] instance, we can [sequence] the list to reverse the types.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Option
@@ -135,7 +135,7 @@ import arrow.core.ValidatedNel
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
+ * fun writeToStore(data: Data): IO<Nothing, Unit> = TODO("")
  * ```
  *
  * If we traverse using this, we end up with a funny type.
@@ -148,14 +148,14 @@ import arrow.core.ValidatedNel
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
+ * fun writeToStore(data: Data): IO<Nothing, Unit> = TODO("")
  * //sampleStart
- * fun writeManyToStore(data: ListK<Data>): IO<ListK<Unit>> =
+ * fun writeManyToStore(data: ListK<Data>): IO<Nothing, ListK<Unit>> =
  *   data.traverse(IO.applicative()) { writeToStore(it) }.fix()
  * //sampleEnd
  * ```
  *
- * We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
+ * We end up with a `IO<Nothing, ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
  *
  * Traversing solely for the sake of the effects (ignoring any values that may be produced, [Unit] or otherwise) is common, so [Foldable] (superclass of [Traverse]) provides [traverse_] and [sequence_] methods that do the same thing as [traverse] and [sequence] but ignore any value produced along the way, returning [Unit] at the end.
  *
@@ -168,9 +168,9 @@ import arrow.core.ValidatedNel
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
+ * fun writeToStore(data: Data): IO<Nothing, Unit> = TODO("")
  * //sampleStart
- * fun writeManyToStore(data: ListK<Data>): IO<Unit> =
+ * fun writeManyToStore(data: ListK<Data>): IO<Nothing, Unit> =
  *   data.traverse_(IO.applicative()) { writeToStore(it) }.fix()
  * //sampleEnd
  * ```
@@ -352,7 +352,7 @@ import arrow.core.ValidatedNel
  * import arrow.fx.IO
  * import arrow.fx.extensions.fx
  * import arrow.fx.extensions.io.concurrent.parTraverse
- * import arrow.fx.extensions.io.unsafeRun.runBlocking
+ * import arrow.fx.extensions.runBlocking
  * import arrow.unsafe
  *
  * interface Profile
@@ -361,13 +361,13 @@ import arrow.core.ValidatedNel
  * data class DummyUser(val name: String) : User
  * data class DummyProfile(val u: User) : Profile
  *
- * fun userInfo(u: User): IO<Profile> =
+ * fun userInfo(u: User): IO<Nothing, Profile> =
  *   IO { DummyProfile(u) } // this can be a call to the DB
  *
- * fun List<User>.processLogin(): IO<List<Profile>> =
+ * fun List<User>.processLogin(): IO<Nothing, List<Profile>> =
  *   parTraverse { userInfo(it) }
  *
- * fun program(): IO<Unit> = IO.fx {
+ * fun program(): IO<Nothing, Unit> = IO.fx<Nothing, Unit> {
  *   val list = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa"))
  *     .processLogin().bind()
  *   println(list)

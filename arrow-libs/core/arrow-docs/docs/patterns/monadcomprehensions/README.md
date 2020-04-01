@@ -87,7 +87,7 @@ import arrow.fx.*
 import arrow.typeclasses.*
 import arrow.fx.extensions.fx
 
-IO.fx {
+IO.fx<Nothing, Unit> {
   1
 }.fix().unsafeRunSync()
 ```
@@ -109,14 +109,14 @@ This will block the current thread until the operation completes. What we want i
 For that, we have two versions of the function `bind()`, which is a function only available inside the function passed to `binding()`.
 
 ```kotlin:ank
-IO.fx {
+IO.fx<Nothing, Unit> {
   val (a) = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
 ```
 
 ```kotlin:ank
-IO.fx {
+IO.fx<Nothing, Unit> {
   val a = IO.invoke { 1 }.bind()
   a + 1
 }.fix().unsafeRunSync()

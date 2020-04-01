@@ -37,7 +37,7 @@ Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 import arrow.fx.*
 import arrow.fx.extensions.io.applicativeError.*
 
-IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
+IO.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 #### Kind<F, A>#handleErrorWith
@@ -97,11 +97,11 @@ Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException
 In the case of `fromEither()`, converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E> is required.
 
 ```kotlin:ank
-IO.applicativeError().run { Either.Right(1).fromEither { it } }
+IO.applicativeError<Throwable>().run { Either.Right(1).fromEither { it } }
 ```
 
 ```kotlin:ank
-IO.applicativeError().run { Either.Left(RuntimeException("Boom")).fromEither { it } }
+IO.applicativeError<Throwable>().run { Either.Left(RuntimeException("Boom")).fromEither { it } }
 ```
 
 #### catch
