@@ -1,9 +1,7 @@
 <a href="https://arrow-kt.io" title="Arrow website"><img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/header-image.png" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-<!-- Remove the following on when having just one WIP again -->
-[![Latest snapshot](https://img.shields.io/badge/latest%20snapshot-v0.10.5--SNAPSHOT-blue)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
-[![Latest snapshot](https://img.shields.io/maven-metadata/v?label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
+[![Latest snapshot](https://img.shields.io/maven-metadata/v?color=blue&label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
@@ -68,7 +66,7 @@ Find more details in [CONTRIBUTING](https://github.com/arrow-kt/arrow/blob/maste
 
 ### Next development version
 
-If you want to try the last features, replace `0.10.4` by `0.10.5-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.10.5` by `0.11.0-SNAPSHOT` in the following guideline.
 
 ### JDK
 
@@ -104,7 +102,7 @@ Add the dependencies into the project's `build.gradle`:
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.4"
+def arrow_version = "0.10.5"
 dependencies {
     implementation "io.arrow-kt:arrow-core:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -117,7 +115,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.4"
+def arrow_version = "0.10.5"
 dependencies {
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -130,7 +128,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.4"
+def arrow_version = "0.10.5"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -143,7 +141,7 @@ dependencies {
 ```groovy
 apply plugin: 'kotlin-kapt'
 
-def arrow_version = "0.10.4"
+def arrow_version = "0.10.5"
 dependencies {
     implementation "io.arrow-kt:arrow-fx:$arrow_version"
     implementation "io.arrow-kt:arrow-optics:$arrow_version"
@@ -167,7 +165,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.4"
+def arrow_version = "0.10.5"
 dependencies {
     ...
     kapt    "io.arrow-kt:arrow-meta:$arrow_version" //optional
@@ -209,7 +207,7 @@ Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-     <arrow.version>0.10.4</arrow.version>
+     <arrow.version>0.10.5</arrow.version>
 </properties>
 ```
 
