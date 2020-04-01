@@ -5,13 +5,12 @@ import arrow.core.left
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
-import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
-import arrow.fx.rx2.extensions.maybek.applicative.applicative
 import arrow.fx.rx2.extensions.maybek.async.async
 import arrow.fx.rx2.extensions.maybek.functor.functor
-import arrow.fx.rx2.extensions.maybek.monad.flatMap
+import arrow.fx.rx2.extensions.maybek.applicative.applicative
 import arrow.fx.rx2.extensions.maybek.monad.monad
+import arrow.fx.rx2.extensions.maybek.monad.flatMap
 import arrow.fx.rx2.extensions.maybek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
@@ -20,6 +19,7 @@ import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.throwable
+import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -47,6 +47,7 @@ class MaybeKTests : RxJavaSpec() {
         MaybeK.eqK(),
         testStackSafety = false
       )
+    )
 
       /*
       TODO: MonadFilter instances are not lawsful
@@ -61,7 +62,7 @@ class MaybeKTests : RxJavaSpec() {
         MaybeK.eqK()
       )
        */
-    )
+    // )
 
     "Multi-thread Maybes finish correctly" {
       val value: Maybe<Long> = MaybeK.fx {
@@ -143,7 +144,7 @@ class MaybeKTests : RxJavaSpec() {
       ec shouldBe ExitCase.Cancelled
     }
 
-    "MaybeK should cancel KindConnection on dispose" {
+    "MaybeK.cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
           MaybeK.cancellable<Unit> {

@@ -1,16 +1,19 @@
 package arrow.fx
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.identity
+import arrow.fx.IO.Companion.effect
 import arrow.core.internal.AtomicIntW
 import arrow.core.test.UnitSpec
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.unsafeRun.runBlocking
-import arrow.fx.extensions.io.unsafeRun.unsafeRun
+import arrow.fx.extensions.io.dispatchers.dispatchers
+import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.unsafeRun
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.UnsafeRun
 import arrow.unsafe
@@ -55,7 +58,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * Effect blocks suspend side effect in the monadic computation of the runtime
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
-      val program: IO<String> = IO.fx {
+      val program: IO<Nothing, String> = IO.fx<Nothing, String> {
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -67,9 +70,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
       suspend fun getThreadName(): String = Thread.currentThread().name
 
-      val program = IO.fx {
+      val program = IO.fx<Nothing, Tuple2<String, String>> {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and non-blocking parallel computations
-        val result = !parTupledN(
+        val result = !IO.parTupledN(
           textContext,
           // we only care to know the name of the thread, ignore the number
           effect { getThreadName().split("-")[0] },
@@ -83,8 +86,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "raiseError" {
       shouldThrow<TestError> {
         fxTest {
-          IO.fx {
-            !TestError.raiseError<Int>()
+          IO.fx<Nothing, Int> {
+            !IO.raiseException<Int>(TestError)
           }
         }
       }
@@ -92,32 +95,32 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "handleError" {
       fxTest {
-        IO.fx {
-          !effect { throw TestError }.handleError { 1 }
+        IO.fx<Nothing, Int> {
+          !IO.effect { throw TestError }.handleError { 1 }
         }
       } shouldBe 1
     }
 
     "attempt success" {
       fxTest {
-        IO.fx {
-          !effect { 1 }.attempt()
+        IO.fx<Nothing, Either<Throwable, Int>> {
+          !IO.effect { 1 }.attempt()
         }
       } shouldBe Right(1)
     }
 
     "attempt failure" {
       fxTest {
-        IO.fx {
-          !effect { throw TestError }.attempt()
+        IO.fx<Nothing, Either<Throwable, Int>> {
+          !IO.effect { throw TestError }.attempt()
         }
       } shouldBe Left(TestError)
     }
 
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
-        IO.fx {
-          val suspendedValue = !effect { suspend { 1 }() }
+        IO.fx<Nothing, Boolean> {
+          val suspendedValue = !IO.effect { suspend { 1 }() }
           val ioValue = !IO.just(1)
           suspendedValue == ioValue
         }
@@ -127,9 +130,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "asyncCallback" {
       val result = 1
       fxTest {
-        IO.fx {
-          val asyncResult = !async<Int> { cb ->
-            cb(Right(result))
+        IO.fx<Nothing, Int> {
+          val asyncResult = !IO.async<Nothing, Int> { cb ->
+            cb(IOResult.Success(result))
           }
           asyncResult
         }
@@ -138,11 +141,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "continueOn" {
       fxTest {
-        IO.fx {
+        IO.fx<Nothing, Boolean> {
           continueOn(ctxA)
-          val contextA = !effect { Thread.currentThread().name }
+          val contextA = !IO.effect { Thread.currentThread().name }
           continueOn(ctxB)
-          val contextB = !effect { Thread.currentThread().name }
+          val contextB = !IO.effect { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -150,9 +153,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "CoroutineContext.defer" {
       fxTest {
-        IO.fx {
-          val contextA = !effect(ctxA) { Thread.currentThread().name }
-          val contextB = !effect(ctxB) { Thread.currentThread().name }
+        IO.fx<Nothing, Boolean> {
+          val contextA = !IO.effect(ctxA) { Thread.currentThread().name }
+          val contextB = !IO.effect(ctxB) { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -162,10 +165,10 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val msg = AtomicIntW(0)
       val const = 1
       fxTest {
-        IO.fx {
-          !effect { const }.bracketCase(
-            release = { n, exit -> effect { msg.value = const } },
-            use = { effect { it } }
+        IO.fx<Nothing, Int> {
+          !IO.effect { const }.bracketCase(
+            release = { n, exit -> IO.effect { msg.value = const } },
+            use = { IO.effect { it } }
           )
         }
       }
@@ -178,10 +181,10 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       shouldThrow<TestError> {
         fxTest {
-          IO.fx {
-            !effect { const }.bracketCase(
-              release = { n, exit -> effect { msg.value = const } },
-              use = { effect { throw TestError } }
+          IO.fx<Nothing, Int> {
+            !IO.effect { const }.bracketCase(
+              release = { n, exit -> IO.effect { msg.value = const } },
+              use = { IO.effect { throw TestError } }
             )
           }
         }
@@ -192,8 +195,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "fork" {
       val const = 1
       fxTest {
-        IO.fx {
-          val fiber = !effect { const }.fork(dispatchers().default())
+        IO.fx<Nothing, Int> {
+          val fiber = !IO.effect { const }.fork(IO.dispatchers<Nothing>().default())
           val n = !fiber.join()
           n
         }
@@ -202,11 +205,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.traverse syntax" {
       fxTest {
-        IO.fx {
+        IO.fx<Nothing, List<Int>> {
           !listOf(
-            effect { 1 },
-            effect { 2 },
-            effect { 3 }
+            IO.effect { 1 },
+            IO.effect { 2 },
+            IO.effect { 3 }
           ).parTraverse(::identity)
         }
       } shouldBe listOf(1, 2, 3)
@@ -214,11 +217,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.sequence syntax" {
       fxTest {
-        IO.fx {
+        IO.fx<Nothing, List<Int>> {
           !listOf(
-            effect { 1 },
-            effect { 2 },
-            effect { 3 }
+            IO.effect { 1 },
+            IO.effect { 2 },
+            IO.effect { 3 }
           ).parSequence()
         }
       } shouldBe listOf(1, 2, 3)
@@ -246,9 +249,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
         return done
       }
       fxTest {
-        IO.fx {
-          val appliedPureEffect1: String = !effect { sideEffect() }
-          val appliedPureEffect2: String = !effect { sideEffect() }
+        IO.fx<Nothing, String> {
+          val appliedPureEffect1: String = !IO.effect { sideEffect() }
+          val appliedPureEffect2: String = !IO.effect { sideEffect() }
           appliedPureEffect1
         }
       } shouldBe done
@@ -256,7 +259,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
   }
 }
 
-fun <A> fxTest(f: () -> IO<A>): A =
+fun <A> fxTest(f: () -> IO<Nothing, A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()

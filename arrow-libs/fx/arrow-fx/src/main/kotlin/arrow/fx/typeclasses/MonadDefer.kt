@@ -54,7 +54,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    *     }
    *
    *   //sampleEnd
-   *   IO.monadDefer().refExample()
+   *   IO.monadDefer<Nothing>().refExample()
    *     .fix().unsafeRunSync().let(::println)
    * }
    * ```

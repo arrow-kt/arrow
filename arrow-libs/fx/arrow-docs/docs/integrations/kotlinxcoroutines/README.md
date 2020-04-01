@@ -54,8 +54,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
-  IO.fx {
+fun greet(): IO<Nothing, Unit> =
+  IO.fx<Unit> {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
@@ -98,8 +98,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Unit> =
-  IO.fx {
+fun greet(): IO<Nothing, Unit> =
+  IO.fx<Unit> {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
@@ -156,8 +156,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye ${fetchNameOrThrow(userId)}!")
 
-fun greet(): IO<Unit> =
-  IO.fx {
+fun greet(): IO<Nothing, Unit> =
+  IO.fx<Unit> {
     !effect { sayHello() } // This first call will throw and the exception be captured within this IO.
     !effect { sayGoodBye() } // The second op will not be executed because of the above.
   }.handleErrorWith { IO { println("Error printing greeting") } }

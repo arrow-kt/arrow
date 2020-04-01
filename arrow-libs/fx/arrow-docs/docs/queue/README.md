@@ -21,8 +21,8 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
-      val q = !Queue.bounded<ForIO, Int>(10, IO.concurrent())
+    IO.fx<Int> {
+      val q = !Queue.bounded<IOPartialOf<Nothing>, Int>(10, IO.concurrent())
       !q.offer(42)
       !q.take()
     }
@@ -42,8 +42,8 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
-      val q = !Queue.bounded<ForIO, Int>(10, IO.concurrent())
+    IO.fx<Int> {
+      val q = !Queue.bounded<IOPartialOf<Nothing>, Int>(10, IO.concurrent())
       val waiting = !q.take().fork()
       !q.offer(42)
       !waiting.join()
@@ -69,9 +69,9 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
+    IO.fx<List<Int>> {
       val capacity = 2
-      val q = !Queue.bounded<ForIO, Int>(capacity, IO.concurrent())
+      val q = !Queue.bounded<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent())
       !q.offer(42)
       !q.offer(43)
       !q.offer(44).fork() // <-- This `offer` exceeds the capacity and will be suspended
@@ -95,9 +95,9 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
+    IO.fx<List<Int>> {
       val capacity = 2
-      val q = !Queue.dropping<ForIO, Int>(capacity, IO.concurrent())
+      val q = !Queue.dropping<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent())
       !q.offer(42)
       !q.offer(43)
       !q.offer(44) // <-- This `offer` exceeds the capacity and will be dropped immediately
@@ -123,9 +123,9 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
+    IO.fx<List<Int>> {
       val capacity = 2
-      val q = !Queue.sliding<ForIO, Int>(capacity, IO.concurrent())
+      val q = !Queue.sliding<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent())
       !q.offer(42)
       !q.offer(43)
       !q.offer(44) // <-- This `offer` exceeds the capacity, causing the oldest value to be removed
@@ -151,8 +151,8 @@ import arrow.fx.extensions.io.concurrent.concurrent
 fun main(args: Array<String>) {
   val result =
   //sampleStart
-    IO.fx {
-      val q = !Queue.unbounded<ForIO, Int>(IO.concurrent())
+    IO.fx<Int> {
+      val q = !Queue.unbounded<IOPartialOf<Nothing>, Int>(IO.concurrent())
       !q.offer(42)
       // ...
       !q.offer(42000000)

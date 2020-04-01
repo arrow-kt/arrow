@@ -4,10 +4,14 @@ import arrow.core.test.UnitSpec
 import arrow.fx.test.eq.eq
 import arrow.fx.test.laws.shouldBeEq
 import io.kotlintest.shouldBe
+import arrow.fx.test.eq.eqK
+import arrow.typeclasses.Eq
 
-class KindConnectionTests : UnitSpec() {
+class IOConnectionTests : UnitSpec() {
 
   init {
+    val EQ = IO.eqK<Nothing>().liftEq(Eq.any())
+
     "cancellation is only executed once" {
       var effect = 0
       val initial = IO { effect += 1 }
@@ -90,9 +94,9 @@ class KindConnectionTests : UnitSpec() {
       c.push(initial1)
       c.push(initial2)
       c.push(initial3)
-      c.pop() shouldBe initial3
-      c.pop() shouldBe initial2
-      c.pop() shouldBe initial1
+      c.pop().shouldBeEq(initial3, EQ)
+      c.pop().shouldBeEq(initial2, EQ)
+      c.pop().shouldBeEq(initial1, EQ)
     }
 
     "pushPair" {

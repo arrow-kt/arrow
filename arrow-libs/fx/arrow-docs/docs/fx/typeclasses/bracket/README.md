@@ -52,11 +52,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 ```
 
 Note that we wrapped them into [`IO`]({{ '/effects/io' | relative_url }}). [`IO`]({{ '/effects/io' | relative_url }})
@@ -69,6 +69,7 @@ Now, let's say we want to open a file, do some work with it, and then close it. 
 process look like this:
 
 ```kotlin:ank:playground
+import arrow.fx.bracket
 import arrow.fx.IO
 
 class File(url: String) {
@@ -77,11 +78,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -163,7 +164,7 @@ class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
 
 fun main(args: Array<String>) {
 //sampleStart
-val ioProgram = Program(IO.bracket())
+val ioProgram = Program(IO.bracket<Nothing>())
 
 val safeComputation = with (ioProgram) {
   openFile("data.json").bracket(
@@ -234,11 +235,11 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -261,8 +262,8 @@ It requires passing `release` and `use` lambdas. It ensures acquiring, using, an
 `fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
 ```kotlin:ank:playground
-import arrow.fx.IO
-import arrow.fx.typeclasses.ExitCase
+import arrow.fx.*
+import arrow.fx.typeclasses.ExitCase2
 
 class File(url: String) {
     fun open(): File = this
@@ -270,20 +271,21 @@ class File(url: String) {
     override fun toString(): String = "This file contains some interesting content!"
 }
 
-fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+fun openFile(uri: String): IO<Nothing, File> = IO { File(uri).open() }
 
-fun closeFile(file: File): IO<Unit> = IO { file.close() }
+fun closeFile(file: File): IO<Nothing, Unit> = IO { file.close() }
 
-fun fileToString(file: File): IO<String> = IO { file.toString() }
+fun fileToString(file: File): IO<Nothing, String> = IO { file.toString() }
 
 fun main(args: Array<String>) {
 //sampleStart
 val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
-        is ExitCase.Completed -> { /* do something */ }
-        is ExitCase.Cancelled -> { /* do something */ }
-        is ExitCase.Error -> { /* do something */ }
+        ExitCase2.Completed -> { /* do something */ }
+        ExitCase2.Cancelled -> { /* do something */ }
+        is ExitCase2.Error<Nothing> -> { /* do something */ }
+        is ExitCase2.Exception -> { /* do Something */ }
       }
       closeFile(file)
     },

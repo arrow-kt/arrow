@@ -20,7 +20,6 @@ import arrow.core.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.core.none
 import arrow.core.some
-import arrow.core.toT
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import kotlin.coroutines.CoroutineContext
@@ -29,297 +28,312 @@ import kotlin.coroutines.CoroutineContext
 interface IOParMap {
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C> parMapN(fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> =
+  fun <EE, A, B, C> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, f: (A, B) -> C): IO<EE, C> =
     parMapN(IODispatchers.CommonPool, fa, fb, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C> parMapN(fa: IOOf<A>, fb: IOOf<B>, f: (Tuple2<A, B>) -> C): IO<C> =
+  fun <EE, A, B, C> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, f: (Tuple2<A, B>) -> C): IO<EE, C> =
     parMapN(IODispatchers.CommonPool, fa, fb, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B> parTupledN(fa: IOOf<A>, fb: IOOf<B>): IO<Tuple2<A, B>> =
+  fun <EE, A, B> parTupledN(fa: IOOf<EE, A>, fb: IOOf<EE, B>): IO<EE, Tuple2<A, B>> =
     parTupledN(IODispatchers.CommonPool, fa, fb)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (A, B, C) -> D): IO<D> =
+  fun <EE, A, B, C, D> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, f: (A, B, C) -> D): IO<EE, D> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (Tuple3<A, B, C>) -> D): IO<D> =
+  fun <EE, A, B, C, D> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, f: (Tuple3<A, B, C>) -> D): IO<EE, D> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C> parTupledN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<Tuple3<A, B, C>> =
+  fun <EE, A, B, C> parTupledN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>): IO<EE, Tuple3<A, B, C>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, f: (A, B, C, D) -> E): IO<E> =
+  fun <EE, A, B, C, D, E> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, f: (A, B, C, D) -> E): IO<EE, E> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
+  fun <EE, A, B, C, D, E> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
     f: (Tuple4<A, B, C, D>) -> E
-  ): IO<E> =
+  ): IO<EE, E> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>
-  ): IO<Tuple4<A, B, C, D>> =
+  fun <EE, A, B, C, D> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>
+  ): IO<EE, Tuple4<A, B, C, D>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, fe: IOOf<E>, f: (A, B, C, D, E) -> G): IO<G> =
+  fun <EE, A, B, C, D, E, G> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, fe: IOOf<EE, E>, f: (A, B, C, D, E) -> G): IO<EE, G> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E, G> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
+  fun <EE, A, B, C, D, E, G> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
     f: (Tuple5<A, B, C, D, E>) -> G
-  ): IO<G> =
+  ): IO<EE, G> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D, E> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>
-  ): IO<Tuple5<A, B, C, D, E>> =
+  fun <EE, A, B, C, D, E> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>
+  ): IO<EE, Tuple5<A, B, C, D, E>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd, fe)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, fe: IOOf<E>, fg: IOOf<G>, f: (A, B, C, D, E, G) -> H): IO<H> =
+  fun <EE, A, B, C, D, E, G, H> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, fe: IOOf<EE, E>, fg: IOOf<EE, G>, f: (A, B, C, D, E, G) -> H): IO<EE, H> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E, G, H> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
+  fun <EE, A, B, C, D, E, G, H> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
     f: (Tuple6<A, B, C, D, E, G>) -> H
-  ): IO<H> =
+  ): IO<EE, H> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D, E, G> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>
-  ): IO<Tuple6<A, B, C, D, E, G>> =
+  fun <EE, A, B, C, D, E, G> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>
+  ): IO<EE, Tuple6<A, B, C, D, E, G>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, fe: IOOf<E>, fg: IOOf<G>, fh: IOOf<H>, f: (A, B, C, D, E, G, H) -> I): IO<I> =
+  fun <EE, A, B, C, D, E, G, H, I> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, fe: IOOf<EE, E>, fg: IOOf<EE, G>, fh: IOOf<EE, H>, f: (A, B, C, D, E, G, H) -> I): IO<EE, I> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E, G, H, I> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
+  fun <EE, A, B, C, D, E, G, H, I> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
     f: (Tuple7<A, B, C, D, E, G, H>) -> I
-  ): IO<I> =
+  ): IO<EE, I> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D, E, G, H> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>
-  ): IO<Tuple7<A, B, C, D, E, G, H>> =
+  fun <EE, A, B, C, D, E, G, H> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>
+  ): IO<EE, Tuple7<A, B, C, D, E, G, H>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I, J> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, fe: IOOf<E>, fg: IOOf<G>, fh: IOOf<H>, fi: IOOf<I>, f: (A, B, C, D, E, G, H, I) -> J): IO<J> =
+  fun <EE, A, B, C, D, E, G, H, I, J> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, fe: IOOf<EE, E>, fg: IOOf<EE, G>, fh: IOOf<EE, H>, fi: IOOf<EE, I>, f: (A, B, C, D, E, G, H, I) -> J): IO<EE, J> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E, G, H, I, J> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
+  fun <EE, A, B, C, D, E, G, H, I, J> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
     f: (Tuple8<A, B, C, D, E, G, H, I>) -> J
-  ): IO<J> =
+  ): IO<EE, J> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D, E, G, H, I> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>
-  ): IO<Tuple8<A, B, C, D, E, G, H, I>> =
+  fun <EE, A, B, C, D, E, G, H, I> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>
+  ): IO<EE, Tuple8<A, B, C, D, E, G, H, I>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I, J, K> parMapN(fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, fd: IOOf<D>, fe: IOOf<E>, fg: IOOf<G>, fh: IOOf<H>, fi: IOOf<I>, fj: IOOf<J>, f: (A, B, C, D, E, G, H, I, J) -> K): IO<K> =
+  fun <EE, A, B, C, D, E, G, H, I, J, K> parMapN(fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, fd: IOOf<EE, D>, fe: IOOf<EE, E>, fg: IOOf<EE, G>, fh: IOOf<EE, H>, fi: IOOf<EE, I>, fj: IOOf<EE, J>, f: (A, B, C, D, E, G, H, I, J) -> K): IO<EE, K> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi, fj, f)
 
   /**
    * @see parMapN
    */
-  fun <A, B, C, D, E, G, H, I, J, K> parMapN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
-    fj: IOOf<J>,
+  fun <EE, A, B, C, D, E, G, H, I, J, K> parMapN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
+    fj: IOOf<EE, J>,
     f: (Tuple9<A, B, C, D, E, G, H, I, J>) -> K
-  ): IO<K> =
+  ): IO<EE, K> =
     parMapN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi, fj, f)
 
   /**
    * @see parTupledN
    */
-  fun <A, B, C, D, E, G, H, I, J> parTupledN(
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
-    fj: IOOf<J>
-  ): IO<Tuple9<A, B, C, D, E, G, H, I, J>> =
+  fun <EE, A, B, C, D, E, G, H, I, J> parTupledN(
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
+    fj: IOOf<EE, J>
+  ): IO<EE, Tuple9<A, B, C, D, E, G, H, I, J>> =
     parTupledN(IODispatchers.CommonPool, fa, fb, fc, fd, fe, fg, fh, fi, fj)
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> =
+  fun <EE, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>, f: (A, B) -> C): IO<EE, C> =
     parMapN(ctx, fa, fb) { (a, b) -> f(a, b) }
 
-  fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (Tuple2<A, B>) -> C): IO<C> =
+  fun <EE, A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>, f: (Tuple2<A, B>) -> C): IO<EE, C> =
     parTupledN(ctx, fa, fb).map(f)
 
-  fun <A, B> parTupledN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<Tuple2<A, B>> = IO.Async(true) { conn, cb ->
-    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
-    val state = AtomicRefW<Any?>(null)
+  fun <EE, A, B> parTupledN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>): IO<EE, Tuple2<A, B>> =
+    IO.Async(true) { conn, cb ->
+      // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
+      val state = AtomicRefW<Any?>(null)
 
-    val connA = IOConnection()
-    val connB = IOConnection()
+      val connA = IOConnection()
+      val connB = IOConnection()
 
-    conn.pushPair(connA, connB)
+      conn.pushPair(connA, connB)
 
-    fun complete(a: A, b: B) {
-      conn.pop()
-      cb(try {
-        Either.Right(a toT b)
-      } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
-      })
-    }
-
-    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
-      is Throwable -> Unit // Do nothing we already finished
-      else -> other.cancel().fix().unsafeRunAsync { r ->
+      fun complete(a: A, b: B) {
         conn.pop()
-        cb(Left(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
+        cb(try {
+          IOResult.Success(Tuple2(a, b))
+        } catch (e: Throwable) {
+          IOResult.Exception(e.nonFatalOrThrow())
+        })
+      }
+
+      fun sendException(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
+        is Throwable -> Unit // Do nothing we already finished TODO replace with active field
+        else -> other.cancel().unsafeRunAsync { r ->
+          conn.pop()
+          // TODO if `r` is an exception send it to the asyncErrorHandler
+          cb(IOResult.Exception(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
+        }
+      }
+
+      fun sendError(other: IOConnection, e: EE) = when (state.getAndSet(e)) {
+        is Throwable -> Unit
+        else -> other.cancel().unsafeRunAsync { r ->
+          conn.pop()
+          cb(IOResult.Error(e))
+          // TODO if `r` is an exception send it to the asyncErrorHandler
+        }
+      }
+
+      IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
+        resultA.fold({ e ->
+          sendException(connB, e)
+        }, { e ->
+          sendError(connB, e)
+        }, { a ->
+          when (val oldState = state.getAndSet(Left(a))) {
+            null -> Unit // Wait for B
+            is Throwable -> Unit // ParMapN already failed and A was cancelled.
+            is Either.Left<*> -> Unit // Already state.getAndSet
+            is Either.Right<*> -> complete(a, (oldState as Either.Right<B>).b)
+          }
+        })
+      }
+
+      IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
+        resultB.fold({ e ->
+          sendException(connA, e)
+        }, { e ->
+          sendError(connB, e)
+        }, { b ->
+          when (val oldState = state.getAndSet(Right(b))) {
+            null -> Unit // Wait for A
+            is Throwable -> Unit // ParMapN already failed and B was cancelled.
+            is Either.Right<*> -> Unit // IO cannot finish twice
+            is Either.Left<*> -> complete((oldState as Either.Left<A>).a, b)
+          }
+        })
       }
     }
 
-    IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
-      resultA.fold({ e ->
-        sendError(connB, e)
-      }, { a ->
-        when (val oldState = state.getAndSet(Left(a))) {
-          null -> Unit // Wait for B
-          is Throwable -> Unit // ParMapN already failed and A was cancelled.
-          is Either.Left<*> -> Unit // Already state.getAndSet
-          is Either.Right<*> -> complete(a, (oldState as Either.Right<B>).b)
-        }
-      })
-    }
-
-    IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
-      resultB.fold({ e ->
-        sendError(connA, e)
-      }, { b ->
-        when (val oldState = state.getAndSet(Right(b))) {
-          null -> Unit // Wait for A
-          is Throwable -> Unit // ParMapN already failed and B was cancelled.
-          is Either.Right<*> -> Unit // IO cannot finish twice
-          is Either.Left<*> -> complete((oldState as Either.Left<A>).a, b)
-        }
-      })
-    }
-  }
-
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (A, B, C) -> D): IO<D> =
+  fun <EE, A, B, C, D> parMapN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, f: (A, B, C) -> D): IO<EE, D> =
     parMapN(ctx, fa, fb, fc) { (a, b, c) -> f(a, b, c) }
 
-  fun <A, B, C, D> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>, f: (Tuple3<A, B, C>) -> D): IO<D> =
+  fun <EE, A, B, C, D> parMapN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>, f: (Tuple3<A, B, C>) -> D): IO<EE, D> =
     parTupledN(ctx, fa, fb, fc).map(f)
 
-  fun <A, B, C> parTupledN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<Tuple3<A, B, C>> = IO.Async(true) { conn, cb ->
+  fun <EE, A, B, C> parTupledN(ctx: CoroutineContext, fa: IOOf<EE, A>, fb: IOOf<EE, B>, fc: IOOf<EE, C>): IO<EE, Tuple3<A, B, C>> = IO.Async(true) { conn, cb ->
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(None)
     val active = AtomicBooleanW(true)
 
@@ -333,22 +347,23 @@ interface IOParMap {
 
     fun complete(a: A, b: B, c: C) {
       conn.pop()
-      cb(try {
-        Either.Right(Tuple3(a, b, c))
+      val result: IOResult<EE, Tuple3<A, B, C>> = try {
+        IOResult.Success(Tuple3(a, b, c))
       } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
-      })
+        IOResult.Exception(e.nonFatalOrThrow())
+      }
+      cb(result)
     }
 
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
       result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
-    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
+    fun sendException(other: IOConnection, other2: IOConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
-        other.cancel().fix().unsafeRunAsync { r1 ->
-          other2.cancel().fix().unsafeRunAsync { r2 ->
+        other.cancel().unsafeRunAsync { r1 ->
+          other2.cancel().unsafeRunAsync { r2 ->
             conn.pop()
-            cb(Left(r1.fold({ e2 ->
+            cb(IOResult.Exception(r1.fold({ e2 ->
               r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
             }, {
               r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
@@ -357,8 +372,21 @@ interface IOParMap {
         }
       } else Unit
 
+    fun sendError(other: IOConnection, other2: IOConnection, e: EE) =
+      if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
+        other.cancel().unsafeRunAsync { r1 ->
+          other2.cancel().unsafeRunAsync { r2 ->
+            conn.pop()
+            // Send r1 & r2 to asyncErrorHandler if cancellation failed
+            cb(IOResult.Error(e))
+          }
+        }
+      } else Unit
+
     IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
       resultA.fold({ e ->
+        sendException(connB, connC, e)
+      }, { e ->
         sendError(connB, connC, e)
       }, { a ->
         tryComplete(state.updateAndGet { current ->
@@ -371,7 +399,9 @@ interface IOParMap {
 
     IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
       resultB.fold({ e ->
-        sendError(connA, connC, e)
+        sendException(connA, connC, e)
+      }, { e ->
+        sendError(connB, connC, e)
       }, { b ->
         tryComplete(state.updateAndGet { current ->
           current
@@ -383,7 +413,9 @@ interface IOParMap {
 
     IORunLoop.startCancellable(IOForkedStart(fc, ctx), connC) { resultC ->
       resultC.fold({ e ->
-        sendError(connA, connB, e)
+        sendException(connA, connB, e)
+      }, { e ->
+        sendError(connB, connC, e)
       }, { c ->
         tryComplete(state.updateAndGet { current ->
           current
@@ -398,14 +430,14 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E> parMapN(
+  fun <EE, A, B, C, D, E> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
     f: (A, B, C, D) -> E
-  ): IO<E> =
+  ): IO<EE, E> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, ::Tuple2),
       parMapN(ctx, fc, fd, ::Tuple2)
@@ -413,22 +445,22 @@ interface IOParMap {
       f(a, b, c, d)
     }
 
-  fun <A, B, C, D, E> parMapN(
+  fun <EE, A, B, C, D, E> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
     f: (Tuple4<A, B, C, D>) -> E
-  ): IO<E> = parTupledN(ctx, fa, fb, fc, fd).map(f)
+  ): IO<EE, E> = parTupledN(ctx, fa, fb, fc, fd).map(f)
 
-  fun <A, B, C, D> parTupledN(
+  fun <EE, A, B, C, D> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>
-  ): IO<Tuple4<A, B, C, D>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>
+  ): IO<EE, Tuple4<A, B, C, D>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb),
       parTupledN(ctx, fc, fd)
@@ -440,15 +472,15 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G> parMapN(
+  fun <EE, A, B, C, D, E, G> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
     f: (A, B, C, D, E) -> G
-  ): IO<G> =
+  ): IO<EE, G> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, ::Tuple2)
@@ -456,24 +488,24 @@ interface IOParMap {
       f(a, b, c, d, e)
     }
 
-  fun <A, B, C, D, E, G> parMapN(
+  fun <EE, A, B, C, D, E, G> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
     f: (Tuple5<A, B, C, D, E>) -> G
-  ): IO<G> = parTupledN(ctx, fa, fb, fc, fd, fe).map(f)
+  ): IO<EE, G> = parTupledN(ctx, fa, fb, fc, fd, fe).map(f)
 
-  fun <A, B, C, D, E> parTupledN(
+  fun <EE, A, B, C, D, E> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>
-  ): IO<Tuple5<A, B, C, D, E>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>
+  ): IO<EE, Tuple5<A, B, C, D, E>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe)
@@ -487,16 +519,16 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H> parMapN(
+  fun <EE, A, B, C, D, E, G, H> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
     f: (A, B, C, D, E, G) -> H
-  ): IO<H> =
+  ): IO<EE, H> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3)
@@ -504,26 +536,26 @@ interface IOParMap {
       f(a, b, c, d, e, g)
     }
 
-  fun <A, B, C, D, E, G, H> parMapN(
+  fun <EE, A, B, C, D, E, G, H> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
     f: (Tuple6<A, B, C, D, E, G>) -> H
-  ): IO<H> = parTupledN(ctx, fa, fb, fc, fd, fe, fg).map(f)
+  ): IO<EE, H> = parTupledN(ctx, fa, fb, fc, fd, fe, fg).map(f)
 
-  fun <A, B, C, D, E, G> parTupledN(
+  fun <EE, A, B, C, D, E, G> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>
-  ): IO<Tuple6<A, B, C, D, E, G>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>
+  ): IO<EE, Tuple6<A, B, C, D, E, G>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg)
@@ -537,17 +569,17 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
     f: (A, B, C, D, E, G, H) -> I
-  ): IO<I> =
+  ): IO<EE, I> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, ::Tuple2),
@@ -556,28 +588,28 @@ interface IOParMap {
       f(a, b, c, d, e, g, h)
     }
 
-  fun <A, B, C, D, E, G, H, I> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
     f: (Tuple7<A, B, C, D, E, G, H>) -> I
-  ): IO<I> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh).map(f)
+  ): IO<EE, I> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh).map(f)
 
-  fun <A, B, C, D, E, G, H> parTupledN(
+  fun <EE, A, B, C, D, E, G, H> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>
-  ): IO<Tuple7<A, B, C, D, E, G, H>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>
+  ): IO<EE, Tuple7<A, B, C, D, E, G, H>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe),
@@ -593,18 +625,18 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I, J> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I, J> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
     f: (A, B, C, D, E, G, H, I) -> J
-  ): IO<J> =
+  ): IO<EE, J> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3),
@@ -613,30 +645,30 @@ interface IOParMap {
       f(a, b, c, d, e, g, h, i)
     }
 
-  fun <A, B, C, D, E, G, H, I, J> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I, J> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
     f: (Tuple8<A, B, C, D, E, G, H, I>) -> J
-  ): IO<J> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh, fi).map(f)
+  ): IO<EE, J> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh, fi).map(f)
 
-  fun <A, B, C, D, E, G, H, I> parTupledN(
+  fun <EE, A, B, C, D, E, G, H, I> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>
-  ): IO<Tuple8<A, B, C, D, E, G, H, I>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>
+  ): IO<EE, Tuple8<A, B, C, D, E, G, H, I>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),
@@ -652,19 +684,19 @@ interface IOParMap {
    * @see parMapN
    */
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
-  fun <A, B, C, D, E, G, H, I, J, K> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I, J, K> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
-    fj: IOOf<J>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
+    fj: IOOf<EE, J>,
     f: (A, B, C, D, E, G, H, I, J) -> K
-  ): IO<K> =
+  ): IO<EE, K> =
     parMapN(ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3),
@@ -673,32 +705,32 @@ interface IOParMap {
       f(a, b, c, d, e, g, h, i, j)
     }
 
-  fun <A, B, C, D, E, G, H, I, J, K> parMapN(
+  fun <EE, A, B, C, D, E, G, H, I, J, K> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
-    fj: IOOf<J>,
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
+    fj: IOOf<EE, J>,
     f: (Tuple9<A, B, C, D, E, G, H, I, J>) -> K
-  ): IO<K> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj).map(f)
+  ): IO<EE, K> = parTupledN(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj).map(f)
 
-  fun <A, B, C, D, E, G, H, I, J> parTupledN(
+  fun <EE, A, B, C, D, E, G, H, I, J> parTupledN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
-    fd: IOOf<D>,
-    fe: IOOf<E>,
-    fg: IOOf<G>,
-    fh: IOOf<H>,
-    fi: IOOf<I>,
-    fj: IOOf<J>
-  ): IO<Tuple9<A, B, C, D, E, G, H, I, J>> =
+    fa: IOOf<EE, A>,
+    fb: IOOf<EE, B>,
+    fc: IOOf<EE, C>,
+    fd: IOOf<EE, D>,
+    fe: IOOf<EE, E>,
+    fg: IOOf<EE, G>,
+    fh: IOOf<EE, H>,
+    fi: IOOf<EE, I>,
+    fj: IOOf<EE, J>
+  ): IO<EE, Tuple9<A, B, C, D, E, G, H, I, J>> =
     parMapN(ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),

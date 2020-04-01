@@ -28,11 +28,12 @@ inline fun <F, A> QueueOf<F, A>.fix(): Queue<F, A> =
  * import arrow.fx.*
  * import arrow.fx.typeclasses.*
  * import arrow.fx.extensions.fx
+ * import arrow.fx.extensions.io.async.effectMap
  * import kotlin.coroutines.EmptyCoroutineContext
  *
  * //sampleStart
- * suspend fun main(args: Array<String>): Unit = IO.fx {
- *   fun consumeInts(e: Dequeue<ForIO, Int>, max: Int): IOOf<Unit> =
+ * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
+ *   fun consumeInts(e: Dequeue<IOPartialOf<Nothing>, Int>, max: Int): IOOf<Nothing, Unit> =
  *     (0..max).toList().parTraverse(EmptyCoroutineContext) { i ->
  *       IO.sleep(i * 10.milliseconds).followedBy(
  *         e.take().effectMap { println("I took $it") }
@@ -42,8 +43,7 @@ inline fun <F, A> QueueOf<F, A>.fix(): Queue<F, A> =
  *   val queue = !Queue.unbounded<Int>()
  *   !consumeInts(queue, 1000).fork()
  *   !IO.sleep(4.seconds)
- * }.suspended()
- * //sampleEnd
+ * }.suspended().let { Unit }
  * ```
  *
  * @see Queue in the case your functions or layers are allowed to take and offer.
@@ -59,13 +59,13 @@ interface Dequeue<F, A> {
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   val (join, _) = !queue.take().fork()
    *   !queue.offer(1) // Removing this offer makes, !join block forever.
    *   val res = !join // Join the blocking take, after we offered a value
-   *   !effect { println(res) }
-   * }.suspended()
+   *   !IO.effect { println(res) }
+   * }.suspended().let { Unit }
    * //sampleEnd
    * ```
    *
@@ -83,14 +83,14 @@ interface Dequeue<F, A> {
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   val none = !queue.tryTake()
    *   !queue.offer(1)
    *   val one = !queue.tryTake()
    *   val none2 = !queue.tryTake()
-   *   !effect { println("none: $none, one $one, none2: $none2") }
-   * }.suspended()
+   *   !IO.effect { println("none: $none, one $one, none2: $none2") }
+   * }.suspended().let { Unit }
    * //sampleEnd
    * ```
    *
@@ -103,19 +103,19 @@ interface Dequeue<F, A> {
    * Peeks a value from the [Queue] or semantically blocks until a value becomes available.
    * In contrast to [take], [peek] does not remove the value from the [Queue].
    *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.fx.*
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   val (join, _) = !queue.peek().fork()
    *   !queue.offer(1) // Removing this offer makes, !join block forever.
    *   val res = !join // Join the blocking peek, after we offered a value
    *   val res2 = !queue.peek() // We can peek again since it doesn't remove the value
-   *   !effect { println("res: $res, res2: $res2") }
-   * }.suspended()
+   *   !IO.effect { println("res: $res, res2: $res2") }
+   * }.suspended().let { Unit }
    * //sampleEnd
    * ```
    *
@@ -128,19 +128,21 @@ interface Dequeue<F, A> {
    * Tries to peek a value from the [Queue]. Returns immediately with either [None] or a value [Some].
    * In contrast to [tryTake], [tryPeek] does not remove the value from the [Queue].
    *
+   * ```kotlin:ank:playground
    * import arrow.fx.*
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   val none = !queue.tryPeek()
    *   !queue.offer(1)
    *   val one = !queue.tryPeek()
    *   val one2 = !queue.tryPeek()
-   *   !effect { println("none: $none, one $one, one2: $one2") }
-   * }.suspended()
+   *   !IO.effect { println("none: $none, one $one, one2: $one2") }
+   * }.suspended().let { Unit }
    * //sampleEnd
+   *```
    *
    * @see [peek] for a function that semantically blocks until a value becomes available.
    * @see [tryTake] for a function that attempts to take a value from the [Queue] while removing it.
@@ -151,18 +153,20 @@ interface Dequeue<F, A> {
    * Immediately returns all available values in the [Queue], and empties the [Queue].
    * It returns an [emptyList] when no values are available.
    *
+   * ```kotlin:ank:playground
    * import arrow.fx.*
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   !queue.offerAll(1, 2, 3, 4)
    *   val values = !queue.takeAll()
    *   val empty = !queue.takeAll()
-   *   !effect { println("values: $values, empty: $empty") }
-   * }.suspended()
+   *   !IO.effect { println("values: $values, empty: $empty") }
+   * }.suspended().let { Unit }
    * //sampleEnd
+   * ```
    *
    * For a [BackpressureStrategy.Bounded], this also includes all blocking offers that are waiting to be added in the [Queue].
    *
@@ -174,18 +178,21 @@ interface Dequeue<F, A> {
    * Immediately returns all available values in the [Queue], without empty'ing the [Queue].
    * It returns an [emptyList] when no values are available.
    *
+   *
+   * ```kotlin:ank:playground
    * import arrow.fx.*
    * import arrow.fx.extensions.fx
    *
    * //sampleStart
-   * suspend fun main(args: Array<String>): Unit = IO.fx {
+   * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
    *   val queue = !Queue.unbounded<Int>()
    *   !queue.offerAll(1, 2, 3, 4)
    *   val values = !queue.peekAll()
    *   val values2 = !queue.peekAll()
-   *   !effect { println("values: $values, values2: values2") }
-   * }.suspended()
+   *   !IO.effect { println("values: $values, values2: values2") }
+   * }.suspended().let { Unit }
    * //sampleEnd
+   *```
    *
    * For a [BackpressureStrategy.Bounded], this also includes all blocking offers that are waiting to be added in the [Queue].
    *
@@ -205,8 +212,8 @@ interface Dequeue<F, A> {
   * import kotlin.coroutines.EmptyCoroutineContext
   *
   * //sampleStart
-  * suspend fun main(args: Array<String>): Unit = IO.fx {
-  *   fun produceInts(e: Enqueue<ForIO, Int>, max: Int): IOOf<Unit> =
+  * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
+  *   fun produceInts(e: Enqueue<IOPartialOf<Nothing>, Int>, max: Int): IOOf<Nothing, Unit> =
   *     (0..max).parTraverse(EmptyCoroutineContext) { i ->
   *       IO.sleep(i * 10.milliseconds).followedBy(e.offer(i))
   *     }.void()
@@ -215,8 +222,8 @@ interface Dequeue<F, A> {
   *   !produceInts(queue, 1000).fork()
   *   !IO.sleep(4.seconds)
   *   val res = !queue.takeAll()
-  *   !effect { println(res) }
-  * }.suspended()
+  *   !IO.effect { println(res) }
+  * }.suspended().let { Unit }
   * //sampleEnd
  * ```
  *
@@ -302,7 +309,7 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      * import arrow.fx.extensions.fx
      * import arrow.fx.extensions.io.concurrent.concurrent
      *
-     * suspend fun main(args: Array<String>): Unit = IO.fx {
+     * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
      *   val capacity = 2
      *   val q = !Queue.bounded<Int>(capacity)
      *   !q.offer(42)
@@ -311,8 +318,8 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      *   val fortyTwo   = !q.take()
      *   val fortyThree = !q.take()
      *   val fortyFour  = !q.take()
-     *   !effect { println(listOf(fortyTwo, fortyThree, fortyFour)) }
-     * }.suspended()
+     *   !IO.effect { println(listOf(fortyTwo, fortyThree, fortyFour)) }
+     * }.suspended().let { Unit }
      * ```
      */
     fun <F, A> bounded(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
@@ -332,9 +339,9 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      * import arrow.fx.extensions.fx
      * import arrow.fx.extensions.io.concurrent.concurrent
      *
-     * suspend fun main(args: Array<String>): Unit = IO.fx {
+     * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
      *  val capacity = 2
-     *  val q = !Queue.sliding<ForIO, Int>(capacity, IO.concurrent())
+     *  val q = !Queue.sliding<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent<Nothing>())
      *  !q.offer(42)
      *  !q.offer(43)
      *  !q.offer(44) // <-- This `offer` exceeds the capacity, causing the oldest value to be removed
@@ -342,8 +349,8 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      *  val fortyFour  = !q.take()
      *  !q.offer(45)
      *  val fortyFive  = !q.take()
-     *  !effect { println(listOf(fortyThree, fortyFour, fortyFive)) }
-     * }.suspended()
+     *  !IO.effect { println(listOf(fortyThree, fortyFour, fortyFive)) }
+     * }.suspended().let { Unit }
      * ```
      */
     fun <F, A> sliding(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
@@ -362,9 +369,9 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      * import arrow.fx.extensions.fx
      * import arrow.fx.extensions.io.concurrent.concurrent
      *
-     * suspend fun main(args: Array<String>): Unit = IO.fx {
+     * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
      *   val capacity = 2
-     *   val q = !Queue.dropping<ForIO, Int>(capacity, IO.concurrent())
+     *   val q = !Queue.dropping<IOPartialOf<Nothing>, Int>(capacity, IO.concurrent<Nothing>())
      *   !q.offer(42)
      *   !q.offer(43)
      *   !q.offer(44) // <-- This `offer` exceeds the capacity and will be dropped immediately
@@ -372,8 +379,8 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      *   val fortyThree = !q.take()
      *   !q.offer(45)
      *   val fortyFive  = !q.take()
-     *   !effect { println(listOf(fortyTwo, fortyThree, fortyFive)) }
-     * }.suspended()
+     *   !IO.effect { println(listOf(fortyTwo, fortyThree, fortyFive)) }
+     * }.suspended().let { Unit }
      * ```
      */
     fun <F, A> dropping(capacity: Int, CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.run {
@@ -392,14 +399,14 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
      * import arrow.fx.extensions.fx
      * import arrow.fx.extensions.io.concurrent.concurrent
      *
-     * suspend fun main(args: Array<String>): Unit = IO.fx {
-     *   val q = !Queue.unbounded<ForIO, Int>(IO.concurrent())
+     * suspend fun main(args: Array<String>): Unit = IO.fx<Nothing, Unit> {
+     *   val q = !Queue.unbounded<IOPartialOf<Nothing>, Int>(IO.concurrent<Nothing>())
      *   !q.offer(42)
      *   // ...
      *   !q.offer(42000000)
      *   val res = !q.take()
-     *   !effect { println(res) }
-     * }.suspended()
+     *   !IO.effect { println(res) }
+     * }.suspended().let { Unit }
      * ```
      */
     fun <F, A> unbounded(CF: Concurrent<F>): Kind<F, Queue<F, A>> = CF.later {
@@ -428,13 +435,13 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
  * import arrow.fx.extensions.io.concurrent.concurrent
  *
  * //sampleStart
- * suspend fun main(): Unit = IO.fx {
- *   val factory: QueueFactory<ForIO> = Queue.factory(IO.concurrent())
+ * suspend fun main(): Unit = IO.fx<Nothing, Unit> {
+ *   val factory: QueueFactory<IOPartialOf<Nothing>> = Queue.factory(IO.concurrent<Nothing>())
  *   val unbounded = !factory.unbounded<Int>()
  *   val bounded = !factory.bounded<String>(10)
  *   val sliding = !factory.sliding<Double>(4)
  *   val dropping = !factory.dropping<Float>(4)
- * }.suspended()
+ * }.suspended().let { Unit }
  * //sampleEnd
  * ```
  */

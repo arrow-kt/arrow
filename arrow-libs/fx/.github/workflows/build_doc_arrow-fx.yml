@@ -1,9 +1,6 @@
 name: "arrow-fx: build documentation"
 
-on:
-  pull_request:
-    branches-ignore:
-    - release/0.11.0
+on: pull_request
 
 jobs:
   arrow-fx_build_documentation:

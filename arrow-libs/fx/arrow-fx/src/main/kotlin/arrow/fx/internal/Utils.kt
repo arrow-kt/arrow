@@ -1,8 +1,10 @@
 package arrow.fx.internal
 
 import arrow.core.Either
+import arrow.core.Left
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Some
 import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
@@ -10,6 +12,7 @@ import arrow.core.right
 import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOOf
+import arrow.fx.IOResult
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
@@ -150,10 +153,10 @@ object Platform {
     }
   }
 
-  fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
+  fun <E, A> unsafeResync(ioa: IO<E, A>, limit: Duration): Option<Either<E, A>> {
     val latch = OneShotLatch()
-    var ref: Either<Throwable, A>? = null
-    ioa.unsafeRunAsync { a ->
+    var ref: IOResult<E, A>? = null
+    ioa.fix().unsafeRunAsyncEither { a ->
       ref = a
       latch.releaseShared(1)
     }
@@ -166,8 +169,9 @@ object Platform {
 
     return when (val eitherRef = ref) {
       null -> None
-      is Either.Left -> throw eitherRef.a
-      is Either.Right -> Some(eitherRef.b)
+      is IOResult.Success -> Some(Right(eitherRef.value))
+      is IOResult.Error -> Some(Left(eitherRef.error))
+      is IOResult.Exception -> throw eitherRef.exception
     }
   }
 
@@ -298,5 +302,5 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
  * so it'll share it's [kotlin.coroutines.Continuation] with other potential jumps or [IO.async].
  * @see [arrow.fx.IORunLoop.RestartCallback]
  */
-internal fun <A> IOForkedStart(fa: IOOf<A>, ctx: CoroutineContext): IO<A> =
-  IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }
+internal fun <E, A> IOForkedStart(fa: IOOf<E, A>, ctx: CoroutineContext): IO<E, A> =
+  IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa }

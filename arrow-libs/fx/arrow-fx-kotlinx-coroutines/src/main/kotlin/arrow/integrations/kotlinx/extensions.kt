@@ -1,17 +1,21 @@
 package arrow.integrations.kotlinx
 
 import arrow.core.Either
-import arrow.fx.ForIO
+import arrow.core.Left
+import arrow.core.Right
 import arrow.fx.IO
 import arrow.fx.IOOf
+import arrow.fx.IOPartialOf
+import arrow.fx.IOResult
 import arrow.fx.fix
+import arrow.fx.flatMap
+import arrow.fx.unsafeRunAsyncCancellable
 import arrow.fx.internal.UnsafePromise
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Fiber
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.newCoroutineContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.EmptyCoroutineContext
@@ -24,16 +28,27 @@ import kotlin.coroutines.resumeWithException
  *
  * This will make sure that the source [IO] is cancelled whenever it's [CoroutineScope] is cancelled.
  */
-suspend fun <A> IOOf<A>.suspendCancellable(): A =
+suspend fun <A> IOOf<Nothing, A>.suspendCancellable(): A =
   suspendCancellableCoroutine { cont ->
     if (cont.isActive) {
-      val disposable = fix().unsafeRunAsyncCancellable { result ->
-        result.fold<Unit>(cont::resumeWithException, cont::resume)
+      val disposable = fix().unsafeRunAsyncCancellable { either ->
+        either.fold(cont::resumeWithException) { cont.resume(it) }
       }
 
       cont.invokeOnCancellation { disposable() }
     }
   }
+
+@JvmName("suspendEitherCancellable")
+suspend fun <E, A> IOOf<E, A>.suspendCancellable(): Either<E, A> = suspendCancellableCoroutine { cont ->
+  if (cont.isActive) {
+    val disposable = fix().unsafeRunAsyncCancellableEither { result ->
+      result.fold(cont::resumeWithException, { cont.resume((Left(it))) }) { cont.resume(Right(it)) }
+    }
+
+    cont.invokeOnCancellation { disposable() }
+  }
+}
 
 /**
  * Unsafely run an [IO] and receive the values in a callback [cb] while participating in structured concurrency.
@@ -41,7 +56,7 @@ suspend fun <A> IOOf<A>.suspendCancellable(): A =
  *
  * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
  */
-fun <A> CoroutineScope.unsafeRunIO(io: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+fun <E, A> CoroutineScope.unsafeRunIO(io: IOOf<E, A>, cb: (IOResult<E, A>) -> Unit): Unit =
   io.unsafeRunScoped(this, cb)
 
 /**
@@ -50,15 +65,15 @@ fun <A> CoroutineScope.unsafeRunIO(io: IOOf<A>, cb: (Either<Throwable, A>) -> Un
  *
  * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
  */
-fun <A> IOOf<A>.unsafeRunScoped(
+fun <E, A> IOOf<E, A>.unsafeRunScoped(
   scope: CoroutineScope,
-  cb: (Either<Throwable, A>) -> Unit
-): Unit {
+  cb: (IOResult<E, A>) -> Unit
+) {
   val newContext = scope.newCoroutineContext(EmptyCoroutineContext)
   val job = newContext[Job]
 
   if (job == null || job.isActive) {
-    val disposable = fix().unsafeRunAsyncCancellable(cb = cb)
+    val disposable = fix().unsafeRunAsyncCancellableEither(cb = cb)
 
     job?.invokeOnCompletion { e ->
       if (e is CancellationException) disposable?.invoke()
@@ -73,28 +88,28 @@ fun <A> IOOf<A>.unsafeRunScoped(
  *
  * This returns a [Fiber] that automatically gets cancelled when [CoroutineScope] gets cancelled.
  */
-fun <A> IOOf<A>.forkScoped(scope: CoroutineScope): IO<Fiber<ForIO, A>> =
+fun <E, A> IOOf<E, A>.forkScoped(scope: CoroutineScope): IO<E, Fiber<IOPartialOf<E>, A>> =
   IO.async { cb ->
     val newContext = scope.newCoroutineContext(EmptyCoroutineContext)
     val job = newContext[Job]
 
-    val promise = UnsafePromise<A>()
+    val promise = UnsafePromise<E, A>()
 
     if (job == null || job.isActive) {
       val disposable = IO.unit.continueOn(newContext).flatMap { fix() }
-        .unsafeRunAsyncCancellable(cb = promise::complete)
+        .unsafeRunAsyncCancellableEither(cb = promise::complete)
 
       job?.invokeOnCompletion { e ->
         if (e is CancellationException) disposable.invoke()
         else Unit
       }
 
-      cb(Either.Right(IOFiber(promise, disposable)))
-    } else cb(Either.Right(Fiber(IO.never, IO.unit)))
+      cb(IOResult.Success(IOFiber(promise, disposable)))
+    } else cb(IOResult.Success(Fiber<IOPartialOf<E>, A>(IO.never, IO.unit)))
   }
 
-private fun <A> IOFiber(promise: UnsafePromise<A>, conn: Disposable): Fiber<ForIO, A> {
-  val join: IO<A> = IO.cancellable { cb ->
+private fun <E, A> IOFiber(promise: UnsafePromise<E, A>, conn: Disposable): Fiber<IOPartialOf<E>, A> {
+  val join: IO<E, A> = IO.cancellable { cb ->
     promise.get(cb)
 
     IO { promise.remove(cb) }

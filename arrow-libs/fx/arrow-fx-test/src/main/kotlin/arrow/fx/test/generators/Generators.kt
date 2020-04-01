@@ -6,8 +6,8 @@ import arrow.core.test.generators.GenK
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.throwable
 import arrow.fx.DecisionPartialOf
-import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IOPartialOf
 import arrow.fx.Schedule
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.FiberPartialOf
@@ -22,10 +22,18 @@ fun <F, A, E> Gen<E>.raiseError(AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
 
 fun Gen.Companion.timeUnit(): Gen<TimeUnit> = Gen.from(TimeUnit.values())
 
-fun IO.Companion.genK() = object : GenK<ForIO> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(
+fun IO.Companion.genK() = object : GenK<IOPartialOf<Nothing>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<IOPartialOf<Nothing>, A>> = Gen.oneOf(
     gen.map(IO.Companion::just),
-    Gen.throwable().map(IO.Companion::raiseError)
+    Gen.throwable().map(IO.Companion::raiseException)
+  )
+}
+
+fun <E> IO.Companion.genK(GENE: Gen<E>) = object : GenK<IOPartialOf<E>> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<IOPartialOf<E>, A>> = Gen.oneOf(
+    gen.map(IO.Companion::just),
+    Gen.throwable().map(IO.Companion::raiseException),
+    GENE.map(IO.Companion::raiseError)
   )
 }
 

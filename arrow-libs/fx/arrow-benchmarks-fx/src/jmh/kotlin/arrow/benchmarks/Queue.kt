@@ -1,13 +1,14 @@
 package arrow.benchmarks
 
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOOf
+import arrow.fx.IOPartialOf
 import arrow.fx.Queue
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.functor.unit
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.fix
+import arrow.fx.unsafeRunSync
+import arrow.fx.void
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -31,19 +32,19 @@ open class Queue {
   @Param("1000")
   var size: Int = 0
 
-  var ConcurQueue by Delegates.notNull<Queue<ForIO, Int>>()
+  var ConcurQueue by Delegates.notNull<Queue<IOPartialOf<Nothing>, Int>>()
 
   @Setup(Level.Trial)
   fun createQueues(): Unit {
-    ConcurQueue = Queue.unbounded<ForIO, Int>(IO.concurrent()).fix().unsafeRunSync()
+    ConcurQueue = Queue.unbounded<IOPartialOf<Nothing>, Int>(IO.concurrent()).unsafeRunSync()
   }
 
-  fun <A> IOOf<A>.repeat(n: Int): IO<A> =
+  fun <A> IOOf<Nothing, A>.repeat(n: Int): IO<Nothing, A> =
     if (n < 1) fix() else flatMap { repeat(n - 1) }
 
-  fun loop(q: Queue<ForIO, Int>): Unit =
-    q.offer(0).unit().repeat(size).flatMap {
-      q.take().unit().repeat(size)
+  fun loop(q: Queue<IOPartialOf<Nothing>, Int>): Unit =
+    q.offer(0).void().repeat(size).flatMap {
+      q.take().void().repeat(size)
     }.unsafeRunSync()
 
   @Benchmark

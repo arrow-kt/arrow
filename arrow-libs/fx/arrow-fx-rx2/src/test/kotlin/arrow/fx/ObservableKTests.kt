@@ -5,20 +5,20 @@ import arrow.core.Try
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
-import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
-import arrow.fx.rx2.extensions.observablek.applicative.applicative
 import arrow.fx.rx2.extensions.observablek.async.async
-import arrow.fx.rx2.extensions.observablek.functor.functor
 import arrow.fx.rx2.extensions.observablek.monad.flatMap
-import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.extensions.observablek.timer.timer
+import arrow.fx.rx2.extensions.observablek.functor.functor
+import arrow.fx.rx2.extensions.observablek.applicative.applicative
+import arrow.fx.rx2.extensions.observablek.monad.monad
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.throwable
+import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
@@ -91,7 +91,7 @@ class ObservableKTests : RxJavaSpec() {
       ec shouldBe ExitCase.Cancelled
     }
 
-    "ObservableK should cancel KindConnection on dispose" {
+    "ObservableK.cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
           ObservableK.cancellable<Unit> {

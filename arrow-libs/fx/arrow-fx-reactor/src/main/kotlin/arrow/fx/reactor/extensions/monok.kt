@@ -109,10 +109,10 @@ interface MonoKMonadDefer : MonadDefer<ForMonoK>, MonoKBracket {
 @extension
 interface MonoKAsync : Async<ForMonoK>, MonoKMonadDefer {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
-    MonoK.async { _, cb -> fa(cb) }
+    MonoK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForMonoK, A>): MonoK<A> =
-    MonoK.asyncF { _, cb -> k(cb) }
+    MonoK.asyncF(k)
 
   override fun <A> MonoKOf<A>.continueOn(ctx: CoroutineContext): MonoK<A> =
     fix().continueOn(ctx)
