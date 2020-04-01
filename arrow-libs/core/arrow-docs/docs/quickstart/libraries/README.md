@@ -179,11 +179,11 @@ This library includes the datatypes and typeclasses in Recursion schemes.
 
 Dependency: `arrow-core`
 
-### arrow-integration-retrofit-adapter
+### arrow-integrations-retrofit-adapter
 
 ```groovy
 dependencies {
-    implementation "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version"
+    implementation "io.arrow-kt:arrow-integrations-retrofit-adapter:$arrow_version"
 }
 ```
 
