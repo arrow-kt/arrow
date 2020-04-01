@@ -1,9 +1,6 @@
 name: "arrow-integrations: build documentation"
 
-on:
-  pull_request:
-    branches-ignore:
-    - release/0.11.0
+on: pull_request
 
 jobs:
   arrow-integrations_build_documentation:
