@@ -71,7 +71,7 @@ jobs:
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
             cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
             $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
-            echo "include 'arrow-docs'" >> $repository/settings.gradle
+            echo "include 'arrow-docs'" >> $BASEDIR/$repository/settings.gradle
             $BASEDIR/arrow/scripts/project-run-ank.sh $repository
             #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
             cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
@@ -100,6 +100,7 @@ jobs:
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
         AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
                 echo "Update $version ..."
@@ -107,21 +108,32 @@ jobs:
                 cd $BASEDIR/arrow-site
                 cp sidebar/$SHORT_VERSION/* docs/_data/
                 ./gradlew clean runAnk
-                cd $BASEDIR
-                git clone -b $version https://github.com/arrow-kt/arrow.git arrow-$version
-                cd arrow-$version
-                sed -i "s/modules {/modules {\\ndocs {\\n_ 'docs'\\n_ 'examples'\\n}/g" settings.gradle
-                find modules/docs/arrow-docs/docs/docs/ -name "*.md" -exec sh -c 'sed -i "s/\/docs//g" $0' {} ';'
-                ./gradlew clean dokka
-                ./gradlew :arrow-docs:runAnk
-                cp -r modules/docs/arrow-docs/build/site/docs/* $BASEDIR/arrow-site/build/site/
+                cd $BASEDIR/arrow
+                git checkout $version
+                sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
+                OSS_REPOSITORY="https://oss.jfrog.org/artifactory/oss-snapshot-local/"
+                BINTRAY_REPOSITORY="https://dl.bintray.com/arrow-kt/arrow-kt/"
+                sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" generic-conf.gradle
+                for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+                    cd $BASEDIR/$repository
+                    git checkout $version
+                    replaceGlobalPropertiesbyLocalConf gradle.properties
+                    if [ -f arrow-docs/build.gradle ]; then
+                        sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" arrow-docs/build.gradle
+                    fi
+                    $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
+                    echo "include 'arrow-docs'" >> $BASEDIR/$repository/settings.gradle
+                    $BASEDIR/arrow/scripts/project-run-ank.sh $repository
+                    #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
+                    cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
+                done
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
                 rm -f build/_site/index.*
                 tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
                 echo ">>> $SHORT_VERSION VERSION" >> aws_sync_jekyll.log
                 aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> aws_sync_jekyll.log
-            done            
+            done
         fi
     - name: CloudFront cache invalidation
       env:

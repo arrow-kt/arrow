@@ -108,6 +108,12 @@ options:
       - title: EitherT
         url: /arrow/mtl/eithert/
 
+      - title: Accum
+        url: /arrow/mtl/accum/
+
+      - title: AccumT
+        url: /arrow/mtl/accumt/
+
   - title: Type Classes
 
     nested_options:
@@ -120,6 +126,9 @@ options:
 
       - title: MonadState
         url: /arrow/mtl/typeclasses/monadstate/
+
+      - title: MonadTrans
+        url: /arrow/mtl/typeclasses/monadtrans/
 
   - title: API Docs
 

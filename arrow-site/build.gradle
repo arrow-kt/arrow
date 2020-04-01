@@ -1,7 +1,6 @@
 buildscript {
-    apply from: "$COMMON_SETUP"
     repositories {
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
     }
     dependencies {
         classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
@@ -35,5 +34,5 @@ task printcp {
 
 repositories {
     jcenter()
-    maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
+    maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
 }

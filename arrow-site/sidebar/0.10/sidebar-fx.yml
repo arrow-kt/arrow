@@ -40,12 +40,34 @@ options:
       - title: Resource
         url: /apidocs/arrow-fx/arrow.fx/-resource/
 
+      - title: Schedule
+        url: /apidocs/arrow-fx/arrow.fx/-schedule/
+
+      - title: Queue
+        url: /effects/queue/
+
   - title: Type Classes
 
     nested_options:
 
       - title: Bracket
         url: /fx/typeclasses/bracket/
+
+      - title: MonadIO
+        url: /apidocs/arrow-fx/arrow.fx.typeclasses/-monad-i-o/
+
+  - title: Integrations
+
+    nested_options:
+
+      - title: RxJava2
+        url: /integrations/rx2/
+
+      - title: Reactor
+        url: /integrations/reactor/
+
+      - title: kotlinx.coroutines
+        url: /integrations/kotlinxcoroutines/
 
   - title: API Docs
 

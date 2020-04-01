@@ -62,9 +62,6 @@ options:
       - title: Either
         url: /apidocs/arrow-core-data/arrow.core/-either/
 
-      - title: Try
-        url: /apidocs/arrow-core-data/arrow.core/-try/
-
       - title: Validated
         url: /apidocs/arrow-core-data/arrow.core/-validated/
 
@@ -129,6 +126,9 @@ options:
 
       - title: EqK
         url: /arrow/typeclasses/eqk/
+
+      - title: EqK2
+        url: /arrow/typeclasses/eqk2/
 
       - title: Hash
         url: /arrow/typeclasses/hash/
@@ -256,15 +256,6 @@ options:
   - title: Integrations
 
     nested_options:
-
-      - title: Rx2
-        url: /integrations/rx2/
-
-      - title: Reactor
-        url: /integrations/reactor/
-
-      - title: kotlinx.coroutines
-        url: /integrations/kotlinxcoroutines/
 
       - title: Retrofit
         url: /integrations/retrofit/
