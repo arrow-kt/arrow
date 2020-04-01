@@ -1,0 +1,79 @@
+name: "Publish Arrow Ank into Bintray"
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'gradle.properties'
+    - '**.gradle'
+    - 'scripts/**'
+
+jobs:
+  publish-arrow-ank:
+
+    env:
+      BASEDIR: ${{github.workspace}}/..
+      JAVA_OPTS: -Xms512m -Xmx1024m
+      LIB: arrow-ank
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        architecture: x64
+    - name: "Get target: OSS or Bintray"
+      id: versions
+      run: |
+        LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
+        NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
+        echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
+        echo "::set-output name=release-version::$LATEST_VERSION"
+        echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
+        echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: Publish into Bintray
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        echo "Update version ..."
+        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
+        $BASEDIR/arrow/scripts/lib-publish.sh $LIB
+    - name: Create tag
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        cd $BASEDIR/$LIB
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$LIB.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
+        git push origin ${{ steps.versions.outputs.release-version }}
+    - name: Create release notes
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        sudo snap install hub --classic
+        cd $BASEDIR/$LIB
+        TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
+        hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
+        while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
+        cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
+        while read contributor; do 
+            echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
+        done < contributors.txt > local-release-notes.txt
+        echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > release-notes.txt
+        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" >> release-notes.txt
+        cat local-release-notes.txt >> release-notes.txt
+        echo -e "\n--- RELEASE NOTES ---\n"
+        cat release-notes.txt
+        hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
