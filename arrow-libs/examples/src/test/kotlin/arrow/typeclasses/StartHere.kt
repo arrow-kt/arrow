@@ -14,7 +14,7 @@ typealias Index = Int
 
 data class User(val id: Index)
 
-fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): IO<User> =
+fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): IO<Nothing, User> =
     IO { dao.query("SELECT * FROM Users where id = $i").toUserFromDatabase() }
         .handleErrorWith {
             IO { network.fetch(i, mapOf()).toUserFromNetwork() }
