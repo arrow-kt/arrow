@@ -1,5 +1,11 @@
 # Move arrow repository content to multi-repo
 
+The mono-repo was a blocking point for the future of Arrow and some changes couldn't be implemented because of having a single project with all the libraries. For instance, changes related to type checking.
+
+The multi-repo introduces some challenges with breaking changes in several Arrow libraries that are being counteracted with global checks after merging changes and a development environment to check crossed changes.
+
+However, the benefits of having single Arrow libraries will allow to implement improvements in type management that will take Arrow to the next level.
+
 ![From mono-repo to multi-repo](img/split.png)
 
 Find details about the re-organization from mono-repo to multi-repo:
