@@ -42,4 +42,4 @@ If these files are changed, a full check for all the libraries will be executed 
 
 ## Release
 
-Take a look at [RELEASE guideline](RELEASE.md). 
+Take a look at [RELEASE guideline](/RELEASE.md). 
