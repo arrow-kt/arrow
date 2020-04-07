@@ -157,3 +157,9 @@ options:
 
       - title: Free Extensions
         url: /apidocs/arrow-free-data/
+
+      - title: Check
+        url: /apidocs/arrow-check/
+
+      - title: Check KotlinTest
+        url: /apidocs/arrow-check-kotlintest/
