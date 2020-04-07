@@ -5,4 +5,5 @@ arrow-incubator
 arrow-optics
 arrow-ank
 arrow-integrations
+arrow-check
 arrow-examples
