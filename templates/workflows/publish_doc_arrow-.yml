@@ -30,7 +30,7 @@ jobs:
         $BASEDIR/arrow/scripts/site-download.sh
         $BASEDIR/arrow/scripts/site-run-ank.sh
     - name: Generate API doc and validate
-      run: $BASEDIR/arrow/scripts/project-build-doc.sh <arrow-library>
+      run: ./gradlew buildArrowDoc
     - name: Join docs to site
       run: $BASEDIR/arrow/scripts/project-locate-doc.sh <arrow-library>
     - name: Prepare environment
