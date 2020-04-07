@@ -97,6 +97,16 @@ defaults:
     values:
       layout: "docs-incubator"
   - scope:
+      path: "apidocs/arrow-check"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
+      path: "apidocs/arrow-check-kotlintest"
+      type: "pages"
+    values:
+      layout: "docs-incubator"
+  - scope:
       path: "apidocs"
       type: "pages"
     values:
