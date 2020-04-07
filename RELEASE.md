@@ -1,6 +1,8 @@
 ## Release flow
 
-Every **Λrrow** library publishes SNAPSHOT versions from its repository.
+### Artifacts
+
+Every **Λrrow** library publishes SNAPSHOT versions from its repository into [OSS](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/)
 
 However, RELEASE versions must be published at the same time. So in order to publish a RELEASE version, it's necessary to prepare a pull request for `arrow` repository with these changes:
 
@@ -21,4 +23,16 @@ When merging that pull request:
 
 Then, it will be necessary to sync Bintray with Maven (pending task: automating it).
 
--- TODO: website
+### Documentation
+
+Every **Λrrow** library publishes the API Doc and some static documentation from its repository into the next version of the website:
+
+* API Doc:
+    * `https://arrow-kt.io/docs/next/apidocs/<arrow-module>/`
+* Static documentation:
+    * https://arrow-kt.io/docs/next/core/
+    * https://arrow-kt.io/docs/next/fx/
+    * https://arrow-kt.io/docs/next/optics/dsl/
+    * https://arrow-kt.io/docs/next/aql/intro/
+
+TODO: In order to publish a RELEASE version, ...
