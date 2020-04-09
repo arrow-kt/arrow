@@ -10,15 +10,17 @@ This repository **just** includes the [Arrow website](https://arrow-kt.io/) main
 * sidebar
 * etc.
 
+and it could include common documentation for all the Arrow libraries.
+
 The **rest** of the website content comes from:
 
-* [Every Arrow library generates its own API Doc](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md)
-* Some Arrow libraries include static documentation:
+* [Every Arrow library generates its own API Doc](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md) (pages with `/apidocs/` in the URL). Every pull request on an Arrow library will publish API Doc for the next version with this URL pattern: `https://arrow-kt.io/docs/next/apidocs/<arrow-module>/`.
+* Some Arrow libraries include static documentation (pages without `/apidocs/` in the URL). Every pull request on an Arrow library will publish it with this URL pattern: `https://arrow-kt.io/docs/next/<optional-directory>/<page>`. The source code for that documentation can be found in these directories:
   * [Arrow Core](https://github.com/arrow-kt/arrow-core/tree/master/arrow-docs/docs)
   * [Arrow Fx](https://github.com/arrow-kt/arrow-fx/tree/master/arrow-docs/docs)
   * [Arrow Incubator](https://github.com/arrow-kt/arrow-incubator/tree/master/arrow-docs/docs)
   * [Arrow Optics](https://github.com/arrow-kt/arrow-optics/tree/master/arrow-docs/docs)
-* [Arrow Media](https://github.com/arrow-kt/arrow-media): the showcase of tutorials, conference presentations and other Arrow-related content. If you have given a talk, written a post, or spread the word about Arrow in any other way, please don't hesitate to include it in the [MEDIA section of the Arrow website](https://media.arrow-kt.io/). To do so, take a look at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repository.
+* [Arrow Media](https://media.arrow-kt.io): the showcase of tutorials, conference presentations and other Arrow-related content. If you have given a talk, written a post, or spread the word about Arrow in any other way, please don't hesitate to include it in the [MEDIA section of the Arrow website](https://media.arrow-kt.io/). To do so, take a look at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repository.
 
 ## Table of contents
 
