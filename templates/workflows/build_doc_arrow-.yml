@@ -1,9 +1,6 @@
 name: "<arrow-library>: build documentation"
 
-on:
-  pull_request:
-    branches-ignore:
-    - release/0.11.0
+on: pull_request
 
 jobs:
   <arrow-library>_build_documentation:
@@ -11,6 +8,7 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: <arrow-library>
 
     runs-on: ubuntu-latest
 

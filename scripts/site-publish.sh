@@ -27,3 +27,5 @@ for file in *; do
         fi
     fi
 done
+
+aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/docs/next/*"
