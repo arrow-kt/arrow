@@ -8,8 +8,9 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: arrow-core
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1

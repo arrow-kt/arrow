@@ -8,8 +8,9 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: arrow-core
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -25,4 +26,4 @@ jobs:
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
-      run: $BASEDIR/arrow/scripts/project-build.sh arrow-core
+      run: $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
