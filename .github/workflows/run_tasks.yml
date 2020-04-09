@@ -25,12 +25,12 @@ jobs:
       run: |
         # sed into 2 steps because of macOS compatibility
         sed -e "s/git@github.com:/https:\/\/github.com\//g" scripts/commons4gradle.sh > scripts/commons4gradle.sh.tmp
-        mv scripts/commons4gradle.sh.tmp scripts/commons4gradle.sh
+        mv scripts/commons4gradle.sh.tmp scripts/commons4gradle.sh; chmod +x scripts/commons4gradle.sh
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow-core.git
         cd arrow-core
         sed -e "s/git pull//g" scripts/checkout-orchestrator.sh > scripts/checkout-orchestrator.sh.tmp
-        mv scripts/checkout-orchestrator.sh.tmp scripts/checkout-orchestrator.sh
+        mv scripts/checkout-orchestrator.sh.tmp scripts/checkout-orchestrator.sh; chmod +x scripts/checkout-orchestrator.sh
         ./gradlew installAllWithLocalDeps
     - name: Build with local dependencies
       run: |
