@@ -12,7 +12,7 @@ jobs:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
 
     steps:
     - uses: actions/checkout@v1
@@ -26,7 +26,7 @@ jobs:
       id: create-issue
       run: |
         $BASEDIR/arrow/scripts/issue-create-description.sh > issue.log
-        echo ::set-output name=title::$(git log -1 --pretty=format:%s)
+        echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
         rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
         cd /home/runner/work/_actions/actions/github-script/0.3.0/
         npm install
