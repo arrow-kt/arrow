@@ -11,6 +11,7 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: arrow-integrations
 
     runs-on: ubuntu-latest
 
@@ -28,18 +29,18 @@ jobs:
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
-      run: $BASEDIR/arrow/scripts/project-build.sh arrow-integrations
+      run: $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
     - name: Publish artifacts
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: $BASEDIR/arrow/scripts/project-publish.sh arrow-integrations
+      run: $BASEDIR/arrow/scripts/project-publish.sh $ARROW_LIB
     - name: Prepare environment to create the issue (new package)
       if: failure()
       id: create-issue
       run: |
         $BASEDIR/arrow/scripts/issue-create-description.sh > issue.log
-        echo ::set-output name=title::$(git log -1 --pretty=format:%s)
+        echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
         rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
         cd /home/runner/work/_actions/actions/github-script/0.3.0/
         npm install

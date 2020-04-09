@@ -11,6 +11,7 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: arrow-integrations
 
     runs-on: ubuntu-latest
 
@@ -32,7 +33,7 @@ jobs:
     - name: Generate API doc and validate
       run: ./gradlew buildArrowDoc
     - name: Join docs to site
-      run: $BASEDIR/arrow/scripts/project-locate-doc.sh arrow-integrations
+      run: $BASEDIR/arrow/scripts/project-locate-doc.sh $ARROW_LIB
     - name: Prepare environment
       run: |
         $BASEDIR/arrow/scripts/site-prepare-env.sh
@@ -51,7 +52,7 @@ jobs:
       id: create-issue
       run: |
         $BASEDIR/arrow/scripts/issue-create-description.sh > issue.log
-        echo ::set-output name=title::$(git log -1 --pretty=format:%s)
+        echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
         rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
         cd /home/runner/work/_actions/actions/github-script/0.3.0/
         npm install

@@ -8,6 +8,7 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
+      ARROW_LIB: arrow-integrations
 
     runs-on: ubuntu-latest
 
