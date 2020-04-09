@@ -13,7 +13,7 @@ jobs:
       JAVA_OPTS: -Xms512m -Xmx1024m
       ARROW_LIB: arrow-core
 
-    runs-on: macos-latest
+    runs-on: ubuntu-16.04
 
     steps:
     - uses: actions/checkout@v1
