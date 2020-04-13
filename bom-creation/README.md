@@ -1,6 +1,6 @@
 # BOM file
 
-Thanks to @ps-feng for creating #2129 proposal.
+Thanks to [@ps-feng](https://github.com/ps-feng) for creating [#2129](https://github.com/arrow-kt/arrow/issues/2129) proposal.
 
 BOM file is useful to include several dependencies without the specification of their versions.
 
