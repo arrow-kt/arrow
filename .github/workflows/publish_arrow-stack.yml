@@ -1,0 +1,25 @@
+name: "Publish Arrow Stack (BOM file)"
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'gradle.properties'
+    - '**.gradle'
+    - 'scripts/**'
+    - 'bom-creation/**'
+
+jobs:
+  publish-arrow-stack:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Validate Gradle Wrapper
+      uses: gradle/wrapper-validation-action@v1
+      working-directory: bom-creation
+    - name: "Publish"
+      run: ./gradlew publish
+      working-directory: bom-creation
