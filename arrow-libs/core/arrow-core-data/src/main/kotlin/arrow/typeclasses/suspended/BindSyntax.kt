@@ -28,5 +28,3 @@ interface BindSyntax<F> {
   suspend fun <A> Kind<F, A>.getValue(thisRef: Any?, property: KProperty<*>): A =
     bind()
 }
-
-operator fun String.getValue(thisRef: Any?, property: KProperty<*>): Char = 'c'
