@@ -21,5 +21,8 @@ jobs:
       uses: gradle/wrapper-validation-action@v1
       working-directory: bom-creation
     - name: "Publish"
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: ./gradlew publish
       working-directory: bom-creation
