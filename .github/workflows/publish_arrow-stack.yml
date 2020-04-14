@@ -1,14 +1,14 @@
 name: "Publish Arrow Stack (BOM file)"
 
-on: pull_request
-#  push:
-#    branches:
-#    - master
-#    paths:
-#    - 'gradle.properties'
-#    - '**.gradle'
-#    - 'scripts/**'
-#    - 'bom-creation/**'
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'gradle.properties'
+    - '**.gradle'
+    - 'scripts/**'
+    - 'bom-creation/**'
 
 jobs:
   publish-arrow-stack:
@@ -31,8 +31,15 @@ jobs:
         echo "::set-output name=release-version::$LATEST_VERSION"
         echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: "Publish into OSS"
+      if: steps.versions.outputs.new-version-exists == '0'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: ./gradlew publish
+      working-directory: bom-creation
     - name: "Publish into Bintray"
-      #if: steps.versions.outputs.new-version-exists == '1'
+      if: steps.versions.outputs.new-version-exists == '1'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
@@ -42,11 +49,4 @@ jobs:
         . scripts/commons4gradle.sh
         useLocalSetup
         cd bom-creation
-        ./gradlew clean # publish
-    - name: "Publish into OSS"
-      #if: steps.versions.outputs.new-version-exists == '0'
-      env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: ./gradlew clean # publish
-      working-directory: bom-creation
+        ./gradlew publish
