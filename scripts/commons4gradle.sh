@@ -72,7 +72,7 @@ function replaceLocalConfbyGlobalProperties()
 
 function useLocalSetup()
 {
-    sed -i "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" $BASEDIR/arrow/setup.gradle
+    sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
 }
 
 function manageExitCode()
