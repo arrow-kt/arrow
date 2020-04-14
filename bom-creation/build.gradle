@@ -1,0 +1,70 @@
+buildscript {
+    apply from: rootProject.file('../setup.gradle')
+}
+
+plugins {
+    id "maven-publish"
+    id "java-platform"
+}
+
+dependencies {
+    constraints {
+        api "io.arrow-kt:arrow-ank:$VERSION_NAME"
+        api "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
+        api "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+        api "io.arrow-kt:arrow-aql:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-free:$VERSION_NAME"
+        api "io.arrow-kt:arrow-free-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-mtl:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-generic:$VERSION_NAME"
+        api "io.arrow-kt:arrow-incubator-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-integrations-jackson-module:$VERSION_NAME"
+        api "io.arrow-kt:arrow-integrations-retrofit-adapter:$VERSION_NAME"
+        api "io.arrow-kt:arrow-kindedj:$VERSION_NAME"
+        api "io.arrow-kt:arrow-meta:$VERSION_NAME"
+        api "io.arrow-kt:arrow-mtl:$VERSION_NAME"
+        api "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics-mtl:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-recursion:$VERSION_NAME"
+        api "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-reflect:$VERSION_NAME"
+        api "io.arrow-kt:arrow-streams:$VERSION_NAME"
+        api "io.arrow-kt:arrow-syntax:$VERSION_NAME"
+        api "io.arrow-kt:arrow-ui:$VERSION_NAME"
+        api "io.arrow-kt:arrow-ui-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-validation:$VERSION_NAME"
+    }
+}
+
+publishing {
+    publications {
+        myPlatform(MavenPublication) {
+            groupId = GROUP
+            artifactId = POM_ARTIFACT_ID
+            version = VERSION_NAME
+
+            from components.javaPlatform
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username System.getenv('BINTRAY_USER')
+                password System.getenv('BINTRAY_API_KEY')
+            }
+            def releasesRepoUrl = "https://api.bintray.com/maven/arrow-kt/arrow-kt/arrow"
+            def snapshotsRepoUrl = "https://oss.jfrog.org/artifactory/oss-snapshot-local"
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+        }
+    }
+}
