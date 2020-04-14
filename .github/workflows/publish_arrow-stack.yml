@@ -1,17 +1,20 @@
 name: "Publish Arrow Stack (BOM file)"
 
-on:
-  push:
-    branches:
-    - master
-    paths:
-    - 'gradle.properties'
-    - '**.gradle'
-    - 'scripts/**'
-    - 'bom-creation/**'
+on: pull_request
+#  push:
+#    branches:
+#    - master
+#    paths:
+#    - 'gradle.properties'
+#    - '**.gradle'
+#    - 'scripts/**'
+#    - 'bom-creation/**'
 
 jobs:
   publish-arrow-stack:
+
+    env:
+      BASEDIR: ${{github.workspace}}/..
 
     runs-on: ubuntu-latest
 
@@ -20,9 +23,33 @@ jobs:
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
       working-directory: bom-creation
-    - name: "Publish"
+    - name: "Get target: OSS or Bintray"
+      id: versions
+      run: |
+        LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
+        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
+        NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
+        echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
+        echo "::set-output name=release-version::$LATEST_VERSION"
+        echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
+        echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: "Publish into Bintray"
+      #if: steps.versions.outputs.new-version-exists == '1'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: ./gradlew publish
+      run: |
+        echo "Update version ..."
+        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
+        . scripts/commons4gradle.sh
+        useLocalSetup
+        cd bom-creation
+        ./gradlew clean # publish
+    - name: "Publish into OSS"
+      #if: steps.versions.outputs.new-version-exists == '0'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: ./gradlew clean # publish
       working-directory: bom-creation
