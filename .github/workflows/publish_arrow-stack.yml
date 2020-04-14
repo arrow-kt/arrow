@@ -20,9 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Validate Gradle Wrapper
-      uses: gradle/wrapper-validation-action@v1
-      working-directory: bom-creation
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
