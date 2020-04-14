@@ -1,5 +1,5 @@
 buildscript {
-    apply from: "$COMMON_SETUP"
+    apply from: rootProject.file('../setup.gradle')
 }
 
 plugins {
