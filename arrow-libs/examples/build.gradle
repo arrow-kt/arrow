@@ -47,23 +47,22 @@ idea {
 }
 
 dependencies {
+
+    testImplementation platform("io.arrow-kt:arrow-stack:$VERSION_NAME")
+
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
     kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    testImplementation "io.arrow-kt:arrow-annotations:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-core-data:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-core:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-fx:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-optics:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-ui:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-ui-data:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-validation:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-mtl:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-mtl-data:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
-    testImplementation "io.arrow-kt:arrow-meta:$VERSION_NAME", excludeArrow
+    testImplementation "io.arrow-kt:arrow-annotations"
+    testImplementation "io.arrow-kt:arrow-core"
+    testImplementation "io.arrow-kt:arrow-fx"
+    testImplementation "io.arrow-kt:arrow-fx-rx2"
+    testImplementation "io.arrow-kt:arrow-optics"
+    testImplementation "io.arrow-kt:arrow-ui"
+    testImplementation "io.arrow-kt:arrow-validation"
+    testImplementation "io.arrow-kt:arrow-mtl"
+    testImplementation "io.arrow-kt:arrow-meta"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }
