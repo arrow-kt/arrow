@@ -137,18 +137,29 @@ fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
 It's easy to work with [`Option`]({{'/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) if your lang supports [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
 Arrow provides [monadic comprehensions]({{ '/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`]({{'/arrow/typeclasses/monad' | relative_url }}) instance exists built atop coroutines.
 
-```kotlin
-import arrow.typeclasses.*
-import arrow.core.extensions.*
-import arrow.core.extensions.option.monad.binding
+```kotlin:ank
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.extensions.fx
 
+object Lettuce
+object Knife
+object Salad
+
+fun takeFoodFromRefrigerator(): Option<Lettuce> = None
+fun getKnife(): Option<Knife> = None
+fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
+
+//sampleStart
 fun prepareLunchOption(): Option<Salad> =
-  fx.monad {
+  Option.fx {
     val lettuce = takeFoodFromRefrigerator().bind()
     val knife = getKnife().bind()
     val salad = prepare(knife, lettuce).bind()
     salad
   }
+//sampleEnd
 
 prepareLunchOption()
 //None
@@ -200,16 +211,39 @@ Arrow also provides a `Monad` instance for `Either` in the same way it did for `
 Except for the types signatures, our program remains unchanged when we compute over `Either`.
 All values on the left side assume to be `Right` biased and, whenever a `Left` value is found, the computation short-circuits, producing a result that is compatible with the function type signature.
 
-```kotlin
-import arrow.core.extensions.either.monad.binding
+```kotlin:ank
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.extensions.fx
 
+object Lettuce
+object Knife
+object Salad
+
+typealias NastyLettuce = CookingException.LettuceIsRotten
+typealias KnifeIsDull = CookingException.KnifeNeedsSharpening
+typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
+
+sealed class CookingException {
+  object LettuceIsRotten: CookingException()
+  object KnifeNeedsSharpening: CookingException()
+  data class InsufficientAmount(val quantityInGrams : Int): CookingException()
+}
+
+fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
+fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
+fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
+
+//sampleStart
 fun prepareEither(): Either<CookingException, Salad> =
-  fx.monad {
+  Either.fx {
     val lettuce = takeFoodFromRefrigerator().bind()
     val knife = getKnife().bind()
     val salad = lunch(knife, lettuce).bind()
     salad
   }
+//sampleEnd
 
 prepareEither()
 //Left(InsufficientAmountOfLettuce(5))
