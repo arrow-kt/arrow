@@ -49,6 +49,7 @@ jobs:
                 SHORT_VERSION=$(echo $version | cut -d. -f1-2)
                 cd $BASEDIR/arrow-site
                 cp sidebar/$SHORT_VERSION/* docs/_data/
+                sed -i "s/latest/$version/g" docs/_includes/_head-docs.html
                 ./gradlew clean runAnk
                 cd $BASEDIR/arrow
                 git checkout $version
