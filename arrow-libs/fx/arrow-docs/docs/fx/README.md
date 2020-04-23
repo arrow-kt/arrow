@@ -46,7 +46,7 @@ In the example below, `println(a : Any): Unit` is a side effect because, every t
 
 When we denote side effects as `suspend`, the Kotlin compiler will ensure that we're not applying uncontrolled side effects in the pure environment.
 
-```kotlin:ank:fail
+```kotlin
 //sampleStart
 fun helloWorld(): String =
   "Hello World"
@@ -58,7 +58,7 @@ sayHello()
 //sampleEnd  
 ```
 
-Compiling the snippet above will result in a compilation error.
+Compiling the snippet above will result in `javax.script.ScriptException: error: suspend function 'sayHello' should be called only from a coroutine or another suspend function` compilation error for `sayHello` call.
 
 The Kotlin compiler disallows the invocation of suspended functions in the pure environment because `suspend fun` requires declaration inside another suspended function or a continuation.
 
@@ -145,9 +145,9 @@ fun main() {
 }
 ```
 
-An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect` also results in a compilation error.
+An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect`:
 
-```kotlin:ank:fail
+```kotlin
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 //sampleStart
@@ -164,6 +164,8 @@ fun greet(): IO<Nothing, Unit> =
   }
 //sampleEnd
 ```
+
+it also results in `javax.script.ScriptException: error: restricted suspending functions can only invoke member or extension suspending functions on their restricted coroutine scope` compilation error for `sayHello` and `sayGoodBye` calls.
 
 Arrow enforces usage to be explicit about effects application.
 
