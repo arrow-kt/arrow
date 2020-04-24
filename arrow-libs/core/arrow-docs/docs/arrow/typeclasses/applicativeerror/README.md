@@ -15,7 +15,7 @@ It is parametrized to an error type `E`, which means the datatype has at least a
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
 a sealed class UserNotFoundReason that contains three inheritors, for example.
 
-A datatype like [`Either<E, A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allows for the user to apply their error type of choice.
+A datatype like [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) allows for the user to apply their error type of choice.
 
 ### Main Combinators
 
