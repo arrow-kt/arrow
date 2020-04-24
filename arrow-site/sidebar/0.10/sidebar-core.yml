@@ -279,12 +279,6 @@ options:
       - title: Core Extensions
         url: /apidocs/arrow-core-data/
 
-      - title: Docs
-        url: /apidocs/arrow-docs/
-
-      - title: Examples
-        url: /apidocs/arrow-examples/
-
       - title: Integrations Retrofit Adapter
         url: /apidocs/arrow-integrations-retrofit-adapter/
 
@@ -299,9 +293,6 @@ options:
 
       - title: Syntax
         url: /apidocs/arrow-syntax/
-
-      - title: Test
-        url: /apidocs/arrow-test/
 
       - title: UI
         url: /apidocs/arrow-ui/
