@@ -644,7 +644,7 @@ These are called [Monad Comprehensions]({{ '/patterns/monad_comprehensions' | re
 ### Monad Laws
 
 There are a couple laws that `just` constructor and `flatMap` need to adhere to, so that they produce a Monad with a stable implementation.
-These laws are encoded in Arrow as tests you can find in the `arrow-test` module, and are already tested for all instances in the library.
+These laws are encoded in Arrow as tests you can find in the `arrow-core-test` module, and are already tested for all instances in the library.
 
 A typical monad tutorial will place a lot of emphasis on the laws, but I find them less important to explain to a beginner. Nonetheless, here they are for the sake of completeness.
 

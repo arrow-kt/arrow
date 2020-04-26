@@ -75,5 +75,5 @@ TypeClass(Bifunctor::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
 
-[bifunctor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-core-data/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
-[bifunctor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-test/src/main/kotlin/arrow/test/laws/BifunctorLaws.kt
+[bifunctor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
+[bifunctor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/BifunctorLaws.kt

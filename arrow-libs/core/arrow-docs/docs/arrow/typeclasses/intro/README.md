@@ -87,7 +87,7 @@ or treat them as an abstraction placeholder for any one type that can implement 
 The extension functions are scoped within the typeclass so they do not pollute the global namespace!
 
 To assure that a typeclass has been correctly implemented for a type, Arrow provides a test suite called the "laws" per typeclass.
-These test suites are available in the module `arrow-tests`.
+These test suites are available in the module `arrow-core-test`.
 
 ### Typeclasses provided by Arrow
 

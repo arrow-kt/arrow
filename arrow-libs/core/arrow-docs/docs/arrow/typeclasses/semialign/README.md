@@ -75,5 +75,5 @@ TypeClass(Semialign::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Semialign)
 
-[functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-core-data/src/main/kotlin/arrow/typeclasses/Semialign.kt
-[functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-test/src/main/kotlin/arrow/test/laws/SemialignLaws.kt
+[functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Semialign.kt
+[functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/SemialignLaws.kt

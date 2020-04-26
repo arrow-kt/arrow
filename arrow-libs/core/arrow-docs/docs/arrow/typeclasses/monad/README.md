@@ -148,4 +148,4 @@ import arrow.typeclasses.Monad
 TypeClass(Monad::class).hierarchyGraph()
 ```
 
-[monad_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt
+[monad_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt

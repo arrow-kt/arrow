@@ -91,4 +91,4 @@ import arrow.typeclasses.Selective
 TypeClass(Selective::class).hierarchyGraph()
 ```
 
-[selective_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-test/src/main/kotlin/arrow/test/laws/SelectiveLaws.kt
+[selective_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/SelectiveLaws.kt
