@@ -364,4 +364,4 @@ TypeClass(Bracket::class).dtMarkdownList()
 ank_macro_hierarchy(arrow.fx.typeclasses.Bracket)
 
 [bracket_source]: https://github.com/arrow-kt/arrow-fx/blob/master/arrow-fx/arrow-fx/src/main/kotlin/arrow/fx/typeclasses/Bracket.kt
-[bracket_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core/arrow-test/src/main/kotlin/arrow/test/laws/BracketLaws.kt
+[bracket_laws_source]: https://github.com/arrow-kt/arrow-fx/blob/master/arrow-fx-test/src/main/kotlin/arrow/fx/test/laws/BracketLaws.kt
