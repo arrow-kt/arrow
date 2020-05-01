@@ -190,10 +190,10 @@ class EitherTest : UnitSpec() {
       }
     }
 
-    "cond should create right instance only if test is true" {
+    "conditionally should create right instance only if test is true" {
       forAll { t: Boolean, i: Int, s: String ->
         val expected = if (t) Right(i) else Left(s)
-        Either.cond(t, { i }, { s }) == expected
+        Either.conditionally(t, { s }, { i }) == expected
       }
     }
 

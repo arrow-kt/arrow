@@ -416,14 +416,16 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * For creating Either instance based on a predicate, use `Either.cond()` method :
+ * For creating Either instance based on a predicate, use `Either.conditionally()` method. It will evaluate an expression
+ * passed as first parameter, in case the expression evaluates to `false` it will give an `Either.Left<L>` build from the second parameter.
+ * If the expression evaluates to a `true` it will take the third parameter and give an `Either.Right<R>`:
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
  *
  * val value =
  * //sampleStart
- *  Either.cond(true, { 42 }, { "Error" })
+ *  Either.conditionally(true, { "Error" }, { 42 })
  * //sampleEnd
  * fun main() {
  *  println(value)
@@ -435,7 +437,7 @@ import arrow.typeclasses.Show
  *
  * val value =
  * //sampleStart
- *  Either.cond(false, { 42 }, { "Error" })
+ *  Either.conditionally(false, { "Error" }, { 42 })
  * //sampleEnd
  * fun main() {
  *  println(value)
@@ -863,7 +865,28 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
-    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
+    @Deprecated(
+      message = "use conditionally as parameter order is consistent with Either class",
+      replaceWith = ReplaceWith(
+        "Either.conditionally(test, ifFalse, ifTrue)",
+        "arrow.core.Either.conditionally"
+      )
+    )
+    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = conditionally(test, ifFalse, ifTrue)
+
+    /**
+     * Will create an [Either] from the result of evaluating the first parameter using the functions
+     * provided on second and third parameters. Second parameter represents function for creating
+     * an [Either.Left] in case of a false result of evaluation and third parameter will be used
+     * to create a [Either.Right] in case of a true result.
+     *
+     * @param test expression to evaluate and build an [Either]
+     * @param ifFalse function to create a [Either.Left] in case of false result of test
+     * @param ifTrue function to create a [Either.Right] in case of true result of test
+     *
+     * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
+     */
+    fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
 
     suspend fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
       catch(::identity, f)
