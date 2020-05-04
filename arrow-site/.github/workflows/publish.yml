@@ -48,30 +48,11 @@ jobs:
         bundle exec jekyll build -s build/site -d build/_site
         mkdir $BASEDIR/logs
         tree build/_site > $BASEDIR/logs/docs.log
-    - name: "Site: generate sitemap.xml"
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        S3_BUCKET: ${{ secrets.S3_BUCKET }}
-      run: |
-        LAST_MAJOR_MINOR_VERSION=$(git describe --abbrev=0 | cut -d. -f1-2)
-        echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
-        aws s3 ls s3://$S3_BUCKET/docs/$LAST_MAJOR_MINOR_VERSION --recursive > docs-content.log
-        grep html docs-content.log > docs-pages.log
-        while read line; do
-          PAGE_DATE=$(echo $line | cut -d' ' -f1)
-          PAGE_PATH=$(echo $line | cut -d' ' -f4)
-          echo "<url><loc>https://arrow-kt.io/${PAGE_PATH}</loc><lastmod>${PAGE_DATE}</lastmod></url>"
-        done < docs-pages.log >> sitemap.xml
-        echo '</urlset>' >> sitemap.xml
-        cp sitemap.xml build/_site/
     - name: "Site: publish"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
         echo ">>> SITE" > aws_sync_jekyll.log
         cd build/_site/
@@ -107,7 +88,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
         echo ">>> NEXT VERSION" >> aws_sync_jekyll.log
         aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> aws_sync_jekyll.log
@@ -116,7 +96,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: |
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
@@ -154,11 +133,33 @@ jobs:
                 aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> aws_sync_jekyll.log
             done
         fi
-    - name: CloudFront cache invalidation
+    - name: "Site: generate sitemap.xml"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      run: |
+        LAST_MAJOR_MINOR_VERSION=$(git describe --abbrev=0 | cut -d. -f1-2)
+        echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+        aws s3 ls s3://$S3_BUCKET/docs/$LAST_MAJOR_MINOR_VERSION --recursive > docs-content.log
+        grep html docs-content.log > docs-pages.log
+        while read line; do
+          PAGE_DATE=$(echo $line | cut -d' ' -f1)
+          PAGE_PATH=$(echo $line | cut -d' ' -f4)
+          echo "<url><loc>https://arrow-kt.io/${PAGE_PATH}</loc><lastmod>${PAGE_DATE}</lastmod></url>"
+        done < docs-pages.log >> sitemap.xml
+        echo '</urlset>' >> sitemap.xml
+    - name: "Site: publish sitemap.xml"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      run: aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> aws_sync_jekyll.log
+    - name: CloudFront cache invalidation
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
     - name: List S3
@@ -166,7 +167,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
       run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > site-content.log
     - uses: actions/upload-artifact@v1
       with:
