@@ -143,7 +143,7 @@ jobs:
         echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
         aws s3 ls s3://$S3_BUCKET/docs/$LAST_MAJOR_MINOR_VERSION --recursive > docs-content.log
-        grep html docs-content.log > docs-pages.log
+        grep index.html docs-content.log > docs-pages.log
         while read line; do
           PAGE_DATE=$(echo $line | cut -d' ' -f1)
           PAGE_PATH=$(echo $line | cut -d' ' -f4)
