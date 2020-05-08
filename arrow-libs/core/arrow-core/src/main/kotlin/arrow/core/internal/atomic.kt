@@ -2,6 +2,7 @@ package arrow.core.internal
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
+import kotlinx.atomicfu.getAndUpdate
 
 /**
  * Internal wrapper for Atomic-FU Atomics to be used as local variables
@@ -15,15 +16,23 @@ class AtomicRefW<A>(a: A) {
     }
     get() = atomicRef.value
 
-  fun getAndSet(a: A) = atomicRef.getAndSet(a)
+  fun getAndSet(a: A): A =
+    atomicRef.getAndSet(a)
 
-  fun updateAndGet(function: (A) -> A) = atomicRef.updateAndGet(function)
+  fun updateAndGet(function: (A) -> A): A =
+    atomicRef.updateAndGet(function)
 
-  fun compareAndSet(expect: A, update: A) = atomicRef.compareAndSet(expect, update)
+  fun getAndUpdate(f: (A) -> A): A =
+    atomicRef.getAndUpdate(f)
 
-  fun lazySet(a: A) = atomicRef.lazySet(a)
+  fun compareAndSet(expect: A, update: A): Boolean =
+    atomicRef.compareAndSet(expect, update)
 
-  override fun toString(): String = value.toString()
+  fun lazySet(a: A): Unit =
+    atomicRef.lazySet(a)
+
+  override fun toString(): String =
+    value.toString()
 }
 
 class AtomicBooleanW(a: Boolean) {
@@ -35,15 +44,23 @@ class AtomicBooleanW(a: Boolean) {
     }
     get() = atomicRef.value
 
-  fun getAndSet(a: Boolean) = atomicRef.getAndSet(a)
+  fun getAndSet(a: Boolean): Boolean =
+    atomicRef.getAndSet(a)
 
-  fun updateAndGet(function: (Boolean) -> Boolean) = atomicRef.updateAndGet(function)
+  fun updateAndGet(function: (Boolean) -> Boolean): Boolean =
+    atomicRef.updateAndGet(function)
 
-  fun compareAndSet(expect: Boolean, update: Boolean) = atomicRef.compareAndSet(expect, update)
+  fun getAndUpdate(f: (Boolean) -> Boolean): Boolean =
+    atomicRef.getAndUpdate(f)
 
-  fun lazySet(a: Boolean) = atomicRef.lazySet(a)
+  fun compareAndSet(expect: Boolean, update: Boolean): Boolean =
+    atomicRef.compareAndSet(expect, update)
 
-  override fun toString(): String = value.toString()
+  fun lazySet(a: Boolean): Unit =
+    atomicRef.lazySet(a)
+
+  override fun toString(): String =
+    value.toString()
 }
 
 class AtomicIntW(a: Int) {
@@ -55,25 +72,39 @@ class AtomicIntW(a: Int) {
     }
     get() = atomicRef.value
 
-  fun getAndSet(a: Int) = atomicRef.getAndSet(a)
+  fun getAndSet(a: Int): Int =
+    atomicRef.getAndSet(a)
 
-  fun getAndAdd(delta: Int) = atomicRef.getAndAdd(delta)
+  fun getAndAdd(delta: Int): Int =
+    atomicRef.getAndAdd(delta)
 
-  fun addAndGet(delta: Int) = atomicRef.addAndGet(delta)
+  fun addAndGet(delta: Int): Int =
+    atomicRef.addAndGet(delta)
 
-  fun getAndIncrement() = atomicRef.getAndIncrement()
+  fun getAndIncrement(): Int =
+    atomicRef.getAndIncrement()
 
-  fun getAndDecrement() = atomicRef.getAndDecrement()
+  fun getAndDecrement(): Int =
+    atomicRef.getAndDecrement()
 
-  fun incrementAndGet() = atomicRef.incrementAndGet()
+  fun incrementAndGet(): Int =
+    atomicRef.incrementAndGet()
 
-  fun decrementAndGet() = atomicRef.decrementAndGet()
+  fun decrementAndGet(): Int =
+    atomicRef.decrementAndGet()
 
-  fun updateAndGet(function: (Int) -> Int) = atomicRef.updateAndGet(function)
+  fun updateAndGet(function: (Int) -> Int): Int =
+    atomicRef.updateAndGet(function)
 
-  fun compareAndSet(expect: Int, update: Int) = atomicRef.compareAndSet(expect, update)
+  fun getAndUpdate(f: (Int) -> Int): Int =
+    atomicRef.getAndUpdate(f)
 
-  fun lazySet(a: Int) = atomicRef.lazySet(a)
+  fun compareAndSet(expect: Int, update: Int): Boolean =
+    atomicRef.compareAndSet(expect, update)
 
-  override fun toString(): String = value.toString()
+  fun lazySet(a: Int): Unit =
+    atomicRef.lazySet(a)
+
+  override fun toString(): String =
+    value.toString()
 }
