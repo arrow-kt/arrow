@@ -1,8 +1,9 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Either.Left
+import arrow.core.EitherOf
+import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.NonFatal
 import arrow.core.Option
@@ -11,10 +12,15 @@ import arrow.core.Some
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
+import arrow.core.fix
 import arrow.fx.IO.Companion.async
+import arrow.fx.IO.Companion.effect
+import arrow.fx.IO.Pure
+import arrow.fx.IO.RaiseError
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
+import arrow.fx.extensions.io.async.effectMap
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.internal.ArrowInternalException
@@ -92,6 +98,52 @@ sealed class IO<out E, out A> : IOOf<E, A> {
      */
     fun <A> effect(f: suspend () -> A): IO<Nothing, A> =
       Effect(effect = f)
+
+    /**
+     * Delay a suspended effect which results in an Either.
+     *
+     * @return a success [IO] when [f] returns [Either.Right]<[A]> or an error when [f] returns [Either.Left]<[E]>
+     *
+     * ```kotlin:ank:playground:extension
+     * import arrow.fx.IO
+     * import kotlinx.coroutines.Dispatchers
+     * import arrow.fx.unsafeRunSync
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   suspend fun helloWorld(): Either<Nothing, Unit> = Either.catch { println("Hello World!") }
+     *
+     *   val result = IO.effectEither { helloWorld() }
+     *   //sampleEnd
+     *   result.unsafeRunSync()
+     * }
+     * ```
+     *
+     */
+    fun <E, A> effectEither(f: suspend () -> EitherOf<E, A>): IO<E, A> =
+      Effect(effect = f).flattenEither()
+
+    /**
+     * Delay a suspended effect which results in an Either on provided [CoroutineContext].
+     *
+     * @return a success [IO] when [f] returns [Either.Right]<[A]> or an error when [f] returns [Either.Left]<[E]>
+     *
+     * ```kotlin:ank:playground:extension
+     * import arrow.fx.IO
+     * import kotlinx.coroutines.Dispatchers
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   suspend fun getThreadSuspended() = Either.right(Thread.currentThread().name)
+     *
+     *   val result = IO.effect(Dispatchers.Default) { getThreadSuspended() }
+     *   //sampleEnd
+     *   println(result)
+     * }
+     * ```
+     */
+    fun <E, A> effectEither(ctx: CoroutineContext, f: suspend () -> EitherOf<E, A>): IO<E, A> =
+      Effect(ctx, effect = f).flattenEither()
 
     /**
      * Delay a suspended effect on provided [CoroutineContext].
@@ -993,6 +1045,64 @@ fun <E, A, B, E2 : E> IOOf<E, A>.flatMap(f: (A) -> IOOf<E2, B>): IO<E2, B> =
     is IO.Pure<A> -> IO.Suspend { f(current.a) }
     else -> IO.Bind(current, f)
   }
+
+/**
+ * Flatten an [IO] with a success of [Either] into an [IO] of [A], when the left is the same error ([E]) as the original [IO] and the right is [A].
+ *
+ * @returns success if [Either.Right] or raises [E] otherwise.
+ *
+ *  * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ * import arrow.fx.unsafeRunSync
+ * import arrow.core.Either
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.just(Either.right("Hello")).flattenEither().flatMap { IO { "$it World" } }
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A> IO<E, EitherOf<E, A>>.flattenEither(): IO<E, A> =
+  flatMap { it.fix().fold(::RaiseError, ::Pure) }
+
+/**
+ * Transform the value of an [IO] into an [Either] and consequently flatten into an [IO]
+ *
+ * @return success when [f] results in [Either.Right] or error when [f] results in [Either.Left]
+ *
+ * fun main(args: Array<String>) {
+ *   fun Int.increment() = Either.right(this + 1)
+ *   val result =
+ *   //sampleStart
+ *   IO.just(1).mapEither { it.increment() }
+ *   //sampleEnd
+ *   println(result.unsafeRunSyncEither())
+ * }
+ * ```
+ */
+fun <E, A, B> IO<E, A>.mapEither(f: (A) -> EitherOf<E, B>): IO<E, B> =
+  map(f).flattenEither()
+
+/**
+ * Transform, as a suspend effect, the value of an [IO] into an [Either] and consequently flatten into an [IO]
+ *
+ * @return success when [f] results in [Either.Right] or error when [f] results in [Either.Left]
+ *
+ * fun main(args: Array<String>) {
+ *   suspend fun Int.increment() = Either.right(this + 1)
+ *   val result =
+ *   //sampleStart
+ *   IO.just(1).effectMapEither { it.increment() }
+ *   //sampleEnd
+ *   println(result.unsafeRunSyncEither())
+ * }
+ * ```
+ */
+fun <E, A, B> IO<E, A>.effectMapEither(f: suspend (A) -> EitherOf<E, B>): IO<E, B> =
+  effectMap(f).flattenEither()
 
 /**
  * Compose this [IO] with another [IO] [fb] while ignoring the output.

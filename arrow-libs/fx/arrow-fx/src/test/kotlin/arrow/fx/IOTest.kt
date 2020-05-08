@@ -17,12 +17,10 @@ import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.concurrent.raceN
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.functor.functor
 import arrow.fx.extensions.io.monad.flatMap
-import arrow.fx.extensions.io.monad.map
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.extensions.io.semigroupK.semigroupK
 import arrow.fx.extensions.timer
@@ -277,6 +275,71 @@ class IOTest : UnitSpec() {
       run shouldBe expected
     }
 
+    "should flatten Either correctly for success" {
+      val run = just(Either.right(1)).flattenEither().unsafeRunSync()
+
+      run shouldBe 1
+    }
+
+    "should flatten Either correctly for exception" {
+      val error = RuntimeException("failed")
+
+      val run = just(Either.left(error)).flattenEither().unsafeRunSyncEither()
+
+      run shouldBe Either.left(error)
+    }
+
+    "should create success IO from effect producing Either" {
+      suspend fun hello() = Either.catch { "hello" }
+
+      val run = IO.effectEither { hello() }.unsafeRunSyncEither()
+
+      run shouldBe Either.right("hello")
+    }
+
+    "should create error IO from effect producing Either" {
+      val error = Throwable()
+      val failFun = suspend { Either.left(error) }
+
+      val run = IO.effectEither { failFun() }.unsafeRunSyncEither()
+
+      run shouldBe Either.left(error)
+    }
+
+    "transforms to success Either and flattens to success IO" {
+      fun Int.increment(): Either<Throwable, Int> = Either.right(this + 1)
+
+      val run = just(1).mapEither { it.increment() }.unsafeRunSyncEither()
+
+      run shouldBe Either.right(2)
+    }
+
+    "transforms to failure Either and flattens to failure IO" {
+      val error = Throwable()
+      fun fail(): Either<Throwable, Int> = Either.left(error)
+
+      val run = just(1).mapEither { fail() }.unsafeRunSyncEither()
+
+      run shouldBe Either.left(error)
+    }
+
+    "transforms effect to success Either and flattens to success IO" {
+      suspend fun Int.increment() = Either.right(this + 1)
+
+      val run = just(1).effectMapEither { it.increment() }.unsafeRunSyncEither()
+
+      run shouldBe Either.right(2)
+    }
+
+    "transforms effect to failure Either and flattens to failure IO" {
+      val error = Throwable()
+      val fail = suspend { Either.left(error) }
+
+      val run = just(1).effectMapEither { fail() }.unsafeRunSyncEither()
+
+      run shouldBe Either.left(error)
+    }
+
     "invoke is called on every run call" {
       val sideEffect = SideEffect()
       val io = IO { sideEffect.increment(); 1 }
@@ -297,6 +360,11 @@ class IOTest : UnitSpec() {
 
     "effect is called on the correct ctx" {
       val io = IO.effect(all) { Thread.currentThread().name }
+      io.unsafeRunSync() shouldBe "all"
+    }
+
+    "effectEither is called on the correct ctx" {
+      val io = IO.effectEither(all) { Either.right(Thread.currentThread().name) }
       io.unsafeRunSync() shouldBe "all"
     }
 
