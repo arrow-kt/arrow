@@ -38,6 +38,8 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Karumi/KataLogInLogOutKotlin](https://github.com/Karumi/KataLogInLogOutKotlin/): Android development kata used to practice unit testing with test doubles in Kotlin also using Arrow.
 
+[LordRaydenMK/Android-Fx-Examples](https://github.com/LordRaydenMK/Android-Fx-Examples): Real world Android problems solved with Arrow-Fx
+
 #### Backend
 
 [istonikula/realworld-api](https://github.com/istonikula/realworld-api): A spring 5 project
