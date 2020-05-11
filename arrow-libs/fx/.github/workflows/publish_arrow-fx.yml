@@ -31,7 +31,6 @@ jobs:
     - name: Build with Gradle
       run: |
         $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
-        ./gradlew :arrow-benchmarks-fx:jmhClasses
     - name: Publish artifacts
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}

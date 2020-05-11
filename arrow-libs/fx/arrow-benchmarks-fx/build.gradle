@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        maven { url "https://dl.bintray.com/47deg/hood" }
+    }
+    
+    dependencies {
+        classpath "com.47deg:hood:0.8.0"
+    }
+    ext {
+        JMH_RESULT_FOR_MASTER_BRANCH = "$rootDir/master-branch.json"
+        JMH_RESULT_FOR_PULL_REQUEST = "$rootDir/pull-request.json"
+    }
+}
+
 plugins {
     id "maven-publish"
     id "base"
@@ -14,6 +28,7 @@ plugins {
 
 apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
+apply plugin: "com.47deg.hood"
 
 dependencies {
     compile project(":arrow-fx")
@@ -65,6 +80,32 @@ jmhReport {
 }
 
 tasks.jmh.finalizedBy tasks.jmhReport
+
+task jmhForMasterBranch {
+    doLast {
+        jmh.resultsFile = file(JMH_RESULT_FOR_MASTER_BRANCH)
+    }
+    finalizedBy "jmh"
+}
+
+task jmhForPullRequest {
+    doLast {
+        jmh.resultsFile = file(JMH_RESULT_FOR_PULL_REQUEST)
+    }
+    finalizedBy "jmh"
+}
+
+compareBenchmarksCI {
+    previousBenchmarkPath = file(JMH_RESULT_FOR_MASTER_BRANCH)
+    currentBenchmarkPath = [file(JMH_RESULT_FOR_PULL_REQUEST)]
+    outputToFile = true
+    outputFormat = "json"
+    token = System.getenv("CI_TOKEN")
+    repositoryOwner = "arrow-kt"
+    repositoryName = "arrow-fx"
+    pullRequestSha = System.getenv("GITHUB_SHA")
+    pullRequestNumber = System.getenv("PULL_REQUEST_NUMBER")?.toInteger()
+}
 
 repositories {
     maven { url "https://jitpack.io" }
