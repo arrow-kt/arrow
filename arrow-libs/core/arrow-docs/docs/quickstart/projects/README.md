@@ -10,7 +10,7 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 #### Libraries
 
-[arrow/ΛNK](https://github.com/arrow-kt/ank/): Compile time docs verification for Kotlin
+[arrow/ΛNK](https://github.com/arrow-kt/arrow-ank): Compile time docs verification and evaluation for Kotlin and Java.
 
 [xenomachina/kessel](https://github.com/xenomachina/kessel): A simple parser combinator library for Kotlin
 
