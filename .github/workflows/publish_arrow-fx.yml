@@ -1,4 +1,4 @@
-// This is separated by library because of a limit with GitHub and Bintray about the number of published artifacts.
+# This is separated by library because of a limit with GitHub and Bintray about the number of published artifacts.
 name: "Publish Arrow Fx"
 
 on:
