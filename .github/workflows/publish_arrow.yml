@@ -36,14 +36,6 @@ jobs:
         echo "::set-output name=release-version::$LATEST_VERSION"
         echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
-    - name: Publish into OSS
-      if: steps.versions.outputs.new-version-exists == '0'
-      env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: |
-        echo "Publishing Arrow libraries into OSS ..." 
-        $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Download Arrow libraries
       if: steps.versions.outputs.new-version-exists == '1'
       run: |
@@ -59,8 +51,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         git checkout gradle.properties
-        echo "This step is disabled because next SNAPSHOT is already in OSS"
-        #$BASEDIR/arrow/scripts/libs-publish.sh
+        $BASEDIR/arrow/scripts/libs-publish.sh
     - name: Update versions for documentation
       if: steps.versions.outputs.new-version-exists == '1'
       env:

@@ -1,4 +1,5 @@
-name: "Publish Arrow Fx into Bintray"
+# This is separated by library because of a limit with GitHub and Bintray about the number of published artifacts.
+name: "Publish Arrow Fx"
 
 on:
   push:
@@ -15,9 +16,9 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
-      LIB: arrow-fx
+      ARROW_LIB: arrow-fx
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
 
     steps:
     - uses: actions/checkout@v1
@@ -37,6 +38,14 @@ jobs:
         echo "::set-output name=release-version::$LATEST_VERSION"
         echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: "Publish into OSS"
+      if: steps.versions.outputs.new-version-exists == '0'
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        git clone https://github.com/arrow-kt/$ARROW_LIB.git $BASEDIR/$ARROW_LIB
+        $BASEDIR/arrow/scripts/project-publish.sh $ARROW_LIB
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -45,14 +54,14 @@ jobs:
       run: |
         echo "Update version ..."
         sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
-        $BASEDIR/arrow/scripts/lib-publish.sh $LIB
+        $BASEDIR/arrow/scripts/lib-publish.sh $ARROW_LIB
     - name: Create tag
       if: steps.versions.outputs.new-version-exists == '1'
       env:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
-        cd $BASEDIR/$LIB
-        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$LIB.git
+        cd $BASEDIR/$ARROW_LIB
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$ARROW_LIB.git
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
         git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
@@ -63,7 +72,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
         sudo snap install hub --classic
-        cd $BASEDIR/$LIB
+        cd $BASEDIR/$ARROW_LIB
         TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
         hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
         while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
