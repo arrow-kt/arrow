@@ -26,6 +26,8 @@ Use the list below to learn more about Λrrow's main features.
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
+If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo. 
+
 ## About this repository
 
 This repository orchestrates the global configuration and checks of the **Λrrow** libraries:
