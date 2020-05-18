@@ -2,10 +2,13 @@
 
 INCLUDE_ARROW_DOCS="include 'arrow-docs'"
 OSS_REPOSITORY="https://oss.jfrog.org/artifactory/oss-snapshot-local/"
+BINTRAY_REPOSITORY="https://dl.bintray.com/arrow-kt/arrow-kt/"
 MAVEN_LOCAL_REPOSITORY="mavenLocal()"
 ERROR_LOG=error.log
 OLD_DIR="https://raw.githubusercontent.com/arrow-kt/arrow/master"
 NEW_DIR="file://$BASEDIR/arrow"
+
+
 
 function escapeURL()
 {
@@ -23,6 +26,12 @@ function replaceLocalRepositorybyOSS()
 {
     echo "Replacing local repository by OSS ($1) ..."
     sed -e "s/$MAVEN_LOCAL_REPOSITORY/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/g" $1 > $1.tmp ; mv $1.tmp $1
+}
+
+function replaceOSSbyBintrayRepository()
+{
+    echo "Replacing OSS by Bintray repository ($1) ..."
+    sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" $1
 }
 
 function removeArrowDocs()
