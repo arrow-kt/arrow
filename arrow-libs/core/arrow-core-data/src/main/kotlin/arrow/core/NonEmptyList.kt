@@ -198,7 +198,7 @@ class NonEmptyList<out A> private constructor(
   val head: A,
   val tail: List<A>,
   val all: List<A>
-) : NonEmptyListOf<A> {
+) : NonEmptyListOf<A>, Iterable<A> by all {
 
   constructor(head: A, tail: List<A>) : this(head, tail.toList(), listOf(head) + tail.toList())
   private constructor(list: List<A>) : this(list[0], list.drop(1), list.toList())
@@ -248,8 +248,6 @@ class NonEmptyList<out A> private constructor(
   }
 
   fun extract(): A = this.fix().head
-
-  fun iterator(): Iterator<A> = all.iterator()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
