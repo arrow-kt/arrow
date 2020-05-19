@@ -10,6 +10,7 @@ jobs:
 
     env:
       BASEDIR: ${{github.workspace}}/..
+      JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: ubuntu-16.04
 
@@ -26,23 +27,20 @@ jobs:
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
+        git clone https://github.com/arrow-kt/arrow.git arrow-master
     - name: "Site: run Ank"
-      env:
-        JAVA_OPTS: -Xms512m -Xmx1024m
       run: ./gradlew runAnk
     - name: "Next version: generate and validate docs for all the libraries"
       run: |
+        . $BASEDIR/arrow-master/scripts/commons4gradle.sh
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git
-            $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
-            echo "include 'arrow-docs'" >> $BASEDIR/$repository/settings.gradle
-            $BASEDIR/arrow/scripts/project-run-ank.sh $repository
-            #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
-            cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
+            cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git; cd $repository
+            addArrowDocs $BASEDIR/$repository/settings.gradle
+            $BASEDIR/arrow-master/scripts/project-generate-and-validate-doc.sh $repository
         done
     - name: "Other versions: generate and validate docs"
       run: |
-        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        . $BASEDIR/arrow-master/scripts/commons4gradle.sh
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
                 echo "Update $version ..."
@@ -54,21 +52,19 @@ jobs:
                 cd $BASEDIR/arrow
                 git checkout $version
                 sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
-                OSS_REPOSITORY="https://oss.jfrog.org/artifactory/oss-snapshot-local/"
-                BINTRAY_REPOSITORY="https://dl.bintray.com/arrow-kt/arrow-kt/"
-                sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" generic-conf.gradle
+                replaceOSSbyBintrayRepository generic-conf.gradle
                 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
                     cd $BASEDIR/$repository
                     git checkout $version
                     replaceGlobalPropertiesbyLocalConf gradle.properties
                     if [ -f arrow-docs/build.gradle ]; then
-                        sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" arrow-docs/build.gradle
+                        replaceOSSbyBintrayRepository arrow-docs/build.gradle
                     fi
-                    $BASEDIR/arrow/scripts/project-run-dokka.sh $repository
-                    echo "include 'arrow-docs'" >> $BASEDIR/$repository/settings.gradle
-                    $BASEDIR/arrow/scripts/project-run-ank.sh $repository
-                    #$BASEDIR/arrow/scripts/project-locate-doc.sh $repository
-                    cp -r $BASEDIR/$repository/arrow-docs/build/site/* $BASEDIR/arrow-site/build/site/
+                    addArrowDocs $BASEDIR/$repository/settings.gradle
+                    $BASEDIR/arrow-master/scripts/project-assemble.sh $repository
+                    $BASEDIR/arrow-master/scripts/project-run-dokka.sh $repository
+                    $BASEDIR/arrow-master/scripts/project-run-ank.sh $repository
+                    $BASEDIR/arrow-master/scripts/project-locate-doc.sh $repository
                 done
             done
         fi
