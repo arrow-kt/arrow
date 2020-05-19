@@ -21,6 +21,7 @@ dokka {
     configuration {
         includes = ['README.md']
         reportUndocumented = false
+        classpath = [new File("${rootDir}/$project.name/build/classes/kotlin/main/")]
         // Specifies the location of the project source code on the Web.
         // If provided, Dokka generates "source" links for each declaration.
         // Repeat for multiple mappings
