@@ -40,7 +40,7 @@ jobs:
         mkdir $BASEDIR/logs
         sudo pip install awscli
         aws --version
-        $BASEDIR/arrow/scripts/site-prepare-env.sh
+        $BASEDIR/arrow-master/scripts/site-prepare-env.sh
         sudo apt-get install tree
         bundle install --gemfile Gemfile --path vendor/bundle
     - name: "Site: run Ank"
@@ -48,18 +48,18 @@ jobs:
     - name: "Site: build"
       run: |
         bundle exec jekyll build -s build/site -d build/_site
-        tree build/_site > $BASEDIR/logs/docs.log
+        tree build/_site > $BASEDIR/logs/content.log
     - name: "Site: publish"
       run: |
-        echo ">>> SITE" > aws_sync_jekyll.log
+        echo ">>> SITE" > $BASEDIR/logs/aws_sync.log
         cd build/_site/
         for file in *; do
             if [ -f "$file" ]; then
                 echo "Copying $file ..."
-                aws s3 cp $file s3://$S3_BUCKET/$file >> aws_sync_jekyll.log
+                aws s3 cp $file s3://$S3_BUCKET/$file >> $BASEDIR/logs/aws_sync.log
             else
                 echo "Sync $file ..."
-                aws s3 sync $file s3://$S3_BUCKET/$file --delete >> aws_sync_jekyll.log
+                aws s3 sync $file s3://$S3_BUCKET/$file --delete >> $BASEDIR/logs/aws_sync.log
             fi
         done
     - name: "Next version: generate and validate docs for all the libraries"
@@ -74,11 +74,11 @@ jobs:
       run: |
         bundle exec jekyll build -b docs/next -s build/site -d build/_site
         rm -f build/_site/index.*
-        tree build/_site > $BASEDIR/logs/docs-next.log
+        tree build/_site > $BASEDIR/logs/content_docs-next.log
     - name: "Next version: publish"
       run: |
-        echo ">>> NEXT VERSION" >> aws_sync_jekyll.log
-        aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> aws_sync_jekyll.log
+        echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
+        aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
     - name: "Other versions: generate, validate, build and publish"
       run: |
         . $BASEDIR/arrow-master/scripts/commons4gradle.sh
@@ -94,6 +94,8 @@ jobs:
                 git checkout $version
                 sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
                 replaceOSSbyBintrayRepository generic-conf.gradle
+                # TODO: Remove when releasing 0.11.0
+                cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
                 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
                     cd $BASEDIR/$repository
                     git checkout $version
@@ -110,9 +112,9 @@ jobs:
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
                 rm -f build/_site/index.*
-                tree build/_site > $BASEDIR/logs/docs-${SHORT_VERSION}.log
-                echo ">>> $SHORT_VERSION VERSION" >> aws_sync_jekyll.log
-                aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> aws_sync_jekyll.log
+                tree build/_site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+                echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
+                aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
             done
         fi
     - name: "Site: generate sitemap.xml"
@@ -129,16 +131,12 @@ jobs:
         done < docs-pages.log >> sitemap.xml
         echo '</urlset>' >> sitemap.xml
     - name: "Site: publish sitemap.xml"
-      run: aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> aws_sync_jekyll.log
+      run: aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
     - name: CloudFront cache invalidation
       run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
     - name: List S3
-      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > site-content.log
+      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > $BASEDIR/logs/site-content.log
     - uses: actions/upload-artifact@v1
       with:
-        name: site-content
-        path: site-content.log
-    - uses: actions/upload-artifact@v1
-      with:
-        name: log
-        path: aws_sync_jekyll.log
+        name: logs
+        path: ../logs

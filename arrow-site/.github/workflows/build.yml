@@ -28,8 +28,19 @@ jobs:
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
         git clone https://github.com/arrow-kt/arrow.git arrow-master
+    - name: Prepare environment
+      run: |
+        set -ex
+        mkdir $BASEDIR/logs
+        $BASEDIR/arrow-master/scripts/site-prepare-env.sh
+        sudo apt-get install tree
+        bundle install --gemfile Gemfile --path vendor/bundle
     - name: "Site: run Ank"
       run: ./gradlew runAnk
+    - name: "Site: build"
+      run: |
+        bundle exec jekyll build -s build/site -d build/_site
+        tree build/_site > $BASEDIR/logs/content.log
     - name: "Next version: generate and validate docs for all the libraries"
       run: |
         . $BASEDIR/arrow-master/scripts/commons4gradle.sh
@@ -38,6 +49,11 @@ jobs:
             addArrowDocs $BASEDIR/$repository/settings.gradle
             $BASEDIR/arrow-master/scripts/project-generate-and-validate-doc.sh $repository
         done
+    - name: "Next version: build"
+      run: |
+        bundle exec jekyll build -b docs/next -s build/site -d build/_site
+        rm -f build/_site/index.*
+        tree build/_site > $BASEDIR/logs/content_docs-next.log
     - name: "Other versions: generate and validate docs"
       run: |
         . $BASEDIR/arrow-master/scripts/commons4gradle.sh
@@ -53,6 +69,8 @@ jobs:
                 git checkout $version
                 sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
                 replaceOSSbyBintrayRepository generic-conf.gradle
+                # TODO: Remove when releasing 0.11.0
+                cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
                 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
                     cd $BASEDIR/$repository
                     git checkout $version
@@ -66,5 +84,13 @@ jobs:
                     $BASEDIR/arrow-master/scripts/project-run-ank.sh $repository
                     $BASEDIR/arrow-master/scripts/project-locate-doc.sh $repository
                 done
+                cd $BASEDIR/arrow-site
+                bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
+                rm -f build/_site/index.*
+                tree build/_site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
             done
         fi
+    - uses: actions/upload-artifact@v1
+      with:
+        name: logs
+        path: ../logs
