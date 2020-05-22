@@ -26,11 +26,18 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
       Id.just(a)
   }
 
+  /**
+   * Returns [F]<[B]> in [G] context by applying [AP] on a selector function [f], which returns [Option] of [B]
+   * in [G] context.
+   */
   fun <G, A, B> Kind<F, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>
 
   override fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B> =
     traverseFilter(IdApplicative) { Id(f(it)) }.value()
 
+  /**
+   * Returns [F]<[A]> in [G] context by applying [GA] on a selector function [f] in [G] context.
+   */
   fun <G, A> Kind<F, A>.filterA(f: (A) -> Kind<G, Boolean>, GA: Applicative<G>): Kind<G, Kind<F, A>> = GA.run {
     traverseFilter(this) { a -> f(a).map { b -> if (b) Some(a) else None } }
   }
