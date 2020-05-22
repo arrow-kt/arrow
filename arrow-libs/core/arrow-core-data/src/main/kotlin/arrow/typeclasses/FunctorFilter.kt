@@ -14,7 +14,7 @@ import arrow.core.identity
 interface FunctorFilter<F> : Functor<F> {
 
   /**
-   * A combined map and filter. Filtering is handled via Option instead of Boolean such that the output type B can be different than the input type A.
+   * A combined map and filter. Filtering is handled via [Option] instead of [Boolean] such that the output type [B] can be different than the input type [A].
    */
   fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B>
 
@@ -24,7 +24,7 @@ interface FunctorFilter<F> : Functor<F> {
   fun <A> Kind<F, Option<A>>.flattenOption(): Kind<F, A> = filterMap(::identity)
 
   /**
-   * Apply a filter to a structure such that the output structure contains all A elements in the input structure that satisfy the predicate f but none
+   * Apply a filter to a structure such that the output structure contains all [A] elements in the input structure that satisfy the predicate [f] but none
    * that don't.
    */
   fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
