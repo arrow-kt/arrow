@@ -54,36 +54,21 @@ jobs:
         bundle exec jekyll build -b docs/next -s build/site -d build/_site
         rm -f build/_site/index.*
         tree build/_site > $BASEDIR/logs/content_docs-next.log
-    - name: "Other versions: generate and validate docs"
+    - name: "Latest release: generate and validate docs for all the libraries"
       run: |
-        . $BASEDIR/arrow-master/scripts/commons4gradle.sh
+        export VERSION=$(git describe --abbrev=0 --tags)
+        ./scripts/generate-and-validate-doc.sh
+    - name: "Latest release: build"
+      run: |
+        bundle exec jekyll build -b docs -s build/site -d build/_site
+        rm -f build/_site/index.*
+        tree build/_site > $BASEDIR/logs/content_docs.log
+    - name: "Other versions: generate and validate docs for all the libraries"
+      run: |
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
-                echo "Update $version ..."
-                SHORT_VERSION=$(echo $version | cut -d. -f1-2)
-                cd $BASEDIR/arrow-site
-                cp sidebar/$SHORT_VERSION/* docs/_data/
-                sed -i "s/latest/$version/g" docs/_includes/_head-docs.html
-                ./gradlew clean runAnk
-                cd $BASEDIR/arrow
-                git checkout $version
-                sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
-                replaceOSSbyBintrayRepository generic-conf.gradle
-                # TODO: Remove when releasing 0.11.0
-                cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
-                for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-                    cd $BASEDIR/$repository
-                    git checkout $version
-                    replaceGlobalPropertiesbyLocalConf gradle.properties
-                    if [ -f arrow-docs/build.gradle ]; then
-                        replaceOSSbyBintrayRepository arrow-docs/build.gradle
-                    fi
-                    addArrowDocs $BASEDIR/$repository/settings.gradle
-                    $BASEDIR/arrow-master/scripts/project-assemble.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-run-dokka.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-run-ank.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-locate-doc.sh $repository
-                done
+                export VERSION=$version
+                ./scripts/generate-and-validate-doc.sh
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
                 rm -f build/_site/index.*

@@ -79,36 +79,34 @@ jobs:
       run: |
         echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
         aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+    - name: "Latest release: generate and validate docs for all the libraries"
+      run: |
+        export VERSION=$(git describe --abbrev=0 --tags)
+        ./scripts/generate-and-validate-doc.sh
+    - name: "Latest release: build"
+      run: |
+        bundle exec jekyll build -b docs -s build/site -d build/_site
+        rm -f build/_site/index.*
+        tree build/_site > $BASEDIR/logs/content_docs.log
+    - name: "Latest release: publish"
+      run: |
+        echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
+        cd build/_site/
+        for file in *; do
+            if [ -f "$file" ]; then
+                echo "Copying $file ..."
+                aws s3 cp $file s3://$S3_BUCKET/docs/$file >> $BASEDIR/logs/aws_sync.log
+            else
+                echo "Sync $file ..."
+                aws s3 sync $file s3://$S3_BUCKET/docs/$file --delete >> $BASEDIR/logs/aws_sync.log
+            fi
+        done
     - name: "Other versions: generate, validate, build and publish"
       run: |
-        . $BASEDIR/arrow-master/scripts/commons4gradle.sh
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
-                echo "Update $version ..."
-                SHORT_VERSION=$(echo $version | cut -d. -f1-2)
-                cd $BASEDIR/arrow-site
-                cp sidebar/$SHORT_VERSION/* docs/_data/
-                sed -i "s/latest/$version/g" docs/_includes/_head-docs.html
-                ./gradlew clean runAnk
-                cd $BASEDIR/arrow
-                git checkout $version
-                sed -i "s/^VERSION_NAME.*/VERSION_NAME=$version/g" gradle.properties
-                replaceOSSbyBintrayRepository generic-conf.gradle
-                # TODO: Remove when releasing 0.11.0
-                cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
-                for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-                    cd $BASEDIR/$repository
-                    git checkout $version
-                    replaceGlobalPropertiesbyLocalConf gradle.properties
-                    if [ -f arrow-docs/build.gradle ]; then
-                        replaceOSSbyBintrayRepository arrow-docs/build.gradle
-                    fi
-                    addArrowDocs $BASEDIR/$repository/settings.gradle
-                    $BASEDIR/arrow-master/scripts/project-assemble.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-run-dokka.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-run-ank.sh $repository
-                    $BASEDIR/arrow-master/scripts/project-locate-doc.sh $repository
-                done
+                export VERSION=$version
+                ./scripts/generate-and-validate-doc.sh
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
                 rm -f build/_site/index.*
@@ -119,16 +117,15 @@ jobs:
         fi
     - name: "Site: generate sitemap.xml"
       run: |
-        LAST_MAJOR_MINOR_VERSION=$(git describe --abbrev=0 | cut -d. -f1-2)
         echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
-        aws s3 ls s3://$S3_BUCKET/docs/$LAST_MAJOR_MINOR_VERSION --recursive > docs-content.log
-        grep index.html docs-content.log > docs-pages.log
+        aws s3 ls s3://$S3_BUCKET/docs --recursive > docs-content.log
+        grep -e " docs/[^0-9|next].*index.html$" docs-content.log > $BASEDIR/logs/main-pages.log
         while read line; do
           PAGE_DATE=$(echo $line | cut -d' ' -f1)
           PAGE_PATH=$(echo $line | cut -d' ' -f4)
           echo "<url><loc>https://arrow-kt.io/${PAGE_PATH}</loc><lastmod>${PAGE_DATE}</lastmod></url>"
-        done < docs-pages.log >> sitemap.xml
+        done < $BASEDIR/logs/main-pages.log >> sitemap.xml
         echo '</urlset>' >> sitemap.xml
     - name: "Site: publish sitemap.xml"
       run: aws s3 cp sitemap.xml s3://$S3_BUCKET/sitemap.xml >> $BASEDIR/logs/aws_sync.log
