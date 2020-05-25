@@ -12,7 +12,6 @@ plugins {
 apply from: "$SUBPROJECT_CONF"
 apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
-apply plugin: 'kotlinx-atomicfu'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"

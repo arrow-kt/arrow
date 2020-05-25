@@ -9,7 +9,6 @@ import arrow.core.extensions.eval.comonad.comonad
 import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.fx
-import arrow.core.internal.AtomicBooleanW
 import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.generators.GenK
@@ -21,6 +20,7 @@ import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import java.util.concurrent.atomic.AtomicBoolean
 
 class EvalTest : UnitSpec() {
 
@@ -42,13 +42,13 @@ class EvalTest : UnitSpec() {
     )
 
     "fx block runs lazily" {
-      val run = AtomicBooleanW(false)
+      val run = AtomicBoolean(false)
       val p = Eval.fx {
         run.getAndSet(true)
-        run.value
+        run.get()
       }
 
-      run.value shouldBe false
+      run.get() shouldBe false
       p.equalUnderTheLaw(just(true), EQK.liftEq(Boolean.eq())) shouldBe true
     }
 
