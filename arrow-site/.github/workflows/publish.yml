@@ -17,6 +17,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
       AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+      JEKYLL_ENV: production
 
     runs-on: ubuntu-16.04
 
