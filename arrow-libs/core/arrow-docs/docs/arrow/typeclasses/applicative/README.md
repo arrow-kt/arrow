@@ -155,4 +155,4 @@ since they are all subtypes of `Applicative`.
 ank_macro_hierarchy(arrow.typeclasses.Applicative)
 
 [applicative_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
-[applicative_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/ApplicativeLaws.kt
+[applicative_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/ApplicativeLaws.kt

@@ -70,4 +70,4 @@ TypeClass(Unalign::class).dtMarkdownList()
 ank_macro_hierarchy(arrow.typeclasses.Unalign)
 
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Unalign.kt
-[functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/test/laws/UnalignLaws.kt
+[functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/UnalignLaws.kt
