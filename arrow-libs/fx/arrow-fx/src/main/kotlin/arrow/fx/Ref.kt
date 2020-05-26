@@ -5,7 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.internal.AtomicBooleanW
+import arrow.fx.internal.AtomicBooleanW
 import arrow.core.invoke
 import arrow.fx.typeclasses.MonadDefer
 import kotlinx.atomicfu.AtomicRef

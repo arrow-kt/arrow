@@ -15,8 +15,8 @@ import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.applicativeError.handleError
-import arrow.core.internal.AtomicBooleanW
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicBooleanW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.core.none
 import arrow.core.some

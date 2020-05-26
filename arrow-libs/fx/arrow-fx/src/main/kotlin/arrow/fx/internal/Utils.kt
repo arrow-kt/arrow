@@ -6,7 +6,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.internal.AtomicBooleanW
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO

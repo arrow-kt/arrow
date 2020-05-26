@@ -3,7 +3,7 @@ package arrow.integrations.kotlinx
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.extensions.eq
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.throwable
 import arrow.core.test.laws.equalUnderTheLaw

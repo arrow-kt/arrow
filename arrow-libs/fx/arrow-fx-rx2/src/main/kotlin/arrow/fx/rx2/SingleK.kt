@@ -3,7 +3,7 @@ package arrow.fx.rx2
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 
 import arrow.fx.internal.Platform

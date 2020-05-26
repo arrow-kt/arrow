@@ -2,7 +2,7 @@ package arrow.fx.test.laws
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.core.internal.AtomicIntW
+import arrow.fx.internal.AtomicIntW
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicativeError
 import arrow.core.test.generators.functionAToB

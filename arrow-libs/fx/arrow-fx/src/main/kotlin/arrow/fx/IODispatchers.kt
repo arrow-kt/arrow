@@ -1,6 +1,6 @@
 package arrow.fx
 
-import arrow.core.internal.AtomicIntW
+import arrow.fx.internal.AtomicIntW
 import arrow.undocumented
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors

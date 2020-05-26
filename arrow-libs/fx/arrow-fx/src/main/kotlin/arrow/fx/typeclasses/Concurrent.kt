@@ -16,7 +16,7 @@ import arrow.core.Tuple9
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.identity
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.k
 import arrow.fx.MVar
 import arrow.fx.Promise

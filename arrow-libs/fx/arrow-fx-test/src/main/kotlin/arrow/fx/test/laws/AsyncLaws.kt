@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.extensions.eq
-import arrow.core.internal.AtomicBooleanW
+import arrow.fx.internal.AtomicBooleanW
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.applicativeError
 import arrow.core.test.generators.either

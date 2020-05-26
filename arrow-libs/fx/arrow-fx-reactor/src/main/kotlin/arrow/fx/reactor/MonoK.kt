@@ -4,8 +4,8 @@ import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.Left
 import arrow.core.NonFatal
-import arrow.core.internal.AtomicBooleanW
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicBooleanW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.onceOnly

@@ -7,7 +7,6 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.internal.AtomicRefW
 import arrow.fx.Queue
 import arrow.fx.Queue.BackpressureStrategy
 import arrow.fx.typeclasses.CancelToken

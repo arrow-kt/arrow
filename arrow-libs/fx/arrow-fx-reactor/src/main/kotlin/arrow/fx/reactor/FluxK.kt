@@ -8,7 +8,7 @@ import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
-import arrow.core.internal.AtomicRefW
+import arrow.fx.internal.AtomicRefW
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.Platform
 import arrow.fx.reactor.CoroutineContextReactorScheduler.asScheduler
