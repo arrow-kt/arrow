@@ -19,8 +19,10 @@ interface MonadFilterSyntax<F> : MonadSyntax<F> {
   suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B
 }
 
-open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadContinuation<F, A>(MF), MonadFilterSyntax<F> {
+open class MonadFilterContinuation<F, A>(
+  val MF: MonadFilter<F>,
+  override val context: CoroutineContext = EmptyCoroutineContext
+) : MonadContinuation<F, A>(MF), MonadFilterSyntax<F> {
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
     result.fold({ super.resumeWith(result) }, {
@@ -43,8 +45,8 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Binds only if the given predicate matches the inner value otherwise binds into the Monad `empty()` value
    * on `MonadFilter` instances
    */
-  override suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
-    val b: B = this.bind()
-    return if (f(b)) b else MF.empty<B>().bind()
-  }
+  override suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B =
+    MF.run {
+      this@bindWithFilter.filter(f)
+    }.bind()
 }
