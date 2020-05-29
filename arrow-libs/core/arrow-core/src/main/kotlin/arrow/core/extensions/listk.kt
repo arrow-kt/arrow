@@ -344,15 +344,13 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
     a: Kind<ForListK, A>,
     fa: (A) -> Kind<F, B>
   ): Kind<F, Kind<ForListK, B>> =
-    a.fix().let { list ->
-      list.foldLeft(ALIGN.run { empty<ListK<B>>() }) { xs, x ->
-        ALIGN.run {
-          alignWith(fa(x), xs) { ior ->
-            ior.fold(
-              { ListK.just(it) },
-              ::identity,
-              { l, r -> ListK.just(l) + r.fix() })
-          }
+    a.fix().foldLeft(ALIGN.run { empty<ListK<B>>() }) { xs, x ->
+      ALIGN.run {
+        alignWith(fa(x), xs) { ior ->
+          ior.fold(
+            { ListK.just(it) },
+            ::identity,
+            { l, r -> ListK.just(l) + r.fix() })
         }
       }
     }
