@@ -75,14 +75,16 @@ interface KotlinPoetEncoder {
       annotations = annotations.map { it.toMeta() }
     )
 
-  private fun com.squareup.kotlinpoet.ClassName.toMeta(): TypeName.Classy =
-    TypeName.Classy(
-      simpleName = simpleName.asKotlin(),
-      fqName = canonicalName.asKotlin(),
+  private fun com.squareup.kotlinpoet.ClassName.toMeta(): TypeName.Classy {
+    val fqNameAsKotlin = canonicalName.asKotlin()
+    return TypeName.Classy(
+      fqName = fqNameAsKotlin,
+      simpleName = fqNameAsKotlin.substringAfterLast("."),
+      pckg = PackageName(fqNameAsKotlin.substringBeforeLast(".")),
       annotations = annotations.map { it.toMeta() },
-      nullable = isNullable,
-      pckg = PackageName(packageName.asKotlin())
+      nullable = isNullable
     )
+  }
 
   private fun com.squareup.kotlinpoet.ParameterizedTypeName.toMeta(): TypeName =
     TypeName.ParameterizedType(

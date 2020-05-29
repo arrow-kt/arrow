@@ -28,15 +28,12 @@ fun String.asKotlin(): String =
     .replace("java.util.SortedMap", "kotlin.collections.SortedMap")
     .replace("java.util.Collection", "kotlin.collections.Collection")
     .replace("java.lang.Number", "kotlin.Number")
-    .replace("java.lang.Throwable", "kotlin.Throwable").let {
-      if (it == "java.lang") it.replace("java.lang", "kotlin")
-      else it
-    }.let {
-      if (it == "java.util") it.replace("java.util", "kotlin.collections")
-      else it
-    }
+    .replace("java.lang.Comparable", "kotlin.Comparable")
+    .replace("java.lang.Boolean", "kotlin.Boolean")
+    .replace("java.lang.Long", "kotlin.Long")
+    .replace("java.lang.Throwable", "kotlin.Throwable")
     .replace("kotlin.Integer", "kotlin.Int")
-    .replace("Integer", "Int")
+    .replace("java.lang.Integer", "kotlin.Int")
     .replace("java.lang.String", "kotlin.String")
 
 internal fun String.asClassy(): TypeName.Classy {
