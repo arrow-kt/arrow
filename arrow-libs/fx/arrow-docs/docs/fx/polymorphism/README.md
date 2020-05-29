@@ -90,16 +90,15 @@ fun main() {
 import arrow.core.Either
 import arrow.core.extensions.fx
 
-//sampleStart
-val result =
-  Either.fx<Throwable, Int> {
-    val (one) = Either.right(1)
-    val (two) = Either.right(one + one)
-    two
-  }
-//sampleEnd
-
-fun main() {
+suspend fun main() {
+  //sampleStart
+  val result =
+    Either.fx<Throwable, Int> {
+      val (one) = Either.right(1)
+      val (two) = Either.right(one + one)
+      two
+    }
+  //sampleEnd
   println(result)
 }
 ```
