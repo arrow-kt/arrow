@@ -5,9 +5,8 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.higherkind
 import arrow.typeclasses.Show
+import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 /**
@@ -651,6 +650,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * import arrow.core.extensions.fx
  * import arrow.core.Either
  *
+ * suspend fun main() {
  * val value =
  * //sampleStart
  *  Either.fx<Int, Int> {
@@ -660,7 +660,6 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  *   a + b + c
  *  }
  * //sampleEnd
- * fun main() {
  *  println(value)
  * }
  * ```
@@ -901,6 +900,21 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       } catch (t: Throwable) {
         fe(t.nonFatalOrThrow()).left()
       }
+
+    fun <E, A> fx2(c: suspend EagerBind<EitherPartialOf<E>>.() -> A): Either<E, A> {
+      val continuation: EitherContinuation<E, A> = EitherContinuation()
+      return continuation.startCoroutineUninterceptedAndReturn {
+        Right(c())
+      } as Either<E, A>
+    }
+
+    suspend fun <E, A> fx(c: suspend BindSyntax<EitherPartialOf<E>>.() -> A): Either<E, A> =
+      suspendCoroutineUninterceptedOrReturn sc@{ cont ->
+        val continuation = EitherSContinuation(cont as Continuation<EitherOf<E, A>>)
+        continuation.startCoroutineUninterceptedOrReturn {
+          Right(c())
+        }
+      }
   }
 }
 
@@ -1102,29 +1116,20 @@ fun <A, B> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<A, B>): Either<A, B
     }
   }
 
-suspend fun <E, A> Either.Companion.fx(c: suspend EitherContinuation<E, A>.() -> A): Either<E, A> =
-  suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-    val continuation = EitherContinuation(cont as Continuation<EitherOf<E, A>>)
-    val wrapReturn: suspend EitherContinuation<E, A>.() -> Either<E, A> = { c().right() }
-
-    // Returns either `Either<A, B>` or `COROUTINE_SUSPENDED`
-    val x: Any? = try {
-      wrapReturn.startCoroutineUninterceptedOrReturn(continuation, continuation)
-    } catch (e: Throwable) {
-      if (e is SuspendMonadContinuation.ShortCircuit) Left(e.e as E)
-      else throw e
-    }
-
-    return@sc if (x == COROUTINE_SUSPENDED) continuation.getResult()
-    else x as Either<E, A>
-  }
-
-class EitherContinuation<E, A>(
+internal class EitherSContinuation<E, A>(
   parent: Continuation<EitherOf<E, A>>
 ) : SuspendMonadContinuation<EitherPartialOf<E>, A>(parent) {
+  override fun ShortCircuit.recover(): Kind<EitherPartialOf<E>, A> =
+    Left(value as E)
+
   override suspend fun <A> Kind<EitherPartialOf<E>, A>.bind(): A =
     fix().fold({ e -> throw ShortCircuit(e) }, ::identity)
+}
 
+internal class EitherContinuation<E, A> : MonadContinuation<EitherPartialOf<E>, A>() {
   override fun ShortCircuit.recover(): Kind<EitherPartialOf<E>, A> =
-    Left(e as E)
+    Left(value as E)
+
+  override suspend fun <A> Kind<EitherPartialOf<E>, A>.bind(): A =
+    fix().fold({ e -> throw ShortCircuit(e) }, ::identity)
 }

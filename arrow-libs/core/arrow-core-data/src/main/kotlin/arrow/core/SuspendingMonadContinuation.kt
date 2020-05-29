@@ -8,17 +8,16 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resumeWithException
 
 internal const val UNDECIDED = 0
 internal const val SUSPENDED = 1
 
 @Suppress("UNCHECKED_CAST")
-abstract class SuspendMonadContinuation<F, A>(private val parent: Continuation<Kind<F, A>>) : Continuation<Kind<F, A>>, BindSyntax<F> {
-
-  class ShortCircuit(val e: Any?) : RuntimeException(null, null) {
-    override fun fillInStackTrace(): Throwable = this
-  }
+internal abstract class SuspendMonadContinuation<F, A>(
+  private val parent: Continuation<Kind<F, A>>
+) : Continuation<Kind<F, A>>, BindSyntax<F> {
 
   abstract fun ShortCircuit.recover(): Kind<F, A>
 
@@ -73,5 +72,16 @@ abstract class SuspendMonadContinuation<F, A>(private val parent: Continuation<K
         UNDECIDED -> if (this._decision.compareAndSet(UNDECIDED, SUSPENDED)) return COROUTINE_SUSPENDED
         else -> return decision
       }
+    }
+
+  fun startCoroutineUninterceptedOrReturn(f: suspend SuspendMonadContinuation<F, A>.() -> Kind<F, A>): Any? =
+    try {
+      f.startCoroutineUninterceptedOrReturn(this, this)?.let {
+        if (it == COROUTINE_SUSPENDED) getResult()
+        else it
+      }
+    } catch (e: Throwable) {
+      if (e is ShortCircuit) e.recover()
+      else throw e
     }
 }

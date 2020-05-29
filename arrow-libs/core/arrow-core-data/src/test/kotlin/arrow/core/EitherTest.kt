@@ -212,6 +212,29 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "non-suspended Either.fx can bind immediate values" {
+      forAll(Gen.either(Gen.string(), Gen.int())) { either ->
+        Either.fx2<String, Int> {
+          val res = !either
+          res
+        } == either
+      }
+    }
+
+    "non-suspended Either.fx can safely handle immediate exceptions" {
+      forAll(Gen.int(), Gen.throwable()) { i: Int, exception ->
+        shouldThrow<Throwable> {
+          Either.fx2<String, Int> {
+            val res = !Either.Right(i)
+            throw exception
+            res
+          }
+
+          fail("It should never reach here. Either.fx should've thrown $exception")
+        } == exception
+      }
+    }
+
     "suspended Either.fx can bind immediate values" {
       Gen.either(Gen.string(), Gen.int())
         .random()

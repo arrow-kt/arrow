@@ -236,7 +236,7 @@ fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
 fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
 
 //sampleStart
-fun prepareEither(): Either<CookingException, Salad> =
+suspend fun prepareEither(): Either<CookingException, Salad> =
   Either.fx {
     val lettuce = takeFoodFromRefrigerator().bind()
     val knife = getKnife().bind()
@@ -245,7 +245,9 @@ fun prepareEither(): Either<CookingException, Salad> =
   }
 //sampleEnd
 
-prepareEither()
+suspend fun main() {
+  prepareEither()
+}
 //Left(InsufficientAmountOfLettuce(5))
 ```
 
