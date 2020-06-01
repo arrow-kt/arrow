@@ -44,6 +44,16 @@ Apply a filter to a structure such that the output structure contains all `A` el
 Some(1).filter { false }
 ```
 
+#### Kind<F, A>#filterIsInstance
+
+Filter out instances of a specific type.
+
+```kotlin:ank
+import arrow.core.extensions.option.functorFilter.filterIsInstance
+
+Some(1).filterIsInstance(Int::class.java)
+```
+
 ### Laws
 
 Arrow provides [`FunctorFilterLaws`][functor_filter_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own `FunctorFilter` instances.

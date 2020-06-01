@@ -44,4 +44,12 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
   override fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
     filterA({ Id(f(it)) }, IdApplicative).value()
+
+  /**
+   * Filter out instances of [B] type and traverse the [G] context.
+   */
+  fun <G, A, B> Kind<F, A>.traverseFilterIsInstance(AP: Applicative<G>, klass: Class<B>): Kind<G, Kind<F, B>> = AP.run {
+    filterA({ a -> just(klass.isInstance(a)) }, AP)
+      .map { fa -> fa.map { a -> klass.cast(a) } }
+  }
 }

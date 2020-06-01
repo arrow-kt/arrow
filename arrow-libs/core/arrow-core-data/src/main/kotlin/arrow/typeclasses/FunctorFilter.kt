@@ -29,4 +29,11 @@ interface FunctorFilter<F> : Functor<F> {
    */
   fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
     filterMap { a -> if (f(a)) Some(a) else None }
+
+  /**
+   * Filter out instances of [B] type.
+   */
+  fun <A, B> Kind<F, A>.filterIsInstance(klass: Class<B>): Kind<F, B> =
+    filter(klass::isInstance)
+      .map { klass.cast(it) }
 }

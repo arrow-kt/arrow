@@ -29,7 +29,8 @@ object TraverseFilterLaws {
     return TraverseLaws.laws(TF, GA, GENK, EQK) +
       listOf(
         Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GEN, GA, EQ_NESTED) },
-        Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, genBool, GA, EQ_NESTED) }
+        Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GEN, genBool, GA, EQ_NESTED) },
+        Law("TraverseFilter Laws: traverseFilterIsInstance consistent with TraverseFilter") { TF.traverseFilterIsInstanceConsistentWithTraverseFilter(GEN, GA, EQ_NESTED) }
       )
   }
 
@@ -46,6 +47,18 @@ object TraverseFilterLaws {
   ) = run {
     forAll(genInt, Gen.functionAToB<Int, Kind<F, Boolean>>(genBool)) { fa: Kind<F, Int>, f: (Int) -> Kind<F, Boolean> ->
       fa.filterA(f, GA).equalUnderTheLaw(fa.traverseFilter(GA) { a -> f(a).map { b: Boolean -> if (b) Some(a) else None } }, EQ)
+    }
+  }
+
+  fun <F> TraverseFilter<F>.traverseFilterIsInstanceConsistentWithTraverseFilter(
+    genInt: Gen<Kind<F, Int>>,
+    GA: Applicative<F>,
+    EQ: Eq<Kind<F, Kind<F, Int>>>
+  ) = run {
+    forAll(
+      genInt
+    ) { fa: Kind<F, Int> ->
+      fa.traverseFilterIsInstance(GA, Integer::class.java).map { it.map { it as Int } }.equalUnderTheLaw(fa.traverseFilter(GA) { a -> GA.just(Some(a)) }, EQ)
     }
   }
 }

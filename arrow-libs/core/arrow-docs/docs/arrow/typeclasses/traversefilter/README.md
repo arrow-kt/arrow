@@ -42,6 +42,18 @@ import arrow.core.extensions.option.traverseFilter.filterA
 Some(1).filterA({ Id.just(false) }, Id.applicative())
 ```
 
+#### Kind<F, A>#traverseFilterIsInstance
+
+Filter out instances of a specific type and traverse a context.
+
+```kotlin:ank
+import arrow.core.*
+import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.option.traverseFilter.traverseFilterIsInstance
+
+Some(1).traverseFilterIsInstance(Id.applicative(), Int::class.java)
+```
+
 ### Laws
 
 Arrow provides [`TraverseFilterLaws`][travers_filter_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own `TraverseFilter` instances.
