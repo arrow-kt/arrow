@@ -45,16 +45,6 @@ subprojects { project ->
 
     sourceCompatibility = JAVA_VERSION
     targetCompatibility = JAVA_VERSION
-
-    buildtimetracker {
-        reporters {
-            csv {
-                output "build/times.csv"
-                append true
-                header false
-            }
-        }
-    }
 }
 
 configurations {
