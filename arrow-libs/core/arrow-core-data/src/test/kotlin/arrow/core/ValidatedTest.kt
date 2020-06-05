@@ -18,6 +18,7 @@ import arrow.core.extensions.validated.traverse.traverse
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
+import arrow.core.test.generators.throwable
 import arrow.core.test.generators.validated
 import arrow.core.test.laws.BifunctorLaws
 import arrow.core.test.laws.BitraverseLaws
@@ -31,6 +32,7 @@ import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 
 class ValidatedTest : UnitSpec() {
 
@@ -92,12 +94,12 @@ class ValidatedTest : UnitSpec() {
       Valid(13).exist { v -> v < 10 } shouldBe false
     }
 
-    "swap should return Valid(e) if is Invalid and Invalid(v) in otherwise" {
+    "swap should return Valid(e) if is Invalid and Invalid(v) otherwise" {
       Valid(13).swap() shouldBe Invalid(13)
       Invalid(13).swap() shouldBe Valid(13)
     }
 
-    "getOrElse should return value if is Valid or default in otherwise" {
+    "getOrElse should return value if is Valid or default otherwise" {
       Valid(13).getOrElse { fail("None should not be called") } shouldBe 13
       Invalid(13).getOrElse { "defaultValue" } shouldBe "defaultValue"
     }
@@ -108,12 +110,12 @@ class ValidatedTest : UnitSpec() {
       invalid.orNull() shouldBe null
     }
 
-    "valueOr should return value if is Valid or the the result of f in otherwise" {
+    "valueOr should return value if is Valid or the the result of f otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
       Invalid(13).valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
     }
 
-    "orElse should return Valid(value) if is Valid or the result of default in otherwise" {
+    "orElse should return Valid(value) if is Valid or the result of default otherwise" {
       Valid(13).orElse { fail("None should not be called") } shouldBe Valid(13)
       Invalid(13).orElse { Valid("defaultValue") } shouldBe Valid("defaultValue")
       Invalid(13).orElse { Invalid("defaultValue") } shouldBe Invalid("defaultValue")
@@ -127,34 +129,34 @@ class ValidatedTest : UnitSpec() {
       Valid(10).foldLeft("Tennant") { b, a -> "$a is $b" } shouldBe "10 is Tennant"
     }
 
-    "toEither should return Either.Right(value) if is Valid or Either.Left(error) in otherwise" {
+    "toEither should return Either.Right(value) if is Valid or Either.Left(error) otherwise" {
       Valid(10).toEither() shouldBe Right(10)
       Invalid(13).toEither() shouldBe Left(13)
     }
 
-    "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) in otherwise" {
+    "toIor should return Ior.Right(value) if is Valid or Ior.Left(error) otherwise" {
       Valid(10).toIor() shouldBe Ior.Right(10)
       Invalid(13).toIor() shouldBe Ior.Left(13)
     }
 
-    "toOption should return Some(value) if is Valid or None in otherwise" {
+    "toOption should return Some(value) if is Valid or None otherwise" {
       Valid(10).toOption() shouldBe Some(10)
       Invalid(13).toOption() shouldBe None
     }
 
-    "toList should return listOf(value) if is Valid or empty list in otherwise" {
+    "toList should return listOf(value) if is Valid or empty list otherwise" {
       Valid(10).toList() shouldBe listOf(10)
       Invalid(13).toList() shouldBe listOf<Int>()
     }
 
-    "toValidatedNel should return Valid(value) if is Valid or Invalid<NonEmptyList<E>, A>(error) in otherwise" {
+    "toValidatedNel should return Valid(value) if is Valid or Invalid<NonEmptyList<E>, A>(error) otherwise" {
       Valid(10).toValidatedNel() shouldBe Valid(10)
       Invalid(13).toValidatedNel() shouldBe Invalid(NonEmptyList(13, listOf()))
     }
 
     val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
 
-    "findValid should return the first Valid value or combine or Invalid values in otherwise" {
+    "findValid should return the first Valid value or combine or Invalid values otherwise" {
       Valid(10).findValid(plusIntSemigroup) { fail("None should not be called") } shouldBe Valid(10)
       Invalid(10).findValid(plusIntSemigroup) { Valid(5) } shouldBe Valid(5)
       Invalid(10).findValid(plusIntSemigroup) { Invalid(5) } shouldBe Invalid(15)
@@ -164,7 +166,7 @@ class ValidatedTest : UnitSpec() {
       Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Valid(15)
     }
 
-    "ap should return first Invalid found if is unique or combine both in otherwise" {
+    "ap should return first Invalid found if is unique or combine both otherwise" {
       Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Valid({ a -> a + 5 })) shouldBe Invalid(10)
       Valid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(5)
       Invalid(10).ap<Int, Int, Int>(plusIntSemigroup, Invalid(5)) shouldBe Invalid(15)
@@ -172,19 +174,24 @@ class ValidatedTest : UnitSpec() {
 
     data class MyException(val msg: String) : Exception()
 
-    "fromTry should return Valid if is Success or Failure in otherwise" {
+    "fromTry should return Valid if is Success or Failure otherwise" {
       Validated.fromTry(Success(10)) shouldBe Valid(10)
       Validated.fromTry<Int>(Failure(MyException(""))) shouldBe Invalid(MyException(""))
     }
 
-    "fromEither should return Valid if is Either.Right or Failure in otherwise" {
+    "fromEither should return Valid if is Either.Right or Failure otherwise" {
       Validated.fromEither(Right(10)) shouldBe Valid(10)
       Validated.fromEither(Left(10)) shouldBe Invalid(10)
     }
 
-    "fromOption should return Valid if is Some or Invalid in otherwise" {
-      Validated.fromOption<Int, Int>(Some(10)) { fail("None should not be called") } shouldBe Valid(10)
+    "fromOption should return Valid if is Some or Invalid otherwise" {
+      Validated.fromOption<Int, Int>(Some(10)) { fail("should not be called") } shouldBe Valid(10)
       Validated.fromOption<Int, Int>(None) { 5 } shouldBe Invalid(5)
+    }
+
+    "fromNullable should return Valid if is not-null or Invalid otherwise" {
+      Validated.fromNullable<Int, Int>(10) { fail("should not be called") } shouldBe Valid(10)
+      Validated.fromNullable<Int, Int>(null) { 5 } shouldBe Invalid(5)
     }
 
     "invalidNel<E> should return a Invalid<NonEmptyList<E>>" {
@@ -266,6 +273,67 @@ class ValidatedTest : UnitSpec() {
       val invalid: Validated<String, String> = Invalid("Nope")
 
       invalid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("NopeNope"))
+    }
+
+    "suspended Validated.fx can bind immediate values" {
+      Gen.validated(Gen.string(), Gen.int())
+        .random()
+        .take(1001)
+        .forEach { validated ->
+          Validated.fx<String, Int> {
+            val res = !validated
+            res
+          } shouldBe validated
+        }
+    }
+
+    "suspended Validated.fx can bind suspended values" {
+      Gen.validated(Gen.string(), Gen.int())
+        .random()
+        .take(10)
+        .forEach { validated ->
+          Validated.fx<String, Int> {
+            val res = !(suspend {
+              sleep(100)
+              validated
+            }).invoke()
+
+            res
+          } shouldBe validated
+        }
+    }
+
+    "suspended Validated.fx can safely handle immediate exceptions" {
+      Gen.bind(Gen.int(), Gen.throwable(), ::Pair)
+        .random()
+        .take(1001)
+        .forEach { (i, exception) ->
+          shouldThrow<Throwable> {
+            Validated.fx<String, Int> {
+              val res = !Validated.Valid(i)
+              throw exception
+              res
+            }
+            fail("It should never reach here. Validated.fx should've thrown $exception")
+          } shouldBe exception
+        }
+    }
+
+    "suspended Validated.fx can bind suspended exceptions" {
+      Gen.bind(Gen.int(), Gen.throwable(), ::Pair)
+        .random()
+        .take(10)
+        .forEach { (i, exception) ->
+          shouldThrow<Throwable> {
+            Validated.fx<String, Int> {
+              val res = !Validated.Valid(i)
+              sleep(100)
+              throw exception
+              res
+            }
+            fail("It should never reach here. Validated.fx should've thrown $exception")
+          } shouldBe exception
+        }
     }
   }
 }

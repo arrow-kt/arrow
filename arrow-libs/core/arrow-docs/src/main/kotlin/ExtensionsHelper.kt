@@ -1,7 +1,13 @@
 package arrow.reflect
 
 import arrow.aql.Box
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.extensions.validated.applicative.applicative
 import arrow.syntax.function.partially2
+import arrow.typeclasses.Applicative
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 
@@ -174,3 +180,6 @@ fun List<TypeClass>.mixedHierarchyGraph(): String = """
   |#.selected: fill=#61A8FF visual=class bold
   |${nomnomlMixedHierarchyGraph()}
 """.trimMargin()
+
+fun <E> Validated.Companion.applicativeNel(): Applicative<ValidatedPartialOf<NonEmptyList<E>>> =
+  Validated.applicative(NonEmptyList.semigroup())

@@ -6,12 +6,15 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForValidated
 import arrow.core.Invalid
+import arrow.core.NonEmptyList
 import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedOf
 import arrow.core.ValidatedPartialOf
 import arrow.core.ap
 import arrow.core.combineK
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.fix
 import arrow.extension
@@ -185,3 +188,6 @@ interface ValidatedHash<L, R> : Hash<Validated<L, R>>, ValidatedEq<L, R> {
     HR().run { it.hash() }
   })
 }
+
+fun <E> Validated.Companion.applicativeNel(): ValidatedApplicative<NonEmptyList<E>> =
+  Validated.applicative(NonEmptyList.semigroup())
