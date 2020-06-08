@@ -208,7 +208,8 @@ interface TypeDecoder : MetaDecoder<Type> {
     ).copy(suspending = modifiers.contains(Modifier.Suspend))
 
   fun TypeName.Classy.lyrics(): ClassName =
-    ClassName(packageName = pckg.value, simpleName = simpleName)
+    ClassName(packageName = pckg.value, simpleNames = listOf(simpleName))
+      .copy(nullable = nullable, annotations = annotations.map { it.lyrics() }, tags = emptyMap())
 
   fun TypeName.lyrics(): com.squareup.kotlinpoet.TypeName =
     when (this) {
@@ -223,7 +224,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     Code(f().trimMargin())
 
   operator fun TypeName?.unaryPlus(): Code =
-    if (this != null) Code(CodeBlock.of("%T", this.lyrics()).toString())
+    if (this != null) Code(CodeBlock.of("%T", lyrics()).toString())
     else Code("")
 
   operator fun String.unaryPlus(): Code =

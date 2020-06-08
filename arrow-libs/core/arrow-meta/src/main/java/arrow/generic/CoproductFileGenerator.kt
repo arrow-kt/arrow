@@ -47,7 +47,7 @@ fun generateCoproducts(destination: File) {
   for (size in 2 until genericsToClassNames.size + 1) {
     val generics = genericsToClassNames.keys.toList().take(size)
 
-    FileSpec.builder("arrow.generic.coproduct$size", "Coproduct$size")
+    FileSpec.builder(coproductPackageName(size), "Coproduct$size")
       .apply {
         addCoproductClassDeclaration(generics)
         addExtensionConstructors(generics)
@@ -196,7 +196,7 @@ private fun methodDocumentation(
 private fun List<String>.toTypeParameters(): List<TypeVariableName> = map { TypeVariableName(it) }
 
 private fun parameterizedCoproductNClassName(generics: List<String>): ParameterizedTypeName =
-  ClassName("", "Coproduct${generics.size}")
+  ClassName(coproductPackageName(generics.size), "Coproduct${generics.size}")
     .parameterizedBy(*generics.map { TypeVariableName(it) }.toTypedArray())
 
 private fun additionalParameterSuppressAnnotation(count: Int): List<AnnotationSpec> =
@@ -215,3 +215,5 @@ private fun additionalParameterSpecs(count: Int): List<ParameterSpec> = List(cou
     .defaultValue("Unit")
     .build()
 }
+
+private fun coproductPackageName(size: Int) = "arrow.generic.coproduct$size"
