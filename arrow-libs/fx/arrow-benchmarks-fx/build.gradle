@@ -79,8 +79,6 @@ jmhReport {
     jmhReportOutput = project.file('build/reports')
 }
 
-tasks.jmh.finalizedBy tasks.jmhReport
-
 task jmhForMasterBranch {
     doLast {
         jmh.resultsFile = file(JMH_RESULT_FOR_MASTER_BRANCH)

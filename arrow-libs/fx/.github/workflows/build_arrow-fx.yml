@@ -33,12 +33,12 @@ jobs:
         git checkout master
         # TODO: When this file is located on master branch
         # ./gradlew :arrow-benchmarks-fx:jmhForMasterBranch
-        ./gradlew :arrow-benchmarks-fx:jmh
+        ./gradlew clean :arrow-benchmarks-fx:jmh
         cp arrow-benchmarks-fx/build/reports/benchmarks.json master-branch.json
     - name: Run benchmark for pull request
       run: |
         git checkout $GITHUB_SHA
-        ./gradlew :arrow-benchmarks-fx:jmhForPullRequest
+        ./gradlew clean :arrow-benchmarks-fx:jmhForPullRequest
     - name: Run benchmark comparison
       env:
         CI_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -52,18 +52,18 @@ suspend fun <E, A> IOOf<E, A>.suspendCancellable(): Either<E, A> = suspendCancel
 
 /**
  * Unsafely run an [IO] and receive the values in a callback [cb] while participating in structured concurrency.
- * Equivalent of [IO.unsafeRunAsyncCancellable] but with its cancellation token wired to [CoroutineScope].
+ * Equivalent of [IO.unsafeRunAsyncCancellableEither] but with its cancellation token wired to [CoroutineScope].
  *
- * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
+ * @see [IO.unsafeRunAsyncCancellableEither] for a version that returns the cancellation token instead.
  */
 fun <E, A> CoroutineScope.unsafeRunIO(io: IOOf<E, A>, cb: (IOResult<E, A>) -> Unit): Unit =
   io.unsafeRunScoped(this, cb)
 
 /**
  * Unsafely run an [IO] and receive the values in a callback [cb] while participating in structured concurrency.
- * Equivalent of [IO.unsafeRunAsyncCancellable] but with its cancellation token wired to [CoroutineScope].
+ * Equivalent of [IO.unsafeRunAsyncCancellableEither] but with its cancellation token wired to [CoroutineScope].
  *
- * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
+ * @see [IO.unsafeRunAsyncCancellableEither] for a version that returns the cancellation token instead.
  */
 fun <E, A> IOOf<E, A>.unsafeRunScoped(
   scope: CoroutineScope,
@@ -76,7 +76,7 @@ fun <E, A> IOOf<E, A>.unsafeRunScoped(
     val disposable = fix().unsafeRunAsyncCancellableEither(cb = cb)
 
     job?.invokeOnCompletion { e ->
-      if (e is CancellationException) disposable?.invoke()
+      if (e is CancellationException) disposable()
       else Unit
     }
   }
@@ -100,7 +100,7 @@ fun <E, A> IOOf<E, A>.forkScoped(scope: CoroutineScope): IO<E, Fiber<IOPartialOf
         .unsafeRunAsyncCancellableEither(cb = promise::complete)
 
       job?.invokeOnCompletion { e ->
-        if (e is CancellationException) disposable.invoke()
+        if (e is CancellationException) disposable()
         else Unit
       }
 

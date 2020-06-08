@@ -9,22 +9,20 @@ import arrow.core.test.generators.throwable
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.fx.IO
 import arrow.fx.IOResult
-import arrow.fx.onCancel
 import arrow.fx.bracketCase
 import arrow.fx.extensions.exitcase2.eq.eq
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.effectMap
 import arrow.fx.extensions.io.monad.followedBy
-import arrow.fx.handleErrorWith
 import arrow.fx.flatMap
-import arrow.fx.onCancel
 import arrow.fx.handleErrorWith
+import arrow.fx.onCancel
+import arrow.fx.test.eq.eqK
+import arrow.fx.test.laws.shouldBeEq
 import arrow.fx.typeclasses.ExitCase2
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
 import arrow.fx.unsafeRunAsync
-import arrow.fx.test.eq
-import arrow.fx.test.laws.shouldBeEq
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -39,7 +37,6 @@ import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineExceptionHandler
 import kotlinx.coroutines.test.TestCoroutineScope
-import arrow.fx.test.eq.eqK
 
 @ObsoleteCoroutinesApi
 @Suppress("IMPLICIT_NOTHING_AS_TYPE_PARAMETER")
