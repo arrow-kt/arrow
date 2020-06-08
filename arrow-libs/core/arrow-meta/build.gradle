@@ -17,7 +17,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compile project(':arrow-annotations')
     compile "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:$KOTLIN_METADATA_VERSION"
-    compile("com.squareup:kotlinpoet:1.5.0") {
+    compile("com.squareup:kotlinpoet:$KOTLIN_POET_VERSION") {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
     }
     compile "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
