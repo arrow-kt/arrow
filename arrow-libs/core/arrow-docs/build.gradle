@@ -11,7 +11,6 @@ plugins {
     id "base"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.kapt"
-    id "net.rdrei.android.buildtimetracker"
     id "org.jlleitschuh.gradle.ktlint"
     id "ru.vyarus.animalsniffer"
 }
