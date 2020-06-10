@@ -9,13 +9,13 @@ SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
 cd $BASEDIR/arrow-site
 git checkout .
 cp sidebar/$SHORT_VERSION/* docs/_data/
-sed -i "s/latest/$VERSION/g" docs/_includes/_head-docs.html
+perl -pe "s/latest/$VERSION/g" -i docs/_includes/_head-docs.html
 ./gradlew clean runAnk
 
 cd $BASEDIR/arrow
 git checkout .
 git checkout $VERSION
-sed -i "s/^VERSION_NAME.*/VERSION_NAME=$VERSION/g" gradle.properties
+perl -pe "s/^VERSION_NAME.*/VERSION_NAME=$VERSION/g" -i gradle.properties
 replaceOSSbyBintrayRepository generic-conf.gradle
 
 # TODO: Remove when releasing 0.11.0
