@@ -1,0 +1,28 @@
+plugins {
+    id "maven-publish"
+    id "base"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.dokka"
+    id "org.jlleitschuh.gradle.ktlint"
+    id "ru.vyarus.animalsniffer"
+}
+
+apply from: "$SUBPROJECT_CONF"
+apply from: "$DOC_CONF"
+apply from: "$PUBLISH_CONF"
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:4.0.5" // for kotest framework
+    testImplementation "io.kotest:kotest-assertions-core-jvm:4.0.5" // for kotest core jvm assertions
+    testImplementation "io.kotest:kotest-property-jvm:4.0.5" // for kotest property test
+    testImplementation("io.kotest:kotest-runner-console-jvm:4.0.5")
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

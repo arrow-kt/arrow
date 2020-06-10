@@ -433,7 +433,7 @@ class IOTest : UnitSpec() {
       result shouldBe None
     }
 
-    "parallel execution with single threaded context makes all IOs start at the same time" {
+    "parallel execution with single threaded context makes all IOs start at the same time".config(enabled = false) {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long): IO<Nothing, Long> =
@@ -503,7 +503,7 @@ class IOTest : UnitSpec() {
       order shouldBe listOf(9, 8, 7, 6, 5, 4, 3, 2, 1)
     }
 
-    "parallel mapping is done in the expected CoroutineContext" {
+    "parallel mapping is done in the expected CoroutineContext".config(enabled = false) {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
