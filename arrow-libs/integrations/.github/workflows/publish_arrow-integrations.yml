@@ -13,23 +13,16 @@ jobs:
       JAVA_OPTS: -Xms512m -Xmx1024m
       ARROW_LIB: arrow-integrations
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        architecture: x64
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
-    - name: Build with Gradle
-      run: $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
     - name: Publish artifacts
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
