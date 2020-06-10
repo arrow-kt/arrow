@@ -13,31 +13,31 @@ NEW_DIR="file://$BASEDIR/arrow"
 function escapeURL()
 {
     URL=$1
-    echo $URL | sed "s/\//\\\\\//g"
+    echo $URL | perl -pe "s/\//\\\\\//g"
 }
 
 function replaceOSSbyLocalRepository()
 {
     echo "Replacing OSS by local repository ($1)..."
-    sed -e "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY/g" $1 > $1.tmp ; mv $1.tmp $1
+    perl -pe "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY/g" -i $1
 }
 
 function replaceLocalRepositorybyOSS()
 {
     echo "Replacing local repository by OSS ($1) ..."
-    sed -e "s/$MAVEN_LOCAL_REPOSITORY/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/g" $1 > $1.tmp ; mv $1.tmp $1
+    perl -pe "s/$MAVEN_LOCAL_REPOSITORY/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/g" -i $1
 }
 
 function replaceOSSbyBintrayRepository()
 {
     echo "Replacing OSS by Bintray repository ($1) ..."
-    sed -i "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" $1
+    perl -pe "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" -i $1
 }
 
 function removeArrowDocs()
 {
     echo "Removing Arrow Docs ($1)..."
-    sed "/$INCLUDE_ARROW_DOCS/d" $1 > $1.tmp ; mv $1.tmp $1
+    perl -pe "/$INCLUDE_ARROW_DOCS/d" -i $1
 }
 
 function addArrowDocs()
@@ -60,28 +60,28 @@ function checkAndDownload()
 function replaceGlobalPropertiesbyLocalConf()
 {
     echo "Replacing global properties by local conf ($1) ..."
-    sed -e "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $NEW_DIR)\/generic-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $NEW_DIR)\/subproject-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $NEW_DIR)\/doc-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $NEW_DIR)\/publish-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle > $BASEDIR/arrow/setup.gradle.tmp ; mv $BASEDIR/arrow/setup.gradle.tmp $BASEDIR/arrow/setup.gradle
+    perl -pe "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" -i $1
+    perl -pe "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $NEW_DIR)\/generic-conf.gradle/g" -i $1
+    perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $NEW_DIR)\/subproject-conf.gradle/g" -i $1
+    perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $NEW_DIR)\/doc-conf.gradle/g" -i $1
+    perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $NEW_DIR)\/publish-conf.gradle/g" -i $1
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
 function replaceLocalConfbyGlobalProperties()
 {
     echo "Replacing local conf by global properties ($1) ..."
-    sed -e "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $OLD_DIR)\/setup.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $OLD_DIR)\/generic-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $OLD_DIR)\/subproject-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $OLD_DIR)\/doc-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $OLD_DIR)\/publish-conf.gradle/g" $1 > $1.tmp ; mv $1.tmp $1
-    sed -e "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" $BASEDIR/arrow/setup.gradle > $BASEDIR/arrow/setup.gradle.tmp ; mv $BASEDIR/arrow/setup.gradle.tmp $BASEDIR/arrow/setup.gradle
+    perl -pe "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $OLD_DIR)\/setup.gradle/g" -i $1
+    perl -pe "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $OLD_DIR)\/generic-conf.gradle/g" -i $1
+    perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $OLD_DIR)\/subproject-conf.gradle/g" -i $1
+    perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $OLD_DIR)\/doc-conf.gradle/g" -i $1
+    perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $OLD_DIR)\/publish-conf.gradle/g" -i $1
+    perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
 function useLocalSetup()
 {
-    sed -i "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" $BASEDIR/arrow/setup.gradle
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
 function manageExitCode()

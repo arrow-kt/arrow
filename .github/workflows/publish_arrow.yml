@@ -16,15 +16,10 @@ jobs:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: ubuntu-16.04
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        architecture: x64
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
@@ -61,8 +56,8 @@ jobs:
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
         git config --global user.email "arrow-kt@users.noreply.github.com"
         git config --global user.name "arrow-kt"
-        sed -i "s/[0-9\.]\+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" arrow-docs/docs/quickstart/setup/README.md
-        sed -i "s/${{ steps.versions.outputs.latest-published-version }}/${{ steps.versions.outputs.release-version }}/g" arrow-docs/docs/quickstart/setup/README.md
+        perl -pe "s/[0-9\.]\+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" -i arrow-docs/docs/quickstart/setup/README.md
+        perl -pe "s/${{ steps.versions.outputs.latest-published-version }}/${{ steps.versions.outputs.release-version }}/g" -i arrow-docs/docs/quickstart/setup/README.md
         git add arrow-docs/docs/quickstart/setup/README.md
         git diff --staged
         git commit -m "Documentation: update versions"
@@ -82,31 +77,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
-        sudo snap install hub --classic
-        echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > $BASEDIR/arrow/release-notes-all.txt
-        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
-        for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            cd $BASEDIR/$lib
-            TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
-            hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
-            while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
-            cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
-            while read contributor; do 
-                echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
-            done < contributors.txt > local-release-notes.txt
-            echo -e "\n## $lib\n" >> $BASEDIR/arrow/release-notes-all.txt
-            cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
-        done
-        cd $BASEDIR/arrow
-        TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
-        hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
-        while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
-        cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
-        while read contributor; do
-            echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
-        done < contributors.txt > local-release-notes.txt
-        echo -e "\n## arrow\n" >> $BASEDIR/arrow/release-notes-all.txt
-        cat local-release-notes.txt >> $BASEDIR/arrow/release-notes-all.txt
-        echo -e "\n--- RELEASE NOTES ALL ---\n"
-        cat $BASEDIR/arrow/release-notes-all.txt
-        hub release create --copy -F release-notes-all.txt ${{ steps.versions.outputs.release-version }}
+        export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-version }}
+        export RELEASE_VERSION=${{ steps.versions.outputs.release-version }}
+        $BASEDIR/arrow/scripts/create-release-notes-all-libraries.sh

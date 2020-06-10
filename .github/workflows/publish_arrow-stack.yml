@@ -16,7 +16,7 @@ jobs:
     env:
       BASEDIR: ${{github.workspace}}/..
 
-    runs-on: ubuntu-16.04
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -45,7 +45,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         echo "Update version ..."
-        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
+        perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         . scripts/commons4gradle.sh
         useLocalSetup
         cd bom-creation
