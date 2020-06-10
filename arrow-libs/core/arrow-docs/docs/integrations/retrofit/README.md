@@ -9,7 +9,7 @@ permalink: /integrations/retrofit/
 
 
 
-Arrow contains an integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`ObservableK`]({{ '/integrations/rx2' | relative_url }}) or [`IO`]({{ '/effects/io' | relative_url }}).
+Arrow contains an [integration module]({{'/quickstart/libraries/#arrow-integrations-retrofit-adapter' | relative_url }}) for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`ObservableK`]({{ '/integrations/rx2' | relative_url }}) or [`IO`]({{ '/effects/io' | relative_url }}).
 
 
 ### Using `Call` directly with extensions functions
