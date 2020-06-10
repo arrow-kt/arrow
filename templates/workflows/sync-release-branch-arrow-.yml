@@ -7,7 +7,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -23,12 +23,6 @@ jobs:
         git config --global user.name "raulraja"
         git merge origin/master -m "Merge master on release branch"
         echo ::set-output name=changes::$(git diff origin/release/0.11.0..HEAD)
-    - name: Set up JDK 1.8
-      if: steps.merge.outputs.changes != ''
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        architecture: x64
     - name: Validate Gradle Wrapper
       if: steps.merge.outputs.changes != ''
       uses: gradle/wrapper-validation-action@v1

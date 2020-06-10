@@ -18,19 +18,14 @@ jobs:
       JAVA_OPTS: -Xms512m -Xmx1024m
       ARROW_LIB: arrow-fx
 
-    runs-on: ubuntu-16.04
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        architecture: x64
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
-        LATEST_PUBLISHED_VERSION=$(curl https://dl.bintray.com/arrow-kt/arrow-kt/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
+        LATEST_PUBLISHED_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
         LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
         NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
@@ -53,7 +48,7 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         echo "Update version ..."
-        sed -i "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" gradle.properties
+        perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         $BASEDIR/arrow/scripts/lib-publish.sh $ARROW_LIB
     - name: Create tag
       if: steps.versions.outputs.new-version-exists == '1'
@@ -71,18 +66,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
       run: |
-        sudo snap install hub --classic
-        cd $BASEDIR/$ARROW_LIB
-        TAG_TIMESTAMP=$(git log ${{ steps.versions.outputs.latest-published-version }} --pretty="format:%ct" | head -1)
-        hub pr list --limit 500 --base master -s merged --format='%mt#%au#%t [%i](%U)%n' > PR-list-all.txt
-        while read line; do PR_TIMESTAMP=$(echo $line | cut -d# -f1); if [ $PR_TIMESTAMP -gt $TAG_TIMESTAMP ]; then echo $line; fi; done < PR-list-all.txt > PR-list.txt
-        cat PR-list.txt | cut -d# -f2 | sort | uniq > contributors.txt
-        while read contributor; do 
-            echo "### [@$contributor](https://github.com/$contributor)"; grep "#${contributor}#" PR-list.txt | cut -d# -f3- | sed -e 's/^/ - /'
-        done < contributors.txt > local-release-notes.txt
-        echo -e "Release ${{ steps.versions.outputs.release-version }}\n\n" > release-notes.txt
-        echo -e "${{ steps.versions.outputs.release-version }} ($(date +%Y-%m-%d))\n---" >> release-notes.txt
-        cat local-release-notes.txt >> release-notes.txt
-        echo -e "\n--- RELEASE NOTES ---\n"
-        cat release-notes.txt
-        hub release create --copy -F release-notes.txt ${{ steps.versions.outputs.release-version }}
+        export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-version }}
+        export RELEASE_VERSION=${{ steps.versions.outputs.release-version }}
+        $BASEDIR/arrow/scripts/create-release-notes.sh

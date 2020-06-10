@@ -9,11 +9,7 @@ jobs:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: ${{ matrix.os }}
-    strategy:
-        matrix:
-            os: [ubuntu-16.04, macos-latest]
-        fail-fast: false
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -24,14 +20,11 @@ jobs:
         architecture: x64
     - name: Install all with local dependencies
       run: |
-        # sed into 2 steps because of macOS compatibility
-        sed -e "s/git@github.com:/https:\/\/github.com\//g" scripts/commons4gradle.sh > scripts/commons4gradle.sh.tmp
-        mv scripts/commons4gradle.sh.tmp scripts/commons4gradle.sh; chmod +x scripts/commons4gradle.sh
+        perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow-core.git
         cd arrow-core
-        sed -e "s/git pull//g" scripts/checkout-orchestrator.sh > scripts/checkout-orchestrator.sh.tmp
-        mv scripts/checkout-orchestrator.sh.tmp scripts/checkout-orchestrator.sh; chmod +x scripts/checkout-orchestrator.sh
+        perl -pe "s/git pull//g" -i scripts/checkout-orchestrator.sh
         ./gradlew installAllWithLocalDeps
     - name: Build with local dependencies
       run: |
