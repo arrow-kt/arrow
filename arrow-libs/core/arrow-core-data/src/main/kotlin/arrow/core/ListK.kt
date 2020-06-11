@@ -281,3 +281,6 @@ fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
   (fix() + y.fix()).k()
 
 fun <A> List<A>.k(): ListK<A> = ListK(this)
+
+fun <A> listKOf(vararg elements: A): ListK<A> =
+  listOf(*elements).k()

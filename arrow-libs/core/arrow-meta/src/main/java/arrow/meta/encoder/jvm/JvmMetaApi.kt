@@ -600,7 +600,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * ex: SetK<A> to Set<A>
    */
   val Type.kindWrapper: Pair<TypeName, TypeName.ParameterizedType>?
-    get() = if (primaryConstructor?.parameters?.size == 1 && typeVariables.size == 1) {
+    get() = if (primaryConstructor?.parameters?.size == 1) {
       val wrappedType = primaryConstructor.parameters[0].type.asKotlin()
       when (wrappedType) {
         is TypeName.ParameterizedType -> {
