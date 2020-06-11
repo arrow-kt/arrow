@@ -37,7 +37,7 @@ function replaceOSSbyBintrayRepository()
 function removeArrowDocs()
 {
     echo "Removing Arrow Docs ($1)..."
-    perl -pe "/$INCLUDE_ARROW_DOCS/d" -i $1
+    perl -pe "s/$INCLUDE_ARROW_DOCS//g" -i $1
 }
 
 function addArrowDocs()
