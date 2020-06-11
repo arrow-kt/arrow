@@ -44,8 +44,10 @@ jobs:
       run: |
         $BASEDIR/arrow/scripts/issue-create-description.sh > issue.log
         echo ::set-output name=title::$(git log -1 --pretty=format:%s | sed 's/"//g')
-        rm -rf /home/runner/work/_actions/actions/github-script/0.3.0/node_modules
-        cd /home/runner/work/_actions/actions/github-script/0.3.0/
+        SCRIPT_DIR=$(find $HOME -name github-script | head -n1)
+        NODE_MODULES=$(find $SCRIPT_DIR -maxdepth 2 -name node_modules | head -n1)
+        cd $NODE_MODULES/..
+        rm -rf node_modules
         npm install
         npm install xmlhttprequest
     - name: Create the issue
