@@ -22,17 +22,17 @@ jobs:
     - name: Build with Gradle
       run: |
         $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
-    - name: Run benchmark for master branch
-      run: |
-        git checkout master
-        ./gradlew :arrow-benchmarks-fx:jmhForMasterBranch
-    - name: Run benchmark for pull request
-      run: |
-        git checkout $GITHUB_SHA
-        ./gradlew clean :arrow-benchmarks-fx:jmhForPullRequest
-    - name: Run benchmark comparison
-      env:
-        CI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        export PULL_REQUEST_NUMBER=$(echo $GITHUB_REF | cut -d/ -f3)
-        ./gradlew :arrow-benchmarks-fx:compareBenchmarksCI
+    #- name: Run benchmark for master branch
+    #  run: |
+    #    git checkout master
+    #    ./gradlew :arrow-benchmarks-fx:jmhForMasterBranch
+    #- name: Run benchmark for pull request
+    #  run: |
+    #    git checkout $GITHUB_SHA
+    #    ./gradlew clean :arrow-benchmarks-fx:jmhForPullRequest
+    #- name: Run benchmark comparison
+    #  env:
+    #    CI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #  run: |
+    #    export PULL_REQUEST_NUMBER=$(echo $GITHUB_REF | cut -d/ -f3)
+    #    ./gradlew :arrow-benchmarks-fx:compareBenchmarksCI
