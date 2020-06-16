@@ -8,7 +8,6 @@ import arrow.fx.ForSchedule
 import arrow.fx.Schedule
 import arrow.fx.SchedulePartialOf
 import arrow.fx.fix
-import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
@@ -17,7 +16,6 @@ import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -69,25 +67,6 @@ interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>,
 interface ScheduleSemigroupK<F, Input> : SemigroupK<SchedulePartialOf<F, Input>> {
   override fun <A> Kind<SchedulePartialOf<F, Input>, A>.combineK(y: Kind<SchedulePartialOf<F, Input>, A>): Kind<SchedulePartialOf<F, Input>, A> =
     fix().andThen(y.fix()).map { it.fold(::identity, ::identity) }
-}
-
-@extension
-interface ScheduleMonoidK<F, Input> : MonoidK<SchedulePartialOf<F, Input>>, ScheduleSemigroupK<F, Input> {
-  fun MF(): Monad<F>
-
-  override fun <A> empty(): Kind<SchedulePartialOf<F, Input>, A> =
-    Schedule.never(MF())
-}
-
-@extension
-interface ScheduleAlternative<F, Input> : Alternative<SchedulePartialOf<F, Input>>, ScheduleApplicative<F, Input>, ScheduleMonoidK<F, Input> {
-  override fun MF(): Monad<F>
-
-  override fun <A> Kind<SchedulePartialOf<F, Input>, A>.orElse(b: Kind<SchedulePartialOf<F, Input>, A>): Kind<SchedulePartialOf<F, Input>, A> =
-    fix().andThen(b.fix()).map { it.fold(::identity, ::identity) }
-
-  override fun <A> Kind<SchedulePartialOf<F, Input>, A>.combineK(y: Kind<SchedulePartialOf<F, Input>, A>): Kind<SchedulePartialOf<F, Input>, A> =
-    orElse(y)
 }
 
 @extension

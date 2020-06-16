@@ -15,6 +15,7 @@ import arrow.core.right
 import arrow.core.some
 import arrow.core.toT
 import arrow.fx.Schedule.Companion.withMonad
+import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.MonadDefer
@@ -401,7 +402,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
   /**
    * Add random jitter to a schedule.
-   * The argument [genRand] is supposed to be a computation with when run returns
+   * The argument [genRand] is supposed to be a computation that returns
    *  doubles. An example would be the following [IO] `IO { Random.nextDouble() }`.
    *
    * This is done to push the source of randomness to the caller which makes the function
@@ -690,16 +691,21 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       unfoldM(M, M.just(c)) { M.just(f(it)) }
 
     /**
-     * Create a schedule that continues forever and returns the number of iterations.
+     * Create a schedule that continues forever and returns the number of repetitions.
      */
     fun <F, A> forever(M: Monad<F>): Schedule<F, A, Int> =
       unfold(M, 0) { it + 1 }
 
     /**
-     * Create a schedule that continues n times and returns the number of iterations.
+     * Create a schedule that continues n times and returns the number of repetitions.
      */
     fun <F, A> recurs(M: Monad<F>, n: Int): Schedule<F, A, Int> =
-      forever<F, A>(M).whileOutput { it <= n }
+      invoke(M, M.just(0)) { _, acc ->
+        M.just(
+          if (acc < n) Decision.cont(0.seconds, acc + 1, Eval.now(acc + 1))
+          else Decision.done(0.seconds, acc, Eval.now(acc))
+        )
+      }
 
     /**
      * Create a schedule that only ever retries once.
@@ -708,10 +714,15 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
     /**
      * Create a schedule that never retries.
-     * This is a difference with zio, where they define never as a schedule that itself never executes.
+     *
+     * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
-    fun <F, A> never(M: Monad<F>): Schedule<F, A, Nothing> =
-      recurs<F, A>(M, 0).map { throw IllegalStateException("Impossible") }
+    fun <F, A> never(AS: Async<F>): Schedule<F, A, Nothing> =
+      invoke(AS, AS.never<A>()) { a, _ ->
+        AS.later {
+          Decision(false, 0.nanoseconds, a, Eval.later { throw IllegalStateException("Impossible") })
+        }
+      }
 
     /**
      * Create a schedule that uses another schedule to generate the delay of this schedule.
@@ -862,8 +873,6 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
 
       fun <A> exponential(base: Duration, factor: Double = 2.0): Schedule<M, A, Duration> =
         exponential(MM(), base, factor)
-
-      fun <A> never(): Schedule<M, A, Nothing> = never(MM())
     }
 
     /**
@@ -940,15 +949,15 @@ fun <F, E, A, B, C> Kind<F, A>.repeatOrElseEither(
 
   fun loop(last: A, state: Any?): Kind<F, Either<C, B>> =
     schedule.update(last, state)
-      .flatMap { desc ->
-        if (desc.cont)
-          flatMap { a -> T.sleep(desc.delay).flatMap { loop(a, desc.state) } }
-            .handleErrorWith { e -> orElse(e, desc.finish.value().some()).map { Left(it) } }
-        else just(desc.finish.value().right())
+      .flatMap { step ->
+        if (step.cont)
+          T.sleep(step.delay).followedBy(this@repeatOrElseEither).flatMap { a -> loop(a, step.state) }
+            .handleErrorWith { e -> orElse(e, step.finish.value().some()).map(::Left) }
+        else just(step.finish.value().right())
       }
 
-  return flatMap { a -> schedule.initialState.flatMap { b -> loop(a, b) } }
-    .handleErrorWith { e -> orElse(e, None).map { Left(it) } }
+  return this@repeatOrElseEither.flatMap { a -> schedule.initialState.flatMap { b -> loop(a, b) } }
+    .handleErrorWith { e -> orElse(e, None).map(::Left) }
 }
 
 /**
@@ -1014,7 +1023,7 @@ fun <F, E, A, B, C> Kind<F, A>.retryOrElseEither(
   (schedule as Schedule.ScheduleImpl<F, Any?, E, B>)
 
   fun loop(state: Any?): Kind<F, Either<C, A>> =
-    flatMap { just(it.right()) }
+    this@retryOrElseEither.map { it.right() }
       .handleErrorWith { e ->
         schedule.update(e, state)
           .flatMap { dec ->

@@ -617,6 +617,8 @@ sealed class Schedule<Input, Output> {
 
     /**
      * Create a schedule that never retries.
+     *
+     * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
     fun <A> never(): Schedule<A, Nothing> =
       invoke(suspend { arrow.fx.coroutines.never<Unit>() }) { _, _ ->
