@@ -10,11 +10,19 @@ jobs:
       ARROW_LIB: arrow-fx
 
     runs-on: macos-latest
+    timeout-minutes: 60
 
     steps:
     - uses: actions/checkout@v1
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
+    - name: Cache management
+      uses: actions/cache@v2
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}--gradle--${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}--gradle--
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
@@ -36,3 +44,6 @@ jobs:
     #  run: |
     #    export PULL_REQUEST_NUMBER=$(echo $GITHUB_REF | cut -d/ -f3)
     #    ./gradlew :arrow-benchmarks-fx:compareBenchmarksCI
+    - name: Clean SNAPSHOTs
+      run: |
+        find ~/.gradle/caches/ -type d -name "*SNAPSHOT*" -prune -exec rm -rf {} +
