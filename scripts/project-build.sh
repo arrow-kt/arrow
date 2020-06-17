@@ -2,4 +2,19 @@
  
 set -e
 cd $BASEDIR/$1
-./gradlew clean build
+
+if [ "$1" != "arrow-fx" ]; then
+    ./gradlew clean build
+else
+    # TODO: Temporary fix until Fx is re-organized
+    ./gradlew clean assemble
+    ./gradlew :arrow-fx:test
+    ./gradlew :arrow-fx-test:test
+    ./gradlew :arrow-fx-coroutines:test
+    ./gradlew :arrow-streams:test
+    ./gradlew :arrow-fx-reactor:test
+    ./gradlew :arrow-fx-rx2:test
+    ./gradlew :arrow-fx-kotlinx-coroutines:test
+    ./gradlew :arrow-fx-android:test
+    ./gradlew :arrow-benchmarks-fx:test
+fi
