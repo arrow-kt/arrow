@@ -15,8 +15,6 @@ typealias Invalid<E> = Validated.Invalid<E>
 
 /**
  *
- * ank_macro_hierarchy(arrow.core.Validated)
- *
  *
  * Imagine you are filling out a web form to sign up for an account. You input your username and
  * password, then submit. A response comes back saying your username can't have dashes in it,

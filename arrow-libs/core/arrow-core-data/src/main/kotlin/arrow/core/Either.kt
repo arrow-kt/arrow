@@ -11,8 +11,6 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 /**
  *
- * ank_macro_hierarchy(arrow.core.Either)
- *
  *
  * In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
  * For instance, querying a service may result in a connection issue, or some unexpected JSON response.
@@ -608,7 +606,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  * Option does not require a type parameter with the following functions, but it is specifically used for Either.Left
  *
- * [Functor]({{'/docs/arrow/typeclasses/functor/' | relative_url }})
+ * [`Functor`](../../../../arrow/typeclasses/functor/)
  *
  * Transforming the inner contents
  *
@@ -624,7 +622,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * }
  * ```
  *
- * [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }})
+ * [`Applicative`](../../../../arrow/typeclasses/applicative/)
  *
  * Computing over independent values
  *
@@ -641,7 +639,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * }
  * ```
  *
- * [Monad]({{'/arrow/typeclasses/monad/' | relative_url }})
+ * [`Monad`](../../../../arrow/typeclasses/monad/)
  *
  * Computing over dependent values ignoring absence
  *

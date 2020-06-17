@@ -6,8 +6,6 @@ import arrow.typeclasses.Show
 
 /**
  *
- * ank_macro_hierarchy(arrow.core.Option)
- *
  *
  * If you have worked with Java at all in the past, it is very likely that you have come across a `NullPointerException` at some time (other languages will throw similarly named errors in such a case). Usually this happens because some method returns `null` when you weren't expecting it and, thus, isn't dealing with that possibility in your client code. A value of `null` is often abused to represent an absent optional value.
  * Kotlin tries to solve the problem by getting rid of `null` values altogether, and providing its own special syntax [Null-safety machinery based on `?`](https://kotlinlang.org/docs/reference/null-safety.html).
@@ -272,7 +270,7 @@ import arrow.typeclasses.Show
  *
  * Arrow contains `Option` instances for many useful typeclasses that allow you to use and transform optional values
  *
- * [Functor]({{'/arrow/typeclasses/functor/' | relative_url }})
+ * [`Functor`](../../../../arrow/typeclasses/functor/)
  *
  * Transforming the inner contents
  *
@@ -288,7 +286,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * [Applicative]({{'/arrow/typeclasses/applicative/' | relative_url }})
+ * [`Applicative`](../../../../arrow/typeclasses/applicative/)
  *
  * Computing over independent values
  *
@@ -305,7 +303,7 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * [Monad]({{'/arrow/typeclasses/monad/' | relative_url }})
+ * [`Monad`](../../../../arrow/typeclasses/monad/)
  *
  * Computing over dependent values ignoring absence
  *
