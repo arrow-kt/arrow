@@ -18,12 +18,12 @@ import arrow.core.extensions.validated.traverse.traverse
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
-import arrow.core.test.generators.throwable
 import arrow.core.test.generators.validated
 import arrow.core.test.laws.BifunctorLaws
 import arrow.core.test.laws.BitraverseLaws
 import arrow.core.test.laws.EqK2Laws
 import arrow.core.test.laws.EqLaws
+import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.SelectiveLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
@@ -32,7 +32,6 @@ import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
 
 class ValidatedTest : UnitSpec() {
 
@@ -59,7 +58,8 @@ class ValidatedTest : UnitSpec() {
         Validated.bitraverse(),
         Validated.genK2(),
         Validated.eqK2()
-      )
+      ),
+      FxLaws.laws<ValidatedPartialOf<String>, Int>(Gen.int().map(::Valid), Gen.validated(Gen.string(), Gen.int()).map { it }, Validated.eqK(String.eq()).liftEq(Int.eq()), Validated.Companion::fx2, Validated.Companion::fx)
     )
 
     "fold should call function on Invalid" {
@@ -273,67 +273,6 @@ class ValidatedTest : UnitSpec() {
       val invalid: Validated<String, String> = Invalid("Nope")
 
       invalid.combine(String.monoid(), String.monoid(), invalid) shouldBe (Invalid("NopeNope"))
-    }
-
-    "suspended Validated.fx can bind immediate values" {
-      Gen.validated(Gen.string(), Gen.int())
-        .random()
-        .take(1001)
-        .forEach { validated ->
-          Validated.fx<String, Int> {
-            val res = !validated
-            res
-          } shouldBe validated
-        }
-    }
-
-    "suspended Validated.fx can bind suspended values" {
-      Gen.validated(Gen.string(), Gen.int())
-        .random()
-        .take(10)
-        .forEach { validated ->
-          Validated.fx<String, Int> {
-            val res = !(suspend {
-              sleep(100)
-              validated
-            }).invoke()
-
-            res
-          } shouldBe validated
-        }
-    }
-
-    "suspended Validated.fx can safely handle immediate exceptions" {
-      Gen.bind(Gen.int(), Gen.throwable(), ::Pair)
-        .random()
-        .take(1001)
-        .forEach { (i, exception) ->
-          shouldThrow<Throwable> {
-            Validated.fx<String, Int> {
-              val res = !Validated.Valid(i)
-              throw exception
-              res
-            }
-            fail("It should never reach here. Validated.fx should've thrown $exception")
-          } shouldBe exception
-        }
-    }
-
-    "suspended Validated.fx can bind suspended exceptions" {
-      Gen.bind(Gen.int(), Gen.throwable(), ::Pair)
-        .random()
-        .take(10)
-        .forEach { (i, exception) ->
-          shouldThrow<Throwable> {
-            Validated.fx<String, Int> {
-              val res = !Validated.Valid(i)
-              sleep(100)
-              throw exception
-              res
-            }
-            fail("It should never reach here. Validated.fx should've thrown $exception")
-          } shouldBe exception
-        }
     }
   }
 }

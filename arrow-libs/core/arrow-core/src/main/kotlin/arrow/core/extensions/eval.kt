@@ -105,6 +105,3 @@ interface EvalBimonad : Bimonad<ForEval> {
   override fun <A> EvalOf<A>.extract(): A =
     fix().extract()
 }
-
-fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
-  defer { Eval.monad().fx.monad(c).fix() }
