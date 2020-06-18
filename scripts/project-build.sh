@@ -7,14 +7,14 @@ if [ "$1" != "arrow-fx" ]; then
     ./gradlew clean build
 else
     # TODO: Temporary fix until Fx is re-organized
-    ./gradlew clean assemble
-    ./gradlew :arrow-fx:test
-    ./gradlew :arrow-fx-test:test
-    ./gradlew :arrow-fx-coroutines:test
-    ./gradlew :arrow-streams:test
-    ./gradlew :arrow-fx-reactor:test
-    ./gradlew :arrow-fx-rx2:test
-    ./gradlew :arrow-fx-kotlinx-coroutines:test
-    ./gradlew :arrow-fx-android:test
-    ./gradlew :arrow-benchmarks-fx:test
+    ./gradlew --no-daemon clean assemble
+    ./gradlew --no-daemon :arrow-fx:test
+    ./gradlew --no-daemon :arrow-fx-test:test
+    ./gradlew --no-daemon :arrow-fx-coroutines:test
+    ./gradlew --no-daemon :arrow-streams:test
+    ./gradlew --no-daemon :arrow-fx-reactor:test
+    ./gradlew --no-daemon :arrow-fx-rx2:test
+    ./gradlew --no-daemon :arrow-fx-kotlinx-coroutines:test
+    ./gradlew --no-daemon :arrow-fx-android:test
+    ./gradlew --no-daemon :arrow-benchmarks-fx:test
 fi
