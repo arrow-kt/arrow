@@ -14,6 +14,7 @@ import arrow.core.test.generators.genConst
 import arrow.core.test.generators.genK
 import arrow.core.test.laws.ApplicativeLaws
 import arrow.core.test.laws.EqLaws
+import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
@@ -30,16 +31,17 @@ class ConstTest : UnitSpec() {
   }
 
   init {
-    Int.monoid().run {
-      testLaws(
-        TraverseFilterLaws.laws(Const.traverseFilter(),
-          Const.applicative(this),
-          Const.genK(Gen.int()),
-          EQK(Int.eq())),
-        ApplicativeLaws.laws(Const.applicative(this), Const.functor(), Const.genK(Gen.int()), EQK(Int.eq())),
-        EqLaws.laws(Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int())),
-        ShowLaws.laws(Const.show(Int.show()), Const.eq<Int, Int>(Eq.any()), Gen.genConst<Int, Int>(Gen.int()))
+    val M = Int.monoid()
+    val EQK = EQK(Int.eq())
+    val GENK = Const.genK(Gen.int())
+    val GEN = Gen.genConst<Int, Int>(Gen.int())
+
+    testLaws(
+        TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(M), GENK, EQK),
+        ApplicativeLaws.laws(Const.applicative(M), Const.functor(), GENK, EQK),
+        EqLaws.laws(Const.eq<Int, Int>(Eq.any()), GEN),
+        ShowLaws.laws(Const.show(Int.show()), Const.eq<Int, Int>(Eq.any()), GEN),
+        FxLaws.laws<ConstPartialOf<Int>, Int>(GENK.genK(Gen.int()), GENK.genK(Gen.int()), EQK.liftEq(Int.eq()), ::const, ::const)
       )
-    }
   }
 }

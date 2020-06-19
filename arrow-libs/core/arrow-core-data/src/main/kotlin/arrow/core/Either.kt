@@ -645,13 +645,13 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  *
  *
  * ```kotlin:ank:playground
- * import arrow.core.extensions.fx
  * import arrow.core.Either
+ * import arrow.core.either
  *
  * suspend fun main() {
  * val value =
  * //sampleStart
- *  Either.fx<Int, Int> {
+ *  either<Int, Int> {
  *   val (a) = Either.Right(1)
  *   val (b) = Either.Right(1 + a)
  *   val (c) = Either.Right(1 + b)
@@ -898,21 +898,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       } catch (t: Throwable) {
         fe(t.nonFatalOrThrow()).left()
       }
-
-    fun <E, A> fx2(c: suspend EagerBind<EitherPartialOf<E>>.() -> A): Either<E, A> {
-      val continuation: EitherContinuation<E, A> = EitherContinuation()
-      return continuation.startCoroutineUninterceptedAndReturn {
-        Right(c())
-      } as Either<E, A>
-    }
-
-    suspend fun <E, A> fx(c: suspend BindSyntax<EitherPartialOf<E>>.() -> A): Either<E, A> =
-      suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-        val continuation = EitherSContinuation(cont as Continuation<EitherOf<E, A>>)
-        continuation.startCoroutineUninterceptedOrReturn {
-          Right(c())
-        }
-      }
   }
 }
 
@@ -1111,6 +1096,21 @@ fun <A, B> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<A, B>): Either<A, B
     when (it) {
       is Left -> f(it.a).fix()
       is Right -> it
+    }
+  }
+
+fun <E, A> either(c: suspend EagerBind<EitherPartialOf<E>>.() -> A): Either<E, A> {
+  val continuation: EitherContinuation<E, A> = EitherContinuation()
+  return continuation.startCoroutineUninterceptedAndReturn {
+    Right(c())
+  } as Either<E, A>
+}
+
+suspend fun <E, A> either(c: suspend BindSyntax<EitherPartialOf<E>>.() -> A): Either<E, A> =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val continuation = EitherSContinuation(cont as Continuation<EitherOf<E, A>>)
+    continuation.startCoroutineUninterceptedOrReturn {
+      Right(c())
     }
   }
 

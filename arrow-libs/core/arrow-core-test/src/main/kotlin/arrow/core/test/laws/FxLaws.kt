@@ -26,18 +26,18 @@ object FxLaws {
     pureGen: Gen<Kind<F, A>>, // TODO cannot specify or filter a pure generator, so we need to require an additional one
     G: Gen<Kind<F, A>>,
     EQ: Eq<Kind<F, A>>,
-    fxBlock: EagerFxBlock<F, A>,
-    sfxBlock: SuspendFxBlock<F, A>
+    fxEager: EagerFxBlock<F, A>,
+    fxSuspend: SuspendFxBlock<F, A>
   ): List<Law> = listOf(
-    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediate(G, EQ, fxBlock) },
-    Law("non-suspended fx can bind immediate exceptions") { nonSuspendedCanBindImmediateException(pureGen, fxBlock) },
-    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, EQ, sfxBlock) },
-    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, EQ, sfxBlock) },
-    Law("suspended fx can bind immediate exceptions") { suspendedCanBindImmediateExceptions(pureGen, sfxBlock) },
-    Law("suspended fx can bind suspended exceptions") { suspendedCanBindSuspendedExceptions(pureGen, sfxBlock) }
+    Law("non-suspended fx can bind immediate values") { nonSuspendedCanBindImmediateValues(G, EQ, fxEager) },
+    Law("non-suspended fx can bind immediate exceptions") { nonSuspendedCanBindImmediateException(pureGen, fxEager) },
+    Law("suspended fx can bind immediate values") { suspendedCanBindImmediateValues(G, EQ, fxSuspend) },
+    Law("suspended fx can bind suspended values") { suspendedCanBindSuspendedValues(G, EQ, fxSuspend) },
+    Law("suspended fx can bind immediate exceptions") { suspendedCanBindImmediateExceptions(pureGen, fxSuspend) },
+    Law("suspended fx can bind suspended exceptions") { suspendedCanBindSuspendedExceptions(pureGen, fxSuspend) }
   )
 
-  private suspend fun <F, A> nonSuspendedCanBindImmediate(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>, fxBlock: EagerFxBlock<F, A>) {
+  private suspend fun <F, A> nonSuspendedCanBindImmediateValues(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>, fxBlock: EagerFxBlock<F, A>) {
     forAll(G) { f: Kind<F, A> ->
       fxBlock {
         val res = !f

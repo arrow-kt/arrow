@@ -242,21 +242,6 @@ sealed class Eval<out A> : EvalOf<A> {
 
       return curr.value() as A
     }
-
-    fun <A> fx2(c: suspend EagerBind<ForEval>.() -> A): Eval<A> {
-      val continuation: EvalContinuation<A> = EvalContinuation()
-      return continuation.startCoroutineUninterceptedAndReturn {
-        just(c())
-      } as Eval<A>
-    }
-
-    suspend fun <A> fx(c: suspend BindSyntax<ForEval>.() -> A): Eval<A> =
-      suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-        val continuation = EvalSContinuation(cont as Continuation<EvalOf<A>>)
-        continuation.startCoroutineUninterceptedOrReturn {
-          just(c())
-        }
-      }
   }
 
   abstract fun value(): A
@@ -382,6 +367,21 @@ fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Ev
     Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
   return loop()
 }
+
+fun <A> eval(c: suspend EagerBind<ForEval>.() -> A): Eval<A> {
+  val continuation: EvalContinuation<A> = EvalContinuation()
+  return continuation.startCoroutineUninterceptedAndReturn {
+    Eval.just(c())
+  } as Eval<A>
+}
+
+suspend fun <A> eval(c: suspend BindSyntax<ForEval>.() -> A): Eval<A> =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val continuation = EvalSContinuation(cont as Continuation<EvalOf<A>>)
+    continuation.startCoroutineUninterceptedOrReturn {
+      Eval.just(c())
+    }
+  }
 
 internal class EvalSContinuation<A>(
   parent: Continuation<EvalOf<A>>

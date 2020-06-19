@@ -142,12 +142,13 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
+ * import arrow.core.validated
  * import arrow.core.valid
  * import arrow.core.invalid
  *
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = Validated.fx<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }.bind()
@@ -243,6 +244,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
+ * import arrow.core.validated
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
@@ -275,7 +277,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = Validated.fx<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }.bind()
@@ -309,6 +311,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
+ * import arrow.core.validated
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
@@ -341,7 +344,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = Validated.fx<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }.bind()
@@ -382,6 +385,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.right
  * import arrow.core.Some
  * import arrow.core.Validated
+ * import arrow.core.validated
  * import arrow.core.valid
  * import arrow.core.invalid
  *
@@ -404,7 +408,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = Validated.fx<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }.bind()
@@ -678,21 +682,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      */
     fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
-
-    fun <E, A> fx2(c: suspend EagerBind<ValidatedPartialOf<E>>.() -> A): Validated<E, A> {
-      val continuation: ValidatedContinuation<E, A> = ValidatedContinuation()
-      return continuation.startCoroutineUninterceptedAndReturn {
-        Valid(c())
-      } as Validated<E, A>
-    }
-
-    suspend fun <E, A> fx(c: suspend BindSyntax<ValidatedPartialOf<E>>.() -> A): Validated<E, A> =
-      suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-        val continuation = ValidatedSContinuation(cont as Continuation<ValidatedOf<E, A>>)
-        continuation.startCoroutineUninterceptedOrReturn {
-          Valid(c())
-        }
-      }
   }
 
   fun show(SE: Show<E>, SA: Show<A>): String = fold({
@@ -905,6 +894,21 @@ fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
+
+fun <E, A> validated(c: suspend EagerBind<ValidatedPartialOf<E>>.() -> A): Validated<E, A> {
+  val continuation: ValidatedContinuation<E, A> = ValidatedContinuation()
+  return continuation.startCoroutineUninterceptedAndReturn {
+    Valid(c())
+  } as Validated<E, A>
+}
+
+suspend fun <E, A> validated(c: suspend BindSyntax<ValidatedPartialOf<E>>.() -> A): Validated<E, A> =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val continuation = ValidatedSContinuation(cont as Continuation<ValidatedOf<E, A>>)
+    continuation.startCoroutineUninterceptedOrReturn {
+      Valid(c())
+    }
+  }
 
 internal class ValidatedSContinuation<E, A>(
   parent: Continuation<ValidatedOf<E, A>>

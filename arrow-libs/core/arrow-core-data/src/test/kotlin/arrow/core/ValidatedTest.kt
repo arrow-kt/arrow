@@ -59,7 +59,7 @@ class ValidatedTest : UnitSpec() {
         Validated.genK2(),
         Validated.eqK2()
       ),
-      FxLaws.laws<ValidatedPartialOf<String>, Int>(Gen.int().map(::Valid), Gen.validated(Gen.string(), Gen.int()).map { it }, Validated.eqK(String.eq()).liftEq(Int.eq()), Validated.Companion::fx2, Validated.Companion::fx)
+      FxLaws.laws<ValidatedPartialOf<String>, Int>(Gen.int().map(::Valid), Gen.validated(Gen.string(), Gen.int()).map { it }, Validated.eqK(String.eq()).liftEq(Int.eq()), ::validated, ::validated)
     )
 
     "fold should call function on Invalid" {
