@@ -23,6 +23,12 @@ fun <A> List<A>.deleteFirst(f: (A) -> Boolean): Pair<A, List<A>>? {
   return go(this, emptyList())
 }
 
+fun Iterable<*>.size(): Int =
+  when (this) {
+    is Collection -> size
+    else -> fold(0) { acc, _ -> acc + 1 }
+  }
+
 /** Represents a unique identifier using object equality. */
 internal class Token {
   override fun toString(): String = "Token(${Integer.toHexString(hashCode())})"
