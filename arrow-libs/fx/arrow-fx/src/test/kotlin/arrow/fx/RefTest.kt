@@ -2,7 +2,6 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.extensions.eq
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.fx.extensions.io.concurrent.concurrent
@@ -16,7 +15,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
-class RefTest : UnitSpec() {
+class RefTest : ArrowFxSpec() {
 
   init {
     fun <F> MonadDefer<F>.tests(EQF: EqK<F>, RF: RefFactory<F>) {

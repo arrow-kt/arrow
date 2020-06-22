@@ -1,17 +1,16 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
 
-class BracketCaseTest : StringSpec({
+class BracketCaseTest : ArrowFxSpec(spec = {
 
   "Uncancellable back pressures timeoutOrNull" {
-    checkAll(10, Arb.long(10, 20), Arb.long(50, 100)) { a, b ->
+    checkAll(Arb.long(10, 20), Arb.long(50, 100)) { a, b ->
       val start = System.currentTimeMillis()
 
       val n = timeOutOrNull(a.milliseconds) {

@@ -2,11 +2,10 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlin.math.pow
 
-class ScheduleTest : StringSpec({
+class ScheduleTest : ArrowFxSpec(spec = {
 
   class MyException : Exception()
 

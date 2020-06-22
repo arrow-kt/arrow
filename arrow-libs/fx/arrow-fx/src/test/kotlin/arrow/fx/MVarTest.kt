@@ -7,7 +7,6 @@ import arrow.core.Some
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
-import arrow.core.test.UnitSpec
 import arrow.core.toT
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
@@ -20,7 +19,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
-class MVarTest : UnitSpec() {
+class MVarTest : ArrowFxSpec() {
 
   fun <A> fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> A): IO<Nothing, A> =
     IO.concurrent<Nothing>().fx.concurrent(c).fix()

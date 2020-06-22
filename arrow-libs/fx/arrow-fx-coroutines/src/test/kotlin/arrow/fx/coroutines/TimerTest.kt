@@ -1,13 +1,12 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
 
-class TimerTest : StringSpec({
+class TimerTest : ArrowFxSpec(spec = {
 
   suspend fun timeNano(): Long =
     System.nanoTime()
@@ -35,7 +34,7 @@ class TimerTest : StringSpec({
   }
 
   "sleep can be cancelled" {
-    checkAll(15, Arb.int(100, 500)) { d ->
+    checkAll(Arb.int(100, 500)) { d ->
       assertCancellable { sleep(d.milliseconds) }
     }
   }

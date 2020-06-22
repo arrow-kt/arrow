@@ -2,13 +2,12 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.fail
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 
-class RaceTripleTest : StringSpec({
+class RaceTripleTest : ArrowFxSpec(spec = {
 
   "race triple mirrors left winner" {
     checkAll(Arb.either(Arb.throwable(), Arb.int())) { fa ->

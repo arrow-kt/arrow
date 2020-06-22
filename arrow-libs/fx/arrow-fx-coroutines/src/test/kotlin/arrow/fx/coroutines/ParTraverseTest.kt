@@ -1,16 +1,13 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.checkAll
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
-class ParTraverseTest : StringSpec({
+class ParTraverseTest : ArrowFxSpec(spec = {
 
   "parTraverse can traverse effect full computations" {
     val ref = Atomic(0)
@@ -43,7 +40,6 @@ class ParTraverseTest : StringSpec({
 
   "parTraverse results in the correct error" {
     checkAll(
-      10,
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
       Arb.throwable()
@@ -146,7 +142,6 @@ class ParTraverseTest : StringSpec({
 
   "parTraverseN results in the correct error" {
     checkAll(
-      10,
       Arb.int(min = 10, max = 20),
       Arb.int(min = 1, max = 9),
       Arb.throwable()

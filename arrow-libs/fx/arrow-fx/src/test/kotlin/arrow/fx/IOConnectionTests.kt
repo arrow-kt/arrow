@@ -1,13 +1,12 @@
 package arrow.fx
 
-import arrow.core.test.UnitSpec
 import arrow.fx.test.eq.eq
 import arrow.fx.test.laws.shouldBeEq
 import io.kotlintest.shouldBe
 import arrow.fx.test.eq.eqK
 import arrow.typeclasses.Eq
 
-class IOConnectionTests : UnitSpec() {
+class IOConnectionTests : ArrowFxSpec() {
 
   init {
     val EQ = IO.eqK<Nothing>().liftEq(Eq.any())

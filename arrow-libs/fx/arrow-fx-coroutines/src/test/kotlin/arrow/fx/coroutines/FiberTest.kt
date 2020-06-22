@@ -1,13 +1,12 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 
-class FiberTest : StringSpec({
+class FiberTest : ArrowFxSpec(spec = {
 
   "ForkConnected get cancelled by its parent" {
     val start = Promise<Unit>()

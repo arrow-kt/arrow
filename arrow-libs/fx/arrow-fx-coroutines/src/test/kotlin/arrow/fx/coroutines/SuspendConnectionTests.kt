@@ -1,12 +1,11 @@
 package arrow.fx.coroutines
 
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlin.coroutines.EmptyCoroutineContext
 
-class SuspendConnectionTests : StringSpec({
+class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "Left identity" {
     val ref = SuspendConnection()

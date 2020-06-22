@@ -8,7 +8,6 @@ import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.fx.IO.Companion.effect
 import arrow.fx.internal.AtomicIntW
-import arrow.core.test.UnitSpec
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.dispatchers.dispatchers
@@ -24,7 +23,7 @@ import kotlinx.coroutines.newSingleThreadContext
 
 @ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
-class EffectsSuspendDSLTests : UnitSpec() {
+class EffectsSuspendDSLTests : ArrowFxSpec() {
 
   private val ctxA = newSingleThreadContext("A")
   private val ctxB = newSingleThreadContext("B")

@@ -1,14 +1,13 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.lang.IllegalStateException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-class ForwardCancelableTests : StringSpec({
+class ForwardCancelableTests : ArrowFxSpec(spec = {
   "cancel() after complete" {
     var effect = 0
 

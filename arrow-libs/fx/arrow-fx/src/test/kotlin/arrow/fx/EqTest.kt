@@ -1,6 +1,5 @@
 package arrow.fx
 
-import arrow.core.test.UnitSpec
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.fx.internal.TimeoutException
 import arrow.fx.typeclasses.milliseconds
@@ -9,7 +8,7 @@ import arrow.fx.test.laws.shouldBeEq
 import arrow.fx.test.laws.shouldNotBeEq
 import io.kotlintest.shouldThrow
 
-class EqTest : UnitSpec() {
+class EqTest : ArrowFxSpec() {
 
   init {
     "Should pass pure equal values" {

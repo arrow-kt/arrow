@@ -1,13 +1,12 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 
-class CancellableF : StringSpec({
+class CancellableF : ArrowFxSpec(spec = {
 
   "cancelable works for immediate values" {
     checkAll(Arb.result(Arb.int())) { res ->

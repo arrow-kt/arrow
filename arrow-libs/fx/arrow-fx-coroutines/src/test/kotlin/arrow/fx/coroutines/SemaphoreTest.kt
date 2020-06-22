@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -10,7 +9,7 @@ import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
-class SemaphoreTest : StringSpec({
+class SemaphoreTest : ArrowFxSpec(spec = {
 
   "acquire n times synchronously" {
     checkAll(Arb.positiveInts(max = 20).map(Int::toLong)) { n ->
@@ -183,7 +182,7 @@ class SemaphoreTest : StringSpec({
   }
 
   "withPermitN does not leak fibers or permits upon cancellation" {
-    checkAll(100, Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
+    checkAll(Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
       val s = Semaphore(n)
 
       val r = timeOutOrNull(10.milliseconds) {
@@ -215,7 +214,7 @@ class SemaphoreTest : StringSpec({
   }
 
   "acquireN does not leak permits upon cancellation" {
-    checkAll(100, Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
+    checkAll(Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
       val s = Semaphore(n)
 
       val x = timeOutOrNull(10.milliseconds) {

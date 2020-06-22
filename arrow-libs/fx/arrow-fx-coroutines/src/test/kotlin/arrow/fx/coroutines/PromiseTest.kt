@@ -1,10 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
-class PromiseTest : StringSpec({
+class PromiseTest : ArrowFxSpec(spec = {
 
   class MyException : Exception()
 

@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
@@ -9,7 +8,7 @@ import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 
-class RaceNTest : StringSpec({
+class RaceNTest : ArrowFxSpec(spec = {
 
   "race2 can join first" {
     checkAll(Arb.int()) { i ->

@@ -11,7 +11,6 @@ import arrow.core.extensions.id.eqK.eqK
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.foldable.forAll
 import arrow.core.extensions.monoid
-import arrow.core.test.UnitSpec
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.GenK2
@@ -48,7 +47,7 @@ import io.kotlintest.shouldBe
 import kotlin.math.max
 import kotlin.math.pow
 
-class ScheduleTest : UnitSpec() {
+class ScheduleTest : ArrowFxSpec() {
 
   fun <F, I> eqK(fEqK: EqK<F>, MF: Monad<F>, i: I): EqK<SchedulePartialOf<F, I>> = object : EqK<SchedulePartialOf<F, I>> {
     override fun <A> Kind<SchedulePartialOf<F, I>, A>.eqK(other: Kind<SchedulePartialOf<F, I>, A>, EQ: Eq<A>): Boolean {

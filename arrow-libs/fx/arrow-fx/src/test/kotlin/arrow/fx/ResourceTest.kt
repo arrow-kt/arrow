@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.extensions.monoid
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.GenK
 import arrow.core.test.laws.MonadLaws
 import arrow.core.test.laws.MonoidLaws
@@ -22,7 +21,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
 
-class ResourceTest : UnitSpec() {
+class ResourceTest : ArrowFxSpec() {
   init {
 
     val EQ: Eq<Kind<Kind<Kind<ForResource, Kind<ForIO, Nothing>>, Throwable>, Int>> =

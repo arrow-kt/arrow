@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
@@ -15,10 +14,8 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
-class EvalOnTests : StringSpec({
+class EvalOnTests : ArrowFxSpec(spec = {
 
   "immediate value" {
     checkAll(Arb.int()) { i ->

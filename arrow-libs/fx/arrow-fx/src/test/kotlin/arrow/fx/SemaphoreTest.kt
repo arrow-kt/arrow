@@ -2,7 +2,6 @@ package arrow.fx
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.list.traverse.traverse
-import arrow.core.test.UnitSpec
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.core.toT
 import arrow.fx.extensions.io.applicative.applicative
@@ -18,7 +17,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
 
-class SemaphoreTest : UnitSpec() {
+class SemaphoreTest : ArrowFxSpec() {
 
   init {
 

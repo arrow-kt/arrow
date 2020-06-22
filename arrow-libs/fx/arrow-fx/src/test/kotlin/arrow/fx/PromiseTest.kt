@@ -4,7 +4,6 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.throwable
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.apply.product
@@ -20,7 +19,7 @@ import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-class PromiseTest : UnitSpec() {
+class PromiseTest : ArrowFxSpec() {
 
   init {
 

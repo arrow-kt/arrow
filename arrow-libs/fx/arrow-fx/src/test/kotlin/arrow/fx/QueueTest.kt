@@ -9,7 +9,6 @@ import arrow.core.Tuple3
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.fix
-import arrow.core.test.UnitSpec
 import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.generators.tuple2
 import arrow.core.test.generators.tuple3
@@ -28,7 +27,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlin.coroutines.CoroutineContext
 
-class QueueTest : UnitSpec() {
+class QueueTest : ArrowFxSpec() {
 
   fun <A> fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> A): IO<Nothing, A> =
     IO.concurrent<Nothing>().fx.concurrent(c).fix()

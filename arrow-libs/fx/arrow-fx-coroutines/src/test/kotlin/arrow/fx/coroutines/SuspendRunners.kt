@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -12,7 +11,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-class SuspendRunners : StringSpec({
+class SuspendRunners : ArrowFxSpec(spec = {
 
   "should defer evaluation until run" {
     var run = false

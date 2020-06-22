@@ -1,7 +1,6 @@
 package arrow.fx
 
 import arrow.core.extensions.monoid
-import arrow.core.test.UnitSpec
 import arrow.core.test.laws.ApplicativeLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.fx.extensions.applicative
@@ -16,7 +15,7 @@ import arrow.fx.test.generators.genK
 import arrow.fx.typeclasses.FiberPartialOf
 import io.kotlintest.properties.Gen
 
-class FiberTest : UnitSpec() {
+class FiberTest : ArrowFxSpec() {
 
   init {
     testLaws(

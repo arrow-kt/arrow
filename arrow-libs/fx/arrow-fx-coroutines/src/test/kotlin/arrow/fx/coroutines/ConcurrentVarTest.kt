@@ -1,13 +1,12 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlin.time.ExperimentalTime
 import io.kotest.property.forAll
 
 @ExperimentalTime
-class ConcurrentVarTest : StringSpec({
+class ConcurrentVarTest : ArrowFxSpec(spec = {
 
   "empty; put; isNotEmpty; take; put; take" {
     val mvar = ConcurrentVar.empty<Int>()

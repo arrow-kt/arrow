@@ -3,11 +3,10 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.lang.RuntimeException
 
-class CircuitBreakerTest : StringSpec({
+class CircuitBreakerTest : ArrowFxSpec(spec = {
 
   val dummy = RuntimeException("dummy")
   val maxFailures = 5

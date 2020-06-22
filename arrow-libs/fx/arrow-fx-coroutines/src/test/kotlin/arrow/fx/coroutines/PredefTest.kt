@@ -1,7 +1,6 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -11,7 +10,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
-class PredefTest : StringSpec({
+class PredefTest : ArrowFxSpec(spec = {
 
   "suspended always suspends" {
     checkAll(Arb.int()) { i ->
