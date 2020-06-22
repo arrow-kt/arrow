@@ -3,7 +3,10 @@ package arrow.fx.coroutines
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 
 /**
  * Inline marker to mark a [CancelToken],
@@ -83,7 +86,8 @@ internal sealed class SuspendConnection : AbstractCoroutineContextElement(Suspen
 
     override tailrec fun push(token: CancelToken): Unit = when (val list = state.value) {
       // If connection is already cancelled cancel token immediately.
-      null -> Platform.unsafeRunSync { token.invoke() }
+      null -> token.cancel
+        .startCoroutine(Continuation(EmptyCoroutineContext) { })
       else ->
         if (state.compareAndSet(list, listOf(token) + list)) Unit
         else push(token)

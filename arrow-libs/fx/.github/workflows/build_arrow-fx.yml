@@ -16,20 +16,14 @@ jobs:
     - uses: actions/checkout@v1
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
-    - name: Cache management
-      uses: actions/cache@v2
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}--gradle--${{ hashFiles('**/*.gradle*') }}
-        restore-keys: |
-          ${{ runner.os }}--gradle--
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git
     - name: Build with Gradle
       run: |
-        $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
+        ./gradlew build
+        #$BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
     #- name: Run benchmark for master branch
     #  run: |
     #    git checkout master
@@ -44,6 +38,3 @@ jobs:
     #  run: |
     #    export PULL_REQUEST_NUMBER=$(echo $GITHUB_REF | cut -d/ -f3)
     #    ./gradlew :arrow-benchmarks-fx:compareBenchmarksCI
-    - name: Clean SNAPSHOTs
-      run: |
-        find ~/.gradle/caches/ -type d -name "*SNAPSHOT*" -prune -exec rm -rf {} +
