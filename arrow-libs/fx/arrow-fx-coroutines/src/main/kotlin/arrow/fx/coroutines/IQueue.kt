@@ -31,6 +31,9 @@ data class IQueue<A> internal constructor(
   internal fun first(): A =
     firstOrNull() ?: throw NoSuchElementException("first on empty queue")
 
+  internal fun tail(): IQueue<A> =
+    tailOrNull() ?: throw NoSuchElementException("tail on empty queue")
+
   fun firstOrNull(): A? =
     when {
       listOut.isNotEmpty() -> listOut.first()

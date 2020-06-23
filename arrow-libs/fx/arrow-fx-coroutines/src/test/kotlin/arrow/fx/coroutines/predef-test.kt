@@ -1,15 +1,22 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.extensions.sequence.monoidal.identity
+import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bind
+import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
+import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import java.io.ByteArrayOutputStream
@@ -113,8 +120,27 @@ fun Arb.Companion.intRange(min: Int = 0, max: Int = 1000): Arb<IntRange> =
     }
   }
 
+fun Arb.Companion.longRange(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): Arb<LongRange> =
+  Arb.bind(Arb.long(min, max), Arb.long(min, max)) { a, b ->
+    if (a < b) a..b else b..a
+  }
+
+fun Arb.Companion.charRange(): Arb<CharRange> =
+  Arb.bind(Arb.char(), Arb.char()) { a, b ->
+    if (a < b) a..b else b..a
+  }
+
+fun <O> Arb.Companion.function(arb: Arb<O>): Arb<() -> O> =
+  arb.map { { it } }
+
+fun <O> Arb.Companion.suspended(arb: Arb<O>): Arb<suspend () -> O> =
+  arb.map { suspend { it.suspend() } }
+
+fun Arb.Companion.unit(): Arb<Unit> =
+  Arb.constant(Unit)
+
 /** Useful for testing success & error scenarios with an `Either` generator **/
-internal suspend fun <A> Either<Throwable, A>.rethrow(): A =
+internal fun <A> Either<Throwable, A>.rethrow(): A =
   fold({ throw it }, ::identity)
 
 internal fun <A> Result<A>.toEither(): Either<Throwable, A> =
@@ -160,3 +186,21 @@ internal suspend fun <A> Either<Throwable, A>.suspend(): A =
 
 internal fun <A> Either<Throwable, A>.suspended(): suspend () -> A =
   suspend { suspend() }
+
+/**
+ * Example usage:
+ * ```kotlin
+ * val exception = assertThrows<IllegalArgumentException> {
+ *     throw IllegalArgumentException("Talk to a duck")
+ * }
+ * assertEquals("Talk to a duck", exception.message)
+ * ```
+ * @see Assertions.assertThrows
+ */
+inline fun <A> assertThrowable(executable: () -> A): Throwable =
+  try {
+    val a = executable.invoke()
+    fail("Expected an exception but found: $a")
+  } catch (e: Throwable) {
+    e
+  }

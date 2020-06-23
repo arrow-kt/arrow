@@ -62,7 +62,7 @@ suspend fun <A> cancellableF(k: suspend ((Result<A>) -> Unit) -> CancelToken): A
       )
     }.startCoroutineCancellable(CancellableContinuation(cont.context, conn2) {
       // TODO send CancelToken exception to Enviroment
-      it.fold(::identity, Throwable::printStackTrace)
+      it.fold({ arrow.core.identity(it) }, Throwable::printStackTrace)
     })
   }
 

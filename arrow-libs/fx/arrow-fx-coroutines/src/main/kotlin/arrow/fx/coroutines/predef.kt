@@ -1,15 +1,13 @@
 package arrow.fx.coroutines
 
-fun <A> identity(a: A): A = a
-
 inline infix fun <A, B, C> ((A) -> B).andThen(crossinline f: (B) -> C): (A) -> C =
   { a -> f(this(a)) }
 
-infix fun <A> A.prependTo(fa: List<A>): List<A> =
+infix fun <A> A.prependTo(fa: Iterable<A>): List<A> =
   listOf(this) + fa
 
-fun <A> List<A>.deleteFirst(f: (A) -> Boolean): Pair<A, List<A>>? {
-  tailrec fun go(rem: List<A>, acc: List<A>): Pair<A, List<A>>? =
+fun <A> Iterable<A>.deleteFirst(f: (A) -> Boolean): Pair<A, List<A>>? {
+  tailrec fun go(rem: Iterable<A>, acc: List<A>): Pair<A, List<A>>? =
     when {
       rem.isEmpty() -> null
       else -> {
@@ -22,6 +20,12 @@ fun <A> List<A>.deleteFirst(f: (A) -> Boolean): Pair<A, List<A>>? {
 
   return go(this, emptyList())
 }
+
+fun <A> Iterable<A>.uncons(): Pair<A, List<A>>? =
+  firstOrNull()?.let { Pair(it, drop(1)) }
+
+fun Iterable<*>.isEmpty(): Boolean =
+  size() == 0
 
 fun Iterable<*>.size(): Int =
   when (this) {

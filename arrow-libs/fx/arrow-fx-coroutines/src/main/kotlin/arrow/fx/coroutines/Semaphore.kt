@@ -178,9 +178,14 @@ interface Semaphore {
      *   //sampleEnd
      * }
      */
-    suspend operator fun invoke(n: Long): Semaphore {
-      assertNonNegative(n)
-      val r = Atomic<SemaphoreState>(Either.Right(n))
+    suspend operator fun invoke(n: Long): Semaphore =
+      unsafe(n)
+
+    suspend operator fun invoke(n: Int): Semaphore =
+      unsafe(n.toLong())
+
+    fun unsafe(n: Long): Semaphore {
+      val r = Atomic.unsafe<SemaphoreState>(Either.Right(n))
       return SemaphoreDefault(r)
     }
   }
@@ -193,8 +198,8 @@ interface Semaphore {
 internal typealias SemaphoreState = Either<AcquiredPermits, Long>
 internal typealias AcquiredPermits = IQueue<Pair<Long, Promise<Unit>>>
 
-internal suspend fun assertNonNegative(n: Long): Unit =
-  if (n < 0) throw IllegalArgumentException("n must be nonnegative, was: $n")
+internal fun assertNonNegative(n: Long): Unit =
+  if (n < 0) throw IllegalArgumentException("n must be non-negative, was: $n")
   else Unit
 
 private class SemaphoreDefault(private val state: Atomic<SemaphoreState>) : Semaphore {
