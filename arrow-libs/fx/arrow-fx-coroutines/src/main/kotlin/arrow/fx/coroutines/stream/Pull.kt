@@ -349,8 +349,8 @@ fun <O, R> Pull<O, R>.handleErrorWith(f: (Throwable) -> Pull<O, R>): Pull<O, R> 
           } catch (e: Throwable) {
             Fail(e.nonFatalOrThrow())
           }
-        is Pure -> this
-        is Interrupted<*> -> this
+        is Pure -> r
+        is Interrupted<*> -> r
       }
   }
 

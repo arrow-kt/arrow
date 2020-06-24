@@ -1,10 +1,10 @@
 package arrow.fx.coroutines.stream
 
 import arrow.core.Either
-import arrow.core.Right
-import arrow.core.Option
-import arrow.core.Some
 import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
 import arrow.core.extensions.list.foldable.combineAll
 import arrow.core.extensions.list.foldable.foldMap
 import arrow.core.extensions.monoid
@@ -14,11 +14,12 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Semaphore
+import arrow.fx.coroutines.SideEffect
 import arrow.fx.coroutines.StreamSpec
 import arrow.fx.coroutines.assertThrowable
 import arrow.fx.coroutines.charRange
-import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.guarantee
+import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.intRange
 import arrow.fx.coroutines.longRange
 import arrow.fx.coroutines.milliseconds
@@ -32,15 +33,14 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.Sample
+import io.kotest.property.arbitrary.arb
+import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.arb
-import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.set
-import java.lang.RuntimeException
 import kotlin.math.max
 import kotlin.random.Random
 
@@ -193,18 +193,18 @@ class StreamTest : StreamSpec(spec = {
 
     "unfold" {
       Stream.unfold(Pair(0, 1)) { (f1, f2) ->
-        if (f1 <= 13) Pair(Pair(f1, f2), Pair(f2, f1 + f2))
-        else null
-      }.map { it.first }
+          if (f1 <= 13) Pair(Pair(f1, f2), Pair(f2, f1 + f2))
+          else null
+        }.map { it.first }
         .compile()
         .toList() shouldBe listOf(0, 1, 1, 2, 3, 5, 8, 13)
     }
 
     "unfoldChunk" {
       Stream.unfoldChunk(4L) { s ->
-        if (s > 0) Pair(Chunk.longs(longArrayOf(s, s)), s - 1)
-        else null
-      }.compile()
+          if (s > 0) Pair(Chunk.longs(longArrayOf(s, s)), s - 1)
+          else null
+        }.compile()
         .toList() shouldBe listOf(4L, 4, 3, 3, 2, 2, 1, 1)
     }
 
@@ -216,9 +216,9 @@ class StreamTest : StreamSpec(spec = {
 
     "unfoldChunkEffect" {
       Stream.unfoldChunkEffect(true) { s ->
-        if (s) Pair(Chunk.booleans(booleanArrayOf(s)), false)
-        else null
-      }
+          if (s) Pair(Chunk.booleans(booleanArrayOf(s)), false)
+          else null
+        }
         .compile()
         .toList() shouldBe listOf(true)
     }
@@ -451,12 +451,26 @@ class StreamTest : StreamSpec(spec = {
     }
   }
 
-  "handleErrorWith(f) - f(e)" {
-    checkAll(Arb.throwable(), Arb.int()) { e, i ->
-      Stream.raiseError<Int>(e)
-        .handleErrorWith { Stream.just(i) }
-        .compile()
-        .toList() shouldBe listOf(i)
+  "handleErrorWith(f)" - {
+    "recovers from error" {
+      checkAll(Arb.throwable(), Arb.int()) { e, i ->
+        Stream.raiseError<Int>(e)
+          .handleErrorWith { Stream.just(i) }
+          .compile()
+          .toList() shouldBe listOf(i)
+      }
+    }
+
+    "handleErrorWith is not run for happy path" {
+      checkAll(Arb.int()) { i ->
+        val effect = SideEffect()
+        Stream.just(i)
+          .handleErrorWith { Stream.effect { effect.increment() } }
+          .compile()
+          .toList() shouldBe listOf(i)
+
+        effect.counter shouldBe 0
+      }
     }
   }
 
@@ -593,13 +607,13 @@ class StreamTest : StreamSpec(spec = {
         val enableInterrupt = Semaphore(0)
         val interrupt = Stream.effect { enableInterrupt.acquire() }.flatMap { Stream(false) }
         s.effectMap { i ->
-          // enable interruption and hang when hitting a value divisible by 7
-          if (i % 7 == 0) {
-            enableInterrupt.release()
-            barrier.acquire()
-            i
-          } else i
-        }.interruptWhen(interrupt)
+            // enable interruption and hang when hitting a value divisible by 7
+            if (i % 7 == 0) {
+              enableInterrupt.release()
+              barrier.acquire()
+              i
+            } else i
+          }.interruptWhen(interrupt)
           .compile()
           // as soon as we hit a value divisible by 7, we enable interruption then hang before emitting it,
           // so there should be no elements in the output that are divisible by 7
@@ -621,11 +635,11 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.stream(Arb.int()), Arb.throwable()) { s, e ->
         Either.catch {
           Stream.effect { Semaphore(0) }.flatMap { semaphore ->
-            Stream(1)
-              .append { s }
-              .interruptWhen { sleep(20.milliseconds); Either.Left(e) }
-              .flatMap { Stream.effect_ { semaphore.acquire() } }
-          }
+              Stream(1)
+                .append { s }
+                .interruptWhen { sleep(20.milliseconds); Either.Left(e) }
+                .flatMap { Stream.effect_ { semaphore.acquire() } }
+            }
             .compile()
             .toList()
         } shouldBe Either.Left(e)
@@ -757,17 +771,17 @@ class StreamTest : StreamSpec(spec = {
         val expected = s.compile().toList()
 
         Stream.effect { Semaphore(0) }.flatMap { semaphore ->
-          s.interruptWhen { Right(sleep(20.milliseconds)) }
-            .map { None }
-            .append { s.map { Option(it) } }
-            .interruptWhen { Right(never()) }
-            .flatMap {
-              when (it) {
-                is None -> Stream.effect { semaphore.acquire(); None }
-                is Some -> Stream(Some(it.t))
-              }
-            }.filterOption()
-        }
+            s.interruptWhen { Right(sleep(20.milliseconds)) }
+              .map { None }
+              .append { s.map { Option(it) } }
+              .interruptWhen { Right(never()) }
+              .flatMap {
+                when (it) {
+                  is None -> Stream.effect { semaphore.acquire(); None }
+                  is Some -> Stream(Some(it.t))
+                }
+              }.filterOption()
+          }
           .compile()
           .toList() shouldBe expected
       }
