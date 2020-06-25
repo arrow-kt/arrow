@@ -296,15 +296,12 @@ import kotlin.random.Random
             null -> Pull.done
             else -> {
               val all = acc.enqueue(uncons.head)
-              all.dropLast(n.toInt())
+              all
+                .dropLast(n.toInt())
                 .chunks
                 .fold(Pull.done<O>()) { acc, c ->
-                  acc.flatMap {
-                    Pull.output(c).flatMap {
-                      go(all.takeLast(n.toInt()), uncons.tail)
-                    }
-                  }
-                }
+                  acc.flatMap { Pull.output(c) }
+                }.flatMap { go(all.takeLast(n.toInt()), uncons.tail) }
             }
           }
         }
@@ -1757,7 +1754,7 @@ import kotlin.random.Random
         is Resource.Bind<*, O> -> resourceWeak(r.source).flatMap { o ->
           resourceWeak((r.f as (Any?) -> Resource<O>).invoke(o))
         }
-        is Resource.Defer -> Stream.effect(r.resource).flatMap { resourceWeak(it) }
+        is Resource.Defer -> effect(r.resource).flatMap { resourceWeak(it) }
       }
 
     /**
@@ -2628,7 +2625,7 @@ private fun <A, B, C> Pull<A, Unit>.zipWith_(
 }
 
 typealias ZipWithCont<I, O> =
-    (Either<Pair<Chunk<I>, Pull<I, Unit>>, Pull<I, Unit>>) -> Pull<O, Unit>
+  (Either<Pair<Chunk<I>, Pull<I, Unit>>, Pull<I, Unit>>) -> Pull<O, Unit>
 
 /** `Monoid` instance for `Stream`. */
 fun <O> Stream.Companion.monoid(): Monoid<Stream<O>> =

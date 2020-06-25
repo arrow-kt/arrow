@@ -24,7 +24,6 @@ import arrow.fx.coroutines.intRange
 import arrow.fx.coroutines.longRange
 import arrow.fx.coroutines.milliseconds
 import arrow.fx.coroutines.never
-import arrow.fx.coroutines.seconds
 import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.throwable
 import arrow.fx.coroutines.timeOutOrNull
@@ -41,6 +40,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.set
+import java.lang.RuntimeException
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.random.Random
 
@@ -322,7 +323,7 @@ class StreamTest : StreamSpec(spec = {
       }
     }
 
-    "dropLast".config(enabled = false) {
+    "last" {
       checkAll(Arb.stream(Arb.int()), Arb.int(-10..1000)) { s, n0 ->
         val n = n0 % 10
         s.dropLast(n).compile().toList() shouldBe s.compile().toList().dropLast(max(0, n))
@@ -363,16 +364,15 @@ class StreamTest : StreamSpec(spec = {
   }
 
   "chunk" - {
-
     "chunked" {
       val s = Stream(1, 2).append { Stream(3, 4) }
       s.take(3).chunks().compile().toList() shouldBe listOf(Chunk(1, 2), Chunk(3))
     }
 
-    "map identity".config(enabled = false) {
+    "map identity" {
       checkAll(Arb.list(Arb.list(Arb.int()))) { lli ->
         val s = lli.foldMap(Stream.monoid<Int>()) { Stream.iterable(it) }
-        s.chunks().map { it.toList() }.compile().toList() shouldBe lli.filter { it.isNotEmpty() }
+        s.chunks().map { it.toList() }.compile().toList() shouldBe lli
       }
     }
 
@@ -435,7 +435,8 @@ class StreamTest : StreamSpec(spec = {
           .toList() shouldBe s.compile().toList()
       }
     }
-    "buffer results of effectMap" {
+
+    "buffers results of effectMap" {
       checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n0 ->
         val n = n0 % 20 + 1
         var counter = 0
@@ -447,6 +448,66 @@ class StreamTest : StreamSpec(spec = {
           .drain()
 
         counter shouldBe (n * 2)
+      }
+    }
+  }
+
+  "bufferAll" - {
+    "identity" {
+      checkAll(Arb.stream(Arb.int())) { s ->
+        s.bufferAll()
+          .compile()
+          .toList() shouldBe s.compile().toList()
+      }
+    }
+
+    "buffers results of effectMap" {
+      checkAll(Arb.stream(Arb.int())) { s ->
+        val size = s.compile().toList().size
+        val expected = size * 2
+        var counter = 0
+
+        s.append { s }
+          .effectMap { i -> counter += 1; i }
+          .bufferAll()
+          .take(size + 1)
+          .compile()
+          .drain()
+
+        counter shouldBe expected
+      }
+    }
+  }
+
+  "bufferBy" - {
+    "identity" {
+      checkAll(Arb.stream(Arb.int())) { s ->
+        s.bufferBy { it >= 0 }
+          .compile()
+          .toList() shouldBe s.compile().toList()
+      }
+    }
+
+    "buffers results of effectMap" {
+      checkAll(Arb.stream(Arb.int())) { s ->
+        val size = s.compile().toList().size
+        val expected = size * 2 + 1
+        var counter = 0
+
+        val s2 = s
+          .map { x -> if (x == Int.MIN_VALUE) x + 1 else x }
+          .map { it.absoluteValue }
+
+        val s3 = s2.append { Stream(-1) }
+          .append { s2 }
+          .effectMap { i -> counter += 1; i }
+
+        s3.bufferBy { it >= 0 }
+          .take(size + 2)
+          .compile()
+          .drain()
+
+        counter shouldBe expected
       }
     }
   }
@@ -950,27 +1011,26 @@ class StreamTest : StreamSpec(spec = {
     }
 
     "outer failed" {
-      val err = RuntimeException()
-      assertThrowable {
-        Stream(
-          Stream.sleep_(50.seconds),
-          Stream.raiseError(err)
-        ).parJoinUnbounded()
-          .compile()
-          .drain()
-      } shouldBe err
+      checkAll(Arb.throwable(), Arb.stream(Arb.int())) { e, s ->
+        assertThrowable {
+          Stream(s, Stream.raiseError(e))
+            .parJoinUnbounded()
+            .compile()
+            .drain()
+        } shouldBe e
+      }
     }
 
     "propagate error from inner stream before append" {
-      val err = RuntimeException()
-
-      assertThrowable {
-        Stream(Stream.raiseError<Int>(err))
-          .parJoinUnbounded()
-          .append { Stream(1) }
-          .compile()
-          .toList()
-      } shouldBe err
+      checkAll(Arb.throwable(), Arb.stream(Arb.int())) { e, s ->
+        assertThrowable {
+          Stream(Stream.raiseError<Int>(e))
+            .parJoinUnbounded()
+            .append { s }
+            .compile()
+            .toList()
+        } shouldBe e
+      }
     }
   }
 })

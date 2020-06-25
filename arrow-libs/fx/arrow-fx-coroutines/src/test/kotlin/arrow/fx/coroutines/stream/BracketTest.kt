@@ -314,8 +314,8 @@ class BracketTest : StreamSpec(spec = {
       }
     }
 
-    "cancelation" {
-      checkAll(15, Arb.stream(Arb.int())) { s0 ->
+    "cancellation" {
+      checkAll(Arb.stream(Arb.int())) { s0 ->
         val counter = Counter()
         var ecs = emptyList<ExitCase>()
         val latch = Promise<Unit>()
