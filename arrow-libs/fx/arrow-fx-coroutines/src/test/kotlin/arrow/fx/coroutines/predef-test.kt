@@ -14,7 +14,6 @@ import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.char
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
@@ -111,13 +110,9 @@ fun <L, R> Arb.Companion.either(left: Arb<L>, right: Arb<R>): Arb<Either<L, R>> 
   return Arb.choice(failure, success)
 }
 
-fun Arb.Companion.intRange(min: Int = 0, max: Int = 1000): Arb<IntRange> =
-  Arb.int(min, max).flatMap { a ->
-    Arb.int(min, max).map { b ->
-      val first = min(a, b)
-      val last = max(a, b)
-      first..last
-    }
+fun Arb.Companion.intRange(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Arb<IntRange> =
+  Arb.bind(Arb.int(min, max), Arb.int(min, max)) { a, b ->
+    if (a < b) a..b else b..a
   }
 
 fun Arb.Companion.longRange(min: Long = Long.MIN_VALUE, max: Long = Long.MAX_VALUE): Arb<LongRange> =
