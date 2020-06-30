@@ -19,19 +19,19 @@ function escapeURL()
 function replaceOSSbyLocalRepository()
 {
     echo "Replacing OSS by local repository ($1)..."
-    perl -pe "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY/g" -i $1
+    perl -pe "s/maven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY/g" -i $1
 }
 
 function replaceLocalRepositorybyOSS()
 {
     echo "Replacing local repository by OSS ($1) ..."
-    perl -pe "s/$MAVEN_LOCAL_REPOSITORY/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/g" -i $1
+    perl -pe "s/$MAVEN_LOCAL_REPOSITORY/maven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/g" -i $1
 }
 
 function replaceOSSbyBintrayRepository()
 {
     echo "Replacing OSS by Bintray repository ($1) ..."
-    perl -pe "s/maven { url \"$(escapeURL $OSS_REPOSITORY)\" }/maven { url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" -i $1
+    perl -pe "s/maven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/maven \{ url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" -i $1
 }
 
 function removeArrowDocs()
