@@ -4,6 +4,7 @@ import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.common.utils.knownError
+import arrow.common.utils.writeSafeTo
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.jvm.JvmMetaApi
@@ -63,34 +64,42 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
    */
   @Suppress("UNCHECKED_CAST")
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-      transformList += roundEnv
-        .getElementsAnnotatedWith(annotation.java)
-        .flatMap { element ->
-          //          try {
-          val result = when (element.kind) {
-            ElementKind.INTERFACE, ElementKind.CLASS -> {
-              val typeElement = element as TypeElement
-              val encodingResult = typeElement.type()
-              encodingResult.fold({ knownError(it.toString()) }, {
-                transform(
-                  if (element.kind.isInterface)
-                    AnnotatedElement.Interface(
-                      typeElement = typeElement,
-                      type = it
-                    )
-                  else AnnotatedElement.Class(
+    transformList += roundEnv
+      .getElementsAnnotatedWith(annotation.java)
+      .flatMap { element ->
+        //          try {
+        val result = when (element.kind) {
+          ElementKind.INTERFACE, ElementKind.CLASS -> {
+            val typeElement = element as TypeElement
+            val encodingResult = typeElement.type()
+            encodingResult.fold({ knownError(it.toString()) }, {
+              transform(
+                if (element.kind.isInterface)
+                  AnnotatedElement.Interface(
                     typeElement = typeElement,
                     type = it
-                  ))
-              })
-            }
-            else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
+                  )
+                else AnnotatedElement.Class(
+                  typeElement = typeElement,
+                  type = it
+                ))
+            })
           }
-          result.map { it.build() }
+          else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
         }
-      if (roundEnv.processingOver()) {
-        val generatedDir = File(this.generatedDir!!, annotation.java.simpleName).also { it.mkdirs() }
-        transformList.forEach { it.writeTo(generatedDir) }
+        result.map { it.build() }
       }
+    if (roundEnv.processingOver()) {
+      val generatedDir = File(this.generatedDir!!, annotation.java.simpleName).also { it.mkdirs() }
+      transformList.forEach {
+        // Due to FilerException: Illegal name arrow.core.extensions.const.functor
+        if (it.packageName.contains(".const.") ||
+          it.packageName.contains(".try.")) {
+          it.writeTo(generatedDir)
+        } else {
+          it.writeSafeTo(filer)
+        }
+      }
+    }
   }
 }

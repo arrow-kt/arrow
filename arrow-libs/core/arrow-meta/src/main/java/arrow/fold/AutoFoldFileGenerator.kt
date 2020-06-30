@@ -3,19 +3,31 @@ package arrow.fold
 import arrow.common.utils.fullName
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.writeSafe
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
-import java.io.File
+import javax.annotation.processing.Filer
 
 class AutoFoldFileGenerator(
   private val annotatedList: Collection<AnnotatedFold>,
-  private val generatedDir: File
+  private val filer: Filer
 ) {
 
-  fun generate() = annotatedList.map(this::processElement)
+  fun generate(logger: (message: CharSequence) -> Unit) = annotatedList.map(this::processElement)
     .map { (element, fold) ->
-      "${foldAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt" to
+      Triple(element,
+        "${foldAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt",
         fileHeader(element.classData.`package`.escapedClassName) + fold
-    }.map { (name, fileString) -> File(generatedDir, name).writeText(fileString) }
+      )
+    }.map { (element, name, fileString) ->
+      val packageName = element.classData.`package`.escapedClassName
+      filer.writeSafe(
+        if (packageName != "`unnamed package`") packageName else "",
+        name,
+        fileString,
+        logger,
+        element.type
+      )
+    }
 
   private fun processElement(annotatedFold: AnnotatedFold): Pair<AnnotatedFold, String> =
     annotatedFold to annotatedFold.targets.let { targets ->

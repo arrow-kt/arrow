@@ -3,8 +3,9 @@ package arrow.higherkinds
 import arrow.common.Package
 import arrow.common.utils.knownError
 import arrow.common.utils.typeConstraints
+import arrow.common.utils.writeSafe
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
-import java.io.File
+import javax.annotation.processing.Filer
 import javax.lang.model.element.Name
 
 const val KindPostFix = "Of"
@@ -31,7 +32,7 @@ data class HigherKind(
 }
 
 class HigherKindsFileGenerator(
-  private val generatedDir: File,
+  private val filer: Filer,
   annotatedList: List<AnnotatedHigherKind>
 ) {
 
@@ -40,14 +41,19 @@ class HigherKindsFileGenerator(
   /**
    * Main entry point for higher kinds instance generation.
    */
-  fun generate() {
+  fun generate(logger: (message: CharSequence) -> Unit) {
     higherKinds.forEachIndexed { _, hk ->
       val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
       val source: String = elementsToGenerate.joinToString(
         prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
         separator = "\n", postfix = "\n")
-      val file = File(generatedDir, higherKindsAnnotationClass.simpleName + ".${hk.target.classElement.qualifiedName}.kt")
-      file.writeText(source)
+      filer.writeSafe(
+        if (hk.`package` != "unnamed package") hk.`package` else "",
+        hk.target.classElement.qualifiedName,
+        source,
+        logger,
+        hk.target.classElement
+      )
     }
   }
 

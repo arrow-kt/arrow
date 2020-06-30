@@ -1,13 +1,13 @@
 package arrow.fold
 
-import com.google.auto.service.AutoService
+import arrow.common.messager.log
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.asClassOrPackageDataWrapper
 import arrow.common.utils.isSealed
 import arrow.common.utils.knownError
+import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -57,8 +57,7 @@ class AutoFoldProcessor : AbstractProcessor() {
       }
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, foldAnnotationClass.simpleName).also { it.mkdirs() }
-      AutoFoldFileGenerator(annotatedList, generatedDir).generate()
+      AutoFoldFileGenerator(annotatedList, filer).generate { log(it) }
     }
   }
 }

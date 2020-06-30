@@ -1,15 +1,16 @@
 package arrow.generic
 
-import arrow.DerivingTarget.SEMIGROUP
-import arrow.DerivingTarget.MONOID
-import arrow.DerivingTarget.TUPLED
-import arrow.DerivingTarget.HLIST
 import arrow.DerivingTarget.APPLICATIVE
 import arrow.DerivingTarget.EQ
+import arrow.DerivingTarget.HLIST
+import arrow.DerivingTarget.MONOID
+import arrow.DerivingTarget.SEMIGROUP
 import arrow.DerivingTarget.SHOW
+import arrow.DerivingTarget.TUPLED
+import arrow.common.utils.writeSafe
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
-import java.io.File
+import javax.annotation.processing.Filer
 
 sealed class DerivedTypeClass(val type: String)
 object Semigroup : DerivedTypeClass("arrow.typeclasses.Semigroup")
@@ -21,32 +22,40 @@ object Hash : DerivedTypeClass("arrow.typeclasses.Hash")
 
 class ProductFileGenerator(
   private val annotatedList: Collection<AnnotatedGeneric>,
-  private val generatedDir: File
+  private val filer: Filer
 ) {
 
   private val tuple = "arrow.core.Tuple"
   private val hlist = "arrow.generic.HList"
   private val letters = ('a'..'j').toList()
 
-  fun generate() {
-    buildProduct(annotatedList)
-    // buildInstances(annotatedList)
+  fun generate(logger: (message: CharSequence) -> Unit) {
+    buildProduct(annotatedList, logger)
+//    buildInstances(annotatedList, logger)
   }
 
-  private fun buildProduct(products: Collection<AnnotatedGeneric>) =
+  private fun buildProduct(products: Collection<AnnotatedGeneric>, logger: (message: CharSequence) -> Unit) =
     products.map(this::processElement)
       .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.kt").printWriter().use { w ->
-          w.println(funString)
-        }
+        filer.writeSafe(
+          element.classData.`package`,
+          element.sourceName,
+          funString,
+          logger,
+          element.type
+        )
       }
 
-  private fun buildInstances(products: Collection<AnnotatedGeneric>) =
+  private fun buildInstances(products: Collection<AnnotatedGeneric>, logger: (message: CharSequence) -> Unit) =
     products.map { p -> processInstancesForElement(p) }
       .forEach { (element, funString) ->
-        File(generatedDir, "${productAnnotationClass.simpleName}.${element.classData.`package`}.${element.sourceName}.instances.kt").printWriter().use { w ->
-          w.println(funString)
-        }
+        filer.writeSafe(
+          element.classData.`package`,
+          element.sourceName + ".instances",
+          funString,
+          logger,
+          element.type
+        )
       }
 
   private fun processInstancesForElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """

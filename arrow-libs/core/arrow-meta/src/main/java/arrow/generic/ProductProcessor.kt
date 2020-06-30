@@ -1,20 +1,20 @@
 package arrow.generic
 
 import arrow.DerivingTarget
-import arrow.DerivingTarget.SEMIGROUP
-import arrow.DerivingTarget.MONOID
-import arrow.DerivingTarget.TUPLED
-import arrow.DerivingTarget.HLIST
 import arrow.DerivingTarget.APPLICATIVE
 import arrow.DerivingTarget.EQ
+import arrow.DerivingTarget.HLIST
+import arrow.DerivingTarget.MONOID
+import arrow.DerivingTarget.SEMIGROUP
 import arrow.DerivingTarget.SHOW
+import arrow.DerivingTarget.TUPLED
+import arrow.common.messager.log
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.knownError
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -36,8 +36,7 @@ class ProductProcessor : AbstractProcessor() {
       .map(this::evalAnnotatedProductElement)
 
     if (roundEnv.processingOver()) {
-      val generatedDir = File(this.generatedDir!!, "").also { it.mkdirs() }
-      ProductFileGenerator(annotatedProduct, generatedDir).generate()
+      ProductFileGenerator(annotatedProduct, filer).generate { log(it) }
     }
   }
 

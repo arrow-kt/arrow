@@ -1,0 +1,6 @@
+arrow.fold.AutoFoldProcessor,isolating
+arrow.generic.CoproductProcessor,isolating
+arrow.core.extensions.ExtensionProcessor,isolating
+arrow.higherkinds.HigherKindsProcessor,isolating
+arrow.optics.OpticsProcessor,isolating
+arrow.generic.ProductProcessor,isolating

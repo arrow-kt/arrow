@@ -1,9 +1,11 @@
 package arrow.optics
 
+import arrow.common.messager.log
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.isSealed
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.common.utils.writeSafe
 import arrow.optics.OpticsProcessor.ClassType.DATA_CLASS
 import arrow.optics.OpticsProcessor.ClassType.OTHER
 import arrow.optics.OpticsProcessor.ClassType.SEALED_CLASS
@@ -16,7 +18,6 @@ import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import java.io.File
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -65,9 +66,14 @@ class OpticsProcessor : AbstractProcessor() {
                   content = "${acc.content}\n${snippet.content}"
                 )
               }
-            }.forEach {
-              val generatedDir = File("$generatedDir/${it.`package`.removeBackticks().replace(".", "/")}").also { it.mkdirs() }
-              File(generatedDir, "${it.name.removeBackticks()}\$\$optics.kt").writeText(it.asFileText())
+            }.forEach { snippet ->
+              filer.writeSafe(
+                snippet.`package`.removeBackticks(),
+                "optics",
+                snippet.asFileText(),
+                { log(it) },
+                ele.type
+              )
             }
         }
     }
