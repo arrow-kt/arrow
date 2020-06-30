@@ -8,6 +8,7 @@ import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -87,7 +88,7 @@ suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
         timeOut.fold({
           if (isActive.compareAndSet(true, false)) {
             faConn.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) {
-              it.fold({ uCont.resume(null) }, uCont::resumeWithException)
+              it.fold({ uCont.intercepted().resume(null) }, uCont::resumeWithException)
             })
           }
         }, uCont::resumeWithException)

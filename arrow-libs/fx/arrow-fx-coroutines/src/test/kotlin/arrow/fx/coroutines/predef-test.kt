@@ -23,6 +23,7 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -198,4 +199,13 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable =
     fail("Expected an exception but found: $a")
   } catch (e: Throwable) {
     e
+  }
+
+internal suspend fun CoroutineContext.shift(): Unit =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    suspend { this }.startCoroutine(Continuation(this) {
+      cont.resume(Unit)
+    })
+
+    COROUTINE_SUSPENDED
   }

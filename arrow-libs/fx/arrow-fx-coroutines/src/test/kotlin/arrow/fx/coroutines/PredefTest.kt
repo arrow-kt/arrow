@@ -4,7 +4,7 @@ import arrow.core.Either
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
+import io.kotest.property.arbitrary.string
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
@@ -40,6 +40,24 @@ class PredefTest : ArrowFxSpec(spec = {
       Either.catch {
         promise.join()
       } shouldBe ea
+    }
+  }
+
+  "shift" {
+    checkAll(Arb.string(), Arb.string()) { a, b ->
+      val t0 = threadName.invoke()
+
+      singleThreadContext(a)
+        .zip(singleThreadContext(b))
+        .use { (ui, io) ->
+          t0 shouldBe threadName.invoke()
+
+          ui.shift()
+          threadName.invoke() shouldBe a
+
+          io.shift()
+          threadName.invoke() shouldBe b
+        }
     }
   }
 })

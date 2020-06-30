@@ -7,11 +7,14 @@ import arrow.fx.coroutines.stream.map
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
+import io.kotest.property.Shrinker
+import io.kotest.property.arbitrary.arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.choice
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
+import kotlin.math.abs
 
 /**
  * A Spec that allows you to specify depth for all `Arb` used inside the spec.
@@ -69,6 +72,24 @@ abstract class ArrowFxSpec(
   private val iterations: Int = 100,
   spec: ArrowFxSpec.() -> Unit = {}
 ) : FreeSpec() {
+
+  fun Arb.Companion.long(range: LongRange = Long.MIN_VALUE..Long.MAX_VALUE): Arb<Long> {
+    val edgecases = listOf(0L, 1, -1, Long.MAX_VALUE, Long.MIN_VALUE).filter { it in range }
+    return arb(LongShrinker(range), edgecases) { it.random.nextLong(range.first, range.last) }
+  }
+
+  class LongShrinker(private val range: LongRange) : Shrinker<Long> {
+    override fun shrink(value: Long): List<Long> =
+      when (value) {
+        0L -> emptyList()
+        1L, -1L -> listOf(0)
+        else -> {
+          val a = listOf(abs(value), value / 3, value / 2, value * 2 / 3)
+          val b = (1..5L).map { value - it }.reversed().filter { it > 0 }
+          (a + b).distinct().filter { it in range && it != value }
+        }
+      }
+  }
 
   init {
     spec()
