@@ -36,3 +36,17 @@ jobs:
     #  run: |
     #    export PULL_REQUEST_NUMBER=$(echo $GITHUB_REF | cut -d/ -f3)
     #    ./gradlew :arrow-benchmarks-fx:compareBenchmarksCI
+    - name: Prepare test reports
+      if: ${{ always() }}
+      run: |
+        mkdir test-reports
+        for report in `ls -d ./**/build/reports/tests/test`; do
+          arrow_module=$(echo $report | cut -d/ -f2)
+          cp -r $report test-reports/$arrow_module
+        done
+    - name: Make test reports available to download
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-reports
+        path: test-reports
