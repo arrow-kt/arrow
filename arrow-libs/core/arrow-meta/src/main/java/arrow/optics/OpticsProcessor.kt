@@ -69,7 +69,7 @@ class OpticsProcessor : AbstractProcessor() {
             }.forEach { snippet ->
               filer.writeSafe(
                 snippet.`package`.removeBackticks(),
-                "optics",
+                snippet.name,
                 snippet.asFileText(),
                 { log(it) },
                 ele.type
