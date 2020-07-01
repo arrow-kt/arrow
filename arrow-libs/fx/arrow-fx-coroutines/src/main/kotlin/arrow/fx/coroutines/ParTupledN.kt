@@ -5,7 +5,9 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.intercepted
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * Parallel maps [fa], [fb] in parallel on [ComputationPool].
@@ -100,8 +102,9 @@ suspend fun <A, B> parTupledN(
   fa: suspend () -> A,
   fb: suspend () -> B
 ): Pair<A, B> =
-  suspendCoroutine { cont ->
+  suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
+    val cont = cont.intercepted()
     val cb = cont::resumeWith
 
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
@@ -156,6 +159,8 @@ suspend fun <A, B> parTupledN(
         sendException(connA, e)
       })
     })
+
+    COROUTINE_SUSPENDED
   }
 
 /**
@@ -173,8 +178,9 @@ suspend fun <A, B, C> parTupledN(
   fb: suspend () -> B,
   fc: suspend () -> C
 ): Triple<A, B, C> =
-  suspendCoroutine { cont ->
+  suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
+    val cont = cont.intercepted()
     val cb = cont::resumeWith
 
     val state: AtomicRefW<Triple<A?, B?, C?>?> = AtomicRefW(null)
@@ -252,4 +258,6 @@ suspend fun <A, B, C> parTupledN(
         sendException(connA, connC, e)
       })
     })
+
+    COROUTINE_SUSPENDED
   }

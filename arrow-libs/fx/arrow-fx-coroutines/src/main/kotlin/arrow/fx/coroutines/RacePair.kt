@@ -5,9 +5,14 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.intercepted
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 typealias RacePair<A, B> = Either<Pair<A, Fiber<B>>, Pair<Fiber<A>, B>>
+
+fun <A, B, C> Either<Pair<A, Fiber<B>>, Pair<Fiber<A>, B>>.fold(ifLeft: (A, Fiber<B>) -> C, ifRight: (Fiber<A>, B) -> C): C =
+  fold({ (a, b) -> ifLeft(a, b) }, { (a, b) -> ifRight(a, b) })
 
 suspend fun <A, B> racePair(fa: suspend () -> A, fb: suspend () -> B): RacePair<A, B> =
   racePair(ComputationPool, fa, fb)
@@ -44,57 +49,61 @@ suspend fun <A, B> racePair(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B
-): RacePair<A, B> = suspendCoroutine { cont ->
-  val conn = cont.context.connection()
-  val active = AtomicBooleanW(true)
+): RacePair<A, B> =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    val conn = cont.context.connection()
+    val cont = cont.intercepted()
+    val active = AtomicBooleanW(true)
 
-  // Cancellable connection for the left value
-  val connA = SuspendConnection()
-  val promiseA = UnsafePromise<A>()
+    // Cancellable connection for the left value
+    val connA = SuspendConnection()
+    val promiseA = UnsafePromise<A>()
 
-  // Cancellable connection for the right value
-  val connB = SuspendConnection()
-  val promiseB = UnsafePromise<B>()
+    // Cancellable connection for the right value
+    val connB = SuspendConnection()
+    val promiseB = UnsafePromise<B>()
 
-  conn.pushPair(connA, connB)
+    conn.pushPair(connA, connB)
 
-  fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
-    result.fold({ a ->
-      if (active.getAndSet(false)) {
-        conn.pop()
-        cont.resumeWith(Result.success(Either.Left(Pair(a, Fiber(promiseB, connB)))))
-      } else {
-        promiseA.complete(Result.success(a))
-      }
-    }, { error ->
-      if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-        connB.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+    fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
+      result.fold({ a ->
+        if (active.getAndSet(false)) {
           conn.pop()
-          cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
-        })
-      } else {
-        promiseA.complete(Result.failure(error))
-      }
+          cont.resumeWith(Result.success(Either.Left(Pair(a, Fiber(promiseB, connB)))))
+        } else {
+          promiseA.complete(Result.success(a))
+        }
+      }, { error ->
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+          connB.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+            conn.pop()
+            cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
+          })
+        } else {
+          promiseA.complete(Result.failure(error))
+        }
+      })
     })
-  })
 
-  fb.startCoroutineCancellable(CancellableContinuation(ctx, connB) { result ->
-    result.fold({ b ->
-      if (active.getAndSet(false)) {
-        conn.pop()
-        cont.resumeWith(Result.success(Either.Right(Pair(Fiber(promiseA, connA), b))))
-      } else {
-        promiseB.complete(Result.success(b))
-      }
-    }, { error ->
-      if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-        connA.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+    fb.startCoroutineCancellable(CancellableContinuation(ctx, connB) { result ->
+      result.fold({ b ->
+        if (active.getAndSet(false)) {
           conn.pop()
-          cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
-        })
-      } else {
-        promiseB.complete(Result.failure(error))
-      }
+          cont.resumeWith(Result.success(Either.Right(Pair(Fiber(promiseA, connA), b))))
+        } else {
+          promiseB.complete(Result.success(b))
+        }
+      }, { error ->
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+          connA.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+            conn.pop()
+            cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
+          })
+        } else {
+          promiseB.complete(Result.failure(error))
+        }
+      })
     })
-  })
-}
+
+    COROUTINE_SUSPENDED
+  }

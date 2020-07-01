@@ -5,7 +5,9 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.intercepted
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * Races the participants [fa], [fb] in parallel on the [ComputationPool].
@@ -60,8 +62,10 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
       })
     } else Unit
 
-  return suspendCoroutine { cont ->
+  return suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
+    val cont = cont.intercepted()
+
     val active = AtomicBooleanW(true)
     val connA = SuspendConnection()
     val connB = SuspendConnection()
@@ -82,5 +86,7 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
         onError(active, cont::resumeWith, conn, connA, it)
       })
     })
+
+    COROUTINE_SUSPENDED
   }
 }

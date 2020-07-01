@@ -4,7 +4,9 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.intercepted
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 sealed class Race3<out A, out B, out C> {
   data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
@@ -103,8 +105,9 @@ suspend fun <A, B, C> raceN(
     })
   } else Unit
 
-  return suspendCoroutine { cont ->
+  return suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
+    val cont = cont.intercepted()
 
     val active = AtomicBooleanW(true)
     val connA = SuspendConnection()
@@ -136,5 +139,7 @@ suspend fun <A, B, C> raceN(
         onError(active, cont::resumeWith, conn, connA, connB, it)
       })
     })
+
+    COROUTINE_SUSPENDED
   }
 }

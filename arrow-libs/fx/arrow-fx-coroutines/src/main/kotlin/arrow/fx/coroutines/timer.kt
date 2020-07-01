@@ -69,8 +69,8 @@ suspend fun sleep(duration: Duration): Unit =
  **/
 suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
   if (duration.amount <= 0L) null
-  else suspendCoroutineUninterceptedOrReturn sc@{ uCont: Continuation<A?> ->
-    val conn = uCont.context.connection()
+  else suspendCoroutineUninterceptedOrReturn { cont ->
+    val conn = cont.context.connection()
     val isActive = AtomicRefW(true) // keep track if already resumed
 
     // Create connections for fa and timer
@@ -88,15 +88,15 @@ suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
         timeOut.fold({
           if (isActive.compareAndSet(true, false)) {
             faConn.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) {
-              it.fold({ uCont.intercepted().resume(null) }, uCont::resumeWithException)
+              it.fold({ cont.intercepted().resume(null) }, cont.intercepted()::resumeWithException)
             })
           }
-        }, uCont::resumeWithException)
+        }, cont.intercepted()::resumeWithException)
       })
 
     // Start unintercepted with timeOut connection attached to parents CoroutineContext
-    val x = fa.startCoroutineUninterceptedOrReturn(Continuation(uCont.context + faConn) {
-      if (isActive.compareAndSet(true, false)) uCont.resumeWith(it)
+    val x = fa.startCoroutineUninterceptedOrReturn(Continuation(cont.context + faConn) {
+      if (isActive.compareAndSet(true, false)) cont.resumeWith(it)
     })
 
     if (x != COROUTINE_SUSPENDED && isActive.compareAndSet(true, false)) x

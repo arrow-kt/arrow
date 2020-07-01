@@ -95,6 +95,9 @@ abstract class ArrowFxSpec(
     spec()
   }
 
+  suspend fun checkAll(property: suspend PropertyContext.() -> Unit): PropertyContext =
+    checkAll(iterations, Arb.unit()) { property() }
+
   suspend fun <A> checkAll(
     genA: Arb<A>,
     property: suspend PropertyContext.(A) -> Unit
