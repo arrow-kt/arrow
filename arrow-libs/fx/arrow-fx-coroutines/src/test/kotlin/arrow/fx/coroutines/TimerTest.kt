@@ -154,8 +154,7 @@ class TimerTest : ArrowFxSpec(spec = {
   "timeout wins suspend" {
     checkAll(Arb.int()) { i ->
       timeOutOrNull(100.milliseconds) {
-        sleep(1.milliseconds)
-        i
+        i.suspend()
       } shouldBe i
     }
   }

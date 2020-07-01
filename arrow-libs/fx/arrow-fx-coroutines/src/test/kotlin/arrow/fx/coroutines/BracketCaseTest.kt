@@ -10,7 +10,7 @@ import io.kotest.property.checkAll
 class BracketCaseTest : ArrowFxSpec(spec = {
 
   "Uncancellable back pressures timeoutOrNull" {
-    checkAll(Arb.long(20, 40), Arb.long(90, 100)) { a, b ->
+    checkAll(Arb.long(10, 100), Arb.long(300, 400)) { a, b ->
       val start = System.currentTimeMillis()
 
       val n = timeOutOrNull(a.milliseconds) {
