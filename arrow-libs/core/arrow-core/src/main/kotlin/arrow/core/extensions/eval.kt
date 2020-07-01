@@ -105,3 +105,8 @@ interface EvalBimonad : Bimonad<ForEval> {
   override fun <A> EvalOf<A>.extract(): A =
     fix().extract()
 }
+
+@Deprecated("Fx blocks are now named based on each datatype, please use `eval { }` instead",
+  replaceWith = ReplaceWith("eval(c)"))
+fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
+  defer { Eval.monad().fx.monad(c).fix() }

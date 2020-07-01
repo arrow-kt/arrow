@@ -31,6 +31,7 @@ interface Monad<F> : Selective<F> {
    * A coroutine is initiated and suspended inside [MonadThrowContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
    */
+  @Deprecated("Fx will be moved to each datatype as a DSL constructor.")
   val fx: MonadFx<F>
     get() = object : MonadFx<F> {
       override val M: Monad<F> = this@Monad
