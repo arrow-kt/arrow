@@ -787,7 +787,6 @@ class StreamTest : StreamSpec(spec = {
           .compile()
           .toList()
           .let { result ->
-            println("$result")
             result shouldBe listOfNotNull(result.firstOrNull()) + result.drop(1).filter { it != 0 }
           }
       }

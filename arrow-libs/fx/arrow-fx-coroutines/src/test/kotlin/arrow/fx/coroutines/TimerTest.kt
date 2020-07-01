@@ -163,7 +163,7 @@ class TimerTest : ArrowFxSpec(spec = {
     checkAll(Arb.int()) { i ->
       val promise = Promise<Int>()
 
-      timeOutOrNull(1.milliseconds) {
+      timeOutOrNull(50.milliseconds) {
         cancellable<Nothing> {
           CancelToken { promise.complete(i) }
         }
