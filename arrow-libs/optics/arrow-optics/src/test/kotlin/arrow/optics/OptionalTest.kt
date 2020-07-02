@@ -5,11 +5,10 @@ import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
-import arrow.core.Try
-import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.list.foldable.nonEmpty
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.getOrElse
 import arrow.core.identity
@@ -29,8 +28,8 @@ import arrow.optics.mtl.update
 import arrow.optics.mtl.updateOld
 import arrow.optics.mtl.update_
 import arrow.core.test.UnitSpec
-import arrow.core.test.generators.`try`
 import arrow.core.test.generators.functionAToB
+import arrow.core.test.generators.option
 import arrow.core.test.generators.tuple2
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.SetterLaws
@@ -192,9 +191,9 @@ class OptionalTest : UnitSpec() {
     }
 
     "LiftF should be consistent with modifyF" {
-      forAll(Gen.list(Gen.int()), Gen.`try`(Gen.int())) { list, tryInt ->
+      forAll(Gen.list(Gen.int()), Gen.option(Gen.int())) { list, tryInt ->
         val f = { _: Int -> tryInt }
-        ListK.head<Int>().liftF(Try.applicative(), f)(list) == ListK.head<Int>().modifyF(Try.applicative(), list, f)
+        ListK.head<Int>().liftF(Option.applicative(), f)(list) == ListK.head<Int>().modifyF(Option.applicative(), list, f)
       }
     }
 
@@ -230,33 +229,33 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    val successInt = Try.success<Int>().asOptional()
+    val successInt = Option.some<Int>().asOptional()
 
     "Extract should extract the focus from the state" {
-      forAll(Gen.`try`(Gen.int())) { tryInt ->
+      forAll(Gen.option(Gen.int())) { tryInt ->
         successInt.extract().run(tryInt) ==
-          State { x: Try<Int> ->
+          State { x: Option<Int> ->
             x toT successInt.getOption(x)
           }.run(tryInt)
       }
     }
 
     "toState should be an alias to extract" {
-      forAll(Gen.`try`(Gen.int())) { x ->
+      forAll(Gen.option(Gen.int())) { x ->
         successInt.toState().run(x) == successInt.extract().run(x)
       }
     }
 
     "extractMap with f should be same as extract and map" {
-      forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.extractMap(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
       }
     }
 
     "update f should be same modify f within State and returning new state" {
-      forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.update(f).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.modify(xx, f)
               .let { it toT successInt.getOption(it) }
           }.run(x)
@@ -264,27 +263,27 @@ class OptionalTest : UnitSpec() {
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
-      forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.updateOld(f).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.modify(xx, f) toT successInt.getOption(xx)
           }.run(x)
       }
     }
 
     "update_ f should be as modify f within State and returning Unit" {
-      forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
+      forAll(Gen.option(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
         successInt.update_(f).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.modify(xx, f) toT Unit
           }.run(x)
       }
     }
 
     "assign a should be same set a within State and returning new value" {
-      forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
+      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assign(i).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.set(xx, i)
               .let { it toT successInt.getOption(it) }
           }.run(x)
@@ -292,18 +291,18 @@ class OptionalTest : UnitSpec() {
     }
 
     "assignOld f should be same as modify f within State and returning old state" {
-      forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
+      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assignOld(i).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.set(xx, i) toT successInt.getOption(xx)
           }.run(x)
       }
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
-      forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
+      forAll(Gen.option(Gen.int()), Gen.int()) { x, i ->
         successInt.assign_(i).run(x) ==
-          State { xx: Try<Int> ->
+          State { xx: Option<Int> ->
             successInt.set(xx, i) toT Unit
           }.run(x)
       }

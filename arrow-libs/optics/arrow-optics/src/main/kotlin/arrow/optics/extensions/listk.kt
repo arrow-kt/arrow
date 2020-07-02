@@ -3,7 +3,6 @@ package arrow.optics.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
-import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.left
@@ -91,7 +90,7 @@ interface ListKSnoc<A> : Snoc<ListK<A>, A> {
 
   override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
     override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =
-      Option.applicative().mapN(Try { s.dropLast(1).k() }.toOption(), s.lastOrNull().toOption(), ::identity)
+      Option.applicative().mapN(Option.just(s.dropLast(1).k()), s.lastOrNull().toOption(), ::identity)
         .fix()
         .toEither { s }
 
