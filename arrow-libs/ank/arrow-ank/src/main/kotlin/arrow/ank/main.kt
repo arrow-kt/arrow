@@ -4,7 +4,7 @@ package arrow.ank
 
 import arrow.fx.IO
 import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.unsafe
 import java.nio.file.Paths
 
@@ -13,7 +13,7 @@ fun main(vararg args: String) {
     runBlocking {
       when {
         args.size > 1 -> {
-          IO.concurrent<Nothing>().ank(
+          IO.concurrent().ank(
             Paths.get(args[0]),
             Paths.get(args[1]),
             args.drop(2),
