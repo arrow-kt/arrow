@@ -61,7 +61,7 @@ val KotlinReservedKeywords = setOf(
  * The current implementation includes support for [TypeClassInstance] and all the subtrees under the
  * [Tree] hierarchy as well as the notion of emulated higher kinded types via `arrow.Kind`.
  * Among other things one can defunctionalize a Kinded value representation into it's concrete counter part:
- * `Kind<ForIO, A> -> IO<Nothing, A>`
+ * `Kind<ForIO, A> -> IO<A>`
  */
 interface MetaApi {
 
@@ -84,7 +84,7 @@ interface MetaApi {
   /**
    * Determine if this [TypeName.ParameterizedType] is in kinded position.
    * ex: `arrow.Kind<ForIO, A>` => true
-   * ex: `IO<Nothing, A>` => false
+   * ex: `IO<A>` => false
    *
    * The current definition of kinded for Arrow Meta is that a parameterized kinded type is a type that:
    * 1. Extends from arrow.Kind.
@@ -95,7 +95,7 @@ interface MetaApi {
 
   /**
    * Performs a type application transforming a type in kinded position into it's concrete counterpart:
-   * ex: `Kind<ForIO, A> -> IO<Nothing, A>`
+   * ex: `Kind<ForIO, A> -> IO<A>`
    */
   val TypeName.downKind: TypeName
   val TypeName.TypeVariable.downKind: TypeName
@@ -183,7 +183,7 @@ interface MetaApi {
   /**
    * Performs a type application transforming all parameter types in this function
    * in kinded position into it's concrete counterpart:
-   * ex: `(fa: Kind<ForIO, A>) -> (fa: IO<Nothing, A>)`
+   * ex: `(fa: Kind<ForIO, A>) -> (fa: IO<A>)`
    */
   fun Func.downKindParameters(): Func
 
@@ -197,7 +197,7 @@ interface MetaApi {
   /**
    * Performs a type application transforming the return type in this function
    * in kinded position into it's concrete counterpart:
-   * ex: `someFun(): Kind<ForIO, A>` -> `someFun(): IO<Nothing, A>`
+   * ex: `someFun(): Kind<ForIO, A>` -> `someFun(): IO<A>`
    */
   fun Func.downKindReturnType(): Func
 
@@ -219,7 +219,7 @@ interface MetaApi {
   /**
    * Performs a type application transforming the type of this parameter
    * in kinded position into it's concrete counterpart:
-   * ex: `arg: Kind<ForIO, A>` -> `arg: IO<Nothing, A>`
+   * ex: `arg: Kind<ForIO, A>` -> `arg: IO<A>`
    */
   fun Parameter.downKind(): Parameter
 

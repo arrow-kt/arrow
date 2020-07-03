@@ -39,7 +39,7 @@ eitherResult
 import arrow.fx.*
 import arrow.fx.extensions.io.applicativeError.*
 
-val ioResult: IO<Nothing, Int> =
+val ioResult: IO<Int> =
   RuntimeException("BOOM!").raiseError()
 
 ioResult.attempt().unsafeRunSync()
