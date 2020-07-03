@@ -8,6 +8,8 @@ import arrow.core.Tuple3
 import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
 import arrow.core.toT
+import arrow.fx.coroutines.IOPool
+import arrow.fx.coroutines.evalOn
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -93,7 +95,7 @@ val interpreter: AnkOps = object : AnkOps {
     }
 
   override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
-    Files.walk(this)
+    evalOn(IOPool) { Files.walk(this) }
       .filter { Files.isDirectory(it).not() }
       .filter { path ->
         SupportedMarkdownExtensions.fold(false) { c, ext ->
