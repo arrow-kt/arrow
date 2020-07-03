@@ -3,7 +3,6 @@ package arrow.ank
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.extensions.sequence.foldable.foldLeft
@@ -164,7 +163,7 @@ val interpreter: AnkOps = object : AnkOps {
     getEngineCache(snippets.b, compilerArgs).let { engineCache ->
       // run each snipped and handle its result
       snippets.b.mapIndexed { i, snip ->
-        Try {
+        val result = try {
           if (snip.isPlaygroundExtension) ""
           else engineCache.getOrElse(snip.lang) {
             throw CompilationException(
@@ -174,47 +173,47 @@ val interpreter: AnkOps = object : AnkOps {
               msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
             )
           }.eval(snip.code)
-        }.fold<Snippet>({
+        } catch (e: Exception) {
           // raise error and print to console
           if (snip.isFail) {
             val sw = StringWriter()
             val pw = PrintWriter(sw)
-            it.printStackTrace(pw)
-            snip.copy(result = sw.toString().some())
+            e.printStackTrace(pw)
+            return@mapIndexed snip.copy(result = sw.toString().some())
           } else {
             println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
-            throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+            throw CompilationException(snippets.a, snip, e, msg = "\n" + """
                     | File located at: ${snippets.a}
                     |
                     |```
                     |${snip.code}
                     |```
-                    |${colored(ANSI_RED, it.localizedMessage)}
+                    |${colored(ANSI_RED, e.localizedMessage)}
                     """.trimMargin())
           }
-        }, { result ->
-          // handle results, ignore silent snippets
-          if (snip.isSilent) snip
-          else {
-            val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
-              when {
-                // replace entire snippet with result
-                snip.isReplace -> Some("$it")
-                snip.isPlaygroundExtension -> Some("$it")
-                // write result to a new file
-                snip.isOutFile -> {
-                  val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
-                  val dir = snippets.a.parent
-                  Files.write(dir.resolve(fileName), result.toString().toByteArray())
-                  Some("")
-                }
-                // simply append result
-                else -> Some("// ${it.toString().replace("\n", "\n// ")}")
+        }
+
+        // handle results, ignore silent snippets
+        if (snip.isSilent) snip
+        else {
+          val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
+            when {
+              // replace entire snippet with result
+              snip.isReplace -> Some("$it")
+              snip.isPlaygroundExtension -> Some("$it")
+              // write result to a new file
+              snip.isOutFile -> {
+                val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
+                val dir = snippets.a.parent
+                Files.write(dir.resolve(fileName), result.toString().toByteArray())
+                Some("")
               }
-            })
-            snip.copy(result = resultString)
-          }
-        })
+              // simply append result
+              else -> Some("// ${it.toString().replace("\n", "\n// ")}")
+            }
+          })
+          snip.copy(result = resultString)
+        }
       }
     }
 
