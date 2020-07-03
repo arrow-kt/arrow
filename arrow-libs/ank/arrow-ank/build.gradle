@@ -11,7 +11,7 @@ apply from: "$DOC_CONF"
 apply from: "$PUBLISH_CONF"
 
 dependencies {
-    compile "io.arrow-kt:arrow-fx:0.10.5"
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"
