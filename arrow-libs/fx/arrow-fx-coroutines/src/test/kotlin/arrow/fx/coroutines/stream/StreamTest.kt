@@ -31,13 +31,12 @@ import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
-import io.kotest.property.Sample
-import io.kotest.property.arbitrary.arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.set
 import java.lang.RuntimeException
@@ -315,7 +314,7 @@ class StreamTest : StreamSpec(spec = {
 
   "drop" - {
     "identity" {
-      checkAll(Arb.stream(Arb.int().nullable()), Arb.int()) { s, n ->
+      checkAll(Arb.stream(Arb.int().orNull()), Arb.int()) { s, n ->
         s
           .drop(n)
           .compile()
@@ -1041,26 +1040,3 @@ class StreamTest : StreamSpec(spec = {
     }
   }
 })
-
-fun <A> Arb.Companion.`null`(): Arb<A?> =
-  Arb.constant(null)
-
-fun <A> Arb<A>.nullable(): Arb<A?> {
-  val arbs = listOf(this.map { it as A? }, Arb.`null`())
-  return arb(arbs.flatMap(Arb<A?>::edgecases)) { rs ->
-    val iters = arbs.map { it.values(rs).iterator() }
-    fun next(): Sample<A?>? {
-      val iter = iters.shuffled(rs.random).first()
-      return if (iter.hasNext()) iter.next() else null
-    }
-
-    sequence {
-      while (true) {
-        var next: Sample<A?>? = null
-        while (next == null)
-          next = next()
-        yield(next.value)
-      }
-    }
-  }
-}

@@ -8,9 +8,9 @@ import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
+import io.kotest.property.arbitrary.orNull
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
 import kotlin.math.max
 
 class ChunkTest : ArrowFxSpec() {
@@ -21,7 +21,7 @@ class ChunkTest : ArrowFxSpec() {
     testChunk("DoubleArray", Arb.doubleChunk())
     testChunk("LongArray", Arb.longChunk())
     testChunk("BytesArray", Arb.byteChunk())
-    testChunk("Boxed", Arb.boxedChunk(Arb.int()))
+    testChunk("Boxed", Arb.boxedChunk(Arb.int().orNull()))
     testChunk("Float", Arb.floatChunk())
     testChunk("Short", Arb.shortChunk())
 
@@ -78,21 +78,21 @@ class ChunkTest : ArrowFxSpec() {
     }
 
     "Chunk - drop(n)" {
-      checkAll(Arb.chunk(Arb.int().nullable()), Arb.int()) { ch, n ->
+      checkAll(Arb.chunk(Arb.int().orNull()), Arb.int()) { ch, n ->
         ch.drop(n)
           .toList() shouldBe ch.toList().drop(max(n, 0))
       }
     }
 
     "Chunk - take(n)" {
-      checkAll(Arb.chunk(Arb.int().nullable()), Arb.int()) { ch, n ->
+      checkAll(Arb.chunk(Arb.int().orNull()), Arb.int()) { ch, n ->
         ch.take(n)
           .toList() shouldBe ch.toList().take(max(n, 0))
       }
     }
 
     "Chunk - takeLast(n)" {
-      checkAll(Arb.chunk(Arb.int().nullable()), Arb.int()) { ch, n ->
+      checkAll(Arb.chunk(Arb.int().orNull()), Arb.int()) { ch, n ->
         ch.takeLast(n)
           .toList() shouldBe ch.toList().takeLast(max(n, 0))
       }

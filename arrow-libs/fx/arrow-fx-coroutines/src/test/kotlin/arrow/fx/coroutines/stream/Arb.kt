@@ -2,14 +2,14 @@ package arrow.fx.coroutines.stream
 
 import arrow.fx.coroutines.prependTo
 import io.kotest.property.Arb
-import io.kotest.property.Gen
+import io.kotest.property.RandomSource
 import io.kotest.property.Sample
 import io.kotest.property.Shrinker
 import io.kotest.property.arbitrary.arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.byte
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.create
+import io.kotest.property.arbitrary.choose
 import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.float
 import io.kotest.property.arbitrary.int
@@ -43,16 +43,21 @@ inline fun <reified A> Arb.Companion.array(
   }
 }
 
-fun <A, B> arrayChunkGenerator(
-  gen: Gen<A>,
+@PublishedApi
+internal fun <A, B> arrayChunkGenerator(
+  arb: Arb<A>,
+  shrinker: Shrinker<B>,
   range: IntRange = 0..10,
   build: (values: List<A>, offset: Int, length: Int) -> B
 ): Arb<B> {
   check(!range.isEmpty())
   check(range.first >= 0)
 
-  return arb {
-    val genIter = gen.generate(it).iterator()
+  val edgecases =
+    arb.edgecases().map { a -> build(listOf(a), 0, 1) } + build(emptyList(), 0, 0)
+
+  return arb(edgecases, shrinker) {
+    val genIter = arb.generate(it).iterator()
 
     sequence {
       while (true) {
@@ -86,109 +91,139 @@ class ChunkShrinker<A> : Shrinker<Chunk<A>> {
 }
 
 inline fun <reified A> Arb.Companion.chunk(arb: Arb<A>): Arb<Chunk<A>> =
-  Arb.frequency(
-    1 to Arb.create { Chunk.empty<A>() },
-    5 to arb.map { Chunk.just(it) },
-    10 to Arb.list(arb, 0..20).map { Chunk.iterable(it) },
-    10 to Arb.set(arb, 0..20).map { Chunk.iterable(it) },
-    10 to Arb.array(arb, 0..20).map { Chunk.array(it) },
-    10 to Arb.boxedChunk(arb)
-  )
+  object : Arb<Chunk<A>>() {
+    override fun edgecases(): List<Chunk<A>> =
+      listOf(Chunk.empty<A>()) + arb.edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<A>>> =
+      Arb.choose(
+        5 to arb.map { Chunk.just(it) },
+        10 to Arb.list(arb, 0..20).map { Chunk.iterable(it) },
+        10 to Arb.set(arb, 0..20).map { Chunk.iterable(it) },
+        10 to Arb.array(arb, 0..20).map { Chunk.array(it) },
+        10 to Arb.boxedChunk(arb)
+      ).values(rs)
+  }
 
 inline fun <reified A> Arb.Companion.boxedChunk(arb: Arb<A>): Arb<Chunk<A>> =
-  arrayChunkGenerator(arb) { values, offset, length ->
-    Chunk.boxed(values.toTypedArray(), offset, length)
+  object : Arb<Chunk<A>>() {
+    override fun edgecases(): List<Chunk<A>> =
+      listOf(Chunk.empty<A>()) + arb.edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<A>>> =
+      arrayChunkGenerator(arb, ChunkShrinker()) { values, offset, length ->
+        Chunk.boxed(values.toTypedArray(), offset, length)
+      }.values(rs)
   }
 
 fun Arb.Companion.booleanChunk(): Arb<Chunk<Boolean>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.bool()) { values, offset, length ->
-      Chunk.booleans(values.toBooleanArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.bool()) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+  object : Arb<Chunk<Boolean>>() {
+    override fun edgecases(): List<Chunk<Boolean>> =
+      listOf(Chunk.empty<Boolean>()) + Arb.bool().edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Boolean>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.bool(), ChunkShrinker()) { values, offset, length ->
+          Chunk.booleans(values.toBooleanArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.bool(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
 
 fun Arb.Companion.byteChunk(): Arb<Chunk<Byte>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.byte()) { values, offset, length ->
-      Chunk.bytes(values.toByteArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.byte()) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+  object : Arb<Chunk<Byte>>() {
+    override fun edgecases(): List<Chunk<Byte>> =
+      listOf(Chunk.empty<Byte>()) + Arb.byte().edgecases().map { Chunk(it) }
 
-fun Arb.Companion.intChunk(range: IntRange = 0..100): Arb<Chunk<Int>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.int(), range) { values, offset, length ->
-      Chunk.ints(values.toIntArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.int(), range) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Byte>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.byte(), ChunkShrinker()) { values, offset, length ->
+          Chunk.bytes(values.toByteArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.byte(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
+
+fun Arb.Companion.intChunk(): Arb<Chunk<Int>> =
+  object : Arb<Chunk<Int>>() {
+    override fun edgecases(): List<Chunk<Int>> =
+      listOf(Chunk.empty<Int>()) + Arb.int().edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Int>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.int(), ChunkShrinker()) { values, offset, length ->
+          Chunk.ints(values.toIntArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.int(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
 
 fun Arb.Companion.longChunk(): Arb<Chunk<Long>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.long()) { values, offset, length ->
-      Chunk.longs(values.toLongArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.long()) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+  object : Arb<Chunk<Long>>() {
+    override fun edgecases(): List<Chunk<Long>> =
+      listOf(Chunk.empty<Long>()) + Arb.long().edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Long>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.long(), ChunkShrinker()) { values, offset, length ->
+          Chunk.longs(values.toLongArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.long(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
 
 fun Arb.Companion.doubleChunk(): Arb<Chunk<Double>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.double()) { values, offset, length ->
-      Chunk.doubles(values.toDoubleArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.double()) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+  object : Arb<Chunk<Double>>() {
+    override fun edgecases(): List<Chunk<Double>> =
+      listOf(Chunk.empty<Double>()) + Arb.double().edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Double>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.double(), ChunkShrinker()) { values, offset, length ->
+          Chunk.doubles(values.toDoubleArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.double(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
 
 fun Arb.Companion.floatChunk(): Arb<Chunk<Float>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.float()) { values, offset, length ->
-      Chunk.floats(values.toFloatArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.float()) { values, _, _ ->
-      Chunk.array(values.toTypedArray())
-    }
-  )
+  object : Arb<Chunk<Float>>() {
+    override fun edgecases(): List<Chunk<Float>> =
+      listOf(Chunk.empty<Float>()) + Arb.float().edgecases().map { Chunk(it) }
+
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Float>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.float(), ChunkShrinker()) { values, offset, length ->
+          Chunk.floats(values.toFloatArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.float(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
+  }
 
 fun Arb.Companion.shortChunk(): Arb<Chunk<Short>> =
-  Arb.choice(
-    arrayChunkGenerator(Arb.short()) { values, offset, length ->
-      Chunk.shorts(values.toShortArray(), offset, length)
-    },
-    arrayChunkGenerator(Arb.short()) { values, _, _ ->
-      Chunk.array(values.toTypedArray<Short>())
-    }
-  )
+  object : Arb<Chunk<Short>>() {
+    override fun edgecases(): List<Chunk<Short>> =
+      listOf(Chunk.empty<Short>()) + Arb.short().edgecases().map { Chunk(it) }
 
-fun <A> Arb.Companion.frequency(vararg arbs: Pair<Int, Arb<A>>): Arb<A> =
-  arb(arbs.flatMap { it.second.edgecases() }) { rs ->
-    require(arbs.isNotEmpty()) { "No Arb instances passed to Arb.frequency()." }
-
-    val iters = arbs.toList().flatMap { (weight, arb) ->
-      List(weight) { arb }
-    }.map { it.values(rs).iterator() }
-
-    fun next(): Sample<A>? {
-      val iter = iters.shuffled(rs.random).first()
-      return if (iter.hasNext()) iter.next() else null
-    }
-
-    sequence {
-      while (true) {
-        var next: Sample<A>? = null
-        while (next == null)
-          next = next()
-        yield(next.value)
-      }
-    }
+    override fun values(rs: RandomSource): Sequence<Sample<Chunk<Short>>> =
+      Arb.choice(
+        arrayChunkGenerator(Arb.short(), ChunkShrinker()) { values, offset, length ->
+          Chunk.shorts(values.toShortArray(), offset, length)
+        },
+        arrayChunkGenerator(Arb.short(), ChunkShrinker()) { values, _, _ ->
+          Chunk.array(values.toTypedArray())
+        }
+      ).values(rs)
   }

@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.fx.coroutines.stream.Pull
 import arrow.fx.coroutines.stream.Stream
-import arrow.fx.coroutines.stream.frequency
 import arrow.fx.coroutines.stream.map
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.property.Arb
@@ -11,6 +10,7 @@ import io.kotest.property.Shrinker
 import io.kotest.property.arbitrary.arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.choose
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
@@ -47,7 +47,7 @@ abstract class StreamSpec(
     arb: Arb<O>,
     range: IntRange = depth
   ): Arb<Stream<O>> =
-    Arb.frequency(
+    Arb.choose(
       10 to Arb.list(arb, range).map { os ->
         Stream.iterable(os)
       },
