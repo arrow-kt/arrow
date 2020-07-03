@@ -198,9 +198,9 @@ interface Ref<F, A> {
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val refFactory: RefFactory<IOPartialOf<Nothing>> = Ref.factory(IO.monadDefer())
- *   val intVar: IOOf<Nothing, Ref<IOPartialOf<Nothing>, Int>> = refFactory.just(5)
- *   val stringVar: IOOf<Nothing, Ref<IOPartialOf<Nothing>, String>> = refFactory.just("Hello")
+ *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
+ *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
+ *   val stringVar: IOOf<Ref<ForIO, String>> = refFactory.just("Hello")
  *   //sampleEnd
  * }
  * ```
@@ -216,8 +216,8 @@ interface RefFactory<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val refFactory: RefFactory<IOPartialOf<Nothing>> = Ref.factory(IO.async())
-   *   val intVar: IOOf<Nothing, Ref<IOPartialOf<Nothing>, Int>> = refFactory.just(5)
+   *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.async())
+   *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
    *   //sampleEnd
    * }
    * ```

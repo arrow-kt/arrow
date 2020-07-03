@@ -31,14 +31,14 @@ internal class IOContext(val connection: IOConnection) : AbstractCoroutineContex
 
 internal sealed class IOConnection {
 
-  abstract fun cancel(): IOOf<Nothing, Unit>
+  abstract fun cancel(): IOOf<Unit>
   abstract fun isCancelled(): Boolean
   fun isNotCancelled(): Boolean = !isCancelled()
-  abstract fun <E> push(token: IOOf<E, Unit>): Unit
-  abstract fun <E> push(vararg token: IOOf<E, Unit>): Unit
+  abstract fun push(token: IOOf<Unit>): Unit
+  abstract fun push(vararg token: IOOf<Unit>): Unit
   fun pushPair(lh: IOConnection, rh: IOConnection): Unit = push(lh.cancel(), rh.cancel())
-  fun <E, E2> pushPair(lh: IOOf<E, Unit>, rh: IOOf<E2, Unit>): Unit = push(lh, rh)
-  abstract fun pop(): IOOf<Nothing, Unit>
+  fun pushPair(lh: IOOf<Unit>, rh: IOOf<Unit>): Unit = push(lh, rh)
+  abstract fun pop(): IOOf<Unit>
   abstract fun tryReactivate(): Boolean
 
   fun toDisposable(): Disposable = {
@@ -52,19 +52,19 @@ internal sealed class IOConnection {
 }
 
 private object Uncancellable : IOConnection() {
-  override fun cancel(): IOOf<Nothing, Unit> = IO.unit
+  override fun cancel(): IOOf<Unit> = IO.unit
   override fun isCancelled(): Boolean = false
-  override fun <E> push(token: IOOf<E, Unit>): Unit = Unit
-  override fun <E> push(vararg token: IOOf<E, Unit>): Unit = Unit
-  override fun pop(): IOOf<Nothing, Unit> = IO.unit
+  override fun push(token: IOOf<Unit>): Unit = Unit
+  override fun push(vararg token: IOOf<Unit>): Unit = Unit
+  override fun pop(): IOOf<Unit> = IO.unit
   override fun tryReactivate(): Boolean = true
   override fun toString(): String = "UncancellableConnection"
 }
 
 private class DefaultConnection : IOConnection() {
-  private val state: AtomicRef<List<IOOf<Nothing, Unit>>?> = atomic(emptyList())
+  private val state: AtomicRef<List<IOOf<Unit>>?> = atomic(emptyList())
 
-  override fun cancel(): IOOf<Nothing, Unit> = IO.defer {
+  override fun cancel(): IOOf<Unit> = IO.defer {
     state.getAndSet(null).let { stack ->
       when {
         stack == null || stack.isEmpty() -> IO.unit
@@ -75,7 +75,7 @@ private class DefaultConnection : IOConnection() {
 
   override fun isCancelled(): Boolean = state.value == null
 
-  override tailrec fun <E> push(token: IOOf<E, Unit>): Unit = when (val list = state.value) {
+  override tailrec fun push(token: IOOf<Unit>): Unit = when (val list = state.value) {
     // If connection is already cancelled cancel token immediately.
     null -> token.rethrow.unsafeRunSync()
     else ->
@@ -83,10 +83,10 @@ private class DefaultConnection : IOConnection() {
       else push(token)
   }
 
-  override fun <E> push(vararg token: IOOf<E, Unit>): Unit =
+  override fun push(vararg token: IOOf<Unit>): Unit =
     push(token.toList().cancelAll())
 
-  override tailrec fun pop(): IOOf<Nothing, Unit> {
+  override tailrec fun pop(): IOOf<Unit> {
     val state = state.value
     return when {
       state == null || state.isEmpty() -> IO.unit
@@ -99,13 +99,13 @@ private class DefaultConnection : IOConnection() {
   override fun tryReactivate(): Boolean =
     state.compareAndSet(null, emptyList())
 
-  private fun <E> List<IOOf<E, Unit>>.cancelAll(): IOOf<Nothing, Unit> = IO.defer {
+  private fun List<IOOf<Unit>>.cancelAll(): IOOf<Unit> = IO.defer {
     // TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
-    fold(IO.unit) { acc, f -> f.flatMap { acc } }
+    fold(IO.unit) { acc, f -> f.fix().flatMap { acc } }
   }
 
-  override fun toString(): String = "KindConnection(state = ${state.value})"
+  override fun toString(): String = "IOConnection(state = ${state.value})"
 }
 
-internal val <E, A> IOOf<E, A>.rethrow: IO<Nothing, A>
-  get() = handleErrorWith({ t -> IO.raiseException<Nothing>(t) }, { e -> IO.raiseException(UnhandledError(e)) })
+internal val <A> IOOf<A>.rethrow: IO<A>
+  get() = handleErrorWith { t -> IO.raiseError<Nothing>(t) }

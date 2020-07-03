@@ -4,8 +4,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.fx.IO
-import arrow.fx.flatMap
-import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -69,10 +67,10 @@ open class MapStream {
 }
 
 object IOStream {
-  class Stream(val value: Int, val next: IO<Nothing, Option<Stream>>)
+  class Stream(val value: Int, val next: IO<Option<Stream>>)
   val addOne: (Int) -> Int = { it + 1 }
 
-  fun test(times: Int, batchSize: Int): IO<Nothing, Long> {
+  fun test(times: Int, batchSize: Int): IO<Long> {
     var stream = range(0, times)
     var i = 0
     while (i < batchSize) {
@@ -94,7 +92,7 @@ object IOStream {
     }
   }
 
-  private fun sum(acc: Long): (Option<Stream>) -> IO<Nothing, Long> = { box ->
+  private fun sum(acc: Long): (Option<Stream>) -> IO<Long> = { box ->
     when (box) {
       is Some -> box.t.next.flatMap(sum(acc + box.t.value))
       None -> IO.just(acc)

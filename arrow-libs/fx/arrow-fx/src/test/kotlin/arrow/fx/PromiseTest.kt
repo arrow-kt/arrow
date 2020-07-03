@@ -8,7 +8,6 @@ import arrow.core.test.generators.throwable
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.apply.product
 import arrow.fx.extensions.io.async.async
-import arrow.fx.extensions.io.concurrent.Promise
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.functor.tupleLeft
 import arrow.fx.extensions.io.monad.flatMap
@@ -26,7 +25,7 @@ class PromiseTest : ArrowFxSpec() {
     fun tests(
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
-      promise: IO<Nothing, Promise<IOPartialOf<Nothing>, Int>>
+      promise: IO<Promise<ForIO, Int>>
     ) {
 
       "$label - complete" {
@@ -119,7 +118,7 @@ class PromiseTest : ArrowFxSpec() {
       }
 
       "$label - get blocks until set" {
-        Ref(IO.monadDefer<Nothing>(), 0).flatMap { state ->
+        Ref(IO.monadDefer(), 0).flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
               modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.fork(ctx).flatMap {
@@ -149,7 +148,7 @@ class PromiseTest : ArrowFxSpec() {
       }
     }
 
-    tests("CancellablePromise", promise = Promise<IOPartialOf<Nothing>, Int>(IO.concurrent()).fix())
-    tests("UncancellablePromise", promise = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).fix())
+    tests("cancellablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
+    tests("UncancellablePromise", promise = Promise.uncancellable<ForIO, Int>(IO.async()).fix())
   }
 }

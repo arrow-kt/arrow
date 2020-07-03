@@ -68,12 +68,12 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  *
  * Constructing a simple schedule which recurs 10 times until it succeeds:
  * ```kotlin:ank
- * import arrow.fx.IOPartialOf
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.monad.monad
  *
- * fun <A> recurTenTimes() = Schedule.recurs<IOPartialOf<Nothing>, A>(IO.monad<Nothing>(), 10)
+ * fun <A> recurTenTimes() = Schedule.recurs<ForIO, A>(IO.monad(), 10)
  * ```
  *
  * A more complex schedule is best put together using the [withMonad] constructor:
@@ -86,7 +86,7 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * import arrow.fx.typeclasses.seconds
  *
  * fun <A> complexPolicy() =
- *   Schedule.withMonad<IOPartialOf<Nothing>, A, List<A>>(IO.monad()) {
+ *   Schedule.withMonad(IO.monad()) {
  *     exponential<A>(10.milliseconds).whileOutput { it.nanoseconds < 60.seconds.nanoseconds }
  *       .andThen(spaced<A>(60.seconds) and recurs<A>(100)).jittered(IO.monadDefer())
  *       .zipRight(identity<A>().collect())
@@ -121,13 +121,12 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.fix
  * import arrow.fx.repeat
- * import arrow.fx.unsafeRunSync
  *
  * fun main() {
  *   var counter = 0
  *   val io = IO { println("Run: ${counter++}") }
  *   //sampleStart
- *   val res = io.repeat(IO.concurrent<Nothing>(), Schedule.recurs(IO.monad(), 3))
+ *   val res = io.repeat(IO.concurrent(), Schedule.recurs(IO.monad(), 3))
  *   //sampleEnd
  *   println(res.fix().unsafeRunSync())
  * }
@@ -138,23 +137,22 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * If we want to discard the values provided by the repetition of the effect, we can combine our policy with [Schedule.unit], using the [zipLeft] or [zipRight] combinators, which will keep just the output of one of the policies:
  *
  * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
- * import arrow.fx.IOPartialOf
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.concurrent.concurrent
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.fix
  * import arrow.fx.repeat
- * import arrow.fx.unsafeRunSync
  *
  * fun main() {
  *   var counter = 0
  *   val io = IO { println("Run: ${counter++}") }
  *   //sampleStart
- *   val res = io.repeat(IO.concurrent<Nothing>(), Schedule.unit<IOPartialOf<Nothing>, Unit>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *   val res = io.repeat(IO.concurrent(), Schedule.unit<ForIO, Unit>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
  *
  *   // equal to
- *   val res2 = io.repeat(IO.concurrent<Nothing>(), Schedule.recurs<IOPartialOf<Nothing>, Unit>(IO.monad(), 3).zipRight(Schedule.unit(IO.monad())))
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Unit>(IO.monad(), 3).zipRight(Schedule.unit(IO.monad())))
  *
  *   //sampleEnd
  *   println(res.fix().unsafeRunSync())
@@ -165,23 +163,22 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * Following the same strategy, we can zip it with the [Schedule.identity] policy to keep only the last provided result by the effect.
  *
  * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
- * import arrow.fx.IOPartialOf
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.concurrent.concurrent
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.fix
  * import arrow.fx.repeat
- * import arrow.fx.unsafeRunSync
  *
  * fun main() {
  *   var counter = 0
  *   val io = IO { println("Run: ${counter++}"); counter }
  *   //sampleStart
- *   val res = io.repeat(IO.concurrent<Nothing>(), Schedule.identity<IOPartialOf<Nothing>, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *   val res = io.repeat(IO.concurrent(), Schedule.identity<ForIO, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
  *
  *   // equal to
- *   val res2 = io.repeat(IO.concurrent<Nothing>(), Schedule.recurs<IOPartialOf<Nothing>, Int>(IO.monad(), 3).zipRight(Schedule.identity<IOPartialOf<Nothing>, Int>(IO.monad())))
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Int>(IO.monad(), 3).zipRight(Schedule.identity<ForIO, Int>(IO.monad())))
  *
  *   //sampleEnd
  *   println(res.fix().unsafeRunSync())
@@ -192,23 +189,22 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * Finally, if we want to keep all intermediate results, we can zip the policy with [Schedule.collect]:
  *
  * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
- * import arrow.fx.IOPartialOf
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.concurrent.concurrent
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.fix
  * import arrow.fx.repeat
- * import arrow.fx.unsafeRunSync
  *
  * fun main() {
  *   var counter = 0
  *   val io = IO { println("Run: ${counter++}"); counter }
  *   //sampleStart
- *   val res = io.repeat(IO.concurrent<Nothing>(), Schedule.collect<IOPartialOf<Nothing>, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
+ *   val res = io.repeat(IO.concurrent(), Schedule.collect<ForIO, Int>(IO.monad()).zipLeft(Schedule.recurs(IO.monad(), 3)))
  *
  *   // equal to
- *   val res2 = io.repeat(IO.concurrent<Nothing>(), Schedule.recurs<IOPartialOf<Nothing>, Int>(IO.monad(), 3).zipRight(Schedule.collect<IOPartialOf<Nothing>, Int>(IO.monad())))
+ *   val res2 = io.repeat(IO.concurrent(), Schedule.recurs<ForIO, Int>(IO.monad(), 3).zipRight(Schedule.collect<ForIO, Int>(IO.monad())))
  *
  *   //sampleEnd
  *   println(res.fix().unsafeRunSync())
@@ -221,20 +217,19 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * We can make use of the policies doWhile or doUntil to repeat an effect while or until its produced result matches a given predicate.
  *
  * ```kotlin:ank:playground
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
- * import arrow.fx.IOPartialOf
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.concurrent.concurrent
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.fix
  * import arrow.fx.repeat
- * import arrow.fx.unsafeRunSync
  *
  * fun main() {
  *   var counter = 0
  *   val io = IO { println("Run: ${counter++}"); counter }
  *   //sampleStart
- *   val res = io.repeat(IO.concurrent<Nothing>(), Schedule.doWhile<IOPartialOf<Nothing>, Int>(IO.monad()) { it <= 3 })
+ *   val res = io.repeat(IO.concurrent(), Schedule.doWhile<ForIO, Int>(IO.monad()) { it <= 3 })
  *   //sampleEnd
  *   println(res.fix().unsafeRunSync())
  * }
@@ -245,13 +240,13 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin:ank
+ * import arrow.fx.ForIO
  * import arrow.fx.IO
- * import arrow.fx.IOPartialOf
  * import arrow.fx.Schedule
  * import arrow.fx.extensions.io.monad.monad
  * import arrow.fx.typeclasses.milliseconds
  *
- * val exponential = Schedule.exponential<IOPartialOf<Nothing>, Unit>(IO.monad(), 250.milliseconds)
+ * val exponential = Schedule.exponential<ForIO, Unit>(IO.monad(), 250.milliseconds)
  * ```
  */
 sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {

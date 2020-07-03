@@ -1,8 +1,6 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
-import arrow.fx.flatMap
-import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -26,9 +24,9 @@ open class HandleRaisedError {
 
   private val dummy = RuntimeException("dummy")
 
-  private fun ioErrorRaisedloop(i: Int): IO<Nothing, Int> =
+  private fun ioErrorRaisedloop(i: Int): IO<Int> =
     if (i < size)
-      IO.raiseException<Int>(dummy)
+      IO.raiseError<Int>(dummy)
         .flatMap { x -> IO.just(x + 1) }
         .flatMap { x -> IO.just(x + 1) }
         .ioHandleError { ioErrorRaisedloop(i + 1) }

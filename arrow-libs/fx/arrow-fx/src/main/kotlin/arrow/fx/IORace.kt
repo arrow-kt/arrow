@@ -13,28 +13,28 @@ import kotlin.coroutines.CoroutineContext
 
 interface IORace {
 
-  fun <EE, A, B> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>): IO<EE, Race2<A, B>> =
+  fun <A, B> raceN(ioA: IOOf<A>, ioB: IOOf<B>): IO<Race2<A, B>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB)
 
-  fun <EE, A, B, C> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>): IO<EE, Race3<out A, out B, out C>> =
+  fun <A, B, C> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<Race3<out A, out B, out C>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC)
 
-  fun <EE, A, B, C, D> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>): IO<EE, Race4<out A, out B, out C, out D>> =
+  fun <A, B, C, D> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>): IO<Race4<out A, out B, out C, out D>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD)
 
-  fun <EE, A, B, C, D, E> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>, ioE: IOOf<EE, E>): IO<EE, Race5<out A, out B, out C, out D, out E>> =
+  fun <A, B, C, D, E> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>): IO<Race5<out A, out B, out C, out D, out E>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE)
 
-  fun <EE, A, B, C, D, E, F> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>, ioE: IOOf<EE, E>, ioF: IOOf<EE, F>): IO<EE, Race6<out A, out B, out C, out D, out E, out F>> =
+  fun <A, B, C, D, E, F> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>): IO<Race6<out A, out B, out C, out D, out E, out F>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE, ioF)
 
-  fun <EE, A, B, C, D, E, F, G> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>, ioE: IOOf<EE, E>, ioF: IOOf<EE, F>, ioG: IOOf<EE, G>): IO<EE, Race7<out A, out B, out C, out D, out E, out F, out G>> =
+  fun <A, B, C, D, E, F, G> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>): IO<Race7<out A, out B, out C, out D, out E, out F, out G>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE, ioF, ioG)
 
-  fun <EE, A, B, C, D, E, F, G, H> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>, ioE: IOOf<EE, E>, ioF: IOOf<EE, F>, ioG: IOOf<EE, G>, ioH: IOOf<EE, H>): IO<EE, Race8<out A, out B, out C, out D, out E, out F, out G, out H>> =
+  fun <A, B, C, D, E, F, G, H> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, ioH: IOOf<H>): IO<Race8<out A, out B, out C, out D, out E, out F, out G, out H>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE, ioF, ioG, ioH)
 
-  fun <EE, A, B, C, D, E, F, G, H, I> raceN(ioA: IOOf<EE, A>, ioB: IOOf<EE, B>, ioC: IOOf<EE, C>, ioD: IOOf<EE, D>, ioE: IOOf<EE, E>, ioF: IOOf<EE, F>, ioG: IOOf<EE, G>, ioH: IOOf<EE, H>, ioI: IOOf<EE, I>): IO<EE, Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
+  fun <A, B, C, D, E, F, G, H, I> raceN(ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, ioH: IOOf<H>, ioI: IOOf<I>): IO<Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
     IO.raceN(IODispatchers.CommonPool, ioA, ioB, ioC, ioD, ioE, ioF, ioG, ioH, ioI)
 
   /**
@@ -64,7 +64,7 @@ interface IORace {
    *     return result
    *   }
    *
-   *   IO.concurrent<Nothing>().example().fix().unsafeRunSync().let(::println)
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -76,34 +76,34 @@ interface IORace {
    *
    * @see racePair for a version that does not automatically cancel the loser.
    */
-  fun <EE, A, B> raceN(
+  fun <A, B> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>
-  ): IO<EE, Race2<A, B>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>
+  ): IO<Race2<A, B>> =
     race2(ctx, ioA, ioB)
 
   /**
    * @see raceN
    */
-  fun <EE, A, B, C> raceN(
+  fun <A, B, C> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>
-  ): IO<EE, Race3<out A, out B, out C>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>
+  ): IO<Race3<out A, out B, out C>> =
     race3(ctx, ioA, ioB, ioC)
 
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D> raceN(
+  fun <A, B, C, D> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>
-  ): IO<EE, Race4<out A, out B, out C, out D>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>
+  ): IO<Race4<out A, out B, out C, out D>> =
     race2(ctx,
       race2(ctx, ioA, ioB),
       race2(ctx, ioC, ioD)
@@ -117,14 +117,14 @@ interface IORace {
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D, E> raceN(
+  fun <A, B, C, D, E> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>,
-    ioE: IOOf<EE, E>
-  ): IO<EE, Race5<out A, out B, out C, out D, out E>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>,
+    ioE: IOOf<E>
+  ): IO<Race5<out A, out B, out C, out D, out E>> =
     race2(ctx,
       race3(ctx, ioA, ioB, ioC),
       race2(ctx, ioD, ioE)
@@ -138,15 +138,15 @@ interface IORace {
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D, E, F> raceN(
+  fun <A, B, C, D, E, F> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>,
-    ioE: IOOf<EE, E>,
-    ioF: IOOf<EE, F>
-  ): IO<EE, Race6<out A, out B, out C, out D, out E, out F>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>,
+    ioE: IOOf<E>,
+    ioF: IOOf<F>
+  ): IO<Race6<out A, out B, out C, out D, out E, out F>> =
     race2(ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF)
@@ -160,16 +160,16 @@ interface IORace {
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D, E, F, G> raceN(
+  fun <A, B, C, D, E, F, G> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>,
-    ioE: IOOf<EE, E>,
-    ioF: IOOf<EE, F>,
-    ioG: IOOf<EE, G>
-  ): IO<EE, Race7<out A, out B, out C, out D, out E, out F, out G>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>,
+    ioE: IOOf<E>,
+    ioF: IOOf<F>,
+    ioG: IOOf<G>
+  ): IO<Race7<out A, out B, out C, out D, out E, out F, out G>> =
     race3(ctx,
       race3(ctx, ioA, ioB, ioC),
       race2(ctx, ioD, ioE),
@@ -185,17 +185,17 @@ interface IORace {
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D, E, F, G, H> raceN(
+  fun <A, B, C, D, E, F, G, H> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>,
-    ioE: IOOf<EE, E>,
-    ioF: IOOf<EE, F>,
-    ioG: IOOf<EE, G>,
-    ioH: IOOf<EE, H>
-  ): IO<EE, Race8<out A, out B, out C, out D, out E, out F, out G, out H>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>,
+    ioE: IOOf<E>,
+    ioF: IOOf<F>,
+    ioG: IOOf<G>,
+    ioH: IOOf<H>
+  ): IO<Race8<out A, out B, out C, out D, out E, out F, out G, out H>> =
     race3(ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF),
@@ -211,18 +211,18 @@ interface IORace {
   /**
    * @see raceN
    */
-  fun <EE, A, B, C, D, E, F, G, H, I> raceN(
+  fun <A, B, C, D, E, F, G, H, I> raceN(
     ctx: CoroutineContext,
-    ioA: IOOf<EE, A>,
-    ioB: IOOf<EE, B>,
-    ioC: IOOf<EE, C>,
-    ioD: IOOf<EE, D>,
-    ioE: IOOf<EE, E>,
-    ioF: IOOf<EE, F>,
-    ioG: IOOf<EE, G>,
-    ioH: IOOf<EE, H>,
-    ioI: IOOf<EE, I>
-  ): IO<EE, Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
+    ioA: IOOf<A>,
+    ioB: IOOf<B>,
+    ioC: IOOf<C>,
+    ioD: IOOf<D>,
+    ioE: IOOf<E>,
+    ioF: IOOf<F>,
+    ioG: IOOf<G>,
+    ioH: IOOf<H>,
+    ioI: IOOf<I>
+  ): IO<Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
     race3(ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF),
@@ -236,24 +236,24 @@ interface IORace {
     }
 
   /** Implementation for `IO.raceN` arity 2, this way it is more efficient than racePair, as we no longer have to keep internal promises. */
-  private fun <E, A, B> race2(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>): IO<E, Either<A, B>> {
+  private fun <A, B> race2(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<A, B>> {
     fun <T, U> onSuccess(
       isActive: AtomicBooleanW,
       main: IOConnection,
       other: IOConnection,
-      cb: (IOResult<E, Either<T, U>>) -> Unit,
+      cb: (Either<Throwable, Either<T, U>>) -> Unit,
       r: Either<T, U>
     ): Unit =
       if (isActive.getAndSet(false)) {
         other.cancel().fix().unsafeRunAsync { r2 ->
           main.pop()
-          cb(IOResult.Success(r))
+          cb(Right(r))
         }
       } else Unit
 
-    fun onException(
+    fun onError(
       active: AtomicBooleanW,
-      cb: (IOResult<E, Nothing>) -> Unit,
+      cb: (Either<Throwable, Nothing>) -> Unit,
       main: IOConnection,
       other: IOConnection,
       err: Throwable
@@ -261,28 +261,11 @@ interface IORace {
       if (active.getAndSet(false)) {
         other.cancel().fix().unsafeRunAsync { r2 ->
           main.pop()
-          cb(IOResult.Exception(r2.fold({ Platform.composeErrors(err, it) }, { err })))
+          cb(Left(r2.fold({ Platform.composeErrors(err, it) }, { err })))
         }
       } else Unit
 
-    fun onError(
-      active: AtomicBooleanW,
-      cb: (IOResult<E, Nothing>) -> Unit,
-      main: IOConnection,
-      other: IOConnection,
-      err: E
-    ): Unit =
-      if (active.getAndSet(false)) {
-        other.cancel().fix().unsafeRunAsync { r2 ->
-          main.pop()
-          cb(IOResult.Error(r2.fold({
-            it.printStackTrace() // TODO send to undelivered cancellation error to async handler
-            err
-          }, { err })))
-        }
-      } else Unit
-
-    val start = { conn: IOConnection, cb: (IOResult<E, Either<A, B>>) -> Unit ->
+    val start = { conn: IOConnection, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
       val active = AtomicBooleanW(true)
       val connA = IOConnection()
       val connB = IOConnection()
@@ -290,8 +273,6 @@ interface IORace {
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
-          onException(active, cb, conn, connB, it)
-        }, {
           onError(active, cb, conn, connB, it)
         }, {
           onSuccess(active, conn, connB, cb, Left(it))
@@ -300,8 +281,6 @@ interface IORace {
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
         result.fold({
-          onException(active, cb, conn, connA, it)
-        }, {
           onError(active, cb, conn, connA, it)
         }, {
           onSuccess(active, conn, connA, cb, Right(it))
@@ -313,45 +292,26 @@ interface IORace {
   }
 
   /** Implementation for `IO.raceN` arity 3, this way it is more efficient than racePair, as we no longer have to keep internal promises. */
-  private fun <E, A, B, C> race3(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>, ioC: IOOf<E, C>): IO<E, Race3<A, B, C>> {
+  private fun <A, B, C> race3(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<Race3<A, B, C>> {
     fun onSuccess(
       isActive: AtomicBooleanW,
       main: IOConnection,
       other2: IOConnection,
       other3: IOConnection,
-      cb: (IOResult<E, Race3<A, B, C>>) -> Unit,
+      cb: (Either<Throwable, Race3<A, B, C>>) -> Unit,
       r: Race3<A, B, C>
     ): Unit = if (isActive.getAndSet(false)) {
       other2.cancel().fix().unsafeRunAsync { r2 ->
         other3.cancel().fix().unsafeRunAsync { r3 ->
           main.pop()
-          cb(IOResult.Success(r))
+          cb(Right(r))
         }
       }
     } else Unit
 
     fun onError(
       active: AtomicBooleanW,
-      main: IOConnection,
-      other2: IOConnection,
-      other3: IOConnection,
-      cb: (IOResult<E, Nothing>) -> Unit,
-      err: E
-    ): Unit =
-      if (active.getAndSet(false)) {
-        other2.cancel().fix().unsafeRunAsync { r2 ->
-          other3.cancel().fix().unsafeRunAsync { r3 ->
-            main.pop()
-            r2.fold({ it.printStackTrace() }, {}) // TODO send to undelivered cancellation error to async handler
-            r3.fold({ it.printStackTrace() }, {})
-            cb(IOResult.Error(err))
-          }
-        }
-      } else Unit
-
-    fun onException(
-      active: AtomicBooleanW,
-      cb: (IOResult<Nothing, Nothing>) -> Unit,
+      cb: (Either<Throwable, Nothing>) -> Unit,
       main: IOConnection,
       other2: IOConnection,
       other3: IOConnection,
@@ -360,7 +320,7 @@ interface IORace {
       other2.cancel().fix().unsafeRunAsync { r2 ->
         other3.cancel().fix().unsafeRunAsync { r3 ->
           main.pop()
-          cb(IOResult.Exception(
+          cb(Left(
             r2.fold({ err2 ->
               r3.fold({ err3 ->
                 Platform.composeErrors(err, err2, err3)
@@ -379,7 +339,7 @@ interface IORace {
       }
     } else Unit
 
-    val start = { conn: IOConnection, cb: (IOResult<E, Race3<A, B, C>>) -> Unit ->
+    val start = { conn: IOConnection, cb: (Either<Throwable, Race3<A, B, C>>) -> Unit ->
       val active = AtomicBooleanW(true)
       val connA = IOConnection()
       val connB = IOConnection()
@@ -388,9 +348,7 @@ interface IORace {
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
-          onException(active, cb, conn, connB, connC, it)
-        }, {
-          onError(active, conn, connB, connC, cb, it)
+          onError(active, cb, conn, connB, connC, it)
         }, {
           onSuccess(active, conn, connB, connC, cb, Race3.First(it))
         })
@@ -398,9 +356,7 @@ interface IORace {
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
         result.fold({
-          onException(active, cb, conn, connA, connC, it)
-        }, {
-          onError(active, conn, connA, connC, cb, it)
+          onError(active, cb, conn, connA, connC, it)
         }, {
           onSuccess(active, conn, connA, connC, cb, Race3.Second(it))
         })
@@ -408,9 +364,7 @@ interface IORace {
 
       IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { result ->
         result.fold({
-          onException(active, cb, conn, connA, connB, it)
-        }, {
-          onError(active, conn, connA, connB, cb, it)
+          onError(active, cb, conn, connA, connB, it)
         }, {
           onSuccess(active, conn, connA, connB, cb, Race3.Third(it))
         })
@@ -430,13 +384,13 @@ interface IORace {
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
-   *     //sampleStart
-   *     val result = IO.fx<String> {
-   *       val racePair = !IO.racePair(Dispatchers.Default, never<Int>(), just("Hello World!"))
-   *       racePair.fold(
-   *         { _, _ -> "never cannot win race" },
-   *         { _, winner -> winner }
-   *       )
+   *   //sampleStart
+   *   val result = IO.fx {
+   *     val racePair = !IO.racePair(Dispatchers.Default, never<Int>(), just("Hello World!"))
+   *     racePair.fold(
+   *       { _, _ -> "never cannot win race" },
+   *       { _, winner -> winner }
+   *     )
    *   }
    *   //sampleEnd
    *
@@ -453,76 +407,54 @@ interface IORace {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
-  fun <E, A, B> racePair(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>): IO<E, RacePair<IOPartialOf<E>, A, B>> =
+  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      // Cancellable connection for the left value
       val connA = IOConnection()
-      val promiseA = UnsafePromise<E, A>()
+      val promiseA = UnsafePromise<A>()
 
-      // Cancellable connection for the right value
       val connB = IOConnection()
-      val promiseB = UnsafePromise<E, B>()
+      val promiseB = UnsafePromise<B>()
 
       conn.pushPair(connA, connB)
 
-      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: IOResult<E, A> ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().unsafeRunAsync { r2 ->
+            connB.cancel().fix().unsafeRunAsync { r2 ->
               conn.pop()
-              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
           } else {
-            promiseA.complete(IOResult.Exception(error))
-          }
-        }, { e ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().unsafeRunAsync { r2 ->
-              conn.pop()
-              // TODO asyncErrorHandler r2
-              cb(IOResult.Error(e))
-            }
-          } else {
-            promiseA.complete(IOResult.Error(e))
+            promiseA.complete(Left(error))
           }
         }, { a ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(IOResult.Success(RacePair.First(a, IOFiber(promiseB, connB))))
+            cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
           } else {
-            promiseA.complete(IOResult.Success(a))
+            promiseA.complete(Right(a))
           }
         })
       }
 
-      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: IOResult<E, B> ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().unsafeRunAsync { r2 ->
+            connA.cancel().fix().unsafeRunAsync { r2 ->
               conn.pop()
-              cb(IOResult.Exception(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
           } else {
-            promiseB.complete(IOResult.Exception(error))
-          }
-        }, { e ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().unsafeRunAsync { r2 ->
-              conn.pop()
-              // TODO asyncErrorHandler r2
-              cb(IOResult.Error(e))
-            }
-          } else {
-            promiseB.complete(IOResult.Error(e))
+            promiseB.complete(Left(error))
           }
         }, { b ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(IOResult.Success(RacePair.Second(IOFiber(promiseA, connA), b)))
+            cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
           } else {
-            promiseB.complete(IOResult.Success(b))
+            promiseB.complete(Right(b))
           }
         })
       }
@@ -539,7 +471,7 @@ interface IORace {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = IO.fx<String> {
+   *   val result = IO.fx {
    *     val raceResult = !IO.raceTriple(Dispatchers.Default, never<Int>(), just("Hello World!"), never<Double>())
    *     raceResult.fold(
    *       { _, _, _ -> "never cannot win before complete" },
@@ -562,132 +494,98 @@ interface IORace {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
-  fun <E, A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>, ioC: IOOf<E, C>): IO<E, RaceTriple<IOPartialOf<E>, A, B, C>> =
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
       val connA = IOConnection()
-      val promiseA = UnsafePromise<E, A>()
+      val promiseA = UnsafePromise<A>()
 
       val connB = IOConnection()
-      val promiseB = UnsafePromise<E, B>()
+      val promiseB = UnsafePromise<B>()
 
       val connC = IOConnection()
-      val promiseC = UnsafePromise<E, C>()
+      val promiseC = UnsafePromise<C>()
 
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: IOResult<E, A> ->
+      IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().unsafeRunAsync { r2 ->
-              connC.cancel().unsafeRunAsync { r3 ->
+            connB.cancel().fix().unsafeRunAsync { r2 ->
+              connC.cancel().fix().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
                   r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
                 })
-                cb(IOResult.Exception(errorResult))
+                cb(Left(errorResult))
               }
             }
           } else {
-            promiseA.complete(IOResult.Exception(error))
-          }
-        }, { e ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().unsafeRunAsync { r2 ->
-              connC.cancel().unsafeRunAsync { r3 ->
-                conn.pop()
-                cb(IOResult.Error(e))
-              }
-            }
-          } else {
-            promiseA.complete(IOResult.Error(e))
+            promiseA.complete(Left(error))
           }
         }, { a ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(IOResult.Success(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
+            cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
           } else {
-            promiseA.complete(IOResult.Success(a))
+            promiseA.complete(Right(a))
           }
         })
       }
 
-      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: IOResult<E, B> ->
+      IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().unsafeRunAsync { r2 ->
-              connC.cancel().unsafeRunAsync { r3 ->
+            connA.cancel().fix().unsafeRunAsync { r2 ->
+              connC.cancel().fix().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
                   r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
                 })
-                cb(IOResult.Exception(errorResult))
+                cb(Left(errorResult))
               }
             }
           } else {
-            promiseB.complete(IOResult.Exception(error))
-          }
-        }, { e ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().unsafeRunAsync { r2 ->
-              connC.cancel().unsafeRunAsync { r3 ->
-                conn.pop()
-                cb(IOResult.Error(e))
-              }
-            }
-          } else {
-            promiseB.complete(IOResult.Error(e))
+            promiseB.complete(Left(error))
           }
         }, { b ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(IOResult.Success(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
+            cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
           } else {
-            promiseB.complete(IOResult.Success(b))
+            promiseB.complete(Right(b))
           }
         })
       }
 
-      IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { either: IOResult<E, C> ->
+      IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().unsafeRunAsync { r2 ->
-              connB.cancel().unsafeRunAsync { r3 ->
+            connA.cancel().fix().unsafeRunAsync { r2 ->
+              connB.cancel().fix().unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
                 }, {
                   r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
                 })
-                cb(IOResult.Exception(errorResult))
+                cb(Left(errorResult))
               }
             }
           } else {
-            promiseC.complete(IOResult.Exception(error))
-          }
-        }, { e ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().unsafeRunAsync { r2 ->
-              connB.cancel().unsafeRunAsync { r3 ->
-                conn.pop()
-                //
-                cb(IOResult.Error(e))
-              }
-            }
-          } else {
-            promiseC.complete(IOResult.Error(e))
+            promiseC.complete(Left(error))
           }
         }, { c ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(IOResult.Success(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
+            cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
           } else {
-            promiseC.complete(IOResult.Success(c))
+            promiseC.complete(Right(c))
           }
         })
       }

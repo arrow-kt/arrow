@@ -18,7 +18,7 @@ import io.kotlintest.shouldBe
 class RefTest : ArrowFxSpec() {
 
   init {
-    fun <F> MonadDefer<F>.tests(EQF: EqK<F>, RF: RefFactory<F>) {
+    fun <F> MonadDefer<F>.tests(EQF: EqK<F>, RF: RefFactory<F>): Unit {
       val eq: Eq<Kind<F, Unit>> = EQF.liftEq(Eq.any())
       fun Kind<F, Unit>.test(): Boolean = equalUnderTheLaw(unit(), eq)
       fun Kind<F, Unit>.unsafeRunSync(): Boolean = test()
@@ -145,7 +145,7 @@ class RefTest : ArrowFxSpec() {
       }
     }
 
-    fun <F> Concurrent<F>.concurrentTests(EQF: EqK<F>, RF: RefFactory<F>) {
+    fun <F> Concurrent<F>.concurrentTests(EQF: EqK<F>, RF: RefFactory<F>): Unit {
       "concurrent modifications" {
         val finalValue = 1000
         RF.just(0).flatMap { r ->
@@ -156,7 +156,7 @@ class RefTest : ArrowFxSpec() {
       }
     }
 
-    IO.concurrent<Nothing>().tests(IO.eqK<Nothing>(), Ref.factory(IO.monadDefer()))
-    IO.concurrent<Nothing>().concurrentTests(IO.eqK<Nothing>(), Ref.factory(IO.monadDefer()))
+    IO.concurrent().tests(IO.eqK(), Ref.factory(IO.monadDefer()))
+    IO.concurrent().concurrentTests(IO.eqK(), Ref.factory(IO.monadDefer()))
   }
 }

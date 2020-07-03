@@ -3,11 +3,11 @@ package arrow.fx.test.eq
 import arrow.Kind
 import arrow.core.extensions.either.eq.eq
 import arrow.fx.DecisionPartialOf
+import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.IOPartialOf
-import arrow.fx.IOResult
 import arrow.fx.Schedule
 import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.concurrent.waitFor
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
@@ -16,21 +16,19 @@ import arrow.fx.typeclasses.FiberOf
 import arrow.fx.typeclasses.FiberPartialOf
 import arrow.fx.typeclasses.fix
 import arrow.fx.typeclasses.seconds
-import arrow.fx.unsafeRunSync
-import arrow.fx.test.eq
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 
-fun <E, A> IO.Companion.eq(EQA: Eq<A> = Eq.any(), EQE: Eq<E> = Eq.any(), timeout: Duration = 5.seconds): Eq<Kind<IOPartialOf<E>, A>> = Eq { a, b ->
-  IOResult.eq(EQE, EQA, Eq.any()).run {
-    IO.applicative<Nothing>().mapN(a.fix().result(), b.fix().result()) { (a, b) -> a.eqv(b) }
+fun <A> IO.Companion.eq(EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
+  arrow.core.Either.eq(Eq.any(), EQA).run {
+    IO.applicative().mapN(a.attempt(), b.attempt()) { (a, b) -> a.eqv(b) }
       .waitFor(timeout)
       .unsafeRunSync()
   }
 }
 
-fun <E> IO.Companion.eqK(EQE: Eq<E> = Eq.any(), timeout: Duration = 5.seconds) = object : EqK<IOPartialOf<E>> {
-  override fun <A> Kind<IOPartialOf<E>, A>.eqK(other: Kind<IOPartialOf<E>, A>, EQ: Eq<A>): Boolean = eq(EQ, EQE, timeout).run {
+fun IO.Companion.eqK() = object : EqK<ForIO> {
+  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean = eq(EQ).run {
     fix().eqv(other.fix())
   }
 }
@@ -41,9 +39,9 @@ fun <F, A> Fiber.Companion.eq(EQ: Eq<Kind<F, A>>): Eq<FiberOf<F, A>> = object : 
   }
 }
 
-fun <E> Fiber.Companion.eqK() = object : EqK<FiberPartialOf<IOPartialOf<E>>> {
-  override fun <A> Kind<FiberPartialOf<IOPartialOf<E>>, A>.eqK(other: Kind<FiberPartialOf<IOPartialOf<E>>, A>, EQ: Eq<A>): Boolean =
-    IO.eq<E, A>().run {
+fun Fiber.Companion.eqK() = object : EqK<FiberPartialOf<ForIO>> {
+  override fun <A> Kind<FiberPartialOf<ForIO>, A>.eqK(other: Kind<FiberPartialOf<ForIO>, A>, EQ: Eq<A>): Boolean =
+    IO.eq<A>().run {
       fix().join().eqv(other.fix().join())
     }
 }

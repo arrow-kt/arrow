@@ -1,8 +1,6 @@
 package arrow.benchmarks
 
 import arrow.fx.IO
-import arrow.fx.flatMap
-import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -23,7 +21,7 @@ open class Delay {
   @Param("3000")
   var size: Int = 0
 
-  private fun ioDelayLoop(i: Int): IO<Nothing, Int> =
+  private fun ioDelayLoop(i: Int): IO<Int> =
     IO { i }.flatMap { j ->
       if (j > size) IO { j } else ioDelayLoop(j + 1)
     }

@@ -83,7 +83,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
@@ -95,7 +94,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().example().fix().unsafeRunSync()
+   *   IO.concurrent().example().fix().unsafeRunSync()
    * }
    * ```
    *
@@ -119,7 +118,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> =
@@ -133,7 +131,7 @@ interface Concurrent<F> : Async<F> {
    *   }
    *   //sampleEnd
    *
-   *   val r = IO.concurrent<Nothing>().example().fix().unsafeRunSync()
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
    *   println("Race winner result is: $r")
    * }
    * ```
@@ -158,7 +156,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> =
@@ -173,7 +170,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *   //sampleEnd
    *
-   *   val r = IO.concurrent<Nothing>().example().fix().unsafeRunSync()
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
    *   println("Race winner result is: $r")
    * }
    * ```
@@ -258,7 +255,6 @@ interface Concurrent<F> : Async<F> {
    * _imports_
    * _imports_monaddefer_
    * import kotlinx.coroutines.async
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -333,7 +329,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.fix
    * import arrow.fx.typeclasses.Concurrent
    * import arrow.fx.typeclasses.milliseconds
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *  fun <F> Concurrent<F>.processListInParallel(): Kind<F, List<Unit>> =
@@ -347,7 +342,7 @@ interface Concurrent<F> : Async<F> {
    *    }
    *
    *  //sampleEnd
-   *    IO.concurrent<Nothing>().processListInParallel()
+   *    IO.concurrent().processListInParallel()
    *      .fix()
    *      .unsafeRunSync()
    * }
@@ -387,7 +382,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.fix
    * import arrow.fx.typeclasses.Async
    * import arrow.fx.typeclasses.Concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * data class User(val id: Int)
    *
@@ -401,7 +395,7 @@ interface Concurrent<F> : Async<F> {
    *       .map { id -> getUserById(id) }
    *       .parSequence()
    *  //sampleEnd
-   *   IO.concurrent<Nothing>().processInParallel()
+   *   IO.concurrent().processInParallel()
    *     .fix().unsafeRunSync()
    * }
    * ```
@@ -440,7 +434,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.typeclasses.Concurrent
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.fix
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
@@ -456,7 +449,7 @@ interface Concurrent<F> : Async<F> {
    *   return result
    *   }
    *
-   *   IO.concurrent<Nothing>().example().fix().unsafeRunSync().let(::println)
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -487,7 +480,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.typeclasses.Concurrent
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.fix
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, Tuple2<String, String>> {
@@ -501,7 +493,7 @@ interface Concurrent<F> : Async<F> {
    *   return result
    *   }
    *
-   *   IO.concurrent<Nothing>().example().fix().unsafeRunSync().let(::println)
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -873,7 +865,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
    * import arrow.fx.extensions.io.concurrent.concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
@@ -891,7 +882,7 @@ interface Concurrent<F> : Async<F> {
    *   return result
    *   }
    *
-   *   IO.concurrent<Nothing>().example().fix().unsafeRunSync().let(::println)
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -1089,7 +1080,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.Concurrent
    * import arrow.fx.typeclasses.seconds
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
@@ -1104,7 +1094,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().promiseExample()
+   *   IO.concurrent().promiseExample()
    *     .fix().unsafeRunSync()
    * }
    * ```
@@ -1122,7 +1112,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.*
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.Concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
@@ -1138,7 +1127,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().promiseExample()
+   *   IO.concurrent().promiseExample()
    *     .fix().unsafeRunSync()
    * }
    * ```
@@ -1158,7 +1147,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.*
    * import arrow.fx.extensions.io.concurrent.concurrent
    * import arrow.fx.typeclasses.Concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.mvarExample(): Kind<F, Tuple3<Int, Option<Int>, Int>> =
@@ -1173,7 +1161,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().mvarExample()
+   *   IO.concurrent().mvarExample()
    *     .fix().unsafeRunSync().let(::println)
    * }
    * ```
@@ -1240,7 +1228,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.*
    * import arrow.fx.typeclasses.*
    * import arrow.fx.extensions.io.concurrent.concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -1250,7 +1237,7 @@ interface Concurrent<F> : Async<F> {
    *     return world.waitFor(1.seconds, fallbackWorld)
    *   }
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().timedOutWorld()
+   *   IO.concurrent().timedOutWorld()
    *     .fix().unsafeRunSync()
    * }
    * ```
@@ -1271,7 +1258,6 @@ interface Concurrent<F> : Async<F> {
    * import arrow.fx.*
    * import arrow.fx.typeclasses.*
    * import arrow.fx.extensions.io.concurrent.concurrent
-   * import arrow.fx.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -1280,7 +1266,7 @@ interface Concurrent<F> : Async<F> {
    *     return world.waitFor(3.seconds)
    *   }
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().timedOutWorld()
+   *   IO.concurrent().timedOutWorld()
    *     .fix().unsafeRunSync()
    * }
    * ```

@@ -15,7 +15,7 @@ Performing effects while switching execution contexts a la carte is trivial.
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 import kotlinx.coroutines.newSingleThreadContext
 
@@ -25,7 +25,7 @@ val contextA = newSingleThreadContext("A")
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   continueOn(contextA)
   !effect { printThreadName() }
   continueOn(dispatchers().default())
@@ -46,14 +46,14 @@ A [Fiber]({{'/effects/fiber' | relative_url }}) represents the pure result of a 
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   val fiberA = !effect { threadName() }.fork(dispatchers().default())
   val fiberB = !effect { threadName() }.fork(dispatchers().default())
   val threadA = !fiberA.join()
@@ -87,7 +87,7 @@ Once the function specifies a valid return, we can observe how the returned non-
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
@@ -99,7 +99,7 @@ data class ThreadInfo(
   val threadB: String
 )
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   val (threadA: String, threadB: String) =
     !IO.parMapN(
       dispatchers().default(),
@@ -123,14 +123,14 @@ fun main() { // The edge of our world
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(i: Int): String =
   "$i on ${Thread.currentThread().name}"
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   val result: List<String> = !
   listOf(1, 2, 3).parTraverse { i ->
     effect { threadName(i) }
@@ -150,14 +150,14 @@ fun main() { // The edge of our world
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   val result: List<String> = !listOf(
     effect { threadName() },
     effect { threadName() },
@@ -189,13 +189,13 @@ The value `program` below is pure and referentially transparent because `fx` ret
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 //sampleStart
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = IO.fx<Unit> {
+val program = IO.fx {
   !effect { printThreadName() }
 }
 

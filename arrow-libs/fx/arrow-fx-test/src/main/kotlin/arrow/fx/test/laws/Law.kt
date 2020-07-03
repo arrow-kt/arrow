@@ -12,9 +12,6 @@ import arrow.core.test.generators.tuple2
 import arrow.core.test.generators.tuple3
 import arrow.core.test.generators.tuple4
 import arrow.core.test.generators.tuple5
-import arrow.fx.IOResult
-import arrow.fx.unsafeRunSync
-import arrow.fx.test.eq
 import arrow.typeclasses.Eq
 import io.kotlintest.Matcher
 import io.kotlintest.Result
@@ -25,11 +22,11 @@ import io.kotlintest.shouldNot
 fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   shouldBeEq(b, eq).let { true }
 
-fun <E, A> IOOf<E, A>.equalUnderTheLaw(b: IOOf<E, A>, EQE: Eq<E> = Eq.any(), EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Boolean =
-  (this should object : Matcher<IOOf<E, A>> {
-    override fun test(value: IOOf<E, A>): Result =
-      IOResult.eq(EQE, EQA, Eq.any()).run {
-        IO.applicative<Nothing>().mapN(value.fix().result(), b.fix().result()) { (a, b) ->
+fun <A> IOOf<A>.equalUnderTheLaw(b: IOOf<A>, EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Boolean =
+  (this should object : Matcher<IOOf<A>> {
+    override fun test(value: IOOf<A>): Result =
+      arrow.core.Either.eq(Eq.any(), EQA).run {
+        IO.applicative().mapN(value.fix().attempt(), b.fix().attempt()) { (a, b) ->
             Result(a.eqv(b), "Expected: $b but found: $a", "$b and $a should be equal")
           }
           .waitFor(timeout)

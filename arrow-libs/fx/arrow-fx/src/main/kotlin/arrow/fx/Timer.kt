@@ -28,7 +28,7 @@ interface Timer<F> {
    *       effect { println("Hello World!") }
    *     }
    *   //sampleEnd
-   *   IO.concurrent<Nothing>().delayHelloWorld()
+   *   IO.concurrent().delayHelloWorld()
    *     .fix().unsafeRunSync()
    * }
    * ```

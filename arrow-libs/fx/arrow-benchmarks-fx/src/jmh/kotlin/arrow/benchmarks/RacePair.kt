@@ -4,8 +4,6 @@ import arrow.core.extensions.list.foldable.foldLeft
 import arrow.fx.IO
 import arrow.fx.IODispatchers
 import arrow.fx.extensions.io.monad.map
-import arrow.fx.flatMap
-import arrow.fx.unsafeRunSync
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -26,7 +24,7 @@ open class RacePair {
   @Param("100")
   var size: Int = 0
 
-  private fun racePairHelper(): IO<Nothing, Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
+  private fun racePairHelper(): IO<Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
     IO.racePair(IODispatchers.CommonPool, acc, IO { 1 }).flatMap { ei ->
       ei.fold({ a, (_, cancel) ->
         cancel.map { a }

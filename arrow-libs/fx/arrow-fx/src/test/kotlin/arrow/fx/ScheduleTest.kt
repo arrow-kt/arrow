@@ -97,8 +97,8 @@ class ScheduleTest : ArrowFxSpec() {
     return go(initialState.value(), n, emptyList())
   }
 
-  fun refTimer(ref: Ref<IOPartialOf<Nothing>, Duration>): Timer<IOPartialOf<Nothing>> = object : Timer<IOPartialOf<Nothing>> {
-    override fun sleep(duration: Duration): Kind<IOPartialOf<Nothing>, Unit> =
+  fun refTimer(ref: Ref<ForIO, Duration>): Timer<ForIO> = object : Timer<ForIO> {
+    override fun sleep(duration: Duration): Kind<ForIO, Unit> =
       ref.update { d -> d + duration }
   }
 
@@ -239,7 +239,7 @@ class ScheduleTest : ArrowFxSpec() {
         val schedule = Schedule(IO.monad(), IO.just(0 as Any?)) { _: Unit, _ -> IO.just(dec.fix()) }
 
         val eff = SideEffect()
-        val ref = Ref(IO.monadDefer<Nothing>(), 0.seconds).fix().unsafeRunSync()
+        val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
 
         val res = IO { if (eff.counter >= n) throw RuntimeException("WOOO") else eff.increment() }
           .repeat(IO.monadThrow(), refTimer(ref), schedule)
@@ -266,7 +266,7 @@ class ScheduleTest : ArrowFxSpec() {
         val schedule = Schedule(IO.monad(), IO.just(0 as Any?)) { _: Throwable, _ -> IO.just(dec.fix()) }
 
         val eff = SideEffect()
-        val ref = Ref(IO.monadDefer<Nothing>(), 0.seconds).fix().unsafeRunSync()
+        val ref = Ref(IO.monadDefer(), 0.seconds).fix().unsafeRunSync()
 
         val res = IO {
           if (eff.counter <= n) {

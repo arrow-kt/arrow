@@ -21,14 +21,14 @@ import arrow.core.*
 import arrow.fx.*
 import arrow.fx.extensions.io.async.*
 
-IO.async<Nothing>()
+IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit ->
     callback(1.right())
   }.fix().attempt().unsafeRunSync()
 ```
 
 ```kotlin:ank
-IO.async<Nothing>()
+IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit ->
     callback(RuntimeException().left())
   }.fix().attempt().unsafeRunSync()

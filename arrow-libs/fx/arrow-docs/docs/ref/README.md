@@ -21,13 +21,13 @@ Since the allocation of mutable state is not referentially transparent, this sid
 import arrow.fx.*
 import arrow.fx.extensions.io.monadDefer.monadDefer
 
-val ioRef: IO<Nothing, Ref<IOPartialOf<Nothing>, Int>> = Ref(IO.monadDefer<Nothing>(), 1).fix()
+val ioRef: IO<Ref<ForIO, Int>> = Ref(IO.monadDefer(), 1).fix()
 ```
 
 In case you want the side-effect to execute immediately and return the `Ref` instance, you can use the `unsafe` function.
 
 ```kotlin:ank:silent
-val unsafe: Ref<IOPartialOf<Nothing>, Int> = Ref.unsafe(1, IO.monadDefer())
+val unsafe: Ref<ForIO, Int> = Ref.unsafe(1, IO.monadDefer())
 ```
 
 As you can see above, this fixed `Ref` to the type `Int` and initialized it with the value `1`.
@@ -36,10 +36,10 @@ If you want to create a `Ref` for `F`, but not fix the value type yet, you can u
 This returns an interface `RefFactory` with a single method `later` to construct an actual `Ref`.
 
 ```kotlin:ank:silent
-val ref: RefFactory<IOPartialOf<Nothing>> = Ref.factory(IO.monadDefer())
+val ref: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
 
-val ref1: IO<Nothing, Ref<IOPartialOf<Nothing>, String>> = ref.just("Hello, World!").fix()
-val ref2: IO<Nothing, Ref<IOPartialOf<Nothing>, Int>> = ref.just(2).fix()
+val ref1: IO<Ref<ForIO, String>> = ref.just("Hello, World!").fix()
+val ref2: IO<Ref<ForIO, Int>> = ref.just(2).fix()
 ```
 
 ## Working with Ref

@@ -7,29 +7,30 @@ import arrow.core.Some
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
+import arrow.core.extensions.eq
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.core.toT
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parSequence
+import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.extensions.io.monad.followedBy
 import arrow.fx.typeclasses.milliseconds
-import arrow.fx.test.laws.equalUnderTheLaw
-import arrow.fx.typeclasses.ConcurrentSyntax
+import arrow.fx.test.eq.eq
+import arrow.fx.test.laws.shouldBeEq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 
 class MVarTest : ArrowFxSpec() {
 
-  fun <A> fx(c: suspend ConcurrentSyntax<IOPartialOf<Nothing>>.() -> A): IO<Nothing, A> =
-    IO.concurrent<Nothing>().fx.concurrent(c).fix()
-
   init {
 
-    fun tests(label: String, mvar: MVarFactory<IOPartialOf<Nothing>>) {
+    fun tests(label: String, mvar: MVarFactory<ForIO>) {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          fx {
+          IO.fx {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             av.put(a).bind()
@@ -38,13 +39,13 @@ class MVarTest : ArrowFxSpec() {
             av.put(b).bind()
             val r2 = av.take().bind()
             Tuple4(isEmpty, isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)))
+          }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), IO.eq())
         }
       }
 
       "$label - empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-          fx {
+          IO.fx {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             val p1 = av.tryPut(a).bind()
@@ -55,12 +56,12 @@ class MVarTest : ArrowFxSpec() {
             av.put(c).bind()
             val r3 = av.take().bind()
             Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
-          }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)))
+          }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), IO.eq())
         }
       }
 
       "$label - empty; take; put; take; put" {
-        fx {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fork().bind()
@@ -73,11 +74,11 @@ class MVarTest : ArrowFxSpec() {
           val bb = f2.join().bind()
 
           setOf(aa, bb)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20)))
+        }.shouldBeEq(IO.just(setOf(10, 20)), IO.eq())
       }
 
       "$label - empty; put; put; put; take; take; take" {
-        fx {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.put(10).fork().bind()
@@ -93,11 +94,11 @@ class MVarTest : ArrowFxSpec() {
           f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)))
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
       }
 
       "$label - empty; take; take; take; put; put; put" {
-        fx {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fork().bind()
@@ -113,12 +114,12 @@ class MVarTest : ArrowFxSpec() {
           val cc = f3.join().bind()
 
           setOf(aa, bb, cc)
-        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)))
+        }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
       }
 
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          fx {
+          IO.fx {
             val av = mvar.just(a).bind()
             val isNotEmpty = av.isNotEmpty().bind()
             val r1 = av.take().bind()
@@ -126,42 +127,42 @@ class MVarTest : ArrowFxSpec() {
             val r2 = av.take().bind()
 
             Tuple3(isNotEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)))
+          }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), IO.eq())
         }
       }
 
       "$label - initial; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          fx {
+          IO.fx {
             val av = !mvar.just(a)
             val isEmpty = !av.isEmpty()
             val r1 = !av.take()
             !av.put(b)
             val r2 = !av.take()
             Tuple3(isEmpty, r1, r2)
-          }.equalUnderTheLaw(IO.just(Tuple3(false, a, b)))
+          }.equalUnderTheLaw(IO.just(Tuple3(false, a, b)), IO.eq())
         }
       }
 
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
-          fx {
+          IO.fx {
             val av = mvar.just(i).bind()
             val read = av.read().bind()
             val take = av.take().bind()
             read toT take
-          }.equalUnderTheLaw(IO.just(i toT i))
+          }.equalUnderTheLaw(IO.just(i toT i), IO.eq())
         }
       }
 
       "$label - empty; read; put" {
         forAll(Gen.int()) { a ->
-          fx {
+          IO.fx {
             val av = !mvar.empty<Int>()
             val read = !av.read().fork()
             !av.put(a)
             !read.join()
-          }.equalUnderTheLaw(IO.just(a))
+          }.equalUnderTheLaw(IO.just(a), IO.eq())
         }
       }
 
@@ -170,11 +171,11 @@ class MVarTest : ArrowFxSpec() {
           mvar.put(null).flatMap { mvar.read() }
         }
 
-        task.equalUnderTheLaw(IO.just(null))
+        task.equalUnderTheLaw(IO.just(null), IO.eq())
       }
 
       "$label - take/put test is stack safe" {
-        fun loop(n: Int, acc: Int, ch: MVar<IOPartialOf<Nothing>, Int>): IO<Nothing, Int> =
+        fun loop(n: Int, acc: Int, ch: MVar<ForIO, Int>): IO<Int> =
           if (n <= 0) IO.just(acc) else
             ch.take().flatMap { x ->
               ch.put(1).flatMap { loop(n - 1, acc + x, ch) }
@@ -182,13 +183,13 @@ class MVarTest : ArrowFxSpec() {
 
         val count = 10000
         val task = mvar.just(1).flatMap { ch -> loop(count, 0, ch) }
-        task.equalUnderTheLaw(IO.just(count))
+        task.equalUnderTheLaw(IO.just(count), IO.eq())
       }
 
       "$label - stack overflow test" {
         val count = 10_000
 
-        fun consumer(ch: Channel<Int>, sum: Long): IO<Nothing, Long> =
+        fun consumer(ch: Channel<Int>, sum: Long): IO<Long> =
           ch.take().flatMap {
             it.fold({
               IO.just(sum) // we are done!
@@ -198,12 +199,12 @@ class MVarTest : ArrowFxSpec() {
             })
           }
 
-        fun exec(channel: Channel<Int>): IO<Nothing, Long> {
+        fun exec(channel: Channel<Int>): IO<Long> {
           val consumerTask = consumer(channel, 0L)
           val tasks = (0 until count).map { i -> channel.put(Some(i)) }
           val producerTask = tasks.parSequence().flatMap { channel.put(None) }
 
-          return IO.fx<Nothing, Long> {
+          return IO.fx {
             val f1 = !producerTask.fork()
             val f2 = !consumerTask.fork()
             !f1.join()
@@ -216,13 +217,13 @@ class MVarTest : ArrowFxSpec() {
       }
 
       "$label - producer-consumer parallel loop" {
-        fun producer(ch: Channel<Long>, list: List<Long>): IO<Nothing, Unit> =
+        fun producer(ch: Channel<Long>, list: List<Long>): IO<Unit> =
           when {
             list.isEmpty() -> ch.put(None).fix() // we are done!
             else -> ch.put(Some(list.first())).flatMap { producer(ch, list.drop(1)) } // next please
           }
 
-        fun consumer(ch: Channel<Long>, sum: Long): IO<Nothing, Long> =
+        fun consumer(ch: Channel<Long>, sum: Long): IO<Long> =
           ch.take().flatMap {
             it.fold({
               IO.just(sum) // we are done!
@@ -232,23 +233,23 @@ class MVarTest : ArrowFxSpec() {
           }
 
         val count = 10000L
-        fx {
+        IO.fx {
           val channel = !mvar.just(Option(0L))
           val producerFiber = !producer(channel, (0L until count).toList()).fork()
           val consumerFiber = !consumer(channel, 0L).fork()
           !producerFiber.join()
           !consumerFiber.join()
-        }.equalUnderTheLaw(IO.just(count * (count - 1) / 2))
+        }.equalUnderTheLaw(IO.just(count * (count - 1) / 2), IO.eq(Long.eq()))
       }
 
-      fun testStackSequential(channel: MVar<IOPartialOf<Nothing>, Int>): Tuple3<Int, IO<Nothing, Int>, IO<Nothing, Unit>> {
+      fun testStackSequential(channel: MVar<ForIO, Int>): Tuple3<Int, IO<Int>, IO<Unit>> {
         val count = 10000
 
-        fun readLoop(n: Int, acc: Int): IO<Nothing, Int> =
+        fun readLoop(n: Int, acc: Int): IO<Int> =
           if (n > 0) channel.read().followedBy(channel.take().flatMap { readLoop(n - 1, acc + 1) })
           else IO.just(acc)
 
-        fun writeLoop(n: Int): IO<Nothing, Unit> =
+        fun writeLoop(n: Int): IO<Unit> =
           if (n > 0) channel.put(1).flatMap { writeLoop(n - 1) }
           else IO.just(Unit)
 
@@ -256,31 +257,31 @@ class MVarTest : ArrowFxSpec() {
       }
 
       "$label - put is stack safe when repeated sequentially" {
-        fx {
+        IO.fx {
           val channel = !mvar.empty<Int>()
           val (count, reads, writes) = testStackSequential(channel)
           !writes.fork()
           val r = !reads
           !effect { r shouldBe count }
-        }.equalUnderTheLaw(IO.unit)
+        }.equalUnderTheLaw(IO.unit, IO.eq())
       }
 
       "$label - take is stack safe when repeated sequentially" {
-        fx {
+        IO.fx {
           val channel = !mvar.empty<Int>()
           val (count, reads, writes) = testStackSequential(channel)
           val fr = !reads.fork()
           !writes
           val r = !fr.join()
           !effect { r shouldBe count }
-        }.equalUnderTheLaw(IO.unit)
+        }.equalUnderTheLaw(IO.unit, IO.eq())
       }
 
       "$label - concurrent take and put" {
         val count = 1_000
-        fx {
+        IO.fx {
           val mVar = !mvar.empty<Int>()
-          val ref = !Ref<Int>(0)
+          val ref = !Ref(0)
           val takes = (0 until count).map { mVar.read().map2(mVar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
           val puts = (0 until count).map { mVar.put(1) }.parSequence()
           val f1 = !takes.fork()
@@ -288,15 +289,15 @@ class MVarTest : ArrowFxSpec() {
           !f1.join()
           !f2.join()
           !ref.get()
-        }.equalUnderTheLaw(IO.just(count * 2))
+        }.equalUnderTheLaw(IO.just(count * 2), IO.eq())
       }
     }
 
-    fun concurrentTests(label: String, mvar: MVarFactory<IOPartialOf<Nothing>>) {
+    fun concurrentTests(label: String, mvar: MVarFactory<ForIO>) {
       tests(label, mvar)
 
       "$label - put is cancellable" {
-        fx {
+        IO.fx {
           val mVar = !mvar.just(0)
           !mVar.put(1).fork()
           val p2 = !mVar.put(2).fork()
@@ -307,11 +308,11 @@ class MVarTest : ArrowFxSpec() {
           val r1 = !mVar.take()
           val r3 = !mVar.take()
           setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)))
+        }.equalUnderTheLaw(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - take is cancellable" {
-        fx {
+        IO.fx {
           val mVar = !mvar.empty<Int>()
           val t1 = !mVar.take().fork()
           val t2 = !mVar.take().fork()
@@ -323,20 +324,20 @@ class MVarTest : ArrowFxSpec() {
           val r1 = !t1.join()
           val r3 = !t3.join()
           setOf(r1, r3)
-        }.equalUnderTheLaw(IO.just(setOf(1, 3)))
+        }.equalUnderTheLaw(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - read is cancellable" {
-        fx {
+        IO.fx {
           val mVar = !mvar.empty<Int>()
           val finished = !Promise<Int>()
           val fiber = !mVar.read().flatMap(finished::complete).fork()
           !IO.sleep(100.milliseconds) // Give read callback a chance to register
           !fiber.cancel()
           !mVar.put(10)
-          val fallback = IO.sleep(200.milliseconds).followedBy(IO.just(0))
-          !IO.raceN(finished.get(), fallback)
-        }.equalUnderTheLaw(IO.just(Right(0)))
+          val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
+          val res = !IO.raceN(finished.get(), fallback)
+        }.equalUnderTheLaw(IO.just(Right(0)), IO.eq())
       }
     }
 
@@ -346,4 +347,4 @@ class MVarTest : ArrowFxSpec() {
 }
 
 // Signaling option, because we need to detect completion
-private typealias Channel<A> = MVar<IOPartialOf<Nothing>, Option<A>>
+private typealias Channel<A> = MVar<ForIO, Option<A>>

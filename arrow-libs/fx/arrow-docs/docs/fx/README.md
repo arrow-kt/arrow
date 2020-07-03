@@ -105,8 +105,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Nothing, Unit> =
-  IO.fx<Unit> {
+fun greet(): IO<Unit> =
+  IO.fx {
     val pureHello = effect { sayHello() }
     val pureGoodBye = effect { sayGoodBye() }
   }
@@ -134,8 +134,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Nothing, Unit> =
-  IO.fx<Unit> {
+fun greet(): IO<Unit> =
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
@@ -157,8 +157,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Nothing, Unit> =
-  IO.fx<Unit> {
+fun greet(): IO<Unit> =
+  IO.fx {
     sayHello()
     sayGoodBye()
   }
@@ -177,11 +177,11 @@ Composition using regular datatypes such as `IO` is still possible within `fx` b
 import arrow.fx.IO
 import arrow.fx.extensions.fx
 //sampleStart
-fun sayInIO(s: String): IO<Nothing, Unit> =
+fun sayInIO(s: String): IO<Unit> =
   IO { println(s) }
 
-fun greet(): IO<Nothing, Unit> =
-  IO.fx<Unit> {
+fun greet(): IO<Unit> =
+  IO.fx {
     sayInIO("Hello World").bind()
   }
 //sampleEnd
@@ -204,7 +204,7 @@ Usage of `unsafe` is reserved for the end of the world and may be the only impur
 ```kotlin:ank:playground
 import arrow.fx.IO
 import arrow.unsafe
-import arrow.fx.extensions.runBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
@@ -213,8 +213,8 @@ suspend fun sayHello(): Unit =
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
 
-fun greet(): IO<Nothing, Unit> =
-  IO.fx<Unit> {
+fun greet(): IO<Unit> =
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }

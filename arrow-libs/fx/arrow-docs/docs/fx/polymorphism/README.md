@@ -20,8 +20,8 @@ In the following example, the program is declared polymorphic, and then made con
 import arrow.fx.IO
 import arrow.unsafe
 import arrow.Kind
-import arrow.fx.extensions.runBlocking
-import arrow.fx.extensions.unsafeRun
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.io.unsafeRun.unsafeRun
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.fx
 import arrow.fx.typeclasses.Concurrent

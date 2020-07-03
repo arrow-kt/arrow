@@ -23,8 +23,8 @@ import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val promise: IO<Nothing, Promise<IOPartialOf<Nothing>, Int>> =
-  Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).fix()
+val promise: IO<Promise<ForIO, Int>> =
+  Promise.uncancellable<ForIO, Int>(IO.async()).fix()
 //sampleEnd
 println(promise)
 }
@@ -38,7 +38,7 @@ import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val unsafePromise: Promise<IOPartialOf<Nothing>, Int> = Promise.unsafeUncancellable(IO.async())
+val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancellable(IO.async())
 //sampleEnd
 println(unsafePromise)
 }
@@ -55,7 +55,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.get()
 } //never ends because `get` keeps waiting for p to be fulfilled.
 //sampleEnd
@@ -69,7 +69,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.get()
   }
@@ -90,7 +90,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(2).flatMap {
     p.get()
   }
@@ -107,7 +107,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.complete(2)
   }
@@ -130,7 +130,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.error(RuntimeException("Break promise"))
 }
   .attempt()
@@ -147,7 +147,7 @@ import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = Promise.uncancellable<IOPartialOf<Nothing>, Int>(IO.async()).flatMap { p ->
+val result = Promise.uncancellable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.error(RuntimeException("Break promise"))
   }

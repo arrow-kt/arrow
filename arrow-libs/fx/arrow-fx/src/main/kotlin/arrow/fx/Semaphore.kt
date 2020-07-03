@@ -29,7 +29,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.available()
@@ -51,7 +51,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.count()
@@ -73,7 +73,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(6)
@@ -109,7 +109,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.tryAcquireN(6)
@@ -142,7 +142,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap {
@@ -175,7 +175,7 @@ interface Semaphore<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+   *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
    *     s.withPermit(IO { "Use controlled resource" })
@@ -198,7 +198,7 @@ interface Semaphore<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val semaphore = Semaphore<IOPartialOf<Nothing>>(5, IO.concurrent<Nothing>())
+     *   val semaphore = Semaphore<ForIO>(5, IO.concurrent())
      *   //sampleEnd
      * }
      */
@@ -220,7 +220,7 @@ interface Semaphore<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val semaphore = Semaphore.uncancellable<IOPartialOf<Nothing>>(5, IO.async())
+     *   val semaphore = Semaphore.uncancellable<ForIO>(5, IO.async())
      *   //sampleEnd
      * }
      */

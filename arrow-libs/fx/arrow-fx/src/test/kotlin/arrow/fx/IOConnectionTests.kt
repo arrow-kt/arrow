@@ -1,15 +1,15 @@
 package arrow.fx
 
 import arrow.fx.test.eq.eq
-import arrow.fx.test.laws.shouldBeEq
-import io.kotlintest.shouldBe
 import arrow.fx.test.eq.eqK
+import arrow.fx.test.laws.shouldBeEq
 import arrow.typeclasses.Eq
+import io.kotlintest.shouldBe
 
 class IOConnectionTests : ArrowFxSpec() {
 
   init {
-    val EQ = IO.eqK<Nothing>().liftEq(Eq.any())
+    val EQ = IO.eqK().liftEq(Eq.any())
 
     "cancellation is only executed once" {
       var effect = 0

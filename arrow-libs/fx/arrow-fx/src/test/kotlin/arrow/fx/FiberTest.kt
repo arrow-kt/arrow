@@ -12,15 +12,14 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.test.eq.eq
 import arrow.fx.test.eq.eqK
 import arrow.fx.test.generators.genK
-import arrow.fx.typeclasses.FiberPartialOf
 import io.kotlintest.properties.Gen
 
 class FiberTest : ArrowFxSpec() {
 
   init {
     testLaws(
-      ApplicativeLaws.laws<FiberPartialOf<IOPartialOf<Nothing>>>(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), Fiber.genK(IO.applicative()), Fiber.eqK()),
-      MonoidLaws.laws<Fiber<IOPartialOf<Nothing>, Int>>(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
+      ApplicativeLaws.laws(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), Fiber.genK(IO.applicative()), Fiber.eqK()),
+      MonoidLaws.laws(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
         Fiber(IO.just(i), IO.unit)
       }, Fiber.eq(IO.eq()))
     )

@@ -3,17 +3,31 @@ package arrow.fx
 import arrow.Kind
 import arrow.core.Try
 import arrow.core.test.generators.GenK
+import arrow.core.test.laws.MonadFilterLaws
+import arrow.core.test.laws.TraverseLaws
 import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.FlowableKOf
 import arrow.fx.rx2.ForFlowableK
+import arrow.fx.rx2.extensions.asyncDrop
+import arrow.fx.rx2.extensions.asyncError
+import arrow.fx.rx2.extensions.asyncLatest
+import arrow.fx.rx2.extensions.asyncMissing
+import arrow.fx.rx2.extensions.concurrent
+import arrow.fx.rx2.extensions.flowablek.applicative.applicative
 import arrow.fx.rx2.extensions.flowablek.async.async
+import arrow.fx.rx2.extensions.flowablek.functor.functor
 import arrow.fx.rx2.extensions.flowablek.monad.flatMap
+import arrow.fx.rx2.extensions.flowablek.monad.monad
+import arrow.fx.rx2.extensions.flowablek.monadFilter.monadFilter
 import arrow.fx.rx2.extensions.flowablek.timer.timer
+import arrow.fx.rx2.extensions.flowablek.traverse.traverse
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
+import arrow.fx.test.laws.AsyncLaws
+import arrow.fx.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
 import io.kotlintest.properties.Gen
@@ -62,34 +76,34 @@ class FlowableKTests : RxJavaSpec() {
   }
 
   init {
-    // testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.timer(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(FlowableK.concurrent(), FlowableK.timer(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-    // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-    // testLaws(AsyncLaws.laws(FlowableK.asyncError(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncError(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-    // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-    // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
-    // testLaws(TraverseLaws.laws(FlowableK.traverse(), GENK(), EQK()))
+    testLaws(TraverseLaws.laws(FlowableK.traverse(), GENK(), EQK()))
 
-    // testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK()))
+    testLaws(MonadFilterLaws.laws(FlowableK.monadFilter(), FlowableK.functor(), FlowableK.applicative(), FlowableK.monad(), GENK(), EQK()))
 
     "Multi-thread Flowables finish correctly" {
       val value: Flowable<Long> = FlowableK.fx {
@@ -137,7 +151,7 @@ class FlowableKTests : RxJavaSpec() {
       ec shouldBe ExitCase.Cancelled
     }
 
-    "FlowableK.cancellable should cancel CancelToken on dispose" {
+    "FlowableK cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
           FlowableK {
             FlowableK.cancellable<Unit>(fa = {

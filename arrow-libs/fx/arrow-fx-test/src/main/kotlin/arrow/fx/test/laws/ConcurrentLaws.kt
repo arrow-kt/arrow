@@ -18,7 +18,6 @@ import arrow.core.test.generators.either
 import arrow.core.test.generators.throwable
 import arrow.core.test.laws.Law
 import arrow.core.toT
-import arrow.fx.IOResult
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
@@ -281,18 +280,14 @@ object ConcurrentLaws {
     forAll(Gen.int()) { i ->
       fx.concurrent {
         val release = Promise<F, Int>(this@cancellableReceivesCancelSignal).bind()
-        val latch = UnsafePromise<Nothing, Unit>()
+        val latch = UnsafePromise<Unit>()
 
         val (_, cancel) = cancellable<Unit> {
-          latch.complete(IOResult.Success(Unit))
+          latch.complete(Right(Unit))
           release.complete(i)
         }.fork(ctx).bind()
 
-        async<Unit> { cb ->
-          latch.get { res ->
-            res.fold({ e -> cb(Left(e)) }, ::identity, { a -> cb(Right(a)) })
-          }
-        }.bind()
+        async<Unit> { cb -> latch.get(cb) }.bind()
 
         cancel.bind()
         release.get().bind()

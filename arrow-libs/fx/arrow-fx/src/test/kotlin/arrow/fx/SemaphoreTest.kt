@@ -21,7 +21,7 @@ class SemaphoreTest : ArrowFxSpec() {
 
   init {
 
-    fun tests(label: String, semaphore: (Long) -> IOOf<Nothing, Semaphore<IOPartialOf<Nothing>>>) {
+    fun tests(label: String, semaphore: (Long) -> IOOf<Semaphore<ForIO>>) {
       "$label - acquire n synchronously" {
         val n = 20L
         semaphore(n).flatMap { s ->
@@ -138,7 +138,7 @@ class SemaphoreTest : ArrowFxSpec() {
     tests("CancellableSemaphore") { Semaphore(it, IO.concurrent()) }
 
     "CancellableSemaphore - supports cancellation of acquire" {
-      Semaphore(0, IO.concurrent<Nothing>()).flatMap { s ->
+      Semaphore(0, IO.concurrent()).flatMap { s ->
           s.acquire()
         }.unsafeRunAsyncCancellable { }
         .invoke()

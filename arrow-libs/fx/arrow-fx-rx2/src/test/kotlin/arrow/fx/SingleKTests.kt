@@ -5,14 +5,15 @@ import arrow.core.left
 import arrow.fx.rx2.ForSingleK
 import arrow.fx.rx2.SingleK
 import arrow.fx.rx2.SingleKOf
+import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
+import arrow.fx.rx2.extensions.singlek.applicative.applicative
 import arrow.fx.rx2.extensions.singlek.applicativeError.attempt
 import arrow.fx.rx2.extensions.singlek.async.async
-import arrow.fx.rx2.extensions.singlek.monad.flatMap
-import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.extensions.singlek.functor.functor
-import arrow.fx.rx2.extensions.singlek.applicative.applicative
+import arrow.fx.rx2.extensions.singlek.monad.flatMap
 import arrow.fx.rx2.extensions.singlek.monad.monad
+import arrow.fx.rx2.extensions.singlek.timer.timer
 import arrow.fx.rx2.fix
 import arrow.fx.rx2.k
 import arrow.fx.rx2.unsafeRunSync
@@ -20,7 +21,6 @@ import arrow.fx.rx2.value
 import arrow.fx.typeclasses.ExitCase
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.throwable
-import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.test.laws.ConcurrentLaws
 import arrow.fx.test.laws.forFew
 import arrow.typeclasses.Eq
@@ -132,7 +132,7 @@ class SingleKTests : RxJavaSpec() {
       ec shouldBe ExitCase.Cancelled
     }
 
-    "SingleK.cancellable should cancel CancelToken on dispose" {
+    "SingleK cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
         SingleK {
           SingleK.cancellable<Unit> {
