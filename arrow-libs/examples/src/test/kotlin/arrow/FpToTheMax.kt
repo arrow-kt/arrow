@@ -6,8 +6,8 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.fx.IO
 import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.fix
 import arrow.fx.typeclasses.MonadDefer
-import arrow.fx.unsafeRunSync
 import arrow.mtl.State
 import arrow.mtl.StateApi
 import arrow.mtl.StatePartialOf
@@ -100,11 +100,11 @@ object FpToTheMax {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val module = IO.monadDefer<Nothing>().run {
+        val module = IO.monadDefer().run {
             MonadAndConsoleRandom(this, ConsoleImpl(this), FRandomImpl(this))
         }
         val r = module.fMain()
-        r.unsafeRunSync()
+        r.fix().unsafeRunSync()
     }
 
     fun test(): List<String> = run {

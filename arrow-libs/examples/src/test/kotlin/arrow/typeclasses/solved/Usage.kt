@@ -4,10 +4,10 @@ package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
 import arrow.fx.IO
-import arrow.fx.IOPartialOf
+import arrow.fx.ForIO
 import arrow.fx.extensions.io.async.async
+import arrow.fx.fix
 import arrow.fx.typeclasses.Async
-import arrow.fx.unsafeRunSync
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
 import arrow.typeclasses.NetworkModule
@@ -28,7 +28,7 @@ class MyViewModel<F>(dep: RequestOperationsAsync<F>) : RequestOperationsAsync<F>
 
 class MyActivity {
   fun onStart() {
-    dependenciesAsValues.run { 1.fetchUser() }.unsafeRunSync()
+    dependenciesAsValues.run { 1.fetchUser() }.fix().unsafeRunSync()
 
     runBlocking { dependenciesAsValues.fetchUser(1) }
 
@@ -36,9 +36,9 @@ class MyActivity {
   }
 }
 
-val dependenciesAsValues: RequestOperationsAsync<IOPartialOf<Nothing>> =
-  object : RequestOperationsAsync<IOPartialOf<Nothing>>,
-    Async<IOPartialOf<Nothing>> by IO.async() {
+val dependenciesAsValues: RequestOperationsAsync<ForIO> =
+  object : RequestOperationsAsync<ForIO>,
+    Async<ForIO> by IO.async() {
     override val network: NetworkModule = NetworkModule()
     override val dao: DaoDatabase = DaoDatabase()
     override val ctx: CoroutineContext = Dispatchers.Default

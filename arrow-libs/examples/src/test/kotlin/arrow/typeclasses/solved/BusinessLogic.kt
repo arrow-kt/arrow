@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 // Step 0 - Compose operations
 
 interface RequestOperations : DaoOperations, NetworkOperations, DomainMapper {
-    fun Index.fetchUser(): IO<Nothing, User> =
+    fun Index.fetchUser(): IO<User> =
         queryUser().toUserFromDatabase()
             .handleErrorWith { requestUser().toUserFromNetwork() }
 }

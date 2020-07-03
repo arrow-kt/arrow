@@ -21,17 +21,17 @@ import arrow.typeclasses.UserDto
 interface NetworkOperations {
   val network: NetworkModule
 
-  fun Index.requestUser(): IO<Nothing, UserDto> =
+  fun Index.requestUser(): IO<UserDto> =
       IO.effect { network.fetch(this, mapOf("1" to "2")) }
 }
 
 interface DaoOperations {
   val dao: DaoDatabase
 
-  fun Index.queryUser(): IO<Nothing, UserDao> =
+  fun Index.queryUser(): IO<UserDao> =
       IO.effect { dao.query("SELECT * from Users where userId = $this") }
 
-  fun Index.queryCompany(): IO<Nothing, UserDao> =
+  fun Index.queryCompany(): IO<UserDao> =
       IO.effect { dao.query("SELECT * from Companies where companyId = $this") }
 }
 
