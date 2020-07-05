@@ -49,11 +49,17 @@ function addArrowDocs()
 function checkAndDownload()
 {
     REPOSITORY=$1
+    BRANCH=$2
 
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
-        cd $BASEDIR
         echo "Creating $BASEDIR/$REPOSITORY ..."
-        git clone git@github.com:arrow-kt/${REPOSITORY}.git
+        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
+        if [ $BRANCH != "master" ]; then
+            cd $BASEDIR/$REPOSITORY
+            if [ $(hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH) == $BRANCH ]; then
+                git checkout $BRANCH
+            fi
+        fi
     fi
 }
 

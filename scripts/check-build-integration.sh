@@ -1,5 +1,9 @@
 #!/bin/bash
 
+BRANCH=master
+if [ $# -eq 1 ]; then
+    BRANCH=$1
+fi
 export JAVA_OPTS="-Xms512m -Xmx1024m"
 cd $(dirname $0)/../..
 export BASEDIR=$(pwd)
@@ -9,9 +13,7 @@ export BASEDIR=$(pwd)
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    if [ ! -d $BASEDIR/$repository ]; then
-        git clone https://github.com/arrow-kt/$repository.git $BASEDIR/$repository
-    fi
+    checkAndDownload $repository $BRANCH
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
 
@@ -19,9 +21,8 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 done
 
 for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
-    if [ ! -d $BASEDIR/$repository ]; then
-        git clone https://github.com/arrow-kt/$repository.git $BASEDIR/$repository
-    fi
+    checkAndDownload $repository $BRANCH
+
     runAndSaveResult $repository "Test" "$BASEDIR/arrow/scripts/project-test.sh $repository"
 done
 
