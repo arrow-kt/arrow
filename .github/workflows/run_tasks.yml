@@ -18,20 +18,27 @@ jobs:
       with:
         java-version: 1.8
         architecture: x64
-    - name: Install all with local dependencies
+    - name: Prepare env
       run: |
         perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow-core.git
         cd arrow-core
         perl -pe "s/git pull//g" -i scripts/checkout-orchestrator.sh
-        ./gradlew installAllWithLocalDeps
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        replaceGlobalPropertiesbyLocalConf gradle.properties
     - name: Build with local dependencies
       run: |
         cd $BASEDIR/arrow-core
         ./gradlew buildWithLocalDeps
-    # TODO. Flaky tests with Fx
-    #- name: Build all with local dependencies
-    #  run: |
-    #    cd $BASEDIR/arrow-core
-    #    ./gradlew buildAllWithLocalDeps
+    - name: Clean and prepare env
+      run: |
+        cd $BASEDIR/arrow-core
+        git checkout .
+        perl -pe "s/git pull//g" -i scripts/checkout-orchestrator.sh
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        replaceGlobalPropertiesbyLocalConf gradle.properties
+    - name: Build Doc with local dependencies
+      run: |
+        cd $BASEDIR/arrow-core
+        ./gradlew buildArrowDocWithLocalDeps

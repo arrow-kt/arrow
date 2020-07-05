@@ -90,6 +90,11 @@ task testArrowProject(type:Exec) {
     commandLine "${rootDir}/../arrow/scripts/repository-test.sh", "${rootProject.name}"
 }
 
+task generateDocAndValidateWithLocalConf(type:Exec) {
+    mustRunAfter 'installAllWithLocalDeps'
+    commandLine "${rootDir}/../arrow/scripts/repository-build-doc-with-local-conf.sh", "${rootProject.name}"
+}
+
 task testArrowProjects(type:Exec) {
     mustRunAfter 'installAllWithLocalDeps'
     commandLine "${rootDir}/../arrow/scripts/repositories-test.sh"
@@ -100,6 +105,13 @@ task buildWithLocalDeps {
     description = "Build with local Arrow dependencies (tests execution included)"
     dependsOn 'installAllWithLocalDeps'
     dependsOn 'testArrowProject'
+}
+
+task buildArrowDocWithLocalDeps {
+    group = ARROW_GROUP
+    description = "Generate API doc and run validation with local Arrow dependencies"
+    dependsOn 'installAllWithLocalDeps'
+    dependsOn 'generateDocAndValidateWithLocalConf'
 }
 
 task buildAllWithLocalDeps {
