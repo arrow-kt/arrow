@@ -66,7 +66,7 @@ function checkAndDownloadViaHTTPS()
         git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
         if [ $BRANCH != "master" ]; then
             cd $BASEDIR/$REPOSITORY
-            if [ $(hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH) == $BRANCH ]; then
+            if [ "$(hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH)" == $BRANCH ]; then
                 git checkout $BRANCH
             fi
         fi
