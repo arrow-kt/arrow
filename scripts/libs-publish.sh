@@ -5,7 +5,7 @@ set -e
 
 echo "Check and prepare the environment ..."
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    checkAndDownload $lib master
+    checkAndDownloadViaHTTPS $lib master
 done
 
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle

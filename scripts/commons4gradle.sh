@@ -46,14 +46,24 @@ function addArrowDocs()
     echo $INCLUDE_ARROW_DOCS >> $1
 }
 
-function checkAndDownload()
+function checkAndDownloadViaSSH()
+{
+    REPOSITORY=$1
+
+    if [ ! -d $BASEDIR/$REPOSITORY ]; then
+        echo "Creating $BASEDIR/$REPOSITORY ..."
+        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
+    fi
+}
+
+function checkAndDownloadViaHTTPS()
 {
     REPOSITORY=$1
     BRANCH=$2
 
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
         echo "Creating $BASEDIR/$REPOSITORY ..."
-        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
+        git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
         if [ $BRANCH != "master" ]; then
             cd $BASEDIR/$REPOSITORY
             if [ $(hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH) == $BRANCH ]; then

@@ -13,7 +13,7 @@ export BASEDIR=$(pwd)
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    checkAndDownload $repository $BRANCH
+    checkAndDownloadViaHTTPS $repository $BRANCH
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
 
@@ -21,7 +21,7 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 done
 
 for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
-    checkAndDownload $repository $BRANCH
+    checkAndDownloadViaHTTPS $repository $BRANCH
 
     runAndSaveResult $repository "Test" "$BASEDIR/arrow/scripts/project-test.sh $repository"
 done

@@ -9,7 +9,7 @@ REPOSITORY=$(echo $1 | cut -d- -f1-2)
 echo "Check and prepare the environment ..."
 for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
     if [ "$repository" != "$REPOSITORY" ]; then
-        checkAndDownload $repository master
+        checkAndDownloadViaSSH $repository
     fi
 done
 
