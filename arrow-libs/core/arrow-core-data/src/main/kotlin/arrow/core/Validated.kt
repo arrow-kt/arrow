@@ -682,6 +682,20 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      */
     fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
+
+    suspend fun <A> catch(f: suspend () -> A): Validated<Throwable, A> =
+      try {
+        f().valid()
+      } catch (e: Throwable) {
+        e.nonFatalOrThrow().invalid()
+      }
+
+    suspend fun <A> catchNel(f: suspend () -> A): ValidatedNel<Throwable, A> =
+      try {
+        f().validNel()
+      } catch (e: Throwable) {
+        e.nonFatalOrThrow().invalidNel()
+      }
   }
 
   fun show(SE: Show<E>, SA: Show<A>): String = fold({

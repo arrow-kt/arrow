@@ -33,6 +33,7 @@ import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 
+@Suppress("RedundantSuspendModifier")
 class ValidatedTest : UnitSpec() {
 
   init {
@@ -206,6 +207,32 @@ class ValidatedTest : UnitSpec() {
     "withEither should return Invalid(result) if f return Left" {
       Valid(10).withEither { Left(5) } shouldBe Invalid(5)
       Invalid(10).withEither(::identity) shouldBe Invalid(10)
+    }
+
+    "catch should return Valid(result) when f does not throw" {
+      suspend fun loadFromNetwork(): Int = 1
+      val validated = Validated.catch { loadFromNetwork() }
+      validated shouldBe Valid(1)
+    }
+
+    "catch should return Invalid(result) when f throws" {
+      val exception = MyException("Boom!")
+      suspend fun loadFromNetwork(): Int = throw exception
+      val validated = Validated.catch { loadFromNetwork() }
+      validated shouldBe Invalid(exception)
+    }
+
+    "catchNel should return Valid(result) when f does not throw" {
+      suspend fun loadFromNetwork(): Int = 1
+      val validated = Validated.catchNel { loadFromNetwork() }
+      validated shouldBe Valid(1)
+    }
+
+    "catchNel should return Invalid(Nel(result)) when f throws" {
+      val exception = MyException("Boom!")
+      suspend fun loadFromNetwork(): Int = throw exception
+      val validated = Validated.catchNel { loadFromNetwork() }
+      validated shouldBe Invalid(NonEmptyList(exception))
     }
 
     with(VAL_AP) {
