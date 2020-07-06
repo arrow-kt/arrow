@@ -27,6 +27,7 @@ Arrow tasks
 -----------
 buildAllWithLocalDeps - Build libs and examples with local Arrow dependencies (tests execution included)
 buildArrowDoc - Generate API doc and run validation
+buildArrowDocWithLocalDeps - Generate API doc and run validation with local Arrow dependencies
 buildWithLocalDeps - Build with local Arrow dependencies (tests execution included)
 installAllWithLocalDeps - Install all the artifacts using local Arrow dependencies (no tests execution)
 

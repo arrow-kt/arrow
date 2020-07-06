@@ -15,6 +15,6 @@ done
 
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    installProject $lib
+    installWithLocalConf $lib
 done
 #replaceLocalRepositoryByOSS $BASEDIR/arrow/generic-conf.gradle

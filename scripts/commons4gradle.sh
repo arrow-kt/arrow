@@ -107,13 +107,13 @@ function runAndManageExitCode()
     manageExitCode $EXIT_CODE
 }
 
-function installProject()
+function installWithLocalConf()
 {
     PROJECT=$1
     runAndManageExitCode "$PROJECT" "$BASEDIR/arrow/scripts/project-install.sh"
 }
 
-function testProject()
+function testWithLocalConf()
 {
     PROJECT=$1
     runAndManageExitCode "$PROJECT" "$BASEDIR/arrow/scripts/project-test.sh"
@@ -128,4 +128,12 @@ function buildDoc()
     EXIT_CODE=$?
     removeArrowDocs $BASEDIR/$PROJECT/settings.gradle
     manageExitCode $EXIT_CODE
+}
+
+function buildDocWithLocalConf()
+{
+    PROJECT=$1
+
+    replaceGlobalPropertiesbyLocalConf $BASEDIR/$PROJECT/gradle.properties
+    buildDoc $PROJECT
 }
