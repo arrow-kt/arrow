@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sleep 3m
 BRANCH=master
 if [ $# -eq 1 ]; then
     BRANCH=$1
