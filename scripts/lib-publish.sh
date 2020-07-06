@@ -7,9 +7,7 @@ ARROW_LIB=$1
 
 echo "Check and prepare the environment ..."
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    if [ ! -d $BASEDIR/$lib ]; then
-        git clone https://github.com/arrow-kt/$lib.git $BASEDIR/$lib
-    fi
+    checkAndDownloadViaHTTPS $lib master
 done
 
 replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
