@@ -106,7 +106,7 @@ internal fun <O> interruptBoundary(
       when (val close = view.step) {
         is Pull.Eval.CloseScope -> Pull.Eval.CloseScope(
           close.scopeId,
-          Pair(interruptedScope, close.interruptedScope?.second),
+          Pair(interruptedScope, interruptedError),
           ExitCase.Cancelled
         ).transformWith(view::next)
         else ->

@@ -171,7 +171,7 @@ sealed class Pull<out O, out R> {
      */ // Flatten this into Scope with a promise for suspension backpressure?
     data class Interrupted<X>(val context: X, val deferredError: Throwable?) : Result<Nothing>() {
       override fun toString(): String =
-        "Pull.Interrupted($context, ${deferredError?.localizedMessage}"
+        "Pull.Interrupted($context, $deferredError)"
     }
 
     inline fun <B> map(f: (R) -> B): Result<B> =

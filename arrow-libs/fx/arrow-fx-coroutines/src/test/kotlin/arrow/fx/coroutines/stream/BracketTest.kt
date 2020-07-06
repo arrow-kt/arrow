@@ -1,6 +1,7 @@
 package arrow.fx.coroutines.stream
 
 import arrow.core.Either
+import arrow.core.Right
 import arrow.core.identity
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
@@ -231,6 +232,35 @@ class BracketTest : StreamSpec(spec = {
           .drain()
 
         o shouldBe (0 until 10).toList()
+      }
+    }
+
+    "propagate error from release" {
+      checkAll(Arb.stream(Arb.int()), Arb.throwable()) { s, e ->
+        Either.catch {
+          Stream.bracket({ Unit }, { throw e })
+            .flatMap { s }
+            .compile()
+            .toList()
+        } shouldBe Either.Left(e)
+      }
+    }
+
+    "propagate error from pure interrupted stream" {
+      checkAll(Arb.throwable()) { e ->
+        val exit = Promise<ExitCase>()
+
+        assertThrowable {
+          Stream.bracketCase({ Unit }, { _, ex ->
+            exit.complete(ex)
+            throw e
+          }).flatMap { Stream.never<Unit>() }
+            .interruptWhen { Right(sleep(50.milliseconds)) }
+            .compile()
+            .drain()
+        } shouldBe e
+
+        exit.get() shouldBe ExitCase.Cancelled
       }
     }
 
