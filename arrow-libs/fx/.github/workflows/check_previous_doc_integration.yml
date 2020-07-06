@@ -1,0 +1,25 @@
+name: "Check Previous Doc Integration"
+
+on: pull_request
+
+jobs:
+  check-previous_doc-integration:
+
+    env:
+      BASEDIR: ${{github.workspace}}/..
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Prepare env
+      run: brew install hub
+    - name: Check
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git
+        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        $BASEDIR/arrow/scripts/check-doc-integration.sh $BRANCH_NAME
