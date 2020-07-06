@@ -20,6 +20,7 @@ apply from: "$SUBPROJECT_CONF"
 dependencies {
     compile project(":arrow-core-data")
     compile project(":arrow-syntax")
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
     compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
     compile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
     compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
