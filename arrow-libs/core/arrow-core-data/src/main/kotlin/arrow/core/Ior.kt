@@ -139,7 +139,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     is Both -> fab(leftValue, rightValue)
   }
 
-  fun <C> foldLeft(c: C, f: (C, B) -> C): C = fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
+  inline fun <C> foldLeft(c: C, f: (C, B) -> C): C =
+    fold({ c }, { f(c, it) }, { _, b -> f(c, b) })
 
   fun <C> foldRight(lc: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ lc }, { Eval.defer { f(it, lc) } }, { _, b -> Eval.defer { f(b, lc) } })
@@ -148,9 +149,10 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold({ just(Left(it)) }, { b -> f(b).map { Right(it) } }, { _, b -> f(b).map { Right(it) } })
   }
 
-  fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
+  inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+    fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
 
-  fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
 
   /**
@@ -163,8 +165,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
    * ```
    */
-  fun <D> map(f: (B) -> D): Ior<A, D> = fold(
-    { Left(it) },
+  inline fun <D> map(f: (B) -> D): Ior<A, D> = fold(
+    ::Left,
     { Right(f(it)) },
     { a, b -> Both(a, f(b)) }
   )
@@ -180,7 +182,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
    * ```
    */
-  fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
+  inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
     { Left(fa(it)) },
     { Right(fb(it)) },
     { a, b -> Both(fa(a), fb(b)) }
@@ -196,9 +198,9 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
    * ```
    */
-  fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
+  inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
     { Left(fa(it)) },
-    { Right((it)) },
+    ::Right,
     { a, b -> Both(fa(a), b) }
   )
 
@@ -255,7 +257,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Both("power", 12).toEither()  // Result: Either.Right(12)
    * ```
    */
-  fun toEither(): Either<A, B> = fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
+  fun toEither(): Either<A, B> =
+    fold({ Either.Left(it) }, { Either.Right(it) }, { _, b -> Either.Right(b) })
 
   /**
    * Returns a [Some] containing the [Right] value or `B` if this is [Right] or [Both]
@@ -268,7 +271,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Both(12, "power").toOption()  // Result: Some("power")
    * ```
    */
-  fun toOption(): Option<B> = fold({ None }, { Some(it) }, { _, b -> Some(b) })
+  fun toOption(): Option<B> =
+    fold({ None }, { Some(it) }, { _, b -> Some(b) })
 
   /**
    * Returns a [Some] containing the [Left] value or `A` if this is [Left] or [Both]
@@ -295,7 +299,8 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Both(12, "power").toValidated()  // Result: Valid("power")
    * ```
    */
-  fun toValidated(): Validated<A, B> = fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
+  fun toValidated(): Validated<A, B> =
+    fold({ Invalid(it) }, { Valid(it) }, { _, b -> Valid(b) })
 
   data class Left<out A>(val value: A) : Ior<A, Nothing>() {
     override val isRight: Boolean get() = false
@@ -343,7 +348,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
  *
  * @param f The function to bind across [Ior.Right].
  */
-fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> = fold(
+inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D> = fold(
   { Ior.Left(it) },
   f,
   { l, r ->
@@ -362,7 +367,8 @@ fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
   flatMap(SG) { a -> ff.fix().map { f -> f(a) } }
 
-fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
+inline fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B =
+  fold({ default() }, ::identity, { _, b -> b })
 
 fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
   fix().traverse(GA, ::identity)

@@ -203,30 +203,42 @@ class NonEmptyList<out A> private constructor(
   constructor(head: A, tail: List<A>) : this(head, tail.toList(), listOf(head) + tail.toList())
   private constructor(list: List<A>) : this(list[0], list.drop(1), list.toList())
 
-  val size: Int = all.size
+  val size: Int =
+    all.size
 
-  fun contains(element: @UnsafeVariance A): Boolean = (head == element) || element in tail
+  fun contains(element: @UnsafeVariance A): Boolean =
+    (head == element) || element in tail
 
-  fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all(this::contains)
+  fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
+    elements.all(this::contains)
 
   @Suppress("FunctionOnlyReturningConstant")
-  fun isEmpty(): Boolean = false
+  fun isEmpty(): Boolean =
+    false
 
-  fun toList(): List<A> = all
+  fun toList(): List<A> =
+    all
 
-  fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
+  inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
+    NonEmptyList(f(head), tail.map(f))
 
-  fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
+  inline fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
+    f(head).fix() + tail.flatMap { f(it).fix().all }
 
-  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> = fix().flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
+  fun <B> ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
+    fix().flatMap { a -> ff.fix().map { f -> f(a) } }.fix()
 
-  operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l.all)
+  operator fun plus(l: NonEmptyList<@UnsafeVariance A>): NonEmptyList<A> =
+    NonEmptyList(all + l.all)
 
-  operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> = NonEmptyList(all + l)
+  operator fun plus(l: List<@UnsafeVariance A>): NonEmptyList<A> =
+    NonEmptyList(all + l)
 
-  operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> = NonEmptyList(all + a)
+  operator fun plus(a: @UnsafeVariance A): NonEmptyList<A> =
+    NonEmptyList(all + a)
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().tail.fold(f(b, this.fix().head), f)
+  inline fun <B> foldLeft(b: B, f: (B, A) -> B): B =
+    this.fix().tail.fold(f(b, this.fix().head), f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
@@ -247,7 +259,8 @@ class NonEmptyList<out A> private constructor(
     return NonEmptyList(f(this), consume(this.fix().tail))
   }
 
-  fun extract(): A = this.fix().head
+  fun extract(): A =
+    this.fix().head
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -260,19 +273,30 @@ class NonEmptyList<out A> private constructor(
     return true
   }
 
-  override fun hashCode(): Int = all.hashCode()
+  override fun hashCode(): Int =
+    all.hashCode()
 
-  fun show(SA: Show<A>): String = "NonEmptyList(${all.k().show(SA)})"
+  fun show(SA: Show<A>): String =
+    "NonEmptyList(${all.k().show(SA)})"
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String =
+    show(Show.any())
 
   companion object {
-    operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-    fun <A> of(head: A, vararg t: A): NonEmptyList<A> = NonEmptyList(head, t.asList())
-    fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> = if (l.isEmpty()) None else Some(NonEmptyList(l))
-    fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> = NonEmptyList(l)
+    operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> =
+      NonEmptyList(head, t.asList())
 
-    fun <A> just(a: A): NonEmptyList<A> = a.nel()
+    fun <A> of(head: A, vararg t: A): NonEmptyList<A> =
+      NonEmptyList(head, t.asList())
+
+    fun <A> fromList(l: List<A>): Option<NonEmptyList<A>> =
+      if (l.isEmpty()) None else Some(NonEmptyList(l))
+
+    fun <A> fromListUnsafe(l: List<A>): NonEmptyList<A> =
+      NonEmptyList(l)
+
+    fun <A> just(a: A): NonEmptyList<A> =
+      of(a)
 
     @Suppress("UNCHECKED_CAST")
     private tailrec fun <A, B> go(
@@ -302,9 +326,11 @@ class NonEmptyList<out A> private constructor(
   }
 }
 
-fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
+inline fun <A> A.nel(): NonEmptyList<A> =
+  NonEmptyList.of(this)
 
 fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
   fix().traverse(GA, ::identity)
 
-fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = fix().plus(y.fix())
+fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
+  fix().plus(y.fix())
