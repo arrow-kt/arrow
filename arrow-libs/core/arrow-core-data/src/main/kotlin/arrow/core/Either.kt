@@ -852,6 +852,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
     fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
+    fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
+
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
       val ev: Either<L, Either<A, B>> = f(a).fix()
       return when (ev) {

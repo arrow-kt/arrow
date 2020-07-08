@@ -44,6 +44,7 @@ import arrow.core.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 
 class EitherTest : UnitSpec() {
 
@@ -72,6 +73,16 @@ class EitherTest : UnitSpec() {
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
       FxLaws.laws<EitherPartialOf<String>, Int>(Gen.int().map(::Right), GEN.map { it }, Either.eqK(String.eq()).liftEq(Int.eq()), ::either, ::either)
     )
+
+    "fromNullable should lift value as a Right if it is not null" {
+      forAll { a: Int ->
+        Either.fromNullable(a) == Right(a)
+      }
+    }
+
+    "fromNullable should lift value as a Left(Unit) if it is null" {
+      Either.fromNullable(null) shouldBe Left(Unit)
+    }
 
     "empty should return a Right of the empty of the inner type" {
       forAll { _: String ->
