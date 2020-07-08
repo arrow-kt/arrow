@@ -780,7 +780,7 @@ class StreamTest : StreamSpec(spec = {
         }
 
         Stream.iterate(0, Int::inc)
-          .flatMap { Stream(it).delayBy(10.milliseconds) }
+          .flatMap { Stream(it) }
           .interruptWhen { Right(latch.get()) }
           .through(p)
           .compile()
