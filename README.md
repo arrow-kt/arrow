@@ -5,7 +5,7 @@
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
-![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=%231da1f2&style=flat)
+[![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=%231da1f2&style=flat)](https://twitter.com/arrow_kt)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
