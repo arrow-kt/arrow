@@ -5,6 +5,7 @@
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
+![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=%231da1f2&style=flat)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
@@ -30,23 +31,19 @@ If you have a blog post, talk, or upcoming event on Arrow, please considering op
 
 ## About this repository
 
-This repository orchestrates the global configuration and checks of the **Λrrow** libraries:
+This repository orchestrates the global configuration and checks of the **Λrrow** libraries and other related repositories.
 
-|   | Library | SSH | HTTPS | 
+|   |    | SSH | HTTPS | 
 | - | ------- | -------------- | ---------------- |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Ank](https://github.com/arrow-kt/arrow-ank) | `git@github.com:arrow-kt/arrow-ank.git` | `https://github.com/arrow-kt/arrow-ank.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Core](https://github.com/arrow-kt/arrow-core) | `git@github.com:arrow-kt/arrow-core.git` | `https://github.com/arrow-kt/arrow-core.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/fx/arrow-fx-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Fx](https://github.com/arrow-kt/arrow-fx) | `git@github.com:arrow-kt/arrow-fx.git` | `https://github.com/arrow-kt/arrow-fx.git` |
+| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/optics/arrow-optics-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Optics](https://github.com/arrow-kt/arrow-optics) | `git@github.com:arrow-kt/arrow-optics.git` | `https://github.com/arrow-kt/arrow-optics.git` |
+| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/meta/arrow-meta-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Meta](https://github.com/arrow-kt/arrow-meta) | `git@github.com:arrow-kt/arrow-meta.git` | `https://github.com/arrow-kt/arrow-meta.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/incubator/arrow-incubator-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Incubator](https://github.com/arrow-kt/arrow-incubator) | `git@github.com:arrow-kt/arrow-incubator.git` | `https://github.com/arrow-kt/arrow-incubator.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Integrations](https://github.com/arrow-kt/arrow-integrations) | `git@github.com:arrow-kt/arrow-integrations.git` | `https://github.com/arrow-kt/arrow-integrations.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/optics/arrow-optics-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Optics](https://github.com/arrow-kt/arrow-optics) | `git@github.com:arrow-kt/arrow-optics.git` | `https://github.com/arrow-kt/arrow-optics.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow UI](https://github.com/arrow-kt/arrow-ui) | `git@github.com:arrow-kt/arrow-ui.git` | `https://github.com/arrow-kt/arrow-ui.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Check](https://github.com/arrow-kt/arrow-check) | `git@github.com:arrow-kt/arrow-check.git` | `https://github.com/arrow-kt/arrow-check.git` |
-
-and other related repositories:
-
-|   | Repository | SSH | HTTPS | 
-| - | ------- | -------------- | ---------------- |
+| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Ank](https://github.com/arrow-kt/arrow-ank) | `git@github.com:arrow-kt/arrow-ank.git` | `https://github.com/arrow-kt/arrow-ank.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Site](https://github.com/arrow-kt/arrow-site) | `git@github.com:arrow-kt/arrow-site.git` | `https://github.com/arrow-kt/arrow-site.git` |
 | <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Examples](https://github.com/arrow-kt/arrow-examples) | `git@github.com:arrow-kt/arrow-examples.git` | `https://github.com/arrow-kt/arrow-examples.git` |
 
