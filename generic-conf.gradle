@@ -87,7 +87,7 @@ task installAllWithLocalDeps(type:Exec) {
 
 task testArrowProject(type:Exec) {
     mustRunAfter 'installAllWithLocalDeps'
-    commandLine "${rootDir}/../arrow/scripts/repository-test.sh", "${rootProject.name}"
+    commandLine "${rootDir}/../arrow/scripts/repository-check.sh", "${rootProject.name}"
 }
 
 task generateDocAndValidateWithLocalConf(type:Exec) {
@@ -97,7 +97,7 @@ task generateDocAndValidateWithLocalConf(type:Exec) {
 
 task testArrowProjects(type:Exec) {
     mustRunAfter 'installAllWithLocalDeps'
-    commandLine "${rootDir}/../arrow/scripts/repositories-test.sh"
+    commandLine "${rootDir}/../arrow/scripts/repositories-check.sh"
 }
 
 task buildWithLocalDeps {

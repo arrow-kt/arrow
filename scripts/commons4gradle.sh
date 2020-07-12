@@ -169,10 +169,10 @@ function installWithLocalConf()
     runAndManageExitCode "$PROJECT" "$BASEDIR/arrow/scripts/project-install.sh"
 }
 
-function testWithLocalConf()
+function checkWithLocalConf()
 {
     PROJECT=$1
-    runAndManageExitCode "$PROJECT" "$BASEDIR/arrow/scripts/project-test.sh"
+    runAndManageExitCode "$PROJECT" "$BASEDIR/arrow/scripts/project-check.sh"
 }
 
 function buildDoc()
