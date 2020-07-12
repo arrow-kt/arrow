@@ -103,7 +103,7 @@ function updateOrchestrator()
 {
     BRANCH=$1
 
-    sleep 3m
+    sleep 180
     cd $BASEDIR/arrow
     if [ "$BRANCH" == "master" ]; then
         echo "Updating master branch for arrow repository ..."

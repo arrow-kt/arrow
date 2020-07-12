@@ -20,7 +20,7 @@ jobs:
         perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
-        sleep 3m
+        sleep 180
         checkAndDownloadViaHTTPS arrow-core $BRANCH_NAME
         perl -pe "s/git pull//g" -i $BASEDIR/arrow-core/scripts/checkout-orchestrator.sh
         replaceGlobalPropertiesbyLocalConf $BASEDIR/arrow-core/gradle.properties
