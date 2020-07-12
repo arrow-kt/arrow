@@ -21,7 +21,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |
@@ -33,13 +35,17 @@ jobs:
         echo "::set-output name=release-version::$LATEST_VERSION"
         echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
+    - name: "Publish into OSS: previous installation"
+      if: steps.versions.outputs.new-version-exists == '0'
+      run: |
+        git clone https://github.com/arrow-kt/$ARROW_LIB.git $BASEDIR/$ARROW_LIB
+        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB
     - name: "Publish into OSS"
       if: steps.versions.outputs.new-version-exists == '0'
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
-        git clone https://github.com/arrow-kt/$ARROW_LIB.git $BASEDIR/$ARROW_LIB
         $BASEDIR/arrow/scripts/project-publish.sh $ARROW_LIB
     - name: Publish into Bintray
       if: steps.versions.outputs.new-version-exists == '1'

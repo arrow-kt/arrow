@@ -8,6 +8,38 @@ In order to generate the documentation and validate it:
 ./gradlew buildArrowDoc
 ```
 
+## Another Gradle task
+
+One of the drawbacks of the multi-repo is the ability to check changes that could impact on other libraries.
+
+In order to overcome that situation, a new Gradle task is provided for every repository:
+
+* Generate API doc and run validation with local Arrow dependencies:
+```bash
+./gradlew buildArrowDocWithLocalDeps
+```
+
+That task will download the rest of the repositories automatically:
+
+```
+workspace/
+├── arrow
+├── arrow-core
+├── ...
+└── arrow-optics
+```
+
+In order to keep those repositories updated:
+
+* Run git-pull for all the repositories:
+```bash
+./gradlew gitPullAll
+```
+* Run git-pull for the rest of the repositories:
+```bash
+./gradlew gitPullOthers
+```
+
 ## Doc snippets policies
 
 Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please,

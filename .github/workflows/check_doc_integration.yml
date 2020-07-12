@@ -17,6 +17,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Check
-      run: ./scripts/check-doc-integration.sh
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Prepare env
+      run: brew install hub
+    - name: Check Doc Integration
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        ./scripts/check-doc-integration.sh $BRANCH_NAME

@@ -34,6 +34,12 @@ function replaceOSSbyBintrayRepository()
     perl -pe "s/maven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/maven \{ url \"$(escapeURL $BINTRAY_REPOSITORY)\" }/g" -i $1
 }
 
+function addLocalRepositoryBeforeOSS()
+{
+    echo "Adding local repository before OSS ($1) ..."
+    perl -pe "s/maven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/$MAVEN_LOCAL_REPOSITORY\nmaven \{ url \"$(escapeURL $OSS_REPOSITORY)\" }/g" -i $1
+}
+
 function removeArrowDocs()
 {
     echo "Removing Arrow Docs ($1)..."
@@ -56,6 +62,29 @@ function checkAndDownloadViaSSH()
     fi
 }
 
+function lookForBranchInPullRequests()
+{
+    BRANCH=$1
+
+    hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH
+}
+
+function checkoutBranchIfFound()
+{
+    REPOSITORY=$1
+    BRANCH=$2
+
+    cd $BASEDIR/$REPOSITORY
+    if [ "$(lookForBranchInPullRequests $BRANCH)" == $BRANCH ]; then
+        echo "$BRANCH found for $REPOSITORY!"
+        if [[ $BRANCH =~ .+:.+ ]]; then
+            git merge --no-ff $(echo $BRANCH | sed "s/:/-/g")
+        else
+            git checkout $BRANCH
+        fi
+    fi
+}
+
 function checkAndDownloadViaHTTPS()
 {
     REPOSITORY=$1
@@ -63,13 +92,24 @@ function checkAndDownloadViaHTTPS()
 
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
         echo "Creating $BASEDIR/$REPOSITORY ..."
-        git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
-        if [ $BRANCH != "master" ]; then
-            cd $BASEDIR/$REPOSITORY
-            if [ "$(hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH)" == $BRANCH ]; then
-                git checkout $BRANCH
-            fi
-        fi
+        git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY --depth 1 --no-single-branch
+    fi
+    if [ $BRANCH != "master" ]; then
+        checkoutBranchIfFound $REPOSITORY $BRANCH
+    fi
+}
+
+function updateOrchestrator()
+{
+    BRANCH=$1
+
+    sleep 3m
+    cd $BASEDIR/arrow
+    if [ "$BRANCH" == "master" ]; then
+        echo "Updating master branch for arrow repository ..."
+        git pull --rebase origin master
+    else
+        checkoutBranchIfFound arrow $BRANCH
     fi
 }
 

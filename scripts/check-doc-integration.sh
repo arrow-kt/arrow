@@ -1,13 +1,10 @@
 #!/bin/bash
 
-sleep 3m
 BRANCH=master
-if [ $# -eq 1 ]; then
-    BRANCH=$1
-fi
-export JAVA_OPTS="-Xms512m -Xmx1024m"
-cd $(dirname $0)/../..
-export BASEDIR=$(pwd)
+if [ $# -eq 1 ]; then BRANCH=$1; fi
+
+. $BASEDIR/arrow/scripts/commons4gradle.sh
+updateOrchestrator $BRANCH
 . $BASEDIR/arrow/scripts/commons4gradle.sh
 . $BASEDIR/arrow/scripts/commons4filesystem.sh
 

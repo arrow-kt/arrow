@@ -12,21 +12,19 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        architecture: x64
+    - uses: actions/checkout@v2
     - name: Prepare env
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        brew install hub
         perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow-core.git
-        cd arrow-core
-        perl -pe "s/git pull//g" -i scripts/checkout-orchestrator.sh
         . $BASEDIR/arrow/scripts/commons4gradle.sh
-        replaceGlobalPropertiesbyLocalConf gradle.properties
+        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        sleep 3m
+        checkAndDownloadViaHTTPS arrow-core $BRANCH_NAME
+        perl -pe "s/git pull//g" -i $BASEDIR/arrow-core/scripts/checkout-orchestrator.sh
+        replaceGlobalPropertiesbyLocalConf $BASEDIR/arrow-core/gradle.properties
     - name: Build with local dependencies
       run: |
         cd $BASEDIR/arrow-core
