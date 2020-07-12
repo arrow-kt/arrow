@@ -19,7 +19,7 @@ jobs:
       run: |
         perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         . $BASEDIR/arrow/scripts/commons4gradle.sh
-        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         sleep 180
         checkAndDownloadViaHTTPS arrow-core $BRANCH_NAME
         perl -pe "s/git pull//g" -i $BASEDIR/arrow-core/scripts/checkout-orchestrator.sh

@@ -20,10 +20,10 @@ When creating a pull request, several actions are executed automatically to chec
 
 * Optional checks
   * `Check Previous Build Integration`:
-    * Install all the Arrow libraries in the local Maven repository.
+    * Install all the Arrow libraries in the local Maven repository (open pull requests with the same branch name will be considered).
     * Run `check` Gradle task for all the Arrow libraries.
   * `Check Previous Doc Integration`:
-    * Install all the Arrow libraries in the local Maven repository.
+    * Install all the Arrow libraries in the local Maven repository (open pull requests with the same branch name will be considered).
     * Run `buildArrowDoc` Gradle task for all the Arrow libraries.
 
 Besides the required checks, it's necessary to get the approval by one of the members of the Arrow Community.

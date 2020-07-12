@@ -24,5 +24,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         ./scripts/check-doc-integration.sh $BRANCH_NAME
