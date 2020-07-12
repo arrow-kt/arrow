@@ -17,7 +17,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        brew install hub
         perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)

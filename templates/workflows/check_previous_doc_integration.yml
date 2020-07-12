@@ -19,8 +19,6 @@ jobs:
       run: |
         cd $BASEDIR
         git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
-    - name: Prepare env
-      run: brew install hub
     - name: Check Doc Integration
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
