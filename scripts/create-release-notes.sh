@@ -2,7 +2,6 @@
  
 set -e
 
-brew install hub
 cd $BASEDIR/$ARROW_LIB
 
 TAG_TIMESTAMP=$(git log $LATEST_PUBLISHED_VERSION --pretty="format:%ct" | head -1)

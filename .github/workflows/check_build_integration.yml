@@ -17,6 +17,12 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Check
-      run: ./scripts/check-build-integration.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        ./scripts/check-build-integration.sh $BRANCH_NAME

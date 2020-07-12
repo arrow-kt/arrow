@@ -2,7 +2,6 @@
  
 set -e
 
-brew install hub
 echo -e "Release RELEASE_VERSION\n\n" > $BASEDIR/arrow/release-notes-all.txt
 echo -e "RELEASE_VERSION ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do

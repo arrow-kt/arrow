@@ -14,4 +14,3 @@ for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
         git pull
     fi
 done
-

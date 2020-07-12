@@ -10,11 +10,12 @@ Find some combinations of search qualifiers:
 
 ## Gradle tasks
 
-One of the drawbacks of multi-repo is the ability to check changes that could impact on other repositories.
+One of the drawbacks of the multi-repo is the ability to check changes that could impact on other repositories.
 
 In order to overcome that situation, new Gradle tasks are provided for every repository:
 
 ```
+$> cd <arrow-library-repository>
 $> ./gradlew tasks
 
 ...
