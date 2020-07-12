@@ -15,11 +15,13 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Check
+    - uses: actions/checkout@v2
+    - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
+        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+    - name: Check Doc Integration
+      run: |
         $BASEDIR/arrow/scripts/check-doc-integration.sh
     - name: Prepare environment to create the issue (new package)
       if: failure()
