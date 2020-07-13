@@ -75,6 +75,7 @@ function checkoutBranchIfFound()
     BRANCH=$2
 
     cd $BASEDIR/$REPOSITORY
+    echo "Looking for $BRANCH in $REPOSITORY ..."
     if [ "$(lookForBranchInPullRequests $BRANCH)" == $BRANCH ]; then
         echo "$BRANCH found for $REPOSITORY!"
         if [[ $BRANCH =~ .+:.+ ]]; then
@@ -93,9 +94,9 @@ function checkAndDownloadViaHTTPS()
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
         echo "Creating $BASEDIR/$REPOSITORY ..."
         git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY --depth 1 --no-single-branch
-    fi
-    if [ $BRANCH != "master" ]; then
-        checkoutBranchIfFound $REPOSITORY $BRANCH
+        if [ $BRANCH != "master" ]; then
+            checkoutBranchIfFound $REPOSITORY $BRANCH
+        fi
     fi
 }
 

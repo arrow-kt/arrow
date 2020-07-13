@@ -13,8 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
@@ -23,5 +21,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         $BASEDIR/arrow/scripts/check-build-integration.sh $BRANCH_NAME
