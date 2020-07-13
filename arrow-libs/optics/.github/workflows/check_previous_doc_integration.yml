@@ -12,14 +12,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Prepare env
-      run: brew install hub
-    - name: Check
+    - uses: actions/checkout@v2
+    - name: Checkout orchestrator
+      run: |
+        cd $BASEDIR
+        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+    - name: Check Doc Integration
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
-        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         $BASEDIR/arrow/scripts/check-doc-integration.sh $BRANCH_NAME

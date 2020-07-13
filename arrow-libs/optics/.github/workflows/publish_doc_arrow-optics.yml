@@ -16,11 +16,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
+        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+    - name: Install
+      run: |
+        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB
     - name: Run Ank for site
       run: |
         $BASEDIR/arrow/scripts/site-download.sh
