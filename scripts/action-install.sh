@@ -17,7 +17,8 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 
         if [ $BRANCH != "master" ]; then
             cd $BASEDIR/$repository
-            if [ "$(lookForBranchInPullRequests $BRANCH)" != $BRANCH ]; then
+            FOUND_BRANCH=$(lookForBranchInPullRequests $BRANCH)
+            if [ "$FOUND_BRANCH" != $BRANCH ] && [[ ! "$FOUND_BRANCH" =~ ":$BRANCH"$ ]]; then
                 echo "Skipping $repository"
                 continue
             fi
