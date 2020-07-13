@@ -1,6 +1,9 @@
 name: "arrow-ank: build documentation"
 
-on: pull_request
+on:
+  pull_request:
+    paths-ignore:
+    - 'README.md'
 
 jobs:
   arrow-ank_build_documentation:

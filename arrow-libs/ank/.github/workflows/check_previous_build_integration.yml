@@ -1,6 +1,9 @@
 name: "Check Previous Build Integration"
 
-on: pull_request
+on:
+  pull_request:
+    paths-ignore:
+    - 'README.md'
 
 jobs:
   check-previous_build-integration:

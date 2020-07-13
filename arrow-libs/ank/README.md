@@ -104,6 +104,8 @@ The language used (Kotlin or Java) should be prepended to `:ank` e.g. `kotlin:an
 | `:silent` | Suppresses output; under this modifier the input and output text are identical. |
 | `:replace` | Replaces an entire snippet with the output of the resulting evaluation. |
 | `:outFile(<file>)` | Replaces the code fence entirely with an empty string and writes the result of the evaluated code into the specified file. |
+| `:playground` | Provides an option to run the code snippet on the website. |
+| `:fail` | The error raised from the code snippet will be appended at the end. |
 
 ### `<language>:ank`
 
