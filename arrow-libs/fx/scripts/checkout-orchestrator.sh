@@ -2,10 +2,9 @@
 
 ROOTDIR=$1
 cd ${ROOTDIR}/..
-INSTALLDIR=$(pwd)
-cd $INSTALLDIR
+BASEDIR=$(pwd)
 if [ ! -d arrow ]; then
-    echo "Clone arrow repository in $INSTALLDIR/arrow ..."
+    echo "Clone arrow repository in $BASEDIR/arrow ..."
     git clone https://github.com/arrow-kt/arrow.git
 else
     echo "Updating $INSTALLDIR/arrow ..."
