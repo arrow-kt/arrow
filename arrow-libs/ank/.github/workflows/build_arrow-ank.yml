@@ -13,12 +13,33 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
-    - name: Build with Gradle
-      run: $BASEDIR/arrow/scripts/project-build.sh $ARROW_LIB
+        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+    - name: Install
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB $BRANCH_NAME
+    - name: Check
+      run: |
+        ./gradlew check
+    - name: Prepare test reports
+      if: ${{ always() }}
+      run: |
+        mkdir test-reports
+        for report in `ls -d ./**/build/reports/tests/test`; do
+          arrow_module=$(echo $report | cut -d/ -f2)
+          cp -r $report test-reports/$arrow_module
+        done
+    - name: Make test reports available to download
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-reports
+        path: test-reports
