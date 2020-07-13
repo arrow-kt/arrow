@@ -66,7 +66,7 @@ function lookForBranchInPullRequests()
 {
     BRANCH=$1
 
-    hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH
+    hub pr list --limit 100 -s open --format='%H%n' | grep $BRANCH || true
 }
 
 function checkoutBranchIfFound()
@@ -76,12 +76,13 @@ function checkoutBranchIfFound()
 
     cd $BASEDIR/$REPOSITORY
     echo "Looking for $BRANCH in $REPOSITORY ..."
-    if [ "$(lookForBranchInPullRequests $BRANCH)" == $BRANCH ]; then
-        echo "$BRANCH found for $REPOSITORY!"
-        if [[ $BRANCH =~ .+:.+ ]]; then
-            git merge --no-ff $(echo $BRANCH | sed "s/:/-/g")
+    FOUND_BRANCH=$(lookForBranchInPullRequests $BRANCH)
+    if [ "$FOUND_BRANCH" == $BRANCH ] || [[ "$FOUND_BRANCH" =~ ":$BRANCH"$ ]]; then
+        echo "$FOUND_BRANCH found for $REPOSITORY!"
+        if [[ $FOUND_BRANCH =~ .+:.+ ]]; then
+            git merge --no-ff $(echo $FOUND_BRANCH | sed "s/:/-/g")
         else
-            git checkout $BRANCH
+            git checkout $FOUND_BRANCH
         fi
     fi
 }
