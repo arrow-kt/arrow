@@ -16,13 +16,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Validate Gradle Wrapper
-      uses: gradle/wrapper-validation-action@v1
+    - uses: actions/checkout@v2
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git
+        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+    - name: Install
+      run: |
+        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB
     - name: Publish artifacts
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
