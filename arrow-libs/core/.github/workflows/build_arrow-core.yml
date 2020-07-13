@@ -24,7 +24,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        BRANCH_NAME=$(echo $GITHUB_REF | cut -d/ -f3)
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB $BRANCH_NAME
     - name: Check
       run: |
