@@ -80,7 +80,8 @@ function checkoutBranchIfFound()
     if [ "$FOUND_BRANCH" == $BRANCH ] || [[ "$FOUND_BRANCH" =~ ":$BRANCH"$ ]]; then
         echo "$FOUND_BRANCH found for $REPOSITORY!"
         if [[ $FOUND_BRANCH =~ .+:.+ ]]; then
-            git merge --no-ff $(echo $FOUND_BRANCH | sed "s/:/-/g")
+            OWNER=$(echo $FOUND_BRANCH | cut -d: -f1)
+            git pull --rebase https://github.com/$OWNER/$REPOSITORY.git $BRANCH
         else
             git checkout $FOUND_BRANCH
         fi
