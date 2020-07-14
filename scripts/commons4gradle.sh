@@ -124,6 +124,7 @@ function replaceGlobalPropertiesbyLocalConf()
     perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $NEW_DIR)\/subproject-conf.gradle/g" -i $1
     perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $NEW_DIR)\/doc-conf.gradle/g" -i $1
     perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $NEW_DIR)\/publish-conf.gradle/g" -i $1
+    perl -pe "s/^ANDROID_CONF.*/ANDROID_CONF=$(escapeURL $NEW_DIR)\/android-conf.gradle/g" -i $1
     perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
@@ -135,6 +136,7 @@ function replaceLocalConfbyGlobalProperties()
     perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $OLD_DIR)\/subproject-conf.gradle/g" -i $1
     perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $OLD_DIR)\/doc-conf.gradle/g" -i $1
     perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $OLD_DIR)\/publish-conf.gradle/g" -i $1
+    perl -pe "s/^ANDROID_CONF.*/ANDROID_CONF=$(escapeURL $OLD_DIR)\/android-conf.gradle/g" -i $1
     perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
