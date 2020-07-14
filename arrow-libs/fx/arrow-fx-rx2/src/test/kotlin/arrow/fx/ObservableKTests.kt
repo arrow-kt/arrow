@@ -1,10 +1,10 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.Try
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
+import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.rx2.extensions.concurrent
 import arrow.fx.rx2.extensions.fx
 import arrow.fx.rx2.extensions.observablek.applicative.applicative
@@ -29,7 +29,6 @@ import io.reactivex.observers.TestObserver
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.TimeoutException
 
 class ObservableKTests : RxJavaSpec() {
 
@@ -123,21 +122,12 @@ class ObservableKTests : RxJavaSpec() {
 }
 
 private fun <T> ObservableK.Companion.eq(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
-  override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean {
-    val res1 = Try { value().timeout(5, SECONDS).blockingFirst() }
-    val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
-    return res1.fold({ t1 ->
-      res2.fold({ t2 ->
-        if (t1::class.java == TimeoutException::class.java) throw t1
-        if (t2::class.java == TimeoutException::class.java) throw t2
-        (t1::class.java == t2::class.java)
-      }, { false })
-    }, { v1 ->
-      res2.fold({ false }, {
-        v1 == it
-      })
+  override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
+    unsafeRunEq({
+      this.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
+    }, {
+      b.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
     })
-  }
 }
 
 private fun ObservableK.Companion.eqK() = object : EqK<ForObservableK> {

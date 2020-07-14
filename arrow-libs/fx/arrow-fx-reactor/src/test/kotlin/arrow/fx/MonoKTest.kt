@@ -16,6 +16,7 @@ import arrow.fx.reactor.fix
 import arrow.fx.reactor.k
 import arrow.fx.reactor.unsafeRunSync
 import arrow.fx.reactor.value
+import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.typeclasses.ExitCase
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.GenK
@@ -42,25 +43,11 @@ class MonoKTest : UnitSpec() {
 
   fun <T> EQ(): Eq<MonoKOf<T>> = object : Eq<MonoKOf<T>> {
     override fun MonoKOf<T>.eqv(b: MonoKOf<T>): Boolean =
-      try {
-        this.value().block() == b.value().block()
-      } catch (throwable: Throwable) {
-        val errA = try {
-          this.value().block()
-          throw IllegalArgumentException()
-        } catch (err: Throwable) {
-          err
-        }
-
-        val errB = try {
-          b.value().block()
-          throw IllegalStateException()
-        } catch (err: Throwable) {
-          err
-        }
-
-        errA == errB
-      }
+      unsafeRunEq({
+        this.value().block()
+      }, {
+        b.value().block()
+      })
   }
 
   fun EQK() = object : EqK<ForMonoK> {

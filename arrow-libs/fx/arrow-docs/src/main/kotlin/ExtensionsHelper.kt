@@ -41,8 +41,6 @@ private val moduleNames: Map<String, String> = mapOf(
   "arrow.recursion.pattern" to "arrow-recursion-data",
   "arrow.recursion.typeclasses" to "arrow-recursion-data",
   "arrow.reflect" to "arrow-reflect",
-  "arrow.streams" to "arrow-streams",
-  "arrow.streams.internal" to "arrow-streams",
   "arrow.ui.extensions" to "arrow-ui",
   "arrow.ui" to "arrow-ui-data",
   "arrow.validation.refinedTypes" to "arrow-validation",

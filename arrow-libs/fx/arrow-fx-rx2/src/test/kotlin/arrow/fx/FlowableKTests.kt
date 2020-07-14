@@ -1,12 +1,12 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.Try
 import arrow.core.test.generators.GenK
 import arrow.core.test.laws.MonadFilterLaws
 import arrow.core.test.laws.TraverseLaws
 import arrow.fx.rx2.FlowableK
 import arrow.fx.rx2.FlowableKOf
+import arrow.fx.test.eq.unsafeRunEq
 import arrow.fx.rx2.ForFlowableK
 import arrow.fx.rx2.extensions.asyncDrop
 import arrow.fx.rx2.extensions.asyncError
@@ -36,26 +36,16 @@ import io.reactivex.Flowable
 import io.reactivex.subscribers.TestSubscriber
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 class FlowableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
-    override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean {
-      val res1 = Try { value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
-      val res2 = Try { b.value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
-      return res1.fold({ t1 ->
-        res2.fold({ t2 ->
-          if (t1::class.java == TimeoutException::class.java) throw t1
-          if (t2::class.java == TimeoutException::class.java) throw t2
-          (t1::class.java == t2::class.java)
-        }, { false })
-      }, { v1 ->
-        res2.fold({ false }, {
-          v1 == it
-        })
+    override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean =
+      unsafeRunEq({
+        this.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
+      }, {
+        b.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
       })
-    }
   }
 
   fun EQK() = object : EqK<ForFlowableK> {
@@ -153,12 +143,12 @@ class FlowableKTests : RxJavaSpec() {
 
     "FlowableK cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
-          FlowableK {
-            FlowableK.cancellable<Unit>(fa = {
-              latch.complete(Unit)
-            }).flowable.subscribe().dispose()
-          }.flatMap { latch.get() }
-        }.value()
+        FlowableK {
+          FlowableK.cancellable<Unit>(fa = {
+            latch.complete(Unit)
+          }).flowable.subscribe().dispose()
+        }.flatMap { latch.get() }
+      }.value()
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)

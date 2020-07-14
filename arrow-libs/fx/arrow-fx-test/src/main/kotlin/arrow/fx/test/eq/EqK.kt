@@ -18,6 +18,7 @@ import arrow.fx.typeclasses.fix
 import arrow.fx.typeclasses.seconds
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqK
+import java.util.concurrent.TimeoutException
 
 fun <A> IO.Companion.eq(EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
   arrow.core.Either.eq(Eq.any(), EQA).run {
@@ -62,4 +63,24 @@ fun Schedule.Decision.Companion.eqK(): EqK<DecisionPartialOf<Any?>> = object : E
         // don't force end result if we don't continue as it may contain Nothing
         (if (l.cont) EQ.run { l.finish.value().eqv(r.finish.value()) } else true)
     }
+}
+
+fun <A> unsafeRunEq(fa: () -> A, fb: () -> A, EQA: Eq<A> = Eq.any()): Boolean {
+  val aa = try {
+    fa()
+  } catch (err: Throwable) {
+    err
+  }
+  val bb = try {
+    fb()
+  } catch (err: Throwable) {
+    err
+  }
+  return when {
+    aa is TimeoutException -> throw aa
+    bb is TimeoutException -> throw bb
+    aa is Exception && bb is Exception -> throwableEq().run { aa.eqv(bb) }
+    aa is Exception || bb is Exception -> false
+    else -> EQA.run { (aa as A).eqv(bb as A) }
+  }
 }
