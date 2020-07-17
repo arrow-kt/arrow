@@ -37,7 +37,12 @@ subprojects { project ->
 
     archivesBaseName = POM_ARTIFACT_ID
 
-    compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
+    tasks.withType(KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = JAVA_VERSION
+            freeCompilerArgs += ["-Xskip-runtime-version-check"]
+        }
+    }
 
     tasks.withType(Test) {
         maxParallelForks = Runtime.runtime.availableProcessors()
