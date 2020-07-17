@@ -7,7 +7,7 @@
 For [Arrow Fx](https://github.com/arrow-kt/arrow-fx):
 
 - Android SDK
-- `ANDROID_SDK_ROOT` environment variable for 
+- `ANDROID_SDK_ROOT` environment variable
 - If using Intellij IDEA 2020.x, disable bundled Android Plugin to avoid this error when loading the Gradle project:
 > Cannot convert string value 'JETPACK_COMPOSE' to an enum value of type 'com.android.builder.model.AndroidGradlePluginProjectFlags$BooleanFlag' (valid case insensitive values: APPLICATION_R_CLASS_CONSTANT_IDS, TEST_R_CLASS_CONSTANT_IDS, TRANSITIVE_R_CLASS)
 
