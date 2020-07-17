@@ -21,7 +21,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
 
       n shouldBe null // timed-out so should be null
       require((end - start) >= b) {
-        "Should've taken longer than $b milliseconds, but took ${start - end}ms"
+        "Should've taken longer than $b milliseconds, but took ${end - start}ms. (start=$start, end=$end)"
       }
     }
   }

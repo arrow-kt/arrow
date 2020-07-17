@@ -22,7 +22,7 @@ import io.kotlintest.shouldNot
 fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   shouldBeEq(b, eq).let { true }
 
-fun <A> IOOf<A>.equalUnderTheLaw(b: IOOf<A>, EQA: Eq<A> = Eq.any(), timeout: Duration = 5.seconds): Boolean =
+fun <A> IOOf<A>.equalUnderTheLaw(b: IOOf<A>, EQA: Eq<A> = Eq.any(), timeout: Duration = 20.seconds): Boolean =
   (this should object : Matcher<IOOf<A>> {
     override fun test(value: IOOf<A>): Result =
       arrow.core.Either.eq(Eq.any(), EQA).run {
