@@ -161,4 +161,7 @@ internal class DefaultPromise<A> : Promise<A> {
       else unregister(id)
     }
   }
+
+  override fun toString(): String =
+    "Promise@${hashCode()}"
 }

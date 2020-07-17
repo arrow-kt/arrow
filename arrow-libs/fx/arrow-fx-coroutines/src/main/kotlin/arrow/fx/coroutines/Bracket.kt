@@ -8,8 +8,14 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 sealed class ExitCase {
-  object Completed : ExitCase()
-  object Cancelled : ExitCase()
+  object Completed : ExitCase() {
+    override fun toString(): String =
+      "ExitCase.Completed"
+  }
+  object Cancelled : ExitCase() {
+    override fun toString(): String =
+      "ExitCase.Cancelled"
+  }
   data class Failure(val failure: Throwable) : ExitCase()
 }
 

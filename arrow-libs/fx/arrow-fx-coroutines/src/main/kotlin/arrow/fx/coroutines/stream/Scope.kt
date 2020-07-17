@@ -4,21 +4,22 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.getOrElse
+import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.orElse
-import arrow.core.right
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.Platform
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Token
+import arrow.fx.coroutines.connection
 import arrow.fx.coroutines.deleteFirst
 import arrow.fx.coroutines.guarantee
 import arrow.fx.coroutines.prependTo
 import arrow.fx.coroutines.raceN
 import arrow.fx.coroutines.uncons
+import kotlin.coroutines.coroutineContext
 
 /**
  * Implementation of [Scope] for the internal stream interpreter.
@@ -84,15 +85,6 @@ class Scope private constructor(
 
   private val state: Atomic<State> =
     Atomic.unsafe(State.initial)
-
-  /**
-   * Registers supplied resource in this scope.
-   * This is always invoked before state can be marked as closed.
-   */
-  private suspend fun register(resource: ScopedResource): Unit =
-    state.update { s ->
-      s.copy(resources = resource prependTo s.resources)
-    }
 
   /**
    * Opens a child scope.
@@ -174,19 +166,16 @@ class Scope private constructor(
     fr: suspend () -> R,
     release: suspend (R, ExitCase) -> Unit
   ): Either<Throwable, R> {
-    val resource = ScopedResource()
-    return when (val eith = Either.catch(fr)) {
-      is Either.Right ->
-        when (resource.acquired { ex -> release(eith.b, ex) }) {
-          is Either.Right -> {
-            register(resource)
-            eith.b.right()
-          }
-          is Either.Left ->
-            Either.Left(eith.swap().getOrElse { AcquireAfterScopeClosed })
-        }
-
-      is Either.Left -> eith
+    val conn = coroutineContext.connection()
+    val scope = ScopedResource()
+    return Either.catch(fr).flatMap { resource ->
+      scope.acquired { ex: ExitCase -> release(resource, ex) }.map { registered ->
+        state.modify {
+          if (conn.isCancelled() && registered) Pair(it, suspend { release(resource, ExitCase.Cancelled) })
+          else Pair(it.copy(resources = scope prependTo it.resources), suspend { Unit })
+        }.invoke()
+        resource
+      }
     }
   }
 
@@ -370,17 +359,18 @@ class Scope private constructor(
    * and then, without any error handling the whole stream will fail with supplied throwable.
    *
    */
-  suspend fun interrupt(cause: Either<Throwable, Unit>): Unit =
+  suspend fun interrupt(cause: Either<Throwable, Unit>): Unit {
     when (interruptible) {
       null -> throw IllegalStateException("Scope#interrupt called for Scope that cannot be interrupted")
       else -> {
         // note that we guard interruption here by Attempt to prevent failure on multiple sets.
         val interruptCause = cause.map { interruptible.interruptRoot }
-        guarantee({ interruptible.deferred.complete(interruptCause); Unit }) {
+        guarantee({ interruptible.deferred.complete(interruptCause) }) {
           interruptible.ref.update { it.orElse { Some(interruptCause) } }
         }
       }
     }
+  }
 
   /**
    * Checks if current scope is interrupted.
@@ -423,7 +413,7 @@ class Scope private constructor(
     }
 
   override fun toString() =
-    "CompileScope(id=$id,interruptible=$interruptible)"
+    "Scope(id=$id,interruptible=$interruptible)"
 
   /**
    * State of a scope.
@@ -540,8 +530,4 @@ class Scope private constructor(
      */
     abstract suspend fun cancel(): Either<Throwable, Unit>
   }
-}
-
-internal object AcquireAfterScopeClosed : Throwable(null, null) {
-  override fun fillInStackTrace() = this
 }

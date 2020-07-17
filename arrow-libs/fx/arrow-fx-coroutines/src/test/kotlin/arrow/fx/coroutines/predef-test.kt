@@ -1,10 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import arrow.core.extensions.sequence.monoidal.identity
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
+import arrow.fx.coroutines.stream.Stream
+import arrow.fx.coroutines.stream.compile
 import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
@@ -32,8 +33,6 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.startCoroutine
-import kotlin.math.max
-import kotlin.math.min
 
 data class SideEffect(var counter: Int = 0) {
   fun increment() {
@@ -77,6 +76,46 @@ suspend fun assertCancellable(f: suspend () -> Unit): Unit {
   }
 
   start.get()
+  fiber.cancel()
+  p.get() shouldBe ExitCase.Cancelled
+}
+
+suspend fun <A> Stream<A>.assertCancellable(): Unit {
+  val p = Promise<ExitCase>()
+  val start = Promise<Unit>()
+
+  val fiber = ForkAndForget {
+    guaranteeCase(
+      fa = {
+        Stream.effect { start.complete(Unit) }
+          .flatMap { this@assertCancellable }
+          .compile()
+          .drain()
+      },
+      release = { ex -> p.complete(ex) }
+    )
+  }
+
+  start.get()
+  fiber.cancel()
+  p.get() shouldBe ExitCase.Cancelled
+}
+
+@JvmName("assertStreamCancellable")
+suspend fun <A> assertCancellable(fa: (latch: Promise<Unit>) -> Stream<A>): Unit {
+  val p = Promise<ExitCase>()
+  val latch = Promise<Unit>()
+
+  val fiber = ForkAndForget {
+    guaranteeCase(
+      fa = {
+        fa(latch).compile().drain()
+      },
+      release = { ex -> p.complete(ex) }
+    )
+  }
+
+  latch.get()
   fiber.cancel()
   p.get() shouldBe ExitCase.Cancelled
 }

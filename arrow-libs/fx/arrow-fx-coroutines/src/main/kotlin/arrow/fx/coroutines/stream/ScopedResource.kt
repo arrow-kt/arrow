@@ -1,9 +1,13 @@
 package arrow.fx.coroutines.stream
 
 import arrow.core.Either
-import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Token
+import arrow.fx.coroutines.connection
+import arrow.fx.coroutines.stream.concurrent.modify
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.updateAndGet
+import kotlin.coroutines.coroutineContext
 
 /**
  * Represents a resource acquired during stream interpretation.
@@ -38,7 +42,7 @@ import arrow.fx.coroutines.Token
  */
 internal class ScopedResource {
 
-  private val state: Atomic<State> = Atomic.unsafe(State.initial)
+  private val state = atomic(State.initial)
 
   private val id: Token = Token()
 
@@ -56,23 +60,37 @@ internal class ScopedResource {
     return finalizer?.invoke(ec) ?: Either.Right(Unit)
   }
 
-  suspend fun acquired(finalizer: suspend (ExitCase) -> Unit): Either<Throwable, Boolean> =
-    state.modify { s ->
-      if (s.isFinished()) {
-        // state is closed and there are no leases, finalizer has to be invoked right away
-        Pair(s, suspend {
-          Either.catch {
-            finalizer(ExitCase.Completed)
-            false
-          }
-        })
-      } else {
-        val attemptFinalizer: suspend (ExitCase) -> Either<Throwable, Unit> =
-          { ec -> Either.catch { finalizer(ec) } }
-        // either state is open, or leases are present, either release or `Lease#cancel` will run the finalizer
-        Pair(s.copy(finalizer = attemptFinalizer), suspend { Either.Right(true) })
+  suspend fun acquired(finalizer: suspend (ExitCase) -> Unit): Either<Throwable, Boolean> {
+    val conn = coroutineContext.connection()
+    return state.modify { s ->
+      when {
+        conn.isCancelled() -> {
+          // state is closed and there are no leases, finalizer has to be invoked right away
+          Pair(s, suspend {
+            Either.catch {
+              finalizer(ExitCase.Cancelled)
+              false
+            }
+          })
+        }
+        s.isFinished() -> {
+          // state is closed and there are no leases, finalizer has to be invoked right away
+          Pair(s, suspend {
+            Either.catch {
+              finalizer(ExitCase.Completed)
+              false
+            }
+          })
+        }
+        else -> {
+          val attemptFinalizer: suspend (ExitCase) -> Either<Throwable, Unit> =
+            { ec -> Either.catch { finalizer(ec) } }
+          // either state is open, or leases are present, either release or `Lease#cancel` will run the finalizer
+          Pair(s.copy(finalizer = attemptFinalizer), suspend { Either.Right(true) })
+        }
       }
     }.invoke()
+  }
 
   suspend fun lease(): Scope.Lease? =
     state.modify { s ->
