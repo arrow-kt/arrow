@@ -395,16 +395,12 @@ class Scope private constructor(
    *
    * Or if the evaluation is interrupted by a failure this evaluates on `Left` - `Left` where the exception
    * that caused the interruption is returned so that it can be handled.
-   */
+   */ // TODO return Pull.Result here, only usage in `Compiler` reconstructs into Pull.Result
   internal suspend fun <A> interruptibleEval(f: suspend () -> A): Either<Either<Throwable, Token>, A> =
     when (interruptible) {
       null -> Either.catch(f).mapLeft { it.left() }
       else -> {
-        val res = raceN({
-          interruptible.deferred.get()
-        }, {
-          Either.catch(f)
-        })
+        val res = raceN({ interruptible.deferred.get() }, { Either.catch(f) })
         when (res) {
           is Either.Right -> res.b.mapLeft { it.left() }
           is Either.Left -> Either.Left(res.a)

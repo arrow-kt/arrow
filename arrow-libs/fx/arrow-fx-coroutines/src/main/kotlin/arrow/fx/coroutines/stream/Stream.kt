@@ -18,6 +18,7 @@ import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.forkAndForget
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.prependTo
+import arrow.fx.coroutines.stream.concurrent.Queue
 import arrow.fx.coroutines.stream.concurrent.Signal
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -1330,6 +1331,69 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
    */
   fun delayBy(d: Duration): Stream<O> =
     sleep_(d).append { this }
+
+  /**
+   * Runs the supplied stream in the background as elements from this stream are pulled.
+   *
+   * The resulting stream terminates upon termination of this stream. The background stream will
+   * be interrupted at that point. Early termination of [other] does not terminate the resulting stream.
+   *
+   * Any errors that occur in either `this` or [other] stream result in the overall stream terminating
+   * with an error.
+   *
+   * Upon finalization, the resulting stream will interrupt the background stream and wait for it to be
+   * finalized.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.coroutines.stream.concurrent.SignallingAtomic
+   * import arrow.fx.coroutines.stream.*
+   *
+   * //sampleStart
+   * suspend fun main(): Unit {
+   *   val data = Stream.range(1..10)
+   *   val signalling = SignallingAtomic(0)
+   *
+   *   signalling.discrete()
+   *     .concurrently(data.effectMap { signalling.set(it) })
+   *     .takeWhile { it < 9 }
+   *     .compile()
+   *     .toList()
+   *     .let(::println) //[0, 1, 2, 3, 4, 5, 6, 7, 8]
+   * }
+   * //sampleEnd
+   * ```
+   */
+  fun <O2> concurrently(other: Stream<O2>): Stream<O> =
+    effect { Pair(Promise<Unit>(), Promise<Either<Throwable, Unit>>()) }
+      .flatMap { (interrupt, doneR) ->
+        bracket(
+          { ForkAndForget { concurrentlyRunR(other, interrupt, doneR) } },
+          {
+            interrupt.complete(Unit)
+            doneR.get().fold({ throw it }, ::identity)
+          }
+        ).flatMap { this.interruptWhen { Either.catch { interrupt.get() } } }
+      }
+
+  private suspend fun <O> concurrentlyRunR(
+    other: Stream<O>,
+    interrupt: Promise<Unit>,
+    done: Promise<Either<Throwable, Unit>>
+  ): Unit {
+    val r = Either.catch {
+      other
+        .interruptWhen { Either.catch { interrupt.get() } }
+        .compile()
+        .drain()
+    }
+
+    done.complete(r)
+
+    when (r) { // interrupt only if this failed otherwise give change to `this` to finalize
+      is Left -> interrupt.complete(Unit)
+      else -> Unit
+    }
+  }
 
   /**
    * Starts this stream and cancels it as finalization of the returned stream.

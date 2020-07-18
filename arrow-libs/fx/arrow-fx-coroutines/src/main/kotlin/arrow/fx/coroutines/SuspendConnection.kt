@@ -17,6 +17,8 @@ inline class CancelToken(val cancel: suspend () -> Unit) {
 
   suspend fun invoke(): Unit = cancel.invoke()
 
+  override fun toString(): String = "CancelToken(..)"
+
   companion object {
     val unit = CancelToken { Unit }
   }
