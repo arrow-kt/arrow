@@ -35,7 +35,7 @@ When creating the pull request, ensure that these checks pass:
 * Required automatic checks:
     * `arrow library: build`
     * `arrow library: build documentation`
-* The approval by one of the members of the Arrow Community.
+* The approval by 2 members of the Arrow Community.
 
 ### What happens when creating a pull request
 
