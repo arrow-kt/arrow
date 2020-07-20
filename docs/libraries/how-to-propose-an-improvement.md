@@ -19,7 +19,7 @@ If you want to propose a fix, rename, move, etc. please, ensure that these check
 * Required checks:
     * `arrow library: build`
     * `arrow library: build documentation`
-* The approval by one of the members of the Arrow Community.
+* The approval by 2 maintainers of the Arrow Community.
 
 ### Requirements to add a new feature
 
