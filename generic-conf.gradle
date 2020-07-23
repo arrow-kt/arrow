@@ -37,7 +37,14 @@ subprojects { project ->
 
     archivesBaseName = POM_ARTIFACT_ID
 
-    tasks.withType(KotlinCompile).all {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = JAVA_VERSION
+            freeCompilerArgs += ["-Xskip-runtime-version-check"]
+        }
+    }
+
+    compileTestKotlin {
         kotlinOptions {
             jvmTarget = JAVA_VERSION
             freeCompilerArgs += ["-Xskip-runtime-version-check"]

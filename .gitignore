@@ -81,8 +81,8 @@ gen-external-apklibs
 .idea/**/gradle.xml
 .idea/**/libraries
 
-#Kotlintest
-**/.kotlintest
+#kotest
+**/.kotest
 
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
@@ -131,4 +131,4 @@ reports/
 target/
 
 .bash_profile
-**/.kotlintest/
+**/.kotest/
