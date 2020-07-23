@@ -119,24 +119,14 @@ function updateOrchestrator()
 function replaceGlobalPropertiesbyLocalConf()
 {
     echo "Replacing global properties by local conf ($1) ..."
-    perl -pe "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $NEW_DIR)\/setup.gradle/g" -i $1
-    perl -pe "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $NEW_DIR)\/generic-conf.gradle/g" -i $1
-    perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $NEW_DIR)\/subproject-conf.gradle/g" -i $1
-    perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $NEW_DIR)\/doc-conf.gradle/g" -i $1
-    perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $NEW_DIR)\/publish-conf.gradle/g" -i $1
-    perl -pe "s/^ANDROID_CONF.*/ANDROID_CONF=$(escapeURL $NEW_DIR)\/android-conf.gradle/g" -i $1
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $1
     perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
 function replaceLocalConfbyGlobalProperties()
 {
     echo "Replacing local conf by global properties ($1) ..."
-    perl -pe "s/^COMMON_SETUP.*/COMMON_SETUP=$(escapeURL $OLD_DIR)\/setup.gradle/g" -i $1
-    perl -pe "s/^GENERIC_CONF.*/GENERIC_CONF=$(escapeURL $OLD_DIR)\/generic-conf.gradle/g" -i $1
-    perl -pe "s/^SUBPROJECT_CONF.*/SUBPROJECT_CONF=$(escapeURL $OLD_DIR)\/subproject-conf.gradle/g" -i $1
-    perl -pe "s/^DOC_CONF.*/DOC_CONF=$(escapeURL $OLD_DIR)\/doc-conf.gradle/g" -i $1
-    perl -pe "s/^PUBLISH_CONF.*/PUBLISH_CONF=$(escapeURL $OLD_DIR)\/publish-conf.gradle/g" -i $1
-    perl -pe "s/^ANDROID_CONF.*/ANDROID_CONF=$(escapeURL $OLD_DIR)\/android-conf.gradle/g" -i $1
+    perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $1
     perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $BASEDIR/arrow/setup.gradle
 }
 
