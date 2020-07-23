@@ -254,7 +254,7 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 }
 
 @Deprecated("Fx blocks are now named based on each datatype, please use `either { }` instead",
-  replaceWith = ReplaceWith("either(c)"))
+  replaceWith = ReplaceWith("either.eager<L, R>(c)"))
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
 

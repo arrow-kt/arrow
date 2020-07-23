@@ -90,7 +90,7 @@ interface EvalBimonad : Bimonad<ForEval> {
   override fun <A, B> EvalOf<A>.flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
     Eval.tailRecM(a, f)
 
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
@@ -107,6 +107,6 @@ interface EvalBimonad : Bimonad<ForEval> {
 }
 
 @Deprecated("Fx blocks are now named based on each datatype, please use `eval { }` instead",
-  replaceWith = ReplaceWith("eval(c)"))
+  replaceWith = ReplaceWith("eval.eager(c)"))
 fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
   defer { Eval.monad().fx.monad(c).fix() }

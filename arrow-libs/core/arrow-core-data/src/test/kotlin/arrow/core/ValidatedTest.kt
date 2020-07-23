@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.core.computations.validated
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
@@ -60,7 +61,7 @@ class ValidatedTest : UnitSpec() {
         Validated.genK2(),
         Validated.eqK2()
       ),
-      FxLaws.laws<ValidatedPartialOf<String>, Int>(Gen.int().map(::Valid), Gen.validated(Gen.string(), Gen.int()).map { it }, Validated.eqK(String.eq()).liftEq(Int.eq()), ::validated, ::validated)
+      FxLaws.laws<ValidatedPartialOf<String>, Int>(Gen.int().map(::Valid), Gen.validated(Gen.string(), Gen.int()).map { it }, Validated.eqK(String.eq()).liftEq(Int.eq()), validated::eager, validated::invoke)
     )
 
     "fold should call function on Invalid" {

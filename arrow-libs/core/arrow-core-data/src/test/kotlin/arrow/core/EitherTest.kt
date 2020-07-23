@@ -1,9 +1,9 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.computations.either
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.applicativeError.handleErrorWith
 import arrow.core.extensions.either.bicrosswalk.bicrosswalk
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.bitraverse.bitraverse
@@ -71,7 +71,7 @@ class EitherTest : UnitSpec() {
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), GEN, Either.eq(String.eq(), Int.eq())),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
-      FxLaws.laws<EitherPartialOf<String>, Int>(Gen.int().map(::Right), GEN.map { it }, Either.eqK(String.eq()).liftEq(Int.eq()), ::either, ::either)
+      FxLaws.laws<EitherPartialOf<String>, Int>(Gen.int().map(::Right), GEN.map { it }, Either.eqK(String.eq()).liftEq(Int.eq()), either::eager, either::invoke)
     )
 
     "fromNullable should lift value as a Right if it is not null" {

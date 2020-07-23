@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.computations.const
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq
 import arrow.core.extensions.const.functor.functor
@@ -41,7 +42,7 @@ class ConstTest : UnitSpec() {
         ApplicativeLaws.laws(Const.applicative(M), Const.functor(), GENK, EQK),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any()), GEN),
         ShowLaws.laws(Const.show(Int.show()), Const.eq<Int, Int>(Eq.any()), GEN),
-        FxLaws.laws<ConstPartialOf<Int>, Int>(GENK.genK(Gen.int()), GENK.genK(Gen.int()), EQK.liftEq(Int.eq()), ::const, ::const)
+        FxLaws.laws<ConstPartialOf<Int>, Int>(GENK.genK(Gen.int()), GENK.genK(Gen.int()), EQK.liftEq(Int.eq()), const::eager, const::invoke)
       )
   }
 }
