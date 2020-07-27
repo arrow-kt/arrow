@@ -76,7 +76,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
      * @return [None] if both [oa] and [ob] are [None]. Otherwise [Some] wrapping
      * an [Ior.Left], [Ior.Right], or [Ior.Both] if [oa], [ob], or both are defined (respectively).
      */
-
+    @Deprecated("Deprecated, use `fromNullables` instead", ReplaceWith("fromNullables(a, b)"))
     fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
       is Some -> when (ob) {
         is Some -> Some(Both(oa.t, ob.t))
@@ -86,6 +86,27 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
         is Some -> Some(Right(ob.t))
         is None -> None
       }
+    }
+
+    /**
+     * Create an [Ior] from two nullables if at least one of them is defined.
+     *
+     * @param a an element (nullable) for the left side of the [Ior]
+     * @param b an element (nullable) for the right side of the [Ior]
+     *
+     * @return [null] if both [a] and [b] are [null]. Otherwise
+     * an [Ior.Left], [Ior.Right], or [Ior.Both] if [a], [b], or both are defined (respectively).
+     */
+    fun <A, B> fromNullables(a: A?, b: B?): Ior<A, B>? =
+      when (a != null) {
+        true -> when (b != null) {
+          true -> Both(a, b)
+          false -> Left(a)
+        }
+        false -> when (b != null) {
+          true -> Right(b)
+          false -> null
+        }
     }
 
     private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> = when (v) {
@@ -235,15 +256,42 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    *
    * Example:
    * ```
-   * Right(12).pad() // Result: Pair(None, Some(12))
-   * Left(12).pad()  // Result: Pair(Some(12), None)
-   * Both("power", 12).pad()  // Result: Pair(Some("power"), Some(12))
+   * Ior.Right(12).pad()          // Result: Pair(None, Some(12))
+   * Ior.Left(12).pad()           // Result: Pair(Some(12), None)
+   * Ior.Both("power", 12).pad()  // Result: Pair(Some("power"), Some(12))
    * ```
    */
+  @Deprecated("Deprecated, use `padNull` instead", ReplaceWith("padNull()"))
   fun pad(): Pair<Option<A>, Option<B>> = fold(
     { Pair(Some(it), None) },
     { Pair(None, Some(it)) },
     { a, b -> Pair(Some(a), Some(b)) }
+  )
+
+  /**
+   * Return this [Ior] as [Pair] of nullables]
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.Ior
+   *
+   * //sampleStart
+   * val right = Ior.Right(12).padNull()         // Result: Pair(null, 12)
+   * val left = Ior.Left(12).padNull()           // Result: Pair(12, null)
+   * val both = Ior.Both("power", 12).padNull()  // Result: Pair("power", 12)
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("right = $right")
+   *   println("left = $left")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun padNull(): Pair<A?, B?> = fold(
+    { Pair(it, null) },
+    { Pair(null, it) },
+    { a, b -> Pair(a, b) }
   )
 
   /**
@@ -271,8 +319,32 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Both(12, "power").toOption()  // Result: Some("power")
    * ```
    */
+  @Deprecated("Deprecated, use `orNull` instead", ReplaceWith("orNull()"))
   fun toOption(): Option<B> =
     fold({ None }, { Some(it) }, { _, b -> Some(b) })
+
+  /**
+   * Returns the [Right] value or `B` if this is [Right] or [Both]
+   * and [null] if this is a [Left].
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.Ior
+   *
+   * //sampleStart
+   * val right = Ior.Right(12).orNull()         // Result: 12
+   * val left = Ior.Left(12).orNull()           // Result: null
+   * val both = Ior.Both(12, "power").orNull()  // Result: "power"
+   * //sampleEnd
+   * fun main() {
+   *   println("right = $right")
+   *   println("left = $left")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun orNull(): B? =
+    fold({ null }, { it }, { _, b -> b })
 
   /**
    * Returns a [Some] containing the [Left] value or `A` if this is [Left] or [Both]
@@ -285,8 +357,33 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Both(12, "power").toLeftOption()  // Result: Some(12)
    * ```
    */
+  @Deprecated("Deprecated, use `leftOrNull` instead", ReplaceWith("leftOrNull()"))
   fun toLeftOption(): Option<A> =
     fold({ Option.just(it) }, { Option.empty() }, { a, _ -> Option.just(a) })
+
+  /**
+   * Returns the [Left] value or `A` if this is [Left] or [Both]
+   * and [null] if this is a [Right].
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.Ior
+   *
+   * //sampleStart
+   * val right = Ior.Right(12).leftOrNull()         // Result: null
+   * val left = Ior.Left(12).leftOrNull()           // Result: 12
+   * val both = Ior.Both(12, "power").leftOrNull()  // Result: 12
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("right = $right")
+   *   println("left = $left")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun leftOrNull(): A? =
+    fold({ it }, { null }, { a, _ -> a })
 
   /**
    * Returns a [Validated.Valid] containing the [Right] value or `B` if this is [Right] or [Both]

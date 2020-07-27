@@ -799,8 +799,29 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Left(12).toOption()  // Result: None
    * ```
    */
+  @Deprecated("Deprecated, use `orNull` instead", ReplaceWith("orNull()"))
   fun toOption(): Option<B> =
     fold({ None }, { Some(it) })
+
+  /**
+   * Returns the right value if it exists, otherwise null
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.Right
+   * import arrow.core.Left
+   *
+   * //sampleStart
+   * val right = Right(12).orNull() // Result: 12
+   * val left = Left(12).orNull()   // Result: null
+   * //sampleEnd
+   * fun main() {
+   *   println("right = $right")
+   *   println("left = $left")
+   * }
+   * ```
+   */
+  fun orNull(): B? = fold({ null }, { it })
 
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
