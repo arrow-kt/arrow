@@ -83,8 +83,8 @@ class ValidatedTest : UnitSpec() {
     }
 
     "leftMap should modify error" {
-      Valid(10).leftMap { fail("None should not be called") } shouldBe Valid(10)
-      Invalid(13).leftMap { i -> i.toString() + " is Coming soon!" } shouldBe Invalid("13 is Coming soon!")
+      Valid(10).mapLeft { fail("None should not be called") } shouldBe Valid(10)
+      Invalid(13).mapLeft { i -> "$i is Coming soon!" } shouldBe Invalid("13 is Coming soon!")
     }
 
     "exist should return false if is Invalid" {
@@ -212,28 +212,24 @@ class ValidatedTest : UnitSpec() {
 
     "catch should return Valid(result) when f does not throw" {
       suspend fun loadFromNetwork(): Int = 1
-      val validated = Validated.catch { loadFromNetwork() }
-      validated shouldBe Valid(1)
+      Validated.catch { loadFromNetwork() } shouldBe Valid(1)
     }
 
     "catch should return Invalid(result) when f throws" {
       val exception = MyException("Boom!")
       suspend fun loadFromNetwork(): Int = throw exception
-      val validated = Validated.catch { loadFromNetwork() }
-      validated shouldBe Invalid(exception)
+      Validated.catch { loadFromNetwork() } shouldBe Invalid(exception)
     }
 
     "catchNel should return Valid(result) when f does not throw" {
       suspend fun loadFromNetwork(): Int = 1
-      val validated = Validated.catchNel { loadFromNetwork() }
-      validated shouldBe Valid(1)
+      Validated.catchNel { loadFromNetwork() } shouldBe Valid(1)
     }
 
     "catchNel should return Invalid(Nel(result)) when f throws" {
       val exception = MyException("Boom!")
       suspend fun loadFromNetwork(): Int = throw exception
-      val validated = Validated.catchNel { loadFromNetwork() }
-      validated shouldBe Invalid(NonEmptyList(exception))
+      Validated.catchNel { loadFromNetwork() } shouldBe Invalid(NonEmptyList(exception))
     }
 
     with(VAL_AP) {

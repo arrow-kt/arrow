@@ -385,9 +385,8 @@ sealed class Option<out A> : OptionOf<A> {
      */
     fun <A> just(a: A): Option<A> = Some(a)
 
-    tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
-      val option = f(a).fix()
-      return when (option) {
+    tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
+      when (val option = f(a).fix()) {
         is Some -> {
           when (option.t) {
             is Either.Left -> tailRecM(option.t.a, f)
@@ -396,7 +395,6 @@ sealed class Option<out A> : OptionOf<A> {
         }
         is None -> None
       }
-    }
 
     fun <A> fromNullable(a: A?): Option<A> = if (a != null) Some(a) else None
 

@@ -718,7 +718,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
-  fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
+  inline fun <C> foldRight(initial: Eval<C>, crossinline rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().let { either ->
       when (either) {
         is Right -> Eval.defer { rightOperation(either.b, initial) }
@@ -726,7 +726,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
-  inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fold({ f(c, it) }, { g(c, it) })
+  inline fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+    fold({ f(c, it) }, { g(c, it) })
 
   inline fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fold({ f(it, c) }, { g(it, c) })
@@ -740,7 +741,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Right("right").swap() // Result: Left("right")
    * ```
    */
-  fun swap(): Either<B, A> = fold({ Right(it) }, { Left(it) })
+  fun swap(): Either<B, A> =
+    fold({ Right(it) }, { Left(it) })
 
   /**
    * The given function is applied if this is a `Right`.
@@ -886,13 +888,14 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     }
 
     @Deprecated(
-      message = "use conditionally as parameter order is consistent with Either class",
+      message = "Use conditionally since the parameter order is consistent with Either class",
       replaceWith = ReplaceWith(
         "Either.conditionally(test, ifFalse, ifTrue)",
         "arrow.core.Either.conditionally"
       )
     )
-    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = conditionally(test, ifFalse, ifTrue)
+    fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> =
+      conditionally(test, ifFalse, ifTrue)
 
     /**
      * Will create an [Either] from the result of evaluating the first parameter using the functions
@@ -906,11 +909,17 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
      *
      * @return [Either.Right] if evaluation succeed, [Either.Left] otherwise
      */
-    inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
+    inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
+      if (test) right(ifTrue()) else left(ifFalse())
 
     suspend fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
-      catch(::identity, f)
+      try {
+        f().right()
+      } catch (t: Throwable) {
+        t.nonFatalOrThrow().left()
+      }
 
+    @Deprecated("Use catch with mapLeft instead", ReplaceWith("catch(f).mapLeft(fe)"))
     suspend fun <L, R> catch(fe: (Throwable) -> L, f: suspend () -> R): Either<L, R> =
       try {
         f().right()
@@ -920,9 +929,9 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   }
 }
 
-fun <L> Left(left: L): Either<L, Nothing> = Either.left(left)
+fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 
-fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
+fun <R> Right(right: R): Either<Nothing, R> = Right(right)
 
 /**
  * Binds the given function across [Either.Right].
@@ -1027,8 +1036,8 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default
  */
 inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
   flatMap {
-    if (predicate(it)) arrow.core.Either.Right(it)
-    else arrow.core.Either.Left(default(it))
+    if (predicate(it)) Right(it)
+    else Left(default(it))
   }
 
 /**
@@ -1047,7 +1056,7 @@ inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, defaul
  * Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * ```
  */
-fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
+inline fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   fix().flatMap { it.rightIfNotNull { default() } }
 
 /**
@@ -1100,8 +1109,8 @@ inline fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this
  * [Either.Left].
  */
 inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
-  null -> Either.right(null)
-  else -> Either.left(default())
+  null -> Right(null)
+  else -> Left(default())
 }
 
 /**

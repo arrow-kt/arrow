@@ -223,5 +223,16 @@ class EitherTest : UnitSpec() {
           Right(a).handleErrorWith { Right(b) } == Right(a)
       }
     }
+
+    "catch should return Right(result) when f does not throw" {
+      suspend fun loadFromNetwork(): Int = 1
+      Either.catch { loadFromNetwork() } shouldBe Right(1)
+    }
+
+    "catch should return Left(result) when f throws" {
+      val exception = Exception("Boom!")
+      suspend fun loadFromNetwork(): Int = throw exception
+      Either.catch { loadFromNetwork() } shouldBe Left(exception)
+    }
   }
 }

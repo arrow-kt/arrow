@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.higherkind
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 fun <A> EvalOf<A>.value(): A = this.fix().value()
 
@@ -111,8 +112,8 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
      */
-    fun <A> later(f: () -> A): Later<A> =
-      Later(f)
+    inline fun <A> later(crossinline f: () -> A): Later<A> =
+      Later { f() }
 
     /**
      * Creates an Eval instance from a function deferring it's evaluation until `.value()` is invoked recomputing each time `.value()` is invoked.
@@ -132,11 +133,11 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * "expensive computation" is computed every time `value()` is invoked.
      */
-    fun <A> always(f: () -> A) =
-      Always(f)
+    inline fun <A> always(crossinline f: () -> A) =
+      Always { f() }
 
-    fun <A> defer(f: () -> Eval<A>): Eval<A> =
-      Defer(f)
+    inline fun <A> defer(crossinline f: () -> Eval<A>): Eval<A> =
+      Defer { f() }
 
     fun raise(t: Throwable): Eval<Nothing> =
       defer { throw t }
@@ -185,22 +186,20 @@ sealed class Eval<out A> : EvalOf<A> {
             currComp.start<A>().let { cc ->
               when (cc) {
                 is FlatMap -> {
-                  val inStartFun: (Any?) -> Eval<A> = { cc.run(it) }
-                  val outStartFun: (Any?) -> Eval<A> = { currComp.run(it) }
                   curr = cc.start<A>()
-                  fs.add(0, outStartFun)
-                  fs.add(0, inStartFun)
+                  fs.add(0, currComp::run)
+                  fs.add(0, cc::run)
                 }
                 is Memoize -> {
                   cc.result.fold(
                     {
                       curr = cc.eval
-                      fs.add(0) { currComp.run(it) }
+                      fs.add(0, currComp::run)
                       fs.add(0, addToMemo(cc as Memoize<Any?>))
                     },
                     {
                       curr = Now(it)
-                      fs.add(0) { currComp.run(it) }
+                      fs.add(0, currComp::run)
                     }
                   )
                 }
@@ -211,12 +210,12 @@ sealed class Eval<out A> : EvalOf<A> {
             }
           }
           is Memoize -> {
-            val currComp = curr as Memoize<A>
+            val currComp = curr as Memoize<Any?>
             val eval = currComp.eval
             currComp.result.fold(
               {
                 curr = eval
-                fs.add(0, addToMemo(currComp as Memoize<Any?>))
+                fs.add(0, addToMemo(currComp))
               },
               {
                 if (fs.isNotEmpty()) {
@@ -244,15 +243,18 @@ sealed class Eval<out A> : EvalOf<A> {
 
   abstract fun memoize(): Eval<A>
 
-  fun <B> map(f: (A) -> B): Eval<B> = flatMap { a -> Now(f(a)) }
+  inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
+    flatMap { a -> Now(f(a)) }
 
-  fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> =
+    ff.fix().flatMap { f -> map(f) }.fix()
 
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
-  fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
+  inline fun <B> flatMap(crossinline f: (A) -> EvalOf<B>): Eval<B> =
     when (this) {
       is FlatMap<A> -> object : FlatMap<B>() {
         override fun <S> start(): Eval<S> = (this@Eval).start()
+        @IgnoreJRERequirement
         override fun <S> run(s: S): Eval<B> =
           object : FlatMap<B>() {
             override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
@@ -269,7 +271,8 @@ sealed class Eval<out A> : EvalOf<A> {
       }
     }
 
-  fun <B> coflatMap(f: (EvalOf<A>) -> B): Eval<B> = Later { f(this) }
+  inline fun <B> coflatMap(crossinline f: (EvalOf<A>) -> B): Eval<B> =
+    Later { f(this) }
 
   fun extract(): A = value()
 
@@ -335,7 +338,7 @@ sealed class Eval<out A> : EvalOf<A> {
    * Unlike a traditional trampoline, the internal workings of the trampoline are not exposed. This allows a slightly
    * more efficient implementation of the .value method.
    */
-  internal abstract class FlatMap<out A> : Eval<A>() {
+  abstract class FlatMap<out A> : Eval<A>() {
     abstract fun <S> start(): Eval<S>
     abstract fun <S> run(s: S): Eval<A>
     override fun memoize(): Eval<A> = Memoize(this)

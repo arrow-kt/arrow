@@ -667,7 +667,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * Converts an `Option<A>` to a `Validated<E, A>`, where the provided `ifNone` output value is returned as [Invalid]
      * when the specified `Option` is `None`.
      */
-    fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
+    inline fun <E, A> fromOption(o: Option<A>, ifNone: () -> E): Validated<E, A> =
       o.fold(
         { Invalid(ifNone()) },
         { Valid(it) }
@@ -677,7 +677,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
      * Converts a nullable `A?` to a `Validated<E, A>`, where the provided `ifNull` output value is returned as [Invalid]
      * when the specified value is null.
      */
-    fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
+    inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
     suspend fun <A> catch(f: suspend () -> A): Validated<Throwable, A> =
@@ -770,11 +770,15 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   inline fun <B> map(f: (A) -> B): Validated<E, B> =
     bimap(::identity, f)
 
+  @Deprecated("Use mapLeft for consistency", ReplaceWith("mapLeft(f)"))
+  inline fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> =
+    mapLeft(f)
+
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
    * Or, if the original valid was Valid, return it.
    */
-  inline fun <EE> leftMap(f: (E) -> EE): Validated<EE, A> =
+  inline fun <EE> mapLeft(f: (E) -> EE): Validated<EE, A> =
     bimap(f, ::identity)
 
   /**
