@@ -19,8 +19,8 @@ interface Fiber<A> {
     /**
      * [Fiber] constructor.
      *
-     * @param join task that will trigger the cancellation.
-     * @param cancel task that will await for the completion of the underlying Fiber.
+     * @param join task that will await for the completion of the underlying Fiber.
+     * @param cancel task that will trigger the cancellation.
      */
     operator fun <A> invoke(join: suspend () -> A, cancel: CancelToken): Fiber<A> = object : Fiber<A> {
       override suspend fun join(): A = join()
