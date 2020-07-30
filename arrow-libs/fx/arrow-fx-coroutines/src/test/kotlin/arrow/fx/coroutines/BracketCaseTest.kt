@@ -6,22 +6,23 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
+@ExperimentalTime
 class BracketCaseTest : ArrowFxSpec(spec = {
 
   "Uncancellable back pressures timeoutOrNull" {
     checkAll(Arb.long(10, 100), Arb.long(300, 400)) { a, b ->
-      val start = System.currentTimeMillis()
-
-      val n = timeOutOrNull(a.milliseconds) {
-        uncancellable { sleep(b.milliseconds) }
+      val (n, duration) = measureTimedValue {
+        timeOutOrNull(a.milliseconds) {
+          uncancellable { sleep(b.milliseconds) }
+        }
       }
 
-      val end = System.currentTimeMillis()
-
       n shouldBe null // timed-out so should be null
-      require((end - start) >= b) {
-        "Should've taken longer than $b milliseconds, but took ${end - start}ms. (start=$start, end=$end)"
+      require((duration.inMilliseconds) >= b) {
+        "Should've taken longer than $b milliseconds, but took $duration"
       }
     }
   }
