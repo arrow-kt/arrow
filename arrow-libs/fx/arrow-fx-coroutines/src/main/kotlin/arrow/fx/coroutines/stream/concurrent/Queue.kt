@@ -39,7 +39,7 @@ interface Enqueue<A> {
    *
    * @param a `A` to enqueue
    */
-  suspend fun offer1(a: A): Boolean
+  fun tryOffer1(a: A): Boolean
 }
 
 /** Provides the ability to dequeue individual elements from a `Queue`. */
@@ -97,7 +97,7 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
   fun <B> imap(f: (A) -> B, g: (B) -> A): Queue<B> =
     object : Queue<B> {
       override suspend fun enqueue1(a: B) = enqueue1(g(a))
-      override suspend fun offer1(a: B): Boolean = offer1(g(a))
+      override fun tryOffer1(a: B): Boolean = tryOffer1(g(a))
       override suspend fun dequeue1(): B = f(this@Queue.dequeue1())
       override suspend fun tryDequeue1(): Option<B> = this@Queue.tryDequeue1().map(f)
       override suspend fun dequeueChunk1(maxSize: Int): Chunk<B> = this@Queue.dequeueChunk1(maxSize).map(f)
@@ -111,14 +111,14 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
   companion object {
 
     /** Creates a queue from the supplied strategy. */
-    private suspend fun <S, A> fromStrategy(strategy: PubSub.Strategy<A, Chunk<A>, S, Int>): Queue<A> {
-      val pubSub = PubSub.from(strategy)
+    private fun <S, A> fromStrategy(strategy: PubSub.Strategy<A, Chunk<A>, S, Int>): Queue<A> {
+      val pubSub = PubSub.unsafe(strategy)
       return DefaultQueue(pubSub)
     }
 
     /** Creates a queue from the supplied strategy. */
-    private suspend fun <S, A> fromStrategyNoneTerminated(strategy: PubSub.Strategy<Option<A>, Option<Chunk<A>>, S, Int>): NoneTerminatedQueue<A> {
-      val pubSub = PubSub.from(strategy)
+    private fun <S, A> fromStrategyNoneTerminated(strategy: PubSub.Strategy<Option<A>, Option<Chunk<A>>, S, Int>): NoneTerminatedQueue<A> {
+      val pubSub = PubSub.unsafe(strategy)
       return DefaultNoneTerminatedQueue(pubSub)
     }
 
@@ -126,32 +126,52 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
     suspend fun <A> unbounded(): Queue<A> =
       fromStrategy(Strategy.fifo())
 
+    fun <A> unsafeUnbounded(): Queue<A> =
+      fromStrategy(Strategy.fifo())
+
     /** Creates an unbounded FIFO queue that distributed always at max `fairSize` elements to any subscriber. */
     suspend fun <A> fairUnbounded(fairSize: Int): Queue<A> =
+      fromStrategy(Strategy.fifo<A>().transformSelector { size, _ -> min(size, fairSize) })
+
+    fun <A> unsafeFairUnbounded(fairSize: Int): Queue<A> =
       fromStrategy(Strategy.fifo<A>().transformSelector { size, _ -> min(size, fairSize) })
 
     /** Creates a FIFO queue with the specified size bound. */
     suspend fun <A> bounded(maxSize: Int): Queue<A> =
       fromStrategy(Strategy.boundedFifo(maxSize))
 
-    /** Creates a FILO queue with the specified size bound. */
-    suspend fun <A> boundedLife(maxSize: Int): Queue<A> =
-      fromStrategy(Strategy.boundedLifo(maxSize))
+    fun <A> unsafeBounded(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.boundedFifo(maxSize))
 
     /** Creates a queue which stores the last `maxSize` enqueued elements and which never blocks on enqueue. */
     suspend fun <A> circularBuffer(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.circularBuffer(maxSize))
+
+    fun <A> unsafeCircularBuffer(maxSize: Int): Queue<A> =
       fromStrategy(Strategy.circularBuffer(maxSize))
 
     /** Created a bounded queue that distributed always at max `fairSize` elements to any subscriber. */
     suspend fun <A> fairBounded(maxSize: Int, fairSize: Int): Queue<A> =
       fromStrategy(Strategy.boundedFifo<A>(maxSize).transformSelector { size, _ -> min(size, fairSize) })
 
+    fun <A> unsafeFairBounded(maxSize: Int, fairSize: Int): Queue<A> =
+      fromStrategy(Strategy.boundedFifo<A>(maxSize).transformSelector { size, _ -> min(size, fairSize) })
+
     /** Creates a queue which allows at most a single element to be enqueued at any time. */
     suspend fun <A> synchronous(): Queue<A> =
       fromStrategy(Strategy.synchronous())
 
+    fun <A> unsafeSynchronous(): Queue<A> =
+      fromStrategy(Strategy.synchronous())
+
     /** Like [synchronous], except that any enqueue of `None` will never block and cancels any dequeue operation. */
     suspend fun <A> synchronousNoneTerminated(): NoneTerminatedQueue<A> {
+      val strategy = Strategy.synchronous<A>()
+      val pubSub = PubSub.Strategy.closeNowOption(strategy)
+      return fromStrategyNoneTerminated(pubSub)
+    }
+
+    fun <A> unsafeSynchronousNoneTerminated(): NoneTerminatedQueue<A> {
       val strategy = Strategy.synchronous<A>()
       val pubSub = PubSub.Strategy.closeNowOption(strategy)
       return fromStrategyNoneTerminated(pubSub)
@@ -276,7 +296,7 @@ internal class DefaultQueue<A>(private val pubSub: PubSub<A, Chunk<A>, Int>) : Q
   override suspend fun enqueue1(a: A) =
     pubSub.publish(a)
 
-  override suspend fun offer1(a: A): Boolean =
+  override fun tryOffer1(a: A): Boolean =
     pubSub.tryPublish(a)
 
   override suspend fun dequeue1(): A =
@@ -309,7 +329,7 @@ internal class DefaultNoneTerminatedQueue<A>(
   override suspend fun enqueue1(a: Option<A>) =
     pubSub.publish(a)
 
-  override suspend fun offer1(a: Option<A>): Boolean =
+  override fun tryOffer1(a: Option<A>): Boolean =
     pubSub.tryPublish(a)
 
   override suspend fun dequeue1(): Option<A> =

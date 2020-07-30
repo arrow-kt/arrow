@@ -32,7 +32,7 @@ internal interface Publish<A> {
    * Evaluates to `false` if element was not published.
    * Evaluates to `true` if element was published successfully.
    */
-  suspend fun tryPublish(a: A): Boolean
+  fun tryPublish(a: A): Boolean
 }
 
 internal interface Subscribe<A, Selector> {
@@ -563,7 +563,14 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
 
   val state = atomic(initial)
 
-  suspend fun <X> update(f: (PubSub.PubSubState<I, O, QS, S>) -> Pair<PubSub.PubSubState<I, O, QS, S>, suspend () -> X>): X =
+  fun <X> update(f: (PubSub.PubSubState<I, O, QS, S>) -> Pair<PubSub.PubSubState<I, O, QS, S>, X>): X =
+    state.modify { ps ->
+      val (ps1, result) = f(ps)
+      val (ps2, _) = loop(ps1) { Unit }
+      Pair(ps2, result)
+    }
+
+  suspend fun <X> modify(f: (PubSub.PubSubState<I, O, QS, S>) -> Pair<PubSub.PubSubState<I, O, QS, S>, suspend () -> X>): X =
     state.modify { ps ->
       val (ps1, result) = f(ps)
       val (ps2, action) = loop(ps1) { Unit }
@@ -681,7 +688,7 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
     ps.copy(queue = strategy.publish(i, ps.queue))
 
   override suspend fun publish(a: I) =
-    update { ps ->
+    modify { ps ->
       if (strategy.accepts(a, ps.queue)) {
         val ps1 = publish_(a, ps)
         Pair(ps1, suspend { Unit })
@@ -698,17 +705,17 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
       }
     }
 
-  override suspend fun tryPublish(a: I): Boolean =
+  override fun tryPublish(a: I): Boolean =
     update { ps ->
-      if (!strategy.accepts(a, ps.queue)) Pair(ps, suspend { false })
+      if (!strategy.accepts(a, ps.queue)) Pair(ps, false)
       else {
         val ps1 = publish_(a, ps)
-        Pair(ps1, suspend { true })
+        Pair(ps1, true)
       }
     }
 
   override suspend fun get(selector: S): O =
-    update { ps ->
+    modify { ps ->
       val (ps, option) = tryGet_(selector, ps)
       when (option) {
         None -> {
@@ -726,7 +733,7 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
     }
 
   private suspend fun streamingGet(token: Token, selector: S) =
-    update<O> { ps ->
+    modify<O> { ps ->
       val (ps, option) = tryGet_(selector, ps)
       when (option) {
         is Some -> Pair(ps, suspend { option.t })
@@ -743,19 +750,19 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
     }
 
   override suspend fun tryGet(selector: S): Option<O> =
-    update { ps ->
+    modify { ps ->
       val (ps1, result) = tryGet_(selector, ps)
       Pair(ps1, suspend { result })
     }
 
   override suspend fun subscribe(selector: S): Boolean =
-    update { ps ->
+    modify { ps ->
       val (queue, success) = strategy.subscribe(selector, ps.queue)
       Pair(ps.copy(queue = queue), suspend { success })
     }
 
   override suspend fun unsubscribe(selector: S): Unit =
-    update { ps ->
+    modify { ps ->
       Pair(ps.copy(queue = strategy.unsubscribe(selector, ps.queue)), suspend { Unit })
     }
 }
