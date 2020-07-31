@@ -1,5 +1,7 @@
 package arrow.fx.coroutines.stream
 
+import arrow.core.None
+import arrow.core.Some
 import arrow.core.extensions.list.foldable.combineAll
 import arrow.core.extensions.list.foldable.foldMap
 import arrow.core.extensions.monoid
@@ -526,5 +528,26 @@ class StreamTest : StreamSpec(spec = {
         .compile()
         .toList() shouldBe List(n) { i }
     }
+  }
+
+  "terminateOn" {
+    Stream(1, 2, 3, 4)
+      .terminateOn { it % 3 == 0 }
+      .compile()
+      .toList() shouldBe listOf(1, 2)
+  }
+
+  "terminateOnNull" {
+    Stream(1, 2, null, 4)
+      .terminateOnNull()
+      .compile()
+      .toList() shouldBe listOf(1, 2)
+  }
+
+  "terminateOnNone" {
+    Stream(Some(1), Some(2), None, Some(4))
+      .terminateOnNone()
+      .compile()
+      .toList() shouldBe listOf(1, 2)
   }
 })

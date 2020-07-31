@@ -512,7 +512,7 @@ abstract class Chunk<out O> {
 
   object Empty : Chunk<Nothing>() {
     override fun size(): Int = 0
-    override fun get(i: Int): Nothing = throw RuntimeException("Chunk.empty.apply($i)")
+    override fun get(i: Int): Nothing = throw RuntimeException("Chunk.empty[$i]")
     override fun splitAtChunk_(n: Int): Pair<Chunk<Nothing>, Chunk<Nothing>> = TODO("INTERNAL DEV ERROR NUB")
     override fun copyToArray_(xs: Array<Any?>, start: Int) = Unit
   }

@@ -4,6 +4,62 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
+/**
+ * Create a cancellable `suspend` function that executes an asynchronous process on evaluation.
+ * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ * import java.lang.RuntimeException
+ * import java.util.concurrent.Executors
+ * import java.util.concurrent.ScheduledFuture
+ * import java.util.concurrent.TimeUnit
+ *
+ * typealias Callback = (List<String>?, Throwable?) -> Unit
+ *
+ * class GithubId
+ * object GithubService {
+ *   private val listeners: MutableMap<GithubId, ScheduledFuture<*>> = mutableMapOf()
+ *   fun getUsernames(callback: Callback): GithubId {
+ *     val id = GithubId()
+ *     val future = Executors.newScheduledThreadPool(1).run {
+ *       schedule({
+ *         callback(listOf("Arrow"), null)
+ *         shutdown()
+ *       }, 2, TimeUnit.SECONDS)
+ *     }
+ *     listeners[id] = future
+ *     return id
+ *   }
+ *   fun unregisterCallback(id: GithubId): Unit {
+ *     listeners[id]?.cancel(false)
+ *     listeners.remove(id)
+ *   }
+ * }
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   suspend fun getUsernames(): List<String> =
+ *     cancellable { cb: (Result<List<String>>) -> Unit ->
+ *       val id = GithubService.getUsernames { names, throwable ->
+ *         when {
+ *           names != null -> cb(Result.success(names))
+ *           throwable != null -> cb(Result.failure(throwable))
+ *           else -> cb(Result.failure(RuntimeException("Null result and no exception")))
+ *         }
+ *       }
+ *       CancelToken { GithubService.unregisterCallback(id) }
+ *     }
+ *   val result = getUsernames()
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * @param cb an asynchronous computation that might fail.
+ * @see suspendCoroutine for wrapping impure APIs without cancellation
+ * @see cancellableF for wrapping impure APIs using a suspend with cancellation
+ */
 suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
   suspendCoroutine { cont ->
     val conn = cont.context.connection()
@@ -24,7 +80,61 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
     } else cancellable.complete(CancelToken.unit)
   }
 
-suspend fun <A> cancellableF(k: suspend ((Result<A>) -> Unit) -> CancelToken): A =
+/**
+ * Create a cancellable `suspend` function that executes an asynchronous process on evaluation.
+ * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+ *
+ * The suspending [cb] runs in an uncancellable manner, acquiring [CancelToken] as a resource.
+ * If cancellation signal is received while [cb] is running, then the [CancelToken] will be triggered as soon as it's returned.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * import arrow.fx.coroutines.*
+ * import java.lang.RuntimeException
+ *
+ * typealias Callback = (List<String>?, Throwable?) -> Unit
+ *
+ * class GithubId
+ * object GithubService {
+ *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+ *   suspend fun getUsernames(callback: Callback): GithubId {
+ *     val id = GithubId()
+ *     listeners[id] = callback
+ *     ForkConnected { sleep(2.seconds); callback(listOf("Arrow"), null) }
+ *     return id
+ *   }
+ *
+ *   fun unregisterCallback(id: GithubId): Unit {
+ *     listeners.remove(id)
+ *   }
+ * }
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   suspend fun getUsernames(): List<String> =
+ *     cancellableF { cb: (Result<List<String>>) -> Unit ->
+ *       val id = GithubService.getUsernames { names, throwable ->
+ *         when {
+ *           names != null -> cb(Result.success(names))
+ *           throwable != null -> cb(Result.failure(throwable))
+ *           else -> cb(Result.failure(RuntimeException("Null result and no exception")))
+ *         }
+ *       }
+ *
+ *       CancelToken { GithubService.unregisterCallback(id) }
+ *     }
+ *
+ *   val result = getUsernames()
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * @param cb an asynchronous computation that might fail.
+ * @see suspendCoroutine for wrapping impure APIs without cancellation
+ * @see cancellable for wrapping impure APIs with cancellation
+ */
+suspend fun <A> cancellableF(cb: suspend ((Result<A>) -> Unit) -> CancelToken): A =
   suspendCoroutine { cont ->
     val conn = cont.context.connection()
 
@@ -51,7 +161,7 @@ suspend fun <A> cancellableF(k: suspend ((Result<A>) -> Unit) -> CancelToken): A
       // uninterruptedly, otherwise risking a leak, hence the bracket
       // TODO CREATE KotlinTracker issue using CancelToken here breaks something in compilation
       bracketCase<suspend () -> Unit, Unit>(
-        acquire = { k(cb1).cancel },
+        acquire = { cb(cb1).cancel },
         use = { waitUntilCallbackInvoked(state) },
         release = { token, ex ->
           when (ex) {

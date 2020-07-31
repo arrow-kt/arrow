@@ -16,7 +16,7 @@ import arrow.fx.coroutines.stream.concurrent.SignallingAtomic
 import arrow.fx.coroutines.uncancellable
 
 /**
- * Nondeterministically merges a stream of streams (`outer`) in to a single stream,
+ * Non-deterministically merges a stream of streams (`outer`) in to a single stream,
  * opening at most `maxOpen` streams at any point in time.
  *
  * The outer stream is evaluated and each resulting inner stream is run concurrently,
@@ -67,7 +67,7 @@ suspend fun <O> stop(
   outputQ.enqueue1(None)
 }
 
-suspend fun <O> decrementRunning(
+internal suspend fun <O> decrementRunning(
   done: SignallingAtomic<Option<Option<Throwable>>>,
   outputQ: NoneTerminatedQueue<Chunk<O>>,
   running: SignallingAtomic<Int>
@@ -77,7 +77,7 @@ suspend fun <O> decrementRunning(
     Pair(now, (if (now == 0) suspend { stop(done, outputQ, None) } else suspend { Unit }))
   }.invoke()
 
-suspend fun incrementRunning(running: SignallingAtomic<Int>): Unit =
+internal suspend fun incrementRunning(running: SignallingAtomic<Int>): Unit =
   running.update { it + 1 }
 
 // runs inner stream, each stream is forked. terminates when killSignal is true if fails will enq in queue failure
@@ -121,7 +121,7 @@ internal suspend fun <O> runInner(
   }
 
 // runs the outer stream, interrupts when kill == true, and then decrements the `running`
-suspend fun <O> Stream<Stream<O>>.runOuter(
+internal suspend fun <O> Stream<Stream<O>>.runOuter(
   done: SignallingAtomic<Option<Option<Throwable>>>,
   outputQ: NoneTerminatedQueue<Chunk<O>>,
   running: SignallingAtomic<Int>,
@@ -146,8 +146,16 @@ suspend fun <O> Stream<Stream<O>>.runOuter(
 
 // awaits when all streams (outer + inner) finished,
 // and then collects result of the stream (outer + inner) execution
-suspend fun signalResult(done: SignallingAtomic<Option<Option<Throwable>>>): Unit =
+internal suspend fun signalResult(done: SignallingAtomic<Option<Option<Throwable>>>): Unit =
   done.get().flatten().fold({ Unit }, { throw it })
+
+/**
+ * Merges both Streams into an Stream of A and B represented by Either<A, B>.
+ * This operation is equivalent to a normal merge but for different types.
+ */
+fun <A, B> Stream<A>.either(other: Stream<B>): Stream<Either<A, B>> =
+  Stream(this.map { Either.Left(it) }, other.map { Either.Right(it) })
+    .parJoin(2)
 
 fun <O> Stream<Stream<O>>.parJoin(maxOpen: Int): Stream<O> {
   require(maxOpen > 0) { "maxOpen must be > 0, was: $maxOpen" }
@@ -180,6 +188,6 @@ fun <O> Stream<Stream<O>>.parJoin(maxOpen: Int): Stream<O> {
   }.flatten()
 }
 
-/** Like [parJoin] but races all inner streams simultaneously. */
+/** Like [parJoin] but races all inner streams simultaneously without limit. */
 fun <O> Stream<Stream<O>>.parJoinUnbounded(): Stream<O> =
   parJoin(Int.MAX_VALUE)
