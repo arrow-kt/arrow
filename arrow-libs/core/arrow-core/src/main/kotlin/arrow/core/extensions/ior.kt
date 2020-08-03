@@ -38,6 +38,36 @@ import arrow.typeclasses.Traverse
 import arrow.undocumented
 
 @extension
+interface IorSemigroup<L, R> : Semigroup<Ior<L, R>> {
+
+  fun SGL(): Semigroup<L>
+  fun SGR(): Semigroup<R>
+
+  override fun Ior<L, R>.combine(b: Ior<L, R>): Ior<L, R> =
+    with(SGL()) {
+      with(SGR()) {
+        when (val a = this@combine) {
+          is Ior.Left -> when (b) {
+            is Ior.Left -> Ior.Left(a.value + b.value)
+            is Ior.Right -> Ior.Both(a.value, b.value)
+            is Ior.Both -> Ior.Both(a.value + b.leftValue, b.rightValue)
+          }
+          is Ior.Right -> when (b) {
+            is Ior.Left -> Ior.Both(b.value, a.value)
+            is Ior.Right -> Ior.Right(a.value + b.value)
+            is Ior.Both -> Ior.Both(b.leftValue, a.value + b.rightValue)
+          }
+          is Ior.Both -> when (b) {
+            is Ior.Left -> Ior.Both(a.leftValue + b.value, a.rightValue)
+            is Ior.Right -> Ior.Both(a.leftValue, a.rightValue + b.value)
+            is Ior.Both -> Ior.Both(a.leftValue + b.leftValue, a.rightValue + b.rightValue)
+          }
+        }
+      }
+    }
+}
+
+@extension
 @undocumented
 interface IorFunctor<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
@@ -245,3 +275,6 @@ interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
       }
     }
 }
+
+operator fun <L, R> Ior<L, R>.component1(): L? = leftOrNull()
+operator fun <L, R> Ior<L, R>.component2(): R? = orNull()
