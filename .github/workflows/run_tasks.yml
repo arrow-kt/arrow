@@ -21,20 +21,15 @@ jobs:
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         sleep 180
-        checkAndDownloadViaHTTPS arrow-core $BRANCH_NAME
-        perl -pe "s/git pull//g" -i $BASEDIR/arrow-core/scripts/checkout-orchestrator.sh
-        replaceGlobalPropertiesbyLocalConf $BASEDIR/arrow-core/gradle.properties
+        for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+            checkAndDownloadViaHTTPS $repository $BRANCH_NAME
+            perl -pe "s/git pull//g" -i $BASEDIR/$repository/scripts/checkout-orchestrator.sh
+            replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
+        done
     - name: Build with local dependencies
       run: |
         cd $BASEDIR/arrow-core
         ./gradlew buildWithLocalDeps
-    - name: Clean and prepare env
-      run: |
-        cd $BASEDIR/arrow-core
-        git checkout .
-        perl -pe "s/git pull//g" -i scripts/checkout-orchestrator.sh
-        . $BASEDIR/arrow/scripts/commons4gradle.sh
-        replaceGlobalPropertiesbyLocalConf gradle.properties
     - name: Build Doc with local dependencies
       run: |
         cd $BASEDIR/arrow-core
