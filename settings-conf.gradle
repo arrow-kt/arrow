@@ -1,0 +1,11 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        // version variables cannot be used in settings.gradle
+        classpath "com.pablisco.gradle.automodule:core:0.12"
+    }
+}
+
+apply plugin: com.pablisco.gradle.automodule.AutoModulePlugin

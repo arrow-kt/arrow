@@ -90,7 +90,6 @@ task checkoutOrchestrator(type:Exec) {
 }
 
 task installAllWithLocalDeps(type:Exec) {
-    group = ARROW_GROUP
     description = "Install all the artifacts using local Arrow dependencies (no tests execution)"
     commandLine "${rootDir}/../arrow/scripts/libs-install.sh", "${rootProject.name}"
     mustRunAfter 'checkoutOrchestrator'
