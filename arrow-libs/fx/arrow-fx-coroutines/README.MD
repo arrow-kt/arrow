@@ -6,7 +6,7 @@ It's a functional implementation of Kotlin's coroutine system while providing su
 Arrow Fx aims to be a battery included functional effects framework, below you can find a small overview of the library.
 A full coverage of all data types and functions can be found [here](LINK DOCS).
 
-### IO<A> vs suspend () -> A
+### IO\<A\> vs suspend () -> A
 
 Let's look at two simple concurrent examples that switch context and print the `Thread.currentThread().name`.
 
