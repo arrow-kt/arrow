@@ -1,6 +1,7 @@
 name: Publish site
 
 on:
+  workflow_dispatch:
   push:
     branches:
     - master
@@ -20,6 +21,7 @@ jobs:
       JEKYLL_ENV: production
 
     runs-on: macos-latest
+    if: github.ref == 'refs/heads/master' // because of workflow_dispatch allows to choose a branch
 
     steps:
     - uses: actions/checkout@v1
