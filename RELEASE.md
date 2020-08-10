@@ -35,4 +35,8 @@ Every **Λrrow** library publishes the API Doc and some static documentation fro
     * https://arrow-kt.io/docs/next/optics/dsl/
     * https://arrow-kt.io/docs/next/aql/intro/
 
-TODO: In order to publish a RELEASE version, ...
+After creating a new RELEASE version, prepare a pull request for `arrow-site` repository with these changes:
+
+1. Update `gradle.properties` (check `runAnk` task locally because maybe it's necessary to adapt the code snippets in the landing page).
+2. Update `docs/_data/doc-versions.yml`.
+3. (Optional) Add the RELEASE version in `update-other-versions.txt` if it's necessary to create `docs/<major.minor>`.
