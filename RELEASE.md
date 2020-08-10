@@ -39,6 +39,20 @@ TODO: In order to publish a RELEASE version, ...
 
 ### How to fix the documentation for the latest release
 
+These steps will change the documentation for the latest release.
+
+For instance, for Arrow Core:
+
+* https://arrow-kt.io/docs/core/
+
+instead of:
+
+* https://arrow-kt.io/docs/next/core/
+
+that it's being changed with every pull request.
+
+Steps:
+
 1. Clone the repository to be fixed. For instance, `arrow-core`.
 2. Create a branch from the latest release version:
 ```
