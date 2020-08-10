@@ -412,7 +412,7 @@ sealed class IO<out A> : IOOf<A> {
      * @see async for wrapping impure APIs without cancellation
      */
     fun <A> cancellable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<A> =
-      Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
+      Async(true) { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
         onceOnly(conn, cbb).let { cbb2 ->
           val cancellable = ForwardCancellable()
           conn.push(cancellable.cancel())
