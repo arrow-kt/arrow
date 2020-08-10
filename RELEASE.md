@@ -66,7 +66,7 @@ git tag -a 0.10.5.1 -m "Fix ..."
 ```
 git push origin <latest-release-version>.<fix>
 ```
-8. Run the publication: [Publish site action](https://github.com/arrow-kt/arrow-site/actions?query=workflow%3A%22Publish+site%22) > `Run workflow` (it branch is changed by a non `master` branch, it won't work)
+8. Run the publication: [Publish site action](https://github.com/arrow-kt/arrow-site/actions?query=workflow%3A%22Publish+site%22) > `Run workflow` (if branch is changed by a non `master` branch, it won't work)
 9. Create the pull request to apply the fix on `master` branch as well.
 
 It's important that the tag points to the last commit that it's fixing the documentation before creating the pull request and merging `master` branch on it.
