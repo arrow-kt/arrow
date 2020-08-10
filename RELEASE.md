@@ -6,12 +6,12 @@ Every **Λrrow** library publishes SNAPSHOT versions from its repository into [O
 
 However, RELEASE versions must be published at the same time. So in order to publish a RELEASE version, it's necessary to prepare a pull request for `arrow` repository with these changes:
 
-* Update versions in `gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
+1. Update versions in `gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
 ```
 VERSION_NAME=0.11.0-SNAPSHOT
 LATEST_VERSION=0.10.5
 ```
-* Update versions in `README.md`
+2. Update versions in `README.md`
 
 When merging that pull request:
 
@@ -44,7 +44,7 @@ TODO: In order to publish a RELEASE version, ...
 ```
 git checkout -b <branch-name> <latest-release-version>
 ```
-For instance:
+For instance, to create a fix for `0.10.5`:
 ```
 git checkout -b fix-documentation 0.10.5
 ```
@@ -54,13 +54,19 @@ git checkout -b fix-documentation 0.10.5
 -/gradlew buildArrowDoc
 ```
 5. Commit the changes.
-6. Create a new annotated tag with the format `<latest-release-version>.<fix>`. For instance:
+6. Create a new annotated tag with the format `<latest-release-version>.<fix>`:
+```
+git tag -a <latest-release-version>.<fix> -m "<comment about the fix>"
+```
+For instance, for the first fix on `0.10.5`:
 ```
 git tag -a 0.10.5.1 -m "Fix ..."
 ```
 7. Push the tag
 ```
-git push origin <tag>
+git push origin <latest-release-version>.<fix>
 ```
-8. TODO: waiting for https://github.com/arrow-kt/arrow-site/pull/60
+8. Run the publication: [Publish site action](https://github.com/arrow-kt/arrow-site/actions?query=workflow%3A%22Publish+site%22) > `Run workflow` (it branch is changed by a non `master` branch, it won't work)
 9. Create the pull request to apply the fix on `master` branch as well.
+
+It's important that the tag points to the last commit that it's fixing the documentation before creating the pull request and merging `master` branch on it.
