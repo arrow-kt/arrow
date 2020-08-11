@@ -48,7 +48,13 @@ Go to `docs/_data/` and choose the correspondent `sidebar-x.yml` file. Then, add
   url: /typeclasses/applicative/
 ```
 
-Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
+### How to choose the style for an Arrow module
+
+Is a page showing a wrong style? For instance, is an Arrow Incubator page showing the style of Arrow Core?
+
+Please, add that module in `docs/_config.yml` and choose the right `layout`.
+
+If the module starts with `arrow-optics-` or `arrow-fx-` will show the right style by default.
 
 ### How to deploy the site to a local server
 
