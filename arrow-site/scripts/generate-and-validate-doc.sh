@@ -24,7 +24,7 @@ cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     cd $BASEDIR/$repository
     git checkout .
-    git checkout $VERSION
+    git checkout $(git tag -l --sort=version:refname ${VERSION}* | tail -1)
     replaceGlobalPropertiesbyLocalConf gradle.properties
     if [ -f arrow-docs/build.gradle ]; then
         replaceOSSbyBintrayRepository arrow-docs/build.gradle

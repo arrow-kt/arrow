@@ -50,7 +50,7 @@ jobs:
         tree build/_site > $BASEDIR/logs/content_docs-next.log
     - name: "Latest release: generate and validate docs for all the libraries"
       run: |
-        export VERSION=$(git describe --abbrev=0 --tags)
+        export VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
         ./scripts/generate-and-validate-doc.sh
     - name: "Latest release: build"
       run: |

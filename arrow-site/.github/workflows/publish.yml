@@ -76,7 +76,7 @@ jobs:
         aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
     - name: "Latest release: generate and validate docs for all the libraries"
       run: |
-        export VERSION=$(git describe --abbrev=0 --tags)
+        export VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
         ./scripts/generate-and-validate-doc.sh
     - name: "Latest release: build"
       run: |
