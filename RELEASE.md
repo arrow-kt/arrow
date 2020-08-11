@@ -1,17 +1,17 @@
-## Release flow
+# Release flow
 
-### Artifacts
+## Artifacts
 
 Every **Λrrow** library publishes SNAPSHOT versions from its repository into [OSS](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/)
 
 However, RELEASE versions must be published at the same time. So in order to publish a RELEASE version, it's necessary to prepare a pull request for `arrow` repository with these changes:
 
-* Update versions in `gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
+1. Update versions in `gradle.properties`. For instance, the release version will be `0.10.5` and the next SNAPSHOT version will be `0.11.0-SNAPSHOT`:
 ```
 VERSION_NAME=0.11.0-SNAPSHOT
 LATEST_VERSION=0.10.5
 ```
-* Update versions in `README.md`
+2. Update versions in `README.md`
 
 When merging that pull request:
 
@@ -23,7 +23,7 @@ When merging that pull request:
 
 Then, it will be necessary to sync Bintray with Maven (pending task: automating it).
 
-### Documentation
+## Documentation
 
 Every **Λrrow** library publishes the API Doc and some static documentation from its repository into the next version of the website:
 
@@ -40,3 +40,51 @@ After creating a new RELEASE version, prepare a pull request for `arrow-site` re
 1. Update `gradle.properties` (check `runAnk` task locally because maybe it's necessary to adapt the code snippets in the landing page).
 2. Update `docs/_data/doc-versions.yml`.
 3. (Optional) Add the RELEASE version in `update-other-versions.txt` if it's necessary to create `docs/<major.minor>`.
+
+### How to fix the documentation for the latest release
+
+These steps will change the documentation for the latest release.
+
+For instance, for Arrow Core:
+
+* https://arrow-kt.io/docs/core/
+
+instead of:
+
+* https://arrow-kt.io/docs/next/core/
+
+that it's being changed with every pull request.
+
+Steps:
+
+1. Clone the repository to be fixed. For instance, `arrow-core`.
+2. Create a branch from the latest release version:
+```
+git checkout -b <branch-name> <latest-release-version>
+```
+For instance, to create a fix for `0.10.5`:
+```
+git checkout -b fix-documentation 0.10.5
+```
+3. Update the documentation.
+4. Check that everything is working as expected:
+```
+-/gradlew buildArrowDoc
+```
+5. Commit the changes.
+6. Create a new annotated tag with the format `<latest-release-version>.<fix>`:
+```
+git tag -a <latest-release-version>.<fix> -m "<comment about the fix>"
+```
+For instance, for the first fix on `0.10.5`:
+```
+git tag -a 0.10.5.1 -m "Fix ..."
+```
+7. Push the tag
+```
+git push origin <latest-release-version>.<fix>
+```
+8. Run the publication: [Publish site action](https://github.com/arrow-kt/arrow-site/actions?query=workflow%3A%22Publish+site%22) > `Run workflow` (don't change the default branch; if branch is changed by a non `master` branch, it will be skipped)
+9. Create the pull request to apply the fix on `master` branch **if the fix should exist in the next version as well**.
+
+It's important that the tag points to the last commit that it's fixing the documentation before creating the pull request and merging `master` branch on it.
