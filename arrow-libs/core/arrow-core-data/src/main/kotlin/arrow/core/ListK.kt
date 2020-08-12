@@ -167,14 +167,41 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       }
     }
 
+  @Deprecated("Deprecated, use mapNotNull(f: (A) -> B?) instead", ReplaceWith("mapNotNull(f: (A) -> B?)"))
   fun <B> filterMap(f: (A) -> Option<B>): ListK<B> =
     flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
+
+  /**
+   * Returns a [ListK] containing the transformed values from the original
+   * [ListK] filtering out any null value.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val evenStrings = listOf(1, 2).k().mapNotNull {
+   *   when (it % 2 == 0) {
+   *     true -> it.toString()
+   *     else -> null
+   *   }
+   * }
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("evenStrings = $evenStrings")
+   * }
+   * ```
+   */
+  fun <B> mapNotNull(f: (A) -> B?): ListK<B> =
+    flatMap { a -> f(a)?.let { just(it) } ?: empty<B>() }
 
   override fun hashCode(): Int = list.hashCode()
 
   /**
    * Align two Lists as in zip, but filling in blanks with None.
    */
+  @Deprecated("Deprecated, use `padZipWithNull` instead", ReplaceWith("padZipWithNull(other: ListK<B>)"))
   fun <B> padZip(
     other: ListK<B>
   ): ListK<Tuple2<Option<A>, Option<B>>> =
@@ -186,8 +213,40 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     }
 
   /**
+   * Returns a [ListK<Tuple2<A?, B?>>] containing the zipped values of the two listKs
+   * with null for padding.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val padRight = listOf(1, 2).k().padZip(listOf("a").k())        // Result: ListK(Tuple2(1, "a"), Tuple2(2, null))
+   * val padLeft = listOf(1).k().padZip(listOf("a", "b").k())       // Result: ListK(Tuple2(1, "a"), Tuple2(null, "b"))
+   * val noPadding = listOf(1, 2).k().padZip(listOf("a", "b").k())  // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("padRight = $padRight")
+   *   println("padLeft = $padLeft")
+   *   println("noPadding = $noPadding")
+   * }
+   * ```
+   */
+  fun <B> padZipWithNull(
+    other: ListK<B>
+  ): ListK<Tuple2<A?, B?>> =
+    alignWith(this, other) { ior ->
+      ior.fold(
+        { it toT null },
+        { null toT it },
+        { a, b -> a toT b })
+    }
+
+  /**
    * Align two Lists as in zipWith, but filling in blanks with None.
    */
+  @Deprecated("Deprecated, use `padZip(other: ListK<B>, fa: (A?, B?) -> C)` instead", ReplaceWith("padZip(other: ListK<B>, fa: (A?, B?) -> C)"))
   fun <B, C> padZipWith(
     other: ListK<B>,
     fa: (Option<A>, Option<B>) -> C
@@ -195,13 +254,68 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     padZip(other).map { fa(it.a, it.b) }
 
   /**
+   * Returns a [ListK<C>] containing the result of applying some transformation `(A?, B?) -> C`
+   * on a zip.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val padZipRight = listOf(1, 2).k().padZip(listOf("a").k()) { l, r -> l toT r }.k()     // Result: ListK(Tuple2(1, "a"), Tuple2(2, null))
+   * val padZipLeft = listOf(1).k().padZip(listOf("a", "b").k()) { l, r -> l toT r }.k()    // Result: ListK(Tuple2(1, "a"), Tuple2(null, "b"))
+   * val noPadding = listOf(1, 2).k().padZip(listOf("a", "b").k()) { l, r -> l toT r }.k()  // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("padZipRight = $padZipRight")
+   *   println("padZipLeft = $padZipLeft")
+   *   println("noPadding = $noPadding")
+   * }
+   * ```
+   */
+  fun <B, C> padZip(
+    other: ListK<B>,
+    fa: (A?, B?) -> C
+  ): ListK<C> =
+    padZipWithNull(other).map { fa(it.a, it.b) }
+
+  /**
    * Left-padded zipWith.
    */
+  @Deprecated("Deprecated, use `leftPadZip(other: ListK<B>, fab: (A?, B) -> C)` instead", ReplaceWith("leftPadZip(other: ListK<B>, fab: (A?, B) -> C)"))
   fun <B, C> lpadZipWith(
     other: ListK<B>,
     fab: (Option<A>, B) -> C
   ): ListK<C> =
-    padZipWith(other) { a, b -> b.map { fab(a, it) } }.filterMap(::identity)
+    padZipWith(other) { a: Option<A>, b -> b.map { fab(a, it) } }.filterMap(::identity)
+
+  /**
+   * Returns a [ListK<C>] containing the result of applying some transformation `(A?, B) -> C`
+   * on a zip, excluding all cases where the right value is null.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val left = listOf(1, 2).k().leftPadZip(listOf("a").k()) { l, r -> l toT r }.k()      // Result: ListK(Tuple2(1, "a"))
+   * val right = listOf(1).k().leftPadZip(listOf("a", "b").k()) { l, r -> l toT r }.k()   // Result: ListK(Tuple2(1, "a"), Tuple2(null, "b"))
+   * val both = listOf(1, 2).k().leftPadZip(listOf("a", "b").k()) { l, r -> l toT r }.k() // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("left = $left")
+   *   println("right = $right")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun <B, C> leftPadZip(
+    other: ListK<B>,
+    fab: (A?, B) -> C
+  ): ListK<C> =
+    padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
 
   /**
    * Left-padded zip.
