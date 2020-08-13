@@ -9,7 +9,10 @@ import arrow.core.EitherOf
 import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.ForEither
+import arrow.core.GT
+import arrow.core.LT
 import arrow.core.Left
+import arrow.core.Ordering
 import arrow.core.Right
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.monad.monad
@@ -36,6 +39,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
@@ -250,6 +254,17 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
     HL().run { it.hash() }
   }, {
     HR().run { it.hash() }
+  })
+}
+
+@extension
+interface EitherOrder<L, R> : Order<Either<L, R>> {
+  fun OL(): Order<L>
+  fun OR(): Order<R>
+  override fun Either<L, R>.compare(b: Either<L, R>): Ordering = fold({ l1 ->
+    b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT })
+  }, { r1 ->
+    b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } })
   })
 }
 

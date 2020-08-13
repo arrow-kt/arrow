@@ -8,6 +8,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.Eval
 import arrow.core.ForTuple2
+import arrow.core.Ordering
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple2Of
@@ -19,6 +20,8 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.extensions.list.foldable.fold
+import arrow.core.extensions.ordering.monoid.monoid
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.toT
@@ -35,6 +38,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -214,6 +218,17 @@ interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
 }
 
 @extension
+interface Tuple2Order<A, B> : Order<Tuple2<A, B>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+
+  override fun Tuple2<A, B>.compare(other: Tuple2<A, B>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) }
+  ).fold(Ordering.monoid())
+}
+
+@extension
 interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 
   fun EQA(): Eq<A>
@@ -255,6 +270,19 @@ interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
 }
 
 @extension
+interface Tuple3Order<A, B, C> : Order<Tuple3<A, B, C>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+
+  override fun Tuple3<A, B, C>.compare(other: Tuple3<A, B, C>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) }
+  ).fold(Ordering.monoid())
+}
+
+@extension
 interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
   fun EQA(): Eq<A>
@@ -290,6 +318,21 @@ interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D
     HC().run { c.hash() },
     HD().run { d.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple4Order<A, B, C, D> : Order<Tuple4<A, B, C, D>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+
+  override fun Tuple4<A, B, C, D>.compare(other: Tuple4<A, B, C, D>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -344,6 +387,23 @@ interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B
     HD().run { d.hash() },
     HE().run { e.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple5Order<A, B, C, D, E> : Order<Tuple5<A, B, C, D, E>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+
+  override fun Tuple5<A, B, C, D, E>.compare(other: Tuple5<A, B, C, D, E>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -405,6 +465,25 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6E
     HE().run { e.hash() },
     HF().run { f.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple6Order<A, B, C, D, E, F> : Order<Tuple6<A, B, C, D, E, F>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+  fun OF(): Order<F>
+
+  override fun Tuple6<A, B, C, D, E, F>.compare(other: Tuple6<A, B, C, D, E, F>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) },
+    OF().run { f.compare(other.f) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -473,6 +552,27 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, T
     HF().run { f.hash() },
     HG().run { g.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple7Order<A, B, C, D, E, F, G> : Order<Tuple7<A, B, C, D, E, F, G>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+  fun OF(): Order<F>
+  fun OG(): Order<G>
+
+  override fun Tuple7<A, B, C, D, E, F, G>.compare(other: Tuple7<A, B, C, D, E, F, G>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) },
+    OF().run { f.compare(other.f) },
+    OG().run { g.compare(other.g) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -548,6 +648,29 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
     HG().run { g.hash() },
     HH().run { h.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple8Order<A, B, C, D, E, F, G, H> : Order<Tuple8<A, B, C, D, E, F, G, H>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+  fun OF(): Order<F>
+  fun OG(): Order<G>
+  fun OH(): Order<H>
+
+  override fun Tuple8<A, B, C, D, E, F, G, H>.compare(other: Tuple8<A, B, C, D, E, F, G, H>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) },
+    OF().run { f.compare(other.f) },
+    OG().run { g.compare(other.g) },
+    OH().run { h.compare(other.h) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -630,6 +753,31 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
     HH().run { h.hash() },
     HI().run { i.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple9Order<A, B, C, D, E, F, G, H, I> : Order<Tuple9<A, B, C, D, E, F, G, H, I>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+  fun OF(): Order<F>
+  fun OG(): Order<G>
+  fun OH(): Order<H>
+  fun OI(): Order<I>
+
+  override fun Tuple9<A, B, C, D, E, F, G, H, I>.compare(other: Tuple9<A, B, C, D, E, F, G, H, I>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) },
+    OF().run { f.compare(other.f) },
+    OG().run { g.compare(other.g) },
+    OH().run { h.compare(other.h) },
+    OI().run { i.compare(other.i) }
+  ).fold(Ordering.monoid())
 }
 
 @extension
@@ -719,6 +867,33 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
     HI().run { i.hash() },
     HJ().run { j.hash() }
   ).fold(1) { hash, v -> 31 * hash + v }
+}
+
+@extension
+interface Tuple10Order<A, B, C, D, E, F, G, H, I, J> : Order<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
+  fun OA(): Order<A>
+  fun OB(): Order<B>
+  fun OC(): Order<C>
+  fun OD(): Order<D>
+  fun OE(): Order<E>
+  fun OF(): Order<F>
+  fun OG(): Order<G>
+  fun OH(): Order<H>
+  fun OI(): Order<I>
+  fun OJ(): Order<J>
+
+  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.compare(other: Tuple10<A, B, C, D, E, F, G, H, I, J>): Ordering = listOf(
+    OA().run { a.compare(other.a) },
+    OB().run { b.compare(other.b) },
+    OC().run { c.compare(other.c) },
+    OD().run { d.compare(other.d) },
+    OE().run { e.compare(other.e) },
+    OF().run { f.compare(other.f) },
+    OG().run { g.compare(other.g) },
+    OH().run { h.compare(other.h) },
+    OI().run { i.compare(other.i) },
+    OJ().run { j.compare(other.j) }
+  ).fold(Ordering.monoid())
 }
 
 @extension

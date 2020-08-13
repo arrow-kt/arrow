@@ -11,29 +11,32 @@ import arrow.core.test.generators.short
 import arrow.core.test.generators.shortSmall
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.SemiringLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
 import arrow.typeclasses.Semiring
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 class NumberInstancesTest : UnitSpec() {
 
-  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, HF: Hash<F>, GEN: Gen<F>, EQ: Eq<F>) {
+  fun <F> testAllLaws(SG: Semiring<F>, M: Monoid<F>, HF: Hash<F>, GEN: Gen<F>, EQ: Eq<F>, OF: Order<F>) {
     testLaws(SemiringLaws.laws(SG, GEN, EQ))
     testLaws(MonoidLaws.laws(M, GEN, EQ))
     testLaws(HashLaws.laws(HF, GEN, EQ))
+    testLaws(OrderLaws.laws(OF, GEN))
   }
 
   init {
-    testAllLaws(Byte.semiring(), Byte.monoid(), Byte.hash(), Gen.byteSmall(), Byte.eq())
-    testAllLaws(Double.semiring(), Double.monoid(), Double.hash(), Gen.doubleSmall(), Double.eq())
-    testAllLaws(Int.semiring(), Int.monoid(), Int.hash(), Gen.intSmall(), Int.eq())
-    testAllLaws(Short.semiring(), Short.monoid(), Short.hash(), Gen.shortSmall(), Short.eq())
-    testAllLaws(Float.semiring(), Float.monoid(), Float.hash(), Gen.floatSmall(), Float.eq())
-    testAllLaws(Long.semiring(), Long.monoid(), Long.hash(), Gen.longSmall(), Long.eq())
+    testAllLaws(Byte.semiring(), Byte.monoid(), Byte.hash(), Gen.byteSmall(), Byte.eq(), Byte.order())
+    testAllLaws(Double.semiring(), Double.monoid(), Double.hash(), Gen.doubleSmall(), Double.eq(), Double.order())
+    testAllLaws(Int.semiring(), Int.monoid(), Int.hash(), Gen.intSmall(), Int.eq(), Int.order())
+    testAllLaws(Short.semiring(), Short.monoid(), Short.hash(), Gen.shortSmall(), Short.eq(), Short.order())
+    testAllLaws(Float.semiring(), Float.monoid(), Float.hash(), Gen.floatSmall(), Float.eq(), Float.order())
+    testAllLaws(Long.semiring(), Long.monoid(), Long.hash(), Gen.longSmall(), Long.eq(), Long.order())
 
     /** Semigroup specific instance check */
 

@@ -2,7 +2,9 @@ package arrow.core
 
 import arrow.core.computations.validated
 import arrow.core.extensions.eq
+import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
+import arrow.core.extensions.order
 import arrow.core.extensions.semigroup
 import arrow.core.extensions.show
 import arrow.core.extensions.validated.applicative.applicative
@@ -12,6 +14,8 @@ import arrow.core.extensions.validated.eq.eq
 import arrow.core.extensions.validated.eqK.eqK
 import arrow.core.extensions.validated.eqK2.eqK2
 import arrow.core.extensions.validated.functor.functor
+import arrow.core.extensions.validated.hash.hash
+import arrow.core.extensions.validated.order.order
 import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
@@ -25,6 +29,8 @@ import arrow.core.test.laws.BitraverseLaws
 import arrow.core.test.laws.EqK2Laws
 import arrow.core.test.laws.EqLaws
 import arrow.core.test.laws.FxLaws
+import arrow.core.test.laws.HashLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.SelectiveLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
@@ -50,6 +56,8 @@ class ValidatedTest : UnitSpec() {
       BifunctorLaws.laws(Validated.bifunctor(), Validated.genK2(), Validated.eqK2()),
       EqLaws.laws(EQ, Gen.validated(Gen.string(), Gen.int())),
       ShowLaws.laws(Validated.show(String.show(), Int.show()), EQ, Gen.validated(Gen.string(), Gen.int())),
+      HashLaws.laws(Validated.hash(String.hash(), Int.hash()), Gen.validated(Gen.string(), Gen.int()), EQ),
+      OrderLaws.laws(Validated.order(String.order(), Int.order()), Gen.validated(Gen.string(), Gen.int())),
       SelectiveLaws.laws(Validated.selective(String.semigroup()), Validated.functor(), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       TraverseLaws.laws(Validated.traverse(), Validated.applicative(String.semigroup()), Validated.genK(Gen.string()), Validated.eqK(String.eq())),
       SemigroupKLaws.laws(

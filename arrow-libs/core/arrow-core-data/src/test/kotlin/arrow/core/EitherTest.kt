@@ -15,6 +15,7 @@ import arrow.core.extensions.either.hash.hash
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.monadError.monadError
 import arrow.core.extensions.either.monoid.monoid
+import arrow.core.extensions.either.order.order
 import arrow.core.extensions.either.semigroupK.semigroupK
 import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
@@ -22,6 +23,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.order
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
@@ -38,6 +40,7 @@ import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.MonadErrorLaws
 import arrow.core.test.laws.MonoidLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
@@ -70,6 +73,7 @@ class EitherTest : UnitSpec() {
       BitraverseLaws.laws(Either.bitraverse(), Either.genK2(), Either.eqK2()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), GEN, Either.eq(String.eq(), Int.eq())),
+      OrderLaws.laws(Either.order(String.order(), Int.order()), GEN),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
       FxLaws.laws<EitherPartialOf<String>, Int>(Gen.int().map(::Right), GEN.map { it }, Either.eqK(String.eq()).liftEq(Int.eq()), either::eager, either::invoke)
     )

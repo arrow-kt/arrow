@@ -11,12 +11,14 @@ import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.order.order
 import arrow.core.extensions.nonemptylist.semialign.semialign
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.nonemptylist.unzip.unzip
+import arrow.core.extensions.order
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
@@ -24,6 +26,7 @@ import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.laws.BimonadLaws
 import arrow.core.test.laws.EqKLaws
 import arrow.core.test.laws.HashLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.core.test.laws.SemigroupLaws
 import arrow.core.test.laws.ShowLaws
@@ -58,6 +61,7 @@ class NonEmptyListTest : UnitSpec() {
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), NonEmptyList.genK(), NonEmptyList.eqK()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Gen.nonEmptyList(Gen.int()), EQ1),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), Gen.nonEmptyList(Gen.int()), EQ1),
+      OrderLaws.laws(NonEmptyList.order(Int.order()), Gen.nonEmptyList(Gen.int())),
       EqKLaws.laws(
         NonEmptyList.eqK(),
         NonEmptyList.genK()

@@ -1,5 +1,6 @@
 package arrow.core.extensions
 
+import arrow.core.Ordering
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -28,7 +29,8 @@ interface ByteSemiring : Semiring<Byte> {
 }
 
 interface ByteOrder : Order<Byte> {
-  override fun Byte.compare(b: Byte): Int = compareTo(b)
+  override fun Byte.compare(b: Byte): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Byte.compareTo(b: Byte): Int = this.compareTo(b)
 }
 
 interface ByteEq : Eq<Byte> {
@@ -85,7 +87,8 @@ interface DoubleSemiring : Semiring<Double> {
 }
 
 interface DoubleOrder : Order<Double> {
-  override fun Double.compare(b: Double): Int = compareTo(b)
+  override fun Double.compare(b: Double): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Double.compareTo(b: Double): Int = this.compareTo(b)
 }
 
 interface DoubleEq : Eq<Double> {
@@ -149,7 +152,8 @@ interface IntShow : Show<Int> {
 }
 
 interface IntOrder : Order<Int> {
-  override fun Int.compare(b: Int): Int = compareTo(b)
+  override fun Int.compare(b: Int): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Int.compareTo(b: Int): Int = this.compareTo(b)
 }
 
 interface IntHash : Hash<Int>, IntEq {
@@ -198,7 +202,8 @@ interface LongSemiring : Semiring<Long> {
 }
 
 interface LongOrder : Order<Long> {
-  override fun Long.compare(b: Long): Int = compareTo(b)
+  override fun Long.compare(b: Long): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Long.compareTo(b: Long): Int = this.compareTo(b)
 }
 
 interface LongEq : Eq<Long> {
@@ -255,7 +260,8 @@ interface ShortSemiring : Semiring<Short> {
 }
 
 interface ShortOrder : Order<Short> {
-  override fun Short.compare(b: Short): Int = compareTo(b)
+  override fun Short.compare(b: Short): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Short.compareTo(b: Short): Int = this.compareTo(b)
 }
 
 interface ShortEq : Eq<Short> {
@@ -312,7 +318,8 @@ interface FloatSemiring : Semiring<Float> {
 }
 
 interface FloatOrder : Order<Float> {
-  override fun Float.compare(b: Float): Int = compareTo(b)
+  override fun Float.compare(b: Float): Ordering = Ordering.fromInt(this.compareTo(b))
+  override fun Float.compareTo(b: Float): Int = this.compareTo(b)
 }
 
 interface FloatEq : Eq<Float> {

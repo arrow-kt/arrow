@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.order
 import arrow.core.extensions.sequencek.align.align
 import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.crosswalk.crosswalk
@@ -18,6 +19,7 @@ import arrow.core.extensions.sequencek.monadLogic.monadLogic
 import arrow.core.extensions.sequencek.monoid.monoid
 import arrow.core.extensions.sequencek.monoidK.monoidK
 import arrow.core.extensions.sequencek.monoidal.monoidal
+import arrow.core.extensions.sequencek.order.order
 import arrow.core.extensions.sequencek.repeat.repeat
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.extensions.sequencek.show.show
@@ -37,6 +39,7 @@ import arrow.core.test.laws.MonadLogicLaws
 import arrow.core.test.laws.MonoidKLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.MonoidalLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.RepeatLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseLaws
@@ -71,6 +74,7 @@ class SequenceKTest : UnitSpec() {
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.genK(), SequenceK.eqK()),
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
       HashLaws.laws(SequenceK.hash(Int.hash()), Gen.sequenceK(Gen.int()), SequenceK.eq(Int.eq())),
+      OrderLaws.laws(SequenceK.order(Int.order()), Gen.sequenceK(Gen.int())),
       AlignLaws.laws(SequenceK.align(),
         SequenceK.genK(),
         SequenceK.eqK(),

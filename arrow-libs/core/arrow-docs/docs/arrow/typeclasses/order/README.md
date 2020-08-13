@@ -6,9 +6,6 @@ permalink: /arrow/typeclasses/order/
 
 ## Order
 
-
-
-
 The `Order` typeclass abstracts the ability to compare two instances of any object and determine their total order.
 Depending on your needs, this comparison can be structural (the content of the object), referential (the memory address of the object), based on an identity (like an Id field), or any combination of these.
 
@@ -18,12 +15,7 @@ It can be considered the typeclass equivalent of Java's `Comparable`.
 
 #### F#compare
 
-`fun F.compare(b: F): Int`
-
-Compare [a] with [b]. Returns an Int whose sign is:
-  * negative if `x < y`
-  * zero     if `x = y`
-  * positive if `x > y`
+`fun F.compare(b: F): Ordering`
 
 ```kotlin:ank
 import arrow.*
@@ -93,11 +85,11 @@ Arrow provides `OrderLaws` in the form of test cases for internal verification o
 
 #### Creating your own `Order` instances
 
-Order has a constructor to create an `Order` instance from a compare function `(F, F) -> Int`.
+Order has a constructor to create an `Order` instance from a compare function `(F, F) -> Ordering`.
 
 ```kotlin:ank
-
-Order { a: Int, b: Int -> b - a }.run {
+import arrow.core.Ordering
+Order { a: Int, b: Int -> Ordering.fromInt(b - a) }.run {
   1.lt(2)
 }
 ```

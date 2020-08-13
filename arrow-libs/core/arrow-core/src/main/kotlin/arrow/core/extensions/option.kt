@@ -3,13 +3,17 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.core.EQ
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
+import arrow.core.GT
 import arrow.core.Ior
+import arrow.core.LT
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.OptionOf
+import arrow.core.Ordering
 import arrow.core.SequenceK
 import arrow.core.Some
 import arrow.core.Tuple2
@@ -45,6 +49,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Order
 import arrow.typeclasses.Repeat
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semialign
@@ -285,6 +290,16 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
     None.hashCode()
   }, {
     HA().run { it.hash() }
+  })
+}
+
+@extension
+interface OptionOrder<A> : Order<Option<A>> {
+  fun OA(): Order<A>
+  override fun Option<A>.compare(b: Option<A>): Ordering = fold({
+    b.fold({ EQ }, { LT })
+  }, { a1 ->
+    b.fold({ GT }, { a2 -> OA().run { a1.compare(a2) } })
   })
 }
 

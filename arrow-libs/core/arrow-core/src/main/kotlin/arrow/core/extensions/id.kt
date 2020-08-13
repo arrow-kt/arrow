@@ -9,6 +9,7 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.Ior
+import arrow.core.Ordering
 import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
@@ -31,6 +32,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
 import arrow.typeclasses.Repeat
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semialign
@@ -210,6 +212,12 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
   override fun EQ(): Eq<A> = HA()
 
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
+}
+
+@extension
+interface IdOrder<A> : Order<Id<A>> {
+  fun OA(): Order<A>
+  override fun Id<A>.compare(b: Id<A>): Ordering = OA().run { value().compare(b.value()) }
 }
 
 fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =

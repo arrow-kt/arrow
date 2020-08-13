@@ -17,12 +17,14 @@ import arrow.core.extensions.option.monadCombine.monadCombine
 import arrow.core.extensions.option.monadPlus.monadPlus
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
+import arrow.core.extensions.option.order.order
 import arrow.core.extensions.option.repeat.repeat
 import arrow.core.extensions.option.selective.selective
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.core.extensions.option.unalign.unalign
 import arrow.core.extensions.option.unzip.unzip
+import arrow.core.extensions.order
 import arrow.core.extensions.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.test.UnitSpec
@@ -37,6 +39,7 @@ import arrow.core.test.laws.MonadCombineLaws
 import arrow.core.test.laws.MonadPlusLaws
 import arrow.core.test.laws.MonoidLaws
 import arrow.core.test.laws.MonoidalLaws
+import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.RepeatLaws
 import arrow.core.test.laws.ShowLaws
 import arrow.core.test.laws.TraverseFilterLaws
@@ -78,6 +81,7 @@ class OptionTest : UnitSpec() {
       FunctorFilterLaws.laws(Option.traverseFilter(), Option.genK(), Option.eqK()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), Option.genK(), Option.eqK()),
       HashLaws.laws(Option.hash(Int.hash()), Gen.option(Gen.int()), Option.eq(Int.eq())),
+      OrderLaws.laws(Option.order(Int.order()), Gen.option(Gen.int())),
       MonoidalLaws.laws(Option.monoidal(), Option.genK(), Option.eqK(), ::bijection),
       EqKLaws.laws(
         Option.eqK(),

@@ -1,5 +1,6 @@
 package arrow.core.extensions
 
+import arrow.core.Ordering
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -41,7 +42,10 @@ fun String.Companion.show(): Show<String> =
   object : StringShow {}
 
 interface StringOrder : Order<String> {
-  override fun String.compare(b: String): Int = this.compareTo(b)
+  override fun String.compare(b: String): Ordering =
+    Ordering.fromInt(this.compareTo(b))
+
+  override fun String.compareTo(b: String): Int = this.compareTo(b)
 }
 
 fun String.Companion.order(): Order<String> =
