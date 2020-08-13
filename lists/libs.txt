@@ -4,5 +4,4 @@ arrow-fx
 arrow-incubator
 arrow-optics
 arrow-ank
-arrow-integrations
 arrow-check
