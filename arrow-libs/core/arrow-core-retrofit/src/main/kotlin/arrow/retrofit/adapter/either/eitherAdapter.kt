@@ -1,4 +1,4 @@
-package arrow.integrations.retrofit.adapter.either
+package arrow.retrofit.adapter.either
 
 import okhttp3.ResponseBody
 import retrofit2.Call

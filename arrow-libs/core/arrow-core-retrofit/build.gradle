@@ -1,0 +1,29 @@
+plugins {
+    id "maven-publish"
+    id "base"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+    id "org.jetbrains.dokka"
+    id "org.jlleitschuh.gradle.ktlint"
+    id "ru.vyarus.animalsniffer"
+}
+
+apply from: "$SUBPROJECT_CONF"
+apply from: "$DOC_CONF"
+apply from: "$PUBLISH_CONF"
+
+dependencies {
+    compile project(":arrow-annotations")
+    compile project(":arrow-core-data")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    kapt project(":arrow-meta")
+    kaptTest project(":arrow-meta")
+    compileOnly project(":arrow-meta")
+    testCompileOnly project(":arrow-meta")
+    testCompile project(":arrow-core-test")
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    testCompile "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
+}

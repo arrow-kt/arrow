@@ -1,4 +1,4 @@
-package arrow.integrations.retrofit.adapter.either
+package arrow.retrofit.adapter.either
 
 import arrow.core.Either
 import retrofit2.Call

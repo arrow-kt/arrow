@@ -1,11 +1,11 @@
-package arrow.integrations.retrofit.adapter.either
+package arrow.retrofit.adapter.either
 
 import arrow.core.left
 import arrow.core.right
 import arrow.core.test.UnitSpec
-import arrow.integrations.retrofit.adapter.mock.ErrorMock
-import arrow.integrations.retrofit.adapter.mock.ResponseMock
-import arrow.integrations.retrofit.adapter.retrofit.SuspedApiClientTest
+import arrow.retrofit.adapter.mock.ErrorMock
+import arrow.retrofit.adapter.mock.ResponseMock
+import arrow.retrofit.adapter.retrofit.SuspedApiClientTest
 import io.kotlintest.Spec
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.runBlocking
