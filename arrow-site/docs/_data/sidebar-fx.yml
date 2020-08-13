@@ -12,49 +12,30 @@ options:
       - title: Polymorphism. One Program multiple runtimes
         url: /fx/polymorphism/
 
-  - title: Effects
+  - title: Data types
 
     nested_options:
 
-      - title: IO
-        url: /effects/io/
+      - title: Atomic
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic
 
-      - title: MonadDefer
-        url: /effects/monaddefer/
-
-      - title: Async
-        url: /effects/async/
-
-      - title: Effect
-        url: /effects/effect/
-
-      - title: Promise
-        url: /effects/promise/
-
-      - title: Ref
-        url: /effects/ref/
-
-      - title: Fiber
-        url: /effects/fiber/
+      - title: ConcurrentVar
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-concurrent-var
 
       - title: Resource
-        url: /apidocs/arrow-fx/arrow.fx/-resource/
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource
 
       - title: Schedule
-        url: /apidocs/arrow-fx/arrow.fx/-schedule/
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule
 
-      - title: Queue
-        url: /effects/queue/
+      - title: CircuitBreaker
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker
 
-  - title: Type Classes
+      - title: Promise
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-promise
 
-    nested_options:
-
-      - title: Bracket
-        url: /fx/typeclasses/bracket/
-
-      - title: MonadIO
-        url: /apidocs/arrow-fx/arrow.fx.typeclasses/-monad-i-o/
+      - title: Semaphore
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-semaphore
 
   - title: Integrations
 
@@ -73,14 +54,17 @@ options:
 
     nested_options:
 
-      - title: Effects
+      - title: Arrow Fx Coroutines
+        url: /apidocs/arrow-fx-coroutines/
+
+      - title: Arrow Fx
         url: /apidocs/arrow-fx/
 
-      - title: Effects MTL
+      - title: Arrow Fx MTL
         url: /apidocs/arrow-fx-mtl/
 
-      - title: Effects Reactor
+      - title: Arrow Fx Reactor
         url: /apidocs/arrow-fx-reactor/
 
-      - title: Effects Rx2
+      - title: Arrow Fx Rx2
         url: /apidocs/arrow-fx-rx2/
