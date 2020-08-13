@@ -144,11 +144,18 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
       fromStrategy(Strategy.boundedFifo(maxSize))
 
     /** Creates a queue which stores the last `maxSize` enqueued elements and which never blocks on enqueue. */
-    suspend fun <A> circularBuffer(maxSize: Int): Queue<A> =
-      fromStrategy(Strategy.circularBuffer(maxSize))
+    suspend fun <A> sliding(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.sliding(maxSize))
 
-    fun <A> unsafeCircularBuffer(maxSize: Int): Queue<A> =
-      fromStrategy(Strategy.circularBuffer(maxSize))
+    fun <A> unsafeSliding(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.sliding(maxSize))
+
+    /** Creates a queue which stores the first `maxSize` enqueued elements and which never blocks on enqueue. */
+    suspend fun <A> dropping(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.dropping(maxSize))
+
+    fun <A> unsafeDropping(maxSize: Int): Queue<A> =
+      fromStrategy(Strategy.dropping(maxSize))
 
     /** Created a bounded queue that distributed always at max `fairSize` elements to any subscriber. */
     suspend fun <A> fairBounded(maxSize: Int, fairSize: Int): Queue<A> =
@@ -205,11 +212,17 @@ internal object Strategy {
   fun <A> boundedLifo(maxSize: Int): PubSub.Strategy<A, Chunk<A>, IQueue<A>, Int> =
     PubSub.Strategy.bounded(maxSize, lifo()) { it.size }
 
-  /** Strategy for circular buffer, which stores the last `maxSize` enqueued elements and never blocks on enqueue. */
-  fun <A> circularBuffer(maxSize: Int): PubSub.Strategy<A, Chunk<A>, IQueue<A>, Int> =
+  /** Strategy for sliding, which stores the last `maxSize` enqueued elements and never blocks on enqueue. */
+  fun <A> sliding(maxSize: Int): PubSub.Strategy<A, Chunk<A>, IQueue<A>, Int> =
     unbounded { q: IQueue<A>, a ->
-      if (q.size < maxSize) q.enqueue(a)
-      else q.tail().enqueue(a)
+      if (q.size <= maxSize) q.enqueue(a)
+      else q.drop(1).enqueue(a)
+    }
+
+  /** Strategy for dropping, which stores the first `maxSize` enqueued elements and never blocks on enqueue. */
+  fun <A> dropping(maxSize: Int): PubSub.Strategy<A, Chunk<A>, IQueue<A>, Int> =
+    unbounded { q: IQueue<A>, a ->
+      if (q.size <= maxSize) q.enqueue(a) else q
     }
 
   /** Unbounded lifo strategy. */
