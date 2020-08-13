@@ -6,7 +6,7 @@ It's a functional implementation of Kotlin's coroutine system while providing su
 Arrow Fx aims to be a battery included functional effects framework, below you can find a small overview of the library.
 A full coverage of all data types and functions can be found [here](LINK DOCS).
 
-### IO\<A\> vs suspend () -> A
+## IO\<A\> vs suspend () -> A
 
 Let's look at two simple concurrent examples that switch context and print the `Thread.currentThread().name`.
 
@@ -40,7 +40,7 @@ As you can see we can directly apply `evalOn` to our `suspend fun`, this elimina
 Both programs are equivalent in semantics and guarantees, the later will however perform better since it eliminates the wrapping `IO` requires.
 This is possible without losing cancellation support, as explained in the detail here [anchor cancellation].
 
-### IO<Either<E, A>> vs suspend () -> Either<E, A>
+## IO<Either<E, A>> vs suspend () -> Either<E, A>
 
 When writing functional code style we often want to express our domain errors as clearly as possible, a popular pattern is to return `Either<DomainError, SuccessValue>`.
 Let's assume following domain, and compare two snippets one using `IO<Either<E, A>>` and another `suspend () -> Either<E, A>`.
@@ -60,7 +60,7 @@ suspend fun User.process(): Either<PersistenceError, ProcessedUser> =
     else Left(PersistenceError)
 ```
 
-#### IO<Either<E, A>>
+### IO<Either<E, A>>
 
  ```kotlin:ank
 fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
@@ -79,7 +79,7 @@ suspend suspendedIOProgram(): Either<PersistenceError, ProcessedUser> =
   ioProgram().suspended()
  ```
 
-#### suspend () -> Either<E, A>
+### suspend () -> Either<E, A>
 
 ```kotlin:ank
 suspend fun either(): Either<PersistenceError, ProcessedUser> =
@@ -90,7 +90,7 @@ suspend fun either(): Either<PersistenceError, ProcessedUser> =
   }
 ```
 
-#### suspend R.() -> A
+### suspend R.() -> A
 
 We can use extension functions to do functional dependency injection with similar semantics as `Reader` or `Kleisli`.
 They allow us to elegantly define `syntax` for a certain type. Let's see a simple example.
@@ -147,7 +147,7 @@ tailrec suspend fun sleeper(): Unit {
 }
 ```
 
-#### cancelBoundary()
+### cancelBoundary()
 
 Calling `suspend fun cancelBoundary()` will check for cancellation, and will gracefully exit in case the effect was cancelled. An example.
 
@@ -173,7 +173,7 @@ tailrec suspend fun repeat(n: Int): Unit {
 }
 ```
 
-#### Parallel operations cancellation
+### Parallel operations cancellation
 
 All parallel `suspend` operators in Arrow Fx behave in the following way.
 
@@ -183,7 +183,7 @@ All parallel `suspend` operators in Arrow Fx behave in the following way.
 
 For more documentation on parallel operations see below.
 
-#### Uncancellable
+### Uncancellable
 
 So how can you execute of `suspend fun` with guarantee that it cannot be cancelled. You simply `wrap` it in the `uncancelable` builder and the function will guarantee not to be cancelled. If the progam is already cancelled before, this block will not run and if it gets cancelled during the execution of this block it will exit immediately after.
 
@@ -315,13 +315,84 @@ suspend main(): Unit {
 }
 ```
 
-### Error Handling
+## Concurrency Helpers
+
+### Ref vs Atomic
+
+`Ref` has been renamed `Atomic` in the new API; and, it provides the same level of service as `Ref` 
+(i.e. `Atomic` provides a safe concurrent API to access to a mutable reference).
+
+For example
+
+```kotlin
+fun factorial(n: Int) = IO.fx {
+    val res = Ref(1L).bind()
+
+    (1 until n+1).parTraverse {
+        res.update(it::times)
+    }.bind()
+    res.get().bind()
+}
+```
+
+becomes
+ 
+```kotlin:ank
+ suspend fun factorial(n: Int)  {
+    val res = Atomic(1L)
+
+    (1 until n+1).parTraverse {
+        res.update(it::times)
+    }
+    res.get()
+}
+```
+
+This code snippet isn’t very useful, except to show how `Ref/Atomic` can be used with concurrent access. 
+
+### MVar vs ConcurrentVar
+
+`MVar` is now called `ConcurrentVar`; and, it provides the same level of service as `MVar` 
+(i.e. a `ConcurrentVar` is a mutable concurrent safe variable which is either `empty` or contains a typed `single value`).
+
+```kotlin:ank
+tailrec
+fun sum(state: MVar<ForIO, Int>, list: List<Int>) : IO<Int> =
+    IO.fx {
+        when {
+            list.isEmpty() -> state.take().bind()
+            else -> state.take().flatMap { cur ->
+                state.put(cur + list[0]).flatMap { _ -> sum(state, list.tail()) }
+            }.bind()
+        }
+    }
+```
+
+becomes
+ 
+```kotlin:ank
+tailrec
+suspend fun sum(state: ConcurrentVar<Int>, list: List<Int>) {
+    when {
+        list.isEmpty() -> state.take()
+        else -> {
+            val cur = state.take()
+            state.put(cur + list[0])
+            sum(state, list.tail())
+        }
+    }
+}
+```
+
+This code snippet isn’t very useful, except to show how the atomic calls of `MVar/ConcurrentVar` can be used.
+
+## Error Handling
 
 In Kotlin with suspend `try/catch` can safely be used to recover from exceptions.
 
 Simple constructs like `suspend fun Either.catch(f: () -> A): Either<Throwable, A>` are available for nicer syntax when and lifting errors in your domain.
 
-### Retrying and repeating effects
+## Retrying and repeating effects
 
 `Schedule` allows you to define and compose powerful yet simple policies, which can be used to either repeat or retry computation. 
 
@@ -443,6 +514,14 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
     }
   )
 ```
+
+## And more…
+
+Arrow Fx Coroutines also provides, for complex/specific use cases, services such as :  
+- an immutable queue (`IQueue` datatype),  
+- a purely functional, effectful stream processing with the new `Stream`API,  
+- The new service `CircuitBreaker`aims to to make our distributed systems more reliable.  
+This list is not exhaustive.
 
 ## Arrow Fx Coroutines, KotlinX Coroutines & Kotlin Standard Library
  
