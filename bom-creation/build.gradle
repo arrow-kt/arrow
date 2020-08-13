@@ -9,16 +9,18 @@ plugins {
 
 dependencies {
     constraints {
-        api "io.arrow-kt:arrow-ank:$VERSION_NAME"
-        api "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
         api "io.arrow-kt:arrow-annotations:$VERSION_NAME"
         api "io.arrow-kt:arrow-aql:$VERSION_NAME"
+        api "io.arrow-kt:arrow-check:$VERSION_NAME"
+        api "io.arrow-kt:arrow-check-kotlintest:$VERSION_NAME"
         api "io.arrow-kt:arrow-core:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
         api "io.arrow-kt:arrow-free:$VERSION_NAME"
         api "io.arrow-kt:arrow-free-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-android:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-mtl:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
