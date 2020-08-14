@@ -14,6 +14,7 @@ jobs:
       ARROW_LIB: arrow-fx
 
     runs-on: macos-latest
+    timeout-minutes: 90
 
     steps:
     - uses: actions/checkout@v2
