@@ -13,6 +13,7 @@ jobs:
       JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: macos-latest
+    timeout-minutes: 90
 
     steps:
     - uses: actions/checkout@v2
