@@ -39,6 +39,7 @@ import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.hashWithSalt
 import arrow.undocumented
 
 @extension
@@ -229,19 +230,15 @@ interface IorShow<L, R> : Show<Ior<L, R>> {
 }
 
 @extension
-interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
+interface IorHash<L, R> : Hash<Ior<L, R>> {
 
   fun HL(): Hash<L>
   fun HR(): Hash<R>
 
-  override fun EQL(): Eq<L> = HL()
-
-  override fun EQR(): Eq<R> = HR()
-
-  override fun Ior<L, R>.hash(): Int = when (this) {
-    is Ior.Left -> HL().run { value.hash() }
-    is Ior.Right -> HR().run { value.hash() }
-    is Ior.Both -> 31 * HL().run { leftValue.hash() } + HR().run { rightValue.hash() }
+  override fun Ior<L, R>.hashWithSalt(salt: Int): Int = when (this) {
+    is Ior.Left -> HL().run { value.hashWithSalt(salt.hashWithSalt(0)) }
+    is Ior.Right -> HR().run { value.hashWithSalt(salt.hashWithSalt(1)) }
+    is Ior.Both -> HL().run { HR().run { leftValue.hashWithSalt(rightValue.hashWithSalt(salt.hashWithSalt(2))) } }
   }
 }
 

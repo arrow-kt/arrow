@@ -32,6 +32,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.hashWithSalt
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
@@ -196,19 +197,15 @@ interface TryTraverse : Traverse<ForTry> {
 }
 
 @extension
-interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
+interface TryHash<A> : Hash<Try<A>> {
 
   fun HA(): Hash<A>
   fun HT(): Hash<Throwable>
 
-  override fun EQA(): Eq<A> = HA()
-
-  override fun EQT(): Eq<Throwable> = HT()
-
-  override fun Try<A>.hash(): Int = fold({
-    HT().run { it.hash() }
+  override fun Try<A>.hashWithSalt(salt: Int): Int = fold({
+    HT().run { it.hashWithSalt(salt.hashWithSalt(0)) }
   }, {
-    HA().run { it.hash() }
+    HA().run { it.hashWithSalt(salt.hashWithSalt(1)) }
   })
 }
 

@@ -205,13 +205,10 @@ interface IdTraverse : Traverse<ForId> {
 }
 
 @extension
-interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
-
+interface IdHash<A> : Hash<Id<A>> {
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun Id<A>.hash(): Int = HA().run { value().hash() }
+  override fun Id<A>.hashWithSalt(salt: Int): Int = HA().run { value().hashWithSalt(salt) }
 }
 
 @extension

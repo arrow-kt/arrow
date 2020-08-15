@@ -20,6 +20,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
+import arrow.typeclasses.hashWithSalt
 import arrow.core.combineK as setCombineK
 
 @extension
@@ -92,14 +93,11 @@ interface SetKMonoidK : MonoidK<ForSetK> {
 }
 
 @extension
-interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
+interface SetKHash<A> : Hash<SetK<A>> {
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
-  }
+  override fun SetK<A>.hashWithSalt(salt: Int): Int =
+    HA().run { foldLeft(salt) { hash, v -> v.hashWithSalt(hash) } }.hashWithSalt(size)
 }
 
 @extension

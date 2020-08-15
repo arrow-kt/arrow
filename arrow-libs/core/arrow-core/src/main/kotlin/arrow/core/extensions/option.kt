@@ -62,6 +62,7 @@ import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
+import arrow.typeclasses.hashWithSalt
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
@@ -280,17 +281,12 @@ interface OptionTraverse : Traverse<ForOption> {
 }
 
 @extension
-interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
+interface OptionHash<A> : Hash<Option<A>> {
 
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun Option<A>.hash(): Int = fold({
-    None.hashCode()
-  }, {
-    HA().run { it.hash() }
-  })
+  override fun Option<A>.hashWithSalt(salt: Int): Int =
+    fold({ salt.hashWithSalt(0) }, { v -> HA().run { v.hashWithSalt(salt.hashWithSalt(1)) } })
 }
 
 @extension

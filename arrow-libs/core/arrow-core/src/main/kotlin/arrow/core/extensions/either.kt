@@ -44,6 +44,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.hashWithSalt
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
@@ -241,20 +242,22 @@ interface EitherShow<L, R> : Show<Either<L, R>> {
 }
 
 @extension
-interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
+interface EitherHash<L, R> : Hash<Either<L, R>> {
 
   fun HL(): Hash<L>
   fun HR(): Hash<R>
 
-  override fun EQL(): Eq<L> = HL()
+  override fun Either<L, R>.hash(): Int =
+    fold(
+      { HL().run { it.hashWithSalt(0) } },
+      { HR().run { it.hashWithSalt(1) } }
+    )
 
-  override fun EQR(): Eq<R> = HR()
-
-  override fun Either<L, R>.hash(): Int = fold({
-    HL().run { it.hash() }
-  }, {
-    HR().run { it.hash() }
-  })
+  override fun Either<L, R>.hashWithSalt(salt: Int): Int =
+    fold(
+      { l -> HL().run { l.hashWithSalt(salt.hashWithSalt(0)) } },
+      { r -> HR().run { r.hashWithSalt(salt.hashWithSalt(1)) } }
+    )
 }
 
 @extension

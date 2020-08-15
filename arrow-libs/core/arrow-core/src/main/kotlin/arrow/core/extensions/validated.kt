@@ -38,6 +38,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.hashWithSalt
 import arrow.undocumented
 import arrow.core.handleErrorWith as validatedHandleErrorWith
 import arrow.core.traverse as validatedTraverse
@@ -179,18 +180,15 @@ interface ValidatedShow<L, R> : Show<Validated<L, R>> {
 }
 
 @extension
-interface ValidatedHash<L, R> : Hash<Validated<L, R>>, ValidatedEq<L, R> {
+interface ValidatedHash<L, R> : Hash<Validated<L, R>> {
   fun HL(): Hash<L>
   fun HR(): Hash<R>
 
-  override fun EQL(): Eq<L> = HL()
-  override fun EQR(): Eq<R> = HR()
-
-  override fun Validated<L, R>.hash(): Int = fold({
-    HL().run { it.hash() }
-  }, {
-    HR().run { it.hash() }
-  })
+  override fun Validated<L, R>.hashWithSalt(salt: Int): Int =
+    fold(
+      { l -> HL().run { l.hashWithSalt(salt.hashWithSalt(0)) } },
+      { r -> HR().run { r.hashWithSalt(salt.hashWithSalt(1)) } }
+    )
 }
 
 @extension

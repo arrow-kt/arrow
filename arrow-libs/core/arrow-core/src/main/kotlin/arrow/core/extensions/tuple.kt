@@ -204,17 +204,12 @@ interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
 }
 
 @extension
-interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>>, Tuple2Eq<A, B> {
+interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-
-  override fun Tuple2<A, B>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple2<A, B>.hashWithSalt(salt: Int): Int =
+    HA().run { HB().run { a.hashWithSalt(b.hashWithSalt(salt)) } }
 }
 
 @extension
@@ -253,20 +248,13 @@ interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
 }
 
 @extension
-interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>>, Tuple3Eq<A, B, C> {
+interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-
-  override fun Tuple3<A, B, C>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple3<A, B, C>.hashWithSalt(salt: Int): Int =
+    HA().run { HB().run { HC().run { a.hashWithSalt(b.hashWithSalt(c.hashWithSalt(salt))) } } }
 }
 
 @extension
@@ -301,23 +289,22 @@ interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 }
 
 @extension
-interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>>, Tuple4Eq<A, B, C, D> {
+interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
   fun HD(): Hash<D>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-
-  override fun Tuple4<A, B, C, D>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple4<A, B, C, D>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            a.hashWithSalt(b.hashWithSalt(c.hashWithSalt(d.hashWithSalt(salt))))
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -367,26 +354,25 @@ interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 }
 
 @extension
-interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>>, Tuple5Eq<A, B, C, D, E> {
+interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
   fun HD(): Hash<D>
   fun HE(): Hash<E>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-
-  override fun Tuple5<A, B, C, D, E>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple5<A, B, C, D, E>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              a.hashWithSalt(b.hashWithSalt(c.hashWithSalt(d.hashWithSalt(e.hashWithSalt(salt)))))
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -442,7 +428,7 @@ interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 }
 
 @extension
-interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6Eq<A, B, C, D, E, F> {
+interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -450,21 +436,20 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>>, Tuple6E
   fun HE(): Hash<E>
   fun HF(): Hash<F>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-  override fun EQF(): Eq<F> = HF()
-
-  override fun Tuple6<A, B, C, D, E, F>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple6<A, B, C, D, E, F>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              HF().run {
+                a.hashWithSalt(b.hashWithSalt(c.hashWithSalt(d.hashWithSalt(e.hashWithSalt(f.hashWithSalt(salt))))))
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -526,7 +511,7 @@ interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
 }
 
 @extension
-interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, Tuple7Eq<A, B, C, D, E, F, G> {
+interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -535,23 +520,34 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>>, T
   fun HF(): Hash<F>
   fun HG(): Hash<G>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-  override fun EQF(): Eq<F> = HF()
-  override fun EQG(): Eq<G> = HG()
-
-  override fun Tuple7<A, B, C, D, E, F, G>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple7<A, B, C, D, E, F, G>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              HF().run {
+                HG().run {
+                  a.hashWithSalt(
+                    b.hashWithSalt(
+                      c.hashWithSalt(
+                        d.hashWithSalt(
+                          e.hashWithSalt(
+                            f.hashWithSalt(
+                              g.hashWithSalt(salt)
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -619,7 +615,7 @@ interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> 
 }
 
 @extension
-interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, H>>, Tuple8Eq<A, B, C, D, E, F, G, H> {
+interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, H>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -629,25 +625,32 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
   fun HG(): Hash<G>
   fun HH(): Hash<H>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-  override fun EQF(): Eq<F> = HF()
-  override fun EQG(): Eq<G> = HG()
-  override fun EQH(): Eq<H> = HH()
-
-  override fun Tuple8<A, B, C, D, E, F, G, H>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple8<A, B, C, D, E, F, G, H>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              HF().run {
+                HG().run {
+                  HH().run {
+                    a.hashWithSalt(
+                      b.hashWithSalt(
+                        c.hashWithSalt(
+                          d.hashWithSalt(
+                            e.hashWithSalt(
+                              f.hashWithSalt(
+                                g.hashWithSalt(
+                                  h.hashWithSalt(salt)
+                                )))))))
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -721,7 +724,7 @@ interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H
 }
 
 @extension
-interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, G, H, I>>, Tuple9Eq<A, B, C, D, E, F, G, H, I> {
+interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, G, H, I>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -732,27 +735,35 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
   fun HH(): Hash<H>
   fun HI(): Hash<I>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-  override fun EQF(): Eq<F> = HF()
-  override fun EQG(): Eq<G> = HG()
-  override fun EQH(): Eq<H> = HH()
-  override fun EQI(): Eq<I> = HI()
-
-  override fun Tuple9<A, B, C, D, E, F, G, H, I>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() },
-    HI().run { i.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple9<A, B, C, D, E, F, G, H, I>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              HF().run {
+                HG().run {
+                  HH().run {
+                    HI().run {
+                      a.hashWithSalt(
+                        b.hashWithSalt(
+                          c.hashWithSalt(
+                            d.hashWithSalt(
+                              e.hashWithSalt(
+                                f.hashWithSalt(
+                                  g.hashWithSalt(
+                                    h.hashWithSalt(
+                                      i.hashWithSalt(salt)
+                                    ))))))))
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension
@@ -832,7 +843,7 @@ interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F,
 }
 
 @extension
-interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>>, Tuple10Eq<A, B, C, D, E, F, G, H, I, J> {
+interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
   fun HC(): Hash<C>
@@ -844,29 +855,38 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
   fun HI(): Hash<I>
   fun HJ(): Hash<J>
 
-  override fun EQA(): Eq<A> = HA()
-  override fun EQB(): Eq<B> = HB()
-  override fun EQC(): Eq<C> = HC()
-  override fun EQD(): Eq<D> = HD()
-  override fun EQE(): Eq<E> = HE()
-  override fun EQF(): Eq<F> = HF()
-  override fun EQG(): Eq<G> = HG()
-  override fun EQH(): Eq<H> = HH()
-  override fun EQI(): Eq<I> = HI()
-  override fun EQJ(): Eq<J> = HJ()
-
-  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.hash(): Int = listOf(
-    HA().run { a.hash() },
-    HB().run { b.hash() },
-    HC().run { c.hash() },
-    HD().run { d.hash() },
-    HE().run { e.hash() },
-    HF().run { f.hash() },
-    HG().run { g.hash() },
-    HH().run { h.hash() },
-    HI().run { i.hash() },
-    HJ().run { j.hash() }
-  ).fold(1) { hash, v -> 31 * hash + v }
+  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.hashWithSalt(salt: Int): Int =
+    HA().run {
+      HB().run {
+        HC().run {
+          HD().run {
+            HE().run {
+              HF().run {
+                HG().run {
+                  HH().run {
+                    HI().run {
+                      HJ().run {
+                        a.hashWithSalt(
+                          b.hashWithSalt(
+                            c.hashWithSalt(
+                              d.hashWithSalt(
+                                e.hashWithSalt(
+                                  f.hashWithSalt(
+                                    g.hashWithSalt(
+                                      h.hashWithSalt(
+                                        i.hashWithSalt(
+                                          j.hashWithSalt(salt)
+                                        )))))))))
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 }
 
 @extension

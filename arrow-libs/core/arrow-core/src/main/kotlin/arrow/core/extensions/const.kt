@@ -177,10 +177,8 @@ interface ConstShow<A, T> : Show<Const<A, T>> {
 }
 
 @extension
-interface ConstHash<A, T> : Hash<Const<A, T>>, ConstEq<A, T> {
+interface ConstHash<A, T> : Hash<Const<A, T>> {
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun Const<A, T>.hash(): Int = HA().run { value().hash() }
+  override fun Const<A, T>.hashWithSalt(salt: Int): Int = HA().run { value().hashWithSalt(salt) }
 }

@@ -156,12 +156,11 @@ interface IntOrder : Order<Int> {
   override fun Int.compareTo(b: Int): Int = this.compareTo(b)
 }
 
-interface IntHash : Hash<Int>, IntEq {
+interface IntHash : Hash<Int> {
   override fun Int.hash(): Int = hashCode()
 }
 
-fun Int.Companion.hash(): Hash<Int> =
-  object : IntHash {}
+fun Int.Companion.hash(): Hash<Int> = object : IntHash {}
 
 fun Int.Companion.show(): Show<Int> =
   object : IntShow {}

@@ -63,6 +63,7 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
+import arrow.typeclasses.hashWithSalt
 import arrow.core.combineK as sequenceCombineK
 
 @extension
@@ -204,14 +205,13 @@ interface SequenceKMonoidK : MonoidK<ForSequenceK> {
 }
 
 @extension
-interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
+interface SequenceKHash<A> : Hash<SequenceK<A>> {
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun SequenceK<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
-  }
+  // Not using ListK.hash here to avoid extra loop converting it
+  override fun SequenceK<A>.hashWithSalt(salt: Int): Int =
+    HA().run { foldLeft(salt toT 0) { (hash, sz), v -> v.hashWithSalt(hash) toT sz + 1 } }
+      .let { (hash, size) -> hash.hashWithSalt(size) }
 }
 
 @extension

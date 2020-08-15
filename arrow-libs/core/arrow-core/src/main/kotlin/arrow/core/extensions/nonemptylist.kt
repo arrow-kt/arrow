@@ -12,6 +12,7 @@ import arrow.core.NonEmptyListOf
 import arrow.core.Ordering
 import arrow.core.Tuple2
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.listk.hash.hash
 import arrow.core.extensions.listk.order.order
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
@@ -182,14 +183,11 @@ interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListHash<A> : Hash<NonEmptyList<A>>, NonEmptyListEq<A> {
+interface NonEmptyListHash<A> : Hash<NonEmptyList<A>> {
   fun HA(): Hash<A>
 
-  override fun EQ(): Eq<A> = HA()
-
-  override fun NonEmptyList<A>.hash(): Int = foldLeft(1) { hash, a ->
-    31 * hash + HA().run { a.hash() }
-  }
+  override fun NonEmptyList<A>.hashWithSalt(salt: Int): Int =
+    HA().run { head.hashWithSalt(ListK.hash(HA()).run { tail.k().hashWithSalt(salt) }) }
 }
 
 @extension

@@ -6,6 +6,7 @@ import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Failure
+import arrow.core.Hashed
 import arrow.core.Id
 import arrow.core.Ior
 import arrow.core.Left
@@ -36,6 +37,7 @@ import arrow.core.k
 import arrow.core.toOption
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.shrinking.DoubleShrinker
 import io.kotlintest.properties.shrinking.FloatShrinker
@@ -190,6 +192,8 @@ fun <A> Gen<A>.eval(): Gen<Eval<A>> =
 
 fun Gen.Companion.char(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
+
+fun <A> Gen<A>.hashed(HA: Hash<A>): Gen<Hashed<A>> = map { v -> Hashed(HA.run { v.hash() }, v) }
 
 private fun <A, B, R> Gen<A>.alignWith(genB: Gen<B>, transform: (Ior<A, B>) -> R): Gen<R> =
   object : Gen<R> {
