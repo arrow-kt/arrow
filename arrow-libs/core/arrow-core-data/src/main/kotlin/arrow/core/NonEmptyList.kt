@@ -194,30 +194,27 @@ typealias Nel<A> = NonEmptyList<A>
  *
  */
 @higherkind
-class NonEmptyList<out A> private constructor(
+class NonEmptyList<out A>(
   val head: A,
-  val tail: List<A>,
+  val tail: List<A>
+) : NonEmptyListOf<A>, AbstractList<A>() {
+
+  private constructor(list: List<A>) : this(list[0], list.drop(1))
+
+  override val size: Int =
+    1 + tail.size
+
   val all: List<A>
-) : NonEmptyListOf<A>, Iterable<A> by all {
+    get() = toList()
 
-  constructor(head: A, tail: List<A>) : this(head, tail.toList(), listOf(head) + tail.toList())
-  private constructor(list: List<A>) : this(list[0], list.drop(1), list.toList())
+  override operator fun get(index: Int): A {
+    if (index < 0 || index >= size) throw IndexOutOfBoundsException("$index is not in 1..${size - 1}")
+    return if (index == 0) head else tail[index - 1]
+  }
 
-  val size: Int =
-    all.size
+  override fun isEmpty(): Boolean = false
 
-  fun contains(element: @UnsafeVariance A): Boolean =
-    (head == element) || element in tail
-
-  fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean =
-    elements.all(this::contains)
-
-  @Suppress("FunctionOnlyReturningConstant")
-  fun isEmpty(): Boolean =
-    false
-
-  fun toList(): List<A> =
-    all
+  fun toList(): List<A> = listOf(head) + tail
 
   inline fun <B> map(f: (A) -> B): NonEmptyList<B> =
     NonEmptyList(f(head), tail.map(f))
