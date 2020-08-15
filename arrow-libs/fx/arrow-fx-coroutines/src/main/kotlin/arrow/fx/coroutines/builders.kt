@@ -91,20 +91,24 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
  * import arrow.core.*
  * import arrow.fx.coroutines.*
  * import java.lang.RuntimeException
+ * import kotlin.coroutines.Continuation
+ * import kotlin.coroutines.EmptyCoroutineContext
+ * import kotlin.coroutines.startCoroutine
  *
  * typealias Callback = (List<String>?, Throwable?) -> Unit
  *
  * class GithubId
  * object GithubService {
- *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+ *   private val listeners: MutableMap<GithubId, Fiber<*>> = mutableMapOf()
  *   suspend fun getUsernames(callback: Callback): GithubId {
  *     val id = GithubId()
- *     listeners[id] = callback
- *     ForkConnected { sleep(2.seconds); callback(listOf("Arrow"), null) }
+ *     val fiber = ForkConnected { sleep(2.seconds); callback(listOf("Arrow"), null) }
+ *     listeners[id] = fiber
  *     return id
  *   }
- *
  *   fun unregisterCallback(id: GithubId): Unit {
+ *     suspend { listeners[id]?.cancel() }
+ *       .startCoroutine(Continuation(EmptyCoroutineContext) { }) // Launch and forget
  *     listeners.remove(id)
  *   }
  * }
@@ -120,10 +124,8 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
  *           else -> cb(Result.failure(RuntimeException("Null result and no exception")))
  *         }
  *       }
- *
  *       CancelToken { GithubService.unregisterCallback(id) }
  *     }
- *
  *   val result = getUsernames()
  *   //sampleEnd
  *   println(result)

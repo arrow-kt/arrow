@@ -4,7 +4,6 @@ import arrow.core.Either
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
 
 class GuaranteeCaseTest : ArrowFxSpec(spec = {
 
@@ -14,7 +13,7 @@ class GuaranteeCaseTest : ArrowFxSpec(spec = {
 
       val res = guaranteeCase(
         fa = { i },
-        release = { ex -> p.complete(ex) }
+        finalizer = { ex -> p.complete(ex) }
       )
 
       p.get() shouldBe ExitCase.Completed
@@ -28,7 +27,7 @@ class GuaranteeCaseTest : ArrowFxSpec(spec = {
       val attempted = Either.catch {
         guaranteeCase<Int>(
           fa = { throw e },
-          release = { ex -> p.complete(ex) }
+          finalizer = { ex -> p.complete(ex) }
         )
       }
 
@@ -47,7 +46,7 @@ class GuaranteeCaseTest : ArrowFxSpec(spec = {
           start.complete(Unit)
           never<Unit>()
         },
-        release = { ex -> p.complete(ex) }
+        finalizer = { ex -> p.complete(ex) }
       )
     }
 

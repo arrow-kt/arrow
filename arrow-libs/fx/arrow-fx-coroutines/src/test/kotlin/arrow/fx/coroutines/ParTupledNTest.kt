@@ -13,7 +13,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
   "parTupledN 2 returns to original context" {
     val mapCtxName = "parTupled2"
-    val mapCtx = fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
+    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
 
     checkAll {
       single.zip(mapCtx).use { (single, mapCtx) ->
@@ -32,7 +32,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
   "parTupledN 2 returns to original context on failure" {
     val mapCtxName = "parTupled2"
-    val mapCtx = fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
+    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { mapCtxName }) }
 
     checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (single, mapCtx) ->
@@ -123,7 +123,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
   "parTupledN 3 returns to original context" {
     val mapCtxName = "parTupled3"
-    val mapCtx = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
     checkAll {
       single.zip(mapCtx).use { (single, mapCtx) ->
@@ -143,7 +143,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
   "parTupledN 3 returns to original context on failure" {
     val mapCtxName = "parTupled3"
-    val mapCtx = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (single, mapCtx) ->

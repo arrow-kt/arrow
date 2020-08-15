@@ -10,7 +10,28 @@ import kotlinx.atomicfu.atomic
 /**
  * When made, a [Promise] is empty. Until it is fulfilled, which can only happen once.
  *
- * A [Promise] that a value of type [A] will be provided later.
+ * A `Promise` is commonly used to provide and receive a value from 2 different threads,
+ * since `Promise` can only be completed once unlike [ConcurrentVar] we can consider it a synchronization primitive.
+ *
+ * Let's say we wanted to await a `Fiber`, we could complete a Promise `latch` to signal it finished.
+ * Awaiting the latch `Promise` will now prevent `main` from finishing early.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
+ * suspend fun main(): Unit {
+ *   val await = Promise<Unit>()
+ *
+ *   ForkConnected {
+ *     println("Fiber starting up!")
+ *     sleep(3.seconds)
+ *     println("Fiber finished!")
+ *     await.complete(Unit)
+ *   }
+ *
+ *   await.get() // Suspend until fiber finishes
+ * }
+ * ```
  */
 interface Promise<A> {
 
@@ -79,8 +100,11 @@ interface Promise<A> {
   suspend fun complete(a: A): Either<AlreadyFulfilled, Unit>
 
   companion object {
-    fun <A> unsafe(): Promise<A> = DefaultPromise()
-    suspend operator fun <A> invoke(): Promise<A> = unsafe()
+    fun <A> unsafe(): Promise<A> =
+      DefaultPromise()
+
+    suspend operator fun <A> invoke(): Promise<A> =
+      unsafe()
   }
 
   object AlreadyFulfilled {

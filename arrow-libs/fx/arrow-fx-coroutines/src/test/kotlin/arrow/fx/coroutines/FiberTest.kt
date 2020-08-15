@@ -10,7 +10,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
   "ForkConnected returns on the original context" {
     val forkCtxName = "forkCtx"
-    val forker = singleThreadContext(forkCtxName)
+    val forker = Resource.singleThreadContext(forkCtxName)
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->
         evalOn(single) {
@@ -28,7 +28,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
   "ForkConnected returns on the original context on failure" {
     val forkCtxName = "forkCtx"
-    val forker = singleThreadContext(forkCtxName)
+    val forker = Resource.singleThreadContext(forkCtxName)
     checkAll(Arb.throwable()) { e ->
       single.zip(forker).use { (single, forker) ->
         evalOn(single) {
@@ -127,7 +127,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
   "ForkScoped returns on the original context" {
     val forkCtxName = "forkCtx"
-    val forker = singleThreadContext(forkCtxName)
+    val forker = Resource.singleThreadContext(forkCtxName)
 
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->
@@ -211,7 +211,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
   "ForkAndForget returns on the original context" {
     val forkCtxName = "forkCtx"
-    val forker = singleThreadContext(forkCtxName)
+    val forker = Resource.singleThreadContext(forkCtxName)
 
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->

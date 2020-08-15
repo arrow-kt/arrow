@@ -6,7 +6,7 @@ import kotlinx.atomicfu.atomic
 
 /**
  * [ConcurrentVar] is a mutable concurrent safe variable which is either `empty` or contains a `single value` of type [A].
- *
+ * It behaves the same as a single element [arrow.fx.coroutines.stream.concurrent.Queue].
  * When trying to [put] or [take], it'll suspend when it's respectively [isEmpty] or [isNotEmpty].
  *
  * There are also operators that return immediately, [tryTake] & [tryPut],
@@ -18,19 +18,12 @@ import kotlinx.atomicfu.atomic
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
  *
- * suspend fun fibonacci(n: Int, prev: Int = 0, next: Int = 1): Int =
- *     when (n) {
- *       0 -> prev
- *       1 -> next
- *       else -> fibonacci(n - 1, next, prev + next)
- *     }
- *
  * suspend fun main(): Unit {
  *   val mvar = ConcurrentVar.empty<Int>()
  *
  *   ForkConnected {
- *     val asyncFib = fibonacci(50)
- *     mvar.put(asyncFib)
+ *     sleep(3.seconds)
+ *     mvar.put(5)
  *   }
  *
  *  val r = mvar.take() // suspend until Fork puts result in MVar

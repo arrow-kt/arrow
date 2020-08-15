@@ -13,6 +13,27 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  * Parallel maps [fa], [fb] in parallel on [ComputationPool].
  * Cancelling this operation cancels both operations running in parallel.
  *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parMapN(
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *   ) { (a, b) ->
+ *       "$a\n$b"
+ *     }
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param f function to map/combine value [A] and [B]
+ * ```
+ *
  * @see parMapN for the same function that can race on any [CoroutineContext].
  */
 suspend fun <A, B, C> parMapN(fa: suspend () -> A, fb: suspend () -> B, f: (Pair<A, B>) -> C): C =

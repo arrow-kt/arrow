@@ -55,25 +55,29 @@ fun <A> Stream.Companion.callback(@BuilderInference f: suspend EmitterSyntax<A>.
  * If cancellation signal is received while [cb] is running, then the [CancelToken] will be triggered as soon as it's returned.
  *
  * ```kotlin:ank:playground
- * import arrow.fx.coroutines.CancelToken
+ * import arrow.fx.coroutines.*
  * import arrow.fx.coroutines.stream.*
  * import java.lang.RuntimeException
  * import java.util.concurrent.Executors
- * import java.util.concurrent.ScheduledFuture
- * import java.util.concurrent.TimeUnit
+ * import java.util.concurrent.Future
  *
  * typealias Callback = (List<String>?, Throwable?) -> Unit
  *
  * class GithubId
  * object GithubService {
- *   private val listeners: MutableMap<GithubId, ScheduledFuture<*>> = mutableMapOf()
+ *   private val listeners: MutableMap<GithubId, Future<*>> = mutableMapOf()
  *   fun getUsernames(callback: Callback): GithubId {
  *     val id = GithubId()
- *     val future = Executors.newScheduledThreadPool(1).run {
- *       var count = 0
- *       scheduleAtFixedRate({
- *         callback(listOf("Arrow - ${count++}"), null)
- *       }, 0, 500, TimeUnit.MILLISECONDS)
+ *     val future = Executors.newSingleThreadExecutor().run {
+ *       submit {
+ *         Thread.sleep(300)
+ *         callback(listOf("Arrow - 1"), null)
+ *         Thread.sleep(300)
+ *         callback(listOf("Arrow - 2"), null)
+ *         Thread.sleep(300)
+ *         callback(listOf("Arrow - 3"), null)
+ *         shutdown()
+ *       }
  *     }
  *     listeners[id] = future
  *     return id
@@ -88,7 +92,7 @@ fun <A> Stream.Companion.callback(@BuilderInference f: suspend EmitterSyntax<A>.
  * suspend fun main(): Unit {
  *   //sampleStart
  *   fun getUsernames(): Stream<String> =
- *     Stream.cancellable {
+ *     Stream.cancellable<String> {
  *       val id = GithubService.getUsernames { names, throwable ->
  *         when {
  *           names != null -> emit(names)
@@ -96,15 +100,13 @@ fun <A> Stream.Companion.callback(@BuilderInference f: suspend EmitterSyntax<A>.
  *           else -> throw RuntimeException("Null result and no exception")
  *         }
  *       }
- *
  *       CancelToken { GithubService.unregisterCallback(id) }
- *     }
+ *     }.take(3)
  *
  *   val result = getUsernames()
- *     .take(3)
+ *     .effectTap { println(it) }
  *     .compile()
  *     .toList()
- *
  *   //sampleEnd
  *   println(result)
  * }

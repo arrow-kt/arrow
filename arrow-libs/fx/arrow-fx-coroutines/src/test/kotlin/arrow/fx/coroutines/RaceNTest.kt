@@ -15,7 +15,7 @@ class RaceNTest : ArrowFxSpec(spec = {
 
   "race2 returns to original context" {
     val racerName = "race2"
-    val racer = fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..2)) { choose ->
       single.zip(racer).use { (single, raceCtx) ->
@@ -36,7 +36,7 @@ class RaceNTest : ArrowFxSpec(spec = {
 
   "race2 returns to original context on failure" {
     val racerName = "race2"
-    val racer = fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
       single.zip(racer).use { (single, raceCtx) ->
@@ -116,7 +116,7 @@ class RaceNTest : ArrowFxSpec(spec = {
 
   "race3 returns to original context" {
     val racerName = "race3"
-    val racer = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..3)) { choose ->
       single.zip(racer).use { (single, raceCtx) ->
@@ -141,7 +141,7 @@ class RaceNTest : ArrowFxSpec(spec = {
 
   "race3 returns to original context on failure" {
     val racerName = "race3"
-    val racer = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       single.zip(racer).use { (single, raceCtx) ->

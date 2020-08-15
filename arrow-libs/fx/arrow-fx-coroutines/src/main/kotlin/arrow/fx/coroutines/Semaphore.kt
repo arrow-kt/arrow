@@ -3,13 +3,73 @@ package arrow.fx.coroutines
 import arrow.core.Either
 
 /**
- * A counting [Semaphore]  has a non-negative number of permits available.
+ * A counting [Semaphore] has a non-negative number of permits available.
+ * It's used to track how many permits are in-use,
+ * and to automatically await a number of permits to become available.
+ *
  * Acquiring permits decreases the available permits, and releasing increases the available permits
  *
  * Acquiring permits when there aren't enough available will suspend the acquire call
  * until the requested become available. Note that acquires are satisfied in strict FIFO order.
+ * The suspending acquire calls are cancellable, and will release any already acquired permits.
  *
- * The blocking acquire calls are cancellable, and will release any already acquired permits.
+ * Let's say we want to guarantee mutually exclusiveness, we can use a `Semaphore` with a single permit.
+ * Having a `Semaphore` with a single permit, we can track that only a single context can access something.
+ *
+ * ```kotlin:ank:playground
+ * //sampleStart
+ * import arrow.fx.coroutines.*
+ * import java.util.concurrent.atomic.AtomicInteger
+ *
+ * /* Only allwos single accesor */
+ * class PreciousFile(private val accesors: AtomicInteger = AtomicInteger(0)) {
+ *     fun use(): Unit {
+ *        check(accesors.incrementAndGet() == 1) { "File accessed before released" }
+ *        check(accesors.decrementAndGet() == 0) { "File accessed before released" }
+ *     }
+ * }
+ *
+ * suspend fun main() {
+ *   val file = PreciousFile()
+ *   val mutex = Semaphore(1)
+ *
+ *   (0 until 100).parTraverse(IOPool) { i ->
+ *     mutex.withPermit {
+ *       val res = file.use()
+ *       println("$i accessed PreciousFile on ${Thread.currentThread().name}")
+ *     }
+ *   }
+ * //sampleEnd
+ * }
+ * ```
+ *
+ * By wrapping our operation in `withPermit` we ensure that our `var count: Int` is only updated by a single thread at the same time.
+ * If we wouldn't protect our `PreciousFile` from being access by only a single thread at the same time, then it'll blow up our program.
+ *
+ * This is a common use-case when you need to write to a single `File` from different threads, since concurrent writes could result in inconsistent state.
+ *
+ * `Semaphore` is more powerful besides just modelling mutally exlusiveness,
+ * since it's allows to track any amount of permits.
+ * You can also use it to limit amount of parallel tasks, for example when using `parTraverse` we might want to limit how many tasks are running effectively in parallel.
+ *
+ * ```kotlin:ank:playground
+ * suspend fun heavyProcess(i: Int): Unit {
+ *   println("Started job $i")
+ *   sleep(250.milliseconds)
+ *   println("Finished job $i")
+ * }
+ *
+ * suspend fun main(): Unit {
+ *  val limit = 3
+ *  val semaphore = Semaphore(3)
+ *  (0..50).parTraverse { i ->
+ *    semaphore.withPermit { heavyProcess(i) }
+ *  }
+ * }
+ * ```
+ *
+ * Here we set a limit of `3` to ensure that only 3 `heavyProcess` are running at the same time.
+ * This can ensure we don't stress the JVM too hard, OOM or worse.
  */
 interface Semaphore {
 

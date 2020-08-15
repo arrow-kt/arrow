@@ -70,7 +70,7 @@ private suspend fun <A> assertCancellable(fa: (latch: Promise<Unit>) -> Stream<A
       fa = {
         fa(latch).compile().drain()
       },
-      release = { ex -> p.complete(ex) }
+      finalizer = { ex -> p.complete(ex) }
     )
   }
 
@@ -91,7 +91,7 @@ private suspend fun <A> Stream<A>.assertCancellable(): Unit {
           .compile()
           .drain()
       },
-      release = { ex -> p.complete(ex) }
+      finalizer = { ex -> p.complete(ex) }
     )
   }
 

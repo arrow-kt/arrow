@@ -84,6 +84,23 @@ suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
  * Traverse this [Iterable] and and run all mappers [f] on [CoroutineContext].
  * Cancelling this operation cancels all running tasks.
  *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
+ * data class User(val id: Int)
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   suspend fun getUserById(id: Int): User =
+ *     User(id)
+ *
+ *   val res = listOf(1, 2, 3)
+ *     .parTraverse(ComputationPool, ::getUserById)
+ *  //sampleEnd
+ *  println(res)
+ * }
+ * ```
+ *
  * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *

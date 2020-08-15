@@ -1,6 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 
 /**
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
@@ -42,7 +45,7 @@ import arrow.core.Either
  *   closeDBHandle(handle)
  *   closeConsumer(consumer)
  * }
- * // sampleEnd
+ * //sampleEnd
  * suspend fun main(): Unit = program.invoke()
  * ```
  * Here we are creating and then using a service that has a dependency on two resources: A database handle and a consumer of some sort. All three resources need to be closed in the correct order at the end.
@@ -79,7 +82,7 @@ import arrow.core.Either
  *       Unit
  *     }
  * }
- * // sampleEnd
+ * //sampleEnd
  *
  * suspend fun main(): Unit = resourceProgram.invoke()
  * ```
@@ -208,6 +211,65 @@ sealed class Resource<out A> {
 
     fun <A> defer(f: suspend () -> Resource<A>): Resource<A> =
       Resource.Defer(f)
+
+    /**
+     * Creates a single threaded [CoroutineContext] as a [Resource].
+     * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
+     * tasks are executed, but no new tasks will be accepted.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.fx.coroutines.*
+     * import java.util.concurrent.Executors
+     * import java.util.concurrent.atomic.AtomicInteger
+     * import kotlin.math.max
+     *
+     * suspend fun main(): Unit {
+     *   val pool = Resource.fromExecutor {
+     *     val ctr = AtomicInteger(0)
+     *     val size = max(2, Runtime.getRuntime().availableProcessors())
+     *     Executors.newFixedThreadPool(size) { r ->
+     *       Thread(r, "computation-${ctr.getAndIncrement()}")
+     *         .apply { isDaemon = true }
+     *     }
+     *   }
+     *
+     *   pool.use { ctx ->
+     *     listOf(1, 2, 3, 4, 5).parTraverse(ctx) { i ->
+     *       println("#$i running on ${Thread.currentThread().name}")
+     *     }
+     *   }
+     * }
+     * ```
+     */
+    fun fromExecutor(f: suspend () -> ExecutorService): Resource<CoroutineContext> =
+      Resource(f) { s -> s.shutdown() }.map(ExecutorService::asCoroutineContext)
+
+    /**
+     * Creates a single threaded [CoroutineContext] as a [Resource].
+     * Upon release an orderly shutdown of the [ExecutorService] takes place in which previously submitted
+     * tasks are executed, but no new tasks will be accepted.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.fx.coroutines.*
+     *
+     * val singleCtx = Resource.singleThreadContext("single")
+     *
+     * suspend fun main(): Unit =
+     *   singleCtx.use { ctx ->
+     *     evalOn(ctx) {
+     *       println("I am running on ${Thread.currentThread().name}")
+     *     }
+     *   }
+     * ```
+     */
+    fun singleThreadContext(name: String): Resource<CoroutineContext> =
+      fromExecutor {
+        Executors.newSingleThreadExecutor { r ->
+          Thread(r, name).apply {
+            isDaemon = true
+          }
+        }
+      }
 
     @Suppress("UNCHECKED_CAST")
     fun <A, B> tailRecM(a: A, f: (A) -> Resource<Either<A, B>>): Resource<B> {

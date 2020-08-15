@@ -208,9 +208,11 @@ tailrec suspend fun sleeper(): Unit {
 This also means that our new sleep can back-pressure `timeOutOrNull`.
 
 ```kotlin:ank
-suspend main(): Unit {
+import arrow.fx.coroutines.*
+
+suspend fun main(): Unit {
   val r = timeOutOrNull(1.seconds) {
-    uncancelable { sleep(2.seconds) }
+    uncancellable { sleep(2.seconds) }
   } // r is null, but took 2 seconds.
 }
 ```
@@ -306,7 +308,7 @@ val resources: List<Resource<File>> =
 val resource: Resource<List<File>> =
   resources.sequence(Resource.applicative())
 
-suspend main(): Unit {
+suspend fun main(): Unit {
   resource.use { files ->
     files.parTraverse(IODispatchers.IOPool) { file ->
        file.toString()
@@ -399,7 +401,7 @@ Simple constructs like `suspend fun Either.catch(f: () -> A): Either<Throwable, 
 A simple example might be to repeat an action `n` times, similar to the `repeat` function in the standard library.
 
 ```kotlin:ank
-suspend main(): Unit {
+suspend fun main(): Unit {
   repeat(Schedule.recurs<A>(n)) {
     println("Hello")
   }
@@ -409,7 +411,7 @@ suspend main(): Unit {
 Alternatively we can re-use this `Schedule` to `retry` a `suspend fun` `n` times when it fails.
 
 ```kotlin:ank
-suspend main(): Unit {
+suspend fun main(): Unit {
   retry(Schedule.recurs<A>(n)) {
     println("I am going to do nothing but throw a tantrum!")
     throw RuntimeException("Boom!")
@@ -424,8 +426,8 @@ fun <A> schedule(): Schedule<A, List<A>> = Schedule {
   (recurs<A>(10) and spaced(10.seconds)) zipRight collect()
 }
 
-suspend main(): Unit {
-  var count = Atomic(0)
+suspend fun main(): Unit {
+  val count = Atomic(0)
 
   val history: List<Int> = repeat(schedule<Int>()) {
     println("Incrementing the ref")

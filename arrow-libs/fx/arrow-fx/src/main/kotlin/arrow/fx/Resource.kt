@@ -61,7 +61,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *   !closeDBHandle(handle)
  *   !closeConsumer(consumer)
  * }
- * // sampleEnd
+ * //sampleEnd
  *
  * fun main() {
  *   program.unsafeRunSync()
@@ -99,7 +99,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *       }
  *     }
  *   }
- * // sampleEnd
+ * //sampleEnd
  *
  * fun main() {
  *   bracketProgram.unsafeRunSync()
@@ -140,7 +140,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  *   IO.unit
  * }.fix()
- * // sampleEnd
+ * //sampleEnd
  *
  * fun main() {
  *   managedTProgram.unsafeRunSync()

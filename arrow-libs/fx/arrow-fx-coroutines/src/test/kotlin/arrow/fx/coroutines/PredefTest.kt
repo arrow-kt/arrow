@@ -47,8 +47,8 @@ class PredefTest : ArrowFxSpec(spec = {
     checkAll(Arb.string(), Arb.string()) { a, b ->
       val t0 = threadName.invoke()
 
-      singleThreadContext(a)
-        .zip(singleThreadContext(b))
+      Resource.singleThreadContext(a)
+        .zip(Resource.singleThreadContext(b))
         .use { (ui, io) ->
           t0 shouldBe threadName.invoke()
 

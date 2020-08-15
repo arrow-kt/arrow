@@ -11,7 +11,7 @@ class RaceTripleTest : ArrowFxSpec(spec = {
 
   "race triple returns to original context" {
     val racerName = "raceTriple"
-    val racer = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..3)) { choose ->
       single.zip(racer).use { (single, raceCtx) ->
@@ -36,7 +36,7 @@ class RaceTripleTest : ArrowFxSpec(spec = {
 
   "race triple returns to original context on failure" {
     val racerName = "raceTriple"
-    val racer = fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
+    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { racerName }) }
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       single.zip(racer).use { (single, raceCtx) ->

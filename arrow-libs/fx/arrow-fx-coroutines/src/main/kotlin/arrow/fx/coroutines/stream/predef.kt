@@ -8,7 +8,7 @@ internal fun checkBounds(arraySize: Int, offset: Int, length: Int) {
 }
 
 /** The iterator which produces no values. */
-val empty: Iterator<Nothing> = object : Iterator<Nothing> {
+internal val empty: Iterator<Nothing> = object : Iterator<Nothing> {
   override fun hasNext(): Boolean =
     false
 
@@ -16,7 +16,7 @@ val empty: Iterator<Nothing> = object : Iterator<Nothing> {
     throw NoSuchElementException("next on empty iterator")
 }
 
-fun <A, B> Iterator<A>.flatMap(f: (A) -> Iterator<B>): Iterator<B> =
+internal fun <A, B> Iterator<A>.flatMap(f: (A) -> Iterator<B>): Iterator<B> =
   object : Iterator<B> {
     private var cur: Iterator<B> = empty
 

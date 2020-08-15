@@ -31,7 +31,7 @@ class TimerTest : ArrowFxSpec(spec = {
 
   "timeOutOrNull" - {
     "returns to original context without timing out" {
-      singleThreadContext("1").zip(single).use { (one, single) ->
+      Resource.singleThreadContext("1").zip(single).use { (one, single) ->
         checkAll {
           evalOn(single) {
             val n0 = threadName.invoke()
@@ -49,7 +49,7 @@ class TimerTest : ArrowFxSpec(spec = {
     }
 
     "returns to original context when timing out" {
-      singleThreadContext("1").zip(single).use { (one, single) ->
+      Resource.singleThreadContext("1").zip(single).use { (one, single) ->
         checkAll {
           evalOn(single) {
             val n0 = threadName.invoke()
@@ -67,7 +67,7 @@ class TimerTest : ArrowFxSpec(spec = {
     }
 
     "returns to original context on failure" {
-      singleThreadContext("1").zip(single).use { (one, single) ->
+      Resource.singleThreadContext("1").zip(single).use { (one, single) ->
         checkAll(Arb.throwable()) { e ->
           evalOn(single) {
             val n0 = threadName.invoke()
@@ -87,7 +87,7 @@ class TimerTest : ArrowFxSpec(spec = {
     }
 
     "returns to original context on CancelToken failure" {
-      singleThreadContext("1").zip(single).use { (one, single) ->
+      Resource.singleThreadContext("1").zip(single).use { (one, single) ->
         checkAll(Arb.throwable()) { e ->
           evalOn(single) {
             val n0 = threadName.invoke()
