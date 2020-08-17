@@ -43,7 +43,7 @@ function addLocalRepositoryBeforeOSS()
 function removeArrowDocs()
 {
     echo "Removing Arrow Docs ($1)..."
-    perl -pe "s/$INCLUDE_ARROW_DOCS//g" -i $1
+    perl -sne "print unless /$INCLUDE_ARROW_DOCS/" -i $1
 }
 
 function addArrowDocs()
