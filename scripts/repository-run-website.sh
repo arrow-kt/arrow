@@ -17,7 +17,7 @@ $BASEDIR/arrow/scripts/project-build-doc.sh ${ARROW_LIB}
 removeArrowDocs $BASEDIR/${ARROW_LIB}/settings.gradle
 $BASEDIR/arrow/scripts/project-locate-doc.sh $ARROW_LIB
 
-MAIN_LIBS=(arrow-core arrow-fx arrow-optics arrow-incubator)
+MAIN_LIBS=(arrow-core arrow-fx arrow-optics)
 for library in ${MAIN_LIBS[*]}; do
     if [ "$library" != "$ARROW_LIB" ]; then
         checkAndDownloadViaSSH $library

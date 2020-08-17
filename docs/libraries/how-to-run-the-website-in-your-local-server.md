@@ -8,7 +8,7 @@ Arrow website can be run for any of the Arrow libraries via this Gradle task:
 ./gradlew runArrowSite
 ```
 
-After generating and validating the documentation for the main libraries (Core, Fx, Optics, Incubator) and the current Arrow library (if it's not any of those), the website will be launched in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
+After generating and validating the documentation for the main libraries (Core, Fx, Optics) and the current Arrow library (if it's not any of those), the website will be launched in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
 
 ## Via manual steps
 
