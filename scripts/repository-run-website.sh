@@ -12,14 +12,18 @@ checkAndDownloadViaSSH arrow-site
 perl -pe "s/\/docs//g" -i $BASEDIR/arrow-site/docs/_data/features.yml
 $BASEDIR/arrow/scripts/site-run-ank.sh
 
-cd $BASEDIR/${ARROW_LIB}; ./gradlew buildArrowDoc
+addArrowDocs $BASEDIR/${ARROW_LIB}/settings.gradle
+$BASEDIR/arrow/scripts/project-build-doc.sh ${ARROW_LIB}
+removeArrowDocs $BASEDIR/${ARROW_LIB}/settings.gradle
 $BASEDIR/arrow/scripts/project-locate-doc.sh $ARROW_LIB
 
 MAIN_LIBS=(arrow-core arrow-fx arrow-optics arrow-incubator)
 for library in ${MAIN_LIBS[*]}; do
     if [ "$library" != "$ARROW_LIB" ]; then
         checkAndDownloadViaSSH $library
-        cd $BASEDIR/$library; ./gradlew buildArrowDoc
+        addArrowDocs $BASEDIR/$library/settings.gradle
+        $BASEDIR/arrow/scripts/project-build-doc.sh $library
+        removeArrowDocs $BASEDIR/$library/settings.gradle
         $BASEDIR/arrow/scripts/project-locate-doc.sh $library
     fi
 done

@@ -136,5 +136,7 @@ task gitPullOthers(type:Exec) {
 task runArrowSite(type:Exec) {
     group = ARROW_DOC_GROUP
     description = "Run Arrow website (includes buildArrowDoc)"
-    commandLine "${rootDir}/../arrow/scripts/project-run-website.sh", "${rootProject.name}"
+    commandLine "${rootDir}/../arrow/scripts/repository-run-website.sh", "${rootProject.name}"
+    mustRunAfter 'checkoutOrchestrator'
+    dependsOn 'checkoutOrchestrator'
 }
