@@ -104,6 +104,23 @@ class FunctionSyntaxTest : UnitSpec() {
       sum2ints(2, 4) shouldBe 6
     }
 
+    "testCurryingEffect" {
+      val sum2ints: suspend (Int, Int) -> Int = { x: Int, y: Int -> x + y }
+      val curried: (Int) -> suspend (Int) -> Int = sum2ints.curried()
+      curried(2)(4) shouldBe 6
+      val add5: suspend (Int) -> Int = curried(5)
+      add5(7) shouldBe 12
+    }
+
+    "testUncurryingEffect" {
+      val sum2ints: suspend (Int, Int) -> Int = { x, y -> x + y }
+      val curried: (Int) -> suspend (Int) -> Int = sum2ints.curried()
+      curried(2)(4) shouldBe 6
+      // same type as sum2ints,
+      curried.uncurried()(2, 4) shouldBe 6
+      sum2ints(2, 4) shouldBe 6
+    }
+
     "testTupling" {
       val sum2ints = { x: Int, y: Int -> x + y }
       val tupled = sum2ints.tupled()
