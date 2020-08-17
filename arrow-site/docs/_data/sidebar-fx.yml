@@ -17,25 +17,25 @@ options:
     nested_options:
 
       - title: Atomic
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-atomic/
 
       - title: ConcurrentVar
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-concurrent-var
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-concurrent-var/
 
       - title: Resource
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-resource/
 
       - title: Schedule
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-schedule/
 
       - title: CircuitBreaker
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-circuit-breaker/
 
       - title: Promise
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-promise
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-promise/
 
       - title: Semaphore
-        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-semaphore
+        url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-semaphore/
 
   - title: Integrations
 

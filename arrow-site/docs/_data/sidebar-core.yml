@@ -279,6 +279,9 @@ options:
       - title: Core Extensions
         url: /apidocs/arrow-core-data/
 
+      - title: Core Retrofit
+        url: /apidocs/arrow-core-retrofit/
+
       - title: Integrations Retrofit Adapter
         url: /apidocs/arrow-integrations-retrofit-adapter/
 
