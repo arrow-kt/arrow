@@ -53,6 +53,8 @@ import arrow.core.Either
  * You can also use it to limit amount of parallel tasks, for example when using `parTraverse` we might want to limit how many tasks are running effectively in parallel.
  *
  * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
  * suspend fun heavyProcess(i: Int): Unit {
  *   println("Started job $i")
  *   sleep(250.milliseconds)
