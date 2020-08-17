@@ -27,9 +27,13 @@ Tasks runnable from root project
 Arrow tasks
 -----------
 buildAllWithLocalDeps - Build libs and examples with local Arrow dependencies (tests execution included)
+buildWithLocalDeps - Build with local Arrow dependencies (tests execution included)
+
+Arrow (documentation) tasks
+---------------------------
 buildArrowDoc - Generate API doc and run validation
 buildArrowDocWithLocalDeps - Generate API doc and run validation with local Arrow dependencies
-buildWithLocalDeps - Build with local Arrow dependencies (tests execution included)
+runArrowSite - Run website (includes buildArrowDoc)
 
 Arrow (Git) tasks
 -----------------

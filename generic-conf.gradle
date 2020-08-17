@@ -62,11 +62,12 @@ wrapper {
 
 ext {
     ARROW_GROUP = "Arrow"
+    ARROW_DOC_GROUP = "Arrow (documentation)"
     ARROW_GIT_GROUP = "Arrow (Git)"
 }
 
 task buildArrowDoc(type:Exec) {
-    group = ARROW_GROUP
+    group = ARROW_DOC_GROUP
     description = "Generate API doc and run validation"
     commandLine "${rootDir}/../arrow/scripts/repository-build-doc.sh", "${rootProject.name}"
     mustRunAfter 'checkoutOrchestrator'
@@ -107,7 +108,7 @@ task buildWithLocalDeps {
 }
 
 task buildArrowDocWithLocalDeps {
-    group = ARROW_GROUP
+    group = ARROW_DOC_GROUP
     description = "Generate API doc and run validation with local Arrow dependencies"
     dependsOn 'installAllWithLocalDeps'
     dependsOn 'generateDocAndValidateWithLocalConf'
@@ -130,4 +131,10 @@ task gitPullOthers(type:Exec) {
     group = ARROW_GIT_GROUP
     description = "Run git-pull for the rest of the repositories"
     commandLine "${rootDir}/../arrow/scripts/repositories-others-git-pull.sh", "${rootProject.name}"
+}
+
+task runArrowSite(type:Exec) {
+    group = ARROW_DOC_GROUP
+    description = "Run Arrow website (includes buildArrowDoc)"
+    commandLine "${rootDir}/../arrow/scripts/project-run-website.sh", "${rootProject.name}"
 }
