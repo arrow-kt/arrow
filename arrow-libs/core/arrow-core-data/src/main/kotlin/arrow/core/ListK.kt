@@ -320,14 +320,42 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   /**
    * Left-padded zip.
    */
+  @Deprecated("Deprecated, use `leftPadZip(other: ListK<B>)` instead", ReplaceWith("leftPadZip(other: ListK<B>)"))
   fun <B> lpadZip(
     other: ListK<B>
   ): ListK<Tuple2<Option<A>, B>> =
     this.lpadZipWith(other) { a, b -> a toT b }
 
   /**
+   * Returns a [ListK<Tuple2<A?, B>>] containing the zipped values of the two listKs
+   * with null for padding on the left.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val padRight = listOf(1, 2).k().leftPadZip(listOf("a").k())        // Result: ListK(Tuple2(1, "a"))
+   * val padLeft = listOf(1).k().leftPadZip(listOf("a", "b").k())       // Result: ListK(Tuple2(1, "a"), Tuple2(null, "b"))
+   * val noPadding = listOf(1, 2).k().leftPadZip(listOf("a", "b").k())  // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("left = $left")
+   *   println("right = $right")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun <B> leftPadZip(
+    other: ListK<B>
+  ): ListK<Tuple2<A?, B>> =
+    this.leftPadZip(other) { a, b -> a toT b }
+
+  /**
    * Right-padded zipWith.
    */
+  @Deprecated("Deprecated, use `rightPadZip(other: ListK<B>, fa: (A, B?) -> C)` instead", ReplaceWith("rightPadZip(other: ListK<B>, fa: (A, B?) -> C)"))
   fun <B, C> rpadZipWith(
     other: ListK<B>,
     fa: (A, Option<B>) -> C
@@ -335,14 +363,68 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     other.lpadZipWith(this) { a, b -> fa(b, a) }
 
   /**
+   * Returns a [ListK<C>] containing the result of applying some transformation `(A, B?) -> C`
+   * on a zip, excluding all cases where the left value is null.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val left = listOf(1, 2).k().rightPadZip(listOf("a").k()) { l, r -> l toT r }.k()      // Result: ListK(Tuple2(1, "a"), Tuple2(null, "b"))
+   * val right = listOf(1).k().rightPadZip(listOf("a", "b").k()) { l, r -> l toT r }.k()   // Result: ListK(Tuple2(1, "a"))
+   * val both = listOf(1, 2).k().rightPadZip(listOf("a", "b").k()) { l, r -> l toT r }.k() // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("left = $left")
+   *   println("right = $right")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun <B, C> rightPadZip(
+    other: ListK<B>,
+    fa: (A, B?) -> C
+  ): ListK<C> =
+    other.leftPadZip(this) { a, b -> fa(b, a) }
+
+  /**
    * Right-padded zip.
    */
+  @Deprecated("Deprecated, use `rightPadZip(other: ListK<B>)` instead", ReplaceWith("rightPadZip(other: ListK<B>)"))
   fun <B> rpadZip(
     other: ListK<B>
   ): ListK<Tuple2<A, Option<B>>> =
     this.rpadZipWith(other) { a, b ->
       a toT b
     }
+
+  /**
+   * Returns a [ListK<Tuple2<A, B?>>] containing the zipped values of the two listKs
+   * with null for padding on the right.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val padRight = listOf(1, 2).k().rightPadZip(listOf("a").k())        // Result: ListK(Tuple2(1, "a"), Tuple2(2, null))
+   * val padLeft = listOf(1).k().rightPadZip(listOf("a", "b").k())       // Result: ListK(Tuple2(1, "a"))
+   * val noPadding = listOf(1, 2).k().rightPadZip(listOf("a", "b").k())  // Result: ListK(Tuple2(1, "a"), Tuple2(2, "b"))
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("left = $left")
+   *   println("right = $right")
+   *   println("both = $both")
+   * }
+   * ```
+   */
+  fun <B> rightPadZip(
+    other: ListK<B>
+  ): ListK<Tuple2<A, B?>> =
+    this.rightPadZip(other) { a, b -> a toT b }
 
   fun show(SA: Show<A>): String = "[" +
     list.joinToString(", ") { SA.run { it.show() } } + "]"
