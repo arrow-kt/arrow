@@ -2153,14 +2153,14 @@ fun <O> Stream<O>.repartition(S: Semigroup<O>, f: (O) -> Chunk<O>): Stream<O> =
  * //sampleStart
  * suspend fun main(): Unit =
  *   Stream(1, 2, null, 3, None)
- *     .filterNull()
+ *     .filterNotNull()
  *     .compile()
  *     .toList()
  *     .let(::println) //[1, 2, 3]
  * //sampleEnd
  * ```
  */
-fun <O : Any> Stream<O?>.filterNull(): Stream<O> =
+fun <O : Any> Stream<O?>.filterNotNull(): Stream<O> =
   mapFilter { it }
 
 /**
