@@ -5,7 +5,7 @@ This guideline provides all the things to keep in mind when adding a new module:
 - Configuration:
   - Add `<module>/gradle.properties`
   - Add `<module>/build.gradle`
-  - Update `settings.xml` - This update can be avoided with the use of [`Auto Module` plugin](https://github.com/pablisco/auto-module) by @pablisco: [an example of use](https://github.com/arrow-kt/arrow-incubator/blob/master/settings.gradle)
+  - Update `settings.xml` - This update can be avoided with the use of [Auto Module plugin](https://github.com/pablisco/auto-module) by [@pablisco](https://github.com/pablisco): [an example of use](https://github.com/arrow-kt/arrow-incubator/blob/master/settings.gradle)
 - Website:
   - Update [libraries page](https://github.com/arrow-kt/arrow-core/tree/master/arrow-docs/docs/quickstart/libraries)
   - Update [sidebar files](https://github.com/arrow-kt/arrow-site/tree/master/docs/_data)
