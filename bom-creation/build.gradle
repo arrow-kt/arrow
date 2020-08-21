@@ -20,7 +20,6 @@ dependencies {
         api "io.arrow-kt:arrow-free:$VERSION_NAME"
         api "io.arrow-kt:arrow-free-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx:$VERSION_NAME"
-        api "io.arrow-kt:arrow-fx-android:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-mtl:$VERSION_NAME"
