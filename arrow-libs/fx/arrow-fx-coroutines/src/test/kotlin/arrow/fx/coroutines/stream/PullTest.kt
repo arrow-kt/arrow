@@ -11,7 +11,6 @@ class PullTest : ArrowFxSpec(spec = {
   "pull can output chunks" {
     checkAll(Arb.chunk(Arb.int())) { ch ->
       Stream(Pull.output(ch))
-        .compile()
         .toList() shouldBe ch.toList()
     }
   }

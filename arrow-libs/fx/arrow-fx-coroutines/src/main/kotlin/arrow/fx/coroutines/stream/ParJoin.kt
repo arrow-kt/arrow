@@ -74,7 +74,6 @@ internal suspend fun <O> runInner(
                 outputQ.enqueue1(Some(s))
               }
               .interruptWhen(done.map { it.isDefined() }) // must be AFTER enqueue to the sync queue, otherwise the process may hang to enq last item while being interrupted
-              .compile()
               .drain()
           }.swap().orNull()
           val e2 = lease.cancel().swap().orNull()
@@ -104,7 +103,6 @@ internal suspend fun <O> Stream<Stream<O>>.runOuter(
         runInner(ctx, inner, done, outputQ, running, available, outerScope)
       }
     }.interruptWhen(done.map { it.isDefined() })
-      .compile()
       .drain()
   }
 
@@ -165,7 +163,6 @@ internal suspend fun signalResult(done: SignallingAtomic<Option<Option<Throwable
  *       }
  *     }
  *     .parJoin(10, IOPool)
- *     .compile()
  *     .drain()
  * //sampleEnd
  * ```
@@ -196,7 +193,6 @@ fun <O> Stream<Stream<O>>.parJoin(
       running.discrete() // Await everyone stop running
         .dropWhile { it > 0 }
         .take(1)
-        .compile()
         .drain()
 
       signalResult(done)

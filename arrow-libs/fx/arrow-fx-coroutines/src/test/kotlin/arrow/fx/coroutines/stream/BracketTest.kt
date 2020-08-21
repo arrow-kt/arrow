@@ -31,7 +31,6 @@ class BracketTest : StreamSpec(spec = {
           events.recordBracketEvents(1)
             .effectMap { events.get() shouldBe listOf(Acquired.one) }
             .flatMap { use }
-            .compile()
             .drain()
         }.fold({ e ->
           if (e is RuntimeException) Unit else throw e
@@ -60,7 +59,6 @@ class BracketTest : StreamSpec(spec = {
             .flatMap { events.recordBracketEvents(2) }
             .effectMap { events.get() shouldBe listOf(Acquired(1), Acquired(2)) }
             .flatMap { use }
-            .compile()
             .drain()
         }.fold({ e ->
           if (e is RuntimeException) Unit else throw e
@@ -88,7 +86,6 @@ class BracketTest : StreamSpec(spec = {
             .append {
               events.recordBracketEvents(2).flatMap { use2 }
             }
-            .compile()
             .drain()
         }.fold({ e ->
           if (e is RuntimeException) Unit else throw e
@@ -118,7 +115,7 @@ class BracketTest : StreamSpec(spec = {
         val counter = Counter()
 
         val innermost: Stream<Int> =
-          if (finalizerFail) Stream.bracket(counter::increment) { counter.decrement(); throw e }.drain()
+          if (finalizerFail) Stream.bracket(counter::increment) { counter.decrement(); throw e }.void()
           else Stream.raiseError(e)
 
         val nested = s0.foldRight(innermost) { i, acc ->
@@ -128,7 +125,6 @@ class BracketTest : StreamSpec(spec = {
 
         assertThrowable {
           nested
-            .compile()
             .drain()
         } shouldBe e
 
@@ -150,7 +146,7 @@ class BracketTest : StreamSpec(spec = {
         val fiveLevels = bracketed.take(i).take(j).take(k).take(j).take(i)
         val all =
           earlyTermination.append { twoLevels.append { twoLevels2.append { threeLevels.append { fiveLevels } } } }
-        all.compile().drain()
+        all.drain()
         counter.count() shouldBe 0L
       }
     }
@@ -166,7 +162,6 @@ class BracketTest : StreamSpec(spec = {
           buffer += "FlatMapped"
           Stream(s)
         }
-        .compile()
         .toList()
 
       buffer shouldBe listOf(
@@ -186,7 +181,6 @@ class BracketTest : StreamSpec(spec = {
         Stream.bracket({ counter.increment() }) { counter.decrement() }
           .flatMap { Stream(i) }
       }
-        .compile()
         .toList() shouldBe (0..bracketsInSequence).toList()
 
       counter.count() shouldBe 0
@@ -195,7 +189,6 @@ class BracketTest : StreamSpec(spec = {
     "evaluating a bracketed stream multiple times is safe" {
       val s = suspend {
         Stream.bracket({ Unit }, { Unit })
-          .compile()
           .drain()
       }
 
@@ -211,7 +204,6 @@ class BracketTest : StreamSpec(spec = {
             Stream.bracket({ i }, { i -> o = o + i })
               .flatMap { acc }
           }
-          .compile()
           .drain()
 
         o shouldBe (0 until 10).toList()
@@ -227,7 +219,6 @@ class BracketTest : StreamSpec(spec = {
           }
         }
           .attempt()
-          .compile()
           .drain()
 
         o shouldBe (0 until 10).toList()
@@ -239,7 +230,6 @@ class BracketTest : StreamSpec(spec = {
         Either.catch {
           Stream.bracket({ Unit }, { throw e })
             .flatMap { s }
-            .compile()
             .toList()
         } shouldBe Either.Left(e)
       }
@@ -255,7 +245,6 @@ class BracketTest : StreamSpec(spec = {
             throw e
           }).flatMap { Stream.never<Unit>() }
             .interruptWhen { Right(sleep(50.milliseconds)) }
-            .compile()
             .drain()
         } shouldBe e
 
@@ -270,7 +259,6 @@ class BracketTest : StreamSpec(spec = {
 
         assertThrowable {
           s1.zip(s2)
-            .compile()
             .toList()
         } shouldBe e
       }
@@ -283,7 +271,6 @@ class BracketTest : StreamSpec(spec = {
 
         assertThrowable {
           s1.zip(s2)
-            .compile()
             .toList()
         } shouldBe e
       }
@@ -297,7 +284,6 @@ class BracketTest : StreamSpec(spec = {
           .flatMap { Stream.raiseError<Unit>(e) }
           .handleErrorWith { Stream(1) }
           .flatMap { events.recordBracketEvents(2) }
-          .compile()
           .drain()
 
         events.get() shouldBe listOf(Acquired.one, Released.one, Acquired.two, Released.two)
@@ -319,7 +305,7 @@ class BracketTest : StreamSpec(spec = {
         }
 
         val s2 = s.fold(Stream.empty<Int>()) { acc, ss -> acc.append { ss } }
-        s2.append { s2.take(10) }.take(10).compile().drain()
+        s2.append { s2.take(10) }.take(10).drain()
 
         counter.count() shouldBe 0L
         ecs.all { it is ExitCase.Completed } shouldBe true
@@ -337,7 +323,7 @@ class BracketTest : StreamSpec(spec = {
           }.flatMap { s.append { Stream.raiseError(e) } }
         }
         val s2 = s.fold(Stream.empty<Int>()) { acc, i -> acc.append { i } }
-        Either.catch { s2.compile().drain() }
+        Either.catch { s2.drain() }
         counter.count() shouldBe 0L
         ecs.all { it == ExitCase.Failure(e) } shouldBe true
       }
@@ -356,7 +342,7 @@ class BracketTest : StreamSpec(spec = {
 
         val f = ForkAndForget {
           parTupledN(
-            { s.compile().drain() },
+            { s.drain() },
             { latch.complete(Unit) }
           )
         }
@@ -381,7 +367,6 @@ class BracketTest : StreamSpec(spec = {
 
         s
           .interruptAfter(50.milliseconds)
-          .compile()
           .drain()
 
         counter.count() shouldBe 0L

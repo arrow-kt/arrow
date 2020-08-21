@@ -19,10 +19,9 @@ class ConcurrentlyTest : StreamSpec(spec = {
   "concurrently" - {
     "when background stream terminates, overall stream continues" {
       checkAll(Arb.stream(Arb.int()), Arb.stream(Arb.int())) { s1, s2 ->
-        val expected = s1.compile().toList()
+        val expected = s1.toList()
         s1.delayBy(25.milliseconds)
           .concurrently(s2)
-          .compile()
           .toList() shouldBe expected
       }
     }
@@ -32,7 +31,6 @@ class ConcurrentlyTest : StreamSpec(spec = {
         assertThrowable {
           s.delayBy(25.milliseconds)
             .concurrently(Stream.raiseError<Unit>(e))
-            .compile()
             .drain()
         } shouldBe e
       }
@@ -47,7 +45,6 @@ class ConcurrentlyTest : StreamSpec(spec = {
         assertThrowable {
           fg.concurrently(bg)
             .onFinalize { semaphore.acquire() } // Hangs if bg doesn't go through terminate
-            .compile()
             .drain()
         } shouldBe e
       }
@@ -62,7 +59,6 @@ class ConcurrentlyTest : StreamSpec(spec = {
 
         fg.concurrently(bg)
           .onFinalize { semaphore.acquire() } // Hangs if bg doesn't go through terminate
-          .compile()
           .drain()
       }
     }
@@ -72,7 +68,6 @@ class ConcurrentlyTest : StreamSpec(spec = {
         assertThrowable {
           s.concurrently(Stream.raiseError<Unit>(e))
             .effectTap { never() }
-            .compile()
             .drain()
         } shouldBe e
       }
@@ -98,7 +93,6 @@ class ConcurrentlyTest : StreamSpec(spec = {
           Stream.bracket({ Unit }, { finRef.update { it + "Outer" } })
             .flatMap { s.concurrently(runner) }
             .interruptWhen { Either.catch { halt.get() } }
-            .compile()
             .toList()
         }
 
@@ -112,7 +106,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
         } else {
           // still the outer finalizer shall be run, but there is no failure in `s`
           finalizers shouldBe listOf("Outer")
-          r shouldBe Either.Right(s.compile().toList())
+          r shouldBe Either.Right(s.toList())
         }
       }
     }

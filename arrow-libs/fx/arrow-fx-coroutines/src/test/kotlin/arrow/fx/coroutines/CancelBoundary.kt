@@ -7,7 +7,6 @@ class CancelBoundary : StringSpec({
 
   suspend fun forever(): Unit {
     while (true) {
-      println("I am getting dizzy...")
       cancelBoundary() // cancellable computation loop
     }
   }

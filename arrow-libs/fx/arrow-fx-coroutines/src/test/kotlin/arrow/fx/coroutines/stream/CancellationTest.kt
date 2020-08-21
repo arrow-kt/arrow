@@ -68,7 +68,7 @@ private suspend fun <A> assertCancellable(fa: (latch: Promise<Unit>) -> Stream<A
   val fiber = ForkAndForget {
     guaranteeCase(
       fa = {
-        fa(latch).compile().drain()
+        fa(latch).drain()
       },
       finalizer = { ex -> p.complete(ex) }
     )
@@ -88,7 +88,6 @@ private suspend fun <A> Stream<A>.assertCancellable(): Unit {
       fa = {
         Stream.effect { start.complete(Unit) }
           .flatMap { this@assertCancellable }
-          .compile()
           .drain()
       },
       finalizer = { ex -> p.complete(ex) }

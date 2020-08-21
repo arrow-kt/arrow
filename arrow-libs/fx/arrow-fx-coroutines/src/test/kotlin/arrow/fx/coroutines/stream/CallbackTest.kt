@@ -37,7 +37,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
       }
 
       effect.get() shouldBe false
-      s.compile().drain()
+      s.drain()
       effect.get() shouldBe true
     }
   }
@@ -48,7 +48,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         list.forEach { emit(it) }
         end()
       }
-        .compile()
         .toList() shouldBe list
     }
   }
@@ -60,7 +59,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         end()
       }
         .chunks()
-        .compile()
         .toList() shouldBe listOf(Chunk(*list))
     }
   }
@@ -72,7 +70,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         end()
       }
         .chunks()
-        .compile()
         .toList() shouldBe listOf(Chunk.iterable(list))
     }
   }
@@ -85,7 +82,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         end()
       }
         .chunks()
-        .compile()
         .toList() shouldBe listOf(ch, ch2)
     }
   }
@@ -96,7 +92,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         countToCallback(4, { it }, { emit(it) }) { end() }
       }
     }
-      .compile()
       .toList() shouldBe listOf(1, 2, 3, 4, 5)
   }
 
@@ -114,7 +109,6 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         if (it == 1) ref.get() shouldBe false
         else Unit
       }
-      .compile()
       .drain()
   }
 
@@ -122,7 +116,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
     checkAll(Arb.throwable()) { e ->
       val s = Stream.cancellable<Int> {
         throw e
-      }.compile()
+      }
 
       assertThrowable {
         s.drain()
@@ -134,7 +128,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
     checkAll(Arb.throwable()) { e ->
       val s = Stream.cancellable<Int> {
         e.suspend()
-      }.compile()
+      }
 
       assertThrowable {
         s.drain()
@@ -153,7 +147,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
 
       val f = ForkAndForget {
         parTupledN(
-          { s.compile().drain() },
+          { s.drain() },
           { latch.complete(Unit) }
         )
       }
@@ -180,7 +174,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
           emit(Unit)
           done.complete(i)
           CancelToken.unit
-        }.compile()
+        }
           .lastOrError()
       }
 
@@ -209,7 +203,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
       end()
       CancelToken { effect.set(true) }
     }
-      .compile()
+
       .drain()
 
     effect.get() shouldBe false

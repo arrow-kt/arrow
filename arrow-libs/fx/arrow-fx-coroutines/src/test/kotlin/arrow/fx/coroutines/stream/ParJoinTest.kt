@@ -22,19 +22,17 @@ class ParJoinTest : StreamSpec(spec = {
     checkAll(Arb.stream(Arb.int())) { s ->
       s.map { Stream.just(it) }
         .parJoin(1)
-        .compile()
-        .toList() shouldBe s.compile().toList()
+        .toList() shouldBe s.toList()
     }
   }
 
   "concurrency" - {
     checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n0 ->
       val n = (n0 % 20) + 1
-      val expected = s.compile().toList().toSet()
+      val expected = s.toList().toSet()
 
       s.map { Stream(it) }
         .parJoin(n)
-        .compile()
         .toSet() shouldBe expected
     }
   }
@@ -42,10 +40,9 @@ class ParJoinTest : StreamSpec(spec = {
   "concurrent flattening" - {
     checkAll(Arb.stream(Arb.stream(Arb.int())), Arb.positiveInts()) { s, n0 ->
       val n = n0 % 20 + 1
-      val expected = s.flatten().compile().toSet()
+      val expected = s.flatten().toSet()
 
       s.parJoin(n)
-        .compile()
         .toSet() shouldBe expected
     }
   }
@@ -62,7 +59,6 @@ class ParJoinTest : StreamSpec(spec = {
     }
 
     s.parJoinUnbounded()
-      .compile()
       .drain()
   }
 
@@ -97,7 +93,6 @@ class ParJoinTest : StreamSpec(spec = {
       val r = Either.catch {
         prg0
           .parJoinUnbounded()
-          .compile()
           .drain()
       }
       val finalizers = finalizerRef.get()
@@ -113,13 +108,12 @@ class ParJoinTest : StreamSpec(spec = {
 
   val full = Stream.constant(42)
   val hang = Stream.effect { never<Nothing>() }.repeat()
-  val hang2 = full.drain()
+  val hang2 = full.void()
 
   "Can take from non-hanging stream on left" - {
     Stream(full, hang)
       .parJoin(10)
       .take(2)
-      .compile()
       .toList() shouldBe listOf(42, 42)
   }
 
@@ -127,7 +121,6 @@ class ParJoinTest : StreamSpec(spec = {
     Stream(hang2, full)
       .parJoin(10)
       .take(1)
-      .compile()
       .toList() shouldBe listOf(42)
   }
 
@@ -135,7 +128,6 @@ class ParJoinTest : StreamSpec(spec = {
     Stream(hang, full, hang2)
       .parJoin(10)
       .take(1)
-      .compile()
       .toList() shouldBe listOf(42)
   }
 
@@ -144,7 +136,6 @@ class ParJoinTest : StreamSpec(spec = {
       assertThrowable {
         Stream(s, Stream.raiseError(e))
           .parJoinUnbounded()
-          .compile()
           .drain()
       } shouldBe e
     }
@@ -156,7 +147,6 @@ class ParJoinTest : StreamSpec(spec = {
         Stream(Stream.raiseError<Int>(e))
           .parJoinUnbounded()
           .append { s }
-          .compile()
           .toList()
       } shouldBe e
     }

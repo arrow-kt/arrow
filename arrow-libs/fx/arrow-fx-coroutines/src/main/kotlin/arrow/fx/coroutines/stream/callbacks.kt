@@ -35,7 +35,6 @@ interface EmitterSyntax<A> {
  *       emit(2, 3, 4)
  *       end()
  *     }
- *     .compile()
  *     .toList()
  *     .let(::println) //[1, 2, 3, 4]
  * //sampleEnd
@@ -105,7 +104,6 @@ fun <A> Stream.Companion.callback(@BuilderInference f: suspend EmitterSyntax<A>.
  *
  *   val result = getUsernames()
  *     .effectTap { println(it) }
- *     .compile()
  *     .toList()
  *   //sampleEnd
  *   println(result)

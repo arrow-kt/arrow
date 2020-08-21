@@ -33,19 +33,17 @@ class StreamTest : StreamSpec(spec = {
   "constructors" - {
     "empty() is empty" {
       Stream.empty<Int>()
-        .compile()
         .toList() shouldBe emptyList()
     }
 
     "Stream.unit" {
       Stream.unit
-        .compile()
         .toList() shouldBe listOf(Unit)
     }
 
     "never() should timeout" {
       timeOutOrNull(10.milliseconds) {
-        Stream.never<Int>().compile().toList()
+        Stream.never<Int>().toList()
       } shouldBe null
     }
 
@@ -54,7 +52,6 @@ class StreamTest : StreamSpec(spec = {
         checkAll(Arb.throwable()) { e ->
           assertThrowable {
             Stream.raiseError<Int>(e)
-              .compile()
               .drain()
           } shouldBe e
         }
@@ -65,7 +62,6 @@ class StreamTest : StreamSpec(spec = {
           assertThrowable {
             Stream.just(1)
               .append { Stream.raiseError(e) }
-              .compile()
               .drain()
           } shouldBe e
         }
@@ -76,7 +72,6 @@ class StreamTest : StreamSpec(spec = {
           Stream.just(i)
             .append { Stream.raiseError(e) }
             .take(1)
-            .compile()
             .toList() shouldBe listOf(i)
         }
       }
@@ -86,7 +81,6 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.chunk(Arb.int())) { ch ->
         Stream.chunk(ch)
           .chunks()
-          .compile()
           .toList() shouldBe listOf(ch)
       }
     }
@@ -94,7 +88,6 @@ class StreamTest : StreamSpec(spec = {
     "effect" {
       checkAll(Arb.int()) { i ->
         Stream.effect { i }
-          .compile()
           .toList() shouldBe listOf(i)
       }
     }
@@ -103,7 +96,6 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.int()) { i ->
         var effect: Int? = null
         Stream.effect_ { effect = i }
-          .compile()
           .drain()
         effect shouldBe i
       }
@@ -112,7 +104,6 @@ class StreamTest : StreamSpec(spec = {
     "effectUnChunk" {
       checkAll(Arb.chunk(Arb.int())) { ch ->
         Stream.effectUnChunk { ch }
-          .compile()
           .toList() shouldBe ch.toList()
       }
     }
@@ -122,7 +113,6 @@ class StreamTest : StreamSpec(spec = {
         Stream.constant(i, n)
           .take(n * 2)
           .chunks()
-          .compile()
           .toList() shouldBe if (n == 0) emptyList() else listOf(Chunk(n) { i }, Chunk(n) { i })
       }
     }
@@ -130,7 +120,6 @@ class StreamTest : StreamSpec(spec = {
     "iterable" {
       checkAll(Arb.set(Arb.int())) { s ->
         Stream.iterable(s)
-          .compile()
           .toSet() shouldBe s
       }
     }
@@ -138,7 +127,6 @@ class StreamTest : StreamSpec(spec = {
     "iterate" {
       Stream.iterate(0, Int::inc)
         .take(100)
-        .compile()
         .toList() shouldBe (0..99).toList()
     }
 
@@ -148,14 +136,12 @@ class StreamTest : StreamSpec(spec = {
 
       Stream.iterateEffect(0) { it.increment() }
         .take(100)
-        .compile()
         .toList() shouldBe (0..99).toList()
     }
 
     "range(IntRange).toList() - IntRange.toList()" {
       checkAll(Arb.intRange(min = -500, max = 500)) { range ->
         Stream.range(range)
-          .compile()
           .toList() shouldBe range.toList()
       }
     }
@@ -163,7 +149,6 @@ class StreamTest : StreamSpec(spec = {
     "range(LongRange).toList() - LongRange.toList()" {
       checkAll(Arb.longRange(min = -500, max = 500)) { range ->
         Stream.range(range)
-          .compile()
           .toList() shouldBe range.toList()
       }
     }
@@ -171,7 +156,6 @@ class StreamTest : StreamSpec(spec = {
     "range(CharRange).toList() - CharRange.toList()" {
       checkAll(Arb.charRange()) { range ->
         Stream.range(range)
-          .compile()
           .toList() shouldBe range.toList()
       }
     }
@@ -181,7 +165,6 @@ class StreamTest : StreamSpec(spec = {
         if (f1 <= 13) Pair(Pair(f1, f2), Pair(f2, f1 + f2))
         else null
       }.map { it.first }
-        .compile()
         .toList() shouldBe listOf(0, 1, 1, 2, 3, 5, 8, 13)
     }
 
@@ -189,13 +172,11 @@ class StreamTest : StreamSpec(spec = {
       Stream.unfoldChunk(4L) { s ->
         if (s > 0) Pair(Chunk.longs(longArrayOf(s, s)), s - 1)
         else null
-      }.compile()
-        .toList() shouldBe listOf(4L, 4, 3, 3, 2, 2, 1, 1)
+      }.toList() shouldBe listOf(4L, 4, 3, 3, 2, 2, 1, 1)
     }
 
     "unfoldEffect" {
       Stream.unfoldEffect(10) { s -> if (s > 0) Pair(s, s - 1) else null }
-        .compile()
         .toList() shouldBe (10 downTo 1).toList()
     }
 
@@ -204,14 +185,12 @@ class StreamTest : StreamSpec(spec = {
         if (s) Pair(Chunk.booleans(booleanArrayOf(s)), false)
         else null
       }
-        .compile()
         .toList() shouldBe listOf(true)
     }
 
     "emits - array.toList()" {
       checkAll(Arb.list(Arb.int())) { ints ->
         Stream.emits(*ints.toTypedArray())
-          .compile()
           .toList() shouldBe ints
       }
     }
@@ -219,7 +198,6 @@ class StreamTest : StreamSpec(spec = {
     "invoke - array.toList()" {
       checkAll(Arb.list(Arb.int())) { ints ->
         Stream.emits(*ints.toTypedArray())
-          .compile()
           .toList() shouldBe ints
       }
     }
@@ -229,7 +207,6 @@ class StreamTest : StreamSpec(spec = {
         val n = n0 % 20
         Stream.random(seed)
           .take(n)
-          .compile()
           .toList() shouldBe Random(seed).run { List(max(n, 0)) { nextInt() } }
       }
     }
@@ -238,20 +215,19 @@ class StreamTest : StreamSpec(spec = {
   "filterNotNull" {
     checkAll(Arb.stream(Arb.int().orNull())) { s ->
       s.filterNotNull()
-        .compile()
-        .toList() shouldBe s.compile().toList().filterNotNull()
+        .toList() shouldBe s.toList().filterNotNull()
     }
   }
 
   "append" {
     checkAll(Arb.stream(Arb.int()), Arb.stream(Arb.int())) { s1, s2 ->
-      s1.append { s2 }.compile().toList() shouldBe s1.compile().toList() + s2.compile().toList()
+      s1.append { s2 }.toList() shouldBe s1.toList() + s2.toList()
     }
   }
 
   "flatMap" {
     checkAll(Arb.stream(Arb.int()), Arb.stream(Arb.int())) { s1, s2 ->
-      s1.flatMap { s2 }.compile().toList() shouldBe s1.compile().toList().flatMap { s2.compile().toList() }
+      s1.flatMap { s2 }.toList() shouldBe s1.toList().flatMap { s2.toList() }
     }
   }
 
@@ -262,27 +238,25 @@ class StreamTest : StreamSpec(spec = {
 
         s
           .take(n)
-          .compile()
-          .toList() shouldBe s.compile().toList().take(max(n, 0))
+          .toList() shouldBe s.toList().take(max(n, 0))
       }
     }
 
     "takeLast" {
       checkAll(Arb.stream(Arb.int()), Arb.int(-10..1000)) { s, n0 ->
         val n = n0 % 20
-        s.takeLast(n).compile().toList() shouldBe s.compile().toList().takeLast(max(0, n))
+        s.takeLast(n).toList() shouldBe s.toList().takeLast(max(0, n))
       }
     }
 
     "takeWhile - identity" {
       checkAll(Arb.stream(Arb.int()), Arb.int(-10..1000)) { s, n0 ->
         val n = n0 % 20
-        val l = s.compile().toList()
+        val l = s.toList()
         val set = l.take(max(0, n)).toSet()
 
         s
           .takeWhile(set::contains)
-          .compile()
           .toList() shouldBe l.takeWhile(set::contains)
       }
     }
@@ -290,7 +264,7 @@ class StreamTest : StreamSpec(spec = {
     "takeThrough" {
       checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n0 ->
         val n = n0 % 20 + 1
-        val l = s.compile().toList()
+        val l = s.toList()
         val isEven = { i: Int -> i % n == 0 }
 
         val head = l.takeWhile(isEven)
@@ -299,7 +273,6 @@ class StreamTest : StreamSpec(spec = {
 
         s
           .takeThrough(isEven)
-          .compile()
           .toList() shouldBe rhs
       }
     }
@@ -310,46 +283,43 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.stream(Arb.int().orNull()), Arb.int()) { s, n ->
         s
           .drop(n)
-          .compile()
-          .toList() shouldBe s.compile().toList().drop(max(n, 0))
+          .toList() shouldBe s.toList().drop(max(n, 0))
       }
     }
 
     "last" {
       checkAll(Arb.stream(Arb.int()), Arb.int(-10..1000)) { s, n0 ->
         val n = n0 % 10
-        s.dropLast(n).compile().toList() shouldBe s.compile().toList().dropLast(max(0, n))
+        s.dropLast(n).toList() shouldBe s.toList().dropLast(max(0, n))
       }
     }
 
     "tail" {
       checkAll(Arb.stream(Arb.int())) { s ->
-        s.tail().compile().toList() shouldBe s.compile().toList().drop(1)
+        s.tail().toList() shouldBe s.toList().drop(1)
       }
     }
 
     "dropWhile" {
       checkAll(Arb.stream(Arb.int()), Arb.int(-10..1000)) { s, n0 ->
-        val l = s.compile().toList()
+        val l = s.toList()
         val n = n0 % 10
         val set = l.take(max(0, n)).toSet()
 
         s.dropWhile(set::contains)
-          .compile()
           .toList() shouldBe l.dropWhile(set::contains)
       }
     }
 
     "dropThrough" {
       checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n ->
-        val l = s.compile().toList()
+        val l = s.toList()
         val set = l.take(n).toSet()
 
         val expected = l.dropWhile(set::contains).drop(1)
 
         s
           .dropThrough(set::contains)
-          .compile()
           .toList() shouldBe expected
       }
     }
@@ -358,13 +328,13 @@ class StreamTest : StreamSpec(spec = {
   "chunk" - {
     "chunked" {
       val s = Stream(1, 2).append { Stream(3, 4) }
-      s.take(3).chunks().compile().toList() shouldBe listOf(Chunk(1, 2), Chunk(3))
+      s.take(3).chunks().toList() shouldBe listOf(Chunk(1, 2), Chunk(3))
     }
 
     "map identity" {
       checkAll(Arb.list(Arb.list(Arb.int()))) { lli ->
         val s = lli.foldMap(Stream.monoid<Int>()) { Stream.iterable(it) }
-        s.chunks().map { it.toList() }.compile().toList() shouldBe lli
+        s.chunks().map { it.toList() }.toList() shouldBe lli
       }
     }
 
@@ -372,28 +342,28 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.list(Arb.list(Arb.int()))) { lli ->
         val s =
           if (lli.isEmpty()) Stream.empty() else lli.map { Stream.iterable(it) }.reduce { a, b -> a.append { b } }
-        s.chunks().flatMap { Stream.chunk(it) }.compile().toList() shouldBe lli.flatten()
+        s.chunks().flatMap { Stream.chunk(it) }.toList() shouldBe lli.flatten()
       }
     }
 
     "chunkLimit" {
       checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n0 ->
         val n = n0 % 20 + 1
-        val sizes = s.chunkLimit(n).compile().toList().map { it.size() }
+        val sizes = s.chunkLimit(n).toList().map { it.size() }
         sizes.all { it <= n } shouldBe true
-        sizes.combineAll(Int.monoid()) shouldBe s.compile().toList().size
+        sizes.combineAll(Int.monoid()) shouldBe s.toList().size
       }
     }
 
     "chunkMin" {
       checkAll(Arb.stream(Arb.int()), Arb.int()) { s, n0 ->
         val n = n0 % 20 + 1
-        val chunked = s.chunkMin(n, true).compile().toList()
-        val chunkedSmaller = s.chunkMin(n, false).compile().toList()
-        val unchunked = s.compile().toList()
-        val smallerSet = s.take(n - 1).compile().toList()
-        val smallerN = s.take(n - 1).chunkMin(n, false).compile().toList()
-        val smallerY = s.take(n - 1).chunkMin(n, true).compile().toList()
+        val chunked = s.chunkMin(n, true).toList()
+        val chunkedSmaller = s.chunkMin(n, false).toList()
+        val unchunked = s.toList()
+        val smallerSet = s.take(n - 1).toList()
+        val smallerN = s.take(n - 1).chunkMin(n, false).toList()
+        val smallerY = s.take(n - 1).chunkMin(n, true).toList()
         // All but last list have n values
         chunked.dropLast(1).all { it.size() >= n }
         // Equivalent to last chunk with allowFewerTotal
@@ -414,7 +384,6 @@ class StreamTest : StreamSpec(spec = {
   "repartition" {
     Stream("Hel", "l", "o Wor", "ld")
       .repartition(String.semigroup()) { s -> Chunk.iterable(s.split(" ")) }
-      .compile()
       .toList() shouldBe listOf("Hello", "World")
   }
 
@@ -423,8 +392,7 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.stream(Arb.int()), Arb.positiveInts()) { s, n ->
         s
           .buffer(n)
-          .compile()
-          .toList() shouldBe s.compile().toList()
+          .toList() shouldBe s.toList()
       }
     }
 
@@ -436,7 +404,6 @@ class StreamTest : StreamSpec(spec = {
         s2.effectMap { i -> counter += 1; i }
           .buffer(n)
           .take(n + 1)
-          .compile()
           .drain()
 
         counter shouldBe (n * 2)
@@ -448,14 +415,13 @@ class StreamTest : StreamSpec(spec = {
     "identity" {
       checkAll(Arb.stream(Arb.int())) { s ->
         s.bufferAll()
-          .compile()
-          .toList() shouldBe s.compile().toList()
+          .toList() shouldBe s.toList()
       }
     }
 
     "buffers results of effectMap" {
       checkAll(Arb.stream(Arb.int())) { s ->
-        val size = s.compile().toList().size
+        val size = s.toList().size
         val expected = size * 2
         var counter = 0
 
@@ -463,7 +429,6 @@ class StreamTest : StreamSpec(spec = {
           .effectMap { i -> counter += 1; i }
           .bufferAll()
           .take(size + 1)
-          .compile()
           .drain()
 
         counter shouldBe expected
@@ -475,14 +440,13 @@ class StreamTest : StreamSpec(spec = {
     "identity" {
       checkAll(Arb.stream(Arb.int())) { s ->
         s.bufferBy { it >= 0 }
-          .compile()
-          .toList() shouldBe s.compile().toList()
+          .toList() shouldBe s.toList()
       }
     }
 
     "buffers results of effectMap" {
       checkAll(Arb.stream(Arb.int())) { s ->
-        val size = s.compile().toList().size
+        val size = s.toList().size
         val expected = size * 2 + 1
         var counter = 0
 
@@ -496,7 +460,6 @@ class StreamTest : StreamSpec(spec = {
 
         s3.bufferBy { it >= 0 }
           .take(size + 2)
-          .compile()
           .drain()
 
         counter shouldBe expected
@@ -509,7 +472,6 @@ class StreamTest : StreamSpec(spec = {
       checkAll(Arb.throwable(), Arb.int()) { e, i ->
         Stream.raiseError<Int>(e)
           .handleErrorWith { Stream.just(i) }
-          .compile()
           .toList() shouldBe listOf(i)
       }
     }
@@ -519,7 +481,6 @@ class StreamTest : StreamSpec(spec = {
         val effect = SideEffect()
         Stream.just(i)
           .handleErrorWith { Stream.effect { effect.increment() } }
-          .compile()
           .toList() shouldBe listOf(i)
 
         effect.counter shouldBe 0
@@ -533,7 +494,6 @@ class StreamTest : StreamSpec(spec = {
 
       infinite
         .take(n)
-        .compile()
         .toList() shouldBe List(n) { i }
     }
   }
@@ -541,21 +501,18 @@ class StreamTest : StreamSpec(spec = {
   "terminateOn" {
     Stream(1, 2, 3, 4)
       .terminateOn { it % 3 == 0 }
-      .compile()
       .toList() shouldBe listOf(1, 2)
   }
 
   "terminateOnNull" {
     Stream(1, 2, null, 4)
       .terminateOnNull()
-      .compile()
       .toList() shouldBe listOf(1, 2)
   }
 
   "terminateOnNone" {
     Stream(Some(1), Some(2), None, Some(4))
       .terminateOnNone()
-      .compile()
       .toList() shouldBe listOf(1, 2)
   }
 })

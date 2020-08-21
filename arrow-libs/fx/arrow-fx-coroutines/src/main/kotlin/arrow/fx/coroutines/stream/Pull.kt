@@ -590,19 +590,6 @@ fun <O> Pull<O, Unit>.firstOrNull(f: (O) -> Boolean): Pull<Nothing, PullUncons1<
     }
   }
 
-/** Returns the last element of the input, if non-empty. */
-fun <O> Pull<O, Unit>.lastOrNull(): Pull<Nothing, O?> {
-  fun go(prev: O?, s: Pull<O, Unit>): Pull<Nothing, O?> =
-    s.unconsOrNull().flatMap { uncons ->
-      when (uncons) {
-        null -> Pull.just(prev)
-        else -> go(uncons.head.lastOrNull() ?: prev, uncons.tail)
-      }
-    }
-
-  return go(null, this)
-}
-
 /** Writes a single `true` value if all input matches the predicate, `false` otherwise. */
 fun <O> Pull<O, Unit>.forall(p: (O) -> Boolean): Pull<Nothing, Boolean> =
   unconsOrNull().flatMap { uncons ->

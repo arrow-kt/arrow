@@ -2,12 +2,55 @@ package arrow.fx.coroutines.stream
 
 import arrow.fx.coroutines.Resource
 
+/** Opens DSL to consume [Stream] as a [Resource]. */
+fun <O> Stream<O>.asResource(): ResourceOps<O> =
+  ResourceOps(this)
+
 /**
- * DSL boundary to access terminal operators as resources
+ * DSL boundary to access terminal operators as a [Resource]
+ * Allows for consume a [Stream] as a [Resource],
+ * meaning the root scope of the [Stream] remains open until [Resource.use] returns.
  *
- * Terminal operators consume the stream
- */ // TODO report inline results in Exception in thread "main" java.lang.VerifyError: Bad type on operand stack
-/* inline */ class ResourceTerminalOps<O>(private val s: Stream<O>) {
+ * This allows for safe consumption of streaming resources in terminal operators,
+ * and inside the [Resource.use] combinator.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.stream.*
+ * import arrow.fx.coroutines.Atomic
+ *
+ * class Logger {
+ *   private val state = Atomic.unsafe(emptyList<String>())
+ *
+ *   suspend fun log(msg: String): Unit =
+ *     state.update { it + msg }
+ *
+ *   suspend fun dumpLog(): Unit =
+ *     println(state.get())
+ * }
+ *
+ * fun openFileWithName(name: String): String =
+ *   "File($name)"
+ *
+ * //sampleStart
+ * suspend fun main(): Unit {
+ *   val logger = Logger()
+ *
+ *   Stream.bracket({ openFileWithName("a") }, { name -> logger.log("finalizing: $name") })
+ *     .append { Stream.bracket({ openFileWithName("b") }, { name -> logger.log("finalizing: $name") }) }
+ *     .asResource()
+ *     .lastOrError()
+ *     .use { last -> logger.log("Using $last") }
+ *
+ *   logger.dumpLog() // [finalizing: File(a), Using File(b), finalizing: File(b)]
+ * }
+ * //sampleEnd
+ * ```
+ *
+ * As you can see here, we can `use` the `last` streamed `File` before it gets closed by the Stream.
+ * Since we consumed the Stream as `asResource().lastOrError()`, this extends the last scope to the returned `Resource`,
+ * so we can safely `use` it and the `Stream` still properly closes all resources opened with `bracket`.
+ */
+class ResourceOps<O>(private val s: Stream<O>) {
 
   suspend fun toList(): Resource<List<O>> =
     compiler(mutableListOf()) { acc, ch -> acc.apply { addAll(ch.toList()) } }
