@@ -138,6 +138,20 @@ idea {
     }
 }
 ```
+#### BOM file
+
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
+```
+    implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
+
+    implementation "io.arrow-kt:arrow-core"
+    implementation "io.arrow-kt:arrow-fx"
+    implementation "io.arrow-kt:arrow-syntax"
+    ...
+```
+
+[Example of use](https://github.com/arrow-kt/arrow-examples/blob/master/build.gradle)
 
 ### Maven
 
@@ -215,6 +229,27 @@ Enable annotation processing using Kotlin plugin:
         </execution>
     </executions>
 </plugin>
+```
+
+#### BOM file
+
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
+```
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.arrow-kt</groupId>
+        <artifactId>arrow-stack</artifactId>
+        <version>${arrow.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    ...
+  </dependencies>
 ```
 
 ### Linting
