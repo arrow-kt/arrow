@@ -32,7 +32,7 @@ configure(subprojects
             - project("arrow-benchmarks-fx")
             - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
             - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
-            - project("arrow-fx-android")
+            // - project("arrow-fx-android")
             - project("arrow-fx-coroutines")) 
 {
     apply plugin: 'ru.vyarus.animalsniffer'
