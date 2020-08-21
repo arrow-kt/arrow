@@ -110,6 +110,6 @@ suspend fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: suspend (A)
   if (ctx === EmptyCoroutineContext || ctx[ContinuationInterceptor] == null) map { a -> f(a) }
   else toList().foldRight(suspend { emptyList<B>() }) { a, acc ->
     suspend {
-      parMapN(ctx, { f(a) }, { acc.invoke() }) { (a, b) -> listOf(a) + b }
+      parMapN(ctx, { f(a) }, { acc.invoke() }) { a, b -> listOf(a) + b }
     }
   }.invoke()

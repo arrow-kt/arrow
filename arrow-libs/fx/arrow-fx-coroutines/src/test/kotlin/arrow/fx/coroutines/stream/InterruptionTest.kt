@@ -38,7 +38,7 @@ class InterruptionTest : StreamSpec(spec = {
 
       latch.get()
       f.cancel()
-      timeOutOrNull(50.milliseconds) { exit.get() } shouldBe ExitCase.Cancelled
+      exit.get() shouldBe ExitCase.Cancelled
     }
   }
 

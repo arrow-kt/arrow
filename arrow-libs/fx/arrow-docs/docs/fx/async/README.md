@@ -66,9 +66,7 @@ data class ThreadInfo(
 
 suspend fun main(): Unit {
   val (threadA: String, threadB: String) =
-    parMapN(::threadName, ::threadName) { (a, b) ->
-      ThreadInfo(a, b)
-    }
+    parMapN(::threadName, ::threadName, ::ThreadInfo)
 
   println(threadA)
   println(threadB)

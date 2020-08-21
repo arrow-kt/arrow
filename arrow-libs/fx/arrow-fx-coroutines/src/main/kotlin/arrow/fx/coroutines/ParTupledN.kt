@@ -10,87 +10,6 @@ import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
- * Parallel maps [fa], [fb] in parallel on [ComputationPool].
- * Cancelling this operation cancels both operations running in parallel.
- *
- * ```kotlin:ank:playground
- * import arrow.fx.coroutines.*
- *
- * suspend fun main(): Unit {
- *   //sampleStart
- *   val result = parMapN(
- *     { "First one is on ${Thread.currentThread().name}" },
- *     { "Second one is on ${Thread.currentThread().name}" }
- *   ) { (a, b) ->
- *       "$a\n$b"
- *     }
- *   //sampleEnd
- *  println(result)
- * }
- * ```
- *
- * @param fa value to parallel map
- * @param fb value to parallel map
- * @param f function to map/combine value [A] and [B]
- * ```
- *
- * @see parMapN for the same function that can race on any [CoroutineContext].
- */
-suspend fun <A, B, C> parMapN(fa: suspend () -> A, fb: suspend () -> B, f: (Pair<A, B>) -> C): C =
-  f(parTupledN(ComputationPool, fa, fb))
-
-/**
- * Parallel maps [fa], [fb], [fc] in parallel on [ComputationPool].
- * Cancelling this operation cancels both operations running in parallel.
- *
- * @see parMapN for the same function that can race on any [CoroutineContext].
- */
-suspend fun <A, B, C, D> parMapN(
-  fa: suspend () -> A,
-  fb: suspend () -> B,
-  fc: suspend () -> C,
-  f: (Triple<A, B, C>) -> D
-): D =
-  f(parTupledN(ComputationPool, fa, fb, fc))
-
-/**
- * Parallel maps [fa], [fb] on the provided [CoroutineContext].
- * Cancelling this operation cancels both tasks running in parallel.
- *
- * **WARNING** this function forks [fa], [fb] but if it runs in parallel depends
- * on the capabilities of the provided [CoroutineContext].
- * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
- *
- * @see parMapN for a function that ensures it runs in parallel on the [ComputationPool].
- */
-suspend fun <A, B, C> parMapN(
-  ctx: CoroutineContext,
-  fa: suspend () -> A,
-  fb: suspend () -> B,
-  f: (Pair<A, B>) -> C
-): C =
-  f(parTupledN(ctx, fa, fb))
-
-/**
- * Parallel maps [fa], [fb], [fc] on the provided [CoroutineContext].
- * Cancelling this operation cancels both tasks running in parallel.
- *
- * **WARNING** this function forks [fa], [fb] & [fc] but if it runs in parallel depends
- * on the capabilities of the provided [CoroutineContext].
- * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
- *
- * @see parMapN for a function that ensures it runs in parallel on the [ComputationPool].
- */
-suspend fun <A, B, C, D> parMapN(
-  ctx: CoroutineContext,
-  fa: suspend () -> A,
-  fb: suspend () -> B,
-  fc: suspend () -> C,
-  f: (Triple<A, B, C>) -> D
-): D =
-  f(parTupledN(ctx, fa, fb, fc))
-
-/**
  * Tuples [fa], [fb] in parallel on [ComputationPool].
  * Cancelling this operation cancels both operations running in parallel.
  *
@@ -117,12 +36,81 @@ suspend fun <A, B, C> parTupledN(fa: suspend () -> A, fb: suspend () -> B, fc: s
  *
  * @see parTupledN for a function that ensures it runs in parallel on the [ComputationPool].
  */
+suspend fun <A, B> parTupledN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend () -> B): Pair<A, B> =
+  parMapN(ctx, fa, fb, ::Pair)
+
+/**
+ * Tuples [fa], [fb] & [fc] on the provided [CoroutineContext].
+ * Cancelling this operation cancels both tasks running in parallel.
+ *
+ * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
+ *
+ * @see parTupledN for a function that ensures it runs in parallel on the [ComputationPool].
+ */
+suspend fun <A, B, C> parTupledN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend () -> B, fc: suspend () -> C): Triple<A, B, C> =
+  parMapN(ctx, fa, fb, fc, ::Triple)
+
+/**
+ * Parallel maps [fa], [fb] in parallel on [ComputationPool].
+ * Cancelling this operation cancels both operations running in parallel.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val result = parMapN(
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" }
+ *   ) { a, b ->
+ *       "$a\n$b"
+ *     }
+ *   //sampleEnd
+ *  println(result)
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param f function to map/combine value [A] and [B]
+ * ```
+ *
+ * @see parMapN for the same function that can race on any [CoroutineContext].
+ */
+suspend fun <A, B, C> parMapN(fa: suspend () -> A, fb: suspend () -> B, f: (A, B) -> C): C =
+  parMapN(ComputationPool, fa, fb, f)
+
+/**
+ * Parallel maps [fa], [fb], [fc] in parallel on [ComputationPool].
+ * Cancelling this operation cancels both operations running in parallel.
+ *
+ * @see parMapN for the same function that can race on any [CoroutineContext].
+ */
+suspend fun <A, B, C, D> parMapN(
+  fa: suspend () -> A,
+  fb: suspend () -> B,
+  fc: suspend () -> C,
+  f: (A, B, C) -> D
+): D = parMapN(ComputationPool, fa, fb, fc, f)
+
+/**
+ * Parallel maps [fa], [fb] on the provided [CoroutineContext].
+ * Cancelling this operation cancels both tasks running in parallel.
+ *
+ * **WARNING** this function forks [fa], [fb] but if it runs in parallel depends
+ * on the capabilities of the provided [CoroutineContext].
+ * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
+ *
+ * @see parMapN for a function that ensures it runs in parallel on the [ComputationPool].
+ */
 @Suppress("UNCHECKED_CAST")
-suspend fun <A, B> parTupledN(
+suspend fun <A, B, C> parMapN(
   ctx: CoroutineContext,
   fa: suspend () -> A,
-  fb: suspend () -> B
-): Pair<A, B> =
+  fb: suspend () -> B,
+  f: (A, B) -> C
+): C =
   suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
     val cont = cont.intercepted()
@@ -140,9 +128,9 @@ suspend fun <A, B> parTupledN(
       conn.pop()
       cb(
         try {
-          Result.success(Pair(a, b))
+          Result.success(f(a, b))
         } catch (e: Throwable) {
-          Result.failure<Pair<A, B>>(e.nonFatalOrThrow())
+          Result.failure<C>(e.nonFatalOrThrow())
         }
       )
     }
@@ -151,7 +139,7 @@ suspend fun <A, B> parTupledN(
       is Throwable -> Unit // Do nothing we already finished
       else -> other.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
         conn.pop()
-        cb(Result.failure<Pair<A, B>>(r.fold({ e }, { e2 -> Platform.composeErrors(e, e2) })))
+        cb(Result.failure(r.fold({ e }, { e2 -> Platform.composeErrors(e, e2) })))
       })
     }
 
@@ -185,20 +173,22 @@ suspend fun <A, B> parTupledN(
   }
 
 /**
- * Tuples [fa], [fb] & [fc] on the provided [CoroutineContext].
+ * Parallel maps [fa], [fb], [fc] on the provided [CoroutineContext].
  * Cancelling this operation cancels both tasks running in parallel.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING** this function forks [fa], [fb] & [fc] but if it runs in parallel depends
+ * on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
- * @see parTupledN for a function that ensures it runs in parallel on the [ComputationPool].
+ * @see parMapN for a function that ensures it runs in parallel on the [ComputationPool].
  */
-suspend fun <A, B, C> parTupledN(
+suspend fun <A, B, C, D> parMapN(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B,
-  fc: suspend () -> C
-): Triple<A, B, C> =
+  fc: suspend () -> C,
+  f: (A, B, C) -> D
+): D =
   suspendCoroutineUninterceptedOrReturn { cont ->
     val conn = cont.context.connection()
     val cont = cont.intercepted()
@@ -217,7 +207,7 @@ suspend fun <A, B, C> parTupledN(
 
     fun complete(a: A, b: B, c: C) {
       conn.pop()
-      cb(Result.success(Triple(a, b, c)))
+      cb(Result.success(f(a, b, c)))
     }
 
     fun tryComplete(result: Triple<A?, B?, C?>?): Unit {
