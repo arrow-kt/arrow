@@ -10,20 +10,28 @@ jobs:
       JAVA_OPTS: -Xms512m -Xmx1024m
 
     runs-on: macos-latest
+    timeout-minutes: 90
 
     steps:
     - uses: actions/checkout@v2
     - name: Validate Gradle Wrapper
       uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+        git clone https://github.com/arrow-kt/arrow.git $BASEDIR/arrow --depth 1 --no-single-branch
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        updateOrchestrator $BRANCH_NAME
     - name: Install
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         BRANCH_NAME=${{ github.event.pull_request.head.ref }}
-        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB $BRANCH_NAME
+        $BASEDIR/arrow/scripts/action-install.sh arrow-examples $BRANCH_NAME
+        $BASEDIR/arrow/scripts/project-install.sh arrow/BOM-file
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        replaceGlobalPropertiesbyLocalConf $BASEDIR/arrow-examples/gradle.properties
     - name: Build with Gradle
       run: ./gradlew build
