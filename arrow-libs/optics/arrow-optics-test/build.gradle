@@ -1,15 +1,9 @@
 plugins {
-    id "maven-publish"
-    id "base"
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-    id "net.rdrei.android.buildtimetracker"
     id "org.jlleitschuh.gradle.ktlint"
-    id "ru.vyarus.animalsniffer"
 }
 
-apply from: "$SUBPROJECT_CONF"
-apply from: "$PUBLISH_CONF"
+apply from: "$SUB_PROJECT"
 
 dependencies {
     compile project(":arrow-optics")
@@ -18,6 +12,4 @@ dependencies {
     compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
 
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
