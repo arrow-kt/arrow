@@ -1,14 +1,9 @@
 plugins {
-    id "maven-publish"
-    id "base"
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-    id "org.jetbrains.dokka"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$DOC_CONF"
-apply from: "$PUBLISH_CONF"
+apply from: "$DOC_CREATION"
 
 dependencies {
     compile "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
@@ -17,5 +12,4 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"
     runtime "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     runtime "org.jetbrains.kotlin:kotlin-scripting-compiler:$KOTLIN_VERSION"
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
