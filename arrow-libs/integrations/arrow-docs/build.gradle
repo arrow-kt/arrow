@@ -8,14 +8,13 @@ buildscript {
 }
 
 plugins {
-    id "base"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
-    id "ru.vyarus.animalsniffer"
 }
 
-apply from: "$SUBPROJECT_CONF"
+apply from: "$SUB_PROJECT"
+apply from: "$DOC_VALIDATION"
 
 dependencies {
     compile "io.arrow-kt:arrow-optics-mtl:$VERSION_NAME"
@@ -30,12 +29,4 @@ dependencies {
     compile "io.arrow-kt:arrow-recursion:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
-}
-
-apply plugin: 'ank-gradle-plugin'
-
-ank {
-    source = file("${projectDir}/docs")
-    target = file("${projectDir}/build/site")
-    classpath = sourceSets.main.runtimeClasspath
 }

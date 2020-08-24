@@ -3,18 +3,20 @@ buildscript {
 }
 
 plugins {
-    id "maven-publish"
-    id "base"
     id "org.jetbrains.kotlin.jvm" version "$KOTLIN_VERSION"
-    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION"
-    id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
+    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION" apply false
     id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION"
-    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION"
+    id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
+    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
 }
 
-apply from: "$GENERIC_CONF"
+apply from: "$ROOT_PROJECT"
 
 subprojects {
+    // -- Artifacts publication
+    apply from: "$PUBLICATION"
+
+    // -- Gradle Animal Sniffer Plugin: https://github.com/xvik/gradle-animalsniffer-plugin
     apply plugin: 'ru.vyarus.animalsniffer'
     apply plugin: 'java'
     dependencies {
