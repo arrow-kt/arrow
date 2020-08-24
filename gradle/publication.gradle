@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+apply plugin: 'java'
+apply plugin: 'maven'
+
+// -- publishToMavenLocal
+apply plugin: 'maven-publish'
 publishing {
     publications {
         maven(MavenPublication) {
@@ -22,4 +27,14 @@ publishing {
     }
 }
 
-apply from: 'https://raw.githubusercontent.com/arrow-kt/arrow/master/gradle/gradle-mvn-push.gradle'
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource, 'build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/main'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+apply from: 'https://raw.githubusercontent.com/arrow-kt/arrow/master/gradle/publication-details.gradle'

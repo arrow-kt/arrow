@@ -5,7 +5,7 @@ set -e
 
 ARROW_LIB=$1
 
-replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
+replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
     checkAndDownloadViaHTTPS $lib master

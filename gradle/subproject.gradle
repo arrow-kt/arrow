@@ -14,6 +14,29 @@
  * limitations under the License.
  */
 
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += ["-Xskip-runtime-version-check"]
+    }
+    sourceCompatibility = JAVA_VERSION
+    targetCompatibility = JAVA_VERSION
+}
+
+compileTestKotlin {
+    sourceCompatibility = JAVA_VERSION
+    targetCompatibility = JAVA_VERSION
+}
+
+ktlint {
+    version = KTLINT_VERSION
+}
+
+clean.doFirst {
+    delete "${projectDir}/docs/apidocs"
+}
+
+archivesBaseName = POM_ARTIFACT_ID
+
 test {
     useJUnitPlatform()
     testLogging {
@@ -24,4 +47,8 @@ test {
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+tasks.withType(Test) {
+    maxParallelForks = Runtime.runtime.availableProcessors()
 }

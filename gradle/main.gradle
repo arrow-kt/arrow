@@ -22,44 +22,6 @@ allprojects {
     }
 }
 
-subprojects { project ->
-
-    clean.doFirst {
-        delete "${projectDir}/docs/apidocs"
-    }
-
-    group = GROUP
-    version = VERSION_NAME
-
-    ktlint {
-        version = KTLINT_VERSION
-    }
-
-    archivesBaseName = POM_ARTIFACT_ID
-
-    compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
-
-    tasks.withType(Test) {
-        maxParallelForks = Runtime.runtime.availableProcessors()
-    }
-
-    sourceCompatibility = JAVA_VERSION
-    targetCompatibility = JAVA_VERSION
-}
-
-configurations {
-    buildableProjects
-}
-
-dependencies {
-    buildableProjects(subprojects)
-}
-
-wrapper {
-    gradleVersion = "6.0.1"
-    distributionType = Wrapper.DistributionType.ALL
-}
-
 ext {
     ARROW_GROUP = "Arrow"
     ARROW_DOC_GROUP = "Arrow (documentation)"

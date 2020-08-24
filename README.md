@@ -82,7 +82,7 @@ We'll be working on a Arrow-Android integration module that adds some helpers an
 
 #### Basic Setup
 
-In your project's root `build.gradle` append these repositories to your list:
+In your project's root `build.gradle`, append these repositories to your list:
 
 ```groovy
 allprojects {
@@ -152,11 +152,11 @@ dependencies {
 
 ##### Other libraries
 
-Here is the complete [library list]({{ '/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
+Here is the complete [library list](https://arrow-kt.io/docs/quickstart/libraries/) for a more granular dependency set-up.
 
 #### Additional Setup
 
-For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
+For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
 the setup below is also required:
 
 Add the dependencies into the project's `build.gradle`
@@ -198,6 +198,20 @@ idea {
     }
 }
 ```
+#### BOM file
+
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
+```
+    implementation platform("io.arrow-kt:arrow-stack:$arrow_version")
+
+    implementation "io.arrow-kt:arrow-core"
+    implementation "io.arrow-kt:arrow-fx"
+    implementation "io.arrow-kt:arrow-syntax"
+    ...
+```
+
+[Example of use](https://github.com/arrow-kt/arrow-examples/blob/master/build.gradle)
 
 ### Maven
  
@@ -227,7 +241,7 @@ Add the dependencies that you want to use
 
 #### Enabling kapt
 
-Enable annotation processing using kotlin plugin 
+Enable annotation processing using Kotlin plugin:
 ```xml
 <plugin>
     <groupId>org.jetbrains.kotlin</groupId>
@@ -274,6 +288,28 @@ Enable annotation processing using kotlin plugin
     </executions>
 </plugin>
 ```
+
+#### BOM file
+
+To avoid specifying the Arrow version for every dependency, a BOM file is available:
+
+```
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.arrow-kt</groupId>
+        <artifactId>arrow-stack</artifactId>
+        <version>${arrow.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    ...
+  </dependencies>
+```
+
 ## License
 
     Copyright (C) 2017 The Λrrow Authors

@@ -14,9 +14,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Checkout orchestrator
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+        BRANCH_NAME=${{ github.event.pull_request.head.ref }}
+        git clone https://github.com/arrow-kt/arrow.git $BASEDIR/arrow --depth 1 --no-single-branch
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        updateOrchestrator $BRANCH_NAME
     - name: Check Build Integration
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

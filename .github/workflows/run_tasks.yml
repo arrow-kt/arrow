@@ -1,6 +1,12 @@
 name: "Run Gradle tasks"
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+    - 'gradle.properties'
+    - 'gradle/**'
+    - 'scripts/**'
+    - 'lists/**'
 
 jobs:
   run-tasks:
@@ -24,7 +30,6 @@ jobs:
         sleep 180
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
             checkAndDownloadViaHTTPS $repository $BRANCH_NAME
-            perl -pe "s/git pull//g" -i $BASEDIR/$repository/scripts/checkout-orchestrator.sh
             replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
         done
     - name: Build with local dependencies

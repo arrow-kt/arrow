@@ -13,8 +13,8 @@ for repository in $(cat $BASEDIR/arrow/lists/test.txt); do
     fi
 done
 
-replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
+replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
     installWithLocalConf $lib
 done
-#replaceLocalRepositoryByOSS $BASEDIR/arrow/generic-conf.gradle
+#replaceLocalRepositoryByOSS "$BASEDIR/arrow/gradle/*.gradle"
