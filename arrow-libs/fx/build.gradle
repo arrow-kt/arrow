@@ -1,40 +1,44 @@
 buildscript {
     apply from: "$COMMON_SETUP"
     repositories {
-        jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
+        mavenCentral()
+        google()
     }
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
         classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
+        classpath "com.android.tools.build:gradle:$ANDROID_TOOLS_BUILD_PLUGIN_VERSION"
     }
 }
 
 plugins {
-    id "maven-publish"
-    id "base"
-    id "org.jetbrains.kotlin.jvm" version "$KOTLIN_VERSION"
-    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION"
     id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
-    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION"
-    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION"
+    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION" apply false
+    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
 }
 
-apply from: "$GENERIC_CONF"
+apply from: "$ROOT_PROJECT"
 
-subprojects {
-    apply plugin: 'kotlinx-atomicfu'
-}
-
+// -- Artifacts publication
 configure(subprojects
-            - project("arrow-fx-reactor")
+            - project("arrow-benchmarks-fx")
+            - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
+            - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
+            // - project("arrow-fx-android") // It has its own configuration
+) {
+    apply from: "$PUBLICATION"
+}
+
+// -- Gradle Animal Sniffer Plugin: https://github.com/xvik/gradle-animalsniffer-plugin
+configure(subprojects
             - project("arrow-benchmarks-fx")
             - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
             - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
             // - project("arrow-fx-android")
-            - project("arrow-fx-coroutines")) 
-{
+            - project("arrow-fx-coroutines")
+            - project("arrow-fx-reactor")
+) {
     apply plugin: 'ru.vyarus.animalsniffer'
     apply plugin: 'java'
 

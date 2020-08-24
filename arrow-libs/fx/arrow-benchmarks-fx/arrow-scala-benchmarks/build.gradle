@@ -1,15 +1,10 @@
 plugins {
-    id "base"
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-    id "org.jetbrains.dokka"
     id "org.jlleitschuh.gradle.ktlint"
-    id "ru.vyarus.animalsniffer"
     id "scala"
 }
 
-apply from: "$SUBPROJECT_CONF"
-apply from: "$DOC_CONF"
+apply from: "$SUB_PROJECT"
 
 dependencies {
     api "org.scala-lang:scala-library:$SCALA_LIBRARY_VERSION"

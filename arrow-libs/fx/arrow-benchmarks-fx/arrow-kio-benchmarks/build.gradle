@@ -1,13 +1,9 @@
 plugins {
-    id "base"
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-    id "org.jetbrains.dokka"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
-apply from: "$SUBPROJECT_CONF"
-apply from: "$DOC_CONF"
+apply from: "$SUB_PROJECT"
 
 dependencies {
     compile "it.msec:kio:$MSEC_KIO_VERSION"

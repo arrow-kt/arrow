@@ -1,14 +1,11 @@
 plugins {
-    id "maven-publish"
-    id "base"
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
-    id "ru.vyarus.animalsniffer"
 }
 
-apply from: "$SUBPROJECT_CONF"
-apply from: "$PUBLISH_CONF"
+apply plugin: 'kotlinx-atomicfu'
+
+apply from: "$SUB_PROJECT"
 
 dependencies {
     compile project(":arrow-fx")
@@ -16,5 +13,4 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
