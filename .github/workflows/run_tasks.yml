@@ -15,7 +15,7 @@ jobs:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 90
 
     steps:
