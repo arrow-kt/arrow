@@ -6,9 +6,9 @@ on:
     - master
     paths:
     - 'gradle.properties'
-    - '**.gradle'
+    - 'gradle/**'
     - 'scripts/**'
-    - 'bom-creation/**'
+    - 'BOM-file/**'
 
 jobs:
   publish-arrow-stack:
@@ -37,7 +37,7 @@ jobs:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: ./gradlew publish
-      working-directory: bom-creation
+      working-directory: BOM-file
     - name: "Publish into Bintray"
       if: steps.versions.outputs.new-version-exists == '1'
       env:
@@ -48,5 +48,5 @@ jobs:
         perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         . scripts/commons4gradle.sh
         useLocalSetup
-        cd bom-creation
+        cd BOM-file
         ./gradlew publish

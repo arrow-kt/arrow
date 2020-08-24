@@ -2,10 +2,11 @@ name: "Check Doc Integration"
 
 on:
   pull_request:
-    paths-ignore:
-    - 'docs/**'
-    - 'templates/**'
-    - '**.md'
+    paths:
+    - 'gradle.properties'
+    - 'gradle/**'
+    - 'scripts/**'
+    - 'lists/**'
 
 jobs:
   check-doc-integration:

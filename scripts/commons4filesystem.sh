@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export OUTPUT_FILE=$BASEDIR/output.log
 export ERRORLOG_FILE=$BASEDIR/error.log
 export RESULT_FILE=$BASEDIR/result.log
 export EXIT_CODE=0
@@ -19,46 +18,57 @@ function printHeaderSeparator()
 
 function showFile()
 {
-    if [ -f $2 ]; then
+    TITLE=$1
+    LOGFILE=$2
+
+    if [ -f $LOGFILE ]; then
         echo ""
         printFileHeaderSeparator
-        echo $1
+        echo $TITLE
         printFileHeaderSeparator
         echo ""
-        cat $2
+        cat $LOGFILE
     fi
 }
 
 function showFiles()
 {
-    showFile "OUTPUT" $OUTPUT_FILE
     showFile "ERROR LOG" $ERRORLOG_FILE
     showFile "RESULT" $RESULT_FILE 
 }
 
 function saveTmpFile()
 {
-    printHeader "$1" "$2" >> $3
-    cat $3.tmp >> $3
+    REPOSITORY=$1
+    ACTION=$2
+    LOGFILE=$3
+
+    printHeader "$REPOSITORY" "$ACTION" >> $LOGFILE
+    cat $LOGFILE.tmp >> $LOGFILE
 }
 
 function saveResult()
 {
-    saveTmpFile "$2" "$3" $OUTPUT_FILE
-    if [[ $1 -eq 0 ]]; then
-        printf "%-30s\t%-20s\t%-20s\n" "$3" "$2" "OK" >> $RESULT_FILE
+    EXIT_CODE=$1
+    REPOSITORY=$2
+    ACTION=$3
+    
+    if [[ $EXIT_CODE -eq 0 ]]; then
+        printf "%-30s\t%-20s\t%-20s\n" "$ACTION" "$REPOSITORY" "OK" >> $RESULT_FILE
     else
-        EXIT_CODE=$1
-        saveTmpFile "$2" "$3" $ERRORLOG_FILE
-        printf "%-30s\t%-20s\t%-20s\n" "$3" "$2" "KO !!" >> $RESULT_FILE
+        saveTmpFile "$REPOSITORY" "$ACTION" $ERRORLOG_FILE
+        printf "%-30s\t%-20s\t%-20s\n" "$ACTION" "$REPOSITORY" "KO !!" >> $RESULT_FILE
     fi
 }
 
 function printHeader()
 {
+    REPOSITORY=$1
+    ACTION=$2
+
     echo ""
     printHeaderSeparator
-    echo "$1 > $2"
+    echo "$REPOSITORY > $ACTION"
     printHeaderSeparator
     echo ""
 }
@@ -70,6 +80,10 @@ function exitForResult()
 
 function runAndSaveResult()
 {
-    $3 > $OUTPUT_FILE.tmp 2> $ERRORLOG_FILE.tmp
-    saveResult $? "$1" "$2"
+    REPOSITORY=$1
+    ACTION=$2
+    COMMANDLINE=$3
+    
+    $COMMANDLINE 2> $ERRORLOG_FILE.tmp
+    saveResult $? "$REPOSITORY" "$ACTION"
 }

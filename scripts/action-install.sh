@@ -5,10 +5,8 @@ BRANCH=master
 if [ $# -eq 2 ]; then BRANCH=$2; fi
 
 . $BASEDIR/arrow/scripts/commons4gradle.sh
-updateOrchestrator $BRANCH
-. $BASEDIR/arrow/scripts/commons4gradle.sh
 
-addLocalRepositoryBeforeOSS $BASEDIR/arrow/generic-conf.gradle
+addLocalRepositoryBeforeOSS "$BASEDIR/arrow/gradle/*.gradle"
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 

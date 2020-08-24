@@ -120,19 +120,19 @@ function replaceGlobalPropertiesbyLocalConf()
 {
     echo "Replacing global properties by local conf ($1) ..."
     perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $1
-    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/gradle/*.gradle
 }
 
 function replaceLocalConfbyGlobalProperties()
 {
     echo "Replacing local conf by global properties ($1) ..."
     perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $1
-    perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $BASEDIR/arrow/setup.gradle
+    perl -pe "s/$(escapeURL $NEW_DIR)/$(escapeURL $OLD_DIR)/g" -i $BASEDIR/arrow/gradle/*.gradle
 }
 
 function useLocalSetup()
 {
-    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/setup.gradle
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/gradle/*.gradle
 }
 
 function manageExitCode()

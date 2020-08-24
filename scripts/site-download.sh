@@ -1,5 +1,6 @@
 #!/bin/bash
 
 set -e
-cd $BASEDIR
-git clone https://github.com/arrow-kt/arrow-site.git
+if [ ! -d $BASEDIR/arrow-site ]; then
+    git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site
+fi

@@ -4,11 +4,9 @@ BRANCH=master
 if [ $# -eq 1 ]; then BRANCH=$1; fi
 
 . $BASEDIR/arrow/scripts/commons4gradle.sh
-updateOrchestrator $BRANCH
-. $BASEDIR/arrow/scripts/commons4gradle.sh
 . $BASEDIR/arrow/scripts/commons4filesystem.sh
 
-replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
+replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 
 $BASEDIR/arrow/scripts/site-download.sh
 runAndSaveResult "Site" "Run Ank" "$BASEDIR/arrow/scripts/site-run-ank.sh"

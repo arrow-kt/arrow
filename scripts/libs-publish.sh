@@ -3,7 +3,7 @@
 set -e
 . $BASEDIR/arrow/scripts/commons4gradle.sh
 
-replaceOSSbyLocalRepository $BASEDIR/arrow/generic-conf.gradle
+replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
     checkAndDownloadViaHTTPS $lib master

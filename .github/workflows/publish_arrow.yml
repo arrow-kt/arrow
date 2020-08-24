@@ -6,7 +6,7 @@ on:
     - master
     paths:
     - 'gradle.properties'
-    - '**.gradle'
+    - 'gradle/**'
     - 'scripts/**'
 
 jobs:

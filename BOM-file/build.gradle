@@ -1,5 +1,5 @@
 buildscript {
-    apply from: rootProject.file('../setup.gradle')
+    apply from: rootProject.file('../gradle/setup.gradle')
 }
 
 plugins {
