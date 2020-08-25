@@ -12,7 +12,6 @@ import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
 import arrow.core.ForSequenceK
 import arrow.core.ForSetK
-import arrow.core.ForTry
 import arrow.core.Hashed
 import arrow.core.Id
 import arrow.core.Ior
@@ -26,8 +25,6 @@ import arrow.core.SequenceK
 import arrow.core.SetK
 import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
-import arrow.core.Success
-import arrow.core.Try
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
 import arrow.typeclasses.Hash
@@ -107,14 +104,6 @@ fun <A> Const.Companion.genK(genA: Gen<A>) = object : GenK<ConstPartialOf<A>> {
     genA.map {
       Const<A, T>(it)
     }
-}
-
-fun Try.Companion.genK() = object : GenK<ForTry> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForTry, A>> =
-    Gen.oneOf(
-      gen.map {
-        Success(it)
-      }, Gen.throwable().map { Try.Failure(it) })
 }
 
 fun Hashed.Companion.genK() = object : GenK<ForHashed> {

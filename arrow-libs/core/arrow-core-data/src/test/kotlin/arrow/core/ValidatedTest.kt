@@ -184,11 +184,6 @@ class ValidatedTest : UnitSpec() {
 
     data class MyException(val msg: String) : Exception()
 
-    "fromTry should return Valid if is Success or Failure otherwise" {
-      Validated.fromTry(Success(10)) shouldBe Valid(10)
-      Validated.fromTry<Int>(Failure(MyException(""))) shouldBe Invalid(MyException(""))
-    }
-
     "fromEither should return Valid if is Either.Right or Failure otherwise" {
       Validated.fromEither(Right(10)) shouldBe Valid(10)
       Validated.fromEither(Left(10)) shouldBe Invalid(10)

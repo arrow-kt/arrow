@@ -6,6 +6,9 @@ fun <I, O> ((I) -> O).k(): Function1<I, O> = Function1(this)
 
 operator fun <I, O> Function1Of<I, O>.invoke(i: I): O = this.fix().f(i)
 
+@Deprecated(
+  "Function1 will be deleted soon as the API will be provided by Meta without the need of wrappers"
+)
 @higherkind
 class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 

@@ -8,6 +8,9 @@ fun <A> (() -> A).k(): Function0<A> = Function0(this)
 
 operator fun <A> Function0Of<A>.invoke(): A = this.fix().f()
 
+@Deprecated(
+  "Function0 will be deleted soon as the API will be provided by Meta without the need of wrappers"
+)
 @higherkind
 data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 

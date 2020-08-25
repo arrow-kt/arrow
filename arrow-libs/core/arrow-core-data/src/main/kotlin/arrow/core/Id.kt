@@ -43,7 +43,9 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * }
  * ```
  */
-
+@Deprecated(
+  "Id will be deleted soon as the API will be provided by Meta without the need of wrappers"
+)
 @higherkind
 data class Id<out A>(private val value: A) : IdOf<A> {
 

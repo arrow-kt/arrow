@@ -5,7 +5,6 @@ import arrow.core.Const
 import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
-import arrow.core.Failure
 import arrow.core.Hashed
 import arrow.core.Id
 import arrow.core.Ior
@@ -18,8 +17,6 @@ import arrow.core.Right
 import arrow.core.SequenceK
 import arrow.core.SetK
 import arrow.core.SortedMapK
-import arrow.core.Success
-import arrow.core.Try
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -149,9 +146,6 @@ fun <E, A> Gen<E>.or(genA: Gen<A>): Gen<Either<E, A>> = Gen.either(this, genA)
 
 fun <E, A> Gen.Companion.validated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
   Gen.either(genE, genA).map { Validated.fromEither(it) }
-
-fun <A> Gen.Companion.`try`(genA: Gen<A>, genThrowable: Gen<Throwable> = throwable()): Gen<Try<A>> =
-  Gen.either(genThrowable, genA).map { it.fold({ Failure(it) }, { Success(it) }) }
 
 fun <A> Gen.Companion.nonEmptyList(gen: Gen<A>): Gen<NonEmptyList<A>> =
   gen.flatMap { head -> Gen.list(gen).map { NonEmptyList(head, it) } }

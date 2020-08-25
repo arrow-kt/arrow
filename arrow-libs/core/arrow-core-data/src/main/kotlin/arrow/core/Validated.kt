@@ -652,12 +652,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     fun <E, A> validNel(a: A): ValidatedNel<E, A> = Valid(a)
 
-    @Deprecated(
-      "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or an effect handler like IO",
-      ReplaceWith("fromEither(t)")
-    )
-    fun <A> fromTry(t: Try<A>): Validated<Throwable, A> = t.fold({ Invalid(it) }, { Valid(it) })
-
     /**
      * Converts an `Either<E, A>` to a `Validated<E, A>`.
      */
