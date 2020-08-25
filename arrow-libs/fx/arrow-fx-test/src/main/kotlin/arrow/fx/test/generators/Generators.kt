@@ -9,6 +9,7 @@ import arrow.fx.DecisionPartialOf
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.Schedule
+import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.FiberPartialOf
 import arrow.fx.typeclasses.nanoseconds
@@ -21,6 +22,9 @@ fun <F, A, E> Gen<E>.raiseError(AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
   map { AP.raiseError<A>(it) }
 
 fun Gen.Companion.timeUnit(): Gen<TimeUnit> = Gen.from(TimeUnit.values())
+
+fun duration(): Gen<Duration> =
+  Gen.bind(Gen.long(), Gen.timeUnit(), ::Duration)
 
 fun IO.Companion.genK() = object : GenK<ForIO> {
   override fun <A> genK(gen: Gen<A>): Gen<Kind<ForIO, A>> = Gen.oneOf(

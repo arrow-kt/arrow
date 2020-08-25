@@ -20,6 +20,15 @@ data class Duration(val amount: Long, val timeUnit: TimeUnit) {
       else -> d + this // Swap this and d to add to the smaller unit
     }
   }
+
+  operator fun compareTo(d: Duration): Int = run {
+    val comp = timeUnit.compareTo(d.timeUnit)
+    when {
+      comp == 0 -> amount.compareTo(d.amount)
+      comp < 0 -> amount.compareTo(timeUnit.convert(d.amount, d.timeUnit))
+      else -> -d.compareTo(this)
+    }
+  }
 }
 
 operator fun Int.times(d: Duration) = d * this
