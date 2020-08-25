@@ -1,7 +1,6 @@
 package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
-import arrow.core.Try
 import arrow.fx.IO
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.User

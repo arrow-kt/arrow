@@ -3,7 +3,6 @@
 package arrow.typeclasses.solved
 
 import arrow.Kind
-import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
