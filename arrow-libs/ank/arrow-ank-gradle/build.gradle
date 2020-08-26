@@ -4,6 +4,8 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
+apply from: "$SUB_PROJECT"
+
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
@@ -28,4 +30,8 @@ gradlePlugin {
             implementationClass = 'arrow.ank.AnkPlugin'
         }
     }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.matches('.*Plugin.*MavenPublication.*')) { task.enabled = false }
 }
