@@ -7,12 +7,12 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    compile project(":arrow-core-data")
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
-    compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    testCompile project(":arrow-core-test")
-    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
-    testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
-    testCompile "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
+    compileOnly project(":arrow-core-data")
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    compileOnly "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
+    testImplementation project(":arrow-core-test")
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompileOnly "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testImplementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
 }

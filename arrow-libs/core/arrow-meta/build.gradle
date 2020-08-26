@@ -10,28 +10,28 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
-    compile project(':arrow-annotations')
-    compile "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:$KOTLIN_METADATA_VERSION"
-    compile("com.squareup:kotlinpoet:$KOTLIN_POET_VERSION") {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+    api project(':arrow-annotations')
+    api "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:$KOTLIN_METADATA_VERSION"
+    api("com.squareup:kotlinpoet:$KOTLIN_POET_VERSION") {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
     }
-    compile "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+    api "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
 
     //To generate stubs for data classes
     kaptTest "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
-    testCompile "com.google.testing.compile:compile-testing:$GOOGLE_COMPILE_TESTING_VERSION"
-    testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
-    testCompile project(":arrow-meta:arrow-meta-test-models")
-    testCompile("junit:junit:$JUNIT_VERSION")
-    testRuntime("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
-    testCompile "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow
+    testCompileOnly "com.google.testing.compile:compile-testing:$GOOGLE_COMPILE_TESTING_VERSION"
+    testCompileOnly fileTree(dir: './src/test/libs', includes: ['*.jar'])
+    testCompileOnly project(":arrow-meta:arrow-meta-test-models")
+    testCompileOnly("junit:junit:$JUNIT_VERSION")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION")
+    testImplementation "io.kotlintest:kotlintest-runner-junit4:$KOTLIN_TEST_VERSION", excludeArrow
     def toolsJar = Jvm.current().getToolsJar()
 
     if (!toolsJar)
         throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
                 "Building with a JRE or JDK9 is currently not supported.")
-    testCompile files(toolsJar)
+    testCompileOnly files(toolsJar)
 }

@@ -7,6 +7,6 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
-    compile "io.kindedj:kindedj:$KINDEDJ_VERSION"
+    api "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+    api "io.kindedj:kindedj:$KINDEDJ_VERSION"
 }

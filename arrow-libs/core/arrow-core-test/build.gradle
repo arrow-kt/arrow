@@ -7,11 +7,11 @@ plugins {
 apply from: "$SUB_PROJECT"
 
 dependencies {
-    compile project(":arrow-core")
-    compile project(":arrow-core-data")
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
-    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    api project(":arrow-core")
+    api project(":arrow-core-data")
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+    api "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     kapt project(":arrow-meta")
 }

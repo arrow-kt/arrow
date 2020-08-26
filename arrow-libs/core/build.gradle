@@ -20,7 +20,9 @@ plugins {
 apply from: "$ROOT_PROJECT"
 
 // -- Artifacts publication
-subprojects {
+configure(subprojects
+            - project("arrow-meta:arrow-meta-test-models")
+) {
     apply from: "$PUBLICATION"
 }
 
@@ -34,9 +36,8 @@ configure(subprojects
     animalsniffer { // Ingore tests
         sourceSets = [sourceSets.main]
     }
-
     dependencies {
-        implementation "org.codehaus.mojo:animal-sniffer-annotations:1.19"
+        compileOnly "org.codehaus.mojo:animal-sniffer-annotations:1.19"
         signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
     }
 }

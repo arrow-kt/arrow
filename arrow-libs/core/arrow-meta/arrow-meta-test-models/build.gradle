@@ -7,9 +7,9 @@ plugins {
 apply from: "$DOC_CREATION"
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
     kapt "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"
-    compile project(":arrow-annotations")
-    compile project(":arrow-core")
+    compileOnly project(":arrow-annotations")
+    compileOnly project(":arrow-core")
 }
