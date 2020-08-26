@@ -15,14 +15,55 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'maven'
-
-// -- publishToMavenLocal
 apply plugin: 'maven-publish'
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
+
+afterEvaluate {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                pom {
+                    groupId = GROUP
+                    artifactId = POM_ARTIFACT_ID
+                    version = VERSION_NAME
+
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+    
+                    artifact sourcesJar
+                    artifact javadocJar
+                    from components.java
+    
+                    scm {
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                    }
+                    licenses {
+                        license {
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                            distribution = POM_LICENCE_DIST
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
+                        }
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                credentials {
+                    username "$System.env.BINTRAY_USER"
+                    password "$System.env.BINTRAY_API_KEY"
+                }
+                url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
+            }
         }
     }
 }
@@ -36,5 +77,3 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
-
-apply from: 'https://raw.githubusercontent.com/arrow-kt/arrow/master/gradle/publication-details.gradle'
