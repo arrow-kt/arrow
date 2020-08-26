@@ -93,11 +93,13 @@ task androidJavadocs(type: Javadoc) {
 }
 
 task javadocJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc'
+    //noinspection GroovyAccessibility //alternatively replace this with archiveClassifier.set('...')
+    archiveClassifier = 'javadoc'
     from androidJavadocs.destinationDir
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    //noinspection GroovyAccessibility //alternatively replace this with archiveClassifier.set('...')
+    archiveClassifier = 'sources'
     from android.sourceSets.main.java.srcDirs
 }
