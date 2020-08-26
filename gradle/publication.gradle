@@ -69,11 +69,13 @@ afterEvaluate {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    //noinspection GroovyAccessibility //alternatively replace this with archiveClassifier.set('...')
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource, 'build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/main'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    //noinspection GroovyAccessibility //alternatively replace this with archiveClassifier.set('...')
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
