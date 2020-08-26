@@ -2,9 +2,12 @@ package arrow.fx.coroutines.stream.concurrent
 
 import arrow.core.Option
 import arrow.fx.coroutines.ForkAndForget
+import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.StreamSpec
 import arrow.fx.coroutines.milliseconds
+import arrow.fx.coroutines.seconds
+import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.stream.Stream
 import arrow.fx.coroutines.stream.append
 import arrow.fx.coroutines.stream.noneTerminate
@@ -18,6 +21,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
+import kotlin.math.max
 
 class QueueTest : StreamSpec(spec = {
 
@@ -187,5 +191,95 @@ class QueueTest : StreamSpec(spec = {
       q.enqueue1(2)
       q.dequeue1() shouldBe 1
     }
+  }
+
+  "Queue.bounded with capacity can always take tryOffer1" {
+    checkAll(Arb.int()) { i ->
+      val q = Queue.bounded<Int>(1)
+
+      q.tryOffer1(i) shouldBe true
+      q.dequeue().take(1).toList() shouldBe listOf(i)
+    }
+  }
+
+  "Queue.bounded with outstanding taker received tryOffer1 value" {
+    checkAll(Arb.int()) { i ->
+      val q = Queue.bounded<Int>(1)
+      val start = Promise<Unit>()
+
+      val f = ForkAndForget {
+        start.complete(Unit)
+        q.dequeue1()
+      }
+
+      start.get()
+
+      q.tryOffer1(i) shouldBe true
+      f.join() shouldBe i
+    }
+  }
+
+  "Queue.bounded producer/consumer" {
+    checkAll(Arb.stream(Arb.int())) { s ->
+      val expected = s.toList()
+      val n = expected.size
+      val q = Queue.bounded<Int>(n)
+
+      Stream(
+        q.dequeue(),
+        s.through(q.enqueue()).void()
+      ).parJoinUnbounded()
+        .take(n)
+        .toList() shouldBe expected
+    }
+  }
+
+  "Queue.bounded none terminating producer/consumer" {
+    checkAll(Arb.stream(Arb.int())) { s ->
+      val expected = s.toList()
+
+      // Queue.bounded requires minimum size of 1
+      val n = max(expected.size, 1)
+      val q = Queue.bounded<Option<Int>>(n)
+
+      q.dequeue()
+        .terminateOnNone()
+        .concurrently(
+          s.noneTerminate()
+            .through(q.enqueue())
+        ).toList() shouldBe s.toList()
+    }
+  }
+
+  "Queue.bounded(0) with outstanding taker cannot offer" {
+    val q = Queue.bounded<Int>(0)
+    val taker = ForkConnected { q.dequeue1() }
+    sleep(1.seconds)
+    q.tryOffer1(1) shouldBe false
+  }
+
+  "Queue.synchronous consumer / producer" {
+    checkAll(Arb.stream(Arb.int())) { s ->
+      val q = Queue.synchronous<Option<Int>>()
+
+      q.dequeue()
+        .terminateOnNone()
+        .concurrently(
+          s.noneTerminate()
+            .through(q.enqueue())
+        ).toList() shouldBe s.toList()
+    }
+  }
+
+  "Queue.synchronous without outstanding taker cannot tryOffer1" {
+    val q = Queue.synchronous<Int>()
+    q.tryOffer1(1) shouldBe false
+  }
+
+  "Queue.synchronous with outstanding taker can tryOffer1" {
+    val q = Queue.synchronous<Int>()
+    ForkConnected { q.dequeue1() }
+    sleep(1.seconds)
+    q.tryOffer1(1) shouldBe true
   }
 })

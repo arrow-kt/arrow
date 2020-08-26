@@ -136,7 +136,36 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
     fun <A> unsafeFairUnbounded(fairSize: Int): Queue<A> =
       fromStrategy(Strategy.fifo<A>().transformSelector { size, _ -> min(size, fairSize) })
 
-    /** Creates a FIFO queue with the specified size bound. */
+    /**
+     * Creates a FIFO queue with the specified size bound.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.fx.coroutines.*
+     * import arrow.fx.coroutines.stream.*
+     * import arrow.fx.coroutines.stream.concurrent.*
+     *
+     * suspend fun main(): Unit {
+     *   val q = Queue.bounded<Int>(10)
+     *   Stream(
+     *     Stream.range(0..100)
+     *       .through(q.enqueue())
+     *       .void(),
+     *     q.dequeue()
+     *   ).parJoinUnbounded()
+     *     .take(100)
+     *     .toList().let(::println) // [0, 1, 2, .., 99]
+     *
+     *   val alwaysEmpty = Queue.bounded<Int>(0)
+     *   ForkConnected { alwaysEmpty.dequeue1() }
+     *   alwaysEmpty.tryOffer1(1).let(::println) // false
+     * }
+     * ```
+     *
+     * A size <= 0, will not allow any elements to pass through the [Queue],
+     * in that case it will always return `false` for `tryOffer1`.
+     *
+     * @see Queue.synchronous If you need a [Queue] that suspends until both a [dequeue] & [enqueue] happen, or handshake.
+     */
     suspend fun <A> bounded(maxSize: Int): Queue<A> =
       fromStrategy(Strategy.boundedFifo(maxSize))
 
@@ -164,7 +193,11 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
     fun <A> unsafeFairBounded(maxSize: Int, fairSize: Int): Queue<A> =
       fromStrategy(Strategy.boundedFifo<A>(maxSize).transformSelector { size, _ -> min(size, fairSize) })
 
-    /** Creates a queue which allows at most a single element to be enqueued at any time. */
+    /**
+     * Creates a [Queue] in which each [enqueue] operation must wait for a corresponding [dequeue] operation, and vice versa.
+     * In other words, [dequeue] and [enqueue] need to shake hands, or meet, before the value is successfully passed along.
+     * Works like functional suspending version [java.util.concurrent.SynchronousQueue].
+     */
     suspend fun <A> synchronous(): Queue<A> =
       fromStrategy(Strategy.synchronous())
 

@@ -731,7 +731,7 @@ internal class DefaultPubSub<I, O, QS, S>(private val strategy: PubSub.Strategy<
       }
     }
 
-  private suspend fun streamingGet(token: Token, selector: S) =
+  private suspend fun streamingGet(token: Token, selector: S): O =
     modify<O> { ps ->
       val (ps, option) = tryGet_(selector, ps)
       when (option) {
