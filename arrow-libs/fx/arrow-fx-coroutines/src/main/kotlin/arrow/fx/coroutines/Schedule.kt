@@ -20,6 +20,8 @@ import kotlin.random.Random
  *
  * [Schedule] allows you to define and compose powerful yet simple policies, which can be used to either repeat or retry computation.
  *
+ * > [Schedule] has been derived from scalaz zio's [Schedule](https://zio.dev/docs/datatypes/datatypes_schedule) datatype and has been adapted to kotlin.
+ *
  * The two core methods of running a schedule are:
  * - __retry__: The effect is executed once, and if it fails, it will be reattempted based on the scheduling policy passed as an argument. It will stop if the effect ever succeeds, or the policy determines it should not be reattempted again.
  * - __repeat__: The effect is executed once, and if it succeeds, it will be executed again based on the scheduling policy passed as an argument. It will stop if the effect ever fails, or the policy determines it should not be executed again. It will return the last internal state of the scheduling policy, or the error that happened running the effect.
