@@ -11,10 +11,10 @@ import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 @RestrictsSuspension
 interface EagerBind<F> : BindSyntax<F>
 
-@PublishedApi
-internal class ShortCircuit(val value: Any?) : RuntimeException(null, null) {
+class ShortCircuit(val value: Any?) : RuntimeException(null, null) {
   override fun fillInStackTrace(): Throwable = this
   override fun toString(): String = "ShortCircuit($value)"
+  inline fun <E> resolve(): E = value as E
 }
 
 @Suppress("UNCHECKED_CAST")
