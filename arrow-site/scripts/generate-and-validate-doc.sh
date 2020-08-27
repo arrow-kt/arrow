@@ -16,16 +16,20 @@ cd $BASEDIR/arrow
 git checkout .
 git checkout $VERSION
 perl -pe "s/^VERSION_NAME.*/VERSION_NAME=$VERSION/g" -i gradle.properties
-replaceOSSbyBintrayRepository generic-conf.gradle
+. ./scripts/commons4gradle.sh
+replaceOSSbyBintrayRepository "*.gradle"
+replaceOSSbyBintrayRepository "gradle/*.gradle"
 
 # TODO: Remove when releasing 0.11.0
-cp $BASEDIR/arrow-master/doc-conf.gradle $BASEDIR/arrow/
+cp $BASEDIR/arrow-master/gradle/apidoc-creation.gradle $BASEDIR/arrow/doc-conf.gradle
 
+# TODO: Refactor when releasing 0.11.0
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     cd $BASEDIR/$repository
     git checkout .
     git checkout $(git tag -l --sort=version:refname ${VERSION}* | tail -1)
     replaceGlobalPropertiesbyLocalConf gradle.properties
+    perl -pe "s/$(escapeURL $OLD_DIR)/$(escapeURL $NEW_DIR)/g" -i $BASEDIR/arrow/*.gradle # TODO
     if [ -f arrow-docs/build.gradle ]; then
         replaceOSSbyBintrayRepository arrow-docs/build.gradle
     fi
