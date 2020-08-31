@@ -17,14 +17,18 @@
 compileKotlin {
     kotlinOptions {
         freeCompilerArgs += ["-Xskip-runtime-version-check"]
+        jvmTarget = "1.8"
     }
-    sourceCompatibility = JAVA_VERSION
-    targetCompatibility = JAVA_VERSION
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 compileTestKotlin {
-    sourceCompatibility = JAVA_VERSION
-    targetCompatibility = JAVA_VERSION
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 ktlint {
