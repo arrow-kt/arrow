@@ -10,6 +10,6 @@ This guideline provides all the things to keep in mind when adding a new module:
   - Update [libraries page](https://github.com/arrow-kt/arrow-core/tree/master/arrow-docs/docs/quickstart/libraries)
   - Update [sidebar files](https://github.com/arrow-kt/arrow-site/tree/master/docs/_data)
 - Utilities:
-  - Update BOM file: [build.gradle](https://github.com/arrow-kt/arrow/blob/how-to-add-a-new-module/BOM-file/build.gradle)
+  - Update BOM file: [build.gradle](https://github.com/arrow-kt/arrow/blob/master/BOM-file/build.gradle)
 
 Last things can be automated though it's necessary to update them manually until it's ready.
