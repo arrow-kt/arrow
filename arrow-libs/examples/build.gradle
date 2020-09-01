@@ -11,8 +11,6 @@ plugins {
 
 apply from: "$ROOT_PROJECT"
 
-ktlintTestSourceSetCheck.enabled = false
-
 idea {
     module {
         sourceDirs += files(
@@ -35,12 +33,10 @@ idea {
 }
 
 dependencies {
-
     testImplementation platform("io.arrow-kt:arrow-stack:$VERSION_NAME")
 
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
     kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     testImplementation "io.arrow-kt:arrow-annotations"
     testImplementation "io.arrow-kt:arrow-core"
@@ -57,4 +53,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
