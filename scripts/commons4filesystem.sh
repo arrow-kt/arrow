@@ -49,13 +49,14 @@ function saveTmpFile()
 
 function saveResult()
 {
-    EXIT_CODE=$1
+    PARTIAL_EXIT_CODE=$1
     REPOSITORY=$2
     ACTION=$3
     
-    if [[ $EXIT_CODE -eq 0 ]]; then
+    if [[ $PARTIAL_EXIT_CODE -eq 0 ]]; then
         printf "%-30s\t%-20s\t%-20s\n" "$ACTION" "$REPOSITORY" "OK" >> $RESULT_FILE
     else
+        EXIT_CODE=$PARTIAL_EXIT_CODE
         saveTmpFile "$REPOSITORY" "$ACTION" $ERRORLOG_FILE
         printf "%-30s\t%-20s\t%-20s\n" "$ACTION" "$REPOSITORY" "KO !!" >> $RESULT_FILE
     fi
