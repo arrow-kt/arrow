@@ -37,7 +37,7 @@ class ParJoinTest : StreamSpec(spec = {
     }
   }
 
-  "concurrent flattening" - {
+  "concurrent flattening".config(enabled = false) {
     checkAll(Arb.stream(Arb.stream(Arb.int())), Arb.positiveInts()) { s, n0 ->
       val n = n0 % 20 + 1
       val expected = s.flatten().toSet()

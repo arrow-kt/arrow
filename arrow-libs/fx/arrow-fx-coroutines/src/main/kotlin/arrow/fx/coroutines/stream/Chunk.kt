@@ -339,7 +339,7 @@ abstract class Chunk<out O> {
   inline fun <O2> scanLeftCarry(z: O2, f: (O2, O) -> O2): Pair<Chunk<O2>, O2> =
     scanLeft_(z, false, f)
 
-  protected inline fun <O2> scanLeft_(z: O2, emitFinal: Boolean, f: (O2, O) -> O2): Pair<Chunk<O2>, O2> {
+  @PublishedApi internal inline fun <O2> scanLeft_(z: O2, emitFinal: Boolean, f: (O2, O) -> O2): Pair<Chunk<O2>, O2> {
     val size = if (emitFinal) size() + 1 else size()
     var acc = z
 

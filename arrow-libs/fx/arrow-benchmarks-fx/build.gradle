@@ -14,7 +14,6 @@ buildscript {
 
 plugins {
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
     id "me.champeau.gradle.jmh" version "$JMH_PLUGIN_VERSION"
     id "io.morethan.jmhreport" version "$JMH_REPORT_PLUGIN_VERSION"
@@ -30,7 +29,6 @@ dependencies {
     compile project(":arrow-fx-reactor")
     compile project(":arrow-benchmarks-fx:arrow-scala-benchmarks")
     compile project(":arrow-benchmarks-fx:arrow-kio-benchmarks")
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     compileOnly "org.openjdk.jmh:jmh-core:$JMH_CORE_VERSION"
 }

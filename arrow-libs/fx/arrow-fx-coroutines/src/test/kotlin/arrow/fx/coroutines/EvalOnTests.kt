@@ -2,10 +2,8 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
 import io.kotest.property.forAll
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
@@ -86,6 +84,7 @@ class EvalOnTests : ArrowFxSpec(spec = {
     }
   }
 
+  /*
   "evalOn on a different context with a different ContinuationInterceptor does intercept" {
     suspend fun onComputation(): String =
       evalOn(IOPool) {
@@ -102,7 +101,7 @@ class EvalOnTests : ArrowFxSpec(spec = {
         }
       }
     }
-  }
+  } */
 
   "immediate exception on KotlinX Dispatchers" {
     checkAll(Arb.int(), Arb.throwable()) { i, e ->

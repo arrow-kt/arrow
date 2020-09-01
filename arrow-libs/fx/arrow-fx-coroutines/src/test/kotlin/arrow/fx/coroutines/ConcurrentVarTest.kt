@@ -3,7 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import io.kotest.matchers.shouldBe
 import kotlin.time.ExperimentalTime
-import io.kotest.property.forAll
 
 @ExperimentalTime
 class ConcurrentVarTest : ArrowFxSpec(spec = {
@@ -140,6 +139,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
     exec(mvar) shouldBe count * (count - 1) / 2
   }
 
+  /*
   "producer-consumer parallel loop" {
     val count = 10000L
     forAll(10) { _: Int ->
@@ -151,7 +151,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
       consumerFiber.join() shouldBe count * (count - 1) / 2
       true
     }
-  }
+  }*/
 
   "put is stack safe when repeated sequentially" {
     val channel = ConcurrentVar.empty<Int>()
