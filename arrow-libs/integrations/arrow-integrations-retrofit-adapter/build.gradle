@@ -9,7 +9,6 @@ apply from: "$DOC_CREATION"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
     compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
