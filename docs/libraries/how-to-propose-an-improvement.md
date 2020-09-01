@@ -61,6 +61,12 @@ When creating a pull request, several actions are executed automatically to chec
 
 Besides the required checks, it's necessary to get the approval by one of the members of the Arrow Community.
 
+#### How to download the tests report
+
+Both successful or failed build checks allow to download the tests report to review it:
+
+![how-to-download-tests-report](img/download-report.png)
+
 ### What happens when merging a pull request
 
 When merging the pull request, a new SNAPSHOT library will be published into [OSS repository](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/).
