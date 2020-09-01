@@ -10,9 +10,8 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$KOTLIN_VERSION"
     api project(':arrow-annotations')
-    api "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:$KOTLIN_METADATA_VERSION"
+    api "io.arrow-kt:kotlin-metadata:$KOTLIN_METADATA_VERSION"
     api("com.squareup:kotlinpoet:$KOTLIN_POET_VERSION") {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
     }

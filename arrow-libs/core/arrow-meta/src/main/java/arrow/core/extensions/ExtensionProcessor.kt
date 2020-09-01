@@ -1,6 +1,5 @@
 package arrow.core.extensions
 
-import arrow.common.messager.log
 import arrow.common.utils.knownError
 import arrow.extension
 import arrow.meta.ast.Code
@@ -24,7 +23,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
         val info = annotatedElement.typeElement.typeClassInstance()
-        log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
+        // log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
         val fileSpec = annotatedElement.fileSpecBuilder(info)
         info.processTypeClassExtensions(fileSpec, annotatedElement)
       }

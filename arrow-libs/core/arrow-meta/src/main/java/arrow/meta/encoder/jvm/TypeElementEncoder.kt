@@ -83,8 +83,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
               val typeElement = this@type as TypeElement
               val classBuilder = Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Shape.Class)
               val declaredConstructorSignatures = meta.constructorList.map { it.getJvmConstructorSignature(meta.nameResolver, meta.classProto.typeTable) }
-              val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter {
-                declaredConstructorSignatures.contains(it.jvmMethodSignature)
+              val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter { executableElement ->
+                declaredConstructorSignatures.any { it?.asString() == executableElement.jvmMethodSignature }
               }.mapNotNull { it.asConstructor(this@type) }
               Either.Right(classBuilder.copy(
                 primaryConstructor = constructors.find { it.first }?.second,
@@ -156,8 +156,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.declaredFunctions(declaredElement: TypeElement): List<Func> {
     val declaredFunctionSignatures = meta.functionList.map { it.getJvmMethodSignature(meta.nameResolver, meta.classProto.typeTable) }
-    return allFunctions(declaredElement).filter {
-      declaredFunctionSignatures.contains(it.jvmMethodSignature)
+    return allFunctions(declaredElement).filter { function ->
+      declaredFunctionSignatures.any { it?.asString() == function.jvmMethodSignature }
     }
   }
 
@@ -308,7 +308,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
       val members = filteredMembers.mapNotNull { member ->
         val templateFunction = allFunctions.find { (proto, function) ->
-          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
+          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable)?.asString() == member.jvmMethodSignature
         }
         @Suppress("SwallowedException")
         try {
@@ -386,7 +386,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
   fun ExecutableElement.asConstructor(typeElement: TypeElement): Pair<Boolean, Func>? =
     kotlinMetadataUtils().run {
       typeElement.meta.constructorList.find {
-        it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable) == this@asConstructor.jvmMethodSignature
+        it.getJvmConstructorSignature(typeElement.meta.nameResolver, typeElement.meta.classProto.typeTable)?.asString() == this@asConstructor.jvmMethodSignature
       }?.let { constructor ->
         constructor.isPrimary to
           Func(

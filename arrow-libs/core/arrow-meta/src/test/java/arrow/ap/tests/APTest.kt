@@ -1,7 +1,5 @@
 package arrow.ap.tests
 
-import com.google.common.collect.ImmutableList
-import com.google.common.io.Files
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler.javac
 import com.google.testing.compile.JavaFileObjects
@@ -17,7 +15,7 @@ abstract class APTest(
 
   fun testProcessor(
     vararg processor: AnnotationProcessor,
-    generationDir: File = Files.createTempDir(),
+    generationDir: File = createTempDir(),
     actualFileLocation: (File) -> String = { it.path }
   ) {
 
@@ -40,7 +38,7 @@ abstract class APTest(
 
         val compilation = javac()
           .withProcessors(proc)
-          .withOptions(ImmutableList.of("-Akapt.kotlin.generated=$generationDir", "-proc:only"))
+          .withOptions(listOf("-Akapt.kotlin.generated=$generationDir", "-proc:only"))
           .compile(sources.map {
             val stub = File(stubs, it).toURI().toURL()
             JavaFileObjects.forResource(stub)

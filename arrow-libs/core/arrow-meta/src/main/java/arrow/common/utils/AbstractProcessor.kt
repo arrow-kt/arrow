@@ -31,7 +31,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
     locationName()
       .replacePackageSeparatorsToFolderSeparators()
       .replaceInvalidPathCharacters()
-      .let { "$userDir/build/kdocs/meta/$it.javadoc" }
+      .let { "$tmpDir/build/kdocs/meta/$it.javadoc" }
       .let(::File)
 
   fun Element.kDoc(): String? =
@@ -50,8 +50,8 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
   private fun processElementDoc(e: Element) {
     try {
       val doc = elementUtils.getDocComment(e)
-      val kDocLocation = e.kDocLocation()
       if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
+        val kDocLocation = e.kDocLocation()
         @Suppress("SwallowedException")
         try {
           val path = kDocLocation.toPath()
@@ -62,12 +62,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
           }
           @Suppress("SwallowedException")
           try {
-            Files.delete(path)
-          } catch (e: IOException) {
-          }
-          @Suppress("SwallowedException")
-          try {
-            Files.createFile(path)
+            kDocLocation.createNewFile()
           } catch (e: IOException) {
           }
           kDocLocation.writeText(doc)
@@ -120,7 +115,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
 }
 
-private val userDir get() = System.getProperty("user.dir")
+private val tmpDir get() = System.getProperty("java.io.tmpdir")
 private fun String.replacePackageSeparatorsToFolderSeparators() = replace('.', '/')
 private fun String.replaceInvalidPathCharacters() = replace('?', '_')
 

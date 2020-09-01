@@ -8,11 +8,10 @@ apply from: "$DOC_CREATION"
 
 dependencies {
     compileOnly project(":arrow-core-data")
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     compileOnly "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    testImplementation project(":arrow-core-test")
+    testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    testCompileOnly "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testImplementation project(":arrow-core-test")
     testImplementation "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     testImplementation "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
 }

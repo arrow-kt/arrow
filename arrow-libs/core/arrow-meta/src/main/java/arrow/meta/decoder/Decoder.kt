@@ -79,7 +79,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     val builder = ParameterSpec.builder(
       name = name,
       type = type.lyrics(),
-      modifiers = *modifiers.map { it.lyrics() }.toTypedArray()
+      modifiers = modifiers.map { it.lyrics() }.toTypedArray()
     )
     val builderDefaultValue = if (defaultValue != null) builder.defaultValue(defaultValue.lyrics()) else builder
     return builderDefaultValue.build()
@@ -203,7 +203,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName =
     LambdaTypeName.get(
       receiver = receiverType?.lyrics(),
-      parameters = *parameters.map { it.lyrics() }.toTypedArray(),
+      parameters = parameters.map { it.lyrics() }.toTypedArray(),
       returnType = returnType.lyrics()
     ).copy(suspending = modifiers.contains(Modifier.Suspend))
 

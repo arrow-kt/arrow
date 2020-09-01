@@ -35,6 +35,7 @@ configure(subprojects
 
     animalsniffer { // Ingore tests
         sourceSets = [sourceSets.main]
+        ignore 'java.lang.*'
     }
     dependencies {
         compileOnly "org.codehaus.mojo:animal-sniffer-annotations:1.19"
