@@ -6,6 +6,9 @@ options:
       - title: Getting Started
         url: /fx/
 
+      - title: Coroutines
+        url: /fx/coroutines/
+
       - title: Asynchronous & Concurrent Programming
         url: /fx/async/
 
@@ -37,18 +40,25 @@ options:
       - title: Semaphore
         url: /apidocs/arrow-fx-coroutines/arrow.fx.coroutines/-semaphore/
 
-  - title: Integrations
+  - title: Coroutines Integrations
+
+    nested_options:
+
+      - title: kotlinx.coroutines
+        url: /integrations/kotlinxcoroutines/
+
+  - title: IO Integrations
 
     nested_options:
 
       - title: RxJava2
-        url: /integrations/rx2/
+        url: /io-integrations/rx2/
 
       - title: Reactor
-        url: /integrations/reactor/
+        url: /io-integrations/reactor/
 
       - title: kotlinx.coroutines
-        url: /integrations/kotlinxcoroutines/
+        url: /io-integrations/kotlinxcoroutines/
 
   - title: API Docs
 
