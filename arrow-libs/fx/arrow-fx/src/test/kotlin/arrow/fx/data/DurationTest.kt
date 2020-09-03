@@ -1,21 +1,29 @@
 package arrow.fx.data
 
 import arrow.core.test.UnitSpec
-import io.kotlintest.properties.forAll
+import arrow.core.test.laws.HashLaws
+import arrow.core.test.laws.OrderLaws
+import arrow.core.test.laws.equalUnderTheLaw
+import arrow.fx.extensions.duration.eq.eq
+import arrow.fx.extensions.duration.hash.hash
+import arrow.fx.extensions.duration.order.order
 import arrow.fx.test.generators.duration
+import arrow.fx.typeclasses.Duration
+import io.kotlintest.properties.forAll
 
 class DurationTest : UnitSpec() {
 
   init {
-    "plus should be commutative" {
-      forAll(duration(), duration()) { a, b ->
-        a + b == b + a
-      }
-    }
+    testLaws(
+      OrderLaws.laws(Duration.order(), duration()),
+      HashLaws.laws(Duration.hash(), duration(), Duration.eq())
+      // This fails on overflows on the associativity law
+      // MonoidLaws.laws(Duration.monoid(), duration(), Duration.eq())
+    )
 
-    "comparison should correct in both directions" {
+    "plus is commutative" {
       forAll(duration(), duration()) { a, b ->
-        a < b == b > a
+        (a + b).equalUnderTheLaw(b + a, Duration.eq())
       }
     }
   }
