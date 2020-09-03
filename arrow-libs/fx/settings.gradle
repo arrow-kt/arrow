@@ -2,6 +2,7 @@ rootProject.name = 'arrow-fx-lib'
 
 include 'arrow-fx'
 include 'arrow-fx-coroutines'
+include 'arrow-fx-coroutines-kotlinx-coroutines'
 include 'arrow-fx-reactor'
 include 'arrow-fx-rx2'
 include 'arrow-fx-kotlinx-coroutines'

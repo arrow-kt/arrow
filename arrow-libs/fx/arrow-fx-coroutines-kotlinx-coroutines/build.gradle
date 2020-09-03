@@ -1,0 +1,26 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply from: "$SUB_PROJECT"
+apply from: "$DOC_CREATION"
+
+dependencies {
+    implementation project(':arrow-fx-coroutines')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION"
+    testImplementation "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION"
+    testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
+}
+
+
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
