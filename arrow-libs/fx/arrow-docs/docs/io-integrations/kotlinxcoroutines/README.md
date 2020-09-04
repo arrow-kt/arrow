@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: kotlinx.coroutines
-permalink: /integrations/kotlinxcoroutines/
+permalink: /io-integrations/kotlinxcoroutines/
 ---
 
 # Kotlin Coroutines and runtime support

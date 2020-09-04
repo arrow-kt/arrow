@@ -1,6 +1,7 @@
 ---
 layout: docs-fx
 title: "Kotlin Standard Library and Arrow Fx Coroutines"
+permalink: /fx/coroutines/
 ---
 
 # Kotlin Standard Library & Arrow Fx Coroutines

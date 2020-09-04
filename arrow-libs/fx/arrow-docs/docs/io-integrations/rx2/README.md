@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: RxJava 2
-permalink: /integrations/rx2/
+permalink: /io-integrations/rx2/
 
 ---
 

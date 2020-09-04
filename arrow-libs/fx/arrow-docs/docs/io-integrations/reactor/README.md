@@ -1,7 +1,7 @@
 ---
 layout: docs-fx
 title: Reactor
-permalink: /integrations/reactor/
+permalink: /io-integrations/reactor/
 ---
 
 ## Project Reactor
