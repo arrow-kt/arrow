@@ -13,8 +13,8 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
   fun <B, Z> map2(fb: MapK<K, B>, f: (A, B) -> Z): MapK<K, Z> =
     if (fb.isEmpty()) emptyMap<K, Z>().k()
     else this.map.flatMap { (k, a) ->
-      fb.getOption(k).map { Tuple2(k, f(a, it)) }.k().asIterable()
-    }.k()
+      fb[k]?.let { Pair(k, f(a, it)) }.asIterable()
+    }.toMap().k()
 
   fun <B, Z> map2Eval(fb: Eval<MapK<K, B>>, f: (A, B) -> Z): Eval<MapK<K, Z>> =
     if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
@@ -25,14 +25,14 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 
   fun <B, Z> ap2(f: MapK<K, (A, B) -> Z>, fb: MapK<K, B>): Map<K, Z> =
     f.map.flatMap { (k, f) ->
-      this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }
-        .getOption(k).map { Tuple2(k, it) }.k().asIterable()
-    }.k()
+      this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }[k]
+        ?.let { Pair(k, it) }.asIterable()
+    }.toMap().k()
 
   fun <B> flatMap(f: (A) -> MapK<K, B>): MapK<K, B> =
     this.map.flatMap { (k, v) ->
-      f(v).getOption(k).map { Tuple2(k, it) }.k().asIterable()
-    }.k()
+      f(v)[k]?.let { Pair(k, it) }.asIterable()
+    }.toMap().k()
 
   fun <B> foldRight(b: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.map.values.iterator().iterateRight(b, f)
 
@@ -65,6 +65,7 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 
 fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
 
+@Deprecated("Deprecated, use nullable instead", ReplaceWith("Tuple2<K, A>>?.let { ... }"))
 fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
   when (this) {
     is Some -> mapOf(this.t).k()
@@ -76,6 +77,7 @@ fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K
 
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()
 
+@Deprecated("Deprecated, use nullable instead", ReplaceWith("map[k]?.let { ... }"))
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
 fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (this + (k to value)).k()
@@ -85,6 +87,12 @@ fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -
   this.forEach { result = f(result, it) }
   return result
 }
+
+internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
+  when (this) {
+    null -> emptyList()
+    else -> listOf(this)
+  }
 
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
   this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }

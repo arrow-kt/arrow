@@ -42,7 +42,6 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
-import arrow.typeclasses.hashWithSalt
 import arrow.undocumented
 
 @extension

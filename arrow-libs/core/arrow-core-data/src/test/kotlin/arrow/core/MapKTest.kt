@@ -110,5 +110,47 @@ class MapKTest : UnitSpec() {
         }
       }
     }
+
+    "map2" {
+      forAll(
+        Gen.mapK(Gen.intSmall(), Gen.intSmall()),
+        Gen.mapK(Gen.intSmall(), Gen.intSmall())
+      ) { a, b ->
+        val result = a.map2(b) { left, right -> left + right }
+        val expected: MapK<Int, Int> = a.filter { (k, v) -> b.containsKey(k) }
+          .map { (k, v) -> Tuple2(k, v + b[k]!!) }
+          .let { mapOf(*it.toTypedArray()) }
+        result == expected
+      }
+    }
+
+    "ap2" {
+      forAll(
+        Gen.mapK(Gen.intSmall(), Gen.intSmall()),
+        Gen.mapK(Gen.intSmall(), Gen.intSmall())
+      ) { a, b ->
+        val result = a.ap2(
+          a.map { {x: Int, y: Int -> x + y } },
+          b
+        )
+        val expected: MapK<Int, Int> = a.filter { (k, v) -> b.containsKey(k) }
+          .map { (k, v) -> Tuple2(k, v + b[k]!!) }
+          .let { mapOf(*it.toTypedArray()) }
+        result == expected
+      }
+    }
+
+    "flatMap" {
+      forAll(
+        Gen.mapK(Gen.string(), Gen.intSmall()),
+        Gen.mapK(Gen.string(), Gen.string())
+      ) { a, b ->
+        val result: MapK<String, String> = a.flatMap { b }
+        val expected: MapK<String, String> = a.filter { (k, _) -> b.containsKey(k) }
+          .map { (k, v) -> Tuple2(k, b[k]!!) }
+          .let { mapOf(*it.toTypedArray()) }
+        result == expected
+      }
+    }
   }
 }
