@@ -34,8 +34,39 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
     }
 
+  @Deprecated("Deprecated, use mapNotNull(f: (A) -> B?) instead", ReplaceWith("mapNotNull(f: (A) -> B?)"))
   fun <B> filterMap(f: (A) -> Option<B>): SequenceK<B> =
     map(f).filter { it.isDefined() }.map { it.orNull()!! }.k()
+
+  /**
+   * Returns a [SequenceK] containing the transformed values from the original
+   * [SequenceK] filtering out any null value.
+   *
+   * Example:
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * //sampleStart
+   * val evenStrings = listOf(1, 2).asSequence().k().mapNotNull {
+   *   when (it % 2 == 0) {
+   *     true -> it.toString()
+   *     else -> null
+   *   }
+   * }
+   * //sampleEnd
+   *
+   * fun main() {
+   *   println("evenStrings = $evenStrings")
+   * }
+   * ```
+   */
+  fun <B> mapNotNull(f: (A) -> B?): SequenceK<B> =
+    flatMap { a ->
+      when (val b = f(a)) {
+        null -> empty<B>()
+        else -> just(b)
+      }
+    }
 
   fun toList(): List<A> = this.fix().sequence.toList()
 

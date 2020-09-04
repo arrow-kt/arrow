@@ -156,6 +156,54 @@ class SequenceKTest : UnitSpec() {
         }
       }
     }
+
+    "filterMap" {
+      forAll(Gen.sequenceK(Gen.int())) { a ->
+        val result =
+          a.filterMap {
+            when (it % 2 == 0) {
+              true -> Some(it.toString())
+              else -> None
+            }
+          }
+
+        val expected =
+          a.toList()
+            .mapNotNull {
+              when (it % 2 == 0) {
+                true -> it.toString()
+                else -> null
+              }
+            }
+            .asSequence()
+            .k()
+
+        result.toList() == expected.toList()
+      }
+    }
+
+    "mapNotNull" {
+      forAll(Gen.sequenceK(Gen.int())) { a ->
+        val result = a.mapNotNull {
+          when (it % 2 == 0) {
+            true -> it.toString()
+            else -> null
+          }
+        }
+        val expected =
+          a.toList()
+            .mapNotNull {
+              when (it % 2 == 0) {
+                true -> it.toString()
+                else -> null
+              }
+            }
+            .asSequence()
+            .k()
+
+        result.toList() == expected.toList()
+      }
+    }
   }
 
   private fun bijection(from: Kind<ForSequenceK, Tuple2<Tuple2<Int, Int>, Int>>): SequenceK<Tuple2<Int, Tuple2<Int, Int>>> =
