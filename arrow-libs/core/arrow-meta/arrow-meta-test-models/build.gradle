@@ -5,6 +5,7 @@ plugins {
 }
 
 apply from: "$DOC_CREATION"
+apply from: "$SUB_PROJECT"
 
 dependencies {
     compileOnly "com.google.auto.service:auto-service:$GOOGLE_AUTO_SERVICE_VERSION"

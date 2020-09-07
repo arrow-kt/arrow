@@ -128,20 +128,16 @@ fun Filer.writeSafe(
   logger: ((message: CharSequence) -> Unit)? = null,
   vararg originatingElements: Element?
 ) = catchDoubleAttempt({
-  val filerSourceFile = createResource(
-    StandardLocation.SOURCE_OUTPUT,
-    pkg,
-    "$name.kt",
-    *originatingElements
-  )
-  try {
-    filerSourceFile.openWriter().use { writer -> writer.append(fileString) }
-  } catch (e: Exception) {
-    try {
-      filerSourceFile.delete()
-    } catch (ignored: Exception) {
+  when (pkg) {
+    "unnamed package" -> knownError("package not found")
+    else -> {
+      val filerSourceFile = createResource(StandardLocation.SOURCE_OUTPUT, pkg, "$name.kt", *originatingElements)
+      try {
+        filerSourceFile.openWriter().use { writer -> writer.append(fileString) }
+      } catch (exception: IOException) {
+        knownError("Cannot create the file: ${exception.message}")
+      }
     }
-    throw e
   }
 }) {
   logger?.invoke("$it by $pkg.$name")
