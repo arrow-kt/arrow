@@ -13,6 +13,7 @@ dependencies {
         api "io.arrow-kt:arrow-aql:$VERSION_NAME"
         api "io.arrow-kt:arrow-check:$VERSION_NAME"
         api "io.arrow-kt:arrow-check-kotlintest:$VERSION_NAME"
+        api "io.arrow-kt:arrow-continuations:$VERSION_NAME"
         api "io.arrow-kt:arrow-core:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-retrofit:$VERSION_NAME"
