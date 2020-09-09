@@ -21,19 +21,19 @@ afterEvaluate {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                pom {
-                    groupId = GROUP
-                    artifactId = POM_ARTIFACT_ID
-                    version = VERSION_NAME
+                groupId = GROUP
+                artifactId = POM_ARTIFACT_ID
+                version = VERSION_NAME
 
+                artifact sourcesJar
+                artifact javadocJar
+                from components.java
+
+                pom {
                     name = POM_NAME
                     packaging = POM_PACKAGING
                     description = POM_DESCRIPTION
                     url = POM_URL
-    
-                    artifact sourcesJar
-                    artifact javadocJar
-                    from components.java
     
                     scm {
                         url = POM_SCM_URL
