@@ -2,8 +2,8 @@
  
 set -e
 
-echo -e "Release RELEASE_VERSION\n\n" > $BASEDIR/arrow/release-notes-all.txt
-echo -e "RELEASE_VERSION ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
+echo -e "Release $RELEASE_VERSION\n\n" > $BASEDIR/arrow/release-notes-all.txt
+echo -e "$RELEASE_VERSION ($(date +%Y-%m-%d))\n---\n" >> $BASEDIR/arrow/release-notes-all.txt
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
     cd $BASEDIR/$lib
     TAG_TIMESTAMP=$(git log $LATEST_PUBLISHED_VERSION --pretty="format:%ct" | head -1)
