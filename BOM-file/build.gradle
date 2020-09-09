@@ -13,6 +13,7 @@ dependencies {
         api "io.arrow-kt:arrow-aql:$VERSION_NAME"
         api "io.arrow-kt:arrow-check:$VERSION_NAME"
         api "io.arrow-kt:arrow-check-kotlintest:$VERSION_NAME"
+        api "io.arrow-kt:arrow-continuations:$VERSION_NAME"
         api "io.arrow-kt:arrow-core:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-core-retrofit:$VERSION_NAME"
@@ -40,7 +41,6 @@ dependencies {
         api "io.arrow-kt:arrow-recursion:$VERSION_NAME"
         api "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-        api "io.arrow-kt:arrow-streams:$VERSION_NAME"
         api "io.arrow-kt:arrow-syntax:$VERSION_NAME"
         api "io.arrow-kt:arrow-ui:$VERSION_NAME"
         api "io.arrow-kt:arrow-ui-data:$VERSION_NAME"
@@ -56,6 +56,32 @@ publishing {
             version = VERSION_NAME
 
             from components.javaPlatform
+
+            pom {
+                name = POM_NAME
+                packaging = POM_PACKAGING
+                description = POM_DESCRIPTION
+                url = POM_URL
+
+                scm {
+                    url = POM_SCM_URL
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_DEV_CONNECTION
+                }
+                licenses {
+                    license {
+                        name = POM_LICENCE_NAME
+                        url = POM_LICENCE_URL
+                        distribution = POM_LICENCE_DIST
+                    }
+                }
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                    }
+                }
+            }
         }
     }
     repositories {
@@ -64,9 +90,7 @@ publishing {
                 username System.getenv('BINTRAY_USER')
                 password System.getenv('BINTRAY_API_KEY')
             }
-            def releasesRepoUrl = "https://api.bintray.com/maven/arrow-kt/arrow-kt/arrow"
-            def snapshotsRepoUrl = "https://oss.jfrog.org/artifactory/oss-snapshot-local"
-            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+            url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
         }
     }
 }

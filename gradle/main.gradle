@@ -20,7 +20,6 @@ allprojects {
         mavenCentral()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
         maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" }
-        maven { url 'https://dl.bintray.com/arrow-kt/arrow-kt/' }
     }
 }
 
