@@ -57,6 +57,32 @@ publishing {
             version = VERSION_NAME
 
             from components.javaPlatform
+
+            pom {
+                name = POM_NAME
+                packaging = POM_PACKAGING
+                description = POM_DESCRIPTION
+                url = POM_URL
+
+                scm {
+                    url = POM_SCM_URL
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_DEV_CONNECTION
+                }
+                licenses {
+                    license {
+                        name = POM_LICENCE_NAME
+                        url = POM_LICENCE_URL
+                        distribution = POM_LICENCE_DIST
+                    }
+                }
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                    }
+                }
+            }
         }
     }
     repositories {
@@ -65,9 +91,7 @@ publishing {
                 username System.getenv('BINTRAY_USER')
                 password System.getenv('BINTRAY_API_KEY')
             }
-            def releasesRepoUrl = "https://api.bintray.com/maven/arrow-kt/arrow-kt/arrow"
-            def snapshotsRepoUrl = "https://oss.jfrog.org/artifactory/oss-snapshot-local"
-            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+            url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
         }
     }
 }
