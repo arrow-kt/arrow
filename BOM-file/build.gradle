@@ -41,7 +41,6 @@ dependencies {
         api "io.arrow-kt:arrow-recursion:$VERSION_NAME"
         api "io.arrow-kt:arrow-recursion-data:$VERSION_NAME"
         api "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-        api "io.arrow-kt:arrow-streams:$VERSION_NAME"
         api "io.arrow-kt:arrow-syntax:$VERSION_NAME"
         api "io.arrow-kt:arrow-ui:$VERSION_NAME"
         api "io.arrow-kt:arrow-ui-data:$VERSION_NAME"
