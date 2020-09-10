@@ -6,7 +6,7 @@ library: core
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.extensions.fx
+import arrow.core.computations.either
 
 object Lettuce
 object Knife
@@ -25,12 +25,12 @@ typealias InsufficientAmountOfLettuce = CookingException.InsufficientAmount
 fun takeFoodFromRefrigerator(): Either<NastyLettuce, Lettuce> = Right(Lettuce)
 fun getKnife(): Either<KnifeIsDull, Knife> = Right(Knife)
 fun prepare(tool: Knife, ingredient: Lettuce): Either<InsufficientAmountOfLettuce, Salad> = Left(InsufficientAmountOfLettuce(5))
-fun main() {
+suspend fun main() {
 //sampleStart
 
 
-fun prepareLunch(): Either<CookingException, Salad> =
-  Either.fx<CookingException, Salad> {
+suspend fun prepareLunch(): Either<CookingException, Salad> =
+  either<CookingException, Salad> {
     val lettuce = !takeFoodFromRefrigerator()
     val knife = !getKnife()
     val lunch = !prepare(knife, lettuce)

@@ -62,6 +62,7 @@ jobs:
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
                 export VERSION=$version
+                export SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
                 ./scripts/generate-and-validate-doc.sh
                 cd $BASEDIR/arrow-site
                 bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site

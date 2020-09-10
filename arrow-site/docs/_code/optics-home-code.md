@@ -37,7 +37,7 @@ fun main() {
 
 
   val john =
-  Employee("John Doe",
+  Employee("Audrey Tang",
           Company("Arrow",
                   Address("Functional city",
                           Street(42, "lambda street"))))
