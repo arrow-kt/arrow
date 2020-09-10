@@ -33,7 +33,7 @@
       </li>
 
       <li>
-        <a href="{{ previous_version.url }}">
+        <a href="{{ previous_version.url | append: doc-link }}">
           <span>
             {{ previous_version.title }} - {{ site.data.doc-versions.previous }}
           </span>
