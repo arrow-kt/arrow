@@ -24,6 +24,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Wait for other related changes
+      run: sleep 180
     - name: "Get target: OSS or Bintray"
       id: versions
       run: |

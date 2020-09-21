@@ -20,14 +20,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Wait for other related changes
+      run: sleep 180
     - name: Prepare env
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        perl -pe "s/git\@github.com:/https:\/\/github.com\//g" -i scripts/commons4gradle.sh
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         BRANCH_NAME=${{ github.event.pull_request.head.ref }}
-        sleep 180
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
             checkAndDownloadViaHTTPS $repository $BRANCH_NAME
             replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
