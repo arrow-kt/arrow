@@ -20,7 +20,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
         evalOn(single) {
           threadName() shouldBe singleThreadName
 
-          val (s1, s2) = parTupledN(mapCtx, { threadName() }, { threadName() })
+          val (s1, s2) = parTupledN(mapCtx, threadName, threadName)
 
           s1 shouldBe mapCtxName
           s2 shouldBe mapCtxName
@@ -130,7 +130,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
         evalOn(single) {
           threadName() shouldBe singleThreadName
 
-          val (s1, s2, s3) = parTupledN(mapCtx, { threadName() }, { threadName() }, { threadName() })
+          val (s1, s2, s3) = parTupledN(mapCtx, threadName, threadName, threadName)
 
           s1 shouldBe mapCtxName
           s2 shouldBe mapCtxName
