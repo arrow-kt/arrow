@@ -14,13 +14,17 @@ jobs:
       ARROW_LIB: arrow-integrations
 
     runs-on: macos-latest
+    timeout-minutes: 90
 
     steps:
     - uses: actions/checkout@v2
     - name: Checkout orchestrator
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd $BASEDIR
-        git clone https://github.com/arrow-kt/arrow.git --depth 1 --no-single-branch
+        git clone https://github.com/arrow-kt/arrow.git $BASEDIR/arrow --depth 1 --no-single-branch
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        updateOrchestrator master
     - name: Install
       run: |
         $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB
