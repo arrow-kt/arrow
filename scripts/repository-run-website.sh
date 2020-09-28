@@ -8,7 +8,7 @@ export BASEDIR=$(pwd)
 ARROW_LIB=$(echo $1 | cut -d- -f1-2)
 
 
-checkAndDownloadViaSSH arrow-site
+checkAndDownload arrow-site
 perl -pe "s/\/docs//g" -i $BASEDIR/arrow-site/docs/_data/features.yml
 $BASEDIR/arrow/scripts/site-run-ank.sh
 
@@ -20,7 +20,7 @@ $BASEDIR/arrow/scripts/project-locate-doc.sh $ARROW_LIB
 MAIN_LIBS=(arrow-core arrow-fx arrow-optics)
 for library in ${MAIN_LIBS[*]}; do
     if [ "$library" != "$ARROW_LIB" ]; then
-        checkAndDownloadViaSSH $library
+        checkAndDownload $library
         addArrowDocs $BASEDIR/$library/settings.gradle
         $BASEDIR/arrow/scripts/project-build-doc.sh $library
         removeArrowDocs $BASEDIR/$library/settings.gradle

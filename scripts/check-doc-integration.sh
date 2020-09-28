@@ -12,7 +12,7 @@ $BASEDIR/arrow/scripts/site-download.sh
 runAndSaveResult "Site" "Run Ank" "$BASEDIR/arrow/scripts/site-run-ank.sh"
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    checkAndDownloadViaHTTPS $repository $BRANCH
+    checkAndDownloadBranch $repository $BRANCH
 
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
 

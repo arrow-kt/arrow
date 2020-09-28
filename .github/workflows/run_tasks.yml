@@ -29,7 +29,7 @@ jobs:
         . $BASEDIR/arrow/scripts/commons4gradle.sh
         BRANCH_NAME=${{ github.event.pull_request.head.ref }}
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            checkAndDownloadViaHTTPS $repository $BRANCH_NAME
+            checkAndDownloadBranch $repository $BRANCH_NAME
             replaceGlobalPropertiesbyLocalConf $BASEDIR/$repository/gradle.properties
             replaceOSSbyLocalRepository $BASEDIR/$repository/arrow-docs/build.gradle
         done
