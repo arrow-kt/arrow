@@ -314,6 +314,121 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
+ * ## Either.catch exceptions
+ *
+ * Sometimes you do need to interact with code that can potentially throw exceptions. In such cases, you should mitigate the possibility that an exception can be thrown. You can do so by using the `catch` function.
+ *
+ * Example:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ *
+ * //sampleStart
+ * fun potentialThrowingCode(): String = throw RuntimeException("Blow up!")
+ *
+ * suspend fun makeSureYourLogicDoesNotHaveSideEffects(): Either<Error, String> =
+ *   Either.catch { potentialThrowingCode() }.mapLeft { Error.SpecificError }
+ * //sampleEnd
+ * suspend fun main() {
+ *   println("makeSureYourLogicDoesNotHaveSideEffects().isLeft() = ${makeSureYourLogicDoesNotHaveSideEffects().isLeft()}")
+ * }
+ *
+ * sealed class Error {
+ *   object SpecificError : Error()
+ * }
+ * ```
+ *
+ * ## Resolve Either into one type of value
+ * In some cases you can not use Either as a value. For instance, when you need to respond to an HTTP request. To resolve Either into one type of value, you can use the resolve function.
+ * In the case of an HTTP endpoint you most often need to return some (framework specific) response object which holds the result of the request. The result can be expected and positive, this is the success flow.
+ * Or the result can be expected but negative, this is the error flow. Or the result can be unexpected and negative, in this case an unhandled exception was thrown.
+ * In all three cases, you want to use the same kind of response object. But probably you want to respond slightly different in each case. This can be achieved by providing specific functions for the success, error and throwable cases.
+ *
+ * Example:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.core.flatMap
+ * import arrow.core.left
+ * import arrow.core.right
+ *
+ * //sampleStart
+ * suspend fun httpEndpoint(request: String = "Hello?") =
+ *   Either.resolve(
+ *     f = {
+ *       if (request == "Hello?") "HELLO WORLD!".right()
+ *       else Error.SpecificError.left()
+ *     },
+ *     success = { a -> handleSuccess({ a: Any -> log(Level.INFO, "This is a: $a") }, a) },
+ *     error = { e -> handleError({ e: Any -> log(Level.WARN, "This is e: $e") }, e) },
+ *     throwable = { throwable -> handleThrowable({ throwable: Throwable -> log(Level.ERROR, "Log the throwable: $throwable.") }, throwable) },
+ *     unrecoverableState = { _ -> Unit.right() }
+ *   )
+ * //sampleEnd
+ * suspend fun main() {
+ *  println("httpEndpoint().status = ${httpEndpoint().status}")
+ * }
+ *
+ * @Suppress("UNUSED_PARAMETER")
+ * suspend fun <A> handleSuccess(log: suspend (a: A) -> Either<Throwable, Unit>, a: A): Either<Throwable, Response> =
+ *   Either.catch {
+ *     Response.Builder(HttpStatus.OK)
+ *       .header(CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
+ *       .body(a)
+ *       .build()
+ *   }
+ *
+ * @Suppress("UNUSED_PARAMETER")
+ * suspend fun <E> handleError(log: suspend (e: E) -> Either<Throwable, Unit>, e: E): Either<Throwable, Response> =
+ *   createErrorResponse(HttpStatus.NOT_FOUND, ErrorResponse("$ERROR_MESSAGE_PREFIX $e"))
+ *
+ * suspend fun handleThrowable(log: suspend (throwable: Throwable) -> Either<Throwable, Unit>, throwable: Throwable): Either<Throwable, Response> =
+ *   log(throwable)
+ *     .flatMap { createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorResponse("$THROWABLE_MESSAGE_PREFIX $throwable")) }
+ *
+ * suspend fun createErrorResponse(httpStatus: HttpStatus, errorResponse: ErrorResponse): Either<Throwable, Response> =
+ *   Either.catch {
+ *     Response.Builder(httpStatus)
+ *       .header(CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON)
+ *       .body(errorResponse)
+ *       .build()
+ *   }
+ *
+ * suspend fun log(level: Level, message: String): Either<Throwable, Unit> =
+ *   Unit.right() // Should implement logging.
+ *
+ * enum class HttpStatus(val value: Int) { OK(200), NOT_FOUND(404), INTERNAL_SERVER_ERROR(500) }
+ *
+ * class Response private constructor(
+ *   val status: HttpStatus,
+ *   val headers: Map<String, String>,
+ *   val body: Any?
+ * ) {
+ *
+ *   data class Builder(
+ *     val status: HttpStatus,
+ *     var headers: Map<String, String> = emptyMap(),
+ *     var body: Any? = null
+ *   ) {
+ *     fun header(key: String, value: String) = apply { this.headers = this.headers + mapOf<String, String>(key to value) }
+ *     fun body(body: Any?) = apply { this.body = body }
+ *     fun build() = Response(status, headers, body)
+ *   }
+ * }
+ *
+ * val CONTENT_TYPE = "Content-Type"
+ * val CONTENT_TYPE_APPLICATION_JSON = "application/json"
+ * val ERROR_MESSAGE_PREFIX = "An error has occurred. The error is:"
+ * val THROWABLE_MESSAGE_PREFIX = "An exception was thrown. The exception is:"
+ * sealed class Error {
+ *   object SpecificError : Error()
+ * }
+ * data class ErrorResponse(val errorMessage: String)
+ * enum class Level { INFO, WARN, ERROR }
+ * ```
+ *
+ * There are far more use cases for the resolve function, the HTTP endpoint example is just one of them.
+ *
  * ## Syntax
  *
  * Either can also map over the `left` value with `mapLeft`, which is similar to map, but applies on left instances.
@@ -912,12 +1027,15 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     inline fun <L, R> conditionally(test: Boolean, ifFalse: () -> L, ifTrue: () -> R): Either<L, R> =
       if (test) right(ifTrue()) else left(ifFalse())
 
-    suspend fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
+    suspend inline fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
       try {
         f().right()
       } catch (t: Throwable) {
         t.nonFatalOrThrow().left()
       }
+
+    suspend inline fun <R> catchAndFlatten(f: suspend () -> Either<Throwable, R>): Either<Throwable, R> =
+      catch(f).fold({ it.left() }, { it })
 
     @Deprecated("Use catch with mapLeft instead", ReplaceWith("catch(f).mapLeft(fe)"))
     suspend fun <L, R> catch(fe: (Throwable) -> L, f: suspend () -> R): Either<L, R> =
@@ -926,6 +1044,29 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       } catch (t: Throwable) {
         fe(t.nonFatalOrThrow()).left()
       }
+
+    /**
+     * The resolve function can resolve any suspended function that yields an Either into one type of value.
+     *
+     * @param f the function that needs to be resolved.
+     * @param success the function to apply if [f] yields a success of type [A].
+     * @param error the function to apply if [f] yields an error of type [E].
+     * @param throwable the function to apply if [f] throws a [Throwable].
+     * Throwing any [Throwable] in the [throwable] function will render the [resolve] function nondeterministic.
+     * @param unrecoverableState the function to apply if [resolve] is in an unrecoverable state.
+     * @return the result of applying the [resolve] function.
+     */
+    suspend inline fun <E, A, B> resolve(
+      f: suspend () -> Either<E, A>,
+      success: suspend (a: A) -> Either<Throwable, B>,
+      error: suspend (e: E) -> Either<Throwable, B>,
+      throwable: suspend (throwable: Throwable) -> Either<Throwable, B>,
+      unrecoverableState: suspend (throwable: Throwable) -> Either<Throwable, Unit>
+    ): B =
+      catch(f)
+        .fold({ t: Throwable -> throwable(t) }, { it.fold({ e: E -> catchAndFlatten { error(e) } }, { a: A -> catchAndFlatten { success(a) } }) })
+        .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
+        .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
   }
 }
 
