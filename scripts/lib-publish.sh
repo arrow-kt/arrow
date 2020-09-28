@@ -8,7 +8,7 @@ ARROW_LIB=$1
 replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 
 for lib in $(cat $BASEDIR/arrow/lists/libs.txt); do
-    checkAndDownloadViaHTTPS $lib master
+    checkAndDownloadBranch $lib master
     replaceGlobalPropertiesbyLocalConf $BASEDIR/$lib/gradle.properties
     $BASEDIR/arrow/scripts/project-install.sh $lib
 done

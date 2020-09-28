@@ -11,7 +11,7 @@ addLocalRepositoryBeforeOSS "$BASEDIR/arrow/gradle/*.gradle"
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
 
     if [ $repository != $ARROW_LIB ]; then
-        checkAndDownloadViaHTTPS $repository $BRANCH
+        checkAndDownloadBranch $repository $BRANCH
 
         if [ $BRANCH != "master" ]; then
             cd $BASEDIR/$repository

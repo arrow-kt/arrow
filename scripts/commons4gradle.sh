@@ -52,13 +52,13 @@ function addArrowDocs()
     echo $INCLUDE_ARROW_DOCS >> $1
 }
 
-function checkAndDownloadViaSSH()
+function checkAndDownload()
 {
     REPOSITORY=$1
 
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
         echo "Creating $BASEDIR/$REPOSITORY ..."
-        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
+        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY 2> /dev/null || git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY
     fi
 }
 
@@ -88,14 +88,14 @@ function checkoutBranchIfFound()
     fi
 }
 
-function checkAndDownloadViaHTTPS()
+function checkAndDownloadBranch()
 {
     REPOSITORY=$1
     BRANCH=$2
 
     if [ ! -d $BASEDIR/$REPOSITORY ]; then
         echo "Creating $BASEDIR/$REPOSITORY ..."
-        git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY --depth 1 --no-single-branch
+        git clone git@github.com:arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY --depth 1 --no-single-branch 2> /dev/null || git clone https://github.com/arrow-kt/${REPOSITORY}.git $BASEDIR/$REPOSITORY --depth 1 --no-single-branch
         if [ $BRANCH != "master" ]; then
             checkoutBranchIfFound $REPOSITORY $BRANCH
         fi
