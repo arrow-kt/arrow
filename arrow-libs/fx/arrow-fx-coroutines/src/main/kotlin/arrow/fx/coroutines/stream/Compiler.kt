@@ -4,6 +4,9 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.nonFatalOrThrow
+import arrow.core.right
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Platform
 import arrow.fx.coroutines.Token
@@ -161,33 +164,39 @@ internal tailrec suspend fun go(
                    |Scope id: ${scope.id}
                    |Step: $res""".trimMargin()
             )
-            else -> when (val either =
-              Either.catch { go(stepScope, extendLastTopLevelScope, extendedTopLevelScope, res.pull) }) {
-              is Either.Right -> when (val r = either.b) {
-                is Done -> when (val rr = interruptGuard(r.scope)) {
-                  null -> go(r.scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(Result.Pure(null)))
-                  else -> go(r.scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(rr))
-                }
-                is Out -> {
-                  // if we originally swapped scopes we want to return the original
-                  // scope back to the go as that is the scope that is expected to be here.
-                  val nextScope = if (res.token == null) r.scope else scope
-                  val result = Result.Pure(Triple(r.head, r.scope.id, r.tail))
-                  when (val rr = interruptGuard(r.scope)) {
-                    null -> go(nextScope, extendLastTopLevelScope, extendedTopLevelScope, view.next(result))
+            else -> {
+              val either = try {
+                go(stepScope, extendLastTopLevelScope, extendedTopLevelScope, res.pull).right()
+              } catch (t: Throwable) {
+                t.nonFatalOrThrow().left()
+              }
+              when (either) {
+                is Either.Right -> when (val r = either.b) {
+                  is Done -> when (val rr = interruptGuard(r.scope)) {
+                    null -> go(r.scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(Result.Pure(null)))
                     else -> go(r.scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(rr))
                   }
+                  is Out -> {
+                    // if we originally swapped scopes we want to return the original
+                    // scope back to the go as that is the scope that is expected to be here.
+                    val nextScope = if (res.token == null) r.scope else scope
+                    val result = Result.Pure(Triple(r.head, r.scope.id, r.tail))
+                    when (val rr = interruptGuard(r.scope)) {
+                      null -> go(nextScope, extendLastTopLevelScope, extendedTopLevelScope, view.next(result))
+                      else -> go(r.scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(rr))
+                    }
+                  }
+                  is Interrupted ->
+                    go(
+                      scope,
+                      extendLastTopLevelScope,
+                      extendedTopLevelScope,
+                      view.next(Result.Interrupted(r.scopeId, r.err))
+                    )
                 }
-                is Interrupted ->
-                  go(
-                    scope,
-                    extendLastTopLevelScope,
-                    extendedTopLevelScope,
-                    view.next(Result.Interrupted(r.scopeId, r.err))
-                  )
+                is Either.Left ->
+                  go(scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(Result.Fail(either.a)))
               }
-              is Either.Left ->
-                go(scope, extendLastTopLevelScope, extendedTopLevelScope, view.next(Result.Fail(either.a)))
             }
           }
         }
@@ -235,7 +244,12 @@ internal tailrec suspend fun go(
               } else false
 
               val newExtendedScope = if (closedExtendedScope) null else extendedTopLevelScope
-              when (val res2 = Either.catch { scope.open(res.isInterruptible) }) {
+              val res2 = try {
+                scope.open(res.isInterruptible).right()
+              } catch (t: Throwable) {
+                t.nonFatalOrThrow().left()
+              }
+              when (res2) {
                 is Either.Left -> go(scope, extendLastTopLevelScope, newExtendedScope, view.next(Result.Fail(res2.a)))
                 is Either.Right -> go(res2.b, extendLastTopLevelScope, newExtendedScope, view.next(Result.Pure(res2.b.id)))
               }
