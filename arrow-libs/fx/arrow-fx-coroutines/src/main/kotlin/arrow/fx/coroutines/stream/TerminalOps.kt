@@ -59,7 +59,7 @@ suspend fun <O> Stream<O>.firstOrNull(): O? =
  * This a terminal operator, meaning this functions `suspend`s until the [Stream] finishes.
  * If any errors are raised while streaming, it's thrown from this `suspend` scope.
  */
-suspend fun <O> Stream<O>.firstOrError(): O? =
+suspend fun <O> Stream<O>.firstOrError(): O =
   firstOrNull() ?: throw NoSuchElementException()
 
 /**
@@ -84,7 +84,7 @@ suspend fun <O> Stream<O>.lastOrNull(): O? =
   foldChunks<O, O?>(null) { acc, c -> c.lastOrNull() ?: acc }
 
 /**
- * Runs all the effects of this [Stream], raising a [NoSuchElementException] if the stream emitted no values
+ * Runs all the effects of this [Stream], raising a [NoSuchElementException] if the stream emitted no values,
  * and returning the last value emitted otherwise.
  *
  * This a terminal operator, meaning this functions `suspend`s until the [Stream] finishes.
