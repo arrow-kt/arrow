@@ -139,19 +139,17 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
     exec(mvar) shouldBe count * (count - 1) / 2
   }
 
-  /*
   "producer-consumer parallel loop" {
     val count = 10000L
-    forAll(10) { _: Int ->
+    forFew(10) {
       val channel = ConcurrentVar<Long?>(0L)
       val producerFiber = ForkAndForget { producerParallel(channel, (0L until count).toList()) }
       val consumerFiber = ForkAndForget { consumerParallel(channel, 0L) }
 
       producerFiber.join() shouldBe Unit
       consumerFiber.join() shouldBe count * (count - 1) / 2
-      true
     }
-  }*/
+  }
 
   "put is stack safe when repeated sequentially" {
     val channel = ConcurrentVar.empty<Int>()

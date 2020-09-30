@@ -187,4 +187,14 @@ abstract class ArrowFxSpec(
       genF,
       property
     )
+
+  suspend fun forFew(
+    iterations: Int,
+    property: suspend PropertyContext.(Unit) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      Arb.unit(),
+      property
+    )
 }

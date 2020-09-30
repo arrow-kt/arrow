@@ -2,9 +2,9 @@ package arrow.fx.coroutines
 
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
-import io.kotest.property.forAll
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -37,7 +37,7 @@ class EvalOnTests : ArrowFxSpec(spec = {
         Thread.currentThread().name
       }
 
-    forAll { _: Int ->
+    checkAll {
       Platform.unsafeRunSync(ComputationPool) {
         val startOn = Thread.currentThread().name
         onSameContext() shouldBe startOn
@@ -52,7 +52,7 @@ class EvalOnTests : ArrowFxSpec(spec = {
         Thread.currentThread().name
       }
 
-    forAll { _: Int ->
+    checkAll {
       val interceptor = TestableContinuationInterceptor()
 
       Platform.unsafeRunSync(interceptor) {
@@ -60,7 +60,6 @@ class EvalOnTests : ArrowFxSpec(spec = {
         onComputation(interceptor) shouldBe startOn
         Thread.currentThread().name shouldBe startOn
         interceptor.timesIntercepted() shouldBe 0
-        true
       }
     }
   }
@@ -71,7 +70,7 @@ class EvalOnTests : ArrowFxSpec(spec = {
         Thread.currentThread().name
       }
 
-    forAll { _: Int ->
+    checkAll {
       val interceptor = TestableContinuationInterceptor()
 
       Platform.unsafeRunSync(interceptor) {
@@ -79,29 +78,26 @@ class EvalOnTests : ArrowFxSpec(spec = {
         onComputation(interceptor) shouldBe startOn
         Thread.currentThread().name shouldBe startOn
         interceptor.timesIntercepted() shouldBe 0
-        true
       }
     }
   }
 
-  /*
   "evalOn on a different context with a different ContinuationInterceptor does intercept" {
     suspend fun onComputation(): String =
       evalOn(IOPool) {
         Thread.currentThread().name
       }
 
-    forAll { _: Int -> // Run this test on single thread context to guarantee name
+    checkAll { // Run this test on single thread context to guarantee name
       single.use { ctx ->
         Platform.unsafeRunSync(ctx) {
           val startOn = Thread.currentThread().name
           onComputation() shouldNotBe startOn
           Thread.currentThread().name shouldBe startOn
-          true
         }
       }
     }
-  } */
+  }
 
   "immediate exception on KotlinX Dispatchers" {
     checkAll(Arb.int(), Arb.throwable()) { i, e ->
