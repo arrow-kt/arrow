@@ -58,6 +58,21 @@ jobs:
         echo "Update version ..."
         perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         $BASEDIR/arrow/scripts/lib-publish.sh $ARROW_LIB
+    - name: Update versions for documentation
+      if: steps.versions.outputs.new-version-exists == '1'
+      env:
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      run: |
+        cd $BASEDIR/arrow-core
+        git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
+        git config --global user.email "arrow-kt@users.noreply.github.com"
+        git config --global user.name "arrow-kt"
+        perl -pe "s/[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT/${{ steps.versions.outputs.snapshot-version }}/g" -i arrow-docs/docs/quickstart/setup/README.md
+        perl -pe "s/${{ steps.versions.outputs.latest-published-version }}/${{ steps.versions.outputs.release-version }}/g" -i arrow-docs/docs/quickstart/setup/README.md
+        git add arrow-docs/docs/quickstart/setup/README.md
+        git diff --staged
+        git commit -m "Documentation: update versions"
+        git push origin HEAD:master
     - name: Create tag
       if: steps.versions.outputs.new-version-exists == '1'
       env:
