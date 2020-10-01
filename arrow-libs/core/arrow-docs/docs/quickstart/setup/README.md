@@ -8,7 +8,7 @@ permalink: /quickstart/setup/
 
 ### Next development version
 
-If you want to try the last features, replace `0.11.0` by `0.11.0-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.11.0` by `1.0.0-SNAPSHOT` in the following guideline.
 
 ### JDK
 
