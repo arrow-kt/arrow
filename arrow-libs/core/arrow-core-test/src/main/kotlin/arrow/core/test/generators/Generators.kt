@@ -31,6 +31,8 @@ import arrow.core.extensions.listk.semialign.semialign
 import arrow.core.extensions.sequencek.semialign.semialign
 import arrow.core.fix
 import arrow.core.k
+import arrow.core.left
+import arrow.core.right
 import arrow.core.toOption
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -201,3 +203,41 @@ private fun <A, B, R> Gen<A>.alignWith(genB: Gen<B>, transform: (Ior<A, B>) -> R
         alignWith(this@alignWith.random().k(), genB.random().k(), transform)
       }.fix()
   }
+
+fun Gen.Companion.suspendFunThatReturnsEitherAnyOrAnyOrThrows(): Gen<suspend () -> Either<Any, Any>> =
+  oneOf(
+    suspendFunThatReturnsAnyRight(),
+    suspendFunThatReturnsAnyLeft(),
+    suspendFunThatThrows()
+  )
+
+fun Gen.Companion.suspendFunThatReturnsAnyRight(): Gen<suspend () -> Either<Any, Any>> =
+  any().map { suspend { it.right() } }
+
+fun Gen.Companion.suspendFunThatReturnsAnyLeft(): Gen<suspend () -> Either<Any, Any>> =
+  any().map { suspend { it.left() } }
+
+fun Gen.Companion.suspendFunThatThrows(): Gen<suspend () -> Either<Any, Any>> =
+  throwable().map { suspend { throw it } } as Gen<suspend () -> Either<Any, Any>>
+
+fun Gen.Companion.suspendFunThatThrowsFatalThrowable(): Gen<suspend () -> Either<Any, Any>> =
+  fatalThrowable().map { suspend { throw it } } as Gen<suspend () -> Either<Any, Any>>
+
+fun Gen.Companion.any(): Gen<Any> =
+  oneOf(
+    string() as Gen<Any>,
+    int() as Gen<Any>,
+    long() as Gen<Any>,
+    float() as Gen<Any>,
+    double() as Gen<Any>,
+    bool() as Gen<Any>,
+    uuid() as Gen<Any>,
+    file() as Gen<Any>,
+    localDate() as Gen<Any>,
+    localTime() as Gen<Any>,
+    localDateTime() as Gen<Any>,
+    period() as Gen<Any>,
+    throwable() as Gen<Any>,
+    fatalThrowable() as Gen<Any>,
+    unit() as Gen<Any>
+  )

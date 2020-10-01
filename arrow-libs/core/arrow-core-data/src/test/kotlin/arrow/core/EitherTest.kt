@@ -26,11 +26,17 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.order
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
+import arrow.core.test.generators.any
 import arrow.core.test.generators.either
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
 import arrow.core.test.generators.id
 import arrow.core.test.generators.intSmall
+import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
+import arrow.core.test.generators.suspendFunThatReturnsAnyRight
+import arrow.core.test.generators.suspendFunThatReturnsEitherAnyOrAnyOrThrows
+import arrow.core.test.generators.suspendFunThatThrows
+import arrow.core.test.generators.suspendFunThatThrowsFatalThrowable
 import arrow.core.test.generators.throwable
 import arrow.core.test.laws.BicrosswalkLaws
 import arrow.core.test.laws.BifunctorLaws
@@ -48,6 +54,8 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
+import kotlinx.coroutines.runBlocking
 
 class EitherTest : UnitSpec() {
 
@@ -238,5 +246,135 @@ class EitherTest : UnitSpec() {
       suspend fun loadFromNetwork(): Int = throw exception
       Either.catch { loadFromNetwork() } shouldBe Left(exception)
     }
+
+    "catchAndFlatten should return Right(result) when f does not throw" {
+      suspend fun loadFromNetwork(): Either<Throwable, Int> = Right(1)
+      Either.catchAndFlatten { loadFromNetwork() } shouldBe Right(1)
+    }
+
+    "catchAndFlatten should return Left(result) when f throws" {
+      val exception = Exception("Boom!")
+      suspend fun loadFromNetwork(): Either<Throwable, Int> = throw exception
+      Either.catchAndFlatten { loadFromNetwork() } shouldBe Left(exception)
+    }
+
+    "resolve should yield a result when deterministic functions are used as handlers" {
+      forAll(
+        Gen.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
+        Gen.any()
+      ) { f: suspend () -> Either<Any, Any>,
+          returnObject: Any ->
+
+        runBlocking {
+          val result =
+            Either.resolve(
+              f = f,
+              success = { a -> handleWithPureFunction(a, returnObject) },
+              error = { e -> handleWithPureFunction(e, returnObject) },
+              throwable = { t -> handleWithPureFunction(t, returnObject) },
+              unrecoverableState = ::handleWithPureFunction
+            )
+          result == returnObject
+        }
+      }
+    }
+
+    "resolve should throw a Throwable when a fatal Throwable is thrown" {
+      forAll(
+        Gen.suspendFunThatThrowsFatalThrowable(),
+        Gen.any()
+      ) { f: suspend () -> Either<Any, Any>,
+          returnObject: Any ->
+
+        runBlocking {
+          shouldThrow<Throwable> {
+            Either.resolve(
+              f = f,
+              success = { a -> handleWithPureFunction(a, returnObject) },
+              error = { e -> handleWithPureFunction(e, returnObject) },
+              throwable = { t -> handleWithPureFunction(t, returnObject) },
+              unrecoverableState = ::handleWithPureFunction
+            )
+          }
+        }
+        true
+      }
+    }
+
+    "resolve should yield a result when an exception is thrown in the success supplied function" {
+      forAll(
+        Gen.suspendFunThatReturnsAnyRight(),
+        Gen.any()
+      ) { f: suspend () -> Either<Any, Any>,
+          returnObject: Any ->
+
+        runBlocking {
+          val result =
+            Either.resolve(
+              f = f,
+              success = ::throwException,
+              error = { e -> handleWithPureFunction(e, returnObject) },
+              throwable = { t -> handleWithPureFunction(t, returnObject) },
+              unrecoverableState = ::handleWithPureFunction
+            )
+          result == returnObject
+        }
+      }
+    }
+
+    "resolve should yield a result when an exception is thrown in the error supplied function" {
+      forAll(
+        Gen.suspendFunThatReturnsAnyLeft(),
+        Gen.any()
+      ) { f: suspend () -> Either<Any, Any>,
+          returnObject: Any ->
+
+        runBlocking {
+          val result =
+            Either.resolve(
+              f = f,
+              success = { a -> handleWithPureFunction(a, returnObject) },
+              error = ::throwException,
+              throwable = { t -> handleWithPureFunction(t, returnObject) },
+              unrecoverableState = ::handleWithPureFunction
+            )
+          result == returnObject
+        }
+      }
+    }
+
+    "resolve should throw a Throwable when any exception is thrown in the throwable supplied function" {
+      forAll(
+        Gen.suspendFunThatThrows()
+      ) { f: suspend () -> Either<Any, Any> ->
+
+        runBlocking {
+          shouldThrow<Throwable> {
+            Either.resolve(
+              f = f,
+              success = ::throwException,
+              error = ::throwException,
+              throwable = ::throwException,
+              unrecoverableState = ::handleWithPureFunction
+            )
+          }
+        }
+        true
+      }
+    }
   }
 }
+
+@Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")
+suspend fun handleWithPureFunction(a: Any, b: Any): Either<Throwable, Any> =
+  b.right()
+
+@Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")
+suspend fun handleWithPureFunction(throwable: Throwable): Either<Throwable, Unit> =
+  Unit.right()
+
+@Suppress("RedundantSuspendModifier", "UNUSED_PARAMETER")
+private suspend fun <A> throwException(
+  a: A
+): Either<Throwable, Any> =
+  throw RuntimeException("An Exception is thrown while handling the result of the supplied function.")
