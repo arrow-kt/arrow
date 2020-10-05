@@ -1,5 +1,3 @@
 #!/bin/bash
 
-set -e
-cd $BASEDIR/arrow-site
-./gradlew runAnk
+echo "-- runAnk is not executed for the site"
