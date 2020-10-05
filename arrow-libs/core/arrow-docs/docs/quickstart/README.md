@@ -4,11 +4,13 @@ title: Quick Start
 permalink: /core/
 ---
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=%234caf50)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Latest snapshot](https://img.shields.io/maven-metadata/v?color=blue&label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
-[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+[![Latest snapshot](https://img.shields.io/maven-metadata/v?color=important&label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
+[![Kotlin version badge](https://img.shields.io/badge/Kotlin-1.4-blue)](https://kotlinlang.org/docs/reference/whatsnew14.html)
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![StackOverflow](https://img.shields.io/badge/arrow--kt-black.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
+[![StackOverflow](https://img.shields.io/badge/arrow--kt-grey.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/arrow-kt)
+[![Twitter](https://img.shields.io/twitter/follow/arrow_kt?color=blue&style=flat)](https://twitter.com/arrow_kt)
 
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
