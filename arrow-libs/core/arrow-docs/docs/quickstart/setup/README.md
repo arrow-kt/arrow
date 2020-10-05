@@ -161,7 +161,7 @@ Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
 <properties>
-    <kotlin.version>1.3.0</kotlin.version>
+    <kotlin.version>1.4.0</kotlin.version>
      <arrow.version>0.11.0</arrow.version>
 </properties>
 ```
