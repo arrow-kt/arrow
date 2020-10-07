@@ -28,8 +28,5 @@ for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     runAndSaveResult $repository "Generate and validate doc" "$BASEDIR/arrow/scripts/project-generate-and-validate-doc.sh $repository"
 done
 
-#runAndSaveResult "Site" "Prepare env" "$BASEDIR/arrow/scripts/site-prepare-env.sh"
-#runAndSaveResult "Site" "Site build" "$BASEDIR/arrow/scripts/site-build.sh"
-
 showFiles
 exitForResult
