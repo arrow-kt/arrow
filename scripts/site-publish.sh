@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Used from Arrow repositories for next version documentation: docs/next/
+
 set -e
 MAIN_CONTENT=(CNAME  code  css  error.html  fonts  img  index.html  js  redirects.json)
 
