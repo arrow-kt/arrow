@@ -1,6 +1,6 @@
 # Arrow library: How to run the website in your local server
 
-## Via Gradle task
+## Via Gradle task (recommended)
 
 Arrow website can be run for any of the Arrow libraries via this Gradle task:
 
@@ -19,13 +19,8 @@ It can be useful to know an alternative in order to avoid running all the steps 
 ```sh
 git clone https://github.com/arrow-kt/arrow-site.git
 cd arrow-site
-perl -pe "s/\/docs//g" -i docs/_data/features.yml
-./gradlew runAnk
+rm docs/index.md
 ```
-
-Then `build/site` directory will be created.
-
-If you need to change any of the files on `arrow-site` (for instance, the sidebar menu), remember to do it before executing `runAnk` task.
 
 ### 2. Copy the documentation from Arrow library
 
@@ -44,10 +39,10 @@ cd <arrow-library>
 ./gradlew buildArrowDoc
 ```
 
-Then copy the result to the previous directory:
+Then copy the result to the `docs` directory:
 
 ```sh
-cp -r <arrow-library>/arrow-docs/build/site/* arrow-site/build/site/
+cp -r <arrow-library>/arrow-docs/build/site/* arrow-site/docs
 ```
 
 ### 3. Run the website in your local server
@@ -55,10 +50,10 @@ cp -r <arrow-library>/arrow-docs/build/site/* arrow-site/build/site/
 ```sh
 cd arrow-site
 bundle install --gemfile Gemfile --path vendor/bundle
-bundle exec jekyll serve -s build/site/
+bundle exec jekyll serve -s docs
 ```
 
-This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000/docs](http://127.0.0.1:4000/docs) so you can open it with a standard browser.
 
 If you get an error while installing the Ruby gem _http_parser_, check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
 

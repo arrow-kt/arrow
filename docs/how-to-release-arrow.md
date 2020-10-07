@@ -37,9 +37,10 @@ Every **Λrrow** library publishes the API Doc and some static documentation fro
 
 After creating a new RELEASE version, prepare a pull request for `arrow-site` repository with these changes:
 
-1. Update `gradle.properties` (check `runAnk` task locally because maybe it's necessary to adapt the code snippets in the landing page).
-2. Update `docs/_data/doc-versions.yml`.
-3. (Optional) Add the RELEASE version in `update-other-versions.txt` if it's necessary to create `docs/<major.minor>`.
+1. Update `docs/_data/doc-versions.yml`.
+2. (Optional) Add the RELEASE version in `update-other-versions.txt` if it's necessary to create `docs/<major.minor>`.
+
+After merging that pull request, create and push the corresponding tag.
 
 ### How to fix the documentation for the latest release
 

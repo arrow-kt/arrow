@@ -10,7 +10,6 @@ ARROW_LIB=$(echo $1 | cut -d- -f1-2)
 
 checkAndDownload arrow-site
 perl -pe "s/\/docs//g" -i $BASEDIR/arrow-site/docs/_data/features.yml
-$BASEDIR/arrow/scripts/site-run-ank.sh
 
 addArrowDocs $BASEDIR/${ARROW_LIB}/settings.gradle
 $BASEDIR/arrow/scripts/project-build-doc.sh ${ARROW_LIB}

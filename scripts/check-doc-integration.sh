@@ -9,7 +9,6 @@ if [ $# -eq 1 ]; then BRANCH=$1; fi
 replaceOSSbyLocalRepository "$BASEDIR/arrow/gradle/*.gradle"
 
 $BASEDIR/arrow/scripts/site-download.sh
-runAndSaveResult "Site" "Run Ank" "$BASEDIR/arrow/scripts/site-run-ank.sh"
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     checkAndDownloadBranch $repository $BRANCH

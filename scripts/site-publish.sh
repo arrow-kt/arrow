@@ -5,7 +5,7 @@ MAIN_CONTENT=(CNAME  code  css  error.html  fonts  img  index.html  js  redirect
 
 
 echo "Publish in S3 ..."
-cd $BASEDIR/arrow-site/build/_site
+cd $BASEDIR/arrow-site/_site
 
 for file in ${MAIN_CONTENT[*]}; do
     rm -rf $file
