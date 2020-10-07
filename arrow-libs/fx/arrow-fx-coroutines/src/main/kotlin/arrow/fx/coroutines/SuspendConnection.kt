@@ -26,12 +26,43 @@ inline class CancelToken(val cancel: suspend () -> Unit) {
 
 typealias Disposable = () -> Unit
 
+/**
+ * Grab the [SuspendConnection] from [CoroutineContext],
+ * when none is found then default to an uncancellable connection.
+ *
+ * That could only happen when we call [connection] inside a [suspend] function **not** started by our [Environment],
+ * or [startCoroutineCancellable] runners.
+ * When Arrow Fx Coroutines code is started by KotlinX runners, then the Arrow Fx Coroutines KotlinX Coroutines module must install a [SuspendConnection]
+ * for the operation to be cancellable, and thus we'd find a connection here as well.
+ */
 internal fun CoroutineContext.connection(): SuspendConnection =
   this[SuspendConnection] ?: SuspendConnection.uncancellable
 
 /**
- * SuspendConnection is a state-machine inside [CoroutineContext] that manages cancellation.
- * This could in the future also serve as a mechanism to collect debug information on running connections.
+ * [SuspendConnection] is a [CoroutineContext] and has two implementations:
+ *   - [Uncancellable]
+ *   - [DefaultConnection]
+ *
+ * # Uncancellable
+ *
+ * The [Uncancellable] implementation has a no-op [cancel] method, and always returns [false] upon checking [isCancelled].
+ * Which subsequently means that all cancellable operations become uncancellable when run on this [CoroutineContext],
+ * and inserting [cancelBoundary] becomes a no-op operation.
+ * Some optimisations could be implemented when an [Uncancellable] context is detected,
+ * such as [bracket] could run as a simple `try/catch/finally` since [ExitCase.Cancelled] can never occur on a [Uncancellable] connection.
+ * See the [arrow.fx.coroutines.uncancellable] combinator implementation to see how you can swap from any kind of [SuspendConnection] to a [Uncancellable] and back to the original connection.
+ *
+ * # DefaultConnection
+ *
+ * [DefaultConnection] keeps track of all [CancelToken] registered for a given [CoroutineContext].
+ * It does so by keeping all [CancelToken] in a FIFO stack, and running them in order when cancelled.
+ *
+ * Since [SuspendConnection] is a stack, we can register a token before running a cancellable operation,
+ * and pop the token after the cancellable operation has finished so
+ * we don't run a [CancelToken] when it's not necessary anymore since that could lead to (undefined) weird behavior.
+ * You can see this usage in [parMapN], [raceN], [racePair] & [raceTriple],
+ * where we create multiple new connections and push them onto the stack with [push] and remove them with [pop]
+ * when the operations running on those connections terminate.
  */
 @PublishedApi
 internal sealed class SuspendConnection : AbstractCoroutineContextElement(SuspendConnection) {

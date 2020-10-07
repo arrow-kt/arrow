@@ -1,6 +1,5 @@
 package arrow.fx.coroutines
 
-import kotlinx.atomicfu.atomic
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -39,12 +38,13 @@ sealed class ExitCase {
  */
 suspend fun <A> uncancellable(f: suspend () -> A): A =
   suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-    val conn = cont.context.connection()
+    val originalConnection = cont.context.connection()
 
+    // ForwardCancellable back-pressures the originalConnection#cancel until we call `ForwardCancellable#complete`
     val deferredRelease = ForwardCancellable()
-    conn.push(deferredRelease.cancel())
+    originalConnection.push(deferredRelease.cancel())
 
-    if (conn.isNotCancelled()) {
+    if (originalConnection.isNotCancelled()) {
       val uncancellable = cont.context + SuspendConnection.uncancellable
 
       return@sc f.startCoroutineUninterceptedOrReturn(Continuation(uncancellable) {
@@ -234,13 +234,18 @@ suspend fun <A, B> bracketCase(
   // Race-condition check, avoiding starting the bracket if the connection
   // was cancelled already, to ensure that `cancel` really blocks if we
   // start `acquire` — n.b. `isCancelled` is visible here due to `push`
-
   if (!conn.isCancelled()) {
     // Note `acquire` is uncancellable (in other words it is disconnected from our SuspendConnection)
     val uncancellable = cont.context + SuspendConnection.uncancellable
 
+    // Guard used for thread-safety, to ensure the idempotency
+    // of the release; otherwise `release` can be called twice
+    // Needs to be created here, since we can have branching depending on if suspending code returns immediately or actually suspends.
+    val waitsForResult = AtomicBooleanW(true)
+
     val acquiredOrSuspended = acquire.startCoroutineUninterceptedOrReturn(
       BracketAcquireContinuation(
+        waitsForResult,
         uncancellable,
         cont,
         use,
@@ -251,7 +256,7 @@ suspend fun <A, B> bracketCase(
 
     if (acquiredOrSuspended != COROUTINE_SUSPENDED) {
       val usedAndReleasedOrSuspended =
-        launchUseAndRelease(acquiredOrSuspended as A, uncancellable, cont, use, release, deferredRelease)
+        launchUseAndRelease(waitsForResult, acquiredOrSuspended as A, uncancellable, cont, use, release, deferredRelease)
 
       if (usedAndReleasedOrSuspended != COROUTINE_SUSPENDED) (usedAndReleasedOrSuspended as Result<B>).fold(
         { it },
@@ -265,6 +270,7 @@ suspend fun <A, B> bracketCase(
 }
 
 private class BracketAcquireContinuation<A, B>(
+  val waitsForResult: AtomicBooleanW,
   val uncancellableContext: CoroutineContext,
   val uCont: Continuation<B>,
   val use: suspend (A) -> B,
@@ -276,7 +282,7 @@ private class BracketAcquireContinuation<A, B>(
   override fun resumeWith(result: Result<A>) {
     result.fold({ a ->
       val usedAndReleasedOrSuspended =
-        launchUseAndRelease(a, uncancellableContext, uCont, use, release, deferredRelease)
+        launchUseAndRelease(waitsForResult, a, uncancellableContext, uCont, use, release, deferredRelease)
 
       // Use & Release immediately returned
       if (usedAndReleasedOrSuspended != COROUTINE_SUSPENDED) {
@@ -293,6 +299,7 @@ private class BracketAcquireContinuation<A, B>(
  * or [COROUTINE_SUSPENDED] in the case the `Coroutine` suspended.
  */
 private fun <A, B> launchUseAndRelease(
+  waitsForResult: AtomicBooleanW,
   a: A,
   uncancellableContext: CoroutineContext,
   uCont: Continuation<B>,
@@ -301,7 +308,7 @@ private fun <A, B> launchUseAndRelease(
   deferredRelease: ForwardCancellable
 ): Any? {
   val fb = suspend { use(a) }
-  val frame = BracketUseContinuation(a, uCont, release, uncancellableContext)
+  val frame = BracketUseContinuation(waitsForResult, a, uCont, release, uncancellableContext)
   deferredRelease.complete(frame.cancel)
 
   val x = try {
@@ -312,7 +319,7 @@ private fun <A, B> launchUseAndRelease(
     Result.failure<B>(e.nonFatalOrThrow())
   }
 
-  return launchRelease(a, x, uCont, release, uncancellableContext)
+  return launchRelease(waitsForResult, a, x, uCont, release, uncancellableContext)
 }
 
 /**
@@ -320,6 +327,7 @@ private fun <A, B> launchUseAndRelease(
  * It's cancel signal needs to be registered to it's `uCont.context.connection()` using [ForwardCancellable].
  */
 private class BracketUseContinuation<A, B>(
+  val waitsForResult: AtomicBooleanW,
   val a: A,
   val uCont: Continuation<B>,
   val release: suspend (A, ExitCase) -> Unit,
@@ -327,10 +335,6 @@ private class BracketUseContinuation<A, B>(
 ) : Continuation<B> {
 
   override val context: CoroutineContext = uCont.context
-
-  // Guard used for thread-safety, to ensure the idempotency
-  // of the release; otherwise `release` can be called twice
-  private val waitsForResult = atomic(true)
 
   suspend fun release(c: ExitCase): Unit = release(a, c)
 
@@ -343,7 +347,7 @@ private class BracketUseContinuation<A, B>(
 
   override fun resumeWith(result: Result<B>) {
     val releasedOrSuspended = try {
-      launchRelease(a, result, uCont, release, uncancellableContext)
+      launchRelease(waitsForResult, a, result, uCont, release, uncancellableContext)
     } catch (e: Throwable) {
       Result.failure<B>(e.nonFatalOrThrow())
     }
@@ -361,19 +365,19 @@ private class BracketUseContinuation<A, B>(
  *  => `Unit` result of `release` is **always** ignored.
  */
 private fun <A, B> launchRelease(
+  waitsForResult: AtomicBooleanW,
   a: A,
   result: Result<B>,
   uCont: Continuation<B>,
   release: suspend (A, ExitCase) -> Unit,
   uncancellableContext: CoroutineContext
 ): Any? {
-  val active = AtomicBooleanW(true)
 
   val frame = BracketReleaseContinuation(result, uCont, uncancellableContext)
   val released = suspend {
     result.fold(
-      { if (active.compareAndSet(true, false)) release(a, ExitCase.Completed) },
-      { e -> if (active.compareAndSet(true, false)) release(a, ExitCase.Failure(e)) }
+      { if (waitsForResult.compareAndSet(true, false)) release(a, ExitCase.Completed) },
+      { e -> if (waitsForResult.compareAndSet(true, false)) release(a, ExitCase.Failure(e)) }
     )
   }
 

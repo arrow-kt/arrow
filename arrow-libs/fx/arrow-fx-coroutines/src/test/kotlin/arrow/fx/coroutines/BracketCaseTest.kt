@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -99,7 +100,10 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         bracketCase<Int, Int>(
           acquire = { i },
           use = { throw e },
-          release = { _, ex -> promise.complete(ex) }
+          release = { _, ex ->
+            promise.complete(ex)
+              .mapLeft { fail("Release should only be called once, called again with $ex") }
+          }
         )
       }
 
@@ -115,7 +119,10 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         bracketCase<Int, Int>(
           acquire = { x },
           use = { e.suspend() },
-          release = { xx, ex -> promise.complete(Pair(xx, ex)) }
+          release = { xx, ex ->
+            promise.complete(Pair(xx, ex))
+              .mapLeft { fail("Release should only be called once, called again with $ex") }
+          }
         )
       }
 
@@ -131,7 +138,11 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         bracketCase(
           acquire = { x },
           use = { it },
-          release = { xx, ex -> promise.complete(Pair(xx, ex)) }
+          release = { xx, ex ->
+            promise
+              .complete(Pair(xx, ex))
+              .mapLeft { fail("Release should only be called once, called again with $ex") }
+          }
         )
       }
 
@@ -147,7 +158,11 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         bracketCase(
           acquire = { x },
           use = { it },
-          release = { xx, ex -> promise.complete(Pair(xx, ex)).suspend() }
+          release = { xx, ex ->
+            promise.complete(Pair(xx, ex))
+              .mapLeft { fail("Release should only be called once, called again with $ex") }
+              .suspend()
+          }
         )
       }
 
@@ -227,7 +242,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
     }
   }
 
-  "cancel on bracketCase releases" {
+  "cancel on bracketCase releases with immediate acquire" {
     val start = Promise<Unit>()
     val exit = Promise<ExitCase>()
 
@@ -241,6 +256,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         },
         release = { _, exitCase ->
           exit.complete(exitCase)
+            .mapLeft { fail("Release should only be called once, called again with $exitCase") }
         }
       )
     }
@@ -249,6 +265,56 @@ class BracketCaseTest : ArrowFxSpec(spec = {
     start.get()
     f.cancel()
     exit.get() shouldBe ExitCase.Cancelled
+  }
+
+  "cancel on bracketCase releases with suspending acquire" {
+    val start = Promise<Unit>()
+    val exit = Promise<ExitCase>()
+
+    val f = ForkAndForget {
+      bracketCase(
+        acquire = { Unit.suspend() },
+        use = {
+          // Signal that fiber is running
+          start.complete(Unit)
+          never<Unit>()
+        },
+        release = { _, exitCase ->
+          exit.complete(exitCase)
+            .mapLeft { fail("Release should only be called once, called again with $exitCase") }
+        }
+      )
+    }
+
+    // Wait until the fiber is started before cancelling
+    start.get()
+    f.cancel()
+    exit.get() shouldBe ExitCase.Cancelled
+  }
+
+  "cancel on bracketCase doesn't invoke after finishing" {
+    val start = Promise<Unit>()
+    val exit = Promise<ExitCase>()
+
+    val f = ForkAndForget {
+      bracketCase(
+        acquire = { Unit },
+        use = { Unit.suspend() },
+        release = { _, exitCase ->
+          exit.complete(exitCase)
+            .mapLeft { fail("Release should only be called once, called again with $exitCase") }
+        }
+      )
+
+      // Signal that fiber can be cancelled running
+      start.complete(Unit)
+      never<Unit>()
+    }
+
+    // Wait until the fiber is started before cancelling
+    start.get()
+    f.cancel()
+    exit.get() shouldBe ExitCase.Completed
   }
 
   "acquire on bracketCase is not cancellable" {
