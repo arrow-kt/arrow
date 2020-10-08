@@ -12,8 +12,8 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.Platform
 import arrow.fx.coroutines.Promise
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.coroutines.Token
-import arrow.fx.coroutines.connection
 import arrow.fx.coroutines.deleteFirst
 import arrow.fx.coroutines.guarantee
 import arrow.fx.coroutines.prependTo
@@ -166,7 +166,7 @@ class Scope private constructor(
     fr: suspend () -> R,
     release: suspend (R, ExitCase) -> Unit
   ): Either<Throwable, R> {
-    val conn = coroutineContext.connection()
+    val conn = coroutineContext[SuspendConnection] ?: SuspendConnection.uncancellable
     val scope = ScopedResource()
     return Either.catch(fr).flatMap { resource ->
       scope.acquired { ex: ExitCase -> release(resource, ex) }.map { registered ->

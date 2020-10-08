@@ -4,13 +4,16 @@ import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.IOConnection
 import arrow.fx.IORunLoop
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.fix
 import arrow.fx.internal.ForwardCancellable.Companion.State.Active
 import arrow.fx.internal.ForwardCancellable.Companion.State.Empty
 import arrow.fx.typeclasses.CancelToken
 import kotlinx.atomicfu.atomic
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
@@ -20,8 +23,8 @@ internal class ForwardCancellable {
 
   private val state = atomic<State>(init)
 
-  fun cancel(): CancelToken<ForIO> {
-    fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.value.let { current ->
+  suspend fun cancel(): Unit {
+    fun loop(conn: SuspendConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
         is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
@@ -33,7 +36,12 @@ internal class ForwardCancellable {
       }
     }
 
-    return IO.Async { conn, cb -> loop(conn, cb) }
+    return suspendCoroutine { cont ->
+      val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
+      loop(conn) {
+        it.fold(cont::resumeWithException, cont::resume)
+      }
+    }
   }
 
   fun complete(value: CancelToken<ForIO>): Unit = state.value.let { current ->

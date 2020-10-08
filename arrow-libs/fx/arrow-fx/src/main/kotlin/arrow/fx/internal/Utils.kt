@@ -7,8 +7,8 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
-import arrow.fx.IOConnection
 import arrow.fx.IOOf
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.Duration
 import java.util.concurrent.Executor
@@ -138,7 +138,7 @@ object Platform {
     }
   }
 
-  internal inline fun <A> onceOnly(conn: IOConnection, crossinline f: (A) -> Unit): (A) -> Unit {
+  internal inline fun <A> onceOnly(conn: SuspendConnection, crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBooleanW(false)
 
     return { a ->

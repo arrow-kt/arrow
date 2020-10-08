@@ -2,8 +2,8 @@ package arrow.fx.coroutines.stream
 
 import arrow.core.Either
 import arrow.fx.coroutines.ExitCase
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.coroutines.Token
-import arrow.fx.coroutines.connection
 import arrow.fx.coroutines.stream.concurrent.modify
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
@@ -61,7 +61,7 @@ internal class ScopedResource {
   }
 
   suspend fun acquired(finalizer: suspend (ExitCase) -> Unit): Either<Throwable, Boolean> {
-    val conn = coroutineContext.connection()
+    val conn = coroutineContext[SuspendConnection] ?: SuspendConnection.uncancellable
     return state.modify { s ->
       when {
         conn.isCancelled() -> {

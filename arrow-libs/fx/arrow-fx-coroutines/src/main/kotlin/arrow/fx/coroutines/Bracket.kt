@@ -38,11 +38,11 @@ sealed class ExitCase {
  */
 suspend fun <A> uncancellable(f: suspend () -> A): A =
   suspendCoroutineUninterceptedOrReturn sc@{ cont ->
-    val originalConnection = cont.context.connection()
+    val originalConnection = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
     // ForwardCancellable back-pressures the originalConnection#cancel until we call `ForwardCancellable#complete`
     val deferredRelease = ForwardCancellable()
-    originalConnection.push(deferredRelease.cancel())
+    originalConnection.push { deferredRelease.cancel() }
 
     if (originalConnection.isNotCancelled()) {
       val uncancellable = cont.context + SuspendConnection.uncancellable
@@ -226,10 +226,10 @@ suspend fun <A, B> bracketCase(
   use: suspend (A) -> B,
   release: suspend (A, ExitCase) -> Unit
 ): B = suspendCoroutineUninterceptedOrReturn { cont ->
-  val conn = cont.context.connection()
+  val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
   val deferredRelease = ForwardCancellable()
-  conn.push(deferredRelease.cancel())
+  conn.push { deferredRelease.cancel() }
 
   // Race-condition check, avoiding starting the bracket if the connection
   // was cancelled already, to ensure that `cancel` really blocks if we

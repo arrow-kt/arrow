@@ -91,7 +91,7 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
     r: Either<T, U>
   ): Unit =
     if (isActive.getAndSet(false)) {
-      other.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+      suspend { other.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
         main.pop()
         r2.fold({
           cb(Result.success(r))
@@ -109,14 +109,14 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
     err: Throwable
   ): Unit =
     if (active.getAndSet(false)) {
-      other.cancelToken().cancel.startCoroutine(Continuation(ComputationPool) { r2: Result<Unit> ->
+      suspend { other.cancel() }.startCoroutine(Continuation(ComputationPool) { r2: Result<Unit> ->
         main.pop()
         cb(Result.failure(r2.fold({ err }, { Platform.composeErrors(err, it) })))
       })
     } else Unit
 
   return suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cont = cont.intercepted()
 
     val active = AtomicBooleanW(true)

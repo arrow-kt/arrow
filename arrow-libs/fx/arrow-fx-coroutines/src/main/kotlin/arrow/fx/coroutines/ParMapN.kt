@@ -70,7 +70,7 @@ suspend fun <A, B, C> parMapN(
   f: (A, B) -> C
 ): C =
   suspendCoroutineUninterceptedOrReturn { _cont ->
-    val conn = _cont.context.connection()
+    val conn = _cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cont = _cont.intercepted()
     val cb = cont::resumeWith
 
@@ -95,7 +95,7 @@ suspend fun <A, B, C> parMapN(
 
     fun sendException(other: SuspendConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
-      else -> other.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
+      else -> suspend { other.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
         conn.pop()
         cb(Result.failure(r.fold({ e }, { e2 -> Platform.composeErrors(e, e2) })))
       })

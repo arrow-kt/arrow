@@ -31,7 +31,7 @@ interface Fiber<A> {
 }
 
 internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fiber<A> =
-  Fiber({ promise.join() }, conn.cancelToken())
+  Fiber({ promise.join() }, CancelToken { conn.cancel() })
 
 /**
  * Launches a new suspendable cancellable coroutine within a [Fiber].
@@ -59,12 +59,12 @@ internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fibe
  */
 suspend fun <A> ForkConnected(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
     val promise = UnsafePromise<A>()
     // A new SuspendConnection, because its cancellation is now decoupled from our current one.
     val conn2 = SuspendConnection()
-    conn.push(conn2.cancelToken())
+    conn.push { conn2.cancel() }
     f.startCoroutineCancellable(CancellableContinuation(ctx, conn2, promise::complete))
     Fiber(promise, conn2)
   }
@@ -109,12 +109,12 @@ suspend fun <A> ForkScoped(
   interruptWhen: suspend () -> Unit,
   f: suspend () -> A
 ): Fiber<A> = suspendCoroutineUninterceptedOrReturn { cont ->
-  val conn = cont.context.connection()
+  val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
   val promise = UnsafePromise<A>()
   // A new SuspendConnection, because its cancellation is now decoupled from our current one.
   val conn2 = SuspendConnection()
-  conn.push(conn2.cancelToken())
+  conn.push{ conn2.cancel() }
 
   suspend { // Launch cancelation trigger system concurrently
     ForkConnected { interruptWhen.invoke(); conn2.cancel() }

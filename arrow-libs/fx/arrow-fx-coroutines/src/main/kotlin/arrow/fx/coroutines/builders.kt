@@ -62,11 +62,11 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  */
 suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
   suspendCoroutine { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cbb2 = Platform.onceOnly(conn, cont::resumeWith)
 
     val cancellable = ForwardCancellable()
-    conn.push(cancellable.cancel())
+    conn.push { cancellable.cancel() }
 
     if (conn.isNotCancelled()) {
       cancellable.complete(
@@ -138,7 +138,7 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
  */
 suspend fun <A> cancellableF(cb: suspend ((Result<A>) -> Unit) -> CancelToken): A =
   suspendCoroutine { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
     val state = AtomicRefW<((Result<Unit>) -> Unit)?>(null)
     val cb1 = { a: Result<A> ->
@@ -156,7 +156,7 @@ suspend fun <A> cancellableF(cb: suspend ((Result<A>) -> Unit) -> CancelToken): 
     }
 
     val conn2 = SuspendConnection()
-    conn.push(conn2.cancelToken())
+    conn.push { conn2.cancel() }
 
     suspend {
       // Until we've got a cancellation token, the task needs to be evaluated

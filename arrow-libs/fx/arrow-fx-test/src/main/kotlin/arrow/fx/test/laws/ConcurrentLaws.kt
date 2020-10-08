@@ -691,7 +691,7 @@ object ConcurrentLaws {
   val TestError = RuntimeException("TestError")
 
   fun <F> Concurrent<F>.parTraverseResultsInTheCorrectError(EQ: Eq<Kind<F, Unit>>): Unit =
-    forAll(Gen.choose(0, 10)) { killOn ->
+    forFew(10, Gen.choose(0, 10)) { killOn ->
       (10 downTo 0).toList().k().parTraverse(ListK.traverse()) { i ->
           if (i == killOn) raiseError(TestError)
           else unit()

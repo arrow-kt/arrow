@@ -9,13 +9,13 @@ import kotlin.coroutines.resume
 /**
  * Type to constraint [startCoroutineCancellable] to the [CancellableContinuation] constructor.
  */
-interface CancellableContinuation<A> : Continuation<A>
+abstract class CancellableContinuation<A> internal constructor() : Continuation<A>
 
 /** Constructor for [CancellableContinuation] */
 @Suppress("FunctionName")
-inline fun <A> CancellableContinuation(
+fun <A> CancellableContinuation(
   ctx: CoroutineContext = ComputationPool,
-  crossinline resumeWith: (Result<A>) -> Unit
+  resumeWith: (Result<A>) -> Unit
 ): CancellableContinuation<A> = CancellableContinuation(ctx, SuspendConnection(), resumeWith)
 
 /**
@@ -26,22 +26,23 @@ inline fun <A> CancellableContinuation(
  * @returns Disposable handler to cancel the started suspendable cancellable computation.
  */
 fun <A> (suspend () -> A).startCoroutineCancellable(completion: CancellableContinuation<A>): Disposable {
-  val conn = completion.context.connection()
+  val conn = completion.context[SuspendConnection] ?: SuspendConnection.uncancellable
   createCoroutineUnintercepted(completion).intercepted().resume(Unit)
-  return conn.toDisposable()
+  return {
+    Platform.unsafeRunSync { conn.cancel() }
+  }
 }
 
 /**
  *
  * Constructor that allows us to launch a [CancellableContinuation] on an existing [SuspendConnection].
  */
-@PublishedApi
 @Suppress("FunctionName")
-internal inline fun <A> CancellableContinuation(
+internal fun <A> CancellableContinuation(
   ctx: CoroutineContext = ComputationPool,
   conn: SuspendConnection,
-  crossinline resumeWith: (Result<A>) -> Unit
-): CancellableContinuation<A> = object : CancellableContinuation<A> {
+  resumeWith: (Result<A>) -> Unit
+): CancellableContinuation<A> = object : CancellableContinuation<A>() {
   override val context: CoroutineContext = conn + ctx // Faster in case ctx is EmptyCoroutineContext
   override fun resumeWith(result: Result<A>) {
     if (conn.isNotCancelled()) resumeWith(result)

@@ -34,6 +34,6 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  */
 suspend fun cancelBoundary(): Unit =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    if (cont.context.connection().isCancelled()) COROUTINE_SUSPENDED
+    if ((cont.context[SuspendConnection] ?: SuspendConnection.uncancellable).isCancelled()) COROUTINE_SUSPENDED
     else Unit
   }

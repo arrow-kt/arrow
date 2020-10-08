@@ -61,8 +61,8 @@ suspend fun <A, B, C> raceN(
     cb: (Result<Race3<A, B, C>>) -> Unit,
     r: Race3<A, B, C>
   ): Unit = if (isActive.getAndSet(false)) {
-    other2.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
-      other3.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+    suspend { other2.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+      suspend { other3.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
         main.pop()
         r2.fold({
           r3.fold({ cb(Result.success(r)) }, { e -> cb(Result.failure(e)) })
@@ -81,8 +81,8 @@ suspend fun <A, B, C> raceN(
     other3: SuspendConnection,
     err: Throwable
   ): Unit = if (active.getAndSet(false)) {
-    other2.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
-      other3.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+    suspend { other2.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+      suspend { other3.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
         main.pop()
         cb(
           Result.failure(
@@ -106,7 +106,7 @@ suspend fun <A, B, C> raceN(
   } else Unit
 
   return suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cont = cont.intercepted()
 
     val active = AtomicBooleanW(true)
@@ -114,7 +114,7 @@ suspend fun <A, B, C> raceN(
     val connB = SuspendConnection()
     val connC = SuspendConnection()
 
-    conn.push(listOf(connA.cancelToken(), connB.cancelToken(), connC.cancelToken()))
+    conn.push(listOf(suspend { connA.cancel() }, suspend { connB.cancel() }, suspend { connC.cancel() }))
 
     fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
       result.fold({

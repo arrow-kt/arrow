@@ -1,11 +1,11 @@
 package arrow.fx.coroutines
 
-import io.kotest.matchers.should
+import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlin.coroutines.EmptyCoroutineContext
 
-class SuspendConnectionTests : ArrowFxSpec(spec = {
+class SuspendConnectionTests : StringSpec({
 
   "Left identity" {
     val ref = SuspendConnection()
@@ -33,7 +33,7 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "cancellation is only executed once" {
     var effect = 0
-    val initial = CancelToken { effect += 1 }
+    val initial = suspend { effect += 1 }
     val c = SuspendConnection()
     c.push(initial)
 
@@ -46,27 +46,26 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "Disposable is only executed once" {
     var effect = 0
-    val initial = CancelToken { effect += 1 }
+    val initial = suspend { effect += 1 }
     val c = SuspendConnection()
     c.push(initial)
 
-    c.toDisposable().invoke()
+    c.cancel()
     effect shouldBe 1
 
-    c.toDisposable().invoke()
+    c.cancel()
     effect shouldBe 1
   }
 
   "CancelToken delays cancel effect until invoked" {
     var effect = 0
-    val initial = CancelToken { effect += 1 }
+    val initial = suspend { effect += 1 }
     val c = SuspendConnection()
     c.push(initial)
 
-    val token = c.cancelToken()
     effect shouldBe 0
 
-    token.invoke()
+    c.cancel()
     effect shouldBe 1
   }
 
@@ -82,14 +81,14 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "empty; push; cancel; isCancelled" {
     val c = SuspendConnection()
-    c.push(CancelToken {})
+    c.push(suspend {})
     c.cancel()
     c.isCancelled() shouldBe true
   }
 
   "cancel immediately if already cancelled" {
     var effect = 0
-    val initial = CancelToken { effect += 1 }
+    val initial = suspend { effect += 1 }
     val c = SuspendConnection()
     c.push(initial)
 
@@ -102,8 +101,8 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "push two, pop one" {
     var effect = 0
-    val initial1 = CancelToken { effect += 1 }
-    val initial2 = CancelToken { effect += 2 }
+    val initial1 = suspend { effect += 1 }
+    val initial2 = suspend { effect += 2 }
 
     val c = SuspendConnection()
     c.push(initial1)
@@ -116,8 +115,8 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "push two, pop two" {
     var effect = 0
-    val initial1 = CancelToken { effect += 1 }
-    val initial2 = CancelToken { effect += 2 }
+    val initial1 = suspend { effect += 1 }
+    val initial2 = suspend { effect += 2 }
 
     val c = SuspendConnection()
     c.push(initial1)
@@ -131,9 +130,9 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "pop removes tokens in LIFO order" {
     var effect = 0
-    val initial1 = CancelToken { effect += 1 }
-    val initial2 = CancelToken { effect += 2 }
-    val initial3 = CancelToken { effect += 3 }
+    val initial1 = suspend { effect += 1 }
+    val initial2 = suspend { effect += 2 }
+    val initial3 = suspend { effect += 3 }
 
     val c = SuspendConnection()
     c.push(initial1)
@@ -146,7 +145,7 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "push list tokens" {
     var effect = 0
-    val initial = CancelToken { effect += 1 }
+    val initial = suspend { effect += 1 }
 
     val c = SuspendConnection()
     c.push(listOf(initial, initial, initial))
@@ -157,8 +156,8 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
 
   "pushPair token" {
     var effect = 0
-    val initial1 = CancelToken { effect += 1 }
-    val initial2 = CancelToken { effect += 2 }
+    val initial1 = suspend { effect += 1 }
+    val initial2 = suspend { effect += 2 }
 
     val c = SuspendConnection()
     c.pushPair(initial1, initial2)
@@ -170,10 +169,10 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
   "pushPair connections" {
     var effect = 0
     val ref1 = SuspendConnection().apply {
-      push(CancelToken { effect += 1 })
+      push(suspend { effect += 1 })
     }
     val ref2 = SuspendConnection().apply {
-      push(CancelToken { effect += 2 })
+      push(suspend { effect += 2 })
     }
 
     val c = SuspendConnection()
@@ -208,20 +207,12 @@ class SuspendConnectionTests : ArrowFxSpec(spec = {
     ref.isCancelled() shouldBe false
   }
 
-  "uncancellable.pop" {
-    val ref = SuspendConnection.uncancellable
-    ref.pop() should unsafeEquals(CancelToken.unit)
-
-    ref.push(CancelToken.unit)
-    ref.pop() should unsafeEquals(CancelToken.unit)
-  }
-
   "uncancellable.push never cancels the given cancellable" {
     val ref = SuspendConnection.uncancellable
     ref.cancel()
 
     var effect = 0
-    val c = CancelToken { effect += 1 }
+    val c = suspend { effect += 1 }
     ref.push(c)
     effect shouldBe 0
   }

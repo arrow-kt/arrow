@@ -4,10 +4,10 @@ import arrow.core.Either
 import arrow.core.nonFatalOrThrow
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.IOConnection
 import arrow.fx.IOFrame
 import arrow.fx.IOOf
 import arrow.fx.IORunLoop
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.fix
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
@@ -22,14 +22,14 @@ internal object IOBracket {
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancellable()
-      conn.push(deferredRelease.cancel())
+      conn.push { deferredRelease.cancel() }
 
       // Race-condition check, avoiding starting the bracket if the connection
       // was cancelled already, to ensure that `cancel` really blocks if we
       // start `acquire` — n.b. `isCancelled` is visible here due to `push`
       if (!conn.isCancelled()) {
         // Note `acquire` is uncancellable due to usage of `IORunLoop.start`
-        // (in other words it is disconnected from our IOConnection)
+        // (in other words it is disconnected from our SuspendConnection)
         IORunLoop.start(acquire, BracketStart(use, release, conn, deferredRelease, cb))
       } else {
         deferredRelease.complete(IO.unit)
@@ -40,7 +40,7 @@ internal object IOBracket {
   private class BracketStart<A, B>(
     val use: (A) -> IOOf<B>,
     val release: (A, ExitCase<Throwable>) -> IOOf<Unit>,
-    val conn: IOConnection,
+    val conn: SuspendConnection,
     val deferredRelease: ForwardCancellable,
     val cb: (Either<Throwable, B>) -> Unit
   ) : (Either<Throwable, A>) -> Unit {
@@ -86,7 +86,7 @@ internal object IOBracket {
         val onNext = IO.Bind(source, frame)
         // Registering our cancellable token ensures that in case
         // cancellation is detected, `release` gets called
-        conn.push(frame.cancel)
+        conn.push { frame.cancel.fix().suspended() }
 
         // Race condition check, avoiding starting `source` in case
         // the connection was already cancelled — n.b. we don't need
@@ -135,7 +135,7 @@ internal object IOBracket {
     override operator fun invoke(a: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
-    // otherwise we might have a conflict with the auto-cancellation logic
+      // otherwise we might have a conflict with the auto-cancellation logic
       IO.ContextSwitch(applyRelease(ExitCase.Completed), IO.ContextSwitch.makeUncancellable, disableUncancellableAndPop)
         .map { a }
   }
@@ -148,7 +148,7 @@ internal object IOBracket {
     override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(error)
   }
 
-  private val disableUncancellableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
+  private val disableUncancellableAndPop: (Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection =
     { _, _, old, _ ->
       old.pop()
       old

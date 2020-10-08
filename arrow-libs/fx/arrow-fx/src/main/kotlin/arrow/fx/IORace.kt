@@ -3,6 +3,7 @@ package arrow.fx
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.internal.AtomicBooleanW
 import arrow.fx.internal.IOFiber
 import arrow.fx.internal.IOForkedStart
@@ -239,13 +240,13 @@ interface IORace {
   private fun <A, B> race2(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<A, B>> {
     fun <T, U> onSuccess(
       isActive: AtomicBooleanW,
-      main: IOConnection,
-      other: IOConnection,
+      main: SuspendConnection,
+      other: SuspendConnection,
       cb: (Either<Throwable, Either<T, U>>) -> Unit,
       r: Either<T, U>
     ): Unit =
       if (isActive.getAndSet(false)) {
-        other.cancel().fix().unsafeRunAsync { r2 ->
+        IO.effect { other.cancel() }.unsafeRunAsync { r2 ->
           main.pop()
           cb(Right(r))
         }
@@ -254,21 +255,21 @@ interface IORace {
     fun onError(
       active: AtomicBooleanW,
       cb: (Either<Throwable, Nothing>) -> Unit,
-      main: IOConnection,
-      other: IOConnection,
+      main: SuspendConnection,
+      other: SuspendConnection,
       err: Throwable
     ): Unit =
       if (active.getAndSet(false)) {
-        other.cancel().fix().unsafeRunAsync { r2 ->
+        IO.effect { other.cancel() }.unsafeRunAsync { r2 ->
           main.pop()
           cb(Left(r2.fold({ Platform.composeErrors(err, it) }, { err })))
         }
       } else Unit
 
-    val start = { conn: IOConnection, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
+    val start = { conn: SuspendConnection, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
       val active = AtomicBooleanW(true)
-      val connA = IOConnection()
-      val connB = IOConnection()
+      val connA = SuspendConnection()
+      val connB = SuspendConnection()
       conn.pushPair(connA, connB)
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
@@ -295,14 +296,14 @@ interface IORace {
   private fun <A, B, C> race3(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<Race3<A, B, C>> {
     fun onSuccess(
       isActive: AtomicBooleanW,
-      main: IOConnection,
-      other2: IOConnection,
-      other3: IOConnection,
+      main: SuspendConnection,
+      other2: SuspendConnection,
+      other3: SuspendConnection,
       cb: (Either<Throwable, Race3<A, B, C>>) -> Unit,
       r: Race3<A, B, C>
     ): Unit = if (isActive.getAndSet(false)) {
-      other2.cancel().fix().unsafeRunAsync { r2 ->
-        other3.cancel().fix().unsafeRunAsync { r3 ->
+      IO.effect { other2.cancel() }.unsafeRunAsync { r2 ->
+        IO.effect { other3.cancel() }.unsafeRunAsync { r3 ->
           main.pop()
           cb(Right(r))
         }
@@ -312,13 +313,13 @@ interface IORace {
     fun onError(
       active: AtomicBooleanW,
       cb: (Either<Throwable, Nothing>) -> Unit,
-      main: IOConnection,
-      other2: IOConnection,
-      other3: IOConnection,
+      main: SuspendConnection,
+      other2: SuspendConnection,
+      other3: SuspendConnection,
       err: Throwable
     ): Unit = if (active.getAndSet(false)) {
-      other2.cancel().fix().unsafeRunAsync { r2 ->
-        other3.cancel().fix().unsafeRunAsync { r3 ->
+      IO.effect { other2.cancel() }.unsafeRunAsync { r2 ->
+        IO.effect { other3.cancel() }.unsafeRunAsync { r3 ->
           main.pop()
           cb(Left(
             r2.fold({ err2 ->
@@ -339,12 +340,12 @@ interface IORace {
       }
     } else Unit
 
-    val start = { conn: IOConnection, cb: (Either<Throwable, Race3<A, B, C>>) -> Unit ->
+    val start = { conn: SuspendConnection, cb: (Either<Throwable, Race3<A, B, C>>) -> Unit ->
       val active = AtomicBooleanW(true)
-      val connA = IOConnection()
-      val connB = IOConnection()
-      val connC = IOConnection()
-      conn.push(connA.cancel(), connB.cancel(), connC.cancel())
+      val connA = SuspendConnection()
+      val connB = SuspendConnection()
+      val connC = SuspendConnection()
+      conn.push(listOf(connA::cancel, connB::cancel, connC::cancel))
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
         result.fold({
@@ -411,10 +412,10 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val connA = IOConnection()
+      val connA = SuspendConnection()
       val promiseA = UnsafePromise<A>()
 
-      val connB = IOConnection()
+      val connB = SuspendConnection()
       val promiseB = UnsafePromise<B>()
 
       conn.pushPair(connA, connB)
@@ -422,7 +423,7 @@ interface IORace {
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
+            IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
               conn.pop()
               cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
@@ -442,7 +443,7 @@ interface IORace {
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
+            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
               conn.pop()
               cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
             }
@@ -498,22 +499,22 @@ interface IORace {
     IO.Async(true) { conn, cb ->
       val active = AtomicBooleanW(true)
 
-      val connA = IOConnection()
+      val connA = SuspendConnection()
       val promiseA = UnsafePromise<A>()
 
-      val connB = IOConnection()
+      val connB = SuspendConnection()
       val promiseB = UnsafePromise<B>()
 
-      val connC = IOConnection()
+      val connC = SuspendConnection()
       val promiseC = UnsafePromise<C>()
 
-      conn.push(connA.cancel(), connB.cancel(), connC.cancel())
+      conn.push(listOf(connA::cancel, connB::cancel, connC::cancel))
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connB.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
+              IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
@@ -539,8 +540,8 @@ interface IORace {
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connC.cancel().fix().unsafeRunAsync { r3 ->
+            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
+              IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
@@ -566,8 +567,8 @@ interface IORace {
       IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            connA.cancel().fix().unsafeRunAsync { r2 ->
-              connB.cancel().fix().unsafeRunAsync { r3 ->
+            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
+              IO.effect { connB.cancel() }.unsafeRunAsync { r3 ->
                 conn.pop()
                 val errorResult = r2.fold({ e2 ->
                   r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })

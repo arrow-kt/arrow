@@ -12,8 +12,11 @@ import arrow.core.right
 import arrow.core.some
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.SemigroupKLaws
+import arrow.core.test.laws.equalUnderTheLaw
 import arrow.fx.IO.Companion.just
-import arrow.fx.extensions.concurrent
+import arrow.fx.coroutines.Environment
+import arrow.fx.coroutines.timeOutOrNull
+import arrow.fx.coroutines.seconds as cSeconds
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
@@ -33,9 +36,9 @@ import arrow.fx.typeclasses.seconds
 import arrow.fx.test.eq.eqK
 import arrow.fx.test.generators.genK
 import arrow.fx.test.laws.ConcurrentLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
@@ -426,7 +429,7 @@ class IOTest : ArrowFxSpec() {
 
       val result =
         IO.parMapN(all,
-            makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 3, 2, 4, 1, 5)
@@ -448,7 +451,7 @@ class IOTest : ArrowFxSpec() {
 
       val result =
         IO.parMapN(all,
-            makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -460,8 +463,8 @@ class IOTest : ArrowFxSpec() {
 
       fun makePar(num: Int): IO<Int> =
         IO.effect {
-            order.add(num)
-          }.followedBy(IO.sleep((num * 200L).milliseconds))
+          order.add(num)
+        }.followedBy(IO.sleep((num * 200L).milliseconds))
           .map { num }
 
       val result = IO.raceN(
@@ -502,10 +505,10 @@ class IOTest : ArrowFxSpec() {
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext".config(enabled = false) {
       val result =
         IO.parTupledN(all,
-            IO { Thread.currentThread().name },
-            IO.defer { just(Thread.currentThread().name) },
-            IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
-            IO(other) { Thread.currentThread().name })
+          IO { Thread.currentThread().name },
+          IO.defer { just(Thread.currentThread().name) },
+          IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
+          IO(other) { Thread.currentThread().name })
           .unsafeRunSync()
 
       result shouldBe Tuple4("all", "all", "all", "other")
@@ -576,9 +579,9 @@ class IOTest : ArrowFxSpec() {
       IO.fx<ExitCase<Throwable>> {
         val p = Promise<ExitCase<Throwable>>().bind()
         IO.just(0L).bracketCase(
-            use = { IO.never },
-            release = { _, exitCase -> p.complete(exitCase) }
-          )
+          use = { IO.never },
+          release = { _, exitCase -> p.complete(exitCase) }
+        )
           .unsafeRunAsyncCancellable { }
           .invoke() // cancel immediately
 
@@ -590,8 +593,8 @@ class IOTest : ArrowFxSpec() {
       IO.fx<Unit> {
         val p = !Promise<Unit>()
         IO.cancellable<Unit> {
-            p.complete(Unit)
-          }.unsafeRunAsyncCancellable { }
+          p.complete(Unit)
+        }.unsafeRunAsyncCancellable { }
           .invoke()
 
         !p.get()
@@ -602,7 +605,7 @@ class IOTest : ArrowFxSpec() {
       IO.fx<Unit> {
         val p = !Promise<Unit>()
         IO.cancellableF<Unit> {
-            IO { p.complete(Unit) }
+          IO { p.complete(Unit) }
         }.unsafeRunAsyncCancellable { }
           .invoke()
 
@@ -614,8 +617,8 @@ class IOTest : ArrowFxSpec() {
       Promise.uncancellable<ForIO, Unit>(IO.async()).flatMap { latch ->
         IO {
           IO.cancellable<Unit> {
-              latch.complete(Unit)
-            }.unsafeRunAsyncCancellable { }
+            latch.complete(Unit)
+          }.unsafeRunAsyncCancellable { }
             .invoke()
         }.flatMap { latch.get() }
       }.unsafeRunSync()
@@ -761,6 +764,37 @@ class IOTest : ArrowFxSpec() {
         val result = !p.get()
         !effect { result shouldBe ExitCase.Cancelled }
       }.suspended()
+    }
+
+    "Arrow Fx Coroutines bracket works inside IO.effect" {
+      IO.fx {
+        val p = !Promise<arrow.fx.coroutines.ExitCase>()
+        val (_, cancel) = !IO.effect {
+          arrow.fx.coroutines.bracketCase(
+            acquire = { Unit },
+            use = {
+              arrow.fx.coroutines.never<Unit>()
+            },
+            release = { _, ex -> p.complete(ex).fix().suspended() }
+          )
+        }.fork()
+        !sleep(2.seconds)
+        !cancel
+        !p.get()
+      }.equalUnderTheLaw(IO.just(arrow.fx.coroutines.ExitCase.Cancelled), IO.eqK().liftEq(Eq.any()))
+    }
+
+    "IO.bracket works inside Arrow Fx Coroutines" {
+      val p = arrow.fx.coroutines.Promise<ExitCase<Throwable>>()
+      val disp = Environment().unsafeRunAsyncCancellable {
+        IO.unit.bracketCase(
+          release = { _, ex -> IO.effect { p.complete(ex) } },
+          use = { IO.never }
+        ).suspended()
+      }
+      arrow.fx.coroutines.sleep(2.cSeconds)
+      disp.invoke()
+      timeOutOrNull(5.cSeconds) { p.get() } shouldBe ExitCase.Cancelled
     }
   }
 }

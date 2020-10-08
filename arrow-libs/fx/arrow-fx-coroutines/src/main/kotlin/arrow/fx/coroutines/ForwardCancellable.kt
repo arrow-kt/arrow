@@ -30,7 +30,7 @@ internal class ForwardCancellable {
 
   private val state = atomic(init)
 
-  fun cancel(): CancelToken {
+  suspend fun cancel(): Unit {
     fun loop(conn: SuspendConnection, cb: (Result<Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
         is State.Empty ->
@@ -45,10 +45,8 @@ internal class ForwardCancellable {
       }
     }
 
-    return CancelToken {
-      suspendCoroutine { cont ->
-        loop(cont.context.connection(), cont::resumeWith)
-      }
+    return suspendCoroutine { cont ->
+      loop(cont.context[SuspendConnection] ?: SuspendConnection.uncancellable, cont::resumeWith)
     }
   }
 

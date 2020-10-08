@@ -51,7 +51,7 @@ suspend fun <A, B> racePair(
   fb: suspend () -> B
 ): RacePair<A, B> =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cont = cont.intercepted()
     val active = AtomicBooleanW(true)
 
@@ -75,7 +75,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          connB.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+          suspend { connB.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })
@@ -95,7 +95,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          connA.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+          suspend { connA.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })

@@ -70,7 +70,7 @@ suspend fun sleep(duration: Duration): Unit =
 suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
   if (duration.amount <= 0L) null
   else suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context.connection()
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val isActive = AtomicRefW(true) // keep track if already resumed
 
     // Create connections for fa and timer
@@ -78,7 +78,7 @@ suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
     val timerConn = SuspendConnection()
 
     // Register our new tokens to our parents connection
-    conn.push(listOf(timerConn.cancelToken(), faConn.cancelToken()))
+    conn.push(listOf(suspend { timerConn.cancel() }, suspend { faConn.cancel() }))
 
     suspend { sleep(duration) }.startCoroutineCancellable(
       CancellableContinuation(
@@ -87,7 +87,7 @@ suspend fun <A> timeOutOrNull(duration: Duration, fa: suspend () -> A): A? =
       ) { timeOut ->
         timeOut.fold({
           if (isActive.compareAndSet(true, false)) {
-            faConn.cancelToken().cancel.startCoroutine(Continuation(EmptyCoroutineContext) {
+            suspend { faConn.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) {
               it.fold({ cont.intercepted().resume(null) }, cont.intercepted()::resumeWithException)
             })
           }

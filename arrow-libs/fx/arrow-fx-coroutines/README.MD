@@ -1,561 +1,561 @@
 # Arrow Fx Coroutines
 
-Arrow Fx Coroutines offers a suspend DSL with the same semantics and API you find in Arrow Fx's IO, this allows for writing programs using suspend fun directly instead of wrapping in IO.
-It's a functional implementation of Kotlin's coroutine system while providing support for cancellation, error handling, resource handling and all goodies you might be familiar with from other functional effect systems.
+[![Arrow Fx logo](https://raw.githubusercontent.com/arrow-kt/arrow-site/master/docs/img/fx/arrow-fx-brand-sidebar.svg?sanitize=true)](https://arrow-kt.io)
 
-Arrow Fx aims to be a battery included functional effects framework, below you can find a small overview of the library.
-A full coverage of all data types and functions can be found [here](LINK DOCS).
+Λrrow Fx Coroutines is part of Arrow Fx [**Λrrow**](https://arrow-kt.io/docs/fx/), and the public documentation and information on how to use the library can be found there.
 
-## IO\<A\> vs suspend () -> A
+# Contributing and understanding the internals of Arrow Fx Coroutines
 
-Let's look at two simple concurrent examples that switch context and print the `Thread.currentThread().name`.
+To understand how Arrow Fx Coroutines work, we need to take a step back and look at how Coroutines work in Kotlin.
 
-```kotlin:ank
-suspend fun getThreadName(): String =
-  Thread.currentThread().name
+We have several core types that are exposed from Kotlin Std, and the code rewrite performed by the compiler.
 
-suspend fun main(): Unit = IO.fx {
-  val t1 = !effect { getThreadName() }.evalOn(Computation) 
-  val t2 = !effect { getThreadName() }.evalOn(BlockingIO)
-  val t3 = !effect { getThreadName() }.evalOn(UI)
-  !effect { println("$t1 ~> $t2 ~> $t3") }
-}.suspended()
-```
+It's not very important to understand how the code rewrite works, the most important thing to understand is that it rewrites your `suspend` code into a very efficient state machine that allows flattening callbacks. In other words, when a method `suspends` it means that it will not return immediately but at a later point in time through a callback. This is important to know, since this concept also leaks into public API of coroutines.
 
-becomes
+## Kotlin Std Coroutines
+### CoroutineContext
 
-```kotlin:ank
-suspend fun getThreadName(): String =
-  Thread.currentThread().name
+CoroutineContext is a immutable key-value map, where the keys are the types and the values are the instances of the type. Meaning that for every type, there can only be a single instance entry.
+This is useful to for example ensure there is only a single `ContinuationInterceptor`, or a single `Job` in the case of KotlinX Coroutines or a single `SuspendConnection` in the case of Arrow Fx Coroutines.
 
-suspend fun main(): Unit {
-  val t1 = evalOn(Computation) { getThreadName() }
-  val t2 = evalOn(BlockingIO) { getThreadName() }
-  val t3 = evalOn(UI) { getThreadName() }
-  println("$t1 ~> $t2 ~> $t3")
-}
-```
+A `suspend` function/program **always** has a `CoroutineContext`, this restriction is made in the `Continuation` interface.
 
-As you can see we can directly apply `evalOn` to our `suspend fun`, this eliminates the need to wrap explicitly in `IO`.
-Both programs are equivalent in semantics and guarantees, the later will however perform better since it eliminates the wrapping `IO` requires.
-This is possible without losing cancellation support, as explained in the detail here [anchor cancellation].
+This type-instance relationship is achieved by two interfaces `CoroutineContext.Element` and `CoroutineContext.Key<E: CoroutineContext.Element>`. Where `CoroutineContext.Element` has a `Key<*>`, which needs to point to a `Key` for it's concrete type. 
 
-## IO<Either<E, A>> vs suspend () -> Either<E, A>
-
-When writing functional code style we often want to express our domain errors as clearly as possible, a popular pattern is to return `Either<DomainError, SuccessValue>`.
-Let's assume following domain, and compare two snippets one using `IO<Either<E, A>>` and another `suspend () -> Either<E, A>`.
-
-```kotlin:ank
-inline class Id(val id: Long)
-object PersistenceError
-
-data class User(val email: String, val name: String)
-data class ProcessedUser(val id: Id, val email: String, val name: String)
-
-suspend fun fetchUser(): Either<PersistenceError, User> =
-    Right(User("simon@arrow-kt.io", "Simon"))
-
-suspend fun User.process(): Either<PersistenceError, ProcessedUser> =
-    if (email.contains(Regex("^(.+)@(.+)$"))) Right(ProcessedUser(UUID.V4.squuid(), email, name))
-    else Left(PersistenceError)
-```
-
-### IO<Either<E, A>>
-
- ```kotlin:ank
-fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
-  IO.fx {
-    val res = !IO.effect { fetchUser() }
-
-    !res.fold({ error ->
-      IO.just(Either.Left(error))
-    }, { user ->
-      IO.effect { user.process() }
-    })
-  }
-
-// Or unwrapped in `suspend`
-suspend suspendedIOProgram(): Either<PersistenceError, ProcessedUser> =
-  ioProgram().suspended()
- ```
-
-### suspend () -> Either<E, A>
-
-```kotlin:ank
-suspend fun either(): Either<PersistenceError, ProcessedUser> =
-  Either.fx {
-    val user = !fetchUser()
-    val processed = !user.process()
-    processed
-  }
-```
-
-### suspend R.() -> A
-
-We can use extension functions to do functional dependency injection with similar semantics as `Reader` or `Kleisli`.
-They allow us to elegantly define `syntax` for a certain type. Let's see a simple example.
-
-Let's reuse our previous domain of`User`, `ProcessedUser`, but let's introduce `Repo` and `Persistence` layers to mimick what could be a small app with a couple layers.
-
-```kotlin:ank:playground
-interface Repo {
-    suspend fun fetchUsers(): List<User>
-}
-
-interface Persistence {
-    suspend fun User.process(): Either<ProcessingError, ProcessedUser>
-
-    suspend fun List<User>.process(): Either<ProcessingError, List<ProcessedUser>> =
-        Either.fx { map { !it.process() } }
-}
-```
-
-Given the above defined layers we can easily compose them by creating a product which implements the dependencies by delegation.
-This can easily be done manually or with the help of a framework like Dagger to do this wiring automatically.
-
-```kotlin:ank
-class DataModule(
-    persistence: Persistence,
-    repo: Repo
-) : Persistence by persistence, Repo by repo
-```
-
-We can also define top-level functions based on constraints on the receiver.
-Here we define `getProcessUsers` which can only be called where `R` is both `Repo` and `Persistence`.
-
-```kotlin:ank
-/**
- * Generic top-level function based on syntax enabled by [Persistence] & [Repo] constraint
- */
-suspend fun <R> R.getProcessUsers(): Either<ProcessingError, List<ProcessedUser>>
-        where R : Repo,
-              R : Persistence = fetchUsers().process()
-```
-
-## Cancellation
-
-The cancellation system exists out of a few simple building blocks.
-
-All operators found in Arrow Fx check for cancellation. In the small example of an infinite sleeping loop below `sleep` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
-
-```kotlin:ank
-tailrec suspend fun sleeper(): Unit {
-  println("I am sleepy. I'm going to nap")
-  sleep(1.seconds)                                     // <-- cancellation check-point
-  println("1 second nap.. Going to sleep some more")
-  sleeper()
-}
-```
-
-### cancelBoundary()
-
-Calling `suspend fun cancelBoundary()` will check for cancellation, and will gracefully exit in case the effect was cancelled. An example.
-
-```
-suspend fun loop(): Unit {
-  while(true) { 
-	 cancelBoundary() // cancellable computation loop
-    println("I am getting dizzy...")
-  }
-}
-```
-
-This `while` will `loop` until the cancel signal is triggered. Once the cancellation is trigger, this task will gracefully exit through `cancelBoundary()`.
-
-In case you don't want to check for cancellation so often, you can also only install a `cancelBoundary` every n batches.
-The example below defines `repeat` which checks cancellation every `10` repetition.
-
-```kotlin:ank
-tailrec suspend fun repeat(n: Int): Unit {
-  if (n % 10 == 0) cancelBoundary()
-  if (n == 0) Unit
-  else repeat(n - 1)
-}
-```
-
-### Parallel operations cancellation
-
-All parallel `suspend` operators in Arrow Fx behave in the following way.
-
-1. When one of the parallel task fails, the others are also cancelled since a result cannot be determined. This will allow the other parallel operations to gracefully exit and close their resources before returning.
-
-2. When the resulting `suspend` operation is cancelled than all running fibers inside will also be cancelled so that all paralell running task can gracefully exit and close their resources before returning.
-
-For more documentation on parallel operations see below.
-
-### Uncancellable
-
-So how can you execute of `suspend fun` with guarantee that it cannot be cancelled. You simply `wrap` it in the `uncancelable` builder and the function will guarantee not to be cancelled. If the progam is already cancelled before, this block will not run and if it gets cancelled during the execution of this block it will exit immediately after.
-
-```kotlin:ank
-suspend fun uncancellableSleep(duration: Duration): Unit =
-  uncancellable { sleep(duration) }
-```
-
-If we now re-implement our previous `sleeper`, than it will behave a little different from before. The cancellation check before and after `uncancellableSleep` but note that the `sleep` istelf will not be cancelled.
-
-```kotlin:ank
-tailrec suspend fun sleeper(): Unit {
-  println("I am sleepy. I'm going to nap")
-   // <-- cancellation check-point
-  uncancellableSleep(1.seconds)
-   // <-- cancellation check-point
-  println("1 second nap.. Going to sleep some more")
-  sleeper()
-}
-```
-
-This also means that our new sleep can back-pressure `timeOutOrNull`.
-
-```kotlin:ank
-import arrow.fx.coroutines.*
-
-suspend fun main(): Unit {
-  val r = timeOutOrNull(1.seconds) {
-    uncancellable { sleep(2.seconds) }
-  } // r is null, but took 2 seconds.
-}
-```
-
-## Resource Safety
-
-To ensure resource safety we need to take care with cancellation since we don't wont our process to be cancelled but our resources to remain open.
-
-There Arrow Fx offers 2 tools `Resource` and `suspend fun bracketCase`. Any `resource` operations exists out of 3 steps.
-
-1. Acquiring the resource
-2. Using the resource
-3. Releasing the resource with either a result, a `Throwable` or `Cancellation`.
-
-To ensure the resource can be correctly acquired we make the `acquire` & `release` step `uncancelable`.
-If the `bracketCase` was cancelled during `acquire` it'll immediately go to `release`, skipping the `use` step.
-
-`bracketCase` is defined below, in the `release` step you can inspect the `ExitCase` of the `acquire`/`use`.
-
-```
-sealed ExitCase {
-  object Completed: ExitCase()
-  object Cancelled: ExitCase()
-  data class Error(val error: Throwable): ExitCase()
-}
-
-suspend fun <A, B> bracketCase(acquire: suspend () -> A, use: suspend (A) -> B, release: (a, ExitCase) -> B): B
-```
-
-`bracket` is an overload of `bracketCase` that ignores the `ExitCase` value, a simple example.
-We want to create a function to safely create and consume a `DatabaseConnection` that always needs to be closed no matter what the _ExitCase_.
-
-```kotlin:ank
-class DatabaseConnection {
-  suspend fun open(): String = println("Database connection opened")
-  suspend fun close(): String = println("Database connection closed")
-}
-
-suspend fun <A> DatabaseConnection.use(f: suspend (DatabaseConnection) -> A): A =
-  bracket(
-    acquire = { DatabaseConnection().apply { open() } },
-    use = f,
-    release = DatabaseConnection::close
-  )
-```
-
-The difference between `Resource` is that `bracketCase` is simple function, while `Resource` is a data type, both ensure that resources are `acquire`d and `release`d correctly.
-It also forms a `Monad` so you can use it to safely compose `Resource`s, map them or safely traverse `Resource`s.
-
-```kotlin:ank
-suspend fun service(nThreads: Int, name: String): ExecutorService {
-  val threadN = AtomicReference(1)
-  return Executors.newScheduledThreadPool(nThreads) { r ->
-    Thread(r, if (nThreads == 1) name else "$name-${threadNo.incrementAndGet()}")
-    .apply { isDaemon = true}
-  }
-}
-
-suspend fun shutdown(service: ExecutorService): Unit =
-  service.shutdown()
-
-suspend fun singleThreadContext(name: String): Resource<CoroutineContext> =
-  Resource({ service(1, name) }, ::shutdown)
-    .map(ScheduledExecutorService::asCoroutineContext)
-
-suspend fun main(): Unit {
-  singleThreadContext("example-pool").use { ctx ->
-     evalOn(ctx) {
-        println("Running on example-pool: $Thread.currenThread().name")
-     }
-  }
-}
-```
-
-A more advanced `Resource` example that reads 3 `File`s in parallel
-
-```kotlin:ank
-class File(url: String) {
-  fun open(): File = this
-  suspend fun close(): Unit {}
-  override fun toString(): String = "This file contains some interesting content!"
-}
-
-suspend fun openFile(uri: String): File = File(uri).open()
-
-val resources: List<Resource<File>> =
- listOf(
-   Resource({ openFile("path1") }, File::close),
-   Resource({ openFile("path2") }, File::close),
-   Resource({ openFile("path3") }, File::close)
- )
-
-val resource: Resource<List<File>> =
-  resources.sequence(Resource.applicative())
-
-suspend fun main(): Unit {
-  resource.use { files ->
-    files.parTraverse(IODispatchers.IOPool) { file ->
-       file.toString()
-    }
-  }
-}
-```
-
-## Concurrency Helpers
-
-### Ref vs Atomic
-
-`Ref` has been renamed `Atomic` in the new API; and, it provides the same level of service as `Ref` 
-(i.e. `Atomic` provides a safe concurrent API to access to a mutable reference).
-
-For example
+A simple example:
 
 ```kotlin
-fun factorial(n: Int) = IO.fx {
-    val res = Ref(1L).bind()
-
-    (1 until n+1).parTraverse {
-        res.update(it::times)
-    }.bind()
-    res.get().bind()
+class CoroutineName(val name: String): CoroutineContext.Element {
+  companion object Key : CoroutineContext.Key<CoroutineName>
+  override val key: CoroutineContext.Key<*> = Key
 }
 ```
 
-becomes
- 
-```kotlin:ank
- suspend fun factorial(n: Int)  {
-    val res = Atomic(1L)
+### Continuation
 
-    (1 until n+1).parTraverse {
-        res.update(it::times)
-    }
-    res.get()
+```kotlin
+interface Continuation<A> {
+	val ctx: CoroutineContext
+	fun resume(result: Result<A>)
 }
 ```
 
-This code snippet isn’t very useful, except to show how `Ref/Atomic` can be used with concurrent access. 
+As mentioned above, a `suspend` programs can return immediately or `suspend` and return it's value at a later point in time. Thus this can be modeled with a `Contination<A>` where both the immediate result or a suspended result is always returned to `resume`, this ensures that the result is always consumed in the same manner no matter how the `suspend` program behaves.
 
-### MVar vs ConcurrentVar
+Important to note here is that the `resume` callback works with `Result<A>` which is similar to `Either<Throwable, Int>` but with a fast inlined implementation. This allows us to safely run any code inside `suspend`, whilst keeping our programs from blowing up since it will be safely rewired to `resume`.
 
-`MVar` is now called `ConcurrentVar`; and, it provides the same level of service as `MVar` 
-(i.e. a `ConcurrentVar` is a mutable concurrent safe variable which is either `empty` or contains a typed `single value`).
+Additionally it **always** has a `CoroutineContext`, which could be `EmptyCoroutineContext` (~ emptyMap()), or any other `CoroutineContext`.
 
-```kotlin:ank
-tailrec
-fun sum(state: MVar<ForIO, Int>, list: List<Int>) : IO<Int> =
-    IO.fx {
-        when {
-            list.isEmpty() -> state.take().bind()
-            else -> state.take().flatMap { cur ->
-                state.put(cur + list[0]).flatMap { _ -> sum(state, list.tail()) }
-            }.bind()
-        }
-    }
-```
+Such a `Continuation` is always required to consume any `suspend` program through the runners exposed by the Kotlin Standard Library.
 
-becomes
- 
-```kotlin:ank
-tailrec
-suspend fun sum(state: ConcurrentVar<Int>, list: List<Int>) {
-    when {
-        list.isEmpty() -> state.take()
-        else -> {
-            val cur = state.take()
-            state.put(cur + list[0])
-            sum(state, list.tail())
-        }
-    }
-}
-```
+### startCoroutine
 
-This code snippet isn’t very useful, except to show how the atomic calls of `MVar/ConcurrentVar` can be used.
+The most high level runner in the standard library is `startCoroutine`, and it's the first method we'll discuss that creates a `Coroutine` and runs it. Kotlin’s standard library defines a Coroutine as an instance of a suspendable computation. In other words, a Coroutine is a compiled `suspend () -> T` program wired to a Continuation.
 
-## Error Handling
+Let’s take a quick look at an example with the 3 types we've seen and discussed above.
 
-In Kotlin with suspend `try/catch` can safely be used to recover from exceptions.
-
-Simple constructs like `suspend fun Either.catch(f: () -> A): Either<Throwable, A>` are available for nicer syntax when and lifting errors in your domain.
-
-## Retrying and repeating effects
-
-`Schedule` allows you to define and compose powerful yet simple policies, which can be used to either repeat or retry computation. 
-
-A simple example might be to repeat an action `n` times, similar to the `repeat` function in the standard library.
-
-```kotlin:ank
-suspend fun main(): Unit {
-  repeat(Schedule.recurs<A>(n)) {
-    println("Hello")
-  }
-}
-```
-
-Alternatively we can re-use this `Schedule` to `retry` a `suspend fun` `n` times when it fails.
-
-```kotlin:ank
-suspend fun main(): Unit {
-  retry(Schedule.recurs<A>(n)) {
-    println("I am going to do nothing but throw a tantrum!")
-    throw RuntimeException("Boom!")
-  }
-}
-```
-
-Additionally a `Schedule` can also produce an output, let's compose our simple `recurs` Schedule to `recur` every `10.seconds` in a `spaced` fashion and collect all outputs along the way.
-
-```kotlin:ank
-fun <A> schedule(): Schedule<A, List<A>> = Schedule {
-  (recurs<A>(10) and spaced(10.seconds)) zipRight collect()
-}
-
-suspend fun main(): Unit {
-  val count = Atomic(0)
-
-  val history: List<Int> = repeat(schedule<Int>()) {
-    println("Incrementing the ref")
-    count.update(Int::inc)
-  }
-}
-```
-
-## Parallel Ops
-
-
-### ForkConnected
-
-`forkConnected` launches a `suspend () -> A` function on a given `CoroutineContext` inside a `Fiber`, the lifecycle of this `Fiber` is connected to its parent.
-If the parent cancels that this operation will also be cancelled.
-
-A `Fiber` is a data type that represents a `suspend fun join(): A` and `suspend fun cancel(): Unit` handle.
-
-### ForkScoped
-
-`forkScoped` is a similar construct as `ForkConnected` but instead of automatically connecting to its parent it takes a `suspend () -> Unit` op which triggers the cancellation.
-This can be used as a lower level construct to signal cancellation on a trigger, and wire cancellation with 3rd party frameworks.
-
-```kotlin:ank
-tailrec fun fun sleeper(): Unit {
-  sleep(1.seconds)
-  return sleeper()
-}
-
-
-class AndroidFragment : Fragment {
-
-  val cancelPromise = Promise.unsafe<Unit>()
-  
-  override fun onCreateView(bundle: SavedBundleInstance): Unit {
-     suspend {
-       ::sleeper.forkScoped(ComputationPool, cancelPromise::get)
-     }.startCoroutine(Continuation(EmptyCoroutineContext) { })
-  }
-  
-  override fun onDestroyView(): Unit {
-    suspend { cancelPromise.complete(Unit) }
-      .startCoroutine(Continuation(EmptyCoroutineContext) { })
-  }
-}
-```
-
-### ParMapN/parTupledN
-
-`parMapN` combines two `suspend` functions given a pure function `(A, B) -> C` in parallel on a given `CoroutineContext`. Both `suspend fun` will guarantee to dispatch on the given `CoroutineContext` before they start running.
-
-It also wires their respective cancellation. That means that cancelling the resulting `suspend fun` will cancel both functions running in parallel inside.
-Additionally, the function does not return until both tasks are finished and their results combined by `f: (A, B) -> C`.
-
-
-### ParTraverse/parSequence
-
-`parTraverse` can be used to traverse any data type that supports `Traverse` such as `List`, `Validated`, `Either`, `Option`, etc.
-It is used to map elements of the same type `A` in parallel. Cancelling the caller `suspend fun` will cancel all running `Fiber`s inside `parTraverse` gracefully. 
-
-### RaceN
-
-`raceN` is similar to `parMapN` except for it only returns the winner of the race, and cancels the loser as soon as the first fiber finishes the race.
-
-#### RacePair/RaceTriple/ForkAndForget
-
-There are a couple of low level constructs available, and they should be used with care!
-
-- racePair/raceTriple like `raceN` races 2 operations, but instead of cancelling the loser it returns the `Fiber` of the loser task
-
-- ForkAndForget launches a task `fa` as a `Fiber` but doesn't connect it's cancellation system
-
-Both operators can safely capture the running `Fiber` and _guarantee_ not leaking using `bracketCase`.
-An example, writing `raceN` in terms of `racePair`.
-
-```kotlin:ank
-suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend () -> B): Either<A, B> =
-  bracket(
-    acquire = { racePair(ctx, fa, fb) },
-    use = { it.bimap({ (a, _) -> a }, { (_, b) -> b }) },
-    release = {
-      it.bimap(
-        { (_, fiber) -> fiber.cancel() },
-        { (fiber, _) -> fiber.cancel() }
-      )
-    }
-  )
-```
-
-## And more…
-
-Arrow Fx Coroutines also provides, for complex/specific use cases, services such as :  
-- an immutable queue (`IQueue` datatype),  
-- a purely functional, effectful stream processing with the new `Stream`API,  
-- The new service `CircuitBreaker`aims to to make our distributed systems more reliable.  
-This list is not exhaustive.
-
-## Arrow Fx Coroutines, KotlinX Coroutines & Kotlin Standard Library
- 
-### Demystify Coroutine 
-
-Kotlin's standard library defines a `Coroutine` as an instance of a suspendable computation.
-
-In other words, a `Coroutine` is a compiled `suspend () -> A` program wired to a `Continuation`.
-
-Which can be created by using [`kotlin.coroutines.intrinsics.createCoroutineUnintercepted`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.intrinsics/create-coroutine-unintercepted.html).
-
-So let's take a quick look at an example.
-
-```kotlin:ank
-import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
+```kotlin
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 
 suspend fun one(): Int = 1
+
+suspend fun fail(): Int = TODO()
+
+fun main() {
+  ::one.startCoroutine(Continuation(EmptyCoroutineContext) {
+    println(it) // Success(1)
+  })
+
+  ::fail.startCoroutine(Continuation(EmptyCoroutineContext) {
+    println(it) // Failure(kotlin.NotImplementedError: An operation is not implemented.)
+  })
+}
+```
+
+Here you can see that even if our program blows up, it will be correctly wired into the `Continuation` callback without blowing up `main`.
+
+If we take a look at its very short implementation, we can see that it exists of a composition of 3 functions. `createCoroutineUnintercepted` with the completion `Continuation`, `intercepted` and `resume`. In the sections below we'll dig into what that means, and how that works.
+All you really need to remember here is that `suspend () -> T` will run on a given `Continuation<T>`, on its `CoroutineContext`. If that `CoroutineContext` is capable of interception, it will intercept first and then it will start with `resume(Unit)`.
+
+```
+public fun <T> (suspend () -> T).startCoroutine(completion: Continuation<T>) {
+    createCoroutineUnintercepted(completion).intercepted().resume(Unit)
+}
+```
+
+### ContinuationInterceptor
+
+Before we can move into what `createCoroutineUnintercepted` is or how it works, we should first understand what interception or `intercepted` is in Kotlin Coroutines.
+One thing that is important to understand is that Coroutines by themselves have nothing to do with concurreny or asynchronity, but rather they can be used to build concurrent frameworks or libraries.
+
+So let's take a quick look at its definition
+
+```kotlin
+public interface ContinuationInterceptor : CoroutineContext.Element {
+    companion object Key : CoroutineContext.Key<ContinuationInterceptor>
+
+    public fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T>
+
+    public fun releaseInterceptedContinuation(continuation: Continuation<*>) {
+        /* do nothing by default */
+    }
+}
+```
+
+Here we can see that `ContinuationInterceptor` is a `CoroutineContext.Element`, which means we can put into an immutable `CoroutineContext` map. It has an abstract `interceptContinuation` method, which is called upon calling `intercepted`. It can be called upon the `Continuation` returned by `createCoroutineUnintercepted`, and in that case will call `interceptContinuation` in the case the `CoroutineContext` contains a `ContinuationInterceptor`. This operation is idempotent, since the result is cached.
+
+When the `Continuation` is finished running, then before returning it will call `releaseInterceptedContinuation`, but only in the case `interceptContinuation` returned a different `Continuation` than it received.
+
+Let's take a look at a simple example.
+
+```kotlin
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
+
+suspend fun helloWorld(): String = "Hello World!"
+
+fun main() {
+  ::helloWorld.startCoroutine(Continuation(Printer) {
+    println("Received result: $it")
+  })
+}
+
+object Printer : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+  override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> {
+    val newContinuation = object : Continuation<T> {
+      override val context: CoroutineContext = continuation.context
+
+      override fun resumeWith(result: Result<T>) {
+        println("PrinterContinuation resume: pass $result to original continuation")
+        continuation.resumeWith(result)
+      }
+    }
+    println("interceptContinuation($continuation)\nand returning a new one: $newContinuation\n")
+    return newContinuation
+  }
+
+  override fun releaseInterceptedContinuation(continuation: Continuation<*>) {
+    super.releaseInterceptedContinuation(continuation)
+    println("releaseInterceptedContinuation($continuation)")
+  }
+}
+```
+
+```
+1. interceptContinuation(Continuation at kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsJvmKt$createCoroutineUnintercepted$$inlined$createCoroutineFromSuspendFunction$IntrinsicsKt__IntrinsicsJvmKt$2) 
+and returning a new one: Printer$interceptContinuation$newContinuation$1@448139f0
+
+2. PrinterContinuation resume: pass Success(kotlin.Unit) to original continuation
+
+3. releaseInterceptedContinuation(Printer$interceptContinuation$newContinuation$1@448139f0)
+
+4. Received result: Success(Hello World!)
+```
+
+Let's analyse the output:
+
+In the first line of the output we can clearly see that our original `Continuation` created by `startCoroutine` is one created by the Kotlin Compiler through `createCoroutineUnintercepted` (and some other internal machinery inside the Kotlin Std library which creates a `Coroutine` from a suspending function). We wrap it, and return our own `Printer` continuation.
+
+Secondly, our `Printer` continuation is started with `resume(Unit)`, which we see reflected as receiving `Success(kotlin.Unit)` in `resume` and then simply passing it along to our original continuation. The original continuation, created by the Kotlin Compiler, will then start our `helloWorld` suspend program.
+
+3. After our program is finished, we see that our `Printer` continuation is released.
+
+4. Finally, we see that our result is finally returned to our own `Continuation`.
+
+So you might be wondering why this is useful? This isn't very useful for printing anything obviously, because we only get `intercepted` before anything starts running and released when it's finished. But it gives us the perfect entry point to schedule the coroutine on a `Thread` or `ExecutorService`.
+
+#### Intercepting to schedule/dispatch
+
+Scheduling something on a `ExecutorService` is simply a call to the function `ExecutorService#submit` with a `Runnable` argument. Which is exactly what we can do with interception, looking at the previous log output, we can intercept the _start_ signal of `Result<Unit>` before we pass it to the original continuation. This means we can intercept the _start_ signal, and `submit` it on an `ExecutorService` before starting the original continuation.
+So let's see the most basic example where we do this for the `ForkJoinPool`.
+
+```kotlin
+object CommonPoolContext : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+  val pool: ForkJoinPool = ForkJoinPool()
+
+  override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
+    object : Continuation<T> {
+      override val context: CoroutineContext = continuation.context
+
+      override fun resumeWith(result: Result<T>) {
+        pool.submit { continuation.resumeWith(result) }
+      }
+    }
+}
+```
+
+We create a singleton `ContinuationInterceptor` just like we did for our `Printer`, and we when we get intercepted we can then wrap the original `Continuation` with a `Continuation` that `submit`s the _start_ signal onto the `ForkJoinPool`.
+
+A small example to see this in action, we need the `Thread.sleep` in `main` since when we reach `pool.submit` in the `Continuation` `main` will finish and we want to wait a bit so we can see the ouput printed.
+
+```kotlin
+import java.util.concurrent.ForkJoinPool
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
+
+suspend fun helloWorld(): String =
+  "Hello from ${Thread.currentThread().name}"
+
+object CommonPoolInterceptor : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+  val pool: ForkJoinPool = ForkJoinPool()
+
+  override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
+    object : Continuation<T> {
+      override val context: CoroutineContext = continuation.context
+
+      override fun resumeWith(result: Result<T>) {
+        pool.execute { continuation.resumeWith(result) }
+      }
+    }
+}
+
+fun main() {
+  ::helloWorld.startCoroutine(Continuation(CommonPoolInterceptor) {
+    println(it)
+  })
+
+  Thread.sleep(100)
+}
+```
+
+Now that we know what it means to `intercept` and why it's crucial to build effect systems on top of Kotlin Coroutines, let's investigate some more of the lower level combinators. Those will allow us to by-pass `intercepted` from the higher level combinators to avoid scheduling all over the place, or allowing us to change `CoroutineContext` without having to explicitly schedule. This is important in relation to cancellation, which we'll see in great detail below.
+
+### createCoroutineUnintercepted
+
+`createCoroutineUnintercepted` is the lowest level function of creating (and thus subsequently starting) a Coroutine, and you'll find it is used in most other function with either `createCoroutineXXX` or `startCoroutineXXX`.
+
+It's found in the `kotlin.coroutines.intrinsics` package, which we saw 1 method of so far `intercepted`. And we'll cover the other content below. As we've already mentioned above, this method turns a `suspend () -> T` function into a `Coroutine`, which is an instance of a suspendable computation. This Coroutine hasn't started running yet, and we can run it as many times as we want. As you might've guessed from above, we can start the Coroutine by calling `resume(Unit)` on it.
+
+For a given program `suspend () -> T` we pass a `Continuation<A>`, and `createCoroutineUnintercepted` returns us a `Continuation<Unit>`. This `Continuation<Unit>` models a Coroutine, which is the program `suspend () -> T` wired to it's `context` and callback `resume: (Result<T>) -> Unit`.
+
+Let's see a quick example of the creation of a simple Coroutine which is started multiple times.
+
+```kotlin
+import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.resume
+
+suspend fun one(): String = "Hello World!"
 
 val cont: Continuation<Unit> = ::one
   .createCoroutineUnintercepted(Continuation(EmptyCoroutineContext, ::println))
 
-cont.resume(Unit)
+fun main() {
+  cont.resume(Unit)
+  println("Fired once")
+
+  cont.resume(Unit)
+  println("Fired Twice")
+
+  cont.resume(Unit)
+  println("Fired three times")
+}
 ```
 
-As you can see here above we create a `Coroutine` using `createCoroutineUnintercepted` which returns us `Continuation<Unit>`.
-Strange, you might've expected a `Coroutine` type but a `Coroutine` is represented by `Continuation<Unit>`.
+If we look back at `startCoroutine`, we see that is simply creates a Coroutine, **always** invokes its interceptor and then immediately starts it. So the highest level runner, combines the lowest level functions. 
 
-This `typealias Coroutine = Contination<Unit>` will start running every time you call `resume(Unit)`, which allows you to run the suspend program N times.
+```
+public fun <T> (suspend () -> T).startCoroutine(completion: Continuation<T>) {
+    createCoroutineUnintercepted(completion).intercepted().resume(Unit)
+}
+```
 
-### Arrow Fx Coroutines & KotlinX Coroutines
+### suspendCoroutineUninterceptedOrReturn / COROUTINE_SUSPENDED
 
-Both Arrow Fx Coroutines & KotlinX Coroutines independently offer an implementation for Kotlin's coroutine system.
+As you might've noticed in all examples above, we haven't actually used any suspension so far. But what does it mean to suspend? Most simply put it means the function doesn't immediately returns, but is going to return the result through the callback `(Result<T>) -> Unit`.
 
-As explained in the document above, Arrow Fx Coroutines offers a battery-included functional IO with cancellation support.
-Where KotlinX Coroutines offers an implementation that offers light-weight futures with cancellation support.
+At the lowest guts of writing suspend functions you can find this function, is capable of returning immediately or returning in a suspended way. We however have to signal to Kotlin's Coroutine system that we're returning immediately or we're suspending and returning at a later point in time. This is done with the marker `COROUTINE_SUSPENDED`.
+
+`COROUTINE_SUSPENDED` is a simply marker that can be compared to check if it's the users result, or we should wait for `Continuation#resume` to be called. In the Kotlin Standard Library we can find following definition.
+
+```
+val COROUTINE_SUSPENDED: Any
+```
+
+So in combination with `suspend inline fun <T> suspendCoroutineUninterceptedOrReturn(crossinline block: (Continuation<T>) -> Any?): T`, we can now write `suspend fun` which suspend or return immediately.
+
+```kotlin
+suspend fun immediateHelloWorld(): String =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    "Hello World!"
+  }
+
+suspend fun suspendingHelloWorld(): String =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    cont.resumeWith(Result.success("Hello World!"))
+    COROUTINE_SUSPENDED
+  }
+```
+
+Here you can see that in `immediateHelloWorld` we immediately return `"Hello World!"` to the `suspendCoroutineUninterceptedOrReturn` function, and in `suspendingHelloWorld` we return the value through the `Continuation#resume` callback and signal to the Coroutine that we returned the result through the callback.
+
+This is useful when you need to access the `CoroutineContext`, but you know you don't actually need to `suspend` since it allows accesing the `Continuation` and its `CoroutineContext` without having to suspend.
+Or when you want to suspend the coroutine but you don't want to explicitely `intercept` again, this is a useful optimisation when for example the `CoroutineContext` contains a `ContinuationInterceptor` that dispatches/schedules which is an expensive operation when it's  unnecessary.
+
+#### suspendCoroutine
+
+So what is the difference with the higher level and better known `suspendCoroutine` function? As the name of the lower level function might have hinted, this function always calls `intercepted` but additionally it also removes the ability to immediately return **whilst still allowing for this optimisation underneath at a relative small cost!**.
+
+The implementation of `suspendCoroutine` looks like this:
+
+```
+@SinceKotlin("1.3")
+@InlineOnly
+public suspend inline fun <T> suspendCoroutine(crossinline block: (Continuation<T>) -> Unit): T {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    return suspendCoroutineUninterceptedOrReturn { c: Continuation<T> ->
+        val safe = SafeContinuation(c.intercepted())
+        block(safe)
+        safe.getOrThrow()
+    }
+}
+```
+
+As you can see here it's build on top of the lower level function `suspendCoroutineUninterceptedOrReturn`, which we've discussed above, but it calls `intercepted` on the `Continuation`. This is done to add some additional safety, **which only works in the case the `CoroutineContext` contains a dispatching `ContinuationInterceptor`**.
+
+Let's say that inside `suspendCoroutine` you wrap some Java API that runs on an unbounded cached pool (commonly known as `IO` pools) to run blocking IO operations such as JDBC, it would be dangerous to remain on this pool since we could unknownlingly exhaust the JDBC pool deadlocking calls to JDBC. For this reason it's much safer to always call `intercepted` so that after suspension we return to the original context. Similarly to how `evalOn` or `withContext` return to their original context after running an operation on a different pool. This is a safety measure commonly used in effect systems in other languages as well such as `IO.async` from Cats Effects in Scala. Important to note is that this only works if a dispatching `ContinuationInterceptor` is available in the `CoroutineContext`.
+
+So what is `SafeContinuation`? `SafeContinuation` runs the code provide by the `block` lambda, and in case that it calls `resumeWith` in an immediate manner we want to return that result immmediately to `suspendCoroutineUninterceptedOrReturn`. In the case it for example forks to a different context, for example for JDBC or a network call, we cannot return immediately and we need to return `COROUTINE_SUSPENDED` such as explained above. This machinery and state machine is hidden inside `SafeContinuation`. Simply put, `getOrThrow` is raced with `resumeWith` to see which one is reached first and depending on who wins it returns the result or `COROUTINE_SUSPENDED`. You can check the implementation [here](https://github.com/JetBrains/kotlin/blob/master/libraries/stdlib/jvm/src/kotlin/coroutines/SafeContinuationJvm.kt).
+
+### startCoroutineUninterceptedOrReturn
+
+The last method we haven't discussed yet is `startCoroutineUninterceptedOrReturn`, which is similar to `startCoroutine` but as you might've guessed doesn't call `intercepted`. Additionally, it's more raw bones since it either returns us the result immediately or it returns us the result in the `Continuation` callback.
+
+If we look at the implementation, we can also clearly see how it works in a desugared way on the JVM.
+
+```kotlin
+@SinceKotlin("1.3")
+@InlineOnly
+public actual inline fun <T> (suspend () -> T).startCoroutineUninterceptedOrReturn(
+    completion: Continuation<T>
+): Any? = (this as Function1<Continuation<T>, Any?>).invoke(completion)
+```
+
+The `suspend () -> T` function is casted to a `Function1<Continuation<T>, Any?>`, and we simply pass the `completion` callback as an argument. If you think back to `suspendCoroutineUninterceptedOrReturn` which either passed the result to the callback or returned immediately it's clear how these two could be wired together.
+So let's take back our examples from `suspendCoroutineUninterceptedOrReturn` and see how they behave when we run them with `startCoroutineUninterceptedOrReturn`.
+
+```kotlin
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+
+suspend fun immediateHelloWorld(): String =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    "Hello World!"
+  }
+
+suspend fun suspendingHelloWorld(): String =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    cont.resumeWith(Result.success("Hello World!"))
+    COROUTINE_SUSPENDED
+  }
+
+fun main() {
+  ::immediateHelloWorld.startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) {
+    println("I am never called")
+  }).also { println("Immediately returned: $it") }
+
+  ::suspendingHelloWorld.startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) {
+    println("I am called with result: $it")
+  }).also { println("suspending returned: $it") }
+}
+```
+
+Output:
+```
+Immediately returned: Hello World!
+I am called with result: Success(Hello World!)
+suspending returned: COROUTINE_SUSPENDED
+```
+
+Here in the output we can clearly see that in the first case the callback is never invoked, and we get the result immediately returned to us.
+In contrast to the second case where the callback is invoked, **and** the immediate returned value is `COROUTINE_SUSPENDED`.
+This means that if we use `startCoroutineUninterceptedOrReturn` you **always** need to check the returned value to check if it's `COROUTINE_SUSPENDED` or a user returned value (which in that case needs to be casted back from Any? to T).
+
+This might all seem very obscure, but very powerful as we'll discuss below how we use these primitives to implement some of Arrow Fx Coroutines core operations.
+
+## Arrow Fx Coroutines
+
+When building an effect system it's crucial that we take into account cancellation, since in todays high traffic back-ends or fast paced web/mobile users its important we can cancel request when a user or device is not interested in receiving the result anymore. 
+
+### SuspendConnection
+
+At the basis of this cancellation is a `sealed class SuspendConnection`, which is also a `CoroutineContext` and is defined as follows:
+
+```kotlin
+sealed class SuspendConnection : AbstractCoroutineContextElement(SuspendConnection) {
+  companion object Key : CoroutineContext.Key<SuspendConnection>
+  
+  abstract suspend fun cancel(): Unit
+  abstract fun isCancelled(): Boolean
+
+  abstract fun push(token: CancelToken): Unit
+
+  // ...
+}
+```
+
+A `CancelToken` is a `inline class` wrapper around `suspend () -> Unit` which is used to model cancellation token. These are used to define cancellable operations in a typed manner.
+
+It has two implementations, `Uncancellable` and `DefaultConnection`
+
+#### Uncancellable
+
+The uncancellable implementation has a no-op `cancel` method, and always returns `false` upon checking `isCancelled`.
+Which subsequently means that all cancellable operations become uncancellable when run on this `CoroutineContext`.
+Some optimisations could be implemented when an `uncancellable` context is detected.
+
+#### DefaultConnection
+
+The `DefaultConnection` keeps track of all `CancelToken` registered for a given `SuspendConnection`.
+It does so by keeping all `CancelToken` in a FIFO stack, and running them in order when cancelled.
+Since `SuspendConnection` is a FIFO stack, we can register a token before running a cancellable operation,
+and pop the token after the cancellable operation has finished so
+we don't run a `CancelToken` when it's not necessary anymore since that could lead to (undefined) weird behavior. This is useful for example in `parMap2` where we want to launch two parallel operations, and push their cancellation system onto to the original `SuspendConnection` and `pop` it when both finish.
+
+### Cancellation
+
+So what does it actually mean to cancel? Currently in Arrow 0.11.0, cancellation means that the code stops running (or in other words suspends forever and `never` returns).
+This is implemented as a `cancelBoundary`, and with all the understanding of the low-level Kotlin machinery we have now can be implemented as follows.
+
+```kotlin
+suspend fun cancelBoundary(): Unit =
+  suspendCoroutineUninterceptedOrReturn { cont ->
+    if (cont.context[SuspendConnection]?.isCancelled() == true) COROUTINE_SUSPENDED
+    else Unit
+  }
+```
+
+So a `cancelBoundary` checks if the `SuspendConnection#isCancelled` and if so it suspends forever and never invokes the callback, effectively this means it stops running the code.
+In the case the `SuspendConnection` isn't cancelled, it immediately returns `Unit`. Here we use `suspendCoroutineUninterceptedOrReturn` since we can return immediately when no cancellation signal was triggered, and we don't want to intercept or schedule but we have to check the `Continuation#context` to be able to access the `SuspendConnection`.
+
+So this is how from any user or library code we can add checks for cancellation that automatically exit when a cancellation signal was trigerred.
+
+When `isCancelled` returns `true`, this means that all the registered `CancelToken`'s inside `SuspendConnection` have run, or are running.
+
+NOTE:
+In Kotlin 1.4, CancellationException was added to the Kotlin Std as an ExperimentalApi. The documentation states that a cancellable coroutine should throw it to signal that it has been canccelled. In a future version of Arrow Fx Coroutines we can follow this pattern by instead of suspend upon cancellation like we did in Arrow Fx IO, and as is known from Cats Effects IO, we can `throw CancellationException`. This would also only happen when we're running on a cancellable `SuspendConnection`, and we'd still be able to control cancellation in the same way as you might be familiar with from Cats Effects IO or Arrow Fx IO.
+
+### startCoroutineCancellable
+
+So how do we start a Coroutine with `SuspendConnection`, so we can start `suspend () -> T` in a cancellable way. Using `SuspendConnection` is no different than using any other `CoroutineContext`, so let's take a look at the most simple example we can come up with.
+
+```kotlin
+import arrow.fx.coroutines.CancelToken
+import arrow.fx.coroutines.SuspendConnection
+import arrow.fx.coroutines.seconds
+import arrow.fx.coroutines.sleep
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.startCoroutine
+
+suspend fun main() {
+  val connection = SuspendConnection()
+  connection.push(CancelToken { println("CancelToken ran") })
+
+  suspend { sleep(1.seconds) }.startCoroutine(Continuation(connection) {
+    println("This never runs, since sleep was cancelled.")
+  })
+
+  connection.cancel()
+
+  Thread.sleep(2000) // Sleep longer than suspend program
+}
+```
+
+Output
+```
+CancelToken ran
+```
+
+As we can see in the output, it only prints the `println` from the `CancelToken`. The reason that we also don't see the output from the `Continuation` callback is because it was cancelled before reaching it, since the `sleep` operation gets cancelled and thus never resumed.
+
+So one of the final questions is, how do we build cancellable operators such as `sleep`.
+
+### cancellable (suspendCoroutineCancellable)
+
+To understand how `cancellable` operations are build, let's take a quick look at the implementation of `sleep`. If you're familiar with Arrow's IO, or another `IO` implementation the code below might look familiar.
+
+```kotlin
+internal val scheduler: ScheduledExecutorService = TODO()
+
+suspend fun sleep(duration: Duration): Unit =
+  if (duration.amount <= 0) Unit
+  else cancellable { resumeWith: (Result<Unit>) -> Unit ->
+    val cancelRef = scheduler.schedule(
+      { resumeWith(Result.success(Unit)) },
+      duration.amount,
+      duration.timeUnit
+    )
+
+    CancelToken { cancelRef.cancel(false) }
+  }
+```
+
+We open a `cancellable` block and get a callback which we can invoke with either a pure value, or a `Throwable` failure. We can then schedule a task to resume the callback after the desired `Duration` has passed, and to the `cancellable` block we return the `CancelToken` that we want to execute if the resulting `suspend fun` gets cancelled.
+
+So the signature of `cancellable` looks like:
+
+`suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A`
+
+Where we create a `cancellable` `suspend fun` by consuming a callback of the shape `((Result<A>) -> Unit)` and returning `CancelToken`. 
+
+So let's take a look at what the implementation of `cancellable` looks like.
+
+```
+suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
+  suspendCoroutine { cont ->
+    val conn = cont.context[SuspendConnection] ?: SuspendConnection.Uncancellable
+
+    val cancellable = ForwardCancellable()
+    conn.push(cancellable.cancel())
+
+    val token = try {
+      cb(cont::resumeWith)
+    } catch (throwable: Throwable) {
+      cont.resumeWith(Result.failure(throwable.nonFatalOrThrow()))
+      CancelToken.unit
+    }
+    
+    cancellable.complete(token)
+  }
+```
+
+We `suspendCoroutine` to access the `Continuation`, and since we use `suspendCoroutine` here it will also `intercept` and thus behave in the same safe way as Kotlin's high-level combinators.
+We retrieve the `SuspendConnection`, and default back to an `Uncancellable` connection.
+
+Since we don't know how long it will take before `cb: ((Result<A>) -> Unit) -> CancelToken` returns the `CancelToken` we need a mechanism to back-pressure `conn`, when it gets cancelled, until we receive the `CancelToken`. Otherwise `conn` might get cancelled whilst `CancelToken` is not registered yet creating a race-condition and possibly leaking resources.
+
+`ForwardCancellable` allows us to _defer_ or back-pressure the cancellation signal from the original `conn`, until we receive the `complete` signal with the resulting `CancelToken`.
+
+So here we create a `ForwardCancellable` and push its `cancel` token onto the `SuspendConnection`. We run the _foreign_ user code with the `resumeWith` callback, and `complete` the `ForwardCancellable` with the returned `CancelToken`.
+In case of an exception we `resumeWith` the exception and return a no-op `CancelToken`.
+
+#### ForwardCancellable
+
+ForwardCancellable is useful to forward cancellation when you want to inject an uncancellable piece of logic,
+or defer cancellation and wire two different `SuspendConnection`'s together.
+
+ForwardCancellable can be cancelled and completed with a `CancelToken`.
+
+The following 4 scenarios can occur:
+
+ - When `cancel` is called before `complete`, then `cancel`'s token is back-pressured until `complete` is called.
+   Then `cancel`'s token will subsequently call the CancelToken that was passed to `complete`.
+
+ - When `cancel` is called after `complete`, then `cancel` immediately runs the cancellation token passed to `complete`.
+
+ - When the `ForwardCancellable` is completed, before `cancel`'s token is invoked.
+ The completed `CancelToken` will be invoked immediately when `cancel`'s token is invoked.
+
+ - Calling `complete` twice will result in an `ArrowInternalException`, and is considered an internal developer bug.

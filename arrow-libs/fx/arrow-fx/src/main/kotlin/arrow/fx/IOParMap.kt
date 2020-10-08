@@ -21,6 +21,7 @@ import arrow.core.nonFatalOrThrow
 import arrow.core.none
 import arrow.core.some
 import arrow.core.toT
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
 import kotlin.coroutines.CoroutineContext
@@ -263,8 +264,8 @@ interface IOParMap {
     // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better performing ParMap2)
     val state = AtomicRefW<Any?>(null)
 
-    val connA = IOConnection()
-    val connB = IOConnection()
+    val connA = SuspendConnection()
+    val connB = SuspendConnection()
 
     conn.pushPair(connA, connB)
 
@@ -277,9 +278,9 @@ interface IOParMap {
       })
     }
 
-    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
+    fun sendError(other: SuspendConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
-      else -> other.cancel().fix().unsafeRunAsync { r ->
+      else -> IO.effect { other.cancel() }.unsafeRunAsync { r ->
         conn.pop()
         cb(Left(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
       }
@@ -323,13 +324,13 @@ interface IOParMap {
     val state: AtomicRefW<Option<Tuple3<Option<A>, Option<B>, Option<C>>>> = AtomicRefW(None)
     val active = AtomicBooleanW(true)
 
-    val connA = IOConnection()
-    val connB = IOConnection()
-    val connC = IOConnection()
+    val connA = SuspendConnection()
+    val connB = SuspendConnection()
+    val connC = SuspendConnection()
 
     // Composite cancellable that cancels all ops.
     // NOTE: conn.pop() called when cb gets called below in complete.
-    conn.push(connA.cancel(), connB.cancel(), connC.cancel())
+    conn.push(listOf(connA::cancel, connB::cancel, connC::cancel))
 
     fun complete(a: A, b: B, c: C) {
       conn.pop()
@@ -343,10 +344,10 @@ interface IOParMap {
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
       result.fold({ Unit }, { (a, b, c) -> Option.applicative().map(a, b, c) { (a, b, c) -> complete(a, b, c) } })
 
-    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
+    fun sendError(other: SuspendConnection, other2: SuspendConnection, e: Throwable) =
       if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
-        other.cancel().fix().unsafeRunAsync { r1 ->
-          other2.cancel().fix().unsafeRunAsync { r2 ->
+        IO.effect { other.cancel() }.unsafeRunAsync { r1 ->
+          IO.effect { other2.cancel() }.unsafeRunAsync { r2 ->
             conn.pop()
             cb(Left(r1.fold({ e2 ->
               r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })

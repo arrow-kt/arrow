@@ -5,6 +5,7 @@ import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
+import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.ArrayStack
@@ -21,14 +22,14 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 internal object IORunLoop {
 
   fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, IOConnection.uncancellable, cb as Callback, null, null, null, IOContext(IOConnection.uncancellable))
+    loop(source, SuspendConnection.uncancellable, cb as Callback, null, null, null, SuspendConnection.uncancellable)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <A> startCancellable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, conn, cb as Callback, null, null, null, IOContext(conn))
+  fun <A> startCancellable(source: IOOf<A>, conn: SuspendConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+    loop(source, conn, cb as Callback, null, null, null, conn)
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -150,7 +151,7 @@ internal object IORunLoop {
 
   private fun loop(
     source: Current,
-    cancellable: IOConnection,
+    cancellable: SuspendConnection,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
@@ -158,7 +159,7 @@ internal object IORunLoop {
     ctx: CoroutineContext
   ) {
     var currentIO: Current? = source
-    var conn: IOConnection = cancellable
+    var conn: SuspendConnection = cancellable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -361,14 +362,14 @@ internal object IORunLoop {
    * A `RestartCallback` gets created only once, per [startCancellable] (`unsafeRunAsync`) invocation, once an `Async`
    * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
    */
-  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback, kotlin.coroutines.Continuation<Any?> {
+  private data class RestartCallback(val connInit: SuspendConnection, val cb: Callback) : Callback, kotlin.coroutines.Continuation<Any?> {
 
     // Nasty trick to re-use `Continuation` with different CC.
     private var _context: CoroutineContext = EmptyCoroutineContext
     override val context: CoroutineContext
       get() = _context
 
-    private var conn: IOConnection = connInit
+    private var conn: SuspendConnection = connInit
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
@@ -379,7 +380,7 @@ internal object IORunLoop {
 
     private var value: IO<Any?>? = null
 
-    fun contextSwitch(conn: IOConnection) {
+    fun contextSwitch(conn: SuspendConnection) {
       this.conn = conn
     }
 
@@ -452,8 +453,8 @@ internal object IORunLoop {
   }
 
   private class RestoreContext(
-    val old: IOConnection,
-    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection
+    val old: SuspendConnection,
+    val restore: (Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection
   ) : IOFrame<Any?, IO<Any?>> {
 
     override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
