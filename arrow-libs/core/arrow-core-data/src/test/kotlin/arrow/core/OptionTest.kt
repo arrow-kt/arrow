@@ -87,33 +87,40 @@ class OptionTest : UnitSpec() {
         Option.eqK(),
         Option.genK()
       ),
-      AlignLaws.laws(Option.align(),
+      AlignLaws.laws(
+        Option.align(),
         Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
-      UnalignLaws.laws(Option.unalign(),
+      UnalignLaws.laws(
+        Option.unalign(),
         Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
-      RepeatLaws.laws(Option.repeat(),
+      RepeatLaws.laws(
+        Option.repeat(),
         Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
-      UnzipLaws.laws(Option.unzip(),
+      UnzipLaws.laws(
+        Option.unzip(),
         Option.genK(),
         Option.eqK(),
         Option.foldable()
       ),
-      CrosswalkLaws.laws(Option.crosswalk(),
+      CrosswalkLaws.laws(
+        Option.crosswalk(),
         Option.genK(),
         Option.eqK()
       ),
-      MonadPlusLaws.laws(Option.monadPlus(),
+      MonadPlusLaws.laws(
+        Option.monadPlus(),
         Option.genK(),
-        Option.eqK())
+        Option.eqK()
+      )
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

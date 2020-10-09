@@ -75,33 +75,40 @@ class SequenceKTest : UnitSpec() {
       FunctorFilterLaws.laws(SequenceK.functorFilter(), SequenceK.genK(), SequenceK.eqK()),
       HashLaws.laws(SequenceK.hash(Int.hash()), Gen.sequenceK(Gen.int()), SequenceK.eq(Int.eq())),
       OrderLaws.laws(SequenceK.order(Int.order()), Gen.sequenceK(Gen.int())),
-      AlignLaws.laws(SequenceK.align(),
+      AlignLaws.laws(
+        SequenceK.align(),
         SequenceK.genK(),
         SequenceK.eqK(),
         SequenceK.foldable()
       ),
-      UnalignLaws.laws(SequenceK.unalign(),
+      UnalignLaws.laws(
+        SequenceK.unalign(),
         SequenceK.genK(),
         SequenceK.eqK(),
         SequenceK.foldable()
       ),
-      RepeatLaws.laws(SequenceK.repeat(),
+      RepeatLaws.laws(
+        SequenceK.repeat(),
         SequenceK.genK(),
         SequenceK.eqK(),
         SequenceK.foldable()
       ),
-      UnzipLaws.laws(SequenceK.unzip(),
+      UnzipLaws.laws(
+        SequenceK.unzip(),
         SequenceK.genK(),
         SequenceK.eqK(),
         SequenceK.foldable()
       ),
-      CrosswalkLaws.laws(SequenceK.crosswalk(),
+      CrosswalkLaws.laws(
+        SequenceK.crosswalk(),
         SequenceK.genK(),
         SequenceK.eqK()
       ),
-      MonadLogicLaws.laws(SequenceK.monadLogic(),
+      MonadLogicLaws.laws(
+        SequenceK.monadLogic(),
         SequenceK.genK(),
-        SequenceK.eqK())
+        SequenceK.eqK()
+      )
     )
 
     "can align sequences" {

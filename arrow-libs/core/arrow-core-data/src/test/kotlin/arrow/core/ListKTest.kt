@@ -75,10 +75,12 @@ class ListKTest : UnitSpec() {
       ShowLaws.laws(ListK.show(Int.show()), EQ, Gen.listK(Gen.int())),
       MonoidLaws.laws(ListK.monoid(), Gen.listK(Gen.int()), ListK.eq(Int.eq())),
       SemigroupKLaws.laws(ListK.semigroupK(), ListK.genK(), ListK.eqK()),
-      MonoidalLaws.laws(ListK.monoidal(),
+      MonoidalLaws.laws(
+        ListK.monoidal(),
         ListK.genK(10),
         ListK.eqK(),
-        this::bijection),
+        this::bijection
+      ),
       MonoidKLaws.laws(ListK.monoidK(), ListK.genK(), ListK.eqK()),
       TraverseLaws.laws(ListK.traverse(), ListK.applicative(), ListK.genK(), ListK.eqK()),
 
@@ -88,22 +90,26 @@ class ListKTest : UnitSpec() {
         ListK.eqK(),
         ListK.genK()
       ),
-      AlignLaws.laws(ListK.align(),
+      AlignLaws.laws(
+        ListK.align(),
         ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
       ),
-      UnalignLaws.laws(ListK.unalign(),
+      UnalignLaws.laws(
+        ListK.unalign(),
         ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
       ),
-      UnzipLaws.laws(ListK.unzip(),
+      UnzipLaws.laws(
+        ListK.unzip(),
         ListK.genK(),
         ListK.eqK(),
         ListK.foldable()
       ),
-      CrosswalkLaws.laws(ListK.crosswalk(),
+      CrosswalkLaws.laws(
+        ListK.crosswalk(),
         ListK.genK(),
         ListK.eqK()
       ),
@@ -282,12 +288,12 @@ class ListKTest : UnitSpec() {
 
     "filterMap() should map list and filter out None values" {
       forAll(Gen.listK(Gen.int())) { listk ->
-          listk.filterMap {
-            when (it % 2 == 0) {
-              true -> it.toString().toOption()
-              else -> None
-            }
-          } == listk.toList().filter { it % 2 == 0 }.map { it.toString() }.k()
+        listk.filterMap {
+          when (it % 2 == 0) {
+            true -> it.toString().toOption()
+            else -> None
+          }
+        } == listk.toList().filter { it % 2 == 0 }.map { it.toString() }.k()
       }
     }
 

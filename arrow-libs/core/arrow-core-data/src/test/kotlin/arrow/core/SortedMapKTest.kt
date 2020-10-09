@@ -45,17 +45,20 @@ class SortedMapKTest : UnitSpec() {
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq())
       ),
-      AlignLaws.laws(SortedMapK.align<String>(),
+      AlignLaws.laws(
+        SortedMapK.align<String>(),
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       ),
-      UnalignLaws.laws(SortedMapK.unalign<String>(),
+      UnalignLaws.laws(
+        SortedMapK.unalign<String>(),
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()
       ),
-      UnzipLaws.laws(SortedMapK.unzip<String>(),
+      UnzipLaws.laws(
+        SortedMapK.unzip<String>(),
         SortedMapK.genK(Gen.string()),
         SortedMapK.eqK(String.eq()),
         SortedMapK.foldable<String>()

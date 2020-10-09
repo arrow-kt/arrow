@@ -209,7 +209,8 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       ior.fold(
         { it.some() toT Option.empty<B>() },
         { Option.empty<A>() toT it.some() },
-        { a, b -> a.some() toT b.some() })
+        { a, b -> a.some() toT b.some() }
+      )
     }
 
   /**
@@ -240,7 +241,8 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       ior.fold(
         { it toT null },
         { null toT it },
-        { a, b -> a toT b })
+        { a, b -> a toT b }
+      )
     }
 
   /**

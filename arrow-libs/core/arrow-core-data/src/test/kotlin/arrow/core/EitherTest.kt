@@ -263,7 +263,7 @@ class EitherTest : UnitSpec() {
         Gen.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>,
-          returnObject: Any ->
+        returnObject: Any ->
 
         runBlocking {
           val result =
@@ -284,7 +284,7 @@ class EitherTest : UnitSpec() {
         Gen.suspendFunThatThrowsFatalThrowable(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>,
-          returnObject: Any ->
+        returnObject: Any ->
 
         runBlocking {
           shouldThrow<Throwable> {
@@ -306,7 +306,7 @@ class EitherTest : UnitSpec() {
         Gen.suspendFunThatReturnsAnyRight(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>,
-          returnObject: Any ->
+        returnObject: Any ->
 
         runBlocking {
           val result =
@@ -327,7 +327,7 @@ class EitherTest : UnitSpec() {
         Gen.suspendFunThatReturnsAnyLeft(),
         Gen.any()
       ) { f: suspend () -> Either<Any, Any>,
-          returnObject: Any ->
+        returnObject: Any ->
 
         runBlocking {
           val result =

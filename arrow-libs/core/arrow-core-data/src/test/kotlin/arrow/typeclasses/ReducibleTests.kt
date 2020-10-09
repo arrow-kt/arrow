@@ -26,12 +26,14 @@ class ReducibleTests : UnitSpec() {
         Tuple2(fix().head, ListK(fix().tail))
     }
 
-    testLaws(ReducibleLaws.laws(
-      nonEmptyReducible,
-      NonEmptyList.applicative(),
-      NonEmptyList.genK(),
-      NonEmptyList.eqK()
-    ))
+    testLaws(
+      ReducibleLaws.laws(
+        nonEmptyReducible,
+        NonEmptyList.applicative(),
+        NonEmptyList.genK(),
+        NonEmptyList.eqK()
+      )
+    )
 
     with(nonEmptyReducible) {
       with(Int.semigroup()) {

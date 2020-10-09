@@ -689,11 +689,14 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       }
   }
 
-  fun show(SE: Show<E>, SA: Show<A>): String = fold({
-    "Invalid(${SE.run { it.show() }})"
-  }, {
-    "Valid(${SA.run { it.show() }})"
-  })
+  fun show(SE: Show<E>, SA: Show<A>): String = fold(
+    {
+      "Invalid(${SE.run { it.show() }})"
+    },
+    {
+      "Valid(${SA.run { it.show() }})"
+    }
+  )
 
   data class Valid<out A>(val a: A) : Validated<Nothing, A>() {
     override fun toString(): String = show(Show.any(), Show.any())

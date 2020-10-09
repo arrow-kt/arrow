@@ -66,24 +66,29 @@ class IdTest : UnitSpec() {
         Id.eqK(),
         Id.genK()
       ),
-      SemialignLaws.laws(Id.semialign(),
+      SemialignLaws.laws(
+        Id.semialign(),
         Id.genK(),
         Id.eqK(),
         Id.foldable()
       ),
-      RepeatLaws.laws(Id.repeat(),
+      RepeatLaws.laws(
+        Id.repeat(),
         Id.genK(),
         Id.eqK(),
         Id.foldable()
       ),
-      UnzipLaws.laws(Id.unzip(),
+      UnzipLaws.laws(
+        Id.unzip(),
         Id.genK(),
         Id.eqK(),
         Id.foldable()
       ),
-      CrosswalkLaws.laws(Id.crosswalk(),
+      CrosswalkLaws.laws(
+        Id.crosswalk(),
         Id.genK(),
-        Id.eqK())
+        Id.eqK()
+      )
     )
 
     "Semigroup of Id<A> is Id<Semigroup<A>>" {

@@ -19,6 +19,12 @@ plugins {
 
 apply from: "$ROOT_PROJECT"
 
+// Override ktlint version because prev version does not support fun-interfaces
+ktlint {
+    // TODO: update KTLINT_VERSION=0.34.2 in common gradle.properties
+    version = "0.39.0"
+}
+
 // -- Artifacts publication
 configure(subprojects
             - project("arrow-meta:arrow-meta-test-models")

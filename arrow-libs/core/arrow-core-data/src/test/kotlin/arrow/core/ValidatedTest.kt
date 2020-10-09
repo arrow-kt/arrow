@@ -63,7 +63,8 @@ class ValidatedTest : UnitSpec() {
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.genK(Gen.string()),
-        Validated.eqK(String.eq())),
+        Validated.eqK(String.eq())
+      ),
       BitraverseLaws.laws(
         Validated.bitraverse(),
         Validated.genK2(),

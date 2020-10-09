@@ -91,13 +91,16 @@ fun <T, F, A> Kind<T, A>.altFold(AF: Alternative<F>, FT: Foldable<T>): Kind<F, A
   FT.run { toList().altFromList(AF) }
 
 fun <F, A> List<A>.altFromList(AF: Alternative<F>): Kind<F, A> =
-  map { AF.just(it) }.k().altSum(AF, object : Foldable<ForListK> {
-    override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
-      fix().foldLeft(b, f)
+  map { AF.just(it) }.k().altSum(
+    AF,
+    object : Foldable<ForListK> {
+      override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+        fix().foldLeft(b, f)
 
-    override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
-      fix().foldRight(lb, f)
-  })
+      override fun <A, B> Kind<ForListK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+        fix().foldRight(lb, f)
+    }
+  )
 
 fun <F, A> Option<A>.altFromOption(AF: Alternative<F>): Kind<F, A> =
   fold({ AF.empty() }, { AF.just(it) })

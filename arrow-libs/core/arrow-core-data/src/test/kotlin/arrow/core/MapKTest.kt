@@ -54,16 +54,20 @@ class MapKTest : UnitSpec() {
       EqLaws.laws(MapK.eq(Long.eq(), Int.eq()), Gen.mapK(Gen.long(), Gen.int())),
       FunctorFilterLaws.laws(MapK.functorFilter(), MapK.genK(Gen.long()), MapK.eqK(Long.eq())),
       HashLaws.laws(MapK.hash(Long.hash(), Int.hash()), Gen.mapK(Gen.long(), Gen.int()), EQ_TC),
-      AlignLaws.laws(MapK.align(),
+      AlignLaws.laws(
+        MapK.align(),
         MapK.genK(Gen.long()),
         MapK.eqK(Long.eq()),
         MapK.foldable()
       ),
-      UnalignLaws.laws(MapK.unalign(),
+      UnalignLaws.laws(
+        MapK.unalign(),
         MapK.genK(Gen.long()),
         MapK.eqK(Long.eq()),
-        MapK.foldable()),
-      UnzipLaws.laws(MapK.unzip(),
+        MapK.foldable()
+      ),
+      UnzipLaws.laws(
+        MapK.unzip(),
         MapK.genK(Gen.long()),
         MapK.eqK(Long.eq()),
         MapK.foldable()

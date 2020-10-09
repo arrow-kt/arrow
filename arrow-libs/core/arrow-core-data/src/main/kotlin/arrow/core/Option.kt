@@ -544,11 +544,14 @@ sealed class Option<out A> : OptionOf<A> {
     value
   }
 
-  fun show(SA: Show<A>): String = fold({
-    "None"
-  }, {
-    "Some(${SA.run { it.show() }})"
-  })
+  fun show(SA: Show<A>): String = fold(
+    {
+      "None"
+    },
+    {
+      "Some(${SA.run { it.show() }})"
+    }
+  )
 }
 
 object None : Option<Nothing>() {

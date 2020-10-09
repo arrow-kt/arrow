@@ -29,11 +29,14 @@ internal abstract class MonadContinuation<F, A> : Continuation<Kind<F, A>>, Eage
   fun returnedMonad(): Kind<F, A> = returnedMonad
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
-    result.fold({ returnedMonad = it }, { e ->
-      if (e is ShortCircuit) {
-        returnedMonad = e.recover()
-      } else throw e
-    })
+    result.fold(
+      { returnedMonad = it },
+      { e ->
+        if (e is ShortCircuit) {
+          returnedMonad = e.recover()
+        } else throw e
+      }
+    )
   }
 
   fun startCoroutineUninterceptedAndReturn(f: suspend EagerBind<F>.() -> Kind<F, A>): Any? =

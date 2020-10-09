@@ -25,12 +25,15 @@ open class MonadFilterContinuation<F, A>(
 ) : MonadContinuation<F, A>(MF), MonadFilterSyntax<F> {
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
-    result.fold({ super.resumeWith(result) }, {
-      when (it) {
-        is PredicateInterrupted -> returnedMonad = MF.empty()
-        else -> super.resumeWith(result)
+    result.fold(
+      { super.resumeWith(result) },
+      {
+        when (it) {
+          is PredicateInterrupted -> returnedMonad = MF.empty()
+          else -> super.resumeWith(result)
+        }
       }
-    })
+    )
   }
 
   /**

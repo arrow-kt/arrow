@@ -46,7 +46,8 @@ class SetKTest : UnitSpec() {
       ShowLaws.laws(SetK.show(Int.show()), EQ, Gen.genSetK(Gen.int())),
       MonoidLaws.laws(SetK.monoid(), Gen.genSetK(Gen.int()), EQ),
       SemigroupKLaws.laws(SetK.semigroupK(), SetK.genK(), SetK.eqK()),
-      MonoidalLaws.laws(SetK.monoidal(),
+      MonoidalLaws.laws(
+        SetK.monoidal(),
         SetK.genK(10),
         SetK.eqK(),
         this::bijection

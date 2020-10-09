@@ -47,7 +47,8 @@ class NonEmptyListTest : UnitSpec() {
       SemigroupKLaws.laws(
         NonEmptyList.semigroupK(),
         NonEmptyList.genK(),
-        NonEmptyList.eqK()),
+        NonEmptyList.eqK()
+      ),
       BimonadLaws.laws(
         NonEmptyList.bimonad(),
         NonEmptyList.monad(),
@@ -66,7 +67,8 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.eqK(),
         NonEmptyList.genK()
       ),
-      UnzipLaws.laws(NonEmptyList.unzip(),
+      UnzipLaws.laws(
+        NonEmptyList.unzip(),
         NonEmptyList.genK(),
         NonEmptyList.eqK(),
         NonEmptyList.foldable()

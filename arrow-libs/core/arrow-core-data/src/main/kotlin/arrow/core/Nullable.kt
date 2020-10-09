@@ -26,6 +26,22 @@ inline fun <A, B, C, D, E, F, G, H, R> mapN(a: A?, b: B?, c: C?, d: D?, e: E?, f
   mapN(a, b, c, d, e, f, g, h, Unit) { a, b, c, d, e, f, g, h, _ -> fn(a, b, c, d, e, f, g, h) }
 
 inline fun <A, B, C, D, E, F, G, H, I, R> mapN(a: A?, b: B?, c: C?, d: D?, e: E?, f: F?, g: G?, h: H?, i: I?, fn: (A, B, C, D, E, F, G, H, I) -> R): R? =
-  a?.let { a -> b?.let { b -> c?.let { c -> d?.let { d -> e?.let { e -> f?.let { f -> g?.let { g -> h?.let { h -> i?.let { i ->
-    fn(a, b, c, d, e, f, g, h, i)
-  } } } } } } } } }
+  a?.let { a ->
+    b?.let { b ->
+      c?.let { c ->
+        d?.let { d ->
+          e?.let { e ->
+            f?.let { f ->
+              g?.let { g ->
+                h?.let { h ->
+                  i?.let { i ->
+                    fn(a, b, c, d, e, f, g, h, i)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

@@ -107,7 +107,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
           true -> Right(b)
           false -> null
         }
-    }
+      }
 
     private tailrec fun <L, A, B> Semigroup<L>.loop(v: Ior<L, Either<A, B>>, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> = when (v) {
       is Left -> Left(v.value)
@@ -433,11 +433,15 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override fun toString(): String = show(Show.any(), Show.any())
   }
 
-  fun show(SL: Show<A>, SR: Show<B>): String = fold({
-    "Left(${SL.run { it.show() }})"
-  }, {
-    "Right(${SR.run { it.show() }})"
-  }, { a, b -> "Both(${SL.run { a.show() }}, ${SR.run { b.show() }})" })
+  fun show(SL: Show<A>, SR: Show<B>): String = fold(
+    {
+      "Left(${SL.run { it.show() }})"
+    },
+    {
+      "Right(${SR.run { it.show() }})"
+    },
+    { a, b -> "Both(${SL.run { a.show() }}, ${SR.run { b.show() }})" }
+  )
 }
 
 /**
@@ -450,13 +454,17 @@ inline fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): I
   f,
   { l, r ->
     with(SG) {
-      f(r).fold({
-        Ior.Left(l.combine(it))
-      }, {
-        Ior.Both(l, it)
-      }, { ll, rr ->
-        Ior.Both(l.combine(ll), rr)
-      })
+      f(r).fold(
+        {
+          Ior.Left(l.combine(it))
+        },
+        {
+          Ior.Both(l, it)
+        },
+        { ll, rr ->
+          Ior.Both(l.combine(ll), rr)
+        }
+      )
     }
   }
 )
