@@ -117,7 +117,7 @@ IO.fx {
 
 ```kotlin:ank
 IO.fx {
-  val a = IO.invoke { 1 }.bind()
+  val a = IO.invoke { 1 }()
   a + 1
 }.fix().unsafeRunSync()
 ```
@@ -153,7 +153,7 @@ fun getNLines(path: FilePath, count: Int): IO<List<String>> =
     val (file) = getFile(path)
     val (lines) = file.readLines()
     if (lines.length < count) {
-      IO.raiseError(RuntimeException("File has fewer lines than expected")).bind()
+      IO.raiseError(RuntimeException("File has fewer lines than expected"))()
     } else {
       lines.take(count)
     }

@@ -194,7 +194,7 @@ class UserFetcher<F>(ME: MonadThrow<F>, val api: ApiService): MonadThrow<F> by M
     fx.monadThrow {
       val (id) = fid
       val (user) = api.getUser(id)
-      user.friendIds.map { api.getUser(it.id) }.bind()
+      user.friendIds.map { api.getUser(it.id) }()
     }.handleError { listOf() }
 
   fun createId(id: String): Kind<F, UserId> =
@@ -385,7 +385,7 @@ class UserFetcher<F>(ME: MonadThrow<F>, val api: ApiService): MonadThrow<F> by M
     fx.monadThrow {
       val (id) = fid
       val (user) = api.getUser(id)
-      user.friendIds.map { api.getUser(it.id) }.bind()
+      user.friendIds.map { api.getUser(it.id) }()
     }.handleError { listOf() }
 
   fun createId(id: String): Kind<F, UserId> = ...
@@ -417,7 +417,7 @@ object Api {
     fx.monadThrow {
       val (id) = fid
       val (user) = api().getUser(id)
-      user.friendIds.map { api().getUser(it.id) }.bind()
+      user.friendIds.map { api().getUser(it.id) }()
     }.handleError { listOf() }
 
   fun MonadThrow<F>.createId(id: String): Kind<F, UserId> = ...

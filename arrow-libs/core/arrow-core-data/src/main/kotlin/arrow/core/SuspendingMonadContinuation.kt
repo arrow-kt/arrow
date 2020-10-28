@@ -15,6 +15,7 @@ internal const val UNDECIDED = 0
 internal const val SUSPENDED = 1
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated("SuspendMonadContinuation is replaced by delimited continuations, please use DelimContScope instead")
 internal abstract class SuspendMonadContinuation<F, A>(
   private val parent: Continuation<Kind<F, A>>
 ) : Continuation<Kind<F, A>>, BindSyntax<F> {

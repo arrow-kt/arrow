@@ -369,7 +369,7 @@ import arrow.core.ValidatedNel
  *
  * fun program(): IO<Unit> = IO.fx {
  *   val list = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa"))
- *     .processLogin().bind()
+ *     .processLogin()()
  *   println(list)
  * }
  * //sampleEnd

@@ -172,8 +172,8 @@ listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 import arrow.core.extensions.fx
 
 Option.fx {
-    val a = Some(1).bind()
-    val b = Some(a+1).bind()
+    val a = Some(1)()
+    val b = Some(a+1)()
     a + b
 }
 ```

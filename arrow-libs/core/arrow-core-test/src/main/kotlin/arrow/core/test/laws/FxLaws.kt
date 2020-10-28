@@ -40,7 +40,7 @@ object FxLaws {
   private suspend fun <F, A> nonSuspendedCanBindImmediateValues(G: Gen<Kind<F, A>>, EQ: Eq<Kind<F, A>>, fxBlock: EagerFxBlock<F, A>) {
     forAll(G) { f: Kind<F, A> ->
       fxBlock {
-        val res = !f
+        val res = f()
         res
       }.equalUnderTheLaw(f, EQ)
     }
@@ -50,7 +50,7 @@ object FxLaws {
     forAll(G, Gen.throwable()) { f, exception ->
       shouldThrow<Throwable> {
         fxBlock {
-          val res = !f
+          val res = f()
           throw exception
           res
         }
@@ -65,7 +65,7 @@ object FxLaws {
       .take(1001)
       .forEach { f ->
         fxBlock {
-          val res = !f
+          val res = f()
           res
         }.equalUnderTheLaw(f, EQ)
       }
@@ -76,7 +76,7 @@ object FxLaws {
       .take(10)
       .forEach { f ->
         fxBlock {
-          val res = !f.suspend()
+          val res = f.suspend()()
           res
         }.equalUnderTheLaw(f, EQ)
       }
@@ -89,7 +89,7 @@ object FxLaws {
       .forEach { (f, exception) ->
         shouldThrow<Throwable> {
           fxBlock {
-            val res = !f
+            val res = f()
             throw exception
             res
           }
@@ -105,7 +105,7 @@ object FxLaws {
       .forEach { (f, exception) ->
         shouldThrow<Throwable> {
           fxBlock {
-            val res = !f
+            val res = f()
             exception.suspend()
             res
           }

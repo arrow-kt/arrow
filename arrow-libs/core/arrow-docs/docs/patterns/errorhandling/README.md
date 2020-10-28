@@ -154,9 +154,9 @@ fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
 //sampleStart
 fun prepareLunchOption(): Option<Salad> =
   Option.fx {
-    val lettuce = takeFoodFromRefrigerator().bind()
-    val knife = getKnife().bind()
-    val salad = prepare(knife, lettuce).bind()
+    val lettuce = takeFoodFromRefrigerator()()
+    val knife = getKnife()()
+    val salad = prepare(knife, lettuce)()
     salad
   }
 //sampleEnd
@@ -238,9 +238,9 @@ fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Sala
 //sampleStart
 suspend fun prepareEither(): Either<CookingException, Salad> =
   Either.fx {
-    val lettuce = takeFoodFromRefrigerator().bind()
-    val knife = getKnife().bind()
-    val salad = lunch(knife, lettuce).bind()
+    val lettuce = takeFoodFromRefrigerator()()
+    val knife = getKnife()()
+    val salad = lunch(knife, lettuce)()
     salad
   }
 //sampleEnd
@@ -290,9 +290,9 @@ We can now express the same program as before in a fully polymorphic context
 ```kotlin
 fun <F> MonadError<F, CookingException>.prepare():Kind<F, Salad> =
     fx.monad {
-        val lettuce = takeFoodFromRefrigerator<F>().bind()
-        val knife = getKnife<F>().bind()
-        val salad = lunch<F>(knife, lettuce).bind()
+        val lettuce = takeFoodFromRefrigerator<F>()()
+        val knife = getKnife<F>()()
+        val salad = lunch<F>(knife, lettuce)()
         salad
     }
 ```
@@ -319,9 +319,9 @@ fun <F> MonadError<F, CookingException>.lunchImpure(knife: Knife, lettuce: Lettu
 
 fun <F> MonadError<F, CookingException>.prepare(): Kind<F, Salad> =
     fx.monadThrow {
-        val lettuce = takeFoodFromRefrigerator<F>().bind()
-        val knife = getKnife<F>().bind()
-        val salad = lunchImpure<F>(knife, lettuce).bind()
+        val lettuce = takeFoodFromRefrigerator<F>()()
+        val knife = getKnife<F>()()
+        val salad = lunchImpure<F>(knife, lettuce)()
         salad
     }
 ```

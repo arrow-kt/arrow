@@ -148,10 +148,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
- *     }.bind()
+ *     }()
  *     val readVal = Validated.fromOption(read.read(value)) {
  *       ConfigError.ParseConfig(key)
- *     }.bind()
+ *     }()
  *     readVal
  *   }
  * }
@@ -277,10 +277,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
- *     }.bind()
+ *     }()
  *     val readVal = Validated.fromOption(read.read(value)) {
  *       ConfigError.ParseConfig(key)
- *     }.bind()
+ *     }()
  *     readVal
  *   }.toValidatedNel()
  * }
@@ -344,10 +344,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
- *     }.bind()
+ *     }()
  *     val readVal = Validated.fromOption(read.read(value)) {
  *       ConfigError.ParseConfig(key)
- *     }.bind()
+ *     }()
  *     readVal
  *   }.toValidatedNel()
  * }
@@ -408,10 +408,10 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
- *     }.bind()
+ *     }()
  *     val readVal = Validated.fromOption(read.read(value)) {
  *       ConfigError.ParseConfig(key)
- *     }.bind()
+ *     }()
  *     readVal
  *   }
  * }

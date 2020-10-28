@@ -629,7 +629,7 @@ fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
         val (talk) = speaker.nextTalk()
         val (conference) = talk.getConference()
         val (city) = conference.getCity()
-        reservations.bookFlight(speaker, city).bind()
+        reservations.bookFlight(speaker, city)()
     }
 
 bookSpeakersFlights(ObservableSwitchMonad).fix() // Observable<Reservation>

@@ -18,6 +18,7 @@ class ShortCircuit(val value: Any?) : RuntimeException(null, null) {
 }
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated("MonadContinuation is replaced by delimited continuations, please use DelimContScope instead")
 internal abstract class MonadContinuation<F, A> : Continuation<Kind<F, A>>, EagerBind<F> {
 
   abstract fun ShortCircuit.recover(): Kind<F, A>
