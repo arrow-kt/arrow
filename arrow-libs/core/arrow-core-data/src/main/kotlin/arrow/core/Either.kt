@@ -904,7 +904,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * ```
    */
   inline fun exists(predicate: (B) -> Boolean): Boolean =
-    fold({ false }, { predicate(it) })
+    fold({ false }, predicate)
 
   /**
    * Returns a [Some] containing the [Right] value
@@ -996,8 +996,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       return when (ev) {
         is Left -> Left(ev.a)
         is Right -> {
-          val b: Either<A, B> = ev.b
-          when (b) {
+          when (val b = ev.b) {
             is Left -> tailRecM(b.a, f)
             is Right -> Right(b.b)
           }
@@ -1209,16 +1208,16 @@ inline fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
  *
  * Example:
  * ```
- * Right("something").contains { "something" } // Result: true
- * Right("something").contains { "anything" }  // Result: false
- * Left("something").contains { "something" }  // Result: false
+ * Right("something").contains("something") // Result: true
+ * Right("something").contains("anything")  // Result: false
+ * Left("something").contains("something")  // Result: false
  *  ```
  *
  * @param elem the element to test.
  * @return `true` if the option has an element that is equal (as determined by `==`) to `elem`, `false` otherwise.
  */
 fun <A, B> EitherOf<A, B>.contains(elem: B): Boolean =
-  fix().fold({ false }, { it == elem })
+  fix().exists { it == elem }
 
 fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
   flatMap { a -> ff.fix().map { f -> f(a) } }
@@ -1261,10 +1260,8 @@ inline fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (t
  * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
  * This is like `flatMap` for the exception.
  */
-inline fun <A, B> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<A, B>): Either<A, B> =
-  fix().let {
-    when (it) {
-      is Left -> f(it.a).fix()
-      is Right -> it
-    }
+inline fun <A, B, C> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<C, B>): Either<C, B> =
+  when (val either = fix()) {
+    is Left -> f(either.a).fix()
+    is Right -> either
   }

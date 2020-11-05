@@ -230,9 +230,10 @@ class EitherTest : UnitSpec() {
     }
 
     "handleErrorWith should handle left instance otherwise return Right" {
-      forAll { a: Int, b: Int ->
+      forAll { a: Int, b: String ->
         Left(a).handleErrorWith { Right(b) } == Right(b) &&
-          Right(a).handleErrorWith { Right(b) } == Right(a)
+          Right(a).handleErrorWith { Right(b) } == Right(a) &&
+          Left(a).handleErrorWith { Left(b) } == Left(b)
       }
     }
 
@@ -262,8 +263,7 @@ class EitherTest : UnitSpec() {
       forAll(
         Gen.suspendFunThatReturnsEitherAnyOrAnyOrThrows(),
         Gen.any()
-      ) { f: suspend () -> Either<Any, Any>,
-        returnObject: Any ->
+      ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
 
         runBlocking {
           val result =
@@ -283,8 +283,7 @@ class EitherTest : UnitSpec() {
       forAll(
         Gen.suspendFunThatThrowsFatalThrowable(),
         Gen.any()
-      ) { f: suspend () -> Either<Any, Any>,
-        returnObject: Any ->
+      ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
 
         runBlocking {
           shouldThrow<Throwable> {
@@ -305,8 +304,7 @@ class EitherTest : UnitSpec() {
       forAll(
         Gen.suspendFunThatReturnsAnyRight(),
         Gen.any()
-      ) { f: suspend () -> Either<Any, Any>,
-        returnObject: Any ->
+      ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
 
         runBlocking {
           val result =
@@ -326,8 +324,7 @@ class EitherTest : UnitSpec() {
       forAll(
         Gen.suspendFunThatReturnsAnyLeft(),
         Gen.any()
-      ) { f: suspend () -> Either<Any, Any>,
-        returnObject: Any ->
+      ) { f: suspend () -> Either<Any, Any>, returnObject: Any ->
 
         runBlocking {
           val result =
