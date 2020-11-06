@@ -648,13 +648,13 @@ sealed class Schedule<Input, Output> {
       identity<A>().collect()
 
     /**
-     * Create a schedule that continues as long as [đ] returns true.
+     * Create a schedule that continues as long as [f] returns true.
      */
     fun <A> doWhile(f: suspend (A) -> Boolean): Schedule<A, A> =
       identity<A>().whileInput(f)
 
     /**
-     * Create a schedule that continues until [đ] returns true.
+     * Create a schedule that continues until [f] returns true.
      */
     fun <A> doUntil(f: suspend (A) -> Boolean): Schedule<A, A> =
       identity<A>().untilInput(f)
