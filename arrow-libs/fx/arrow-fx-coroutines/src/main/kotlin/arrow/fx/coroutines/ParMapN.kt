@@ -10,7 +10,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 
 /**
- * Parallel maps [fa], [fb] in parallel on [ComputationPool].
+ * Runs [fa], [fb] in parallel on [ComputationPool] and combines their results using the provided function.
  * Cancelling this operation cancels both operations running in parallel.
  *
  * ```kotlin:ank:playground
@@ -40,10 +40,10 @@ suspend fun <A, B, C> parMapN(fa: suspend () -> A, fb: suspend () -> B, f: (A, B
   parMapN(ComputationPool, fa, fb, f)
 
 /**
- * Parallel maps [fa], [fb], [fc] in parallel on [ComputationPool].
+ * Runs [fa], [fb], [fc] in parallel on [ComputationPool] and combines their results using the provided function.
  * Cancelling this operation cancels both operations running in parallel.
  *
- * @see parMapN for the same function that can race on any [CoroutineContext].
+ * @see parMapN for the same function that can run on any [CoroutineContext].
  */
 suspend fun <A, B, C, D> parMapN(
   fa: suspend () -> A,
@@ -53,10 +53,10 @@ suspend fun <A, B, C, D> parMapN(
 ): D = parMapN(ComputationPool, fa, fb, fc, f)
 
 /**
- * Parallel maps [fa], [fb] on the provided [CoroutineContext].
+ * Runs [fa], [fb] on the provided [CoroutineContext] and combines their results using the provided function.
  * Cancelling this operation cancels both tasks running in parallel.
  *
- * **WARNING** this function forks [fa], [fb] but if it runs in parallel depends
+ * **WARNING** this function forks [fa], [fb] but if they run in parallel depends
  * on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
@@ -131,10 +131,10 @@ suspend fun <A, B, C> parMapN(
   }
 
 /**
- * Parallel maps [fa], [fb], [fc] on the provided [CoroutineContext].
+ * Runs [fa], [fb], [fc] on the provided [CoroutineContext] and combines their results using the provided function.
  * Cancelling this operation cancels both tasks running in parallel.
  *
- * **WARNING** this function forks [fa], [fb], [fc] but if it runs in parallel depends
+ * **WARNING**: this function forks [fa], [fb], [fc] but if they run in parallel depends
  * on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *

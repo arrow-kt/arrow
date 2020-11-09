@@ -18,7 +18,7 @@ suspend fun <A, B> racePair(fa: suspend () -> A, fb: suspend () -> B): RacePair<
   racePair(ComputationPool, fa, fb)
 
 /**
- * Race two tasks concurrently within a new suspend fun.
+ * Races two tasks concurrently within a new suspend fun.
  * Race results in a winner and the other, yet to finish task running in a [Fiber].
  *
  * ```kotlin:ank:playground

@@ -4,13 +4,13 @@ import arrow.core.Either
 
 /**
  * A counting [Semaphore] has a non-negative number of permits available.
- * It's used to track how many permits are in-use,
+ * It is used to track how many permits are in-use,
  * and to automatically await a number of permits to become available.
  *
- * Acquiring permits decreases the available permits, and releasing increases the available permits
+ * Acquiring permits decreases the available permits, and releasing increases the available permits.
  *
  * Acquiring permits when there aren't enough available will suspend the acquire call
- * until the requested become available. Note that acquires are satisfied in strict FIFO order.
+ * until the requested becomes available. Note that acquires are satisfied in strict FIFO order.
  * The suspending acquire calls are cancellable, and will release any already acquired permits.
  *
  * Let's say we want to guarantee mutually exclusiveness, we can use a `Semaphore` with a single permit.
@@ -21,7 +21,7 @@ import arrow.core.Either
  * import arrow.fx.coroutines.*
  * import java.util.concurrent.atomic.AtomicInteger
  *
- * /* Only allwos single accesor */
+ * /* Only allows a single accesor */
  * class PreciousFile(private val accesors: AtomicInteger = AtomicInteger(0)) {
  *     fun use(): Unit {
  *        check(accesors.incrementAndGet() == 1) { "File accessed before released" }
@@ -44,7 +44,7 @@ import arrow.core.Either
  * ```
  *
  * By wrapping our operation in `withPermit` we ensure that our `var count: Int` is only updated by a single thread at the same time.
- * If we wouldn't protect our `PreciousFile` from being access by only a single thread at the same time, then it'll blow up our program.
+ * If we wouldn't protect our `PreciousFile` from being access by only a single thread at the same time, then our program will crash.
  *
  * This is a common use-case when you need to write to a single `File` from different threads, since concurrent writes could result in inconsistent state.
  *
@@ -63,7 +63,7 @@ import arrow.core.Either
  *
  * suspend fun main(): Unit {
  *  val limit = 3
- *  val semaphore = Semaphore(3)
+ *  val semaphore = Semaphore(limit)
  *  (0..50).parTraverse { i ->
  *    semaphore.withPermit { heavyProcess(i) }
  *  }
@@ -76,9 +76,9 @@ import arrow.core.Either
 interface Semaphore {
 
   /**
-   * Get a snapshot of the currently available permits, always non negative.
+   * Gets a snapshot of the currently available permits, always non negative.
    *
-   * May be out of data instantly, use [tryAcquire] or [tryAcquireN]
+   * The semaphore may be out of data instantly; use [tryAcquire] or [tryAcquireN]
    * for acquires that immediately return if failed.
    *
    * ```kotlin:ank:playground
@@ -95,7 +95,7 @@ interface Semaphore {
   suspend fun available(): Long
 
   /**
-   * Get a snapshot of the number of permits callers are waiting for when there are no permits available.
+   * Gets a snapshot of the number of permits callers are waiting for, when there are no permits available.
    *
    * The count is current available permits minus the outstanding acquires.
    *
@@ -113,8 +113,8 @@ interface Semaphore {
   suspend fun count(): Long
 
   /**
-   * Acquire [n] permits, suspends until the required permits are available.
-   * When it gets cancelled while suspending it will release its already acquired permits.
+   * Acquires [n] permits, suspends until the required permits are available.
+   * When it gets cancelled while suspending, it will release its already acquired permits.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.coroutines.*
@@ -134,12 +134,12 @@ interface Semaphore {
    * }
    * ```
    *
-   * @param n number of permits to acquire - must be >= 0
+   * @param n number of permits to acquire; must be greater or equal than zero.
    */
   suspend fun acquireN(n: Long): Unit
 
   /**
-   * Acquire 1 permit, suspends until the requested permit is available.
+   * Acquires 1 permit, suspending until the requested permit is available.
    *
    * @see acquireN
    */
@@ -161,12 +161,12 @@ interface Semaphore {
    * }
    * ```
    *
-   * @param n number of permits to acquire - must be >= 0
+   * @param n number of permits to acquire; must be greater or equal than zero.
    */
   suspend fun tryAcquireN(n: Long): Boolean
 
   /**
-   * Acquire 1 permit and signals success with a [Boolean] immediately.
+   * Acquires 1 permit and signals success with a [Boolean] immediately.
    *
    * @see acquireN
    */
@@ -189,7 +189,7 @@ interface Semaphore {
    * }
    * ```
    *
-   * @param n number of permits to release - must be >= 0
+   * @param n number of permits to release; must be greater or equal than zero.
    */
   suspend fun releaseN(n: Long): Unit
 
@@ -200,9 +200,6 @@ interface Semaphore {
    */
   suspend fun release(): Unit = releaseN(1)
 
-  /**
-   * Returns an effect that acquires a permit, runs the supplied effect, and then releases the permit.
-   */
   /**
    * Runs the supplied effect with an acquired permit, and releases the permit on [ExitCase].
    *
@@ -223,13 +220,16 @@ interface Semaphore {
    */
   suspend fun <A> withPermitN(n: Long, fa: suspend () -> A): A
 
+  /**
+   * Returns an effect that acquires a permit, runs the supplied effect, and then releases the permit.
+   */
   suspend fun <A> withPermit(fa: suspend () -> A): A =
     withPermitN(1, fa)
 
   companion object {
 
     /**
-     * Construct a [Semaphore] initialized with [n] available permits.
+     * Constructs a [Semaphore] initialized with [n] available permits.
      *
      * ```kotlin:ank:playground
      * import arrow.fx.coroutines.*

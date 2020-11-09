@@ -6,7 +6,7 @@ import kotlinx.atomicfu.getAndUpdate
 import kotlinx.atomicfu.updateAndGet
 
 /**
- * Creates a [AtomicRef] with a initial value of [A].
+ * Creates an [AtomicRef] with a initial value of [A].
  *
  * Data type on top of [atomic] to use in parallel functions.
  *
@@ -102,29 +102,30 @@ interface Atomic<A> {
 
   /**
    * ModifyGet allows to inspect state [A], update it and extract a different state [B].
-   * In contrast to [modify] it a [Pair] of the updated state [A] and the extracted state [B].
+   * In contrast to [modify], it returns a [Pair] of the updated state [A] and the extracted state [B].
    *
    * @see [modify] for an example
    */
   suspend fun <B> modifyGet(f: (A) -> Pair<A, B>): Pair<A, B>
 
   /**
-   * Attempts to modify the current value once,
-   *   in contrast to [update] which calls [f] until it succeeds.
+   * Attempts to modify the current value once, in contrast to [update] which calls [f] until it succeeds.
    *
    * @returns `false` if concurrent modification completes between the time the variable is read and the time it is set.
    */
   suspend fun tryUpdate(f: (A) -> A): Boolean
 
   /**
-   * Like [tryUpdate] but allows the update function to return an output value of type [B].
+   * Attempts to inspect the state, uptade it, and extract a different state.
+   *
+   * [tryModify] behaves as [tryUpdate] but allows the update function to return an output value of type [B].
    *
    * @returns `null` if the update fails and [B] otherwise.
    */
   suspend fun <B> tryModify(f: (A) -> Pair<A, B>): B?
 
   /**
-   * Obtain a snapshot of the current value, and a setter for updating it.
+   * Obtains a snapshot of the current value, and a setter for updating it.
    *
    * This is useful when you need to execute effects with the original result while still ensuring an atomic update.
    *
@@ -136,11 +137,11 @@ interface Atomic<A> {
   suspend fun access(): Pair<A, suspend (A) -> Boolean>
 
   /**
-   * Creates a [AtomicRef] for [B] based on provided a [get] and [set] operation.
+   * Creates an [AtomicRef] for [B] based on provided a [get] and [set] operation.
    *
-   * This is useful when you have a [AtomicRef] of a `data class`
-   * and need to work with with certain properties individually.
-   * Or want to hide parts of your domain from a dependency
+   * This is useful when you have an [AtomicRef] of a `data class`
+   * and need to work with with certain properties individually,
+   * or want to hide parts of your domain from a dependency.
    *
    * ```kotlin:ank:playground
    * import arrow.fx.coroutines.*
@@ -176,7 +177,7 @@ interface Atomic<A> {
   companion object {
 
     /**
-     * Creates a [AtomicRef] with a initial value of [A].
+     * Creates an [AtomicRef] with an initial value of [A].
      *
      * Data type on top of [atomic] to use in parallel functions.
      *

@@ -61,7 +61,7 @@ suspend fun <A> uncancellable(f: suspend () -> A): A =
  * Registers an [onCancel] handler after [fa].
  * [onCancel] is guaranteed to be called in case of cancellation, otherwise it's ignored.
  *
- * Useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
+ * This function is useful for wiring cancellation tokens between fibers, building inter-op with other effect systems or testing.
  *
  * @param fa program that you want to register handler on
  * @param onCancel handler to run when [fa] gets cancelled.
@@ -97,8 +97,8 @@ suspend fun <A> guarantee(
 ): A = guaranteeCase(fa) { finalizer.invoke() }
 
 /**
- * Guarantees execution of a given [finalizer] after [fa] regardless of success, error or cancellation., allowing
- * for differentiating between exit conditions with to the [ExitCase] argument of the finalizer.
+ * Guarantees execution of a given [finalizer] after [fa] regardless of success, error or cancellation, allowing
+ * for differentiating between exit conditions with the [ExitCase] argument of the finalizer.
  *
  * As best practice, it's not a good idea to release resources via [guaranteeCase].
  * since [guaranteeCase] doesn't properly model acquiring, using and releasing resources.
@@ -116,11 +116,11 @@ suspend fun <A> guaranteeCase(
 ): A = bracketCase({ Unit }, { fa.invoke() }, { _, ex -> finalizer(ex) })
 
 /**
- * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
+ * Describes a task with safe resource acquisition and release in the face of errors and interruption.
  * It would be the equivalent of an async capable `try/catch/finally` statements in mainstream imperative languages for resource
  * acquisition and release.
  *
- * @param acquire the action to acquire the resource
+ * @param acquire is the action to acquire the resource.
  *
  * @param use is the action to consume the resource and produce a result.
  * Once the resulting suspend program terminates, either successfully, error or disposed,
@@ -164,30 +164,30 @@ suspend fun <A, B> bracket(
  * A way to safely acquire a resource and release in the face of errors and cancellation.
  * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
  *
- * [bracketCase] exists out of a three stages:
+ * [bracketCase] exists out of three stages:
  *   1. acquisition
  *   2. consumption
  *   3. releasing
  *
  * 1. Resource acquisition is **NON CANCELLABLE**.
  *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
- *   Reason being, we cannot [release] what we did not `acquire` first. Same reason we cannot call [use].
+ *   As the resource was not acquired, it is not possible to [use] or [release] it.
  *   If it is successful we pass the result to stage 2 [use].
  *
  * 2. Resource consumption is like any other `suspend` effect. The key difference here is that it's wired in such a way that
  *   [release] **will always** be called either on [ExitCase.Cancelled], [ExitCase.Failure] or [ExitCase.Completed].
- *   If it failed than the resulting [suspend] from [bracketCase] will be the error, otherwise the result of [use].
+ *   If it failed, then the resulting [suspend] from [bracketCase] will be the error; otherwise the result of [use] will be returned.
  *
  * 3. Resource releasing is **NON CANCELLABLE**, otherwise it could result in leaks.
- *   In the case it throws the resulting [suspend] will be either the error or a composed error if one occurred in the [use] stage.
+ *   In the case it throws an exception, the resulting [suspend] will be either such error, or a composed error if one occurred in the [use] stage.
  *
- * @param acquire the action to acquire the resource
+ * @param acquire is the action to acquire the resource.
  *
  * @param use is the action to consume the resource and produce a result.
  * Once the resulting suspend program terminates, either successfully, error or disposed,
  * the [release] function will run to clean up the resources.
  *
- * @param release the allocated resource after [use] terminates.
+ * @param release is the action to release the allocated resource after [use] terminates.
  *
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*

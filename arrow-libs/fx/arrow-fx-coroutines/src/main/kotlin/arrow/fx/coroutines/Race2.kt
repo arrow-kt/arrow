@@ -11,9 +11,9 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * Races the participants [fa], [fb] in parallel on the [ComputationPool].
- * The winner of the race cancels the other participants,
- * cancelling the operation cancels all participants.
- * An [uncancellable] participants will back-pressure the result of [raceN].
+ * The winner of the race cancels the other participants.
+ * Cancelling the operation cancels all participants.
+ * An [uncancellable] participant will back-pressure the result of [raceN].
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
@@ -48,10 +48,10 @@ suspend fun <A, B> raceN(fa: suspend () -> A, fb: suspend () -> B): Either<A, B>
 
 /**
  * Races the participants [fa], [fb] on the provided [CoroutineContext].
- * The winner of the race cancels the other participants,
- * cancelling the operation cancels all participants.
+ * The winner of the race cancels the other participants.
+ * Cancelling the operation cancels all participants.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * ```kotlin:ank:playground

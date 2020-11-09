@@ -20,7 +20,7 @@ import kotlin.random.Random
  *
  * [Schedule] allows you to define and compose powerful yet simple policies, which can be used to either repeat or retry computation.
  *
- * > [Schedule] has been derived from scalaz zio's [Schedule](https://zio.dev/docs/datatypes/datatypes_schedule) datatype and has been adapted to kotlin.
+ * > [Schedule] has been derived from Scala ZIO's [Schedule](https://zio.dev/docs/datatypes/datatypes_schedule) datatype and has been adapted to kotlin.
  *
  * The two core methods of running a schedule are:
  * - __retry__: The effect is executed once, and if it fails, it will be reattempted based on the scheduling policy passed as an argument. It will stop if the effect ever succeeds, or the policy determines it should not be reattempted again.
@@ -65,7 +65,7 @@ import kotlin.random.Random
  * - Discard all intermediate results and just keep the last produced result.
  * - Keep all intermediate results.
  *
- * Assuming we have an suspend effect in, and we want to repeat it 3 times after its first successful execution, we can do:
+ * Assuming we have a suspend effect in, and we want to repeat it 3 times after its first successful execution, we can do:
  *
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
@@ -179,27 +179,27 @@ import kotlin.random.Random
 sealed class Schedule<Input, Output> {
 
   /**
-   * Change the output of a schedule. Does not alter the decision of the schedule.
+   * Changes the output of a schedule. Does not alter the decision of the schedule.
    */
   abstract fun <B> map(f: (Output) -> B): Schedule<Input, B>
 
   /**
-   * Change the input of the schedule. May alter a schedules decision if it is based on input.
+   * Changes the input of the schedule. May alter a schedule's decision if it is based on input.
    */
   abstract fun <B> contramap(f: suspend (B) -> Input): Schedule<B, Output>
 
   /**
-   * Conditionally check on both the input and the output whether or not to continue.
+   * Conditionally checks on both the input and the output whether or not to continue.
    */
   abstract fun <A : Input> check(pred: suspend (A, Output) -> Boolean): Schedule<A, Output>
 
   /**
-   * Invert the decision of a schedule.
+   * Inverts the decision of a schedule.
    */
   abstract operator fun not(): Schedule<Input, Output>
 
   /**
-   * Combine with another schedule by combining the result and the delay of the [Decision] with the functions [f] and [g]
+   * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [f] and [g]
    */
   abstract fun <A : Input, B> combineWith(
     other: Schedule<A, B>,
@@ -208,32 +208,32 @@ sealed class Schedule<Input, Output> {
   ): Schedule<A, Pair<Output, B>>
 
   /**
-   * Always retry a schedule regardless of the decision made prior to invoking this method.
+   * Always retries a schedule regardless of the decision made prior to invoking this method.
    */
   abstract fun forever(): Schedule<Input, Output>
 
   /**
-   * Execute one schedule after the other. When the first schedule ends, it continues with the second.
+   * Executes one schedule after the other. When the first schedule ends, it continues with the second.
    */
   abstract infix fun <A : Input, B> andThen(other: Schedule<A, B>): Schedule<A, Either<Output, B>>
 
   /**
-   * Change the delay of a resulting [Decision] based on the [Output] and the produced delay.
+   * Changes the delay of a resulting [Decision] based on the [Output] and the produced delay.
    */
   abstract fun modifyDelay(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output>
 
   /**
-   * Run a effectful handler on every input. Does not alter the decision.
+   * Runs an effectful handler on every input. Does not alter the decision.
    */
   abstract fun logInput(f: suspend (Input) -> Unit): Schedule<Input, Output>
 
   /**
-   * Run a effectful handler on every output. Does not alter the decision.
+   * Runs an effectful handler on every output. Does not alter the decision.
    */
   abstract fun logOutput(f: suspend (Output) -> Unit): Schedule<Input, Output>
 
   /**
-   * Accumulate the results of a schedule by folding over them effectfully.
+   * Accumulates the results of a schedule by folding over them effectfully.
    */
   abstract fun <C> foldM(
     initial: suspend () -> C,
@@ -241,18 +241,18 @@ sealed class Schedule<Input, Output> {
   ): Schedule<Input, C>
 
   /**
-   * Compose this schedule with the other schedule by piping the output of this schedule
+   * Composes this schedule with the other schedule by piping the output of this schedule
    *  into the input of the other.
    */
   abstract infix fun <B> pipe(other: Schedule<Output, B>): Schedule<Input, B>
 
   /**
-   * Combine two with different input and output using and. Continues when both continue and uses the maximum delay.
+   * Combines two with different input and output using and. Continues when both continue and uses the maximum delay.
    */
   abstract infix fun <A, B> tupled(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>>
 
   /**
-   * Combine two schedules with different input and output and conditionally choose between the two.
+   * Combines two schedules with different input and output and conditionally choose between the two.
    * Continues when the chosen schedule continues and uses the chosen schedules delay.
    */
   abstract infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>>
@@ -261,18 +261,18 @@ sealed class Schedule<Input, Output> {
     map { Unit }
 
   /**
-   * Change the result of a [Schedule] to always be [b]
+   * Changes the result of a [Schedule] to always be [b].
    */
   fun <B> const(b: B): Schedule<Input, B> = map { b }
 
   /**
-   * Continue or stop the schedule based on the output
+   * Continues or stops the schedule based on the output.
    */
   fun whileOutput(f: suspend (Output) -> Boolean): Schedule<Input, Output> =
     check { _, output -> f(output) }
 
   /**
-   * Continue or stop the schedule based on the input
+   * Continues or stops the schedule based on the input.
    */
   fun <A : Input> whileInput(f: suspend (A) -> Boolean): Schedule<A, Output> =
     check { input, _ -> f(input) }
@@ -293,39 +293,39 @@ sealed class Schedule<Input, Output> {
     contramap(f).map(g)
 
   /**
-   * Combine two schedules. Continues only when both continue and chooses the maximum delay.
+   * Combines two schedules. Continues only when both continue and chooses the maximum delay.
    */
   infix fun <A : Input, B> and(other: Schedule<A, B>): Schedule<A, Pair<Output, B>> =
     combineWith(other, { a, b -> a && b }, { a, b -> max(a.nanoseconds, b.nanoseconds).nanoseconds })
 
   /**
-   * Combine two schedules. Continues if one continues and chooses the minimum delay
+   * Combines two schedules. Continues if one continues and chooses the minimum delay.
    */
   infix fun <A : Input, B> or(other: Schedule<A, B>): Schedule<A, Pair<Output, B>> =
     combineWith(other, { a, b -> a || b }, { a, b -> min(a.nanoseconds, b.nanoseconds).nanoseconds })
 
   /**
-   * Combine two schedules with [and] but throw away the left schedule's result
+   * Combines two schedules with [and] but throws away the left schedule's result.
    */
   infix fun <A : Input, B> zipRight(other: Schedule<A, B>): Schedule<A, B> =
     (this and other).map { it.second }
 
   /**
-   * Combine two schedules with [and] but throw away the right schedule's result
+   * Combines two schedules with [and] but throws away the right schedule's result.
    */
   infix fun <A : Input, B> zipLeft(other: Schedule<A, B>): Schedule<A, Output> =
     (this and other).map { it.first }
 
   /**
-   * Adjust the delay of a schedule's [Decision]
+   * Adjusts the delay of a schedule's [Decision].
    */
   fun delayed(f: suspend (Duration) -> Duration): Schedule<Input, Output> =
     modifyDelay { _, duration -> f(duration) }
 
   /**
    * Add random jitter to a schedule.
-   * The argument [genRand] is supposed to be a computation with when run returns
-   *  doubles. An example would be the following [IO] `IO { Random.nextDouble() }`.
+   * The argument [genRand] is supposed to be a computation which returns
+   *  doubles. An example would be `suspend { Random.nextDouble() }`.
    *
    * This is done to push the source of randomness to the caller which makes the function
    *  jittered deterministic and testable.
@@ -348,7 +348,7 @@ sealed class Schedule<Input, Output> {
     foldM(suspend { initial }) { acc, o -> f(acc, o) }
 
   /**
-   * Accumulate the results of every execution to a list
+   * Accumulates the results of every execution into a list.
    */
   fun collect(): Schedule<Input, List<Output>> =
     fold(emptyList()) { acc, o -> acc + listOf(o) }
@@ -559,7 +559,7 @@ sealed class Schedule<Input, Output> {
   companion object {
 
     /**
-     * Invoke constructor to manually define a schedule. If you need this, please consider adding it to arrow or suggest
+     * Invoke constructor to manually define a schedule. If you need this, please consider adding it to Arrow or suggest
      *  a change to avoid using this manual method.
      */
     operator fun <S, A, B> invoke(
@@ -569,20 +569,20 @@ sealed class Schedule<Input, Output> {
       ScheduleImpl(initial, update)
 
     /**
-     * Creates a schedule that continues without delay and just returns its input.
+     * Creates a Schedule that continues without delay and just returns its input.
      */
     fun <A> identity(): Schedule<A, A> = invoke({ Unit }) { a, s ->
       Decision.cont(0.seconds, s, Eval.now(a))
     }
 
     /**
-     * Creates a schedule that continues without delay and always returns Unit
+     * Creates a Schedule that continues without delay and always returns Unit.
      */
     fun <A> unit(): Schedule<A, Unit> =
       identity<A>().unit()
 
     /**
-     * Create a schedule that unfolds effectfully using a seed value [c] and a unfold function [f].
+     * Creates a schedule that unfolds effectfully using a seed value [c] and a unfold function [f].
      * This keeps the current state (the current seed) as [State] and runs the unfold function on every
      *  call to update. This schedule always continues without delay and returns the current state.
      */
@@ -599,13 +599,13 @@ sealed class Schedule<Input, Output> {
       unfoldM(suspend { c }) { f(it) }
 
     /**
-     * Create a schedule that continues forever and returns the number of iterations.
+     * Creates a Schedule that continues forever and returns the number of iterations.
      */
     fun <A> forever(): Schedule<A, Int> =
       unfold(0) { it + 1 }
 
     /**
-     * Create a schedule that continues n times and returns the number of iterations.
+     * Creates a Schedule that continues n times and returns the number of iterations.
      */
     fun <A> recurs(n: Int): Schedule<A, Int> =
       invoke(suspend { 0 }) { _: A, acc ->
@@ -614,12 +614,12 @@ sealed class Schedule<Input, Output> {
       }
 
     /**
-     * Create a schedule that only ever retries once.
+     * Creates a Schedule that only retries once.
      */
     fun <A> once(): Schedule<A, Unit> = recurs<A>(1).unit()
 
     /**
-     * Create a schedule that never retries.
+     * Creates a schedule that never retries.
      *
      * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
@@ -629,7 +629,7 @@ sealed class Schedule<Input, Output> {
       }
 
     /**
-     * Create a schedule that uses another schedule to generate the delay of this schedule.
+     * Creates a Schedule that uses another Schedule to generate the delay of this schedule.
      * Continues for as long as [delaySchedule] continues and adds the output of [delaySchedule] to
      *  the delay that [delaySchedule] produced. Also returns the full delay as output.
      *
@@ -642,37 +642,37 @@ sealed class Schedule<Input, Output> {
         .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delay)) }
 
     /**
-     * Create a schedule which collects all it's inputs in a list
+     * Creates a Schedule which collects all its inputs in a list.
      */
     fun <A> collect(): Schedule<A, List<A>> =
       identity<A>().collect()
 
     /**
-     * Create a schedule that continues as long as [f] returns true.
+     * Creates a Schedule that continues as long as [f] returns true.
      */
     fun <A> doWhile(f: suspend (A) -> Boolean): Schedule<A, A> =
       identity<A>().whileInput(f)
 
     /**
-     * Create a schedule that continues until [f] returns true.
+     * Creates a Schedule that continues until [f] returns true.
      */
     fun <A> doUntil(f: suspend (A) -> Boolean): Schedule<A, A> =
       identity<A>().untilInput(f)
 
     /**
-     * Create a schedule with an effectful handler on the input.
+     * Creates a Schedule with an effectful handler on the input.
      */
     fun <A> logInput(f: suspend (A) -> Unit): Schedule<A, A> =
       identity<A>().logInput(f)
 
     /**
-     * Create a schedule with an effectful handler on the output.
+     * Creates a Schedule with an effectful handler on the output.
      */
     fun <A> logOutput(f: suspend (A) -> Unit): Schedule<A, A> =
       identity<A>().logOutput(f)
 
     /**
-     * Create a schedule that returns its delay.
+     * Creates a Schedule that returns its delay.
      */
     @Suppress("UNCHECKED_CAST")
     fun <A> delay(): Schedule<A, Duration> =
@@ -686,7 +686,7 @@ sealed class Schedule<Input, Output> {
       }
 
     /**
-     * Create a schedule that returns its decisions
+     * Creates a Schedule that returns its decisions.
      */
     @Suppress("UNCHECKED_CAST")
     fun <A> decision(): Schedule<A, Boolean> =
@@ -700,13 +700,13 @@ sealed class Schedule<Input, Output> {
       }
 
     /**
-     * Create a schedule that continues with fixed delay.
+     * Creates a Schedule that continues with a fixed delay.
      */
     fun <A> spaced(interval: Duration): Schedule<A, Int> =
       forever<A>().delayed { d -> d + interval }
 
     /**
-     * Create a schedule that continues with increasing delay by adding the last two delays.
+     * Creates a Schedule that continues with increasing delay by adding the last two delays.
      */
     fun <A> fibonacci(one: Duration): Schedule<A, Duration> =
       delayed(
@@ -716,7 +716,7 @@ sealed class Schedule<Input, Output> {
       )
 
     /**
-     * Create a schedule which increases its delay linear by n * base where n is the number of
+     * Creates a Schedule which increases its delay linearly, by n * base where n is the number of
      *  executions.
      */
     fun <A> linear(base: Duration): Schedule<A, Duration> =
@@ -725,8 +725,8 @@ sealed class Schedule<Input, Output> {
       )
 
     /**
-     * Create a schedule that increases its delay exponentially with a given factor and base.
-     * Delay can be calculated as [base] * factor ^ n where n is the number of executions.
+     * Creates a Schedule that increases its delay exponentially with a given factor and base.
+     * Delays can be calculated as [base] * factor ^ n where n is the number of executions.
      */
     fun <A> exponential(base: Duration, factor: Double = 2.0): Schedule<A, Duration> =
       delayed(
@@ -736,7 +736,7 @@ sealed class Schedule<Input, Output> {
 }
 
 /**
- * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
+ * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Returns the last output from the policy or raises an error if a repeat failed.
  */
 suspend fun <A, B> repeat(
@@ -745,7 +745,7 @@ suspend fun <A, B> repeat(
 ): B = repeatOrElse(schedule, fa) { e, _ -> throw e }
 
 /**
- * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
+ * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
 suspend fun <A, B> repeatOrElse(
@@ -755,7 +755,7 @@ suspend fun <A, B> repeatOrElse(
 ): B = repeatOrElseEither(schedule, fa, orElse).fold(::identity, ::identity)
 
 /**
- * Run this effect once and, if it succeeded, decide using the passed policy if the effect should be repeated and if so, with how much delay.
+ * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
 @Suppress("UNCHECKED_CAST")
@@ -788,7 +788,7 @@ suspend fun <A, B, C> repeatOrElseEither(
 }
 
 /**
- * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
  */
 suspend fun <A, B> retry(
@@ -797,7 +797,7 @@ suspend fun <A, B> retry(
 ): A = retryOrElse(schedule, fa) { e, _ -> throw e }
 
 /**
- * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
 suspend fun <A, B> retryOrElse(
@@ -807,7 +807,7 @@ suspend fun <A, B> retryOrElse(
 ): A = retryOrElseEither(schedule, fa, orElse).fold(::identity, ::identity)
 
 /**
- * Run an effect and, if it fails, decide using the passed policy if the effect should be retried and if so, with how much delay.
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
 @Suppress("UNCHECKED_CAST")

@@ -10,8 +10,9 @@ import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 
 /**
- * A [CoroutineContext] to run non-blocking suspending code,
- * all code that relies on blocking IO should prefer to use an unbounded [IOPool].
+ * A [CoroutineContext] to run non-blocking suspending code.
+ *
+ * All code that relies on blocking IO should prefer to use an unbounded [IOPool].
  *
  * A work-stealing thread pool using all available processors as its target parallelism level.
  */
@@ -25,7 +26,7 @@ private object IOCounter {
 
 /**
  * Creates a thread pool that creates new threads as needed, but
- * will reuse previously constructed threads when they are available, and uses the provided.
+ * will reuse previously constructed threads when they are available.
  *
  * This pool is prone to cause [OutOfMemoryError] since the pool size is unbounded.
  */

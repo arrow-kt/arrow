@@ -173,14 +173,14 @@ class CircuitBreaker constructor(
    * and that upon a task being rejected will execute the given
    * `callback`.
    *
-   * Useful for gathering stats.
+   * This is useful for gathering stats.
    *
    * NOTE: calling this method multiple times will create a circuit
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback is to be executed when tasks get rejected
-   * @return a new circuit breaker wrapping the state of the source
+   * @param callback will be executed when tasks get rejected.
+   * @return a new circuit breaker wrapping the state of the source.
    */
   fun doOnRejectedTask(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
@@ -197,16 +197,16 @@ class CircuitBreaker constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.Closed Closed] state.
+   * transitioning to the [CircuitBreaker.Closed] state.
    *
-   * Useful for gathering stats.
+   * It is useful for gathering stats.
    *
    * NOTE: calling this method multiple times will create a circuit
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback is to be executed when the state evolves into `Closed`
-   * @return a new circuit breaker wrapping the state of the source
+   * @param callback will be executed when the state evolves into [CircuitBreaker.Closed].
+   * @return a new circuit breaker wrapping the state of the source.
    */
   fun doOnClosed(callback: suspend () -> Unit): CircuitBreaker =
     CircuitBreaker(
@@ -223,16 +223,15 @@ class CircuitBreaker constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.HalfOpen HalfOpen]
-   * state.
+   * transitioning to the [CircuitBreaker.HalfOpen] state.
    *
-   * Useful for gathering stats.
+   * It is useful for gathering stats.
    *
    * NOTE: calling this method multiple times will create a circuit
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback is to be executed when the state evolves into `HalfOpen`
+   * @param callback is to be executed when the state evolves into [CircuitBreaker.HalfOpen]
    * @return a new circuit breaker wrapping the state of the source
    */
   fun doOnHalfOpen(callback: suspend () -> Unit): CircuitBreaker =
@@ -250,15 +249,15 @@ class CircuitBreaker constructor(
 
   /** Returns a new circuit breaker that wraps the state of the source
    * and that will fire the given callback upon the circuit breaker
-   * transitioning to the [CircuitBreaker.Open Open] state.
+   * transitioning to the [CircuitBreaker.Open] state.
    *
-   * Useful for gathering stats.
+   * It is useful for gathering stats.
    *
    * NOTE: calling this method multiple times will create a circuit
    * breaker that will call multiple callbacks, thus the callback
    * given is cumulative with other specified callbacks.
    *
-   * @param callback is to be executed when the state evolves into `Open`
+   * @param callback will be executed when the state evolves into [CircuitBreaker.Open]
    * @return a new circuit breaker wrapping the state of the source
    */
   fun doOnOpen(callback: suspend () -> Unit): CircuitBreaker =
@@ -275,11 +274,9 @@ class CircuitBreaker constructor(
     )
 
   /**
-   *
    * The initial state when initializing a [CircuitBreaker] is [Closed].
    *
-   * The available states:
-   *
+   * The available states are:
    *  - [Closed] in case tasks are allowed to go through
    *  - [Open] in case the circuit breaker is active and rejects incoming tasks
    *  - [HalfOpen] in case a reset attempt was triggered and it is waiting for
@@ -288,14 +285,13 @@ class CircuitBreaker constructor(
   sealed class State {
 
     /** The initial [State] of the [CircuitBreaker]. While in this
-     * state the circuit breaker allows tasks to be executed.
+     * state, the circuit breaker allows tasks to be executed.
      *
      * Contract:
-     *
-     *  - Exceptions increment the `failures` counter
-     *  - Successes reset the failure count to zero
+     *  - Exceptions increment the `failures` counter.
+     *  - Successes reset the failure count to zero.
      *  - When the `failures` counter reaches the `maxFailures` count,
-     *    the breaker is tripped into the `Open` state
+     *    the breaker is tripped into the [CircuitBreaker.Open] state.
      *
      * @param failures is the current failures count
      */
@@ -315,14 +311,13 @@ class CircuitBreaker constructor(
      * breaker rejects all tasks with an [ExecutionRejected].
      *
      * Contract:
-     *
-     *  - all tasks fail fast with [ExecutionRejected]
-     *  - after the configured `resetTimeout`, the circuit breaker
+     *  - All tasks fail fast with [ExecutionRejected].
+     *  - After the configured `resetTimeout`, the circuit breaker
      *    enters a [HalfOpen] state, allowing one task to go through
-     *    for testing the connection
+     *    for testing the connection.
      *
      * @param startedAt is the timestamp in milliseconds since the
-     *        epoch when the transition to `Open` happened
+     *        epoch when the transition to `Open` happened.
      *
      * @param resetTimeout is the current `resetTimeout` that is
      *        applied to this `Open` state, to be multiplied by the
@@ -364,26 +359,25 @@ class CircuitBreaker constructor(
      * attempt, in order to test the connection.
      *
      * Contract:
-     *
      *  - The first task when `Open` has expired is allowed through
      *    without failing fast, just before the circuit breaker is
-     *    evolved into the `HalfOpen` state
+     *    evolved into the `HalfOpen` state.
      *  - All tasks attempted in `HalfOpen` fail-fast with an exception
-     *    just as in [Open] state
+     *    just as in [Open] state.
      *  - If that task attempt succeeds, the breaker is reset back to
      *    the `Closed` state, with the `resetTimeout` and the
-     *    `failures` count also reset to initial values
+     *    `failures` count also reset to initial values.
      *  - If the first call fails, the breaker is tripped again into
      *    the `Open` state (the `resetTimeout` is multiplied by the
-     *    exponential backoff factor)
+     *    exponential backoff factor).
      *
      * @param resetTimeout is the current `resetTimeout` that was
      *        applied to the previous `Open` state, to be multiplied by
      *        the exponential backoff factor for the next transition to
-     *        `Open`, in case the reset attempt fails
+     *        `Open`, in case the reset attempt fails.
      *
      * @param awaitClose is a [Promise] that will get completed
-     *        when the `CircuitBreaker` switches to the `Closed` state again
+     *        when the `CircuitBreaker` switches to the `Closed` state again.
      */
     class HalfOpen(val resetTimeout: Duration, internal val awaitClose: Promise<Unit>) : State() {
       override fun hashCode(): Int =
@@ -402,30 +396,32 @@ class CircuitBreaker constructor(
 
   companion object {
     /**
+     * Attempts to create a [CircuitBreaker].
+     *
      * @param maxFailures is the maximum count for failures before
-     *        opening the circuit breaker
+     *        opening the circuit breaker.
      *
      * @param resetTimeout is the timeout to wait in the `Open` state
      *        before attempting a close of the circuit breaker (but without
-     *        the backoff factor applied)
+     *        the backoff factor applied).
      *
      * @param exponentialBackoffFactor is a factor to use for resetting
      *        the `resetTimeout` when in the `HalfOpen` state, in case
-     *        the attempt to `Close` fails
+     *        the attempt to `Close` fails.
      *
      * @param maxResetTimeout is the maximum timeout the circuit breaker
-     *        is allowed to use when applying the `exponentialBackoffFactor`
+     *        is allowed to use when applying the `exponentialBackoffFactor`.
      *
      * @param onRejected is a callback for signaling rejected tasks, so
      *         every time a task execution is attempted and rejected in
      *         [CircuitBreaker.Open] or [CircuitBreaker.HalfOpen]
-     *         states
+     *         states.
      *
-     * @param onClosed is a callback for signaling transitions to the [CircuitBreaker.State.Closed] state
+     * @param onClosed is a callback for signaling transitions to the [CircuitBreaker.State.Closed] state.
      *
-     * @param onHalfOpen is a callback for signaling transitions to [CircuitBreaker.State.HalfOpen]
+     * @param onHalfOpen is a callback for signaling transitions to [CircuitBreaker.State.HalfOpen].
      *
-     * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open]
+     * @param onOpen is a callback for signaling transitions to [CircuitBreaker.State.Open].
      *
      */
     suspend fun of(

@@ -5,7 +5,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
- * Create a cancellable `suspend` function that executes an asynchronous process on evaluation.
+ * Creates a cancellable `suspend` function that executes an asynchronous process on evaluation.
  * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
  *
  * ```kotlin:ank:playground
@@ -81,7 +81,7 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
   }
 
 /**
- * Create a cancellable `suspend` function that executes an asynchronous process on evaluation.
+ * Creates a cancellable `suspend` function that executes an asynchronous process on evaluation.
  * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
  *
  * The suspending [cb] runs in an uncancellable manner, acquiring [CancelToken] as a resource.

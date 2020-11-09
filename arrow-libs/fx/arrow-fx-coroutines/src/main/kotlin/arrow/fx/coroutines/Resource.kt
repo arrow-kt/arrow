@@ -49,7 +49,7 @@ import kotlin.coroutines.CoroutineContext
  * suspend fun main(): Unit = program.invoke()
  * ```
  * Here we are creating and then using a service that has a dependency on two resources: A database handle and a consumer of some sort. All three resources need to be closed in the correct order at the end.
- * However this program is quite bad! It does not guarantee release if something failed in between and keeping track of acquisition order is unnecessary overhead.
+ * However this program is not correct. It does not guarantee release if something failed in between, and keeping track of acquisition order is unnecessary overhead.
  *
  * That is where `Resource` comes in:
  *
@@ -86,8 +86,6 @@ import kotlin.coroutines.CoroutineContext
  *
  * suspend fun main(): Unit = resourceProgram.invoke()
  * ```
- *
- * All three programs do exactly the same with varying levels of simplicity and overhead. `Resource` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
  **/
 sealed class Resource<out A> {
 

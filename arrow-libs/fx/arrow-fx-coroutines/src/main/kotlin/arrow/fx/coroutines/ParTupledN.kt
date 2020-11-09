@@ -24,7 +24,7 @@ suspend fun <A, B, C> parTupledN(fa: suspend () -> A, fb: suspend () -> B, fc: s
  * Tuples [fa], [fb] on the provided [CoroutineContext].
  * Cancelling this operation cancels both tasks running in parallel.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parTupledN for a function that ensures it runs in parallel on the [ComputationPool].
@@ -36,7 +36,7 @@ suspend fun <A, B> parTupledN(ctx: CoroutineContext, fa: suspend () -> A, fb: su
  * Tuples [fa], [fb] & [fc] on the provided [CoroutineContext].
  * Cancelling this operation cancels both tasks running in parallel.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parTupledN for a function that ensures it runs in parallel on the [ComputationPool].

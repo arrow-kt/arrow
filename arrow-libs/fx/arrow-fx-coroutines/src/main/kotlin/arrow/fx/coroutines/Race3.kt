@@ -26,8 +26,8 @@ sealed class Race3<out A, out B, out C> {
 
 /**
  * Races the participants [fa], [fb] & [fc] in parallel on the [ComputationPool].
- * The winner of the race cancels the other participants,
- * cancelling the operation cancels all participants.
+ * The winner of the race cancels the other participants.
+ * Cancelling the operation cancels all participants.
  *
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
@@ -39,13 +39,13 @@ suspend fun <A, B, C> raceN(
 
 /**
  * Races the participants [fa], [fb] & [fc] on the provided [CoroutineContext].
- * The winner of the race cancels the other participants,
- * cancelling the operation cancels all participants.
+ * The winner of the race cancels the other participants.
+ * Cancelling the operation cancels all participants.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
- * @see raceN for a function that ensures it runs in parallel on the [ComputationPool].
+ * @see raceN for a function that ensures operations run in parallel on the [ComputationPool].
  */
 suspend fun <A, B, C> raceN(
   ctx: CoroutineContext,

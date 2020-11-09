@@ -6,7 +6,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 /**
  * [Fiber] represents a pure value that contains a running `suspend () -> A`.
  *
- * You can think of fibers as being lightweight threads, a Fiber being a
+ * You can think of fibers as being lightweight threads. A [Fiber] is a
  * concurrency primitive for doing cooperative multi-tasking.
  */
 interface Fiber<A> {
@@ -78,7 +78,7 @@ suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Computat
  * It does so by connecting the created [Fiber]'s cancellation to the provided [interruptWhen].
  * If the [interruptWhen] signal gets triggered, then this [Fiber] will get cancelled.
  *
- * You can still cancel the [Fiber] independent from the [interruptWhen] token,
+ * You can still cancel the [Fiber] independent from the [interruptWhen] token;
  * whichever one comes first cancels the [Fiber].
  *
  * This function is meant to integrate with 3rd party cancellation system such as Android.
@@ -134,7 +134,7 @@ suspend fun <A> (suspend () -> A).forkScoped(
  * Launches a new suspendable cancellable coroutine within a [Fiber].
  * You can [Fiber.join] or [Fiber.cancel] the computation.
  *
- * **BEWARE** you immediately leak the [Fiber] when launching without connection control.
+ * **BEWARE**: you immediately leak the [Fiber] when launching without connection control.
  * Use [ForkConnected] or safely launch the fiber as a [Resource] or using [bracketCase].
  *
  * @see ForkConnected for a fork operation that wires cancellation to its parent in a safe way.

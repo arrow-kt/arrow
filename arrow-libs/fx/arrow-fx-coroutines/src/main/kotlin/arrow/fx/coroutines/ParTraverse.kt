@@ -5,17 +5,17 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Sequence all tasks in [n] parallel processes and return the result
+ * Sequences all tasks in [n] parallel processes and return the result
  * Cancelling this operation cancels all running tasks.
  */
 suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Long): List<A> =
   parSequenceN(ComputationPool, n)
 
 /**
- * Sequence all tasks in [n] parallel processes and return the result
+ * Sequences all tasks in [n] parallel processes and return the result.
  * Cancelling this operation cancels all running tasks.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parSequence for a function that ensures it runs in parallel on the [ComputationPool].
@@ -28,17 +28,17 @@ suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext, n:
 }
 
 /**
- * Sequence all tasks in parallel and return the result
+ * Sequences all tasks in parallel and return the result.
  * Cancelling this operation cancels all running tasks.
  */
 suspend fun <A> Iterable<suspend () -> A>.parSequence(): List<A> =
   parTraverse { it.invoke() }
 
 /**
- * Sequence all tasks in parallel and return the result
+ * Sequences all tasks in parallel and return the result
  * Cancelling this operation cancels all running tasks.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parSequence for a function that ensures it runs in parallel on the [ComputationPool].
@@ -47,7 +47,7 @@ suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext): Li
   parTraverse(ctx) { it.invoke() }
 
 /**
- * Traverse this [Iterable] and run mapper [f] in [n] parallel processes.
+ * Traverses this [Iterable] and runs mapper [f] in [n] parallel processes.
  * Cancelling this operation cancels all running tasks.
  */
 suspend fun <A, B> Iterable<A>.parTraverseN(n: Long, f: suspend (A) -> B): List<B> {
@@ -58,10 +58,10 @@ suspend fun <A, B> Iterable<A>.parTraverseN(n: Long, f: suspend (A) -> B): List<
 }
 
 /**
- * Traverse this [Iterable] and run [f] in parallel on [ctx].
+ * Traverses this [Iterable] and runs [f] in parallel on [ctx].
  * Cancelling this operation cancels all running tasks.
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations runs in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parTraverseN for a function that ensures it runs in parallel on the [ComputationPool].
@@ -74,14 +74,14 @@ suspend fun <A, B> Iterable<A>.parTraverseN(ctx: CoroutineContext, n: Long, f: s
 }
 
 /**
- * Traverse this [Iterable] and and run all mappers [f] in parallel.
+ * Traverses this [Iterable] and runs all mappers [f] in parallel.
  * Cancelling this operation cancels all running tasks.
  */
 suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
   parTraverse(ComputationPool, f)
 
 /**
- * Traverse this [Iterable] and and run all mappers [f] on [CoroutineContext].
+ * Traverses this [Iterable] and runs all mappers [f] on [CoroutineContext].
  * Cancelling this operation cancels all running tasks.
  *
  * ```kotlin:ank:playground
@@ -101,7 +101,7 @@ suspend fun <A, B> Iterable<A>.parTraverse(f: suspend (A) -> B): List<B> =
  * }
  * ```
  *
- * **WARNING** it runs in parallel depending on the capabilities of the provided [CoroutineContext].
+ * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
  * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
  *
  * @see parTraverse for a function that ensures it runs in parallel on the [ComputationPool].

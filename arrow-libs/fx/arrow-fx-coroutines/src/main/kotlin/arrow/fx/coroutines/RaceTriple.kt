@@ -28,8 +28,8 @@ suspend fun <A, B, C> raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: s
   raceTriple(ComputationPool, fa, fb, fc)
 
 /**
- * Race two tasks concurrently within a new suspend fun.
- * Race results in a winner and the other, yet to finish task running in a [Fiber].
+ * Races three tasks concurrently within a new suspend fun.
+ * Race results in a winner and the others, yet to finish tasks running in [Fiber].
  *
  * ```kotlin:ank:playground
  * import arrow.fx.coroutines.*
