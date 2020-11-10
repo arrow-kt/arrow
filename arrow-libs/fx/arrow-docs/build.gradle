@@ -28,6 +28,7 @@ dependencies {
     compile "io.arrow-kt:arrow-meta:$VERSION_NAME"
     compile project(":arrow-fx")
     compile project(":arrow-fx-coroutines")
+    compile project(":arrow-fx-stm")
     compile project(":arrow-fx-rx2")
     compile project(":arrow-fx-reactor")
     compile project(":arrow-fx-kotlinx-coroutines")
