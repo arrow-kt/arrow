@@ -1,6 +1,3 @@
----
-library: meta
----
 ```kotlin
 val Meta.comprehensions: Plugin
   get() =

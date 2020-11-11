@@ -3,15 +3,15 @@
     <div class="header-flex">
       <div class="header-text">
         <h1 id="header-text">{{site.data.commons.description}}</h1>
-        {% assign codeCol = site.code %}
-        {% for code in codeCol %}
-        <div id="{{code.library}}-code-block" class="browser-content">
+        {% for library in site.data.code.libraries %}
+        <div id="{{ library }}-code-block" class="browser-content">
           <ul class="browser-header">
             <li></li>
             <li></li>
             <li></li>
           </ul>
-          <div class="browser-code">{{ code }}</div>
+          {% capture library_snippet %}{% include_relative landscape/{{ library }}-home-code.md  %}{% endcapture %}
+          <div class="browser-code">{{ library_snippet | markdownify }}</div>
         </div>
         {% endfor %}
       </div>
@@ -21,7 +21,7 @@
         <div id="fx-arrow-animation" class="image-animation" alt="Arrow fx"></div>
         <div id="optics-arrow-animation" class="image-animation" alt="Arrow optics"></div>
         <div id="meta-arrow-animation" class="image-animation" alt="Arrow meta"></div>
-        <img id="logo-white-lines" class="image-animation" src="{{ site.baseurl }}/img/home/logo-white-lines.svg" alt="Arrow white lines"></img>
+        <img id="logo-white-lines" class="image-animation" src="{{ '/img/home/logo-white-lines.svg' | relative_url }}" alt="Arrow white lines"></img>
       </div>
     </div>
   </div>

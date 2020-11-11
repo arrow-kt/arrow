@@ -4,13 +4,12 @@ set -e
 . $BASEDIR/arrow-master/scripts/commons4gradle.sh
 
 echo "For version: $VERSION ..."
-SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
 
 cd $BASEDIR/arrow-site
 git checkout .
-if [ -d sidebar/$SHORT_VERSION ]; then cp sidebar/$SHORT_VERSION/* docs/_data/; fi
-perl -pe "s/latest/$VERSION/g" -i docs/_includes/_head-docs.html
-./gradlew clean runAnk
+git clean -dxf -e vendor -e .bundle
+if [ -d $BASEDIR/arrow-site-$VERSION ]; then cp $BASEDIR/arrow-site-$VERSION/docs/_data/sidebar* docs/_data/; fi
+perl -pe "s/latest/$VERSION/g" -i docs/_includes/_head-docs.html # TODO
 
 cd $BASEDIR/arrow
 git checkout .
@@ -20,10 +19,6 @@ perl -pe "s/^VERSION_NAME.*/VERSION_NAME=$VERSION/g" -i gradle.properties
 replaceOSSbyBintrayRepository "*.gradle"
 replaceOSSbyBintrayRepository "gradle/*.gradle"
 
-# TODO: Remove when releasing 0.11.0
-cp $BASEDIR/arrow-master/gradle/apidoc-creation.gradle $BASEDIR/arrow/doc-conf.gradle
-
-# TODO: Refactor when releasing 0.11.0
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
     cd $BASEDIR/$repository
     git checkout .

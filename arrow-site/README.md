@@ -62,23 +62,9 @@ We use Jekyll so you can deploy your docs to a local server to test your changes
 
 These steps **just** run the website with the main files: landing page, JS, CSS, etc. If you want to browse more content, find the required steps in [Arrow library: How to run the website in your local server](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-run-the-website-in-your-local-server.md) for every Arrow library.
 
-#### 1. Ank to compile and validate code snippets
-
-Ank is in charge of compiling and validating your code snippets and deploying the proper binaries for those. Run the following command:
-
-```bash
-./gradlew runAnk
-```
-
-In this case, it will compile and validate the code snippets that are shown in the landing page.
-
-#### 2. Run the docs in your local server
-
-Once code snippets are validated, do this:
-
 ```bash
 bundle install --gemfile Gemfile --path vendor/bundle
-bundle exec jekyll serve -s build/site/
+bundle exec jekyll serve -s docs
 ```
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.

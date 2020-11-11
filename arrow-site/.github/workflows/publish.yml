@@ -25,8 +25,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Validate Gradle Wrapper
-      uses: gradle/wrapper-validation-action@v1
     - name: Checkout orchestrator
       run: |
         cd $BASEDIR
@@ -34,81 +32,59 @@ jobs:
         git clone https://github.com/arrow-kt/arrow.git arrow-master
     - name: Prepare environment
       run: |
-        set -ex
         mkdir $BASEDIR/logs
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
-    - name: "Site: run Ank"
-      run: ./gradlew runAnk
-    - name: "Site: build"
-      run: |
-        bundle exec jekyll build -s build/site -d build/_site
-        tree build/_site > $BASEDIR/logs/content.log
-    - name: "Site: publish"
-      run: |
-        echo ">>> SITE" > $BASEDIR/logs/aws_sync.log
-        cd build/_site/
-        for file in *; do
-            if [ -f "$file" ]; then
-                echo "Copying $file ..."
-                aws s3 cp $file s3://$S3_BUCKET/$file >> $BASEDIR/logs/aws_sync.log
-            else
-                echo "Sync $file ..."
-                aws s3 sync $file s3://$S3_BUCKET/$file --delete >> $BASEDIR/logs/aws_sync.log
-            fi
-        done
     - name: "Next version: generate and validate docs for all the libraries"
       run: |
         . $BASEDIR/arrow-master/scripts/commons4gradle.sh
         for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            cd $BASEDIR ; git clone https://github.com/arrow-kt/$repository.git; cd $repository
+            checkAndDownload $repository
             addArrowDocs $BASEDIR/$repository/settings.gradle
             $BASEDIR/arrow-master/scripts/project-generate-and-validate-doc.sh $repository
         done
     - name: "Next version: build"
       run: |
-        bundle exec jekyll build -b docs/next -s build/site -d build/_site
-        rm -f build/_site/index.*
-        tree build/_site > $BASEDIR/logs/content_docs-next.log
+        rm -f docs/index.md
+        bundle exec jekyll build -b docs/next -s docs
+        tree _site > $BASEDIR/logs/content_docs-next.log
     - name: "Next version: publish"
       run: |
         echo ">>> NEXT VERSION" >> $BASEDIR/logs/aws_sync.log
-        aws s3 sync build/_site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
+        aws s3 sync _site s3://$S3_BUCKET/docs/next --delete >> $BASEDIR/logs/aws_sync.log
     - name: "Latest release: generate and validate docs for all the libraries"
       run: |
-        export VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
+        export VERSION=$(grep LATEST_VERSION $BASEDIR/arrow-master/gradle.properties | cut -d= -f2)
+        git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
+        LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
+        echo ">> Last tag: $LAST_TAG"
+        cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
         ./scripts/generate-and-validate-doc.sh
     - name: "Latest release: build"
       run: |
-        bundle exec jekyll build -b docs -s build/site -d build/_site
-        rm -f build/_site/index.*
-        tree build/_site > $BASEDIR/logs/content_docs.log
+        bundle exec jekyll build -b docs -s docs
+        tree _site > $BASEDIR/logs/content_docs.log
     - name: "Latest release: publish"
       run: |
         echo ">>> Latest release" >> $BASEDIR/logs/aws_sync.log
-        cd build/_site/
-        for file in *; do
-            if [ -f "$file" ]; then
-                echo "Copying $file ..."
-                aws s3 cp $file s3://$S3_BUCKET/docs/$file >> $BASEDIR/logs/aws_sync.log
-            else
-                echo "Sync $file ..."
-                aws s3 sync $file s3://$S3_BUCKET/docs/$file --delete >> $BASEDIR/logs/aws_sync.log
-            fi
-        done
+        ./scripts/publish-latest-release.sh
     - name: "Other versions: generate, validate, build and publish"
       run: |
         if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
             for version in $(cat update-other-versions.txt); do
                 export VERSION=$version
                 export SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
+                git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
+                LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
+                echo ">> Last tag: $LAST_TAG"
+                cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
                 ./scripts/generate-and-validate-doc.sh
                 cd $BASEDIR/arrow-site
-                bundle exec jekyll build -b docs/$SHORT_VERSION -s build/site -d build/_site
-                rm -f build/_site/index.*
-                tree build/_site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+                rm -f docs/index.md
+                bundle exec jekyll build -b docs/$SHORT_VERSION -s docs
+                tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
                 echo ">>> $SHORT_VERSION VERSION" >> $BASEDIR/logs/aws_sync.log
-                aws s3 sync build/_site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
+                aws s3 sync _site s3://$S3_BUCKET/docs/$SHORT_VERSION --delete >> $BASEDIR/logs/aws_sync.log
             done
         fi
     - name: "Site: generate sitemap.xml"
