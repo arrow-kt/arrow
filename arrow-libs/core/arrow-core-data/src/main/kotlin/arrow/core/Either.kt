@@ -1184,6 +1184,18 @@ inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, defaul
   }
 
 /**
+ * Returns the value from this [Either.Right] or [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).merge() // Result: 12
+ * Left(12).merge() // Result: 12
+ * ```
+ */
+inline fun <A> EitherOf<A, A>.merge(): A =
+  fix().fold(::identity, ::identity)
+
+/**
  * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
  * The returned Either.Right type is not nullable.
  *
