@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.Eval
+import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import kotlin.math.pow
 
@@ -175,10 +176,21 @@ class ScheduleTest : ArrowFxSpec(spec = {
     l shouldBe Either.Left(stop)
   }
 
+  "repeat fails fast on errors" {
+    val ex = Throwable("Hello")
+    repeatOrElseEither(Schedule.recurs(0), { throw ex }) { exc, _ -> exc }
+      .fold({ it shouldBe ex }, { fail("The impossible happened") })
+  }
+
+  "repeat should run the schedule with the correct input" {
+    var i = 0
+    repeat(Schedule.recurs<Int>(10).zipRight(Schedule.collect())) { i++ } shouldBe (0..10).toList()
+  }
+
   "retry is stack-safe" {
     val count = Atomic(0)
     val l = Either.catch {
-      val n: Nothing = retry(Schedule.recurs(20_000)) {
+      retry(Schedule.recurs(20_000)) {
         count.updateAndGet { it + 1 }
         throw exception
       }
@@ -186,6 +198,18 @@ class ScheduleTest : ArrowFxSpec(spec = {
 
     l shouldBe Either.Left(exception)
     count.get() shouldBe 20_001
+  }
+
+  "retry succeeds if no exception is thrown" {
+    retry(Schedule.recurs(0)) { 1 } shouldBe 1
+  }
+
+  "retryOrElseEither runs the schedule with the correct input and runs the orElse handler if it does not retry" {
+    val ex = Throwable("Hello")
+    val res = retryOrElseEither<Int, Int, Throwable>(Schedule.recurs(0), {
+      throw ex
+    }) { e, _ -> e }
+    res.fold({ it shouldBe ex }, { fail("The impossible happened") })
   }
 })
 

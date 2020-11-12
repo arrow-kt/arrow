@@ -792,7 +792,7 @@ suspend fun <A, B, C> repeatOrElseEither(
  * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
  */
 suspend fun <A, B> retry(
-  schedule: Schedule<A, B>,
+  schedule: Schedule<Throwable, B>,
   fa: suspend () -> A
 ): A = retryOrElse(schedule, fa) { e, _ -> throw e }
 
@@ -801,7 +801,7 @@ suspend fun <A, B> retry(
  * Also offers a function to handle errors if they are encountered during retrial.
  */
 suspend fun <A, B> retryOrElse(
-  schedule: Schedule<A, B>,
+  schedule: Schedule<Throwable, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B) -> A
 ): A = retryOrElseEither(schedule, fa, orElse).fold(::identity, ::identity)
@@ -812,7 +812,7 @@ suspend fun <A, B> retryOrElse(
  */
 @Suppress("UNCHECKED_CAST")
 suspend fun <A, B, C> retryOrElseEither(
-  schedule: Schedule<A, B>,
+  schedule: Schedule<Throwable, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B) -> C
 ): Either<C, A> {
