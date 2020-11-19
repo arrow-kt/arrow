@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.coroutines.DefaultConcurrentVar.Companion.State.WaitForPut
 import arrow.fx.coroutines.DefaultConcurrentVar.Companion.State.WaitForTake
 import kotlinx.atomicfu.atomic
@@ -30,6 +32,15 @@ import kotlinx.atomicfu.atomic
  *  println(r)
  * }
  * ```
+ *
+ * ## Using [ConcurrentVar] as a lock safely
+ *
+ * [ConcurrentVar] can also be used as a lock if every operation calls [take], does work and then [put]'s the value back.
+ * However this is quite unsafe if operations can be cancelled or can throw exception while they hold a lock.
+ * The best approach to overcome this is to use [bracketCase] however since this is a rather common pattern, it is made available with [withConcurrentVar], [modify] and [modify_].
+ *
+ * > Note that this only works if all operations over the [ConcurrentVar] follow the pattern of first taking and then putting back both exactly once and in order.
+ *  Or use the helpers to also be safe in case of exceptions and cancellation.
  */
 interface ConcurrentVar<A> {
 
@@ -180,6 +191,37 @@ interface ConcurrentVar<A> {
    */
   suspend fun read(): A
 
+  /**
+   * Exception- and Cancellation-safe wrapper for operating on the contents of a [ConcurrentVar].
+   *
+   * Should an exception occur during [f]'s execution, or if it is cancelled, the value will always be put back.
+   *
+   * This operation is only atomic if there are no other producers for this [ConcurrentVar].
+   */
+  suspend fun <B> withConcurrentVar(f: suspend (A) -> B): B
+
+  /**
+   * Exception- and Cancellation-safe wrapper for modifying the contents of a [ConcurrentVar].
+   *
+   * Should an exception occur during [f]'s execution, or if it is cancelled, the initial value will be put back.
+   *
+   * This operation is only atomic if there are no other producers for this [ConcurrentVar].
+   *
+   * @see [modify_] A version that returns unit and does not expect a Tuple
+   */
+  suspend fun <B> modify(f: suspend (A) -> Tuple2<A, B>): B
+
+  /**
+   * Exception- and Cancellation-safe wrapper for modifying the contents of a [ConcurrentVar].
+   *
+   * Should an exception occur during [f]'s execution, or if it is cancelled, the initial value will be put back.
+   *
+   * This operation is only atomic if there are no other producers for this [ConcurrentVar].
+   *
+   * @see [modify] A version that allows a custom return value instead of unit.
+   */
+  suspend fun modify_(f: suspend (A) -> A): Unit = modify { f(it) toT Unit }
+
   companion object {
     /** Builds a [ConcurrentVar] instance with an [initial] value. */
     suspend operator fun <A> invoke(initial: A): ConcurrentVar<A> =
@@ -257,6 +299,33 @@ private class DefaultConcurrentVar<A> constructor(initial: State<A>) : Concurren
 
   override suspend fun read(): A =
     cancellable(::unsafeRead)
+
+  override suspend fun <B> withConcurrentVar(f: suspend (A) -> B): B =
+    bracketCase(
+      acquire = ::take,
+      use = f,
+      release = { a, _ -> put(a) }
+    )
+
+  override suspend fun <B> modify(f: suspend (A) -> Tuple2<A, B>): B {
+    // ugly. Is there a better way?
+    var res: A? = null
+    return bracketCase(
+      acquire = ::take,
+      use = {
+        val (a, b) = f(it)
+        res = a
+        b
+      },
+      release = { a, exit ->
+        when (exit) {
+          is ExitCase.Failure -> put(a)
+          is ExitCase.Cancelled -> put(a)
+          is ExitCase.Completed -> put(res!!)
+        }
+      }
+    )
+  }
 
   private tailrec suspend fun unsafeTryPut(a: A): Boolean =
     when (val current = state.value) {
