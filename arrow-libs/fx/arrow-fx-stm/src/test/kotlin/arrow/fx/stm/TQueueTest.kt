@@ -105,26 +105,17 @@ class TQueueTest : ArrowFxSpec(spec = {
     atomically { tq.peek() } shouldBeExactly 50
     atomically { tq.flush() } shouldBe listOf(50, 203)
   }
-  "filter and filterNot should work" {
+  "removeAll should work" {
     val tq = TQueue.new<Int>()
-    atomically { tq.filter { true } }
-    atomically { tq.flush() } shouldBe emptyList()
-    atomically { tq.filterNot { false } }
+    atomically { tq.removeAll { true } }
     atomically { tq.flush() } shouldBe emptyList()
 
     atomically {
       for (i in 0..100) {
         tq.write(i)
       }
-      tq.filter { it.rem(2) == 0 }
+      tq.removeAll { it.rem(2) == 0 }
       tq.flush()
     } shouldBe (0..100).filter { it.rem(2) == 0 }
-    atomically {
-      for (i in 0..100) {
-        tq.write(i)
-      }
-      tq.filterNot { it.rem(2) == 0 }
-      tq.flush()
-    } shouldBe (0..100).filterNot { it.rem(2) == 0 }
   }
 })

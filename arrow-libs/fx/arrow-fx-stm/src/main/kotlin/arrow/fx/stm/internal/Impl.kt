@@ -154,7 +154,7 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
  * In some special cases it is possible to detect if a STM transaction blocks indefinitely so we can
  *  abort here.
  */
-object BlockedIndefinitely : Throwable("Transaction blocked indefinitely")
+class BlockedIndefinitely : Throwable("Transaction blocked indefinitely")
 
 object RetryException : Throwable("Arrow STM Retry. This should always be caught by arrow internally. Please report this as a bug if that is not the case!") {
   override fun fillInStackTrace(): Throwable { return this }
@@ -189,7 +189,7 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
 
         if (frame.validateAndCommit()) return@commit res
       } catch (ignored: RetryException) {
-        if (frame.accessMap.isEmpty()) throw BlockedIndefinitely
+        if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
 
         val registered = mutableListOf<TVar<Any?>>()
         suspendCoroutine<Unit> susp@{ k ->

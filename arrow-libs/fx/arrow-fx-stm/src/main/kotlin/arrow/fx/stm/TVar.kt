@@ -1,9 +1,5 @@
 package arrow.fx.stm
 
-import arrow.fx.coroutines.AtomicRefW
-import arrow.fx.coroutines.Duration
-import arrow.fx.coroutines.ForkConnected
-import arrow.fx.coroutines.sleep
 import arrow.fx.stm.internal.STMFrame
 import arrow.fx.stm.internal.STMTransaction
 import kotlinx.atomicfu.AtomicLong
@@ -11,17 +7,6 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 import kotlin.coroutines.resume
-
-/**
- * Utility to create [TVar] which sets its value to true after a [delay].
- */
-suspend fun registerDelay(delay: Duration): TVar<Boolean> =
-  TVar.new(false).also { v ->
-    ForkConnected {
-      sleep(delay)
-      atomically { v.write(true) }
-    }
-  }
 
 /**
  * A [TVar] is a mutable reference that can only be (safely) accessed inside a [STM] transaction.
@@ -36,18 +21,102 @@ suspend fun registerDelay(delay: Duration): TVar<Boolean> =
  *  faster because it avoids creating a (pointless) transaction.
  * [STM.newTVar] should be used inside transactions because it is not possible to use [TVar.new] inside [STM] due to `suspend`.
  *
- * ## Accessing and modifying a [TVar]
+ * ## Reading a value from a [TVar]
  *
- * Retrieving the value of a [TVar] can be done outside of transactions with [TVar.unsafeRead].
- * This is called unsafe because if the result is then used inside an [atomically] it may end up with an inconsistent state
- *  and thus a race-condition.
- * Using it for one-off reads is fine though and is also faster than `atomically { v.read() }` because it avoids creating a transaction.
+ * One-off reading from a [TVar] outside of a transaction can be done by using [TVar.unsafeRead].
+ * Despite the name using this method is only unsafe if the read value (or a derivative) is then used inside another transaction which may cause
+ *  race conditions again. However the benefit of using this over `atomically { tvar.read() }` is that it avoids creating a transaction and is
+ *  thus much faster.
  *
- * Inside a transaction several combinators are present to modify and read a [TVar]:
- * - [STM.read] Read the value from a [TVar]
- * - [STM.write] Write a new value to the [TVar]
- * - [STM.modify] Modify the [TVar] with a function. `modify(f) = write(f(read()))`
- * - [STM.swap] Swap the content of a [TVar]. `swap(a) = read().also { write(a) }`
+ * ```kotlin:ank:playground
+ * import arrow.fx.stm.TVar
+ *
+ * suspend fun main() {
+ *   //sampleStart
+ *   val tvar = TVar.new(10)
+ *   val result = tvar.unsafeRead()
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * Reading from a [TVar] inside a transaction is done by using [STM.read].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.stm.TVar
+ * import arrow.fx.stm.atomically
+ *
+ * suspend fun main() {
+ *   //sampleStart
+ *   val tvar = TVar.new(10)
+ *   val result = atomically {
+ *     tvar.read()
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * > Checking the validity of a transaction is done by checking the contents of all accessed [TVar]'s before locking the [TVar]'s that have
+ *  been written to and then checking only the [TVar]'s that have only been read not modified again. To keep transactions as fast as possible
+ *  it is key to keep the number of accessed [TVar]'s small.
+ *
+ * > Another important thing to remember is that only writes will ever lock a [TVar] and only those that need to be changed.
+ *  This means that so long as transactions access disjoint sets of variables or a transaction is read only, they may run in parallel.
+ *
+ * ## Modifying the value inside the [TVar]
+ *
+ * Writing a new value to the [TVar]:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.stm.TVar
+ * import arrow.fx.stm.atomically
+ *
+ * suspend fun main() {
+ *   //sampleStart
+ *   val tvar = TVar.new(10)
+ *   val result = atomically {
+ *     tvar.write(20)
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * Modifying the value based on the initial value:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.stm.TVar
+ * import arrow.fx.stm.atomically
+ *
+ * suspend fun main() {
+ *   //sampleStart
+ *   val tvar = TVar.new(10)
+ *   val result = atomically {
+ *     tvar.modify { it * 2 }
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * Writing a new value to the [TVar] and returning the initial value:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.stm.TVar
+ * import arrow.fx.stm.atomically
+ *
+ * suspend fun main() {
+ *   //sampleStart
+ *   val tvar = TVar.new(10)
+ *   val result = atomically {
+ *     tvar.swap(20)
+ *   }
+ *   //sampleEnd
+ *   println("Result $result")
+ *   println("New value ${tvar.unsafeRead()}")
+ * }
+ * ```
  */
 class TVar<A> internal constructor(a: A) {
   /**
@@ -104,7 +173,7 @@ class TVar<A> internal constructor(a: A) {
    * Release a lock held by [frame].
    *
    * If [frame] no longer has the lock (a write happened and now read
-   *  tries to unlock) it is ignored (By the semantics of [AtomicRefW.compareAndSet])
+   *  tries to unlock) it is ignored
    */
   internal fun release(frame: STMFrame, a: A): Unit {
     ref.compareAndSet(frame, a as Any?)
