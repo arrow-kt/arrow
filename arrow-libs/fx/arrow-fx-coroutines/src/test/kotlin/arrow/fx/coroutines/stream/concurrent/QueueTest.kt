@@ -10,6 +10,7 @@ import arrow.fx.coroutines.seconds
 import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.stream.Stream
 import arrow.fx.coroutines.stream.append
+import arrow.fx.coroutines.stream.drain
 import arrow.fx.coroutines.stream.noneTerminate
 import arrow.fx.coroutines.stream.parJoinUnbounded
 import arrow.fx.coroutines.stream.terminateOnNone
@@ -176,7 +177,7 @@ class QueueTest : StreamSpec(spec = {
   "dequeue releases subscriber on " - {
     "interrupt" {
       val q = Queue.unbounded<Int>()
-      q.dequeue().interruptAfter(100.milliseconds).void()
+      q.dequeue().interruptAfter(100.milliseconds).drain()
       q.enqueue1(1)
       q.enqueue1(2)
       q.dequeue1() shouldBe 1

@@ -3,8 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -75,7 +73,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connB.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+          suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })
@@ -95,7 +93,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connA.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+          suspend { connA.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })

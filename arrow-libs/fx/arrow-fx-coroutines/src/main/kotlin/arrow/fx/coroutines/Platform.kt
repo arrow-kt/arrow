@@ -159,6 +159,11 @@ object Platform {
     }
   }
 
+  fun composeErrors(first: Throwable, res: Result<Any?>): Throwable {
+    res.fold({ first }, { e -> first.addSuppressed(e) })
+    return first
+  }
+
   /**
    * Composes multiple errors together, meant for those cases in which error suppression, due to a second error being
    * triggered, is not acceptable.

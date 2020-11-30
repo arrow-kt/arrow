@@ -65,7 +65,7 @@ suspend fun <A> cancellable(cb: ((Result<A>) -> Unit) -> CancelToken): A =
     val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
     val cbb2 = Platform.onceOnly(conn, cont::resumeWith)
 
-    val cancellable = ForwardCancellable()
+    val cancellable = ForwardCancellable(cont.context)
     conn.push { cancellable.cancel() }
 
     if (conn.isNotCancelled()) {

@@ -2,8 +2,6 @@ package arrow.fx.coroutines
 
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -61,8 +59,9 @@ suspend fun <A, B, C> raceN(
     cb: (Result<Race3<A, B, C>>) -> Unit,
     r: Race3<A, B, C>
   ): Unit = if (isActive.getAndSet(false)) {
-    suspend { other2.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
-      suspend { other3.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+    // Continue on the winners Context/Thread
+    suspend { other2.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
+      suspend { other3.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r3 ->
         main.pop()
         r2.fold({
           r3.fold({ cb(Result.success(r)) }, { e -> cb(Result.failure(e)) })
@@ -81,8 +80,9 @@ suspend fun <A, B, C> raceN(
     other3: SuspendConnection,
     err: Throwable
   ): Unit = if (active.getAndSet(false)) {
-    suspend { other2.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
-      suspend { other3.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+    // Continue on the winners Context/Thread
+    suspend { other2.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
+      suspend { other3.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r3 ->
         main.pop()
         cb(
           Result.failure(

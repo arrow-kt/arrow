@@ -41,7 +41,7 @@ suspend fun <A> uncancellable(f: suspend () -> A): A =
     val originalConnection = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
     // ForwardCancellable back-pressures the originalConnection#cancel until we call `ForwardCancellable#complete`
-    val deferredRelease = ForwardCancellable()
+    val deferredRelease = ForwardCancellable(cont.context)
     originalConnection.push { deferredRelease.cancel() }
 
     if (originalConnection.isNotCancelled()) {
@@ -228,7 +228,7 @@ suspend fun <A, B> bracketCase(
 ): B = suspendCoroutineUninterceptedOrReturn { cont ->
   val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
 
-  val deferredRelease = ForwardCancellable()
+  val deferredRelease = ForwardCancellable(cont.context)
   conn.push { deferredRelease.cancel() }
 
   // Race-condition check, avoiding starting the bracket if the connection

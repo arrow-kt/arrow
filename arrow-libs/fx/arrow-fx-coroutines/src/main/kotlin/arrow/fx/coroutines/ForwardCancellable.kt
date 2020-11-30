@@ -2,7 +2,7 @@ package arrow.fx.coroutines
 
 import kotlinx.atomicfu.atomic
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
@@ -18,35 +18,37 @@ import kotlin.coroutines.suspendCoroutine
  *
  *  - When `cancel` is called after `complete`, then `cancel` immediately runs the cancellation token passed to `complete`.
  *
- *  - When the `ForwardCancellable` is completed, before `cancel`'s token is invoked.
- *  The completed [CancelToken] will be invoked immediately when `cancel`'s token is invoked.
- *
  *  - Calling `complete` twice will result in an [ArrowInternalException], and is considered an internal developer bug.
  *
  * You can find example of this usage in [bracket] and [guaranteeCase] to schedule the `cancel` frame and
  * in [uncancellable] to back-pressure the original context until the uncancellable context is finished.
+ *
+ * @param ctx, the CoroutineContext where the `CancelToken` is run on.
+ *   => This is taken into the constructor because we want to run it on the `CoroutineContext` of the creator of the `CancelToken`,
+ *   and not on the `CoroutineContext` of the caller of `cancel`.
+ *   => We want the `CancelToken` from `cancellable` to run on the `CoroutineContext` where `cancellable` is  called.
+ *   => We want the release function of `bracket` & `bracketCase` to run on the `CoroutineContext` where `bracketX` is called.
  */
-internal class ForwardCancellable {
+internal class ForwardCancellable(private val ctx: CoroutineContext) {
 
   private val state = atomic(init)
 
   suspend fun cancel(): Unit {
-    fun loop(conn: SuspendConnection, cb: (Result<Unit>) -> Unit): Unit = state.value.let { current ->
+    fun loop(cb: (Result<Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
         is State.Empty ->
-          if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack))) loop(conn, cb)
+          if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack))) loop(cb)
           else Unit
 
         is State.Active -> {
           state.lazySet(finished) // GC purposes
-          // Platform.trampoline { }
-          current.token.cancel.startCoroutineCancellable(CancellableContinuation(EmptyCoroutineContext, conn, cb))
+          current.token.cancel.startCoroutine(Continuation(ctx + SuspendConnection.uncancellable, cb))
         }
       }
     }
 
     return suspendCoroutine { cont ->
-      loop(cont.context[SuspendConnection] ?: SuspendConnection.uncancellable, cont::resumeWith)
+      loop(cont::resumeWith)
     }
   }
 
@@ -65,10 +67,8 @@ internal class ForwardCancellable {
         if (!state.compareAndSet(current, State.Active(value)))
           complete(value)
       } else {
-        if (!state.compareAndSet(current, finished))
-          complete(value)
-        else
-          execute(value, current.stack)
+        if (!state.compareAndSet(current, finished)) complete(value)
+        else execute(ctx, value, current.stack)
       }
     }
   }
@@ -94,8 +94,8 @@ internal class ForwardCancellable {
     private val init: State = State.Empty(listOf())
     private val finished: State = State.Active(CancelToken.unit)
 
-    private fun execute(token: CancelToken, stack: List<(Result<Unit>) -> Unit>): Unit =
-      token.cancel.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
+    private fun execute(ctx: CoroutineContext, token: CancelToken, stack: List<(Result<Unit>) -> Unit>): Unit =
+      token.cancel.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
           try {
             cb(r)

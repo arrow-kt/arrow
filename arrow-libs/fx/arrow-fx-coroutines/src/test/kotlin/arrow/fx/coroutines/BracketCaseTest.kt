@@ -14,7 +14,7 @@ import kotlin.time.measureTimedValue
 class BracketCaseTest : ArrowFxSpec(spec = {
 
   "Uncancellable back pressures timeoutOrNull" {
-    checkAll(Arb.long(10, 100), Arb.long(300, 400)) { a, b ->
+    checkAll(Arb.long(50, 100), Arb.long(300, 400)) { a, b ->
       val (n, duration) = measureTimedValue {
         timeOutOrNull(a.milliseconds) {
           uncancellable { sleep(b.milliseconds) }

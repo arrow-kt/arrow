@@ -2,8 +2,6 @@ package arrow.fx.coroutines
 
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -89,8 +87,8 @@ suspend fun <A, B, C> raceTriple(
       promise: UnsafePromise<A>
     ): Unit {
       if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-        suspend { connB.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
-          suspend { connC.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+        suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
+          suspend { connC.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r3 ->
             conn.pop()
 
             val errorResult = r2.fold({

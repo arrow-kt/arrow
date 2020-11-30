@@ -3,8 +3,6 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -91,7 +89,7 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
     r: Either<T, U>
   ): Unit =
     if (isActive.getAndSet(false)) {
-      suspend { other.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+      suspend { other.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
         main.pop()
         r2.fold({
           cb(Result.success(r))
@@ -109,7 +107,7 @@ suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend
     err: Throwable
   ): Unit =
     if (active.getAndSet(false)) {
-      suspend { other.cancel() }.startCoroutine(Continuation(ComputationPool) { r2: Result<Unit> ->
+      suspend { other.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2: Result<Unit> ->
         main.pop()
         cb(Result.failure(r2.fold({ err }, { Platform.composeErrors(err, it) })))
       })

@@ -25,7 +25,7 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlin.coroutines.CoroutineContext
 
-class QueueTest : ArrowFxSpec() {
+class QueueTest : ArrowFxSpec(iterations = 100) {
 
   init {
 
@@ -368,7 +368,6 @@ class QueueTest : ArrowFxSpec() {
       queue: (Int) -> IO<Queue<ForIO, Int>>
     ) {
       val label = "BoundedQueue"
-      allStrategyTests(label, ctx, queue)
       strategyAtCapacityTests(label, queue)
 
       "$label - time out offering to a queue at capacity" {
@@ -587,7 +586,6 @@ class QueueTest : ArrowFxSpec() {
       queue: (Int) -> IO<Queue<ForIO, Int>>
     ) {
       val label = "SlidingQueue"
-      allStrategyTests(label, ctx, queue)
       strategyAtCapacityTests(label, queue)
 
       "$label - capacity must be a positive integer" {
@@ -616,7 +614,6 @@ class QueueTest : ArrowFxSpec() {
       queue: (Int) -> IO<Queue<ForIO, Int>>
     ) {
       val label = "DroppingQueue"
-      allStrategyTests(label, ctx, queue)
       strategyAtCapacityTests(label, queue)
 
       "$label - capacity must be a positive integer" {

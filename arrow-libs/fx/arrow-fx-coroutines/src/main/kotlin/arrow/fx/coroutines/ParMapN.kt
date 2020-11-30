@@ -3,11 +3,9 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.startCoroutine
 
 /**
  * Runs [fa], [fb] in parallel on [ComputationPool] and combines their results using the provided function.
@@ -95,7 +93,7 @@ suspend fun <A, B, C> parMapN(
 
     fun sendException(other: SuspendConnection, e: Throwable) = when (state.getAndSet(e)) {
       is Throwable -> Unit // Do nothing we already finished
-      else -> suspend { other.cancel() }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
+      else -> suspend { other.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r ->
         conn.pop()
         cb(Result.failure(r.fold({ e }, { e2 -> Platform.composeErrors(e, e2) })))
       })
