@@ -12,11 +12,11 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.proto
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.Flags
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
-import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
+import org.jetbrains.kotlin.metadata.ProtoBuf
+import org.jetbrains.kotlin.metadata.deserialization.Flags
+import org.jetbrains.kotlin.metadata.deserialization.TypeTable
+import org.jetbrains.kotlin.metadata.deserialization.supertypes
+import org.jetbrains.kotlin.serialization.deserialization.getName
 import java.io.File
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement

@@ -27,10 +27,10 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
 import me.eugeniomarletti.kotlin.metadata.modality
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
+import org.jetbrains.kotlin.metadata.ProtoBuf
+import org.jetbrains.kotlin.metadata.deserialization.TypeTable
+import org.jetbrains.kotlin.metadata.deserialization.hasReceiver
+import org.jetbrains.kotlin.metadata.jvm.JvmProtoBuf
 import me.eugeniomarletti.kotlin.metadata.visibility
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind

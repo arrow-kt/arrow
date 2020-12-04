@@ -13,11 +13,11 @@ import arrow.meta.ast.TypeName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.modality
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.Flags
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
+import org.jetbrains.kotlin.metadata.ProtoBuf
+import org.jetbrains.kotlin.metadata.deserialization.Flags
+import org.jetbrains.kotlin.metadata.deserialization.NameResolver
+import org.jetbrains.kotlin.metadata.deserialization.TypeTable
+import org.jetbrains.kotlin.metadata.deserialization.supertypes
 import javax.lang.model.element.ExecutableElement
 
 interface KotlinMetatadataEncoder {

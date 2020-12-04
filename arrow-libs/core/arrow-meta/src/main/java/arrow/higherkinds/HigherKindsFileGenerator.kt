@@ -4,7 +4,7 @@ import arrow.common.Package
 import arrow.common.utils.knownError
 import arrow.common.utils.typeConstraints
 import arrow.common.utils.writeSafe
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import org.jetbrains.kotlin.metadata.ProtoBuf
 import javax.annotation.processing.Filer
 import javax.lang.model.element.Name
 

@@ -2,11 +2,11 @@ package arrow.common.utils
 
 import me.eugeniomarletti.kotlin.metadata.ClassData
 import me.eugeniomarletti.kotlin.metadata.PackageData
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Constructor
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Function
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Property
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.TypeParameter
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
+import org.jetbrains.kotlin.metadata.ProtoBuf.Constructor
+import org.jetbrains.kotlin.metadata.ProtoBuf.Function
+import org.jetbrains.kotlin.metadata.ProtoBuf.Property
+import org.jetbrains.kotlin.metadata.ProtoBuf.TypeParameter
+import org.jetbrains.kotlin.metadata.deserialization.NameResolver
 
 sealed class ClassOrPackageDataWrapper {
   abstract val `package`: String
@@ -19,7 +19,7 @@ sealed class ClassOrPackageDataWrapper {
 
   class Package(
     override val nameResolver: NameResolver,
-    val packageProto: me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Package,
+    val packageProto: org.jetbrains.kotlin.metadata.ProtoBuf.Package,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = emptyList()
@@ -31,7 +31,7 @@ sealed class ClassOrPackageDataWrapper {
 
   class Class(
     override val nameResolver: NameResolver,
-    val classProto: me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf.Class,
+    val classProto: org.jetbrains.kotlin.metadata.ProtoBuf.Class,
     override val `package`: String
   ) : ClassOrPackageDataWrapper() {
     override val constructorList: List<Constructor> get() = classProto.constructorList
