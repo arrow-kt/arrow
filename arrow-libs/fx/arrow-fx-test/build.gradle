@@ -10,7 +10,6 @@ apply from: "$SUB_PROJECT"
 dependencies {
     compile project(":arrow-fx")
     api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
 }

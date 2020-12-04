@@ -287,7 +287,7 @@ private class DefaultConcurrentVar<A> constructor(initial: State<A>) : Concurren
 
   override suspend fun take(): A =
     when (val m = unsafeTryTake()) {
-      Maybe.None -> cancellableF(::unsafeTake)
+      Maybe.None -> cancellableF { unsafeTake(it) }
       is Maybe.Just -> m.value
     }
 
