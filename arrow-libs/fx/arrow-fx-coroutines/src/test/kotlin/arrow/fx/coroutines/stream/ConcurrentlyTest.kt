@@ -64,9 +64,10 @@ class ConcurrentlyTest : StreamSpec(spec = {
     }
 
     "when background stream fails, primary stream fails even when hung" {
-      checkAll(Arb.stream(Arb.int()), Arb.throwable()) { s, e ->
+      checkAll(Arb.int(), Arb.stream(Arb.int()), Arb.throwable()) { i, s, e ->
         assertThrowable {
-          s.concurrently(Stream.raiseError<Unit>(e))
+          Stream(i).append { s }
+            .concurrently(Stream.raiseError<Unit>(e))
             .effectTap { never() }
             .drain()
         } shouldBe e
