@@ -31,9 +31,6 @@ data class IQueue<A> internal constructor(
   internal fun first(): A =
     firstOrNull() ?: throw NoSuchElementException("first on empty queue")
 
-  internal fun tail(): IQueue<A> =
-    tailOrNull() ?: throw NoSuchElementException("tail on empty queue")
-
   fun firstOrNull(): A? =
     when {
       listOut.isNotEmpty() -> listOut.first()
@@ -111,7 +108,7 @@ data class IQueue<A> internal constructor(
   fun toList(): List<A> = listOut + listIn.reversed()
 }
 
-internal infix fun <A> A.prependTo(q: IQueue<A>): IQueue<A> =
+infix fun <A> A.prependTo(q: IQueue<A>): IQueue<A> =
   q.prepend(this)
 
 private val EmptyQueue: IQueue<Nothing> = IQueue(emptyList(), emptyList(), 0)

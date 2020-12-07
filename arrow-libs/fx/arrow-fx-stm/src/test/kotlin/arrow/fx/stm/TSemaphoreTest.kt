@@ -1,5 +1,6 @@
 package arrow.fx.stm
 
+import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe

@@ -1,5 +1,6 @@
 package arrow.fx.stm
 
+import arrow.fx.coroutines.ArrowFxSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int

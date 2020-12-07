@@ -2,6 +2,8 @@ rootProject.name = 'arrow-fx-lib'
 
 include 'arrow-fx'
 include 'arrow-fx-coroutines'
+include 'arrow-fx-coroutines-test'
+include 'arrow-fx-coroutines-stream'
 include 'arrow-fx-suspend-connection'
 include 'arrow-fx-coroutines-kotlinx-coroutines'
 include 'arrow-fx-reactor'

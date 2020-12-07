@@ -1,5 +1,6 @@
 package arrow.fx.stm
 
+import arrow.fx.coroutines.ArrowFxSpec
 import arrow.fx.coroutines.Fiber
 import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.microseconds

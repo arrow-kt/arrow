@@ -1,5 +1,6 @@
 package arrow.fx.stm
 
+import arrow.fx.coroutines.ArrowFxSpec
 import arrow.fx.coroutines.milliseconds
 import arrow.fx.coroutines.raceN
 import arrow.fx.coroutines.sleep

@@ -9,10 +9,10 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
-const val ArrowExceptionMessage =
+internal const val ArrowExceptionMessage =
   "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
 
-internal open class ArrowInternalException(override val message: String = ArrowExceptionMessage) : RuntimeException(message)
+internal class ArrowInternalException(override val message: String = ArrowExceptionMessage) : RuntimeException(message)
 
 private const val initialIndex: Int = 0
 private const val chunkSize: Int = 8

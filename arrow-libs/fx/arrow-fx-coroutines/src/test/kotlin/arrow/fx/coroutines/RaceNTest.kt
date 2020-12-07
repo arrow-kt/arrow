@@ -2,13 +2,11 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
-import arrow.core.orNull
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
-import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 
 class RaceNTest : ArrowFxSpec(spec = {

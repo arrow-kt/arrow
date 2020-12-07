@@ -7,7 +7,7 @@ import kotlinx.atomicfu.atomic
  * An eager Promise implementation to bridge results across processes internally.
  * @see ForkAndForget
  */
-internal class UnsafePromise<A> {
+class UnsafePromise<A> {
 
   private sealed class State<out A> {
     object Empty : State<Nothing>()

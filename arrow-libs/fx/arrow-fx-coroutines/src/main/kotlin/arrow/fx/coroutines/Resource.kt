@@ -157,14 +157,14 @@ sealed class Resource<out A> {
   fun <B> zip(other: Resource<B>): Resource<Pair<A, B>> =
     map2(other, ::Pair)
 
-  internal class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
+  class Bind<A, B>(val source: Resource<A>, val f: (A) -> Resource<B>) : Resource<B>()
 
-  internal class Allocate<A>(
+  class Allocate<A>(
     val acquire: suspend () -> A,
     val release: suspend (A, ExitCase) -> Unit
   ) : Resource<A>()
 
-  internal class Defer<A>(val resource: suspend () -> Resource<A>) : Resource<A>()
+  class Defer<A>(val resource: suspend () -> Resource<A>) : Resource<A>()
 
   companion object {
     /**
