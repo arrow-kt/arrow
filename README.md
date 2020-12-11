@@ -67,7 +67,7 @@ Find more details in [CONTRIBUTING](https://github.com/arrow-kt/arrow/blob/maste
 
 ### Next development version
 
-If you want to try the last features, replace `0.11.0` by `1.0.0-SNAPSHOT` in the following guideline.
+If you want to try the last features, replace `0.11.0` by `0.12.0-SNAPSHOT` in the following guideline.
 
 ### JDK
 
