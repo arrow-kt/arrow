@@ -28,6 +28,7 @@ dependencies {
         api "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
         api "io.arrow-kt:arrow-fx-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
         api "io.arrow-kt:arrow-generic:$VERSION_NAME"
         api "io.arrow-kt:arrow-incubator-test:$VERSION_NAME"
         api "io.arrow-kt:arrow-integrations-retrofit-adapter:$VERSION_NAME"
