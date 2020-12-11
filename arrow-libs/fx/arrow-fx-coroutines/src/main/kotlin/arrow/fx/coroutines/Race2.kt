@@ -1,14 +1,20 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
-import kotlin.coroutines.Continuation
+import arrow.core.Left
+import arrow.core.Right
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.selects.select
+import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.intrinsics.intercepted
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Races the participants [fa], [fb] in parallel on the [ComputationPool].
+ * Races the participants [fa], [fb] in parallel on the [Dispatchers.Default].
  * The winner of the race cancels the other participants.
  * Cancelling the operation cancels all participants.
  * An [uncancellable] participant will back-pressure the result of [raceN].
@@ -41,20 +47,22 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  * @see racePair for a version that does not automatically cancel the loser.
  * @see raceN for the same function that can race on any [CoroutineContext].
  */
-suspend fun <A, B> raceN(fa: suspend () -> A, fb: suspend () -> B): Either<A, B> =
-  raceN(ComputationPool, fa, fb)
+suspend inline fun <A, B> raceN(crossinline fa: suspend () -> A, crossinline fb: suspend () -> B): Either<A, B> =
+  raceN(Dispatchers.Default, fa, fb)
 
 /**
  * Races the participants [fa], [fb] on the provided [CoroutineContext].
  * The winner of the race cancels the other participants.
  * Cancelling the operation cancels all participants.
  *
- * **WARNING**: operations run in parallel depending on the capabilities of the provided [CoroutineContext].
- * We ensure they start in sequence so it's guaranteed to finish on a single threaded context.
+ * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
+ * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa] & [fb] in parallel.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
  * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
  *
  * suspend fun main(): Unit {
  *   suspend fun loser(): Int =
@@ -63,7 +71,7 @@ suspend fun <A, B> raceN(fa: suspend () -> A, fb: suspend () -> B): Either<A, B>
  *        CancelToken { println("Never got cancelled for losing.") }
  *     }
  *
- *   val winner = raceN(IOPool, { loser() }, { 5 })
+ *   val winner = raceN(Dispatchers.IO, { loser() }, { 5 })
  *
  *   val res = when(winner) {
  *     is Either.Left -> "Never always loses race"
@@ -77,67 +85,23 @@ suspend fun <A, B> raceN(fa: suspend () -> A, fb: suspend () -> B): Either<A, B>
  * @param fa task to participate in the race
  * @param fb task to participate in the race
  * @return either [Either.Left] if [fa] won the race, or [Either.Right] if [fb] won the race.
- * @see racePair for a version that does not automatically cancel the loser.
- * @see raceN for a function that ensures it runs in parallel on the [ComputationPool].
+ * @see raceN for a function that ensures it runs in parallel on the [Dispatchers.Default].
  */
-suspend fun <A, B> raceN(ctx: CoroutineContext, fa: suspend () -> A, fb: suspend () -> B): Either<A, B> {
-  fun <T, U> onSuccess(
-    isActive: AtomicBooleanW,
-    main: SuspendConnection,
-    other: SuspendConnection,
-    cb: (Result<Either<T, U>>) -> Unit,
-    r: Either<T, U>
-  ): Unit =
-    if (isActive.getAndSet(false)) {
-      suspend { other.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
-        main.pop()
-        r2.fold({
-          cb(Result.success(r))
-        }, { e ->
-          cb(Result.failure(e))
-        })
-      })
-    } else Unit
-
-  fun onError(
-    active: AtomicBooleanW,
-    cb: (Result<Nothing>) -> Unit,
-    main: SuspendConnection,
-    other: SuspendConnection,
-    err: Throwable
-  ): Unit =
-    if (active.getAndSet(false)) {
-      suspend { other.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2: Result<Unit> ->
-        main.pop()
-        cb(Result.failure(r2.fold({ err }, { Platform.composeErrors(err, it) })))
-      })
-    } else Unit
-
-  return suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
-    val cont = cont.intercepted()
-
-    val active = AtomicBooleanW(true)
-    val connA = SuspendConnection()
-    val connB = SuspendConnection()
-    conn.pushPair(connA, connB)
-
-    fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
-      result.fold({
-        onSuccess(active, conn, connB, cont::resumeWith, Either.Left(it))
-      }, {
-        onError(active, cont::resumeWith, conn, connB, it)
-      })
-    })
-
-    fb.startCoroutineCancellable(CancellableContinuation(ctx, connB) { result ->
-      result.fold({
-        onSuccess(active, conn, connA, cont::resumeWith, Either.Right(it))
-      }, {
-        onError(active, cont::resumeWith, conn, connA, it)
-      })
-    })
-
-    COROUTINE_SUSPENDED
+suspend inline fun <A, B> raceN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend () -> A,
+  crossinline fb: suspend () -> B
+): Either<A, B> =
+  coroutineScope {
+    val a = async(ctx) { fa() }
+    val b = async(ctx) { fb() }
+    select<Either<A, B>> {
+      a.onAwait.invoke { Left(it) }
+      b.onAwait.invoke { Right(it) }
+    }.also {
+      when (it) {
+        is Either.Left -> b.cancelAndJoin()
+        is Either.Right -> a.cancelAndJoin()
+      }
+    }
   }
-}

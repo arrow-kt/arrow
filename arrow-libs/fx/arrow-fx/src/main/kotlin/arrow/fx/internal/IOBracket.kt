@@ -12,6 +12,8 @@ import arrow.fx.fix
 import arrow.fx.typeclasses.CancelToken
 import arrow.fx.typeclasses.ExitCase
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.NonCancellable
+import kotlin.coroutines.CoroutineContext
 
 internal object IOBracket {
 
@@ -30,7 +32,7 @@ internal object IOBracket {
       if (!conn.isCancelled()) {
         // Note `acquire` is uncancellable due to usage of `IORunLoop.start`
         // (in other words it is disconnected from our SuspendConnection)
-        IORunLoop.start(acquire, BracketStart(use, release, conn, deferredRelease, cb))
+        IORunLoop.start(acquire, NonCancellable, BracketStart(use, release, conn, deferredRelease, cb))
       } else {
         deferredRelease.complete(IO.unit)
       }
@@ -71,7 +73,7 @@ internal object IOBracket {
             // Registering our cancellable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
             // Actual execution
-            IORunLoop.startCancellable(onNext(), conn, cb)
+            IORunLoop.startCancellable(onNext(), conn, cb = cb)
           }
           is Either.Left -> cb(ea)
         }
@@ -91,7 +93,7 @@ internal object IOBracket {
         // Race condition check, avoiding starting `source` in case
         // the connection was already cancelled — n.b. we don't need
         // to trigger `release` otherwise, because it already happened
-        if (!conn.isCancelled()) IORunLoop.startCancellable(onNext, conn, cb)
+        if (!conn.isCancelled()) IORunLoop.startCancellable(onNext, conn, cb = cb)
       }
     }
 
@@ -148,9 +150,9 @@ internal object IOBracket {
     override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(error)
   }
 
-  private val disableUncancellableAndPop: (Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection =
-    { _, _, old, _ ->
+  private val disableUncancellableAndPop: (Any?, Throwable?, SuspendConnection, CoroutineContext, SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext> =
+    { _, _, old, oldCtx, _, _ ->
       old.pop()
-      old
+      old to oldCtx
     }
 }

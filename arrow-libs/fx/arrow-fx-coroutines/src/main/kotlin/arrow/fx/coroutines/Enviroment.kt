@@ -1,5 +1,9 @@
 package arrow.fx.coroutines
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -18,6 +22,7 @@ import kotlin.coroutines.startCoroutine
  *
  * This contract could be elaborated on Android to provide automatic cancellation on Android LifecycleOwner.
  */
+@Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 interface Environment {
 
   /**
@@ -88,13 +93,21 @@ internal class DefaultEnvironment(override val ctx: CoroutineContext) : Environm
     e.printStackTrace()
 
   override fun <A> unsafeRunSync(fa: suspend () -> A): A =
-    Platform.unsafeRunSync(ctx, fa)
+    runBlocking(ctx) { fa.invoke() }
 
   override fun <A> unsafeRunAsync(fa: suspend () -> A, e: (Throwable) -> Unit, a: (A) -> Unit): Unit =
     fa.startCoroutine(Continuation(ctx) { res -> res.fold(a, e) })
 
-  override fun <A> unsafeRunAsyncCancellable(fa: suspend () -> A, e: (Throwable) -> Unit, a: (A) -> Unit): Disposable =
-    fa.startCoroutineCancellable(CancellableContinuation(ctx) { res ->
-      res.fold(a, e) // Return error to caller
-    })
+  override fun <A> unsafeRunAsyncCancellable(fa: suspend () -> A, e: (Throwable) -> Unit, a: (A) -> Unit): Disposable {
+    val job = Job()
+    val conn = SuspendConnection()
+    conn.push { job.cancel() }
+    val scope = CoroutineScope(ctx + job + conn)
+
+    scope.launch {
+      runCatching { fa() }.fold(a, e)
+    }
+
+    return { runBlocking { conn.cancel() } }
+  }
 }

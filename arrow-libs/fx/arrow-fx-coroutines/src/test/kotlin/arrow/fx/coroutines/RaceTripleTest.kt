@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.should
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import java.util.concurrent.Executors
@@ -70,7 +71,7 @@ class RaceTripleTest : ArrowFxSpec(spec = {
             { _, _, _ -> fail("never can not win race") },
             { _, _, _ -> fail("never can not win race") }
           )
-      } shouldBe fa
+      } should either(fa)
     }
   }
 
@@ -84,7 +85,7 @@ class RaceTripleTest : ArrowFxSpec(spec = {
             { _, b, _ -> b },
             { _, _, _ -> fail("never can not win race") }
           )
-      } shouldBe fa
+      } should either(fa)
     }
   }
 
@@ -98,7 +99,7 @@ class RaceTripleTest : ArrowFxSpec(spec = {
             { _, _, _ -> fail("never can not win race") },
             { _, _, b -> b }
           )
-      } shouldBe fa
+      } should either(fa)
     }
   }
 

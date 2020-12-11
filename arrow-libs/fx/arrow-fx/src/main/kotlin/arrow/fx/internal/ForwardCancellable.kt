@@ -31,7 +31,7 @@ internal class ForwardCancellable {
 
         is Active -> {
           state.lazySet(finished) // GC purposes
-          Platform.trampoline { IORunLoop.startCancellable(current.token, conn, cb) }
+          Platform.trampoline { IORunLoop.startCancellable(current.token, conn, cb = cb) }
         }
       }
     }

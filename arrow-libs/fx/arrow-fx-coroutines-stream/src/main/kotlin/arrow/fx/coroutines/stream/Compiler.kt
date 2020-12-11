@@ -14,6 +14,7 @@ import arrow.fx.coroutines.stream.R.Done
 import arrow.fx.coroutines.stream.R.Out
 import arrow.fx.coroutines.stream.Pull.Result
 import arrow.fx.coroutines.stream.R.Interrupted
+import java.util.concurrent.CancellationException
 
 internal sealed class R<out O> {
   data class Done(val scope: Scope) : R<Nothing>()
@@ -110,7 +111,7 @@ internal fun <O> interruptBoundary(
         is Pull.Eval.CloseScope -> Pull.Eval.CloseScope(
           close.scopeId,
           Pair(interruptedScope, interruptedError),
-          ExitCase.Cancelled
+          ExitCase.Cancelled(CancellationException())
         ).transformWith(view::next)
         else ->
           // all other cases insert interruption cause

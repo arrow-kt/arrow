@@ -38,6 +38,8 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import arrow.fx.typeclasses.rightUnit
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
@@ -757,8 +759,10 @@ sealed class IO<out A> : IOOf<A> {
   fun fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { cb ->
     val promise = UnsafePromise<A>()
     // A new SuspendConnection, because its cancellation is now decoupled from our current one.
+    val job = Job()
     val conn = SuspendConnection()
-    IORunLoop.startCancellable(IOForkedStart(this, ctx + conn), conn, promise::complete)
+    conn.push { job.cancel() }
+    IORunLoop.startCancellable(IOForkedStart(this, ctx + conn + job), conn, job, promise::complete)
     cb(Either.Right(IOFiber(promise, conn)))
   }
 
@@ -860,7 +864,7 @@ sealed class IO<out A> : IOOf<A> {
    * @see [runAsync] to run in a referential transparent manner.
    */
   fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-    IORunLoop.start(this, cb)
+    IORunLoop.start(this, NonCancellable, cb)
 
   /**
    * A pure version of [unsafeRunAsyncCancellable], it defines how an [IO] is ran in a cancellable manner but it doesn't run yet.
@@ -884,7 +888,7 @@ sealed class IO<out A> : IOOf<A> {
             { either -> either.fold({ if (!conn.isCancelled() || it != CancellationException) cb(either) }, { cb(either); Unit }) }
         }
       ccb(conn.toDisposable().right())
-      IORunLoop.startCancellable(this, conn, onCancelCb)
+      IORunLoop.startCancellable(this, conn, cb = onCancelCb)
     }
 
   /**
@@ -1105,17 +1109,18 @@ sealed class IO<out A> : IOOf<A> {
 
   internal class ContextSwitch<A>(
     val source: IO<A>,
-    val modify: (SuspendConnection) -> SuspendConnection,
-    val restore: ((Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection)?
+    val modify: (SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext>,
+    val restore: ((Any?, Throwable?, SuspendConnection, CoroutineContext, SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext>)?
   ) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
       // Internal reusable reference.
-      internal val makeUncancellable: (SuspendConnection) -> SuspendConnection = { SuspendConnection.uncancellable }
+      internal val makeUncancellable: (SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext> =
+        { _, ctx -> SuspendConnection.uncancellable to (ctx + NonCancellable) }
 
-      internal val disableUncancellable: (Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection =
-        { _, _, old, _ -> old }
+      internal val disableUncancellable: (Any?, Throwable?, SuspendConnection, CoroutineContext, SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext> =
+        { _, _, oldConn, oldCtx, _, _ -> oldConn to oldCtx }
     }
   }
 

@@ -17,6 +17,7 @@ import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.never
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 
@@ -36,7 +37,7 @@ class InterruptionTest : StreamSpec(spec = {
 
       latch.get()
       f.cancel()
-      exit.get() shouldBe ExitCase.Cancelled
+      exit.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 
@@ -276,7 +277,7 @@ class InterruptionTest : StreamSpec(spec = {
     val latch = Promise<Unit>()
 
     timeOutOrNull(500.milliseconds) {
-      Stream.effect { guarantee(latch::get) { latch.complete(Unit) } }
+      Stream.effect { guarantee({ latch.get() }) { latch.complete(Unit) } }
         .interruptAfter(50.milliseconds)
         .drain()
 
@@ -336,6 +337,6 @@ class InterruptionTest : StreamSpec(spec = {
     latch.get()
     fiber.cancel()
 
-    stop.get() shouldBe ExitCase.Cancelled
+    stop.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 })

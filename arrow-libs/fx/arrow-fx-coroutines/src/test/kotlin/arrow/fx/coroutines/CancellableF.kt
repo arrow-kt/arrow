@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.launch
 
 class CancellableF : ArrowFxSpec(spec = {
 
@@ -23,15 +24,15 @@ class CancellableF : ArrowFxSpec(spec = {
     val cancelled = Promise<Boolean>()
     val latch = UnsafePromise<Unit>()
 
-    val c = suspend {
+    val c = launch {
       cancellable<Unit> {
         latch.complete(Result.success(Unit))
         CancelToken { cancelled.complete(true) }
       }
-    }.startCoroutineCancellable(CancellableContinuation { })
+    }
 
     latch.join()
-    c.invoke()
+    c.cancel()
 
     cancelled.get() shouldBe true
   }
@@ -51,7 +52,7 @@ class CancellableF : ArrowFxSpec(spec = {
     checkAll(Arb.result(Arb.int())) { res ->
       Either.catch {
         cancellableF<Int> { cb ->
-          Unit.suspend()
+          val res = res.suspend()
           cb(res)
           CancelToken.unit
         }
@@ -63,7 +64,7 @@ class CancellableF : ArrowFxSpec(spec = {
     checkAll(Arb.int()) { i ->
       val d = ConcurrentVar.empty<Int>()
       val latch = Promise<Unit>()
-      val fiber = ForkConnected {
+      val fiber = launch {
         cancellableF<Unit> { _ ->
           latch.complete(Unit)
           CancelToken { d.put(i) }

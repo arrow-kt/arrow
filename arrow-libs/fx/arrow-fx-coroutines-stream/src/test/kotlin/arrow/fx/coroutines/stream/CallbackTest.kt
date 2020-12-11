@@ -18,9 +18,6 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 
 class CallbackTest : StreamSpec(iterations = 250, spec = {
 
@@ -206,12 +203,12 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
   }
 })
 
-private fun <A> countToCallback(
+private suspend fun <A> countToCallback(
   iterations: Int,
   map: (Int) -> A,
   cb: suspend (A) -> Unit,
   onEnd: suspend () -> Unit = { }
-): Unit = suspend {
+): Unit {
   var i = 0
   arrow.fx.coroutines.repeat(Schedule.recurs(iterations)) {
     i += 1
@@ -219,4 +216,4 @@ private fun <A> countToCallback(
     sleep(500.milliseconds)
   }
   onEnd()
-}.startCoroutine(Continuation(EmptyCoroutineContext) { })
+}

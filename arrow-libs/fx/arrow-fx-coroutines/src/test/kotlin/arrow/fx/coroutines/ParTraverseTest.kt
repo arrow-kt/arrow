@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -48,7 +49,7 @@ class ParTraverseTest : ArrowFxSpec(spec = {
         (0 until n).parTraverse(IOPool) { i ->
           if (i == killOn) throw e else unit()
         }
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -150,7 +151,7 @@ class ParTraverseTest : ArrowFxSpec(spec = {
         (0 until n).parTraverseN(IOPool, 3) { i ->
           if (i == killOn) throw e else unit()
         }
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 

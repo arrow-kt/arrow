@@ -1,10 +1,15 @@
 package arrow.fx.coroutines
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.intercepted
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 sealed class RaceTriple<A, B, C> {
   data class First<A, B, C>(val winner: A, val fiberB: Fiber<B>, val fiberC: Fiber<C>) : RaceTriple<A, B, C>()
@@ -23,7 +28,7 @@ sealed class RaceTriple<A, B, C> {
 }
 
 suspend fun <A, B, C> raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: suspend () -> C): RaceTriple<A, B, C> =
-  raceTriple(ComputationPool, fa, fb, fc)
+  raceTriple(Dispatchers.Default, fa, fb, fc)
 
 /**
  * Races three tasks concurrently within a new suspend fun.
@@ -55,7 +60,23 @@ suspend fun <A, B, C> raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: s
  *
  * @see [arrow.fx.coroutines.raceN] for a simpler version that cancels loser.
  */
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 suspend fun <A, B, C> raceTriple(
+  ctx: CoroutineContext,
+  fa: suspend () -> A,
+  fb: suspend () -> B,
+  fc: suspend () -> C
+): RaceTriple<A, B, C> =
+  suspendCancellableCoroutine { cont ->
+    if (cont.isActive) {
+      val disposable = suspend {
+        oldRaceTriple(ctx, fa, fb, fc)
+      }.startCoroutineCancellable(CancellableContinuation(cont.context, cont::resumeWith))
+      cont.invokeOnCancellation { disposable() }
+    }
+  }
+
+suspend fun <A, B, C> oldRaceTriple(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B,
@@ -67,15 +88,21 @@ suspend fun <A, B, C> raceTriple(
     val active = AtomicBooleanW(true)
 
     // Cancellable connection for the left value
+    val jobA = Job()
     val connA = SuspendConnection()
+    connA.push { jobA.cancelAndJoin() }
     val promiseA = UnsafePromise<A>()
 
     // Cancellable connection for the right value
+    val jobB = Job()
     val connB = SuspendConnection()
+    connB.push { jobB.cancelAndJoin() }
     val promiseB = UnsafePromise<B>()
 
     // Cancellable connection for the right value
+    val jobC = Job()
     val connC = SuspendConnection()
+    connC.push { jobC.cancelAndJoin() }
     val promiseC = UnsafePromise<C>()
 
     conn.push(listOf(suspend { connA.cancel() }, suspend { connB.cancel() }, suspend { connC.cancel() }))
@@ -87,8 +114,8 @@ suspend fun <A, B, C> raceTriple(
       promise: UnsafePromise<A>
     ): Unit {
       if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-        suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
-          suspend { connC.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r3 ->
+        suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
+          suspend { connC.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r3 ->
             conn.pop()
 
             val errorResult = r2.fold({
@@ -105,7 +132,7 @@ suspend fun <A, B, C> raceTriple(
       }
     }
 
-    fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
+    fa.startCoroutineCancellable(CancellableContinuation(ctx + jobA, connA) { result ->
       result.fold({ a ->
         if (active.getAndSet(false)) {
           conn.pop()
@@ -116,7 +143,7 @@ suspend fun <A, B, C> raceTriple(
       }, { error -> onError(error, connB, connC, promiseA) })
     })
 
-    fb.startCoroutineCancellable(CancellableContinuation(ctx, connB) { result ->
+    fb.startCoroutineCancellable(CancellableContinuation(ctx + jobB, connB) { result ->
       result.fold({ b ->
         if (active.getAndSet(false)) {
           conn.pop()
@@ -127,7 +154,7 @@ suspend fun <A, B, C> raceTriple(
       }, { error -> onError(error, connA, connC, promiseB) })
     })
 
-    fc.startCoroutineCancellable(CancellableContinuation(ctx, connC) { result ->
+    fc.startCoroutineCancellable(CancellableContinuation(ctx + jobC, connC) { result ->
       result.fold({ c ->
         if (active.getAndSet(false)) {
           conn.pop()

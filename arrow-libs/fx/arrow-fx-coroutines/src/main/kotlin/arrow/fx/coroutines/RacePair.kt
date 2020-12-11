@@ -1,6 +1,11 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -13,7 +18,7 @@ fun <A, B, C> Either<Pair<A, Fiber<B>>, Pair<Fiber<A>, B>>.fold(ifLeft: (A, Fibe
   fold({ (a, b) -> ifLeft(a, b) }, { (a, b) -> ifRight(a, b) })
 
 suspend fun <A, B> racePair(fa: suspend () -> A, fb: suspend () -> B): RacePair<A, B> =
-  racePair(ComputationPool, fa, fb)
+  racePair(Dispatchers.Default, fa, fb)
 
 /**
  * Races two tasks concurrently within a new suspend fun.
@@ -43,7 +48,22 @@ suspend fun <A, B> racePair(fa: suspend () -> A, fb: suspend () -> B): RacePair<
  *
  * @see [arrow.fx.coroutines.raceN] for a simpler version that cancels loser.
  */
+@Deprecated("Will be removed since it leaks Fiber, and breaks structured concurrency. Replace with select")
 suspend fun <A, B> racePair(
+  ctx: CoroutineContext,
+  fa: suspend () -> A,
+  fb: suspend () -> B
+): RacePair<A, B> =
+  suspendCancellableCoroutine { cont ->
+    if (cont.isActive) {
+      val disposable = suspend {
+        oldRacePair(ctx, fa, fb)
+      }.startCoroutineCancellable(CancellableContinuation(cont.context, cont::resumeWith))
+      cont.invokeOnCancellation { disposable() }
+    }
+  }
+
+suspend fun <A, B> oldRacePair(
   ctx: CoroutineContext,
   fa: suspend () -> A,
   fb: suspend () -> B
@@ -54,16 +74,20 @@ suspend fun <A, B> racePair(
     val active = AtomicBooleanW(true)
 
     // Cancellable connection for the left value
+    val jobA = Job()
     val connA = SuspendConnection()
+    connA.push { jobA.cancelAndJoin() }
     val promiseA = UnsafePromise<A>()
 
     // Cancellable connection for the right value
+    val jobB = Job()
     val connB = SuspendConnection()
+    connB.push { jobB.cancelAndJoin() }
     val promiseB = UnsafePromise<B>()
 
     conn.pushPair(connA, connB)
 
-    fa.startCoroutineCancellable(CancellableContinuation(ctx, connA) { result ->
+    fa.startCoroutineCancellable(CancellableContinuation(ctx + jobA, connA) { result ->
       result.fold({ a ->
         if (active.getAndSet(false)) {
           conn.pop()
@@ -73,7 +97,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
+          suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })
@@ -83,7 +107,7 @@ suspend fun <A, B> racePair(
       })
     })
 
-    fb.startCoroutineCancellable(CancellableContinuation(ctx, connB) { result ->
+    fb.startCoroutineCancellable(CancellableContinuation(ctx + jobB, connB) { result ->
       result.fold({ b ->
         if (active.getAndSet(false)) {
           conn.pop()
@@ -93,7 +117,7 @@ suspend fun <A, B> racePair(
         }
       }, { error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connA.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r2 ->
+          suspend { connA.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
             conn.pop()
             cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
           })

@@ -1,7 +1,13 @@
 package arrow.fx.coroutines
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.coroutineContext
 
 /**
  * [Fiber] represents a pure value that contains a running `suspend () -> A`.
@@ -9,6 +15,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * You can think of fibers as being lightweight threads. A [Fiber] is a
  * concurrency primitive for doing cooperative multi-tasking.
  */
+@Deprecated("Use kotlinx.coroutines.Deferred")
 interface Fiber<A> {
 
   suspend fun join(): A
@@ -57,19 +64,26 @@ internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fibe
  * You can [Fiber.join] or [Fiber.cancel] the computation.
  * Cancelling this [Fiber] **will not** cancel its parent.
  */
-suspend fun <A> ForkConnected(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> =
-  suspendCoroutineUninterceptedOrReturn { cont ->
-    val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
-
-    val promise = UnsafePromise<A>()
-    // A new SuspendConnection, because its cancellation is now decoupled from our current one.
-    val conn2 = SuspendConnection()
-    conn.push { conn2.cancel() }
-    f.startCoroutineCancellable(CancellableContinuation(ctx, conn2, promise::complete))
-    Fiber(promise, conn2)
+@Deprecated(
+  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("async(ctx) { f() }", "kotlinx.coroutines.Deferred")
+)
+suspend fun <A> ForkConnected(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> {
+  val def = CoroutineScope(coroutineContext[Job] ?: Job()).async(ctx) {
+    runCatching { f.invoke() }
   }
 
+  return object : Fiber<A> {
+    override suspend fun join(): A = def.await().getOrThrow()
+    override suspend fun cancel() = def.cancelAndJoin()
+  }
+}
+
 /** @see ForkConnected **/
+@Deprecated(
+  "Use Deferred with KotlinX Coroutines Structured Concurrency",
+  ReplaceWith("async(ctx) { invoke() }", "kotlinx.coroutines.Deferred")
+)
 suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = ComputationPool): Fiber<A> =
   ForkConnected(ctx, this)
 
@@ -104,27 +118,20 @@ suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Computat
  * }
  * ```
  */
+// TODO provide proper deprecation annotation
 suspend fun <A> ForkScoped(
   ctx: CoroutineContext = ComputationPool,
   interruptWhen: suspend () -> Unit,
   f: suspend () -> A
-): Fiber<A> = suspendCoroutineUninterceptedOrReturn { cont ->
-  val conn = cont.context[SuspendConnection] ?: SuspendConnection.uncancellable
-
-  val promise = UnsafePromise<A>()
-  // A new SuspendConnection, because its cancellation is now decoupled from our current one.
-  val conn2 = SuspendConnection()
-  conn.push{ conn2.cancel() }
-
-  suspend { // Launch cancelation trigger system concurrently
-    ForkConnected { interruptWhen.invoke(); conn2.cancel() }
-    f.invoke() // Fire actual operation
-  }.startCoroutineCancellable(CancellableContinuation(ctx, conn2, promise::complete))
-
-  Fiber(promise, conn2)
+): Fiber<A> {
+  val scope = CoroutineScope(ctx)
+  val res = scope.async { f.invoke() }
+  scope.launch { interruptWhen.invoke(); res.cancelAndJoin() }
+  return res.toFiber()
 }
 
 /** @see ForkScoped */
+// TODO provide proper deprecation annotation
 suspend fun <A> (suspend () -> A).forkScoped(
   ctx: CoroutineContext = ComputationPool,
   interruptWhen: suspend () -> Unit
@@ -139,14 +146,19 @@ suspend fun <A> (suspend () -> A).forkScoped(
  *
  * @see ForkConnected for a fork operation that wires cancellation to its parent in a safe way.
  */
+// TODO provide proper deprecation annotation
 suspend fun <A> ForkAndForget(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> =
   f.forkAndForget(ctx)
 
 /** @see ForkAndForget */
-suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = ComputationPool): Fiber<A> {
-  val promise = UnsafePromise<A>()
-  // A new SuspendConnection, because its cancellation is now decoupled from our current one.
-  val conn = SuspendConnection()
-  startCoroutineCancellable(CancellableContinuation(ctx, conn, promise::complete))
-  return Fiber(promise, conn)
-}
+// TODO provide proper deprecation annotation
+suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = ComputationPool): Fiber<A> =
+  CoroutineScope(ctx).async {
+    invoke()
+  }.toFiber()
+
+fun <A> Deferred<A>.toFiber(): Fiber<A> =
+  object : Fiber<A> {
+    override suspend fun join(): A = await()
+    override suspend fun cancel() = cancelAndJoin()
+  }

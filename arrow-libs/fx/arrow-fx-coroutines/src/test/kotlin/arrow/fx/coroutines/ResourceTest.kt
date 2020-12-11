@@ -1,7 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
@@ -33,7 +35,7 @@ class ResourceTest : ArrowFxSpec(spec = {
 
       Either.catch {
         r.use { it + 1 }
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -52,7 +54,7 @@ class ResourceTest : ArrowFxSpec(spec = {
 
       start.get()
       f.cancel()
-      p.get() shouldBe ExitCase.Cancelled
+      p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 })

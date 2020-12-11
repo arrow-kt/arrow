@@ -16,6 +16,10 @@ import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.coroutines.guarantee
 import arrow.fx.coroutines.prependTo
 import arrow.fx.coroutines.raceN
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import java.util.concurrent.CancellationException
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -69,6 +73,7 @@ import kotlin.coroutines.coroutineContext
  *                       that eventually allows interruption while eval is evaluating.
  *
  */
+@Deprecated("Stream is deprecated in favor of Flow")
 class Scope private constructor(
   internal val id: Token,
   internal val parent: Scope?,
@@ -162,13 +167,15 @@ class Scope private constructor(
   internal suspend fun <R> acquireResource(
     fr: suspend () -> R,
     release: suspend (R, ExitCase) -> Unit
-  ): Either<Throwable, R> {
+  ): Either<Throwable, R> = withContext(NonCancellable) {
     val conn = coroutineContext[SuspendConnection] ?: SuspendConnection.uncancellable
+    val job = coroutineContext[Job]
     val scope = ScopedResource()
-    return Either.catch(fr).flatMap { resource ->
+    val release: suspend (R, ExitCase) -> Unit = { r, ex -> withContext(NonCancellable) { release(r, ex) } }
+    Either.catch(fr).flatMap { resource ->
       scope.acquired { ex: ExitCase -> release(resource, ex) }.map { registered ->
         state.modify {
-          if (conn.isCancelled() && registered) Pair(it, suspend { release(resource, ExitCase.Cancelled) })
+          if ((conn.isCancelled() || job?.isCancelled == true) && registered) Pair(it, suspend { release(resource, ExitCase.Cancelled(CancellationException())) })
           else Pair(it.copy(resources = scope prependTo it.resources), suspend { Unit })
         }.invoke()
         resource

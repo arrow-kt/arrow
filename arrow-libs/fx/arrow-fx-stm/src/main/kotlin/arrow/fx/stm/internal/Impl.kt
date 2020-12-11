@@ -3,8 +3,8 @@ package arrow.fx.stm.internal
 import arrow.fx.stm.STM
 import arrow.fx.stm.TVar
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * A STMFrame keeps the reads and writes performed by a transaction.
@@ -192,7 +192,7 @@ internal class STMTransaction<A>(val f: STM.() -> A) {
         if (frame.accessMap.isEmpty()) throw BlockedIndefinitely()
 
         val registered = mutableListOf<TVar<Any?>>()
-        suspendCoroutine<Unit> susp@{ k ->
+        suspendCancellableCoroutine<Unit> susp@{ k ->
           cont.value = k
 
           frame.accessMap

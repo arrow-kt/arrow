@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 
 class CancelBoundary : StringSpec({
 
@@ -22,7 +22,7 @@ class CancelBoundary : StringSpec({
     }
     latch.get()
     f.cancel()
-    exit.get() shouldBe ExitCase.Cancelled
+    exit.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     sleep(1.seconds)
   }
 })

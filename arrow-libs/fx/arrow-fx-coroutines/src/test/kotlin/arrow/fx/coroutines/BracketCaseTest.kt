@@ -2,7 +2,9 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.fail
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
@@ -56,7 +58,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
           use = { 5 },
           release = { _, _ -> CancelToken.unit }
         )
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -68,7 +70,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
           use = { 5 },
           release = { _, _ -> CancelToken.unit }
         )
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -178,7 +180,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
           use = { it },
           release = { _, _ -> throw e }
         )
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -190,7 +192,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
           use = { it },
           release = { _, _ -> e.suspend() }
         )
-      } shouldBe Either.Left(e)
+      } should leftException(e)
     }
   }
 
@@ -264,7 +266,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
     // Wait until the fiber is started before cancelling
     start.get()
     f.cancel()
-    exit.get() shouldBe ExitCase.Cancelled
+    exit.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 
   "cancel on bracketCase releases with suspending acquire" {
@@ -289,7 +291,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
     // Wait until the fiber is started before cancelling
     start.get()
     f.cancel()
-    exit.get() shouldBe ExitCase.Cancelled
+    exit.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 
   "cancel on bracketCase doesn't invoke after finishing" {
@@ -327,6 +329,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
         bracketCase(
           acquire = {
             latch.complete(Unit)
+            // This should be uncancellable, and suspends until capacity 1 is received
             mVar.put(y)
           },
           use = { never<Unit>() },
@@ -340,7 +343,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
 
       mVar.take() shouldBe x
       mVar.take() shouldBe y
-      p.get() shouldBe ExitCase.Cancelled
+      p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 
@@ -361,6 +364,7 @@ class BracketCaseTest : ArrowFxSpec(spec = {
       ForkAndForget { fiber.cancel() }
 
       mVar.take() shouldBe x
+      // If release was cancelled this hangs since the buffer is empty
       mVar.take() shouldBe y
     }
   }

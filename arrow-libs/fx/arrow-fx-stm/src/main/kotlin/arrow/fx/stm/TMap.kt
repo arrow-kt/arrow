@@ -35,7 +35,7 @@ fun <K, V> STM.newTMap(hash: Hash<K>): TMap<K, V> = newTMap { hash.run { it.hash
  *   //sampleStart
  *   val tmap = TMap.new<Int, String>()
  *   val result = atomically {
- *     tmap[1] = "Hello"
+ *     tmap.set(1, "Hello")
  *     tmap[2] = "World"
  *
  *     tmap.lookup(1) + tmap[2]

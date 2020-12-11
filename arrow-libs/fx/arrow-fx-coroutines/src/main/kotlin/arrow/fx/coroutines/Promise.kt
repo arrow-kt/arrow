@@ -35,6 +35,7 @@ import kotlinx.atomicfu.atomic
  * }
  * ```
  */
+@Deprecated("Use CompletableDeferred", ReplaceWith("CompletableDeferred", "kotlinx.coroutines"))
 interface Promise<A> {
 
   /**
@@ -102,9 +103,12 @@ interface Promise<A> {
   suspend fun complete(a: A): Either<AlreadyFulfilled, Unit>
 
   companion object {
+    @Deprecated("Use CompletableDeferred", ReplaceWith("CompletableDeferred<A>()", "kotlinx.coroutines.CompletableDeferred"))
     fun <A> unsafe(): Promise<A> =
       DefaultPromise()
 
+    @Deprecated("Use CompletableDeferred", ReplaceWith("CompletableDeferred<A>()", "kotlinx.coroutines.CompletableDeferred"))
+    // TODO ReplaceWith doesn't seem to work. Fix & investigate
     suspend operator fun <A> invoke(): Promise<A> =
       unsafe()
   }

@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
@@ -93,6 +94,6 @@ class EnvironmentTest : StringSpec({
 
     startLatch.get()
     d.invoke()
-    p.get() shouldBe ExitCase.Cancelled
+    p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 })

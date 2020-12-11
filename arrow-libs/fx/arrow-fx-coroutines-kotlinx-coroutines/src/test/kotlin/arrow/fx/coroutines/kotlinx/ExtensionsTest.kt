@@ -12,6 +12,7 @@ import arrow.fx.coroutines.never
 import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
@@ -123,7 +124,7 @@ class ExtensionsTest : StringSpec({
 
     latch.get()
     scope.cancel()
-    promise.get() shouldBe ExitCase.Cancelled
+    promise.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 
   // --------------- unsafeRunScoped ---------------
@@ -214,7 +215,7 @@ class ExtensionsTest : StringSpec({
 
       latch.get()
       scope.cancel()
-      promise.get() shouldBe ExitCase.Cancelled
+      promise.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 

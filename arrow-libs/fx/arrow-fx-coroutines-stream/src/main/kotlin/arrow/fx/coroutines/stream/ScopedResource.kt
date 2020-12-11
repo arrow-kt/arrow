@@ -6,6 +6,7 @@ import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.coroutines.stream.concurrent.modify
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
+import java.util.concurrent.CancellationException
 import kotlin.coroutines.coroutineContext
 
 /**
@@ -67,7 +68,7 @@ internal class ScopedResource {
           // state is closed and there are no leases, finalizer has to be invoked right away
           Pair(s, suspend {
             Either.catch {
-              finalizer(ExitCase.Cancelled)
+              finalizer(ExitCase.Cancelled(CancellationException()))
               false
             }
           })

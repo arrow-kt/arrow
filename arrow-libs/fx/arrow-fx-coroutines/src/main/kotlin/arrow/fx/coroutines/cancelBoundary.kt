@@ -1,7 +1,7 @@
 package arrow.fx.coroutines
 
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 
 /**
  * Inserts a cancellable boundary.
@@ -32,8 +32,11 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
  * }
  * ```
  */
+@Deprecated(
+  "Use coroutineContext.ensureActive()",
+  ReplaceWith("coroutineContext.ensureActive()",
+    "kotlinx.coroutines.ensureActive",
+    "kotlin.coroutines.coroutineContext")
+)
 suspend fun cancelBoundary(): Unit =
-  suspendCoroutineUninterceptedOrReturn { cont ->
-    if ((cont.context[SuspendConnection] ?: SuspendConnection.uncancellable).isCancelled()) COROUTINE_SUSPENDED
-    else Unit
-  }
+  coroutineContext.ensureActive()

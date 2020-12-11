@@ -18,6 +18,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * This will make sure that the source [f] is cancelled whenever it's [CoroutineScope] is cancelled.
  */
+@Deprecated("Redundant since 0.12.0 will provide automatic integration with KotlinX", ReplaceWith("f()"))
 suspend fun <A> suspendCancellable(f: suspend () -> A): A =
   suspendCancellableCoroutine { cont ->
     if (cont.isActive) {
@@ -32,6 +33,7 @@ suspend fun <A> suspendCancellable(f: suspend () -> A): A =
  *
  * @see [startCoroutineCancellable] for a version that returns the cancellation token instead.
  */
+@Deprecated("Redundant since 0.12.0 will provide automatic integration with KotlinX")
 fun <A> CoroutineScope.unsafeRunScoped(fa: suspend () -> A, cb: (Result<A>) -> Unit): Unit =
   fa.unsafeRunScoped(this, cb)
 
@@ -41,6 +43,7 @@ fun <A> CoroutineScope.unsafeRunScoped(fa: suspend () -> A, cb: (Result<A>) -> U
  *
  * @see [startCoroutineCancellable] for a version that returns the cancellation token instead.
  */
+@Deprecated("Redundant since 0.12.0 will provide automatic integration with KotlinX")
 fun <A> (suspend () -> A).unsafeRunScoped(
   scope: CoroutineScope,
   cb: (Result<A>) -> Unit
@@ -65,6 +68,7 @@ fun <A> (suspend () -> A).unsafeRunScoped(
  * The returned [Fiber] is automatically cancelled when [CoroutineScope] gets cancelled, or
  * whenever it's [Fiber.cancel] token is invoked. Whichever comes first.
  */
+@Deprecated("Redundant since 0.12.0 will provide automatic integration with KotlinX")
 suspend fun <A> ForkScoped(scope: CoroutineScope, f: suspend () -> A): Fiber<A> {
   val newContext = scope.newCoroutineContext(EmptyCoroutineContext)
   val job = newContext[Job]

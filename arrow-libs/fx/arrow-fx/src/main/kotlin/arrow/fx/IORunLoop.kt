@@ -9,6 +9,7 @@ import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.internal.ArrowInternalException
 import arrow.fx.internal.Platform
 import arrow.fx.internal.Platform.ArrayStack
+import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -21,15 +22,17 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 @Suppress("UNCHECKED_CAST", "ReturnCount", "ComplexMethod")
 internal object IORunLoop {
 
-  fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, SuspendConnection.uncancellable, cb as Callback, null, null, null, SuspendConnection.uncancellable)
+  fun <A> start(source: IOOf<A>, ctx: CoroutineContext, cb: (Either<Throwable, A>) -> Unit): Unit =
+    loop(source, SuspendConnection.uncancellable, cb as Callback, null, null, null, ctx + SuspendConnection.uncancellable)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <A> startCancellable(source: IOOf<A>, conn: SuspendConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, conn, cb as Callback, null, null, null, conn)
+  fun <A> startCancellable(source: IOOf<A>, conn: SuspendConnection, job: Job = Job(), cb: (Either<Throwable, A>) -> Unit): Unit {
+    conn.push { job.cancel() }
+    loop(source, conn, cb as Callback, null, null, null, job + conn)
+  }
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -160,6 +163,7 @@ internal object IORunLoop {
   ) {
     var currentIO: Current? = source
     var conn: SuspendConnection = cancellable
+    var ctx: CoroutineContext = ctx
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -267,12 +271,15 @@ internal object IORunLoop {
           val restore = currentIO.restore
 
           val old = conn
-          conn = modify(old)
+          val oldCtx = ctx
+          val (_conn, _ctx) = modify(old, oldCtx)
+          conn = _conn
+          ctx = _ctx
           currentIO = next
           if (conn != old) {
-            rcb?.contextSwitch(conn)
+            rcb?.contextSwitch(conn, ctx)
             if (restore != null)
-              currentIO = IO.Bind(next, RestoreContext(old, restore))
+              currentIO = IO.Bind(next, RestoreContext(old, oldCtx, restore))
           }
         }
         null -> {
@@ -380,8 +387,9 @@ internal object IORunLoop {
 
     private var value: IO<Any?>? = null
 
-    fun contextSwitch(conn: SuspendConnection) {
+    fun contextSwitch(conn: SuspendConnection, ctx: CoroutineContext) {
       this.conn = conn
+      this._context = ctx
     }
 
     private fun prepare(ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
@@ -454,14 +462,17 @@ internal object IORunLoop {
 
   private class RestoreContext(
     val old: SuspendConnection,
-    val restore: (Any?, Throwable?, SuspendConnection, SuspendConnection) -> SuspendConnection
+    val oldCtx: CoroutineContext,
+    val restore: (Any?, Throwable?, SuspendConnection, CoroutineContext, SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext>
   ) : IOFrame<Any?, IO<Any?>> {
 
-    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
+    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current, ctx ->
+      restore(a, null, old, oldCtx, current, ctx)
+    }, null)
 
     override fun recover(e: Throwable): IO<Any> =
-      IO.ContextSwitch(IO.RaiseError(e), { current ->
-        restore(null, e, old, current)
+      IO.ContextSwitch(IO.RaiseError(e), { current, ctx ->
+        restore(null, e, old, oldCtx, current, ctx)
       }, null)
   }
 }

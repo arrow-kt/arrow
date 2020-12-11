@@ -14,6 +14,7 @@ import arrow.fx.coroutines.stream.terminateOnNone
 import kotlin.math.min
 
 /** Provides the ability to enqueue elements to a `Queue`. */
+@Deprecated("Stream is deprecated in favor of Flow. Use SendChannel")
 interface Enqueue<A> {
 
   /**
@@ -43,6 +44,7 @@ interface Enqueue<A> {
 }
 
 /** Provides the ability to dequeue individual elements from a `Queue`. */
+@Deprecated("Stream is deprecated in favor of Flow. Use ReceiveChannel")
 interface Dequeue1<A> {
 
   /** Dequeues one `A` from this queue. Completes once one is ready. */
@@ -56,6 +58,7 @@ interface Dequeue1<A> {
 }
 
 /** Provides the ability to dequeue chunks of elements from a `Queue` as streams. */
+@Deprecated("Stream is deprecated in favor of Flow")
 interface Dequeue<A> {
 
   /** Dequeues elements from the queue. */
@@ -78,6 +81,7 @@ interface Dequeue<A> {
  * a queue may have a bound on its size, in which case enqueuing may
  * block (be delayed asynchronously) until there is an offsetting dequeue.
  */
+@Deprecated("Stream is deprecated in favor of Flow. Use Channel")
 interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
 
   /** Dequeues one `Chunk[A]` with no more than `maxSize` elements. Completes once one is ready. */

@@ -1,7 +1,9 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.element
@@ -44,7 +46,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
               1 -> parTupledN(mapCtx, { e.suspend() }, { never<Nothing>() })
               else -> parTupledN(mapCtx, { never<Nothing>() }, { e.suspend() })
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -94,8 +96,14 @@ class ParTupledNTest : ArrowFxSpec(spec = {
       s.acquireN(2) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -116,8 +124,11 @@ class ParTupledNTest : ArrowFxSpec(spec = {
         else parTupledN(loserA, winner)
       }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      r shouldBe Either.Left(e)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      r should leftException(e)
     }
   }
 
@@ -156,7 +167,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
               2 -> parTupledN(mapCtx, { never<Nothing>() }, { e.suspend() }, { never<Nothing>() })
               else -> parTupledN(mapCtx, { never<Nothing>() }, { never<Nothing>() }, { e.suspend() })
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -212,9 +223,18 @@ class ParTupledNTest : ArrowFxSpec(spec = {
       s.acquireN(3) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
-      pc.get() shouldBe Pair(c, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pc.get().let { (res, exit) ->
+        res shouldBe c
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -241,9 +261,15 @@ class ParTupledNTest : ArrowFxSpec(spec = {
         }
       }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
-      res shouldBe Either.Left(e)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      res should leftException(e)
     }
   }
 })

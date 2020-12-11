@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.Eval
 import io.kotest.assertions.fail
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlin.math.pow
 
@@ -196,7 +197,7 @@ class ScheduleTest : ArrowFxSpec(spec = {
       }
     }
 
-    l shouldBe Either.Left(exception)
+    l should leftException(exception)
     count.get() shouldBe 20_001
   }
 

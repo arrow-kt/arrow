@@ -16,6 +16,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * A work-stealing thread pool using all available processors as its target parallelism level.
  */
+@Deprecated("Use Dispatchers.Default", replaceWith = ReplaceWith("Dispatchers.Default", "kotlinx.coroutines.Dispatchers"))
 val ComputationPool: CoroutineContext =
   ForkJoinPool().asCoroutineContext()
 
@@ -30,6 +31,7 @@ private object IOCounter {
  *
  * This pool is prone to cause [OutOfMemoryError] since the pool size is unbounded.
  */
+@Deprecated("Use Dispatchers.IO", replaceWith = ReplaceWith("Dispatchers.IO", "kotlinx.coroutines.Dispatchers"))
 val IOPool: CoroutineContext =
   Executors.newCachedThreadPool { r ->
     Thread(r).apply {

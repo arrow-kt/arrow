@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import io.kotest.assertions.fail
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
@@ -50,7 +51,7 @@ class RacePairTest : ArrowFxSpec(spec = {
               else -> racePair(raceCtx, { never<Nothing>() }, { e.suspend() })
                 .fold({ _, _ -> null }, { _, b -> b })
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -64,7 +65,7 @@ class RacePairTest : ArrowFxSpec(spec = {
       Either.catch {
         racePair({ fa.rethrow() }, { never<Unit>() })
           .fold(Pair<Int, Fiber<Unit>>::first) { fail("never can not win race") }
-      } shouldBe fa
+      } should either(fa)
     }
   }
 
@@ -74,7 +75,7 @@ class RacePairTest : ArrowFxSpec(spec = {
       Either.catch {
         racePair({ never<Unit>() }, { fa.rethrow() })
           .fold({ fail("never can not win race") }, Pair<Fiber<Unit>, Int>::second)
-      } shouldBe fa
+      } should either(fa)
     }
   }
 

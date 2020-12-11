@@ -257,6 +257,7 @@ class QueueTest : StreamSpec(spec = {
     val taker = ForkConnected { q.dequeue1() }
     sleep(1.seconds)
     q.tryOffer1(1) shouldBe false
+    taker.cancel()
   }
 
   "Queue.synchronous consumer / producer" {

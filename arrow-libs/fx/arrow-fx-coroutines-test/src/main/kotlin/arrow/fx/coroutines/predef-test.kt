@@ -7,7 +7,8 @@ import arrow.core.right
 import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.equalityMatcher
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.char
@@ -77,7 +78,7 @@ suspend fun assertCancellable(f: suspend () -> Unit): Unit {
 
   start.get()
   fiber.cancel()
-  p.get() shouldBe ExitCase.Cancelled
+  p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
 }
 
 /**
@@ -216,4 +217,58 @@ suspend fun CoroutineContext.shift(): Unit =
     })
 
     COROUTINE_SUSPENDED
+  }
+
+fun leftException(e: Throwable): Matcher<Either<Throwable, *>> =
+  object : Matcher<Either<Throwable, *>> {
+    override fun test(value: Either<Throwable, *>): MatcherResult =
+      when (value) {
+        is Either.Left -> when {
+          value.a::class != e::class -> MatcherResult(
+            false,
+            "Expected exception of type ${e::class} but found ${value.a::class}",
+            "Should not be exception of type ${e::class}"
+          )
+          value.a.message != e.message -> MatcherResult(
+            false,
+            "Expected exception with message ${e.message} but found ${value.a.message}",
+            "Should not be exception with message ${e.message}"
+          )
+          else -> MatcherResult(
+            true,
+            "Expected exception of type ${e::class} and found ${value.a::class}",
+            "Expected exception of type ${e::class} and found ${value.a::class}"
+          )
+        }
+        is Either.Right -> MatcherResult(
+          false,
+          "Expected Either.Left with exception of type ${e::class} and found Right with ${value.b}",
+          "Should not be Either.Left with exception"
+        )
+      }
+  }
+
+fun <A> either(e: Either<Throwable, A>): Matcher<Either<Throwable, A>> =
+  object : Matcher<Either<Throwable, A>> {
+    override fun test(value: Either<Throwable, A>): MatcherResult =
+      when (value) {
+        is Either.Left -> when {
+          value.a::class != (e.swap().orNull() ?: Int)::class -> MatcherResult(
+            false,
+            "Expected $e but found $value",
+            "Should not be $e"
+          )
+          value.a.message != (e.swap().orNull()?.message ?: -1) -> MatcherResult(
+            false,
+            "Expected $e but found $value",
+            "Should not be $e"
+          )
+          else -> MatcherResult(
+            true,
+            "Expected exception of type ${e::class} and found ${value.a::class}",
+            "Expected exception of type ${e::class} and found ${value.a::class}"
+          )
+        }
+        is Either.Right -> equalityMatcher(e).test(value)
+      }
   }

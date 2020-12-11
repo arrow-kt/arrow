@@ -11,6 +11,7 @@ apply from: "$DOC_CREATION"
 
 dependencies {
     implementation project(":arrow-fx-suspend-connection")
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 
     compile "io.arrow-kt:arrow-core:$VERSION_NAME"
     compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"

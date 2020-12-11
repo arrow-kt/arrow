@@ -17,7 +17,6 @@ import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.forkAndForget
 import arrow.fx.coroutines.guaranteeCase
-import arrow.fx.coroutines.prependTo
 import arrow.fx.coroutines.stream.concurrent.Signal
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -34,6 +33,7 @@ typealias StreamOf<A> = arrow.Kind<ForStream, A>
 inline fun <A> StreamOf<A>.fix(): Stream<A> =
   this as Stream<A>
 
+@Deprecated("Deprecated in favor of Flow")
 /*inline*/ class Stream<out O> internal constructor(internal val asPull: Pull<O, Unit>) : StreamOf<O> {
 
   /**
@@ -1366,7 +1366,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
   fun interruptWhen(haltOnSignal: suspend () -> Either<Throwable, Unit>): Stream<O> =
     getScope.flatMap { scope ->
       supervise {
-        val e = haltOnSignal.invoke()
+        val e = haltOnSignal.invoke().ignoreCancellation()
         scope.interrupt(e)
       }.flatMap { this }
     }.interruptScope()
@@ -1771,7 +1771,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
      * Starts the supplied task and cancels it as finalization of the returned stream.
      */
     fun <A> supervise(ctx: CoroutineContext = ComputationPool, fa: suspend () -> A): Stream<Fiber<A>> =
-      bracket(acquire = { fa.forkAndForget(ctx) }, release = Fiber<A>::cancel)
+      bracket(acquire = { fa.forkAndForget(ctx) }, release = { it.cancel() })
 
     /**
      * Lazily produce the range `[start, stopExclusive)`. If you want to produce

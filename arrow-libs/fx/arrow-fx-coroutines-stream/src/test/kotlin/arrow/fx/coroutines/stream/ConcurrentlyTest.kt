@@ -4,9 +4,11 @@ import arrow.core.Either
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Semaphore
+import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.milliseconds
 import arrow.fx.coroutines.never
 import arrow.fx.coroutines.sleep
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -100,7 +102,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
         if (runnerStarted) {
           // finalizers shall be called in correct order and exception shall be thrown
           finalizers shouldBe listOf("Inner", "Outer")
-          r shouldBe Either.Left(e)
+          r should leftException(e)
         } else {
           // still the outer finalizer shall be run, but there is no failure in `s`
           finalizers shouldBe listOf("Outer")

@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.Either
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -8,10 +9,12 @@ import io.kotest.property.arbitrary.int
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
+import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 class EvalOnTests : ArrowFxSpec(spec = {
 
@@ -195,6 +198,37 @@ class EvalOnTests : ArrowFxSpec(spec = {
     }
   }
 })
+
+internal fun <A> Platform.unsafeRunSync(startOn: CoroutineContext, f: suspend () -> A): A {
+  val latch = OneShotLatch()
+  var ref: Either<Throwable, A>? = null
+  f.startCoroutine(Continuation(startOn) { a ->
+    ref = a.fold({ aa -> Either.Right(aa) }, { t -> Either.Left(t) })
+    latch.releaseShared(1)
+  })
+
+  latch.acquireSharedInterruptibly(1)
+
+  return when (val either = ref) {
+    is Either.Left -> throw either.a
+    is Either.Right -> either.b
+    null -> throw ArrowInternalException("$ArrowExceptionMessage\nSuspend execution should yield a valid result")
+  }
+}
+
+private class OneShotLatch : AbstractQueuedSynchronizer() {
+  override fun tryAcquireShared(ignored: Int): Int =
+    if (state != 0) {
+      1
+    } else {
+      -1
+    }
+
+  override fun tryReleaseShared(ignore: Int): Boolean {
+    state = 1
+    return true
+  }
+}
 
 private class TestableContinuationInterceptor : AbstractCoroutineContextElement(ContinuationInterceptor),
   ContinuationInterceptor {

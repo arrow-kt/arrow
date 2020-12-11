@@ -1,10 +1,13 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
 
 class FiberTest : ArrowFxSpec(spec = {
 
@@ -59,7 +62,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
     start.get()
     parent.cancel()
-    p.get() shouldBe ExitCase.Cancelled
+    p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 
   "ForkConnected doesn't cancel its parent" {
@@ -107,7 +110,7 @@ class FiberTest : ArrowFxSpec(spec = {
   "ForkConnected error join is identity" {
     checkAll(Arb.throwable()) { e ->
       val f = suspend { throw e }.forkConnected()
-      Either.catch { f.join() } shouldBe Either.Left(e)
+      Either.catch { f.join() } should leftException(e)
     }
   }
 
@@ -158,7 +161,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
     start.get()
     interrupt.complete(Unit)
-    p.get() shouldBe ExitCase.Cancelled
+    p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
   }
 
   "ForkScoped runs on the expected dispatcher" {
@@ -191,7 +194,7 @@ class FiberTest : ArrowFxSpec(spec = {
   "ForkScoped error join is identity" {
     checkAll(Arb.throwable()) { e ->
       val f = suspend { throw e }.forkScoped { never<Unit>() }
-      Either.catch { f.join() } shouldBe Either.Left(e)
+      Either.catch { f.join() } should leftException(e)
     }
   }
 
@@ -258,7 +261,7 @@ class FiberTest : ArrowFxSpec(spec = {
   "ForkAndForget error join is identity" {
     checkAll(Arb.throwable()) { e ->
       val f = suspend { throw e }.forkAndForget()
-      Either.catch { f.join() } shouldBe Either.Left(e)
+      Either.catch { f.join() } should leftException(e)
     }
   }
 
@@ -273,6 +276,21 @@ class FiberTest : ArrowFxSpec(spec = {
     checkAll(Arb.int()) { i ->
       val f = suspend { i }.forkAndForget()
       f.cancel() shouldBe Unit
+    }
+  }
+
+  "ForkAndForget is cancellable" {
+    checkAll(Arb.int()) { i ->
+      val latch = CompletableDeferred<Unit>()
+      val cancelled = CompletableDeferred<Int>()
+      val fiber = ForkAndForget {
+        onCancel({ latch.complete(Unit); never<Unit>() }) {
+          cancelled.complete(i)
+        }
+      }
+      latch.await()
+      fiber.cancel()
+      cancelled.await() shouldBe i
     }
   }
 })

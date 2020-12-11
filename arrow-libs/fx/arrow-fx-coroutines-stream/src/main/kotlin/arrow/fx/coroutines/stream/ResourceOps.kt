@@ -50,6 +50,7 @@ fun <O> Stream<O>.asResource(): ResourceOps<O> =
  * Since we consumed the Stream as `asResource().lastOrError()`, this extends the last scope to the returned `Resource`,
  * so we can safely `use` it and the `Stream` still properly closes all resources opened with `bracket`.
  */
+@Deprecated("Stream is deprecated in favor of Flow")
 class ResourceOps<O>(private val s: Stream<O>) {
 
   suspend fun toList(): Resource<List<O>> =

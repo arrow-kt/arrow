@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -39,7 +40,7 @@ class PredefTest : ArrowFxSpec(spec = {
 
       Either.catch {
         promise.join()
-      } shouldBe ea
+      } should either(ea)
     }
   }
 

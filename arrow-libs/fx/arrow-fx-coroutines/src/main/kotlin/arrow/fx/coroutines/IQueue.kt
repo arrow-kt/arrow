@@ -11,6 +11,8 @@ package arrow.fx.coroutines
  *  queue is pivoted by replacing the ''out'' list by ''in.reverse'', and ''in'' by ''Nil''.
  *
  */
+// TODO should we move this to Arrow Core? There is no such class in the Kotlin Std.
+// All classes that need this are deprecated
 data class IQueue<A> internal constructor(
   private val listIn: List<A>,
   private val listOut: List<A>,

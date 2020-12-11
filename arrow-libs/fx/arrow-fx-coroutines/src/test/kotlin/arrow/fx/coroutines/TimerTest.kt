@@ -1,12 +1,20 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.Right
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CompletionHandlerException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@OptIn(InternalCoroutinesApi::class)
 class TimerTest : ArrowFxSpec(spec = {
 
   suspend fun timeNano(): Long =
@@ -78,7 +86,7 @@ class TimerTest : ArrowFxSpec(spec = {
                 threadName.invoke() shouldBe "1"
                 e.suspend()
               }
-            } shouldBe Either.Left(e)
+            } should leftException(e)
 
             n0 shouldBe threadName.invoke()
           }
@@ -89,7 +97,11 @@ class TimerTest : ArrowFxSpec(spec = {
     "returns to original context on CancelToken failure" {
       Resource.singleThreadContext("1").zip(single).use { (one, single) ->
         checkAll(Arb.throwable()) { e ->
-          evalOn(single) {
+          val promised = CompletableDeferred<Throwable>()
+          val handler = CoroutineExceptionHandler { _, e ->
+            promised.complete(e)
+          }
+          evalOn(single + handler) {
             val n0 = threadName.invoke()
 
             Either.catch {
@@ -97,12 +109,17 @@ class TimerTest : ArrowFxSpec(spec = {
                 cancellableF<Nothing> {
                   one.shift()
                   threadName.invoke() shouldBe "1"
+
+                  // This exception is send to CoroutineExceptionHandler
                   CancelToken { e.suspend() }
                 }
               }
-            } shouldBe Either.Left(e)
+            } shouldBe Right(null)
 
             n0 shouldBe threadName.invoke()
+          }
+          promised.await().shouldBeInstanceOf<CompletionHandlerException> {
+            it.cause shouldBe e
           }
         }
       }

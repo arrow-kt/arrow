@@ -11,6 +11,7 @@ import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.evalOn
 import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
 import arrow.fx.coroutines.parMapN
 import arrow.fx.coroutines.single
@@ -19,6 +20,8 @@ import arrow.fx.coroutines.suspend
 import arrow.fx.coroutines.threadName
 import arrow.fx.coroutines.throwable
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.should
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
@@ -61,7 +64,7 @@ class ParMap3Test : ArrowFxSpec(spec = {
               2 -> parMapN(_mapCtx, suspend { never<Nothing>() }, suspend { e.suspend() }, suspend { never<Nothing>() }) { _, _, _ -> Unit }
               else -> parMapN(_mapCtx, suspend { never<Nothing>() }, suspend { never<Nothing>() }, suspend { e.suspend() }) { _, _, _ -> Unit }
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -121,9 +124,18 @@ class ParMap3Test : ArrowFxSpec(spec = {
       s.acquireN(3) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
-      pc.get() shouldBe Pair(c, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pc.get().let { (res, exit) ->
+        res shouldBe c
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -150,9 +162,15 @@ class ParMap3Test : ArrowFxSpec(spec = {
         }
       }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
-      r shouldBe Either.Left(e)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      r should leftException(e)
     }
   }
 })

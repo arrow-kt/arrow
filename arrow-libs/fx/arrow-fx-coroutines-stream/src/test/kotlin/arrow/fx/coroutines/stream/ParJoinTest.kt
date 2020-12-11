@@ -3,10 +3,12 @@ package arrow.fx.coroutines.stream
 import arrow.core.Either
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.Promise
+import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.milliseconds
 import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.never
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
@@ -98,7 +100,7 @@ class ParJoinTest : StreamSpec(spec = {
       finalizers shouldContainExactlyInAnyOrder streamRunned.map { idx -> "Inner $idx" } + "Outer"
       finalizers.lastOrNull() shouldBe "Outer"
 
-      if (streamRunned.contains(biasIdx)) r shouldBe Either.Left(err)
+      if (streamRunned.contains(biasIdx)) r should leftException(err)
       else r shouldBe Either.Right(Unit)
     }
   }

@@ -6,7 +6,7 @@ import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.guaranteeCase
 import io.kotest.assertions.failure
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 
@@ -33,7 +33,7 @@ class CancellationTest : ArrowFxSpec(spec = {
         ).flatMap { Stream.constant(i) }
       }
 
-      exitCase.get() shouldBe ExitCase.Cancelled
+      exitCase.get().shouldBeInstanceOf<ExitCase.Cancelled>()
     }
   }
 
@@ -75,7 +75,7 @@ private suspend fun <A> assertCancellable(fa: (latch: Promise<Unit>) -> Stream<A
 
   latch.get()
   fiber.cancel()
-  p.get() shouldBe ExitCase.Cancelled
+  p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
 }
 
 private suspend fun <A> Stream<A>.assertCancellable(): Unit {
@@ -95,5 +95,5 @@ private suspend fun <A> Stream<A>.assertCancellable(): Unit {
 
   start.get()
   fiber.cancel()
-  p.get() shouldBe ExitCase.Cancelled
+  p.get().shouldBeInstanceOf<ExitCase.Cancelled>()
 }

@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -176,7 +177,7 @@ class SemaphoreTest : ArrowFxSpec(spec = {
         }, { throw e }) // Cancels other parallel op
       }
 
-      r shouldBe Either.Left(e) // Proof parallel op failed
+      r should leftException(e) // Proof parallel op failed
       s.count() shouldBe n // Proof that withPermitN released on cancel
     }
   }
@@ -208,7 +209,7 @@ class SemaphoreTest : ArrowFxSpec(spec = {
         }, { throw e })
       }
 
-      r shouldBe Either.Left(e) // Proof parallel op failed
+      r should leftException(e) // Proof parallel op failed
       s.count() shouldBe n // Proof that acquireN released on cancel
     }
   }

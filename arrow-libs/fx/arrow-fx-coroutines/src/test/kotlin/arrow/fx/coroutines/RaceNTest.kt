@@ -2,11 +2,15 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
+import arrow.core.merge
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
+import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 
 class RaceNTest : ArrowFxSpec(spec = {
@@ -46,7 +50,7 @@ class RaceNTest : ArrowFxSpec(spec = {
               1 -> raceN(raceCtx, { e.suspend() }, { never<Nothing>() }).swap().orNull()
               else -> raceN(raceCtx, { never<Nothing>() }, { e.suspend() }).orNull()
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -86,8 +90,14 @@ class RaceNTest : ArrowFxSpec(spec = {
       s.acquireN(2) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -103,12 +113,16 @@ class RaceNTest : ArrowFxSpec(spec = {
       val winner = suspend { s.acquire(); eith.rethrow() }
       val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
 
-      Either.catch {
+      val res = Either.catch {
         if (leftWinner) raceN(winner, loserA)
         else raceN(loserA, winner)
-      }
+      }.map { it.merge() }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      res shouldBe either(eith)
     }
   }
 
@@ -155,7 +169,7 @@ class RaceNTest : ArrowFxSpec(spec = {
               else -> raceN(raceCtx, { never<Nothing>() }, { never<Nothing>() }, { e.suspend() })
                 .fold({ null }, { null }, ::identity)
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -203,9 +217,18 @@ class RaceNTest : ArrowFxSpec(spec = {
       s.acquireN(3) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
-      pc.get() shouldBe Pair(c, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pc.get().let { (res, exit) ->
+        res shouldBe c
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -224,16 +247,23 @@ class RaceNTest : ArrowFxSpec(spec = {
       val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
       val loserB = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
 
-      Either.catch {
+      val res = Either.catch {
         when (leftWinner) {
           1 -> raceN(winner, loserA, loserB)
           2 -> raceN(loserA, winner, loserB)
           else -> raceN(loserA, loserB, winner)
         }
-      }
+      }.map { it.fold(::identity, ::identity, ::identity) }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      res should either(eith)
     }
   }
 })

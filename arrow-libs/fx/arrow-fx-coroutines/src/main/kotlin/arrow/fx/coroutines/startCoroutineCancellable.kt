@@ -9,10 +9,12 @@ import kotlin.coroutines.resume
 /**
  * Type to constraint [startCoroutineCancellable] to the [CancellableContinuation] constructor.
  */
+@Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 abstract class CancellableContinuation<A> internal constructor() : Continuation<A>
 
 /** Constructor for [CancellableContinuation] */
 @Suppress("FunctionName")
+@Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 fun <A> CancellableContinuation(
   ctx: CoroutineContext = ComputationPool,
   resumeWith: (Result<A>) -> Unit
@@ -25,6 +27,7 @@ fun <A> CancellableContinuation(
  *
  * @returns Disposable handler to cancel the started suspendable cancellable computation.
  */
+@Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 fun <A> (suspend () -> A).startCoroutineCancellable(completion: CancellableContinuation<A>): Disposable {
   val conn = completion.context[SuspendConnection] ?: SuspendConnection.uncancellable
   createCoroutineUnintercepted(completion).intercepted().resume(Unit)
@@ -38,6 +41,7 @@ fun <A> (suspend () -> A).startCoroutineCancellable(completion: CancellableConti
  * Constructor that allows us to launch a [CancellableContinuation] on an existing [SuspendConnection].
  */
 @Suppress("FunctionName")
+@Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 internal fun <A> CancellableContinuation(
   ctx: CoroutineContext = ComputationPool,
   conn: SuspendConnection,

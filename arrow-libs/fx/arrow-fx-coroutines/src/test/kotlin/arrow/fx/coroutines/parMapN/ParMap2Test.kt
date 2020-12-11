@@ -11,6 +11,7 @@ import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.evalOn
 import arrow.fx.coroutines.guaranteeCase
+import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
 import arrow.fx.coroutines.parMapN
 import arrow.fx.coroutines.single
@@ -18,7 +19,9 @@ import arrow.fx.coroutines.singleThreadName
 import arrow.fx.coroutines.suspend
 import arrow.fx.coroutines.threadName
 import arrow.fx.coroutines.throwable
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
@@ -59,7 +62,7 @@ class ParMap2Test : ArrowFxSpec(spec = {
               1 -> parMapN(_mapCtx, suspend { e.suspend() }, suspend { never<Nothing>() }) { _, _ -> Unit }
               else -> parMapN(_mapCtx, suspend { never<Nothing>() }, suspend { e.suspend() }) { _, _ -> Unit }
             }
-          } shouldBe Either.Left(e)
+          } should leftException(e)
 
           threadName() shouldBe singleThreadName
         }
@@ -111,8 +114,14 @@ class ParMap2Test : ArrowFxSpec(spec = {
       s.acquireN(2) // Suspend until all racers started
       f.cancel()
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      pb.get() shouldBe Pair(b, ExitCase.Cancelled)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      pb.get().let { (res, exit) ->
+        res shouldBe b
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
     }
   }
 
@@ -133,8 +142,11 @@ class ParMap2Test : ArrowFxSpec(spec = {
         else parMapN(loserA, winner) { _, _ -> Unit }
       }
 
-      pa.get() shouldBe Pair(a, ExitCase.Cancelled)
-      r shouldBe Either.Left(e)
+      pa.get().let { (res, exit) ->
+        res shouldBe a
+        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+      r should leftException(e)
     }
   }
 })

@@ -12,7 +12,6 @@ import arrow.core.right
 import arrow.core.some
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.SemigroupKLaws
-import arrow.core.test.laws.equalUnderTheLaw
 import arrow.fx.IO.Companion.just
 import arrow.fx.coroutines.Environment
 import arrow.fx.coroutines.timeOutOrNull
@@ -36,8 +35,8 @@ import arrow.fx.typeclasses.seconds
 import arrow.fx.test.eq.eqK
 import arrow.fx.test.generators.genK
 import arrow.fx.test.laws.ConcurrentLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.fail
+import io.kotlintest.matchers.types.shouldBeInstanceOf
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
@@ -781,7 +780,7 @@ class IOTest : ArrowFxSpec() {
         !sleep(2.seconds)
         !cancel
         !p.get()
-      }.equalUnderTheLaw(IO.just(arrow.fx.coroutines.ExitCase.Cancelled), IO.eqK().liftEq(Eq.any()))
+      }.unsafeRunSync().shouldBeInstanceOf<arrow.fx.coroutines.ExitCase>()
     }
 
     "IO.bracket works inside Arrow Fx Coroutines" {
