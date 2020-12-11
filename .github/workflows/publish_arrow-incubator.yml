@@ -17,6 +17,9 @@ jobs:
       BASEDIR: ${{github.workspace}}/..
       JAVA_OPTS: -Xms512m -Xmx1024m
       ARROW_LIB: arrow-incubator
+      BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+      BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
     runs-on: macos-latest
 
@@ -24,44 +27,23 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Wait for other related changes
-      run: sleep 180
-    - name: "Get target: OSS or Bintray"
+    - name: "Check versions"
       id: versions
       run: |
-        LATEST_PUBLISHED_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
-        LATEST_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
-        SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
-        NEW_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_VERSION" == "$LATEST_VERSION" ] && echo '0' || echo '1')
-        echo "::set-output name=latest-published-version::$LATEST_PUBLISHED_VERSION"
-        echo "::set-output name=release-version::$LATEST_VERSION"
-        echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
-        echo "::set-output name=new-version-exists::$NEW_VERSION_EXISTS"
-    - name: "Publish into OSS: previous installation"
-      if: steps.versions.outputs.new-version-exists == '0'
-      run: |
-        git clone https://github.com/arrow-kt/$ARROW_LIB.git $BASEDIR/$ARROW_LIB
-        $BASEDIR/arrow/scripts/action-install.sh $ARROW_LIB
-    - name: "Publish into OSS"
-      if: steps.versions.outputs.new-version-exists == '0'
-      env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-      run: |
-        $BASEDIR/arrow/scripts/project-publish.sh $ARROW_LIB
+        LATEST_PUBLISHED_RELEASE_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
+        RELEASE_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
+        NEW_RELEASE_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_RELEASE_VERSION" == "$RELEASE_VERSION" ] && echo '0' || echo '1')
+        echo "::set-output name=latest-published-release-version::$LATEST_PUBLISHED_RELEASE_VERSION"
+        echo "::set-output name=release-version::$RELEASE_VERSION"
+        echo "::set-output name=new-release-version-exists::$NEW_RELEASE_VERSION_EXISTS"
     - name: Publish into Bintray
-      if: steps.versions.outputs.new-version-exists == '1'
-      env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      if: steps.versions.outputs.new-release-version-exists == '1'
       run: |
         echo "Update version ..."
         perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         $BASEDIR/arrow/scripts/lib-publish.sh $ARROW_LIB
     - name: Create tag
-      if: steps.versions.outputs.new-version-exists == '1'
-      env:
-        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      if: steps.versions.outputs.new-release-version-exists == '1'
       run: |
         cd $BASEDIR/$ARROW_LIB
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/$ARROW_LIB.git
@@ -70,10 +52,8 @@ jobs:
         git tag -a ${{ steps.versions.outputs.release-version }} -m "Release ${{ steps.versions.outputs.release-version }}"
         git push origin ${{ steps.versions.outputs.release-version }}
     - name: Create release notes
-      if: steps.versions.outputs.new-version-exists == '1'
-      env:
-        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+      if: steps.versions.outputs.new-release-version-exists == '1'
       run: |
-        export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-version }}
+        export LATEST_PUBLISHED_VERSION=${{ steps.versions.outputs.latest-published-release-version }}
         export RELEASE_VERSION=${{ steps.versions.outputs.release-version }}
         $BASEDIR/arrow/scripts/create-release-notes.sh
