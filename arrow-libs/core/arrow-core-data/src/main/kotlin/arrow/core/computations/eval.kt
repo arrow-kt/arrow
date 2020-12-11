@@ -1,32 +1,22 @@
 package arrow.core.computations
 
-import arrow.Kind
-import arrow.continuations.generic.DelimContScope
-import arrow.core.EagerBind
+import arrow.continuations.Effect
 import arrow.core.Eval
-import arrow.core.ForEval
-import arrow.core.fix
-import arrow.typeclasses.suspended.BindSyntax
+import kotlin.coroutines.RestrictsSuspension
 
+fun interface EvalEffect<A> : Effect<Eval<A>> {
+  suspend operator fun <B> Eval<B>.invoke(): B =
+    value()
+}
+
+@RestrictsSuspension
+fun interface RestrictedEvalEffect<A> : EvalEffect<A>
+
+@Suppress("ClassName")
 object eval {
+  inline fun <A> eager(crossinline func: suspend RestrictedEvalEffect<A>.() -> A): Eval<A> =
+    Effect.restricted(eff = { RestrictedEvalEffect { it } }, f = func, just = Eval.Companion::just)
 
-  fun <A> eager(c: suspend EagerBind<ForEval>.() -> A): Eval<A> =
-    DelimContScope.reset {
-      Eval.just(
-        c(object : EagerBind<ForEval> {
-          override suspend fun <A> Kind<ForEval, A>.invoke(): A =
-            fix().value()
-        })
-      )
-    }
-
-  suspend operator fun <A> invoke(c: suspend BindSyntax<ForEval>.() -> A): Eval<A> =
-    DelimContScope.reset {
-      Eval.just(
-        c(object : BindSyntax<ForEval> {
-          override suspend fun <A> Kind<ForEval, A>.invoke(): A =
-            fix().value()
-        })
-      )
-    }
+  suspend inline operator fun <A> invoke(crossinline func: suspend EvalEffect<*>.() -> A): Eval<A> =
+    Effect.suspended(eff = { EvalEffect { it } }, f = func, just = Eval.Companion::just)
 }

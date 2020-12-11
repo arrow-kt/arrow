@@ -1,38 +1,40 @@
 package arrow.core.computations
 
-import arrow.Kind
-import arrow.continuations.generic.DelimContScope
-import arrow.core.EagerBind
+import arrow.continuations.Effect
 import arrow.core.Either
-import arrow.core.EitherPartialOf
-import arrow.core.fix
-import arrow.typeclasses.suspended.BindSyntax
+import arrow.core.Left
+import arrow.core.Validated
+import arrow.core.right
+import kotlin.coroutines.RestrictsSuspension
 
+fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
+  suspend operator fun <B> Either<E, B>.invoke(): B =
+    when (this) {
+      is Either.Right -> b
+      is Either.Left -> control().shift(this@invoke)
+    }
+
+  suspend operator fun <B> Validated<E, B>.invoke(): B =
+    when (this) {
+      is Validated.Valid -> a
+      is Validated.Invalid -> control().shift(Left(e))
+    }
+}
+
+@RestrictsSuspension
+fun interface RestrictedEitherEffect<E, A> : Effect<Either<E, A>> {
+  suspend operator fun <B> Either<E, B>.invoke(): B =
+    when (this) {
+      is Either.Right -> b
+      is Either.Left -> control().shift(this@invoke)
+    }
+}
+
+@Suppress("ClassName")
 object either {
+  inline fun <E, A> eager(crossinline c: suspend RestrictedEitherEffect<E, *>.() -> A): Either<E, A> =
+    Effect.restricted(eff = { RestrictedEitherEffect { it } }, f = c, just = { it.right() })
 
-  fun <E, A> eager(c: suspend EagerBind<EitherPartialOf<E>>.() -> A): Either<E, A> =
-    DelimContScope.reset {
-      Either.Right(
-        c(object : EagerBind<EitherPartialOf<E>> {
-          override suspend fun <A> Kind<EitherPartialOf<E>, A>.invoke(): A =
-            when (val v = fix()) {
-              is Either.Right -> v.b
-              is Either.Left -> shift { v }
-            }
-        })
-      )
-    }
-
-  suspend operator fun <E, A> invoke(c: suspend BindSyntax<EitherPartialOf<E>>.() -> A): Either<E, A> =
-    DelimContScope.reset {
-      Either.Right(
-        c(object : BindSyntax<EitherPartialOf<E>> {
-          override suspend fun <A> Kind<EitherPartialOf<E>, A>.invoke(): A =
-            when (val v = fix()) {
-              is Either.Right -> v.b
-              is Either.Left -> shift { v }
-            }
-        })
-      )
-    }
+  suspend inline operator fun <E, A> invoke(crossinline c: suspend EitherEffect<E, *>.() -> A): Either<E, A> =
+    Effect.suspended(eff = { EitherEffect { it } }, f = c, just = { it.right() })
 }

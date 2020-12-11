@@ -1,18 +1,20 @@
 package arrow.core.computations
 
-import arrow.continuations.generic.DelimContScope
-import arrow.continuations.generic.DelimitedScope
-import arrow.core.computations.suspended.BindSyntax
+import arrow.continuations.Effect
+import kotlin.coroutines.RestrictsSuspension
+
+fun interface NullableEffect<A> : Effect<A?> {
+  suspend operator fun <B> B?.invoke(): B = this ?: control().shift(null)
+}
+
+@RestrictsSuspension
+fun interface RestrictedNullableEffect<A> : NullableEffect<A>
 
 @Suppress("ClassName")
 object nullable {
-  operator fun <A> invoke(func: suspend BindSyntax.() -> A?): A? =
-    DelimContScope.reset { NullableBindSyntax(this).func() }
+  inline fun <A> eager(crossinline func: suspend RestrictedNullableEffect<A>.() -> A?): A? =
+    Effect.restricted(eff = { RestrictedNullableEffect { it } }, f = func, just = { it })
 
-  private class NullableBindSyntax<R>(
-    scope: DelimitedScope<R?>
-  ) : BindSyntax, DelimitedScope<R?> by scope {
-    override suspend fun <A> A?.invoke(): A =
-      this ?: shift { null }
-  }
+  suspend inline operator fun <A> invoke(crossinline func: suspend NullableEffect<*>.() -> A?): A? =
+    Effect.suspended(eff = { NullableEffect { it } }, f = func, just = { it })
 }

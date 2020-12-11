@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Validated.Valid
 import arrow.higherkind
 import arrow.typeclasses.Show
 
@@ -764,9 +765,9 @@ import arrow.typeclasses.Show
  * val value =
  * //sampleStart
  *  either<Int, Int> {
- *   val (a) = Either.Right(1)
- *   val (b) = Either.Right(1 + a)
- *   val (c) = Either.Right(1 + b)
+ *   val a = Either.Right(1)()
+ *   val b = Either.Right(1 + a)()
+ *   val c = Either.Right(1 + b)()
  *   a + b + c
  *  }
  * //sampleEnd
@@ -982,6 +983,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       "Right(${SR.run { it.show() }})"
     }
   )
+
+  fun toValidatedNel(): ValidatedNel<A, B> =
+    fold({ Validated.invalidNel(it) }, ::Valid)
+
+  fun toValidated(): Validated<A, B> =
+    fold({ it.invalid() }, { it.valid() })
 
   companion object {
 

@@ -1,13 +1,11 @@
 package arrow.continuations.generic
 
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.loop
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Implements delimited continuations with with no multi shot support (apart from shiftCPS which trivially supports it).
@@ -20,17 +18,17 @@ import kotlin.coroutines.suspendCoroutine
  *  continuation is appended to a list waiting to be invoked with the final result of the block.
  * When running a function we jump back and forth between the main function and every function inside shift via their continuations.
  */
-class DelimContScope<R>(val f: suspend DelimitedScope<R>.() -> R) : DelimitedScope<R> {
+internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.() -> R) : RestrictedScope<R> {
 
   /**
    * Variable used for polling the result after suspension happened.
    */
-  private val resultVar = atomic<Any?>(EMPTY_VALUE)
+  private var resultVar: Any? = EMPTY_VALUE
 
   /**
    * Variable for the next shift block to (partially) run, if it is empty that usually means we are done.
    */
-  private val nextShift = atomic<(suspend () -> R)?>(null)
+  private var nextShift: (suspend () -> R)? = null
 
   /**
    * "Callbacks"/partially evaluated shift blocks which now wait for the final result
@@ -45,9 +43,10 @@ class DelimContScope<R>(val f: suspend DelimitedScope<R>.() -> R) : DelimitedSco
     private val continuation: Continuation<A>,
     private val shiftFnContinuations: MutableList<Continuation<R>>
   ) : DelimitedContinuation<A, R> {
-    override suspend fun invoke(a: A): R = suspendCoroutine { resumeShift ->
+    override suspend fun invoke(a: A): R = suspendCoroutineUninterceptedOrReturn { resumeShift ->
       shiftFnContinuations.add(resumeShift)
       continuation.resume(a)
+      COROUTINE_SUSPENDED
     }
   }
 
@@ -63,43 +62,47 @@ class DelimContScope<R>(val f: suspend DelimitedScope<R>.() -> R) : DelimitedSco
   /**
    * Captures the continuation and set [f] with the continuation to be executed next by the runloop.
    */
-  override suspend fun <A> shift(f: suspend DelimitedScope<R>.(DelimitedContinuation<A, R>) -> R): A =
-    suspendCoroutine { continueMain ->
+  override suspend fun <A> shift(f: suspend RestrictedScope<R>.(DelimitedContinuation<A, R>) -> R): A =
+    suspendCoroutineUninterceptedOrReturn { continueMain ->
       val delCont = SingleShotCont(continueMain, shiftFnContinuations)
-      assert(nextShift.compareAndSet(null, suspend { this.f(delCont) }))
+      assert(nextShift == null)
+      nextShift = suspend { this.f(delCont) }
+      COROUTINE_SUSPENDED
     }
 
   /**
    * Same as [shift] except we never resume execution because we only continue in [c].
    */
-  override suspend fun <A, B> shiftCPS(f: suspend (DelimitedContinuation<A, B>) -> R, c: suspend DelimitedScope<B>.(A) -> B): Nothing =
-    suspendCoroutine {
-      assert(nextShift.compareAndSet(null, suspend { f(CPSCont(c)) }))
+  suspend fun <A, B> shiftCPS(f: suspend (DelimitedContinuation<A, B>) -> R, c: suspend DelimitedScope<B>.(A) -> B): Nothing =
+    suspendCoroutineUninterceptedOrReturn {
+      assert(nextShift == null)
+      nextShift = suspend { f(CPSCont(c)) }
+      COROUTINE_SUSPENDED
     }
 
   /**
    * Unsafe if [f] calls [shift] on this scope! Use [NestedDelimContScope] instead if this is a problem.
    */
-  override suspend fun <A> reset(f: suspend DelimitedScope<A>.() -> A): A =
+  fun <A> reset(f: suspend DelimitedScope<A>.() -> A): A =
     DelimContScope(f).invoke()
 
   @Suppress("UNCHECKED_CAST")
   fun invoke(): R {
     f.startCoroutineUninterceptedOrReturn(this, Continuation(EmptyCoroutineContext) { result ->
-      resultVar.value = result.getOrThrow()
+      resultVar = result.getOrThrow()
     }).let {
       if (it == COROUTINE_SUSPENDED) {
         // we have a call to shift so we must start execution the blocks there
-        resultVar.loop { mRes ->
-          if (mRes === EMPTY_VALUE) {
-            val nextShiftFn = nextShift.getAndSet(null)
-              ?: throw IllegalStateException("No further work to do but also no result!")
+        while (true) {
+          if (resultVar === EMPTY_VALUE) {
+            val nextShiftFn = requireNotNull(nextShift) { "No further work to do but also no result!" }
+            nextShift = null
             nextShiftFn.startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
-              resultVar.value = result.getOrThrow()
+              resultVar = result.getOrThrow()
             }).let { nextRes ->
               // If we suspended here we can just continue to loop because we should now have a new function to run
               // If we did not suspend we short-circuited and are thus done with looping
-              if (nextRes != COROUTINE_SUSPENDED) resultVar.value = nextRes as R
+              if (nextRes != COROUTINE_SUSPENDED) resultVar = nextRes as R
             }
             // Break out of the infinite loop if we have a result
           } else return@let
@@ -108,17 +111,15 @@ class DelimContScope<R>(val f: suspend DelimitedScope<R>.() -> R) : DelimitedSco
       // we can return directly if we never suspended/called shift
       else return@invoke it as R
     }
-    assert(resultVar.value !== EMPTY_VALUE)
+    assert(resultVar !== EMPTY_VALUE)
     // We need to finish the partially evaluated shift blocks by passing them our result.
     // This will update the result via the continuations that now finish up
-    for (c in shiftFnContinuations.asReversed()) c.resume(resultVar.value as R)
+    for (c in shiftFnContinuations.asReversed()) c.resume(resultVar as R)
     // Return the final result
-    return resultVar.value as R
+    return resultVar as R
   }
 
   companion object {
-    fun <R> reset(f: suspend DelimitedScope<R>.() -> R): R = DelimContScope(f).invoke()
-
     @Suppress("ClassName")
     private object EMPTY_VALUE
   }

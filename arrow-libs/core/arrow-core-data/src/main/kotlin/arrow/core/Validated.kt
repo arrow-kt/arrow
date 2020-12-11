@@ -132,20 +132,21 @@ typealias Invalid<E> = Validated.Invalid<E>
  * ```
  *
  * And, as you can see, the parser runs sequentially: it first tries to get the map value and then tries to read it.
- * It's then straightforward to translate this to an Fx block:
+ * It's then straightforward to translate this to an effect block. We use here the `either` block which includes syntax
+ * to obtain `A` from values of `Validated<*, A>` through the [arrow.core.computations.EitherEffect.invoke]
  *
  * ```kotlin:ank
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
- * import arrow.core.computations.validated
+ * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  *
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
@@ -241,7 +242,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
- * import arrow.core.computations.validated
+ * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
@@ -274,7 +275,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
@@ -308,7 +309,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Option
  * import arrow.core.Some
  * import arrow.core.Validated
- * import arrow.core.computations.validated
+ * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
@@ -341,7 +342,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
@@ -382,7 +383,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.right
  * import arrow.core.Some
  * import arrow.core.Validated
- * import arrow.core.computations.validated
+ * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  *
@@ -405,7 +406,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * data class Config(val map: Map<String, String>) {
- *   suspend fun <A> parse(read: Read<A>, key: String) = validated<ConfigError, A> {
+ *   suspend fun <A> parse(read: Read<A>, key: String) = either<ConfigError, A> {
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
@@ -413,7 +414,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *       ConfigError.ParseConfig(key)
  *     }()
  *     readVal
- *   }
+ *   }.toValidatedNel()
  * }
  *
  * sealed class ConfigError {

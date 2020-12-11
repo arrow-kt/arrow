@@ -1,5 +1,7 @@
 package arrow.core
 
+import arrow.continuations.generic.ControlThrowable
+
 /**
  * Extractor of non-fatal Throwables. Will not match fatal errors like `VirtualMachineError`
  * (for example, `OutOfMemoryError` and `StackOverflowError`, subclasses of `VirtualMachineError`), `ThreadDeath`,
@@ -41,7 +43,7 @@ package arrow.core
  */
 fun NonFatal(t: Throwable): Boolean =
   when (t) {
-    is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError -> false
+    is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError, is ControlThrowable -> false
     else -> true
   }
 

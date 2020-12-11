@@ -1,6 +1,8 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.computations.EitherEffect
+import arrow.core.computations.RestrictedEitherEffect
 import arrow.core.computations.either
 import arrow.core.extensions.combine
 import arrow.core.extensions.either.applicative.applicative
@@ -83,7 +85,12 @@ class EitherTest : UnitSpec() {
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), GEN, Either.eq(String.eq(), Int.eq())),
       OrderLaws.laws(Either.order(String.order(), Int.order()), GEN),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
-      FxLaws.laws(Gen.int().map(::Right), GEN.map { it }, Either.eqK(String.eq()).liftEq(Int.eq()), either::eager, either::invoke)
+      FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::invoke) {
+        it()
+      },
+      FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::eager) {
+        it()
+      }
     )
 
     "fromNullable should lift value as a Right if it is not null" {

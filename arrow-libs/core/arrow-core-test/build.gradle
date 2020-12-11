@@ -8,6 +8,7 @@ apply from: "$SUB_PROJECT"
 
 dependencies {
     api project(":arrow-core")
+    api project(":arrow-continuations")
     api project(":arrow-core-data")
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     api "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow

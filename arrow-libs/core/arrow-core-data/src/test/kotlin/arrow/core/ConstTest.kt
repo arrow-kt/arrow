@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.computations.const
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq
 import arrow.core.extensions.const.functor.functor
@@ -19,7 +18,6 @@ import arrow.core.test.generators.genConst
 import arrow.core.test.generators.genK
 import arrow.core.test.laws.ApplicativeLaws
 import arrow.core.test.laws.EqLaws
-import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.OrderLaws
 import arrow.core.test.laws.ShowLaws
@@ -48,7 +46,6 @@ class ConstTest : UnitSpec() {
       ApplicativeLaws.laws(Const.applicative(M), Const.functor(), GENK, EQK),
       EqLaws.laws(Const.eq<Int, Int>(Eq.any()), GEN),
       ShowLaws.laws(Const.show(Int.show()), Const.eq<Int, Int>(Eq.any()), GEN),
-      FxLaws.laws<ConstPartialOf<Int>, Int>(GENK.genK(Gen.int()), GENK.genK(Gen.int()), EQK.liftEq(Int.eq()), const::eager, const::invoke),
       HashLaws.laws(Const.hash(Int.hash()), GEN, Const.eq(Int.eq())),
       OrderLaws.laws(Const.order<Int, Int>(Int.order()), GEN)
     )

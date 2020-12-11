@@ -1,39 +1,38 @@
 package arrow.core.computations
 
-import arrow.Kind
-import arrow.continuations.generic.DelimContScope
-import arrow.core.EagerBind
-import arrow.core.Valid
+import arrow.continuations.Effect
 import arrow.core.Validated
-import arrow.core.ValidatedPartialOf
-import arrow.core.fix
-import arrow.typeclasses.suspended.BindSyntax
+import arrow.core.valid
+import kotlin.coroutines.RestrictsSuspension
 
+@Deprecated(
+  "The `EitherEffect` computation block supports validated with the right short-circuiting semantics",
+  ReplaceWith("EitherEffect", "arrow.core.computations.either.EitherEffect")
+)
+fun interface ValidatedEffect<E, A> : Effect<Validated<E, A>> {
+  suspend operator fun <B> Validated<E, B>.invoke(): B =
+    when (this) {
+      is Validated.Valid -> a
+      is Validated.Invalid -> control().shift(this@invoke)
+    }
+}
+
+@Deprecated(
+  "The `EitherRestrictedEffect` computation block supports validated with the right short-circuiting semantics",
+  ReplaceWith("EitherRestrictedEffect", "arrow.core.computations.either.EitherRestrictedEffect")
+)
+@RestrictsSuspension
+fun interface RestrictedValidatedEffect<E, A> : ValidatedEffect<E, A>
+
+@Suppress("ClassName")
+@Deprecated(
+  "The `either` computation block supports validated with the right short-circuiting semantics",
+  ReplaceWith("either", "arrow.core.computations.either")
+)
 object validated {
+  inline fun <E, A> eager(crossinline c: suspend RestrictedValidatedEffect<E, *>.() -> A): Validated<E, A> =
+    Effect.restricted(eff = { RestrictedValidatedEffect { it } }, f = c, just = { it.valid() })
 
-  fun <E, A> eager(c: suspend EagerBind<ValidatedPartialOf<E>>.() -> A): Validated<E, A> =
-    DelimContScope.reset {
-      Valid(
-        c(object : EagerBind<ValidatedPartialOf<E>> {
-          override suspend fun <A> Kind<ValidatedPartialOf<E>, A>.invoke(): A =
-            when (val v = fix()) {
-              is Validated.Valid -> v.a
-              is Validated.Invalid -> shift { v }
-            }
-        })
-      )
-    }
-
-  suspend operator fun <E, A> invoke(c: suspend BindSyntax<ValidatedPartialOf<E>>.() -> A): Validated<E, A> =
-    DelimContScope.reset {
-      Valid(
-        c(object : BindSyntax<ValidatedPartialOf<E>> {
-          override suspend fun <A> Kind<ValidatedPartialOf<E>, A>.invoke(): A =
-            when (val v = fix()) {
-              is Validated.Valid -> v.a
-              is Validated.Invalid -> shift { v }
-            }
-        })
-      )
-    }
+  suspend inline operator fun <E, A> invoke(crossinline c: suspend ValidatedEffect<E, *>.() -> A): Validated<E, A> =
+    Effect.suspended(eff = { ValidatedEffect { it } }, f = c, just = { it.valid() })
 }
