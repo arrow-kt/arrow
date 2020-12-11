@@ -50,6 +50,8 @@ jobs:
     - name: Update versions for documentation
       if: ${{ steps.versions.outputs.new-release-version-exists == '1' || steps.versions.outputs.new-snapshot-version-exists == '1' }}
       run: |
+        . $BASEDIR/arrow/scripts/commons4gradle.sh
+        checkAndDownload arrow-core
         cd $BASEDIR/arrow-core
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
         git config --global user.email "arrow-kt@users.noreply.github.com"

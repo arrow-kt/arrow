@@ -27,7 +27,7 @@ jobs:
         fetch-depth: 0
     - name: Wait for other related changes
       run: sleep 180
-    - name: "Get target: OSS or Bintray"
+    - name: "Check versions"
       id: versions
       run: |
         LATEST_PUBLISHED_RELEASE_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
