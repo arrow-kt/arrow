@@ -31,13 +31,16 @@ jobs:
       id: versions
       run: |
         LATEST_PUBLISHED_RELEASE_VERSION=$(curl -X GET https://api.bintray.com/packages/arrow-kt/arrow-kt/arrow/versions/_latest | jq -r '.name')
+        LATEST_PUBLISHED_SNAPSHOT_VERSION=$(curl https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/maven-metadata.xml | grep latest | cut -d'>' -f2 | cut -d'<' -f1)
         RELEASE_VERSION=$(grep LATEST_VERSION gradle.properties | cut -d= -f2)
         SNAPSHOT_VERSION=$(grep VERSION_NAME gradle.properties | cut -d= -f2)
         NEW_RELEASE_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_RELEASE_VERSION" == "$RELEASE_VERSION" ] && echo '0' || echo '1')
+        NEW_SNAPSHOT_VERSION_EXISTS=$([ "$LATEST_PUBLISHED_SNAPSHOT_VERSION" == "$SNAPSHOT_VERSION" ] && echo '0' || echo '1')
         echo "::set-output name=latest-published-release-version::$LATEST_PUBLISHED_RELEASE_VERSION"
         echo "::set-output name=release-version::$RELEASE_VERSION"
         echo "::set-output name=snapshot-version::$SNAPSHOT_VERSION"
         echo "::set-output name=new-release-version-exists::$NEW_RELEASE_VERSION_EXISTS"
+        echo "::set-output name=new-snapshot-version-exists::$NEW_SNAPSHOT_VERSION_EXISTS"
     - name: Publish into Bintray
       if: steps.versions.outputs.new-release-version-exists == '1'
       run: |
@@ -45,7 +48,7 @@ jobs:
         perl -pe "s/^VERSION_NAME=.*/VERSION_NAME=${{ steps.versions.outputs.release-version }}/g" -i gradle.properties
         $BASEDIR/arrow/scripts/lib-publish.sh $ARROW_LIB
     - name: Update versions for documentation
-      if: steps.versions.outputs.new-release-version-exists == '1'
+      if: ${{ steps.versions.outputs.new-release-version-exists == '1' || steps.versions.outputs.new-snapshot-version-exists == '1' }}
       run: |
         cd $BASEDIR/arrow-core
         git remote set-url origin https://arrow-kt:$GITHUB_TOKEN@github.com/arrow-kt/arrow-core.git
