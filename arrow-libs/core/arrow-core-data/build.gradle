@@ -11,7 +11,7 @@ apply from: "$DOC_CREATION"
 
 dependencies {
     api project(":arrow-annotations")
-    implementation project(":arrow-continuations")
+    api project(":arrow-continuations")
     kapt project(":arrow-meta")
     kaptTest project(":arrow-meta")
     compileOnly project(":arrow-meta")
