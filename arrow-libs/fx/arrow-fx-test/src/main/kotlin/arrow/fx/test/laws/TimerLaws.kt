@@ -46,9 +46,9 @@ object TimerLaws {
   ) = forFew(25, Gen.intSmall()) {
     val length = 100L
     val lhs = fx.async {
-      val start = !C.timeNano()
-      !T.sleep(length.milliseconds)
-      val end = !C.timeNano()
+      val start = C.timeNano().invoke()
+      T.sleep(length.milliseconds).invoke()
+      val end = C.timeNano().invoke()
       (end - start) >= length
     }
 

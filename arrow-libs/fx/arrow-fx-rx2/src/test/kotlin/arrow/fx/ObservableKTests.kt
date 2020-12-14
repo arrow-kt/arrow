@@ -48,7 +48,7 @@ class ObservableKTests : RxJavaSpec() {
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, SECONDS).k().bind()
+        val a = Observable.timer(2, SECONDS).k().invoke()
         a
       }.value()
 
@@ -59,7 +59,7 @@ class ObservableKTests : RxJavaSpec() {
 
     "Observable cancellation forces binding to cancel without completing too" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(3, SECONDS).k().bind()
+        val a = Observable.timer(3, SECONDS).k().invoke()
         a
       }.value()
       val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, SECONDS).subscribe { subscription.dispose() } }.test()

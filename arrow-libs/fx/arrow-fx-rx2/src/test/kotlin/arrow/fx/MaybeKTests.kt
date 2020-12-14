@@ -65,7 +65,7 @@ class MaybeKTests : RxJavaSpec() {
 
     "Multi-thread Maybes finish correctly" {
       val value: Maybe<Long> = MaybeK.fx {
-        val a = Maybe.timer(2, TimeUnit.SECONDS).k().bind()
+        val a = Maybe.timer(2, TimeUnit.SECONDS).k().invoke()
         a
       }.value()
 
@@ -79,9 +79,9 @@ class MaybeKTests : RxJavaSpec() {
       var threadRef: Thread? = null
 
       val value: Maybe<Long> = MaybeK.fx {
-        val a = Maybe.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
+        val a = Maybe.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().invoke()
         threadRef = Thread.currentThread()
-        val b = Maybe.just(a).observeOn(Schedulers.newThread()).k().bind()
+        val b = Maybe.just(a).observeOn(Schedulers.newThread()).k().invoke()
         b
       }.value()
 
@@ -96,7 +96,7 @@ class MaybeKTests : RxJavaSpec() {
 
     "Maybe dispose forces binding to cancel without completing too" {
       val value: Maybe<Long> = MaybeK.fx {
-        val a = Maybe.timer(3, TimeUnit.SECONDS).k().bind()
+        val a = Maybe.timer(3, TimeUnit.SECONDS).k().invoke()
         a
       }.value()
 
@@ -174,7 +174,7 @@ class MaybeKTests : RxJavaSpec() {
 
     "MaybeK should suspend" {
       MaybeK.fx {
-        val s = effect { Maybe.just(1).k().suspended() }.bind()
+        val s = effect { Maybe.just(1).k().suspended() }.invoke()
 
         s shouldBe 1
       }.unsafeRunSync()
@@ -184,7 +184,7 @@ class MaybeKTests : RxJavaSpec() {
       val error = IllegalArgumentException()
 
       MaybeK.fx {
-        val s = effect { Maybe.error<Int>(error).k().suspended() }.attempt().bind()
+        val s = effect { Maybe.error<Int>(error).k().suspended() }.attempt().invoke()
 
         s shouldBe error.left()
       }.unsafeRunSync()
@@ -192,7 +192,7 @@ class MaybeKTests : RxJavaSpec() {
 
     "Empty MaybeK should suspend" {
       MaybeK.fx {
-        val s = effect { Maybe.empty<Int>().k().suspended() }.bind()
+        val s = effect { Maybe.empty<Int>().k().suspended() }.invoke()
 
         s shouldBe null
       }.unsafeRunSync()

@@ -55,9 +55,9 @@ class SingleKTests : RxJavaSpec() {
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
         SingleK.fx {
-            val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().bind()
-            a
-          }.value()
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().invoke()
+          a
+        }.value()
           .test()
           .awaitDone(delay + awaitDelay, TimeUnit.MILLISECONDS)
           .assertTerminated()
@@ -74,9 +74,9 @@ class SingleKTests : RxJavaSpec() {
         var threadRef: Thread? = null
 
         val value: Single<Long> = SingleK.fx {
-          val a = Single.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io()).k().bind()
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io()).k().invoke()
           threadRef = Thread.currentThread()
-          val b = Single.just(a).observeOn(Schedulers.computation()).k().bind()
+          val b = Single.just(a).observeOn(Schedulers.computation()).k().invoke()
           b
         }.value()
 
@@ -91,7 +91,7 @@ class SingleKTests : RxJavaSpec() {
     "Single dispose forces binding to cancel without completing too" {
       forFew(5, Gen.choose(10L, 50)) { delay ->
         val value: Single<Long> = SingleK.fx {
-          val a = Single.timer(delay + awaitDelay, TimeUnit.MILLISECONDS).k().bind()
+          val a = Single.timer(delay + awaitDelay, TimeUnit.MILLISECONDS).k().invoke()
           a
         }.value()
 
@@ -165,7 +165,7 @@ class SingleKTests : RxJavaSpec() {
       fun getSingle(): Single<Int> = Single.just(1)
 
       SingleK.fx {
-        val s = effect { getSingle().k().suspended() }.bind()
+        val s = effect { getSingle().k().suspended() }.invoke()
 
         s shouldBe 1
       }.unsafeRunSync()
@@ -175,7 +175,7 @@ class SingleKTests : RxJavaSpec() {
       val error = IllegalArgumentException()
 
       SingleK.fx {
-        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().bind()
+        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().invoke()
 
         s shouldBe error.left()
       }.unsafeRunSync()

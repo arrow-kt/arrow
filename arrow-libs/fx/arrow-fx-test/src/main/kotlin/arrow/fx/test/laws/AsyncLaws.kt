@@ -190,7 +190,7 @@ object AsyncLaws {
           continueOn(ctx)
           getCurrentThread()
         }
-        .equalUnderTheLaw(fx.async { ctx.shift().bind(); getCurrentThread() }, EQ)
+        .equalUnderTheLaw(fx.async { ctx.shift()(); getCurrentThread() }, EQ)
     }
 
   fun <F> Async<F>.derivedShift(EQ: Eq<Kind<F, Int>>): Unit =

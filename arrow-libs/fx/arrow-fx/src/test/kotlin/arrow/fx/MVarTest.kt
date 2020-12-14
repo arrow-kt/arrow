@@ -31,13 +31,13 @@ class MVarTest : ArrowFxSpec() {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           IO.fx {
-            val av = mvar.empty<Int>().bind()
-            val isEmpty = av.isEmpty().bind()
-            av.put(a).bind()
-            val isNotEmpty = av.isNotEmpty().bind()
-            val r1 = av.take().bind()
-            av.put(b).bind()
-            val r2 = av.take().bind()
+            val av = mvar.empty<Int>().invoke()
+            val isEmpty = av.isEmpty().invoke()
+            av.put(a).invoke()
+            val isNotEmpty = av.isNotEmpty().invoke()
+            val r1 = av.take().invoke()
+            av.put(b).invoke()
+            val r2 = av.take().invoke()
             Tuple4(isEmpty, isNotEmpty, r1, r2)
           }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), IO.eq())
         }
@@ -46,15 +46,15 @@ class MVarTest : ArrowFxSpec() {
       "$label - empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
           IO.fx {
-            val av = mvar.empty<Int>().bind()
-            val isEmpty = av.isEmpty().bind()
-            val p1 = av.tryPut(a).bind()
-            val p2 = av.tryPut(b).bind()
-            val isNotEmpty = av.isNotEmpty().bind()
-            val r1 = av.tryTake().bind()
-            val r2 = av.tryTake().bind()
-            av.put(c).bind()
-            val r3 = av.take().bind()
+            val av = mvar.empty<Int>().invoke()
+            val isEmpty = av.isEmpty().invoke()
+            val p1 = av.tryPut(a).invoke()
+            val p2 = av.tryPut(b).invoke()
+            val isNotEmpty = av.isNotEmpty().invoke()
+            val r1 = av.tryTake().invoke()
+            val r2 = av.tryTake().invoke()
+            av.put(c).invoke()
+            val r3 = av.take().invoke()
             Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
           }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), IO.eq())
         }
@@ -62,16 +62,16 @@ class MVarTest : ArrowFxSpec() {
 
       "$label - empty; take; put; take; put" {
         IO.fx {
-          val av = mvar.empty<Int>().bind()
+          val av = mvar.empty<Int>().invoke()
 
-          val f1 = av.take().fork().bind()
-          av.put(10).bind()
+          val f1 = av.take().fork().invoke()
+          av.put(10).invoke()
 
-          val f2 = av.take().fork().bind()
-          av.put(20).bind()
+          val f2 = av.take().fork().invoke()
+          av.put(20).invoke()
 
-          val aa = f1.join().bind()
-          val bb = f2.join().bind()
+          val aa = f1.join().invoke()
+          val bb = f2.join().invoke()
 
           setOf(aa, bb)
         }.shouldBeEq(IO.just(setOf(10, 20)), IO.eq())
@@ -79,19 +79,19 @@ class MVarTest : ArrowFxSpec() {
 
       "$label - empty; put; put; put; take; take; take" {
         IO.fx {
-          val av = mvar.empty<Int>().bind()
+          val av = mvar.empty<Int>().invoke()
 
-          val f1 = av.put(10).fork().bind()
-          val f2 = av.put(20).fork().bind()
-          val f3 = av.put(30).fork().bind()
+          val f1 = av.put(10).fork().invoke()
+          val f2 = av.put(20).fork().invoke()
+          val f3 = av.put(30).fork().invoke()
 
-          val aa = av.take().bind()
-          val bb = av.take().bind()
-          val cc = av.take().bind()
+          val aa = av.take().invoke()
+          val bb = av.take().invoke()
+          val cc = av.take().invoke()
 
-          f1.join().bind()
-          f2.join().bind()
-          f3.join().bind()
+          f1.join().invoke()
+          f2.join().invoke()
+          f3.join().invoke()
 
           setOf(aa, bb, cc)
         }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
@@ -99,19 +99,19 @@ class MVarTest : ArrowFxSpec() {
 
       "$label - empty; take; take; take; put; put; put" {
         IO.fx {
-          val av = mvar.empty<Int>().bind()
+          val av = mvar.empty<Int>().invoke()
 
-          val f1 = av.take().fork().bind()
-          val f2 = av.take().fork().bind()
-          val f3 = av.take().fork().bind()
+          val f1 = av.take().fork().invoke()
+          val f2 = av.take().fork().invoke()
+          val f3 = av.take().fork().invoke()
 
-          av.put(10).bind()
-          av.put(20).bind()
-          av.put(30).bind()
+          av.put(10).invoke()
+          av.put(20).invoke()
+          av.put(30).invoke()
 
-          val aa = f1.join().bind()
-          val bb = f2.join().bind()
-          val cc = f3.join().bind()
+          val aa = f1.join().invoke()
+          val bb = f2.join().invoke()
+          val cc = f3.join().invoke()
 
           setOf(aa, bb, cc)
         }.shouldBeEq(IO.just(setOf(10, 20, 30)), IO.eq())
@@ -120,11 +120,11 @@ class MVarTest : ArrowFxSpec() {
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           IO.fx {
-            val av = mvar.just(a).bind()
-            val isNotEmpty = av.isNotEmpty().bind()
-            val r1 = av.take().bind()
-            av.put(b).bind()
-            val r2 = av.take().bind()
+            val av = mvar.just(a).invoke()
+            val isNotEmpty = av.isNotEmpty().invoke()
+            val r1 = av.take().invoke()
+            av.put(b).invoke()
+            val r2 = av.take().invoke()
 
             Tuple3(isNotEmpty, r1, r2)
           }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), IO.eq())
@@ -134,11 +134,11 @@ class MVarTest : ArrowFxSpec() {
       "$label - initial; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           IO.fx {
-            val av = !mvar.just(a)
-            val isEmpty = !av.isEmpty()
-            val r1 = !av.take()
-            !av.put(b)
-            val r2 = !av.take()
+            val av = mvar.just(a).invoke()
+            val isEmpty = av.isEmpty().invoke()
+            val r1 = av.take().invoke()
+            av.put(b).invoke()
+            val r2 = av.take().invoke()
             Tuple3(isEmpty, r1, r2)
           }.equalUnderTheLaw(IO.just(Tuple3(false, a, b)), IO.eq())
         }
@@ -147,9 +147,9 @@ class MVarTest : ArrowFxSpec() {
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
           IO.fx {
-            val av = mvar.just(i).bind()
-            val read = av.read().bind()
-            val take = av.take().bind()
+            val av = mvar.just(i).invoke()
+            val read = av.read().invoke()
+            val take = av.take().invoke()
             read toT take
           }.equalUnderTheLaw(IO.just(i toT i), IO.eq())
         }
@@ -158,10 +158,10 @@ class MVarTest : ArrowFxSpec() {
       "$label - empty; read; put" {
         forAll(Gen.int()) { a ->
           IO.fx {
-            val av = !mvar.empty<Int>()
-            val read = !av.read().fork()
-            !av.put(a)
-            !read.join()
+            val av = mvar.empty<Int>().invoke()
+            val read = av.read().fork().invoke()
+            av.put(a).invoke()
+            read.join().invoke()
           }.equalUnderTheLaw(IO.just(a), IO.eq())
         }
       }
@@ -205,10 +205,10 @@ class MVarTest : ArrowFxSpec() {
           val producerTask = tasks.parSequence().flatMap { channel.put(None) }
 
           return IO.fx {
-            val f1 = !producerTask.fork()
-            val f2 = !consumerTask.fork()
-            !f1.join()
-            !f2.join()
+            val f1 = producerTask.fork().invoke()
+            val f2 = consumerTask.fork().invoke()
+            f1.join().invoke()
+            f2.join().invoke()
           }
         }
 
@@ -234,11 +234,11 @@ class MVarTest : ArrowFxSpec() {
 
         val count = 10000L
         IO.fx {
-          val channel = !mvar.just(Option(0L))
-          val producerFiber = !producer(channel, (0L until count).toList()).fork()
-          val consumerFiber = !consumer(channel, 0L).fork()
-          !producerFiber.join()
-          !consumerFiber.join()
+          val channel = mvar.just(Option(0L)).invoke()
+          val producerFiber = producer(channel, (0L until count).toList()).fork().invoke()
+          val consumerFiber = consumer(channel, 0L).fork().invoke()
+          producerFiber.join().invoke()
+          consumerFiber.join().invoke()
         }.equalUnderTheLaw(IO.just(count * (count - 1) / 2), IO.eq(Long.eq()))
       }
 
@@ -258,37 +258,39 @@ class MVarTest : ArrowFxSpec() {
 
       "$label - put is stack safe when repeated sequentially" {
         IO.fx {
-          val channel = !mvar.empty<Int>()
+          val channel = mvar.empty<Int>().invoke()
           val (count, reads, writes) = testStackSequential(channel)
-          !writes.fork()
-          val r = !reads
-          !effect { r shouldBe count }
+          writes.fork().invoke()
+          val r = reads.invoke()
+          effect { r shouldBe count }.invoke()
         }.equalUnderTheLaw(IO.unit, IO.eq())
       }
 
       "$label - take is stack safe when repeated sequentially" {
         IO.fx {
-          val channel = !mvar.empty<Int>()
+          val channel = mvar.empty<Int>().invoke()
           val (count, reads, writes) = testStackSequential(channel)
-          val fr = !reads.fork()
-          !writes
-          val r = !fr.join()
-          !effect { r shouldBe count }
+          val fr = reads.fork().invoke()
+          writes.invoke()
+          val r = fr.join().invoke()
+          effect { r shouldBe count }.invoke()
         }.equalUnderTheLaw(IO.unit, IO.eq())
       }
 
       "$label - concurrent take and put" {
         val count = 1_000
         IO.fx {
-          val mVar = !mvar.empty<Int>()
-          val ref = !Ref(0)
-          val takes = (0 until count).map { mVar.read().map2(mVar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } } }.parSequence()
+          val mVar = mvar.empty<Int>().invoke()
+          val ref = Ref(0).invoke()
+          val takes = (0 until count).map {
+            mVar.read().map2(mVar.take()) { (a, b) -> a + b }.flatMap { x -> ref.update { it + x } }
+          }.parSequence()
           val puts = (0 until count).map { mVar.put(1) }.parSequence()
-          val f1 = !takes.fork()
-          val f2 = !puts.fork()
-          !f1.join()
-          !f2.join()
-          !ref.get()
+          val f1 = takes.fork().invoke()
+          val f2 = puts.fork().invoke()
+          f1.join().invoke()
+          f2.join().invoke()
+          ref.get().invoke()
         }.equalUnderTheLaw(IO.just(count * 2), IO.eq())
       }
     }
@@ -298,45 +300,45 @@ class MVarTest : ArrowFxSpec() {
 
       "$label - put is cancellable" {
         IO.fx {
-          val mVar = !mvar.just(0)
-          !mVar.put(1).fork()
-          val p2 = !mVar.put(2).fork()
-          !mVar.put(3).fork()
-          !IO.sleep(10.milliseconds) // Give put callbacks a chance to register
-          !p2.cancel()
-          !mVar.take()
-          val r1 = !mVar.take()
-          val r3 = !mVar.take()
+          val mVar = mvar.just(0).invoke()
+          mVar.put(1).fork().invoke()
+          val p2 = mVar.put(2).fork().invoke()
+          mVar.put(3).fork().invoke()
+          IO.sleep(10.milliseconds).invoke() // Give put callbacks a chance to register
+          p2.cancel().invoke()
+          mVar.take().invoke()
+          val r1 = mVar.take().invoke()
+          val r3 = mVar.take().invoke()
           setOf(r1, r3)
         }.equalUnderTheLaw(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - take is cancellable" {
         IO.fx {
-          val mVar = !mvar.empty<Int>()
-          val t1 = !mVar.take().fork()
-          val t2 = !mVar.take().fork()
-          val t3 = !mVar.take().fork()
-          !IO.sleep(10.milliseconds) // Give take callbacks a chance to register
-          !t2.cancel()
-          !mVar.put(1)
-          !mVar.put(3)
-          val r1 = !t1.join()
-          val r3 = !t3.join()
+          val mVar = mvar.empty<Int>().invoke()
+          val t1 = mVar.take().fork().invoke()
+          val t2 = mVar.take().fork().invoke()
+          val t3 = mVar.take().fork().invoke()
+          IO.sleep(10.milliseconds).invoke() // Give take callbacks a chance to register
+          t2.cancel().invoke()
+          mVar.put(1).invoke()
+          mVar.put(3).invoke()
+          val r1 = t1.join().invoke()
+          val r3 = t3.join().invoke()
           setOf(r1, r3)
         }.equalUnderTheLaw(IO.just(setOf(1, 3)), IO.eq())
       }
 
       "$label - read is cancellable" {
         IO.fx {
-          val mVar = !mvar.empty<Int>()
-          val finished = !Promise<Int>()
-          val fiber = !mVar.read().flatMap(finished::complete).fork()
-          !IO.sleep(100.milliseconds) // Give read callback a chance to register
-          !fiber.cancel()
-          !mVar.put(10)
+          val mVar = mvar.empty<Int>().invoke()
+          val finished = Promise<Int>().invoke()
+          val fiber = mVar.read().flatMap(finished::complete).fork().invoke()
+          IO.sleep(100.milliseconds).invoke() // Give read callback a chance to register
+          fiber.cancel().invoke()
+          mVar.put(10).invoke()
           val fallback = sleep(200.milliseconds).followedBy(IO.just(0))
-          val res = !IO.raceN(finished.get(), fallback)
+          val res = IO.raceN(finished.get(), fallback).invoke()
         }.equalUnderTheLaw(IO.just(Right(0)), IO.eq())
       }
     }

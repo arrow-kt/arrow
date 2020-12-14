@@ -38,9 +38,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - make a queue the add values then retrieve in the same order" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            !l.traverse(IO.applicative(), q::offer)
-            !(1..l.size).toList().traverse(IO.applicative()) { q.take() }
+            val q = queue(l.size).invoke()
+            l.traverse(IO.applicative(), q::offer).invoke()
+            (1..l.size).toList().traverse(IO.applicative()) { q.take() }.invoke()
           }.equalUnderTheLaw(IO.just(l.toList()))
         }
       }
@@ -48,9 +48,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - queue can be filled at once with enough capacity" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            val succeed = !q.tryOfferAll(l.toList())
-            val res = !q.takeAll()
+            val q = queue(l.size)()
+            val succeed = q.tryOfferAll(l.toList())()
+            val res = q.takeAll()()
             Tuple2(succeed, res)
           }.equalUnderTheLaw(IO.just(Tuple2(true, l.toList())))
         }
@@ -59,13 +59,13 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - queue can be filled at once over capacity with takers" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            val (join, _) = !q.take().fork()
-            !IO.sleep(50.milliseconds) // Registered first, should receive first element of `tryOfferAll`
+            val q = queue(l.size)()
+            val (join, _) = q.take().fork()()
+            IO.sleep(50.milliseconds)() // Registered first, should receive first element of `tryOfferAll`
 
-            val succeed = !q.tryOfferAll(listOf(500) + l.toList())
-            val res = !q.takeAll()
-            val head = !join
+            val succeed = q.tryOfferAll(listOf(500) + l.toList())()
+            val res = q.takeAll()()
+            val head = join()
             Tuple3(succeed, res, head)
           }.equalUnderTheLaw(IO.just(Tuple3(true, l.toList(), 500)))
         }
@@ -77,9 +77,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.int().filter { it > 100 }
         ) { l, capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            val succeed = !q.tryOfferAll(l)
-            val all = !q.takeAll()
+            val q = queue(capacity).invoke()
+            val succeed = q.tryOfferAll(l).invoke()
+            val all = q.takeAll().invoke()
             Tuple2(succeed, all)
           }.equalUnderTheLaw(IO.just(Tuple2(true, l)))
         }
@@ -88,10 +88,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - takeAll takes all values from a Queue" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            !l.traverse(IO.applicative(), q::offer)
-            val res = !q.takeAll()
-            val after = !q.takeAll()
+            val q = queue(l.size).invoke()
+            l.traverse(IO.applicative(), q::offer).invoke()
+            val res = q.takeAll().invoke()
+            val after = q.takeAll().invoke()
             Tuple2(res, after)
           }.equalUnderTheLaw(IO.just(Tuple2(l.toList(), emptyList())))
         }
@@ -100,10 +100,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - peekAll reads all values from a Queue without removing them" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            !l.traverse(IO.applicative(), q::offer)
-            val res = !q.peekAll()
-            val after = !q.peekAll()
+            val q = queue(l.size).invoke()
+            l.traverse(IO.applicative(), q::offer).invoke()
+            val res = q.peekAll().invoke()
+            val after = q.peekAll().invoke()
             Tuple2(res, after)
           }.equalUnderTheLaw(IO.just(Tuple2(l.toList(), l.toList())))
         }
@@ -112,8 +112,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - empty queue takeAll is empty" {
         forAll(Gen.positiveIntegers()) { capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            !q.takeAll()
+            val q = queue(capacity).invoke()
+            q.takeAll().invoke()
           }.equalUnderTheLaw(IO.just(emptyList()))
         }
       }
@@ -121,8 +121,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - empty queue peekAll is empty" {
         forAll(Gen.positiveIntegers()) { capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            !q.peekAll()
+            val q = queue(capacity).invoke()
+            q.peekAll().invoke()
           }.equalUnderTheLaw(IO.just(emptyList()))
         }
       }
@@ -131,8 +131,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
         forAll(Gen.int()) {
           IO.fx {
             val wontComplete = queue(10).flatMap(Queue<ForIO, Int>::take)
-            val received = !wontComplete.map { Some(it) }
-              .waitFor(100.milliseconds, default = just(None))
+            val received = wontComplete.map { Some(it) }
+              .waitFor(100.milliseconds, default = just(None)).invoke()
             received shouldBe None
           }.equalUnderTheLaw(IO.unit)
         }
@@ -141,10 +141,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - suspended take calls on an empty queue complete when offer calls made to queue" {
         forAll(Gen.int()) { i ->
           IO.fx {
-            val q = !queue(3)
-            val first = !q.take().fork(ctx)
-            !q.offer(i)
-            !first.join()
+            val q = queue(3).invoke()
+            val first = q.take().fork(ctx).invoke()
+            q.offer(i).invoke()
+            first.join().invoke()
           }.equalUnderTheLaw(IO.just(i))
         }
       }
@@ -152,16 +152,16 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - multiple take calls on an empty queue complete when until as many offer calls made to queue" {
         forAll(Gen.tuple3(Gen.int(), Gen.int(), Gen.int())) { t ->
           IO.fx {
-            val q = !queue(3)
-            val first = !q.take().fork(ctx)
-            val second = !q.take().fork(ctx)
-            val third = !q.take().fork(ctx)
-            !q.offer(t.a)
-            !q.offer(t.b)
-            !q.offer(t.c)
-            val firstValue = !first.join()
-            val secondValue = !second.join()
-            val thirdValue = !third.join()
+            val q = queue(3).invoke()
+            val first = q.take().fork(ctx).invoke()
+            val second = q.take().fork(ctx).invoke()
+            val third = q.take().fork(ctx).invoke()
+            q.offer(t.a).invoke()
+            q.offer(t.b).invoke()
+            q.offer(t.c).invoke()
+            val firstValue = first.join().invoke()
+            val secondValue = second.join().invoke()
+            val thirdValue = third.join().invoke()
             setOf(firstValue, secondValue, thirdValue)
           }.equalUnderTheLaw(IO.just(setOf(t.a, t.b, t.c)))
         }
@@ -171,8 +171,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
         forAll(Gen.int()) {
           IO.fx {
             val wontComplete = queue(10).flatMap(Queue<ForIO, Int>::peek)
-            val received = !wontComplete.map { Some(it) }
-              .waitFor(100.milliseconds, default = just(None))
+            val received = wontComplete.map { Some(it) }
+              .waitFor(100.milliseconds, default = just(None)).invoke()
             received shouldBe None
           }.equalUnderTheLaw(IO.unit)
         }
@@ -181,10 +181,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - suspended peek calls on an empty queue complete when offer calls made to queue" {
         forAll(Gen.int()) { i ->
           IO.fx {
-            val q = !queue(3)
-            val first = !q.peek().fork(ctx)
-            !q.offer(i)
-            !first.join()
+            val q = queue(3).invoke()
+            val first = q.peek().fork(ctx).invoke()
+            q.offer(i).invoke()
+            first.join().invoke()
           }.equalUnderTheLaw(IO.just(i))
         }
       }
@@ -192,14 +192,14 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - multiple peek calls offerAll is cancelable an empty queue all complete with the first value is received" {
         forAll(Gen.int()) { i ->
           IO.fx {
-            val q = !queue(1)
-            val first = !q.peek().fork(ctx)
-            val second = !q.peek().fork(ctx)
-            val third = !q.peek().fork(ctx)
-            !q.offer(i)
-            val firstValue = !first.join()
-            val secondValue = !second.join()
-            val thirdValue = !third.join()
+            val q = queue(1).invoke()
+            val first = q.peek().fork(ctx).invoke()
+            val second = q.peek().fork(ctx).invoke()
+            val third = q.peek().fork(ctx).invoke()
+            q.offer(i).invoke()
+            val firstValue = first.join().invoke()
+            val secondValue = second.join().invoke()
+            val thirdValue = third.join().invoke()
             setOf(firstValue, secondValue, thirdValue)
           }.equalUnderTheLaw(IO.just(setOf(i, i, i)))
         }
@@ -208,10 +208,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - peek does not remove value from Queue" {
         forAll(Gen.int()) { i ->
           IO.fx {
-            val q = !queue(10)
-            !q.offer(i)
-            val peeked = !q.peek()
-            val took = !q.takeAll()
+            val q = queue(10).invoke()
+            q.offer(i).invoke()
+            val peeked = q.peek().invoke()
+            val took = q.takeAll().invoke()
             Tuple2(peeked, took)
           }.equalUnderTheLaw(IO.just(Tuple2(i, listOf(i))))
         }
@@ -220,8 +220,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - tryTake on an empty Queue returns None" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(10)
-            !q.tryTake()
+            val q = queue(10).invoke()
+            q.tryTake().invoke()
           }.equalUnderTheLaw(IO.just(None))
         }
       }
@@ -229,8 +229,8 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - tryPeek on an empty Queue returns None" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(10)
-            !q.tryPeek()
+            val q = queue(10).invoke()
+            q.tryPeek().invoke()
           }.equalUnderTheLaw(IO.just(None))
         }
       }
@@ -238,17 +238,17 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - take is cancelable" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val t1 = !q.take().fork()
-            val t2 = !q.take().fork()
-            val t3 = !q.take().fork()
-            !IO.sleep(50.milliseconds) // Give take callbacks a chance to register
-            !t2.cancel()
-            !q.offer(1)
-            !q.offer(3)
-            val r1 = !t1.join()
-            val r3 = !t3.join()
-            val size = !q.size()
+            val q = queue(1).invoke()
+            val t1 = q.take().fork().invoke()
+            val t2 = q.take().fork().invoke()
+            val t3 = q.take().fork().invoke()
+            IO.sleep(50.milliseconds).invoke() // Give take callbacks a chance to register
+            t2.cancel().invoke()
+            q.offer(1).invoke()
+            q.offer(3).invoke()
+            val r1 = t1.join().invoke()
+            val r3 = t3.join().invoke()
+            val size = q.size().invoke()
             Tuple2(setOf(r1, r3), size)
           }.equalUnderTheLaw(IO.just(Tuple2(setOf(1, 3), 0)))
         }
@@ -257,14 +257,14 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - peek is cancelable" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val finished = !Promise<Int>()
-            val fiber = !q.peek().flatMap(finished::complete).fork()
-            !sleep(50.milliseconds) // Give read callback a chance to register
-            !fiber.cancel()
-            !q.offer(10)
+            val q = queue(1).invoke()
+            val finished = Promise<Int>().invoke()
+            val fiber = q.peek().flatMap(finished::complete).fork().invoke()
+            sleep(50.milliseconds).invoke() // Give read callback a chance to register
+            fiber.cancel().invoke()
+            q.offer(10).invoke()
             val fallback = sleep(50.milliseconds).followedBy(IO.just(0))
-            !IO.raceN(finished.get(), fallback)
+            IO.raceN(finished.get(), fallback).invoke()
           }.equalUnderTheLaw(IO.just(Right(0)))
         }
       }
@@ -272,11 +272,11 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - takeAll returns emptyList with waiting suspended takers" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val (_, cancel) = !q.take().fork()
-            !sleep(50.milliseconds)
-            val res = !q.takeAll()
-            !cancel
+            val q = queue(1).invoke()
+            val (_, cancel) = q.take().fork().invoke()
+            sleep(50.milliseconds).invoke()
+            val res = q.takeAll().invoke()
+            cancel.invoke()
             res
           }.equalUnderTheLaw(IO.just(emptyList()))
         }
@@ -285,11 +285,11 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - peekAll returns emptyList with waiting suspended takers" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val (_, cancel) = !q.take().fork()
-            !sleep(50.milliseconds)
-            val res = !q.peekAll()
-            !cancel
+            val q = queue(1).invoke()
+            val (_, cancel) = q.take().fork().invoke()
+            sleep(50.milliseconds).invoke()
+            val res = q.peekAll().invoke()
+            cancel.invoke()
             res
           }.equalUnderTheLaw(IO.just(emptyList()))
         }
@@ -301,13 +301,13 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.choose(52, 100)
         ) { l, capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            val (_, cancel) = !q.take().fork()
-            !IO.sleep(50.milliseconds) // Give take callbacks a chance to register
+            val q = queue(capacity).invoke()
+            val (_, cancel) = q.take().fork().invoke()
+            IO.sleep(50.milliseconds).invoke() // Give take callbacks a chance to register
 
-            !q.offerAll(l.toList())
-            !cancel
-            !q.peekAll()
+            q.offerAll(l.toList()).invoke()
+            cancel.invoke()
+            q.peekAll().invoke()
           }.equalUnderTheLaw(IO.just(l.toList().drop(1)))
         }
       }
@@ -315,10 +315,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - offerAll can offer empty" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(1)
-            !q.offerAll(emptyList())
-            !q.peekAll()
+            val q = queue(1).invoke()
+            q.offer(1).invoke()
+            q.offerAll(emptyList()).invoke()
+            q.peekAll().invoke()
           }.equalUnderTheLaw(IO.just(listOf(1)))
         }
       }
@@ -331,9 +331,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - tryOffer returns false over capacity" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(1)
-            !q.tryOffer(2)
+            val q = queue(1).invoke()
+            q.offer(1).invoke()
+            q.tryOffer(2).invoke()
           }.equalUnderTheLaw(IO.just(false))
         }
       }
@@ -341,9 +341,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - tryOfferAll over capacity" {
         forAll(Gen.list(Gen.int()).filter { it.size > 1 }) { l ->
           IO.fx {
-            val q = !queue(1)
-            val succeed = !q.tryOfferAll(l)
-            val res = !q.peekAll()
+            val q = queue(1).invoke()
+            val succeed = q.tryOfferAll(l).invoke()
+            val res = q.peekAll().invoke()
             Tuple2(succeed, res)
           }.equalUnderTheLaw(IO.just(Tuple2(false, emptyList())))
         }
@@ -352,11 +352,11 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - can take and offer at capacity".config(enabled = false) {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val (join, _) = !q.take().fork()
-            val succeed = !q.tryOfferAll(1, 2)
-            val a = !q.take()
-            val b = !join
+            val q = queue(1).invoke()
+            val (join, _) = q.take().fork().invoke()
+            val succeed = q.tryOfferAll(1, 2).invoke()
+            val a = q.take().invoke()
+            val b = join.invoke()
             Tuple2(succeed, setOf(a, b))
           }.equalUnderTheLaw(IO.just(Tuple2(true, setOf(1, 2))))
         }
@@ -373,11 +373,11 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - time out offering to a queue at capacity" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(1)
+            val q = queue(1).invoke()
+            q.offer(1).invoke()
             val wontComplete = q.offer(2)
-            val received = !wontComplete.map { Some(it) }
-              .waitFor(100.milliseconds, default = just(None))
+            val received = wontComplete.map { Some(it) }
+              .waitFor(100.milliseconds, default = just(None)).invoke()
             received shouldBe None
           }.equalUnderTheLaw(IO.unit)
         }
@@ -386,10 +386,10 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - time out offering multiple values to a queue at capacity" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(3)
+            val q = queue(3).invoke()
             val wontComplete = q.offerAll(1, 2, 3, 4)
-            val received = !wontComplete.map { Some(it) }
-              .waitFor(100.milliseconds, default = just(None))
+            val received = wontComplete.map { Some(it) }
+              .waitFor(100.milliseconds, default = just(None)).invoke()
             received shouldBe None
           }.equalUnderTheLaw(IO.unit)
         }
@@ -398,9 +398,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - queue cannot be filled at once without enough capacity" {
         forAll(Gen.nonEmptyList(Gen.int())) { l ->
           IO.fx {
-            val q = !queue(l.size)
-            val succeed = !q.tryOfferAll(l.toList() + 1)
-            val res = !q.takeAll()
+            val q = queue(l.size).invoke()
+            val succeed = q.tryOfferAll(l.toList() + 1).invoke()
+            val res = q.takeAll().invoke()
             Tuple2(succeed, res)
           }.equalUnderTheLaw(IO.just(Tuple2(false, emptyList())))
         }
@@ -409,12 +409,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - can offerAll at capacity with take" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val (join, _) = !q.take().fork()
-            !IO.sleep(50.milliseconds)
-            !q.offerAll(1, 2)
-            val a = !q.take()
-            val b = !join
+            val q = queue(1).invoke()
+            val (join, _) = q.take().fork().invoke()
+            IO.sleep(50.milliseconds).invoke()
+            q.offerAll(1, 2).invoke()
+            val a = q.take().invoke()
+            val b = join.invoke()
             setOf(a, b)
           }.equalUnderTheLaw(IO.just(setOf(1, 2)))
         }
@@ -423,12 +423,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - can tryOfferAll at capacity with take" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            val (join, _) = !q.take().fork()
-            !IO.sleep(50.milliseconds)
-            val succeed = !q.tryOfferAll(1, 2)
-            val a = !q.take()
-            val b = !join
+            val q = queue(1).invoke()
+            val (join, _) = q.take().fork().invoke()
+            IO.sleep(50.milliseconds).invoke()
+            val succeed = q.tryOfferAll(1, 2).invoke()
+            val a = q.take().invoke()
+            val b = join.invoke()
             Tuple2(succeed, setOf(a, b))
           }.equalUnderTheLaw(IO.just(Tuple2(true, setOf(1, 2))))
         }
@@ -438,13 +438,13 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - offerAll is atomic" {
         forAll(Gen.nonEmptyList(Gen.int()), Gen.nonEmptyList(Gen.int())) { fa, fb ->
           IO.fx {
-            val q = !queue(fa.size + fb.size)
-            !q.offerAll(fa.toList()).fork()
-            !q.offerAll(fb.toList()).fork()
+            val q = queue(fa.size + fb.size).invoke()
+            q.offerAll(fa.toList()).fork().invoke()
+            q.offerAll(fb.toList()).fork().invoke()
 
-            !IO.sleep(50.milliseconds)
+            IO.sleep(50.milliseconds).invoke()
 
-            val res = !q.takeAll()
+            val res = q.takeAll().invoke()
             res == (fa.toList() + fb.toList()) || res == (fb.toList() + fa.toList())
           }.equalUnderTheLaw(IO.just(true))
         }
@@ -457,12 +457,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.choose(1, 50)
         ) { l, capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            !l.parTraverse(NonEmptyList.traverse(), q::offer).fork()
-            !IO.sleep(50.milliseconds) // Give take callbacks a chance to register
+            val q = queue(capacity).invoke()
+            l.parTraverse(NonEmptyList.traverse(), q::offer).fork().invoke()
+            IO.sleep(50.milliseconds).invoke() // Give take callbacks a chance to register
 
-            val res = !q.takeAll().map(Iterable<Int>::toSet)
-            val after = !q.peekAll()
+            val res = q.takeAll().map(Iterable<Int>::toSet).invoke()
+            val after = q.peekAll().invoke()
             Tuple2(res, after)
           }.equalUnderTheLaw(IO.just(Tuple2(l.toList().toSet(), emptyList())))
         }
@@ -475,12 +475,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.choose(1, 50)
         ) { l, capacity ->
           IO.fx {
-            val q = !queue(capacity)
-            !l.parTraverse(NonEmptyList.traverse(), q::offer).fork()
-            !IO.sleep(50.milliseconds) // Give take callbacks a chance to register
+            val q = queue(capacity).invoke()
+            l.parTraverse(NonEmptyList.traverse(), q::offer).fork().invoke()
+            IO.sleep(50.milliseconds).invoke() // Give take callbacks a chance to register
 
-            val res = !q.peekAll().map(Iterable<Int>::toSet)
-            val after = !q.peekAll().map(Iterable<Int>::toSet)
+            val res = q.peekAll().map(Iterable<Int>::toSet).invoke()
+            val after = q.peekAll().map(Iterable<Int>::toSet).invoke()
             Tuple2(res, after)
           }.equalUnderTheLaw(IO.just(Tuple2(l.toList().toSet(), l.toList().toSet())))
         }
@@ -490,19 +490,19 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - offer is cancelable" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(0)
-            !q.offer(1).fork()
-            val p2 = !q.offer(2).fork()
-            !q.offer(3).fork()
+            val q = queue(1).invoke()
+            q.offer(0).invoke()
+            q.offer(1).fork().invoke()
+            val p2 = q.offer(2).fork().invoke()
+            q.offer(3).fork().invoke()
 
-            !IO.sleep(50.milliseconds) // Give put callbacks a chance to register
+            IO.sleep(50.milliseconds).invoke() // Give put callbacks a chance to register
 
-            !p2.cancel()
+            p2.cancel().invoke()
 
-            !q.take()
-            val r1 = !q.take()
-            val r3 = !q.take()
+            q.take().invoke()
+            val r1 = q.take().invoke()
+            val r3 = q.take().invoke()
 
             setOf(r1, r3)
           }.equalUnderTheLaw(IO.just(setOf(1, 3)))
@@ -513,19 +513,19 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - offerAll is cancelable" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(0)
-            !q.offer(1).fork()
-            val p2 = !q.offerAll(2, 3).fork()
-            !q.offer(4).fork()
+            val q = queue(1).invoke()
+            q.offer(0).invoke()
+            q.offer(1).fork().invoke()
+            val p2 = q.offerAll(2, 3).fork().invoke()
+            q.offer(4).fork().invoke()
 
-            !IO.sleep(50.milliseconds) // Give put callbacks a chance to register
+            IO.sleep(50.milliseconds).invoke() // Give put callbacks a chance to register
 
-            !p2.cancel()
+            p2.cancel().invoke()
 
-            !q.take()
-            val r1 = !q.take()
-            val r3 = !q.take()
+            q.take().invoke()
+            val r1 = q.take().invoke()
+            val r3 = q.take().invoke()
 
             setOf(r1, r3)
           }.equalUnderTheLaw(IO.just(setOf(1, 4)))
@@ -535,9 +535,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - tryOffer returns false at capacity" {
         forAll(Gen.int()) {
           IO.fx {
-            val q = !queue(1)
-            !q.offer(1)
-            !q.tryOffer(2)
+            val q = queue(1).invoke()
+            q.offer(1).invoke()
+            q.tryOffer(2).invoke()
           }.equalUnderTheLaw(IO.just(false))
         }
       }
@@ -552,12 +552,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - suspended offers called on a full queue complete when take calls made to queue" {
         forAll(Gen.tuple2(Gen.int(), Gen.int())) { t ->
           IO.fx {
-            val q = !queue(1)
-            !q.offer(t.a)
-            val (join, _) = !q.offer(t.b).fork(ctx)
-            val first = !q.take()
-            val second = !q.take()
-            !join // Check if fiber completed
+            val q = queue(1).invoke()
+            q.offer(t.a).invoke()
+            val (join, _) = q.offer(t.b).fork(ctx).invoke()
+            val first = q.take().invoke()
+            val second = q.take().invoke()
+            join.invoke() // Check if fiber completed
             Tuple2(first, second)
           }.equalUnderTheLaw(IO.just(t))
         }
@@ -566,15 +566,15 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - multiple offer calls on an full queue complete when as many take calls are made to queue" {
         forAll(Gen.tuple3(Gen.int(), Gen.int(), Gen.int())) { t ->
           IO.fx {
-            val q = !queue(1)
-            !q.offer(t.a)
-            val (join, _) = !q.offer(t.b).fork(ctx)
-            val (join2, _) = !q.offer(t.c).fork(ctx)
-            val first = !q.take()
-            val second = !q.take()
-            val third = !q.take()
-            !join // Check if fiber completed
-            !join2 // Check if fiber completed
+            val q = queue(1).invoke()
+            q.offer(t.a).invoke()
+            val (join, _) = q.offer(t.b).fork(ctx).invoke()
+            val (join2, _) = q.offer(t.c).fork(ctx).invoke()
+            val first = q.take().invoke()
+            val second = q.take().invoke()
+            val third = q.take().invoke()
+            join.invoke() // Check if fiber completed
+            join2.invoke() // Check if fiber completed
             setOf(first, second, third)
           }.equalUnderTheLaw(IO.just(setOf(t.a, t.b, t.c)))
         }
@@ -601,9 +601,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.nonEmptyList(Gen.int()).filter { it.size > 50 }
         ) { capacity, xs ->
           IO.fx {
-            val q = !queue(capacity)
-            !q.offerAll(xs.toList())
-            !q.peekAll()
+            val q = queue(capacity).invoke()
+            q.offerAll(xs.toList()).invoke()
+            q.peekAll().invoke()
           }.equalUnderTheLaw(IO.just(xs.toList().drop(xs.size - capacity)))
         }
       }
@@ -626,12 +626,12 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       "$label - drops elements offered to a queue at capacity" {
         forAll(Gen.int(), Gen.int(), Gen.nonEmptyList(Gen.int())) { x, x2, xs ->
           IO.fx {
-            val q = !queue(xs.size)
-            !xs.traverse(IO.applicative(), q::offer)
-            !q.offer(x) // this `x` should be dropped
-            val taken = !(1..xs.size).toList().traverse(IO.applicative()) { q.take() }
-            !q.offer(x2)
-            val taken2 = !q.take()
+            val q = queue(xs.size).invoke()
+            xs.traverse(IO.applicative(), q::offer).invoke()
+            q.offer(x).invoke() // this `x` should be dropped
+            val taken = (1..xs.size).toList().traverse(IO.applicative()) { q.take() }.invoke()
+            q.offer(x2).invoke()
+            val taken2 = q.take().invoke()
             taken.fix() + taken2
           }.equalUnderTheLaw(IO.just(xs.toList() + x2))
         }
@@ -643,9 +643,9 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
           Gen.nonEmptyList(Gen.int()).filter { it.size > 50 }
         ) { capacity, xs ->
           IO.fx {
-            val q = !queue(capacity)
-            !q.offerAll(xs.toList())
-            !q.peekAll()
+            val q = queue(capacity).invoke()
+            q.offerAll(xs.toList()).invoke()
+            q.peekAll().invoke()
           }.equalUnderTheLaw(IO.just(xs.toList().take(capacity)))
         }
       }

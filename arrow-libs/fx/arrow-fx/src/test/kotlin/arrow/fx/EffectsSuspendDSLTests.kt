@@ -68,12 +68,12 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
 
       val program = IO.fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and non-blocking parallel computations
-        val result = !parTupledN(
+        val result = parTupledN(
           textContext,
           // we only care to know the name of the thread, ignore the number
           effect { getThreadName().split("-")[0] },
           effect { getThreadName().split("-")[0] }
-        )
+        ).invoke()
         result
       }
       unsafe { runBlocking { program } } shouldBe Tuple2("test", "test")
@@ -83,7 +83,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       shouldThrow<TestError> {
         fxTest {
           IO.fx {
-            !TestError.raiseError<Int>()
+            TestError.raiseError<Int>().invoke()
           }
         }
       }
@@ -92,7 +92,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "handleError" {
       fxTest {
         IO.fx {
-          !effect { throw TestError }.handleError { 1 }
+          effect { throw TestError }.handleError { 1 }.invoke()
         }
       } shouldBe 1
     }
@@ -100,7 +100,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "attempt success" {
       fxTest {
         IO.fx {
-          !effect { 1 }.attempt()
+          effect { 1 }.attempt().invoke()
         }
       } shouldBe Right(1)
     }
@@ -108,7 +108,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "attempt failure" {
       fxTest {
         IO.fx {
-          !effect { throw TestError }.attempt()
+          effect { throw TestError }.attempt().invoke()
         }
       } shouldBe Left(TestError)
     }
@@ -116,8 +116,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         IO.fx {
-          val suspendedValue = !effect { suspend { 1 }() }
-          val ioValue = !IO.just(1)
+          val suspendedValue = effect { suspend { 1 }() }.invoke()
+          val ioValue = IO.just(1).invoke()
           suspendedValue == ioValue
         }
       } shouldBe true
@@ -127,9 +127,9 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       val result = 1
       fxTest {
         IO.fx {
-          val asyncResult = !async<Int> { cb ->
+          val asyncResult = async<Int> { cb ->
             cb(Right(result))
-          }
+          }.invoke()
           asyncResult
         }
       } shouldBe result
@@ -139,9 +139,9 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       fxTest {
         IO.fx {
           continueOn(ctxA)
-          val contextA = !effect { Thread.currentThread().name }
+          val contextA = effect { Thread.currentThread().name }.invoke()
           continueOn(ctxB)
-          val contextB = !effect { Thread.currentThread().name }
+          val contextB = effect { Thread.currentThread().name }.invoke()
           contextA != contextB
         }
       } shouldBe true
@@ -150,8 +150,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "CoroutineContext.defer" {
       fxTest {
         IO.fx {
-          val contextA = !effect(ctxA) { Thread.currentThread().name }
-          val contextB = !effect(ctxB) { Thread.currentThread().name }
+          val contextA = effect(ctxA) { Thread.currentThread().name }.invoke()
+          val contextB = effect(ctxB) { Thread.currentThread().name }.invoke()
           contextA != contextB
         }
       } shouldBe true
@@ -162,10 +162,10 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       val const = 1
       fxTest {
         IO.fx {
-          !effect { const }.bracketCase(
+          effect { const }.bracketCase(
             release = { n, exit -> effect { msg.value = const } },
             use = { effect { it } }
-          )
+          ).invoke()
         }
       }
       msg.value shouldBe const
@@ -178,10 +178,10 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       shouldThrow<TestError> {
         fxTest {
           IO.fx {
-            !effect { const }.bracketCase(
+            effect { const }.bracketCase(
               release = { n, exit -> effect { msg.value = const } },
               use = { effect { throw TestError } }
-            )
+            ).invoke()
           }
         }
       }
@@ -192,8 +192,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       val const = 1
       fxTest {
         IO.fx {
-          val fiber = !effect { const }.fork(dispatchers().default())
-          val n = !fiber.join()
+          val fiber = effect { const }.fork(dispatchers().default()).invoke()
+          val n = fiber.join().invoke()
           n
         }
       } shouldBe const
@@ -202,11 +202,11 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "List.traverse syntax" {
       fxTest {
         IO.fx {
-          !listOf(
+          listOf(
             effect { 1 },
             effect { 2 },
             effect { 3 }
-          ).parTraverse(::identity)
+          ).parTraverse(::identity).invoke()
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -214,11 +214,11 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "List.sequence syntax" {
       fxTest {
         IO.fx {
-          !listOf(
+          listOf(
             effect { 1 },
             effect { 2 },
             effect { 3 }
-          ).parSequence()
+          ).parSequence().invoke()
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -230,7 +230,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
         const
 
       fun <F> Concurrent<F>.program(): Kind<F, Int> =
-        fx.concurrent { !effect { sideEffect() } }
+        fx.concurrent { effect { sideEffect() }.invoke() }
 
       fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
         unsafe { runBlocking { fx.program() } }
@@ -246,8 +246,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       }
       fxTest {
         IO.fx {
-          val appliedPureEffect1: String = !effect { sideEffect() }
-          val appliedPureEffect2: String = !effect { sideEffect() }
+          val appliedPureEffect1: String = effect { sideEffect() }.invoke()
+          val appliedPureEffect2: String = effect { sideEffect() }.invoke()
           appliedPureEffect1
         }
       } shouldBe done
