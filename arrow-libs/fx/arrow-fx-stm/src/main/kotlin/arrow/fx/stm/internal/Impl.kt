@@ -26,8 +26,6 @@ internal class STMFrame(val parent: STMFrame? = null) : STM {
     fun getValue(): Any? = if (isWrite()) newVal else initialVal
   }
 
-  object RETRYING
-
   internal val accessMap = mutableMapOf<TVar<Any?>, Entry>()
 
   /**

@@ -22,7 +22,7 @@ inline fun <A> STM.lookupHamtWithHash(hmt: Hamt<A>, hash: Int, test: (A) -> Bool
     val branches = hamt.branches.read()
     when (val branch = branches[branchInd]) {
       null -> return null
-      is Branch.Leaf -> return@lookupHamtWithHash branch.value.find(test)
+      is Branch.Leaf -> return@lookupHamtWithHash (branch.value as Array<A>).find(test)
       is Branch.Branches -> {
         depth = depth.nextDepth()
         hamt = branch.sub
@@ -47,7 +47,7 @@ fun <A> STM.pair(depth: Int, hash1: Int, branch1: Branch<A>, hash2: Int, branch2
 
 fun <A> STM.clearHamt(hamt: Hamt<A>): Unit = hamt.branches.write(arrayOfNulls(ARR_SIZE))
 
-inline fun <reified A> STM.alterHamtWithHash(
+inline fun <A> STM.alterHamtWithHash(
   hamt: Hamt<A>,
   hash: Int,
   test: (A) -> Boolean,
@@ -68,7 +68,7 @@ inline fun <reified A> STM.alterHamtWithHash(
       }
       is Branch.Leaf -> {
         if (hash == branch.hash) {
-          val ind = branch.value.indexOfFirst(test).takeIf { it != -1 }
+          val ind = (branch.value as Array<A>).indexOfFirst(test).takeIf { it != -1 }
           when (val el = ind?.let { branch.value[it] }) {
             null -> {
               // insert new value with a colliding hash
@@ -83,7 +83,7 @@ inline fun <reified A> STM.alterHamtWithHash(
                 null -> {
                   // remove element
                   if (branch.value.size > 1) {
-                    val newLeafArray = Array(branch.value.size - 1) { i ->
+                    val newLeafArray: Array<Any?> = Array(branch.value.size - 1) { i ->
                       if (i >= ind) branch.value[i + 1]
                       else branch.value[i]
                     }
@@ -99,7 +99,7 @@ inline fun <reified A> STM.alterHamtWithHash(
                   val newLeafArr = branch.value.copyOf()
                   newLeafArr[ind] = newEl
                   val new = branches.copyOf()
-                  new[branchInd] = Branch.Leaf(hash, newLeafArr)
+                  new[branchInd] = Branch.Leaf(hash, newLeafArr as Array<Any?>)
                   hmt.branches.write(new)
                   return true
                 }
@@ -133,7 +133,7 @@ fun <A> STM.newHamt(): Hamt<A> = Hamt(newTVar(arrayOfNulls(ARR_SIZE)))
 
 sealed class Branch<out A> {
   data class Branches<A>(val sub: Hamt<A>) : Branch<A>()
-  data class Leaf<A>(val hash: Int, val value: Array<A>) : Branch<A>()
+  data class Leaf<A>(val hash: Int, val value: Array<Any?>) : Branch<A>()
 }
 
 const val ARR_SIZE = 32 // 2^DEPTH_STEP

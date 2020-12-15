@@ -22,6 +22,7 @@ import arrow.fx.stm.internal.lookupHamtWithHash
  * There are several datastructures built on top of [TVar]'s already provided out of the box:
  * - [TQueue]: A transactional mutable queue
  * - [TMVar]: A mutable transactional variable that may be empty
+ * - [TSet], [TMap]: Transactional Set and Map
  * - [TArray]: Array of [TVar]'s
  * - [TSemaphore]: Transactional semaphore
  * - [TVar]: A transactional mutable variable
@@ -1420,7 +1421,7 @@ interface STM {
    * ```
    */
   fun <A> TSet<A>.member(a: A): Boolean =
-    lookupHamtWithHash(hamt, hashFn(a)) { it.second == a } != null
+    lookupHamtWithHash(hamt, hashFn(a)) { it == a } != null
 
   /**
    * Adds an element to the set.
@@ -1440,7 +1441,7 @@ interface STM {
    * ```
    */
   fun <A> TSet<A>.insert(a: A): Unit {
-    alterHamtWithHash(hamt, hashFn(a), { it.second == a }) { Unit to a }
+    alterHamtWithHash(hamt, hashFn(a), { it == a }) { a }
   }
 
   /**
@@ -1481,7 +1482,7 @@ interface STM {
    * ```
    */
   fun <A> TSet<A>.remove(a: A): Unit {
-    alterHamtWithHash(hamt, hashFn(a), { it.second == a }) { null }
+    alterHamtWithHash(hamt, hashFn(a), { it == a }) { null }
   }
 }
 

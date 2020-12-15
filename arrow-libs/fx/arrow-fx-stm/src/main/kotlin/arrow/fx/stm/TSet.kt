@@ -87,10 +87,7 @@ fun <A> STM.newTSet(hash: Hash<A>): TSet<A> = newTSet { hash.run { it.hash() } }
  *  of [TSet] that keeps track of its size.
  *
  */
-// Why a `Pair<Unit, A>`? Well because kotlin. Altering a Hamt is done through inline *reified* methods and because we cannot get
-//  that on an interface like STM we have to trick the compiler a bit by supplying the type information at the implementation sort of
-//  ahead of time... Sucks.
-data class TSet<A>internal constructor(internal val hamt: Hamt<Pair<Unit, A>>, internal val hashFn: (A) -> Int) {
+data class TSet<A>internal constructor(internal val hamt: Hamt<A>, internal val hashFn: (A) -> Int) {
   companion object {
     suspend fun <A> new(fn: (A) -> Int): TSet<A> = TSet(Hamt.new(), fn)
     suspend fun <A> new(): TSet<A> = new { it.hashCode() }
