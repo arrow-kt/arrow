@@ -23,7 +23,16 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated("use parSequenceN with n as Int type", ReplaceWith("parSequenceN", "arrow.fx.coroutines.parSequenceN"))
 suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Long): List<A> =
+  parSequenceN(Dispatchers.Default, n)
+
+/**
+ * Sequences all tasks in [n] parallel processes on [Dispatchers.Default] and return the result.
+ *
+ * Cancelling this operation cancels all running tasks
+ */
+suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
   parSequenceN(Dispatchers.Default, n)
 
 /**
@@ -35,8 +44,25 @@ suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Long): List<A> =
  *
  * Cancelling this operation cancels all running tasks
  */
+@Deprecated("use parSequenceN with n as Int type", ReplaceWith("parTraverseN", "arrow.fx.coroutines.parSequenceN"))
 suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Long): List<A> {
-  val s = Semaphore(n.toInt())
+  val s = Semaphore(Math.toIntExact(n))
+  return parTraverse(ctx) {
+    s.withPermit { it.invoke() }
+  }
+}
+
+/**
+ * Sequences all tasks in [n] parallel processes and return the result.
+ *
+ * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
+ * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run in parallel.
+ *
+ * Cancelling this operation cancels all running tasks
+ */
+suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Int): List<A> {
+  val s = Semaphore(n)
   return parTraverse(ctx) {
     s.withPermit { it.invoke() }
   }
@@ -103,8 +129,37 @@ suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext = Em
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
  * Cancelling this operation cancels all running tasks.
  */
+@Deprecated("use parTraverseN with n as Int type", ReplaceWith("parTraverseN", "arrow.fx.coroutines.parTraverseN"))
 suspend fun <A, B> Iterable<A>.parTraverseN(n: Long, f: suspend (A) -> B): List<B> =
   parTraverseN(Dispatchers.Default, n, f)
+
+/**
+ * Traverses this [Iterable] and runs [f] in [n] parallel operations on [Dispatchers.Default].
+ * Cancelling this operation cancels all running tasks.
+ */
+suspend fun <A, B> Iterable<A>.parTraverseN(n: Int, f: suspend (A) -> B): List<B> =
+  parTraverseN(Dispatchers.Default, n, f)
+
+/**
+ * Traverses this [Iterable] and runs [f] in [n] parallel operations on [ctx].
+ *
+ * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
+ * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run in parallel.
+ *
+ * Cancelling this operation cancels all running tasks.
+ */
+@Deprecated("use parTraverseN with n as Int type", ReplaceWith("parTraverseN", "arrow.fx.coroutines.parTraverseN"))
+suspend fun <A, B> Iterable<A>.parTraverseN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  n: Long,
+  f: suspend (A) -> B
+): List<B> {
+  val s = Semaphore(Math.toIntExact(n))
+  return parTraverse(ctx) { a ->
+    s.withPermit { f(a) }
+  }
+}
 
 /**
  * Traverses this [Iterable] and runs [f] in [n] parallel operations on [ctx].
@@ -117,10 +172,10 @@ suspend fun <A, B> Iterable<A>.parTraverseN(n: Long, f: suspend (A) -> B): List<
  */
 suspend fun <A, B> Iterable<A>.parTraverseN(
   ctx: CoroutineContext = EmptyCoroutineContext,
-  n: Long,
+  n: Int,
   f: suspend (A) -> B
 ): List<B> {
-  val s = Semaphore(n.toInt())
+  val s = Semaphore(n)
   return parTraverse(ctx) { a ->
     s.withPermit { f(a) }
   }
