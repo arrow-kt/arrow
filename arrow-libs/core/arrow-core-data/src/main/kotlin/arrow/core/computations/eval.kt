@@ -5,6 +5,13 @@ import arrow.core.Eval
 import kotlin.coroutines.RestrictsSuspension
 
 fun interface EvalEffect<A> : Effect<Eval<A>> {
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend fun <B> Eval<B>.bind(): B = this()
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend operator fun <B> Eval<B>.not(): B = this()
+
   suspend operator fun <B> Eval<B>.invoke(): B =
     value()
 }

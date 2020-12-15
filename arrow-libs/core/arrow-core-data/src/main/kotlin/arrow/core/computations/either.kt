@@ -8,6 +8,13 @@ import arrow.core.right
 import kotlin.coroutines.RestrictsSuspension
 
 fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend fun <B> Either<E, B>.bind(): B = this()
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend operator fun <B> Either<E, B>.not(): B = this()
+
   suspend operator fun <B> Either<E, B>.invoke(): B =
     when (this) {
       is Either.Right -> b
@@ -22,13 +29,7 @@ fun interface EitherEffect<E, A> : Effect<Either<E, A>> {
 }
 
 @RestrictsSuspension
-fun interface RestrictedEitherEffect<E, A> : Effect<Either<E, A>> {
-  suspend operator fun <B> Either<E, B>.invoke(): B =
-    when (this) {
-      is Either.Right -> b
-      is Either.Left -> control().shift(this@invoke)
-    }
-}
+fun interface RestrictedEitherEffect<E, A> : EitherEffect<E, A>
 
 @Suppress("ClassName")
 object either {

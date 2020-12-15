@@ -10,6 +10,13 @@ import kotlin.coroutines.RestrictsSuspension
   ReplaceWith("EitherEffect", "arrow.core.computations.either.EitherEffect")
 )
 fun interface ValidatedEffect<E, A> : Effect<Validated<E, A>> {
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend fun <B> Validated<E, B>.bind(): B = this()
+
+  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
+  suspend operator fun <B> Validated<E, B>.not(): B = this()
+
   suspend operator fun <B> Validated<E, B>.invoke(): B =
     when (this) {
       is Validated.Valid -> a
