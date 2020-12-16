@@ -21,6 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
@@ -166,7 +167,17 @@ class SuspendingComputationTest : StringSpec({
 
     cancelled.await()
   }
+
+  "Computation blocks run on parent context" {
+    val parentCtx = currentContext()
+    either<String, Unit> {
+      currentContext() shouldBe parentCtx
+    }
+  }
 })
+
+suspend fun currentContext(): CoroutineContext =
+  kotlin.coroutines.coroutineContext
 
 suspend fun completeOnCancellation(latch: CompletableDeferred<Unit>, cancelled: CompletableDeferred<Unit>): Unit =
   suspendCancellableCoroutine { cont ->

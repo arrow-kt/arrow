@@ -118,9 +118,11 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
     // Return the final result
     return resultVar as R
   }
+}
 
-  companion object {
-    @Suppress("ClassName")
-    private object EMPTY_VALUE
-  }
+@Suppress("ClassName")
+internal object EMPTY_VALUE {
+  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+  inline fun <T> unbox(value: Any?): T =
+    if (value === this) null as T else value as T
 }
