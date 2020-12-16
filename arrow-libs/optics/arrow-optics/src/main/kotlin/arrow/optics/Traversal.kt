@@ -208,7 +208,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
-    modifyF(Const.applicative(M), s) { b -> Const(f(b)) }.value()
+    modifyF(Const.applicative(M), s) { b -> Const<R, B>(f(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.

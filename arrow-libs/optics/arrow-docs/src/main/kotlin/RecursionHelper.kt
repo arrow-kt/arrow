@@ -60,7 +60,7 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForIntListPattern, A>, Ki
   "EXTENSION_SHADOWED_BY_MEMBER"
 )
 fun <A> Kind<ForIntListPattern, A>.void(): IntListPattern<Unit> = IntListPattern.functor().run {
-  unit<A>() as IntListPattern<kotlin.Unit>
+  void<A>() as IntListPattern<kotlin.Unit>
 }
 
 @JvmName("fproduct")
