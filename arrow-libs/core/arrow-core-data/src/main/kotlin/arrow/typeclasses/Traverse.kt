@@ -332,7 +332,7 @@ import arrow.core.ValidatedNel
  * fun main() {
  *   //sampleStart
  *   val validatedList = listOf("1", "22w", "3", "33s").k()
- *     .traverse(ValidatedNel.applicative(Nel.semigroup<NumberFormatException>()), ::parseIntValidated).fix()
+ *     .traverse(ValidatedNel.applicative(Nel.semigroup<NumberFormatException>()), ::parseIntValidated)
  *   //sampleEnd
  *   println(validatedList)
  * }

@@ -135,10 +135,6 @@ interface Functor<F> : Invariant<F> {
   fun <A> Kind<F, A>.void(): Kind<F, Unit> =
     map { Unit }
 
-  @Deprecated("Deprecated due to collision with Applicative's unit(), use void() instead", ReplaceWith("void()"))
-  fun <A> Kind<F, A>.unit(): Kind<F, Unit> =
-    void()
-
   /**
    * Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
    * computed [B] value as result of applying [f]

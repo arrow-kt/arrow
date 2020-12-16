@@ -5,6 +5,7 @@ import arrow.Kind
 /**
  * ank_macro_hierarchy(arrow.typeclasses.SemigroupK)
  */
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 interface SemigroupK<F> {
 
   /**

@@ -79,12 +79,12 @@ object FunctorLaws {
 
   fun <F> Functor<F>.unitIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Unit>>): Unit =
     forAll(G) { fa: Kind<F, Int> ->
-      fa.unit().equalUnderTheLaw(fa.map { Unit }, EQ)
+      fa.void().equalUnderTheLaw(fa.map { Unit }, EQ)
     }
 
   fun <F> Functor<F>.unitComposition(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Unit>>): Unit =
     forAll(G) { fa: Kind<F, Int> ->
-      fa.unit().unit().equalUnderTheLaw(fa.map { Unit }, EQ)
+      fa.void().void().equalUnderTheLaw(fa.map { Unit }, EQ)
     }
 
   fun <F> Functor<F>.fproductIdentity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Tuple2<Int, String>>>): Unit =

@@ -869,7 +869,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Left(12).map { "flower" }  // Result: Left(12)
    * ```
    */
-  @Suppress("UNCHECKED_CAST")
   inline fun <C> map(f: (B) -> C): Either<A, C> =
     flatMap { Right(f(it)) }
 
@@ -996,6 +995,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
     fun <R> right(right: R): Either<Nothing, R> = Right(right)
 
+    val leftUnit: Either<Unit, Nothing> = left(Unit)
+
+    val unit: Either<Nothing, Unit> = right(Unit)
+
+    fun <L> unit(): Either<L, Unit> = unit
+
     fun <A> fromNullable(a: A?): Either<Unit, A> = a?.right() ?: Unit.left()
 
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
@@ -1077,6 +1082,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
         .fold({ t: Throwable -> throwable(t) }, { b: B -> b.right() })
         .fold({ t: Throwable -> unrecoverableState(t); throw t }, { b: B -> b })
   }
+
+  fun <C> mapConst(c: C): Either<A, C> =
+    map { c }
+
+  fun void(): Either<A, Unit> =
+    mapConst(Unit)
 }
 
 fun <L> Left(left: L): Either<L, Nothing> = Left(left)

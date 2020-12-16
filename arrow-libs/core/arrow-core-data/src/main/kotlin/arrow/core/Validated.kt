@@ -1,14 +1,33 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.defaultSalt
+import arrow.typeclasses.hashWithSalt
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
 typealias Invalid<E> = Validated.Invalid<E>
+
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+class ForValidated private constructor() {
+  companion object
+}
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+inline fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
+  this as Validated<E, A>
 
 /**
  *
@@ -59,25 +78,22 @@ typealias Invalid<E> = Validated.Invalid<E>
  * for `String` and `Int` for brevity.
  *
  * ```kotlin:ank
- * import arrow.core.None
- * import arrow.core.Option
- *
  * //sampleStart
  * abstract class Read<A> {
  *
- * abstract fun read(s: String): Option<A>
+ * abstract fun read(s: String): A?
  *
  *  companion object {
  *
  *   val stringRead: Read<String> =
  *    object: Read<String>() {
- *     override fun read(s: String): Option<String> = Option(s)
+ *     override fun read(s: String): String? = s
  *    }
  *
  *   val intRead: Read<Int> =
  *    object: Read<Int>() {
- *     override fun read(s: String): Option<Int> =
- *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+ *     override fun read(s: String): Int? =
+ *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
  *    }
  *  }
  * }
@@ -98,7 +114,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * It would look like the following, which Arrow provides in `arrow.Validated`:
  *
  * ```kotlin
- * @higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
+ * sealed class Validated<out E, out A> {
  *  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
  *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
  * }
@@ -117,14 +133,14 @@ typealias Invalid<E> = Validated.Invalid<E>
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
  *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
- *   val v = Option.fromNullable(map[key])
+ *   val v = map[key]
  *   return when (v) {
- *    is Some ->
- *     when (val s = read.read(v.t)) {
- *      is Some -> s.t.valid()
- *      is None -> ConfigError.ParseConfig(key).invalid()
+ *    null -> Validated.Invalid(ConfigError.MissingConfig(key))
+ *    else ->
+ *     when (val s = read.read(v)) {
+ *      null -> ConfigError.ParseConfig(key).invalid()
+ *      else -> s.valid()
  *     }
- *    is None -> Validated.Invalid(ConfigError.MissingConfig(key))
  *   }
  *  }
  * }
@@ -136,9 +152,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * to obtain `A` from values of `Validated<*, A>` through the [arrow.core.computations.EitherEffect.invoke]
  *
  * ```kotlin:ank
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
  * import arrow.core.Validated
  * import arrow.core.computations.either
  * import arrow.core.valid
@@ -150,7 +163,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
- *     val readVal = Validated.fromOption(read.read(value)) {
+ *     val readVal = Validated.fromNullable(read.read(value)) {
  *       ConfigError.ParseConfig(key)
  *     }()
  *     readVal
@@ -208,25 +221,19 @@ typealias Invalid<E> = Validated.Invalid<E>
  * ### Improving the validation
  *
  * Kotlin says that our match is not exhaustive and we have to add `else`. To solve this, we would need to nest our when,
- * but that would complicate the code. To achieve this, Arrow provides an [arrow.typeclasses.Applicative] through the
- * `applicativeNel` function in arrow-core to unlock `tupledN`.
+ * but that would complicate the code. To achieve this, Arrow provides [mapN] & [tupledN].
  * This function combines [Validated]s by accumulating errors in a tuple, which we can then map.
  * The above function can be rewritten as follows:
  *
  * ```kotlin:ank:silent
  * import arrow.core.Validated
- * import arrow.core.fix
- * import arrow.reflect.applicativeNel
- *
- * // added manually due to deps
- *
- * val v1: Validated<ConfigError, Int> = Validated.Valid(1)
- * val v2: Validated<ConfigError, Int> = Validated.Valid(2)
+ * import arrow.core.validNel
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * //sampleStart
- * val parallelValidate = Validated.applicativeNel<ConfigError>()
- *     .tupledN(v1.toValidatedNel(), v2.toValidatedNel()).fix()
- *     .map { (a, b) -> /* combine the result */ }
+ * val parallelValidate = Validated
+ *   .mapN(NonEmptyList.semigroup<ConfigError>(), 1.validNel(), 2.validNel())
+ *     { a, b -> /* combine the result */ }
  * //sampleEnd
  * ```
  *
@@ -238,33 +245,29 @@ typealias Invalid<E> = Validated.Invalid<E>
  * Coming back to our example, when no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
  * import arrow.core.Validated
  * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.fix
- * import arrow.reflect.applicativeNel
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
  * abstract class Read<A> {
- *  abstract fun read(s: String): Option<A>
+ *  abstract fun read(s: String): A?
  *
  *  companion object {
  *
  *   val stringRead: Read<String> =
  *    object : Read<String>() {
- *     override fun read(s: String): Option<String> = Option(s)
+ *     override fun read(s: String): String? = s
  *    }
  *
  *   val intRead: Read<Int> =
  *    object : Read<Int>() {
- *     override fun read(s: String): Option<Int> =
- *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+ *     override fun read(s: String): Int? =
+ *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
  *    }
  *  }
  * }
@@ -279,23 +282,23 @@ typealias Invalid<E> = Validated.Invalid<E>
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
- *     val readVal = Validated.fromOption(read.read(value)) {
+ *     val readVal = Validated.fromNullable(read.read(value)) {
  *       ConfigError.ParseConfig(key)
  *     }()
  *     readVal
  *   }.toValidatedNel()
  * }
  *
- * val parallelValidate = Validated.applicativeNel<ConfigError>()
  *
  * suspend fun main() {
  * //sampleStart
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
- *  val valid = parallelValidate.tupledN(
- *  config.parse(Read.stringRead, "url"),
- *  config.parse(Read.intRead, "port")
- *  ).fix().map { (url, port) -> ConnectionParams(url, port) }
+ *  val valid = Validated.mapN(
+ *    NonEmptyList.semigroup<ConfigError>(),
+ *    config.parse(Read.stringRead, "url"),
+ *    config.parse(Read.intRead, "port")
+ *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
  *  println("valid = $valid")
  * }
@@ -305,33 +308,29 @@ typealias Invalid<E> = Validated.Invalid<E>
  * an `Invalid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.None
- * import arrow.core.Option
- * import arrow.core.Some
  * import arrow.core.Validated
  * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  * import arrow.core.NonEmptyList
- * import arrow.core.fix
- * import arrow.reflect.applicativeNel
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
  * abstract class Read<A> {
- *  abstract fun read(s: String): Option<A>
+ *  abstract fun read(s: String): A?
  *
  *  companion object {
  *
  *   val stringRead: Read<String> =
  *    object : Read<String>() {
- *     override fun read(s: String): Option<String> = Option(s)
+ *     override fun read(s: String): String? = s
  *    }
  *
  *   val intRead: Read<Int> =
  *    object : Read<Int>() {
- *     override fun read(s: String): Option<Int> =
- *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+ *     override fun read(s: String): Int? =
+ *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
  *    }
  *  }
  * }
@@ -346,23 +345,22 @@ typealias Invalid<E> = Validated.Invalid<E>
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
- *     val readVal = Validated.fromOption(read.read(value)) {
+ *     val readVal = Validated.fromNullable(read.read(value)) {
  *       ConfigError.ParseConfig(key)
  *     }()
  *     readVal
  *   }.toValidatedNel()
  * }
  *
- * val parallelValidate = Validated.applicativeNel<ConfigError>()
- *
  * suspend fun main() {
  * //sampleStart
  * val config = Config(mapOf("wrong field" to "127.0.0.1", "port" to "not a number"))
  *
- * val valid = parallelValidate.tupledN(
+ * val valid = Validated.mapN(
+ *  NonEmptyList.semigroup<ConfigError>(),
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
- *  ).fix().map { (url, port) -> ConnectionParams(url, port) }
+ *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
  *  println("valid = $valid")
  * }
@@ -378,29 +376,26 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.Either
  * import arrow.core.flatMap
  * import arrow.core.left
- * import arrow.core.None
- * import arrow.core.Option
  * import arrow.core.right
- * import arrow.core.Some
  * import arrow.core.Validated
  * import arrow.core.computations.either
  * import arrow.core.valid
  * import arrow.core.invalid
  *
  * abstract class Read<A> {
- *  abstract fun read(s: String): Option<A>
+ *  abstract fun read(s: String): A?
  *
  *  companion object {
  *
  *   val stringRead: Read<String> =
  *    object : Read<String>() {
- *     override fun read(s: String): Option<String> = Option(s)
+ *     override fun read(s: String): String? = s
  *    }
  *
  *   val intRead: Read<Int> =
  *    object : Read<Int>() {
- *     override fun read(s: String): Option<Int> =
- *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+ *     override fun read(s: String): Int? =
+ *      if (s.matches(Regex("-?[0-9]+"))) s.toInt() else null
  *    }
  *  }
  * }
@@ -410,7 +405,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *     val value = Validated.fromNullable(map[key]) {
  *       ConfigError.MissingConfig(key)
  *     }()
- *     val readVal = Validated.fromOption(read.read(value)) {
+ *     val readVal = Validated.fromNullable(read.read(value)) {
  *       ConfigError.ParseConfig(key)
  *     }()
  *     readVal
@@ -423,10 +418,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * //sampleStart
- * fun positive(field: String, i: Int): Either<ConfigError, Int> {
- *  return if (i >= 0) i.right()
+ * fun positive(field: String, i: Int): Either<ConfigError, Int> =
+ *  if (i >= 0) i.right()
  *  else ConfigError.ParseConfig(field).left()
- * }
  *
  * val config = Config(mapOf("house_number" to "-42"))
  *
@@ -439,212 +433,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * }
  *
  * ```
- *
- * ## Alternative validation strategies to Validated: using `ApplicativeError`
- *
- * We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
- *
- * ```kotlin:ank
- * import arrow.Kind
- * import arrow.core.Either
- * import arrow.core.EitherPartialOf
- * import arrow.core.Nel
- * import arrow.core.NonEmptyList
- * import arrow.core.Validated
- * import arrow.core.ValidatedPartialOf
- * import arrow.core.nel
- * import arrow.typeclasses.ApplicativeError
- * import arrow.core.extensions.validated.applicativeError.applicativeError
- * import arrow.core.extensions.either.applicativeError.applicativeError
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
- *
- * //sampleStart
- * sealed class ValidationError(val msg: String) {
- *  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
- *  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
- *  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
- * }
- *
- * data class FormField(val label: String, val value: String)
- * data class Email(val value: String)
- *
- * sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
- *
- *  private fun FormField.contains(needle: String): Kind<F, FormField> =
- *   if (value.contains(needle, false)) just(this)
- *   else raiseError(ValidationError.DoesNotContain(needle).nel())
- *
- *  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
- *   if (value.length <= maxLength) just(this)
- *   else raiseError(ValidationError.MaxLength(maxLength).nel())
- *
- *  fun FormField.validateEmail(): Kind<F, Email> =
- *   map(contains("@"), maxLength(250), {
- *    Email(value)
- *   }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
- *
- *  object ErrorAccumulationStrategy :
- *    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
- *
- *  object FailFastStrategy :
- *   Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
- *
- *  companion object {
- *   infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
- *   infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
- *  }
- * }
- * //sampleEnd
- * ```
- *
- * `Rules` defines abstract behaviors that can be composed and have access to the scope of `ApplicativeError` where we can invoke `just` to lift values into the positive result and `raiseError` into the error context.
- *
- * Once we have such abstract algebra defined, we can simply materialize it to data types that support different error strategies:
- *
- *  *Error accumulation*
- *
- * ```kotlin:ank:playground
- * import arrow.Kind
- * import arrow.core.Either
- * import arrow.core.EitherPartialOf
- * import arrow.core.Nel
- * import arrow.core.NonEmptyList
- * import arrow.core.Validated
- * import arrow.core.ValidatedPartialOf
- * import arrow.core.nel
- * import arrow.typeclasses.ApplicativeError
- * import arrow.core.extensions.validated.applicativeError.applicativeError
- * import arrow.core.extensions.either.applicativeError.applicativeError
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
- *
- * sealed class ValidationError(val msg: String) {
- *  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
- *  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
- *  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
- * }
- *
- * data class FormField(val label: String, val value: String)
- * data class Email(val value: String)
- *
- * sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
- *
- *  private fun FormField.contains(needle: String): Kind<F, FormField> =
- *   if (value.contains(needle, false)) just(this)
- *   else raiseError(ValidationError.DoesNotContain(needle).nel())
- *
- *  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
- *   if (value.length <= maxLength) just(this)
- *   else raiseError(ValidationError.MaxLength(maxLength).nel())
- *
- *  fun FormField.validateEmail(): Kind<F, Email> =
- *   map(contains("@"), maxLength(250), {
- *    Email(value)
- *   }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
- *
- *  object ErrorAccumulationStrategy :
- *    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
- *
- *  object FailFastStrategy :
- *   Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
- *
- *  companion object {
- *   infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
- *   infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
- *  }
- * }
- *
- * val value =
- * //sampleStart
- *  Rules accumulateErrors {
- *    listOf(
- *      FormField("Invalid Email Domain Label", "nowhere.com"),
- *      FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
- *      FormField("Valid Email Label", "getlost@nowhere.com")
- *    ).map { it.validateEmail() }
- *    }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- *  *Fail Fast*
- *
- * ```kotlin:ank:playground
- * import arrow.Kind
- * import arrow.core.Either
- * import arrow.core.EitherPartialOf
- * import arrow.core.Nel
- * import arrow.core.NonEmptyList
- * import arrow.core.Validated
- * import arrow.core.ValidatedPartialOf
- * import arrow.core.nel
- * import arrow.typeclasses.ApplicativeError
- * import arrow.core.extensions.validated.applicativeError.applicativeError
- * import arrow.core.extensions.either.applicativeError.applicativeError
- * import arrow.core.extensions.nonemptylist.semigroup.semigroup
- *
- * sealed class ValidationError(val msg: String) {
- *  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
- *  data class MaxLength(val value: Int) : ValidationError("Exceeded length of $value")
- *  data class NotAnEmail(val reasons: Nel<ValidationError>) : ValidationError("Not a valid email")
- * }
- *
- * data class FormField(val label: String, val value: String)
- * data class Email(val value: String)
- *
- * sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : ApplicativeError<F, Nel<ValidationError>> by A {
- *
- *  private fun FormField.contains(needle: String): Kind<F, FormField> =
- *   if (value.contains(needle, false)) just(this)
- *   else raiseError(ValidationError.DoesNotContain(needle).nel())
- *
- *  private fun FormField.maxLength(maxLength: Int): Kind<F, FormField> =
- *   if (value.length <= maxLength) just(this)
- *   else raiseError(ValidationError.MaxLength(maxLength).nel())
- *
- *  fun FormField.validateEmail(): Kind<F, Email> =
- *   map(contains("@"), maxLength(250), {
- *    Email(value)
- *   }).handleErrorWith { raiseError(ValidationError.NotAnEmail(it).nel()) }
- *
- *  object ErrorAccumulationStrategy :
- *    Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
- *
- *  object FailFastStrategy :
- *   Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
- *
- *  companion object {
- *   infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
- *   infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
- *  }
- * }
- *
- * val value =
- * //sampleStart
- *  Rules failFast {
- *    listOf(
- *      FormField("Invalid Email Domain Label", "nowhere.com"),
- *      FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
- *      FormField("Valid Email Label", "getlost@nowhere.com")
- *    ).map { it.validateEmail() }
- *  }
- * //sampleEnd
- * fun main() {
- *  println(value)
- * }
- * ```
- *
- * ### Supported type classes
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.DataType
- * import arrow.reflect.tcMarkdownList
- * import arrow.core.Validated
- *
- * DataType(Validated::class).tcMarkdownList()
- * ```
  */
-@higherkind
 sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   companion object {
@@ -675,6 +464,14 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     inline fun <E, A> fromNullable(value: A?, ifNull: () -> E): Validated<E, A> =
       value?.let(::Valid) ?: Invalid(ifNull())
 
+    inline fun <A> catch(f: () -> A): Validated<Throwable, A> =
+      try {
+        f().valid()
+      } catch (e: Throwable) {
+        e.nonFatalOrThrow().invalid()
+      }
+
+    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
     suspend fun <A> catch(f: suspend () -> A): Validated<Throwable, A> =
       try {
         f().valid()
@@ -682,13 +479,438 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         e.nonFatalOrThrow().invalid()
       }
 
+    inline fun <E, A> catch(recover: (Throwable) -> E, f: () -> A): Validated<E, A> =
+      catch(f).mapLeft(recover)
+
+    inline fun <A> catchNel(f: () -> A): ValidatedNel<Throwable, A> =
+      try {
+        f().validNel()
+      } catch (e: Throwable) {
+        e.nonFatalOrThrow().invalidNel()
+      }
+
+    @Deprecated("Use the inline version. Hidden for binary compat", level = DeprecationLevel.HIDDEN)
     suspend fun <A> catchNel(f: suspend () -> A): ValidatedNel<Throwable, A> =
       try {
         f().validNel()
       } catch (e: Throwable) {
         e.nonFatalOrThrow().invalidNel()
       }
+
+    /** Construct an [Eq] instance which use [EQE] and [EQA] to compare the [Invalid] and [Valid] cases **/
+    fun <E, A> eq(EQE: Eq<E>, EQA: Eq<A>): Eq<Validated<E, A>> =
+      ValidatedEq(EQE, EQA)
+
+    fun <E, A> hash(HE: Hash<E>, HA: Hash<A>): Hash<Validated<E, A>> =
+      ValidatedHash(HE, HA)
+
+    fun <E, A> show(SE: Show<E>, SA: Show<A>): Show<Validated<E, A>> =
+      ValidatedShow(SE, SA)
+
+    fun <E, A> order(OE: Order<E>, OA: Order<A>): Order<Validated<E, A>> =
+      ValidatedOrder(OE, OA)
+
+    /**
+     * Lifts a function `A -> B` to the [Validated] structure.
+     *
+     * `A -> B -> Validated<E, A> -> Validated<E, B>`
+     *
+     * ```kotlin:ank:playground:extension
+     * import arrow.core.*
+     *
+     * fun main(args: Array<String>) {
+     *   val result =
+     *   //sampleStart
+     *   Validated.lift { s: CharSequence -> "$s World" }("Hello".valid())
+     *   //sampleEnd
+     *   println(result)
+     * }
+     * ```
+     */
+    fun <E, A, B> lift(f: (A) -> B): (Validated<E, A>) -> Validated<E, B> =
+      { fa -> fa.map(f) }
+
+    /**
+     * Lifts two functions to the Bifunctor type.
+     *
+     * ```kotlin:ank
+     * import arrow.core.*
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val f = Validated.lift(String::toUpperCase, Int::inc)
+     *   val res1 = f("test".invalid())
+     *   val res2 = f(1.valid())
+     *   //sampleEnd
+     *   println("res1: $res1")
+     *   println("res2: $res2")
+     * }
+     * ```
+     */
+    fun <A, B, C, D> lift(fl: (A) -> C, fr: (B) -> D): (Validated<A, B>) -> Validated<C, D> =
+      { fa -> fa.bimap(fl, fr) }
+
+    val s = 1.inc()
+
+    val unit: Validated<Nothing, Unit> = Unit.valid()
+
+    fun <E> unit(): Validated<E, Unit> = unit
+
+    fun <E, A, B, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      f: (A, B) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b)
+        .map { (a, b) -> f(a, b) }
+
+    fun <E, A, B, C, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      f: (A, B, C) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c)
+        .map { (a, b, c) -> f(a, b, c) }
+
+    fun <E, A, B, C, D, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      f: (A, B, C, D) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d)
+        .map { (a, b, c, d) -> f(a, b, c, d) }
+
+    fun <E, A, B, C, D, EE, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: (A, B, C, D, EE) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e)
+        .map { (a, b, c, d, e) -> f(a, b, c, d, e) }
+
+    fun <E, A, B, C, D, EE, FF, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      ff: Validated<E, FF>,
+      f: (A, B, C, D, EE, FF) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e, ff)
+        .map { (a, b, c, d, e, ff) -> f(a, b, c, d, e, ff) }
+
+    fun <E, A, B, C, D, EE, F, G, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      ff: Validated<E, F>,
+      g: Validated<E, G>,
+      f: (A, B, C, D, EE, F, G) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e, ff, g)
+        .map { (a, b, c, d, e, ff, g) -> f(a, b, c, d, e, ff, g) }
+
+    fun <E, A, B, C, D, EE, F, G, H, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      ff: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>,
+      f: (A, B, C, D, EE, F, G, H) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e, ff, g, h)
+        .map { (a, b, c, d, e, ff, g, h) -> f(a, b, c, d, e, ff, g, h) }
+
+    fun <E, A, B, C, D, EE, F, G, H, I, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      ff: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>,
+      i: Validated<E, I>,
+      f: (A, B, C, D, EE, F, G, H, I) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e, ff, g, h, i)
+        .map { (a, b, c, d, e, ff, g, h, i) -> f(a, b, c, d, e, ff, g, h, i) }
+
+    fun <E, A, B, C, D, EE, F, G, H, I, J, Z> mapN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      ff: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>,
+      i: Validated<E, I>,
+      j: Validated<E, J>,
+      f: (A, B, C, D, EE, F, G, H, I, J) -> Z
+    ): Validated<E, Z> =
+      tupledN(SE, a, b, c, d, e, ff, g, h, i, j)
+        .map { (a, b, c, d, e, ff, g, h, i, j) -> f(a, b, c, d, e, ff, g, h, i, j) }
+
+    fun <E, A, B> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>
+    ): Validated<E, Tuple2<A, B>> =
+      a.product(SE, b)
+
+    fun <E, A, B, C> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>
+    ): Validated<E, Tuple3<A, B, C>> =
+      a.product(SE, b).product(SE, c)
+
+    fun <E, A, B, C, D> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>
+    ): Validated<E, Tuple4<A, B, C, D>> =
+      a.product(SE, b).product(SE, c).product(SE, d)
+
+    fun <E, A, B, C, D, EE> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>
+    ): Validated<E, Tuple5<A, B, C, D, EE>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e)
+
+    fun <E, A, B, C, D, EE, F> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: Validated<E, F>
+    ): Validated<E, Tuple6<A, B, C, D, EE, F>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f)
+
+    fun <E, A, B, C, D, EE, F, G> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: Validated<E, F>,
+      g: Validated<E, G>
+    ): Validated<E, Tuple7<A, B, C, D, EE, F, G>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g)
+
+    fun <E, A, B, C, D, EE, F, G, H> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>
+    ): Validated<E, Tuple8<A, B, C, D, EE, F, G, H>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g).product(SE, h)
+
+    fun <E, A, B, C, D, EE, F, G, H, I> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>,
+      i: Validated<E, I>
+    ): Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g).product(SE, h).product(SE, i)
+
+    fun <E, A, B, C, D, EE, F, G, H, I, J> tupledN(
+      SE: Semigroup<E>,
+      a: Validated<E, A>,
+      b: Validated<E, B>,
+      c: Validated<E, C>,
+      d: Validated<E, D>,
+      e: Validated<E, EE>,
+      f: Validated<E, F>,
+      g: Validated<E, G>,
+      h: Validated<E, H>,
+      i: Validated<E, I>,
+      j: Validated<E, J>
+    ): Validated<E, Tuple10<A, B, C, D, EE, F, G, H, I, J>> =
+      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g)
+        .product(SE, h).product(SE, i).product(SE, j)
   }
+
+  /**
+   * Discards the [A] value inside [Validated] signaling this container may be pointing to a noop
+   * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.core.*
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello World".valid().void()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun void(): Validated<E, Unit> =
+    map { Unit }
+
+  /**
+   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a tuple of the [A] value and the
+   * computed [B] value as result of applying [f]
+   *
+   *
+   * ```kotlin:ank
+   * import arrow.core.*
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".valid().fproduct { "$it World" }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <B> fproduct(f: (A) -> B): Validated<E, Tuple2<A, B>> =
+    map { a -> Tuple2(a, f(a)) }
+
+  /**
+   * Replaces [A] inside [Validated] with [B] resulting in a Kind<F, B>
+   *
+   * ```kotlin:ank
+   * import arrow.core.*
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello World".valid().mapConst("...")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <B> mapConst(b: B): Validated<E, B> =
+    map { b }
+
+  /**
+   * Pairs [B] with [A] returning a Validated<E, Tuple2<B, A>>
+   *
+   * ```kotlin:ank
+   * import arrow.core.*
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".valid().tupleLeft("World")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <B> tupleLeft(b: B): Validated<E, Tuple2<B, A>> =
+    map { a -> Tuple2(b, a) }
+
+  /**
+   * Pairs [A] with [B] returning a Validated<E, Tuple2<A, B>>
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.core.*
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".valid().tupleRight("World")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <B> tupleRight(b: B): Validated<E, Tuple2<A, B>> =
+    map { a -> Tuple2(a, b) }
+
+  inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
+    fold({ emptyList() }, { fa(it).map { Valid(it) } })
+
+  inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
+    fold({ emptyList() }, { fa(it).void() })
+
+  inline fun <EE, B> traverseEither(fa: (A) -> Either<EE, B>): Either<EE, Validated<E, B>> =
+    when (this) {
+      is Valid -> fa(this.a).map { Valid(it) }
+      is Invalid -> this.right()
+    }
+
+  inline fun <EE, B> traverseEither_(fa: (A) -> Either<EE, B>): Either<EE, Unit> =
+    fold({ Either.right(Unit) }, { fa(it).void() })
+
+  inline fun <B> bifoldLeft(
+    c: B,
+    fe: (B, E) -> B,
+    fa: (B, A) -> B
+  ): B =
+    fold({ fe(c, it) }, { fa(c, it) })
+
+  inline fun <B> bifoldRight(
+    c: Eval<B>,
+    fe: (E, Eval<B>) -> Eval<B>,
+    fa: (A, Eval<B>) -> Eval<B>
+  ): Eval<B> =
+    fold({ fe(it, c) }, { fa(it, c) })
+
+  inline fun <B> bifoldMap(MN: Monoid<B>, g: (E) -> B, f: (A) -> B) = MN.run {
+    bifoldLeft(MN.empty(), { c, b -> c.combine(g(b)) }) { c, a -> c.combine(f(a)) }
+  }
+
+  fun <EE, B> bitraverse(fe: (E) -> Iterable<EE>, fa: (A) -> Iterable<B>): List<Validated<EE, B>> =
+    fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
+
+  fun <EE, B, C> bitraverseEither(
+    fe: (E) -> Either<EE, B>,
+    fa: (A) -> Either<EE, C>
+  ): Either<EE, Validated<B, C>> =
+    fold({ fe(it).map { Invalid(it) } }, { fa(it).map { Valid(it) } })
+
+  fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B =
+    fold({ MB.empty() }, f)
 
   fun show(SE: Show<E>, SA: Show<A>): String = fold(
     {
@@ -697,6 +919,14 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     {
       "Valid(${SA.run { it.show() }})"
     }
+  )
+
+  fun hash(HL: Hash<E>, HR: Hash<A>): Int =
+    hashWithSalt(HL, HR, defaultSalt)
+
+  fun hashWithSalt(HL: Hash<E>, HR: Hash<A>, salt: Int): Int = fold(
+    { e -> HL.run { e.hashWithSalt(salt.hashWithSalt(0)) } },
+    { a -> HR.run { a.hashWithSalt(salt.hashWithSalt(1)) } }
   )
 
   data class Valid<out A>(val a: A) : Validated<Nothing, A>() {
@@ -723,6 +953,19 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    */
   inline fun exist(predicate: (A) -> Boolean): Boolean =
     fold({ false }, predicate)
+
+  inline fun findOrNull(predicate: (A) -> Boolean): A? =
+    when (this) {
+      is Valid -> if (predicate(this.a)) this.a else null
+      is Invalid -> null
+    }
+
+  inline fun all(predicate: (A) -> Boolean): Boolean =
+    fold({ true }, predicate)
+
+  fun isEmpty(): Boolean = isInvalid
+
+  fun isNotEmpty(): Boolean = isValid
 
   /**
    * Converts the value to an Either<E, A>
@@ -759,7 +1002,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    *
    * Apply a function to an Invalid or Valid value, returning a new Invalid or Valid value respectively.
    */
-  inline fun <EE, AA> bimap(fe: (E) -> EE, fa: (A) -> AA): Validated<EE, AA> =
+  inline fun <EE, B> bimap(fe: (E) -> EE, fa: (A) -> B): Validated<EE, B> =
     fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
 
   /**
@@ -797,21 +1040,230 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 }
 
 /**
+ * Compares two instances of [Validated] and returns true if they're considered not equal for this instance.
+ *
+ * @receiver object to compare with [other]
+ * @param other object to compare with [this@neqv]
+ * @returns false if [this@neqv] and [other] are equivalent, true otherwise.
+ */
+fun <E, B> Validated<E, B>.neqv(
+  EQL: Eq<E>,
+  EQR: Eq<B>,
+  other: Validated<E, B>
+): Boolean = Validated.eq(EQL, EQR).run {
+  this@neqv.neqv(other)
+}
+
+/**
+ * Compares two instances of [Validated] and returns true if they're considered not equal for this instance.
+ *
+ * @receiver object to compare with [other]
+ * @param other object to compare with [this@neqv]
+ * @returns false if [this@neqv] and [other] are equivalent, true otherwise.
+ */
+fun <E, B> Validated<E, B>.eqv(
+  EQL: Eq<E>,
+  EQR: Eq<B>,
+  other: Validated<E, B>
+): Boolean = Validated.eq(EQL, EQR).run {
+  this@eqv.neqv(other)
+}
+
+/**
+ * Replaces the [B] value inside [Validated] with [A] resulting in Validated<E, A>
+ */
+fun <E, A, B> A.mapConst(fb: Validated<E, B>): Validated<E, A> =
+  fb.mapConst(this)
+
+/**
+ * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
+ *
+ * ```kotlin:ank:playground:extension
+ * import arrow.core.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val string: Validated<Int, String> = "Hello".invalid()
+ *   val chars: Validated<Int, CharSequence> =
+ *     string.widen<Int, CharSequence, String>()
+ *   //sampleEnd
+ *   println(chars)
+ * }
+ * ```
+ */
+fun <E, B, A : B> Validated<E, A>.widen(): Validated<E, B> =
+  this
+
+fun <EE, E : EE, A> Validated<E, A>.leftWiden(): Validated<EE, A> =
+  this
+
+fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int): Validated<E, List<A>> =
+  if (n <= 0) emptyList<A>().valid()
+  else Validated.mapN(SE, this, replicate(SE, n - 1)) { a, xs -> listOf(a) + xs }
+
+fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): Validated<E, A> =
+  if (n <= 0) MA.empty().valid()
+  else Validated.mapN(SE, this@replicate, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
+
+fun <E, A, B> Validated<E, A>.product(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Tuple2<A, B>> =
+  ap(SE, fb.map { b: B -> { a: A -> Tuple2(a, b) } })
+
+fun <E, A, B, Z> Validated<E, A>.map2(SE: Semigroup<E>, fb: Validated<E, B>, f: (Tuple2<A, B>) -> Z): Validated<E, Z> =
+  product(SE, fb).map(f)
+
+@JvmName("product3")
+fun <E, A, B, C> Validated<E, Tuple2<A, B>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, C>,
+): Validated<E, Tuple3<A, B, C>> =
+  map2(SE, other) { (ab, c) -> Tuple3(ab.a, ab.b, c) }
+
+@JvmName("product4")
+fun <E, A, B, C, D> Validated<E, Tuple3<A, B, C>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, D>,
+): Validated<E, Tuple4<A, B, C, D>> =
+  map2(SE, other) { (abc, d) -> Tuple4(abc.a, abc.b, abc.c, d) }
+
+@JvmName("product5")
+fun <E, A, B, C, D, EE> Validated<E, Tuple4<A, B, C, D>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, EE>,
+): Validated<E, Tuple5<A, B, C, D, EE>> =
+  map2(SE, other) { (abcd, e) -> Tuple5(abcd.a, abcd.b, abcd.c, abcd.d, e) }
+
+@JvmName("product6")
+fun <E, A, B, C, D, EE, F> Validated<E, Tuple5<A, B, C, D, EE>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, F>,
+): Validated<E, Tuple6<A, B, C, D, EE, F>> =
+  map2(SE, other) { (abcde, f) -> Tuple6(abcde.a, abcde.b, abcde.c, abcde.d, abcde.e, f) }
+
+@JvmName("product7")
+fun <E, A, B, C, D, EE, F, G> Validated<E, Tuple6<A, B, C, D, EE, F>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, G>,
+): Validated<E, Tuple7<A, B, C, D, EE, F, G>> =
+  map2(SE, other) { (abcdef, g) -> Tuple7(abcdef.a, abcdef.b, abcdef.c, abcdef.d, abcdef.e, abcdef.f, g) }
+
+@JvmName("product8")
+fun <E, A, B, C, D, EE, F, G, H> Validated<E, Tuple7<A, B, C, D, EE, F, G>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, H>,
+): Validated<E, Tuple8<A, B, C, D, EE, F, G, H>> =
+  map2(SE, other) { (abcdefg, h) -> Tuple8(abcdefg.a, abcdefg.b, abcdefg.c, abcdefg.d, abcdefg.e, abcdefg.f, abcdefg.g, h) }
+
+@JvmName("product9")
+fun <E, A, B, C, D, EE, F, G, H, I> Validated<E, Tuple8<A, B, C, D, EE, F, G, H>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, I>,
+): Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>> =
+  map2(SE, other) { (abcdefgh, i) -> Tuple9(abcdefgh.a, abcdefgh.b, abcdefgh.c, abcdefgh.d, abcdefgh.e, abcdefgh.f, abcdefgh.g, abcdefgh.h, i) }
+
+@JvmName("product10")
+fun <E, A, B, C, D, EE, F, G, H, I, J> Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>>.product(
+  SE: Semigroup<E>,
+  other: Validated<E, J>,
+): Validated<E, Tuple10<A, B, C, D, EE, F, G, H, I, J>> =
+  map2(SE, other) { (abcdefghi, j) -> Tuple10(abcdefghi.a, abcdefghi.b, abcdefghi.c, abcdefghi.d, abcdefghi.e, abcdefghi.f, abcdefghi.g, abcdefghi.h, abcdefghi.i, j) }
+
+fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
+  bitraverse(::identity, ::identity)
+
+fun <E, A, B> Validated<Either<E, A>, Either<E, B>>.bisequenceEither(): Either<E, Validated<A, B>> =
+  bitraverseEither(::identity, ::identity)
+
+fun <E, A> Validated<E, A>.fold(MA: Monoid<A>): A = MA.run {
+  foldLeft(empty()) { acc, a -> acc.combine(a) }
+}
+
+fun <E, A> Validated<E, A>.combineAll(MA: Monoid<A>): A =
+  fold(MA)
+
+fun <E, A> Validated<E, Iterable<A>>.sequence(): List<Validated<E, A>> =
+  traverse(::identity)
+
+fun <E, A> Validated<E, Iterable<A>>.sequence_(): List<Unit> =
+  traverse_(::identity)
+
+fun <E, A, B> Validated<A, Either<E, B>>.sequenceEither(): Either<E, Validated<A, B>> =
+  traverseEither(::identity)
+
+fun <E, A, B> Validated<A, Either<E, B>>.traverseEither_(): Either<E, Unit> =
+  traverseEither_(::identity)
+
+fun <E, A> Validated<E, A>.compare(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Ordering = fold(
+  { l1 -> b.fold({ l2 -> OE.run { l1.compare(l2) } }, { LT }) },
+  { r1 -> b.fold({ GT }, { r2 -> OA.run { r1.compare(r2) } }) }
+)
+
+fun <E, A> Validated<E, A>.compareTo(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Int =
+  compare(OE, OA, b).toInt()
+
+fun <E, A> Validated<E, A>.lt(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Boolean =
+  compare(OE, OA, b) == LT
+
+fun <E, A> Validated<E, A>.lte(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Boolean =
+  compare(OE, OA, b) != GT
+
+fun <E, A> Validated<E, A>.gt(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Boolean =
+  compare(OE, OA, b) == GT
+
+fun <E, A> Validated<E, A>.gte(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Boolean =
+  compare(OE, OA, b) != LT
+
+fun <E, A> Validated<E, A>.max(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Validated<E, A> =
+  if (gt(OE, OA, b)) this else b
+
+fun <E, A> Validated<E, A>.min(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Validated<E, A> =
+  if (lt(OE, OA, b)) this else b
+
+fun <E, A> Validated<E, A>.sort(OE: Order<E>, OA: Order<A>, b: Validated<E, A>): Tuple2<Validated<E, A>, Validated<E, A>> =
+  if (gte(OE, OA, b)) Tuple2(this, b) else Tuple2(b, this)
+
+fun <E, A, B> Validated<E, Either<A, B>>.select(f: Validated<E, (A) -> B>): Validated<E, B> =
+  fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> r.valid() }) })
+
+fun <E, A, B, C> Validated<E, Either<A, B>>.branch(fl: Validated<E, (A) -> C>, fr: Validated<E, (B) -> C>): Validated<E, C> =
+  when (this) {
+    is Validated.Valid -> when (val either = this.a) {
+      is Either.Left -> fl.map { f -> f(either.a) }
+      is Either.Right -> fr.map { f -> f(either.b) }
+    }
+    is Validated.Invalid -> this
+  }
+
+private fun <E> Validated<E, Boolean>.selector(): Validated<E, Either<Unit, Unit>> =
+  map { bool -> if (bool) Either.leftUnit else Either.unit }
+
+fun <E> Validated<E, Boolean>.whenS(x: Validated<E, () -> Unit>): Validated<E, Unit> =
+  selector().select(x.map { f -> { f() } })
+
+fun <E, A> Validated<E, Boolean>.ifS(fl: Validated<E, A>, fr: Validated<E, A>): Validated<E, A> =
+  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
+
+fun <E> Validated<E, Boolean>.orS(f: Validated<E, Boolean>): Validated<E, Boolean> =
+  ifS(Valid(true), f)
+
+fun <E> Validated<E, Boolean>.andS(f: Validated<E, Boolean>): Validated<E, Boolean> =
+  ifS(f, Valid(false))
+
+/**
  * Return the Valid value, or the default if Invalid
  */
-inline fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
+inline fun <E, A> ValidatedOf<E, A>.getOrElse(default: () -> A): A =
   fix().fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid
  */
-fun <E, B> ValidatedOf<E, B>.orNull(): B? =
+fun <E, A> ValidatedOf<E, A>.orNull(): A? =
   getOrElse { null }
 
 /**
  * Return the Valid value, or the result of f if Invalid
  */
-inline fun <E, B> ValidatedOf<E, B>.valueOr(f: (E) -> B): B =
+inline fun <E, A> ValidatedOf<E, A>.valueOr(f: (E) -> A): A =
   fix().fold({ f(it) }, ::identity)
 
 /**
@@ -845,10 +1297,16 @@ inline fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Vali
  * if both the function and this value are Valid, apply the function
  */
 inline fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
-  fix().fold(
-    { e -> f.fold({ Invalid(SE.run { e.combine(it) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid) { Valid(it(a)) } }
-  )
+  when (val value = fix()) {
+    is Validated.Valid -> when (f) {
+      is Validated.Valid -> Valid(f.a(value.a))
+      is Validated.Invalid -> f
+    }
+    is Validated.Invalid -> when (f) {
+      is Validated.Valid -> value
+      is Validated.Invalid -> Invalid(SE.run { value.e.combine(f.e) })
+    }
+  }
 
 @Deprecated(
   "To keep API consistent with Either and Option please use `handleErrorWith` instead",
@@ -858,15 +1316,32 @@ inline fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>):
   handleErrorWith(f)
 
 inline fun <E, A> ValidatedOf<E, A>.handleErrorWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
-  fix().fold({ f(it).fix() }, ::Valid)
+  when (val value = fix()) {
+    is Validated.Valid -> value
+    is Validated.Invalid -> f(value.e).fix()
+  }
 
-inline fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<E, A> =
-  fix().handleErrorWith { Valid(f(it)) }
+inline fun <E, A> ValidatedOf<E, A>.handleError(f: (E) -> A): Validated<Nothing, A> =
+  when (val value = fix()) {
+    is Validated.Valid -> value
+    is Validated.Invalid -> Valid(f(value.e))
+  }
 
+inline fun <E, A, B> Validated<E, A>.redeem(fe: (E) -> B, fa: (A) -> B): Validated<E, B> =
+  when (this) {
+    is Validated.Valid -> map(fa)
+    is Validated.Invalid -> Valid(fe(this.e))
+  }
+
+fun <E, A> Validated<E, A>.attempt(): Validated<Nothing, Either<E, A>> =
+  map { Right(it) }.handleError { Left(it) }
+
+@Deprecated("@extension kinded projected functions are deprecated. Replace with traverse or traverseEither from arrow.core.*")
 fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
   fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
 }
 
+@Deprecated("@extension kinded projected functions are deprecated. Replace with sequence or sequenceEither from arrow.core.*")
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
@@ -913,3 +1388,44 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
+
+private class ValidatedEq<L, R>(
+  private val EQL: Eq<L>,
+  private val EQR: Eq<R>
+) : Eq<Validated<L, R>> {
+
+  override fun Validated<L, R>.eqv(b: Validated<L, R>): Boolean = when (this) {
+    is Valid -> when (b) {
+      is Invalid -> false
+      is Valid -> EQR.run { a.eqv(b.a) }
+    }
+    is Invalid -> when (b) {
+      is Invalid -> EQL.run { e.eqv(b.e) }
+      is Valid -> false
+    }
+  }
+}
+
+private class ValidatedShow<L, R>(
+  private val SL: Show<L>,
+  private val SR: Show<R>,
+) : Show<Validated<L, R>> {
+  override fun Validated<L, R>.show(): String =
+    show(SL, SR)
+}
+
+private class ValidatedHash<L, R>(
+  private val HL: Hash<L>,
+  private val HR: Hash<R>
+) : Hash<Validated<L, R>> {
+  override fun Validated<L, R>.hashWithSalt(salt: Int): Int =
+    hashWithSalt(HL, HR, salt)
+}
+
+private class ValidatedOrder<L, R>(
+  private val OL: Order<L>,
+  private val OR: Order<R>
+) : Order<Validated<L, R>> {
+  override fun Validated<L, R>.compare(b: Validated<L, R>): Ordering =
+    compare(OL, OR, b)
+}

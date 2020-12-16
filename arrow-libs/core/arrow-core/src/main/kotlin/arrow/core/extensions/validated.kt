@@ -20,7 +20,6 @@ import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.core.extensions.validated.applicative.applicative
 import arrow.core.extensions.validated.eq.eq
 import arrow.core.fix
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Bifoldable
@@ -39,23 +38,18 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.hashWithSalt
-import arrow.undocumented
 import arrow.core.handleErrorWith as validatedHandleErrorWith
 import arrow.core.traverse as validatedTraverse
 
-@extension
-@undocumented
 interface ValidatedFunctor<E> : Functor<ValidatedPartialOf<E>> {
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }
 
-@extension
 interface ValidatedBifunctor : Bifunctor<ForValidated> {
   override fun <A, B, C, D> ValidatedOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Validated<C, D> =
     fix().bimap(fl, fr)
 }
 
-@extension
 interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E> {
 
   fun SE(): Semigroup<E>
@@ -67,7 +61,6 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
 }
 
-@extension
 interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
@@ -76,7 +69,6 @@ interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApp
     fix().fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> just(r) }) })
 }
 
-@extension
 interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
@@ -87,7 +79,6 @@ interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>,
     fix().validatedHandleErrorWith(f)
 }
 
-@extension
 interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -97,14 +88,12 @@ interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
     fix().foldRight(lb, f)
 }
 
-@extension
 interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)
 }
 
-@extension
 interface ValidatedBifoldable : Bifoldable<ForValidated> {
   override fun <A, B, C> ValidatedOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fix().fold({ f(c, it) }, { g(c, it) })
@@ -113,7 +102,6 @@ interface ValidatedBifoldable : Bifoldable<ForValidated> {
     fix().fold({ f(it, c) }, { g(it, c) })
 }
 
-@extension
 interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
   override fun <G, A, B, C, D> ValidatedOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, ValidatedOf<C, D>> =
     fix().let {
@@ -124,7 +112,6 @@ interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
     }
 }
 
-@extension
 interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
 
   fun SE(): Semigroup<E>
@@ -133,7 +120,6 @@ interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
     fix().combineK(SE(), y)
 }
 
-@extension
 interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
 
   fun EQL(): Eq<L>
@@ -152,7 +138,6 @@ interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
   }
 }
 
-@extension
 interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
   fun EQL(): Eq<L>
 
@@ -162,7 +147,6 @@ interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
     }
 }
 
-@extension
 interface ValidatedEqK2 : EqK2<ForValidated> {
   override fun <A, B> Kind2<ForValidated, A, B>.eqK(other: Kind2<ForValidated, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
@@ -172,14 +156,12 @@ interface ValidatedEqK2 : EqK2<ForValidated> {
     }
 }
 
-@extension
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
   fun SL(): Show<L>
   fun SR(): Show<R>
   override fun Validated<L, R>.show(): String = show(SL(), SR())
 }
 
-@extension
 interface ValidatedHash<L, R> : Hash<Validated<L, R>> {
   fun HL(): Hash<L>
   fun HR(): Hash<R>
@@ -191,7 +173,6 @@ interface ValidatedHash<L, R> : Hash<Validated<L, R>> {
     )
 }
 
-@extension
 interface ValidatedOrder<L, R> : Order<Validated<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
@@ -202,5 +183,6 @@ interface ValidatedOrder<L, R> : Order<Validated<L, R>> {
   })
 }
 
+@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
 fun <E> Validated.Companion.applicativeNel(): ValidatedApplicative<NonEmptyList<E>> =
   Validated.applicative(NonEmptyList.semigroup())

@@ -135,4 +135,4 @@ private fun Int.combineHashes(h: Int): Int = (this * 16777619) xor h
  */
 fun Int.hashWithSalt(salt: Int): Int = salt.combineHashes(this.hashCode())
 
-private const val defaultSalt: Int = 0x087fc72c
+internal const val defaultSalt: Int = 0x087fc72c
