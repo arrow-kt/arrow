@@ -45,7 +45,7 @@ fun <F> Fiber.Companion.apply(C: Concurrent<F>): Apply<Kind<ForFiber, F>> =
 
       Fiber(
         parMapN(dispatchers().default(), fa2, fb2, f),
-        tupledN(fix().cancel(), fb.fix().cancel()).unit()
+        tupledN(fix().cancel(), fb.fix().cancel()).void()
       )
     }
   }

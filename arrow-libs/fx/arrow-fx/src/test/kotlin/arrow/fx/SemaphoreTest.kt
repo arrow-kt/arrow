@@ -9,7 +9,6 @@ import arrow.fx.extensions.io.applicativeError.handleError
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
-import arrow.fx.extensions.io.functor.unit
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
 import arrow.fx.test.eq.eq
@@ -123,8 +122,8 @@ class SemaphoreTest : ArrowFxSpec() {
         val permits: List<Long> = listOf(1, 0, 20, 4, 0, 5, 2, 1, 1, 3)
         semaphore(0).flatMap { s ->
             Dispatchers.Default.parMapN(
-                permits.traverse(IO.applicative()) { s.acquireN(it) }.unit(),
-                permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.unit()
+                permits.traverse(IO.applicative()) { s.acquireN(it) }.void(),
+                permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.void()
               ) { _, _ -> Unit }
               .flatMap {
                 s.count()
