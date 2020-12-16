@@ -61,7 +61,7 @@ object AsyncLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
-    iterations: Int = 20_000
+    iterations: Int = 5_000
   ): List<Law> =
     MonadDeferLaws.laws(AC, GENK, EQK, testStackSafety, iterations) +
       asyncLaws(AC, GENK, EQK)
@@ -74,18 +74,18 @@ object AsyncLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
-    iterations: Int = 20_000
+    iterations: Int = 5_000
   ): List<Law> =
     MonadDeferLaws.laws(AC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
       asyncLaws(AC, GENK, EQK)
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.int()) { num: Int ->
+    forAll(50, Gen.int()) { num: Int ->
       async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just(num), EQ)
     }
 
   fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.throwable()) { e: Throwable ->
+    forAll(50, Gen.throwable()) { e: Throwable ->
       async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError(e), EQ)
     }
 
@@ -119,7 +119,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.asyncCanBeDerivedFromAsyncF(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
+    forAll(50, Gen.either(Gen.throwable(), Gen.int())) { eith ->
       val k: ((Either<Throwable, Int>) -> Unit) -> Unit = { f ->
         f(eith)
       }
@@ -128,7 +128,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
+    forAll(50, Gen.string().applicativeError(this), Gen.int()) { fa, b ->
       Promise.uncancellable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = later { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {
@@ -145,7 +145,7 @@ object AsyncLaws {
   }
 
   fun <F> Async<F>.effectCanCallSuspend(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.int()) { id ->
+    forAll(50, Gen.int()) { id ->
       val fs: suspend () -> Int = { id }
 
       effect { fs() }
@@ -153,7 +153,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.effectEquivalence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.functionAToB<Unit, Int>(Gen.constant(0))) { f ->
+    forAll(50, Gen.functionAToB<Unit, Int>(Gen.constant(0))) { f ->
       val fs: suspend () -> Int = { f(Unit) }
 
       val effect = effect(one) { fs() }
@@ -179,7 +179,7 @@ object AsyncLaws {
   }
 
   fun <F> Async<F>.derivedLaterOrRaise(EQK: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.functionToA(Gen.either(Gen.throwable(), Gen.int()))) { f: () -> Either<Throwable, Int> ->
+    forAll(50, Gen.functionToA(Gen.either(Gen.throwable(), Gen.int()))) { f: () -> Either<Throwable, Int> ->
       laterOrRaise(one, f).equalUnderTheLaw(defer(one) { f().fold({ raiseError<Int>(it) }, { just(it) }) }, EQK)
     }
 
@@ -201,7 +201,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.effectMapSuspendEffect(GK: GenK<F>, EQK: Eq<Kind<F, Int>>): Unit =
-    forAll(GK.genK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
+    forAll(50, GK.genK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { fa: Kind<F, Int>, f: (Int) -> Int ->
       fa.effectMap { f(it) }.equalUnderTheLaw(fa.flatMap { a -> effect { f(a) } }, EQK)
     }
 

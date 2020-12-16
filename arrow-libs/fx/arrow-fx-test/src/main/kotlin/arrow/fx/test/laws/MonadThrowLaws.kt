@@ -47,12 +47,12 @@ object MonadThrowLaws {
       monadThrowLaws(M, EQK)
 
   fun <F> MonadThrow<F>.monadRaiseNonFatalRaiseError(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.throwable()) { e: Throwable ->
+    forAll(50, Gen.throwable()) { e: Throwable ->
       e.raiseNonFatal<Int>().equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> MonadThrow<F>.monadRaiseNonFatalThrowsError(EQ: Eq<Kind<F, Kind<F, Throwable>>>): Unit =
-    forAll(Gen.fatalThrowable()) { fatal: Throwable ->
+    forAll(50, Gen.fatalThrowable()) { fatal: Throwable ->
       shouldThrowAny {
         fun itShouldNotComeThisFar(): Kind<F, Throwable> {
           fail("MonadThrow should rethrow the fatal Throwable: '$fatal'.")

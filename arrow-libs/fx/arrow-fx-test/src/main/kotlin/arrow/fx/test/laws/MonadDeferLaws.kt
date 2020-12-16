@@ -63,7 +63,7 @@ object MonadDeferLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
-    iterations: Int = 20_000
+    iterations: Int = 5_000
   ): List<Law> =
     BracketLaws.laws(SC, GENK, EQK, testStackSafety, iterations) +
       MonadThrowLaws.laws(SC, GENK, EQK) +
@@ -77,38 +77,38 @@ object MonadDeferLaws {
     GENK: GenK<F>,
     EQK: EqK<F>,
     testStackSafety: Boolean = true,
-    iterations: Int = 20_000
+    iterations: Int = 5_000
   ): List<Law> =
     BracketLaws.laws(SC, FF, AP, SL, GENK, EQK, testStackSafety, iterations) +
       MonadThrowLaws.laws(SC, SC, SC, SC, GENK, EQK) +
       monadDeferLaws(SC, GENK, EQK, testStackSafety, iterations)
 
   fun <F> MonadDefer<F>.derivedLaterConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
-    forAll(GK.genK(Gen.int()), Gen.intSmall()) { fa: Kind<F, Int>, x: Int ->
+    forAll(50, GK.genK(Gen.int()), Gen.intSmall()) { fa: Kind<F, Int>, x: Int ->
       later(fa).equalUnderTheLaw(defer { fa }, EQ)
     }
   }
 
   fun <F> MonadDefer<F>.derivedLazyConsistent(GK: GenK<F>, EQ: Eq<Kind<F, Int>>) {
-    forAll(GK.genK(Gen.int())) { fa: Kind<F, Int> ->
+    forAll(50, GK.genK(Gen.int())) { fa: Kind<F, Int> ->
       lazy().flatMap { fa }.equalUnderTheLaw(later { }.flatMap { fa }, EQ)
     }
   }
 
   fun <F> MonadDefer<F>.laterConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.intSmall()) { x ->
+    forAll(50, Gen.intSmall()) { x ->
       later { x }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
   fun <F> MonadDefer<F>.deferConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.intSmall()) { x ->
+    forAll(50, Gen.intSmall()) { x ->
       defer { just(x) }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
   fun <F> MonadDefer<F>.laterOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.intSmall()) { x ->
+    forAll(50, Gen.intSmall()) { x ->
       laterOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
@@ -179,28 +179,28 @@ object MonadDeferLaws {
   }
 
   fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.create { Unit }) {
+    forAll(50, Gen.create { Unit }) {
       (0..iterations).toList().k().foldLeft(just(0)) { def, x ->
         def.flatMap { just(x) }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
   fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.create { Unit }) {
+    forAll(50, Gen.create { Unit }) {
       (0..iterations).toList().foldRight(just(iterations)) { x, def ->
         lazy().flatMap { def }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
   fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.create { Unit }) {
+    forAll(50, Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.attempt().map { x }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
   fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 20_000, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.create { Unit }) {
+    forAll(50, Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.map { x }
       }.equalUnderTheLaw(just(iterations), EQ)

@@ -451,7 +451,7 @@ class QueueTest : ArrowFxSpec(iterations = 100) {
       }
 
       // To test outstanding offers, we need to `offer` more elements to the queue than we have capacity
-      "$label - takeAll takes all values, including outstanding offers" {
+      "$label - takeAll takes all values, including outstanding offers".config(enabled = false) {
         forAll(50,
           Gen.nonEmptyList(Gen.int()).filter { it.size in 51..100 },
           Gen.choose(1, 50)
