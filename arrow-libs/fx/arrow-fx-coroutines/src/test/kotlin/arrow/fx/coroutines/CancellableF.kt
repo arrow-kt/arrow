@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -10,13 +11,16 @@ import kotlinx.coroutines.launch
 class CancellableF : ArrowFxSpec(spec = {
 
   "cancelable works for immediate values" {
-    checkAll(Arb.result(Arb.int())) { res ->
+    checkAll(Arb.either(Arb.throwable(), Arb.int())) { res ->
       Either.catch {
         cancellable<Int> { cb ->
-          cb(res)
+          res.fold(
+            { e -> cb(Result.failure(e)) },
+            { a -> cb(Result.success(a)) }
+          )
           CancelToken.unit
         }
-      } shouldBe res.toEither()
+      } should either(res)
     }
   }
 
@@ -38,25 +42,20 @@ class CancellableF : ArrowFxSpec(spec = {
   }
 
   "cancelableF works for immediate values" {
-    checkAll(Arb.result(Arb.int())) { res ->
-      Either.catch {
-        cancellableF<Int> { cb ->
-          cb(res)
-          CancelToken.unit
-        }
-      } shouldBe res.toEither()
+    checkAll(Arb.either(Arb.throwable(), Arb.int())) { res ->
+      val res = Either.catch {
+        immediateValues(res)
+      }
+      res should either(res)
     }
   }
 
   "cancelableF works for async values" {
-    checkAll(Arb.result(Arb.int())) { res ->
-      Either.catch {
-        cancellableF<Int> { cb ->
-          val res = res.suspend()
-          cb(res)
-          CancelToken.unit
-        }
-      } shouldBe res.toEither()
+    checkAll(Arb.either(Arb.throwable(), Arb.int())) { res ->
+      val res = Either.catch {
+        asyncValues(res)
+      }
+      res should either(res)
     }
   }
 
@@ -113,3 +112,22 @@ class CancellableF : ArrowFxSpec(spec = {
     }
   }
 })
+
+suspend fun immediateValues(e: Either<Throwable, Int>): Int =
+  cancellableF { cb ->
+    e.fold(
+      { e -> cb(Result.failure(e)) },
+      { i -> cb(Result.success(i)) }
+    )
+    CancelToken.unit
+  }
+
+suspend fun asyncValues(e: Either<Throwable, Int>): Int =
+  cancellableF { cb ->
+    val res = e.suspend()
+    res.fold(
+      { e -> cb(Result.failure(e)) },
+      { i -> cb(Result.success(i)) }
+    )
+    CancelToken.unit
+  }

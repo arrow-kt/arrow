@@ -172,7 +172,7 @@ class Scope private constructor(
     val job = coroutineContext[Job]
     val scope = ScopedResource()
     val release: suspend (R, ExitCase) -> Unit = { r, ex -> withContext(NonCancellable) { release(r, ex) } }
-    Either.catch(fr).flatMap { resource ->
+    Either.catch { fr() }.flatMap { resource ->
       scope.acquired { ex: ExitCase -> release(resource, ex) }.map { registered ->
         state.modify {
           if ((conn.isCancelled() || job?.isCancelled == true) && registered) Pair(it, suspend { release(resource, ExitCase.Cancelled(CancellationException())) })
@@ -402,9 +402,9 @@ class Scope private constructor(
    */ // TODO return Pull.Result here, only usage in `Compiler` reconstructs into Pull.Result
   internal suspend fun <A> interruptibleEval(f: suspend () -> A): Either<Either<Throwable, Token>, A> =
     when (interruptible) {
-      null -> Either.catch(f).mapLeft { it.left() }
+      null -> Either.catch { f() }.mapLeft { it.left() }
       else -> {
-        val res = raceN({ interruptible.deferred.get() }, { Either.catch(f) })
+        val res = raceN({ interruptible.deferred.get() }, { Either.catch { f() } })
         when (res) {
           is Either.Right -> res.b.mapLeft { it.left() }
           is Either.Left -> Either.Left(res.a)

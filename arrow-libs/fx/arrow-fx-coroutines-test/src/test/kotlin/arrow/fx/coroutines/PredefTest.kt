@@ -1,7 +1,5 @@
 package arrow.fx.coroutines
 
-import arrow.core.Either
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
@@ -24,23 +22,6 @@ class PredefTest : ArrowFxSpec(spec = {
 
       x shouldBe COROUTINE_SUSPENDED
       promise.join() shouldBe i
-    }
-  }
-
-  "either.suspended always suspends" {
-    checkAll(Arb.either(Arb.throwable(), Arb.int())) { ea ->
-      val promise = UnsafePromise<Int>()
-
-      val x = ea.suspended()
-        .startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) {
-          promise.complete(it)
-        })
-
-      x shouldBe COROUTINE_SUSPENDED
-
-      Either.catch {
-        promise.join()
-      } should either(ea)
     }
   }
 
