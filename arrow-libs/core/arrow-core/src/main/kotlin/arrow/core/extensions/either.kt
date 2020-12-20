@@ -19,7 +19,6 @@ import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.core.left
 import arrow.core.right
-import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -66,7 +65,6 @@ fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<
   }
 }
 
-@extension
 interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
 
   fun SGL(): Semigroup<L>
@@ -75,7 +73,6 @@ interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
   override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> = fix().combine(SGL(), SGR(), b)
 }
 
-@extension
 interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {
   fun MOL(): Monoid<L>
   fun MOR(): Monoid<R>
@@ -86,18 +83,15 @@ interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {
   override fun empty(): Either<L, R> = Right(MOR().empty())
 }
 
-@extension
 interface EitherFunctor<L> : Functor<EitherPartialOf<L>> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
-@extension
 interface EitherBifunctor : Bifunctor<ForEither> {
   override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
 }
 
-@extension
 interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
@@ -109,7 +103,6 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
     fix().eitherAp(ff)
 }
 
-@extension
 interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
@@ -117,7 +110,6 @@ interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L>
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
-@extension
 interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
@@ -142,7 +134,6 @@ internal object EitherMonadFx : MonadFx<EitherPartialOf<Any?>> {
     super.monad(c).fix()
 }
 
-@extension
 interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, EitherApplicative<L> {
 
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
@@ -151,10 +142,8 @@ interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, E
     fix().eitherHandleErrorWith(f)
 }
 
-@extension
 interface EitherMonadError<L> : MonadError<EitherPartialOf<L>, L>, EitherApplicativeError<L>, EitherMonad<L>
 
-@extension
 interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
 
   override fun <A, B> EitherOf<L, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -164,7 +153,6 @@ interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
-@extension
 interface EitherBifoldable : Bifoldable<ForEither> {
   override fun <A, B, C> EitherOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().bifoldLeft(c, f, g)
 
@@ -175,27 +163,23 @@ interface EitherBifoldable : Bifoldable<ForEither> {
 fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
   fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
-@extension
 interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
   override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
     fix().eitherTraverse(AP, f)
 }
 
-@extension
 interface EitherBitraverse : Bitraverse<ForEither>, EitherBifoldable {
   override fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, EitherOf<C, D>> =
     fix().let { AP.run { it.fold({ f(it).map { Either.Left(it) } }, { g(it).map { Either.Right(it) } }) } }
 }
 
-@extension
 interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 
   override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
     fix().eitherCombineK(y)
 }
 
-@extension
 interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 
   fun EQL(): Eq<L>
@@ -214,7 +198,6 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
   }
 }
 
-@extension
 interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
   fun EQL(): Eq<L>
 
@@ -224,7 +207,6 @@ interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
     }
 }
 
-@extension
 interface EitherEqK2 : EqK2<ForEither> {
   override fun <A, B> Kind2<ForEither, A, B>.eqK(other: Kind2<ForEither, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
@@ -234,14 +216,12 @@ interface EitherEqK2 : EqK2<ForEither> {
     }
 }
 
-@extension
 interface EitherShow<L, R> : Show<Either<L, R>> {
   fun SL(): Show<L>
   fun SR(): Show<R>
   override fun Either<L, R>.show(): String = show(SL(), SR())
 }
 
-@extension
 interface EitherHash<L, R> : Hash<Either<L, R>> {
 
   fun HL(): Hash<L>
@@ -260,7 +240,6 @@ interface EitherHash<L, R> : Hash<Either<L, R>> {
     )
 }
 
-@extension
 interface EitherOrder<L, R> : Order<Either<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
@@ -276,7 +255,6 @@ interface EitherOrder<L, R> : Order<Either<L, R>> {
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
 
-@extension
 interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,

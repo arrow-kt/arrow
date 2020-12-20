@@ -275,11 +275,11 @@ class EitherTest : UnitSpec() {
         runBlocking {
           val result =
             Either.resolve(
-              f = f,
+              f = { f() },
               success = { a -> handleWithPureFunction(a, returnObject) },
               error = { e -> handleWithPureFunction(e, returnObject) },
               throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = ::handleWithPureFunction
+              unrecoverableState = { handleWithPureFunction(it) }
             )
           result == returnObject
         }
@@ -295,11 +295,11 @@ class EitherTest : UnitSpec() {
         runBlocking {
           shouldThrow<Throwable> {
             Either.resolve(
-              f = f,
+              f = { f() },
               success = { a -> handleWithPureFunction(a, returnObject) },
               error = { e -> handleWithPureFunction(e, returnObject) },
               throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = ::handleWithPureFunction
+              unrecoverableState = { handleWithPureFunction(it) }
             )
           }
         }
@@ -316,11 +316,11 @@ class EitherTest : UnitSpec() {
         runBlocking {
           val result =
             Either.resolve(
-              f = f,
-              success = ::throwException,
+              f = { f() },
+              success = { throwException(it) },
               error = { e -> handleWithPureFunction(e, returnObject) },
               throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = ::handleWithPureFunction
+              unrecoverableState = { handleWithPureFunction(it) }
             )
           result == returnObject
         }
@@ -336,11 +336,11 @@ class EitherTest : UnitSpec() {
         runBlocking {
           val result =
             Either.resolve(
-              f = f,
+              f = { f() },
               success = { a -> handleWithPureFunction(a, returnObject) },
-              error = ::throwException,
+              error = { throwException(it) },
               throwable = { t -> handleWithPureFunction(t, returnObject) },
-              unrecoverableState = ::handleWithPureFunction
+              unrecoverableState = { handleWithPureFunction(it) }
             )
           result == returnObject
         }
@@ -355,11 +355,11 @@ class EitherTest : UnitSpec() {
         runBlocking {
           shouldThrow<Throwable> {
             Either.resolve(
-              f = f,
-              success = ::throwException,
-              error = ::throwException,
-              throwable = ::throwException,
-              unrecoverableState = ::handleWithPureFunction
+              f = { f() },
+              success = { throwException(it) },
+              error = { throwException(it) },
+              throwable = { throwException(it) },
+              unrecoverableState = { handleWithPureFunction(it) }
             )
           }
         }

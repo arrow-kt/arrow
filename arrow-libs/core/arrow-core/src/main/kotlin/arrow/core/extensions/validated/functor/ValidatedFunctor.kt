@@ -8,7 +8,6 @@ import arrow.core.Validated.Companion
 import arrow.core.extensions.ValidatedFunctor
 import arrow.core.fix
 import arrow.core.widen
-import arrow.core.mapConst as _mapConst
 import kotlin.Any
 import kotlin.Function1
 import kotlin.PublishedApi
@@ -102,9 +101,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.mapConst(arg1: B): Validated<E, B> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("mapConst(arg1)", "arrow.core.mapConst"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.mapConst(this)", "arrow.core.mapConst"))
 fun <E, A, B> A.mapConst(arg1: Kind<Kind<ForValidated, E>, B>): Validated<E, A> =
-  _mapConst(arg1.fix())
+  arg1.fix().mapConst(this)
 
 @JvmName("tupleLeft")
 @Suppress(

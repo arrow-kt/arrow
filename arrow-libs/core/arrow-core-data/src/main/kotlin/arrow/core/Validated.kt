@@ -1076,12 +1076,6 @@ fun <E, B> Validated<E, B>.eqv(
 }
 
 /**
- * Replaces the [B] value inside [Validated] with [A] resulting in Validated<E, A>
- */
-fun <E, A, B> A.mapConst(fb: Validated<E, B>): Validated<E, A> =
-  fb.mapConst(this)
-
-/**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
  *
  * ```kotlin:ank:playground:extension
