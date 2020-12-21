@@ -1,8 +1,10 @@
 package arrow.fx.coroutines
 
+import arrow.core.Tuple2
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.property.Arb
 import io.kotest.property.PropertyContext
+import io.kotest.property.arbitrary.bind
 import io.kotest.property.checkAll
 
 /**
@@ -109,6 +111,28 @@ abstract class ArrowFxSpec(
       genF,
       property
     )
+
+  suspend fun <A, B, C, D, E, F, G> checkAll(
+    genA: Arb<A>,
+    genB: Arb<B>,
+    genC: Arb<C>,
+    genD: Arb<D>,
+    genE: Arb<E>,
+    genF: Arb<F>,
+    genG: Arb<G>,
+    property: suspend PropertyContext.(A, B, C, D, E, F, G) -> Unit
+  ): PropertyContext =
+    checkAll(
+      iterations,
+      genA,
+      genB,
+      genC,
+      genD,
+      genE,
+      Arb.bind(genF, genG, ::Tuple2)
+    ) { a, b, c, d, e, (f, g) ->
+      property(a, b, c, d, e, f, g)
+    }
 
   suspend fun forFew(
     iterations: Int,
