@@ -269,4 +269,10 @@ interface MetaApi {
    * A instance of @SuppressAnnotation in the Arrow Meta AST
    */
   fun SuppressAnnotation(vararg names: String): Annotation
+
+  /**
+   * Renders this generated method as deprecated presenting the alternative
+   * forward or final Api in Arrow 1.0.
+   */
+  fun DeprecatedAnnotation(msg: String, replaceWithExpression: String, imports: List<String>): Annotation
 }

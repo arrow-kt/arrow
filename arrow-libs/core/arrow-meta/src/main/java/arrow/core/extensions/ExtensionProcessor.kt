@@ -81,7 +81,10 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       ).lyrics()
     )
 
-  private fun TypeClassInstance.wrappedFileBuilder(annotatedElement: AnnotatedElement.Interface, wrappedType: Pair<TypeName, TypeName.ParameterizedType>): FileSpec.Builder =
+  private fun TypeClassInstance.wrappedFileBuilder(
+    annotatedElement: AnnotatedElement.Interface,
+    wrappedType: Pair<TypeName, TypeName.ParameterizedType>
+  ): FileSpec.Builder =
     FileSpec.builder(
       packageName = annotatedElement.type.packageName.value + "." +
         wrappedType.second.rawType.simpleName.substringAfterLast(".").toLowerCase() + "." +
@@ -205,6 +208,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
         val dummyArgsCount = f.countDummyArgs()
         val allArgs = requiredParameters + func.parameters
         val typeVariables = extensionTypeVariables(func)
+        val companionOrFactory = extensionsCompanionOrFactory(wrappedType)
         func
           .copy(
             kdoc = func.kdoc?.eval(this),
@@ -223,6 +227,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
                 """"USELESS_CAST"""",
                 """"EXTENSION_SHADOWED_BY_MEMBER"""",
                 """"UNUSED_PARAMETER""""
+              ),
+              DeprecatedAnnotation(
+                "@extension kinded projected functions are deprecated",
+                "${func.name}(${allArgs.joinToString(", ") { it.name.trim() }})",
+                if (func.receiverType != null) listOf("arrow.core.${func.name}")
+                else listOf("${+companionOrFactory}.${func.name}")
               )
             ),
             parameters = allArgs,
@@ -240,7 +250,6 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
               val typeVars =
                 if (instance.name.simpleName == "ConstFunctor") emptyList()
                 else func.typeVariables
-              val companionOrFactory = extensionsCompanionOrFactory(wrappedType)
               if (receiverType != null) {
                 val impl = receiverTypeExtensionImpl(wrappedType, receiverType, func, wrappedArgs, typeVars)
                 receiverTypeExtensionCode(companionOrFactory, impl)
@@ -252,11 +261,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       .toList()
   }
 
-  private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> = (instance.typeVariables + func.typeVariables)
-    .asSequence()
-    .map { it.removeConstrains() }
-    .distinctBy { it.name }
-    .toList()
+  private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> =
+    (instance.typeVariables + func.typeVariables)
+      .asSequence()
+      .map { it.removeConstrains() }
+      .distinctBy { it.name }
+      .toList()
 
   private fun TypeClassInstance.staticExtensionImpl(
     companionOrFactory: TypeName,
@@ -293,13 +303,14 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       "this@${+func.name}.${+func.name}${+typeVars}($wrappedArgs) as ${+func.returnType}"
     }
 
-  private fun TypeClassInstance.extensionsCompanionOrFactory(wrappedType: Pair<TypeName, TypeName.ParameterizedType>?): TypeName = if (wrappedType != null) {
-    val wrappedSimpleName = wrappedType.second.rawType.simpleName
-    val wrappedPackage = PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
-    TypeName.Classy(
-      wrappedSimpleName,
-      "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
-      PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
-    )
-  } else projectedCompanion
+  private fun TypeClassInstance.extensionsCompanionOrFactory(wrappedType: Pair<TypeName, TypeName.ParameterizedType>?): TypeName =
+    if (wrappedType != null) {
+      val wrappedSimpleName = wrappedType.second.rawType.simpleName
+      val wrappedPackage = PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
+      TypeName.Classy(
+        wrappedSimpleName,
+        "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
+        PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
+      )
+    } else projectedCompanion
 }

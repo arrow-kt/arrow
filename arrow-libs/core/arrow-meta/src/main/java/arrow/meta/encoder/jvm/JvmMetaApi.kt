@@ -547,6 +547,24 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       useSiteTarget = null
     )
 
+  override fun DeprecatedAnnotation(
+    msg: String,
+    replaceWithExpression: String,
+    imports: List<String>
+  ): Annotation =
+    Annotation(
+      type = TypeName.typeNameOf(Deprecated::class),
+      members = listOf(
+        Code(""""$msg""""),
+        Code("""ReplaceWith(
+          |"$replaceWithExpression",
+          |"${imports.joinToString(", ")}"
+          |)""".trimMargin()),
+        Code("DeprecationLevel.WARNING")
+      ),
+      useSiteTarget = null
+    )
+
   /**
    * @see [MetaApi.SuppressAnnotation]
    */
