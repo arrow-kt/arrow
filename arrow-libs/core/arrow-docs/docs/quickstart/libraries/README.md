@@ -54,7 +54,7 @@ dependencies {
 }
 ```
 
-The smallest set of [datatypes]({{ '/datatypes/intro/' | relative_url }}) and all basic [typeclasses]({{ '/typeclasses/intro' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
+The smallest set of datatypes and all basic [typeclasses]({{ '/typeclasses/intro' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
 ### arrow-optics

@@ -29,21 +29,12 @@ import arrow.*
 import arrow.core.*
 import arrow.core.extensions.either.applicativeError.*
 
-val eitherResult: Either<Throwable, Int> =
-  RuntimeException("BOOM!").raiseError()
+val eitherResult: Either<String, Int> =
+  "BOOM!".raiseError()
 
 eitherResult
 ```
 
-```kotlin:ank
-import arrow.fx.*
-import arrow.fx.extensions.io.applicativeError.*
-
-val ioResult: IO<Int> =
-  RuntimeException("BOOM!").raiseError()
-
-ioResult.attempt().unsafeRunSync()
-```
 
 #### Kind<F, A>.ensure
 

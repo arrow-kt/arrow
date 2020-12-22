@@ -24,23 +24,12 @@ These solutions have a canonical implementation that is generalized for all poss
 
 Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}),
 branching in code with [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}),
-or interacting with the platform the program runs in using [`IO`]({{ '/effects/io' | relative_url }}).
+or interacting with the platform the program runs in using [`suspend`]({{ '/effects/async' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes, where each inheritor is a `data` class.
 For example, the internal representation of an `Option` is a `sealed` class with two `data` classes: `Some<A>(val a: A)`, and `None`.
 And `Ior` is a `sealed` class with three `data` class inheritors: `Left(val a: A)`, `Right(val b: B)`, and `Both(val a: A, val b: B)`.
 
-Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
-
-```kotlin:ank
-import arrow.fx.*
-
-IO { 0 }
- .flatMap { IO { it * 2 } }
- .map { it + 1 }
-```
-
-You can read more about all the [datatypes]({{ '/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/datatypes/intro' | relative_url }}).
 
 ### Typeclasses
 
@@ -403,6 +392,6 @@ Side-effects are too general to be unit tested for because they depend on the en
 
 Because side-effects are unavoidable in any program, FP provides several datatypes for dealing with them! One way is by abstracting their behavior. The simplest examples of this are the `Writer`datatype, which allows you to write to an information sink like a log or a file buffer; or `State` datatype, which simulates scoped mutable state for the duration of an operation.
 
-For more complicated side-effects that can throw or jump threads, we need more advanced datatypes, called Effects, that wrap over impure operations. Some of these datatypes may already be familiar to you, like [`rx.Observable`]({{ '/integrations/rx2/' | relative_url }}), [`kotlinx.coroutines.Deferred`]({{ '/integrations/kotlinxcoroutines/' | relative_url }}), or Arrow's [`IO`]({{ '/effects/io/' | relative_url }}). These Effects compose, catch exceptions, control asynchrony, and, most importantly, can be run lazily. This gets rid of the issues with side-effects.
+For more complicated effects that can throw or jump threads, we need more advanced techniques. We model side-effects in kotlin with `suspend` functions and Kotlin Continuations. These continuations compose, catch exceptions, control asynchrony, and, most importantly, can be run lazily. This gets rid of the issues with side-effects.
 
 Although one can also write the whole program in an imperative way inside a single Effect wrapper, that wouldn't be very efficient, as you don't get any of its benefits. :D

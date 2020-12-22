@@ -15,15 +15,13 @@ permalink: /core/
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
 Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces and abstractions across Kotlin libraries.
-For this, it includes the most popular data types, type classes and abstractions such as `Option`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` to empower users to write pure FP apps and libraries built atop higher order abstractions.
+For this, it includes the most popular data types, type classes and abstractions such as `Option`, `Either`, `Functor`, `Applicative`, `Monad` to empower users to write pure FP apps and libraries built atop higher order abstractions.
 
 Use the list below to learn more about Λrrow's main features.
 
 - [Patterns]({{ '/patterns/glossary/' | relative_url }}): tutorials and approaches to day-to-day challenges using FP
 - [Libraries]({{ '/quickstart/libraries/' | relative_url }}): all the libraries provided by Λrrow
-- [Type classes]({{ '/typeclasses/intro/' | relative_url }}): defining behaviors for data
-- [Data types]({{ '/datatypes/intro/' | relative_url }}): common abstractions
-- [Effects]({{ '/effects/io/' | relative_url }}): interfacing with external systems
+- [Effects]({{ '/effects/async/' | relative_url }}): interfacing with external systems
 - [Optics]({{ '/optics/iso/' | relative_url }}): inspecting and modifying data structures
 
 ## Curated external links

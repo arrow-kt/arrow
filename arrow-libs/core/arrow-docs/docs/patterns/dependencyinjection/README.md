@@ -187,30 +187,6 @@ parser.parseInts(listOf("bla".some(), "2".some()))
 // None
 ```
 
-```kotlin
-class UserFetcher<F>(ME: MonadThrow<F>, val api: ApiService): MonadThrow<F> by ME {
-
-  fun getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
-    fx.monadThrow {
-      val (id) = fid
-      val (user) = api.getUser(id)
-      user.friendIds.map { api.getUser(it.id) }()
-    }.handleError { listOf() }
-
-  fun createId(id: String): Kind<F, UserId> =
-    catch { parseIdOrThrow(id) }
-      .map { UserId(it) }
-}
-
-...
-
-val fetcher = UserFetcher(IO.monadThrow(), ApiService())
-
-fetcher.getUserFriends(fetcher.createId("122344"))
-  .fix().unsafeRunSync()
-// [User(id="123", friendIds=["122344"]), User(id="44", friendIds=["122344", "1245"]), User(id="1245", friendIds=["122344", "44"])])]
-```
-
 ### Methods inside a class
 
 This is the case where we find the limitations of the Kotlin compiler. Once you're inside a class, `this` gets bound to the class scope.
@@ -427,7 +403,7 @@ object Api {
 
 import Api.getUserFriends
 
-val deps = FetcherDependencies(IO.monadThrow(), ApiService())
+val deps = FetcherDependencies(Either.monadThrow(), ApiService())
 
 deps.getUserFriends(deps.createId("1234"))
    .fix().unsafeRunSync()

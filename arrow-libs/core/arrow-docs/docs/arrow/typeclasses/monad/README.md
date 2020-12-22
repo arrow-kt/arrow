@@ -52,7 +52,7 @@ Right(1).flatMap { _ ->
 ```
 
 Note that, depending on the implementation of `Kind<F, A>`, this chaining function may be executed immediately, i.e., for `Option` or `Either`;
-or lazily, i.e., `IO` or `ObservableK`.
+or lazily, i.e., `suspend` or `Flow`.
 
 #### Kind<F, Kind<F, A>>#flatten
 
@@ -96,11 +96,11 @@ Some(1).followedBy(Some(2))
 Sequentially executes two elements and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
-import arrow.fx.extensions.io.monad.*
+import arrow.core.extensions.option.monad.flatTap
 
-fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
+fun logValue(i: Int): Option<Unit> = Some(println(i))
 
-IO.just(1).flatTap(::logValue).fix().unsafeRunSync()
+Some(1).flatTap(::logValue)
 ```
 
 #### productL/productLEval (formerly ~~forEffect~~/~~forEffectEval~~)

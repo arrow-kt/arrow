@@ -17,8 +17,7 @@ import kotlin.coroutines.startCoroutine
  * Given a type constructor [F] with a value of [A] we can compose multiple operations of type
  * `Kind<F, ?>` where `?` denotes a value being transformed.
  *
- * This is true for all type constructors that can support the [Monad] type class including and not limited to
- * [IO], [ObservableK], [Option], [Either], [List] ...
+ * This is true for all type constructors that can support the [Monad] type class including and not limited to [Option], [Either], [List] ...
  *
  * [The Monad Tutorial](https://arrow-kt.io/docs/patterns/monads/)
  *

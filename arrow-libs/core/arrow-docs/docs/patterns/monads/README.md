@@ -379,8 +379,6 @@ See that, instead of `WorkflowThatReturns<A>`, our containers are called `Kind<F
 
 The constructor `just` is used to put an object into a container `Kind<F, A>`, and `flatMap` is used to replace one contained object with another contained object.
 
-It's important that `flatMaps`'s argument returns `Kind<F, B>` and not just `B`, as this new contained object can have different behavior, like a left branch of `Either` or an async execution of `IO`.
-
 We can think of `flatMap` as a combination of `map` and `flatten`, as defined by the following signature:
 
 ```kotlin
@@ -507,7 +505,7 @@ We are back to the familiar structure. Time for some more complications.
 
 We're going to dispel one common misconception.
 Sometimes the word Monad is used to refer to types like Option, Future, Either, and so on, and that's not correct.
-Those are called [datatypes]({{ '/datatypes/intro' | relative_url }}) or just types. Let's see the difference!
+Those are called datatypes or just types. Let's see the difference!
 
 As you have seen, neither Future nor Option implement Monad directly.
 This is intentional, as you can potentially have several Monad implementations for a single type.

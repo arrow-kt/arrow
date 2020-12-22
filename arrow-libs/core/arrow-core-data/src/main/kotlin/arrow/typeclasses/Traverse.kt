@@ -20,29 +20,32 @@ import arrow.core.ValidatedNel
  *
  * These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single [String] into an [Int], validating a login, or asynchronously fetching website information for a user.
  *
- * ```kotlin
- * import arrow.fx.IO
+ * ```kotlin:ank
+ * import arrow.core.Either
+ * import arrow.core.Right
  *
- * interface Profile
- * interface User
+ * object Profile
+ * object NotFound
+ * object User
  *
- * fun userInfo(u: User): IO<Profile>
+ * fun userInfo(user: User): Either<NotFound, Profile> =
+ *   Right(Profile)
  * ```
  *
  * Each function asks only for the data it needs; in the case of `userInfo`, a single `User`. Indeed, we could write one that takes a `List<User>` and fetches profile for all of them, but it would be a bit strange. If we just wanted to fetch the profile of only one user, we would either have to wrap it in a [List] or write a separate function that takes in a single user, nonetheless. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does it hold in this case?
  *
- * Given just `(User) -> IO<Profile>`, what should we do if we want to fetch profiles for a `List<User>`? We could try familiar combinators like map.
+ * Given just `(User) -> Either<NotFound, Profile>`, what should we do if we want to fetch profiles for a `List<User>`? We could try familiar combinators like map.
  *
- * ```kotlin
- * fun profilesFor(users: List<User>): List<IO<Profile>> =
+ * ```kotlin:ank
+ * fun profilesFor(users: List<User>): List<Either<NotFound, Profile>> =
  *   users.map(::userInfo)
  * ```
  *
- * Note the return type `List<IO<Profile>>`. This makes sense given the type signatures, but seems unwieldy. We now have a list of asynchronous values, and to work with those values we must then use the combinators on `IO` for every single one. It would be nicer instead if we could get the aggregate result in a single `IO`, say a `IO<List<Profile>>`.
+ * Note the return type `List<Either<NotFound, Profile>>`. This makes sense given the type signatures, but seems unwieldy. We now have a list of result values, and to work with those values we must then use the combinators on `Either` for every single one. It would be nicer instead if we could get the aggregate result in a single `Either`, say a `Either<NotFound, List<Profile>>`.
  *
  * ### Sequencing
  *
- * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<IO<Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `IO<List<Profile>>`. Given `Option` and `IO` have an [Applicative] instance, we can [sequence] the list to reverse the types.
+ * Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<Either<NotFound, Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `Either<NotFound, List<Profile>>`. Given `Option` and `Either` have access to [traverse] and [sequence] we can reverse the types.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Option
@@ -112,7 +115,7 @@ import arrow.core.ValidatedNel
  * }
  * ```
  *
- * In our above example, `F` is `List`, and `G` is `Option` or `IO`. For the profile example, traverse says given a `List<User>` and a function `(User) -> IO<Profile>`, it can give you a `IO<List<Profile>>`.
+ * In our above example, `F` is `List`, and `G` is `Option` or `Either`. For the profile example, traverse says given a `List<User>` and a function `(User) -> Either<NotFound, Profile>`, it can give you a `Either<NotFound, List<Profile>>`.
  *
  * Abstracting away the `G` (still imagining `F` to be `List`), [traverse] says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
  *
@@ -124,55 +127,46 @@ import arrow.core.ValidatedNel
  * map(::f).sequence(AP) == traverse(AP, ::f)
  * ```
  *
- * where AP stands for an `Applicative<G>`, which is in prior snippets `Applicative<ForOption>` or `Applicative<ForIO>`.
+ * where AP stands for an `Applicative<G>`, which is in prior snippets `Applicative<ForOption>` or `Applicative<EitherPartialOf<E>>`.
  *
  * ### Sequencing effects
  *
  * Sometimes our effectful functions return a [Unit] value in cases where there is no interesting value to return (e.g. writing to some sort of store).
  *
  * ```kotlin:ank
- * import arrow.fx.IO
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
+ * fun writeToStore(data: Data): Either<NotFound, Unit> =
+ *   Right(Unit)
  * ```
  *
  * If we traverse using this, we end up with a funny type.
  *
  * ```kotlin:ank
  * import arrow.core.ListK
- * import arrow.fx.IO
- * import arrow.fx.extensions.io.applicative.applicative
- * import arrow.fx.fix
+ * import arrow.core.extensions.either.applicative.applicative
+ * import arrow.core.fix
  *
  * interface Data
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
- * //sampleStart
- * fun writeManyToStore(data: ListK<Data>): IO<ListK<Unit>> =
- *   data.traverse(IO.applicative()) { writeToStore(it) }.fix()
- * //sampleEnd
+ * fun writeToStore(data: Data): Either<NotFound, Unit> = TODO("")
+ *
+ * fun writeManyToStore(data: ListK<Data>): Either<NotFound, ListK<Unit>> =
+ *   data.traverse(Either.applicative()) { writeToStore(it) }.fix()
  * ```
  *
- * We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
+ * We end up with a `Either<NotFound, List<Unit>>`! A `List<Unit>` is not of any use to us, and communicates the same amount of information as a single [Unit] does.
  *
  * Traversing solely for the sake of the effects (ignoring any values that may be produced, [Unit] or otherwise) is common, so [Foldable] (superclass of [Traverse]) provides [traverse_] and [sequence_] methods that do the same thing as [traverse] and [sequence] but ignore any value produced along the way, returning [Unit] at the end.
  *
  * ```kotlin:ank
- * import arrow.core.ListK
  * import arrow.core.extensions.list.foldable.traverse_
- * import arrow.fx.IO
- * import arrow.fx.extensions.io.applicative.applicative
- * import arrow.fx.fix
  *
- * interface Data
+ * fun writeToStore(data: Data): Either<NotFound, Unit> = TODO("")
  *
- * fun writeToStore(data: Data): IO<Unit> = TODO("")
- * //sampleStart
- * fun writeManyToStore(data: ListK<Data>): IO<Unit> =
- *   data.traverse_(IO.applicative()) { writeToStore(it) }.fix()
- * //sampleEnd
+ * fun writeManyToStore(data: List<Data>): Either<NotFound, Unit> =
+ *   data.traverse_(Either.applicative()) { writeToStore(it) }.fix()
  * ```
  *
  * ```kotlin:ank:playground
@@ -340,20 +334,12 @@ import arrow.core.ValidatedNel
  *
  * Notice that in the [Either] case, should any string fail to parse the entire [traverse] is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of [traverse] is closely tied with the [Applicative] behavior of the data type, where computations are run in isolation.
  *
- * Going back to our `IO` example from the beginning with concurrency in mind, we can get an [Applicative] instance for `IO`, that traverses concurrently, by using `parApplicative`. Contrary to `IO.applicative()`, which runs in sequence.
- *
- * It is worth mentioning that `parApplicative` does not implement `lazyAp` in contrast to `IO.applicative()`, which means `parApplicative` creates all IO's upfront and executes them in parallel. More importantly, `parApplicative` breaks monad-applicative-consistency laws by design. The aforementioned law holds in the case of `IO.applicative()`, where an effect only runs , when the previous one is successful - hence the monadic nature.
- *
- * Continuing with the example, we traverse a `List<A>` with its [Traverse] instance `ListK.traverse()` and a function`(A) -> IO<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `IO` operations completes they will be gathered back into a `List`.
- *
- * Ultimately, we utilize `parTraverse` that calls traverse with `parApplicative` in an concurrent environment [F] - in the following example `IO`:
+ * Continuing with the example, we traverse a `List<A>` with its [traverse] and a function `(A) -> Either<NotFound, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the suspended `Either` operations completes they will be gathered back into a `List`.
  *
  * ```kotlin:ank:playground
- * import arrow.fx.IO
- * import arrow.fx.extensions.fx
- * import arrow.fx.extensions.io.concurrent.parTraverse
- * import arrow.fx.extensions.io.unsafeRun.runBlocking
- * import arrow.unsafe
+ * import arrow.core.computations.either
+ * import arrow.fx.coroutines.parTraverse
+ * import arrow.core.Right
  *
  * interface Profile
  * interface User
@@ -361,20 +347,23 @@ import arrow.core.ValidatedNel
  * data class DummyUser(val name: String) : User
  * data class DummyProfile(val u: User) : Profile
  *
- * fun userInfo(u: User): IO<Profile> =
- *   IO { DummyProfile(u) } // this can be a call to the DB
+ * suspend fun userInfo(u: User): Either<NotFound, Profile> =
+ *   Right(DummyProfile(u)) // this can be a call to the DB
  *
- * fun List<User>.processLogin(): IO<List<Profile>> =
- *   parTraverse { userInfo(it) }
+ * suspend fun List<User>.processLogin(): Either<NotFound, List<Profile>> =
+ *   either {
+ *     parTraverse { userInfo(it)() }
+ *   }
  *
- * fun program(): IO<Unit> = IO.fx {
+ * suspend fun program(): Unit {
  *   val list = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa"))
- *     .processLogin()()
+ *     .processLogin()
  *   println(list)
  * }
+ *
  * //sampleEnd
- * fun main() {
- *   program().unsafeRunSync()
+ * suspend fun main() {
+ *   program()
  * }
  * ```
  *

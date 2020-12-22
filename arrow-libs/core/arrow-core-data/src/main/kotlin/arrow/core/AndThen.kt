@@ -73,7 +73,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    */
   fun <X> andThen(g: (B) -> X): AndThen<A, X> =
     when (this) {
-      // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
+      // Fusing calls up to a certain threshold
       is Single ->
         if (index != maxStackDepthSize) Single(f andThen g, index + 1)
         else andThenF(AndThen(g))
@@ -105,7 +105,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    */
   infix fun <C> compose(g: (C) -> A): AndThen<C, B> =
     when (this) {
-      // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
+      // Fusing calls up to a certain threshold
       is Single ->
         if (index != maxStackDepthSize) Single(f compose g, index + 1)
         else composeF(AndThen(g))

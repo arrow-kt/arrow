@@ -33,13 +33,6 @@ import arrow.core.extensions.either.applicativeError.*
 Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
-```kotlin:ank
-import arrow.fx.*
-import arrow.fx.extensions.io.applicativeError.*
-
-IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
-```
-
 #### Kind<F, A>#handleErrorWith
 
 This method requires a function that creates a new datatype from an error, `(E) -> Kind<F, A>`. This function is used as a catch + recover clause for the current instance, allowing it to return a new computation after a failure.
@@ -76,12 +69,34 @@ failure.handleError { t -> 0 }
 
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), recovering from any previous error state.
 
-```kotlin:ank
-IO { "3".toInt() }.attempt()
+```kotlin:ank:playground
+import arrow.core.Either
+import arrow.core.Validated
+import arrow.core.valid
+
+//sampleStart
+val validation: Validated<String, Int> = 3.valid()
+val result = validation.attempt()
+//sampleEnd
+
+suspend fun main() {
+  println(result)
+}
 ```
 
-```kotlin:ank
-IO { "nope".toInt() }.attempt()
+```kotlin:ank:playground
+import arrow.core.Either
+import arrow.core.Validated
+import arrow.core.invalid
+
+//sampleStart
+val validation: Validated<String, Int> = "nope".invalid()
+val result = validation.attempt()
+//sampleEnd
+
+suspend fun main() {
+  println(result)
+}
 ```
 
 #### fromEither/fromOption
@@ -96,12 +111,35 @@ Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException
 
 In the case of `fromEither()`, converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E> is required.
 
-```kotlin:ank
-IO.applicativeError().run { Either.Right(1).fromEither { it } }
+```kotlin:ank:playground
+import arrow.core.Either
+import arrow.core.Right
+import arrow.core.Validated
+
+//sampleStart
+val e: Either<String, Int> = Right(1)
+val result = Validated.fromEither(e)
+//sampleEnd
+
+suspend fun main() {
+  println(result)
+}
 ```
 
-```kotlin:ank
-IO.applicativeError().run { Either.Left(RuntimeException("Boom")).fromEither { it } }
+
+```kotlin:ank:playground
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Validated
+
+//sampleStart
+val e: Either<String, Int> = Left("oops")
+val result = Validated.fromEither(e)
+//sampleEnd
+
+suspend fun main() {
+  println(result)
+}
 ```
 
 #### catch

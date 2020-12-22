@@ -7,16 +7,14 @@ permalink: /patterns/polymorphic_programs/
 ## How to write polymorphic programs
 
 
-
-
 What if we could write apps without caring about the runtime data types used, but just about **how the data is operated
-on**? 
+on**?
 
 Let's say we have an application working with RxJava's `Observable`. We'll end up having a bunch of chained call stacks
 based on that given data type. But, at the end of the day, and for the sake of simplicity, wouldn't `Observable` be just
 like a "container" with some extra powers?
 
-And same story for other "containers" like `Flowable`, `Future`, `IO`, and many more.
+And same story for other "containers" like `Flow`, `CompletableFuture`, and many more.
 
 Conceptually, all those types represent an operation (already done or pending to be done), which could support things
 like mapping over the inner value, flatMapping to chain other operations of the same type, zipping it with other
@@ -263,10 +261,10 @@ and both are [**Typeclasses**]({{ '/typeclasses/intro' | relative_url }}).
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument,
 as in [`Monad<F>`]({{ '/arrow/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/arrow/typeclasses/functor' | relative_url }})
 and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }})
-, [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), [`IO`]({{ '/effects/io' | relative_url }}), [`Observable`]({{ '/integrations/rx2' | relative_url }}),
+, [`Option`]({{ '/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), [`Observable`]({{ '/integrations/rx2' | relative_url }}),
 [`Flowable`]({{ '/integrations/rx2' | relative_url }}), and many more for it.
 
-Don't worry if you don't know about some of them yet. Data types like `Either`, `Option`, or `IO` are particular from
+Don't worry if you don't know about some of them yet. Data types like `Either` or `Option` are particular from
 Functional Programming, and you probably don't need to know more about them yet.
 
 So, back to our two problems:
@@ -549,48 +547,13 @@ UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 
 Everything is working as expected. 💪
 
-Finally, let's use a fancier data type related to Functional Programming: [`IO`]({{ '/effects/io' | relative_url }}).
-`IO` exists to wrap an in/out operation that causes side effects and make it pure.
-
-```kotlin
-object test {
-
-  @JvmStatic
-  fun main(args: Array<String>): Unit {
-    val user1 = User(UserId("user1"))
-    val user2 = User(UserId("user2"))
-    val user3 = User(UserId("unknown user"))
-
-    val ioModule = Module(IO.async())
-    ioModule.run {
-      println(repository.allTasksByUser(user1).fix().attempt().unsafeRunSync())
-      println(repository.allTasksByUser(user2).fix().attempt().unsafeRunSync())
-      println(repository.allTasksByUser(user3).fix().attempt().unsafeRunSync())
-    }
-  }
-}
-```
-
-```
-Right(b=[Task(value=LocalTask assigned to user1)])
-Right(b=[Task(value=Remote Task assigned to user2)])
-Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
-```
-
-[`IO`]({{ '/effects/io' | relative_url }}) is a bit special. It returns the errors / successful results using
-[`Either<L,R>`]({{ '/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) (which is another data type). By convention, the "left"
-side of an either (`L`) stores the errors, and the right side (`R`) stores the successful data. That's why successful
-results are printed as `Right(...)` and the failing one is printed as `Left(...)`.
-
-But the result is conceptually the same.
-
 And with this, we are done with all the testing. As you can see, we are able to run the same code stack using different
 data types, so our program has become completely agnostic of those.
 
 [Here you have the polymorphic app all together](https://gist.github.com/JorgeCastilloPrz/c0a4604b9a5dedc89be82b13cfcc1315)
 for copy / paste purposes.
 
-### This is cool but . . . why should I?
+### This is cool but . . . why should I?
 
 That's always your choice, but there are some important benefits that FP brings to the table that you'll need to know
 when the time comes.
