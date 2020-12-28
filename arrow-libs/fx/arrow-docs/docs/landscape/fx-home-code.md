@@ -1,24 +1,34 @@
-{: data-executable="true"}
-```kotlin:ank
-import arrow.fx.IO
-import arrow.fx.extensions.fx
-import kotlinx.coroutines.newSingleThreadContext
+```kotlin:ank:playground
+import arrow.fx.coroutines.parTraverse
+import arrow.fx.coroutines.parMapN
 
-//sampleStart
+data class Street(val name: String) 
+data class Company(val name: String) 
+data class Employee(val name: String, val company: Company, val hired : Boolean = false)
 
+/** An async non blocking service **/
+suspend fun company(name: String): Company =
+  Company("$name on ${Thread.currentThread().name}")  
 
-val Computation = newSingleThreadContext("Computation")
-val BlockingIO = newSingleThreadContext("Blocking IO")
-val UI = newSingleThreadContext("UI")
+/** An async non blocking service **/
+suspend fun street(name: String): Street =
+  Street("$name on ${Thread.currentThread().name}")    
+  
+/** An async non blocking service **/
+suspend fun hire(employee: Employee): Employee =
+  employee.copy(hired = true)
+  
+fun employee(name: String, company: Company): Employee =
+  Employee(name, company)
 
-suspend fun main(): Unit = IO.fx {
-  continueOn(Computation)
-  val t1 = !effect { Thread.currentThread().name }
-  continueOn(BlockingIO)
-  val t2 = !effect { Thread.currentThread().name }
-  continueOn(UI)
-  val t3 = !effect { Thread.currentThread().name }
-  !effect { println("$t1 ~> $t2 ~> $t3") }
-}.suspended()
-//sampleEnd
+suspend fun main() {
+    //sampleStart
+    //maps each function to `::employee` in parallel
+    val audrey = parMapN({ "Audrey" }, { company("Arrow") }, ::employee) 
+    val pepe   = parMapN({  "Pepe"  }, { company("Arrow") }, ::employee)
+    val candidates = listOf(audrey, pepe)
+    val employees = candidates.parTraverse(::hire) //hires in parallel
+    //sampleEnd
+    println(employees)
+}
 ```

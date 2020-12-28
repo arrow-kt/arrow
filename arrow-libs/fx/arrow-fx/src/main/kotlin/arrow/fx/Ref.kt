@@ -20,6 +20,7 @@ import kotlinx.atomicfu.updateAndGet
  * [Ref] is a purely functional wrapper over an [AtomicReference] in context [F],
  * that is always initialised to a value [A].
  */
+@Deprecated(IODeprecation)
 interface Ref<F, A> {
 
   /**

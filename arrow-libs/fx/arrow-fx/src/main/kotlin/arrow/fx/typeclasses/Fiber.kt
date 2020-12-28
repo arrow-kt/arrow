@@ -1,6 +1,7 @@
 package arrow.fx.typeclasses
 
 import arrow.Kind
+import arrow.fx.IODeprecation
 
 import arrow.higherkind
 
@@ -12,6 +13,7 @@ import arrow.higherkind
  * concurrency primitive for doing cooperative multi-tasking.
  */
 @higherkind
+@Deprecated(IODeprecation)
 interface Fiber<F, out A> : FiberOf<F, A> {
 
   /**
@@ -31,6 +33,7 @@ interface Fiber<F, out A> : FiberOf<F, A> {
   operator fun component1(): Kind<F, A> = join()
   operator fun component2(): CancelToken<F> = cancel()
 
+  @Deprecated(IODeprecation)
   companion object {
 
     /**

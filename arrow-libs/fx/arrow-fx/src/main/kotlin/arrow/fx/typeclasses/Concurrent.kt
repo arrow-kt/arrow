@@ -18,6 +18,7 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.fx.internal.AtomicRefW
 import arrow.core.k
+import arrow.fx.IODeprecation
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Queue
@@ -42,6 +43,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
+@Deprecated(IODeprecation)
 typealias CancelToken<F> = Kind<F, Unit>
 
 /**
@@ -49,6 +51,7 @@ typealias CancelToken<F> = Kind<F, Unit>
  *
  * Type class for async data types that are cancellable and can be started concurrently.
  */
+@Deprecated(IODeprecation)
 interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
@@ -1280,6 +1283,7 @@ interface Concurrent<F> : Async<F> {
     }
 }
 
+@Deprecated(IODeprecation)
 interface ConcurrentFx<F> : AsyncFx<F> {
   override val M: Concurrent<F>
   // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context

@@ -3,9 +3,11 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.documented
+import arrow.fx.IODeprecation
 import arrow.fx.typeclasses.ExitCase.Error
 import arrow.typeclasses.MonadError
 
+@Deprecated(IODeprecation)
 sealed class ExitCase<out E> {
 
   object Completed : ExitCase<Nothing>() {
@@ -21,6 +23,7 @@ sealed class ExitCase<out E> {
   companion object
 }
 
+@Deprecated(IODeprecation)
 fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
 
@@ -36,6 +39,7 @@ fun <E> Either<E, *>.toExitCase() =
  * @define use is the action that uses the newly allocated resource and that will provide the final result.
  */
 @documented
+@Deprecated(IODeprecation)
 interface Bracket<F, E> : MonadError<F, E> {
 
   /**

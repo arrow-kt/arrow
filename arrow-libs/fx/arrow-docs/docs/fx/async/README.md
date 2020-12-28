@@ -329,15 +329,8 @@ Strange, you might've expected a `Coroutine` type but a `Coroutine` is represent
 
 This `typealias Coroutine = Contination<Unit>` will start running every time you call `resume(Unit)`, which allows you to run the suspend program N times.
 
-### Arrow Fx Coroutines & KotlinX Coroutines
-
-Both Arrow Fx Coroutines & KotlinX Coroutines independently offer an implementation for Kotlin's coroutine system.
-
-As explained in the document above, Arrow Fx Coroutines offers a battery-included functional IO with cancellation support.
-Where KotlinX Coroutines offers an implementation that offers light-weight futures with cancellation support.
-
 ## Integrating with third-party libraries
 
-Arrow Fx integrates with the Arrow Fx IO runtime, Rx2, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
+Arrow Fx integrates with KotlinX Coroutines Fx, Reactor framework, and any library that can model effectful async/concurrent computations as `suspend`.
 
-If you are interested in providing your own runtime as a backend to the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.
+If you are interested in the Arrow Fx library, please contact us in the main [Arrow Gitter](https://gitter.im/arrow-kt/Lobby) or #Arrow channel on the official [Kotlin Lang Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) with any questions and we'll help you along the way.

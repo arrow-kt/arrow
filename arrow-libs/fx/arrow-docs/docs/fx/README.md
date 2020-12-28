@@ -11,8 +11,6 @@ and is build on top of Kotlin's suspend system.
 
 The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
 
-Arrow Fx programs run unmodified in multiple supported frameworks and runtimes such as Arrow Effects IO, KotlinX Coroutines Deferred, Rx2 Observable, and many others.
-
 # Pure Functions, Side Effects, and Program Execution
 
 ## Pure & Referentially Transparent Functions
@@ -41,7 +39,7 @@ We can state that `helloWorld` is a pure and referentially transparent function 
 
 A side effect is an externally observable effect a function performs in addition to returning a value.
 
-Performing network or file IO, writing to streams, and, in general, all functions that return `Unit` are very likely to produce side effects. That's because a `Unit` return value denotes *no useful return*, which implies that the function does nothing but perform effects.
+Performing network or file I/O, writing to streams, and, in general, all functions that return `Unit` are very likely to produce side effects. That's because a `Unit` return value denotes *no useful return*, which implies that the function does nothing but perform effects.
 
 In Arrow Fx, we use `suspend fun` to denote a function that may cause side effects when invoked.
 

@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
+import arrow.fx.IODeprecation
 import arrow.fx.internal.asyncContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrowFx
@@ -12,9 +13,11 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 /** A asynchronous computation that might fail. **/
+@Deprecated(IODeprecation)
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 
 /** An asynchronous computation that might fail. **/
+@Deprecated(IODeprecation)
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /**
@@ -24,6 +27,7 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
  * Defined by the [Proc] signature, which is the consumption of a callback.
  **/
 @documented
+@Deprecated(IODeprecation)
 interface Async<F> : MonadDefer<F> {
 
   /**
@@ -348,6 +352,7 @@ internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
+@Deprecated(IODeprecation)
 interface AsyncFx<F> : MonadThrowFx<F> {
   override val M: Async<F>
   // Deferring in order to lazily launch the coroutine so it doesn't eagerly run on declaring context

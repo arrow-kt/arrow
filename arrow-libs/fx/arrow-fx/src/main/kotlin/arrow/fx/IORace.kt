@@ -12,6 +12,7 @@ import arrow.fx.internal.UnsafePromise
 import arrow.fx.typeclasses.Fiber
 import kotlin.coroutines.CoroutineContext
 
+@Deprecated(IODeprecation)
 interface IORace {
 
   fun <A, B> raceN(ioA: IOOf<A>, ioB: IOOf<B>): IO<Race2<A, B>> =

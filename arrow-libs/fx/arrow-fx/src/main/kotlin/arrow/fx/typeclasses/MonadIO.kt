@@ -2,6 +2,7 @@ package arrow.fx.typeclasses
 
 import arrow.Kind
 import arrow.fx.IO
+import arrow.fx.IODeprecation
 import arrow.typeclasses.Monad
 
 /**
@@ -12,6 +13,7 @@ import arrow.typeclasses.Monad
  *  types which is why it is not done here. If one wants to use [Concurrent] methods by only delegating to [IO] simply perform the task in [IO] and lift it.
  *  If that is not enough use the fx-mtl package for better instances of the effect hierarchy.
  **/
+@Deprecated(IODeprecation)
 interface MonadIO<M> : Monad<M> {
   fun <A> IO<A>.liftIO(): Kind<M, A>
 }

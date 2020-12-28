@@ -10,11 +10,17 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
+@Deprecated(IODeprecation)
 class ForResource private constructor() {
   companion object
 }
+@Deprecated(IODeprecation)
 typealias ResourceOf<F, E, A> = arrow.Kind3<ForResource, F, E, A>
+
+@Deprecated(IODeprecation)
 typealias ResourcePartialOf<F, E> = arrow.Kind2<ForResource, F, E>
+
+@Deprecated(IODeprecation)
 typealias ResourceKindedJ<F, E, A> = HkJ3<ForResource, F, E, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -150,6 +156,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  * All three programs do exactly the same with varying levels of simplicity and overhead. `Resource` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
  *
  **/
+@Deprecated(IODeprecation)
 sealed class Resource<F, E, A> : ResourceOf<F, E, A> {
 
   /**
@@ -233,6 +240,7 @@ sealed class Resource<F, E, A> : ResourceOf<F, E, A> {
     return loop(this, emptyList())
   }
 
+  @Deprecated(IODeprecation)
   companion object {
     /**
      * Lift a value in context [F] into a [Resource]. Use with caution as the value will have no finalizers added.

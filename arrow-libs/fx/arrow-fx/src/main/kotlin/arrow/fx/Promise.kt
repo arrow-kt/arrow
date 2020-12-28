@@ -18,6 +18,7 @@ import arrow.core.getOrElse
  * A [Promise] guarantees (promises) [A] at some point in the future within the context of [F].
  * Note that since [F] is constrained to [Async] an error can also occur.
  */
+@Deprecated(IODeprecation)
 interface Promise<F, A> {
 
   /**
@@ -199,6 +200,7 @@ interface Promise<F, A> {
    */
   fun tryError(throwable: Throwable): Kind<F, Boolean>
 
+  @Deprecated(IODeprecation)
   companion object {
 
     /**

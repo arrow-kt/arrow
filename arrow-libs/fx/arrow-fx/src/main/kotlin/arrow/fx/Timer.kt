@@ -11,6 +11,7 @@ import arrow.fx.typeclasses.Duration
  *
  * Since sleeping is done by [Timer] it allows for easy modification in testing by providing a no-op [TestTimer]
  */
+@Deprecated(IODeprecation)
 interface Timer<F> {
   /**
    *  Sleeps for a given [duration] without blocking a thread.
@@ -35,6 +36,7 @@ interface Timer<F> {
    **/
   fun sleep(duration: Duration): Kind<F, Unit>
 
+  @Deprecated(IODeprecation)
   companion object {
     operator fun <F> invoke(CF: Concurrent<F>): Timer<F> = object : Timer<F> {
       override fun sleep(duration: Duration): Kind<F, Unit> = CF.ConcurrentSleep(duration)

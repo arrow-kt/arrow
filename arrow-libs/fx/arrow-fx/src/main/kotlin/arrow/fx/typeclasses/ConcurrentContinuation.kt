@@ -1,6 +1,7 @@
 package arrow.fx.typeclasses
 
 import arrow.Kind
+import arrow.fx.IODeprecation
 import arrow.fx.MVar
 import arrow.fx.Promise
 import arrow.fx.Semaphore
@@ -9,9 +10,11 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
 @RestrictsSuspension
+@Deprecated(IODeprecation)
 interface ConcurrentSyntax<F> : Concurrent<F>, AsyncSyntax<F>
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
+@Deprecated(IODeprecation)
 open class ConcurrentContinuation<F, A>(private val CF: Concurrent<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   AsyncContinuation<F, A>(CF), Concurrent<F> by CF, ConcurrentSyntax<F> {
   override val fx: ConcurrentFx<F> = CF.fx

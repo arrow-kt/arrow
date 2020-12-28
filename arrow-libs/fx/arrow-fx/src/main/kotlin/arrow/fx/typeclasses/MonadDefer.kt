@@ -2,6 +2,7 @@ package arrow.fx.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.fx.IODeprecation
 import arrow.fx.Ref
 import arrow.typeclasses.MonadThrow
 
@@ -10,6 +11,7 @@ import arrow.typeclasses.MonadThrow
  *
  * The context required to defer evaluating a safe computation.
  **/
+@Deprecated(IODeprecation)
 interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>

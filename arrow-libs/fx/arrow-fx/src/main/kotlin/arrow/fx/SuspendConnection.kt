@@ -4,6 +4,7 @@ import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.internal.JavaCancellationException
 import arrow.fx.typeclasses.Disposable
 
+@Deprecated(IODeprecation)
 enum class OnCancel {
   ThrowCancellationException, Silent;
 
@@ -12,6 +13,7 @@ enum class OnCancel {
   }
 }
 
+@Deprecated(IODeprecation)
 object ConnectionCancellationException : JavaCancellationException("User cancellation")
 
 internal fun SuspendConnection.toDisposable(): Disposable = {

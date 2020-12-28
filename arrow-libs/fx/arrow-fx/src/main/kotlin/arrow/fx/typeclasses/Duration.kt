@@ -1,10 +1,13 @@
 package arrow.fx.typeclasses
 
+import arrow.fx.IODeprecation
 import java.util.concurrent.TimeUnit
 
+@Deprecated(IODeprecation)
 data class Duration(val amount: Long, val timeUnit: TimeUnit) {
   val nanoseconds: Long by lazy { timeUnit.toNanos(amount) }
 
+  @Deprecated(IODeprecation)
   companion object {
     // Actually limited to 9223372036854775807 days, so unless you are very patient, it is unlimited ;-)
     val INFINITE = Duration(amount = Long.MAX_VALUE, timeUnit = TimeUnit.DAYS)

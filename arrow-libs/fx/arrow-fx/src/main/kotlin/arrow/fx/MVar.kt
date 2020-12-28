@@ -15,6 +15,7 @@ import arrow.fx.typeclasses.Concurrent
  * [MVar] is appropriate for building synchronization
  * primitives and performing simple inter-thread communications.
  */
+@Deprecated(IODeprecation)
 interface MVar<F, A> {
 
   /**
@@ -202,6 +203,7 @@ interface MVar<F, A> {
    */
   fun read(): Kind<F, A>
 
+  @Deprecated(IODeprecation)
   companion object {
 
     /**

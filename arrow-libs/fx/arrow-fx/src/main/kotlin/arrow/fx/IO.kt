@@ -46,21 +46,33 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@Deprecated(IODeprecation)
 class ForIO private constructor() {
   companion object
 }
+
+@Deprecated(IODeprecation)
 typealias IOOf<A> = arrow.Kind<ForIO, A>
 
+@Deprecated(IODeprecation)
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> IOOf<A>.fix(): IO<A> =
   this as IO<A>
 
+@Deprecated(IODeprecation)
 typealias IOProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+
+@Deprecated(IODeprecation)
 typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 
+const val IODeprecation =
+  "The IO datatype and it's related type classes will disappear in Arrow 0.13.0. All useful operations are offered directly over suspend functions by Arrow Fx Coroutines. https://arrow-kt.io/docs/fx/async/"
+
 @Suppress("StringLiteralDuplication")
+@Deprecated(IODeprecation)
 sealed class IO<out A> : IOOf<A> {
 
+  @Deprecated(IODeprecation)
   companion object : IOParMap, IORace {
 
     /**

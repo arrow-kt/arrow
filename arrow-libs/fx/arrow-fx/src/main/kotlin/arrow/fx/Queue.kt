@@ -9,11 +9,15 @@ import arrow.fx.typeclasses.Concurrent
 import arrow.core.None
 import arrow.core.Some
 
+@Deprecated(IODeprecation)
 class ForQueue private constructor() {
   companion object
 }
 
+@Deprecated(IODeprecation)
 typealias QueueOf<F, A> = Kind2<ForQueue, F, A>
+
+@Deprecated(IODeprecation)
 typealias QueuePartialOf<F> = Kind<ForQueue, F>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -49,6 +53,7 @@ inline fun <F, A> QueueOf<F, A>.fix(): Queue<F, A> =
  * @see Queue in the case your functions or layers are allowed to take and offer.
  * @see Dequeue in the case your functions or layers are only allowed to peek or take values.
  * */
+@Deprecated(IODeprecation)
 interface Dequeue<F, A> {
 
   /**
@@ -229,6 +234,7 @@ interface Dequeue<F, A> {
  * @see Queue in the case your functions or layers are allowed to take and offer.
  * @see Dequeue in the case your functions or layers are only allowed to peek or take values.
  * */
+@Deprecated(IODeprecation)
 interface Enqueue<F, A> {
 
   /**
@@ -282,6 +288,7 @@ interface Enqueue<F, A> {
  * - [unbounded]: An unbounded queue has no notion of capacity and is bound only by
  *   exhausting the memory limits of the runtime
  */
+@Deprecated(IODeprecation)
 interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
 
   /**
@@ -290,6 +297,7 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
    */
   fun size(): Kind<F, Int>
 
+  @Deprecated(IODeprecation)
   companion object {
     private fun <F> Concurrent<F>.ensureCapacity(capacity: Int): Kind<F, Int> =
       just(capacity).ensure(
@@ -444,6 +452,7 @@ interface Queue<F, A> : QueueOf<F, A>, Dequeue<F, A>, Enqueue<F, A> {
  * //sampleEnd
  * ```
  */
+@Deprecated(IODeprecation)
 interface QueueFactory<F> {
 
   fun CF(): Concurrent<F>
@@ -482,6 +491,7 @@ interface QueueFactory<F> {
   fun <A> unbounded(): Kind<F, Queue<F, A>> =
     Queue.unbounded(CF())
 
+  @Deprecated(IODeprecation)
   companion object {
     operator fun <F> invoke(CF: Concurrent<F>): QueueFactory<F> = object : QueueFactory<F> {
       override fun CF(): Concurrent<F> = CF

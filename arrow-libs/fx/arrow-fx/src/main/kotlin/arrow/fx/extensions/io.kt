@@ -9,6 +9,7 @@ import arrow.core.identity
 import arrow.extension
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IODeprecation
 import arrow.fx.IODispatchers
 import arrow.fx.IOOf
 import arrow.fx.OnCancel
@@ -54,12 +55,14 @@ import arrow.fx.handleError as ioHandleError
 import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @extension
+@Deprecated(IODeprecation)
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOApply : Apply<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -72,6 +75,7 @@ interface IOApply : Apply<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOApplicative : Applicative<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -87,6 +91,7 @@ interface IOApplicative : Applicative<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonad : Monad<ForIO> {
   override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
     fix().flatMap(f)
@@ -105,6 +110,7 @@ interface IOMonad : Monad<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
@@ -123,6 +129,7 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
@@ -150,9 +157,11 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 
 @extension
+@Deprecated(IODeprecation)
 interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     fix().bracketCase(release, use)
@@ -168,6 +177,7 @@ interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
@@ -176,6 +186,7 @@ interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
@@ -194,6 +205,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
+@Deprecated(IODeprecation)
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A> Kind<ForIO, A>.fork(coroutineContext: CoroutineContext): IO<Fiber<ForIO, A>> =
     fix().fork(coroutineContext)
@@ -231,12 +243,14 @@ fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
   Timer(CF)
 
 @extension
+@Deprecated(IODeprecation)
 interface IOEffect : Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
+@Deprecated(IODeprecation)
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
 
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
@@ -248,6 +262,7 @@ fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEf
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOSemigroup<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>
@@ -257,6 +272,7 @@ interface IOSemigroup<A> : Semigroup<IO<A>> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   override fun SG(): Monoid<A>
 
@@ -264,11 +280,13 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOMonadIO : MonadIO<ForIO>, IOMonad {
   override fun <A> IO<A>.liftIO(): Kind<ForIO, A> = this
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
@@ -278,6 +296,7 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
 
@@ -289,6 +308,7 @@ interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
@@ -298,6 +318,7 @@ interface IODispatchers : Dispatchers<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IOEnvironment : Environment<ForIO> {
   override fun dispatchers(): Dispatchers<ForIO> =
     IO.dispatchers()
@@ -307,6 +328,7 @@ interface IOEnvironment : Environment<ForIO> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
 
   override fun dispatchers(): Dispatchers<ForIO> =
@@ -316,6 +338,7 @@ interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
 fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 
 @extension
+@Deprecated(IODeprecation)
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
@@ -336,6 +359,7 @@ fun <A> Either<Throwable, A>.toIO(): IO<A> =
   toIO(::identity)
 
 @extension
+@Deprecated(IODeprecation)
 interface IOSemigroupK : SemigroupK<ForIO> {
   override fun <A> Kind<ForIO, A>.combineK(y: Kind<ForIO, A>): Kind<ForIO, A> =
     (this.fix() to y.fix()).let { (l, r) ->

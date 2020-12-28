@@ -30,21 +30,33 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.random.Random
 
+@Deprecated(IODeprecation)
 class ForSchedule private constructor() {
   companion object
 }
+
+@Deprecated(IODeprecation)
 typealias ScheduleOf<M, Input, Output> = arrow.Kind3<ForSchedule, M, Input, Output>
+
+@Deprecated(IODeprecation)
 typealias SchedulePartialOf<M, Input> = arrow.Kind2<ForSchedule, M, Input>
+
+@Deprecated(IODeprecation)
 typealias ScheduleKindedJ<M, Input, Output> = arrow.HkJ3<ForSchedule, M, Input, Output>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <M, Input, Output> ScheduleOf<M, Input, Output>.fix(): Schedule<M, Input, Output> =
   this as Schedule<M, Input, Output>
 
+@Deprecated(IODeprecation)
 class ForDecision private constructor() {
   companion object
 }
+
+@Deprecated(IODeprecation)
 typealias DecisionOf<A, B> = arrow.Kind2<ForDecision, A, B>
+
+@Deprecated(IODeprecation)
 typealias DecisionPartialOf<A> = arrow.Kind<ForDecision, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -251,6 +263,7 @@ inline fun <A, B> DecisionOf<A, B>.fix(): Schedule.Decision<A, B> =
  * val exponential = Schedule.exponential<ForIO, Unit>(IO.monad(), 250.milliseconds)
  * ```
  */
+@Deprecated(IODeprecation)
 sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
   internal abstract val M: Monad<F>
 
@@ -624,6 +637,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
   /**
    * A single decision. Contains the decision to continue, the delay, the new state and the (lazy) result of a Schedule.
    */
+  @Deprecated(IODeprecation)
   data class Decision<out A, out B>(val cont: Boolean, val delay: Duration, val state: A, val finish: Eval<B>) : DecisionOf<A, B> {
 
     operator fun not(): Decision<A, B> = copy(cont = !cont)
@@ -651,6 +665,7 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     }
   }
 
+  @Deprecated(IODeprecation)
   companion object {
 
     /**

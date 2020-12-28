@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.fx.typeclasses.Fiber
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
+@Deprecated(IODeprecation)
 sealed class RacePair<F, A, B> {
   data class First<F, A, B>(val winner: A, val fiberB: Fiber<F, B>) : RacePair<F, A, B>()
   data class Second<F, A, B>(val fiberA: Fiber<F, A>, val winner: B) : RacePair<F, A, B>()
@@ -17,6 +18,7 @@ sealed class RacePair<F, A, B> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class RaceTriple<F, A, B, C> {
   data class First<F, A, B, C>(val winner: A, val fiberB: Fiber<F, B>, val fiberC: Fiber<F, C>) : RaceTriple<F, A, B, C>()
   data class Second<F, A, B, C>(val fiberA: Fiber<F, A>, val winner: B, val fiberC: Fiber<F, C>) : RaceTriple<F, A, B, C>()
@@ -34,8 +36,10 @@ sealed class RaceTriple<F, A, B, C> {
 }
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
+@Deprecated(IODeprecation)
 typealias Race2<A, B> = Either<A, B>
 
+@Deprecated(IODeprecation)
 sealed class Race3 <out A, out B, out C> {
   data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
@@ -52,6 +56,7 @@ sealed class Race3 <out A, out B, out C> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race4 <out A, out B, out C, out D> {
   data class First<A>(val winner: A) : Race4<A, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race4<Nothing, B, Nothing, Nothing>()
@@ -71,6 +76,7 @@ sealed class Race4 <out A, out B, out C, out D> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race5 <out A, out B, out C, out D, out E> {
   data class First<A>(val winner: A) : Race5<A, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race5<Nothing, B, Nothing, Nothing, Nothing>()
@@ -93,6 +99,7 @@ sealed class Race5 <out A, out B, out C, out D, out E> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race6 <out A, out B, out C, out D, out E, out F> {
   data class First<A>(val winner: A) : Race6<A, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race6<Nothing, B, Nothing, Nothing, Nothing, Nothing>()
@@ -118,6 +125,7 @@ sealed class Race6 <out A, out B, out C, out D, out E, out F> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race7 <out A, out B, out C, out D, out E, out F, out G> {
   data class First<A>(val winner: A) : Race7<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race7<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing>()
@@ -146,6 +154,7 @@ sealed class Race7 <out A, out B, out C, out D, out E, out F, out G> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race8 <out A, out B, out C, out D, out E, out F, out G, out H> {
   data class First<A>(val winner: A) : Race8<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race8<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
@@ -177,6 +186,7 @@ sealed class Race8 <out A, out B, out C, out D, out E, out F, out G, out H> {
   }
 }
 
+@Deprecated(IODeprecation)
 sealed class Race9 <out A, out B, out C, out D, out E, out F, out G, out H, out I> {
   data class First<A>(val winner: A) : Race9<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
   data class Second<B>(val winner: B) : Race9<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()

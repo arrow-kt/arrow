@@ -1,10 +1,12 @@
 package arrow.fx.extensions
 
 import arrow.extension
+import arrow.fx.IODeprecation
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Eq
 
 @extension
+@Deprecated(IODeprecation)
 interface ExitCaseEq<E> : Eq<ExitCase<E>> {
   fun EQE(): Eq<E>
 

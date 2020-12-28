@@ -9,6 +9,7 @@ import arrow.fx.fix
 import arrow.fx.typeclasses.Bracket
 import arrow.extension
 import arrow.fx.IO
+import arrow.fx.IODeprecation
 import arrow.fx.typeclasses.MonadIO
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -20,6 +21,7 @@ import arrow.undocumented
 
 @extension
 @undocumented
+@Deprecated(IODeprecation)
 interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, A>.map(f: (A) -> B): Resource<F, E, B> =
@@ -27,6 +29,7 @@ interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, ResourceFunctor<F, E> {
   override fun BR(): Bracket<F, E>
 
@@ -39,6 +42,7 @@ interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, Reso
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>>, ResourceApplicative<F, E> {
   override fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
@@ -46,6 +50,7 @@ interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>>, Resource
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>>, ResourceSelective<F, E> {
   override fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, A>.flatMap(f: (A) -> ResourceOf<F, E, B>): Resource<F, E, B> =
@@ -65,6 +70,7 @@ interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>>, ResourceSelectiv
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceSemigroup<F, E, A> : Semigroup<Resource<F, E, A>> {
   fun SR(): Semigroup<A>
   fun BR(): Bracket<F, E>
@@ -72,6 +78,7 @@ interface ResourceSemigroup<F, E, A> : Semigroup<Resource<F, E, A>> {
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceMonoid<F, E, A> : Monoid<Resource<F, E, A>>, ResourceSemigroup<F, E, A> {
   fun MR(): Monoid<A>
   override fun BR(): Bracket<F, E>
@@ -80,6 +87,7 @@ interface ResourceMonoid<F, E, A> : Monoid<Resource<F, E, A>>, ResourceSemigroup
 }
 
 @extension
+@Deprecated(IODeprecation)
 interface ResourceMonadIO<F, E> : MonadIO<ResourcePartialOf<F, E>>, ResourceMonad<F, E> {
   fun FIO(): MonadIO<F>
   override fun BR(): Bracket<F, E>

@@ -187,6 +187,7 @@ interface Semaphore<F> {
    */
   fun <A> withPermit(t: Kind<F, A>): Kind<F, A>
 
+  @Deprecated(IODeprecation)
   companion object {
 
     /**

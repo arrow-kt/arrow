@@ -27,6 +27,7 @@ import arrow.fx.internal.Platform
 import kotlin.coroutines.CoroutineContext
 
 /** Mix-in to enable `parMapN` N-arity on IO's companion directly. */
+@Deprecated(IODeprecation)
 interface IOParMap {
 
   @Deprecated("This API is not consistent with others within Arrow, see version with Tuple instead of function params")
