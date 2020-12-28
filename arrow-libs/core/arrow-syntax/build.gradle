@@ -7,7 +7,6 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    api project(":arrow-annotations")
     api project(":arrow-core")
     testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

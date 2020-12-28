@@ -14,8 +14,6 @@ dependencies {
     api project(":arrow-continuations")
     kapt project(":arrow-meta")
     kaptTest project(":arrow-meta")
-    compileOnly project(":arrow-meta")
-    testCompileOnly project(":arrow-meta")
     testCompileOnly project(":arrow-syntax")
     testCompileOnly project(":arrow-core")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
