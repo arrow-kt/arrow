@@ -8,9 +8,8 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.milliseconds
+import kotlin.time.milliseconds
 import arrow.fx.coroutines.parTupledN
-import arrow.fx.coroutines.sleep
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -19,6 +18,7 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.delay
 
 class BracketTest : StreamSpec(spec = {
 
@@ -243,7 +243,7 @@ class BracketTest : StreamSpec(spec = {
             exit.complete(ex)
             throw e
           }).flatMap { Stream.never<Unit>() }
-            .interruptWhen { Right(sleep(50.milliseconds)) }
+            .interruptWhen { Right(delay(50.milliseconds)) }
             .drain()
         } shouldBe e
 
@@ -346,7 +346,7 @@ class BracketTest : StreamSpec(spec = {
           )
         }
 
-        parTupledN({ latch.get() }, { sleep(50.milliseconds) })
+        parTupledN({ latch.get() }, { delay(50.milliseconds) })
 
         f.cancel()
 

@@ -6,7 +6,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.milliseconds
 
 class CancellableF : ArrowFxSpec(spec = {
 
@@ -103,7 +105,7 @@ class CancellableF : ArrowFxSpec(spec = {
       ForkConnected { cancel.invoke() }
 
       // Let cancel schedule
-      sleep(10.milliseconds)
+      delay(10.milliseconds)
 
       start.complete(Unit) // Continue cancellableF
 

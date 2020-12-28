@@ -9,17 +9,17 @@ import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.guarantee
-import arrow.fx.coroutines.timeOutOrNull
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.ExitCase
-import arrow.fx.coroutines.milliseconds
-import arrow.fx.coroutines.sleep
+import kotlin.time.milliseconds
 import arrow.fx.coroutines.never
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 
 class InterruptionTest : StreamSpec(spec = {
   "can cancel a hung effect" - {
@@ -31,7 +31,7 @@ class InterruptionTest : StreamSpec(spec = {
         s.append { Stream(1) } // Make sure is not empty
           .effectMap {
             guaranteeCase({ latch.complete(Unit); never<Unit>() }) { ex -> exit.complete(ex) }
-          }.interruptWhen { Right(latch.get().also { sleep(20.milliseconds) }) }
+          }.interruptWhen { Right(latch.get().also { delay(20.milliseconds) }) }
           .toList()
       }
 
@@ -44,7 +44,7 @@ class InterruptionTest : StreamSpec(spec = {
   "can interrupt a hung effect" - {
     checkAll(Arb.stream(Arb.int())) { s ->
       s.effectMap { never<Unit>() }
-        .interruptWhen { Right(sleep(20.milliseconds)) }
+        .interruptWhen { Right(delay(20.milliseconds)) }
         .toList() shouldBe emptyList()
     }
   }
@@ -65,7 +65,7 @@ class InterruptionTest : StreamSpec(spec = {
   "constant stream" - {
     checkAll(Arb.int()) { i ->
       Stream.constant(i)
-        .interruptWhen { Right(sleep(20.milliseconds)) }
+        .interruptWhen { Right(delay(20.milliseconds)) }
         .drain() // Finishes and gets interrupted
     }
   }
@@ -73,7 +73,7 @@ class InterruptionTest : StreamSpec(spec = {
   "constant stream with a flatMap" - {
     checkAll(Arb.int()) { i ->
       Stream.constant(i)
-        .interruptWhen { Right(sleep(20.milliseconds)) }
+        .interruptWhen { Right(delay(20.milliseconds)) }
         .flatMap { Stream(1) }
         .drain()
     }
@@ -84,7 +84,7 @@ class InterruptionTest : StreamSpec(spec = {
       Stream(i).flatMap { i -> Stream(i).append { loop(i + 1) } }
 
     loop(0)
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .drain()
   }
 
@@ -93,7 +93,7 @@ class InterruptionTest : StreamSpec(spec = {
       Stream.effect { Unit }.flatMap { loop() }
 
     loop()
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .drain()
   }
 
@@ -102,19 +102,19 @@ class InterruptionTest : StreamSpec(spec = {
       Stream(Unit).flatMap { loop() }
 
     loop()
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .drain()
   }
 
   "effect stream" - {
     Stream.effect { Unit }.repeat()
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .drain()
   }
 
   "Constant drained stream" - {
     Stream.constant(true)
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .drain()
   }
 
@@ -148,7 +148,7 @@ class InterruptionTest : StreamSpec(spec = {
 
   "stream that never terminates in flatMap" - {
     checkAll(Arb.stream(Arb.int())) { s ->
-      s.interruptWhen { Right(sleep(20.milliseconds)) }
+      s.interruptWhen { Right(delay(20.milliseconds)) }
         .flatMap { Stream.never<Int>() }
         .toList() shouldBe emptyList()
     }
@@ -160,7 +160,7 @@ class InterruptionTest : StreamSpec(spec = {
         Stream.effect { Semaphore(0) }.flatMap { semaphore ->
           Stream(1)
             .append { s }
-            .interruptWhen { sleep(20.milliseconds); Either.Left(e) }
+            .interruptWhen { delay(20.milliseconds); Either.Left(e) }
             .flatMap { Stream.effect_ { semaphore.acquire() } }
         }.toList()
       } shouldBe Either.Left(e)
@@ -169,7 +169,7 @@ class InterruptionTest : StreamSpec(spec = {
 
   "resume on append" - {
     Stream.never<Unit>()
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .append { Stream(5) }
       .toList() shouldBe listOf(5)
   }
@@ -178,7 +178,7 @@ class InterruptionTest : StreamSpec(spec = {
     checkAll(Arb.stream(Arb.int())) { s ->
       val expected = s.toList()
 
-      s.interruptWhen { Right(sleep(20.milliseconds)) }
+      s.interruptWhen { Right(delay(20.milliseconds)) }
         .effectMap { never<Int>() }
         .void()
         .append { s }
@@ -190,7 +190,7 @@ class InterruptionTest : StreamSpec(spec = {
     checkAll(Arb.stream(Arb.int())) { s ->
       val expected = s.toList()
 
-      s.interruptWhen { Right(sleep(20.milliseconds)) }
+      s.interruptWhen { Right(delay(20.milliseconds)) }
         .effectMap { never<Option<Int>>() }
         .append { s.map { Some(it) } }
         .filterOption()
@@ -203,7 +203,7 @@ class InterruptionTest : StreamSpec(spec = {
       val expected = s.toList()
 
       s.append { Stream(1) }
-        .interruptWhen { Right(sleep(50.milliseconds)) }
+        .interruptWhen { Right(delay(50.milliseconds)) }
         .map { None }
         .append { s.map { Some(it) } }
         .flatMap {
@@ -250,7 +250,7 @@ class InterruptionTest : StreamSpec(spec = {
   "resume on append with pull" - {
     Stream(1)
       .unchunk()
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .asPull()
       .unconsOrNull()
       .flatMap { uncons ->
@@ -267,7 +267,7 @@ class InterruptionTest : StreamSpec(spec = {
 
   "resume with append after evalMap interruption" - {
     Stream(1)
-      .interruptWhen { Right(sleep(20.milliseconds)) }
+      .interruptWhen { Right(delay(20.milliseconds)) }
       .effectMap { never<Int>() }
       .append { Stream(5) }
       .toList() shouldBe listOf(5)
@@ -276,7 +276,7 @@ class InterruptionTest : StreamSpec(spec = {
   "interrupted effect is cancelled" - {
     val latch = Promise<Unit>()
 
-    timeOutOrNull(500.milliseconds) {
+    withTimeoutOrNull(500.milliseconds) {
       Stream.effect { guarantee({ latch.get() }) { latch.complete(Unit) } }
         .interruptAfter(50.milliseconds)
         .drain()
@@ -290,7 +290,7 @@ class InterruptionTest : StreamSpec(spec = {
     io.kotest.property.checkAll(500, Arb.stream(Arb.int())) { s ->
       val expected = s.toList()
 
-      s.interruptWhen { Right(sleep(50.milliseconds)) }
+      s.interruptWhen { Right(delay(50.milliseconds)) }
         .map { None }
         .append { s.map { Option(it) } }
         .interruptWhen { Right(never()) }

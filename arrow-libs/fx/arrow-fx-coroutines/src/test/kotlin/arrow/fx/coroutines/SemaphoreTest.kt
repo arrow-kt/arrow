@@ -8,6 +8,9 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.string
+import io.kotest.property.checkAll
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.milliseconds
 
 class SemaphoreTest : ArrowFxSpec(spec = {
 
@@ -185,7 +188,7 @@ class SemaphoreTest : ArrowFxSpec(spec = {
     checkAll(Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
       val s = Semaphore(n)
 
-      val r = timeOutOrNull(10.milliseconds) {
+      val r = withTimeoutOrNull(10.milliseconds) {
         s.withPermitN(n + 1) { // Requests a n + 1 permits, puts count to -1
           s.release() // Timeouts out due to no permit
         } // cancel should put count back to 0
@@ -217,7 +220,7 @@ class SemaphoreTest : ArrowFxSpec(spec = {
     checkAll(Arb.positiveInts().map(Int::toLong)) { n -> // 100 iterations takes 1 second
       val s = Semaphore(n)
 
-      val x = timeOutOrNull(10.milliseconds) {
+      val x = withTimeoutOrNull(10.milliseconds) {
         // Puts count to -1, and times out before acquired so should out count back to 1
         s.acquireN(n + 1)
         s.release() // Never runs

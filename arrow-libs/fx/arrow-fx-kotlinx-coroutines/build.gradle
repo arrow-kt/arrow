@@ -15,3 +15,15 @@ dependencies {
     testImplementation project(':arrow-fx')
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
 }
+
+// usage of kotlin.time
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
+    }
+}

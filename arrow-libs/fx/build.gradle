@@ -1,51 +1,77 @@
 buildscript {
-    apply from: "$COMMON_SETUP"
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        google()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
-        classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
-        classpath "com.android.tools.build:gradle:$ANDROID_TOOLS_BUILD_PLUGIN_VERSION"
-    }
+  apply from: "$COMMON_SETUP"
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    google()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
+    classpath "org.jetbrains.kotlinx:atomicfu-gradle-plugin:$ATOMICFU_VERSION"
+    classpath "com.android.tools.build:gradle:$ANDROID_TOOLS_BUILD_PLUGIN_VERSION"
+  }
 }
 
 plugins {
-    id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
-    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION" apply false
-    id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
+  id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
+  id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION" apply false
+  id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
 }
 
 apply from: "$ROOT_PROJECT"
 
 // -- Artifacts publication
 configure(subprojects
-            - project("arrow-benchmarks-fx")
-            - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
-            - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
+  - project("arrow-benchmarks-fx")
+  - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
+  - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
 ) {
-    apply from: "$PUBLICATION"
+  apply from: "$PUBLICATION"
 }
 
 // -- Gradle Animal Sniffer Plugin: https://github.com/xvik/gradle-animalsniffer-plugin
 configure(subprojects
-            - project("arrow-benchmarks-fx")
-            - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
-            - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
-            - project("arrow-fx-coroutines")
-            - project("arrow-fx-reactor")
+  - project("arrow-benchmarks-fx")
+  - project("arrow-benchmarks-fx:arrow-scala-benchmarks")
+  - project("arrow-benchmarks-fx:arrow-kio-benchmarks")
+  - project("arrow-fx-coroutines")
+  - project("arrow-fx-reactor")
 ) {
-    apply plugin: 'ru.vyarus.animalsniffer'
-    apply plugin: 'java'
+  apply plugin: 'ru.vyarus.animalsniffer'
+  apply plugin: 'java'
 
-    animalsniffer { // Ignore tests
-        sourceSets = [sourceSets.main]
-        ignore 'java.lang.*'
-    }
+  animalsniffer { // Ignore tests
+    sourceSets = [sourceSets.main]
+    ignore 'java.lang.*'
+  }
 
-    dependencies {
-        signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
+  dependencies {
+    signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
+  }
+}
+
+configure(
+  [project("arrow-fx-coroutines"),
+   project("arrow-fx-coroutines-kotlinx-coroutines"),
+   project("arrow-fx-coroutines-test"),
+   project("arrow-fx-coroutines-stream"),
+   project("arrow-fx-stm")]
+) {
+  apply plugin: "org.jetbrains.kotlin.jvm"
+  apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+  apply from: "$SUB_PROJECT"
+  apply from: "$DOC_CREATION"
+
+  // usage of kotlin.time
+  compileKotlin {
+    kotlinOptions {
+      freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
     }
+  }
+  compileTestKotlin {
+    kotlinOptions {
+      freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
+    }
+  }
 }

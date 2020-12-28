@@ -9,15 +9,15 @@ import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Schedule
 import arrow.fx.coroutines.UnsafePromise
 import arrow.fx.coroutines.cancelBoundary
-import arrow.fx.coroutines.milliseconds
+import kotlin.time.milliseconds
 import arrow.fx.coroutines.parTupledN
-import arrow.fx.coroutines.sleep
 import arrow.fx.coroutines.startCoroutineCancellable
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
+import kotlinx.coroutines.delay
 
 class CallbackTest : StreamSpec(iterations = 250, spec = {
 
@@ -93,7 +93,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
 
     Stream.callback {
       emit(1)
-      sleep(500.milliseconds)
+      delay(500.milliseconds)
       emit(2)
       ref.set(true)
       end()
@@ -145,7 +145,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
         )
       }
 
-      parTupledN({ latch.get() }, { sleep(20.milliseconds) })
+      parTupledN({ latch.get() }, { delay(20.milliseconds) })
 
       f.cancel()
 
@@ -180,7 +180,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
       ForkConnected { cancel.invoke() }
 
       // Let cancel schedule
-      sleep(10.milliseconds)
+      delay(10.milliseconds)
 
       start.complete(Unit) // Continue cancellableF
 
@@ -213,7 +213,7 @@ private suspend fun <A> countToCallback(
   arrow.fx.coroutines.repeat(Schedule.recurs(iterations)) {
     i += 1
     cb(map(i))
-    sleep(500.milliseconds)
+    delay(500.milliseconds)
   }
   onEnd()
 }

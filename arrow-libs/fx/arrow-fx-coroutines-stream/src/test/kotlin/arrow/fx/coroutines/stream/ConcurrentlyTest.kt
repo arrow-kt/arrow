@@ -5,13 +5,13 @@ import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.milliseconds
+import kotlin.time.milliseconds
 import arrow.fx.coroutines.never
-import arrow.fx.coroutines.sleep
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
+import kotlinx.coroutines.delay
 
 class ConcurrentlyTest : StreamSpec(spec = {
 
@@ -38,7 +38,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
     "when primary stream fails, overall stream fails and background stream is terminated" {
       checkAll(Arb.throwable()) { e ->
         val semaphore = Semaphore(0)
-        val bg = Stream.effect { sleep(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
+        val bg = Stream.effect { delay(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
         val fg = Stream.raiseError<Unit>(e).delayBy(25.milliseconds)
 
         assertThrowable {
@@ -53,7 +53,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
       checkAll(Arb.stream(Arb.int())) { s ->
         val semaphore = Semaphore(0)
 
-        val bg = Stream.effect { sleep(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
+        val bg = Stream.effect { delay(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
         val fg = s.delayBy(25.milliseconds)
 
         fg.concurrently(bg)
@@ -82,7 +82,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
         val runner = Stream.bracket(
           { runnerRun.set(true) },
           {
-            sleep(100.milliseconds) // assure this inner finalizer always take longer run than `outer`
+            delay(100.milliseconds) // assure this inner finalizer always take longer run than `outer`
             finRef.update { it + "Inner" } // signal finalizer invoked
             throw e // signal a failure
           }).flatMap { // flag the concurrently had chance to start, as if the `s` will be empty `runner` may not be evaluated at all.

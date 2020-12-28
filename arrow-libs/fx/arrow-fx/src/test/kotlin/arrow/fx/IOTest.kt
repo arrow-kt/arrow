@@ -14,8 +14,6 @@ import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.laws.SemigroupKLaws
 import arrow.fx.IO.Companion.just
 import arrow.fx.coroutines.Environment
-import arrow.fx.coroutines.timeOutOrNull
-import arrow.fx.coroutines.seconds as cSeconds
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
 import arrow.fx.extensions.io.async.async
@@ -29,21 +27,26 @@ import arrow.fx.extensions.timer
 import arrow.fx.extensions.toIO
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
-import arrow.fx.typeclasses.ExitCase
-import arrow.fx.typeclasses.milliseconds
-import arrow.fx.typeclasses.seconds
 import arrow.fx.test.eq.eqK
 import arrow.fx.test.generators.genK
 import arrow.fx.test.laws.ConcurrentLaws
+import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.milliseconds
+import arrow.fx.typeclasses.seconds
 import io.kotlintest.fail
 import io.kotlintest.matchers.types.shouldBeInstanceOf
 import io.kotlintest.properties.Gen
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds as kSeconds
 
+@ExperimentalTime
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : ArrowFxSpec() {
 
@@ -54,7 +57,8 @@ class IOTest : ArrowFxSpec() {
   init {
     testLaws(
       SemigroupKLaws.laws(IO.semigroupK(), IO.genK(), IO.eqK()),
-      ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK()))
+      ConcurrentLaws.laws(IO.concurrent(), IO.timer(), IO.functor(), IO.applicative(), IO.monad(), IO.genK(), IO.eqK())
+    )
 
     "should defer evaluation until run" {
       var run = false
@@ -427,8 +431,10 @@ class IOTest : ArrowFxSpec() {
         }
 
       val result =
-        IO.parMapN(all,
-          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+        IO.parMapN(
+          all,
+          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)
+        ) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 3, 2, 4, 1, 5)
@@ -450,7 +456,8 @@ class IOTest : ArrowFxSpec() {
 
       val result =
         IO.parMapN(all,
-          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()
+        ) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -647,19 +654,19 @@ class IOTest : ArrowFxSpec() {
     "forked pair race should run" {
       IO.fx {
         dispatchers().io().raceN(
-                timer().sleep(10.seconds).followedBy(effect { 1 }),
-                effect { 3 }
-              ).fork().invoke().join().invoke()
+          timer().sleep(10.seconds).followedBy(effect { 1 }),
+          effect { 3 }
+        ).fork().invoke().join().invoke()
       }.unsafeRunSync() shouldBe 3.right()
     }
 
     "forked triple race should run" {
       IO.fx {
         dispatchers().io().raceN(
-                timer().sleep(10.seconds).followedBy(effect { 1 }),
-                timer().sleep(10.seconds).followedBy(effect { 3 }),
-                effect { 2 }
-              ).fork().invoke().join().invoke()
+          timer().sleep(10.seconds).followedBy(effect { 1 }),
+          timer().sleep(10.seconds).followedBy(effect { 3 }),
+          effect { 2 }
+        ).fork().invoke().join().invoke()
       }.unsafeRunSync() shouldBe Race3.Third(2)
     }
 
@@ -791,9 +798,9 @@ class IOTest : ArrowFxSpec() {
           use = { IO.never }
         ).suspended()
       }
-      arrow.fx.coroutines.sleep(2.cSeconds)
+      delay(2.kSeconds)
       disp.invoke()
-      timeOutOrNull(5.cSeconds) { p.get() } shouldBe ExitCase.Cancelled
+      withTimeoutOrNull(5.kSeconds) { p.get() } shouldBe ExitCase.Cancelled
     }
   }
 }

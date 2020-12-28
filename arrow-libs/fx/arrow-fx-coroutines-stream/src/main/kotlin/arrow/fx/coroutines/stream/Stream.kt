@@ -8,7 +8,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.identity
-import arrow.fx.coroutines.Duration
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Fiber
 import arrow.fx.coroutines.ForkAndForget
@@ -20,9 +19,11 @@ import arrow.fx.coroutines.stream.concurrent.Signal
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
+import kotlin.time.Duration
 
 class ForStream private constructor() {
   companion object
@@ -1447,7 +1448,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
    * Interrupts this stream after the specified duration has passed.
    */
   fun interruptAfter(duration: Duration): Stream<O> =
-    interruptWhen { Right(arrow.fx.coroutines.sleep(duration)) }
+    interruptWhen { Right(delay(duration)) }
 
   /**
    * Transforms this stream using the given `Pipe`.
@@ -1478,7 +1479,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
      * A single-element `Stream` that waits for the duration `d` before emitting unit.
      */
     fun sleep(d: Duration): Stream<Unit> =
-      effect { arrow.fx.coroutines.sleep(d) }
+      effect { delay(d) }
 
     /**
      * Alias for `sleep(d).void`. Often used in conjunction with [append] (i.e., `sleep_(..).append { s }`) as a more

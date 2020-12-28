@@ -6,6 +6,7 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.coroutines.Schedule.ScheduleImpl
+import kotlinx.coroutines.delay
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -775,7 +776,7 @@ suspend fun <A, B, C> repeatOrElseEither(
       val step = schedule.update(a, state)
       if (!step.cont) return Either.Right(step.finish.value())
       else {
-        sleep(step.delay)
+        delay(step.delay.millis)
 
         // Set state before looping again
         last = { step.finish.value() }
@@ -829,7 +830,7 @@ suspend fun <A, B, C> retryOrElseEither(
       dec = schedule.update(e, state)
       state = dec.state
 
-      if (dec.cont) sleep(dec.delay)
+      if (dec.cont) delay(dec.delay.millis)
       else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish.value()))
     }
   }

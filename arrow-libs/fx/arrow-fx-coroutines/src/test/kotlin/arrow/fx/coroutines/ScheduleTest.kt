@@ -5,7 +5,9 @@ import arrow.core.Eval
 import io.kotest.assertions.fail
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.milliseconds
 
 class ScheduleTest : ArrowFxSpec(spec = {
 
@@ -101,7 +103,7 @@ class ScheduleTest : ArrowFxSpec(spec = {
   }
 
   "Schedule.never() times out" {
-    timeOutOrNull(10.milliseconds) {
+    withTimeoutOrNull(10.milliseconds) {
       val a: Nothing = repeat(Schedule.never()) {
         1
       }

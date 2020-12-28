@@ -5,9 +5,8 @@ import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.stream.StreamSpec
-import arrow.fx.coroutines.milliseconds
-import arrow.fx.coroutines.seconds
-import arrow.fx.coroutines.sleep
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 import arrow.fx.coroutines.stream.Stream
 import arrow.fx.coroutines.stream.append
 import arrow.fx.coroutines.stream.drain
@@ -15,13 +14,14 @@ import arrow.fx.coroutines.stream.noneTerminate
 import arrow.fx.coroutines.stream.parJoinUnbounded
 import arrow.fx.coroutines.stream.terminateOnNone
 import arrow.fx.coroutines.stream.toList
-import arrow.fx.coroutines.timeOutOrNull
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.max
 
 class QueueTest : StreamSpec(spec = {
@@ -185,7 +185,7 @@ class QueueTest : StreamSpec(spec = {
 
     "cancel" {
       val q = Queue.unbounded<Int>()
-      timeOutOrNull(100.milliseconds) {
+      withTimeoutOrNull(100.milliseconds) {
         q.dequeue1()
       } shouldBe null
       q.enqueue1(1)
@@ -255,7 +255,7 @@ class QueueTest : StreamSpec(spec = {
   "Queue.bounded(0) with outstanding taker cannot offer" {
     val q = Queue.bounded<Int>(0)
     val taker = ForkConnected { q.dequeue1() }
-    sleep(1.seconds)
+    delay(1.seconds)
     q.tryOffer1(1) shouldBe false
     taker.cancel()
   }
@@ -281,7 +281,7 @@ class QueueTest : StreamSpec(spec = {
   "Queue.synchronous with outstanding taker can tryOffer1" {
     val q = Queue.synchronous<Int>()
     ForkConnected { q.dequeue1() }
-    sleep(1.seconds)
+    delay(1.seconds)
     q.tryOffer1(1) shouldBe true
   }
 })

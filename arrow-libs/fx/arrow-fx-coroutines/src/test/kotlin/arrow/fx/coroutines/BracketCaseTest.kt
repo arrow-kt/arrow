@@ -9,19 +9,22 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.long
 import io.kotest.property.checkAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 @ExperimentalTime
 class BracketCaseTest : ArrowFxSpec(spec = {
 
-  "Uncancellable back pressures timeoutOrNull" {
+  "Uncancellable back pressures withTimeoutOrNull" {
     runBlockingTest {
       checkAll(Arb.long(50, 100), Arb.long(300, 400)) { a, b ->
         val start = currentTime
 
-        val n = timeOutOrNull(a.milliseconds) {
-          uncancellable { sleep(b.milliseconds) }
+        val n = withTimeoutOrNull(a.milliseconds) {
+          uncancellable { delay(b.milliseconds) }
         }
 
         val duration = currentTime - start

@@ -4,8 +4,7 @@ import arrow.core.Either
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.leftException
-import arrow.fx.coroutines.milliseconds
-import arrow.fx.coroutines.sleep
+import kotlin.time.milliseconds
 import arrow.fx.coroutines.never
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.should
@@ -14,6 +13,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
+import kotlinx.coroutines.delay
 import java.lang.RuntimeException
 
 class ParJoinTest : StreamSpec(spec = {
@@ -75,7 +75,7 @@ class ParJoinTest : StreamSpec(spec = {
       // this introduces delay and failure based on bias of the test
       suspend fun finalizer(idx: Int): Unit =
         if (idx == biasIdx) {
-          sleep(50.milliseconds)
+          delay(50.milliseconds)
           finalizerRef.update { it + "Inner $idx" }
           throw err
         } else finalizerRef.update { it + "Inner $idx" }

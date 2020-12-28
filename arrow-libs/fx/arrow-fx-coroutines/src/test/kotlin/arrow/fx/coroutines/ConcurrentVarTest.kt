@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.toT
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
-import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.delay
+import kotlin.time.milliseconds
 
-@ExperimentalTime
 class ConcurrentVarTest : ArrowFxSpec(spec = {
 
   "empty; put; isNotEmpty; take; put; take" {
@@ -192,7 +192,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
     ForkAndForget { mVar.put(1) }
     val p2 = ForkAndForget { mVar.put(2) }
     ForkAndForget { mVar.put(3) }
-    sleep(10.milliseconds) // Give put callbacks a chance to register
+    delay(10.milliseconds) // Give put callbacks a chance to register
     p2.cancel()
     mVar.take()
     val r1 = mVar.take()
@@ -205,7 +205,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
     val t1 = ForkAndForget { mVar.take() }
     val t2 = ForkAndForget { mVar.take() }
     val t3 = ForkAndForget { mVar.take() }
-    sleep(10.milliseconds) // Give take callbacks a chance to register
+    delay(10.milliseconds) // Give take callbacks a chance to register
     t2.cancel()
     mVar.put(1)
     mVar.put(3)
@@ -221,10 +221,10 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
       mVar.read()
       finished.complete(1)
     }
-    sleep(100.milliseconds) // Give read callback a chance to register
+    delay(100.milliseconds) // Give read callback a chance to register
     fiber.cancel()
     mVar.put(10)
-    val fallback = suspend { sleep(200.milliseconds); 0 }
+    val fallback = suspend { delay(200.milliseconds); 0 }
     raceN(finished::get, fallback) shouldBe Either.Right(0)
   }
 
@@ -251,7 +251,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
         finished.complete(Unit)
       }
     }
-    sleep(100.milliseconds)
+    delay(100.milliseconds)
     fiber.cancel()
     started.tryGet() shouldBe 10
     finished.tryGet() shouldBe null
@@ -282,7 +282,7 @@ class ConcurrentVarTest : ArrowFxSpec(spec = {
         it + 1
       }
     }
-    sleep(10.milliseconds)
+    delay(10.milliseconds)
     fiber.cancel()
     started.get() shouldBe 10
     finished.tryGet() shouldBe null

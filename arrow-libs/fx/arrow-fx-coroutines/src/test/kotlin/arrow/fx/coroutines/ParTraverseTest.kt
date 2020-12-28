@@ -9,6 +9,8 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.Dispatchers
 import io.kotest.property.checkAll
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.milliseconds
 
 class ParTraverseTest : ArrowFxSpec(spec = {
 
@@ -130,7 +132,7 @@ class ParTraverseTest : ArrowFxSpec(spec = {
     val promiseB = Promise<Unit>()
     val promiseC = Promise<Unit>()
 
-    timeOutOrNull(10.milliseconds) {
+    withTimeoutOrNull(10.milliseconds) {
       listOf(
         suspend {
           promiseA.get()
