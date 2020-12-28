@@ -16,11 +16,3 @@ dependencies {
     testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
 }
-
-
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}

@@ -14,11 +14,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 
     compile "io.arrow-kt:arrow-core:$VERSION_NAME"
-    compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
     kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
 
-    testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile project(":arrow-fx-coroutines")
     testCompile project(":arrow-fx-test")
