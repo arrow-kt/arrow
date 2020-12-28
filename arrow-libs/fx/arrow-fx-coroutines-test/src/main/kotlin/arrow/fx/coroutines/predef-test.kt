@@ -1,9 +1,15 @@
 package arrow.fx.coroutines
 
 import arrow.core.Either
+import arrow.core.Validated
+import arrow.core.ValidatedNel
 import arrow.core.identity
+import arrow.core.invalid
+import arrow.core.invalidNel
 import arrow.core.left
 import arrow.core.right
+import arrow.core.valid
+import arrow.core.validNel
 import io.kotest.assertions.fail
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
@@ -111,6 +117,18 @@ fun Arb.Companion.throwable(): Arb<Throwable> =
 fun <L, R> Arb.Companion.either(left: Arb<L>, right: Arb<R>): Arb<Either<L, R>> {
   val failure: Arb<Either<L, R>> = left.map { l -> l.left() }
   val success: Arb<Either<L, R>> = right.map { r -> r.right() }
+  return Arb.choice(failure, success)
+}
+
+fun <L, R> Arb.Companion.validated(left: Arb<L>, right: Arb<R>): Arb<Validated<L, R>> {
+  val failure: Arb<Validated<L, R>> = left.map { l -> l.invalid() }
+  val success: Arb<Validated<L, R>> = right.map { r -> r.valid() }
+  return Arb.choice(failure, success)
+}
+
+fun <L, R> Arb.Companion.validatedNel(left: Arb<L>, right: Arb<R>): Arb<ValidatedNel<L, R>> {
+  val failure: Arb<ValidatedNel<L, R>> = left.map { l -> l.invalidNel() }
+  val success: Arb<ValidatedNel<L, R>> = right.map { r -> r.validNel() }
   return Arb.choice(failure, success)
 }
 
