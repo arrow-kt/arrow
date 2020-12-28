@@ -3,6 +3,7 @@ package arrow.fx.coroutines
 import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
+import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
 
 class CircuitBreaker constructor(

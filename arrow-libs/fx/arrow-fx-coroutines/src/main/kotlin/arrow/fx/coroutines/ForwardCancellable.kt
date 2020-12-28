@@ -1,5 +1,7 @@
 package arrow.fx.coroutines
 
+import arrow.fx.coroutines.ForwardCancellable.Companion.State.Active
+import arrow.fx.coroutines.ForwardCancellable.Companion.State.Empty
 import kotlinx.atomicfu.atomic
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext

@@ -1,6 +1,6 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
-    id "org.jlleitschuh.gradle.ktlint"
+  id "org.jetbrains.kotlin.jvm"
+  id "org.jlleitschuh.gradle.ktlint"
 }
 
 apply plugin: 'kotlinx-atomicfu'
@@ -9,13 +9,13 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
-    api "io.arrow-kt:arrow-core:$VERSION_NAME"
-    implementation project(":arrow-fx-suspend-connection")
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+  api "io.arrow-kt:arrow-core:$VERSION_NAME"
+  implementation project(":arrow-fx-suspend-connection")
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 
-    testImplementation project(":arrow-fx-coroutines-test")
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
-    testImplementation "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION" // for kotest framework
-    testImplementation "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION" // for kotest core jvm assertions
-    testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
+  testImplementation project(":arrow-fx-coroutines-test")
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLINX_COROUTINES_VERSION"
+  testImplementation "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION" // for kotest framework
+  testImplementation "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION" // for kotest core jvm assertions
+  testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
 }

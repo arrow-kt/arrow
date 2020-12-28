@@ -40,7 +40,8 @@ class ParMap7Test : ArrowFxSpec(spec = {
           threadName() shouldBe singleThreadName
 
           val (s1, s2, s3, s4, s5, s6, s7) = parMapN(
-            _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e, f, g ->
+            _mapCtx, threadName, threadName, threadName, threadName, threadName, threadName, threadName
+          ) { a, b, c, d, e, f, g ->
             Tuple7(a, b, c, d, e, f, g)
           }
 
@@ -193,7 +194,16 @@ class ParMap7Test : ArrowFxSpec(spec = {
   "parMapN 7 finishes on single thread" {
     checkAll(Arb.string()) {
       single.use { ctx ->
-        parMapN(ctx, threadName, threadName, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e, f, g ->
+        parMapN(
+          ctx,
+          threadName,
+          threadName,
+          threadName,
+          threadName,
+          threadName,
+          threadName,
+          threadName
+        ) { a, b, c, d, e, f, g ->
           Tuple7(a, b, c, d, e, f, g)
         }
       } shouldBe Tuple7("single", "single", "single", "single", "single", "single", "single")

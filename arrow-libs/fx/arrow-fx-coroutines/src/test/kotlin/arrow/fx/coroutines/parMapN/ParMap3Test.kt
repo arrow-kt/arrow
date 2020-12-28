@@ -9,7 +9,6 @@ import arrow.fx.coroutines.NamedThreadFactory
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
-import arrow.fx.coroutines.evalOn
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
@@ -19,13 +18,14 @@ import arrow.fx.coroutines.singleThreadName
 import arrow.fx.coroutines.suspend
 import arrow.fx.coroutines.threadName
 import arrow.fx.coroutines.throwable
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap3Test : ArrowFxSpec(spec = {
@@ -35,7 +35,7 @@ class ParMap3Test : ArrowFxSpec(spec = {
 
     checkAll {
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2, s3) = parMapN(_mapCtx, threadName, threadName, threadName) { a, b, c -> Triple(a, b, c) }
@@ -55,14 +55,26 @@ class ParMap3Test : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {
             when (choose) {
-              1 -> parMapN(_mapCtx, suspend { e.suspend() }, suspend { never<Nothing>() }, suspend { never<Nothing>() }) { _, _, _ -> Unit }
-              2 -> parMapN(_mapCtx, suspend { never<Nothing>() }, suspend { e.suspend() }, suspend { never<Nothing>() }) { _, _, _ -> Unit }
-              else -> parMapN(_mapCtx, suspend { never<Nothing>() }, suspend { never<Nothing>() }, suspend { e.suspend() }) { _, _, _ -> Unit }
+              1 -> parMapN(
+                _mapCtx,
+                suspend { e.suspend() },
+                suspend { never<Nothing>() },
+                suspend { never<Nothing>() }) { _, _, _ -> Unit }
+              2 -> parMapN(
+                _mapCtx,
+                suspend { never<Nothing>() },
+                suspend { e.suspend() },
+                suspend { never<Nothing>() }) { _, _, _ -> Unit }
+              else -> parMapN(
+                _mapCtx,
+                suspend { never<Nothing>() },
+                suspend { never<Nothing>() },
+                suspend { e.suspend() }) { _, _, _ -> Unit }
             }
           } should leftException(e)
 

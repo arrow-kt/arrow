@@ -1,7 +1,7 @@
 package arrow.fx.coroutines.parMapN
 
-import arrow.core.Tuple4
 import arrow.core.Either
+import arrow.core.Tuple4
 import arrow.fx.coroutines.ArrowFxSpec
 import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.ExitCase
@@ -10,7 +10,6 @@ import arrow.fx.coroutines.NamedThreadFactory
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
-import arrow.fx.coroutines.evalOn
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
@@ -27,6 +26,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap4Test : ArrowFxSpec(spec = {
@@ -35,11 +35,12 @@ class ParMap4Test : ArrowFxSpec(spec = {
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(4, NamedThreadFactory { mapCtxName }) }
     checkAll {
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2, s3, s4) = parMapN(
-            _mapCtx, threadName, threadName, threadName, threadName) { a, b, c, d -> Tuple4(a, b, c, d) }
+            _mapCtx, threadName, threadName, threadName, threadName
+          ) { a, b, c, d -> Tuple4(a, b, c, d) }
 
           s1 shouldBe mapCtxName
           s2 shouldBe mapCtxName
@@ -57,7 +58,7 @@ class ParMap4Test : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..4), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {

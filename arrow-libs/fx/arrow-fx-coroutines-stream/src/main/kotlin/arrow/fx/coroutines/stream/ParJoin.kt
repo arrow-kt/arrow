@@ -6,7 +6,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.option.monad.flatten
 import arrow.core.orElse
-import arrow.fx.coroutines.ComputationPool
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Platform
 import arrow.fx.coroutines.Semaphore
@@ -14,6 +13,7 @@ import arrow.fx.coroutines.stream.concurrent.NoneTerminatedQueue
 import arrow.fx.coroutines.stream.concurrent.Queue
 import arrow.fx.coroutines.stream.concurrent.SignallingAtomic
 import arrow.fx.coroutines.uncancellable
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 // stops the join evaluation
@@ -171,7 +171,7 @@ internal suspend fun signalResult(done: SignallingAtomic<Option<Option<Throwable
  */
 fun <O> Stream<Stream<O>>.parJoin(
   maxOpen: Int,
-  ctx: CoroutineContext = ComputationPool
+  ctx: CoroutineContext = Dispatchers.Default
 ): Stream<O> {
   require(maxOpen > 0) { "maxOpen must be > 0, was: $maxOpen" }
 
@@ -204,5 +204,5 @@ fun <O> Stream<Stream<O>>.parJoin(
 }
 
 /** Like [parJoin] but races all inner streams simultaneously without limit. */
-fun <O> Stream<Stream<O>>.parJoinUnbounded(ctx: CoroutineContext = ComputationPool): Stream<O> =
+fun <O> Stream<Stream<O>>.parJoinUnbounded(ctx: CoroutineContext = Dispatchers.Default): Stream<O> =
   parJoin(Int.MAX_VALUE, ctx)

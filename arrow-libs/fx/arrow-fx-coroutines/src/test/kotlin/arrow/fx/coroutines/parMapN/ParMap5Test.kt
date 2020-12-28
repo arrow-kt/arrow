@@ -10,7 +10,7 @@ import arrow.fx.coroutines.NamedThreadFactory
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
-import arrow.fx.coroutines.evalOn
+
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
@@ -27,6 +27,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap5Test : ArrowFxSpec(spec = {
@@ -35,11 +36,12 @@ class ParMap5Test : ArrowFxSpec(spec = {
     val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(5, NamedThreadFactory { mapCtxName }) }
     checkAll {
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2, s3, s4, s5) = parMapN(
-            _mapCtx, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
+            _mapCtx, threadName, threadName, threadName, threadName, threadName
+          ) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
 
           s1 shouldBe mapCtxName
           s2 shouldBe mapCtxName
@@ -58,7 +60,7 @@ class ParMap5Test : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..5), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {
@@ -150,7 +152,15 @@ class ParMap5Test : ArrowFxSpec(spec = {
   "parMapN 5 finishes on single thread" {
     checkAll(Arb.string()) {
       single.use { ctx ->
-        parMapN(ctx, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }
+        parMapN(ctx, threadName, threadName, threadName, threadName, threadName) { a, b, c, d, e ->
+          Tuple5(
+            a,
+            b,
+            c,
+            d,
+            e
+          )
+        }
       } shouldBe Tuple5("single", "single", "single", "single", "single")
     }
   }
@@ -170,7 +180,17 @@ class ParMap5Test : ArrowFxSpec(spec = {
       val loserD = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pd.complete(Pair(d, ex)) } }
       val loserE = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pe.complete(Pair(e, ex)) } }
 
-      val f = ForkAndForget { parMapN(loserA, loserB, loserC, loserD, loserE) { _a, _b, _c, _d, _e -> Tuple5(_a, _b, _c, _d, _e) } }
+      val f = ForkAndForget {
+        parMapN(loserA, loserB, loserC, loserD, loserE) { _a, _b, _c, _d, _e ->
+          Tuple5(
+            _a,
+            _b,
+            _c,
+            _d,
+            _e
+          )
+        }
+      }
 
       s.acquireN(5) // Suspend until all racers started
       f.cancel()

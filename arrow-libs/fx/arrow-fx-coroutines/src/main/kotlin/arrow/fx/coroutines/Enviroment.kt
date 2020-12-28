@@ -1,6 +1,7 @@
 package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -82,7 +83,7 @@ interface Environment {
   fun <A> unsafeRunAsyncCancellable(fa: suspend () -> A, e: (Throwable) -> Unit, a: (A) -> Unit): Disposable
 
   companion object {
-    operator fun invoke(ctx: CoroutineContext = ComputationPool): Environment =
+    operator fun invoke(ctx: CoroutineContext = Dispatchers.Default): Environment =
       DefaultEnvironment(ctx)
   }
 }

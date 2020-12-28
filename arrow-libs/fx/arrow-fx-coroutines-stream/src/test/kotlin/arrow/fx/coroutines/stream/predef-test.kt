@@ -3,7 +3,6 @@ package arrow.fx.coroutines.stream
 import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.coroutines.CancelToken
-import arrow.fx.coroutines.ComputationPool
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Promise
@@ -26,6 +25,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.Dispatchers
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
@@ -158,7 +158,7 @@ internal fun <A> Result<A>.toEither(): Either<Throwable, A> =
 
 internal suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { throw this }.startCoroutine(Continuation(ComputationPool) {
+    suspend { throw this }.startCoroutine(Continuation(Dispatchers.Default) {
       cont.intercepted().resumeWith(it)
     })
 
@@ -167,7 +167,7 @@ internal suspend fun Throwable.suspend(): Nothing =
 
 internal suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(ComputationPool) {
+    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
       cont.intercepted().resumeWith(it)
     })
 
@@ -179,7 +179,7 @@ internal fun <A> A.suspended(): suspend () -> A =
 
 internal suspend fun <A> Either<Throwable, A>.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(ComputationPool) {
+    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
       it.fold(
         {
           it.fold(

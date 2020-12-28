@@ -9,7 +9,7 @@ import arrow.fx.coroutines.NamedThreadFactory
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.Semaphore
-import arrow.fx.coroutines.evalOn
+
 import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.leftException
 import arrow.fx.coroutines.never
@@ -26,6 +26,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParMap2Test : ArrowFxSpec(spec = {
@@ -35,7 +36,7 @@ class ParMap2Test : ArrowFxSpec(spec = {
 
     checkAll {
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2) = parMapN(_mapCtx, threadName, threadName) { a, b -> Pair(a, b) }
@@ -54,7 +55,7 @@ class ParMap2Test : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (_single, _mapCtx) ->
-        evalOn(_single) {
+        withContext(_single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {

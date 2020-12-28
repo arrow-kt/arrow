@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
@@ -68,7 +69,7 @@ internal fun <A> Fiber(promise: UnsafePromise<A>, conn: SuspendConnection): Fibe
   "Use Deferred with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("async(ctx) { f() }", "kotlinx.coroutines.Deferred")
 )
-suspend fun <A> ForkConnected(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> {
+suspend fun <A> ForkConnected(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> {
   val def = CoroutineScope(coroutineContext[Job] ?: Job()).async(ctx) {
     runCatching { f.invoke() }
   }
@@ -84,7 +85,7 @@ suspend fun <A> ForkConnected(ctx: CoroutineContext = ComputationPool, f: suspen
   "Use Deferred with KotlinX Coroutines Structured Concurrency",
   ReplaceWith("async(ctx) { invoke() }", "kotlinx.coroutines.Deferred")
 )
-suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = ComputationPool): Fiber<A> =
+suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
   ForkConnected(ctx, this)
 
 /**
@@ -120,7 +121,7 @@ suspend fun <A> (suspend () -> A).forkConnected(ctx: CoroutineContext = Computat
  */
 // TODO provide proper deprecation annotation
 suspend fun <A> ForkScoped(
-  ctx: CoroutineContext = ComputationPool,
+  ctx: CoroutineContext = Dispatchers.Default,
   interruptWhen: suspend () -> Unit,
   f: suspend () -> A
 ): Fiber<A> {
@@ -133,7 +134,7 @@ suspend fun <A> ForkScoped(
 /** @see ForkScoped */
 // TODO provide proper deprecation annotation
 suspend fun <A> (suspend () -> A).forkScoped(
-  ctx: CoroutineContext = ComputationPool,
+  ctx: CoroutineContext = Dispatchers.Default,
   interruptWhen: suspend () -> Unit
 ): Fiber<A> = ForkScoped(ctx, interruptWhen, this)
 
@@ -147,12 +148,12 @@ suspend fun <A> (suspend () -> A).forkScoped(
  * @see ForkConnected for a fork operation that wires cancellation to its parent in a safe way.
  */
 // TODO provide proper deprecation annotation
-suspend fun <A> ForkAndForget(ctx: CoroutineContext = ComputationPool, f: suspend () -> A): Fiber<A> =
+suspend fun <A> ForkAndForget(ctx: CoroutineContext = Dispatchers.Default, f: suspend () -> A): Fiber<A> =
   f.forkAndForget(ctx)
 
 /** @see ForkAndForget */
 // TODO provide proper deprecation annotation
-suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = ComputationPool): Fiber<A> =
+suspend fun <A> (suspend () -> A).forkAndForget(ctx: CoroutineContext = Dispatchers.Default): Fiber<A> =
   CoroutineScope(ctx).async {
     invoke()
   }.toFiber()

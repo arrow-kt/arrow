@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
@@ -16,7 +17,7 @@ abstract class CancellableContinuation<A> internal constructor() : Continuation<
 @Suppress("FunctionName")
 @Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 fun <A> CancellableContinuation(
-  ctx: CoroutineContext = ComputationPool,
+  ctx: CoroutineContext = Dispatchers.Default,
   resumeWith: (Result<A>) -> Unit
 ): CancellableContinuation<A> = CancellableContinuation(ctx, SuspendConnection(), resumeWith)
 
@@ -43,7 +44,7 @@ fun <A> (suspend () -> A).startCoroutineCancellable(completion: CancellableConti
 @Suppress("FunctionName")
 @Deprecated("Use KotlinX structured concurrency as unsafe Environment to launch side-effects from non-suspending code")
 internal fun <A> CancellableContinuation(
-  ctx: CoroutineContext = ComputationPool,
+  ctx: CoroutineContext = Dispatchers.Default,
   conn: SuspendConnection,
   resumeWith: (Result<A>) -> Unit
 ): CancellableContinuation<A> = object : CancellableContinuation<A>() {

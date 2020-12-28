@@ -8,6 +8,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withContext
 
 class FiberTest : ArrowFxSpec(spec = {
 
@@ -16,7 +17,7 @@ class FiberTest : ArrowFxSpec(spec = {
     val forker = Resource.singleThreadContext(forkCtxName)
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val f = ForkConnected(forker) { Pair(i.suspend(), threadName()) }
@@ -34,7 +35,7 @@ class FiberTest : ArrowFxSpec(spec = {
     val forker = Resource.singleThreadContext(forkCtxName)
     checkAll(Arb.throwable()) { e ->
       single.zip(forker).use { (single, forker) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val f = ForkConnected(forker) { e.suspend() }
@@ -134,7 +135,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val f = ForkScoped(forker, { never() }) { Pair(i.suspend(), threadName()) }
@@ -218,7 +219,7 @@ class FiberTest : ArrowFxSpec(spec = {
 
     checkAll(Arb.int()) { i ->
       single.zip(forker).use { (single, forker) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val f = ForkAndForget(forker) { Pair(i.suspend(), threadName()) }

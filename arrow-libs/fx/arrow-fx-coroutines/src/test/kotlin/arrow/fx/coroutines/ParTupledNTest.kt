@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 class ParTupledNTest : ArrowFxSpec(spec = {
@@ -19,7 +20,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
     checkAll {
       single.zip(mapCtx).use { (single, mapCtx) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2) = parTupledN(mapCtx, threadName, threadName)
@@ -38,7 +39,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (single, mapCtx) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {
@@ -138,7 +139,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
     checkAll {
       single.zip(mapCtx).use { (single, mapCtx) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           val (s1, s2, s3) = parTupledN(mapCtx, threadName, threadName, threadName)
@@ -158,7 +159,7 @@ class ParTupledNTest : ArrowFxSpec(spec = {
 
     checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
       single.zip(mapCtx).use { (single, mapCtx) ->
-        evalOn(single) {
+        withContext(single) {
           threadName() shouldBe singleThreadName
 
           Either.catch {
