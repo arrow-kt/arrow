@@ -11,9 +11,20 @@ import arrow.core.extensions.AndMonoid
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
 import arrow.core.identity
-import arrow.higherkind
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForFold private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias FoldOf<S, A> = arrow.Kind2<ForFold, S, A>
+@Deprecated(KindDeprecation)
+typealias FoldPartialOf<S> = arrow.Kind<ForFold, S>
+@Deprecated(KindDeprecation)
+typealias FoldKindedJ<S, A> = arrow.HkJ2<ForFold, S, A>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, A> FoldOf<S, A>.fix(): Fold<S, A> = this as Fold<S, A>
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.
@@ -23,7 +34,6 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Fold]
  * @param A the target of a [Fold]
  */
-@higherkind
 interface Fold<S, A> : FoldOf<S, A> {
 
   /**

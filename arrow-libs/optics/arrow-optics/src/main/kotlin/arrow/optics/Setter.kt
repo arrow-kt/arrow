@@ -2,8 +2,20 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.higherkind
 import arrow.typeclasses.Functor
+
+@Deprecated(KindDeprecation)
+class ForPSetter private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias PSetterOf<S, T, A, B> = arrow.Kind4<ForPSetter, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias PSetterPartialOf<S, T, A> = arrow.Kind3<ForPSetter, S, T, A>
+@Deprecated(KindDeprecation)
+typealias PSetterKindedJ<S, T, A, B> = arrow.HkJ4<ForPSetter, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> PSetterOf<S, T, A, B>.fix(): PSetter<S, T, A, B> =
+  this as PSetter<S, T, A, B>
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments
@@ -31,7 +43,6 @@ typealias SetterKindedJ<S, A> = PSetterKindedJ<S, S, A, A>
  * @param A the focus of a [PSetter]
  * @param B the modified focus of a [PSetter]
  */
-@higherkind
 interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
   /**

@@ -8,10 +8,22 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.toT
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForPLens private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias PLensOf<S, T, A, B> = arrow.Kind4<ForPLens, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias PLensPartialOf<S, T, A> = arrow.Kind3<ForPLens, S, T, A>
+@Deprecated(KindDeprecation)
+typealias PLensKindedJ<S, T, A, B> = arrow.HkJ4<ForPLens, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> PLensOf<S, T, A, B>.fix(): PLens<S, T, A, B> =
+  this as PLens<S, T, A, B>
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments
@@ -40,7 +52,6 @@ typealias LensKindedJ<S, A> = PLensKindedJ<S, S, A, A>
  * @param A the focus of a [PLens]
  * @param B the modified focus of a [PLens]
  */
-@higherkind
 interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
 
   fun get(s: S): A

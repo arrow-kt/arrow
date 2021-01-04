@@ -15,10 +15,22 @@ import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
 import arrow.core.identity
 import arrow.core.value
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
+
+@Deprecated(KindDeprecation)
+class ForPTraversal private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias PTraversalOf<S, T, A, B> = arrow.Kind4<ForPTraversal, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias PTraversalPartialOf<S, T, A> = arrow.Kind3<ForPTraversal, S, T, A>
+@Deprecated(KindDeprecation)
+typealias PTraversalKindedJ<S, T, A, B> = arrow.HkJ4<ForPTraversal, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> PTraversalOf<S, T, A, B>.fix(): PTraversal<S, T, A, B> =
+  this as PTraversal<S, T, A, B>
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments
@@ -42,7 +54,6 @@ typealias TraversalKindedJ<S, A> = PTraversalKindedJ<S, S, A, A>
  * @param A the target of a [PTraversal]
  * @param B the modified target of a [PTraversal]
  */
-@higherkind
 interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
 
   fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T>

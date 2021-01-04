@@ -10,9 +10,21 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.toT
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForPOptional private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias POptionalOf<S, T, A, B> = arrow.Kind4<ForPOptional, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias POptionalPartialOf<S, T, A> = arrow.Kind3<ForPOptional, S, T, A>
+@Deprecated(KindDeprecation)
+typealias POptionalKindedJ<S, T, A, B> = arrow.HkJ4<ForPOptional, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> POptionalOf<S, T, A, B>.fix(): POptional<S, T, A, B> =
+  this as POptional<S, T, A, B>
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments
@@ -67,7 +79,6 @@ fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus:
  * @param A the focus of a [POptional]
  * @param B the modified focus of a [POptional]
  */
-@higherkind
 interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 
   /**

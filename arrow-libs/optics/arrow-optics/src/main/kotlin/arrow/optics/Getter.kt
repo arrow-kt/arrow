@@ -8,8 +8,19 @@ import arrow.core.Tuple2
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
-import arrow.higherkind
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForGetter private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias GetterOf<S, A> = arrow.Kind2<ForGetter, S, A>
+@Deprecated(KindDeprecation)
+typealias GetterPartialOf<S> = arrow.Kind<ForGetter, S>
+@Deprecated(KindDeprecation)
+typealias GetterKindedJ<S, A> = arrow.HkJ2<ForGetter, S, A>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, A> GetterOf<S, A>.fix(): Getter<S, A> = this as Getter<S, A>
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.
@@ -20,7 +31,6 @@ import arrow.typeclasses.Monoid
  * @param S the source of a [Getter]
  * @param A the focus of a [Getter]
  */
-@higherkind
 interface Getter<S, A> : GetterOf<S, A> {
 
   /**

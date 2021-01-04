@@ -11,10 +11,22 @@ import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.toT
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForPPrism private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias PPrismOf<S, T, A, B> = arrow.Kind4<ForPPrism, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias PPrismPartialOf<S, T, A> = arrow.Kind3<ForPPrism, S, T, A>
+@Deprecated(KindDeprecation)
+typealias PPrismKindedJ<S, T, A, B> = arrow.HkJ4<ForPPrism, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> PPrismOf<S, T, A, B>.fix(): PPrism<S, T, A, B> =
+  this as PPrism<S, T, A, B>
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments
@@ -43,7 +55,6 @@ typealias PrismKindedJ<S, A> = PPrismKindedJ<S, S, A, A>
  * @param A the focus of a [PPrism]
  * @param B the modified focus of a [PPrism]
  */
-@higherkind
 interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
 
   fun getOrModify(s: S): Either<T, A>

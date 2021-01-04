@@ -9,10 +9,22 @@ import arrow.core.Tuple2
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
+
+@Deprecated(KindDeprecation)
+class ForPIso private constructor() { companion object }
+@Deprecated(KindDeprecation)
+typealias PIsoOf<S, T, A, B> = arrow.Kind4<ForPIso, S, T, A, B>
+@Deprecated(KindDeprecation)
+typealias PIsoPartialOf<S, T, A> = arrow.Kind3<ForPIso, S, T, A>
+@Deprecated(KindDeprecation)
+typealias PIsoKindedJ<S, T, A, B> = arrow.HkJ4<ForPIso, S, T, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(KindDeprecation)
+inline fun <S, T, A, B> PIsoOf<S, T, A, B>.fix(): PIso<S, T, A, B> =
+  this as PIso<S, T, A, B>
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments
@@ -39,7 +51,6 @@ typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
  * @param A the focus of a [PIso]
  * @param B the modified target of a [PIso]
  */
-@higherkind
 interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
 
   /**
