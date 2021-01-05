@@ -7,6 +7,8 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
+import kotlin.time.milliseconds
+import kotlin.time.minutes
 import java.lang.RuntimeException
 
 class CircuitBreakerTest : ArrowFxSpec(spec = {
@@ -110,7 +112,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-    delay((resetTimeout + 10.milliseconds).millis)
+    delay(resetTimeout + 10.milliseconds)
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -189,7 +191,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
-    delay((resetTimeout + 10.milliseconds).millis)
+    delay(resetTimeout + 10.milliseconds)
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {

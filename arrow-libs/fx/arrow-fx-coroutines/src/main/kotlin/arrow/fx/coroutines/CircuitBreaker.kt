@@ -5,8 +5,12 @@ import arrow.core.identity
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
+import kotlin.time.Duration
+import kotlin.time.milliseconds
+import kotlin.time.nanoseconds
 
-class CircuitBreaker constructor(
+class CircuitBreaker
+private constructor(
   private val state: AtomicRefW<State>,
   private val maxFailures: Int,
   private val resetTimeout: Duration,
@@ -17,6 +21,25 @@ class CircuitBreaker constructor(
   private val onHalfOpen: suspend () -> Unit,
   private val onOpen: suspend () -> Unit
 ) {
+
+  @Deprecated(
+    "$DeprecateDuration and please use the #of constructor instead",
+    ReplaceWith(
+      "of(maxFailures, resetTimeout.millis.milliseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)",
+      "arrow.fx.coroutines.CircuitBreaker.Companion.of"
+    )
+  )
+  constructor(
+    state: AtomicRefW<State>,
+    maxFailures: Int,
+    resetTimeout: arrow.fx.coroutines.Duration,
+    exponentialBackoffFactor: Double,
+    maxResetTimeout: Duration,
+    onRejected: suspend () -> Unit,
+    onClosed: suspend () -> Unit,
+    onHalfOpen: suspend () -> Unit,
+    onOpen: suspend () -> Unit
+  ) : this(state, maxFailures, resetTimeout.millis.milliseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
@@ -51,7 +74,7 @@ class CircuitBreaker constructor(
         markOrResetFailures(attempt)
       }
       is Open -> {
-        val now = System.currentTimeMillis()
+        val now = System.currentTimeMillis().milliseconds
         if (now >= curr.expiresAt) {
           // The Open state has expired, so we are letting just one
           // task to execute, while transitioning into HalfOpen
@@ -158,9 +181,9 @@ class CircuitBreaker constructor(
           }
           is ExitCase.Failure -> {
             // Failed reset, which means we go back in the Open state with new expiry val nextTimeout
-            val value = (resetTimeout.millis * exponentialBackoffFactor).toLong().milliseconds
-            val nextTimeout =
-              if (/*maxResetTimeout.isFinite &&*/ value.nanoseconds > maxResetTimeout.nanoseconds) maxResetTimeout
+            val value: Duration = (resetTimeout * exponentialBackoffFactor)
+            val nextTimeout: Duration =
+              if (maxResetTimeout.isFinite() && value > maxResetTimeout) maxResetTimeout
               else value
             val ts = System.currentTimeMillis()
             state.value = Open(ts, nextTimeout, awaitClose)
@@ -330,13 +353,20 @@ class CircuitBreaker constructor(
      */
     class Open(val startedAt: Long, val resetTimeout: Duration, internal val awaitClose: Promise<Unit>) : State() {
 
+      @Deprecated(
+        DeprecateDuration,
+        ReplaceWith("(startedAt, resetTimeout.millis.milliseconds, awaitClose)", "kotlin.time.milliseconds")
+      )
+      constructor(startedAt: Long, resetTimeout: arrow.fx.coroutines.Duration, awaitClose: Promise<Unit>) :
+        this(startedAt, resetTimeout.millis.milliseconds, awaitClose)
+
       /** The timestamp in milliseconds since the epoch, specifying
        * when the `Open` state is to transition to [HalfOpen].
        *
        * It is calculated as:
        * `startedAt + resetTimeout.millis`
        */
-      val expiresAt: Long = startedAt + resetTimeout.millis
+      val expiresAt: Duration = startedAt.milliseconds + resetTimeout
 
       override fun equals(other: Any?): Boolean =
         if (other is Open) this.startedAt == startedAt &&
@@ -381,6 +411,14 @@ class CircuitBreaker constructor(
      *        when the `CircuitBreaker` switches to the `Closed` state again.
      */
     class HalfOpen(val resetTimeout: Duration, internal val awaitClose: Promise<Unit>) : State() {
+
+      @Deprecated(
+        DeprecateDuration,
+        ReplaceWith("(resetTimeout.millis.milliseconds, awaitClose)", "kotlin.time.milliseconds")
+      )
+      constructor(resetTimeout: arrow.fx.coroutines.Duration, awaitClose: Promise<Unit>) :
+        this(resetTimeout.millis.milliseconds, awaitClose)
+
       override fun hashCode(): Int =
         resetTimeout.hashCode()
 
@@ -435,8 +473,8 @@ class CircuitBreaker constructor(
       onHalfOpen: suspend () -> Unit = suspend { Unit },
       onOpen: suspend () -> Unit = suspend { Unit }
     ): CircuitBreaker? =
-      if (maxFailures >= 0 && resetTimeout.amount > 0 &&
-        exponentialBackoffFactor > 0 && maxResetTimeout.amount > 0
+      if (maxFailures >= 0 && resetTimeout > 0.nanoseconds &&
+        exponentialBackoffFactor > 0 && maxResetTimeout > 0.nanoseconds
       ) {
         CircuitBreaker(
           state = AtomicRefW(Closed(0)),
@@ -450,5 +488,33 @@ class CircuitBreaker constructor(
           onOpen = onOpen
         )
       } else null
+
+    @Deprecated(
+      DeprecateDuration,
+      ReplaceWith(
+        "of(maxFailures, resetTimeout.millis.milliseconds, exponentialBackoffFactor, maxResetTimeout.millis.milliseconds, onRejected, onClosed, onHalfOpen, onOpen)",
+        "kotlin.time.milliseconds"
+      )
+    )
+    suspend fun of(
+      maxFailures: Int,
+      resetTimeout: arrow.fx.coroutines.Duration,
+      exponentialBackoffFactor: Double = 1.0,
+      maxResetTimeout: arrow.fx.coroutines.Duration = arrow.fx.coroutines.Duration.INFINITE,
+      onRejected: suspend () -> Unit = suspend { Unit },
+      onClosed: suspend () -> Unit = suspend { Unit },
+      onHalfOpen: suspend () -> Unit = suspend { Unit },
+      onOpen: suspend () -> Unit = suspend { Unit }
+    ): CircuitBreaker? =
+      of(
+        maxFailures,
+        resetTimeout.millis.milliseconds,
+        exponentialBackoffFactor,
+        maxResetTimeout.millis.milliseconds,
+        onRejected,
+        onClosed,
+        onHalfOpen,
+        onOpen
+      )
   }
 }
