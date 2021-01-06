@@ -119,7 +119,7 @@ private object OrderingMonoid : Monoid<Ordering> {
   override fun empty(): Ordering = EQ
 
   override fun Ordering.combine(b: Ordering): Ordering =
-    this.combine(b)
+    this + b
 }
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")

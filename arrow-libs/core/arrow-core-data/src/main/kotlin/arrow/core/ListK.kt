@@ -472,6 +472,233 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       rs.isEmpty() -> ls.map { it.leftIor() }
       else -> listOf(Ior.Both(ls.first(), rs.first())) + alignRec(ls.drop(1), rs.drop(1))
     }
+
+    inline fun <B, C, D> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      map: (B, C) -> D
+    ): List<D> =
+      mapN(b, c, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+
+    inline fun <B, C, D, E> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      map: (B, C, D) -> E
+    ): List<E> =
+      mapN(b, c, d, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+    inline fun <B, C, D, E, F> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      map: (B, C, D, E) -> F
+    ): List<F> =
+      mapN(b, c, d, e, unit, unit, unit, unit, unit, unit) { b, c, d, e, _, _, _, _, _, _ -> map(b, c, d, e) }
+
+    inline fun <B, C, D, E, F, G> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      map: (B, C, D, E, F) -> G
+    ): List<G> =
+      mapN(b, c, d, e, f, unit, unit, unit, unit, unit) { b, c, d, e, f, _, _, _, _, _ -> map(b, c, d, e, f) }
+
+    inline fun <B, C, D, E, F, G, H> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      map: (B, C, D, E, F, G) -> H
+    ): List<H> =
+      mapN(b, c, d, e, f, g, unit, unit, unit, unit) { b, c, d, e, f, g, _, _, _, _ -> map(b, c, d, e, f, g) }
+
+    inline fun <B, C, D, E, F, G, H, I> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      map: (B, C, D, E, F, G, H) -> I
+    ): List<I> =
+      mapN(b, c, d, e, f, g, h, unit, unit, unit) { b, c, d, e, f, g, h, _, _, _ -> map(b, c, d, e, f, g, h) }
+
+    inline fun <B, C, D, E, F, G, H, I, J> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>,
+      map: (B, C, D, E, F, G, H, I) -> J
+    ): List<J> =
+      mapN(b, c, d, e, f, g, h, i, unit, unit) { b, c, d, e, f, g, h, i, _, _ -> map(b, c, d, e, f, g, h, i) }
+
+    inline fun <B, C, D, E, F, G, H, I, J, K> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>,
+      j: Iterable<J>,
+      map: (B, C, D, E, F, G, H, I, J) -> K
+    ): List<K> =
+      mapN(b, c, d, e, f, g, h, i, j, unit) { b, c, d, e, f, g, h, i, j, _ -> map(b, c, d, e, f, g, h, i, j) }
+
+    inline fun <B, C, D, E, F, G, H, I, J, K, L> mapN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>,
+      j: Iterable<J>,
+      k: Iterable<K>,
+      map: (B, C, D, E, F, G, H, I, J, K) -> L
+    ): List<L> =
+      b.flatMap { bb ->
+        c.flatMap { cc ->
+          d.flatMap { dd ->
+            e.flatMap { ee ->
+              f.flatMap { ff ->
+                g.flatMap { gg ->
+                  h.flatMap { hh ->
+                    i.flatMap { ii ->
+                      j.flatMap { jj ->
+                        k.map { kk ->
+                          map(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+    fun <B, C> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>
+    ): List<Tuple2<B, C>> =
+      mapN(b, c) { b, c ->
+        Tuple2(b, c)
+      }
+
+    fun <B, C, D> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>
+    ): List<Tuple3<B, C, D>> =
+      mapN(b, c, d) { b, c, d ->
+        Tuple3(b, c, d)
+      }
+
+    fun <B, C, D, E> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>
+    ): List<Tuple4<B, C, D, E>> =
+      mapN(b, c, d, e) { b, c, d, e ->
+        Tuple4(b, c, d, e)
+      }
+
+    fun <B, C, D, E, F> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>
+    ): List<Tuple5<B, C, D, E, F>> =
+      mapN(b, c, d, e, f) { b, c, d, e, f ->
+        Tuple5(b, c, d, e, f)
+      }
+
+    fun <B, C, D, E, F, G> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>
+    ): List<Tuple6<B, C, D, E, F, G>> =
+      mapN(b, c, d, e, f, g) { b, c, d, e, f, g ->
+        Tuple6(b, c, d, e, f, g)
+      }
+
+    fun <B, C, D, E, F, G, H> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>
+    ): List<Tuple7<B, C, D, E, F, G, H>> =
+      mapN(b, c, d, e, f, g, h) { b, c, d, e, f, g, h ->
+        Tuple7(b, c, d, e, f, g, h)
+      }
+
+    fun <B, C, D, E, F, G, H, I> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>
+    ): List<Tuple8<B, C, D, E, F, G, H, I>> =
+      mapN(b, c, d, e, f, g, h, i) { b, c, d, e, f, g, h, i ->
+        Tuple8(b, c, d, e, f, g, h, i)
+      }
+
+    fun <B, C, D, E, F, G, H, I, J> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>,
+      j: Iterable<J>
+    ): List<Tuple9<B, C, D, E, F, G, H, I, J>> =
+      mapN(b, c, d, e, f, g, h, i, j) { b, c, d, e, f, g, h, i, j ->
+        Tuple9(b, c, d, e, f, g, h, i, j)
+      }
+
+    fun <B, C, D, E, F, G, H, I, J, K> tupledN(
+      b: Iterable<B>,
+      c: Iterable<C>,
+      d: Iterable<D>,
+      e: Iterable<E>,
+      f: Iterable<F>,
+      g: Iterable<G>,
+      h: Iterable<H>,
+      i: Iterable<I>,
+      j: Iterable<J>,
+      k: Iterable<K>
+    ): List<Tuple10<B, C, D, E, F, G, H, I, J, K>> =
+      mapN(b, c, d, e, f, g, h, i, j, k) { b, c, d, e, f, g, h, i, j, k ->
+        Tuple10(b, c, d, e, f, g, h, i, j, k)
+      }
   }
 }
 
@@ -482,9 +709,3 @@ fun <A> List<A>.k(): ListK<A> = ListK(this)
 
 fun <A> listKOf(vararg elements: A): ListK<A> =
   listOf(*elements).k()
-
-fun <A, B> Iterable<A>.mapConst(b: B): List<B> =
-  map { b }
-
-fun <A> Iterable<A>.void(): List<Unit> =
-  mapConst(Unit)
