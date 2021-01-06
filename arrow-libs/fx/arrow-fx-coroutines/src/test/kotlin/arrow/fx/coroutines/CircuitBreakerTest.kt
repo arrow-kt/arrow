@@ -23,7 +23,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
     var effect = 0
     repeat(Schedule.recurs(10_000)) {
-      cb.protect { withContext(Dispatchers.Default) { effect += 1 } }
+      cb.protectOrThrow { withContext(Dispatchers.Default) { effect += 1 } }
     }
     effect shouldBe 10_001
   }
@@ -32,7 +32,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
     var effect = 0
     repeat(Schedule.recurs(10_000)) {
-      cb.protect { effect += 1 }
+      cb.protectOrThrow { effect += 1 }
     }
     effect shouldBe 10_001
   }
@@ -41,7 +41,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      Either.catch { cb.protect { throw dummy } }
+      cb.protectEither { throw dummy }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
@@ -51,12 +51,12 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      Either.catch { cb.protect { throw dummy } }
+      cb.protectEither { throw dummy }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
 
-    cb.protect { 1 } shouldBe 1
+    cb.protectOrThrow { 1 } shouldBe 1
 
     cb.state() shouldBe CircuitBreaker.State.Closed(0)
   }
@@ -65,12 +65,12 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      Either.catch { cb.protect { throw dummy } }
+      cb.protectEither { throw dummy }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
 
-    Either.catch { cb.protect { throw dummy } } shouldBe Either.Left(dummy)
+    cb.protectEither { throw dummy } shouldBe Either.Left(dummy)
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -97,7 +97,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 4 failures
-    repeat(recurAndCollect(4)) { Either.catch { cb.protect { throw dummy } } }
+    repeat(recurAndCollect(4)) { cb.protectEither { throw dummy } }
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -108,7 +108,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
 
     // If CircuitBreaker is Open our tasks our rejected
     shouldThrow<CircuitBreaker.ExecutionRejected> {
-      cb.protect { throw dummy }
+      cb.protectOrThrow { throw dummy }
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
@@ -126,7 +126,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val stateAssertionLatch = Promise<Unit>()
 
     ForkAndForget { // Successful tasks puts circuit breaker back in HalfOpen
-      cb.protect {
+      cb.protectOrThrow {
         checkHalfOpen.complete(Unit)
         delayProtectLatch.get()
       } // Delay protect, to inspect HalfOpen state.
@@ -143,8 +143,8 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     }
 
     // Rejects all other tasks in HalfOpen
-    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protect { throw dummy } }
-    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protect { throw dummy } }
+    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
+    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
     // Once we complete `protect`, the circuitbreaker will go back to closer state
     delayProtectLatch.complete(Unit)
@@ -176,7 +176,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 4 failures
-    repeat(recurAndCollect(4)) { Either.catch { cb.protect { throw dummy } } }
+    repeat(recurAndCollect(4)) { cb.protectEither { throw dummy } }
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -187,7 +187,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
 
     // If CircuitBreaker is Open our tasks our rejected
     shouldThrow<CircuitBreaker.ExecutionRejected> {
-      cb.protect { throw dummy }
+      cb.protectOrThrow { throw dummy }
     }
 
     // After resetTimeout passes, CB should still be Open, and we should be able to reset to Closed.
@@ -206,11 +206,9 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
 
     ForkAndForget { // Successful tasks puts circuit breaker back in HalfOpen
       // Delay protect, to inspect HalfOpen state.
-      Either.catch {
-        cb.protect {
-          checkHalfOpen.complete(Unit)
-          delayProtectLatch.get(); throw dummy
-        }
+      cb.protectEither {
+        checkHalfOpen.complete(Unit)
+        delayProtectLatch.get(); throw dummy
       }
       stateAssertionLatch.complete(Unit)
     }
@@ -225,8 +223,8 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     }
 
     // Rejects all other tasks in HalfOpen
-    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protect { throw dummy } }
-    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protect { throw dummy } }
+    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
+    shouldThrow<CircuitBreaker.ExecutionRejected> { cb.protectOrThrow { throw dummy } }
 
     // Once we complete `protect`, the circuitbreaker will go back to closer state
     delayProtectLatch.complete(Unit)
@@ -236,7 +234,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     // resetTimeout should've applied
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
-        s.resetTimeout shouldBe (resetTimeout * exponentialBackoffFactor.toInt())
+        s.resetTimeout shouldBe (resetTimeout * exponentialBackoffFactor)
       }
       else -> fail("Invalid state: Expect CircuitBreaker.State.Open but found $s")
     }
@@ -270,12 +268,12 @@ fun <A> recurAndCollect(n: Int): Schedule<A, List<A>> =
 
 tailrec suspend fun stackSafeSuspend(cb: CircuitBreaker, n: Int, acc: Int): Int =
   if (n > 0) {
-    val s = cb.protect { withContext(Dispatchers.Default) { acc + 1 } }
+    val s = cb.protectOrThrow { withContext(Dispatchers.Default) { acc + 1 } }
     stackSafeSuspend(cb, n - 1, s)
   } else acc
 
 tailrec suspend fun stackSafeImmediate(cb: CircuitBreaker, n: Int, acc: Int): Int =
   if (n > 0) {
-    val s = cb.protect { acc + 1 }
+    val s = cb.protectOrThrow { acc + 1 }
     stackSafeImmediate(cb, n - 1, s)
   } else acc

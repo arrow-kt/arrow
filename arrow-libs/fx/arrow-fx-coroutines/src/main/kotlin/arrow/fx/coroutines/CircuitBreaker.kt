@@ -2,6 +2,7 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
@@ -60,10 +61,36 @@ private constructor(
       is State.HalfOpen -> curr.awaitClose.get()
     }
 
-  /** Returns a new task that upon execution will execute the given
+  /**
+   * Returns a new task that upon execution will execute the given
    * task, but with the protection of this circuit breaker.
    */
-  tailrec suspend fun <A> protect(fa: suspend () -> A): A =
+  @Deprecated("#protect is being renamed to protectOrThrow", ReplaceWith("protectOrThrow(fa)"))
+  suspend fun <A> protect(fa: suspend () -> A): A =
+    protectOrThrow(fa)
+
+  suspend fun <A> protectEither(fa: suspend () -> A): Either<Throwable, A> =
+    Either.catch { protectOrThrow(fa) }
+
+  /**
+   * Returns a new task that upon execution will execute the given
+   * task, but with the protection of this circuit breaker.
+   * If an exception in [fa] occurs it will be rethrown
+   */
+  suspend fun <A> protectOrNull(fa: suspend () -> A): A? =
+    try {
+      protectOrThrow(fa)
+    } catch (ex: ExecutionRejected) {
+      ex.nonFatalOrThrow() // throw if Fatal
+      null
+    }
+
+  /**
+   * Returns a new task that upon execution will execute the given
+   * task, but with the protection of this circuit breaker.
+   * If an exception in [fa] occurs it will be rethrown
+   */
+  tailrec suspend fun <A> protectOrThrow(fa: suspend () -> A): A =
     when (val curr = state.value) {
       is Closed -> {
         val attempt = try {
@@ -82,7 +109,7 @@ private constructor(
               curr,
               State.HalfOpen(curr.resetTimeout, curr.awaitClose)
             )
-          ) protect(fa) // retry!
+          ) protectOrThrow(fa) // retry!
           else attemptReset(fa, curr.resetTimeout, curr.awaitClose, curr.startedAt)
         } else {
           // Open isn't expired, so we need to fail
