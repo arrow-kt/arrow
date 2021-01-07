@@ -18,7 +18,7 @@ import arrow.typeclasses.Traverse
  * @param S source of the [Traversal]
  * @param A focus of [Traversal]
  */
-interface Each<S, A> {
+fun interface Each<S, A> {
 
   /**
    * Provide a [Traversal] for a structure [S] with focus in [A]
@@ -92,9 +92,8 @@ interface Each<S, A> {
      * @param iso [Iso] that defines an isomorphism between [S] and [A]
      * @return [Each] to provide [Traversal] for structure [S] with focus in [B]
      */
-    fun <S, A, B> fromIso(EA: Each<A, B>, iso: Iso<S, A>): Each<S, B> = object : Each<S, B> {
-      override fun each(): Traversal<S, B> = iso compose EA.each()
-    }
+    fun <S, A, B> fromIso(EA: Each<A, B>, iso: Iso<S, A>): Each<S, B> =
+      Each { iso compose EA.each() }
 
     /**
      * Create an instance of [Each] from a [Traverse]
@@ -102,8 +101,7 @@ interface Each<S, A> {
      * @param T [Traverse] to create [Each] instance from
      * @return [Each] that provides [Traversal] created from [Traverse]
      */
-    fun <S, A> fromTraverse(T: Traverse<S>): Each<Kind<S, A>, A> = object : Each<Kind<S, A>, A> {
-      override fun each(): Traversal<Kind<S, A>, A> = Traversal.fromTraversable(T)
-    }
+    fun <S, A> fromTraverse(T: Traverse<S>): Each<Kind<S, A>, A> =
+      Each { Traversal.fromTraversable(T) }
   }
 }

@@ -17,7 +17,7 @@ import arrow.optics.Traversal
  * @param I index
  * @param A focus of [Optional], [A] is supposed to be unique for a given pair [S] and [I].
  */
-interface Index<S, I, A> {
+fun interface Index<S, I, A> {
 
   /**
    * Get [Optional] focus [A] for a structure [S] at index [i].
@@ -162,8 +162,7 @@ interface Index<S, I, A> {
      * @param iso [Iso] that defines an isomorphism between a type [S] and [A]
      * @return [Index] for a structure [S] to focus in an optional [A] at a given index [I]
      */
-    fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> = object : Index<S, I, B> {
-      override fun index(i: I): Optional<S, B> = iso compose ID.index(i)
-    }
+    fun <S, A, I, B> fromIso(ID: Index<A, I, B>, iso: Iso<S, A>): Index<S, I, B> =
+      Index { i -> iso compose ID.index(i) }
   }
 }

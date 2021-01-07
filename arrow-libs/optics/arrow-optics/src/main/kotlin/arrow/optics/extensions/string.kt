@@ -6,7 +6,6 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.ListK
 import arrow.core.k
-import arrow.optics.Optional
 import arrow.optics.Prism
 import arrow.optics.Traversal
 import arrow.optics.toListK
@@ -37,25 +36,12 @@ fun String.Companion.traversal(): Traversal<String, Char> = object : Traversal<S
  * @receiver [String.Companion] to make the instance statically available.
  * @return [Each] instance
  */
-fun String.Companion.each(): Each<String, Char> = StringEach()
+fun String.Companion.each(): Each<String, Char> = stringEach()
 
 /**
  * [Each] instance for [String].
  */
-interface StringEach : Each<String, Char> {
-
-  override fun each(): Traversal<String, Char> =
-    String.traversal()
-
-  companion object {
-    /**
-     * Operator overload to instantiate typeclass instance.
-     *
-     * @return [FilterIndex] instance for [String]
-     */
-    operator fun invoke(): Each<String, Char> = object : StringEach {}
-  }
-}
+fun stringEach(): Each<String, Char> = Each { String.traversal() }
 
 /**
  * [String]'s [FilterIndex] instance
@@ -64,25 +50,14 @@ interface StringEach : Each<String, Char> {
  * @receiver [String.Companion] to make the instance statically available.
  * @return [FilterIndex] instance
  */
-fun String.Companion.filterIndex(): FilterIndex<String, Int, Char> = StringFilterIndex()
+fun String.Companion.filterIndex(): FilterIndex<String, Int, Char> = stringFilterIndex()
 
 /**
  * [FilterIndex] instance for [String].
  * It allows filtering of every [Char] in a [String] by its index's position.
  */
-interface StringFilterIndex : FilterIndex<String, Int, Char> {
-  override fun filter(p: (Int) -> Boolean): Traversal<String, Char> =
-    String.toListK() compose ListK.filterIndex<Char>().filter(p)
-
-  companion object {
-    /**
-     * Operator overload to instantiate typeclass instance.
-     *
-     * @return [FilterIndex] instance for [String]
-     */
-    operator fun invoke(): FilterIndex<String, Int, Char> = object : StringFilterIndex {}
-  }
-}
+fun stringFilterIndex(): FilterIndex<String, Int, Char> = FilterIndex { p ->
+  String.toListK() compose ListK.filterIndex<Char>().filter(p) }
 
 /**
  * [String]'s [Index] instance
@@ -92,67 +67,35 @@ interface StringFilterIndex : FilterIndex<String, Int, Char> {
  * @receiver [String.Companion] to make the instance statically available.
  * @return [Index] instance
  */
-fun String.Companion.index(): Index<String, Int, Char> = StringIndex()
+fun String.Companion.index(): Index<String, Int, Char> = stringIndex()
 
 /**
  * [Index] instance for [String].
  * It allows access to every [Char] in a [String] by its index's position.
  */
-interface StringIndex : Index<String, Int, Char> {
-
-  override fun index(i: Int): Optional<String, Char> =
-    String.toListK() compose ListK.index<Char>().index(i)
-
-  companion object {
-    /**
-     * Operator overload to instantiate typeclass instance.
-     *
-     * @return [Index] instance for [String]
-     */
-    operator fun invoke(): Index<String, Int, Char> = object : StringIndex {}
-  }
-}
+fun stringIndex(): Index<String, Int, Char> = Index { i ->
+  String.toListK() compose ListK.index<Char>().index(i) }
 
 /**
  * [String]'s [Cons] instance
  */
-fun String.Companion.cons(): Cons<String, Char> = StringCons()
+fun String.Companion.cons(): Cons<String, Char> = stringCons()
 
-interface StringCons : Cons<String, Char> {
-
-  override fun cons(): Prism<String, Tuple2<Char, String>> = Prism(
+fun stringCons(): Cons<String, Char> = Cons {
+  Prism(
     getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
     reverseGet = { (h, t) -> h + t }
   )
-
-  companion object {
-    /**
-     * Operator overload to instantiate typeclass instance.
-     *
-     * @return [Cons] instance for [String]
-     */
-    operator fun invoke(): Cons<String, Char> = object : StringCons {}
-  }
 }
 
 /**
  * [String]'s [Snoc] instance
  */
-fun String.Companion.snoc(): Snoc<String, Char> = StringSnoc()
+fun String.Companion.snoc(): Snoc<String, Char> = stringSnoc()
 
-interface StringSnoc : Snoc<String, Char> {
-
-  override fun snoc(): Prism<String, Tuple2<String, Char>> = Prism(
+fun stringSnoc(): Snoc<String, Char> = Snoc {
+  Prism(
     getOrModify = { if (it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left() },
     reverseGet = { (i, l) -> i + l }
   )
-
-  companion object {
-    /**
-     * Operator overload to instantiate typeclass instance.
-     *
-     * @return [Cons] instance for [String]
-     */
-    operator fun invoke(): Snoc<String, Char> = object : StringSnoc {}
-  }
 }

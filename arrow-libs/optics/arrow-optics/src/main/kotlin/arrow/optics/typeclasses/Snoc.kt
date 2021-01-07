@@ -19,7 +19,7 @@ typealias Conj<S, A> = Snoc<S, A>
  * @param [S] source of [Prism] and init of [Prism] target.
  * @param [A] last of [Prism] focus, [A] is supposed to be unique for a given [S].
  */
-interface Snoc<S, A> {
+fun interface Snoc<S, A> {
 
   /**
    * Provides a [Prism] between a [S] and its [init] [S] and last element [A].
@@ -59,15 +59,13 @@ interface Snoc<S, A> {
     /**
      * Lift an instance of [Snoc] using an [Iso].
      */
-    fun <S, A, B> fromIso(SS: Snoc<A, B>, iso: Iso<S, A>): Snoc<S, B> = object : Snoc<S, B> {
-      override fun snoc(): Prism<S, Tuple2<S, B>> = iso compose SS.snoc() compose iso.reverse().first()
-    }
+    fun <S, A, B> fromIso(SS: Snoc<A, B>, iso: Iso<S, A>): Snoc<S, B> =
+      Snoc { iso compose SS.snoc() compose iso.reverse().first() }
 
     /**
      * Construct a [Snoc] instance from a [Prism].
      */
-    operator fun <S, A> invoke(prism: Prism<S, Tuple2<S, A>>): Snoc<S, A> = object : Snoc<S, A> {
-      override fun snoc(): Prism<S, Tuple2<S, A>> = prism
-    }
+    operator fun <S, A> invoke(prism: Prism<S, Tuple2<S, A>>): Snoc<S, A> =
+      Snoc { prism }
   }
 }

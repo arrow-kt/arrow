@@ -20,7 +20,7 @@ import arrow.optics.Traversal
  * @param I index that uniquely identifies the focus of the [Lens]
  * @param A focus that is supposed to be unique for a given pair [S] and [I].
  */
-interface At<S, I, A> {
+fun interface At<S, I, A> {
 
   /**
    * Get a [Lens] for a structure [S] with focus in [A] at index [i].
@@ -111,9 +111,8 @@ interface At<S, I, A> {
      * @param iso [Iso] that defines an isomorphism between [S] and [U]
      * @return [At] to provide [Lens] for structure [S] with focus in [A] at given index [I]
      */
-    fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> = object : At<S, I, A> {
-      override fun at(i: I): Lens<S, A> = iso compose AT.at(i)
-    }
+    fun <S, U, I, A> fromIso(AT: At<U, I, A>, iso: Iso<S, U>): At<S, I, A> =
+      At { i -> iso compose AT.at(i) }
   }
 }
 

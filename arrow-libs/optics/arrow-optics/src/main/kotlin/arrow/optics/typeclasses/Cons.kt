@@ -17,7 +17,7 @@ import arrow.optics.second
  * @param S source of [Prism] and tail of [Prism] focus.
  * @param A first element of [Prism] focus, [A] is supposed to be unique for a given [S].
  */
-interface Cons<S, A> {
+fun interface Cons<S, A> {
 
   /**
    * Provides a [Prism] between [S] and its first element [A] and tail [S].
@@ -57,12 +57,10 @@ interface Cons<S, A> {
     /**
      * Lift an instance of [Cons] using an [Iso].
      */
-    fun <S, A, B> fromIso(C: Cons<A, B>, iso: Iso<S, A>): Cons<S, B> = object : Cons<S, B> {
-      override fun cons(): Prism<S, Tuple2<B, S>> = iso compose C.cons() compose iso.reverse().second()
-    }
+    fun <S, A, B> fromIso(C: Cons<A, B>, iso: Iso<S, A>): Cons<S, B> =
+      Cons { iso compose C.cons() compose iso.reverse().second() }
 
-    operator fun <S, A> invoke(prism: Prism<S, Tuple2<A, S>>): Cons<S, A> = object : Cons<S, A> {
-      override fun cons(): Prism<S, Tuple2<A, S>> = prism
-    }
+    operator fun <S, A> invoke(prism: Prism<S, Tuple2<A, S>>): Cons<S, A> =
+      Cons { prism }
   }
 }
