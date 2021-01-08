@@ -2,7 +2,6 @@ package arrow.fx.coroutines
 
 import arrow.core.Either
 import arrow.core.identity
-import arrow.core.nonFatalOrThrow
 import arrow.fx.coroutines.CircuitBreaker.State.Closed
 import arrow.fx.coroutines.CircuitBreaker.State.HalfOpen
 import arrow.fx.coroutines.CircuitBreaker.State.Open
@@ -40,7 +39,17 @@ private constructor(
     onClosed: suspend () -> Unit,
     onHalfOpen: suspend () -> Unit,
     onOpen: suspend () -> Unit
-  ) : this(state, maxFailures, resetTimeout.millis.milliseconds, exponentialBackoffFactor, maxResetTimeout, onRejected, onClosed, onHalfOpen, onOpen)
+  ) : this(
+    state,
+    maxFailures,
+    resetTimeout.millis.milliseconds,
+    exponentialBackoffFactor,
+    maxResetTimeout,
+    onRejected,
+    onClosed,
+    onHalfOpen,
+    onOpen
+  )
 
   /** Returns the current [CircuitBreaker.State], meant for debugging purposes.
    */
@@ -69,20 +78,16 @@ private constructor(
   suspend fun <A> protect(fa: suspend () -> A): A =
     protectOrThrow(fa)
 
-  suspend fun <A> protectEither(fa: suspend () -> A): Either<Throwable, A> =
-    Either.catch { protectOrThrow(fa) }
-
   /**
    * Returns a new task that upon execution will execute the given
    * task, but with the protection of this circuit breaker.
-   * If an exception in [fa] occurs it will be rethrown
+   * If an exception in [fa] occurs, other than an [ExecutionRejected] exception, it will be rethrown.
    */
-  suspend fun <A> protectOrNull(fa: suspend () -> A): A? =
+  suspend fun <A> protectEither(fa: suspend () -> A): Either<ExecutionRejected, A> =
     try {
-      protectOrThrow(fa)
-    } catch (ex: ExecutionRejected) {
-      ex.nonFatalOrThrow() // throw if Fatal
-      null
+      Either.Right(protectOrThrow(fa))
+    } catch (e: ExecutionRejected) {
+      Either.Left(e)
     }
 
   /**

@@ -5,11 +5,10 @@ import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.time.milliseconds
 import kotlin.time.minutes
-import java.lang.RuntimeException
 
 class CircuitBreakerTest : ArrowFxSpec(spec = {
 
@@ -41,7 +40,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      cb.protectEither { throw dummy }
+      Either.catch { cb.protectOrThrow { throw dummy } }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
@@ -51,7 +50,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      cb.protectEither { throw dummy }
+      Either.catch { cb.protectOrThrow { throw dummy } }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
@@ -65,12 +64,12 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
     val cb = CircuitBreaker.of(maxFailures = maxFailures, resetTimeout = resetTimeout)!!
 
     repeat(recurAndCollect(3)) {
-      cb.protectEither { throw dummy }
+      Either.catch { cb.protectOrThrow { throw dummy } }
     } shouldBe (0..3).map { Either.Left(dummy) }
 
     cb.state() shouldBe CircuitBreaker.State.Closed(4)
 
-    cb.protectEither { throw dummy } shouldBe Either.Left(dummy)
+    Either.catch { cb.protectOrThrow { throw dummy } } shouldBe Either.Left(dummy)
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -97,7 +96,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 4 failures
-    repeat(recurAndCollect(4)) { cb.protectEither { throw dummy } }
+    repeat(recurAndCollect(4)) { Either.catch { cb.protectOrThrow { throw dummy } } }
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -176,7 +175,7 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
       .doOnRejectedTask { rejectedCount += 1 }
 
     // CircuitBreaker opens after 4 failures
-    repeat(recurAndCollect(4)) { cb.protectEither { throw dummy } }
+    repeat(recurAndCollect(4)) { Either.catch { cb.protectOrThrow { throw dummy } } }
 
     when (val s = cb.state()) {
       is CircuitBreaker.State.Open -> {
@@ -206,9 +205,11 @@ class CircuitBreakerTest : ArrowFxSpec(spec = {
 
     ForkAndForget { // Successful tasks puts circuit breaker back in HalfOpen
       // Delay protect, to inspect HalfOpen state.
-      cb.protectEither {
-        checkHalfOpen.complete(Unit)
-        delayProtectLatch.get(); throw dummy
+      Either.catch {
+        cb.protectOrThrow {
+          checkHalfOpen.complete(Unit)
+          delayProtectLatch.get(); throw dummy
+        }
       }
       stateAssertionLatch.complete(Unit)
     }
