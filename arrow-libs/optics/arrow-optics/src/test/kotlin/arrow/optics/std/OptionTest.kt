@@ -4,9 +4,8 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.extensions.monoid
-import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
-import arrow.core.fix
+import arrow.core.map2
 import arrow.optics.none
 import arrow.optics.some
 import arrow.optics.toEither
@@ -62,7 +61,7 @@ class OptionTest : UnitSpec() {
       EQB = Eq.any(),
       bMonoid = object : Monoid<Either<Unit, Int>> {
         override fun Either<Unit, Int>.combine(b: Either<Unit, Int>): Either<Unit, Int> =
-          Either.applicative<Unit>().run { this@combine.map2(b) { (a, b) -> a + b }.fix() }
+          this.map2(b) { (a, b) -> a + b }
 
         override fun empty(): Either<Unit, Int> = Right(0)
       }

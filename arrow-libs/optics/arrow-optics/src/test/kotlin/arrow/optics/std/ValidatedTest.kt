@@ -2,9 +2,8 @@ package arrow.optics.std
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.fix
 import arrow.core.Validated
+import arrow.core.map2
 import arrow.optics.toEither
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
@@ -31,7 +30,7 @@ class ValidatedTest : UnitSpec() {
           override fun empty() = Right(0)
 
           override fun Either<String, Int>.combine(b: Either<String, Int>): Either<String, Int> =
-            Either.applicative<String>().run { this@combine.map2(b) { (a, b) -> a + b }.fix() }
+            this.map2(b) { (a, b) -> a + b }
         })
     )
   }
