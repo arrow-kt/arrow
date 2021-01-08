@@ -5,11 +5,11 @@ import arrow.core.Option
 import arrow.core.ListK
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
-import arrow.optics.extensions.either.each.each
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.traversal
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -18,7 +18,7 @@ class EitherInstanceTest : UnitSpec() {
   init {
 
     testLaws(TraversalLaws.laws(
-      traversal = Either.each<String, Int>().each(),
+      traversal = Either.traversal(),
       aGen = Gen.either(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = Gen.functionAToB(Gen.int()),
