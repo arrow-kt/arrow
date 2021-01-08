@@ -1,13 +1,14 @@
 @file:JvmMultifileClass
 @file:JvmName("ParTraverse")
+
 package arrow.fx.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
@@ -40,7 +41,10 @@ suspend fun <A> Iterable<suspend () -> A>.parSequenceN(n: Int): List<A> =
  * Cancelling this operation cancels all running tasks
  */
 @Deprecated("use parSequenceN with n as Int type", ReplaceWith("parTraverseN", "arrow.fx.coroutines.parSequenceN"))
-suspend fun <A> Iterable<suspend () -> A>.parSequenceN(ctx: CoroutineContext = EmptyCoroutineContext, n: Long): List<A> {
+suspend fun <A> Iterable<suspend () -> A>.parSequenceN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  n: Long
+): List<A> {
   val s = Semaphore(Math.toIntExact(n))
   return parTraverse(ctx) {
     s.withPermit { it.invoke() }

@@ -34,9 +34,9 @@ import java.util.concurrent.ThreadFactory
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.intrinsics.intercepted
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.intercepted
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.coroutines.startCoroutine
 
@@ -153,6 +153,12 @@ fun <O> Arb.Companion.function(arb: Arb<O>): Arb<() -> O> =
 
 fun Arb.Companion.unit(): Arb<Unit> =
   Arb.constant(Unit)
+
+fun <A, B> Arb.Companion.functionAToB(arb: Arb<B>): Arb<(A) -> B> =
+  arb.map { b: B -> { _: A -> b } }
+
+fun <A> Arb.Companion.nullable(arb: Arb<A>): Arb<A?> =
+  Arb.Companion.choice(arb, arb.map { null })
 
 /** Useful for testing success & error scenarios with an `Either` generator **/
 fun <A> Either<Throwable, A>.rethrow(): A =
