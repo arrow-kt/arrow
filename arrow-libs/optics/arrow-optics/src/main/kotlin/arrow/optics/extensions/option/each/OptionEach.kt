@@ -27,8 +27,8 @@ internal val each_singleton: Each<Option<Any?>, Any?> = optionEach()
 @Deprecated(
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
-  "Option.traversal<A>()",
-  "arrow.core.Option", "arrow.optics.traversal"
+  "Traversal.option<A>()",
+  "arrow.optics.traversal", "arrow.optics.option"
   ),
   DeprecationLevel.WARNING
 )
@@ -43,8 +43,8 @@ fun <A> each(): PTraversal<Option<A>, Option<A>, A, A> = arrow.core.Option
 @Deprecated(
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith(
-    "Option.traversal<A>()",
-    "arrow.core.Option", "arrow.optics.traversal"
+    "Traversal.option<A>()",
+    "arrow.optics.traversal", "arrow.optics.option"
   ),
   DeprecationLevel.WARNING
 )

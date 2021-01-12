@@ -60,10 +60,10 @@ fun <A> Option.Companion.toEither(): Iso<Option<A>, Either<Unit, A>> = toPEither
 /**
  * [Traversal] for [Option] that has focus in each [arrow.core.Some].
  *
- * @receiver [Option.Companion] to make it statically available.
+ * @receiver [PTraversal.Companion] to make it statically available.
  * @return [Traversal] with source [Option] and focus in every [arrow.core.Some] of the source.
  */
-fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> =
+fun <A> PTraversal.Companion.option(): Traversal<Option<A>, A> =
   object : Traversal<Option<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: Option<A>, f: (A) -> Kind<F, A>): Kind<F, Option<A>> =
       with(Option.traverse()) {

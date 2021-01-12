@@ -25,10 +25,10 @@ fun <A, B> Either.Companion.toValidated(): Iso<Either<A, B>, Validated<A, B>> = 
 /**
  * [Traversal] for [Either] that has focus in each [Either.Right].
  *
- * @receiver [Either.Companion] to make it statically available.
+ * @receiver [Traversal.Companion] to make it statically available.
  * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
  */
-fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> =
+fun <L, R> PTraversal.Companion.either(): Traversal<Either<L, R>, R> =
   object : Traversal<Either<L, R>, R> {
     override fun <F> modifyF(FA: Applicative<F>, s: Either<L, R>, f: (R) -> Kind<F, R>): Kind<F, Either<L, R>> =
       with(Either.traverse<L>()) {
