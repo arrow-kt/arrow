@@ -29,7 +29,7 @@ fun <L, R> Validated<L, R>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Validated.eq(EQL, EQR)", "arrow.core.eq"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.validated(EQL, EQR)", "arrow.core.Eq", "arrow.core.validated"))
 inline fun <L, R> Companion.eq(EQL: Eq<L>, EQR: Eq<R>): ValidatedEq<L, R> = object :
   arrow.core.extensions.ValidatedEq<L, R> {
   override fun EQL(): arrow.typeclasses.Eq<L> = EQL

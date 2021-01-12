@@ -9,7 +9,7 @@ import kotlin.Suppress
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.show(HL, HR)", "arrow.core.hash"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Show.either(HL, HR)", "arrow.core.Show", "arrow.core.either"))
 inline fun <L, R> Companion.show(SL: Show<L>, SR: Show<R>): EitherShow<L, R> = object :
   arrow.core.extensions.EitherShow<L, R> {
   override fun SL(): arrow.typeclasses.Show<L> = SL

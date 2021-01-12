@@ -158,7 +158,7 @@ fun <L, R> Either<L, R>.sort(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.order(OL, OR)", "arrow.core.order"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Order.either(OL, OR)", "arrow.core.Order", "arrow.core.either"))
 inline fun <L, R> Companion.order(OL: Order<L>, OR: Order<R>): EitherOrder<L, R> = object :
   arrow.core.extensions.EitherOrder<L, R> {
   override fun OL(): arrow.typeclasses.Order<L> = OL

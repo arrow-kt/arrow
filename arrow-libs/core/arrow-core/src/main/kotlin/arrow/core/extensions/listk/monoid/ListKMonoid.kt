@@ -44,6 +44,6 @@ fun <A> combineAll(arg0: List<ListK<A>>): ListK<A> = arrow.core.ListK
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("listMonoid<A>()", "arrow.core.listMonoid"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.list<A>()", "arrow.core.list", "arrow.core.Monoid"))
 inline fun <A> Companion.monoid(): ListKMonoid<A> = monoid_singleton as
     arrow.core.extensions.ListKMonoid<A>

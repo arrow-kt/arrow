@@ -12,7 +12,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroup_singleton: OrderingSemigroup = object :
-    arrow.core.extensions.OrderingSemigroup {}
+  arrow.core.extensions.OrderingSemigroup {}
 
 @JvmName("plus")
 @Suppress(
@@ -42,5 +42,5 @@ fun Ordering.maybeCombine(arg1: Ordering): Ordering = arrow.core.Ordering.semigr
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Ordering.semigroup()"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Semigroup.ordering()", "arrow.core.Semigroup", "arrow.core.ordering"))
 inline fun Companion.semigroup(): OrderingSemigroup = semigroup_singleton

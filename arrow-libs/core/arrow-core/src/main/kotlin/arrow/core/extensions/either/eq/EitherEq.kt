@@ -28,7 +28,7 @@ fun <L, R> Either<L, R>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Either.eq(EQL, EQR)", "arrow.core.eq"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.either(EQL, EQR)", "arrow.core.Eq", "arrow.core.either"))
 inline fun <L, R> Companion.eq(EQL: Eq<L>, EQR: Eq<R>): EitherEq<L, R> = object :
   arrow.core.extensions.EitherEq<L, R> {
   override fun EQL(): arrow.typeclasses.Eq<L> = EQL

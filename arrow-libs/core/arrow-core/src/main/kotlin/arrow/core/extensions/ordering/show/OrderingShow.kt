@@ -15,5 +15,5 @@ internal val show_singleton: OrderingShow = object : arrow.core.extensions.Order
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Ordering.show()", "arrow.core.show"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Show.ordering()", "arrow.core.Show", "arrow.core.ordering"))
 inline fun Companion.show(): OrderingShow = show_singleton

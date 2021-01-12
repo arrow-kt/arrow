@@ -30,5 +30,5 @@ fun Ordering.hashWithSalt(arg1: Int): Int = arrow.core.Ordering.hash().run {
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Ordering.hash()"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Hash.ordering()", "arrow.core.Hash", "arrow.core.ordering"))
 inline fun Companion.hash(): OrderingHash = hash_singleton

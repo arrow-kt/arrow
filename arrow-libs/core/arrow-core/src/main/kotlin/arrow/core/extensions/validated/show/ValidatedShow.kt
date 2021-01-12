@@ -9,7 +9,7 @@ import kotlin.Suppress
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.show(SL, SR)", "arrow.core.show"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Show.validated(SL, SR)", "arrow.core.Show", "arrow.core.validated"))
 inline fun <L, R> Companion.show(SL: Show<L>, SR: Show<R>): ValidatedShow<L, R> = object :
     arrow.core.extensions.ValidatedShow<L, R> { override fun SL(): arrow.typeclasses.Show<L> = SL
 

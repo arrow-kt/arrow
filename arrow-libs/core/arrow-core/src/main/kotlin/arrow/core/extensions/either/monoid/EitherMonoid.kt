@@ -42,7 +42,7 @@ fun <L, R> combineAll(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.monoid(MOL, MOR)", "arrow.core.monoid"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Monoid.either(MOL, MOR)", "arrow.core.either", "arrow.core.Monoid"))
 inline fun <L, R> Companion.monoid(MOL: Monoid<L>, MOR: Monoid<R>): EitherMonoid<L, R> = object :
   arrow.core.extensions.EitherMonoid<L, R> {
   override fun MOL(): arrow.typeclasses.Monoid<L> = MOL

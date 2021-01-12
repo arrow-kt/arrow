@@ -148,6 +148,6 @@ fun <A> Kind<ForListK, A>.sort(OA: Order<A>, arg1: Kind<ForListK, A>): Tuple2<Ki
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("listOrder(OA)", "arrow.core.listOrder"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Order.list(OA)", "arrow.core.list", "arrow.core.Order"))
 inline fun <A> Companion.order(OA: Order<A>): ListKOrder<A> = object :
     arrow.core.extensions.ListKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }

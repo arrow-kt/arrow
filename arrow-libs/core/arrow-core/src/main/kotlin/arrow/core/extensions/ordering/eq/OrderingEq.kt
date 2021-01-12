@@ -30,5 +30,5 @@ fun Ordering.neqv(arg1: Ordering): Boolean = arrow.core.Ordering.eq().run {
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Ordering.eq()"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.ordering()", "arrow.core.Eq", "arrow.core.ordering"))
 inline fun Companion.eq(): OrderingEq = eq_singleton

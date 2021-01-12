@@ -497,19 +497,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         e.nonFatalOrThrow().invalidNel()
       }
 
-    /** Construct an [Eq] instance which use [EQE] and [EQA] to compare the [Invalid] and [Valid] cases **/
-    fun <E, A> eq(EQE: Eq<E>, EQA: Eq<A>): Eq<Validated<E, A>> =
-      ValidatedEq(EQE, EQA)
-
-    fun <E, A> hash(HE: Hash<E>, HA: Hash<A>): Hash<Validated<E, A>> =
-      ValidatedHash(HE, HA)
-
-    fun <E, A> show(SE: Show<E>, SA: Show<A>): Show<Validated<E, A>> =
-      ValidatedShow(SE, SA)
-
-    fun <E, A> order(OE: Order<E>, OA: Order<A>): Order<Validated<E, A>> =
-      ValidatedOrder(OE, OA)
-
     /**
      * Lifts a function `A -> B` to the [Validated] structure.
      *
@@ -1039,6 +1026,25 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     fold(::Valid, ::Invalid)
 }
 
+/** Construct an [Eq] instance which use [EQE] and [EQA] to compare the [Invalid] and [Valid] cases **/
+fun <E, A> Eq.Companion.validated(EQE: Eq<E>, EQA: Eq<A>): Eq<Validated<E, A>> =
+  ValidatedEq(EQE, EQA)
+
+fun <E, A> Hash.Companion.validated(HE: Hash<E>, HA: Hash<A>): Hash<Validated<E, A>> =
+  ValidatedHash(HE, HA)
+
+fun <E, A> Show.Companion.validated(SE: Show<E>, SA: Show<A>): Show<Validated<E, A>> =
+  ValidatedShow(SE, SA)
+
+fun <E, A> Order.Companion.validated(OE: Order<E>, OA: Order<A>): Order<Validated<E, A>> =
+  ValidatedOrder(OE, OA)
+
+fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
+  ValidatedSemigroup(SE, SA)
+
+fun <E, A> Semigroup.Companion.monoid(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
+  ValidatedMonoid(SE, MA)
+
 /**
  * Compares two instances of [Validated] and returns true if they're considered not equal for this instance.
  *
@@ -1420,4 +1426,22 @@ private class ValidatedOrder<L, R>(
 ) : Order<Validated<L, R>> {
   override fun Validated<L, R>.compare(b: Validated<L, R>): Ordering =
     compare(OL, OR, b)
+}
+
+private open class ValidatedSemigroup<A, B>(
+  private val SA: Semigroup<A>,
+  private val SB: Semigroup<B>
+) : Semigroup<Validated<A, B>> {
+  override fun Validated<A, B>.combine(b: Validated<A, B>): Validated<A, B> =
+    combine(SA, SB, b)
+}
+
+private class ValidatedMonoid<A, B>(
+  private val SA: Semigroup<A>,
+  private val MB: Monoid<B>
+) : Monoid<Validated<A, B>>, ValidatedSemigroup<A, B>(SA, MB) {
+  private val empty = Valid(MB.empty())
+
+  override fun empty(): Validated<A, B> =
+    empty
 }

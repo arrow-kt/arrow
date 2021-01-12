@@ -150,7 +150,7 @@ fun <L, R> Validated<L, R>.sort(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.order(OL, OR)", "arrow.core.order"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Order.validated(OL, OR)", "arrow.core.Order", "arrow.core.validated"))
 inline fun <L, R> Companion.order(OL: Order<L>, OR: Order<R>): ValidatedOrder<L, R> = object :
   arrow.core.extensions.ValidatedOrder<L, R> {
   override fun OL(): arrow.typeclasses.Order<L> = OL

@@ -43,7 +43,7 @@ fun <L, R> Either<L, R>.maybeCombine(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.semigroup(SGL, SGR)", "arrow.core.semigroup"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Semigroup.either(SGL, SGR)", "arrow.core.Semigroup", "arrow.core.either"))
 inline fun <L, R> Companion.semigroup(SGL: Semigroup<L>, SGR: Semigroup<R>): EitherSemigroup<L, R> =
   object : arrow.core.extensions.EitherSemigroup<L, R> {
     override fun SGL():

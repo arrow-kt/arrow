@@ -1254,25 +1254,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     fun <A, B, C, D> lift(fa: (A) -> C, fb: (B) -> D): (Either<A, B>) -> Either<C, D> =
       { it.bimap(fa, fb) }
 
-    /** Construct an [Eq] instance which use [EQL] and [EQR] to compare the [Left] and [Right] cases **/
-    fun <L, R> eq(EQL: Eq<L>, EQR: Eq<R>): Eq<Either<L, R>> =
-      EitherEq(EQL, EQR)
-
-    fun <A, B> hash(HA: Hash<A>, HB: Hash<B>): Hash<Either<A, B>> =
-      EitherHash(HA, HB)
-
-    fun <A, B> show(SA: Show<A>, SB: Show<B>): Show<Either<A, B>> =
-      EitherShow(SA, SB)
-
-    fun <A, B> order(OA: Order<A>, OB: Order<B>): Order<Either<A, B>> =
-      EitherOrder(OA, OB)
-
-    fun <A, B> semigroup(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
-      EitherSemigroup(SA, SB)
-
-    fun <A, B> monoid(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
-      EitherMonoid(MA, MB)
-
     inline fun <A, B, C, D> mapN(
       b: Either<A, B>,
       c: Either<A, C>,
@@ -1538,6 +1519,25 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 
 fun <R> Right(right: R): Either<Nothing, R> = Right(right)
+
+/** Construct an [Eq] instance which use [EQL] and [EQR] to compare the [Left] and [Right] cases **/
+fun <L, R> Eq.Companion.either(EQL: Eq<L>, EQR: Eq<R>): Eq<Either<L, R>> =
+  EitherEq(EQL, EQR)
+
+fun <A, B> Hash.Companion.either(HA: Hash<A>, HB: Hash<B>): Hash<Either<A, B>> =
+  EitherHash(HA, HB)
+
+fun <A, B> Show.Companion.either(SA: Show<A>, SB: Show<B>): Show<Either<A, B>> =
+  EitherShow(SA, SB)
+
+fun <A, B> Order.Companion.either(OA: Order<A>, OB: Order<B>): Order<Either<A, B>> =
+  EitherOrder(OA, OB)
+
+fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
+  EitherSemigroup(SA, SB)
+
+fun <A, B> Monoid.Companion.either(MA: Monoid<A>, MB: Monoid<B>): Monoid<Either<A, B>> =
+  EitherMonoid(MA, MB)
 
 /**
  * Binds the given function across [Either.Right].

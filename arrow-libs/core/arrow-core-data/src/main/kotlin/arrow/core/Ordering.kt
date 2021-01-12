@@ -78,18 +78,6 @@ sealed class Ordering {
       0 -> EQ
       else -> if (i < 0) LT else GT
     }
-
-    fun eq(): Eq<Ordering> = OrderingEq
-
-    fun hash(): Hash<Ordering> = OrderingHash
-
-    fun monoid(): Monoid<Ordering> = OrderingMonoid
-
-    fun order(): Order<Ordering> = OrderingOrder
-
-    fun semigroup(): Semigroup<Ordering> = OrderingMonoid
-
-    fun show(): Show<Ordering> = OrderingShow
   }
 }
 
@@ -99,6 +87,18 @@ object EQ : Ordering()
 
 fun Collection<Ordering>.combineAll(): Ordering =
   if (isEmpty()) OrderingMonoid.empty() else reduce { a, b -> a.combine(b) }
+
+fun Eq.Companion.ordering(): Eq<Ordering> = OrderingEq
+
+fun Hash.Companion.ordering(): Hash<Ordering> = OrderingHash
+
+fun Semigroup.Companion.ordering(): Semigroup<Ordering> = OrderingMonoid
+
+fun Monoid.Companion.ordering(): Monoid<Ordering> = OrderingMonoid
+
+fun Order.Companion.ordering(): Order<Ordering> = OrderingOrder
+
+fun Show.Companion.ordering(): Show<Ordering> = OrderingShow
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 private object OrderingEq : Eq<Ordering> {

@@ -1,13 +1,23 @@
 package arrow.core
 
+import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.defaultSalt
 import arrow.typeclasses.hashWithSalt
 
-fun <A> listHash(HA: Hash<A>): Hash<List<A>> =
+fun <A> Eq.Companion.list(EQA: Eq<A>): Eq<List<A>> =
+  ListEq(EQA)
+
+private class ListEq<A>(private val EQA: Eq<A>) : Eq<List<A>> {
+  override fun List<A>.eqv(b: List<A>): Boolean =
+    eqv(EQA, b)
+}
+
+fun <A> Hash.Companion.list(HA: Hash<A>): Hash<List<A>> =
   ListHash(HA)
 
 private class ListHash<A>(private val HA: Hash<A>) : Hash<List<A>> {
@@ -24,7 +34,7 @@ fun <A> List<A>.hashWithSalt(HA: Hash<A>, salt: Int): Int = HA.run {
 
 fun <A> List<A>.compare(OA: Order<A>, b: List<A>): Ordering = OA.run {
   align(b) { ior -> ior.fold({ GT }, { LT }, { a1, a2 -> a1.compare(a2) }) }
-    .fold(Ordering.monoid())
+    .fold(Monoid.ordering())
 }
 
 /**
@@ -97,14 +107,17 @@ fun <A> List<A>.min(OA: Order<A>, b: List<A>): List<A> =
 fun <A> List<A>.sort(OA: Order<A>, b: List<A>): Tuple2<List<A>, List<A>> =
   if (gte(OA, b)) Tuple2(this, b) else Tuple2(b, this)
 
-fun <A> listOrder(OA: Order<A>): Order<List<A>> =
+fun <A> Order.Companion.list(OA: Order<A>): Order<List<A>> =
   ListOrder(OA)
 
 private class ListOrder<A>(private val OA: Order<A>) : Order<List<A>> {
   override fun List<A>.compare(b: List<A>): Ordering = compare(OA, b)
 }
 
-fun <A> listMonoid(): Monoid<List<A>> =
+fun <A> Semigroup.Companion.list(): Semigroup<List<A>> =
+  Monoid.list()
+
+fun <A> Monoid.Companion.list(): Monoid<List<A>> =
   ListMonoid as Monoid<List<A>>
 
 object ListMonoid : Monoid<List<Any?>> {
@@ -112,7 +125,7 @@ object ListMonoid : Monoid<List<Any?>> {
   override fun List<Any?>.combine(b: List<Any?>): List<Any?> = this + b
 }
 
-fun <A> listShow(SA: Show<A>): Show<List<A>> =
+fun <A> Show.Companion.list(SA: Show<A>): Show<List<A>> =
   object : Show<List<A>> {
     override fun List<A>.show(): String =
       show(SA)

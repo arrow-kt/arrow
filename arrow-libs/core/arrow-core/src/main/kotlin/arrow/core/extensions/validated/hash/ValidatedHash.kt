@@ -23,7 +23,7 @@ fun <L, R> Validated<L, R>.hash(HL: Hash<L>, HR: Hash<R>): Int =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.hash(HL, HR)", "arrow.core.hash"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Hash.validated(HL, HR)", "arrow.core.Hash", "arrow.core.validated"))
 inline fun <L, R> Companion.hash(HL: Hash<L>, HR: Hash<R>): ValidatedHash<L, R> = object :
   arrow.core.extensions.ValidatedHash<L, R> {
   override fun HL(): arrow.typeclasses.Hash<L> = HL

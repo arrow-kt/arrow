@@ -38,6 +38,6 @@ fun <A> Kind<ForListK, A>.hashWithSalt(HA: Hash<A>, arg1: Int): Int =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("listHash(HA)", "arrow.core.listHash"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Hash.list(HA)", "arrow.core.list", "arrow.core.Hash"))
 inline fun <A> Companion.hash(HA: Hash<A>): ListKHash<A> = object :
     arrow.core.extensions.ListKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

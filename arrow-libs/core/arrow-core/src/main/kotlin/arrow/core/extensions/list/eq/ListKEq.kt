@@ -37,6 +37,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("listEq(EQ)", "arrow.core.listEq"))
+  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.list(EQ)", "arrow.core.list", "arrow.core.Eq"))
   inline fun <A> eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> { override
       fun EQ(): arrow.typeclasses.Eq<A> = EQ }}

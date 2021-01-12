@@ -25,6 +25,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("listShow(arg1)", "arrow.core.listShow"))
+  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Show.list(arg1)", "arrow.core.list", "arrow.core.Show"))
   inline fun <A> show(SA: Show<A>): ListKShow<A> = object : arrow.core.extensions.ListKShow<A> {
       override fun SA(): arrow.typeclasses.Show<A> = SA }}

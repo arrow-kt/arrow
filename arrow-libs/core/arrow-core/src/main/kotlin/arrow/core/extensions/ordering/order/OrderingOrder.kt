@@ -128,5 +128,5 @@ fun Ordering.sort(arg1: Ordering): Tuple2<Ordering, Ordering> = arrow.core.Order
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Ordering.order()"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Order.ordering()", "arrow.core.Order", "arrow.core.ordering"))
 inline fun Companion.order(): OrderingOrder = order_singleton

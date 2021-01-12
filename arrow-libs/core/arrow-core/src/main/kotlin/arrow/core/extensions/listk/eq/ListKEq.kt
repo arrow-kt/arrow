@@ -39,6 +39,6 @@ fun <A> Kind<ForListK, A>.neqv(EQ: Eq<A>, arg1: Kind<ForListK, A>): Boolean =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("listEq(EQ)", "arrow.core.listEq"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.list(EQ)", "arrow.core.list", "arrow.core.Eq"))
 inline fun <A> Companion.eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> {
     override fun EQ(): arrow.typeclasses.Eq<A> = EQ }

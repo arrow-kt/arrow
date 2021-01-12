@@ -678,14 +678,6 @@ fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
   }
 }
 
-fun <A> listEq(EQA: Eq<A>): Eq<List<A>> =
-  ListEq(EQA)
-
-private class ListEq<A>(private val EQA: Eq<A>) : Eq<List<A>> {
-  override fun List<A>.eqv(b: List<A>): Boolean =
-    eqv(EQA, b)
-}
-
 fun <A> Iterable<A>.eqv(EQA: Eq<A>, other: Iterable<A>): Boolean = EQA.run {
   if (this is Collection<*> && other is Collection && this.size != other.size) false
   else {

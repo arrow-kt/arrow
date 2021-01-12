@@ -15,4 +15,6 @@ interface Semigroup<A> {
     this.combine(b)
 
   fun A.maybeCombine(b: A?): A = Option.fromNullable(b).fold({ this }, { combine(it) })
+
+  companion object
 }

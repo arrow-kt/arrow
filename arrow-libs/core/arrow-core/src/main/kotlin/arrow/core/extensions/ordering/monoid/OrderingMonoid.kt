@@ -42,5 +42,5 @@ fun combineAll(arg0: List<Ordering>): Ordering = arrow.core.Ordering
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Ordering.monoid()"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Monoid.ordering()", "arrow.core.Monoid", "arrow.core.ordering"))
 inline fun Companion.monoid(): OrderingMonoid = monoid_singleton
