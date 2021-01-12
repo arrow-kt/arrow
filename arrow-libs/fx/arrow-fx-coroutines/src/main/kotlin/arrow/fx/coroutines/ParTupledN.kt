@@ -1,5 +1,6 @@
 package arrow.fx.coroutines
 
+import arrow.core.Tuple4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.ContinuationInterceptor
@@ -137,3 +138,78 @@ suspend inline fun <A, B, C> parTupledN(
   crossinline fc: suspend () -> C
 ): Triple<A, B, C> =
   parMapN(ctx, fa, fb, fc, ::Triple)
+
+/**
+ * Runs [fa], [fb], [fc], [fd] in parallel on [Dispatchers.Default] and combines their results into [Tuple4].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val (a, b, c, d) = parTupledN(
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Fourth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println("$a\n$b\n$c\n$d")
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ *
+ * @see parTupledN for a function that can run on any [CoroutineContext].
+ */
+suspend inline fun <A, B, C, D> parTupledN(
+  crossinline fa: suspend () -> A,
+  crossinline fb: suspend () -> B,
+  crossinline fc: suspend () -> C,
+  crossinline fd: suspend () -> D,
+): Tuple4<A, B, C, D> =
+  parTupledN(Dispatchers.Default, fa, fb, fc, fd)
+
+/**
+ * Runs [fa], [fb], [fc], [fd] in parallel on [ctx] and combines their results into [Tuple4].
+ *
+ * Coroutine context is inherited from a [CoroutineScope], additional context elements can be specified with [ctx] argument.
+ * If the combined context does not have any dispatcher nor any other [ContinuationInterceptor], then [Dispatchers.Default] is used.
+ * **WARNING** If the combined context has a single threaded [ContinuationInterceptor], this function will not run [fa], [fb], [fc] and [fd] in parallel.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.coroutines.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * suspend fun main(): Unit {
+ *   //sampleStart
+ *   val (a, b, c, d) = parTupledN(
+ *     Dispatchers.IO,
+ *     { "First one is on ${Thread.currentThread().name}" },
+ *     { "Second one is on ${Thread.currentThread().name}" },
+ *     { "Third one is on ${Thread.currentThread().name}" },
+ *     { "Forth one is on ${Thread.currentThread().name}" }
+ *   )
+ *   //sampleEnd
+ *  println("$a\n$b\n$c\n$d")
+ * }
+ * ```
+ *
+ * @param fa value to parallel map
+ * @param fb value to parallel map
+ * @param fc value to parallel map
+ * @param fd value to parallel map
+ *
+ * @see parTupledN for a function that ensures operations run in parallel on the [Dispatchers.Default].
+ */
+suspend inline fun <A, B, C, D> parTupledN(
+  ctx: CoroutineContext = EmptyCoroutineContext,
+  crossinline fa: suspend () -> A,
+  crossinline fb: suspend () -> B,
+  crossinline fc: suspend () -> C,
+  crossinline fd: suspend () -> D,
+): Tuple4<A, B, C, D> =
+  parMapN(ctx, fa, fb, fc, fd, ::Tuple4)
