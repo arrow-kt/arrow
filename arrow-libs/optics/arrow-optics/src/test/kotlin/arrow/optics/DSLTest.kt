@@ -7,7 +7,6 @@ import arrow.core.k
 import arrow.optics.dsl.at
 import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.mapk.at.at
-import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.traversal
 import arrow.core.test.UnitSpec
 import io.kotlintest.shouldBe
@@ -102,8 +101,8 @@ class BoundedTest : UnitSpec() {
       } shouldBe (Db.content compose MapK.at<Keys, String>().at(One)).set(db, None)
     }
 
-    "Working with Each in Optics should be same as in DSL" {
-      MapK.each<Keys, String>().run {
+    "Working with Traversal in Optics should be same as in DSL" {
+      MapK.traversal<Keys, String>().run {
         Db.content.every.modify(db, String::toUpperCase)
       } shouldBe (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
     }

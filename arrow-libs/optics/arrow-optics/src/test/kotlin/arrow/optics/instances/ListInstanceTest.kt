@@ -1,25 +1,24 @@
 package arrow.optics.instances
 
 import arrow.core.ListExtensions
+import arrow.core.ListK
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.eq
-import arrow.core.ListK
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.optics.extensions.each
-import arrow.optics.extensions.filterIndex
-import arrow.optics.extensions.index
-import arrow.optics.extensions.listk.cons.cons
-import arrow.optics.extensions.listk.each.each
-import arrow.optics.extensions.listk.filterIndex.filterIndex
-import arrow.optics.extensions.listk.index.index
-import arrow.optics.extensions.listk.snoc.snoc
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.listK
 import arrow.core.test.generators.tuple2
+import arrow.optics.extensions.filterIndex
+import arrow.optics.extensions.index
+import arrow.optics.extensions.listk.cons.cons
+import arrow.optics.extensions.listk.filterIndex.filterIndex
+import arrow.optics.extensions.listk.index.index
+import arrow.optics.extensions.listk.snoc.snoc
+import arrow.optics.extensions.traversal
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
@@ -32,7 +31,7 @@ class ListInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = ListK.each<String>().each(),
+        traversal = ListK.traversal(),
         aGen = Gen.listK(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -44,7 +43,7 @@ class ListInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = ListExtensions.each<String>().each(),
+        traversal = ListExtensions.traversal(),
         aGen = Gen.list(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),

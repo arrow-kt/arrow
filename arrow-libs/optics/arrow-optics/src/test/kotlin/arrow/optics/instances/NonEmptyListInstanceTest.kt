@@ -1,16 +1,16 @@
 package arrow.optics.instances
 
-import arrow.core.Option
 import arrow.core.ListK
 import arrow.core.NonEmptyList
+import arrow.core.Option
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
-import arrow.optics.extensions.nonemptylist.each.each
-import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
-import arrow.optics.extensions.nonemptylist.index.index
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
+import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
+import arrow.optics.extensions.nonemptylist.index.index
+import arrow.optics.extensions.traversal
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
@@ -22,7 +22,7 @@ class NonEmptyListInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = NonEmptyList.each<String>().each(),
+        traversal = NonEmptyList.traversal(),
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),

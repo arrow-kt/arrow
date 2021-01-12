@@ -1,28 +1,27 @@
 package arrow.optics.instances
 
+import arrow.core.ListK
 import arrow.core.MapInstances
+import arrow.core.MapK
 import arrow.core.Option
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.semigroup
-import arrow.core.ListK
-import arrow.core.MapK
-import arrow.core.extensions.listk.eq.eq
-import arrow.optics.extensions.at
-import arrow.optics.extensions.each
-import arrow.optics.extensions.filterIndex
-import arrow.optics.extensions.index
-import arrow.optics.extensions.mapk.at.at
-import arrow.optics.extensions.mapk.each.each
-import arrow.optics.extensions.mapk.filterIndex.filterIndex
-import arrow.optics.extensions.mapk.index.index
-import arrow.optics.test.generators.char
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.mapK
 import arrow.core.test.generators.option
+import arrow.optics.extensions.at
+import arrow.optics.extensions.filterIndex
+import arrow.optics.extensions.index
+import arrow.optics.extensions.mapk.at.at
+import arrow.optics.extensions.mapk.filterIndex.filterIndex
+import arrow.optics.extensions.mapk.index.index
+import arrow.optics.extensions.traversal
+import arrow.optics.test.generators.char
 import arrow.optics.test.laws.LensLaws
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
@@ -35,7 +34,7 @@ class MapInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = MapK.each<Int, String>().each(),
+        traversal = MapK.traversal(),
         aGen = Gen.mapK(Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -47,7 +46,7 @@ class MapInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = MapInstances.each<Int, String>().each(),
+        traversal = MapInstances.traversal(),
         aGen = Gen.map(Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),

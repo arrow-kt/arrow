@@ -367,4 +367,66 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Check if forall targets satisfy the predicate
    */
   fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
+
+  /**
+   * DSL to compose [Traversal] with a [Lens] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Lens] with a focus in [S]
+   * @return [Traversal] with a focus in [A]
+   */
+  val <U, V> PLens<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
+    this@every.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Iso] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Iso] with a focus in [S]
+   * @return [Traversal] with a focus in [A]
+   */
+  val <U, V> PIso<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
+    this@every.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Prism] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Prism] with a focus in [S]
+   * @return [Traversal] with a focus in [A]
+   */
+  val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
+  this.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Optional] with a focus in [S]
+   * @return [Traversal] with a focus in [A]
+   */
+  val <U, V> POptional<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
+    this.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Setter] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Setter] with a focus in [S]
+   * @return [Setter] with a focus in [A]
+   */
+  val <U, V> PSetter<U, V, S, T>.every: PSetter<U, V, A, B> get() =
+    this.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Traversal] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Traversal] with a focus in [S]
+   * @return [Traversal] with a focus in [A]
+   */
+  val <U, V> PTraversal<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
+    this.compose(this@PTraversal)
+
+  /**
+   * DSL to compose [Traversal] with a [Fold] for a structure [S] to see all its foci [A]
+   *
+   * @receiver [Fold] with a focus in [S]
+   * @return [Fold] with a focus in [A]
+   */
+  val <U> Fold<U, S>.every: Fold<U, A> get() = this.compose(this@PTraversal.asFold())
 }

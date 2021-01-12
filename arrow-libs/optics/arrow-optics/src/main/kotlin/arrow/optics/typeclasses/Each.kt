@@ -18,6 +18,7 @@ import arrow.typeclasses.Traverse
  * @param S source of the [Traversal]
  * @param A focus of [Traversal]
  */
+@Deprecated("Each is being deprecated. Use Traversal directly instead.")
 fun interface Each<S, A> {
 
   /**
@@ -33,6 +34,7 @@ fun interface Each<S, A> {
    * @receiver [Lens] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Lens<T, S>.every: Traversal<T, A> get() = this.compose(each())
 
   /**
@@ -41,6 +43,7 @@ fun interface Each<S, A> {
    * @receiver [Iso] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Iso<T, S>.every: Traversal<T, A> get() = this.compose(each())
 
   /**
@@ -49,6 +52,7 @@ fun interface Each<S, A> {
    * @receiver [Prism] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Prism<T, S>.every: Traversal<T, A> get() = this.compose(each())
 
   /**
@@ -57,6 +61,7 @@ fun interface Each<S, A> {
    * @receiver [Optional] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Optional<T, S>.every: Traversal<T, A> get() = this.compose(each())
 
   /**
@@ -65,6 +70,7 @@ fun interface Each<S, A> {
    * @receiver [Setter] with a focus in [S]
    * @return [Setter] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Setter<T, S>.every: Setter<T, A> get() = this.compose(each())
 
   /**
@@ -73,6 +79,7 @@ fun interface Each<S, A> {
    * @receiver [Traversal] with a focus in [S]
    * @return [Traversal] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Traversal<T, S>.every: Traversal<T, A> get() = this.compose(each())
 
   /**
@@ -81,6 +88,7 @@ fun interface Each<S, A> {
    * @receiver [Fold] with a focus in [S]
    * @return [Fold] with a focus in [A]
    */
+  @Deprecated("Each is being deprecated. Use Traversal directly instead.")
   val <T> Fold<T, S>.every: Fold<T, A> get() = this.compose(each())
 
   companion object {
