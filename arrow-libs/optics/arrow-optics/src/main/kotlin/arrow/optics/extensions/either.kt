@@ -15,7 +15,7 @@ import arrow.typeclasses.Applicative
  * @return [Traversal] with source [Either] and focus every [Either.Right] of the source.
  */
 @Deprecated(
-  "arrow.optics.extension package is being deprecated, function is being moved to arrow.optics.traversal",
+  "arrow.optics.extensions package is being deprecated, function is being moved to arrow.optics.traversal",
   ReplaceWith("Either.traversal<L, R>()", "arrow.core.Either", "arrow.optics.traversal"),
   DeprecationLevel.WARNING)
 fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : Traversal<Either<L, R>, R> {

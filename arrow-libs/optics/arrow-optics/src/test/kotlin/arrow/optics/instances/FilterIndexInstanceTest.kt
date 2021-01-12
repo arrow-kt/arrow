@@ -1,22 +1,14 @@
 package arrow.optics.instances
 
-import arrow.core.Option
-import arrow.core.extensions.eq
-import arrow.core.extensions.option.eq.eq
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.NonEmptyList
+import arrow.core.Option
 import arrow.core.SequenceK
+import arrow.core.extensions.eq
 import arrow.core.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.sequencek.eq.eq
-import arrow.optics.extensions.listFilterIndex
-import arrow.optics.extensions.filterMapIndex
-import arrow.optics.extensions.filterIndex
-import arrow.optics.extensions.listk.filterIndex.filterIndex
-import arrow.optics.extensions.mapk.filterIndex.filterIndex
-import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
-import arrow.optics.extensions.sequencek.filterIndex.filterIndex
-import arrow.optics.test.generators.char
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.intSmall
@@ -24,7 +16,16 @@ import arrow.core.test.generators.listK
 import arrow.core.test.generators.mapK
 import arrow.core.test.generators.nonEmptyList
 import arrow.core.test.generators.sequenceK
+import arrow.optics.extensions.filterIndex
+import arrow.optics.extensions.filterMapIndex
+import arrow.optics.extensions.listk.filterIndex.filterIndex
+import arrow.optics.extensions.mapk.filterIndex.filterIndex
+import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
+import arrow.optics.extensions.sequencek.filterIndex.filterIndex
+import arrow.optics.list
+import arrow.optics.test.generators.char
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.typeclasses.FilterIndex
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -42,7 +43,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = listFilterIndex<String>().filter { true },
+      traversal = FilterIndex.list<String>().filter { true },
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = Gen.functionAToB(Gen.string()),

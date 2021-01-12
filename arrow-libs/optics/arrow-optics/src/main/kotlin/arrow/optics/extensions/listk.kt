@@ -12,7 +12,6 @@ import arrow.core.toT
 import arrow.core.ListK
 import arrow.core.k
 import arrow.core.fix
-import arrow.extension
 import arrow.core.extensions.option.applicative.applicative
 import arrow.optics.Optional
 import arrow.optics.POptional
@@ -32,6 +31,12 @@ import arrow.typeclasses.Applicative
  * @receiver [ListK.Companion] to make it statically available.
  * @return [Traversal] with source [ListK] and focus every [A] of the source.
  */
+@Deprecated(
+  "ListK is being deprecated. Use the instance for List from the companion object of the typeclass.",
+  ReplaceWith(
+    "Traversal.list<A>()",
+    "arrow.optics.Traversal", "arrow.optics.list"),
+  DeprecationLevel.WARNING)
 fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
   override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> =
     s.traverse(FA, f)
@@ -40,16 +45,25 @@ fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal
 /**
  * [Each] instance definition for [ListK].
  */
-@extension
+@Deprecated(
+  "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
+  ReplaceWith(
+    "Traversal.list<A>()",
+    "arrow.optics.Traversal", "arrow.optics.list"),
+  DeprecationLevel.WARNING)
 interface ListKEach<A> : Each<ListK<A>, A> {
   override fun each(): Traversal<ListK<A>, A> =
     ListK.traversal()
 }
-
 /**
  * [FilterIndex] instance definition for [ListK].
  */
-@extension
+@Deprecated(
+  "Typeclass interface implementation will not be exposed directly anymore",
+  ReplaceWith(
+    "FilterIndex.list<A>()",
+    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"),
+  DeprecationLevel.WARNING)
 interface ListKFilterIndex<A> : FilterIndex<ListK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> = FA.run {
@@ -63,7 +77,12 @@ interface ListKFilterIndex<A> : FilterIndex<ListK<A>, Int, A> {
 /**
  * [Index] instance definition for [ListK].
  */
-@extension
+@Deprecated(
+  "Typeclass interface implementation will not be exposed directly anymore",
+  ReplaceWith(
+    "Index.list<A>()",
+    "arrow.optics.list", "arrow.optics.typeclasses.Index"),
+  DeprecationLevel.WARNING)
 interface ListKIndex<A> : Index<ListK<A>, Int, A> {
   override fun index(i: Int): Optional<ListK<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
@@ -74,7 +93,12 @@ interface ListKIndex<A> : Index<ListK<A>, Int, A> {
 /**
  * [Cons] instance definition for [ListK].
  */
-@extension
+@Deprecated(
+  "Typeclass interface implementation will not be exposed directly anymore",
+  ReplaceWith(
+    "Cons.list<A>()",
+    "arrow.optics.list", "arrow.optics.typeclasses.Cons"),
+  DeprecationLevel.WARNING)
 interface ListKCons<A> : Cons<ListK<A>, A> {
   override fun cons(): Prism<ListK<A>, Tuple2<A, ListK<A>>> = PPrism(
     getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1).k()) }?.right() ?: list.left() },
@@ -85,9 +109,13 @@ interface ListKCons<A> : Cons<ListK<A>, A> {
 /**
  * [Snoc] instance definition for [ListK].
  */
-@extension
+@Deprecated(
+  "Typeclass interface implementation will not be exposed directly anymore",
+  ReplaceWith(
+    "Snoc.list<A>()",
+    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"),
+  DeprecationLevel.WARNING)
 interface ListKSnoc<A> : Snoc<ListK<A>, A> {
-
   override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
     override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =
       Option.applicative().mapN(Option.just(s.dropLast(1).k()), s.lastOrNull().toOption(), ::identity)
