@@ -10,15 +10,16 @@ import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.tuple2
-import arrow.optics.extensions.cons
-import arrow.optics.extensions.filterIndex
-import arrow.optics.extensions.index
-import arrow.optics.extensions.snoc
-import arrow.optics.extensions.traversal
+import arrow.optics.Traversal
+import arrow.optics.string
 import arrow.optics.test.generators.char
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.typeclasses.Cons
+import arrow.optics.typeclasses.FilterIndex
+import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -28,7 +29,7 @@ class StringInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = String.traversal(),
+        traversal = Traversal.string(),
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
@@ -40,7 +41,7 @@ class StringInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = String.filterIndex().filter { true },
+        traversal = FilterIndex.string().filter { true },
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
@@ -52,7 +53,7 @@ class StringInstanceTest : UnitSpec() {
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { String.index().index(it) },
+        optionalGen = Gen.int().map { Index.string().index(it) },
         aGen = Gen.string(),
         bGen = Gen.char(),
         funcGen = Gen.functionAToB(Gen.char()),
@@ -63,7 +64,7 @@ class StringInstanceTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = String.cons().cons(),
+        prism = Cons.string().cons(),
         aGen = Gen.string(),
         bGen = Gen.tuple2(Gen.char(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.char(), Gen.string())),
@@ -74,7 +75,7 @@ class StringInstanceTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = String.snoc().snoc(),
+        prism = Snoc.string().snoc(),
         aGen = Gen.string(),
         bGen = Gen.tuple2(Gen.string(), Gen.char()),
         funcGen = Gen.functionAToB(Gen.tuple2(Gen.string(), Gen.char())),
