@@ -123,4 +123,6 @@ interface Semiring<A> {
   fun A?.maybeCombineMultiplicate(b: A?): A =
     if (this == null) one()
     else b?.let { combineMultiplicate(it) } ?: this
+
+  companion object
 }
