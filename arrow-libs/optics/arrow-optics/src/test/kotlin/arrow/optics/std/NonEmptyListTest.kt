@@ -1,12 +1,12 @@
 package arrow.optics.std
 
-import arrow.core.NonEmptyList
 import arrow.core.extensions.monoid
-import arrow.optics.head
-import arrow.optics.tail
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
+import arrow.optics.Lens
+import arrow.optics.nonEmptyListHead
+import arrow.optics.nonEmptyListTail
 import arrow.optics.test.laws.LensLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
@@ -18,7 +18,7 @@ class NonEmptyListTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lens = NonEmptyList.head(),
+        lens = Lens.nonEmptyListHead(),
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -29,7 +29,7 @@ class NonEmptyListTest : UnitSpec() {
     )
 
     testLaws(LensLaws.laws(
-      lens = NonEmptyList.tail(),
+      lens = Lens.nonEmptyListTail(),
       aGen = Gen.nonEmptyList(Gen.string()),
       bGen = Gen.list(Gen.string()),
       funcGen = Gen.functionAToB(Gen.list(Gen.string())),

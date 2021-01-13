@@ -1,18 +1,18 @@
 package arrow.optics.instances
 
 import arrow.core.ListK
-import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.nonEmptyList
-import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
-import arrow.optics.extensions.nonemptylist.index.index
-import arrow.optics.extensions.traversal
+import arrow.optics.Traversal
+import arrow.optics.nonEmptyList
 import arrow.optics.test.laws.OptionalLaws
 import arrow.optics.test.laws.TraversalLaws
+import arrow.optics.typeclasses.FilterIndex
+import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -22,7 +22,7 @@ class NonEmptyListInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = NonEmptyList.traversal(),
+        traversal = Traversal.nonEmptyList(),
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -34,7 +34,7 @@ class NonEmptyListInstanceTest : UnitSpec() {
 
     testLaws(
       TraversalLaws.laws(
-        traversal = NonEmptyList.filterIndex<String>().filter { true },
+        traversal = FilterIndex.nonEmptyList<String>().filter { true },
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
@@ -46,7 +46,7 @@ class NonEmptyListInstanceTest : UnitSpec() {
 
     testLaws(
       OptionalLaws.laws(
-        optionalGen = Gen.int().map { NonEmptyList.index<String>().index(it) },
+        optionalGen = Gen.int().map { Index.nonEmptyList<String>().index(it) },
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
