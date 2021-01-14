@@ -31,4 +31,7 @@ fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : T
   "Each is being deprecated. Use Traversal directly instead.",
   ReplaceWith("Either.traversal<L, R>()", "arrow.core.Either", "arrow.optics.traversal"),
   DeprecationLevel.WARNING)
-fun <L, R> eitherEach(): Each<Either<L, R>, R> = Each { Either.traversal() }
+interface EitherEach<L, R> : Each<Either<L, R>, R> {
+  override fun each(): Traversal<Either<L, R>, R> =
+    Either.traversal()
+}

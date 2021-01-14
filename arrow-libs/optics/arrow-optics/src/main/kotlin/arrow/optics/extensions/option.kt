@@ -38,4 +38,7 @@ fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> = object : Travers
   ),
   DeprecationLevel.WARNING
 )
-fun <A> optionEach(): Each<Option<A>, A> = Each { Option.traversal() }
+interface OptionEach<A> : Each<Option<A>, A> {
+  override fun each(): Traversal<Option<A>, A> =
+    Option.traversal()
+}

@@ -3,19 +3,13 @@ package arrow.optics.extensions.either.each
 import arrow.core.Either
 import arrow.core.Either.Companion
 import arrow.optics.PTraversal
-import arrow.optics.extensions.eitherEach
-import arrow.optics.typeclasses.Each
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
+import arrow.optics.extensions.EitherEach
 
 /**
  * cached extension
  */
 @PublishedApi()
-internal val each_singleton: Each<Either<Any?, Any?>, Any?> = eitherEach()
+internal val each_singleton: EitherEach<Any?, Any?> = object : EitherEach<Any?, Any?> {}
 
 @JvmName("each")
 @Suppress(
@@ -47,5 +41,5 @@ fun <L, R> each(): PTraversal<Either<L, R>, Either<L, R>, R, R> = arrow.core.Eit
     "arrow.optics.Traversal", "arrow.optics.either"
   ),
   DeprecationLevel.WARNING)
-inline fun <L, R> Companion.each(): Each<Either<L, R>, R> = each_singleton as
-    arrow.optics.typeclasses.Each<Either<L, R>, R>
+inline fun <L, R> Companion.each(): EitherEach<L, R> = each_singleton as
+    arrow.optics.extensions.EitherEach<L, R>

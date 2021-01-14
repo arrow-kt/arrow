@@ -3,19 +3,13 @@ package arrow.optics.extensions.option.each
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.optics.PTraversal
-import arrow.optics.extensions.optionEach
-import arrow.optics.typeclasses.Each
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
+import arrow.optics.extensions.OptionEach
 
 /**
  * cached extension
  */
 @PublishedApi()
-internal val each_singleton: Each<Option<Any?>, Any?> = optionEach()
+internal val each_singleton: OptionEach<Any?> = object : OptionEach<Any?> {}
 
 @JvmName("each")
 @Suppress(
@@ -48,5 +42,5 @@ fun <A> each(): PTraversal<Option<A>, Option<A>, A, A> = arrow.core.Option
   ),
   DeprecationLevel.WARNING
 )
-inline fun <A> Companion.each(): Each<Option<A>, A> = each_singleton as
-    arrow.optics.typeclasses.Each<Option<A>, A>
+inline fun <A> Companion.each(): OptionEach<A> = each_singleton as
+    arrow.optics.extensions.OptionEach<A>
