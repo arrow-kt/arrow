@@ -19,7 +19,7 @@ fun String.Companion.semigroup(): Semigroup<String> =
 
 private object StringSemigroupInstance : StringSemigroup
 
-fun Semigroup.Companion.String(): Semigroup<String> =
+fun Semigroup.Companion.string(): Semigroup<String> =
   StringSemigroupInstance
 
 @Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
@@ -33,7 +33,7 @@ fun String.Companion.monoid(): Monoid<String> =
 
 private object StringMonoidInstance : StringMonoid
 
-fun Monoid.Companion.String(): Monoid<String> =
+fun Monoid.Companion.string(): Monoid<String> =
   StringMonoidInstance
 
 @Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
@@ -47,7 +47,7 @@ fun String.Companion.eq(): Eq<String> =
 
 private object StringEqInstance : StringEq
 
-fun Eq.Companion.String(): Eq<String> =
+fun Eq.Companion.string(): Eq<String> =
   StringEqInstance
 
 @Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
@@ -66,7 +66,7 @@ fun String.Companion.show(): Show<String> =
 
 private object StringShowInstance : StringShow
 
-fun Show.Companion.String(): Show<String> =
+fun Show.Companion.string(): Show<String> =
   StringShowInstance
 
 interface StringOrder : Order<String> {
@@ -78,7 +78,7 @@ interface StringOrder : Order<String> {
 
 private object StringOrderInstance : StringOrder
 
-fun Order.Companion.String(): Order<String> =
+fun Order.Companion.string(): Order<String> =
   StringOrderInstance
 
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.string()", "arrow.core.Order", "arrow.core.string"))
@@ -95,7 +95,7 @@ fun String.Companion.hash(): Hash<String> =
 
 private object StringHashInstance : StringHash
 
-fun Hash.Companion.String(): Hash<String> =
+fun Hash.Companion.string(): Hash<String> =
   StringHashInstance
 
 object StringContext : StringShow, StringOrder, StringMonoid
