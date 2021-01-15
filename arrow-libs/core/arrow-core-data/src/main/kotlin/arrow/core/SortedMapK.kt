@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+import kotlin.collections.flatMap
 
 @higherkind
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {

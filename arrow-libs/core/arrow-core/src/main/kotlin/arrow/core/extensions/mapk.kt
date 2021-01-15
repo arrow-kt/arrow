@@ -24,7 +24,6 @@ import arrow.core.toMap
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.updated
-import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -42,16 +41,11 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
-import arrow.undocumented
 
-@extension
-@undocumented
 interface MapKFunctor<K> : Functor<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
-@extension
-@undocumented
 interface MapKFoldable<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
@@ -60,15 +54,12 @@ interface MapKFoldable<K> : Foldable<MapKPartialOf<K>> {
     fix().foldRight(lb, f)
 }
 
-@extension
-@undocumented
 interface MapKTraverse<K> : Traverse<MapKPartialOf<K>>, MapKFoldable<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
 }
 
-@extension
 interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 
   fun SG(): Semigroup<A>
@@ -79,7 +70,6 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
   }
 }
 
-@extension
 interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.filterMap(f: (A) -> Option<B>): Kind<MapKPartialOf<K>, B> =
     fix().map(f).sequence(Option.applicative()).fix().fold({ emptyMap<K, B>().k() }, ::identity)
@@ -88,7 +78,6 @@ interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
     fix().map(f)
 }
 
-@extension
 interface MapKApply<K> : Apply<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
     fix().ap(ff.fix())
@@ -97,7 +86,6 @@ interface MapKApply<K> : Apply<MapKPartialOf<K>> {
     fix().map(f)
 }
 
-@extension
 interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
 
   override fun SG(): Semigroup<A>
@@ -105,7 +93,6 @@ interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
   override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }
 
-@extension
 interface MapKEq<K, A> : Eq<MapK<K, A>> {
 
   fun EQK(): Eq<K>
@@ -122,14 +109,12 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
     } else false
 }
 
-@extension
 interface MapKShow<K, A> : Show<MapK<K, A>> {
   fun SK(): Show<K>
   fun SA(): Show<A>
   override fun MapK<K, A>.show(): String = show(SK(), SA())
 }
 
-@extension
 interface MapKHash<K, A> : Hash<MapK<K, A>> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
@@ -144,7 +129,6 @@ interface MapKHash<K, A> : Hash<MapK<K, A>> {
     }
 }
 
-@extension
 interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
   override fun <A, B> align(
     a: Kind<MapKPartialOf<K>, A>,
@@ -160,12 +144,10 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
   }
 }
 
-@extension
 interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
 }
 
-@extension
 interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
     ior.fix().let { map ->
@@ -178,7 +160,6 @@ interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
     }
 }
 
-@extension
 interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.zip(other: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
     (this.fix() to other.fix()).let { (ls, rs) ->
@@ -190,7 +171,6 @@ interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
     }
 }
 
-@extension
 interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
   override fun <A, B> Kind<MapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
     this.fix().let { map ->
@@ -200,7 +180,6 @@ interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
     }.bimap({ it.k() }, { it.k() })
 }
 
-@extension
 interface MapKEqK<K> : EqK<MapKPartialOf<K>> {
 
   fun EQK(): Eq<K>

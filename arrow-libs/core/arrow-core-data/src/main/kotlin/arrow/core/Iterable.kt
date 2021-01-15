@@ -702,7 +702,7 @@ fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
 
 fun <A, K, V> Iterable<A>.crosswalkMap(f: (A) -> Map<K, V>): Map<K, List<V>> =
   fold(emptyMap()) { bs, a ->
-    f(a).align(bs) { ior ->
+    f(a).align(bs) { (_, ior) ->
       ior.fold(
         { listOf(it) },
         ::identity,

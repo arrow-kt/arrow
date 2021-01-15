@@ -1,11 +1,20 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 
-@higherkind
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+class ForMapK private constructor() { companion object }
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
+
 data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
 
   fun <B> map(f: (A) -> B): MapK<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
@@ -13,8 +22,8 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
   fun <B, Z> map2(fb: MapK<K, B>, f: (A, B) -> Z): MapK<K, Z> =
     if (fb.isEmpty()) emptyMap<K, Z>().k()
     else this.map.flatMap { (k, a) ->
-      fb[k]?.let { Pair(k, f(a, it)) }.asIterable()
-    }.toMap().k()
+      fb[k]?.let { mapOf(k to f(a, it)) } ?: emptyMap()
+    }.k()
 
   fun <B, Z> map2Eval(fb: Eval<MapK<K, B>>, f: (A, B) -> Z): Eval<MapK<K, Z>> =
     if (fb.value().isEmpty()) Eval.now(emptyMap<K, Z>().k())
@@ -26,13 +35,11 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
   fun <B, Z> ap2(f: MapK<K, (A, B) -> Z>, fb: MapK<K, B>): Map<K, Z> =
     f.map.flatMap { (k, f) ->
       this.flatMap { a -> fb.flatMap { b -> mapOf(Tuple2(k, f(a, b))).k() } }[k]
-        ?.let { Pair(k, it) }.asIterable()
-    }.toMap().k()
+        ?.let { Pair(k, it) }.asIterable().toMap()
+    }.k()
 
   fun <B> flatMap(f: (A) -> MapK<K, B>): MapK<K, B> =
-    this.map.flatMap { (k, v) ->
-      f(v)[k]?.let { Pair(k, it) }.asIterable()
-    }.toMap().k()
+    this.map.flatMap { (_, v) -> f(v) }.k()
 
   fun <B> foldRight(b: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = this.map.values.iterator().iterateRight(b, f)
 
@@ -60,7 +67,238 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
 
   override fun hashCode(): Int = map.hashCode()
 
-  companion object
+  companion object {
+
+    inline fun <Key, B, C, D> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      map: (Key, B, C) -> D
+    ): Map<Key, D> =
+      mapN(b, c, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, _, _, _, _, _, _, _, _ ->
+        map(key, bb, cc)
+      }
+
+    inline fun <Key, B, C, D, E> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      map: (Key, B, C, D) -> E
+    ): Map<Key, E> =
+      mapN(b, c, d, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, _, _, _, _, _, _, _ ->
+        map(key, bb, cc, dd)
+      }
+
+    inline fun <Key, B, C, D, E, F> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      map: (Key, B, C, D, E) -> F
+    ): Map<Key, F> =
+      mapN(b, c, d, e, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, _, _, _, _, _, _ ->
+        map(key, bb, cc, dd, ee)
+      }
+
+    inline fun <Key, B, C, D, E, F, G> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      map: (Key, B, C, D, E, F) -> G
+    ): Map<Key, G> =
+      mapN(b, c, d, e, f, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, _, _, _, _, _ ->
+        map(key, bb, cc, dd, ee, ff)
+      }
+
+    inline fun <Key, B, C, D, E, F, G, H> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      map: (Key, B, C, D, E, F, G) -> H
+    ): Map<Key, H> =
+      mapN(b, c, d, e, f, g, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, _, _, _, _ ->
+        map(key, bb, cc, dd, ee, ff, gg)
+      }
+
+    inline fun <Key, B, C, D, E, F, G, H, I> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      map: (Key, B, C, D, E, F, G, H) -> I
+    ): Map<Key, I> =
+      mapN(b, c, d, e, f, g, h, emptyMap<Key, Unit>(), emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, _, _, _ ->
+        map(key, bb, cc, dd, ee, ff, gg, hh)
+      }
+
+    inline fun <Key, B, C, D, E, F, G, H, I, J> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>,
+      map: (Key, B, C, D, E, F, G, H, I) -> J
+    ): Map<Key, J> =
+      mapN(b, c, d, e, f, g, h, i, emptyMap<Key, Unit>(), emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, _, _ ->
+        map(key, bb, cc, dd, ee, ff, gg, hh, ii)
+      }
+
+    inline fun <Key, B, C, D, E, F, G, H, I, J, K> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>,
+      j: Map<Key, J>,
+      map: (Key, B, C, D, E, F, G, H, I, J) -> K
+    ): Map<Key, K> =
+      mapN(b, c, d, e, f, g, h, i, j, emptyMap<Key, Unit>()) { key, bb, cc, dd, ee, ff, gg, hh, ii, jj, _ ->
+        map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+      }
+
+    inline fun <Key, B, C, D, E, F, G, H, I, J, K, L> mapN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>,
+      j: Map<Key, J>,
+      k: Map<Key, K>,
+      map: (Key, B, C, D, E, F, G, H, I, J, K) -> L
+    ): Map<Key, L> {
+      val destination = LinkedHashMap<Key, L>(b.size)
+      for ((key, bb) in b) {
+        Nullable.mapN(c[key], d[key], e[key], f[key], g[key], h[key], i[key], j[key], k[key]) { cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+          map(key, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+        }?.let { l -> destination.put(key, l) }
+      }
+      return destination
+    }
+
+    fun <Key, B, C> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>
+    ): Map<Key, Tuple2<B, C>> =
+      mapN(b, c) { _, bb, cc ->
+        Tuple2(bb, cc)
+      }
+
+    fun <Key, B, C, D> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>
+    ): Map<Key, Tuple3<B, C, D>> =
+      mapN(b, c, d) { _, bb, cc, dd ->
+        Tuple3(bb, cc, dd)
+      }
+
+    fun <Key, B, C, D, E> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>
+    ): Map<Key, Tuple4<B, C, D, E>> =
+      mapN(b, c, d, e) { _, bb, cc, dd, ee ->
+        Tuple4(bb, cc, dd, ee)
+      }
+
+    fun <Key, B, C, D, E, F> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>
+    ): Map<Key, Tuple5<B, C, D, E, F>> =
+      mapN(b, c, d, e, f) { _, bb, cc, dd, ee, ff ->
+        Tuple5(bb, cc, dd, ee, ff)
+      }
+
+    fun <Key, B, C, D, E, F, G> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>
+    ): Map<Key, Tuple6<B, C, D, E, F, G>> =
+      mapN(b, c, d, e, f, g) { _, bb, cc, dd, ee, ff, gg ->
+        Tuple6(bb, cc, dd, ee, ff, gg)
+      }
+
+    fun <Key, B, C, D, E, F, G, H> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>
+    ): Map<Key, Tuple7<B, C, D, E, F, G, H>> =
+      mapN(b, c, d, e, f, g, h) { _, bb, cc, dd, ee, ff, gg, hh ->
+        Tuple7(bb, cc, dd, ee, ff, gg, hh)
+      }
+
+    fun <Key, B, C, D, E, F, G, H, I> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>
+    ): Map<Key, Tuple8<B, C, D, E, F, G, H, I>> =
+      mapN(b, c, d, e, f, g, h, i) { _, bb, cc, dd, ee, ff, gg, hh, ii ->
+        Tuple8(bb, cc, dd, ee, ff, gg, hh, ii)
+      }
+
+    fun <Key, B, C, D, E, F, G, H, I, J> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>,
+      j: Map<Key, J>
+    ): Map<Key, Tuple9<B, C, D, E, F, G, H, I, J>> =
+      mapN(b, c, d, e, f, g, h, i, j) { _, bb, cc, dd, ee, ff, gg, hh, ii, jj ->
+        Tuple9(bb, cc, dd, ee, ff, gg, hh, ii, jj)
+      }
+
+    fun <Key, B, C, D, E, F, G, H, I, J, K> tupledN(
+      b: Map<Key, B>,
+      c: Map<Key, C>,
+      d: Map<Key, D>,
+      e: Map<Key, E>,
+      f: Map<Key, F>,
+      g: Map<Key, G>,
+      h: Map<Key, H>,
+      i: Map<Key, I>,
+      j: Map<Key, J>,
+      k: Map<Key, K>
+    ): Map<Key, Tuple10<B, C, D, E, F, G, H, I, J, K>> =
+      mapN(b, c, d, e, f, g, h, i, j, k) { _, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk ->
+        Tuple10(bb, cc, dd, ee, ff, gg, hh, ii, jj, kk)
+      }
+  }
 }
 
 fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
@@ -82,7 +320,14 @@ fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
 fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (this + (k to value)).k()
 
+@Deprecated("Available for binary compat", level = DeprecationLevel.HIDDEN)
 fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -> Map<K, B>): Map<K, B> {
+  var result = b
+  this.forEach { result = f(result, it) }
+  return result
+}
+
+inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
   this.forEach { result = f(result, it) }
   return result
@@ -94,7 +339,11 @@ internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
     else -> listOf(this)
   }
 
+@Deprecated("Available for binary compat", level = DeprecationLevel.HIDDEN)
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
+  this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
+
+inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
   this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
 
 fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): MapK<K, V> =
