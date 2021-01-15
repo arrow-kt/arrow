@@ -8,6 +8,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.defaultSalt
 import arrow.typeclasses.hashWithSalt
+import kotlin.collections.plus as _plus
 
 fun <A> Eq.Companion.list(EQA: Eq<A>): Eq<List<A>> =
   ListEq(EQA)
@@ -122,7 +123,7 @@ fun <A> Monoid.Companion.list(): Monoid<List<A>> =
 
 object ListMonoid : Monoid<List<Any?>> {
   override fun empty(): List<Any?> = emptyList()
-  override fun List<Any?>.combine(b: List<Any?>): List<Any?> = this + b
+  override fun List<Any?>.combine(b: List<Any?>): List<Any?> = this._plus(b)
 }
 
 fun <A> Show.Companion.list(SA: Show<A>): Show<List<A>> =
