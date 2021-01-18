@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.Tuple2
 
-/**
- * ank_macro_hierarchy(arrow.typeclasses.MonadCombine)
- */
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F> {
 
   /**

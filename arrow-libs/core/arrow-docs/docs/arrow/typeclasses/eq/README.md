@@ -80,13 +80,4 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 
 ### Data types
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Eq
-
-TypeClass(Eq::class).dtMarkdownList()
-```
-
 Additionally, all instances of [`Order`]({{ '/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`.
-
-ank_macro_hierarchy(arrow.typeclasses.Eq)

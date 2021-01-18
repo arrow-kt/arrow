@@ -11,8 +11,6 @@ import arrow.core.fix
 import arrow.core.k
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Alternative)
- *
  * The Alternative type class is for Applicative functors which also have a monoid structure.
  *
  * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/alternative/">Alternative documentation</a>

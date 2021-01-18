@@ -43,16 +43,5 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 Additionally all instances of [`Align`]({{ '/arrow/typeclasses/align' | relative_url }}) implement the `Semialign` typeclass directly
 since they are all subtypes of `Semialign`
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Align
-
-TypeClass(Align::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Align)
-
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Align.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/AlignLaws.kt

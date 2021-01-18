@@ -5,8 +5,6 @@ import arrow.Kind2
 import arrow.core.identity
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
- *
  * [Bifunctor] has the same properties of [Functor], but acting onto two types, instead of one.
  *
  * It can be used to map both of its inside types.

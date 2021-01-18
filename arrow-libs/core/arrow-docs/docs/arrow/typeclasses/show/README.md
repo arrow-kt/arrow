@@ -53,15 +53,3 @@ val personShow = Show<Person> { "Hello $firstName $lastName" }
 ```
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
-
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Show
-
-TypeClass(Show::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Show)

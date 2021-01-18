@@ -10,9 +10,6 @@ import arrow.core.Some
 import arrow.core.fix
 import arrow.core.value
 
-/**
- * ank_macro_hierarchy(arrow.typeclasses.TraverseFilter)
- */
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
   private object IdApplicative : Applicative<ForId> {

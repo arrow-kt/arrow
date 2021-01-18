@@ -8,9 +8,6 @@ import arrow.typeclasses.Show
 typealias Nel<A> = NonEmptyList<A>
 
 /**
- * ank_macro_hierarchy(arrow.core.NonEmptyList)
- *
- *
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
  * `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
  *
@@ -181,16 +178,6 @@ typealias Nel<A> = NonEmptyList<A>
  * - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
  * - `fx { ... } comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
  * - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
- *
- * ### Supported type classes
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.DataType
- * import arrow.reflect.tcMarkdownList
- * import arrow.core.NonEmptyList
- *
- * DataType(NonEmptyList::class).tcMarkdownList()
- * ```
  *
  */
 @higherkind

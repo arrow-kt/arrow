@@ -384,8 +384,6 @@ fun <A, B> Kind<ForEval, Either<A, B>>.select(arg1: Kind<ForEval, Function1<A, B
 }
 
 /**
- *  ank_macro_hierarchy(arrow.typeclasses.Monad)
- *
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
  *  the results of previous computations.
  *

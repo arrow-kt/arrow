@@ -11,10 +11,3 @@ permalink: /arrow/typeclasses/const/
 
 ### Supported type classes
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.Const
-
-DataType(Const::class).tcMarkdownList()
-```
-

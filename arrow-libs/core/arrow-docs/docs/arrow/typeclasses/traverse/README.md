@@ -53,15 +53,4 @@ Oftentimes, you may find the need to provide your own for unsupported datatypes.
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }})
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Traverse
-
-TypeClass(Traverse::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Traverse)
-
 [travers_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/TraverseLaws.kt

@@ -518,14 +518,3 @@ val rightStr = Either.right("abc") as Either<String, String>
 
 foldableGet(rightStr)
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Foldable
-
-TypeClass(Foldable::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Foldable)

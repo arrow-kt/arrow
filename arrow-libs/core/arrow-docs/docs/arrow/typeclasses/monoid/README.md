@@ -83,15 +83,3 @@ list.foldMap(M) { n: Int ->
   Tuple2(n, n.toString())
 }
 ```
-
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Monoid
-
-TypeClass(Monoid::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Monoid)

@@ -46,8 +46,6 @@ internal val semigroupal_singleton: ListKSemigroupal = object :
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
   /**
-   *  ank_macro_hierarchy(arrow.typeclasses.Semigroupal)
-   *
    *  The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
    *  It defines the function [product].
    *

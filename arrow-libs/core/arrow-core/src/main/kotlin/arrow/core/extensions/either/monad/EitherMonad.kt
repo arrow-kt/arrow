@@ -239,8 +239,6 @@ fun <L, A, B> Kind<Kind<ForEither, L>, Either<A, B>>.select(
   fix()._selectM(arg1.fix())
 
 /**
- *  ank_macro_hierarchy(arrow.typeclasses.Monad)
- *
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
  *  the results of previous computations.
  *

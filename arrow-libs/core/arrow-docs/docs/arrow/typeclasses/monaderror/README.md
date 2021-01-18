@@ -59,14 +59,3 @@ It starts a [Monad Comprehension]({{ '/patterns/monad_comprehensions' | relative
 ### Laws
 
 Arrow provides `MonadErrorLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadError` instances.
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.MonadError
-
-TypeClass(MonadError::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.MonadError)

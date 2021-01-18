@@ -64,17 +64,4 @@ Arrow already provides `FunctorFilter` instances for most common datatypes both 
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `FunctorFilter` instances for custom datatypes.
 
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.FunctorFilter
-
-TypeClass(FunctorFilter::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
-
 [functor_filter_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/FunctorFilterLaws.kt
-

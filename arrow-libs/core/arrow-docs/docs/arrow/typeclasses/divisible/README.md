@@ -41,13 +41,3 @@ Constructs an empty value for any `Kind<F, A>`.
 Arrow provides `DivisibleLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Divisible` instances.
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Divisible` instances for custom datatypes.
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Divisible
-TypeClass(Divisible::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Divisible)

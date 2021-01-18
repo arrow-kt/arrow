@@ -107,13 +107,4 @@ Arrow provides `AlternativeLaws` in the form of test cases for internal verifica
 
 ## Available Instances:
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Alternative
-
-TypeClass(Alternative::class).dtMarkdownList()
-```
-
 Additionally all the instances of [`MonadCombine`]({{ '/arrow/typeclasses/monadcombine' | relative_url }}) implement the `Alternative` directly since it is subtype of `Alternative`.
-
-ank_macro_hierarchy(arrow.typeclasses.Alternative)

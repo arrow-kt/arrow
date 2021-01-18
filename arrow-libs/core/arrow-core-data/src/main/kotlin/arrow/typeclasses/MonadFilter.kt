@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.Option
 import kotlin.coroutines.startCoroutine
 
-/**
- * ank_macro_hierarchy(arrow.typeclasses.MonadFilter)
- */
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
   override val fx: MonadFilterFx<F>

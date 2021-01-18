@@ -794,16 +794,6 @@ inline fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
  * }
  * ```
  *
- * ### Supported type classes
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.DataType
- * import arrow.reflect.tcMarkdownList
- * import arrow.core.Either
- *
- * DataType(Either::class).tcMarkdownList()
- * ```
- *
  */
 sealed class Either<out A, out B> : EitherOf<A, B> {
 

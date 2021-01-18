@@ -56,13 +56,3 @@ Derive a value of `Kind<F, C>` from a `Kind<F, A>`, a `Kind<F, B>` and a functio
 Arrow provides `DivideLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Divide` instances.
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Divide` instances for custom datatypes.
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Divide
-TypeClass(Divide::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Divide)

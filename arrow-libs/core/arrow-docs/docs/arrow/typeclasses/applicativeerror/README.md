@@ -240,14 +240,3 @@ Rules failFast {
   ).map { it.validateEmail() }
 }
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.ApplicativeError
-
-TypeClass(ApplicativeError::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)

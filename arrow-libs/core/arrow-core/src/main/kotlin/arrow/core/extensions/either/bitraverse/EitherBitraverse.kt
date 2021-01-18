@@ -63,8 +63,6 @@ fun <A, B, C, D> Kind<Kind<ForEither, A>, B>.bimap(arg1: Function1<A, C>, arg2: 
   fix().bimap(arg1, arg2)
 
 /**
- *  ank_macro_hierarchy(arrow.typeclasses.Bitraverse)
- *
  *  The type class `Bitraverse` defines the behaviour of two separetes `Traverse` over a data type.
  *
  *  Every instance of `Bitraverse<F>` must contains the next functions:

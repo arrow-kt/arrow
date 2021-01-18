@@ -346,16 +346,6 @@ import arrow.typeclasses.Show
  * }
  * ```
  *
- * ### Supported type classes
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.DataType
- * import arrow.reflect.tcMarkdownList
- * import arrow.core.Option
- *
- * DataType(Option::class).tcMarkdownList()
- * ```
- *
  * ## Credits
  *
  * Contents partially adapted from [Scala Exercises Option Tutorial](https://www.scala-exercises.org/std_lib/options)

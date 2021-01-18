@@ -4,9 +4,6 @@ package arrow.typeclasses
 
 import arrow.Kind
 
-/**
- * ank_macro_hierarchy(arrow.typeclasses.Applicative)
- */
 interface Applicative<F> : Apply<F> {
 
   fun <A> just(a: A): Kind<F, A>

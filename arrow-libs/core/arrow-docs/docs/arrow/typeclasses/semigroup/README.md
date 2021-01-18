@@ -73,15 +73,3 @@ Option.semigroup(Int.semigroup()).run {
 ```
 
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)
-
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Semigroup
-
-TypeClass(Semigroup::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Semigroup)

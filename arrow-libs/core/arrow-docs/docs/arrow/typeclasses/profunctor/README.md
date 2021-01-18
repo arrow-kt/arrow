@@ -81,16 +81,5 @@ For a full list of other useful combinators available in `Profunctor`, see the [
 
 Arrow provides [`ProfunctorLaws`][profunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Profunctor instances.
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Profunctor
-
-TypeClass(Profunctor::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Profunctor)
-
 [profunctor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Profunctor.kt
 [profunctor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/ProfunctorLaws.kt

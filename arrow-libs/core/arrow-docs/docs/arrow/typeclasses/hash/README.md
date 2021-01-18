@@ -115,24 +115,4 @@ fun main(args: Array<String>) {
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Hash` instances for custom datatypes.
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Hash
-TypeClass(Hash::class).dtMarkdownList()
-```
-
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.typeclasses.Hash
-TypeClass(Hash::class).hierarchyGraph()
-```
-
 [hash_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/HashLaws.kt

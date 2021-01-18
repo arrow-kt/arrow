@@ -64,16 +64,5 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 Additionally all instances of [`Semialign`]({{ '/arrow/typeclasses/semialign' | relative_url }}) implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Semialign
-
-TypeClass(Semialign::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Semialign)
-
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Semialign.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/SemialignLaws.kt

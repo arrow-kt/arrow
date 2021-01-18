@@ -7,9 +7,6 @@ import arrow.typeclasses.Show
 
 /**
  *
- * ank_macro_hierarchy(arrow.core.ListK)
- *
- *
  * ListK wraps over the platform `List` type to make it a [type constructor]({{'/patterns/glossary/#type-constructors' | relative_url }}).
  *
  * It can be created from Kotlin List type with a convenient `k()` function.
@@ -116,16 +113,6 @@ import arrow.typeclasses.Show
  * fun main() {
  *  println(value)
  * }
- * ```
- *
- * ### Supported type classes
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.DataType
- * import arrow.reflect.tcMarkdownList
- * import arrow.core.ListK
- *
- * DataType(ListK::class).tcMarkdownList()
  * ```
  *
  */

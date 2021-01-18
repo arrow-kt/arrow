@@ -45,16 +45,5 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 Additionally all instances of [`Repeat`]({{ '/arrow/typeclasses/repeat' | relative_url }}) implement the `Zip` typeclass directly
 since they are all subtypes of `Zip`
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Repeat
-
-TypeClass(Repeat::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Repeat)
-
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Repeat.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/RepeatLaws.kt

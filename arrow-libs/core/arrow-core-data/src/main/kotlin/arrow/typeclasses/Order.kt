@@ -7,8 +7,6 @@ import arrow.core.Ordering
 import arrow.core.Tuple2
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Order)
- *
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *
  * [Order] is a subtype of [Eq] and defines [eqv] in terms of [compare]

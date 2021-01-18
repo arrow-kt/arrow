@@ -7,17 +7,13 @@ import arrow.core.Validated.Companion
 import arrow.core.extensions.ValidatedBitraverse
 import arrow.core.fix
 import arrow.typeclasses.Applicative
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val bitraverse_singleton: ValidatedBitraverse = object :
-    arrow.core.extensions.ValidatedBitraverse {}
+  arrow.core.extensions.ValidatedBitraverse {}
 
 @JvmName("bitraverse")
 @Suppress(
@@ -45,7 +41,7 @@ fun <G, A, B, C, D> Kind<Kind<ForValidated, A>, B>.bitraverse(
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with bisequence or bisequenceEither from arrow.core.*")
 fun <G, A, B> Kind<Kind<ForValidated, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>):
-    Kind<G, Kind<Kind<ForValidated, A>, B>> = arrow.core.Validated.bitraverse().run {
+  Kind<G, Kind<Kind<ForValidated, A>, B>> = arrow.core.Validated.bitraverse().run {
   this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
     arrow.Kind<arrow.Kind<arrow.core.ForValidated, A>, B>>
 }
@@ -62,8 +58,6 @@ fun <A, B, C, D> Kind<Kind<ForValidated, A>, B>.bimap(arg1: Function1<A, C>, arg
   fix().bimap(arg1, arg2)
 
 /**
- *  ank_macro_hierarchy(arrow.typeclasses.Bitraverse)
- *
  *  The type class `Bitraverse` defines the behaviour of two separetes `Traverse` over a data type.
  *
  *  Every instance of `Bitraverse<F>` must contains the next functions:

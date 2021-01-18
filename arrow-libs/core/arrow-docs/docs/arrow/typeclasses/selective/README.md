@@ -67,28 +67,4 @@ Arrow already provides `Selective` instances for most common datatypes both in A
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Selective` instances for custom datatypes.
 
-### Data types
-
-The following data types in Arrow provide instances that adhere to the `Selective` type class.
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Selective
-
-TypeClass(Selective::class).dtMarkdownList()
-```
-
-<canvas id="hierarchy-diagram" style="margin-top:120px"></canvas>
-
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'selective.nomnol')
-</script>
-
-```kotlin:ank:outFile(selective.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Selective
-
-TypeClass(Selective::class).hierarchyGraph()
-```
-
 [selective_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/SelectiveLaws.kt

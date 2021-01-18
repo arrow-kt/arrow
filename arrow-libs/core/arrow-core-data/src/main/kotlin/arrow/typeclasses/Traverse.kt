@@ -14,8 +14,6 @@ import arrow.core.SequenceK
 import arrow.core.ValidatedNel
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Traverse)
- *
  * In functional programming it is very common to encode "behaviors" as data types - common behaviors include [Option] for possibly missing values, [Either] and [Validated] for possible errors, and [Ref]({{ '/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
  *
  * These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single [String] into an [Int], validating a login, or asynchronously fetching website information for a user.
@@ -377,38 +375,9 @@ import arrow.core.ValidatedNel
  *
  * If we fix `D` to be some sort of dependency or configuration and `A` as the return type, we can use the `Reader` applicative in our [traverse].
  *
- * ```kotlin:ank
- * import arrow.mtl.Reader
- *
- * interface Context
- * interface Topic
- * interface Result
- *
- * typealias Job<A> = Reader<Context, A>
- *
- * fun processTopic(t: Topic): Job<Result> = TODO()
- * ```
- *
  * We can imagine we have a data pipeline that processes a bunch of data, each piece of data being categorized by a topic. Given a specific topic, we produce a `Job` that processes that topic. (Note that since a `Job` is just a `Reader`/`Kleisli`, one could write many small `Jobs` and compose them together into one `Job` that is used/returned by `processTopic`.)
  *
  * Corresponding to bunch of topics, a `List<Topic>` if you will. Since `Reader` has an [Applicative] instance, we can [traverse] over this list.
- *
- * ```kotlin:ank
- * import arrow.core.Id
- * import arrow.core.ForId
- * import arrow.core.ListK
- * import arrow.core.extensions.id.applicative.applicative
- * import arrow.mtl.KleisliPartialOf
- * import arrow.mtl.extensions.kleisli.applicative.applicative
- * import arrow.mtl.fix
- *
- * val JobForContext = Job.applicative<Context, ForId>(Id.applicative())
- *
- * fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
- *   topics.traverse<KleisliPartialOf<Context, ForId>, Result>(JobForContext) {
- *     processTopic(it)
- *   }.fix()
- * ```
  *
  * Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that, when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
  *
@@ -494,16 +463,6 @@ import arrow.core.ValidatedNel
  * - the `reduce` method
  *
  * One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/recursion/intro/' | relative_url }}).
- *
- * ### Data types
- *
- * ```kotlin:ank:replace
- * import arrow.reflect.TypeClass
- * import arrow.reflect.dtMarkdownList
- * import arrow.typeclasses.Traverse
- *
- * TypeClass(Traverse::class).dtMarkdownList()
- * ```
  *
  * ## Futher Reading
  *

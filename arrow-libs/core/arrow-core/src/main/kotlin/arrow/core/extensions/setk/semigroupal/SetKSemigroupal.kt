@@ -65,8 +65,6 @@ operator fun <A, B> Kind<ForSetK, A>.times(arg1: Kind<ForSetK, B>): SetK<Tuple2<
 }
 
 /**
- *  ank_macro_hierarchy(arrow.typeclasses.Semigroupal)
- *
  *  The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
  *  It defines the function [product].
  *

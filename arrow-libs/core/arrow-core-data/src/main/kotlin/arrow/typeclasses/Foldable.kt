@@ -14,8 +14,6 @@ import arrow.core.identity
 import arrow.core.right
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Foldable)
- *
  * Data structures that can be folded to a summary value.
  *
  * Foldable<F> is implemented in terms of two basic methods:

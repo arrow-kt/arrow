@@ -31,14 +31,3 @@ Arrow provides `EqK2Laws` in the form of test cases for internal verification of
 See the existing EqK2 instances implementations and accompanying tests for reference.
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `EqK2` instances for custom datatypes.
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.EqK2
-
-TypeClass(EqK2::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.EqK2)

@@ -126,26 +126,4 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 
 ### Data types
 
-The following data types in Arrow provide instances that adhere to the `Monad` type class.
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Monad
-
-TypeClass(Monad::class).dtMarkdownList()
-```
-
-<canvas id="hierarchy-diagram" style="margin-top:120px"></canvas>
-
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'monad.nomnol')
-</script>
-
-```kotlin:ank:outFile(monad.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Monad
-
-TypeClass(Monad::class).hierarchyGraph()
-```
-
 [monad_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/MonadLaws.kt

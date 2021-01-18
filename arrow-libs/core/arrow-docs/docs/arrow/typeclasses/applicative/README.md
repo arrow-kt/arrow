@@ -142,17 +142,8 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 
 ### Data types
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Applicative
-
-TypeClass(Applicative::class).dtMarkdownList()
-```
-
 Additionally, all instances of [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
-
-ank_macro_hierarchy(arrow.typeclasses.Applicative)
 
 [applicative_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/ApplicativeLaws.kt

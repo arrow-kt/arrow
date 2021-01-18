@@ -24,7 +24,6 @@ In this doc, we'll describe all the modules that form the core, alongside a list
 * [arrow-fx-rx2 & arrow-fx-reactor]({{ '/quickstart/libraries/#arrow-fx-rx2&arrow-fx-reactor' | relative_url }})
 * [arrow-mtl]({{ '/quickstart/libraries/#arrow-mtl' | relative_url }})
 * [arrow-mtl-data]({{ '/quickstart/libraries/#arrow-mtl-data' | relative_url }})
-* [arrow-optics-mtl]({{ '/quickstart/libraries/#arrow-optics-mtl' | relative_url }})
 * [arrow-recursion]({{ '/quickstart/libraries/#arrow-recursion' | relative_url }})
 * [arrow-recursion-data]({{ '/quickstart/libraries/#arrow-recursion-data' | relative_url }})
 * [arrow-integrations-retrofit-adapter]({{ '/quickstart/libraries/#arrow-integrations-retrofit-adapter' | relative_url }})
@@ -160,16 +159,6 @@ dependencies {
 ```
 
 Dependency: `arrow-core`
-
-### arrow-optics-mtl
-
-```groovy
-dependencies {
-    implementation "io.arrow-kt:arrow-optics-mtl:$arrow_version"
-}
-```
-
-Dependencies: `arrow-optics`, `arrow-mtl-data`
 
 ### arrow-recursion
 

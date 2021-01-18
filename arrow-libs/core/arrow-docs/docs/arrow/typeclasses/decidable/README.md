@@ -47,13 +47,3 @@ Constructs a `Kind<F, C>` from a `Kind<F, A>`, a `Kind<F, B>`, and a function `(
 The intuition here is that the function "decides" what value to use by specifying it with the either constructed.
 
 See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_url }}) to provide your own `Decidable` instances for custom datatypes.
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Decidable
-TypeClass(Decidable::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Decidable)

@@ -101,17 +101,8 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 
 ### Data types
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Functor
-
-TypeClass(Functor::class).dtMarkdownList()
-```
-
 Additionally, all instances of [`Applicative`]({{ '/arrow/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/arrow/typeclasses/monad' | relative_url }}), and their MTL variants, implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
-
-ank_macro_hierarchy(arrow.typeclasses.Functor)
 
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Functor.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/FunctorLaws.kt

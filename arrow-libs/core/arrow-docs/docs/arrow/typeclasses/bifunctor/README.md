@@ -64,16 +64,5 @@ For a full list of other useful combinators available in `Bifunctor`, see the [S
 
 Arrow provides [`BifunctorLaws`][bifunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Bifunctor instances.
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Bifunctor
-
-TypeClass(Bifunctor::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
-
 [bifunctor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
 [bifunctor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/BifunctorLaws.kt

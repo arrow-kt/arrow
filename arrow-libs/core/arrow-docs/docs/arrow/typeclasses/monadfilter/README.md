@@ -111,14 +111,3 @@ ListK.monadFilter().fx.monadFilter {
  a + b
 }
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.MonadFilter
-
-TypeClass(MonadFilter::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.MonadFilter)

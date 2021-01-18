@@ -7,8 +7,6 @@ import arrow.core.Some
 import arrow.core.identity
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
- *
  * A Functor with the ability to [filterMap].
  */
 interface FunctorFilter<F> : Functor<F> {

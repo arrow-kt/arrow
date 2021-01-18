@@ -11,13 +11,6 @@ permalink: /arrow/core/mapk/
 
 ### Supported type classes
 
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.core.*
-
-DataType(MapK::class).tcMarkdownList()
-```
-
 `MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/patterns/glossary/#type-constructors' | relative_url }})
 and to work with `Map` in more functional way.
 

@@ -59,16 +59,5 @@ See [Deriving and creating custom typeclass]({{ '/patterns/glossary' | relative_
 
 Additionally all instances of [`Bicrosswalk`]({{ '/arrow/typeclasses/bicrosswalk' | relative_url }}) implement the `Bifunctor` and `Bifoldable` typeclass directly.
 
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.Bicrosswalk
-
-TypeClass(Bicrosswalk::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.Bicrosswalk)
-
 [functor_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-data/src/main/kotlin/arrow/typeclasses/Bicrosswalk.kt
 [functor_laws_source]: https://github.com/arrow-kt/arrow-core/blob/master/arrow-core-test/src/main/kotlin/arrow/core/test/laws/BicrosswalkLaws.kt

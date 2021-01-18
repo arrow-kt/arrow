@@ -35,8 +35,6 @@ import arrow.core.identity
  *   println(result)
  * }
  * ```
- *
- * ank_macro_hierarchy(arrow.typeclasses.Decidable)
  */
 interface Decidable<F> : Divisible<F> {
 

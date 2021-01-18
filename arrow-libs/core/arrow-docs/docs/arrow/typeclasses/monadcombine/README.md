@@ -55,14 +55,3 @@ ListK.monadCombine().run {
     f.separate(Either.bifoldable())
 }
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.typeclasses.MonadCombine
-
-TypeClass(MonadCombine::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.typeclasses.MonadCombine)
