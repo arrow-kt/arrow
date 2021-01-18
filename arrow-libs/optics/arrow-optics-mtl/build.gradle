@@ -7,6 +7,14 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 
 dependencies {
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
     compile "io.arrow-kt:arrow-mtl-data:$VERSION_NAME"
     compile project(":arrow-optics")
+
+    testCompile project(":arrow-optics-test")
+
+    testCompile "junit:junit:$JUNIT_VERSION"
+
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
 }

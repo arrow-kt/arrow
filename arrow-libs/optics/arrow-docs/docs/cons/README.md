@@ -44,12 +44,3 @@ listOf(1, 2, 3).uncons()
 ```kotlin:ank
 emptyList<Int>().uncons()
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.optics.typeclasses.*
-
-TypeClass(Cons::class).dtMarkdownList()
-```

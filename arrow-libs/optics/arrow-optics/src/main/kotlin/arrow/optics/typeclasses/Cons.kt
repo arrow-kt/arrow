@@ -9,8 +9,6 @@ import arrow.optics.first
 import arrow.optics.second
 
 /**
- * ank_macro_hierarchy(arrow.optics.typeclasses.Cons)
- *
  * [Cons] provides a [Prism] between [S] and its first element [A] and tail [S].
  * It provides a convenient way to attach or detach elements to the left side of a structure [S].
  *

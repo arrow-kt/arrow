@@ -1,5 +1,4 @@
 rootProject.name = 'arrow-optics-lib'
 
 include 'arrow-optics'
-include 'arrow-optics-mtl'
 include 'arrow-optics-test'

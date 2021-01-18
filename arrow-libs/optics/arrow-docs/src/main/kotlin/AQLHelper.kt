@@ -1,8 +1,5 @@
 package arrow.aql
 
-import arrow.aql.box.foldable.foldable
-import arrow.aql.box.functor.functor
-import arrow.aql.box.functorFilter.functorFilter
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.extension
@@ -43,11 +40,6 @@ interface BoxFunctor : Functor<ForBox> {
 }
 
 @extension
-interface BoxSelect : Select<ForBox> {
-  override fun functor(): Functor<ForBox> = Box.functor()
-}
-
-@extension
 interface BoxFunctorFilter : FunctorFilter<ForBox>, BoxFunctor {
   override fun <A, B> BoxOf<A>.filterMap(f: (A) -> Option<B>): Box<B> =
     when (val box = fix()) {
@@ -57,11 +49,6 @@ interface BoxFunctorFilter : FunctorFilter<ForBox>, BoxFunctor {
         { Box.Full(it) }
       )
     }
-}
-
-@extension
-interface BoxWhere : Where<ForBox> {
-  override fun functorFilter(): FunctorFilter<ForBox> = Box.functorFilter()
 }
 
 @extension
@@ -81,29 +68,4 @@ interface BoxFoldable : Foldable<ForBox> {
         Box.Empty -> lb
       }
     }
-}
-
-@extension
-interface BoxGroupBy : GroupBy<ForBox> {
-  override fun foldable(): Foldable<ForBox> = Box.foldable()
-}
-
-@extension
-interface BoxCount : Count<ForBox> {
-  override fun foldable(): Foldable<ForBox> = Box.foldable()
-}
-
-@extension
-interface BoxSum : Sum<ForBox> {
-  override fun foldable(): Foldable<ForBox> = Box.foldable()
-}
-
-@extension
-interface BoxOrderBy : OrderBy<ForBox> {
-  override fun foldable(): Foldable<ForBox> = Box.foldable()
-}
-
-@extension
-interface BoxUnion : Union<ForBox> {
-  override fun foldable(): Foldable<ForBox> = Box.foldable()
 }

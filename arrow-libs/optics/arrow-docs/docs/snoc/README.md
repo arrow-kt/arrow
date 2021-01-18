@@ -42,12 +42,3 @@ listOf(1, 2, 3).unsnoc()
 ```kotlin:ank
 emptyList<Int>().unsnoc()
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.optics.typeclasses.*
-
-TypeClass(Snoc::class).dtMarkdownList()
-```

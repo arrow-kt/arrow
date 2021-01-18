@@ -41,14 +41,3 @@ import arrow.optics.extensions.listk.filterIndex.*
 ListK.filterIndex<Int>().filter { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
-
-### Data types
-
-```kotlin:ank:replace
-import arrow.reflect.*
-import arrow.optics.typeclasses.*
-
-TypeClass(FilterIndex::class).dtMarkdownList()
-```
-
-ank_macro_hierarchy(arrow.optics.typeclasses.FilterIndex)

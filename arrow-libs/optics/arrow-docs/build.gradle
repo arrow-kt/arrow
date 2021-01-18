@@ -17,19 +17,13 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_VALIDATION"
 
 dependencies {
-    compile project(":arrow-optics-mtl")
-    compile "io.arrow-kt:arrow-generic:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-aql:$VERSION_NAME"
+    compile project(":arrow-optics")
     compile "io.arrow-kt:arrow-syntax:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
     compile "io.arrow-kt:arrow-ui:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-recursion:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-free-data:$VERSION_NAME"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
