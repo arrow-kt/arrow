@@ -3,12 +3,13 @@ package arrow.optics.instances
 import arrow.core.extensions.eq
 import arrow.core.SetK
 import arrow.core.extensions.setk.eq.eq
-import arrow.optics.extensions.setAt
 import arrow.optics.extensions.setk.at.at
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.genSetK
+import arrow.optics.set
 import arrow.optics.test.laws.LensLaws
+import arrow.optics.typeclasses.At
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
@@ -36,7 +37,7 @@ class SetInstanceTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.string().map { setAt<String>().at(it) },
+        lensGen = Gen.string().map { At.set<String>().at(it) },
         aGen = Gen.set(Gen.string()),
         bGen = Gen.bool(),
         funcGen = Gen.functionAToB(Gen.bool()),
