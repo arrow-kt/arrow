@@ -17,16 +17,11 @@ apply from: "$SUB_PROJECT"
 apply from: "$DOC_VALIDATION"
 
 dependencies {
-    compile "io.arrow-kt:arrow-optics-mtl:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-generic:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-aql:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-reflect:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-mtl:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
     compile "io.arrow-kt:arrow-ui:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-recursion:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
 }
