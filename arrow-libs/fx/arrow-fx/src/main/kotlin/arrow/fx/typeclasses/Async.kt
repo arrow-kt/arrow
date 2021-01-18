@@ -21,8 +21,6 @@ typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /**
- * ank_macro_hierarchy(arrow.fx.typeclasses.Async)
- *
  * [Async] models how a data type runs an asynchronous computation that may fail.
  * Defined by the [Proc] signature, which is the consumption of a callback.
  **/

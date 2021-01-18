@@ -28,8 +28,6 @@ fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
 
 /**
- * ank_macro_hierarchy(arrow.fx.typeclasses.Bracket)
- *
  * Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource
  * acquisition and release in the face of errors or interruption.
  *

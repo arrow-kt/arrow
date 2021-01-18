@@ -47,8 +47,6 @@ import kotlin.coroutines.startCoroutine
 typealias CancelToken<F> = Kind<F, Unit>
 
 /**
- * ank_macro_hierarchy(arrow.fx.typeclasses.Concurrent)
- *
  * Type class for async data types that are cancellable and can be started concurrently.
  */
 @Deprecated(IODeprecation)

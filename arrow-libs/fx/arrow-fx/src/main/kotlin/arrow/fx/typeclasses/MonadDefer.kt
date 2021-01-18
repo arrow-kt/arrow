@@ -7,8 +7,6 @@ import arrow.fx.Ref
 import arrow.typeclasses.MonadThrow
 
 /**
- * ank_macro_hierarchy(arrow.fx.typeclasses.MonadDefer)
- *
  * The context required to defer evaluating a safe computation.
  **/
 @Deprecated(IODeprecation)

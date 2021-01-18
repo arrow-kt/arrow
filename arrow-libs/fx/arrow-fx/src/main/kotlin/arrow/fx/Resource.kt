@@ -28,8 +28,6 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
   this as Resource<F, E, A>
 
 /**
- * ank_macro_hierarchy(arrow.fx.Resource)
- *
  * [Resource] models resource allocation and releasing. It is especially useful when multiple resources that depend on each other
  *  need to be acquired and later released in reverse order.
  * When a resource is created one can make use of [use] to run a computation with the resource. The finalizers are then
