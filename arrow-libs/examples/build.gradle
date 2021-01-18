@@ -44,8 +44,6 @@ dependencies {
     testImplementation "io.arrow-kt:arrow-fx-rx2"
     testImplementation "io.arrow-kt:arrow-optics"
     testImplementation "io.arrow-kt:arrow-ui"
-    testImplementation "io.arrow-kt:arrow-validation"
-    testImplementation "io.arrow-kt:arrow-mtl"
     testImplementation "io.arrow-kt:arrow-meta"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
