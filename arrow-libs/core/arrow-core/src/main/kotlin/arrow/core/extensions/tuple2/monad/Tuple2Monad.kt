@@ -24,15 +24,13 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatMap(MF, arg1)",
-  "arrow.core.flatMap"
-  ),
+  ReplaceWith("arg1(this.b)"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.flatMap(
   MF: Monoid<F>,
-  arg1: Function1<A, Kind<Kind<ForTuple2, F>, B>>
+  arg1: Function1<A,
+    Kind<Kind<ForTuple2, F>, B>>
 ): Tuple2<F, B> = arrow.core.Tuple2.monad<F>(MF).run {
   this@flatMap.flatMap<A, B>(arg1) as arrow.core.Tuple2<F, B>
 }
@@ -45,20 +43,16 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.flatMap(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "tailRecM(MF, arg0, arg1)",
-  "arrow.core.Tuple2.tailRecM"
-  ),
-  DeprecationLevel.WARNING
+  "tailRecM is not longer supported for Tuple2. Please write concrete tailrec fun.",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A, B> tailRecM(
   MF: Monoid<F>,
   arg0: A,
   arg1: Function1<A, Kind<Kind<ForTuple2, F>, Either<A, B>>>
 ): Tuple2<F, B> = arrow.core.Tuple2
-   .monad<F>(MF)
-   .tailRecM<A, B>(arg0, arg1) as arrow.core.Tuple2<F, B>
+  .monad<F>(MF)
+  .tailRecM<A, B>(arg0, arg1) as arrow.core.Tuple2<F, B>
 
 @JvmName("map")
 @Suppress(
@@ -70,15 +64,15 @@ fun <F, A, B> tailRecM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(MF, arg1)",
-  "arrow.core.map"
+    "this.a toT arg1(this.b)",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(MF: Monoid<F>, arg1: Function1<A, B>): Tuple2<F, B> =
-    arrow.core.Tuple2.monad<F>(MF).run {
-  this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
-}
+  arrow.core.Tuple2.monad<F>(MF).run {
+    this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
+  }
 
 /**
  *  @see [Apply.ap]
@@ -92,15 +86,13 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(MF: Monoid<F>, arg1: Function1<A, 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "ap(MF, arg1)",
-  "arrow.core.ap"
-  ),
+  ReplaceWith("Tuple2(a, arg1.b(this.b))", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.ap(
   MF: Monoid<F>,
-  arg1: Kind<Kind<ForTuple2, F>, Function1<A, B>>
+  arg1: Kind<Kind<ForTuple2, F>,
+    Function1<A, B>>
 ): Tuple2<F, B> = arrow.core.Tuple2.monad<F>(MF).run {
   this@ap.ap<A, B>(arg1) as arrow.core.Tuple2<F, B>
 }
@@ -114,14 +106,11 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.ap(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatten(MF)",
-  "arrow.core.flatten"
-  ),
+  ReplaceWith("this.b"),
   DeprecationLevel.WARNING
 )
 fun <F, A> Kind<Kind<ForTuple2, F>, Kind<Kind<ForTuple2, F>, A>>.flatten(MF: Monoid<F>): Tuple2<F,
-    A> = arrow.core.Tuple2.monad<F>(MF).run {
+  A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@flatten.flatten<A>() as arrow.core.Tuple2<F, A>
 }
 
@@ -134,15 +123,13 @@ fun <F, A> Kind<Kind<ForTuple2, F>, Kind<Kind<ForTuple2, F>, A>>.flatten(MF: Mon
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "followedBy(MF, arg1)",
-  "arrow.core.followedBy"
-  ),
+  ReplaceWith("arg1"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.followedBy(
   MF: Monoid<F>,
-  arg1: Kind<Kind<ForTuple2, F>, B>
+  arg1: Kind<Kind<ForTuple2, F>,
+    B>
 ): Tuple2<F, B> = arrow.core.Tuple2.monad<F>(MF).run {
   this@followedBy.followedBy<A, B>(arg1) as arrow.core.Tuple2<F, B>
 }
@@ -156,14 +143,11 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.followedBy(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "apTap(MF, arg1)",
-  "arrow.core.apTap"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.apTap(MF: Monoid<F>, arg1: Kind<Kind<ForTuple2, F>, B>):
-    Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
+  Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@apTap.apTap<A, B>(arg1) as arrow.core.Tuple2<F, A>
 }
 
@@ -176,10 +160,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.apTap(MF: Monoid<F>, arg1: Kind<Kind<F
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "followedByEval(MF, arg1)",
-  "arrow.core.followedByEval"
-  ),
+  ReplaceWith("arg1.value()"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.followedByEval(
@@ -198,15 +179,13 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.followedByEval(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "effectM(MF, arg1)",
-  "arrow.core.effectM"
-  ),
+  ReplaceWith("arg1(this.b).let { this }"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.effectM(
   MF: Monoid<F>,
-  arg1: Function1<A, Kind<Kind<ForTuple2, F>, B>>
+  arg1: Function1<A,
+    Kind<Kind<ForTuple2, F>, B>>
 ): Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@effectM.effectM<A, B>(arg1) as arrow.core.Tuple2<F, A>
 }
@@ -220,15 +199,13 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.effectM(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTap(MF, arg1)",
-  "arrow.core.flatTap"
-  ),
+  ReplaceWith("arg1(this.b).let { this }"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.flatTap(
   MF: Monoid<F>,
-  arg1: Function1<A, Kind<Kind<ForTuple2, F>, B>>
+  arg1: Function1<A,
+    Kind<Kind<ForTuple2, F>, B>>
 ): Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@flatTap.flatTap<A, B>(arg1) as arrow.core.Tuple2<F, A>
 }
@@ -243,14 +220,14 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.flatTap(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productL(MF, arg1)",
-  "arrow.core.productL"
+    "arg1.let { (f, _) -> f toT this.b }", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.productL(
   MF: Monoid<F>,
-  arg1: Kind<Kind<ForTuple2, F>, B>
+  arg1: Kind<Kind<ForTuple2, F>,
+    B>
 ): Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@productL.productL<A, B>(arg1) as arrow.core.Tuple2<F, A>
 }
@@ -265,14 +242,14 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.productL(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffect(MF, arg1)",
-  "arrow.core.forEffect"
+    "arg1.let { (f, _) -> f toT this.b }", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.forEffect(
   MF: Monoid<F>,
-  arg1: Kind<Kind<ForTuple2, F>, B>
+  arg1: Kind<Kind<ForTuple2, F>,
+    B>
 ): Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
   this@forEffect.forEffect<A, B>(arg1) as arrow.core.Tuple2<F, A>
 }
@@ -287,8 +264,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.forEffect(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productLEval(MF, arg1)",
-  "arrow.core.productLEval"
+    "arg1.value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -309,8 +285,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.productLEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffectEval(MF, arg1)",
-  "arrow.core.forEffectEval"
+    "arg1.value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -331,14 +306,14 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.forEffectEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mproduct(MF, arg1)",
-  "arrow.core.mproduct"
+    "arg1(this.b).value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.mproduct(
   MF: Monoid<F>,
-  arg1: Function1<A, Kind<Kind<ForTuple2, F>, B>>
+  arg1: Function1<A,
+    Kind<Kind<ForTuple2, F>, B>>
 ): Tuple2<F, Tuple2<A, B>> = arrow.core.Tuple2.monad<F>(MF).run {
   this@mproduct.mproduct<A, B>(arg1) as arrow.core.Tuple2<F, arrow.core.Tuple2<A, B>>
 }
@@ -353,8 +328,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.mproduct(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifM(MF, arg1, arg2)",
-  "arrow.core.ifM"
+    "if(this.b) arg1.invoke() else arg2.invoke()"
   ),
   DeprecationLevel.WARNING
 )
@@ -376,8 +350,7 @@ fun <F, B> Kind<Kind<ForTuple2, F>, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "selectM(MF, arg1)",
-  "arrow.core.selectM"
+    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -385,9 +358,9 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, Either<A, B>>.selectM(
   MF: Monoid<F>,
   arg1: Kind<Kind<ForTuple2, F>, Function1<A, B>>
 ): Tuple2<F, B> =
-    arrow.core.Tuple2.monad<F>(MF).run {
-  this@selectM.selectM<A, B>(arg1) as arrow.core.Tuple2<F, B>
-}
+  arrow.core.Tuple2.monad<F>(MF).run {
+    this@selectM.selectM<A, B>(arg1) as arrow.core.Tuple2<F, B>
+  }
 
 @JvmName("select")
 @Suppress(
@@ -399,8 +372,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "select(MF, arg1)",
-  "arrow.core.select"
+    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })", "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -408,9 +380,9 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, Either<A, B>>.select(
   MF: Monoid<F>,
   arg1: Kind<Kind<ForTuple2, F>, Function1<A, B>>
 ): Tuple2<F, B> =
-    arrow.core.Tuple2.monad<F>(MF).run {
-  this@select.select<A, B>(arg1) as arrow.core.Tuple2<F, B>
-}
+  arrow.core.Tuple2.monad<F>(MF).run {
+    this@select.select<A, B>(arg1) as arrow.core.Tuple2<F, B>
+  }
 
 /**
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
@@ -427,5 +399,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, Either<A, B>>.select(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Monad typeclasses is deprecated. Use concrete methods on Pair")
 inline fun <F> Companion.monad(MF: Monoid<F>): Tuple2Monad<F> = object :
-    arrow.core.extensions.Tuple2Monad<F> { override fun MF(): arrow.typeclasses.Monoid<F> = MF }
+  arrow.core.extensions.Tuple2Monad<F> {
+  override fun MF(): arrow.typeclasses.Monoid<F> = MF
+}

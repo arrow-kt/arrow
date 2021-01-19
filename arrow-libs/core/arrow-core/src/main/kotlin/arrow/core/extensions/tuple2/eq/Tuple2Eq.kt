@@ -36,6 +36,15 @@ fun <A, B> Tuple2<A, B>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Tuple2 is deprecated in favor of Kotlin's Pair. ReplaceWith Pair and use Pair instance of Eq",
+  ReplaceWith(
+    "Eq.pair(EQA, EQB)",
+    "arrow.core.Eq",
+    "arrow.core.pair"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B> Companion.eq(EQA: Eq<A>, EQB: Eq<B>): Tuple2Eq<A, B> = object :
     arrow.core.extensions.Tuple2Eq<A, B> { override fun EQA(): arrow.typeclasses.Eq<A> = EQA
 

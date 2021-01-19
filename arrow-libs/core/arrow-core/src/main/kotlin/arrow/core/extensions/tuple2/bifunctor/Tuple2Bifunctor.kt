@@ -30,8 +30,8 @@ internal val bifunctor_singleton: Tuple2Bifunctor = object : arrow.core.extensio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bimap(arg1, arg2)",
-  "arrow.core.bimap"
+  "fl(this.a) toT fr(this.b)",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,8 +50,8 @@ fun <A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bimap(arg1: Function1<A, C>, arg2: 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0, arg1)",
-  "arrow.core.Tuple2.lift"
+    "{ a: Tuple2<A, B> -> arg0(a.a) toT arg2(a.b) }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -71,8 +71,8 @@ fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapLeft(arg1)",
-  "arrow.core.mapLeft"
+  "arg1(this.a) toT this.b",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -88,14 +88,7 @@ fun <A, B, C> Kind<Kind<ForTuple2, A>, B>.mapLeft(arg1: Function1<A, C>): Tuple2
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "rightFunctor()",
-  "arrow.core.Tuple2.rightFunctor"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Functor typeclasses is deprecated. Use concrete methods on Pair")
 fun <X> rightFunctor(): Functor<Kind<ForTuple2, X>> = arrow.core.Tuple2
    .bifunctor()
    .rightFunctor<X>() as arrow.typeclasses.Functor<arrow.Kind<arrow.core.ForTuple2, X>>
@@ -107,14 +100,7 @@ fun <X> rightFunctor(): Functor<Kind<ForTuple2, X>> = arrow.core.Tuple2
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "leftFunctor()",
-  "arrow.core.Tuple2.leftFunctor"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Functor typeclasses is deprecated. Use concrete methods on Pair")
 fun <X> leftFunctor(): Functor<Conested<ForTuple2, X>> = arrow.core.Tuple2
    .bifunctor()
    .leftFunctor<X>() as arrow.typeclasses.Functor<arrow.typeclasses.Conested<arrow.core.ForTuple2,
@@ -129,10 +115,7 @@ fun <X> leftFunctor(): Functor<Conested<ForTuple2, X>> = arrow.core.Tuple2
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "leftWiden()",
-  "arrow.core.leftWiden"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
 fun <AA, B, A : AA> Kind<Kind<ForTuple2, A>, B>.leftWiden(): Tuple2<AA, B> =
@@ -144,4 +127,5 @@ fun <AA, B, A : AA> Kind<Kind<ForTuple2, A>, B>.leftWiden(): Tuple2<AA, B> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("BiFunctor typeclasses is deprecated. Use concrete methods on Pair")
 inline fun Companion.bifunctor(): Tuple2Bifunctor = bifunctor_singleton

@@ -9,6 +9,15 @@ import kotlin.Suppress
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple. ReplaceWith Triple and use Triple instance of Show",
+  ReplaceWith(
+    "Show.triple(SA, SB, SC)",
+    "arrow.core.Show",
+    "arrow.core.triple"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C> Companion.show(
   SA: Show<A>,
   SB: Show<B>,

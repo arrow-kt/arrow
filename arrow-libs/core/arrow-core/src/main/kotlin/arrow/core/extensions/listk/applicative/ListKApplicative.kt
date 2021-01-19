@@ -88,5 +88,5 @@ fun <A> Kind<ForListK, A>.replicate(arg1: Int, arg2: Monoid<A>): ListK<A> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on List")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on List")
 inline fun Companion.applicative(): ListKApplicative = applicative_singleton

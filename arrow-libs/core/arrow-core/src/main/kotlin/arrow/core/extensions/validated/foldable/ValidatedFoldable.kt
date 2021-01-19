@@ -269,7 +269,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.size(arg1: Monoid<Long>): Long =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 fun <E, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForValidated, E>, A>.foldMapA(
   arg1: AP,
   arg2: MO,

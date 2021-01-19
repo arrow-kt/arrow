@@ -28,13 +28,14 @@ internal val comonad_singleton: Tuple2Comonad<Any?> = object : Tuple2Comonad<Any
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "coflatMap(arg1)",
-  "arrow.core.coflatMap"
+  "this.a toT f(this)",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.coflatMap(
-  arg1: Function1<Kind<Kind<ForTuple2, F>, A>, B>
+  arg1: Function1<Kind<Kind<ForTuple2, F>, A>,
+B>
 ): Tuple2<F, B> = arrow.core.Tuple2.comonad<F>().run {
   this@coflatMap.coflatMap<A, B>(arg1) as arrow.core.Tuple2<F, B>
 }
@@ -48,10 +49,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.coflatMap(
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "extract()",
-  "arrow.core.extract"
-  ),
+  ReplaceWith("this.b"),
   DeprecationLevel.WARNING
 )
 fun <F, A> Kind<Kind<ForTuple2, F>, A>.extract(): A = arrow.core.Tuple2.comonad<F>().run {
@@ -68,8 +66,8 @@ fun <F, A> Kind<Kind<ForTuple2, F>, A>.extract(): A = arrow.core.Tuple2.comonad<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "duplicate()",
-  "arrow.core.duplicate"
+  "this.a toT this.a",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -82,5 +80,6 @@ fun <F, A> Kind<Kind<ForTuple2, F>, A>.duplicate(): Tuple2<F, Tuple2<F, A>> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Comonad typeclasses is deprecated. Use concrete methods on Pair")
 inline fun <F> Companion.comonad(): Tuple2Comonad<F> = comonad_singleton as
     arrow.core.extensions.Tuple2Comonad<F>

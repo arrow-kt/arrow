@@ -80,6 +80,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("Applicative typeclasses is deprecated. Use concrete methods on List")
+  @Deprecated("Applicative typeclass is deprecated. Use concrete methods on List")
   inline fun applicative(): ListKApplicative = applicative_singleton
 }

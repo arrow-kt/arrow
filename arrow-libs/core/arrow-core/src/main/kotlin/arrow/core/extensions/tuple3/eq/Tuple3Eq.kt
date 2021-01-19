@@ -37,6 +37,15 @@ fun <A, B, C> Tuple3<A, B, C>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Tuple3 is deprecated in favor of Kotlin's Triple. ReplaceWith Triple and use Triple instance of Eq",
+    "arrow.core.Eq",
+    "arrow.core.triple"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C> Companion.eq(
   EQA: Eq<A>,
   EQB: Eq<B>,

@@ -9,6 +9,15 @@ import kotlin.Suppress
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Show.tuple10(SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ)",
+    "arrow.core.Show",
+    "arrow.core.tuple10"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J> Companion.show(
   SA: Show<A>,
   SB: Show<B>,

@@ -33,6 +33,15 @@ fun <A, B> Tuple2<A, B>.hash(HA: Hash<A>, HB: Hash<B>): Int = arrow.core.Tuple2.
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Tuple2 is deprecated in favor of Kotlin's Pair. ReplaceWith Pair and use Pair instance of Hash",
+  ReplaceWith(
+    "Hash.pair(HA, HB)",
+    "arrow.core.Hash",
+    "arrow.core.pair"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B> Companion.hash(HA: Hash<A>, HB: Hash<B>): Tuple2Hash<A, B> = object :
     arrow.core.extensions.Tuple2Hash<A, B> { override fun HA(): arrow.typeclasses.Hash<A> = HA
 

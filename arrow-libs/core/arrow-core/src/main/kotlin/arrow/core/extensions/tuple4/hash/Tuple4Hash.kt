@@ -37,6 +37,15 @@ fun <A, B, C, D> Tuple4<A, B, C, D>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Hash.tuple4(HA, HB, HC, HD)",
+    "arrow.core.Hash",
+    "arrow.core.tuple4"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

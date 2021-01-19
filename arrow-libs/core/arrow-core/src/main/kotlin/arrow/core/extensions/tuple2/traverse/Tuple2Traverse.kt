@@ -27,17 +27,11 @@ internal val traverse_singleton: Tuple2Traverse<Any?> = object : Tuple2Traverse<
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse(arg1, arg2)",
-  "arrow.core.traverse"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 fun <F, G, A, B> Kind<Kind<ForTuple2, F>, A>.traverse(
   arg1: Applicative<G>,
-  arg2: Function1<A, Kind<G, B>>
+  arg2: Function1<A,
+    Kind<G, B>>
 ): Kind<G, Kind<Kind<ForTuple2, F>, B>> = arrow.core.Tuple2.traverse<F>().run {
   this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G,
     arrow.Kind<arrow.Kind<arrow.core.ForTuple2, F>, B>>
@@ -50,16 +44,9 @@ fun <F, G, A, B> Kind<Kind<ForTuple2, F>, A>.traverse(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence(arg1)",
-  "arrow.core.sequence"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 fun <F, G, A> Kind<Kind<ForTuple2, F>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
-    Kind<Kind<ForTuple2, F>, A>> = arrow.core.Tuple2.traverse<F>().run {
+  Kind<Kind<ForTuple2, F>, A>> = arrow.core.Tuple2.traverse<F>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForTuple2,
     F>, A>>
 }
@@ -74,15 +61,15 @@ fun <F, G, A> Kind<Kind<ForTuple2, F>, Kind<G, A>>.sequence(arg1: Applicative<G>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.a toT arg1(this.b)",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(arg1: Function1<A, B>): Tuple2<F, B> =
-    arrow.core.Tuple2.traverse<F>().run {
-  this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
-}
+  arrow.core.Tuple2.traverse<F>().run {
+    this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -91,14 +78,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(arg1: Function1<A, B>): Tuple2<F, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTraverse(arg1, arg2, arg3)",
-  "arrow.core.flatTraverse"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Applicative & Monad typeclasses is deprecated. Use concrete methods on Pair")
 fun <F, G, A, B> Kind<Kind<ForTuple2, F>, A>.flatTraverse(
   arg1: Monad<Kind<ForTuple2, F>>,
   arg2: Applicative<G>,
@@ -112,5 +92,6 @@ fun <F, G, A, B> Kind<Kind<ForTuple2, F>, A>.flatTraverse(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Traverse typeclasses is deprecated. Use concrete methods on Pair")
 inline fun <F> Companion.traverse(): Tuple2Traverse<F> = traverse_singleton as
-    arrow.core.extensions.Tuple2Traverse<F>
+  arrow.core.extensions.Tuple2Traverse<F>

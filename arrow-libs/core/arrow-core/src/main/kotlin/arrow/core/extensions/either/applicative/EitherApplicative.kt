@@ -83,6 +83,6 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.replicate(arg1: Int, arg2: Monoid<A>): Ei
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Either")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Either")
 inline fun <L> Companion.applicative(): EitherApplicative<L> = applicative_singleton as
   arrow.core.extensions.EitherApplicative<L>

@@ -274,7 +274,7 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.size(arg1: Monoid<Long>): Long =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 fun <L, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForEither, L>, A>.foldMapA(
   arg1: AP,
   arg2: MO,
@@ -290,7 +290,7 @@ fun <L, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForEither, L>, A
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 fun <L, G, A, B, MA : Monad<G>, MO : Monoid<B>> Kind<Kind<ForEither, L>, A>.foldMapM(
   arg1: MA,
   arg2: MO,
@@ -306,7 +306,7 @@ fun <L, G, A, B, MA : Monad<G>, MO : Monoid<B>> Kind<Kind<ForEither, L>, A>.fold
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 fun <L, G, A, B> Kind<Kind<ForEither, L>, A>.foldM(
   arg1: Monad<G>,
   arg2: B,

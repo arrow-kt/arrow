@@ -21,8 +21,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "compareTo(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.compareTo"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1).toInt()",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,8 +50,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.compareTo(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqv(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.eqv"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) == Ordering.EQ",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -79,8 +80,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.eqv(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lt(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.lt"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) == Ordering.LT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -108,8 +110,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.lt(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lte(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.lte"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) != Ordering.GT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -137,8 +140,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.lte(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "gt(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.gt"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) == Ordering.GT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -166,8 +170,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.gt(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "gte(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.gte"
+    "compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) != Ordering.LT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -195,8 +200,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.gte(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "max(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.max"
+    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) == Ordering.GT) this else arg1",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -225,8 +231,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.max(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "min(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.min"
+    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) == Ordering.LT) this else arg1",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -255,8 +262,9 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.min(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "sort(OA, OB, OC, OD, OE, OF, OG, OH, arg1)",
-  "arrow.core.sort"
+    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, arg1) != Ordering.LT) Tuple2(this, b) else Tuple2(arg1, this)",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -279,6 +287,15 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.sort(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Order.tuple8(OA, OB, OC, OD, OE, OF, OG, OH)",
+    "arrow.core.Order",
+    "arrow.core.tuple8"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <A, B, C, D, E, F, G, H> Companion.order(
   OA: Order<A>,

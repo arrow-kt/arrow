@@ -26,14 +26,7 @@ internal val bitraverse_singleton: Tuple2Bitraverse = object :
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bitraverse(arg1, arg2, arg3)",
-  "arrow.core.bitraverse"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 fun <G, A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bitraverse(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, C>>,
@@ -50,14 +43,7 @@ fun <G, A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bitraverse(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bisequence(arg1)",
-  "arrow.core.bisequence"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 fun <G, A, B> Kind<Kind<ForTuple2, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>):
     Kind<G, Kind<Kind<ForTuple2, A>, B>> = arrow.core.Tuple2.bitraverse().run {
   this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
@@ -74,8 +60,8 @@ fun <G, A, B> Kind<Kind<ForTuple2, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: App
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bimap(arg1, arg2)",
-  "arrow.core.bimap"
+    "fl(this.a) toT fr(this.b)",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -88,4 +74,5 @@ fun <A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bimap(arg1: Function1<A, C>, arg2: 
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("BiTraverse typeclasses is deprecated. Use concrete methods on Pair")
 inline fun Companion.bitraverse(): Tuple2Bitraverse = bitraverse_singleton

@@ -41,6 +41,15 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Hash.tuple8(HA, HB, HC, HD, HE, HF, HG, HH)",
+    "arrow.core.Hash",
+    "arrow.core.tuple8"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

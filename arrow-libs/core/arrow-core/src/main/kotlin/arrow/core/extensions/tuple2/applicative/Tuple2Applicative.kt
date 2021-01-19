@@ -23,10 +23,7 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "just(MF)",
-  "arrow.core.just"
-  ),
+  ReplaceWith("Tuple2(MF.empty(), this)", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F, A> A.just(MF: Monoid<F>): Tuple2<F, A> = arrow.core.Tuple2.applicative<F>(MF).run {
@@ -42,15 +39,12 @@ fun <F, A> A.just(MF: Monoid<F>): Tuple2<F, A> = arrow.core.Tuple2.applicative<F
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "unit(MF)",
-  "arrow.core.Tuple2.unit"
-  ),
+  ReplaceWith("Tuple2(MF.empty(), Unit)", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F> unit(MF: Monoid<F>): Tuple2<F, Unit> = arrow.core.Tuple2
-   .applicative<F>(MF)
-   .unit() as arrow.core.Tuple2<F, kotlin.Unit>
+  .applicative<F>(MF)
+  .unit() as arrow.core.Tuple2<F, kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -61,16 +55,13 @@ fun <F> unit(MF: Monoid<F>): Tuple2<F, Unit> = arrow.core.Tuple2
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "map(MF, arg1)",
-  "arrow.core.map"
-  ),
+  ReplaceWith("Tuple2(a, f(b))", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(MF: Monoid<F>, arg1: Function1<A, B>): Tuple2<F, B> =
-    arrow.core.Tuple2.applicative<F>(MF).run {
-  this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
-}
+  arrow.core.Tuple2.applicative<F>(MF).run {
+    this@map.map<A, B>(arg1) as arrow.core.Tuple2<F, B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -81,16 +72,13 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(MF: Monoid<F>, arg1: Function1<A, 
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "replicate(MF, arg1)",
-  "arrow.core.replicate"
-  ),
+  ReplaceWith("Tuple2(a, List(arg1) { b })", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F, A> Kind<Kind<ForTuple2, F>, A>.replicate(MF: Monoid<F>, arg1: Int): Tuple2<F, List<A>> =
-    arrow.core.Tuple2.applicative<F>(MF).run {
-  this@replicate.replicate<A>(arg1) as arrow.core.Tuple2<F, kotlin.collections.List<A>>
-}
+  arrow.core.Tuple2.applicative<F>(MF).run {
+    this@replicate.replicate<A>(arg1) as arrow.core.Tuple2<F, kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -101,10 +89,7 @@ fun <F, A> Kind<Kind<ForTuple2, F>, A>.replicate(MF: Monoid<F>, arg1: Int): Tupl
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "replicate(MF, arg1, arg2)",
-  "arrow.core.replicate"
-  ),
+  ReplaceWith("Tuple2(a, List(arg1) { b }.combineAll(arg2))", "arrow.core.combineAll", "arrow.core.Tuple2"),
   DeprecationLevel.WARNING
 )
 fun <F, A> Kind<Kind<ForTuple2, F>, A>.replicate(
@@ -119,6 +104,8 @@ fun <F, A> Kind<Kind<ForTuple2, F>, A>.replicate(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 inline fun <F> Companion.applicative(MF: Monoid<F>): Tuple2Applicative<F> = object :
-    arrow.core.extensions.Tuple2Applicative<F> { override fun MF(): arrow.typeclasses.Monoid<F> = MF
-    }
+  arrow.core.extensions.Tuple2Applicative<F> {
+  override fun MF(): arrow.typeclasses.Monoid<F> = MF
+}

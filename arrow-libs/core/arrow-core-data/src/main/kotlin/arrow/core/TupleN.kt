@@ -1,184 +1,151 @@
+@file:JvmMultifileClass
+@file:JvmName("TupleNKt")
+
 package arrow.core
 
-import arrow.higherkind
-import arrow.typeclasses.Show
 import java.util.Collections
 import kotlin.collections.LinkedHashMap
 
-@higherkind
-data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
-  fun <C> map(f: (B) -> C) =
-    a toT f(b)
+class ForTuple11 private constructor() { companion object }
+typealias Tuple11Of<A, B, C, D, E, F, G, H, I, J, K> = arrow.Kind11<ForTuple11, A, B, C, D, E, F, G, H, I, J, K>
+typealias Tuple11PartialOf<A, B, C, D, E, F, G, H, I, J> = arrow.Kind10<ForTuple11, A, B, C, D, E, F, G, H, I, J>
 
-  fun <C, D> bimap(fl: (A) -> C, fr: (B) -> D) =
-    fl(a) toT fr(b)
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K> Tuple11Of<A, B, C, D, E, F, G, H, I, J, K>.fix(): Tuple11<A, B, C, D, E, F, G, H, I, J, K> =
+  this as Tuple11<A, B, C, D, E, F, G, H, I, J, K>
 
-  fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
-    map(f.fix().b)
-
-  fun <C> flatMap(f: (B) -> Tuple2Of<@UnsafeVariance A, C>) =
-    f(b).fix()
-
-  fun <C> coflatMap(f: (Tuple2Of<A, B>) -> C) =
-    a toT f(this)
-
-  fun extract() =
-    b
-
-  fun <C> foldL(b: C, f: (C, B) -> C) =
-    f(b, this.b)
-
-  fun <C> foldR(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>) =
-    f(b, lb)
-
-  fun reverse(): Tuple2<B, A> = Tuple2(b, a)
-
-  fun show(SA: Show<A>, SB: Show<B>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C) : Tuple3Of<A, B, C> {
-  fun reverse(): Tuple3<C, B, A> = Tuple3(c, b, a)
-
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple4<out A, out B, out C, out D>(val a: A, val b: B, val c: C, val d: D) : Tuple4Of<A, B, C, D> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple5<out A, out B, out C, out D, out E>(val a: A, val b: B, val c: C, val d: D, val e: E) : Tuple5Of<A, B, C, D, E> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple6<out A, out B, out C, out D, out E, out F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F) : Tuple6Of<A, B, C, D, E, F> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G) : Tuple7Of<A, B, C, D, E, F, G> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H) : Tuple8Of<A, B, C, D, E, F, G, H> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I) : Tuple9Of<A, B, C, D, E, F, G, H, I> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>, SI: Show<I>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }, SI.run { i.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
-data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J) : Tuple10Of<A, B, C, D, E, F, G, H, I, J> {
-  fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>, SI: Show<I>, SJ: Show<J>): String =
-    "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }, SI.run { i.show() }, SJ.run { j.show() }).joinToString(", ") + ")"
-
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
-
-  companion object
-}
-
-@higherkind
 data class Tuple11<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K) : Tuple11Of<A, B, C, D, E, F, G, H, I, J, K> {
   companion object
 }
 
-@higherkind
+class ForTuple12 private constructor() { companion object }
+typealias Tuple12Of<A, B, C, D, E, F, G, H, I, J, K, L> = arrow.Kind12<ForTuple12, A, B, C, D, E, F, G, H, I, J, K, L>
+typealias Tuple12PartialOf<A, B, C, D, E, F, G, H, I, J, K> = arrow.Kind11<ForTuple12, A, B, C, D, E, F, G, H, I, J, K>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Tuple12Of<A, B, C, D, E, F, G, H, I, J, K, L>.fix(): Tuple12<A, B, C, D, E, F, G, H, I, J, K, L> =
+  this as Tuple12<A, B, C, D, E, F, G, H, I, J, K, L>
+
 data class Tuple12<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L) : Tuple12Of<A, B, C, D, E, F, G, H, I, J, K, L> {
   companion object
 }
 
-@higherkind
+class ForTuple13 private constructor() { companion object }
+typealias Tuple13Of<A, B, C, D, E, F, G, H, I, J, K, L, M> = arrow.Kind13<ForTuple13, A, B, C, D, E, F, G, H, I, J, K, L, M>
+typealias Tuple13PartialOf<A, B, C, D, E, F, G, H, I, J, K, L> = arrow.Kind12<ForTuple13, A, B, C, D, E, F, G, H, I, J, K, L>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M> Tuple13Of<A, B, C, D, E, F, G, H, I, J, K, L, M>.fix(): Tuple13<A, B, C, D, E, F, G, H, I, J, K, L, M> =
+  this as Tuple13<A, B, C, D, E, F, G, H, I, J, K, L, M>
+
 data class Tuple13<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M) : Tuple13Of<A, B, C, D, E, F, G, H, I, J, K, L, M> {
   companion object
 }
 
-@higherkind
+class ForTuple14 private constructor() { companion object }
+typealias Tuple14Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N> = arrow.Kind14<ForTuple14, A, B, C, D, E, F, G, H, I, J, K, L, M, N>
+typealias Tuple14PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M> = arrow.Kind13<ForTuple14, A, B, C, D, E, F, G, H, I, J, K, L, M>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N> Tuple14Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N>.fix(): Tuple14<A, B, C, D, E, F, G, H, I, J, K, L, M, N> =
+  this as Tuple14<A, B, C, D, E, F, G, H, I, J, K, L, M, N>
+
 data class Tuple14<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N) : Tuple14Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N> {
   companion object
 }
 
-@higherkind
+class ForTuple15 private constructor() { companion object }
+typealias Tuple15Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> = arrow.Kind15<ForTuple15, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
+typealias Tuple15PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N> = arrow.Kind14<ForTuple15, A, B, C, D, E, F, G, H, I, J, K, L, M, N>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> Tuple15Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>.fix(): Tuple15<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> =
+  this as Tuple15<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
+
 data class Tuple15<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O) : Tuple15Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> {
   companion object
 }
 
-@higherkind
+class ForTuple16 private constructor() { companion object }
+typealias Tuple16Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> = arrow.Kind16<ForTuple16, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
+typealias Tuple16PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> = arrow.Kind15<ForTuple16, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> Tuple16Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>.fix(): Tuple16<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> =
+  this as Tuple16<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
+
 data class Tuple16<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P) : Tuple16Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> {
   companion object
 }
 
-@higherkind
+class ForTuple17 private constructor() { companion object }
+typealias Tuple17Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> = arrow.Kind17<ForTuple17, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+typealias Tuple17PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> = arrow.Kind16<ForTuple17, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> Tuple17Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>.fix(): Tuple17<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> =
+  this as Tuple17<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+
 data class Tuple17<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q) : Tuple17Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> {
   companion object
 }
 
-@higherkind
+class ForTuple18 private constructor() { companion object }
+typealias Tuple18Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> = arrow.Kind18<ForTuple18, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+typealias Tuple18PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> = arrow.Kind17<ForTuple18, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> Tuple18Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>.fix(): Tuple18<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> =
+  this as Tuple18<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+
 data class Tuple18<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q, out R>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q, val r: R) : Tuple18Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> {
   companion object
 }
 
-@higherkind
+class ForTuple19 private constructor() { companion object }
+typealias Tuple19Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> = arrow.Kind19<ForTuple19, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
+typealias Tuple19PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> = arrow.Kind18<ForTuple19, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> Tuple19Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>.fix(): Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> =
+  this as Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
+
 data class Tuple19<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q, out R, out S>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q, val r: R, val s: S) : Tuple19Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> {
   companion object
 }
 
-@higherkind
+class ForTuple20 private constructor() { companion object }
+typealias Tuple20Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> = arrow.Kind20<ForTuple20, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
+typealias Tuple20PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> = arrow.Kind19<ForTuple20, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> Tuple20Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>.fix(): Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> =
+  this as Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
+
 data class Tuple20<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q, out R, out S, out T>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q, val r: R, val s: S, val t: T) : Tuple20Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> {
   companion object
 }
 
-@higherkind
+class ForTuple21 private constructor() { companion object }
+typealias Tuple21Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> = arrow.Kind21<ForTuple21, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
+typealias Tuple21PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> = arrow.Kind20<ForTuple21, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> Tuple21Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>.fix(): Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> =
+  this as Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
+
 data class Tuple21<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q, out R, out S, out T, out U>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q, val r: R, val s: S, val t: T, val u: U) : Tuple21Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> {
   companion object
 }
 
-@higherkind
+class ForTuple22 private constructor() { companion object }
+typealias Tuple22Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> = arrow.Kind22<ForTuple22, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>
+typealias Tuple22PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> = arrow.Kind21<ForTuple22, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> Tuple22Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>.fix(): Tuple22<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> =
+  this as Tuple22<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>
+
 data class Tuple22<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J, out K, out L, out M, out N, out O, out P, out Q, out R, out S, out T, out U, out V>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J, val k: K, val l: L, val m: M, val n: N, val o: O, val p: P, val q: Q, val r: R, val s: S, val t: T, val u: U, val v: V) : Tuple22Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> {
   companion object
 }

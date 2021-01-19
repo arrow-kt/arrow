@@ -385,9 +385,6 @@ private class MapHash<K, A>(
     hashWithSalt(HK, HA, salt)
 }
 
-fun <A, B> Pair<A, B>.show(SA: Show<A>, SB: Show<B>): String =
-  "(" + listOf(SA.run { first.show() }, SB.run { second.show() }).joinToString(", ") + ")"
-
 fun <K, A> Map<K, A>.show(SK: Show<K>, SA: Show<A>): String =
   "Map(${toList().k().show(Show { show(SK, SA) })})"
 

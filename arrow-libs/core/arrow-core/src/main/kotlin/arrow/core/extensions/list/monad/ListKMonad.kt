@@ -277,5 +277,5 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("Monad typeclasses are deprecated. Use concrete methods on List")
+  @Deprecated("Monad typeclasses is deprecated. Use concrete methods on List")
   inline fun monad(): ListKMonad = monad_singleton}

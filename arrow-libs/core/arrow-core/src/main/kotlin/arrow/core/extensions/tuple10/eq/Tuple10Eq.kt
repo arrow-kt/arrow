@@ -45,6 +45,15 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Eq.tuple10(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH, EQI, EQJ, arg1)",
+    "arrow.core.Eq",
+    "arrow.core.tuple10"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J> Companion.eq(
   EQA: Eq<A>,
   EQB: Eq<B>,

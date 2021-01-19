@@ -43,6 +43,15 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Eq.tuple8(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH)",
+    "arrow.core.Eq",
+    "arrow.core.tuple8"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H> Companion.eq(
   EQA: Eq<A>,
   EQB: Eq<B>,

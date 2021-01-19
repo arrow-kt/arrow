@@ -19,10 +19,10 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "compareTo(OA, OB, OC, arg1)",
-  "arrow.core.compareTo"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1).toInt()",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
@@ -43,10 +43,11 @@ fun <A, B, C> Tuple3<A, B, C>.compareTo(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "eqv(OA, OB, OC, arg1)",
-  "arrow.core.eqv"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) == Ordering.LT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -67,10 +68,11 @@ fun <A, B, C> Tuple3<A, B, C>.eqv(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "lt(OA, OB, OC, arg1)",
-  "arrow.core.lt"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) == Ordering.LT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -91,10 +93,11 @@ fun <A, B, C> Tuple3<A, B, C>.lt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "lte(OA, OB, OC, arg1)",
-  "arrow.core.lte"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) != Ordering.GT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -115,10 +118,11 @@ fun <A, B, C> Tuple3<A, B, C>.lte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "gt(OA, OB, OC, arg1)",
-  "arrow.core.gt"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) == Ordering.GT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -139,10 +143,11 @@ fun <A, B, C> Tuple3<A, B, C>.gt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "gte(OA, OB, OC, arg1)",
-  "arrow.core.gte"
+    "Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) != Ordering.LT",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -163,10 +168,11 @@ fun <A, B, C> Tuple3<A, B, C>.gte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "max(OA, OB, OC, arg1)",
-  "arrow.core.max"
+    "if(Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) == Ordering.GT) this else arg1",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -187,10 +193,11 @@ fun <A, B, C> Tuple3<A, B, C>.max(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "min(OA, OB, OC, arg1)",
-  "arrow.core.min"
+    "if(Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) == Ordering.LT) this else arg1",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -211,10 +218,11 @@ fun <A, B, C> Tuple3<A, B, C>.min(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
   ReplaceWith(
-  "sort(OA, OB, OC, arg1)",
-  "arrow.core.sort"
+    "if(Triple(this.a, this.b, this.c).compare(OA, OB, OC, arg1) != Ordering.LT) Tuple2(this, b) else Tuple2(arg1, this)",
+    "arrow.core.compare",
+    "arrow.core.Ordering"
   ),
   DeprecationLevel.WARNING
 )
@@ -230,6 +238,15 @@ fun <A, B, C> Tuple3<A, B, C>.sort(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Use Triple functionality.",
+  ReplaceWith(
+    "Order.triple(OA, OB, OC)",
+    "arrow.core.Order",
+    "arrow.core.triple"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <A, B, C> Companion.order(
   OA: Order<A>,

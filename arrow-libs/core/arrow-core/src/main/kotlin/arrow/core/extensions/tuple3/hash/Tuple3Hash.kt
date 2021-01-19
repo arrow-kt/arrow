@@ -36,6 +36,15 @@ fun <A, B, C> Tuple3<A, B, C>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple. ReplaceWith Triple and use Triple instance of Hash",
+  ReplaceWith(
+    "Hash.triple(HA, HB, HC)",
+    "arrow.core.Hash",
+    "arrow.core.triple"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A, B, C> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

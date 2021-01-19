@@ -233,7 +233,7 @@ fun <A> List<A>.isNotEmpty(): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on List")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on List")
 fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> List<A>.foldMapA(
   arg1: AP,
   arg2: MO,
@@ -249,7 +249,7 @@ fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> List<A>.foldMapA(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on List")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on List")
 fun <G, A, B, MA : Monad<G>, MO : Monoid<B>> List<A>.foldMapM(
   arg1: MA,
   arg2: MO,
@@ -265,7 +265,7 @@ fun <G, A, B, MA : Monad<G>, MO : Monoid<B>> List<A>.foldMapM(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on List")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on List")
 fun <G, A, B> List<A>.foldM(
   arg1: Monad<G>,
   arg2: B,

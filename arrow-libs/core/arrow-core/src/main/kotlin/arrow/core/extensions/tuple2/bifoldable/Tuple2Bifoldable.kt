@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val bifoldable_singleton: Tuple2Bifoldable = object :
-    arrow.core.extensions.Tuple2Bifoldable {}
+  arrow.core.extensions.Tuple2Bifoldable {}
 
 @JvmName("bifoldLeft")
 @Suppress(
@@ -30,8 +30,7 @@ internal val bifoldable_singleton: Tuple2Bifoldable = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldLeft(arg1, arg2, arg3)",
-  "arrow.core.bifoldLeft"
+    "arg3(arg2(arg1, this.a), this.b)"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +52,8 @@ fun <A, B, C> Kind<Kind<ForTuple2, A>, B>.bifoldLeft(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldRight(arg1, arg2, arg3)",
-  "arrow.core.bifoldRight"
+    "arg2(this.a, arg3(this.b, arg1))",
+    "arrow.core.bifoldRight"
   ),
   DeprecationLevel.WARNING
 )
@@ -76,8 +75,8 @@ fun <A, B, C> Kind<Kind<ForTuple2, A>, B>.bifoldRight(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldMap(arg1, arg2, arg3)",
-  "arrow.core.bifoldMap"
+    "arg1.empty().combine(f(this.a)).combine(g(this.b))",
+    "arrow.core.bifoldMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -93,4 +92,5 @@ fun <A, B, C> Kind<Kind<ForTuple2, A>, B>.bifoldMap(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("BiFoldable typeclasses is deprecated. Use concrete methods on Pair")
 inline fun Companion.bifoldable(): Tuple2Bifoldable = bifoldable_singleton

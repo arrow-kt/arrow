@@ -51,8 +51,8 @@ internal val functor_singleton: Tuple2Functor<Any?> = object : Tuple2Functor<Any
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "this.a toT arg1(this.b)",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -71,8 +71,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.map(arg1: Function1<A, B>): Tuple2<F, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "this.a toT arg1(this.b)",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -137,8 +137,8 @@ fun <F, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForTuple2, F>, A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+  "this.a toT Unit",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -181,8 +181,8 @@ fun <F, A> Kind<Kind<ForTuple2, F>, A>.void(): Tuple2<F, Unit> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+  "this.copy(b= this.b toT arg1(this.b))",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -224,8 +224,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.fproduct(arg1: Function1<A, B>): Tuple
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "this.a toT arg1",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -247,8 +247,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.mapConst(arg1: B): Tuple2<F, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "arg1.a toT this",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -290,8 +290,8 @@ fun <F, A, B> A.mapConst(arg1: Kind<Kind<ForTuple2, F>, B>): Tuple2<F, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+  "this.copy(b= arg2 toT this.b)",
+  "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -333,8 +333,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.tupleLeft(arg1: B): Tuple2<F, Tuple2<B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+    "this.copy(b= this.b toT arg1)",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -377,10 +377,7 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.tupleRight(arg1: B): Tuple2<F, Tuple2<
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
 fun <F, B, A : B> Kind<Kind<ForTuple2, F>, A>.widen(): Tuple2<F, B> =
@@ -392,5 +389,6 @@ fun <F, B, A : B> Kind<Kind<ForTuple2, F>, A>.widen(): Tuple2<F, B> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Foldable typeclasses is deprecated. Use concrete methods on Pair")
 inline fun <F> Companion.functor(): Tuple2Functor<F> = functor_singleton as
     arrow.core.extensions.Tuple2Functor<F>

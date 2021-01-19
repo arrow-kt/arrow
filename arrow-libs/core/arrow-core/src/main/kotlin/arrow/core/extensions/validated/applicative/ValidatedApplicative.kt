@@ -79,7 +79,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.replicate(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 inline fun <E> Companion.applicative(SE: Semigroup<E>): ValidatedApplicative<E> = object :
     arrow.core.extensions.ValidatedApplicative<E> { override fun SE():
     arrow.typeclasses.Semigroup<E> = SE }

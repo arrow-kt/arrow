@@ -183,6 +183,6 @@ interface ValidatedOrder<L, R> : Order<Validated<L, R>> {
   })
 }
 
-@Deprecated("Applicative typeclasses is deprecated. Use concrete methods on Validated")
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 fun <E> Validated.Companion.applicativeNel(): ValidatedApplicative<NonEmptyList<E>> =
   Validated.applicative(NonEmptyList.semigroup())
