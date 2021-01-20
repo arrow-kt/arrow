@@ -33,8 +33,8 @@ internal val monad_singleton: NonEmptyListMonad = object : arrow.core.extensions
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatMap(arg1)",
-  "arrow.core.flatMap"
+  "fix().flatMap<B>(arg1)",
+    "arrow.core.fix", "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +53,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.flatMap(arg1: Function1<A, Kind<ForNonEmptyL
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tailRecM(arg0, arg1)",
-  "arrow.core.NonEmptyList.tailRecM"
+  "NonEmptyList.tailRecM(arg0) { arg1(it) }",
+  "arrow.core.NonEmptyList"
   ),
   DeprecationLevel.WARNING
 )
@@ -73,8 +73,8 @@ fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForNonEmptyList, Either<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "fix().map<B>(arg1)",
+    "arrow.core.fix", "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
@@ -96,8 +96,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ap(arg1)",
-  "arrow.core.ap"
+    "fix().ap<B>(arg1)",
+    "arrow.core.fix", "arrow.core.ap"
   ),
   DeprecationLevel.WARNING
 )
@@ -116,8 +116,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.ap(arg1: Kind<ForNonEmptyList, Function1<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatten()",
-  "arrow.core.flatten"
+  "fix<Kind<ForNonEmptyList, A>>().map<NonEmptyList<A>> { it.fix() }.flatten<A>()",
+  "arrow.core.fix", "arrow.core.flatten"
   ),
   DeprecationLevel.WARNING
 )
@@ -136,8 +136,8 @@ fun <A> Kind<ForNonEmptyList, Kind<ForNonEmptyList, A>>.flatten(): NonEmptyList<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedBy(arg1)",
-  "arrow.core.followedBy"
+  "fix().flatMap { arg1 }",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -156,8 +156,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.followedBy(arg1: Kind<ForNonEmptyList, B>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "apTap(arg1)",
-  "arrow.core.apTap"
+    "fix().flatMap { a -> arg1.fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -176,8 +176,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.apTap(arg1: Kind<ForNonEmptyList, B>): NonEm
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedByEval(arg1)",
-  "arrow.core.followedByEval"
+    "fix().flatMap { arg1.value() }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -196,8 +196,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.followedByEval(arg1: Eval<Kind<ForNonEmptyLi
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "effectM(arg1)",
-  "arrow.core.effectM"
+    "fix().flatMap { a -> arg1(a).fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -216,8 +216,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.effectM(arg1: Function1<A, Kind<ForNonEmptyL
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatTap(arg1)",
-  "arrow.core.flatTap"
+    "fix().flatMap { a -> arg1(a).fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -236,8 +236,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.flatTap(arg1: Function1<A, Kind<ForNonEmptyL
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productL(arg1)",
-  "arrow.core.productL"
+    "fix().flatMap { a -> arg1.fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -256,8 +256,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.productL(arg1: Kind<ForNonEmptyList, B>): No
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffect(arg1)",
-  "arrow.core.forEffect"
+    "fix().flatMap { a -> arg1.fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -276,8 +276,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.forEffect(arg1: Kind<ForNonEmptyList, B>): N
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productLEval(arg1)",
-  "arrow.core.productLEval"
+    "fix().flatMap { a -> arg1.value().fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -296,8 +296,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.productLEval(arg1: Eval<Kind<ForNonEmptyList
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffectEval(arg1)",
-  "arrow.core.forEffectEval"
+    "fix().flatMap { a -> arg1.value().fix().map { a } }",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -316,8 +316,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.forEffectEval(arg1: Eval<Kind<ForNonEmptyLis
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mproduct(arg1)",
-  "arrow.core.mproduct"
+    "fix().flatMap<Tuple2<A, B>> { a -> arg1(a).fix<B>().map<Tuple2<A, B>> { Tuple2<A, B>(a, it) } }",
+    "arrow.core.Tuple2", "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -336,8 +336,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.mproduct(arg1: Function1<A, Kind<ForNonEmpty
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifM(arg1, arg2)",
-  "arrow.core.ifM"
+  "fix().ifM<B>(arg1.fix(), arg2.fix())",
+  "arrow.core.fix", "arrow.core.ifM"
   ),
   DeprecationLevel.WARNING
 )
@@ -359,8 +359,8 @@ fun <B> Kind<ForNonEmptyList, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "selectM(arg1)",
-  "arrow.core.selectM"
+    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
+    "arrow.core.fix", "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
 )
@@ -380,8 +380,8 @@ fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "select(arg1)",
-  "arrow.core.select"
+    "fix<Either<A, B>>().selectM<A, B>(arg1.fix<(A) -> B>())",
+    "arrow.core.fix", "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
 )
@@ -405,4 +405,5 @@ fun <A, B> Kind<ForNonEmptyList, Either<A, B>>.select(arg1: Kind<ForNonEmptyList
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Monad typeclass is deprecated. Use concrete methods on NonEmptyList")
 inline fun Companion.monad(): NonEmptyListMonad = monad_singleton

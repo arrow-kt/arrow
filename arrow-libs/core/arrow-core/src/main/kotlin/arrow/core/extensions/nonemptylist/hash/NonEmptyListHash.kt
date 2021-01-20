@@ -4,10 +4,6 @@ import arrow.core.NonEmptyList
 import arrow.core.NonEmptyList.Companion
 import arrow.core.extensions.NonEmptyListHash
 import arrow.typeclasses.Hash
-import kotlin.Deprecated
-import kotlin.Int
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("hash")
 @Suppress(
@@ -19,8 +15,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "hash(HA)",
-  "arrow.core.hash"
+    "hash(HA)",
+    "arrow.core.hash"
   ),
   DeprecationLevel.WARNING
 )
@@ -31,6 +27,14 @@ fun <A> NonEmptyList<A>.hash(HA: Hash<A>): Int = arrow.core.NonEmptyList.hash<A>
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Hash.nonEmptyList(HA)",
+    "arrow.core.nonEmptyList", "arrow.typeclasses.Hash"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <A> Companion.hash(HA: Hash<A>): NonEmptyListHash<A> = object :
     arrow.core.extensions.NonEmptyListHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

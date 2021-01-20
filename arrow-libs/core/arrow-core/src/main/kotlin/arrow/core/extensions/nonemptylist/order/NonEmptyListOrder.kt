@@ -195,6 +195,14 @@ fun <A> NonEmptyList<A>.sort(OA: Order<A>, arg1: NonEmptyList<A>): Tuple2<NonEmp
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension projected functions are deprecated",
+  ReplaceWith(
+    "Order.nonEmptyList(OA)",
+    "arrow.core.nonEmptyList", "arrow.core.Order"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A> Companion.order(OA: Order<A>): NonEmptyListOrder<A> = object :
     arrow.core.extensions.NonEmptyListOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA
     }

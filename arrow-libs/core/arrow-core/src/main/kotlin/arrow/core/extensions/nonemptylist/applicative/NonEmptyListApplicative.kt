@@ -32,8 +32,8 @@ internal val applicative_singleton: NonEmptyListApplicative = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just()",
-  "arrow.core.just"
+    "NonEmptyList.just(this)",
+    "arrow.core.NonEmptyList", "arrow.core.just"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,8 +51,8 @@ fun <A> A.just(): NonEmptyList<A> = arrow.core.NonEmptyList.applicative().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit()",
-  "arrow.core.NonEmptyList.unit"
+    "NonEmptyList.just(Unit)",
+    "arrow.core.NonEmptyList", "arrow.core.just"
   ),
   DeprecationLevel.WARNING
 )
@@ -69,9 +69,8 @@ fun unit(): NonEmptyList<Unit> = arrow.core.NonEmptyList
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  ReplaceWith("fix().map<B>(arg1)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,8 +89,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)",
-  "arrow.core.replicate"
+    "fix().replicate<A>(arg1)",
+    "arrow.core.fix", "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -110,10 +109,9 @@ fun <A> Kind<ForNonEmptyList, A>.replicate(arg1: Int): NonEmptyList<List<A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)",
-  "arrow.core.replicate"
-  ),
-  DeprecationLevel.WARNING
+    "fix().replicate<A>(arg1, arg2)",
+    "arrow.core.fix", "arrow.core.replicate"
+  )
 )
 fun <A> Kind<ForNonEmptyList, A>.replicate(arg1: Int, arg2: Monoid<A>): NonEmptyList<A> =
     arrow.core.NonEmptyList.applicative().run {
@@ -124,4 +122,7 @@ fun <A> Kind<ForNonEmptyList, A>.replicate(arg1: Int, arg2: Monoid<A>): NonEmpty
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Applicative typeclass is deprecated. Use concrete methods on NonEmptyList",
+  level = DeprecationLevel.WARNING)
 inline fun Companion.applicative(): NonEmptyListApplicative = applicative_singleton

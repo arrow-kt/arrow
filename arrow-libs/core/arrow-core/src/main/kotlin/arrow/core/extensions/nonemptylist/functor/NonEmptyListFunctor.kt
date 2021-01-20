@@ -6,12 +6,6 @@ import arrow.core.NonEmptyList
 import arrow.core.NonEmptyList.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.NonEmptyListFunctor
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -51,8 +45,8 @@ internal val functor_singleton: NonEmptyListFunctor = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "fix().map<B>(arg1)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -71,8 +65,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "fix().map<B>(arg1)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -114,8 +108,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.imap(arg1: Function1<A, B>, arg2: Function1<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0)",
-  "arrow.core.NonEmptyList.lift"
+    "{ nel: NonEmptyList<Int> -> nel.map { arg0 }}",
+    "arrow.core.NonEmptyList"
   ),
   DeprecationLevel.WARNING
 )
@@ -135,8 +129,8 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForNonEmptyList, A>, Kind
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+    "fix().void<A>()",
+    "arrow.core.fix", "arrow.core.void"
   ),
   DeprecationLevel.WARNING
 )
@@ -155,8 +149,8 @@ fun <A> Kind<ForNonEmptyList, A>.void(): NonEmptyList<Unit> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+    "fix().fproduct<A, B>(arg1)",
+    "arrow.core.fix", "arrow.core.fproduct"
   ),
   DeprecationLevel.WARNING
 )
@@ -175,8 +169,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.fproduct(arg1: Function1<A, B>): NonEmptyLis
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "fix().mapConst<A, B>(arg1)",
+    "arrow.core.fix", "arrow.core.mapConst"
   ),
   DeprecationLevel.WARNING
 )
@@ -198,8 +192,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.mapConst(arg1: B): NonEmptyList<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "arg1.fix().mapConst<B, A>(this)",
+    "arrow.core.fix", "arrow.core.mapConst"
   ),
   DeprecationLevel.WARNING
 )
@@ -218,8 +212,8 @@ fun <A, B> A.mapConst(arg1: Kind<ForNonEmptyList, B>): NonEmptyList<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+    "fix().tupleLeft<A, B>(arg1)",
+    "arrow.core.fix", "arrow.core.tupleLeft"
   ),
   DeprecationLevel.WARNING
 )
@@ -238,8 +232,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.tupleLeft(arg1: B): NonEmptyList<Tuple2<B, A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+    "fix().tupleRight<A, B>(arg1)",
+    "arrow.core.fix", "arrow.core.tupleRight"
   ),
   DeprecationLevel.WARNING
 )
@@ -258,8 +252,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.tupleRight(arg1: B): NonEmptyList<Tuple2<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
+    "fix().widen<B, A>()",
+    "arrow.core.fix", "arrow.core.widen"
   ),
   DeprecationLevel.WARNING
 )
@@ -272,4 +266,5 @@ fun <B, A : B> Kind<ForNonEmptyList, A>.widen(): NonEmptyList<B> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-inline fun Companion.functor(): NonEmptyListFunctor = functor_singleton
+@Deprecated("Functor typeclass is deprecated. Use concrete methods on NonEmptyList")
+inline fun Companion.functor(): NonEmptyListFunctor = functor_singleton as arrow.core.extensions.NonEmptyListFunctor

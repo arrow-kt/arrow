@@ -33,8 +33,8 @@ internal val semialign_singleton: NonEmptyListSemialign = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "align(arg0, arg1)",
-  "arrow.core.NonEmptyList.align"
+  "arg0.fix().align(arg1.fix())",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +53,8 @@ fun <A, B> align(arg0: Kind<ForNonEmptyList, A>, arg1: Kind<ForNonEmptyList, B>)
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "alignWith(arg0, arg1, arg2)",
-  "arrow.core.NonEmptyList.alignWith"
+    "arg0.fix().align(arg1.fix()).map(arg2)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -76,8 +76,8 @@ fun <A, B, C> alignWith(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "salign(arg1, arg2)",
-  "arrow.core.salign"
+  "fix().salign(arg1, arg2.fix())",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -96,8 +96,8 @@ fun <A> Kind<ForNonEmptyList, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForNonEmp
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZip(arg1)",
-  "arrow.core.padZip"
+  "fix().padZip(arg1.fix())",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -117,8 +117,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.padZip(arg1: Kind<ForNonEmptyList, B>):
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZipWith(arg1, arg2)",
-  "arrow.core.padZipWith"
+    "fix().padZip(arg1.fix()).map(arg2)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -134,4 +134,5 @@ fun <A, B, C> Kind<ForNonEmptyList, A>.padZipWith(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Semialign typeclass is deprecated. Use concrete methods on NonEmptyList")
 inline fun Companion.semialign(): NonEmptyListSemialign = semialign_singleton

@@ -28,8 +28,8 @@ internal val zip_singleton: NonEmptyListZip = object : arrow.core.extensions.Non
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zip(arg1)",
-  "arrow.core.zip"
+  "fix().zip<B>(arg1.fix())",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +48,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.zip(arg1: Kind<ForNonEmptyList, B>): NonEmpt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zipWith(arg1, arg2)",
-  "arrow.core.zipWith"
+  "fix().zip<B>(arg1.fix(), arg2)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -64,4 +64,5 @@ fun <A, B, C> Kind<ForNonEmptyList, A>.zipWith(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Zip typeclass is deprecated. Use concrete methods on NonEmptyList")
 inline fun Companion.zip(): NonEmptyListZip = zip_singleton

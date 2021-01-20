@@ -28,8 +28,8 @@ internal val unzip_singleton: NonEmptyListUnzip = object : arrow.core.extensions
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzip()",
-  "arrow.core.unzip"
+  "fix<Tuple2<A, B>>().unzip<A, B>()",
+    "arrow.core.Tuple2", "arrow.core.fix", "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,8 +49,8 @@ fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyL
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzipWith(arg1)",
-  "arrow.core.unzipWith"
+    "fix<C>().unzipWith<A, B, C>(arg1)",
+    "arrow.core.fix", "arrow.core.unzipWith"
   ),
   DeprecationLevel.WARNING
 )
@@ -66,4 +66,7 @@ fun <A, B, C> Kind<ForNonEmptyList, C>.unzipWith(arg1: Function1<C, Tuple2<A, B>
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Unzip typeclass is deprecated. Use concrete methods on NonEmptyList",
+  level = DeprecationLevel.WARNING)
 inline fun Companion.unzip(): NonEmptyListUnzip = unzip_singleton

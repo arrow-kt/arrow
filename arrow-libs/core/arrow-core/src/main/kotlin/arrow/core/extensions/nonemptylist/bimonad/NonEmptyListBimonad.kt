@@ -16,4 +16,7 @@ internal val bimonad_singleton: NonEmptyListBimonad = object :
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Bimonad typeclass is deprecated. Use concrete methods on NonEmptyList",
+  level = DeprecationLevel.WARNING)
 inline fun Companion.bimonad(): NonEmptyListBimonad = bimonad_singleton

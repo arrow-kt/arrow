@@ -5,11 +5,6 @@ import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyList.Companion
 import arrow.core.extensions.NonEmptyListComonad
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,8 +23,8 @@ internal val comonad_singleton: NonEmptyListComonad = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "coflatMap(arg1)",
-  "arrow.core.coflatMap"
+  "fix().coflatMap(arg1)",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +43,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(arg1: Function1<Kind<ForNonEmptyLi
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "extract()",
-  "arrow.core.extract"
+  "fix().extract()",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -67,8 +62,8 @@ fun <A> Kind<ForNonEmptyList, A>.extract(): A = arrow.core.NonEmptyList.comonad(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "duplicate()",
-  "arrow.core.duplicate"
+  "fix().coflatMap<NonEmptyListOf<A>>(::identity)",
+  "arrow.core.fix", "arrow.core.identity"
   ),
   DeprecationLevel.WARNING
 )
@@ -81,4 +76,7 @@ fun <A> Kind<ForNonEmptyList, A>.duplicate(): NonEmptyList<NonEmptyList<A>> =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Comonad typeclass is deprecated. Use concrete methods on NonEmptyList",
+  level = DeprecationLevel.WARNING)
 inline fun Companion.comonad(): NonEmptyListComonad = comonad_singleton

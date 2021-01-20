@@ -28,12 +28,8 @@ internal val traverse_singleton: NonEmptyListTraverse = object :
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse(arg1, arg2)",
-  "arrow.core.traverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated, Replace with traverseEither or traverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(
   arg1: Applicative<G>,
@@ -51,12 +47,8 @@ fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence(arg1)",
-  "arrow.core.sequence"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
     Kind<ForNonEmptyList, A>> = arrow.core.NonEmptyList.traverse().run {
@@ -73,8 +65,8 @@ fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence(arg1: Applicative<G>): Kin
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "fix().map(arg1)",
+  "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -91,12 +83,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> 
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTraverse(arg1, arg2, arg3)",
-  "arrow.core.flatTraverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForNonEmptyList, A>.flatTraverse(
   arg1: Monad<ForNonEmptyList>,
@@ -111,4 +99,5 @@ fun <G, A, B> Kind<ForNonEmptyList, A>.flatTraverse(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Traverse typeclass is deprecated. Use concrete methods on NonEmptyList")
 inline fun Companion.traverse(): NonEmptyListTraverse = traverse_singleton
