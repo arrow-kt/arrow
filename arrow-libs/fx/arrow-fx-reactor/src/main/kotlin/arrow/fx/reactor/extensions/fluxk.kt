@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.extension
 import arrow.fx.Timer
+import arrow.fx.reactor.DeprecateReactor
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
 import arrow.fx.reactor.ForFluxK
@@ -42,12 +43,14 @@ import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as fluxHandleErrorWith
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKFunctor : Functor<ForFluxK> {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKApplicative : Applicative<ForFluxK> {
   override fun <A> just(a: A): FluxK<A> =
     FluxK.just(a)
@@ -63,6 +66,7 @@ interface FluxKApplicative : Applicative<ForFluxK> {
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
   override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
     fix().ap(ff)
@@ -81,6 +85,7 @@ interface FluxKMonad : Monad<ForFluxK>, FluxKApplicative {
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKFoldable : Foldable<ForFluxK> {
   override fun <A, B> FluxKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -90,6 +95,7 @@ interface FluxKFoldable : Foldable<ForFluxK> {
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKTraverse : Traverse<ForFluxK> {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
@@ -105,6 +111,7 @@ interface FluxKTraverse : Traverse<ForFluxK> {
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKApplicativeError :
   ApplicativeError<ForFluxK, Throwable>,
   FluxKApplicative {
@@ -116,6 +123,7 @@ interface FluxKApplicativeError :
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKMonadError :
   MonadError<ForFluxK, Throwable>,
   FluxKMonad {
@@ -127,15 +135,18 @@ interface FluxKMonadError :
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKMonadThrow : MonadThrow<ForFluxK>, FluxKMonadError
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKBracket : Bracket<ForFluxK, Throwable>, FluxKMonadThrow {
   override fun <A, B> FluxKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>, use: (A) -> FluxKOf<B>): FluxK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKMonadDefer :
   MonadDefer<ForFluxK>,
   FluxKBracket {
@@ -144,6 +155,7 @@ interface FluxKMonadDefer :
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKAsync :
   Async<ForFluxK>,
   FluxKMonadDefer {
@@ -158,6 +170,7 @@ interface FluxKAsync :
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKEffect :
   Effect<ForFluxK>,
   FluxKAsync {
@@ -166,6 +179,7 @@ interface FluxKEffect :
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKConcurrentEffect :
   ConcurrentEffect<ForFluxK>,
   FluxKEffect {
@@ -173,35 +187,43 @@ interface FluxKConcurrentEffect :
     fix().runAsyncCancellable(cb)
 }
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadFlat(): FluxKMonad = monad()
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadConcat(): FluxKMonad = object : FluxKMonad {
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().concatMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadSwitch(): FluxKMonad = object : FluxKMonadError {
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadErrorFlat(): FluxKMonadError = monadError()
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadErrorConcat(): FluxKMonadError = object : FluxKMonadError {
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().concatMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateReactor)
 fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadError {
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
 }
 
 // TODO FluxK does not yet have a Concurrent instance
+@Deprecated(DeprecateReactor)
 fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
   FluxK.async().fx.async(c).fix()
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKTimer : Timer<ForFluxK> {
   override fun sleep(duration: Duration): FluxK<Unit> =
     FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
@@ -209,12 +231,14 @@ interface FluxKTimer : Timer<ForFluxK> {
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKFunctorFilter : FunctorFilter<ForFluxK>, FluxKFunctor {
   override fun <A, B> Kind<ForFluxK, A>.filterMap(f: (A) -> Option<B>): FluxK<B> =
     fix().filterMap(f)
 }
 
 @extension
+@Deprecated(DeprecateReactor)
 interface FluxKMonadFilter : MonadFilter<ForFluxK>, FluxKMonad {
   override fun <A> empty(): FluxK<A> =
     Flux.empty<A>().k()

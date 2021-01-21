@@ -6,6 +6,7 @@ import reactor.core.scheduler.Scheduler
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
+@Deprecated(DeprecateReactor)
 object CoroutineContextReactorScheduler {
   private interface NonCancellableContinuation : Continuation<Unit>, Disposable
 
@@ -15,6 +16,7 @@ object CoroutineContextReactorScheduler {
     override fun isDisposed(): Boolean = true
   }
 
+  @Deprecated(DeprecateReactor)
   fun CoroutineContext.asScheduler(): Scheduler =
     object : Scheduler {
       override fun schedule(task: Runnable): Disposable =

@@ -20,35 +20,46 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@Deprecated(DeprecateReactor)
 class ForMonoK private constructor() {
   companion object
 }
+
+@Deprecated(DeprecateReactor)
 typealias MonoKOf<A> = arrow.Kind<ForMonoK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateReactor)
 inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
   this as MonoK<A>
 
+@Deprecated(DeprecateReactor)
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateReactor)
 fun <A> MonoKOf<A>.value(): Mono<A> =
   this.fix().mono as Mono<A>
 
+@Deprecated(DeprecateReactor)
 data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
 
+  @Deprecated(DeprecateReactor)
   suspend fun suspended(): A? = suspendCoroutine { cont ->
     onceOnly(cont::resume).let { cb ->
       value().subscribe({ cb(it) }, cont::resumeWithException) { cb(null) }
     }
   }
 
+  @Deprecated(DeprecateReactor)
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
+  @Deprecated(DeprecateReactor)
   fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateReactor)
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     mono.flatMap { f(it).fix().mono }.k()
 
@@ -96,6 +107,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
    * }
    *  ```
    */
+  @Deprecated(DeprecateReactor)
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     MonoK(Mono.create<B> { sink ->
       val isCancelled = AtomicBooleanW(false)
@@ -125,12 +137,15 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       } else sink.success(null)
     })
 
+  @Deprecated(DeprecateReactor)
   fun continueOn(ctx: CoroutineContext): MonoK<A> =
     mono.publishOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateReactor)
   fun runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     mono.flatMap { cb(Right(it)).value() }.onErrorResume { cb(Left(it)).value() }.k()
 
+  @Deprecated(DeprecateReactor)
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     Mono.fromCallable {
       val disposable: reactor.core.Disposable = runAsync(cb).value().subscribe()
@@ -138,6 +153,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       dispose
     }.k()
 
+  @Deprecated(DeprecateReactor)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is MonoK<*> -> this.mono == other.mono
@@ -145,18 +161,23 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
       else -> false
     }
 
+  @Deprecated(DeprecateReactor)
   override fun hashCode(): Int = mono.hashCode()
 
   companion object {
+    @Deprecated(DeprecateReactor)
     fun <A> just(a: A): MonoK<A> =
       Mono.just(a).k()
 
+    @Deprecated(DeprecateReactor)
     fun <A> raiseError(t: Throwable): MonoK<A> =
       Mono.error<A>(t).k()
 
+    @Deprecated(DeprecateReactor)
     operator fun <A> invoke(fa: () -> A): MonoK<A> =
       defer { just(fa()) }
 
+    @Deprecated(DeprecateReactor)
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
@@ -186,6 +207,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateReactor)
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): MonoK<A> =
       Mono.create<A> { sink ->
         fa { either: Either<Throwable, A> ->
@@ -197,6 +219,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateReactor)
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         fa { either: Either<Throwable, A> ->
@@ -235,6 +258,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateReactor)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMonoK>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -259,6 +283,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<CancelToken<ForMonoK>>): MonoK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateReactor)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<CancelToken<ForMonoK>>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -289,6 +314,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateReactor)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {
       val either = f(a).value().block()
       return when (either) {
@@ -320,6 +346,7 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
  * }
  * ```
  */
+@Deprecated(DeprecateReactor)
 fun <A> MonoKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
   value().subscribe({ cb(arrow.core.Right(it)) }, { cb(arrow.core.Left(it)) }).let { }
 
@@ -337,8 +364,10 @@ fun <A> MonoKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
  * }
  * ```
  */
+@Deprecated(DeprecateReactor)
 fun <A> MonoKOf<A>.unsafeRunSync(): A? =
   value().block()
 
+@Deprecated(DeprecateReactor)
 fun <A> MonoK<A>.handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
   value().onErrorResume { t: Throwable -> function(t).value() }.k()

@@ -20,29 +20,40 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext
 
+@Deprecated(DeprecateReactor)
 class ForFluxK private constructor() {
   companion object
 }
+
+@Deprecated(DeprecateReactor)
 typealias FluxKOf<A> = arrow.Kind<ForFluxK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateReactor)
 inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
   this as FluxK<A>
 
+@Deprecated(DeprecateReactor)
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateReactor)
 fun <A> FluxKOf<A>.value(): Flux<A> =
   this.fix().flux as Flux<A>
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+@Deprecated(DeprecateReactor)
 data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
+
+  @Deprecated(DeprecateReactor)
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
+  @Deprecated(DeprecateReactor)
   fun <B> ap(fa: FluxKOf<(A) -> B>): FluxK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateReactor)
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.flatMap { f(it).fix().flux }.k()
 
@@ -90,6 +101,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
    * }
    *  ```
    */
+  @Deprecated(DeprecateReactor)
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     FluxK(Flux.create<B> { sink ->
       flux.subscribe({ a ->
@@ -118,14 +130,18 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
       }, sink::error, sink::complete)
     })
 
+  @Deprecated(DeprecateReactor)
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.concatMap { f(it).fix().flux }.k()
 
+  @Deprecated(DeprecateReactor)
   fun <B> switchMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.switchMap { f(it).fix().flux }.k()
 
+  @Deprecated(DeprecateReactor)
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = flux.reduce(b, f).block()
 
+  @Deprecated(DeprecateReactor)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: FluxK<A>): Eval<B> = when {
       fa_p.flux.hasElements().map { !it }.block() -> lb
@@ -135,17 +151,21 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     return Eval.defer { loop(this) }
   }
 
+  @Deprecated(DeprecateReactor)
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FluxK<B>> =
     foldRight(Eval.always { GA.just(Flux.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Flux.concat(Flux.just<B>(it.a), it.b.flux).k() } }
     }.value()
 
+  @Deprecated(DeprecateReactor)
   fun continueOn(ctx: CoroutineContext): FluxK<A> =
     flux.publishOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateReactor)
   fun runAsync(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Unit> =
     flux.flatMap { cb(Right(it)).value() }.onErrorResume { cb(Left(it)).value() }.k()
 
+  @Deprecated(DeprecateReactor)
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Disposable> =
     Flux.defer {
       val disposable: reactor.core.Disposable = runAsync(cb).value().subscribe()
@@ -153,6 +173,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
       Flux.just(dispose)
     }.k()
 
+  @Deprecated(DeprecateReactor)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is FluxK<*> -> this.flux == other.flux
@@ -160,23 +181,29 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
       else -> false
     }
 
+  @Deprecated(DeprecateReactor)
   fun <B> filterMap(f: (A) -> Option<B>): FluxK<B> =
     flux.flatMap { a ->
       f(a).fold({ Flux.empty<B>() }, { b -> Flux.just(b) })
     }.k()
 
+  @Deprecated(DeprecateReactor)
   override fun hashCode(): Int = flux.hashCode()
 
   companion object {
+    @Deprecated(DeprecateReactor)
     fun <A> just(a: A): FluxK<A> =
       Flux.just(a).k()
 
+    @Deprecated(DeprecateReactor)
     fun <A> raiseError(t: Throwable): FluxK<A> =
       Flux.error<A>(t).k()
 
+    @Deprecated(DeprecateReactor)
     operator fun <A> invoke(fa: () -> A): FluxK<A> =
       defer { just(fa()) }
 
+    @Deprecated(DeprecateReactor)
     fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
       Flux.defer { fa().value() }.k()
 
@@ -205,6 +232,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateReactor)
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): FluxK<A> =
       Flux.create<A> { sink ->
         fa { callback: Either<Throwable, A> ->
@@ -217,6 +245,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateReactor)
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>): FluxK<A> =
       Flux.create { sink: FluxSink<A> ->
         fa { callback: Either<Throwable, A> ->
@@ -233,6 +262,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
       cancellable(fa)
 
+    @Deprecated(DeprecateReactor)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
       Flux.create<A> { sink ->
         val token = fa { either: Either<Throwable, A> ->
@@ -250,6 +280,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateReactor)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
       Flux.create<A> { sink ->
         val cb = { either: Either<Throwable, A> ->
@@ -285,6 +316,7 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateReactor)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {
       val either = f(a).value().blockFirst()
       return when (either) {
@@ -295,8 +327,10 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
   }
 }
 
+@Deprecated(DeprecateReactor)
 fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(DeprecateReactor)
 fun <A> FluxKOf<A>.handleErrorWith(function: (Throwable) -> FluxK<A>): FluxK<A> =
   value().onErrorResume { t: Throwable -> function(t).value() }.k()
