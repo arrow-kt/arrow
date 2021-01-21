@@ -17,11 +17,6 @@ interface StringSemigroup : Semigroup<String> {
 fun String.Companion.semigroup(): Semigroup<String> =
   object : StringSemigroup {}
 
-private object StringSemigroupInstance : StringSemigroup
-
-fun Semigroup.Companion.string(): Semigroup<String> =
-  StringSemigroupInstance
-
 @Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
 interface StringMonoid : Monoid<String>, StringSemigroup {
   override fun empty(): String = ""
@@ -30,11 +25,6 @@ interface StringMonoid : Monoid<String>, StringSemigroup {
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
 fun String.Companion.monoid(): Monoid<String> =
   object : StringMonoid {}
-
-private object StringMonoidInstance : StringMonoid
-
-fun Monoid.Companion.string(): Monoid<String> =
-  StringMonoidInstance
 
 @Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
 interface StringEq : Eq<String> {
@@ -45,12 +35,7 @@ interface StringEq : Eq<String> {
 fun String.Companion.eq(): Eq<String> =
   object : StringEq {}
 
-private object StringEqInstance : StringEq
-
-fun Eq.Companion.string(): Eq<String> =
-  StringEqInstance
-
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.string()", "arrow.core.Show", "arrow.core.string"))
 interface StringShow : Show<String> {
   override fun String.show(): String = "\"${this.escape()}\""
 
@@ -64,11 +49,7 @@ interface StringShow : Show<String> {
 fun String.Companion.show(): Show<String> =
   object : StringShow {}
 
-private object StringShowInstance : StringShow
-
-fun Show.Companion.string(): Show<String> =
-  StringShowInstance
-
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.string()", "arrow.core.Order", "arrow.core.string"))
 interface StringOrder : Order<String> {
   override fun String.compare(b: String): Ordering =
     Ordering.fromInt(this.compareTo(b))
@@ -76,15 +57,11 @@ interface StringOrder : Order<String> {
   override fun String.compareTo(b: String): Int = this.compareTo(b)
 }
 
-private object StringOrderInstance : StringOrder
-
-fun Order.Companion.string(): Order<String> =
-  StringOrderInstance
-
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.string()", "arrow.core.Order", "arrow.core.string"))
 fun String.Companion.order(): Order<String> =
   object : StringOrder {}
 
+@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.string()", "arrow.core.Hash", "arrow.core.string"))
 interface StringHash : Hash<String>, StringEq {
   override fun String.hash(): Int = hashCode()
 }
@@ -93,11 +70,7 @@ interface StringHash : Hash<String>, StringEq {
 fun String.Companion.hash(): Hash<String> =
   object : StringHash {}
 
-private object StringHashInstance : StringHash
-
-fun Hash.Companion.string(): Hash<String> =
-  StringHashInstance
-
+@Deprecated("ForString extensions has been deprecated. Use concrete methods on String")
 object StringContext : StringShow, StringOrder, StringMonoid
 
 @Deprecated("ForString extensions has been deprecated. Use concrete methods on String")

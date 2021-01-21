@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.extensions.boolean
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.order

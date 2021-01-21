@@ -35,34 +35,14 @@ interface CharHash : Hash<Char>, CharEq {
 fun Char.Companion.show(): Show<Char> =
   object : CharShow {}
 
-private object CharShowInstance : CharShow
-
-fun Show.Companion.char(): Show<Char> =
-  CharShowInstance
-
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Eq.char()", "arrow.core.Eq", "arrow.core.char"))
 fun Char.Companion.eq(): Eq<Char> =
   object : CharEq {}
-
-private object CharEqInstance : CharEq
-
-fun Eq.Companion.char(): Eq<Char> =
-  CharEqInstance
 
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.char()", "arrow.core.Order", "arrow.core.char"))
 fun Char.Companion.order(): Order<Char> =
   object : CharOrder {}
 
-private object CharOrderInstance : CharOrder
-
-fun Order.Companion.char(): Order<Char> =
-  CharOrderInstance
-
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.char()", "arrow.core.Hash", "arrow.core.char"))
 fun Char.Companion.hash(): Hash<Char> =
   object : CharHash {}
-
-private object CharHashInstance : CharHash
-
-fun Hash.Companion.char(): Hash<Char> =
-  CharHashInstance
