@@ -71,7 +71,14 @@ fun <A> Kind<ForListK, A>.fold(arg1: Monoid<A>): A = arrow.core.ListK.foldable()
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Option.fromNullable(reduceNullable(arg1, arg2))", "arrow.core.reduceNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension projected functions are deprecated",
+  ReplaceWith(
+    "Option.fromNullable(reduceOrNull(arg1, arg2))",
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
+  )
+)
 fun <A, B> Kind<ForListK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
   Option<B> = arrow.core.ListK.foldable().run {
   this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
@@ -84,7 +91,15 @@ fun <A, B> Kind<ForListK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Fun
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("reduceRightNullable(arg1, arg2).map { Option.fromNullable(it) }", "arrow.core.reduceRightNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "reduceRightOrNull(arg1, arg2).map { Option.fromNullable(it) }",
+    "arrow.core.reduceRightOrNull",
+    "arrow.core.Option"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> Kind<ForListK, A>.reduceRightToOption(
   arg1: Function1<A, B>,
   arg2: Function2<A, Eval<B>,
@@ -101,7 +116,7 @@ fun <A, B> Kind<ForListK, A>.reduceRightToOption(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith(" Option.fromNullable(reduceNullable({ it }, arg1))", "arrow.core.reduceNullable", "arrow.core.Option"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith(" Option.fromNullable(reduceOrNull({ it }, arg1))", "arrow.core.reduceOrNull", "arrow.core.Option"))
 fun <A> Kind<ForListK, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
   arrow.core.ListK.foldable().run {
     this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
@@ -114,7 +129,15 @@ fun <A> Kind<ForListK, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("reduceRightOption({ it }, arg2).map { Option.fromNullable(it) }", "arrow.core.reduceRightNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "reduceOrNull({ it }, arg2).map { Option.fromNullable(it) }",
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> Kind<ForListK, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>): Eval<Option<A>> =
   arrow.core.ListK.foldable().run {
     this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>

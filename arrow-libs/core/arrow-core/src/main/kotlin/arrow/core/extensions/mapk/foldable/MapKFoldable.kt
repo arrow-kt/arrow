@@ -101,7 +101,8 @@ fun <K, A> Kind<Kind<ForMapK, K>, A>.fold(arg1: Monoid<A>): A = arrow.core.MapK.
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(values.reduceOrNull(arg1, arg2))",
-    "arrow.core.reduceNullable", "arrow.core.Option"
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -146,7 +147,7 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.reduceRightToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(values.reduceOrNull({ it }, arg1))",
-    "arrow.core.reduceNullable", "arrow.core.Option"
+    "arrow.core.reduceOrNull", "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )

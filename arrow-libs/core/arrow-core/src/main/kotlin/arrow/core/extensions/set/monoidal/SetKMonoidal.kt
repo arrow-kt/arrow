@@ -16,15 +16,12 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "identity()",
-  "arrow.core.extensions.set.monoidal.Set.identity"
-  ),
+  ReplaceWith("emptySet<A>()"),
   DeprecationLevel.WARNING
 )
 fun <A> identity(): Set<A> = arrow.core.extensions.set.monoidal.Set
-   .monoidal()
-   .identity<A>() as kotlin.collections.Set<A>
+  .monoidal()
+  .identity<A>() as kotlin.collections.Set<A>
 
 /**
  * cached extension
@@ -37,4 +34,6 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  inline fun monoidal(): SetKMonoidal = monoidal_singleton}
+  @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+  inline fun monoidal(): SetKMonoidal = monoidal_singleton
+}

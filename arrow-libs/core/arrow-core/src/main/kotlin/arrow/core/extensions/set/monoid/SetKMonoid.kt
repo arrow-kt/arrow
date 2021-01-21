@@ -21,15 +21,15 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll()",
-  "arrow.core.combineAll"
+    "combineAll(Monoid.set<A>())",
+    "arrow.core.combineAll", "arrow.typeclasses.Monoid", "arrow.core.set"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Collection<SetK<A>>.combineAll(): Set<A> =
-    arrow.core.extensions.set.monoid.Set.monoid<A>().run {
-  this@combineAll.combineAll() as kotlin.collections.Set<A>
-}
+  arrow.core.extensions.set.monoid.Set.monoid<A>().run {
+    this@combineAll.combineAll() as kotlin.collections.Set<A>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -41,14 +41,14 @@ fun <A> Collection<SetK<A>>.combineAll(): Set<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(arg0)",
-  "arrow.core.extensions.set.monoid.Set.combineAll"
+    "arg0.combineAll(Monoid.set<A>())",
+    "arrow.core.combineAll", "arrow.typeclasses.Monoid", "arrow.core.set"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> combineAll(arg0: List<SetK<A>>): Set<A> = arrow.core.extensions.set.monoid.Set
-   .monoid<A>()
-   .combineAll(arg0) as kotlin.collections.Set<A>
+  .monoid<A>()
+  .combineAll(arg0) as kotlin.collections.Set<A>
 
 /**
  * cached extension
@@ -61,4 +61,14 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  inline fun <A> monoid(): SetKMonoid<A> = monoid_singleton as arrow.core.extensions.SetKMonoid<A>}
+  @Deprecated(
+    "@extension kinded projected functions are deprecated",
+    ReplaceWith(
+      "Monoid.set<A>()",
+      "arrow.core.set",
+      "arrow.typeclasses.Monoid"
+    ),
+    DeprecationLevel.WARNING
+  )
+  inline fun <A> monoid(): SetKMonoid<A> = monoid_singleton as arrow.core.extensions.SetKMonoid<A>
+}

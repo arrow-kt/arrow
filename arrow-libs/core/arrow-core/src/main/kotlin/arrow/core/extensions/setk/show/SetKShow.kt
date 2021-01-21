@@ -9,5 +9,15 @@ import kotlin.Suppress
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-inline fun <A> Companion.show(SA: Show<A>): SetKShow<A> = object : arrow.core.extensions.SetKShow<A>
-    { override fun SA(): arrow.typeclasses.Show<A> = SA }
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Show.set<A>(SA)",
+    "arrow.core.set",
+    "arrow.typeclasses.Show"
+  ),
+  DeprecationLevel.WARNING
+)
+inline fun <A> Companion.show(SA: Show<A>): SetKShow<A> = object : arrow.core.extensions.SetKShow<A> {
+  override fun SA(): arrow.typeclasses.Show<A> = SA
+}

@@ -17,16 +17,13 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "plus(arg1)",
-  "arrow.core.plus"
-  ),
+  ReplaceWith("this + arg1"),
   DeprecationLevel.WARNING
 )
 operator fun <A> Set<A>.plus(arg1: Set<A>): Set<A> =
-    arrow.core.extensions.set.semigroup.Set.semigroup<A>().run {
-  arrow.core.SetK(this@plus).plus(arrow.core.SetK(arg1)) as kotlin.collections.Set<A>
-}
+  arrow.core.extensions.set.semigroup.Set.semigroup<A>().run {
+    arrow.core.SetK(this@plus).plus(arrow.core.SetK(arg1)) as kotlin.collections.Set<A>
+  }
 
 @JvmName("maybeCombine")
 @Suppress(
@@ -37,17 +34,14 @@ operator fun <A> Set<A>.plus(arg1: Set<A>): Set<A> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "maybeCombine(arg1)",
-  "arrow.core.maybeCombine"
-  ),
+  ReplaceWith("arg1?.plus(this)"),
   DeprecationLevel.WARNING
 )
 fun <A> Set<A>.maybeCombine(arg1: Set<A>): Set<A> =
-    arrow.core.extensions.set.semigroup.Set.semigroup<A>().run {
-  arrow.core.SetK(this@maybeCombine).maybeCombine(arrow.core.SetK(arg1)) as
-    kotlin.collections.Set<A>
-}
+  arrow.core.extensions.set.semigroup.Set.semigroup<A>().run {
+    arrow.core.SetK(this@maybeCombine).maybeCombine(arrow.core.SetK(arg1)) as
+      kotlin.collections.Set<A>
+  }
 
 /**
  * cached extension
@@ -60,5 +54,15 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
+  @Deprecated(
+    "@extension kinded projected functions are deprecated",
+    ReplaceWith(
+      "Semigroup.set<A>()",
+      "arrow.core.set",
+      "arrow.typeclasses.Semigroup"
+    ),
+    DeprecationLevel.WARNING
+  )
   inline fun <A> semigroup(): SetKSemigroup<A> = semigroup_singleton as
-      arrow.core.extensions.SetKSemigroup<A>}
+    arrow.core.extensions.SetKSemigroup<A>
+}

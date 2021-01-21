@@ -19,8 +19,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "neqv(EQ, arg1)",
-  "arrow.core.neqv"
+    "!eqv(EQ, arg1)",
+    "arrow.core.eqv"
   ),
   DeprecationLevel.WARNING
 )
@@ -32,5 +32,15 @@ fun <A> SetK<A>.neqv(EQ: Eq<A>, arg1: SetK<A>): Boolean = arrow.core.SetK.eq<A>(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Eq.set<A>(EQ)",
+    "arrow.core.set",
+    "arrow.typeclasses.Eq"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A> Companion.eq(EQ: Eq<A>): SetKEq<A> = object : arrow.core.extensions.SetKEq<A> {
-    override fun EQ(): arrow.typeclasses.Eq<A> = EQ }
+  override fun EQ(): arrow.typeclasses.Eq<A> = EQ
+}

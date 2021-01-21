@@ -1,9 +1,18 @@
 package arrow.core
 
-import arrow.higherkind
 import arrow.typeclasses.Show
 
-@higherkind
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+class ForSetK private constructor() { companion object }
+
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+typealias SetKOf<A> = arrow.Kind<ForSetK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+inline fun <A> SetKOf<A>.fix(): SetK<A> =
+  this as SetK<A>
+
 data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
@@ -37,6 +46,8 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
   }
 }
 
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 fun <A> SetKOf<A>.combineK(y: SetKOf<A>): SetK<A> = (fix() + y.fix()).k()
 
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 fun <A> Set<A>.k(): SetK<A> = SetK(this)

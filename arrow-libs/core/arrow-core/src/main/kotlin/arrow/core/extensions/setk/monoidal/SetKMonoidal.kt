@@ -23,18 +23,16 @@ internal val monoidal_singleton: SetKMonoidal = object : arrow.core.extensions.S
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "identity()",
-  "arrow.core.SetK.identity"
-  ),
+  ReplaceWith("emptySet<A>()"),
   DeprecationLevel.WARNING
 )
 fun <A> identity(): SetK<A> = arrow.core.SetK
-   .monoidal()
-   .identity<A>() as arrow.core.SetK<A>
+  .monoidal()
+  .identity<A>() as arrow.core.SetK<A>
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 inline fun Companion.monoidal(): SetKMonoidal = monoidal_singleton

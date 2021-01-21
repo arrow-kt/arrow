@@ -21,15 +21,15 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "eqv(arg2, arg1)",
+    "arrow.core.eqv"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Set<A>.eqK(arg1: Set<A>, arg2: Eq<A>): Boolean =
-    arrow.core.extensions.set.eqK.Set.eqK().run {
-  arrow.core.SetK(this@eqK).eqK<A>(arrow.core.SetK(arg1), arg2) as kotlin.Boolean
-}
+  arrow.core.extensions.set.eqK.Set.eqK().run {
+    arrow.core.SetK(this@eqK).eqK<A>(arrow.core.SetK(arg1), arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -38,17 +38,10 @@ fun <A> Set<A>.eqK(arg1: Set<A>, arg2: Eq<A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.extensions.set.eqK.Set.liftEq"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSetK, A>> = arrow.core.extensions.set.eqK.Set
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSetK, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSetK, A>>
 
 /**
  * cached extension
@@ -61,4 +54,6 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  inline fun eqK(): SetKEqK = eqK_singleton}
+  @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+  inline fun eqK(): SetKEqK = eqK_singleton
+}

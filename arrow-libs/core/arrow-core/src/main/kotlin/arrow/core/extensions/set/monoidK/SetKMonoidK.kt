@@ -19,14 +19,14 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "algebra()",
-  "arrow.core.extensions.set.monoidK.Set.algebra"
+    "Monoid.set<A>()",
+    "arrow.typeclasses.Monoid", "arrow.core.set"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Monoid<Kind<ForSetK, A>> = arrow.core.extensions.set.monoidK.Set
-   .monoidK()
-   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForSetK, A>>
+  .monoidK()
+  .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForSetK, A>>
 
 /**
  * cached extension
@@ -39,4 +39,6 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  inline fun monoidK(): SetKMonoidK = monoidK_singleton}
+  @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+  inline fun monoidK(): SetKMonoidK = monoidK_singleton
+}

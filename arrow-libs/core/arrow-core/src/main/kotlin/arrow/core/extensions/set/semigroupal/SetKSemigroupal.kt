@@ -21,16 +21,16 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "product(arg1)",
-  "arrow.core.product"
+    "product(arg1)",
+    "arrow.core.product"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Set<A>.product(arg1: Set<B>): Set<Tuple2<A, B>> =
-    arrow.core.extensions.set.semigroupal.Set.semigroupal().run {
-  arrow.core.SetK(this@product).product<A, B>(arrow.core.SetK(arg1)) as
-    kotlin.collections.Set<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.set.semigroupal.Set.semigroupal().run {
+    arrow.core.SetK(this@product).product<A, B>(arrow.core.SetK(arg1)) as
+      kotlin.collections.Set<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * syntax
@@ -44,24 +44,20 @@ fun <A, B> Set<A>.product(arg1: Set<B>): Set<Tuple2<A, B>> =
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "times(arg1)",
-  "arrow.core.times"
-  ),
+  ReplaceWith("this + arg1"),
   DeprecationLevel.WARNING
 )
 operator fun <A, B> Set<A>.times(arg1: Set<B>): Set<Tuple2<A, B>> =
-    arrow.core.extensions.set.semigroupal.Set.semigroupal().run {
-  arrow.core.SetK(this@times).times<A, B>(arrow.core.SetK(arg1)) as
-    kotlin.collections.Set<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.set.semigroupal.Set.semigroupal().run {
+    arrow.core.SetK(this@times).times<A, B>(arrow.core.SetK(arg1)) as
+      kotlin.collections.Set<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
-internal val semigroupal_singleton: SetKSemigroupal = object : arrow.core.extensions.SetKSemigroupal
-    {}
+internal val semigroupal_singleton: SetKSemigroupal = object : arrow.core.extensions.SetKSemigroupal {}
 
 object Set {
   /**
@@ -157,4 +153,6 @@ object Set {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  inline fun semigroupal(): SetKSemigroupal = semigroupal_singleton}
+  @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+  inline fun semigroupal(): SetKSemigroupal = semigroupal_singleton
+}

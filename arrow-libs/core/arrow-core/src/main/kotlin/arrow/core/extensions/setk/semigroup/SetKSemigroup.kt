@@ -24,10 +24,7 @@ internal val semigroup_singleton: SetKSemigroup<Any?> = object : SetKSemigroup<A
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "plus(arg1)",
-  "arrow.core.plus"
-  ),
+  ReplaceWith("this + arg1"),
   DeprecationLevel.WARNING
 )
 operator fun <A> SetK<A>.plus(arg1: SetK<A>): SetK<A> = arrow.core.SetK.semigroup<A>().run {
@@ -43,10 +40,7 @@ operator fun <A> SetK<A>.plus(arg1: SetK<A>): SetK<A> = arrow.core.SetK.semigrou
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "maybeCombine(arg1)",
-  "arrow.core.maybeCombine"
-  ),
+  ReplaceWith("arg1?.plus(this)"),
   DeprecationLevel.WARNING
 )
 fun <A> SetK<A>.maybeCombine(arg1: SetK<A>): SetK<A> = arrow.core.SetK.semigroup<A>().run {
@@ -57,5 +51,14 @@ fun <A> SetK<A>.maybeCombine(arg1: SetK<A>): SetK<A> = arrow.core.SetK.semigroup
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Semigroup.set<A>()",
+    "arrow.core.set",
+    "arrow.typeclasses.Semigroup"
+  ),
+  DeprecationLevel.WARNING
+)
 inline fun <A> Companion.semigroup(): SetKSemigroup<A> = semigroup_singleton as
-    arrow.core.extensions.SetKSemigroup<A>
+  arrow.core.extensions.SetKSemigroup<A>

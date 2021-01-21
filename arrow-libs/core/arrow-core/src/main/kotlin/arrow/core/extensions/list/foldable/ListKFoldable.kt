@@ -64,7 +64,14 @@ fun <A> List<A>.fold(arg1: Monoid<A>): A =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Option.fromNullable(reduceNullable(arg1, arg2))", "arrow.core.reduceNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension projected functions are deprecated",
+  ReplaceWith(
+    "Option.fromNullable(reduceOrNull(arg1, arg2))",
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
+  )
+)
 fun <A, B> List<A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>): Option<B> =
   Option.fromNullable(reduceOrNull(arg1, arg2))
 
@@ -75,7 +82,15 @@ fun <A, B> List<A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("reduceRightNullable(arg1, arg2).map { Option.fromNullable(it) }", "arrow.core.reduceRightNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "reduceRightOrNull(arg1, arg2).map { Option.fromNullable(it) }",
+    "arrow.core.reduceRightOrNull",
+    "arrow.core.Option"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A, B> List<A>.reduceRightToOption(arg1: Function1<A, B>, arg2: Function2<A, Eval<B>, Eval<B>>): Eval<Option<B>> =
   reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }
 
@@ -86,7 +101,7 @@ fun <A, B> List<A>.reduceRightToOption(arg1: Function1<A, B>, arg2: Function2<A,
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith(" Option.fromNullable(reduceNullable({ it }, arg1))", "arrow.core.reduceNullable", "arrow.core.Option"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith(" Option.fromNullable(reduceOrNull({ it }, arg1))", "arrow.core.reduceOrNull", "arrow.core.Option"))
 fun <A> List<A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
   Option.fromNullable(reduceOrNull({ it }, arg1))
 
@@ -97,7 +112,15 @@ fun <A> List<A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("reduceRightOption({ it }, arg2).map { Option.fromNullable(it) }", "arrow.core.reduceRightNullable", "arrow.core.Option"))
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "reduceOrNull({ it }, arg2).map { Option.fromNullable(it) }",
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> List<A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>): Eval<Option<A>> =
   reduceRightEvalOrNull({ it }, arg1).map { Option.fromNullable(it) }
 
