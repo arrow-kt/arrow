@@ -34,6 +34,7 @@ import kotlin.coroutines.startCoroutine
  * where we create multiple new connections and push them onto the stack with [push] and remove them with [pop]
  * when the operations running on those connections terminate.
  */
+@Deprecated("SuspendConnection is deprecated with Arrow Fx's IO")
 sealed class SuspendConnection : AbstractCoroutineContextElement(SuspendConnection) {
 
   abstract suspend fun cancel(): Unit
