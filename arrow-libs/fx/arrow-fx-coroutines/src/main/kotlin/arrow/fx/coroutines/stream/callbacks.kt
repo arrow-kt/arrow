@@ -119,7 +119,7 @@ fun <A> Stream.Companion.cancellable(@BuilderInference f: suspend EmitterSyntax<
     val error = UnsafePromise<Throwable>()
     val cancel = Promise<CancelToken>()
 
-    Stream.bracketCase({
+    bracketCase({
       ForkAndForget { emitterCallback(f, cancel, error, q) }
     }, { f, exit ->
       when (exit) {
@@ -131,7 +131,7 @@ fun <A> Stream.Companion.cancellable(@BuilderInference f: suspend EmitterSyntax<
       q.dequeue()
         .interruptWhen { Either.Left(error.join()) }
         .terminateOn { it === END }
-        .flatMap(::chunk)
+        .flatMap(Stream.Companion::chunk)
     }
   }
 

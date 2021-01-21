@@ -54,7 +54,6 @@ configure(
   [project("arrow-fx-coroutines"),
    project("arrow-fx-coroutines-kotlinx-coroutines"),
    project("arrow-fx-coroutines-test"),
-   project("arrow-fx-coroutines-stream"),
    project("arrow-fx-stm")]
 ) {
   apply plugin: "org.jetbrains.kotlin.jvm"

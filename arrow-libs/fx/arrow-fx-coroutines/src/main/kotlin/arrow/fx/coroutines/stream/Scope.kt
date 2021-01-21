@@ -14,13 +14,11 @@ import arrow.fx.coroutines.Platform
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.coroutines.guarantee
-import arrow.fx.coroutines.prependTo
 import arrow.fx.coroutines.raceN
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import java.util.concurrent.CancellationException
-import kotlin.coroutines.coroutineContext
 
 /**
  * Implementation of [Scope] for the internal stream interpreter.

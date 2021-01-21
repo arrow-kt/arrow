@@ -21,6 +21,7 @@ import arrow.fx.coroutines.stream.Token
  * Additionally the subscriber has possibility to terminate whenever size of enqueued elements is over certain size
  * by using `subscribeSize`.
  */
+@Deprecated("Stream is deprecated in favor of KotlinX Flow. Use Channel")
 class Topic<A> internal constructor(
   private val pubSub: PubSub<A, Either<State<A>, IQueue<A>>, Either<Option<Token>, Pair<Token, Int>>>
 ) {

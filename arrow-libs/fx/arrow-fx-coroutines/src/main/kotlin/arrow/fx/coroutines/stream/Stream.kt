@@ -1580,7 +1580,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
      * Like `emits`, but works for any class that extends `Iterable`
      */
     fun <O> iterable(os: Iterable<O>): Stream<O> =
-      Stream.chunk(Chunk.iterable(os))
+      chunk(Chunk.iterable(os))
 
     /**
      * An infinite `Stream` that repeatedly applies a given function to a start value.
@@ -1761,7 +1761,7 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
     internal fun <O> resourceWeak(r: Resource<O>): Stream<O> =
       when (r) {
         is Resource.Allocate ->
-          Stream.bracketCaseWeak(r.acquire) { a, e -> r.release(a, e) }
+          bracketCaseWeak(r.acquire) { a, e -> r.release(a, e) }
         is Resource.Bind<*, O> -> resourceWeak(r.source).flatMap { o ->
           resourceWeak((r.f as (Any?) -> Resource<O>).invoke(o))
         }

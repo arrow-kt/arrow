@@ -11,15 +11,19 @@ package arrow.fx.coroutines.stream
  *
  * i.e. [arrow.fx.coroutines.stream.concurrent.Queue.dequeueBatch]
  */
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 typealias Pipe<I, O> = (Stream<I>) -> Stream<O>
 
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 fun <I, O> Pipe(pipe: (Stream<I>) -> Stream<O>): Pipe<I, O> = pipe
 
 /** Transforms the left input of the given `Pipe2` using a `Pipe`. */
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 fun <I, O, I1, O2> Pipe<I, O>.attachLeft(p: Pipe2<O, I1, O2>): Pipe2<I, I1, O2> =
   { l, r -> p(this(l), r) }
 
 /** Transforms the right input of the given `Pipe2` using a `Pipe`. */
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 fun <I, O, I0, O2> Pipe<I, O>.attachRight(p: Pipe2<I0, O, O2>): Pipe2<I0, I, O2> =
   { l, r -> p(l, this(r)) }
 
@@ -32,6 +36,8 @@ fun <I, O, I0, O2> Pipe<I, O>.attachRight(p: Pipe2<I0, O, O2>): Pipe2<I0, I, O2>
  *
  * `Pipe2`s are typically applied with the `through` operation on `Stream`.
  */
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 typealias Pipe2<I, I2, O> = (Stream<I>, Stream<I2>) -> Stream<O>
 
+@Deprecated("Pipe is deprecated as part of Stream deprecation.")
 fun <I, I2, O> Pipe2(pipe: (Stream<I>, Stream<I2>) -> Stream<O>): Pipe2<I, I2, O> = pipe

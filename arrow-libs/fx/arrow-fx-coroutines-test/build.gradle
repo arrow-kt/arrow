@@ -11,7 +11,6 @@ apply from: "$DOC_CREATION"
 dependencies {
     api "io.arrow-kt:arrow-core:$VERSION_NAME"
     api project(":arrow-fx-coroutines")
-    api project(":arrow-fx-coroutines-stream")
     api project(":arrow-fx-suspend-connection")
 
     api "io.kotest:kotest-runner-junit5-jvm:$KOTEST_VERSION" // for kotest framework

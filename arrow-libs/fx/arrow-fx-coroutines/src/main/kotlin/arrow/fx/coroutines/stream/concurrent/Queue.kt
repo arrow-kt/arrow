@@ -58,7 +58,7 @@ interface Dequeue1<A> {
 }
 
 /** Provides the ability to dequeue chunks of elements from a `Queue` as streams. */
-@Deprecated("Stream is deprecated in favor of Flow")
+@Deprecated("Stream is deprecated in favor of Flow. Use ReceiveChannel")
 interface Dequeue<A> {
 
   /** Dequeues elements from the queue. */
@@ -223,6 +223,7 @@ interface Queue<A> : Enqueue<A>, Dequeue1<A>, Dequeue<A> {
   }
 }
 
+@Deprecated("Stream is deprecated in favor of Flow. Use Channel")
 interface NoneTerminatedQueue<A> : Enqueue<Option<A>>, Dequeue1<Option<A>>, Dequeue<A> {
 
   /** Dequeues one `Chunk[A]` with no more than `maxSize` elements. Completes once one is ready. */

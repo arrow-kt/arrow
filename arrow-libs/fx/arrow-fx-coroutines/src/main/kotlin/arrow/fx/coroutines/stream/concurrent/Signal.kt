@@ -8,6 +8,7 @@ import arrow.fx.coroutines.stream.Stream
 import arrow.fx.coroutines.stream.Token
 
 /** Pure holder of a single value of type `A` that can be read in the effect `F`. */
+@Deprecated("Stream is deprecated in favor of KotlinX Flow. Use Channel")
 interface Signal<A> {
 
   /**
@@ -54,6 +55,7 @@ fun <O> Signal<Boolean>.interrupt(stream: Stream<O>): Stream<O> =
  * Pure holder of a single atomic value of type `A` that can be both read and updated.
  * Composes [Signal] and [Atomic] together to make an signalling atomic value.
  */
+@Deprecated("Stream is deprecated in favor of KotlinX Flow. Use Channel")
 class SignallingAtomic<A> internal constructor(
   private val pubSub: PubSub<Pair<Long, Pair<Long, A>>, A, Option<Token>>,
   private val atomic: Atomic<Pair<Long, A>>

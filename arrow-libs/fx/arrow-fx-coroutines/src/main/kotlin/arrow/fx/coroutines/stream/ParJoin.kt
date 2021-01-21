@@ -169,6 +169,7 @@ internal suspend fun signalResult(done: SignallingAtomic<Option<Option<Throwable
  *
  * @param maxOpen Maximum number of open inner streams at any time. Must be > 0.
  */
+@Deprecated("parJoin is deprecated as part of Stream deprecation.")
 fun <O> Stream<Stream<O>>.parJoin(
   maxOpen: Int,
   ctx: CoroutineContext = Dispatchers.Default

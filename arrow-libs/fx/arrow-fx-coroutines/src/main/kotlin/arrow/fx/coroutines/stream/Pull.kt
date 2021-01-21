@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.identity
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Platform
-import arrow.fx.coroutines.bracketCase
 import arrow.fx.coroutines.nonFatalOrThrow
 import arrow.fx.coroutines.stream.Pull.Eval.CloseScope
 import arrow.fx.coroutines.stream.Pull.Eval.OpenScope
@@ -15,7 +14,7 @@ import arrow.fx.coroutines.stream.Pull.Result.Interrupted
 import arrow.fx.coroutines.stream.Pull.Result.Pure
 import java.util.concurrent.CancellationException
 
-@Deprecated("Deprecated in favor of Flow")
+@Deprecated("Pull is deprecated as part of Stream in favor of Flow")
 sealed class Pull<out O, out R> {
 
   abstract fun <P> mapOutput(f: (O) -> P): Pull<P, R>
@@ -809,7 +808,7 @@ internal tailrec fun <O, Z> ViewL(free: Pull<O, Z>): Pull.ViewL<O, Z> =
           val nb = object : Pull.Bind<O, Any?, Z>(b.step as Pull<O, Any?>) {
             private val bdel: Bind<O, Any?, Z> = free.delegate() as Bind<O, Any?, Z>
             override fun cont(zr: Result<Any?>): Pull<O, Z> =
-              object : Pull.Bind<O, Any?, Z>(b.cont(zr as Result<Nothing>) as Pull<O, Any?>) {
+              object : Bind<O, Any?, Z>(b.cont(zr as Result<Nothing>) as Pull<O, Any?>) {
                 override fun delegate(): Bind<O, Any?, Z> = bdel
                 override fun cont(yr: Result<Any?>): Pull<O, Z> =
                   delegate().cont(yr)

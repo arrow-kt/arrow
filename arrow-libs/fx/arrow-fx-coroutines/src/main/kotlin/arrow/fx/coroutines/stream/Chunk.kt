@@ -15,6 +15,7 @@ import kotlin.math.min
  * The operations on `Chunk` are all defined strictly. For example, `c.map(f).map(g).map(h)` results in
  * intermediate chunks being created (1 per call to `map`).
  */
+@Deprecated("Chunk is deprecated as part of Stream deprecation.")
 abstract class Chunk<out O> {
 
   /** Returns the number of elements in this chunk. */
