@@ -1,11 +1,13 @@
 package arrow.core
 
 import arrow.continuations.generic.ControlThrowable
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * Extractor of non-fatal Throwables. Will not match fatal errors like `VirtualMachineError`
+ * Extractor of non-fatal Throwable. Will not match fatal errors like `VirtualMachineError`
  * (for example, `OutOfMemoryError` and `StackOverflowError`, subclasses of `VirtualMachineError`), `ThreadDeath`,
  * `LinkageError`, `InterruptedException`.
+ * This will also not match [CancellationException] since that's a fatal exception in Kotlin for cancellation purposes.
  *
  * Checks whether the passed [t] Throwable is NonFatal.
  *
@@ -43,7 +45,7 @@ import arrow.continuations.generic.ControlThrowable
  */
 fun NonFatal(t: Throwable): Boolean =
   when (t) {
-    is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError, is ControlThrowable -> false
+    is VirtualMachineError, is ThreadDeath, is InterruptedException, is LinkageError, is ControlThrowable, is CancellationException -> false
     else -> true
   }
 
