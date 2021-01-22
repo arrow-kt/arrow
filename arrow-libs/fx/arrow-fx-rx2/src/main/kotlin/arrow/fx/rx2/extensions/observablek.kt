@@ -10,6 +10,7 @@ import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
+import arrow.fx.rx2.DeprecateRxJava
 import arrow.fx.rx2.ForObservableK
 import arrow.fx.rx2.ObservableK
 import arrow.fx.rx2.ObservableKOf
@@ -52,12 +53,14 @@ import arrow.fx.rx2.handleErrorWith as observableHandleErrorWith
 import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKFunctor : Functor<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKApplicative : Applicative<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
@@ -73,6 +76,7 @@ interface ObservableKApplicative : Applicative<ForObservableK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
@@ -91,6 +95,7 @@ interface ObservableKMonad : Monad<ForObservableK>, ObservableKApplicative {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKFoldable : Foldable<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -100,6 +105,7 @@ interface ObservableKFoldable : Foldable<ForObservableK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKApplicativeError :
   ApplicativeError<ForObservableK, Throwable>,
   ObservableKApplicative {
@@ -111,6 +117,7 @@ interface ObservableKApplicativeError :
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKMonadError :
   MonadError<ForObservableK, Throwable>,
   ObservableKMonad {
@@ -122,21 +129,25 @@ interface ObservableKMonadError :
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKMonadThrow : MonadThrow<ForObservableK>, ObservableKMonadError
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKBracket : Bracket<ForObservableK, Throwable>, ObservableKMonadThrow {
   override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKMonadDefer : MonadDefer<ForObservableK>, ObservableKBracket {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.async(fa)
@@ -149,11 +160,13 @@ interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
 
+@Deprecated(DeprecateRxJava)
 interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
   override fun <A> Kind<ForObservableK, A>.fork(coroutineContext: CoroutineContext): ObservableK<Fiber<ForObservableK, A>> =
     coroutineContext.asScheduler().let { scheduler ->
@@ -226,6 +239,7 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKDispatchers : Dispatchers<ForObservableK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
@@ -234,44 +248,54 @@ interface ObservableKDispatchers : Dispatchers<ForObservableK> {
     IOScheduler
 }
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK> = ObservableK.dispatchers()): Concurrent<ForObservableK> = object : ObservableKConcurrent {
   override fun dispatchers(): Dispatchers<ForObservableK> = dispatchers
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKConcurrentEffect : ConcurrentEffect<ForObservableK>, ObservableKEffect {
   override fun <A> ObservableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadFlat(): ObservableKMonad = monad()
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadConcat(): ObservableKMonad = object : ObservableKMonad {
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadSwitch(): ObservableKMonad = object : ObservableKMonadError {
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadErrorFlat(): ObservableKMonadError = monadError()
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadError = object : ObservableKMonadError {
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateRxJava)
 fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : ObservableKMonadError {
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
+@Deprecated(DeprecateRxJava)
 fun <A> ObservableK.Companion.fx(c: suspend ConcurrentSyntax<ForObservableK>.() -> A): ObservableK<A> =
   ObservableK.concurrent().fx.concurrent(c).fix()
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
     ObservableK(Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
@@ -279,6 +303,7 @@ interface ObservableKTimer : Timer<ForObservableK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface ObservableKFunctorFilter : FunctorFilter<ForObservableK>, ObservableKFunctor {
   override fun <A, B> Kind<ForObservableK, A>.filterMap(f: (A) -> Option<B>): ObservableK<B> =
     fix().filterMap(f)

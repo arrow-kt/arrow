@@ -1,5 +1,6 @@
 package arrow.fx.rx2.extensions
 
+import arrow.fx.rx2.DeprecateRxJava
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -13,6 +14,7 @@ internal val ComputationScheduler: CoroutineContext =
 internal val IOScheduler: CoroutineContext =
   Schedulers.io().asCoroutineContext()
 
+@Deprecated(DeprecateRxJava)
 fun Scheduler.asCoroutineContext(): CoroutineContext =
   SchedulerContext(this)
 

@@ -18,32 +18,43 @@ import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
 
+@Deprecated(DeprecateRxJava)
 typealias ObservableKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+@Deprecated(DeprecateRxJava)
 typealias ObservableKProcF<A> = ((Either<Throwable, A>) -> Unit) -> ObservableKOf<Unit>
 
+@Deprecated(DeprecateRxJava)
 class ForObservableK private constructor() {
   companion object
 }
+@Deprecated(DeprecateRxJava)
 typealias ObservableKOf<A> = arrow.Kind<ForObservableK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateRxJava)
 inline fun <A> ObservableKOf<A>.fix(): ObservableK<A> =
   this as ObservableK<A>
 
+@Deprecated(DeprecateRxJava)
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateRxJava)
 fun <A> ObservableKOf<A>.value(): Observable<A> =
   fix().observable as Observable<A>
 
+@Deprecated(DeprecateRxJava)
 data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf<A> {
 
+  @Deprecated(DeprecateRxJava)
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> ap(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.flatMap { f(it).value() }.k()
 
@@ -90,6 +101,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
    * }
    *  ```
    */
+  @Deprecated(DeprecateRxJava)
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     Observable.create<B> { emitter ->
       val dispose =
@@ -118,14 +130,18 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
       emitter.setCancellable { dispose.dispose() }
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.concatMap { f(it).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> switchMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.switchMap { f(it).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: ObservableK<A>): Eval<B> = when {
       fa_p.observable.isEmpty.blockingGet() -> lb
@@ -135,17 +151,21 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     return Eval.defer { loop(this) }
   }
 
+  @Deprecated(DeprecateRxJava)
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
     foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
 
+  @Deprecated(DeprecateRxJava)
   fun continueOn(ctx: CoroutineContext): ObservableK<A> =
     observable.observeOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     Observable.fromCallable {
       val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
@@ -153,6 +173,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
       dispose
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is ObservableK<*> -> this.observable == other.observable
@@ -160,23 +181,29 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
       else -> false
     }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> filterMap(f: (A) -> Option<B>): ObservableK<B> =
     observable.flatMap { a ->
       f(a).fold({ Observable.empty<B>() }, { b -> Observable.just(b) })
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun hashCode(): Int = observable.hashCode()
 
   companion object {
+    @Deprecated(DeprecateRxJava)
     fun <A> just(a: A): ObservableK<A> =
       Observable.just(a).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> raiseError(t: Throwable): ObservableK<A> =
       Observable.error<A>(t).k()
 
+    @Deprecated(DeprecateRxJava)
     operator fun <A> invoke(fa: () -> A): ObservableK<A> =
       Observable.fromCallable(fa).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
 
@@ -202,6 +229,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
       Observable.create<A> { emitter ->
         fa { either: Either<Throwable, A> ->
@@ -214,6 +242,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         }
       }.k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: ObservableKProcF<A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
@@ -255,6 +284,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
       Observable.create<A> { emitter ->
         val token = fa { either: Either<Throwable, A> ->
@@ -268,14 +298,15 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
       cancellable(fa)
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -311,6 +342,7 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         }
       }.k()
 
+    @Deprecated(DeprecateRxJava)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {
       val either = f(a).value().blockingFirst()
       return when (either) {
@@ -321,8 +353,10 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
   }
 }
 
+@Deprecated(DeprecateRxJava)
 fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(DeprecateRxJava)
 fun <A> ObservableKOf<A>.handleErrorWith(function: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

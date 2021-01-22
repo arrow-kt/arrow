@@ -23,35 +23,47 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@Deprecated(DeprecateRxJava)
 typealias MaybeKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+@Deprecated(DeprecateRxJava)
 typealias MaybeKProcF<A> = ((Either<Throwable, A>) -> Unit) -> Kind<ForMaybeK, Unit>
 
+@Deprecated(DeprecateRxJava)
 class ForMaybeK private constructor() {
   companion object
 }
+@Deprecated(DeprecateRxJava)
 typealias MaybeKOf<A> = arrow.Kind<ForMaybeK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateRxJava)
 inline fun <A> MaybeKOf<A>.fix(): MaybeK<A> =
   this as MaybeK<A>
 
+@Deprecated(DeprecateRxJava)
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateRxJava)
 fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe as Maybe<A>
 
+@Deprecated(DeprecateRxJava)
 data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
 
+  @Deprecated(DeprecateRxJava)
   suspend fun suspended(): A? = suspendCoroutine { cont ->
     value().subscribe(cont::resume, cont::resumeWithException) { cont.resume(null) }
   }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> map(f: (A) -> B): MaybeK<B> =
     maybe.map(f).k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> ap(fa: MaybeKOf<(A) -> B>): MaybeK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).value() }.k()
 
@@ -98,6 +110,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
    * }
    *  ```
    */
+  @Deprecated(DeprecateRxJava)
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     Maybe.create<B> { emitter ->
       val dispose =
@@ -124,30 +137,40 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
       emitter.setCancellable { dispose.dispose() }
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> fold(ifEmpty: () -> B, ifSome: (A) -> B): B = maybe.blockingGet().let {
     if (it == null) ifEmpty() else ifSome(it)
   }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldLeft(b: B, f: (B, A) -> B): B =
     fold({ b }, { a -> f(b, a) })
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     Eval.defer { fold({ lb }, { a -> f(a, lb) }) }
 
+  @Deprecated(DeprecateRxJava)
   fun isEmpty(): Boolean = maybe.isEmpty.blockingGet()
 
+  @Deprecated(DeprecateRxJava)
   fun nonEmpty(): Boolean = !isEmpty()
 
+  @Deprecated(DeprecateRxJava)
   fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
 
+  @Deprecated(DeprecateRxJava)
   fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
+  @Deprecated(DeprecateRxJava)
   fun continueOn(ctx: CoroutineContext): MaybeK<A> =
     maybe.observeOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     maybe.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
+  @Deprecated(DeprecateRxJava)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is MaybeK<*> -> this.maybe == other.maybe
@@ -155,23 +178,29 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
       else -> false
     }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> filterMap(f: (A) -> Option<B>): MaybeK<B> =
     maybe.flatMap { a ->
       f(a).fold({ Maybe.empty<B>() }, { b -> Maybe.just(b) })
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun hashCode(): Int = maybe.hashCode()
 
   companion object {
+    @Deprecated(DeprecateRxJava)
     fun <A> just(a: A): MaybeK<A> =
       Maybe.just(a).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> raiseError(t: Throwable): MaybeK<A> =
       Maybe.error<A>(t).k()
 
+    @Deprecated(DeprecateRxJava)
     operator fun <A> invoke(fa: () -> A): MaybeK<A> =
       defer { just(fa()) }
 
+    @Deprecated(DeprecateRxJava)
     fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
       Maybe.defer { fa().value() }.k()
 
@@ -197,6 +226,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> async(fa: MaybeKProc<A>): MaybeK<A> =
       Maybe.create<A> { emitter ->
         fa { either: Either<Throwable, A> ->
@@ -209,6 +239,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: MaybeKProcF<A>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
@@ -250,6 +281,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -271,14 +303,15 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
       cancellable(fa)
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -314,6 +347,7 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateRxJava)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {
       val either = f(a).value().blockingGet()
       return when (either) {
@@ -324,11 +358,14 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
   }
 }
 
+@Deprecated(DeprecateRxJava)
 fun <A> MaybeK<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
   value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
 
+@Deprecated(DeprecateRxJava)
 fun <A> MaybeK<A>.unsafeRunSync(): A =
   value().blockingGet()
 
+@Deprecated(DeprecateRxJava)
 fun <A> MaybeK<A>.handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

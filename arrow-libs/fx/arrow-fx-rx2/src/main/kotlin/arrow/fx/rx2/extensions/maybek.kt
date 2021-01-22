@@ -11,6 +11,7 @@ import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.internal.AtomicBooleanW
+import arrow.fx.rx2.DeprecateRxJava
 import arrow.fx.rx2.ForMaybeK
 import arrow.fx.rx2.MaybeK
 import arrow.fx.rx2.MaybeKOf
@@ -54,12 +55,14 @@ import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
 import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKFunctor : Functor<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKApplicative : Applicative<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
@@ -75,6 +78,7 @@ interface MaybeKApplicative : Applicative<ForMaybeK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
@@ -93,6 +97,7 @@ interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKFoldable : Foldable<ForMaybeK> {
 
   override fun <A, B> MaybeKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -115,6 +120,7 @@ interface MaybeKFoldable : Foldable<ForMaybeK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKApplicativeError :
   ApplicativeError<ForMaybeK, Throwable>,
   MaybeKApplicative {
@@ -126,6 +132,7 @@ interface MaybeKApplicativeError :
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKMonadError :
   MonadError<ForMaybeK, Throwable>,
   MaybeKMonad {
@@ -137,21 +144,25 @@ interface MaybeKMonadError :
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKMonadThrow : MonadThrow<ForMaybeK>, MaybeKMonadError
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKBracket : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKMonadDefer : MonadDefer<ForMaybeK>, MaybeKBracket {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async(fa)
@@ -164,6 +175,7 @@ interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKEffect :
   Effect<ForMaybeK>,
   MaybeKAsync {
@@ -171,6 +183,7 @@ interface MaybeKEffect :
     fix().runAsync(cb)
 }
 
+@Deprecated(DeprecateRxJava)
 interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
   override fun <A> Kind<ForMaybeK, A>.fork(ctx: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
     ctx.asScheduler().let { scheduler ->
@@ -265,11 +278,13 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
     }
 }
 
+@Deprecated(DeprecateRxJava)
 fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dispatchers()): Concurrent<ForMaybeK> = object : MaybeKConcurrent {
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMaybeK, A>): A = fa().fix().unsafeRunSync()
 
@@ -278,6 +293,7 @@ interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
   override fun default(): CoroutineContext =
     ComputationScheduler
@@ -287,6 +303,7 @@ interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKTimer : Timer<ForMaybeK> {
   override fun sleep(duration: Duration): MaybeK<Unit> =
     MaybeK(Maybe.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
@@ -294,12 +311,14 @@ interface MaybeKTimer : Timer<ForMaybeK> {
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK>, MaybeKFunctor {
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): Kind<ForMaybeK, B> =
     fix().filterMap(f)
 }
 
 @extension
+@Deprecated(DeprecateRxJava)
 interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
   override fun <A> empty(): MaybeK<A> =
     Maybe.empty<A>().k()
@@ -308,5 +327,6 @@ interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
     fix().filterMap(f)
 }
 
+@Deprecated(DeprecateRxJava)
 fun <A> MaybeK.Companion.fx(c: suspend ConcurrentSyntax<ForMaybeK>.() -> A): MaybeK<A> =
   MaybeK.concurrent().fx.concurrent(c).fix()

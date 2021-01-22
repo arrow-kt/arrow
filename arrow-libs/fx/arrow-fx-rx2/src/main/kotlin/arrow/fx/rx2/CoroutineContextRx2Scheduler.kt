@@ -10,6 +10,7 @@ import kotlin.coroutines.startCoroutine
 
 private interface NonCancellableContinuation : Continuation<Unit>, Disposable
 
+@Deprecated(DeprecateRxJava)
 fun CoroutineContext.asScheduler(): Scheduler =
   object : Scheduler() {
     override fun createWorker(): Worker =

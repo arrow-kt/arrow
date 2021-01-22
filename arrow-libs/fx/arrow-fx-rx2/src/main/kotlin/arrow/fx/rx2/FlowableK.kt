@@ -20,31 +20,42 @@ import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
 
+@Deprecated(DeprecateRxJava)
 typealias FlowableKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+@Deprecated(DeprecateRxJava)
 typealias FlowableKProcF<A> = ((Either<Throwable, A>) -> Unit) -> FlowableKOf<Unit>
 
+@Deprecated(DeprecateRxJava)
 class ForFlowableK private constructor() {
   companion object
 }
+@Deprecated(DeprecateRxJava)
 typealias FlowableKOf<A> = arrow.Kind<ForFlowableK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateRxJava)
 inline fun <A> FlowableKOf<A>.fix(): FlowableK<A> =
   this as FlowableK<A>
 
+@Deprecated(DeprecateRxJava)
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateRxJava)
 fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable as Flowable<A>
 
+@Deprecated(DeprecateRxJava)
 data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
 
+  @Deprecated(DeprecateRxJava)
   fun <B> map(f: (A) -> B): FlowableK<B> =
     flowable.map(f).k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> ap(fa: FlowableKOf<(A) -> B>): FlowableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.flatMap { f(it).value() }.k()
 
@@ -91,6 +102,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
    * }
    *  ```
    */
+  @Deprecated(DeprecateRxJava)
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
     Flowable.create<B>({ emitter ->
       val dispose =
@@ -114,14 +126,18 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
       emitter.setCancellable { dispose.dispose() }
     }, mode).k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> switchMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.switchMap { f(it).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: FlowableK<A>): Eval<B> = when {
       fa_p.flowable.isEmpty.blockingGet() -> lb
@@ -131,17 +147,21 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
     return Eval.defer { loop(this) }
   }
 
+  @Deprecated(DeprecateRxJava)
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
     foldRight(Eval.always { GA.just(Flowable.empty<B>().k()) }) { a, eval ->
       GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
 
+  @Deprecated(DeprecateRxJava)
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =
     flowable.observeOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
     Flowable.fromCallable {
       val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
@@ -149,6 +169,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
       dispose
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is FlowableK<*> -> this.flowable == other.flowable
@@ -156,23 +177,29 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
       else -> false
     }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> filterMap(f: (A) -> Option<B>): FlowableK<B> =
     flowable.flatMap { a ->
       f(a).fold({ Flowable.empty<B>() }, { b -> Flowable.just(b) })
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun hashCode(): Int = flowable.hashCode()
 
   companion object {
+    @Deprecated(DeprecateRxJava)
     fun <A> just(a: A): FlowableK<A> =
       Flowable.just(a).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> raiseError(t: Throwable): FlowableK<A> =
       Flowable.error<A>(t).k()
 
+    @Deprecated(DeprecateRxJava)
     operator fun <A> invoke(fa: () -> A): FlowableK<A> =
       defer { just(fa()) }
 
+    @Deprecated(DeprecateRxJava)
     fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
       Flowable.defer { fa().value() }.k()
 
@@ -198,6 +225,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
         fa { either: Either<Throwable, A> ->
@@ -210,6 +238,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         }
       }, mode).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: FlowableKProcF<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
@@ -224,10 +253,11 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         emitter.setCancellable { dispose.dispose() }
       }, mode).k()
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       cancellable(fa)
 
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
         val token = fa { either: Either<Throwable, A> ->
@@ -241,10 +271,11 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }, mode).k()
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -280,6 +311,7 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
         }
       }, mode).k()
 
+    @Deprecated(DeprecateRxJava)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {
       val either = f(a).value().blockingFirst()
       return when (either) {
@@ -290,8 +322,10 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
   }
 }
 
+@Deprecated(DeprecateRxJava)
 fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(DeprecateRxJava)
 fun <A> FlowableK<A>.handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()

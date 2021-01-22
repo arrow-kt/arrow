@@ -20,35 +20,47 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@Deprecated(DeprecateRxJava)
 typealias SingleKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+@Deprecated(DeprecateRxJava)
 typealias SingleKProcF<A> = ((Either<Throwable, A>) -> Unit) -> SingleKOf<Unit>
 
+@Deprecated(DeprecateRxJava)
 class ForSingleK private constructor() {
   companion object
 }
+@Deprecated(DeprecateRxJava)
 typealias SingleKOf<A> = arrow.Kind<ForSingleK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(DeprecateRxJava)
 inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
   this as SingleK<A>
 
+@Deprecated(DeprecateRxJava)
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
 @Suppress("UNCHECKED_CAST")
+@Deprecated(DeprecateRxJava)
 fun <A> SingleKOf<A>.value(): Single<A> = fix().single as Single<A>
 
+@Deprecated(DeprecateRxJava)
 data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
 
+  @Deprecated(DeprecateRxJava)
   suspend fun suspended(): A = suspendCoroutine { cont ->
     value().subscribe(cont::resume, cont::resumeWithException)
   }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
 
+  @Deprecated(DeprecateRxJava)
   fun <B> ap(fa: SingleKOf<(A) -> B>): SingleK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
+  @Deprecated(DeprecateRxJava)
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).value() }.k()
 
@@ -95,6 +107,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
    * }
    *  ```
    */
+  @Deprecated(DeprecateRxJava)
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     Single.create<B> { emitter ->
       val dispose =
@@ -120,12 +133,15 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
       emitter.setCancellable { dispose.dispose() }
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsync(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Unit> =
     single.flatMap { cb(Right(it)).value() }.onErrorResumeNext { cb(Left(it)).value() }.k()
 
+  @Deprecated(DeprecateRxJava)
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     Single.fromCallable {
       val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
@@ -133,6 +149,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
       dispose
     }.k()
 
+  @Deprecated(DeprecateRxJava)
   override fun equals(other: Any?): Boolean =
     when (other) {
       is SingleK<*> -> this.single == other.single
@@ -140,18 +157,23 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
       else -> false
     }
 
+  @Deprecated(DeprecateRxJava)
   override fun hashCode(): Int = single.hashCode()
 
   companion object {
+    @Deprecated(DeprecateRxJava)
     fun <A> just(a: A): SingleK<A> =
       Single.just(a).k()
 
+    @Deprecated(DeprecateRxJava)
     fun <A> raiseError(t: Throwable): SingleK<A> =
       Single.error<A>(t).k()
 
+    @Deprecated(DeprecateRxJava)
     operator fun <A> invoke(fa: () -> A): SingleK<A> =
       defer { just(fa()) }
 
+    @Deprecated(DeprecateRxJava)
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
 
@@ -177,6 +199,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
       SingleK(Single.create<A> { emitter ->
         fa { either: Either<Throwable, A> ->
@@ -188,6 +211,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
         }
       })
 
+    @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
@@ -228,6 +252,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
      * }
      * ```
      */
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -248,14 +273,15 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
       cancellable(fa)
 
-    @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(fa)"))
+    @Deprecated(DeprecateRxJava)
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
       cancellableF(fa)
 
+    @Deprecated(DeprecateRxJava)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
@@ -290,6 +316,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
         }
       }.k()
 
+    @Deprecated(DeprecateRxJava)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> {
       val either = f(a).value().blockingGet()
       return when (either) {
@@ -321,6 +348,7 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
  * }
  * ```
  */
+@Deprecated(DeprecateRxJava)
 fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
   value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
 
@@ -338,8 +366,10 @@ fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
  * }
  * ```
  */
+@Deprecated(DeprecateRxJava)
 fun <A> SingleKOf<A>.unsafeRunSync(): A =
   value().blockingGet()
 
+@Deprecated(DeprecateRxJava)
 fun <A> SingleK<A>.handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
   value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
