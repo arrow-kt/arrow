@@ -3,6 +3,7 @@ package arrow.integrations.kotlinx
 import arrow.core.Either
 import arrow.fx.ForIO
 import arrow.fx.IO
+import arrow.fx.IODeprecation
 import arrow.fx.IOOf
 import arrow.fx.fix
 import arrow.fx.internal.UnsafePromise
@@ -11,7 +12,6 @@ import arrow.fx.typeclasses.Fiber
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.newCoroutineContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.EmptyCoroutineContext
@@ -24,6 +24,7 @@ import kotlin.coroutines.resumeWithException
  *
  * This will make sure that the source [IO] is cancelled whenever it's [CoroutineScope] is cancelled.
  */
+@Deprecated(IODeprecation)
 suspend fun <A> IOOf<A>.suspendCancellable(): A =
   suspendCancellableCoroutine { cont ->
     if (cont.isActive) {
@@ -41,6 +42,7 @@ suspend fun <A> IOOf<A>.suspendCancellable(): A =
  *
  * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
  */
+@Deprecated(IODeprecation)
 fun <A> CoroutineScope.unsafeRunIO(io: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
   io.unsafeRunScoped(this, cb)
 
@@ -50,6 +52,7 @@ fun <A> CoroutineScope.unsafeRunIO(io: IOOf<A>, cb: (Either<Throwable, A>) -> Un
  *
  * @see [IO.unsafeRunAsyncCancellable] for a version that returns the cancellation token instead.
  */
+@Deprecated(IODeprecation)
 fun <A> IOOf<A>.unsafeRunScoped(
   scope: CoroutineScope,
   cb: (Either<Throwable, A>) -> Unit
@@ -73,6 +76,7 @@ fun <A> IOOf<A>.unsafeRunScoped(
  *
  * This returns a [Fiber] that automatically gets cancelled when [CoroutineScope] gets cancelled.
  */
+@Deprecated(IODeprecation)
 fun <A> IOOf<A>.forkScoped(scope: CoroutineScope): IO<Fiber<ForIO, A>> =
   IO.async { cb ->
     val newContext = scope.newCoroutineContext(EmptyCoroutineContext)
