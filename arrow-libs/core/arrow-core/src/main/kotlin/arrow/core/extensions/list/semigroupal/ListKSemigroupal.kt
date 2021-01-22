@@ -2,7 +2,6 @@ package arrow.core.extensions.list.semigroupal
 
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKSemigroupal
-import arrow.core.product as _product
 import kotlin.PublishedApi
 import kotlin.Suppress
 import kotlin.collections.List
@@ -18,9 +17,9 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("product(arg1)", "arrow.core.product"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1, ::Tuple2)", "arrow.core.Tuple2", "kotlin.collections.zip"))
 fun <A, B> List<A>.product(arg1: List<B>): List<Tuple2<A, B>> =
-  _product(arg1)
+  zip(arg1, ::Tuple2)
 
 /**
  * syntax
@@ -32,9 +31,9 @@ fun <A, B> List<A>.product(arg1: List<B>): List<Tuple2<A, B>> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("product(arg1)", "arrow.core.product"))
+@Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1, ::Tuple2)", "arrow.core.Tuple2", "kotlin.collections.zip"))
 operator fun <A, B> List<A>.times(arg1: List<B>): List<Tuple2<A, B>> =
-  _product(arg1)
+  zip(arg1, ::Tuple2)
 
 /**
  * cached extension

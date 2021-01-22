@@ -549,8 +549,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       b: Validated<E, B>,
       f: (A, B) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b)
-        .map { (a, b) -> f(a, b) }
+      mapN(SE, a, b, unit, unit, unit, unit, unit, unit, unit, unit) { a, b, _, _, _, _, _, _, _, _ ->
+        f(a, b)
+      }
 
     inline fun <E, A, B, C, Z> mapN(
       SE: Semigroup<E>,
@@ -559,8 +560,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       c: Validated<E, C>,
       f: (A, B, C) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c)
-        .map { (a, b, c) -> f(a, b, c) }
+      mapN(SE, a, b, c, unit, unit, unit, unit, unit, unit, unit) { a, b, c, _, _, _, _, _, _, _ ->
+        f(a, b, c)
+      }
 
     inline fun <E, A, B, C, D, Z> mapN(
       SE: Semigroup<E>,
@@ -570,8 +572,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       d: Validated<E, D>,
       f: (A, B, C, D) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d)
-        .map { (a, b, c, d) -> f(a, b, c, d) }
+      mapN(SE, a, b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ ->
+        f(a, b, c, d)
+      }
 
     inline fun <E, A, B, C, D, EE, Z> mapN(
       SE: Semigroup<E>,
@@ -582,8 +585,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       e: Validated<E, EE>,
       f: (A, B, C, D, EE) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e)
-        .map { (a, b, c, d, e) -> f(a, b, c, d, e) }
+      mapN(SE, a, b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, _, _, _, _, _ ->
+        f(a, b, c, d, e)
+      }
 
     inline fun <E, A, B, C, D, EE, FF, Z> mapN(
       SE: Semigroup<E>,
@@ -595,8 +599,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       ff: Validated<E, FF>,
       f: (A, B, C, D, EE, FF) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e, ff)
-        .map { (a, b, c, d, e, ff) -> f(a, b, c, d, e, ff) }
+      mapN(SE, a, b, c, d, e, ff, unit, unit, unit, unit) { a, b, c, d, e, ff, _, _, _, _ ->
+        f(a, b, c, d, e, ff)
+      }
 
     inline fun <E, A, B, C, D, EE, F, G, Z> mapN(
       SE: Semigroup<E>,
@@ -609,8 +614,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       g: Validated<E, G>,
       f: (A, B, C, D, EE, F, G) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e, ff, g)
-        .map { (a, b, c, d, e, ff, g) -> f(a, b, c, d, e, ff, g) }
+      mapN(SE, a, b, c, d, e, ff, g, unit, unit, unit) { a, b, c, d, e, ff, g, _, _, _ ->
+        f(a, b, c, d, e, ff, g)
+      }
 
     inline fun <E, A, B, C, D, EE, F, G, H, Z> mapN(
       SE: Semigroup<E>,
@@ -624,8 +630,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       h: Validated<E, H>,
       f: (A, B, C, D, EE, F, G, H) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e, ff, g, h)
-        .map { (a, b, c, d, e, ff, g, h) -> f(a, b, c, d, e, ff, g, h) }
+      mapN(SE, a, b, c, d, e, ff, g, h, unit, unit) { a, b, c, d, e, ff, g, h, _, _ ->
+        f(a, b, c, d, e, ff, g, h)
+      }
 
     inline fun <E, A, B, C, D, EE, F, G, H, I, Z> mapN(
       SE: Semigroup<E>,
@@ -640,8 +647,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       i: Validated<E, I>,
       f: (A, B, C, D, EE, F, G, H, I) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e, ff, g, h, i)
-        .map { (a, b, c, d, e, ff, g, h, i) -> f(a, b, c, d, e, ff, g, h, i) }
+      mapN(SE, a, b, c, d, e, ff, g, h, i, unit) { a, b, c, d, e, ff, g, h, i, _ ->
+        f(a, b, c, d, e, ff, g, h, i)
+      }
 
     inline fun <E, A, B, C, D, EE, F, G, H, I, J, Z> mapN(
       SE: Semigroup<E>,
@@ -657,108 +665,22 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
       j: Validated<E, J>,
       f: (A, B, C, D, EE, F, G, H, I, J) -> Z
     ): Validated<E, Z> =
-      tupledN(SE, a, b, c, d, e, ff, g, h, i, j)
-        .map { (a, b, c, d, e, ff, g, h, i, j) -> f(a, b, c, d, e, ff, g, h, i, j) }
-
-    fun <E, A, B> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>
-    ): Validated<E, Tuple2<A, B>> =
-      a.product(SE, b)
-
-    fun <E, A, B, C> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>
-    ): Validated<E, Tuple3<A, B, C>> =
-      a.product(SE, b).product(SE, c)
-
-    fun <E, A, B, C, D> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>
-    ): Validated<E, Tuple4<A, B, C, D>> =
-      a.product(SE, b).product(SE, c).product(SE, d)
-
-    fun <E, A, B, C, D, EE> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>
-    ): Validated<E, Tuple5<A, B, C, D, EE>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e)
-
-    fun <E, A, B, C, D, EE, F> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: Validated<E, F>
-    ): Validated<E, Tuple6<A, B, C, D, EE, F>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f)
-
-    fun <E, A, B, C, D, EE, F, G> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: Validated<E, F>,
-      g: Validated<E, G>
-    ): Validated<E, Tuple7<A, B, C, D, EE, F, G>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g)
-
-    fun <E, A, B, C, D, EE, F, G, H> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>
-    ): Validated<E, Tuple8<A, B, C, D, EE, F, G, H>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g).product(SE, h)
-
-    fun <E, A, B, C, D, EE, F, G, H, I> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>,
-      i: Validated<E, I>
-    ): Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g).product(SE, h).product(SE, i)
-
-    fun <E, A, B, C, D, EE, F, G, H, I, J> tupledN(
-      SE: Semigroup<E>,
-      a: Validated<E, A>,
-      b: Validated<E, B>,
-      c: Validated<E, C>,
-      d: Validated<E, D>,
-      e: Validated<E, EE>,
-      f: Validated<E, F>,
-      g: Validated<E, G>,
-      h: Validated<E, H>,
-      i: Validated<E, I>,
-      j: Validated<E, J>
-    ): Validated<E, Tuple10<A, B, C, D, EE, F, G, H, I, J>> =
-      a.product(SE, b).product(SE, c).product(SE, d).product(SE, e).product(SE, f).product(SE, g)
-        .product(SE, h).product(SE, i).product(SE, j)
+      if (a is Valid && b is Valid && c is Valid && d is Valid && e is Valid && ff is Valid && g is Valid && h is Valid && i is Valid && j is Valid) {
+        Valid(f(a.a, b.a, c.a, d.a, e.a, ff.a, g.a, h.a, i.a, j.a))
+      } else SE.run {
+        var accumulatedError: E? = null
+        accumulatedError = if (a is Invalid) a.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (b is Invalid) b.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (c is Invalid) c.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (d is Invalid) d.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (e is Invalid) e.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (ff is Invalid) ff.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (g is Invalid) g.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (h is Invalid) h.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (i is Invalid) i.e.maybeCombine(accumulatedError) else accumulatedError
+        accumulatedError = if (j is Invalid) j.e.maybeCombine(accumulatedError) else accumulatedError
+        Invalid(accumulatedError!!)
+      }
   }
 
   /**
@@ -1111,68 +1033,6 @@ fun <E, A> Validated<E, A>.replicate(SE: Semigroup<E>, n: Int, MA: Monoid<A>): V
   if (n <= 0) MA.empty().valid()
   else Validated.mapN(SE, this@replicate, replicate(SE, n - 1, MA)) { a, xs -> MA.run { a + xs } }
 
-fun <E, A, B> Validated<E, A>.product(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Tuple2<A, B>> =
-  ap(SE, fb.map { b: B -> { a: A -> Tuple2(a, b) } })
-
-fun <E, A, B, Z> Validated<E, A>.map2(SE: Semigroup<E>, fb: Validated<E, B>, f: (Tuple2<A, B>) -> Z): Validated<E, Z> =
-  product(SE, fb).map(f)
-
-@JvmName("product3")
-fun <E, A, B, C> Validated<E, Tuple2<A, B>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, C>,
-): Validated<E, Tuple3<A, B, C>> =
-  map2(SE, other) { (ab, c) -> Tuple3(ab.a, ab.b, c) }
-
-@JvmName("product4")
-fun <E, A, B, C, D> Validated<E, Tuple3<A, B, C>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, D>,
-): Validated<E, Tuple4<A, B, C, D>> =
-  map2(SE, other) { (abc, d) -> Tuple4(abc.a, abc.b, abc.c, d) }
-
-@JvmName("product5")
-fun <E, A, B, C, D, EE> Validated<E, Tuple4<A, B, C, D>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, EE>,
-): Validated<E, Tuple5<A, B, C, D, EE>> =
-  map2(SE, other) { (abcd, e) -> Tuple5(abcd.a, abcd.b, abcd.c, abcd.d, e) }
-
-@JvmName("product6")
-fun <E, A, B, C, D, EE, F> Validated<E, Tuple5<A, B, C, D, EE>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, F>,
-): Validated<E, Tuple6<A, B, C, D, EE, F>> =
-  map2(SE, other) { (abcde, f) -> Tuple6(abcde.a, abcde.b, abcde.c, abcde.d, abcde.e, f) }
-
-@JvmName("product7")
-fun <E, A, B, C, D, EE, F, G> Validated<E, Tuple6<A, B, C, D, EE, F>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, G>,
-): Validated<E, Tuple7<A, B, C, D, EE, F, G>> =
-  map2(SE, other) { (abcdef, g) -> Tuple7(abcdef.a, abcdef.b, abcdef.c, abcdef.d, abcdef.e, abcdef.f, g) }
-
-@JvmName("product8")
-fun <E, A, B, C, D, EE, F, G, H> Validated<E, Tuple7<A, B, C, D, EE, F, G>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, H>,
-): Validated<E, Tuple8<A, B, C, D, EE, F, G, H>> =
-  map2(SE, other) { (abcdefg, h) -> Tuple8(abcdefg.a, abcdefg.b, abcdefg.c, abcdefg.d, abcdefg.e, abcdefg.f, abcdefg.g, h) }
-
-@JvmName("product9")
-fun <E, A, B, C, D, EE, F, G, H, I> Validated<E, Tuple8<A, B, C, D, EE, F, G, H>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, I>,
-): Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>> =
-  map2(SE, other) { (abcdefgh, i) -> Tuple9(abcdefgh.a, abcdefgh.b, abcdefgh.c, abcdefgh.d, abcdefgh.e, abcdefgh.f, abcdefgh.g, abcdefgh.h, i) }
-
-@JvmName("product10")
-fun <E, A, B, C, D, EE, F, G, H, I, J> Validated<E, Tuple9<A, B, C, D, EE, F, G, H, I>>.product(
-  SE: Semigroup<E>,
-  other: Validated<E, J>,
-): Validated<E, Tuple10<A, B, C, D, EE, F, G, H, I, J>> =
-  map2(SE, other) { (abcdefghi, j) -> Tuple10(abcdefghi.a, abcdefghi.b, abcdefghi.c, abcdefghi.d, abcdefghi.e, abcdefghi.f, abcdefghi.g, abcdefghi.h, abcdefghi.i, j) }
-
 fun <E, A> Validated<Iterable<E>, Iterable<A>>.bisequence(): List<Validated<E, A>> =
   bitraverse(::identity, ::identity)
 
@@ -1437,8 +1297,8 @@ private open class ValidatedSemigroup<A, B>(
 }
 
 private class ValidatedMonoid<A, B>(
-  private val SA: Semigroup<A>,
-  private val MB: Monoid<B>
+  SA: Semigroup<A>,
+  MB: Monoid<B>
 ) : Monoid<Validated<A, B>>, ValidatedSemigroup<A, B>(SA, MB) {
   private val empty = Valid(MB.empty())
 
