@@ -1,10 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Id
 import arrow.core.identity
-import arrow.core.value
-import arrow.typeclasses.internal.IdBimonad
 import arrow.core.Option
 import arrow.core.Either
 import arrow.core.Validated
@@ -12,6 +9,9 @@ import arrow.core.Const
 import arrow.core.Nel
 import arrow.core.SequenceK
 import arrow.core.ValidatedNel
+import arrow.typeclasses.internal.Id
+import arrow.typeclasses.internal.fix
+import arrow.typeclasses.internal.idApplicative
 
 /**
  * In functional programming it is very common to encode "behaviors" as data types - common behaviors include [Option] for possibly missing values, [Either] and [Validated] for possible errors, and [Ref]({{ '/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
@@ -367,87 +367,6 @@ import arrow.core.ValidatedNel
  *
  * [Traverse] is not limited to [List] or [Nel], it provides an abstraction over 'things that can be traversed over', like a Binary tree, [SequenceK], or a `Stream`, hence the name [Traverse].
  *
- * #### Playing with `Reader`
- *
- * Another interesting data type we can use is `Reader`. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> Id<A>`.
- *
- * In other words all three aforementioned representations are isomorphic to `D -> A` - (Note: In regards to the category of Kotlin, where the morphisms are functions one might consider this signature `D -> A` rather than wrapper Data types like `Kleisli`)
- *
- * If we fix `D` to be some sort of dependency or configuration and `A` as the return type, we can use the `Reader` applicative in our [traverse].
- *
- * We can imagine we have a data pipeline that processes a bunch of data, each piece of data being categorized by a topic. Given a specific topic, we produce a `Job` that processes that topic. (Note that since a `Job` is just a `Reader`/`Kleisli`, one could write many small `Jobs` and compose them together into one `Job` that is used/returned by `processTopic`.)
- *
- * Corresponding to bunch of topics, a `List<Topic>` if you will. Since `Reader` has an [Applicative] instance, we can [traverse] over this list.
- *
- * Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that, when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
- *
- * One example of a "context" can be found in the [Spark](http://spark.apache.org/) project or in [Android's Context](https://developer.android.com/reference/android/content/Context). In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a `SparkContext`. Going back to the above example, we can see how one may define topic-specific Spark jobs `(type Job<A> = Reader<SparkContext, A>)` and then run several Spark jobs on a collection of topics via [traverse]. We then get back a `Job<List<Result>>`, which is equivalent to (`SparkContext) -> List<Result>`. When finally passed a `SparkContext`, we can run the job and get our results back.
- *
- * Moreover, the fact that our aggregate job is not tied to any specific `SparkContext` allows us to pass in a `SparkContext` pointing to a production cluster, or (using the exact same job) pass in a test `SparkContext` that just runs locally across threads. This makes testing our large job nice and easy.
- *
- * Finally, this encoding ensures that all the jobs for each topic run on the exact same cluster. At no point do we manually pass in or thread a `SparkContext` through - that is taken care for us by the (applicative) behavior of `Reader` and therefore by [traverse].
- *
- * ### Traversables are Functors
- *
- * As it turns out every [Traverse] is a lawful [Functor]. By carefully picking the `G` to use in [traverse] we can implement `map`.
- *
- * First let's look at the two signatures.
- *
- * ```kotlin:ank
- * import arrow.Kind
- * import arrow.core.Id
- * import arrow.core.extensions.id.applicative.applicative
- * import arrow.core.value
- * import arrow.typeclasses.Applicative
- * import arrow.typeclasses.Foldable
- * import arrow.typeclasses.Functor
- *
- * interface Traverse<F> : Functor<F>, Foldable<F> {
- *   fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
- *
- *   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
- *     traverse(Id.applicative()) { Id(f(it)) }.value()
- * }
- * ```
- *
- * Both have a `Kind<F, A>` receiver and a similar `f` parameter. [traverse] expects the return type of `f` to be `Kind<G, B>` whereas `map` just wants `B`. Similarly the return type of [traverse] is `Kind<G, Kind<F, B>>` whereas for `map` it's just `Kind<F, B>`. This suggests we need to pick a `G` such that `Kind<G, A>` communicates exactly as much information as `A`. We can conjure one up by simply wrapping an `A` in `arrow.core.Id`.
- *
- * In order to call [traverse] [Id] needs to be [Applicative] which is straightforward - note that while [Id] just wraps an `A`, it is still a type constructor which matches the shape required by [Applicative].
- *
- * ```kotlin:ank
- * import arrow.core.ForId
- * import arrow.core.Id
- * import arrow.core.IdOf
- * import arrow.core.extensions.id.comonad.extract
- * import arrow.typeclasses.Applicative
- *
- * interface IdApplicative : Applicative<ForId> {
- *   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
- *     Id(ff.extract().invoke(extract()))
- *
- *   override fun <A> just(a: A): Id<A> =
- *     Id(a)
- * }
- * ```
- *
- * We can implement [map] by wrapping and unwrapping [Id] as necessary.
- *
- * ```kotlin:ank:playground
- * import arrow.core.Id
- * import arrow.core.MapK
- * import arrow.core.extensions.id.applicative.applicative
- * import arrow.core.fix
- * import arrow.core.k
- * import arrow.core.value
- * //sampleStart
- * val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
- *
- * val result = map.traverse(Id.applicative()) { Id("$it") }.fix().value()
- * //sampleEnd
- * fun main() {
- *   println(result)
- * }
- * ```
  *
  * ### Theory Wrap-up
  *
@@ -488,7 +407,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
   fun <G, A> Kind<F, Kind<G, A>>.sequence(AG: Applicative<G>): Kind<G, Kind<F, A>> = traverse(AG, ::identity)
 
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
-    traverse(IdBimonad) { Id(f(it)) }.value()
+    traverse(idApplicative) { Id(f(it)) }.fix().value
 
   fun <G, A, B> Kind<F, A>.flatTraverse(MF: Monad<F>, AG: Applicative<G>, f: (A) -> Kind<G, Kind<F, B>>): Kind<G, Kind<F, B>> =
     AG.run { traverse(this, f).map { MF.run { it.flatten() } } }

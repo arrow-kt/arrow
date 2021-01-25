@@ -1,27 +1,14 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.ForId
-import arrow.core.Id
-import arrow.core.IdOf
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.fix
-import arrow.core.value
+import arrow.typeclasses.internal.Id
+import arrow.typeclasses.internal.fix
+import arrow.typeclasses.internal.idApplicative
 
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
-
-  private object IdApplicative : Applicative<ForId> {
-    override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
-      fix().ap(ff)
-
-    override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
-      fix().map(f)
-
-    override fun <A> just(a: A): Id<A> =
-      Id.just(a)
-  }
 
   /**
    * Returns [F]<[B]> in [G] context by applying [AP] on a selector function [f], which returns [Option] of [B]
@@ -30,7 +17,7 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
   fun <G, A, B> Kind<F, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>
 
   override fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B> =
-    traverseFilter(IdApplicative) { Id(f(it)) }.value()
+    traverseFilter(idApplicative) { Id(f(it)) }.fix().value
 
   /**
    * Returns [F]<[A]> in [G] context by applying [GA] on a selector function [f] in [G] context.
@@ -40,7 +27,7 @@ interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
   }
 
   override fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
-    filterA({ Id(f(it)) }, IdApplicative).value()
+    filterA({ Id(f(it)) }, idApplicative).fix().value
 
   /**
    * Filter out instances of [B] type and traverse the [G] context.

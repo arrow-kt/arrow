@@ -23,8 +23,8 @@ import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.monoid
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.order
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
@@ -32,7 +32,6 @@ import arrow.core.test.generators.any
 import arrow.core.test.generators.either
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
-import arrow.core.test.generators.id
 import arrow.core.test.generators.intSmall
 import arrow.core.test.generators.suspendFunThatReturnsAnyLeft
 import arrow.core.test.generators.suspendFunThatReturnsAnyRight
@@ -61,7 +60,7 @@ import kotlinx.coroutines.runBlocking
 
 class EitherTest : UnitSpec() {
 
-  val EQ: Eq<Kind<EitherPartialOf<ForId>, Int>> = Eq.any()
+  val EQ: Eq<Kind<EitherPartialOf<ForOption>, Int>> = Eq.any()
   val throwableEQ: Eq<Throwable> = Eq.any()
   val GEN = Gen.either(Gen.string(), Gen.int())
 
@@ -81,7 +80,7 @@ class EitherTest : UnitSpec() {
       ),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), Either.genK(Gen.int()), Either.eqK(Int.eq())),
       BitraverseLaws.laws(Either.bitraverse(), Either.genK2(), Either.eqK2()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
+      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.int().map(::Some)), Either.eqK(Option.eq(Int.eq()))),
       HashLaws.laws(Either.hash(String.hash(), Int.hash()), GEN, Either.eq(String.eq(), Int.eq())),
       OrderLaws.laws(Either.order(String.order(), Int.order()), GEN),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),

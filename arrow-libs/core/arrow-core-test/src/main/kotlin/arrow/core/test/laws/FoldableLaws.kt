@@ -4,21 +4,21 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Eval.Companion.always
-import arrow.core.ForId
 import arrow.core.ForListK
-import arrow.core.Id
+import arrow.core.ForOption
+import arrow.core.some
+import arrow.core.right
+import arrow.core.fix
 import arrow.core.Left
 import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
+import arrow.core.identity
 import arrow.core.extensions.ListKEq
 import arrow.core.extensions.either.monad.flatMap
 import arrow.core.extensions.eq
-import arrow.core.extensions.id.comonad.extract
-import arrow.core.extensions.id.eqK.eqK
-import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.list.eqK.eqK
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.monoid.monoid
@@ -26,9 +26,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.eqK.eqK
-import arrow.core.identity
-import arrow.core.right
-import arrow.core.some
+import arrow.core.extensions.option.monad.monad
 import arrow.core.test.concurrency.SideEffect
 import arrow.core.test.generators.GenK
 import arrow.core.test.generators.functionAAToA
@@ -59,7 +57,7 @@ object FoldableLaws {
     val EQBool = Boolean.eq()
     val EQOptionInt = Option.eq(Int.eq())
     val EQListKInt: ListKEq<Int> = ListK.eq(Int.eq())
-    val EQForIdInt: Eq<Kind<ForId, Int>> = Id.eqK().liftEq(Int.eq())
+    val EQForOptionInt: Eq<Kind<ForOption, Int>> = Option.eqK().liftEq(Int.eq())
 
     return listOf(
       Law("Foldable Laws: foldRight is lazy") { FF.`foldRight is lazy`(GEN) },
@@ -87,9 +85,9 @@ object FoldableLaws {
       Law("Foldable Laws: sequence_ consistent with traverse_") { FF.`sequence_ consistent with traverse_`(Option.applicative(), GENK, Option.genK(), Option.eqK().liftEq(Eq.any())) },
       Law("Foldable Laws: isEmpty returns if there are elements or not") { FF.`isEmpty returns if there are elements or not`(GEN, EQBool) },
       Law("Foldable Laws: isNotEmpty consistent with isEmpty") { FF.`isNotEmpty consistent with isEmpty`(GEN, EQBool) },
-      Law("Foldable Laws: foldMapM folds on F mapping values to G(B) using given Monoid") { FF.`foldMapM folds on F mapping values to G(B) using given Monoid`(GEN, EQForIdInt) },
+      Law("Foldable Laws: foldMapM folds on F mapping values to G(B) using given Monoid") { FF.`foldMapM folds on F mapping values to G(B) using given Monoid`(GEN, EQForOptionInt) },
       Law("Foldable Laws: get gets the item at the given index of the Foldable") { FF.`get gets the item at the given index of the Foldable`(GEN, EQOptionInt) },
-      Law("Foldable Laws: foldMapA folds on F mapping values to G(B) using given Monoid") { FF.`foldMapA folds on F mapping values to G(B) using given Monoid`(GEN, EQForIdInt) }
+      Law("Foldable Laws: foldMapA folds on F mapping values to G(B) using given Monoid") { FF.`foldMapA folds on F mapping values to G(B) using given Monoid`(GEN, EQForOptionInt) }
     )
   }
 
@@ -182,9 +180,9 @@ object FoldableLaws {
   fun <F> Foldable<F>.foldMIdIsFoldL(G: Gen<Kind<F, Int>>, EQ: Eq<Int>) =
     forAll(Gen.functionAToB<Int, Int>(Gen.intSmall()), G) { f: (Int) -> Int, fa: Kind<F, Int> ->
       with(Int.monoid()) {
-        val foldL: Int = fa.foldLeft(empty()) { acc, a -> acc.combine(f(a)) }
-        val foldM: Int = fa.foldM(Id.monad(), empty()) { acc, a -> Id(acc.combine(f(a))) }.extract()
-        foldM.equalUnderTheLaw(foldL, EQ)
+        val foldL: Option<Int> = Some(fa.foldLeft(empty()) { acc, a -> acc.combine(f(a)) })
+        val foldM: Option<Int> = fa.foldM(Option.monad(), empty()) { acc, a -> Some(acc.combine(f(a))) }.fix()
+        foldM == foldL
       }
     }
 
@@ -304,9 +302,9 @@ object FoldableLaws {
       fa.isNotEmpty().equalUnderTheLaw(!fa.isEmpty(), EQ)
     }
 
-  fun <F> Foldable<F>.`foldMapM folds on F mapping values to G(B) using given Monoid`(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<ForId, Int>>) =
-    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), G) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-      Id.monad().run {
+  fun <F> Foldable<F>.`foldMapM folds on F mapping values to G(B) using given Monoid`(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<ForOption, Int>>) =
+    forAll(Gen.functionAToB<Int, Kind<ForOption, Int>>(Gen.intSmall().map(::Some)), G) { f: (Int) -> Kind<ForOption, Int>, fa: Kind<F, Int> ->
+      Option.monad().run {
         with(Int.monoid()) {
           val expected = fa.foldM(this@run, this.empty()) { b, a -> f(a).map { this.run { b.combine(it) } } }
           fa.foldMapM(this@run, this, f).equalUnderTheLaw(expected, EQ)
@@ -329,9 +327,9 @@ object FoldableLaws {
       fa.get(idx).equalUnderTheLaw(expected, EQ)
     }
 
-  fun <F> Foldable<F>.`foldMapA folds on F mapping values to G(B) using given Monoid`(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<ForId, Int>>) =
-    forAll(Gen.functionAToB<Int, Kind<ForId, Int>>(Gen.intSmall().map(::Id)), G) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-      Id.monad().run {
+  fun <F> Foldable<F>.`foldMapA folds on F mapping values to G(B) using given Monoid`(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<ForOption, Int>>) =
+    forAll(Gen.functionAToB<Int, Kind<ForOption, Int>>(Gen.intSmall().map(::Some)), G) { f: (Int) -> Kind<ForOption, Int>, fa: Kind<F, Int> ->
+      Option.monad().run {
         with(Int.monoid()) {
           val expected = fa.foldM(this@run, this.empty()) { b, a -> f(a).map { this.run { b.combine(it) } } }
           fa.foldMapA(this@run, this, f).equalUnderTheLaw(expected, EQ)

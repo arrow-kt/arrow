@@ -6,14 +6,12 @@ import arrow.core.ConstPartialOf
 import arrow.core.Either
 import arrow.core.EitherPartialOf
 import arrow.core.ForHashed
-import arrow.core.ForId
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.ForOption
 import arrow.core.ForSequenceK
 import arrow.core.ForSetK
 import arrow.core.Hashed
-import arrow.core.Id
 import arrow.core.Ior
 import arrow.core.IorPartialOf
 import arrow.core.ListK
@@ -27,6 +25,8 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapKPartialOf
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
+import arrow.core.test.laws.internal.Id
+import arrow.core.test.laws.internal.id
 import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
 
@@ -44,9 +44,9 @@ fun Option.Companion.genK() = object : GenK<ForOption> {
     Gen.option(gen) as Gen<Kind<ForOption, A>>
 }
 
-fun Id.Companion.genK() = object : GenK<ForId> {
-  override fun <A> genK(gen: Gen<A>): Gen<Kind<ForId, A>> =
-    Gen.id(gen) as Gen<Kind<ForId, A>>
+internal fun Id.Companion.genK() = object : GenK<Id.Companion> {
+  override fun <A> genK(gen: Gen<A>): Gen<Kind<Id.Companion, A>> =
+    Gen.id(gen) as Gen<Kind<Id.Companion, A>>
 }
 
 fun ListK.Companion.genK(withMaxSize: Int = DEFAULT_COLLECTION_MAX_SIZE) = object : GenK<ForListK> {

@@ -21,38 +21,13 @@ and [`FunctorFilter`]({{ '/arrow/typeclasses/functorfilter/' | relative_url }}).
 
 Returns `F<B>` in `G` context by applying `AP` on a selector function `f`, which returns `Option` of `B` in `G` context.
 
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.id.applicative.applicative
-import arrow.core.extensions.traverseFilter
-
-Some(1).traverseFilter(Id.applicative()) { Id.just(None) }
-Some(1).traverseFilter(Id.applicative()) { Id.just((it * 2).some()) }
-```
-
 #### Kind<F, A>#filterA
 
 Returns `F<A>` in `G` context by applying `GA` on a selector function `f` in `G` context.
 
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.id.applicative.applicative
-import arrow.core.extensions.option.traverseFilter.filterA
-
-Some(1).filterA({ Id.just(false) }, Id.applicative())
-```
-
 #### Kind<F, A>#traverseFilterIsInstance
 
 Filter out instances of a specific type and traverse a context.
-
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.id.applicative.applicative
-import arrow.core.extensions.option.traverseFilter.traverseFilterIsInstance
-
-Some(1).traverseFilterIsInstance(Id.applicative(), Int::class.java)
-```
 
 ### Laws
 

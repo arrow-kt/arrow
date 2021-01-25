@@ -6,7 +6,6 @@ import arrow.core.Either
 import arrow.core.Endo
 import arrow.core.Eval
 import arrow.core.Hashed
-import arrow.core.Id
 import arrow.core.Ior
 import arrow.core.Left
 import arrow.core.ListK
@@ -166,14 +165,6 @@ fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { 
 
 fun Gen.Companion.unit(): Gen<Unit> =
   create { Unit }
-
-fun <T> Gen.Companion.id(gen: Gen<T>): Gen<Id<T>> = object : Gen<Id<T>> {
-  override fun constants(): Iterable<Id<T>> =
-    gen.constants().map { Id.just(it) }
-
-  override fun random(): Sequence<Id<T>> =
-    gen.random().map { Id.just(it) }
-}
 
 fun <A, B> Gen.Companion.ior(genA: Gen<A>, genB: Gen<B>): Gen<Ior<A, B>> =
   genA.alignWith(genB) { it }

@@ -6,7 +6,6 @@ import arrow.core.extensions.either.eqK.eqK
 import arrow.core.extensions.either.semigroupK.semigroupK
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.ior.applicative.applicative
 import arrow.core.extensions.ior.bicrosswalk.bicrosswalk
 import arrow.core.extensions.ior.bifunctor.bifunctor
@@ -22,13 +21,13 @@ import arrow.core.extensions.ior.order.order
 import arrow.core.extensions.ior.semigroup.semigroup
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
+import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.order
 import arrow.core.extensions.semigroup
 import arrow.core.extensions.show
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.genK
 import arrow.core.test.generators.genK2
-import arrow.core.test.generators.id
 import arrow.core.test.generators.ior
 import arrow.core.test.laws.BicrosswalkLaws
 import arrow.core.test.laws.BifunctorLaws
@@ -74,7 +73,7 @@ class IorTest : UnitSpec() {
       HashLaws.laws(Ior.hash(String.hash(), Int.hash()), Gen.ior(Gen.string(), Gen.int()), Ior.eq(String.eq(), Int.eq())),
       OrderLaws.laws(Ior.order(String.order(), Int.order()), Gen.ior(Gen.string(), Gen.int())),
       BitraverseLaws.laws(Ior.bitraverse(), Ior.genK2(), Ior.eqK2()),
-      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.id(Gen.int())), Either.eqK(Id.eq(Int.eq()))),
+      SemigroupKLaws.laws(Either.semigroupK(), Either.genK(Gen.int().map(::Some)), Either.eqK(Option.eq(Int.eq()))),
       CrosswalkLaws.laws(Ior.crosswalk(), Ior.genK(Gen.int()), Ior.eqK(Int.eq())),
       BicrosswalkLaws.laws(Ior.bicrosswalk(), Ior.genK2(), Ior.eqK2())
     )

@@ -11,7 +11,7 @@ import arrow.undocumented
 
 private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex(RegexOption.MULTILINE)
 
-private const val ConstantTypeConstructor = "ForId"
+private const val ConstantTypeConstructor = "ForEval"
 private const val ConstantType1 = "String"
 private const val ConstantType2 = "CharSequence"
 

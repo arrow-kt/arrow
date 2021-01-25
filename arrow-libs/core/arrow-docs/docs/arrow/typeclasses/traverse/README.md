@@ -23,23 +23,15 @@ and [`Foldable`]({{ '/arrow/typeclasses/foldable/' | relative_url }}).
 Given a function which returns a `G` effect, thread this effect through the running of this function on all the values
 in `F`, returning an `F<B>` in a `G` context.
 
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.id.applicative.applicative
-import arrow.core.extensions.traverse
-
-Some(1).traverse(Id.applicative()) { Id.just(it * 2) }
-```
-
 #### Kind<F, Kind<G, A>>#sequence
 
 Thread all the `G` effects through the `F` structure to invert the structure from `F<G<A>>` to `G<F<A>>`.
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.eval.applicative.applicative
 
-Const<Int, Nothing>(1).sequence<Nothing, Int, ForId>(Id.applicative())
+Const<Int, Nothing>(1).sequence<Nothing, Int, ForEval>(Eval.applicative())
 ```
 
 ### Laws

@@ -6,9 +6,6 @@ permalink: /integrations/kindedj/
 
 ## KindedJ
 
-
-
-
 [KindedJ](https://github.com/KindedJ/KindedJ/) is a project to create an interop layer between multiple libraries that emulate [higher kinds]({{ '/patterns/glossary' | relative_url }}) in the JVM
 using lightweight higher kind polymorphisms. You can read more about this emulation in [KindedJ's Readme](https://github.com/KindedJ/KindedJ/blob/master/README.md).
 
@@ -56,26 +53,6 @@ val idj2: io.kindedj.Hk<ForIdJ, A> = id.fromArrow()
 
 Using the conversion layer, we're able to use an intermediate representation of any Arrow datatype generically by converting it into a `io.kindedj.Hk2<ForConvert, F, A>`,
 where F is the [original representation of the container]({{ '/patterns/glossary' | relative_url }}). Note that the typealias `io.kindedj.Hk2` is only available in Kotlin.
-
-Let's see an example using our type [`Id`]({{ '/apidocs/arrow-core-data/arrow.core/-id/' | relative_url }}):
-
-```kotlin
-data class IdK<out A>(val a: A)
-```
-
-You can convert it to Arrow using the conversion class `Convert.FromArrowToKindedJ` and its static factory `Convert.toKindedJ()`:
-
-```java
-IdK idk = new IdK(1);
-
-Convert.FromArrowToKindedJ<ForIdJ, A> idj = Convert.toKindedJ(idk);
-```
-
-and convert it back using `FromArrowToKindedJ.toArrow()`:
-
-```
-IdJ idk2 = idj.toArrow();
-```
 
 #### How to work with the conversion layer
 
