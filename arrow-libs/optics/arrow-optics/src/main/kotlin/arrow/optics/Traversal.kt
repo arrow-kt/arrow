@@ -3,18 +3,19 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.Const
 import arrow.core.Either
-import arrow.core.Id
 import arrow.core.ListK
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.AndMonoid
 import arrow.core.extensions.const.applicative.applicative
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.listk.monoid.monoid
 import arrow.core.extensions.monoid
 import arrow.core.identity
 import arrow.core.value
+import arrow.optics.typeclasses.Id
+import arrow.optics.typeclasses.fix
+import arrow.optics.typeclasses.idApplicative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
@@ -354,7 +355,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Modify polymorphically the target of a [PTraversal] with a function [f]
    */
-  fun modify(s: S, f: (A) -> B): T = modifyF(Id.applicative(), s) { b -> Id(f(b)) }.value()
+  fun modify(s: S, f: (A) -> B): T = modifyF(idApplicative, s) { b -> Id(f(b)) }.fix().value
 
   /**
    * Check whether at least one element satisfies the predicate.

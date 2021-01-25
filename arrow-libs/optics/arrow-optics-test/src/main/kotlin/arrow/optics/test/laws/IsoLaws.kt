@@ -1,10 +1,8 @@
 package arrow.optics.test.laws
 
 import arrow.core.Const
-import arrow.core.Id
 import arrow.core.compose
 import arrow.core.extensions.const.applicative.applicative
-import arrow.core.extensions.id.functor.functor
 import arrow.core.identity
 import arrow.core.value
 import arrow.optics.Iso
@@ -24,7 +22,6 @@ object IsoLaws {
       Law("Iso Law: modify identity is identity") { iso.modifyIdentity(aGen, EQA) },
       Law("Iso Law: compose modify") { iso.composeModify(aGen, funcGen, EQA) },
       Law("Iso Law: consitent set with modify") { iso.consistentSetModify(aGen, bGen, EQA) },
-      Law("Iso Law: consistent modify with modify identity") { iso.consistentModifyModifyId(aGen, funcGen, EQA) },
       Law("Iso Law: consitent get with modify identity") { iso.consitentGetModifyId(aGen, EQB, bMonoid) }
     )
 
@@ -51,11 +48,6 @@ object IsoLaws {
   fun <A, B> Iso<A, B>.consistentSetModify(aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
     forAll(aGen, bGen) { a, b ->
       set(b).equalUnderTheLaw(modify(a) { b }, EQA)
-    }
-
-  fun <A, B> Iso<A, B>.consistentModifyModifyId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
-    forAll(aGen, funcGen) { a, f ->
-      modify(a, f).equalUnderTheLaw(modifyF(Id.functor(), a) { Id.just(f(it)) }.value(), EQA)
     }
 
   fun <A, B> Iso<A, B>.consitentGetModifyId(aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =

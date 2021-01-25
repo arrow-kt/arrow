@@ -1,13 +1,11 @@
 package arrow.optics.test.laws
 
 import arrow.core.Const
-import arrow.core.Id
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.compose
 import arrow.core.extensions.const.applicative.applicative
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.identity
 import arrow.core.orElse
 import arrow.core.value
@@ -27,7 +25,6 @@ object PrismLaws {
     Law("Prism law: modify identity") { prism.modifyIdentity(aGen, EQA) },
     Law("Prism law: compose modify") { prism.composeModify(aGen, funcGen, EQA) },
     Law("Prism law: consistent set modify") { prism.consistentSetModify(aGen, bGen, EQA) },
-    Law("Prism law: consistent modify with modifyF Id") { prism.consistentModifyModifyFId(aGen, funcGen, EQA) },
     Law("Prism law: consistent get option modify id") { prism.consistentGetOptionModifyId(aGen, EQOptionB) }
   )
 
@@ -56,11 +53,6 @@ object PrismLaws {
   fun <A, B> Prism<A, B>.consistentSetModify(aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
     forAll(aGen, bGen) { a, b ->
       set(a, b).equalUnderTheLaw(modify(a) { b }, EQA)
-    }
-
-  fun <A, B> Prism<A, B>.consistentModifyModifyFId(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQA: Eq<A>): Unit =
-    forAll(aGen, funcGen) { a, f ->
-      modifyF(Id.applicative(), a) { Id.just(f(it)) }.value().equalUnderTheLaw(modify(a, f), EQA)
     }
 
   fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =

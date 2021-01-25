@@ -1,13 +1,11 @@
 package arrow.optics.test.laws
 
 import arrow.core.Const
-import arrow.core.Id
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.compose
 import arrow.core.extensions.const.applicative.applicative
-import arrow.core.extensions.id.applicative.applicative
 import arrow.core.identity
 import arrow.core.value
 import arrow.optics.Optional
@@ -34,14 +32,6 @@ object OptionalLaws {
     Law("Optional Law: modify identity = identity") { modifyIdentity(optionalGen, aGen, EQA) },
     Law("Optional Law: compose modify") { composeModify(optionalGen, aGen, funcGen, EQA) },
     Law("Optional Law: consistent set with modify") { consistentSetModify(optionalGen, aGen, bGen, EQA) },
-    Law("Optional Law: consistent modify with modify identity") {
-      consistentModifyModifyId(
-        optionalGen,
-        aGen,
-        funcGen,
-        EQA
-      )
-    },
     Law("Optional Law: consistent getOption with modify identity") {
       consistentGetOptionModifyId(
         optionalGen,
@@ -113,19 +103,6 @@ object OptionalLaws {
       optional.run {
         set(a, b)
           .equalUnderTheLaw(modify(a) { b }, EQA)
-      }
-    }
-
-  fun <A, B> consistentModifyModifyId(
-    optionalGen: Gen<Optional<A, B>>,
-    aGen: Gen<A>,
-    funcGen: Gen<(B) -> B>,
-    EQA: Eq<A>
-  ): Unit =
-    forAll(optionalGen, aGen, funcGen) { optional, a, f ->
-      optional.run {
-        modify(a, f)
-          .equalUnderTheLaw(modifyF(Id.applicative(), a) { Id.just(f(it)) }.value(), EQA)
       }
     }
 

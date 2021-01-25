@@ -1,11 +1,11 @@
 package arrow.optics.std
 
-import arrow.core.Id
 import arrow.core.extensions.monoid
-import arrow.optics.toValue
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.test.laws.IsoLaws
+import arrow.optics.toValue
+import arrow.optics.typeclasses.Id
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
