@@ -6,8 +6,8 @@ permalink: /fx/
 
 # Arrow Fx. Typed FP for the masses
 
-Arrow Fx is a next-generation Typed FP Effects Library that makes tracked effectful programming first class in Kotlin,
-and is build on top of Kotlin's suspend system.
+Arrow Fx is a next-generation Typed FP Effects Library that makes tracked effectful programming first class in Kotlin built on top of Kotlin's suspend system and [KotlinX Coroutines](https://kotlinlang.org/docs/reference/coroutines/coroutines-guide.html)
+Arrow Fx is a functional companion to KotlinX Coroutines augmenting its api with well known functional operators making it easier to compose async and concurrent programs.
 
 The library brings purity, referential transparency, and direct imperative syntax to typed FP in Kotlin, and is a fun and easy tool for creating Typed Pure Functional Programs.
 
@@ -96,10 +96,12 @@ The `greet` program is ready to run as soon as the user is ready to commit to an
 `blocking` execution strategies will block the current thread that's waiting for the program to yield a value, whereas `non-blocking` strategies will immediately return and perform the program's work without blocking the current thread.
 Since both blocking and non-blocking execution scenarios perform side effects, we consider running effects as an `unsafe` operation.
 
-Arrow offers an `Enviroment` type class to run a suspended program.
-Usage of unsafe runner functions (like `unsafeRunSync` in this case) is reserved for the end of the world and may be the only impure execution of a well-typed functional program.
+KotlinX Coroutines offers `runBlocking`, `launch` and `async` to run a suspended program.
+Usage of unsafe runner functions (like `runBlocking` in this case) is reserved for the end of the world and may be the only impure execution of a well-typed functional program.
+`launch` and `async` can however also be used in pure/safe ways if they're used within another `suspend fun`. 
 
 ```kotlin:ank:playground
+import kotlinx.coroutines.*
 import arrow.fx.coroutines.*
 
 //sampleStart
@@ -114,35 +116,11 @@ suspend fun greet(): Unit {
   sayGoodBye()
 }
 
-fun main() { // The edge of our world
-  val env = Environment()
-  env.unsafeRunSync { greet() }
-}
-//sampleEnd
-```
-
-In cases where you can use `suspend` edge-points, you should always prefer to do so. I.e. Kotlin also offers a `suspend fun main`.
-
-```kotlin:ank:playground
-import arrow.fx.coroutines.*
-
-suspend fun sayHello(): Unit =
-  println("Hello World")
-
-suspend fun sayGoodBye(): Unit =
-  println("Good bye World!")
-
-suspend fun greet(): Unit {
-  sayHello()
-  sayGoodBye()
-}
-
-//sampleStart
-suspend fun main(): Unit = // The edge of our world
+fun main(): Unit = runBlocking { // The edge of our world
   greet()
+}
 //sampleEnd
 ```
-
 
 Arrow Fx emphasizes the guarantee that users understand when they are performing side effects in their program declaration.
 

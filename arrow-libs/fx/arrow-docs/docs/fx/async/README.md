@@ -10,30 +10,6 @@ Arrow Fx benefits from the `suspend` syntax for extremely succinct programs with
 This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime, and bind their results to the left-hand side.
 The resulting expressions enjoy the same syntax that most OOP and Java programmers are already accustomed to—direct blocking imperative style.
 
-## Dispatchers and Contexts
-
-Performing effects while switching execution contexts a la carte is trivial.
-
-```kotlin:ank:playground
-import arrow.fx.coroutines.*
-
-//sampleStart
-suspend fun printThreadName(): Unit =
-  println(Thread.currentThread().name)
-
-suspend fun main(): Unit {
-  evalOn(ComputationPool) {
-    printThreadName()
-  }
-  evalOn(IOPool) {
-    printThreadName()
-  }
-}
-//sampleEnd
-```
-
-In addition to `evalOn`, Arrow Fx allows users to override the executions context in all functions that require one.
-
 ## Parallelization & Concurrency
 
 Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence` and many more allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
@@ -101,17 +77,23 @@ suspend fun main(): Unit {
 Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side.
 
 ```kotlin:ank:playground
-import arrow.fx.coroutines.*
+import kotlinx.coroutines.delay
+import arrow.fx.coroutines.raceN
+import arrow.fx.coroutines.never
+import kotlin.time.milliseconds
+import kotlin.time.ExperimentalTime
 
 //sampleStart
 suspend fun loser(): Unit =
-  never<Unit>() // Never wins
+  never() // Never wins
 
+@ExperimentalTime
 suspend fun winner(): Int {
-  sleep(5.milliseconds)
+  delay(5.milliseconds)
   return 5
 }
 
+@ExperimentalTime
 suspend fun main(): Unit {
   val res = raceN({ loser() }, { winner() })
 
@@ -120,109 +102,22 @@ suspend fun main(): Unit {
 //sampleEnd
 ```
 
-## Fibers
-
-A [Fiber]({{'/effects/fiber' | relative_url }}) represents the pure result of an operation starting concurrently that can be either `join`ed or `cancel`ed.
-All the operators above can also be build using `Fiber`s, be aware that this is considered more low level.
-You should *always* prefer out-of-the-box operators, unless you want to launch concurrent processes explicitly.
-
-```kotlin:ank:playground
-import arrow.fx.coroutines.*
-
-//sampleStart
-suspend fun threadName(): String =
-  Thread.currentThread().name
-
-val ctx = ComputationPool
-
-suspend fun main(): Unit {
-  val fiberA = ForkConnected(ctx) { threadName() }
-  val fiberB = ForkConnected(ctx) { threadName() }
-  val threadA = fiberA.join()
-  val threadB = fiberB.join()
-  println(threadA)
-  println(threadB)
-}
-//sampleEnd
-```
-
-When we spawn fibers, we can obtain their deferred non-blocking result using `join()`.
-
-Note that, because we are using `Fiber` and a `ComputationPool` `CoroutineContext` that may not create new threads in all cases here, there is no guarantee that the printed thread names will be different.
-This is part of the greatness of Fibers. They run as scheduled, based on the policies provided by the (dispatching) `CoroutineContext`.
-
 ## Cancellation
 
-The cancellation system exists out of a few simple building blocks.
+The cancellation system is inherited from KotlinX Coroutines and works the same.
+See [KotlinX Coroutines documentation](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html)
 
-All operators found in Arrow Fx check for cancellation. In the small example of an infinite sleeping loop below `sleep` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
+All operators found in Arrow Fx check for cancellation.
+In the small example of an infinite loop below `parMapN` checks for cancellation and thus this function also check for cancellation before/and while sleeping.
 
 ```kotlin:ank
+import kotlinx.coroutines.Dispatchers
+
 tailrec suspend fun sleeper(): Unit {
   println("I am sleepy. I'm going to nap")
-  sleep(1.seconds)                                     // <-- cancellation check-point
+  parMapN(Dispatchers.IO, { Thread.currentThread().name }, { Thread.currentThread().name }, ::Pair)  // <-- cancellation check-point
   println("1 second nap.. Going to sleep some more")
   sleeper()
-}
-```
-
-#### cancelBoundary()
-
-Calling `suspend fun cancelBoundary()` will check for cancellation, and will gracefully exit in case the effect was cancelled. An example.
-
-```
-suspend fun loop(): Unit {
-  while(true) { 
-	 cancelBoundary() // cancellable computation loop
-    println("I am getting dizzy...")
-  }
-}
-```
-
-This `while` will `loop` until the cancel signal is triggered. Once the cancellation is trigger, this task will gracefully exit through `cancelBoundary()`.
-
-In case you don't want to check for cancellation so often, you can also only install a `cancelBoundary` every n batches.
-The example below defines `repeat` which checks cancellation every `10` repetition.
-
-```kotlin:ank
-tailrec suspend fun repeat(n: Int): Unit {
-  if (n % 10 == 0) cancelBoundary()
-  if (n == 0) Unit
-  else repeat(n - 1)
-}
-```
-
-#### Uncancellable
-
-So how can you execute of `suspend fun` with guarantee that it cannot be cancelled. You simply `wrap` it in the `uncancelable` builder and the function will guarantee not to be cancelled. If the progam is already cancelled before, this block will not run and if it gets cancelled during the execution of this block it will exit immediately after.
-
-```kotlin:ank
-suspend fun uncancellableSleep(duration: Duration): Unit =
-  uncancellable { sleep(duration) }
-```
-
-If we now re-implement our previous `sleeper`, than it will behave a little different from before. The cancellation check before and after `uncancellableSleep` but note that the `sleep` istelf will not be cancelled.
-
-```kotlin:ank
-tailrec suspend fun sleeper(): Unit {
-  println("I am sleepy. I'm going to nap")
-   // <-- cancellation check-point
-  uncancellableSleep(1.seconds)
-   // <-- cancellation check-point
-  println("1 second nap.. Going to sleep some more")
-  sleeper()
-}
-```
-
-This also means that our new sleep can back-pressure `timeOutOrNull`.
-
-```kotlin:ank:playground
-import arrow.fx.coroutines.*
-
-suspend fun main(): Unit {
-  val r = timeOutOrNull(1.seconds) {
-    uncancellable { sleep(2.seconds) }
-  } // r is null, but took 2 seconds.
 }
 ```
 
