@@ -35,23 +35,7 @@ val g = sum2 andThen str
 f(4) == g(4)
 ```
 
-Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/apidocs/arrow-core-data/arrow.core/-function1/' | relative_url }}).
-
 So, if we have a function `(A) -> B` and a `Profunctor` instance for it, we can make the following transformation with `dimap`: `((C) -> A) -> ((A) -> B) -> ((B) -> D)`.
-
-Example:
-
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.function1.profunctor.*
-
-val fab: Function1<Double, Double> = { x: Double -> x * 3 }.k()
-val f: (Int) -> Double = { x -> x.toDouble() / 2 }  
-val g: (Double) -> String = { x -> "Result: $x" }
-
-val h = Function1.profunctor().run { fab.dimap(f, g) }
-h(4)
-```
 
 ### Main Combinators
 
@@ -60,18 +44,6 @@ h(4)
 Contramap on the first type parameter and map on the second type parameter.
 
 `fun Kind2<F, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<F, C, D>`
-
-```kotlin:ank
-import arrow.core.*
-import arrow.core.extensions.*
-
-val f: Function1<Int, Int> = { x: Int -> x + 10 }.k()
-val fl: (String) -> Int = { x -> x.toInt() }
-val fr: (Int) -> List<Int> = { x -> List(x) { x } }
-
-val g: Function1<String, List<Int>> = Function1.profunctor().run { f.dimap(fl, fr) }
-g("6")
-```
 
 #### Other combinators
 
