@@ -366,3 +366,9 @@ fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Ev
     Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
   return loop()
 }
+
+fun <A, B, Z> Eval<A>.zip(fb: Eval<B>, f: (A, B) -> Z): Eval<Z> =
+  flatMap { a: A -> fb.map { b -> f(a, b) } }
+
+fun <A, B> Eval<A>.zip(fb: Eval<B>): Eval<Pair<A, B>> =
+  flatMap { a: A -> fb.map { b -> Pair(a, b) } }

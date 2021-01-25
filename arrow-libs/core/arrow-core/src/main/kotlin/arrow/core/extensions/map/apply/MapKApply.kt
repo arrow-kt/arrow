@@ -15,7 +15,6 @@ import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.ap as _ap
 import arrow.core.extensions.MapKApply
-import arrow.core.extensions.mapk.foldable.isEmpty
 import arrow.core.fix
 import arrow.core.k
 import arrow.core.zip

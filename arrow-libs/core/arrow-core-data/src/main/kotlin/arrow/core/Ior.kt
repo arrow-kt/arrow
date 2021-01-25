@@ -485,3 +485,9 @@ fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
 fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)
 
 fun <A> A.rightIor(): Ior<Nothing, A> = Ior.Right(this)
+
+fun <E, A, B, Z> Ior<E, A>.zip(SE: Semigroup<E>, fb: Ior<E, B>, f: (A, B) -> Z): Ior<E, Z> =
+  ap(SE, fb.map { b: B -> { a: A -> f(a, b) } })
+
+fun <E, A, B> Ior<E, A>.zip(SE: Semigroup<E>, fb: Ior<E, B>): Ior<E, Pair<A, B>> =
+  zip(SE, fb, ::Pair)

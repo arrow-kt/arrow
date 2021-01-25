@@ -430,6 +430,14 @@ sealed class Option<out A> : OptionOf<A> {
   fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
+  @Deprecated(
+    "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
+    ReplaceWith(
+      "zip(fb) { b, c -> f(Tuple2(b, c)) }",
+      "arrow.core.Tuple2",
+      "arrow.core.zip"
+    )
+  )
   fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
     flatMap { a: A -> fb.fix().map { b -> f(a toT b) } }
 
@@ -607,3 +615,9 @@ fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNul
 
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
   flatMap { it.fold({ l -> Option.just(l).ap(f) }, { r -> Option.just(r) }) }
+
+fun <A, B, Z> Option<A>.zip(fb: Option<B>, f: (A, B) -> Z): Option<Z> =
+  flatMap { a: A -> fb.map { b -> f(a, b) } }
+
+fun <A, B> Option<A>.zip(fb: Option<B>): Option<Pair<A, B>> =
+  flatMap { a: A -> fb.map { b -> Pair(a, b) } }

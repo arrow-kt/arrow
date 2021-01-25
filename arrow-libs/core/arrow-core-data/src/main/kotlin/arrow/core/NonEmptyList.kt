@@ -323,12 +323,6 @@ class NonEmptyList<out A>(
   fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Tuple2<A?, B?>> =
     NonEmptyList(Tuple2(head, other.head), tail.padZip(other.tail))
 
-  fun <B> zip(other: NonEmptyList<B>): NonEmptyList<Tuple2<A, B>> =
-    NonEmptyList(Tuple2(head, other.head), tail.zip(other.tail).map { Tuple2(it.first, it.second) })
-
-  fun <B, C> zip(other: NonEmptyList<B>, f: (A, B) -> C): NonEmptyList<C> =
-    zip(other).map { f(it.a, it.b) }
-
   companion object {
     operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> =
       NonEmptyList(head, t.asList())
@@ -703,3 +697,9 @@ private class NonEmptyListShow<A>(
 ) : Show<NonEmptyList<A>> {
   override fun NonEmptyList<A>.show(): String = show(SA)
 }
+
+fun <A, B, Z> NonEmptyList<A>.zip(fb: NonEmptyList<B>, f: (A, B) -> Z): NonEmptyList<Z> =
+  NonEmptyList(f(head, fb.head), tail.zip(fb.tail, f))
+
+fun <A, B> NonEmptyList<A>.zip(fb: NonEmptyList<B>): NonEmptyList<Pair<A, B>> =
+  zip(fb, ::Pair)

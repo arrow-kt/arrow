@@ -1749,13 +1749,39 @@ fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
 fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
+@Deprecated(
+  "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
+  ReplaceWith(
+    "zip(fb) { b, c -> f(Tuple2(b, c)) }",
+    "arrow.core.Tuple2",
+    "arrow.core.zip"
+  )
+)
+fun <A, B, C, D> Either<A, B>.map2(fb: Either<A, C>, f: (Tuple2<B, C>) -> D): Either<A, D> =
+  product(fb).map(f)
+
+@Deprecated(
+  "product will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of product",
+  ReplaceWith(
+    "zip(fb) { a, b -> Tuple2(a, b) }",
+    "arrow.core.Tuple2",
+    "arrow.core.zip"
+  )
+)
 fun <A, B, C> Either<A, B>.product(fb: Either<A, C>): Either<A, Tuple2<B, C>> =
   flatMap { a ->
     fb.map { b -> Tuple2(a, b) }
   }
 
-fun <A, B, C, D> Either<A, B>.map2(fb: Either<A, C>, f: (Tuple2<B, C>) -> D): Either<A, D> =
-  product(fb).map(f)
+fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
+  flatMap { b ->
+    fb.map { c -> f(b, c) }
+  }
+
+fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
+  flatMap { a ->
+    fb.map { b -> Pair(a, b) }
+  }
 
 fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()

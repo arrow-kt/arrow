@@ -1305,3 +1305,9 @@ private class ValidatedMonoid<A, B>(
   override fun empty(): Validated<A, B> =
     empty
 }
+
+fun <E, A, B, Z> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>, f: (A, B) -> Z): Validated<E, Z> =
+  zip(SE, fb).map { ab: Pair<A, B> -> f(ab.first, ab.second) }
+
+fun <E, A, B> Validated<E, A>.zip(SE: Semigroup<E>, fb: Validated<E, B>): Validated<E, Pair<A, B>> =
+  ap(SE, fb.map { b: B -> { a: A -> Pair(a, b) } })

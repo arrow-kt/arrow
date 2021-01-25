@@ -28,15 +28,15 @@ internal val zip_singleton: OptionZip = object : arrow.core.extensions.OptionZip
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zip(arg1)",
-  "arrow.core.zip"
+    "zip(arg1)",
+    "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.zip(arg1: Kind<ForOption, B>): Option<Tuple2<A, B>> =
-    arrow.core.Option.zip().run {
-  this@zip.zip<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Option.zip().run {
+    this@zip.zip<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("zipWith")
 @Suppress(
@@ -48,15 +48,15 @@ fun <A, B> Kind<ForOption, A>.zip(arg1: Kind<ForOption, B>): Option<Tuple2<A, B>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zipWith(arg1, arg2)",
-  "arrow.core.zipWith"
+    "zip(arg1, arg2)",
+    "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, B, C> Kind<ForOption, A>.zipWith(arg1: Kind<ForOption, B>, arg2: Function2<A, B, C>):
-    Option<C> = arrow.core.Option.zip().run {
-  this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.Option<C>
-}
+fun <A, B, C> Kind<ForOption, A>.zipWith(arg1: Kind<ForOption, B>, arg2: Function2<A, B, C>): Option<C> =
+  arrow.core.Option.zip().run {
+    this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.Option<C>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

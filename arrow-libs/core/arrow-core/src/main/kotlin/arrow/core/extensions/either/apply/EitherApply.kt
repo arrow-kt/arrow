@@ -406,7 +406,14 @@ fun <L, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map2(arg1, arg2)", "arrow.core.map2"))
+@Deprecated(
+  "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
+  ReplaceWith(
+    "zip(fb) { b, c -> f(Tuple2(b, c)) }",
+    "arrow.core.Tuple2",
+    "arrow.core.zip"
+  )
+)
 fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2(
   arg1: Kind<Kind<ForEither, L>, B>,
   arg2: Function1<Tuple2<A, B>, Z>
@@ -419,7 +426,14 @@ fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("product(arg1)", "arrow.core.product"))
+@Deprecated(
+  "product will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of product",
+  ReplaceWith(
+    "zip(fb) { a, b -> Tuple2(a, b) }",
+    "arrow.core.Tuple2",
+    "arrow.core.zip"
+  )
+)
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.product(arg1: Kind<Kind<ForEither, L>, B>): Either<L,
   Tuple2<A, B>> = fix()._product(arg1.fix())
 
@@ -729,7 +743,8 @@ fun <L, A, B, C, D, E, FF, G, H> tupled(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(arg0.fix(), arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.Either", "arrow.core.Tuple8"))fun <L, A, B, C, D, E, FF, G, H> tupledN(
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(arg0.fix(), arg1.fix(), arg2.fix(), arg3.fix(), arg4.fix(), arg5.fix(), arg6.fix(), arg7.fix()) { a, b, c, d, e, ff, g, h -> Tuple8(a, b, c, d, e, ff, g, h) }", "arrow.core.Either", "arrow.core.Tuple8"))
+fun <L, A, B, C, D, E, FF, G, H> tupledN(
   arg0: Kind<Kind<ForEither, L>, A>,
   arg1: Kind<Kind<ForEither, L>, B>,
   arg2: Kind<Kind<ForEither, L>, C>,
