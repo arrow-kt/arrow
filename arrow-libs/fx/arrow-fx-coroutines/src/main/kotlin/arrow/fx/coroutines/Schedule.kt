@@ -4,15 +4,22 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.identity
 import arrow.core.left
+import arrow.core.merge
 import arrow.core.right
 import arrow.fx.coroutines.Schedule.ScheduleImpl
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.nanoseconds
+import arrow.fx.coroutines.nanoseconds as oldNanoseconds
+import arrow.fx.coroutines.Duration as FxDuration
 
 /**
  * # Retrying and repeating effects
@@ -39,10 +46,14 @@ import kotlin.random.Random
  * A more complex schedule
  *
  * ```kotlin:ank
+ * import kotlin.time.seconds
+ * import kotlin.time.milliseconds
+ * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
+ * @ExperimentalTime
  * fun <A> complexPolicy(): Schedule<A, List<A>> =
- *   Schedule.exponential<A>(10.milliseconds).whileOutput { it.nanoseconds < 60.seconds.nanoseconds }
+ *   Schedule.exponential<A>(10.milliseconds).whileOutput { it.inNanoseconds < 60.seconds.inNanoseconds }
  *     .andThen(Schedule.spaced<A>(60.seconds) and Schedule.recurs(100)).jittered()
  *     .zipRight(Schedule.identity<A>().collect())
  * ```
@@ -74,7 +85,7 @@ import kotlin.random.Random
  * suspend fun main(): Unit {
  *   var counter = 0
  *   //sampleStart
- *   val res = repeat(Schedule.recurs(3)) {
+ *   val res = Schedule.recurs<Unit>(3).repeat {
  *     println("Run: ${counter++}")
  *   }
  *   //sampleEnd
@@ -92,11 +103,11 @@ import kotlin.random.Random
  * suspend fun main(): Unit {
  *   var counter = 0
  *   //sampleStart
- *   val res = repeat(Schedule.unit<Unit>() zipLeft Schedule.recurs(3)) {
+ *   val res = (Schedule.unit<Unit>() zipLeft Schedule.recurs(3)).repeat {
  *     println("Run: ${counter++}")
  *   }
  *   // equal to
- *   val res2 = repeat(Schedule.recurs<Unit>(3) zipRight Schedule.unit()) {
+ *   val res2 = (Schedule.recurs<Unit>(3) zipRight Schedule.unit()).repeat {
  *     println("Run: ${counter++}")
  *   }
  *   //sampleEnd
@@ -113,11 +124,11 @@ import kotlin.random.Random
  * suspend fun main(): Unit {
  *   var counter = 0
  *   //sampleStart
- *   val res = repeat(Schedule.identity<Int>() zipLeft Schedule.recurs(3)) {
+ *   val res = (Schedule.identity<Int>() zipLeft Schedule.recurs(3)).repeat {
  *     println("Run: ${counter++}"); counter
  *   }
  *   // equal to
- *   val res2 = repeat(Schedule.recurs<Int>(3) zipRight Schedule.identity<Int>()) {
+ *   val res2 = (Schedule.recurs<Int>(3) zipRight Schedule.identity<Int>()).repeat {
  *     println("Run: ${counter++}"); counter
  *   }
  *   //sampleEnd
@@ -134,12 +145,12 @@ import kotlin.random.Random
  * suspend fun main(): Unit {
  *   var counter = 0
  *   //sampleStart
- *   val res = repeat(Schedule.collect<Int>() zipLeft Schedule.recurs(3)) {
+ *   val res = (Schedule.collect<Int>() zipLeft Schedule.recurs(3)).repeat {
  *     println("Run: ${counter++}")
  *     counter
  *   }
  *   // equal to
- *   val res2 = repeat(Schedule.recurs<Int>(3) zipRight Schedule.collect<Int>()) {
+ *   val res2 = (Schedule.recurs<Int>(3) zipRight Schedule.collect<Int>()).repeat {
  *     println("Run: ${counter++}")
  *     counter
  *   }
@@ -159,7 +170,7 @@ import kotlin.random.Random
  * suspend fun main(): Unit {
  *   var counter = 0
  *   //sampleStart
- *   val res = repeat(Schedule.doWhile<Int>{ it <= 3 }) {
+ *   val res = Schedule.doWhile<Int>{ it <= 3 }.repeat {
  *     println("Run: ${counter++}"); counter
  *   }
  *   //sampleEnd
@@ -172,17 +183,39 @@ import kotlin.random.Random
  * A common algorithm to retry effectful operations, as network requests, is the exponential backoff algorithm. There is a scheduling policy that implements this algorithm and can be used as:
  *
  * ```kotlin:ank
+ * import kotlin.time.milliseconds
+ * import kotlin.time.ExperimentalTime
  * import arrow.fx.coroutines.*
  *
+ * @ExperimentalTime
  * val exponential = Schedule.exponential<Unit>(250.milliseconds)
  * ```
  */
 sealed class Schedule<Input, Output> {
 
+  abstract suspend fun <C> repeatOrElseEither(
+    fa: suspend () -> Input,
+    orElse: suspend (Throwable, Output?) -> C
+  ): Either<C, Output>
+
+  /**
+   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
+   * Returns the last output from the policy or raises an error if a repeat failed.
+   */
+  suspend fun repeat(fa: suspend () -> Input): Output =
+    repeatOrElse(fa) { e, _ -> throw e }
+
+  /**
+   * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
+   * Also offers a function to handle errors if they are encountered during repetition.
+   */
+  suspend fun repeatOrElse(fa: suspend () -> Input, orElse: suspend (Throwable, Output?) -> Output): Output =
+    repeatOrElseEither(fa, orElse).fold(::identity, ::identity)
+
   /**
    * Changes the output of a schedule. Does not alter the decision of the schedule.
    */
-  abstract fun <B> map(f: (Output) -> B): Schedule<Input, B>
+  abstract fun <B> map(f: (output: Output) -> B): Schedule<Input, B>
 
   /**
    * Changes the input of the schedule. May alter a schedule's decision if it is based on input.
@@ -192,21 +225,53 @@ sealed class Schedule<Input, Output> {
   /**
    * Conditionally checks on both the input and the output whether or not to continue.
    */
-  abstract fun <A : Input> check(pred: suspend (A, Output) -> Boolean): Schedule<A, Output>
+  abstract fun <A : Input> check(pred: suspend (input: A, output: Output) -> Boolean): Schedule<A, Output>
 
   /**
    * Inverts the decision of a schedule.
    */
   abstract operator fun not(): Schedule<Input, Output>
 
-  /**
-   * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [f] and [g]
-   */
-  abstract fun <A : Input, B> combineWith(
+  @Deprecated(
+    "combineWith is deprecated in favor of combineNanos and combine using Double/kotlin.time.Duration instead of arrow.fx.coroutines.Duration.",
+    ReplaceWith(
+      "combine(other, f, { a, b -> g(a.nanoseconds, b.nanoseconds).nanoseconds }, ::Pair)",
+      "arrow.fx.coroutines.nanoseconds"
+    )
+  )
+  fun <A : Input, B> combineWith(
     other: Schedule<A, B>,
     f: (Boolean, Boolean) -> Boolean,
-    g: (Duration, Duration) -> Duration
-  ): Schedule<A, Pair<Output, B>>
+    g: (FxDuration, FxDuration) -> FxDuration
+  ): Schedule<A, Pair<Output, B>> =
+    combineNanos(
+      other,
+      f,
+      { a, b -> g(a.toLong().oldNanoseconds, b.toLong().oldNanoseconds).nanoseconds.toDouble() },
+      ::Pair
+    )
+
+  /**
+   * Combines with another schedule by combining the result and the delay of the [Decision] with the [zipContinue], [zipDuration] and a [zip] functions
+   */
+  @ExperimentalTime
+  fun <A : Input, B, C> combine(
+    other: Schedule<A, B>,
+    zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
+    zipDuration: (duration: Duration, otherDuration: Duration) -> Duration,
+    zip: (Output, B) -> C
+  ): Schedule<A, C> =
+    combineNanos(other, zipContinue, { a, b -> zipDuration(a.nanoseconds, b.nanoseconds).inNanoseconds }, zip)
+
+  /**
+   * Combines with another schedule by combining the result and the delay of the [Decision] with the functions [zipContinue], [zipDuration] and a [zip] function
+   */
+  abstract fun <A : Input, B, C> combineNanos(
+    other: Schedule<A, B>,
+    zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
+    zipDuration: (duration: Double, otherDuration: Double) -> Double,
+    zip: (Output, B) -> C
+  ): Schedule<A, C>
 
   /**
    * Always retries a schedule regardless of the decision made prior to invoking this method.
@@ -218,28 +283,44 @@ sealed class Schedule<Input, Output> {
    */
   abstract infix fun <A : Input, B> andThen(other: Schedule<A, B>): Schedule<A, Either<Output, B>>
 
+  @Deprecated(
+    "modifyDelay will be replaced by modify and modifyNanos which uses kotlin.time.Duration instead of arrow.fx.coroutines.Duration",
+    ReplaceWith(
+      "modifyNanos { output, l -> f(output, l.toLong().nanoseconds).nanoseconds.toDouble() }",
+      "arrow.fx.coroutines.nanoseconds"
+    )
+  )
+  fun modifyDelay(f: suspend (Output, FxDuration) -> FxDuration): Schedule<Input, Output> =
+    modifyNanos { output, l -> f(output, l.toLong().oldNanoseconds).nanoseconds.toDouble() }
+
   /**
    * Changes the delay of a resulting [Decision] based on the [Output] and the produced delay.
+   *
    */
-  abstract fun modifyDelay(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output>
+  @ExperimentalTime
+  fun modify(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
+    modifyNanos { output, d -> f(output, d.nanoseconds).inNanoseconds }
+
+  abstract fun modifyNanos(f: suspend (Output, Double) -> Double): Schedule<Input, Output>
 
   /**
    * Runs an effectful handler on every input. Does not alter the decision.
    */
-  abstract fun logInput(f: suspend (Input) -> Unit): Schedule<Input, Output>
+  abstract fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output>
 
   /**
    * Runs an effectful handler on every output. Does not alter the decision.
    */
-  abstract fun logOutput(f: suspend (Output) -> Unit): Schedule<Input, Output>
+  abstract fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output>
+
+  @Deprecated("foldM is renamed to foldLazy.", ReplaceWith("foldLazy(initial, f)"))
+  fun <C> foldM(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
+    foldLazy(initial, f)
 
   /**
    * Accumulates the results of a schedule by folding over them effectfully.
    */
-  abstract fun <C> foldM(
-    initial: suspend () -> C,
-    f: suspend (C, Output) -> C
-  ): Schedule<Input, C>
+  abstract fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C>
 
   /**
    * Composes this schedule with the other schedule by piping the output of this schedule
@@ -247,10 +328,20 @@ sealed class Schedule<Input, Output> {
    */
   abstract infix fun <B> pipe(other: Schedule<Output, B>): Schedule<Input, B>
 
+  @Deprecated("tupled is renamed to zip to be consistent with Kotlin Std's naming.", ReplaceWith("zip(other)"))
+  infix fun <A, B> tupled(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>> =
+    zip(other)
+
   /**
    * Combines two with different input and output using and. Continues when both continue and uses the maximum delay.
    */
-  abstract infix fun <A, B> tupled(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>>
+  infix fun <A, B> zip(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>> =
+    zip(other, ::Pair)
+
+  /**
+   * Combines two with different input and output using and. Continues when both continue and uses the maximum delay.
+   */
+  abstract fun <A, B, C> zip(other: Schedule<A, B>, f: (Output, B) -> C): Schedule<Pair<Input, A>, C>
 
   /**
    * Combines two schedules with different input and output and conditionally choose between the two.
@@ -258,13 +349,18 @@ sealed class Schedule<Input, Output> {
    */
   abstract infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>>
 
+  @Deprecated("unit() is renamed to void(), please use void() instead.", ReplaceWith("void()"))
   fun unit(): Schedule<Input, Unit> =
+    map { Unit }
+
+  fun void(): Schedule<Input, Unit> =
     map { Unit }
 
   /**
    * Changes the result of a [Schedule] to always be [b].
    */
-  fun <B> const(b: B): Schedule<Input, B> = map { b }
+  fun <B> const(b: B): Schedule<Input, B> =
+    map { b }
 
   /**
    * Continues or stops the schedule based on the output.
@@ -297,55 +393,71 @@ sealed class Schedule<Input, Output> {
    * Combines two schedules. Continues only when both continue and chooses the maximum delay.
    */
   infix fun <A : Input, B> and(other: Schedule<A, B>): Schedule<A, Pair<Output, B>> =
-    combineWith(other, { a, b -> a && b }, { a, b -> max(a.nanoseconds, b.nanoseconds).nanoseconds })
+    combineNanos(other, { a, b -> a && b }, { a, b -> max(a, b) }, ::Pair)
 
   /**
    * Combines two schedules. Continues if one continues and chooses the minimum delay.
    */
   infix fun <A : Input, B> or(other: Schedule<A, B>): Schedule<A, Pair<Output, B>> =
-    combineWith(other, { a, b -> a || b }, { a, b -> min(a.nanoseconds, b.nanoseconds).nanoseconds })
+    combineNanos(other, { a, b -> a || b }, { a, b -> min(a, b) }, ::Pair)
 
   /**
    * Combines two schedules with [and] but throws away the left schedule's result.
    */
   infix fun <A : Input, B> zipRight(other: Schedule<A, B>): Schedule<A, B> =
-    (this and other).map { it.second }
+    (this and other).map(Pair<Output, B>::second)
 
   /**
    * Combines two schedules with [and] but throws away the right schedule's result.
    */
   infix fun <A : Input, B> zipLeft(other: Schedule<A, B>): Schedule<A, Output> =
-    (this and other).map { it.first }
+    (this and other).map(Pair<Output, B>::first)
 
   /**
    * Adjusts the delay of a schedule's [Decision].
    */
-  fun delayed(f: suspend (Duration) -> Duration): Schedule<Input, Output> =
-    modifyDelay { _, duration -> f(duration) }
+  @Deprecated("delayed is deprecated in favor of delay or delayedNanos. $DeprecatedDurationAPI")
+  fun delayed(f: suspend (duration: FxDuration) -> FxDuration): Schedule<Input, Output> =
+    modifyNanos { _, duration -> f(duration.toLong().oldNanoseconds).nanoseconds.toDouble() }
+
+  @ExperimentalTime
+  fun delay(f: suspend (duration: Duration) -> Duration): Schedule<Input, Output> =
+    modify { _, duration -> f(duration) }
+
+  fun delayedNanos(f: suspend (duration: Double) -> Double): Schedule<Input, Output> =
+    modifyNanos { _, duration -> f(duration) }
+
+  fun jittered(genRand: suspend () -> Double): Schedule<Input, Output> =
+    modifyNanos { _, duration ->
+      val n = genRand.invoke()
+      (duration.nanoseconds * n).inNanoseconds
+    }
+
+  @JvmName("jitteredDuration")
+  @ExperimentalTime
+  fun jittered(genRand: suspend () -> Duration): Schedule<Input, Output> =
+    modify { _, duration ->
+      val n = genRand.invoke()
+      duration.times(n.inNanoseconds)
+    }
 
   /**
    * Add random jitter to a schedule.
-   * The argument [genRand] is supposed to be a computation which returns
-   *  doubles. An example would be `suspend { Random.nextDouble() }`.
    *
-   * This is done to push the source of randomness to the caller which makes the function
-   *  jittered deterministic and testable.
-   *
-   * The result returned by [genRand] is multiplied with the current duration.
+   * By requiring Kotlin's [Random] as a parameter, this function is deterministic and testable.
+   * The result returned by [Random.nextDouble] between 0.0 and 1.0 is multiplied with the current duration.
    */
-  fun jittered(genRand: suspend () -> Double): Schedule<Input, Output> =
-    modifyDelay { _, duration ->
-      val n = genRand.invoke()
-      (duration.nanoseconds * n).roundToLong().nanoseconds
-    }
+  fun jittered(random: Random = Random.Default): Schedule<Input, Output> =
+    jittered(suspend { random.nextDouble(0.0, 1.0) })
 
+  @Deprecated("Hidden for binary compatibility reasons", level = DeprecationLevel.HIDDEN)
   fun jittered(): Schedule<Input, Output> =
     jittered(suspend { Random.nextDouble(0.0, 1.0) })
 
   /**
    * Non-effectful version of [foldM].
    */
-  fun <C> fold(initial: C, f: suspend (C, Output) -> C): Schedule<Input, C> =
+  fun <C> fold(initial: C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
     foldM(suspend { initial }) { acc, o -> f(acc, o) }
 
   /**
@@ -367,13 +479,39 @@ sealed class Schedule<Input, Output> {
     val update: suspend (a: Input, s: State) -> Decision<State, Output>
   ) : Schedule<Input, Output>() {
 
-    override fun <B> map(f: (Output) -> B): Schedule<Input, B> =
-      ScheduleImpl(initialState) { i, s -> update(i, s).mapRight(f) }
+    override suspend fun <C> repeatOrElseEither(
+      fa: suspend () -> Input,
+      orElse: suspend (Throwable, Output?) -> C
+    ): Either<C, Output> {
+      var last: (() -> Output)? = null // We haven't seen any input yet
+      var state: State = initialState.invoke()
+
+      while (true) {
+        coroutineContext.ensureActive()
+        try {
+          val a = fa.invoke()
+          val step = update(a, state)
+          if (!step.cont) return Either.Right(step.finish.value())
+          else {
+            delay(step.delayInNanos.nanoseconds)
+
+            // Set state before looping again
+            last = { step.finish.value() }
+            state = step.state
+          }
+        } catch (e: Throwable) {
+          return Either.Left(orElse(e.nonFatalOrThrow(), last?.invoke()))
+        }
+      }
+    }
+
+    override fun <B> map(f: (output: Output) -> B): Schedule<Input, B> =
+      ScheduleImpl(initialState) { i, s -> update(i, s).map(f) }
 
     override fun <B> contramap(f: suspend (B) -> Input): Schedule<B, Output> =
       ScheduleImpl(initialState) { i, s -> update(f(i), s) }
 
-    override fun <A : Input> check(pred: suspend (A, Output) -> Boolean): Schedule<A, Output> =
+    override fun <A : Input> check(pred: suspend (input: A, output: Output) -> Boolean): Schedule<A, Output> =
       updated { f ->
         { a: A, s: State ->
           val dec = f(a, s)
@@ -382,13 +520,14 @@ sealed class Schedule<Input, Output> {
         }
       }
 
-    override fun <A : Input, B> combineWith(
+    override fun <A : Input, B, C> combineNanos(
       other: Schedule<A, B>,
-      f: (Boolean, Boolean) -> Boolean,
-      g: (Duration, Duration) -> Duration
-    ): Schedule<A, Pair<Output, B>> = (other as ScheduleImpl<Any?, A, B>).let { other ->
+      zipContinue: (cont: Boolean, otherCont: Boolean) -> Boolean,
+      zipDuration: (duration: Double, otherDuration: Double) -> Double,
+      zip: (Output, B) -> C
+    ): Schedule<A, C> = (other as ScheduleImpl<Any?, A, B>).let { other ->
       ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s: Pair<State, Any?> ->
-        update(i, s.first).combineWith(other.update(i, s.second), f, g)
+        update(i, s.first).combineNanos(other.update(i, s.second), zipContinue, zipDuration, zip)
       }
     }
 
@@ -413,74 +552,78 @@ sealed class Schedule<Input, Output> {
     override fun <A : Input, B> andThen(other: Schedule<A, B>): Schedule<A, Either<Output, B>> =
       ScheduleImpl<Either<State, Any?>, A, Either<Output, B>>(suspend { Either.Left(initialState.invoke()) }) { i, s ->
         (other as ScheduleImpl<Any?, A, B>)
-        s.fold({ s ->
-          val dec = this@ScheduleImpl.update(i, s)
+        s.fold({ state ->
+          val dec = this@ScheduleImpl.update(i, state)
           if (dec.cont) dec.bimap({ it.left() }, { it.left() })
           else {
             val newState = other.initialState.invoke()
             val newDec = other.update(i, newState)
             newDec.bimap({ it.right() }, { it.right() })
           }
-        }, { s ->
-          other.update(i, s).bimap({ it.right() }, { it.right() })
+        }, { state ->
+          other.update(i, state).bimap({ it.right() }, { it.right() })
         })
       }
 
-    override fun modifyDelay(f: suspend (Output, Duration) -> Duration): Schedule<Input, Output> =
+    override fun modifyNanos(f: suspend (output: Output, duration: Double) -> Double): Schedule<Input, Output> =
       updated { update ->
         { a: Input, s: State ->
           val step = update(a, s)
-          val d = f(step.finish.value(), step.delay)
-          step.copy(delay = d)
+          val d = f(step.finish.value(), step.delayInNanos)
+          step.copy(delayInNanos = d)
         }
       }
 
-    override fun logInput(f: suspend (Input) -> Unit): Schedule<Input, Output> =
+    override fun logInput(f: suspend (input: Input) -> Unit): Schedule<Input, Output> =
       updated { update ->
         { a: Input, s: State ->
           update(a, s).also { f(a) }
         }
       }
 
-    override fun logOutput(f: suspend (Output) -> Unit): Schedule<Input, Output> =
+    override fun logOutput(f: suspend (output: Output) -> Unit): Schedule<Input, Output> =
       updated { update ->
         { a: Input, s: State ->
           update(a, s).also { f(it.finish.value()) }
         }
       }
 
-    override fun <C> foldM(initial: suspend () -> C, f: suspend (C, Output) -> C): Schedule<Input, C> =
+    override fun <C> foldLazy(initial: suspend () -> C, f: suspend (acc: C, output: Output) -> C): Schedule<Input, C> =
       ScheduleImpl(suspend { Pair(initialState.invoke(), initial.invoke()) }) { i, s ->
         val dec = update(i, s.first)
         val c = if (dec.cont) f(s.second, dec.finish.value()) else s.second
-        dec.bimap({ s -> Pair(s, c) }, { c })
+        dec.bimap({ state -> Pair(state, c) }, { c })
       }
 
+    @Suppress("NAME_SHADOWING")
     override infix fun <B> pipe(other: Schedule<Output, B>): Schedule<Input, B> =
       (other as ScheduleImpl<Any?, Output, B>).let { other ->
         ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s ->
           val dec1 = update(i, s.first)
           val dec2 = other.update(dec1.finish.value(), s.second)
-          dec1.combineWith(dec2, { a, b -> a && b }, { a, b -> a + b }).mapRight { it.second }
+          dec1.combineNanos(dec2, { a, b -> a && b }, { a, b -> a + b }, { _, b -> b })
         }
       }
 
-    override infix fun <A, B> tupled(other: Schedule<A, B>): Schedule<Pair<Input, A>, Pair<Output, B>> =
+    @Suppress("NAME_SHADOWING")
+    override fun <A, B, C> zip(other: Schedule<A, B>, f: (Output, B) -> C): Schedule<Pair<Input, A>, C> =
       (other as ScheduleImpl<Any?, A, B>).let { other ->
         ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s ->
           val dec1 = update(i.first, s.first)
           val dec2 = other.update(i.second, s.second)
-          dec1.combineWith(dec2, { a, b -> a && b }, { a, b -> max(a.nanoseconds, b.nanoseconds).nanoseconds })
+          dec1.combineNanos(dec2, { a, b -> a && b }, { a, b -> max(a, b) }, f)
         }
       }
 
+    @Suppress("NAME_SHADOWING")
     override infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>> =
       (other as ScheduleImpl<Any?, A, B>).let { other ->
         ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s ->
           i.fold({
-            update(it, s.first).mapLeft { Pair(it, s.second) }.mapRight { it.left() }
+            update(it, s.first).mapLeft { state -> Pair(state, s.second) }.map { output -> output.left() }
           }, {
-            other.update(it, s.second).mapLeft { Pair(s.first, it) }.mapRight { it.right() }
+            other.update(it, s.second).mapLeft { otherState -> Pair(s.first, otherState) }
+              .map { otherOutput -> otherOutput.right() }
           })
         }
       }
@@ -489,15 +632,15 @@ sealed class Schedule<Input, Output> {
      * Schedule state machine update function
      */
     fun <A : Input, B> updated(
-      f: (suspend (A, State) -> Decision<State, Output>) -> (suspend (A, State) -> Decision<State, B>)
+      f: (suspend (input: A, state: State) -> Decision<State, Output>) -> (suspend (input: A, state: State) -> Decision<State, B>)
     ): Schedule<A, B> = ScheduleImpl(initialState) { a, s ->
-      f { i, s -> update(i, s) }(a, s)
+      f { input, state -> update(input, state) }(a, s)
     }
 
     /**
      * Inspect and change the [Decision] of a [Schedule]. Also given access to the input.
      */
-    fun <A : Input, B> reconsider(f: suspend (A, Decision<State, Output>) -> Decision<State, B>): Schedule<A, B> =
+    fun <A : Input, B> reconsider(f: suspend (input: A, desision: Decision<State, Output>) -> Decision<State, B>): Schedule<A, B> =
       updated { update ->
         { a: A, s: State ->
           val dec = update(a, s)
@@ -508,7 +651,7 @@ sealed class Schedule<Input, Output> {
     /**
      * Run an effect with a [Decision]. Does not alter the decision.
      */
-    fun <A : Input> onDecision(fa: suspend (A, Decision<State, Output>) -> Unit): Schedule<A, Output> =
+    fun <A : Input> onDecision(fa: suspend (input: A, decision: Decision<State, Output>) -> Unit): Schedule<A, Output> =
       updated { f ->
         { a: A, s: State ->
           f(a, s).also { fa(a, it) }
@@ -519,41 +662,127 @@ sealed class Schedule<Input, Output> {
   /**
    * A single decision. Contains the decision to continue, the delay, the new state and the (lazy) result of a Schedule.
    */
-  data class Decision<out A, out B>(val cont: Boolean, val delay: Duration, val state: A, val finish: Eval<B>) {
+  data class Decision<out A, out B>(val cont: Boolean, val delayInNanos: Double, val state: A, val finish: Eval<B>) {
+
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Decision(cont, delay.nanoseconds.toDouble(), state, finish)"
+      )
+    )
+    constructor(cont: Boolean, delay: FxDuration, state: A, finish: Eval<B>) : this(
+      cont,
+      delay.nanoseconds.toDouble(),
+      state,
+      finish
+    )
+
+    @Deprecated(
+      "delay is deprecated in favor of duration or delayInNanos. $DeprecatedDurationAPI",
+      ReplaceWith("delayInNanos.toLong().nanoseconds ", "arrow.fx.coroutines.nanoseconds")
+    )
+    val delay: FxDuration
+      get() = delayInNanos.toLong().oldNanoseconds
+
+    @ExperimentalTime
+    val duration: Duration
+      get() = delayInNanos.nanoseconds
 
     operator fun not(): Decision<A, B> =
       copy(cont = !cont)
 
     fun <C, D> bimap(f: (A) -> C, g: (B) -> D): Decision<C, D> =
-      Decision(cont, delay, f(state), finish.map(g))
+      Decision(cont, delayInNanos, f(state), finish.map(g))
 
     fun <C> mapLeft(f: (A) -> C): Decision<C, B> =
       bimap(f, ::identity)
 
+    @Deprecated("mapRight is renamed to map", ReplaceWith("map(g)"))
     fun <D> mapRight(g: (B) -> D): Decision<A, D> =
       bimap(::identity, g)
 
+    fun <D> map(g: (B) -> D): Decision<A, D> =
+      bimap(::identity, g)
+
+    @Deprecated(
+      "combineWith is deprecated in favor of combineNanos or combine. $DeprecatedDurationAPI",
+      ReplaceWith(
+        "combineNanos(other, f, { a, b -> g(a.nanoseconds.toDouble(), b.nanoseconds.toDouble()).nanoseconds.toDouble() }, ::Pair)",
+        "arrow.fx.coroutines.nanoseconds"
+      )
+    )
     fun <C, D> combineWith(
       other: Decision<C, D>,
       f: (Boolean, Boolean) -> Boolean,
-      g: (Duration, Duration) -> Duration
-    ): Decision<Pair<A, C>, Pair<B, D>> = Decision(
+      g: (FxDuration, FxDuration) -> FxDuration
+    ): Decision<Pair<A, C>, Pair<B, D>> =
+      Decision(
+        f(cont, other.cont),
+        g(delay, other.delay).nanoseconds.toDouble(),
+        Pair(state, other.state),
+        finish.flatMap { first -> other.finish.map { second -> Pair(first, second) } }
+      )
+
+    fun <C, D, E> combineNanos(
+      other: Decision<C, D>,
+      f: (Boolean, Boolean) -> Boolean,
+      g: (Double, Double) -> Double,
+      zip: (B, D) -> E
+    ): Decision<Pair<A, C>, E> = Decision(
       f(cont, other.cont),
-      g(delay, other.delay),
+      g(delayInNanos, other.delayInNanos),
       Pair(state, other.state),
-      finish.flatMap { first -> other.finish.map { second -> Pair(first, second) } }
+      finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
+    )
+
+    @ExperimentalTime
+    fun <C, D, E> combine(
+      other: Decision<C, D>,
+      f: (Boolean, Boolean) -> Boolean,
+      g: (Duration, Duration) -> Duration,
+      zip: (B, D) -> E
+    ): Decision<Pair<A, C>, E> = Decision(
+      f(cont, other.cont),
+      g(delayInNanos.nanoseconds, other.delayInNanos.nanoseconds).inNanoseconds,
+      Pair(state, other.state),
+      finish.flatMap { first -> other.finish.map { second -> zip(first, second) } }
     )
 
     override fun equals(other: Any?): Boolean =
       if (other !is Decision<*, *>) false
       else cont == other.cont &&
         state == other.state &&
-        delay.nanoseconds == other.delay.nanoseconds &&
+        delayInNanos == other.delayInNanos &&
         finish.value() == other.finish.value()
 
     companion object {
-      fun <A, B> cont(d: Duration, a: A, b: Eval<B>): Decision<A, B> = Decision(true, d, a, b)
-      fun <A, B> done(d: Duration, a: A, b: Eval<B>): Decision<A, B> = Decision(false, d, a, b)
+      @Deprecated(
+        DeprecatedDurationAPI,
+        ReplaceWith("Schedule.Decision.cont(d.nanoseconds.toDouble(), a, b)", "arrow.fx.coroutines.Schedule")
+      )
+      fun <A, B> cont(d: FxDuration, a: A, b: Eval<B>): Decision<A, B> =
+        cont(d.nanoseconds.toDouble(), a, b)
+
+      @Deprecated(
+        DeprecatedDurationAPI,
+        ReplaceWith("Schedule.Decision.done(d.nanoseconds.toDouble(), a, b)", "arrow.fx.coroutines.Schedule")
+      )
+      fun <A, B> done(d: FxDuration, a: A, b: Eval<B>): Decision<A, B> =
+        done(d.nanoseconds.toDouble(), a, b)
+
+      fun <A, B> cont(d: Double, a: A, b: Eval<B>): Decision<A, B> =
+        Decision(true, d, a, b)
+
+      fun <A, B> done(d: Double, a: A, b: Eval<B>): Decision<A, B> =
+        Decision(false, d, a, b)
+
+      @ExperimentalTime
+      fun <A, B> cont(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
+        cont(d.inNanoseconds, a, b)
+
+      @ExperimentalTime
+      fun <A, B> done(d: Duration, a: A, b: Eval<B>): Decision<A, B> =
+        done(d.inNanoseconds, a, b)
     }
   }
 
@@ -565,16 +794,16 @@ sealed class Schedule<Input, Output> {
      */
     operator fun <S, A, B> invoke(
       initial: suspend () -> S,
-      update: suspend (a: A, s: S) -> Decision<S, B>
-    ): Schedule<A, B> =
-      ScheduleImpl(initial, update)
+      update: suspend (input: A, state: S) -> Decision<S, B>
+    ): Schedule<A, B> = ScheduleImpl(initial, update)
 
     /**
      * Creates a Schedule that continues without delay and just returns its input.
      */
-    fun <A> identity(): Schedule<A, A> = invoke({ Unit }) { a, s ->
-      Decision.cont(0.seconds, s, Eval.now(a))
-    }
+    fun <A> identity(): Schedule<A, A> =
+      Schedule({ Unit }) { a, s ->
+        Decision.cont(0.0, s, Eval.now(a))
+      }
 
     /**
      * Creates a Schedule that continues without delay and always returns Unit.
@@ -582,22 +811,26 @@ sealed class Schedule<Input, Output> {
     fun <A> unit(): Schedule<A, Unit> =
       identity<A>().unit()
 
+    @Deprecated("unfoldM is renamed to unfoldLazy", ReplaceWith("Schedule.unfoldLazy(c, f)"))
+    fun <I, A> unfoldM(c: suspend () -> A, f: suspend (A) -> A): Schedule<I, A> =
+      unfoldLazy(c, f)
+
     /**
      * Creates a schedule that unfolds effectfully using a seed value [c] and a unfold function [f].
      * This keeps the current state (the current seed) as [State] and runs the unfold function on every
      *  call to update. This schedule always continues without delay and returns the current state.
      */
-    fun <I, A> unfoldM(c: suspend () -> A, f: suspend (A) -> A): Schedule<I, A> =
-      invoke(c) { _: I, acc ->
+    fun <I, A> unfoldLazy(c: suspend () -> A, f: suspend (A) -> A): Schedule<I, A> =
+      Schedule(c) { _: I, acc ->
         val a = f(acc)
-        Decision.cont(0.seconds, a, Eval.now(a))
+        Decision.cont(0.0, a, Eval.now(a))
       }
 
     /**
-     * Non-effectful variant of [unfoldM]
+     * Non-effectful variant of [unfoldLazy]
      */
     fun <I, A> unfold(c: A, f: (A) -> A): Schedule<I, A> =
-      unfoldM(suspend { c }) { f(it) }
+      unfoldLazy(suspend { c }) { f(it) }
 
     /**
      * Creates a Schedule that continues forever and returns the number of iterations.
@@ -609,15 +842,16 @@ sealed class Schedule<Input, Output> {
      * Creates a Schedule that continues n times and returns the number of iterations.
      */
     fun <A> recurs(n: Int): Schedule<A, Int> =
-      invoke(suspend { 0 }) { _: A, acc ->
-        if (acc < n) Decision.cont(0.seconds, acc + 1, Eval.now(acc + 1))
-        else Decision.done(0.seconds, acc, Eval.now(acc))
+      Schedule(suspend { 0 }) { _: A, acc ->
+        if (acc < n) Decision.cont(0.0, acc + 1, Eval.now(acc + 1))
+        else Decision.done(0.0, acc, Eval.now(acc))
       }
 
     /**
      * Creates a Schedule that only retries once.
      */
-    fun <A> once(): Schedule<A, Unit> = recurs<A>(1).unit()
+    fun <A> once(): Schedule<A, Unit> =
+      recurs<A>(1).unit()
 
     /**
      * Creates a schedule that never retries.
@@ -625,9 +859,36 @@ sealed class Schedule<Input, Output> {
      * Note that this will hang a program if used as a repeat/retry schedule unless cancelled.
      */
     fun <A> never(): Schedule<A, Nothing> =
-      invoke(suspend { arrow.fx.coroutines.never<Unit>() }) { _, _ ->
-        Decision(false, 0.nanoseconds, Unit, Eval.later { throw IllegalArgumentException("Impossible") })
+      Schedule(suspend { arrow.fx.coroutines.never<Unit>() }) { _, _ ->
+        Decision(false, 0.0, Unit, Eval.later { throw IllegalArgumentException("Impossible") })
       }
+
+    @Suppress("UNCHECKED_CAST")
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Schedule.delayed(delaySchedule.map { it.nanoseconds.toDouble() }).map { it.toLong().nanoseconds }",
+        "arrow.fx.coroutines.Schedule", "arrow.fx.coroutines.nanoseconds"
+      )
+    )
+    fun <A> delayed(delaySchedule: Schedule<A, FxDuration>): Schedule<A, FxDuration> =
+      delayed(delaySchedule.map { it.nanoseconds.toDouble() }).map { it.toLong().oldNanoseconds }
+
+    /**
+     * Creates a Schedule that uses another Schedule to generate the delay of this schedule.
+     * Continues for as long as [delaySchedule] continues and adds the output of [delaySchedule] to
+     *  the delay that [delaySchedule] produced. Also returns the full delay as output.
+     *
+     *  The Schedule [delaySchedule] is should specify the delay in nanoseconds.
+     *
+     * A common use case is to define a unfolding schedule and use the result to change the delay.
+     *  For an example see the implementation of [spaced], [linear], [fibonacci] or [exponential]
+     */
+    @Suppress("UNCHECKED_CAST")
+    @JvmName("delayedNanos")
+    fun <A> delayed(delaySchedule: Schedule<A, Double>): Schedule<A, Double> =
+      (delaySchedule.modifyNanos { a, b -> a + b } as ScheduleImpl<Any?, A, Double>)
+        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos)) }
 
     /**
      * Creates a Schedule that uses another Schedule to generate the delay of this schedule.
@@ -637,10 +898,11 @@ sealed class Schedule<Input, Output> {
      * A common use case is to define a unfolding schedule and use the result to change the delay.
      *  For an example see the implementation of [spaced], [linear], [fibonacci] or [exponential]
      */
-    @Suppress("UNCHECKED_CAST")
+    @ExperimentalTime
+    @JvmName("delayedDuration")
     fun <A> delayed(delaySchedule: Schedule<A, Duration>): Schedule<A, Duration> =
-      (delaySchedule.modifyDelay { a, b -> a + b } as ScheduleImpl<Any?, A, Duration>)
-        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delay)) }
+      (delaySchedule.modify { a, b -> a + b } as ScheduleImpl<Any?, A, Duration>)
+        .reconsider { _, dec -> dec.copy(finish = Eval.now(dec.delayInNanos.nanoseconds)) }
 
     /**
      * Creates a Schedule which collects all its inputs in a list.
@@ -676,13 +938,34 @@ sealed class Schedule<Input, Output> {
      * Creates a Schedule that returns its delay.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <A> delay(): Schedule<A, Duration> =
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Schedule.delayInNanos<A>().map { it.toLong().nanoseconds }",
+        "arrow.fx.coroutines.Schedule", "arrow.fx.coroutines.nanoseconds"
+      )
+    )
+    fun <A> delay(): Schedule<A, FxDuration> =
+      delayInNanos<A>().map { it.toLong().oldNanoseconds }
+
+    fun <A> delayInNanos(): Schedule<A, Double> =
       (forever<A>() as ScheduleImpl<Int, A, Int>).reconsider { _: A, decision ->
         Decision(
           cont = decision.cont,
-          delay = decision.delay,
+          delayInNanos = decision.delayInNanos,
           state = decision.state,
-          finish = Eval.now(decision.delay)
+          finish = Eval.now(decision.delayInNanos)
+        )
+      }
+
+    @ExperimentalTime
+    fun <A> duration(): Schedule<A, Duration> =
+      (forever<A>() as ScheduleImpl<Int, A, Int>).reconsider { _: A, decision ->
+        Decision(
+          cont = decision.cont,
+          delayInNanos = decision.delayInNanos,
+          state = decision.state,
+          finish = Eval.now(decision.delayInNanos.nanoseconds)
         )
       }
 
@@ -694,7 +977,7 @@ sealed class Schedule<Input, Output> {
       (forever<A>() as ScheduleImpl<Int, A, Int>).reconsider { _: A, decision ->
         Decision(
           cont = decision.cont,
-          delay = decision.delay,
+          delayInNanos = decision.delayInNanos,
           state = decision.state,
           finish = Eval.now(decision.cont)
         )
@@ -703,15 +986,65 @@ sealed class Schedule<Input, Output> {
     /**
      * Creates a Schedule that continues with a fixed delay.
      */
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "spaced(interval.nanoseconds.toDouble())",
+        "arrow.fx.coroutines.Schedule"
+      )
+    )
+    fun <A> spaced(interval: FxDuration): Schedule<A, Int> =
+      spaced(interval.nanoseconds.toDouble())
+
+    /**
+     * Creates a Schedule that continues with a fixed delay.
+     *
+     * @param interval fixed delay in nanoseconds
+     */
+    fun <A> spaced(interval: Double): Schedule<A, Int> =
+      forever<A>().delayedNanos { d -> d + interval }
+
+    /**
+     * Creates a Schedule that continues with a fixed delay.
+     *
+     * @param interval fixed delay in [Duration]
+     */
+    @ExperimentalTime
     fun <A> spaced(interval: Duration): Schedule<A, Int> =
-      forever<A>().delayed { d -> d + interval }
+      forever<A>().delayedNanos { d -> d + interval.inNanoseconds }
 
     /**
      * Creates a Schedule that continues with increasing delay by adding the last two delays.
      */
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Schedule.fibonacci<A>(one.nanoseconds.toDouble()).map { it.toLong().oldNanoseconds }",
+        "arrow.fx.coroutines.Schedule", "arrow.fx.coroutines.nanoseconds"
+      )
+    )
+    fun <A> fibonacci(one: FxDuration): Schedule<A, FxDuration> =
+      fibonacci<A>(one.nanoseconds.toDouble()).map { it.toLong().oldNanoseconds }
+
+    /**
+     * Creates a Schedule that continues with increasing delay by adding the last two delays.
+     *
+     * @param one initial delay in nanoseconds
+     */
+    fun <A> fibonacci(one: Double): Schedule<A, Double> =
+      delayed(
+        unfold<A, Pair<Double, Double>>(Pair(0.0, one)) { (del, acc) ->
+          Pair(acc, del + acc)
+        }.map { it.first }
+      )
+
+    /**
+     * Creates a Schedule that continues with increasing delay by adding the last two delays.
+     */
+    @ExperimentalTime
     fun <A> fibonacci(one: Duration): Schedule<A, Duration> =
       delayed(
-        unfold<A, Pair<Duration, Duration>>(Pair(0.seconds, one)) { (del, acc) ->
+        unfold<A, Pair<Duration, Duration>>(Pair(0.nanoseconds, one)) { (del, acc) ->
           Pair(acc, del + acc)
         }.map { it.first }
       )
@@ -720,19 +1053,61 @@ sealed class Schedule<Input, Output> {
      * Creates a Schedule which increases its delay linearly, by n * base where n is the number of
      *  executions.
      */
-    fun <A> linear(base: Duration): Schedule<A, Duration> =
-      delayed(
-        forever<A>().map { base * it }
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Schedule.linear<A>(base.nanoseconds.toDouble()).map { it.toLong().nanoseconds }",
+        "arrow.fx.coroutines.Schedule", "arrow.fx.coroutines.nanoseconds"
       )
+    )
+    fun <A> linear(base: FxDuration): Schedule<A, FxDuration> =
+      linear<A>(base.nanoseconds.toDouble()).map { it.toLong().oldNanoseconds }
+
+    /**
+     * Creates a Schedule which increases its delay linearly, by n * base where n is the number of executions.
+     *
+     * @param base the base delay in nanoseconds
+     */
+    fun <A> linear(base: Double): Schedule<A, Double> =
+      delayed(forever<A>().map { base * it })
+
+    /**
+     * Creates a Schedule which increases its delay linearly, by n * base where n is the number of executions.
+     */
+    @ExperimentalTime
+    fun <A> linear(base: Duration): Schedule<A, Duration> =
+      delayed(forever<A>().map { base * it })
 
     /**
      * Creates a Schedule that increases its delay exponentially with a given factor and base.
      * Delays can be calculated as [base] * factor ^ n where n is the number of executions.
      */
-    fun <A> exponential(base: Duration, factor: Double = 2.0): Schedule<A, Duration> =
-      delayed(
-        forever<A>().map { base * factor.pow(it).roundToInt() }
+    @Deprecated(
+      DeprecatedDurationAPI,
+      ReplaceWith(
+        "Schedule.exponential<A>(base.nanoseconds.toDouble(), factor).map { it.toLong().nanoseconds }",
+        "arrow.fx.coroutines.Schedule", "arrow.fx.coroutines.nanoseconds"
       )
+    )
+    fun <A> exponential(base: FxDuration, factor: Double = 2.0): Schedule<A, FxDuration> =
+      exponential<A>(base.nanoseconds.toDouble(), factor).map { it.toLong().oldNanoseconds }
+
+    /**
+     * Creates a Schedule that increases its delay exponentially with a given factor and base.
+     * Delays can be calculated as [base] * factor ^ n where n is the number of executions.
+     *
+     * @param base the base delay in nanoseconds
+     */
+    fun <A> exponential(base: Double, factor: Double = 2.0): Schedule<A, Double> =
+      delayed(forever<A>().map { base * factor.pow(it).roundToInt() })
+
+    /**
+     * Creates a Schedule that increases its delay exponentially with a given factor and base.
+     * Delays can be calculated as [base] * factor ^ n where n is the number of executions.
+     */
+    @ExperimentalTime
+    fun <A> exponential(base: Duration, factor: Double = 2.0): Schedule<A, Duration> =
+      delayed(forever<A>().map { base * factor.pow(it).roundToInt() })
   }
 }
 
@@ -740,98 +1115,132 @@ sealed class Schedule<Input, Output> {
  * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Returns the last output from the policy or raises an error if a repeat failed.
  */
+@Deprecated(
+  "repeat has become a concrete method on Schedule",
+  ReplaceWith("schedule.repeat(fa)")
+)
 suspend fun <A, B> repeat(
   schedule: Schedule<A, B>,
   fa: suspend () -> A
-): B = repeatOrElse(schedule, fa) { e, _ -> throw e }
+): B = schedule.repeat(fa)
 
 /**
  * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@Deprecated(
+  "repeat has become a concrete method on Schedule",
+  ReplaceWith("schedule.repeatOrElseEither(fa, orElse).merge()", "arrow.core.merge")
+)
 suspend fun <A, B> repeatOrElse(
   schedule: Schedule<A, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B?) -> B
-): B = repeatOrElseEither(schedule, fa, orElse).fold(::identity, ::identity)
+): B = schedule.repeatOrElseEither(fa, orElse).merge()
 
 /**
  * Runs this effect once and, if it succeeded, decide using the provided policy if the effect should be repeated and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during repetition.
  */
+@Deprecated(
+  "repeat has become a concrete method on Schedule",
+  ReplaceWith("schedule.repeatOrElseEither(fa, orElse)")
+)
 @Suppress("UNCHECKED_CAST")
 suspend fun <A, B, C> repeatOrElseEither(
   schedule: Schedule<A, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B?) -> C
-): Either<C, B> {
-  (schedule as ScheduleImpl<Any?, A, B>)
-  var last: (() -> B)? = null // We haven't seen any input yet
-  var state: Any? = schedule.initialState.invoke()
-
-  while (true) {
-    cancelBoundary()
-    try {
-      val a = fa.invoke()
-      val step = schedule.update(a, state)
-      if (!step.cont) return Either.Right(step.finish.value())
-      else {
-        delay(step.delay.millis)
-
-        // Set state before looping again
-        last = { step.finish.value() }
-        state = step.state
-      }
-    } catch (e: Throwable) {
-      return Either.Left(orElse(e.nonFatalOrThrow(), last?.invoke()))
-    }
-  }
-}
+): Either<C, B> =
+  schedule.repeatOrElseEither(fa, orElse)
 
 /**
  * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
  */
+@JvmName("deprecatedRetry")
+@Deprecated(
+  "retry has become an extension of Schedule",
+  ReplaceWith("schedule.retry(fa)", "arrow.core.retry")
+)
 suspend fun <A, B> retry(
   schedule: Schedule<Throwable, B>,
   fa: suspend () -> A
-): A = retryOrElse(schedule, fa) { e, _ -> throw e }
+): A = schedule.retry(fa)
 
 /**
  * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
+@JvmName("deprecatedRetryOrElse")
+@Deprecated(
+  "retryOrElse has become an extension of Schedule",
+  ReplaceWith("schedule.retryOrElse(fa, orElse)", "arrow.core.retryOrElse")
+)
 suspend fun <A, B> retryOrElse(
   schedule: Schedule<Throwable, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B) -> A
-): A = retryOrElseEither(schedule, fa, orElse).fold(::identity, ::identity)
+): A = schedule.retryOrElse(fa, orElse)
 
 /**
  * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
  * Also offers a function to handle errors if they are encountered during retrial.
  */
 @Suppress("UNCHECKED_CAST")
+@JvmName("deprecatedRetryOrElseEither")
+@Deprecated(
+  "retryOrElse has become an extension of Schedule",
+  ReplaceWith("schedule.retryOrElseEither(fa, orElse)", "arrow.core.retryOrElseEither")
+)
 suspend fun <A, B, C> retryOrElseEither(
   schedule: Schedule<Throwable, B>,
   fa: suspend () -> A,
   orElse: suspend (Throwable, B) -> C
+): Either<C, A> =
+  schedule.retryOrElseEither(fa, orElse)
+
+/**
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
+ * Returns the result of the effect if if it was successful or re-raises the last error encountered when the schedule ends.
+ */
+suspend fun <A, B> Schedule<Throwable, B>.retry(fa: suspend () -> A): A =
+  retryOrElse(fa) { e, _ -> throw e }
+
+/**
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
+ * Also offers a function to handle errors if they are encountered during retrial.
+ */
+suspend fun <A, B> Schedule<Throwable, B>.retryOrElse(fa: suspend () -> A, orElse: suspend (Throwable, B) -> A): A =
+  retryOrElseEither(fa, orElse).fold(::identity, ::identity)
+
+/**
+ * Runs an effect and, if it fails, decide using the provided policy if the effect should be retried and if so, with how much delay.
+ * Also offers a function to handle errors if they are encountered during retrial.
+ */
+@Suppress("UNCHECKED_CAST")
+suspend fun <A, B, C> Schedule<Throwable, B>.retryOrElseEither(
+  fa: suspend () -> A,
+  orElse: suspend (Throwable, B) -> C
 ): Either<C, A> {
-  (schedule as ScheduleImpl<Any?, Throwable, B>)
+  (this as ScheduleImpl<Any?, Throwable, B>)
 
   var dec: Schedule.Decision<Any?, B>
-  var state: Any? = schedule.initialState.invoke()
+  var state: Any? = initialState.invoke()
 
   while (true) {
-    cancelBoundary()
+    coroutineContext.ensureActive()
     try {
       return Either.Right(fa.invoke())
     } catch (e: Throwable) {
-      dec = schedule.update(e, state)
+      dec = update(e, state)
       state = dec.state
 
-      if (dec.cont) delay(dec.delay.millis)
+      if (dec.cont) delay(dec.delayInNanos.nanoseconds)
       else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish.value()))
     }
   }
 }
+
+private const val DeprecatedDurationAPI: String =
+  "arrow.fx.coroutines.Duration API in Schedule is deprecated in favor of Double and kotlin.time.Duration, and will be removed in 0.13.0."

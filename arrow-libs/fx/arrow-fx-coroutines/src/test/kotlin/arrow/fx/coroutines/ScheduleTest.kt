@@ -8,6 +8,8 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
 import kotlin.time.milliseconds
+import kotlin.time.nanoseconds
+import kotlin.time.seconds
 
 class ScheduleTest : ArrowFxSpec(spec = {
 
@@ -17,14 +19,14 @@ class ScheduleTest : ArrowFxSpec(spec = {
 
   "Schedule.identity()" {
     val dec = Schedule.identity<Int>().calculateSchedule1(1)
-    val expected = Schedule.Decision<Any?, Int>(true, 0.nanoseconds, Unit, Eval.now(1))
+    val expected = Schedule.Decision<Any?, Int>(true, 0.0, Unit, Eval.now(1))
 
     dec eqv expected
   }
 
   "Schedule.unfold()" {
     val dec = Schedule.unfold<Any?, Int>(0) { it + 1 }.calculateSchedule1(0)
-    val expected = Schedule.Decision<Any?, Int>(true, 0.nanoseconds, 1, Eval.now(1))
+    val expected = Schedule.Decision<Any?, Int>(true, 0.0, 1, Eval.now(1))
 
     dec eqv expected
   }
@@ -52,10 +54,10 @@ class ScheduleTest : ArrowFxSpec(spec = {
     val n = 500
     val res = Schedule.recurs<Int>(n).calculateSchedule(0, n + 1)
 
-    res.dropLast(1).map { it.delay.nanoseconds } shouldBe res.dropLast(1).map { 0L }
+    res.dropLast(1).map { it.delayInNanos.nanoseconds } shouldBe res.dropLast(1).map { 0.nanoseconds }
     res.dropLast(1).map { it.cont } shouldBe res.dropLast(1).map { true }
 
-    res.last() eqv Schedule.Decision(false, 0.nanoseconds, n + 1, Eval.now(n + 1))
+    res.last() eqv Schedule.Decision(false, 0.0, n + 1, Eval.now(n + 1))
   }
 
   "Schedule.once() repeats 1 additional time" {
@@ -115,16 +117,16 @@ class ScheduleTest : ArrowFxSpec(spec = {
     val res = Schedule.spaced<Any>(duration).calculateSchedule(0, 500)
 
     res.map { it.cont } shouldBe res.map { true }
-    res.map { it.delay.nanoseconds } shouldBe res.map { duration.nanoseconds }
+    res.map { it.delayInNanos.nanoseconds } shouldBe res.map { duration }
   }
 
   "Schedule.fibonacci()" {
-    val i = 10L
+    val i = 10.0.seconds
     val n = 10
-    val res = Schedule.fibonacci<Any?>(i.seconds).calculateSchedule(0, n)
+    val res = Schedule.fibonacci<Any?>(i).calculateSchedule(0, n)
 
-    val sum = res.fold(0L) { acc, v ->
-      acc + v.delay.inSeconds
+    val sum = res.fold(0.nanoseconds) { acc, v ->
+      acc + v.delayInNanos.nanoseconds
     }
     val fib = fibs(i).drop(1).take(n)
 
@@ -133,11 +135,11 @@ class ScheduleTest : ArrowFxSpec(spec = {
   }
 
   "Schedule.linear()" {
-    val i = 10L
+    val i = 10.0.seconds
     val n = 10
-    val res = Schedule.linear<Any?>(i.seconds).calculateSchedule(0, n)
+    val res = Schedule.linear<Any?>(i).calculateSchedule(0, n)
 
-    val sum = res.fold(0L) { acc, v -> acc + v.delay.inSeconds }
+    val sum = res.fold(0.nanoseconds) { acc, v -> acc + v.delayInNanos.nanoseconds }
     val exp = linear(i).drop(1).take(n)
 
     res.all { it.cont } shouldBe true
@@ -145,11 +147,11 @@ class ScheduleTest : ArrowFxSpec(spec = {
   }
 
   "Schedule.exponential()" {
-    val i = 10L
+    val i = 10.0.seconds
     val n = 10
-    val res = Schedule.exponential<Any?>(i.seconds).calculateSchedule(0, n)
+    val res = Schedule.exponential<Any?>(i).calculateSchedule(0, n)
 
-    val sum = res.fold(0L) { acc, v -> acc + v.delay.inSeconds }
+    val sum = res.fold(0.nanoseconds) { acc, v -> acc + v.delayInNanos.nanoseconds }
     val expSum = exp(i).drop(1).take(n).sum()
 
     res.all { it.cont } shouldBe true
@@ -162,7 +164,7 @@ class ScheduleTest : ArrowFxSpec(spec = {
 
   "repeat" {
     val stop = RuntimeException("WOOO")
-    val dec = Schedule.Decision(true, 10.nanoseconds, 0, Eval.now("state"))
+    val dec = Schedule.Decision(true, 10.0, 0, Eval.now("state"))
     val n = 100
     val schedule = Schedule({ 0 }) { _: Unit, _ -> dec }
 
@@ -216,17 +218,28 @@ class ScheduleTest : ArrowFxSpec(spec = {
   }
 })
 
-private fun fibs(one: Long): Sequence<Long> = generateSequence(Pair(0L, one)) { (a, b) ->
-  Pair(b, (a + b))
-}.map { it.first }
+private fun fibs(one: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
+  generateSequence(Pair(0.0.nanoseconds, one)) { (a, b) ->
+    Pair(b, (a + b))
+  }.map { it.first }
 
-private fun exp(base: Long): Sequence<Long> = generateSequence(Pair(base, 1.0)) { (_, n) ->
-  Pair((base * 2.0.pow(n)).toLong(), n + 1)
-}.map { it.first }
+private fun exp(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
+  generateSequence(Pair(base, 1.0)) { (_, n) ->
+    Pair(base * 2.0.pow(n), n + 1)
+  }.map { it.first }
 
-private fun linear(base: Long): Sequence<Long> = generateSequence(Pair(base, 1L)) { (_, n) ->
-  Pair((base * n), (n + 1))
-}.map { it.first }
+private fun linear(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
+  generateSequence(Pair(base, 1.0)) { (_, n) ->
+    Pair((base * n), (n + 1))
+  }.map { it.first }
+
+internal fun Sequence<kotlin.time.Duration>.sum(): kotlin.time.Duration {
+  var sum: kotlin.time.Duration = 0.0.nanoseconds
+  for (element in this) {
+    sum += element
+  }
+  return sum
+}
 
 private suspend fun <I, A> Schedule<I, A>.calculateSchedule1(input: I): Schedule.Decision<Any?, A> =
   calculateSchedule(input, 1).first()
@@ -264,7 +277,7 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Un
 
 private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>): Unit {
   require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
-  require(delay.nanoseconds == other.delay.nanoseconds) { "Decision#delay.nanoseconds: ${this.delay.nanoseconds} shouldBe ${other.delay.nanoseconds}" }
+  require(delayInNanos.nanoseconds == other.delayInNanos.nanoseconds) { "Decision#delay.nanoseconds: ${this.delayInNanos.nanoseconds} shouldBe ${other.delayInNanos.nanoseconds}" }
   if (cont) {
     val lh = finish.value()
     val rh = other.finish.value()

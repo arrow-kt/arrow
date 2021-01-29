@@ -99,5 +99,5 @@ val Long.seconds: Duration
 val Int.seconds: Duration
   get() = Duration(this.toLong(), TimeUnit.SECONDS)
 
-const val DeprecateDuration: String =
+internal const val DeprecateDuration: String =
   "arrow.fx.coroutines.Duration is deprecated and will be removed in 0.13.0 in favor of kotlin.time.Duration"
