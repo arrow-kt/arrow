@@ -1,11 +1,16 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 
-@higherkind
+class ForSequenceK private constructor() { companion object }
+typealias SequenceKOf<A> = arrow.Kind<ForSequenceK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> SequenceKOf<A>.fix(): SequenceK<A> =
+  this as SequenceK<A>
+
 data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()

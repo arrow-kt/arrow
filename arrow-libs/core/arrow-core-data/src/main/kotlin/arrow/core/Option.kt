@@ -1,8 +1,14 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Show
+
+class ForOption private constructor() { companion object }
+typealias OptionOf<A> = arrow.Kind<ForOption, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> OptionOf<A>.fix(): Option<A> =
+  this as Option<A>
 
 /**
  *
@@ -357,7 +363,6 @@ import arrow.typeclasses.Show
     "as described here https://github.com/arrow-kt/arrow-core/issues/114#issuecomment-641211639",
   ReplaceWith("A?")
 )
-@higherkind
 sealed class Option<out A> : OptionOf<A> {
 
   companion object {

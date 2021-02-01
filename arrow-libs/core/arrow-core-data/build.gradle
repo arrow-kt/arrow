@@ -1,6 +1,5 @@
 plugins {
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
@@ -12,8 +11,6 @@ apply from: "$DOC_CREATION"
 dependencies {
     api project(":arrow-annotations")
     api project(":arrow-continuations")
-    kapt project(":arrow-meta")
-    kaptTest project(":arrow-meta")
     testCompileOnly project(":arrow-syntax")
     testCompileOnly project(":arrow-core")
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

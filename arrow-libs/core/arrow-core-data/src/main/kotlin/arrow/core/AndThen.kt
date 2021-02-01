@@ -1,6 +1,12 @@
 package arrow.core
 
-import arrow.higherkind
+class ForAndThen private constructor() { companion object }
+typealias AndThenOf<A, B> = arrow.Kind2<ForAndThen, A, B>
+typealias AndThenPartialOf<A> = arrow.Kind<ForAndThen, A>
+typealias AndThenKindedJ<A, B> = arrow.HkJ2<ForAndThen, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B> AndThenOf<A, B>.fix(): AndThen<A, B> =
+  this as AndThen<A, B>
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
@@ -35,7 +41,6 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```
  *
  */
-@higherkind
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()

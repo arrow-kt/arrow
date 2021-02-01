@@ -1,9 +1,15 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+
+class ForListK private constructor() { companion object }
+typealias ListKOf<A> = arrow.Kind<ForListK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> ListKOf<A>.fix(): ListK<A> =
+  this as ListK<A>
 
 /**
  *
@@ -116,7 +122,6 @@ import arrow.typeclasses.Show
  * ```
  *
  */
-@higherkind
 data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()

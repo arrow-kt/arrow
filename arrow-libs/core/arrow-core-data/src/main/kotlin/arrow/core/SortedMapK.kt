@@ -1,12 +1,18 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import kotlin.collections.flatMap
 
-@higherkind
+class ForSortedMapK private constructor() { companion object }
+typealias SortedMapKOf<A, B> = arrow.Kind2<ForSortedMapK, A, B>
+typealias SortedMapKPartialOf<A> = arrow.Kind<ForSortedMapK, A>
+typealias SortedMapKKindedJ<A, B> = arrow.HkJ2<ForSortedMapK, A, B>
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A, B> SortedMapKOf<A, B>.fix(): SortedMapK<A, B> where A : kotlin.Comparable<A> =
+  this as SortedMapK<A, B>
+
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
 
   fun <C> map(f: (B) -> C): SortedMapK<A, C> =

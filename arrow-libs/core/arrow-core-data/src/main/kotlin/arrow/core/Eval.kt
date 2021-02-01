@@ -1,7 +1,13 @@
 package arrow.core
 
-import arrow.higherkind
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+class ForEval private constructor() { companion object }
+typealias EvalOf<A> = arrow.Kind<ForEval, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> EvalOf<A>.fix(): Eval<A> =
+  this as Eval<A>
 
 fun <A> EvalOf<A>.value(): A = this.fix().value()
 
@@ -57,7 +63,6 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  * ```
  *
  */
-@higherkind
 sealed class Eval<out A> : EvalOf<A> {
 
   companion object {
