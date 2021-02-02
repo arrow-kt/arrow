@@ -1,14 +1,28 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Either.Right
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 class ForOption private constructor() { companion object }
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 typealias OptionOf<A> = arrow.Kind<ForOption, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <A> OptionOf<A>.fix(): Option<A> =
-  this as Option<A>
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
+inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
 
 /**
  *
@@ -383,6 +397,14 @@ sealed class Option<out A> : OptionOf<A> {
      * ```
      *
      */
+    @Deprecated(
+      "just is deprecated, and will be removed in 0.13.0. Please use Some instead.",
+      ReplaceWith(
+        "Some(a)",
+        "arrow.core.Some"
+      ),
+      DeprecationLevel.WARNING
+    )
     fun <A> just(a: A): Option<A> = Some(a)
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
@@ -400,7 +422,119 @@ sealed class Option<out A> : OptionOf<A> {
 
     operator fun <A> invoke(a: A): Option<A> = Some(a)
 
+    inline fun <A> catch(recover: (Throwable) -> Unit, f: () -> A): Option<A> =
+      try {
+        Some(f())
+      } catch (t: Throwable) {
+        recover(t.nonFatalOrThrow())
+        None
+      }
+
     fun <A> empty(): Option<A> = None
+
+    val unit: Option<Unit> = Some(Unit)
+
+    inline fun <A, B, C> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      map: (A, B) -> C
+    ): Option<C> =
+      mapN(a, b, unit, unit, unit, unit, unit, unit, unit, unit) { b, c, _, _, _, _, _, _, _, _ -> map(b, c) }
+
+    inline fun <A, B, C, D> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      map: (A, B, C) -> D
+    ): Option<D> =
+      mapN(a, b, c, unit, unit, unit, unit, unit, unit, unit) { b, c, d, _, _, _, _, _, _, _ -> map(b, c, d) }
+
+    inline fun <A, B, C, D, E> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      map: (A, B, C, D) -> E
+    ): Option<E> =
+      mapN(a, b, c, d, unit, unit, unit, unit, unit, unit) { a, b, c, d, _, _, _, _, _, _ -> map(a, b, c, d) }
+
+    inline fun <A, B, C, D, E, F> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      map: (A, B, C, D, E) -> F
+    ): Option<F> =
+      mapN(a, b, c, d, e, unit, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e) }
+
+    inline fun <A, B, C, D, E, F, G> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      f: Option<F>,
+      map: (A, B, C, D, E, F) -> G
+    ): Option<G> =
+      mapN(a, b, c, d, e, f, unit, unit, unit, unit) { a, b, c, d, e, f, _, _, _, _ -> map(a, b, c, d, e, f) }
+
+    inline fun <A, B, C, D, E, F, G, H, I> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      f: Option<F>,
+      g: Option<G>,
+      map: (A, B, C, D, E, F, G) -> H
+    ): Option<H> =
+      mapN(a, b, c, d, e, f, g, unit, unit, unit) { a, b, c, d, e, f, g, _, _, _ -> map(a, b, c, d, e, f, g) }
+
+    inline fun <A, B, C, D, E, F, G, H, I> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      f: Option<F>,
+      g: Option<G>,
+      h: Option<H>,
+      map: (A, B, C, D, E, F, G, H) -> I
+    ): Option<I> =
+      mapN(a, b, c, d, e, f, g, h, unit, unit) { a, b, c, d, e, f, g, h, _, _ -> map(a, b, c, d, e, f, g, h) }
+
+    inline fun <A, B, C, D, E, F, G, H, I, J> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      f: Option<F>,
+      g: Option<G>,
+      h: Option<H>,
+      i: Option<I>,
+      map: (A, B, C, D, E, F, G, H, I) -> J
+    ): Option<J> =
+      mapN(a, b, c, d, e, f, g, h, i, unit) { a, b, c, d, e, f, g, h, i, _ -> map(a, b, c, d, e, f, g, h, i) }
+
+    inline fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
+      a: Option<A>,
+      b: Option<B>,
+      c: Option<C>,
+      d: Option<D>,
+      e: Option<E>,
+      f: Option<F>,
+      g: Option<G>,
+      h: Option<H>,
+      i: Option<I>,
+      j: Option<J>,
+      map: (A, B, C, D, E, F, G, H, I, J) -> K
+    ): Option<K> =
+      if (a is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some)
+        Some(map(a.t, b.t, c.t, d.t, e.t, f.t, g.t, h.t, i.t, j.t))
+      else
+        None
   }
 
   /**
@@ -408,6 +542,8 @@ sealed class Option<out A> : OptionOf<A> {
    * @note Used only for performance instead of fold.
    */
   abstract fun isEmpty(): Boolean
+
+  fun isNotEmpty(): Boolean = !isEmpty()
 
   /**
    * alias for [isDefined]
@@ -432,8 +568,28 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see flatMap
    */
-  fun <B> map(f: (A) -> B): Option<B> =
+  inline fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
+
+  /**
+   *  Replaces [A] inside [Option] with [B] resulting in an Option<B>
+   *
+   *  Option<A> -> Option<B>
+   *
+   *  ```kotlin:ank:playground
+   *  import arrow.core.some
+   *
+   *  fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello World".some().mapConst("...")
+   *   //sampleEnd
+   *   println(result)
+   *  }
+   *  ```
+   */
+  fun <B> mapConst(b: B): Option<B> =
+    map { b }
 
   @Deprecated(
     "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
@@ -446,8 +602,16 @@ sealed class Option<out A> : OptionOf<A> {
   fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
     flatMap { a: A -> fb.fix().map { b -> f(a toT b) } }
 
+  @Deprecated(
+    "filterMap will be renamed to mapNotNull to be consistent with Kotlin Std's naming, please use mapNotNull instead of filterMap",
+    ReplaceWith(
+      "this.mapNotNull(f.andThen { it.orNull() })",
+      "arrow.core.andThen"
+    ),
+    level = DeprecationLevel.WARNING
+  )
   fun <B> filterMap(f: (A) -> Option<B>): Option<B> =
-    flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
+    flatMap(f)
 
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
@@ -463,7 +627,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param f the function to apply.
    * */
-  fun <B> mapNotNull(f: (A) -> B?): Option<B> =
+  inline fun <B> mapNotNull(f: (A) -> B?): Option<B> =
     flatMap { a -> fromNullable(f(a)) }
 
   /**
@@ -476,14 +640,50 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
     when (this) {
       is None -> this
       is Some -> f(t).fix()
     }
 
+  fun <B> align(b: Option<B>): Option<Ior<A, B>> =
+    Ior.fromOptions(this, b)
+
+  inline fun <B, C> align(b: Option<B>, f: (Ior<A, B>) -> C): Option<C> =
+    Ior.fromOptions(this, b).map(f)
+
+  /**
+   * Returns true if this option is empty '''or''' the predicate
+   * $predicate returns true when applied to this $option's value.
+   *
+   * @param predicate the predicate to test
+   */
+  inline fun all(predicate: (A) -> Boolean): Boolean =
+    fold({ true }, predicate)
+
   fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
     ff.fix().flatMap { this.fix().map(it) }
+
+  fun <B> apEval(ff: Eval<Option<(A) -> B>>): Eval<Option<B>> =
+    ff.map { ap(it) }
+
+  inline fun <B> crosswalk(f: (A) -> Option<B>): Option<Option<B>> =
+    when (this) {
+      is None -> empty<B>().map { empty() }
+      is Some -> f(t).map { Some(it) }
+    }
+
+  inline fun <K, V> crosswalkMap(f: (A) -> Map<K, V>): Map<K, Option<V>> =
+    when (this) {
+      is None -> emptyMap()
+      is Some -> f(t).mapValues { Some(it.value) }
+    }
+
+  inline fun <B> crosswalkNull(f: (A) -> B?): Option<B>? =
+    when (this) {
+      is None -> null
+      is Some -> f(t)?.let { Some(it) }
+    }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -491,8 +691,17 @@ sealed class Option<out A> : OptionOf<A> {
    *
    *  @param predicate the predicate used for testing.
    */
-  fun filter(predicate: Predicate<A>): Option<A> =
+  inline fun filter(predicate: (A) -> Boolean): Option<A> =
     flatMap { a -> if (predicate(a)) Some(a) else None }
+
+  inline fun <AA> filterEither(predicate: (A) -> Either<AA, Boolean>): Either<AA, Option<A>> =
+    traverseFilterEither { a -> predicate(a).map { if (it) Some(a) else None } }
+
+  inline fun filterIterable(predicate: (A) -> Iterable<Boolean>): Iterable<Option<A>> =
+    traverseFilter { a -> predicate(a).map { if (it) Some(a) else None } }
+
+  inline fun <AA> filterValidated(predicate: (A) -> Validated<AA, Boolean>): Validated<AA, Option<A>> =
+    traverseFilterValidated { a -> predicate(a).map { if (it) Some(a) else None } }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -500,7 +709,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate used for testing.
    */
-  fun filterNot(predicate: Predicate<A>): Option<A> =
+  inline fun filterNot(predicate: (A) -> Boolean): Option<A> =
     flatMap { a -> if (!predicate(a)) Some(a) else None }
 
   /**
@@ -508,9 +717,18 @@ sealed class Option<out A> : OptionOf<A> {
    * $p returns true when applied to this $option's value.
    * Otherwise, returns false.
    *
+   * Example:
+   * ```
+   * Some(12).exists { it > 10 } // Result: true
+   * Some(7).exists { it > 10 }  // Result: false
+   *
+   * val none: Option<Int> = None
+   * none.exists { it > 10 }      // Result: false
+   * ```
+   *
    * @param predicate the predicate to test
    */
-  fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
+  inline fun exists(predicate: (A) -> Boolean): Boolean = fold({ false }, predicate)
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -518,28 +736,215 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param p the predicate to test
    */
-  fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
+  @Deprecated(
+    "forall will be renamed to all to be consistent with Kotlin Std's naming, please use all instead of forall",
+    ReplaceWith(
+      "this.all(p)"
+    ),
+    DeprecationLevel.WARNING
+  )
+  inline fun forall(p: (A) -> Boolean): Boolean = fold({ true }, p)
 
-  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    fix().let { option ->
-      when (option) {
-        is Some -> operation(initial, option.t)
-        is None -> initial
-      }
+  /**
+   * Returns the $option's value if this option is nonempty '''and''' the predicate
+   * $p returns true when applied to this $option's value.
+   * Otherwise, returns null.
+   *
+   * Example:
+   * ```
+   * Some(12).exists { it > 10 } // Result: 12
+   * Some(7).exists { it > 10 }  // Result: null
+   *
+   * val none: Option<Int> = None
+   * none.exists { it > 10 }      // Result: null
+   * ```
+   */
+  inline fun findOrNull(predicate: (A) -> Boolean): A? =
+    when (this) {
+      is Some -> if (predicate(t)) t else null
+      is None -> null
     }
 
-  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    fix().let { option ->
-      when (option) {
-        is Some -> Eval.defer { operation(option.t, initial) }
-        is None -> initial
-      }
+  inline fun <B> flatTraverse(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
+    fold(
+      { emptyList() },
+      { f(it).toList() }
+    )
+
+  inline fun <E, B> flatTraverseEither(f: (A) -> Either<E, Option<B>>): Either<E, Option<B>> =
+    fold(
+      { Right(empty()) },
+      { f(it) }
+    )
+
+  inline fun <E, B> flatTraverseValidated(f: (A) -> Validated<E, Option<B>>): Validated<E, Option<B>> =
+    fold(
+      { Valid(empty()) },
+      { f(it) }
+    )
+
+  inline fun <B> foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
+    foldLeft(empty()) { b, a -> b.combine(f(a)) }
+  }
+
+  inline fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
+    when (this) {
+      is Some -> operation(initial, t)
+      is None -> initial
     }
 
-  fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
+  inline fun <B> foldRight(initial: Eval<B>, crossinline operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    when (this) {
+      is Some -> Eval.defer { operation(t, initial) }
+      is None -> initial
+    }
+
+  /**
+   *  Applies [f] to an [A] inside [Option] and returns the [Option] structure with a pair of the [A] value and the
+   *  computed [B] value as result of applying [f]
+   *
+   *  Option<A> -> Option<Pair<A, B>>
+   *
+   *  ```kotlin:ank:playground
+   *  import arrow.core.some
+   *
+   *  fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".some().fproduct({ "$it World" })
+   *   //sampleEnd
+   *   println(result)
+   *  }
+   *  ```
+   */
+  inline fun <B> fproduct(f: (A) -> B): Option<Pair<A, B>> =
+    map { a -> Pair(a, f(a)) }
+
+  fun <B> padZip(other: Option<B>): Option<Pair<A?, B?>> =
+    align(other) { ior ->
+      ior.fold(
+        { it to null },
+        { null to it },
+        { a, b -> a to b }
+      )
+    }
+
+  inline fun <B, C> padZip(other: Option<B>, f: (A?, B?) -> C): Option<C> =
+    align(other) { ior ->
+      ior.fold(
+        { f(it, null) },
+        { f(null, it) },
+        { a, b -> f(a, b) }
+      )
+    }
+
+  inline fun <B> reduceOrNull(initial: (A) -> B, operation: (acc: B, A) -> B): B? =
+    when (this) {
+      is None -> null
+      is Some -> operation(initial(t), t)
+    }
+
+  inline fun <B> reduceRightEvalOrNull(
+    initial: (A) -> B,
+    operation: (A, acc: Eval<B>) -> Eval<B>
+  ): Eval<B?> =
+    when (this) {
+      is None -> Eval.now(null)
+      is Some -> operation(t, Eval.now(initial(t)))
+    }
+
+  fun replicate(n: Int): Option<List<A>> =
+    if (n <= 0) Some(emptyList()) else map { a -> List(n) { a } }
+
+  inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Option<B>> =
+    fold({ emptyList() }, { a -> fa(a).map { Some(it) } })
+
+  inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
+    fold({ emptyList() }, { fa(it).void() })
+
+  inline fun <AA, B> traverseEither(fa: (A) -> Either<AA, B>): Either<AA, Option<B>> =
+    when (this) {
+      is Some -> fa(t).map { Some(it) }
+      is None -> Right(this)
+    }
+
+  inline fun <AA, B> traverseEither_(fa: (A) -> Either<AA, B>): Either<AA, Unit> =
+    fold({ Right(Unit) }, { fa(it).void() })
+
+  inline fun <AA, B> traverseValidated(fa: (A) -> Validated<AA, B>): Validated<AA, Option<B>> =
+    when (this) {
+      is Some -> fa(t).map { Some(it) }
+      is None -> Valid(this)
+    }
+
+  inline fun <AA, B> traverseValidated_(fa: (A) -> Validated<AA, B>): Validated<AA, Unit> =
+    fold({ Valid(Unit) }, { fa(it).void() })
+
+  inline fun <B> traverseFilter(f: (A) -> Iterable<Option<B>>): List<Option<B>> =
+    this.fold({ emptyList() }, { f(it).toList() })
+
+  inline fun <AA, B> traverseFilterEither(f: (A) -> Either<AA, Option<B>>): Either<AA, Option<B>> =
+    this.fold({ Right(empty()) }, f)
+
+  inline fun <AA, B> traverseFilterValidated(f: (A) -> Validated<AA, Option<B>>): Validated<AA, Option<B>> =
+    this.fold({ Valid(empty()) }, f)
+
+  inline fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
   fun toList(): List<A> = fold(::emptyList) { listOf(it) }
+
+  /**
+   *  Pairs [B] with [A] returning an Option<Pair<B, A>>
+   *
+   *  Option<A> -> Option<Pair<B, A>>
+   *
+   *  ```kotlin:ank:playground
+   *  import arrow.core.some
+   *
+   *  fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".some().tupleLeft("World")
+   *   //sampleEnd
+   *   println(result)
+   *  }
+   *  ```
+   */
+  fun <B> tupleLeft(b: B): Option<Pair<B, A>> =
+    map { a -> Pair(b, a) }
+
+  /**
+   *  Pairs [A] with [B] returning an Option<Pair<A, B>>
+   *
+   *  Option<A> -> Option<Pair<A, B>>
+   *
+   *  ```kotlin:ank:playground
+   *  import arrow.core.some
+   *
+   *  fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   "Hello".some().tupleRight("World")
+   *   //sampleEnd
+   *   println(result)
+   *  }
+   *  ```
+   */
+  fun <B> tupleRight(b: B): Option<Pair<A, B>> =
+    map { a -> Pair(a, b) }
+
+  fun void(): Option<Unit> =
+    mapConst(Unit)
+
+  fun <B> zip(other: Option<B>): Option<Pair<A, B>> =
+    mapN(this, other) { a, b -> a to b}
+
+  inline fun <B, C> zip(other: Option<B>, f: (A, B) -> C): Option<C> =
+    zip(other).map { a -> f(a.first, a.second)}
+
+  inline fun <B, C> zipEval(other: Eval<Option<B>>, crossinline f: (A, B) -> C): Eval<Option<C>> =
+    other.map {zip(it).map { a -> f(a.first, a.second) }}
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -547,6 +952,13 @@ sealed class Option<out A> : OptionOf<A> {
     value
   }
 
+  @Deprecated(
+    "Show typeclass is deprecated, and will be removed in 0.13.0. Please use the toString method instead.",
+    ReplaceWith(
+      "toString()"
+    ),
+    DeprecationLevel.WARNING
+  )
   fun show(SA: Show<A>): String = fold(
     {
       "None"
@@ -560,13 +972,13 @@ sealed class Option<out A> : OptionOf<A> {
 object None : Option<Nothing>() {
   override fun isEmpty() = true
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String = "None"
 }
 
 data class Some<out T>(val t: T) : Option<T>() {
   override fun isEmpty() = false
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String = "Some($t)"
 }
 
 /**
@@ -575,7 +987,7 @@ data class Some<out T>(val t: T) : Option<T>() {
  *
  * @param default the default expression.
  */
-fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
+inline fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identity)
 
 /**
  * Returns this option's if the option is nonempty, otherwise
@@ -583,7 +995,7 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -593,7 +1005,7 @@ infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty())
 
 fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
-fun <A> Boolean.maybe(f: () -> A): Option<A> =
+inline fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
     Some(f())
   } else {
@@ -604,13 +1016,18 @@ fun <A> A.some(): Option<A> = Some(this)
 
 fun <A> none(): Option<A> = None
 
+fun <A> Iterable<Option<A>>.combineAll(MA: Monoid<A>): Option<A> =
+  fold(Option(MA.empty())) { acc, a ->
+    acc.combine(MA, a)
+  }
+
 fun <T> Iterable<T>.firstOrNone(): Option<T> = this.firstOrNull().toOption()
 
-fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
+inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
 
 fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
 
-fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
+inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
 
 fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
 
@@ -619,10 +1036,242 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  flatMap { it.fold({ l -> Option.just(l).ap(f) }, { r -> Option.just(r) }) }
+  branch(f.fix(), Some(::identity))
 
-fun <A, B, Z> Option<A>.zip(fb: Option<B>, f: (A, B) -> Z): Option<Z> =
-  flatMap { a: A -> fb.map { b -> f(a, b) } }
+fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
+  flatMap { it.fold(
+    { a -> Some(a).ap(fa) },
+    { b -> Some(b).ap(fb) }
+  )}
 
-fun <A, B> Option<A>.zip(fb: Option<B>): Option<Pair<A, B>> =
-  flatMap { a: A -> fb.map { b -> Pair(a, b) } }
+private fun Option<Boolean>.selector(): Option<Either<Unit, Unit>> =
+  map { bool -> if (bool) Either.right(Unit) else Either.left(Unit) }
+
+fun <A> Option<Boolean>.whenS(x: Option<() -> Unit>): Option<Unit> =
+  selector().select(x.map { f -> { _: Unit -> f() } })
+
+fun <A> Option<Boolean>.ifS(fl: Option<A>, fr: Option<A>): Option<A> =
+  selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
+
+fun Option<Boolean>.orS(f: Option<Boolean>): Option<Boolean> =
+  ifS(Some(true), f)
+
+fun Option<Boolean>.andS(f: Option<Boolean>): Option<Boolean> =
+  ifS(f, Some(false))
+
+fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
+  foldLeft(empty()) { acc, a -> acc.combine(a) } }
+
+inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
+  when (this) {
+    is Some ->
+      if (predicate(t)) this
+      else {
+        error()
+        None
+      }
+    is None -> this
+  }
+
+/**
+ * Returns an Option containing all elements that are instances of specified type parameter R.
+ */
+inline fun <reified B> Option<*>.filterIsInstance(): Option<B> {
+  val f: (Any?) -> B? = { it as? B }
+  return this.mapNotNull(f)
+}
+
+inline fun <A> Option<A>.handleError(f: (Unit) -> A): Option<A> =
+  handleErrorWith { Some(f(Unit)) }
+
+inline fun <A> Option<A>.handleErrorWith(f: (Unit) -> Option<A>): Option<A> =
+  if (isEmpty()) f(Unit) else this
+
+inline fun <reified B> Option<*>.traverseFilterIsInstance(): List<Option<B>> =
+  filterIterable { a -> listOf(a is B) }.map { it.map { a -> a as B } }
+
+inline fun <E, reified B> Option<*>.traverseFilterIsInstanceEither(): Either<E, Option<B>> =
+  filterEither { a -> Right(a is B) }.map { it.map { a -> a as B } }
+
+inline fun <E, reified B> Option<*>.traverseFilterIsInstanceValidated(): Validated<E, Option<B>> =
+  filterValidated { a -> Valid(a is B) }.map { it.map { a -> a as B } }
+
+fun <A> Option<Option<A>>.flatten(): Option<A> =
+  flatMap(::identity)
+
+inline fun <A, B> Option<A>.mproduct(f: (A) -> Option<B>): Option<Pair<A, B>> =
+  flatMap { a ->
+    f(a).map { b -> a to b }
+  }
+
+inline fun <A> Option<Boolean>.ifM(ifTrue: () -> Option<A>, ifFalse: () -> Option<A>): Option<A> =
+  flatMap { if (it) ifTrue() else ifFalse() }
+
+fun <A, B> Option<Either<A, B>>.selectM(f: Option<(A) -> B>): Option<B> =
+  flatMap { it.fold(
+    { a -> Some(a).ap(f) },
+    { b -> Some(b) }
+  )}
+
+inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
+  map(fb).handleError(fe)
+
+inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Option<B>): Option<B> =
+  flatMap(fb).handleErrorWith(fe)
+
+fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
+  if (n <= 0) Some(empty())
+  else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }}
+
+fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
+  flatMap { it.fold({ None }, { a -> Some(a) }) }
+
+fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
+  align(b) { it.fold(::identity, ::identity) { a, b ->
+    SA.run { a.combine(b) }
+  }}
+
+/**
+ * Separate the inner [Either] value into the [Either.Left] and [Either.Right].
+ *
+ * @receiver Option of Either
+ * @return a tuple containing Option of [Either.Left] and another Option of its [Either.Right] value.
+ */
+fun <A, B> Option<Either<A, B>>.separateEither(): Pair<Option<A>, Option<B>> {
+  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
+  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
+  return asep to bsep
+}
+
+/**
+ * Separate the inner [Validated] value into the [Validated.Invalid] and [Validated.Valid].
+ *
+ * @receiver Option of Either
+ * @return a tuple containing Option of [Validated.Invalid] and another Option of its [Validated.Valid] value.
+ */
+fun <A, B> Option<Validated<A, B>>.separateValidated(): Pair<Option<A>, Option<B>> {
+  val asep = flatMap { gab -> gab.fold({ Some(it) }, { None }) }
+  val bsep = flatMap { gab -> gab.fold({ None }, { Some(it) }) }
+  return asep to bsep
+}
+
+fun <A> Option<Iterable<A>>.sequence(): List<Option<A>> =
+  traverse(::identity)
+
+fun <A> Option<Iterable<A>>.sequence_(): List<Unit> =
+  traverse_(::identity)
+
+fun <A, B> Option<Either<A, B>>.sequenceEither(): Either<A, Option<B>> =
+  traverseEither(::identity)
+
+fun <A, B> Option<Either<A, B>>.sequenceEither_(): Either<A, Unit> =
+  traverseEither_(::identity)
+
+fun <A, B> Option<Validated<A, B>>.sequenceValidated(): Validated<A, Option<B>> =
+  traverseValidated(::identity)
+
+fun <A, B> Option<Validated<A, B>>.sequenceValidated_(): Validated<A, Unit> =
+  traverseValidated_(::identity)
+
+fun <A, B> Option<Ior<A, B>>.unalign(): Pair<Option<A>, Option<B>> =
+  unalign(::identity)
+
+inline fun <A, B, C> Option<C>.unalign(f: (C) -> Ior<A, B>): Pair<Option<A>, Option<B>> =
+  when (val option = this.map(f)) {
+    is None -> None to None
+    is Some -> when (val v = option.t) {
+      is Ior.Left -> Some(v.value) to None
+      is Ior.Right -> None to Some(v.value)
+      is Ior.Both -> Some(v.leftValue) to Some(v.rightValue)
+    }
+  }
+
+fun <A> Option<Iterable<A>>.unite(MA: Monoid<A>): Option<A> =
+  map { iterable ->
+    iterable.fold(MA)
+  }
+
+fun <A, B> Option<Either<A, B>>.uniteEither(): Option<B> =
+  flatMap { either ->
+    either.fold({ None }, { b -> Some(b) })
+  }
+
+fun <A, B> Option<Validated<A, B>>.uniteValidated(): Option<B> =
+  flatMap { validated ->
+    validated.fold({ None }, { b -> Some(b) })
+  }
+
+fun <A, B> Option<Pair<A, B>>.unzip(): Pair<Option<A>, Option<B>> =
+  unzip(::identity)
+
+inline fun <A, B, C> Option<C>.unzip(f: (C) -> Pair<A, B>): Pair<Option<A>, Option<B>> =
+  fold(
+    { Option.empty<A>() to Option.empty() },
+    { f(it).let { pair -> Some(pair.first) to Some(pair.second) }}
+  )
+
+/**
+ *  Given [A] is a sub type of [B], re-type this value from Option<A> to Option<B>
+ *
+ *  Option<A> -> Option<B>
+ *
+ *  ```kotlin:ank:playground
+ *  import arrow.core.Option
+ *  import arrow.core.some
+ *  import arrow.core.widen
+ *
+ *  fun main(args: Array<String>) {
+ *   val result: Option<CharSequence> =
+ *   //sampleStart
+ *   "Hello".some().map({ "$it World" }).widen()
+ *   //sampleEnd
+ *   println(result)
+ *  }
+ *  ```
+ */
+fun <B, A : B> Option<A>.widen(): Option<B> =
+  this
+
+fun <A> Option<A>.combine(SGA: Semigroup<A>, b: Option<A>): Option<A> =
+  when (this) {
+    is Some -> when (b) {
+      is Some -> Some(SGA.run { t.combine(b.t) })
+      None -> this
+    }
+    None -> b
+  }
+
+fun <A> Monoid.Companion.option(MA: Monoid<A>): Monoid<Option<A>> =
+  OptionMonoid(MA)
+
+fun <A> Semigroup.Companion.option(SGA: Semigroup<A>): Semigroup<Option<A>> =
+  OptionSemigroup(SGA)
+
+private class OptionMonoid<A>(
+  private val MA: Monoid<A>
+) : Monoid<Option<A>> {
+
+  override fun Option<A>.combine(b: Option<A>): Option<A> =
+    combine(MA, b)
+
+  override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
+    b?.let { combine(MA, it) } ?: this
+
+  override fun empty(): Option<A> = None
+}
+
+private class OptionSemigroup<A>(
+  private val SGA: Semigroup<A>
+) : Semigroup<Option<A>> {
+
+  override fun Option<A>.combine(b: Option<A>): Option<A> =
+    combine(SGA, b)
+
+  override fun Option<A>.maybeCombine(b: Option<A>?): Option<A> =
+    b?.let { combine(SGA, it) } ?: this
+}
+
+operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
+  { other.fold({ 0 }, { -1 }) },
+  { a1 -> other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
+  })

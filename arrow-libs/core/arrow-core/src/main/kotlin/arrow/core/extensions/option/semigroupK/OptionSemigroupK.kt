@@ -6,10 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionSemigroupK
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,8 +24,8 @@ internal val semigroupK_singleton: OptionSemigroupK = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineK(arg1)",
-  "arrow.core.combineK"
+    "orElse { arg1 }",
+    "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +44,8 @@ fun <A> Kind<ForOption, A>.combineK(arg1: Kind<ForOption, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "algebra()",
-  "arrow.core.Option.algebra"
+  "Semigroup.option<A>()",
+  "arrow.core.option", "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
@@ -60,5 +56,9 @@ fun <A> algebra(): Semigroup<Kind<ForOption, A>> = arrow.core.Option
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semigroupK(): OptionSemigroupK = semigroupK_singleton

@@ -3,10 +3,6 @@ package arrow.core.extensions.option.monoidal
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionMonoidal
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,8 +20,8 @@ internal val monoidal_singleton: OptionMonoidal = object : arrow.core.extensions
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "identity()",
-  "arrow.core.Option.identity"
+  "Option.empty<A>()",
+  "arrow.core.Option", "arrow.core.empty"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,5 +32,9 @@ fun <A> identity(): Option<A> = arrow.core.Option
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Monoidal typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monoidal(): OptionMonoidal = monoidal_singleton

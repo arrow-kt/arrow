@@ -1,5 +1,3 @@
-@file:Suppress("UnusedImports")
-
 package arrow.core.extensions
 
 import arrow.Kind
@@ -26,7 +24,6 @@ import arrow.core.k
 import arrow.core.orElse
 import arrow.core.some
 import arrow.core.toT
-import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Applicative
@@ -67,7 +64,11 @@ import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 import arrow.core.select as optionSelect
 
-@extension
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass.",
+  ReplaceWith("Semigroup.option()", "arrow.core.option", "arrow.typeclasses.Semigroup"),
+  DeprecationLevel.WARNING
+)
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>
@@ -82,24 +83,37 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
     }
 }
 
-@extension
+@Deprecated(
+  message = "Semigroupal typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionSemigroupal : Semigroupal<ForOption> {
   override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
     fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
-@extension
+@Deprecated(
+  message = "Monoidal typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
   override fun <A> identity(): Kind<ForOption, A> = None
 }
 
-@extension
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass.",
+  ReplaceWith("Monoid.option()", "arrow.core.option", "arrow.typeclasses.Monoid"),
+  DeprecationLevel.WARNING
+)
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
 }
 
-@extension
+@Deprecated(
+  message = "ApplicativeError typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
@@ -108,7 +122,10 @@ interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionAppl
     fix().orElse { f(Unit).fix() }
 }
 
-@extension
+@Deprecated(
+  message = "MonadError typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
   override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
@@ -117,7 +134,10 @@ interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
     fix().orElse { f(Unit).fix() }
 }
 
-@extension
+@Deprecated(
+  message = "Eq typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionEq<A> : Eq<Option<A>> {
 
   fun EQ(): Eq<A>
@@ -134,19 +154,28 @@ interface OptionEq<A> : Eq<Option<A>> {
   }
 }
 
-@extension
+@Deprecated(
+  message = "Show typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionShow<A> : Show<Option<A>> {
   fun SA(): Show<A>
   override fun Option<A>.show(): String = show(SA())
 }
 
-@extension
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionFunctor : Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
-@extension
+@Deprecated(
+  message = "Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionApply : Apply<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
@@ -158,7 +187,10 @@ interface OptionApply : Apply<ForOption> {
     fix().fold({ Eval.now(None) }, { v -> ff.map { it.fix().map { f -> f(v) } } })
 }
 
-@extension
+@Deprecated(
+  message = "Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionApplicative : Applicative<ForOption>, OptionApply {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
@@ -170,13 +202,19 @@ interface OptionApplicative : Applicative<ForOption>, OptionApply {
     Option.just(a)
 }
 
-@extension
+@Deprecated(
+  message = "Selective typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionSelective : Selective<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
     fix().optionSelect(f)
 }
 
-@extension
+@Deprecated(
+  message = "Monad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonad : Monad<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
@@ -206,7 +244,10 @@ internal object OptionFxMonad : MonadFx<ForOption> {
     super.monad(c).fix()
 }
 
-@extension
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionFoldable : Foldable<ForOption> {
   override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
@@ -227,13 +268,19 @@ interface OptionFoldable : Foldable<ForOption> {
     fix().nonEmpty()
 }
 
-@extension
+@Deprecated(
+  message = "SemigroupK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionSemigroupK : SemigroupK<ForOption> {
   override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
-@extension
+@Deprecated(
+  message = "MonoidK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonoidK : MonoidK<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
@@ -242,18 +289,33 @@ interface OptionMonoidK : MonoidK<ForOption> {
     orElse { y.fix() }
 }
 
+@Deprecated(
+  "Applicative typeclass is deprecated, Replace with traverse, traverseEither or traverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
+)
 fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> = GA.run {
   fix().fold({ just(None) }, { f(it).map { Some(it) } })
 }
 
+@Deprecated(
+  "Applicative typeclass is deprecated, Replace with sequence, sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
+)
 fun <A, G> OptionOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Option<A>> =
   optionTraverse(GA, ::identity)
 
+@Deprecated(
+  "Applicative typeclass is deprecated, Replace with traverseFilter, traverseFilterEither or traverseFilterValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
+)
 fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> = GA.run {
   fix().fold({ just(None) }, f)
 }
 
-@extension
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionTraverse : Traverse<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
@@ -280,7 +342,10 @@ interface OptionTraverse : Traverse<ForOption> {
     fix().nonEmpty()
 }
 
-@extension
+@Deprecated(
+  message = "Hash typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionHash<A> : Hash<Option<A>> {
 
   fun HA(): Hash<A>
@@ -289,7 +354,10 @@ interface OptionHash<A> : Hash<Option<A>> {
     fold({ salt.hashWithSalt(0) }, { v -> HA().run { v.hashWithSalt(salt.hashWithSalt(1)) } })
 }
 
-@extension
+@Deprecated(
+  message = "Order typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionOrder<A> : Order<Option<A>> {
   fun OA(): Order<A>
   override fun Option<A>.compare(b: Option<A>): Ordering = fold({
@@ -299,7 +367,10 @@ interface OptionOrder<A> : Order<Option<A>> {
   })
 }
 
-@extension
+@Deprecated(
+  message = "FunctorFilter typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionFunctorFilter : FunctorFilter<ForOption> {
   override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
     fix().filterMap(f)
@@ -311,7 +382,10 @@ interface OptionFunctorFilter : FunctorFilter<ForOption> {
 fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
   Option.monad().fx.monad(c).fix()
 
-@extension
+@Deprecated(
+  message = "MonadCombine typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
   override fun <A> empty(): Option<A> =
     Option.empty()
@@ -366,7 +440,10 @@ interface OptionMonadCombine : MonadCombine<ForOption>, OptionAlternative {
     )
 }
 
-@extension
+@Deprecated(
+  message = "TraverseFilter typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionTraverseFilter : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
@@ -399,7 +476,10 @@ interface OptionTraverseFilter : TraverseFilter<ForOption> {
     fix().nonEmpty()
 }
 
-@extension
+@Deprecated(
+  message = "MonadFilter typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonadFilter : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
@@ -426,7 +506,10 @@ interface OptionMonadFilter : MonadFilter<ForOption> {
     Option.just(a)
 }
 
-@extension
+@Deprecated(
+  message = "Alternative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
   override fun <A> empty(): Kind<ForOption, A> = None
   override fun <A> Kind<ForOption, A>.orElse(b: Kind<ForOption, A>): Kind<ForOption, A> =
@@ -438,7 +521,10 @@ interface OptionAlternative : Alternative<ForOption>, OptionApplicative {
     else this
 }
 
-@extension
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionEqK : EqK<ForOption> {
   override fun <A> Kind<ForOption, A>.eqK(other: Kind<ForOption, A>, EQ: Eq<A>) =
     (this.fix() to other.fix()).let { (a, b) ->
@@ -459,18 +545,27 @@ interface OptionEqK : EqK<ForOption> {
     }
 }
 
-@extension
+@Deprecated(
+  message = "Semialign typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionSemialign : Semialign<ForOption>, OptionFunctor {
   override fun <A, B> align(a: Kind<ForOption, A>, b: Kind<ForOption, B>): Kind<ForOption, Ior<A, B>> =
     Ior.fromOptions(a.fix(), b.fix())
 }
 
-@extension
+@Deprecated(
+  message = "Align typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionAlign : Align<ForOption>, OptionSemialign {
   override fun <A> empty(): Kind<ForOption, A> = Option.empty()
 }
 
-@extension
+@Deprecated(
+  message = "Unalign typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
   override fun <A, B> unalign(ior: Kind<ForOption, Ior<A, B>>): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
     when (val a = ior.fix()) {
@@ -483,26 +578,38 @@ interface OptionUnalign : Unalign<ForOption>, OptionSemialign {
     }
 }
 
-@extension
+@Deprecated(
+  message = "Zip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionZip : Zip<ForOption>, OptionSemialign {
   override fun <A, B> Kind<ForOption, A>.zip(other: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
     Option.apply().tupledN(this, other)
 }
 
-@extension
+@Deprecated(
+  message = "Repeat typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionRepeat : Repeat<ForOption>, OptionZip {
   override fun <A> repeat(a: A): Kind<ForOption, A> =
     Option.just(a)
 }
 
-@extension
+@Deprecated(
+  message = "Unzip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionUnzip : Unzip<ForOption>, OptionZip {
   override fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
     fix().fold({ Option.empty<A>() toT Option.empty() },
       { it.a.some() toT it.b.some() })
 }
 
-@extension
+@Deprecated(
+  message = "Crosswalk typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable {
   override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<ForOption, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<ForOption, B>> =
     when (val e = a.fix()) {
@@ -511,5 +618,8 @@ interface OptionCrosswalk : Crosswalk<ForOption>, OptionFunctor, OptionFoldable 
     }
 }
 
-@extension
+@Deprecated(
+  message = "MonadPlus typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
+)
 interface OptionMonadPlus : MonadPlus<ForOption>, OptionMonad, OptionAlternative

@@ -5,10 +5,6 @@ import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionMonadPlus
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -27,8 +23,8 @@ internal val monadPlus_singleton: OptionMonadPlus = object : arrow.core.extensio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zeroM()",
-  "arrow.core.Option.zeroM"
+  "Option.empty<A>()",
+  "arrow.core.Option", "arrow.core.empty"
   ),
   DeprecationLevel.WARNING
 )
@@ -46,8 +42,8 @@ fun <A> zeroM(): Option<A> = arrow.core.Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plusM(arg1)",
-  "arrow.core.plusM"
+  "orElse { arg1 }",
+  "arrow.core.Option", "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -59,5 +55,9 @@ fun <A> Kind<ForOption, A>.plusM(arg1: Kind<ForOption, A>): Option<A> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "MonadPlus typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadPlus(): OptionMonadPlus = monadPlus_singleton

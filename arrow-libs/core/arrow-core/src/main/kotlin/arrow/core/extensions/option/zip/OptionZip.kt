@@ -6,11 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionZip
-import kotlin.Deprecated
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,7 +23,7 @@ internal val zip_singleton: OptionZip = object : arrow.core.extensions.OptionZip
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "zip(arg1)",
+    "zip<B>(arg1)",
     "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
@@ -48,7 +43,7 @@ fun <A, B> Kind<ForOption, A>.zip(arg1: Kind<ForOption, B>): Option<Tuple2<A, B>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "zip(arg1, arg2)",
+    "zip<B, C>(arg1, arg2)",
     "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
@@ -61,5 +56,9 @@ fun <A, B, C> Kind<ForOption, A>.zipWith(arg1: Kind<ForOption, B>, arg2: Functio
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Zip typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.zip(): OptionZip = zip_singleton

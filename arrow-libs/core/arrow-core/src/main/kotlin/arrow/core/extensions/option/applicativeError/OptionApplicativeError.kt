@@ -7,14 +7,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionApplicativeError
 import arrow.typeclasses.ApplicativeError
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Throwable
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -33,8 +25,8 @@ internal val applicativeError_singleton: OptionApplicativeError = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "handleErrorWith(arg1)",
-  "arrow.core.handleErrorWith"
+    "handleErrorWith(arg1)",
+    "arrow.core.handleErrorWith"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +45,8 @@ fun <A> Kind<ForOption, A>.handleErrorWith(arg1: Function1<Unit, Kind<ForOption,
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "raiseError()",
-  "arrow.core.raiseError"
+    "None",
+    "arrow.core.None"
   ),
   DeprecationLevel.WARNING
 )
@@ -72,8 +64,8 @@ fun <A> Unit.raiseError(): Option<A> = arrow.core.Option.applicativeError().run 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fromOption(arg1)",
-  "arrow.core.fromOption"
+  "fold<Option<A>>({ arg1(); None }, { Some(it) })",
+  "arrow.core.None", "arrow.core.Option", "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
@@ -92,8 +84,8 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Unit>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fromEither(arg1)",
-  "arrow.core.fromEither"
+    "fold<Option<A>>({ arg1(it); None }, { Some(it) })",
+    "arrow.core.None", "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -113,7 +105,7 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Unit>): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
   "handleError(arg1)",
-  "arrow.core.handleError"
+    "arrow.core.handleError"
   ),
   DeprecationLevel.WARNING
 )
@@ -132,8 +124,8 @@ fun <A> Kind<ForOption, A>.handleError(arg1: Function1<Unit, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "redeem(arg1, arg2)",
-  "arrow.core.redeem"
+    "redeem(arg1, arg2)",
+    "arrow.core.redeem"
   ),
   DeprecationLevel.WARNING
 )
@@ -152,8 +144,8 @@ fun <A, B> Kind<ForOption, A>.redeem(arg1: Function1<Unit, B>, arg2: Function1<A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "attempt()",
-  "arrow.core.attempt"
+  "map<Either<Unit, A>> { Right(it) }.handleError<Either<Unit, A>> { Left(it) }",
+  "arrow.core.Left", "arrow.core.Right", "arrow.core.handleError"
   ),
   DeprecationLevel.WARNING
 )
@@ -172,8 +164,8 @@ fun <A> Kind<ForOption, A>.attempt(): Option<Either<Unit, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "catch(arg0, arg1)",
-  "arrow.core.Option.catch"
+  "Option.catch(arg0, arg1)",
+  "arrow.core.Option", "arrow.core.catch"
   ),
   DeprecationLevel.WARNING
 )
@@ -189,12 +181,8 @@ fun <A> catch(arg0: Function1<Throwable, Unit>, arg1: Function0<A>): Option<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "catch(arg1)",
-  "arrow.core.catch"
-  ),
-  DeprecationLevel.WARNING
+  "This methods is invalid for Option. ApplicativeError<F, Throwable> is inconsistent in `F`",
+  level = DeprecationLevel.WARNING
 )
 fun <A> ApplicativeError<ForOption, Throwable>.catch(arg1: Function0<A>): Option<A> =
     arrow.core.Option.applicativeError().run {
@@ -211,10 +199,10 @@ fun <A> ApplicativeError<ForOption, Throwable>.catch(arg1: Function0<A>): Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "effectCatch(arg0, arg1)",
-  "arrow.core.Option.effectCatch"
+    "Option.catch(arg0) { arg1() }",
+    "arrow.core.Option", "arrow.core.catch"
   ),
-  DeprecationLevel.WARNING
+  level = DeprecationLevel.WARNING
 )
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Unit>, arg1: suspend () -> A): Option<A> =
     arrow.core.Option
@@ -229,12 +217,8 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Unit>, arg1: suspend () -
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "effectCatch(arg1)",
-  "arrow.core.effectCatch"
-  ),
-  DeprecationLevel.WARNING
+  "This methods is invalid for Option. ApplicativeError<F, Throwable> is inconsistent in `F`",
+  level = DeprecationLevel.WARNING
 )
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
     arrow.core.Option.applicativeError().run {
@@ -244,5 +228,9 @@ suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "ApplicativeError typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.applicativeError(): OptionApplicativeError = applicativeError_singleton

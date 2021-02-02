@@ -4,9 +4,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionSemigroup
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("plus")
 @Suppress(
@@ -18,8 +15,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plus(SG, arg1)",
-  "arrow.core.plus"
+  "combine(SG, arg1)",
+  "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,8 +35,8 @@ fun <A> Option<A>.plus(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "maybeCombine(SG, arg1)",
-  "arrow.core.maybeCombine"
+  "combine(SG, arg1)",
+  "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,6 +48,14 @@ fun <A> Option<A>.maybeCombine(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "@extension projected functions are deprecated",
+  ReplaceWith(
+    "Semigroup.option<A>(EQ)",
+    "arrow.core.option", "arrow.typeclasses.Semigroup"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <A> Companion.semigroup(SG: Semigroup<A>): OptionSemigroup<A> = object :
     arrow.core.extensions.OptionSemigroup<A> { override fun SG(): arrow.typeclasses.Semigroup<A> =

@@ -33,7 +33,7 @@ internal val selective_singleton: OptionSelective = object : arrow.core.extensio
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
   "select(arg1)",
-  "arrow.core.select"
+    "arrow.core.select"
   ),
   DeprecationLevel.WARNING
 )
@@ -74,8 +74,8 @@ fun <A, B, C> Kind<ForOption, Either<A, B>>.branch(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "whenS(arg1)",
-  "arrow.core.whenS"
+    "whenS(arg1)",
+    "arrow.core.whenS"
   ),
   DeprecationLevel.WARNING
 )
@@ -147,5 +147,9 @@ fun <A> Kind<ForOption, Boolean>.andS(arg1: Kind<ForOption, Boolean>): Option<Bo
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Selective typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.selective(): OptionSelective = selective_singleton

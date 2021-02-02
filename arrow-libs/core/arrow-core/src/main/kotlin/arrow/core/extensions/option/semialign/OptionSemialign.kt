@@ -8,12 +8,6 @@ import arrow.core.Option.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionSemialign
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -32,8 +26,7 @@ internal val semialign_singleton: OptionSemialign = object : arrow.core.extensio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "align(arg0, arg1)",
-  "arrow.core.Option.align"
+  "arg0.align(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -52,8 +45,7 @@ fun <A, B> align(arg0: Kind<ForOption, A>, arg1: Kind<ForOption, B>): Option<Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "alignWith(arg0, arg1, arg2)",
-  "arrow.core.Option.alignWith"
+  "arg0.align(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -75,8 +67,7 @@ fun <A, B, C> alignWith(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "salign(arg1, arg2)",
-  "arrow.core.salign"
+  "salign(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -95,8 +86,7 @@ fun <A> Kind<ForOption, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForOption, A>):
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZip(arg1)",
-  "arrow.core.padZip"
+  "padZip(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -116,8 +106,7 @@ fun <A, B> Kind<ForOption, A>.padZip(arg1: Kind<ForOption, B>): Option<Tuple2<Op
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZipWith(arg1, arg2)",
-  "arrow.core.padZipWith"
+  "padZip(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -131,5 +120,9 @@ fun <A, B, C> Kind<ForOption, A>.padZipWith(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Semialign typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semialign(): OptionSemialign = semialign_singleton

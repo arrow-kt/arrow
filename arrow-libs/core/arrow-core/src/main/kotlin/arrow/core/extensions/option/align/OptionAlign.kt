@@ -3,10 +3,6 @@ package arrow.core.extensions.option.align
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionAlign
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,8 +20,8 @@ internal val align_singleton: OptionAlign = object : arrow.core.extensions.Optio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "empty()",
-  "arrow.core.Option.empty"
+  "Option.empty<A>()",
+  "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,5 +32,9 @@ fun <A> empty(): Option<A> = arrow.core.Option
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Align typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.align(): OptionAlign = align_singleton

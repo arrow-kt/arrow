@@ -5,13 +5,6 @@ import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionFunctorFilter
-import java.lang.Class
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -30,8 +23,8 @@ internal val functorFilter_singleton: OptionFunctorFilter = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull(arg1.andThen { it.orNull() })",
+    "arrow.core.andThen"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,8 +43,8 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flattenOption()",
-  "arrow.core.flattenOption"
+    "flatten()",
+    "arrow.core.flatten"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +63,7 @@ fun <A> Kind<ForOption, Option<A>>.flattenOption(): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filter(arg1)",
-  "arrow.core.filter"
+    "filter(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,7 +82,7 @@ fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterIsInstance(arg1)",
+  "filterIsInstance<B>()",
   "arrow.core.filterIsInstance"
   ),
   DeprecationLevel.WARNING
@@ -103,5 +95,9 @@ fun <A, B> Kind<ForOption, A>.filterIsInstance(arg1: Class<B>): Option<B> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "FunctorFilter typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.functorFilter(): OptionFunctorFilter = functorFilter_singleton

@@ -6,14 +6,6 @@ import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionMonadError
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -53,7 +45,7 @@ fun <A> Kind<ForOption, A>.ensure(arg1: Function0<Unit>, arg2: Function1<A, Bool
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
   "redeemWith(arg1, arg2)",
-  "arrow.core.redeemWith"
+    "arrow.core.redeemWith"
   ),
   DeprecationLevel.WARNING
 )
@@ -75,7 +67,7 @@ fun <A, B> Kind<ForOption, A>.redeemWith(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
   "rethrow()",
-  "arrow.core.rethrow"
+    "arrow.core.rethrow"
   ),
   DeprecationLevel.WARNING
 )
@@ -83,8 +75,8 @@ fun <A> Kind<ForOption, Either<Unit, A>>.rethrow(): Option<A> = arrow.core.Optio
   this@rethrow.rethrow<A>() as arrow.core.Option<A>
 }
 
-@Suppress(
-  "UNCHECKED_CAST",
-  "NOTHING_TO_INLINE"
+@Deprecated(
+  "MonadError typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadError(): OptionMonadError = monadError_singleton

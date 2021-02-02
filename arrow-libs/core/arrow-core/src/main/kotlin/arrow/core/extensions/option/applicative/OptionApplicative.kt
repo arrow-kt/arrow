@@ -6,14 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionApplicative
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Int
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -32,8 +24,8 @@ internal val applicative_singleton: OptionApplicative = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just()",
-  "arrow.core.just"
+  "some()",
+  "arrow.core.some"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,8 +43,8 @@ fun <A> A.just(): Option<A> = arrow.core.Option.applicative().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit()",
-  "arrow.core.Option.unit"
+  "Unit.some()",
+  "arrow.core.some"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +62,7 @@ fun unit(): Option<Unit> = arrow.core.Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,8 +81,7 @@ fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)",
-  "arrow.core.replicate"
+  "replicate(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -110,8 +100,7 @@ fun <A> Kind<ForOption, A>.replicate(arg1: Int): Option<List<A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)",
-  "arrow.core.replicate"
+  "replicate(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -123,5 +112,9 @@ fun <A> Kind<ForOption, A>.replicate(arg1: Int, arg2: Monoid<A>): Option<A> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Applicative typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.applicative(): OptionApplicative = applicative_singleton

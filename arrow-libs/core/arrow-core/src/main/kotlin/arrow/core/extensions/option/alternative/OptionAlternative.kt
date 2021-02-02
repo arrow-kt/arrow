@@ -6,13 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.SequenceK
 import arrow.core.extensions.OptionAlternative
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -29,12 +22,8 @@ internal val alternative_singleton: OptionAlternative = object :
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "some()",
-  "arrow.core.some"
-  ),
-  DeprecationLevel.WARNING
+  "This method results in StackOverflow",
+  level = DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> = arrow.core.Option.alternative().run {
   this@some.some<A>() as arrow.core.Option<arrow.core.SequenceK<A>>
@@ -48,12 +37,8 @@ fun <A> Kind<ForOption, A>.some(): Option<SequenceK<A>> = arrow.core.Option.alte
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "many()",
-  "arrow.core.many"
-  ),
-  DeprecationLevel.WARNING
+  "This method results in StackOverflow",
+  level = DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.many(): Option<SequenceK<A>> = arrow.core.Option.alternative().run {
   this@many.many<A>() as arrow.core.Option<arrow.core.SequenceK<A>>
@@ -69,8 +54,8 @@ fun <A> Kind<ForOption, A>.many(): Option<SequenceK<A>> = arrow.core.Option.alte
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "alt(arg1)",
-  "arrow.core.alt"
+  "orElse { arg1 }",
+  "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -89,8 +74,8 @@ infix fun <A> Kind<ForOption, A>.alt(arg1: Kind<ForOption, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "orElse(arg1)",
-  "arrow.core.orElse"
+    "orElse { arg1 }",
+    "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -109,8 +94,8 @@ fun <A> Kind<ForOption, A>.orElse(arg1: Kind<ForOption, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineK(arg1)",
-  "arrow.core.combineK"
+    "orElse { arg1 }",
+    "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -129,8 +114,8 @@ fun <A> Kind<ForOption, A>.combineK(arg1: Kind<ForOption, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "optional()",
-  "arrow.core.optional"
+  "map<Option<A>>(::Some).orElse { Some(None) }",
+  "arrow.core.None", "arrow.core.Option", "arrow.core.Some", "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -148,8 +133,8 @@ fun <A> Kind<ForOption, A>.optional(): Option<Option<A>> = arrow.core.Option.alt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "guard(arg0)",
-  "arrow.core.Option.guard"
+  "if (arg0) Some(Unit) else Option.empty()",
+  "arrow.core.Option", "arrow.core.empty"
   ),
   DeprecationLevel.WARNING
 )
@@ -167,8 +152,8 @@ fun guard(arg0: Boolean): Option<Unit> = arrow.core.Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lazyOrElse(arg1)",
-  "arrow.core.lazyOrElse"
+    "orElse { arg1() }",
+    "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
@@ -180,5 +165,9 @@ fun <A> Kind<ForOption, A>.lazyOrElse(arg1: Function0<Kind<ForOption, A>>): Opti
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Alternative typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.alternative(): OptionAlternative = alternative_singleton

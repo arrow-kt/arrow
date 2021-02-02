@@ -6,11 +6,6 @@ import arrow.core.Ior
 import arrow.core.Option.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionUnalign
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,8 +23,8 @@ internal val unalign_singleton: OptionUnalign = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unalign(arg0)",
-  "arrow.core.Option.unalign"
+    "arg0.unalign()",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,8 +44,8 @@ fun <A, B> unalign(arg0: Kind<ForOption, Ior<A, B>>): Tuple2<Kind<ForOption, A>,
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unalignWith(arg0, arg1)",
-  "arrow.core.Option.unalignWith"
+  "arg0.unalign(arg1)",
+  "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
@@ -63,5 +58,9 @@ fun <A, B, C> unalignWith(arg0: Kind<ForOption, C>, arg1: Function1<C, Ior<A, B>
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Unalign typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.unalign(): OptionUnalign = unalign_singleton

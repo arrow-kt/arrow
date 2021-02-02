@@ -6,12 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionFunctor
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,17 +18,13 @@ internal val functor_singleton: OptionFunctor = object : arrow.core.extensions.O
  *  Kind<F, A> -> Kind<F, B>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.map
  *
  *  fun main(args: Array<String>) {
  *   val result =
  *   //sampleStart
- *   "Hello".just().map({ "$it World" })
+ *   "Hello".just().map { "$it World" }
  *   //sampleEnd
  *   println(result)
  *  }
@@ -50,8 +40,7 @@ internal val functor_singleton: OptionFunctor = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "map<B>(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +59,7 @@ fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "map<B>(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -87,12 +75,8 @@ fun <A, B> Kind<ForOption, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>)
  *  `A -> B -> Kind<F, A> -> Kind<F, B>`
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.lift
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -113,8 +97,8 @@ fun <A, B> Kind<ForOption, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>)
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0)",
-  "arrow.core.Option.lift"
+  "{ option: Option<A> -> option.map<B>(arg0)}",
+  "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -134,8 +118,7 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForOption, A>, Kind<ForOp
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+  "void()"
   ),
   DeprecationLevel.WARNING
 )
@@ -150,12 +133,8 @@ fun <A> Kind<ForOption, A>.void(): Option<Unit> = arrow.core.Option.functor().ru
  *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.fproduct
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -176,8 +155,7 @@ fun <A> Kind<ForOption, A>.void(): Option<Unit> = arrow.core.Option.functor().ru
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+  "fproduct(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -192,12 +170,8 @@ fun <A, B> Kind<ForOption, A>.fproduct(arg1: Function1<A, B>): Option<Tuple2<A, 
  *  Kind<F, A> -> Kind<F, B>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.mapConst
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -218,8 +192,7 @@ fun <A, B> Kind<ForOption, A>.fproduct(arg1: Function1<A, B>): Option<Tuple2<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "mapConst(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -240,8 +213,7 @@ fun <A, B> Kind<ForOption, A>.mapConst(arg1: B): Option<B> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "arg1.mapConst(this)"
   ),
   DeprecationLevel.WARNING
 )
@@ -255,12 +227,8 @@ fun <A, B> A.mapConst(arg1: Kind<ForOption, B>): Option<A> = arrow.core.Option.f
  *  Kind<F, A> -> Kind<F, Tuple2<B, A>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.tupleLeft
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -281,8 +249,7 @@ fun <A, B> A.mapConst(arg1: Kind<ForOption, B>): Option<A> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+  "tupleLeft(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -297,12 +264,8 @@ fun <A, B> Kind<ForOption, A>.tupleLeft(arg1: B): Option<Tuple2<B, A>> =
  *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.tupleRight
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -323,8 +286,7 @@ fun <A, B> Kind<ForOption, A>.tupleLeft(arg1: B): Option<Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+  "tupleRight(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -339,13 +301,9 @@ fun <A, B> Kind<ForOption, A>.tupleRight(arg1: B): Option<Tuple2<A, B>> =
  *  Kind<F, A> -> Kind<F, B>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.option.functor.*
- * import arrow.core.*
- *
- *
- *  import arrow.core.extensions.option.applicative.just
  *  import arrow.Kind
+ *  import arrow.core.extensions.option.applicative.just
+ *  import arrow.core.extensions.option.functor.widen
  *
  *  fun main(args: Array<String>) {
  *   val result: Kind<*, CharSequence> =
@@ -366,8 +324,8 @@ fun <A, B> Kind<ForOption, A>.tupleRight(arg1: B): Option<Tuple2<A, B>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
+    "widen()",
+    "arrow.core.widen"
   ),
   DeprecationLevel.WARNING
 )
@@ -378,5 +336,9 @@ fun <B, A : B> Kind<ForOption, A>.widen(): Option<B> = arrow.core.Option.functor
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Functor typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.functor(): OptionFunctor = functor_singleton

@@ -6,11 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionMonadFilter
 import arrow.typeclasses.MonadFilterSyntax
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -29,8 +24,8 @@ internal val monadFilter_singleton: OptionMonadFilter = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull(arg1.andThen { it.orNull() })",
+    "arrow.core.andThen"
   ),
   DeprecationLevel.WARNING
 )
@@ -47,12 +42,8 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bindingFilter(arg0)",
-  "arrow.core.Option.bindingFilter"
-  ),
-  DeprecationLevel.WARNING
+  "Monad bindings are deprecated",
+  level = DeprecationLevel.WARNING
 )
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForOption>.() -> B): Option<B> =
     arrow.core.Option
@@ -62,5 +53,9 @@ fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForOption>.() -> B): Optio
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "MonadFilter typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadFilter(): OptionMonadFilter = monadFilter_singleton

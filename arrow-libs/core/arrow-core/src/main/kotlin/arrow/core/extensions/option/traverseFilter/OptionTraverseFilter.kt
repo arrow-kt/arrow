@@ -6,13 +6,6 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionTraverseFilter
 import arrow.typeclasses.Applicative
-import java.lang.Class
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -29,12 +22,8 @@ internal val traverseFilter_singleton: OptionTraverseFilter = object :
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverseFilter(arg1, arg2)",
-  "arrow.core.traverseFilter"
-  ),
-  DeprecationLevel.WARNING
+  "Applicative typeclass is deprecated, Replace with traverseFilter, traverseFilterEither or traverseFilterValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForOption, A>.traverseFilter(
   arg1: Applicative<G>,
@@ -54,8 +43,8 @@ fun <G, A, B> Kind<ForOption, A>.traverseFilter(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull(arg1.andThen { it.orNull() })",
+    "arrow.core.andThen"
   ),
   DeprecationLevel.WARNING
 )
@@ -72,12 +61,8 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "filterA(arg1, arg2)",
-  "arrow.core.filterA"
-  ),
-  DeprecationLevel.WARNING
+  "Applicative typeclass is deprecated, Replace with filterEither, filterIterable or filterValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForOption, A>.filterA(arg1: Function1<A, Kind<G, Boolean>>, arg2: Applicative<G>):
     Kind<G, Kind<ForOption, A>> = arrow.core.Option.traverseFilter().run {
@@ -94,8 +79,7 @@ fun <G, A> Kind<ForOption, A>.filterA(arg1: Function1<A, Kind<G, Boolean>>, arg2
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filter(arg1)",
-  "arrow.core.filter"
+    "filter(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -112,12 +96,8 @@ fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverseFilterIsInstance(arg1, arg2)",
-  "arrow.core.traverseFilterIsInstance"
-  ),
-  DeprecationLevel.WARNING
+  "Applicative typeclass is deprecated, Replace with traverseFilterIsInstance, traverseFilterIsInstanceEither or traverseFilterIsInstanceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForOption, A>.traverseFilterIsInstance(arg1: Applicative<G>, arg2: Class<B>):
     Kind<G, Kind<ForOption, B>> = arrow.core.Option.traverseFilter().run {
@@ -128,5 +108,9 @@ fun <G, A, B> Kind<ForOption, A>.traverseFilterIsInstance(arg1: Applicative<G>, 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "TraverseFilter typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.traverseFilter(): OptionTraverseFilter = traverseFilter_singleton

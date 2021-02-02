@@ -5,10 +5,6 @@ import arrow.core.ForOption
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionMonoidK
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -26,8 +22,8 @@ internal val monoidK_singleton: OptionMonoidK = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "algebra()",
-  "arrow.core.Option.algebra"
+  "Monoid.option<A>()",
+  "arrow.core.option", "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,5 +34,9 @@ fun <A> algebra(): Monoid<Kind<ForOption, A>> = arrow.core.Option
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monoidK(): OptionMonoidK = monoidK_singleton

@@ -3,10 +3,6 @@ package arrow.core.extensions.option.repeat
 import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionRepeat
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,8 +20,8 @@ internal val repeat_singleton: OptionRepeat = object : arrow.core.extensions.Opt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "repeat(a)",
-  "arrow.core.Option.repeat"
+  "Option(a)",
+  "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,5 +32,9 @@ fun <A> repeat(a: A): Option<A> = arrow.core.Option
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Repeat typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.repeat(): OptionRepeat = repeat_singleton

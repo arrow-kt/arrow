@@ -5,11 +5,6 @@ import arrow.core.ForOption
 import arrow.core.Option.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.OptionUnzip
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -27,8 +22,8 @@ internal val unzip_singleton: OptionUnzip = object : arrow.core.extensions.Optio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzip()",
-  "arrow.core.unzip"
+    "unzip()",
+    "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +43,8 @@ fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kin
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzipWith(arg1)",
-  "arrow.core.unzipWith"
+    "unzip(arg1)",
+    "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
@@ -62,5 +57,9 @@ fun <A, B, C> Kind<ForOption, C>.unzipWith(arg1: Function1<C, Tuple2<A, B>>): Tu
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Unzip typeclass is deprecated. Use concrete methods on Option",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.unzip(): OptionUnzip = unzip_singleton
