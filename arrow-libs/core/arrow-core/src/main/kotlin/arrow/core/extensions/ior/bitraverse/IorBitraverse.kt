@@ -6,11 +6,6 @@ import arrow.core.Ior
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorBitraverse
 import arrow.typeclasses.Applicative
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -26,12 +21,8 @@ internal val bitraverse_singleton: IorBitraverse = object : arrow.core.extension
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bitraverse(arg1, arg2, arg3)",
-  "arrow.core.bitraverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with bitraverse, bitraverseEither or bitraverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B, C, D> Kind<Kind<ForIor, A>, B>.bitraverse(
   arg1: Applicative<G>,
@@ -50,12 +41,8 @@ fun <G, A, B, C, D> Kind<Kind<ForIor, A>, B>.bitraverse(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bisequence(arg1)",
-  "arrow.core.bisequence"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with bisequence, bisequenceEither or bisequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<Kind<ForIor, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>): Kind<G,
     Kind<Kind<ForIor, A>, B>> = arrow.core.Ior.bitraverse().run {
@@ -73,8 +60,7 @@ fun <G, A, B> Kind<Kind<ForIor, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applic
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bimap(arg1, arg2)",
-  "arrow.core.bimap"
+  "this.bimap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -86,5 +72,9 @@ fun <A, B, C, D> Kind<Kind<ForIor, A>, B>.bimap(arg1: Function1<A, C>, arg2: Fun
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Bitraverse typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.bitraverse(): IorBitraverse = bitraverse_singleton

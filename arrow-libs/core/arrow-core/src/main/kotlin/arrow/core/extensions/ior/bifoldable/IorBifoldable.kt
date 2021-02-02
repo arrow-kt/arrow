@@ -6,12 +6,6 @@ import arrow.core.ForIor
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorBifoldable
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -29,8 +23,7 @@ internal val bifoldable_singleton: IorBifoldable = object : arrow.core.extension
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldLeft(arg1, arg2, arg3)",
-  "arrow.core.bifoldLeft"
+  "this.bifoldLeft(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )
@@ -52,8 +45,7 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.bifoldLeft(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldRight(arg1, arg2, arg3)",
-  "arrow.core.bifoldRight"
+  "this.bifoldRight(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )
@@ -75,8 +67,7 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.bifoldRight(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bifoldMap(arg1, arg2, arg3)",
-  "arrow.core.bifoldMap"
+  "this.bifoldMap(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )
@@ -91,5 +82,9 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.bifoldMap(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Bifoldable typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.bifoldable(): IorBifoldable = bifoldable_singleton

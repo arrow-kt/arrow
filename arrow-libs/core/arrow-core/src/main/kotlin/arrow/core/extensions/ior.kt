@@ -18,7 +18,6 @@ import arrow.core.fix
 import arrow.core.flatMap
 import arrow.core.leftIor
 import arrow.core.rightIor
-import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -40,9 +39,12 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.hashWithSalt
-import arrow.undocumented
 
-@extension
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass.",
+  ReplaceWith("Semigroup.ior()", "arrow.core.ior", "arrow.typeclasses.Semigroup"),
+  DeprecationLevel.WARNING
+)
 interface IorSemigroup<L, R> : Semigroup<Ior<L, R>> {
 
   fun SGL(): Semigroup<L>
@@ -72,19 +74,27 @@ interface IorSemigroup<L, R> : Semigroup<Ior<L, R>> {
     }
 }
 
-@extension
-@undocumented
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorFunctor<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 }
 
-@extension
+@Deprecated(
+  message = "Bifunctor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorBifunctor : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
 }
 
-@extension
+@Deprecated(
+  message = "Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 
   fun SL(): Semigroup<L>
@@ -110,7 +120,10 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
     })
 }
 
-@extension
+@Deprecated(
+  message = "Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorApply<L> {
 
   override fun SL(): Semigroup<L>
@@ -123,7 +136,10 @@ interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorApply<L> {
     fix().ap(SL(), ff)
 }
 
-@extension
+@Deprecated(
+  message = "Monad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun SL(): Semigroup<L>
@@ -140,7 +156,10 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
     Ior.tailRecM(a, f, SL())
 }
 
-@extension
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
@@ -149,14 +168,20 @@ interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
-@extension
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
 }
 
-@extension
+@Deprecated(
+  message = "Bifoldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorBifoldable : Bifoldable<ForIor> {
   override fun <A, B, C> IorOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fix().bifoldLeft(c, f, g)
@@ -165,7 +190,10 @@ interface IorBifoldable : Bifoldable<ForIor> {
     fix().bifoldRight(c, f, g)
 }
 
-@extension
+@Deprecated(
+  message = "Bitraverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
   override fun <G, A, B, C, D> IorOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, IorOf<C, D>> =
     fix().let {
@@ -176,7 +204,10 @@ interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
     }
 }
 
-@extension
+@Deprecated(
+  message = "Eq typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorEq<L, R> : Eq<Ior<L, R>> {
 
   fun EQL(): Eq<L>
@@ -202,7 +233,10 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
   }
 }
 
-@extension
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorEqK<A> : EqK<IorPartialOf<A>> {
   fun EQA(): Eq<A>
 
@@ -212,7 +246,10 @@ interface IorEqK<A> : EqK<IorPartialOf<A>> {
     }
 }
 
-@extension
+@Deprecated(
+  message = "EqK2 typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorEqK2 : EqK2<ForIor> {
   override fun <A, B> Kind2<ForIor, A, B>.eqK(other: Kind2<ForIor, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
@@ -222,14 +259,20 @@ interface IorEqK2 : EqK2<ForIor> {
     }
 }
 
-@extension
+@Deprecated(
+  message = "Show typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorShow<L, R> : Show<Ior<L, R>> {
   fun SL(): Show<L>
   fun SR(): Show<R>
   override fun Ior<L, R>.show(): String = show(SL(), SR())
 }
 
-@extension
+@Deprecated(
+  message = "Hash typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorHash<L, R> : Hash<Ior<L, R>> {
 
   fun HL(): Hash<L>
@@ -242,7 +285,10 @@ interface IorHash<L, R> : Hash<Ior<L, R>> {
   }
 }
 
-@extension
+@Deprecated(
+  message = "Order typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorOrder<L, R> : Order<Ior<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
@@ -258,7 +304,10 @@ interface IorOrder<L, R> : Order<Ior<L, R>> {
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()
 
-@extension
+@Deprecated(
+  message = "Crosswalk typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldable<L> {
   override fun <F, A, B> crosswalk(ALIGN: Align<F>, a: Kind<IorPartialOf<L>, A>, fa: (A) -> Kind<F, B>): Kind<F, Kind<IorPartialOf<L>, B>> {
     return when (val ior = a.fix()) {
@@ -269,7 +318,10 @@ interface IorCrosswalk<L> : Crosswalk<IorPartialOf<L>>, IorFunctor<L>, IorFoldab
   }
 }
 
-@extension
+@Deprecated(
+  message = "Bicrosswalk typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
+)
 interface IorBicrosswalk : Bicrosswalk<ForIor>, IorBifunctor, IorBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,

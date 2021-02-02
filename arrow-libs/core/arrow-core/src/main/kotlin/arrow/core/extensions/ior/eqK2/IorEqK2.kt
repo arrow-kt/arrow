@@ -5,11 +5,6 @@ import arrow.core.ForIor
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorEqK2
 import arrow.typeclasses.Eq
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -25,12 +20,11 @@ internal val eqK2_singleton: IorEqK2 = object : arrow.core.extensions.IorEqK2 {}
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
   ReplaceWith(
-  "eqK(arg1, arg2, arg3)",
-  "arrow.core.eqK"
+    "this.eqv(arg1)"
   ),
-  DeprecationLevel.WARNING
+  level = DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForIor, A>, B>.eqK(
   arg1: Kind<Kind<ForIor, A>, B>,
@@ -48,12 +42,8 @@ fun <A, B> Kind<Kind<ForIor, A>, B>.eqK(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "liftEq(arg0, arg1)",
-  "arrow.core.Ior.liftEq"
-  ),
-  DeprecationLevel.WARNING
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 fun <A, B> liftEq(arg0: Eq<A>, arg1: Eq<B>): Eq<Kind<Kind<ForIor, A>, B>> = arrow.core.Ior
    .eqK2()
@@ -63,5 +53,9 @@ fun <A, B> liftEq(arg0: Eq<A>, arg1: Eq<B>): Eq<Kind<Kind<ForIor, A>, B>> = arro
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.eqK2(): IorEqK2 = eqK2_singleton

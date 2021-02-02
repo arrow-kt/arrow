@@ -9,12 +9,6 @@ import arrow.core.Ior.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.IorMonad
 import arrow.typeclasses.Semigroup
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("flatMap")
 @Suppress(
@@ -26,7 +20,7 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatMap(SL, arg1)",
+  "this.flatMap(SL, arg1)",
   "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
@@ -48,8 +42,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.flatMap(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tailRecM(SL, arg0, arg1)",
-  "arrow.core.Ior.tailRecM"
+  "this.tailRecM(SL, arg0, arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -71,8 +64,7 @@ fun <L, A, B> tailRecM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(SL, arg1)",
-  "arrow.core.map"
+  "this.map(SL, arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -94,7 +86,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(SL: Semigroup<L>, arg1: Function1<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ap(SL, arg1)",
+  "this.ap(SL, arg1)",
   "arrow.core.ap"
   ),
   DeprecationLevel.WARNING
@@ -116,7 +108,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.ap(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatten(SL)",
+  "this.flatten(SL)",
   "arrow.core.flatten"
   ),
   DeprecationLevel.WARNING
@@ -136,8 +128,8 @@ fun <L, A> Kind<Kind<ForIor, L>, Kind<Kind<ForIor, L>, A>>.flatten(SL: Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedBy(SL, arg1)",
-  "arrow.core.followedBy"
+  "this.flatMap(SL) { arg1 }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -156,8 +148,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.followedBy(SL: Semigroup<L>, arg1: Kind<K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "apTap(SL, arg1)",
-  "arrow.core.apTap"
+  "Ior.mapN(SL, this, arg1) { left, _ -> left }",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -176,8 +168,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.apTap(SL: Semigroup<L>, arg1: Kind<Kind<F
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedByEval(SL, arg1)",
-  "arrow.core.followedByEval"
+  "this.flatMap(SL) { arg1.value() }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -198,8 +190,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.followedByEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "effectM(SL, arg1)",
-  "arrow.core.effectM"
+  "this.flatMap(SL) { a -> arg1(a).map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -220,8 +212,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.effectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatTap(SL, arg1)",
-  "arrow.core.flatTap"
+  "this.flatMap { a -> arg1(a).map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -242,8 +234,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.flatTap(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productL(SL, arg1)",
-  "arrow.core.productL"
+  "this.flatMap { a -> arg1.map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -262,8 +254,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.productL(SL: Semigroup<L>, arg1: Kind<Kin
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffect(SL, arg1)",
-  "arrow.core.forEffect"
+  "this.flatMap { a -> arg1.map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -282,8 +274,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.forEffect(SL: Semigroup<L>, arg1: Kind<Ki
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productLEval(SL, arg1)",
-  "arrow.core.productLEval"
+  "this.flatMap { a -> arg1.value().map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -304,8 +296,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.productLEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffectEval(SL, arg1)",
-  "arrow.core.forEffectEval"
+  "this.flatMap { a -> arg1.value().map { a } }",
+  "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -326,7 +318,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.forEffectEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mproduct(SL, arg1)",
+  "this.mproduct(SL, arg1)",
   "arrow.core.mproduct"
   ),
   DeprecationLevel.WARNING
@@ -348,7 +340,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mproduct(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifM(SL, arg1, arg2)",
+  "this.ifM(SL, arg1, arg2)",
   "arrow.core.ifM"
   ),
   DeprecationLevel.WARNING
@@ -371,7 +363,7 @@ fun <L, B> Kind<Kind<ForIor, L>, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "selectM(SL, arg1)",
+  "this.selectM(SL, arg1)",
   "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
@@ -393,8 +385,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "select(SL, arg1)",
-  "arrow.core.select"
+    "this.selectM(SL, arg1)",
+    "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
 )
@@ -419,6 +411,10 @@ fun <L, A, B> Kind<Kind<ForIor, L>, Either<A, B>>.select(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Monad typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.monad(SL: Semigroup<L>): IorMonad<L> = object :
     arrow.core.extensions.IorMonad<L> { override fun SL(): arrow.typeclasses.Semigroup<L> = SL }

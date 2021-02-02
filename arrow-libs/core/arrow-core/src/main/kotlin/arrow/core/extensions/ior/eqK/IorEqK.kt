@@ -5,10 +5,6 @@ import arrow.core.ForIor
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorEqK
 import arrow.typeclasses.Eq
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("eqK")
 @Suppress(
@@ -18,12 +14,11 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
   ReplaceWith(
-  "eqK(EQA, arg1, arg2)",
-  "arrow.core.eqK"
+    "this.eqv(arg1)"
   ),
-  DeprecationLevel.WARNING
+  level = DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForIor, A>, A>.eqK(
   EQA: Eq<A>,
@@ -41,12 +36,8 @@ fun <A> Kind<Kind<ForIor, A>, A>.eqK(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "liftEq(EQA, arg0)",
-  "arrow.core.Ior.liftEq"
-  ),
-  DeprecationLevel.WARNING
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(EQA: Eq<A>, arg0: Eq<A>): Eq<Kind<Kind<ForIor, A>, A>> = arrow.core.Ior
    .eqK<A>(EQA)
@@ -55,6 +46,10 @@ fun <A> liftEq(EQA: Eq<A>, arg0: Eq<A>): Eq<Kind<Kind<ForIor, A>, A>> = arrow.co
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.eqK(EQA: Eq<A>): IorEqK<A> = object : arrow.core.extensions.IorEqK<A> {
     override fun EQA(): arrow.typeclasses.Eq<A> = EQA }

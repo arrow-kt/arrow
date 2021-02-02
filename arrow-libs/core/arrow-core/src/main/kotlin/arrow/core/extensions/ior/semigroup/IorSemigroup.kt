@@ -4,9 +4,6 @@ import arrow.core.Ior
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorSemigroup
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("plus")
 @Suppress(
@@ -18,8 +15,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plus(SGL, SGR, arg1)",
-  "arrow.core.plus"
+  "this.combine(SGL, SGR, arg1)",
+  "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
@@ -41,8 +38,8 @@ fun <L, R> Ior<L, R>.plus(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "maybeCombine(SGL, SGR, arg1)",
-  "arrow.core.maybeCombine"
+    "this.combine(SGL, SGR, arg1)",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
@@ -57,6 +54,14 @@ fun <L, R> Ior<L, R>.maybeCombine(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "@extension kinded projected functions are deprecated",
+  ReplaceWith(
+    "Semigroup.ior(SGL, SGR)",
+    "arrow.core.ior", "arrow.typeclasses.Semigroup"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.semigroup(SGL: Semigroup<L>, SGR: Semigroup<R>): IorSemigroup<L, R> =
     object : arrow.core.extensions.IorSemigroup<L, R> { override fun SGL():

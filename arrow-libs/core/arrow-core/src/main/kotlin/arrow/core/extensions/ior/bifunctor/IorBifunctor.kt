@@ -7,11 +7,6 @@ import arrow.core.Ior.Companion
 import arrow.core.extensions.IorBifunctor
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Functor
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -29,8 +24,7 @@ internal val bifunctor_singleton: IorBifunctor = object : arrow.core.extensions.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "bimap(arg1, arg2)",
-  "arrow.core.bimap"
+  "this.bimap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,8 +43,8 @@ fun <A, B, C, D> Kind<Kind<ForIor, A>, B>.bimap(arg1: Function1<A, C>, arg2: Fun
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0, arg1)",
-  "arrow.core.Ior.lift"
+  "Ior.lift(arg0, arg1)",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +64,7 @@ fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapLeft(arg1)",
-  "arrow.core.mapLeft"
+  "this.mapLeft(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -88,12 +81,8 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.mapLeft(arg1: Function1<A, C>): Ior<C, B>
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "rightFunctor()",
-  "arrow.core.Ior.rightFunctor"
-  ),
-  DeprecationLevel.WARNING
+  "Functor typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 fun <X> rightFunctor(): Functor<Kind<ForIor, X>> = arrow.core.Ior
    .bifunctor()
@@ -107,12 +96,8 @@ fun <X> rightFunctor(): Functor<Kind<ForIor, X>> = arrow.core.Ior
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "leftFunctor()",
-  "arrow.core.Ior.leftFunctor"
-  ),
-  DeprecationLevel.WARNING
+  "Functor typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 fun <X> leftFunctor(): Functor<Conested<ForIor, X>> = arrow.core.Ior
    .bifunctor()
@@ -128,7 +113,7 @@ fun <X> leftFunctor(): Functor<Conested<ForIor, X>> = arrow.core.Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "leftWiden()",
+  "this.leftWiden()",
   "arrow.core.leftWiden"
   ),
   DeprecationLevel.WARNING
@@ -141,5 +126,9 @@ fun <AA, B, A : AA> Kind<Kind<ForIor, A>, B>.leftWiden(): Ior<AA, B> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Bifunctor typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.bifunctor(): IorBifunctor = bifunctor_singleton

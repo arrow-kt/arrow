@@ -5,11 +5,6 @@ import arrow.core.ForIor
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorBicrosswalk
 import arrow.typeclasses.Align
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -26,12 +21,8 @@ internal val bicrosswalk_singleton: IorBicrosswalk = object : arrow.core.extensi
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bicrosswalk(arg0, arg1, arg2, arg3)",
-  "arrow.core.Ior.bicrosswalk"
-  ),
-  DeprecationLevel.WARNING
+  "extension kinded projected functions are deprecated. Replace with bicrosswalk, bicrosswalkMap or bicrosswalkNull from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A, B, C, D> bicrosswalk(
   arg0: Align<F>,
@@ -51,12 +42,8 @@ fun <F, A, B, C, D> bicrosswalk(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bisequenceL(arg0, arg1)",
-  "arrow.core.Ior.bisequenceL"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with bisequence, bisequenceEither or bisequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A, B> bisequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, Kind<F, A>>, Kind<F, B>>): Kind<F,
     Kind<Kind<ForIor, A>, B>> = arrow.core.Ior
@@ -67,5 +54,9 @@ fun <F, A, B> bisequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, Kind<F, A>>, K
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Bicrosswalk typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.bicrosswalk(): IorBicrosswalk = bicrosswalk_singleton

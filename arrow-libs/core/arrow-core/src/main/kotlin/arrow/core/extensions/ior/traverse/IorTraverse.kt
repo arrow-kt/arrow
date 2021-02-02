@@ -7,12 +7,6 @@ import arrow.core.Ior.Companion
 import arrow.core.extensions.IorTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,12 +22,8 @@ internal val traverse_singleton: IorTraverse<Any?> = object : IorTraverse<Any?> 
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse(arg1, arg2)",
-  "arrow.core.traverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with traverse, traverseEither or traverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse(
   arg1: Applicative<G>,
@@ -51,7 +41,7 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "@extension kinded projected functions are deprecated. Replace with sequence, sequenceEither or sequenceValidated from arrow.core.*",
   ReplaceWith(
   "sequence(arg1)",
   "arrow.core.sequence"
@@ -74,8 +64,7 @@ fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence(arg1: Applicative<G>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -92,12 +81,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(arg1: Function1<A, B>): Ior<L, B> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTraverse(arg1, arg2, arg3)",
-  "arrow.core.flatTraverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with flatTraverse, flatTraverseEither or flatTraverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.flatTraverse(
   arg1: Monad<Kind<ForIor, L>>,
@@ -111,6 +96,10 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.flatTraverse(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Traverse typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.traverse(): IorTraverse<L> = traverse_singleton as
     arrow.core.extensions.IorTraverse<L>

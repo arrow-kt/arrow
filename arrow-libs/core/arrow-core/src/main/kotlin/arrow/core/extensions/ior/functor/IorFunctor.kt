@@ -6,13 +6,6 @@ import arrow.core.Ior
 import arrow.core.Ior.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.IorFunctor
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -30,8 +23,7 @@ internal val functor_singleton: IorFunctor<Any?> = object : IorFunctor<Any?> {}
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+  "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,8 +42,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(arg1: Function1<A, B>): Ior<L, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+  "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +61,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.imap(arg1: Function1<A, B>, arg2: Functio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0)",
-  "arrow.core.Ior.lift"
+  "Ior.lift(arg0)",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -91,8 +82,7 @@ fun <L, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForIor, L>, A>, K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+  "this.void()"
   ),
   DeprecationLevel.WARNING
 )
@@ -110,8 +100,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.void(): Ior<L, Unit> = arrow.core.Ior.functo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+  "this.fproduct(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -130,8 +119,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.fproduct(arg1: Function1<A, B>): Ior<L, T
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "this.mapConst(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -150,8 +138,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.mapConst(arg1: B): Ior<L, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+  "arg1.mapConst(this)"
   ),
   DeprecationLevel.WARNING
 )
@@ -170,8 +157,7 @@ fun <L, A, B> A.mapConst(arg1: Kind<Kind<ForIor, L>, B>): Ior<L, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+  "this.tupleLeft(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -190,8 +176,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.tupleLeft(arg1: B): Ior<L, Tuple2<B, A>> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+  "this.tupleRight(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -210,8 +195,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.tupleRight(arg1: B): Ior<L, Tuple2<A, B>>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
+    "this.widen<L, B, A>()",
+    "arrow.core.widen"
   ),
   DeprecationLevel.WARNING
 )
@@ -222,6 +207,10 @@ fun <L, B, A : B> Kind<Kind<ForIor, L>, A>.widen(): Ior<L, B> = arrow.core.Ior.f
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Functor typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.functor(): IorFunctor<L> = functor_singleton as
     arrow.core.extensions.IorFunctor<L>

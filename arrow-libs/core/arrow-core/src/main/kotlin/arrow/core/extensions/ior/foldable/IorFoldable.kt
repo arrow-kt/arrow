@@ -10,17 +10,6 @@ import arrow.core.extensions.IorFoldable
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Function2
-import kotlin.Long
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -38,8 +27,7 @@ internal val foldable_singleton: IorFoldable<Any?> = object : IorFoldable<Any?> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldLeft(arg1, arg2)",
-  "arrow.core.foldLeft"
+  "this.foldLeft(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -58,8 +46,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldLeft(arg1: B, arg2: Function2<B, A, B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldRight(arg1, arg2)",
-  "arrow.core.foldRight"
+  "this.foldRight(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -80,8 +67,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldRight(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fold(arg1)",
-  "arrow.core.fold"
+  "this.fold({ arg1.empty() }, { it }, { _, b -> b })",
   ),
   DeprecationLevel.WARNING
 )
@@ -99,8 +85,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.fold(arg1: Monoid<A>): A = arrow.core.Ior.fo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceLeftToOption(arg1, arg2)",
-  "arrow.core.reduceLeftToOption"
+    "Option.fromNullable(this.map(arg1).orNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -121,8 +107,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.reduceLeftToOption(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceRightToOption(arg1, arg2)",
-  "arrow.core.reduceRightToOption"
+    "Eval.now(Option.fromNullable(this.map(arg1).orNull()))",
+    "arrow.core.Eval", "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -144,8 +130,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.reduceRightToOption(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceLeftOption(arg1)",
-  "arrow.core.reduceLeftOption"
+    "Option.fromNullable(this.orNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -164,8 +150,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.reduceLeftOption(arg1: Function2<A, A, A>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceRightOption(arg1)",
-  "arrow.core.reduceRightOption"
+    "Eval.now(Option.fromNullable(this.orNull()))",
+    "arrow.core.Eval", "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -184,8 +170,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.reduceRightOption(arg1: Function2<A, Eval<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(arg1)",
-  "arrow.core.combineAll"
+  "this.fold({ arg1.empty() }, { it }, { _, b -> b })"
   ),
   DeprecationLevel.WARNING
 )
@@ -204,8 +189,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.combineAll(arg1: Monoid<A>): A =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldMap(arg1, arg2)",
-  "arrow.core.foldMap"
+  "this.foldMap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -224,8 +208,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldMap(arg1: Monoid<B>, arg2: Function1<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "orEmpty(arg0, arg1)",
-  "arrow.core.Ior.orEmpty"
+  "Ior.Right(arg1.empty)",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -241,12 +225,8 @@ fun <L, A> orEmpty(arg0: Applicative<Kind<ForIor, L>>, arg1: Monoid<A>): Ior<L, 
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse_(arg1, arg2)",
-  "arrow.core.traverse_"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with traverse_, traverseEither_ or traverseValidated_ from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse_(
   arg1: Applicative<G>,
@@ -263,12 +243,8 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse_(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence_(arg1)",
-  "arrow.core.sequence_"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequence_, sequenceEither_ or sequenceValidated_ from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
     arrow.core.Ior.foldable<L>().run {
@@ -285,8 +261,8 @@ fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence_(arg1: Applicative<G>):
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "find(arg1)",
-  "arrow.core.find"
+    "Option.fromNullable(this.findOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -305,8 +281,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.find(arg1: Function1<A, Boolean>): Option<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "exists(arg1)",
-  "arrow.core.exists"
+  "this.exists(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -325,8 +300,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.exists(arg1: Function1<A, Boolean>): Boolean
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forAll(arg1)",
-  "arrow.core.forAll"
+  "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -345,8 +319,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.forAll(arg1: Function1<A, Boolean>): Boolean
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "all(arg1)",
-  "arrow.core.all"
+  "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -365,8 +338,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.all(arg1: Function1<A, Boolean>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "isEmpty()",
-  "arrow.core.isEmpty"
+  "this.isEmpty()"
   ),
   DeprecationLevel.WARNING
 )
@@ -384,8 +356,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.isEmpty(): Boolean = arrow.core.Ior.foldable
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "nonEmpty()",
-  "arrow.core.nonEmpty"
+    "this.isNotEmpty()"
   ),
   DeprecationLevel.WARNING
 )
@@ -403,8 +374,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.nonEmpty(): Boolean = arrow.core.Ior.foldabl
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "isNotEmpty()",
-  "arrow.core.isNotEmpty"
+    "this.isNotEmpty()"
   ),
   DeprecationLevel.WARNING
 )
@@ -422,8 +392,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.isNotEmpty(): Boolean = arrow.core.Ior.folda
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "size(arg1)",
-  "arrow.core.size"
+  "this.fold({ 0 }, { 1 }, { 1 })"
   ),
   DeprecationLevel.WARNING
 )
@@ -440,12 +409,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.size(arg1: Monoid<Long>): Long =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldMapA(arg1, arg2, arg3)",
-  "arrow.core.foldMapA"
-  ),
-  DeprecationLevel.WARNING
+  "Applicative typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForIor, L>, A>.foldMapA(
   arg1: AP,
@@ -463,12 +428,8 @@ fun <L, G, A, B, AP : Applicative<G>, MO : Monoid<B>> Kind<Kind<ForIor, L>, A>.f
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldMapM(arg1, arg2, arg3)",
-  "arrow.core.foldMapM"
-  ),
-  DeprecationLevel.WARNING
+  "Monad typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B, MA : Monad<G>, MO : Monoid<B>> Kind<Kind<ForIor, L>, A>.foldMapM(
   arg1: MA,
@@ -486,12 +447,8 @@ fun <L, G, A, B, MA : Monad<G>, MO : Monoid<B>> Kind<Kind<ForIor, L>, A>.foldMap
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldM(arg1, arg2, arg3)",
-  "arrow.core.foldM"
-  ),
-  DeprecationLevel.WARNING
+  "Monad typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.foldM(
   arg1: Monad<G>,
@@ -511,8 +468,8 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.foldM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "get(arg1)",
-  "arrow.core.get"
+    "if (arg1 == 0L) this.fold({ None }, { Some(it) }, { _, b -> Some(b) }) else None",
+    "arrow.core.None", "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
@@ -530,8 +487,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.get(arg1: Long): Option<A> = arrow.core.Ior.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOption()",
-  "arrow.core.firstOption"
+    "Option.fromNullable(this.orNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -549,8 +506,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOption(): Option<A> = arrow.core.Ior.fo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOption(arg1)",
-  "arrow.core.firstOption"
+    "Option.fromNullable(this.findOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -569,8 +526,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOption(arg1: Function1<A, Boolean>): Op
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOrNone()",
-  "arrow.core.firstOrNone"
+    "Option.fromNullable(this.orNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -588,8 +545,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOrNone(): Option<A> = arrow.core.Ior.fo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOrNone(arg1)",
-  "arrow.core.firstOrNone"
+    "Option.fromNullable(this.findOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -608,8 +565,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOrNone(arg1: Function1<A, Boolean>): Op
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "toList()",
-  "arrow.core.toList"
+  "listOfNotNull(this.orNull())"
   ),
   DeprecationLevel.WARNING
 )
@@ -620,6 +576,10 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.toList(): List<A> = arrow.core.Ior.foldable<
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Foldable typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.foldable(): IorFoldable<L> = foldable_singleton as
     arrow.core.extensions.IorFoldable<L>

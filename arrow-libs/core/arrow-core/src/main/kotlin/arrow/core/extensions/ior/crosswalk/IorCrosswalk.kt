@@ -5,12 +5,6 @@ import arrow.core.ForIor
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorCrosswalk
 import arrow.typeclasses.Align
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -26,12 +20,8 @@ internal val crosswalk_singleton: IorCrosswalk<Any?> = object : IorCrosswalk<Any
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "crosswalk(arg0, arg1, arg2)",
-  "arrow.core.Ior.crosswalk"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with crosswalk, crosswalkMap or crosswalkNull from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, F, A, B> crosswalk(
   arg0: Align<F>,
@@ -50,12 +40,8 @@ fun <L, F, A, B> crosswalk(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequenceL(arg0, arg1)",
-  "arrow.core.Ior.sequenceL"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequence, sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <L, F, A> sequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, L>, Kind<F, A>>): Kind<F,
     Kind<Kind<ForIor, L>, A>> = arrow.core.Ior
@@ -65,6 +51,10 @@ fun <L, F, A> sequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, L>, Kind<F, A>>)
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Crosswalk typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.crosswalk(): IorCrosswalk<L> = crosswalk_singleton as
     arrow.core.extensions.IorCrosswalk<L>

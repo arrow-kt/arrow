@@ -7,13 +7,6 @@ import arrow.core.Ior.Companion
 import arrow.core.extensions.IorApplicative
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Int
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 @JvmName("just1")
 @Suppress(
@@ -25,8 +18,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just(SL)",
-  "arrow.core.just"
+  "Ior.Right(this)",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -44,8 +37,8 @@ fun <L, A> A.just(SL: Semigroup<L>): Ior<L, A> = arrow.core.Ior.applicative<L>(S
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit(SL)",
-  "arrow.core.Ior.unit"
+  "Ior.unit<L>()",
+  "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -63,8 +56,7 @@ fun <L> unit(SL: Semigroup<L>): Ior<L, Unit> = arrow.core.Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(SL, arg1)",
-  "arrow.core.map"
+  "map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -119,6 +111,10 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.replicate(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Applicative typeclass is deprecated. Use concrete methods on Ior",
+  level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.applicative(SL: Semigroup<L>): IorApplicative<L> = object :
     arrow.core.extensions.IorApplicative<L> { override fun SL(): arrow.typeclasses.Semigroup<L> = SL
