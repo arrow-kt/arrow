@@ -10,8 +10,10 @@ import io.kotest.property.arbitrary.positiveInts
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@ExperimentalTime
 class SemaphoreTest : ArrowFxSpec(spec = {
 
   "acquire n times synchronously" {

@@ -19,15 +19,3 @@ dependencies {
     testImplementation "io.kotest:kotest-assertions-core-jvm:$KOTEST_VERSION" // for kotest core jvm assertions
     testImplementation "io.kotest:kotest-property-jvm:$KOTEST_VERSION" // for kotest property test
 }
-
-// usage of kotlin.time
-compileKotlin {
-    kotlinOptions {
-        freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
-    }
-}

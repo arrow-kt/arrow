@@ -18,7 +18,9 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class CallbackTest : StreamSpec(iterations = 250, spec = {
 
   "should be lazy" {
@@ -203,6 +205,7 @@ class CallbackTest : StreamSpec(iterations = 250, spec = {
   }
 })
 
+@ExperimentalTime
 private suspend fun <A> countToCallback(
   iterations: Int,
   map: (Int) -> A,

@@ -15,7 +15,9 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.delay
 import java.lang.RuntimeException
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class ParJoinTest : StreamSpec(spec = {
   "no concurrency" - {
     checkAll(Arb.stream(Arb.int())) { s ->

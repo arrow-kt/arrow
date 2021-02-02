@@ -10,8 +10,10 @@ import io.kotest.property.arbitrary.list
 import kotlinx.coroutines.Dispatchers
 import io.kotest.property.checkAll
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@ExperimentalTime
 class ParTraverseTest : ArrowFxSpec(spec = {
 
   "parTraverse can traverse effect full computations" {

@@ -3,8 +3,10 @@ package arrow.fx.coroutines
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
+@ExperimentalTime
 class CancelBoundary : StringSpec({
 
   suspend fun forever(): Unit {

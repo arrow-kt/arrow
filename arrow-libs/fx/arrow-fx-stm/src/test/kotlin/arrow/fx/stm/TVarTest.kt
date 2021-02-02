@@ -10,7 +10,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class TVarTest : ArrowFxSpec(spec = {
   "unsafeRead is consistent with atomically { read }" {
     val tv = TVar.new(10)

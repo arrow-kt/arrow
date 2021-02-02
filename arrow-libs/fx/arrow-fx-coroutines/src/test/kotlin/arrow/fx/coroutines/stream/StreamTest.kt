@@ -18,7 +18,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.random.Random
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class StreamTest : StreamSpec(spec = {
   "constructors" - {
     "empty() is empty" {

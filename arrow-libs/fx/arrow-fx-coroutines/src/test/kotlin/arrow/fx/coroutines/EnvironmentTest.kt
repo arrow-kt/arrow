@@ -7,8 +7,10 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@ExperimentalTime
 class EnvironmentTest : StringSpec({
 
   "unsafeRunSync can run immediate task" {

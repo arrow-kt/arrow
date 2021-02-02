@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.test.runBlockingTest
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
+@ExperimentalTime
 class FlowTest : ArrowFxSpec(spec = {
 
   "Retry - flow fails" {
@@ -58,7 +61,7 @@ class FlowTest : ArrowFxSpec(spec = {
         timestamps.size shouldBe 3
 
         // total run should be between start time + delay * 3 AND start + tolerance %
-        val min = start + (delayMs * 2).milliseconds.millis
+        val min = start + (delayMs * 2)
         val max = min + delayMs / 10
 
         timestamps.last() shouldBeGreaterThanOrEqual min

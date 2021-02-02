@@ -8,8 +8,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@ExperimentalTime
 class CancellableF : ArrowFxSpec(spec = {
 
   "cancelable works for immediate values" {

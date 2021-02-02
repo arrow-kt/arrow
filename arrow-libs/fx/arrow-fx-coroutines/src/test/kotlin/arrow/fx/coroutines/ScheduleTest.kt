@@ -7,10 +7,12 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.pow
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 import kotlin.time.nanoseconds
 import kotlin.time.seconds
 
+@ExperimentalTime
 class ScheduleTest : ArrowFxSpec(spec = {
 
   class MyException : Exception()
@@ -218,21 +220,25 @@ class ScheduleTest : ArrowFxSpec(spec = {
   }
 })
 
+@ExperimentalTime
 private fun fibs(one: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
   generateSequence(Pair(0.0.nanoseconds, one)) { (a, b) ->
     Pair(b, (a + b))
   }.map { it.first }
 
+@ExperimentalTime
 private fun exp(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair(base * 2.0.pow(n), n + 1)
   }.map { it.first }
 
+@ExperimentalTime
 private fun linear(base: kotlin.time.Duration): Sequence<kotlin.time.Duration> =
   generateSequence(Pair(base, 1.0)) { (_, n) ->
     Pair((base * n), (n + 1))
   }.map { it.first }
 
+@ExperimentalTime
 internal fun Sequence<kotlin.time.Duration>.sum(): kotlin.time.Duration {
   var sum: kotlin.time.Duration = 0.0.nanoseconds
   for (element in this) {
@@ -275,6 +281,7 @@ private suspend fun <B> checkRepeat(schedule: Schedule<Int, B>, expected: B): Un
   } shouldBe expected
 }
 
+@ExperimentalTime
 private infix fun <A> Schedule.Decision<Any?, A>.eqv(other: Schedule.Decision<Any?, A>): Unit {
   require(cont == other.cont) { "Decision#cont: ${this.cont} shouldBe ${other.cont}" }
   require(delayInNanos.nanoseconds == other.delayInNanos.nanoseconds) { "Decision#delay.nanoseconds: ${this.delayInNanos.nanoseconds} shouldBe ${other.delayInNanos.nanoseconds}" }

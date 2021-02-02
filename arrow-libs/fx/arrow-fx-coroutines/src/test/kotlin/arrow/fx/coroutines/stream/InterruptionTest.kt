@@ -11,8 +11,8 @@ import arrow.fx.coroutines.guaranteeCase
 import arrow.fx.coroutines.guarantee
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.ExitCase
-import kotlin.time.milliseconds
 import arrow.fx.coroutines.never
+import arrow.fx.coroutines.milliseconds as oldMilliseconds
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -20,7 +20,10 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
+@ExperimentalTime
 class InterruptionTest : StreamSpec(spec = {
   "can cancel a hung effect" - {
     checkAll(Arb.stream(Arb.int())) { s ->
@@ -278,7 +281,7 @@ class InterruptionTest : StreamSpec(spec = {
 
     withTimeoutOrNull(500.milliseconds) {
       Stream.effect { guarantee({ latch.get() }) { latch.complete(Unit) } }
-        .interruptAfter(50.milliseconds)
+        .interruptAfter(50.oldMilliseconds)
         .drain()
 
       latch.get()
@@ -314,7 +317,7 @@ class InterruptionTest : StreamSpec(spec = {
   "nested-interrupt - interrupt in enclosing scope recovers" - {
     Stream.effect { never<Unit>() }
       .interruptWhen { never() }
-      .append { Stream(1).delayBy(20.milliseconds) }
+      .append { Stream(1).delayBy(20.oldMilliseconds) }
       .interruptWhen { Right(Unit) }
       .append { Stream(2) }
       .toList() shouldBe listOf(2)

@@ -5,8 +5,10 @@ import arrow.core.toT
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
 import kotlin.time.milliseconds
 
+@ExperimentalTime
 class ConcurrentVarTest : ArrowFxSpec(spec = {
 
   "empty; put; isNotEmpty; take; put; take" {

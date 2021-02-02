@@ -61,16 +61,4 @@ configure(
 
   apply from: "$SUB_PROJECT"
   apply from: "$DOC_CREATION"
-
-  // usage of kotlin.time
-  compileKotlin {
-    kotlinOptions {
-      freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
-    }
-  }
-  compileTestKotlin {
-    kotlinOptions {
-      freeCompilerArgs = ["-Xopt-in=kotlin.time.ExperimentalTime"]
-    }
-  }
 }

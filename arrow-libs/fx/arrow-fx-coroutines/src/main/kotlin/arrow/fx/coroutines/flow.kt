@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
-import kotlin.time.nanoseconds
 
 /**
  * Retries collection of the given flow when an exception occurs in the upstream flow based on a decision by the [schedule].
@@ -46,7 +45,7 @@ fun <A, B> Flow<A>.retry(schedule: Schedule<Throwable, B>): Flow<A> = flow {
     state = dec.state
 
     if (dec.cont) {
-      delay(dec.delayInNanos.nanoseconds)
+      delay((dec.delayInNanos / 1_000_000).toLong())
       true
     } else {
       false

@@ -8,7 +8,7 @@ import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.leftException
-import kotlin.time.milliseconds
+import arrow.fx.coroutines.milliseconds as oldMilliseconds
 import arrow.fx.coroutines.parTupledN
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -19,7 +19,10 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
+@ExperimentalTime
 class BracketTest : StreamSpec(spec = {
 
   "bracket" - {
@@ -365,7 +368,7 @@ class BracketTest : StreamSpec(spec = {
         }.flatMap { s0.append { Stream.never() } }
 
         s
-          .interruptAfter(50.milliseconds)
+          .interruptAfter(50.oldMilliseconds)
           .drain()
 
         counter.count() shouldBe 0L

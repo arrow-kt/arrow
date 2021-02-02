@@ -4,9 +4,8 @@ import arrow.core.Option
 import arrow.fx.coroutines.ForkAndForget
 import arrow.fx.coroutines.ForkConnected
 import arrow.fx.coroutines.Promise
+import arrow.fx.coroutines.milliseconds as oldMilliseconds
 import arrow.fx.coroutines.stream.StreamSpec
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 import arrow.fx.coroutines.stream.Stream
 import arrow.fx.coroutines.stream.append
 import arrow.fx.coroutines.stream.drain
@@ -23,7 +22,11 @@ import io.kotest.property.arbitrary.positiveInts
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.max
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
+import kotlin.time.milliseconds
 
+@ExperimentalTime
 class QueueTest : StreamSpec(spec = {
 
   "Queue with capacity can always take tryOffer1" {
@@ -177,7 +180,7 @@ class QueueTest : StreamSpec(spec = {
   "dequeue releases subscriber on " - {
     "interrupt" {
       val q = Queue.unbounded<Int>()
-      q.dequeue().interruptAfter(100.milliseconds).drain()
+      q.dequeue().interruptAfter(100.oldMilliseconds).drain()
       q.enqueue1(1)
       q.enqueue1(2)
       q.dequeue1() shouldBe 1

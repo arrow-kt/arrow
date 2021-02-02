@@ -430,7 +430,7 @@ sealed class Schedule<Input, Output> {
   fun jittered(genRand: suspend () -> Double): Schedule<Input, Output> =
     modifyNanos { _, duration ->
       val n = genRand.invoke()
-      (duration.nanoseconds * n).inNanoseconds
+      (duration * n)
     }
 
   @JvmName("jitteredDuration")
@@ -493,7 +493,7 @@ sealed class Schedule<Input, Output> {
           val step = update(a, state)
           if (!step.cont) return Either.Right(step.finish.value())
           else {
-            delay(step.delayInNanos.nanoseconds)
+            delay((step.delayInNanos / 1_000_000).toLong())
 
             // Set state before looping again
             last = { step.finish.value() }
@@ -1236,7 +1236,7 @@ suspend fun <A, B, C> Schedule<Throwable, B>.retryOrElseEither(
       dec = update(e, state)
       state = dec.state
 
-      if (dec.cont) delay(dec.delayInNanos.nanoseconds)
+      if (dec.cont) delay((dec.delayInNanos / 1_000_000).toLong())
       else return Either.Left(orElse(e.nonFatalOrThrow(), dec.finish.value()))
     }
   }

@@ -17,7 +17,9 @@ import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class STMTest : ArrowFxSpec(spec = {
   "no-effects" {
     atomically { 10 } shouldBeExactly 10

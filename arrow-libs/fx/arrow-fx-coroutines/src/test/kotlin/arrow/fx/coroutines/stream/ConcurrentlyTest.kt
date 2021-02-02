@@ -5,21 +5,24 @@ import arrow.fx.coroutines.Atomic
 import arrow.fx.coroutines.Promise
 import arrow.fx.coroutines.Semaphore
 import arrow.fx.coroutines.leftException
-import kotlin.time.milliseconds
 import arrow.fx.coroutines.never
+import arrow.fx.coroutines.milliseconds as oldMilliseconds
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import kotlinx.coroutines.delay
+import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
+@ExperimentalTime
 class ConcurrentlyTest : StreamSpec(spec = {
 
   "concurrently" - {
     "when background stream terminates, overall stream continues" {
       checkAll(Arb.stream(Arb.int()), Arb.stream(Arb.int())) { s1, s2 ->
         val expected = s1.toList()
-        s1.delayBy(25.milliseconds)
+        s1.delayBy(25.oldMilliseconds)
           .concurrently(s2)
           .toList() shouldBe expected
       }
@@ -28,7 +31,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
     "when background stream fails, overall stream fails" {
       checkAll(Arb.stream(Arb.int()), Arb.throwable()) { s, e ->
         assertThrowable {
-          s.delayBy(25.milliseconds)
+          s.delayBy(25.oldMilliseconds)
             .concurrently(Stream.raiseError<Unit>(e))
             .drain()
         } shouldBe e
@@ -39,7 +42,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
       checkAll(Arb.throwable()) { e ->
         val semaphore = Semaphore(0)
         val bg = Stream.effect { delay(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
-        val fg = Stream.raiseError<Unit>(e).delayBy(25.milliseconds)
+        val fg = Stream.raiseError<Unit>(e).delayBy(25.oldMilliseconds)
 
         assertThrowable {
           fg.concurrently(bg)
@@ -54,7 +57,7 @@ class ConcurrentlyTest : StreamSpec(spec = {
         val semaphore = Semaphore(0)
 
         val bg = Stream.effect { delay(50.milliseconds) }.repeat().onFinalize { semaphore.release() }
-        val fg = s.delayBy(25.milliseconds)
+        val fg = s.delayBy(25.oldMilliseconds)
 
         fg.concurrently(bg)
           .onFinalize { semaphore.acquire() } // Hangs if bg doesn't go through terminate
