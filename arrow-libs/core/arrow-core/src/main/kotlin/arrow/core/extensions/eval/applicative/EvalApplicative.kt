@@ -6,21 +6,12 @@ import arrow.core.Eval.Companion
 import arrow.core.ForEval
 import arrow.core.extensions.EvalApplicative
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Int
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
  */
 @PublishedApi()
-internal val applicative_singleton: EvalApplicative = object : arrow.core.extensions.EvalApplicative
-    {}
+internal val applicative_singleton: EvalApplicative = object : arrow.core.extensions.EvalApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -32,8 +23,8 @@ internal val applicative_singleton: EvalApplicative = object : arrow.core.extens
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just()",
-  "arrow.core.just"
+    "Eval.now(this)",
+    "arrow.core.Eval"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,14 +42,14 @@ fun <A> A.just(): Eval<A> = arrow.core.Eval.applicative().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit()",
-  "arrow.core.Eval.unit"
+    "Eval.Unit",
+    "arrow.core.Eval"
   ),
   DeprecationLevel.WARNING
 )
 fun unit(): Eval<Unit> = arrow.core.Eval
-   .applicative()
-   .unit() as arrow.core.Eval<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.core.Eval<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -70,15 +61,15 @@ fun unit(): Eval<Unit> = arrow.core.Eval
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "map(arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.map(arg1: Function1<A, B>): Eval<B> =
-    arrow.core.Eval.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -90,8 +81,8 @@ fun <A, B> Kind<ForEval, A>.map(arg1: Function1<A, B>): Eval<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)",
-  "arrow.core.replicate"
+    "replicate(arg1)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -109,18 +100,19 @@ fun <A> Kind<ForEval, A>.replicate(arg1: Int): Eval<List<A>> = arrow.core.Eval.a
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)",
-  "arrow.core.replicate"
+    "replicate(arg1, arg2)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForEval, A>.replicate(arg1: Int, arg2: Monoid<A>): Eval<A> =
-    arrow.core.Eval.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.core.Eval<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Applicative typeclass is deprecated. Use concrete methods on Eval")
 inline fun Companion.applicative(): EvalApplicative = applicative_singleton

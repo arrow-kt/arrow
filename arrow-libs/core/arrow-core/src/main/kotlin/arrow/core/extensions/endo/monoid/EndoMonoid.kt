@@ -3,13 +3,6 @@ package arrow.core.extensions.endo.monoid
 import arrow.core.Endo
 import arrow.core.Endo.Companion
 import arrow.core.extensions.EndoMonoid
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.collections.Collection
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -27,14 +20,15 @@ internal val monoid_singleton: EndoMonoid<Any?> = object : EndoMonoid<Any?> {}
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll()",
-  "arrow.core.combineAll"
+    "if (isEmpty()) Endo(::identity) else reduce { a, b -> a.combine(b) }",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> Collection<Endo<A>>.combineAll(): Endo<A> = arrow.core.Endo.monoid<A>().run {
-  this@combineAll.combineAll() as arrow.core.Endo<A>
-}
+fun <A> Collection<Endo<A>>.combineAll(): Endo<A> =
+  arrow.core.Endo.monoid<A>().run {
+    this@combineAll.combineAll() as arrow.core.Endo<A>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -46,18 +40,23 @@ fun <A> Collection<Endo<A>>.combineAll(): Endo<A> = arrow.core.Endo.monoid<A>().
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(arg0)",
-  "arrow.core.Endo.combineAll"
+    "if (arg0.isEmpty()) Endo(::identity) else arg0.reduce { a, b -> a.combine(b) }",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> combineAll(arg0: List<Endo<A>>): Endo<A> = arrow.core.Endo
-   .monoid<A>()
-   .combineAll(arg0) as arrow.core.Endo<A>
+fun <A> combineAll(arg0: List<Endo<A>>): Endo<A> =
+  arrow.core.Endo
+    .monoid<A>()
+    .combineAll(arg0) as arrow.core.Endo<A>
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Extension projections are deprecated. Use endo on Monoid.",
+  ReplaceWith("Monoid.endo()", "arrow.typeclasses.Monoid", "arrow.core.endo")
+)
 inline fun <A> Companion.monoid(): EndoMonoid<A> = monoid_singleton as
-    arrow.core.extensions.EndoMonoid<A>
+  arrow.core.extensions.EndoMonoid<A>

@@ -5,7 +5,6 @@ import arrow.core.Eval
 import arrow.core.EvalOf
 import arrow.core.ForEval
 import arrow.core.extensions.eval.monad.monad
-import arrow.extension
 import arrow.core.fix
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -16,13 +15,13 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
 
-@extension
+@Deprecated("Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalFunctor : Functor<ForEval> {
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 }
 
-@extension
+@Deprecated("Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalApply : Apply<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -31,7 +30,7 @@ interface EvalApply : Apply<ForEval> {
     fix().map(f)
 }
 
-@extension
+@Deprecated("Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalApplicative : Applicative<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -43,7 +42,7 @@ interface EvalApplicative : Applicative<ForEval> {
     Eval.just(a)
 }
 
-@extension
+@Deprecated("Monad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalMonad : Monad<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -64,13 +63,14 @@ interface EvalMonad : Monad<ForEval> {
     get() = EvalFxMonad
 }
 
+@Deprecated("MonadFx typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 internal object EvalFxMonad : MonadFx<ForEval> {
   override val M: Monad<ForEval> = Eval.monad()
   override fun <A> monad(c: suspend MonadSyntax<ForEval>.() -> A): Eval<A> =
     super.monad(c).fix()
 }
 
-@extension
+@Deprecated("Comonad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalComonad : Comonad<ForEval> {
   override fun <A, B> EvalOf<A>.coflatMap(f: (EvalOf<A>) -> B): Eval<B> =
     fix().coflatMap(f)
@@ -82,7 +82,7 @@ interface EvalComonad : Comonad<ForEval> {
     fix().map(f)
 }
 
-@extension
+@Deprecated("Bimonad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Eval")
 interface EvalBimonad : Bimonad<ForEval> {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)

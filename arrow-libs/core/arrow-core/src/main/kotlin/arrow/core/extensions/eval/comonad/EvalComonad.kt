@@ -5,11 +5,6 @@ import arrow.core.Eval
 import arrow.core.Eval.Companion
 import arrow.core.ForEval
 import arrow.core.extensions.EvalComonad
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -27,15 +22,15 @@ internal val comonad_singleton: EvalComonad = object : arrow.core.extensions.Eva
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "coflatMap(arg1)",
-  "arrow.core.coflatMap"
+    "coflatMap(arg1)",
+    "arrow.core.coflatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.coflatMap(arg1: Function1<Kind<ForEval, A>, B>): Eval<B> =
-    arrow.core.Eval.comonad().run {
-  this@coflatMap.coflatMap<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.comonad().run {
+    this@coflatMap.coflatMap<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("extract")
 @Suppress(
@@ -46,15 +41,13 @@ fun <A, B> Kind<ForEval, A>.coflatMap(arg1: Function1<Kind<ForEval, A>, B>): Eva
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "extract()",
-  "arrow.core.extract"
-  ),
+  ReplaceWith("value()"),
   DeprecationLevel.WARNING
 )
-fun <A> Kind<ForEval, A>.extract(): A = arrow.core.Eval.comonad().run {
-  this@extract.extract<A>() as A
-}
+fun <A> Kind<ForEval, A>.extract(): A =
+  arrow.core.Eval.comonad().run {
+    this@extract.extract<A>() as A
+  }
 
 @JvmName("duplicate")
 @Suppress(
@@ -66,17 +59,19 @@ fun <A> Kind<ForEval, A>.extract(): A = arrow.core.Eval.comonad().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "duplicate()",
-  "arrow.core.duplicate"
+    "coflatMap(::identity)",
+    "arrow.core.coflatMap"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> Kind<ForEval, A>.duplicate(): Eval<Eval<A>> = arrow.core.Eval.comonad().run {
-  this@duplicate.duplicate<A>() as arrow.core.Eval<arrow.core.Eval<A>>
-}
+fun <A> Kind<ForEval, A>.duplicate(): Eval<Eval<A>> =
+  arrow.core.Eval.comonad().run {
+    this@duplicate.duplicate<A>() as arrow.core.Eval<arrow.core.Eval<A>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Comonad typeclass is deprecated. Use concrete methods on Eval")
 inline fun Companion.comonad(): EvalComonad = comonad_singleton

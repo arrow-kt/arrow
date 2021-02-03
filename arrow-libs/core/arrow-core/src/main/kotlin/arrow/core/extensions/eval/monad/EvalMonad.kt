@@ -7,13 +7,6 @@ import arrow.core.Eval.Companion
 import arrow.core.ForEval
 import arrow.core.Tuple2
 import arrow.core.extensions.EvalMonad
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -31,15 +24,15 @@ internal val monad_singleton: EvalMonad = object : arrow.core.extensions.EvalMon
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatMap(arg1)",
-  "arrow.core.flatMap"
+    "flatMap(arg1)",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.flatMap(arg1: Function1<A, Kind<ForEval, B>>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@flatMap.flatMap<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@flatMap.flatMap<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("tailRecM")
 @Suppress(
@@ -51,15 +44,15 @@ fun <A, B> Kind<ForEval, A>.flatMap(arg1: Function1<A, Kind<ForEval, B>>): Eval<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tailRecM(arg0, arg1)",
-  "arrow.core.Eval.tailRecM"
+    "Eval.tailRecM(arg0, arg1)",
+    "arrow.core.Eval"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForEval, Either<A, B>>>): Eval<B> =
-    arrow.core.Eval
-   .monad()
-   .tailRecM<A, B>(arg0, arg1) as arrow.core.Eval<B>
+  arrow.core.Eval
+    .monad()
+    .tailRecM<A, B>(arg0, arg1) as arrow.core.Eval<B>
 
 @JvmName("map")
 @Suppress(
@@ -71,14 +64,15 @@ fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForEval, Either<A, B>>>): E
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "map(arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, B> Kind<ForEval, A>.map(arg1: Function1<A, B>): Eval<B> = arrow.core.Eval.monad().run {
-  this@map.map<A, B>(arg1) as arrow.core.Eval<B>
-}
+fun <A, B> Kind<ForEval, A>.map(arg1: Function1<A, B>): Eval<B> =
+  arrow.core.Eval.monad().run {
+    this@map.map<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 /**
  *  @see [Apply.ap]
@@ -93,15 +87,15 @@ fun <A, B> Kind<ForEval, A>.map(arg1: Function1<A, B>): Eval<B> = arrow.core.Eva
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ap(arg1)",
-  "arrow.core.ap"
+    "ap(arg1)",
+    "arrow.core.ap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.ap(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@ap.ap<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@ap.ap<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("flatten")
 @Suppress(
@@ -113,14 +107,15 @@ fun <A, B> Kind<ForEval, A>.ap(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatten()",
-  "arrow.core.flatten"
+    "flatMap(::identity)",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> Kind<ForEval, Kind<ForEval, A>>.flatten(): Eval<A> = arrow.core.Eval.monad().run {
-  this@flatten.flatten<A>() as arrow.core.Eval<A>
-}
+fun <A> Kind<ForEval, Kind<ForEval, A>>.flatten(): Eval<A> =
+  arrow.core.Eval.monad().run {
+    this@flatten.flatten<A>() as arrow.core.Eval<A>
+  }
 
 @JvmName("followedBy")
 @Suppress(
@@ -132,15 +127,15 @@ fun <A> Kind<ForEval, Kind<ForEval, A>>.flatten(): Eval<A> = arrow.core.Eval.mon
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedBy(arg1)",
-  "arrow.core.followedBy"
+    "flatMap { arg1 }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.followedBy(arg1: Kind<ForEval, B>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@followedBy.followedBy<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@followedBy.followedBy<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -152,14 +147,15 @@ fun <A, B> Kind<ForEval, A>.followedBy(arg1: Kind<ForEval, B>): Eval<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "apTap(arg1)",
-  "arrow.core.apTap"
+    "apTap(arg1)",
+    "arrow.core.apTap"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, B> Kind<ForEval, A>.apTap(arg1: Kind<ForEval, B>): Eval<A> = arrow.core.Eval.monad().run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.Eval<A>
-}
+fun <A, B> Kind<ForEval, A>.apTap(arg1: Kind<ForEval, B>): Eval<A> =
+  arrow.core.Eval.monad().run {
+    this@apTap.apTap<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("followedByEval")
 @Suppress(
@@ -171,15 +167,15 @@ fun <A, B> Kind<ForEval, A>.apTap(arg1: Kind<ForEval, B>): Eval<A> = arrow.core.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedByEval(arg1)",
-  "arrow.core.followedByEval"
+    "flatMap { arg1.value() }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.followedByEval(arg1: Eval<Kind<ForEval, B>>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("effectM")
 @Suppress(
@@ -191,15 +187,15 @@ fun <A, B> Kind<ForEval, A>.followedByEval(arg1: Eval<Kind<ForEval, B>>): Eval<B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "effectM(arg1)",
-  "arrow.core.effectM"
+    "flatTap(arg1)",
+    "arrow.core.flatTap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.effectM(arg1: Function1<A, Kind<ForEval, B>>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@effectM.effectM<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@effectM.effectM<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("flatTap")
 @Suppress(
@@ -211,15 +207,15 @@ fun <A, B> Kind<ForEval, A>.effectM(arg1: Function1<A, Kind<ForEval, B>>): Eval<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatTap(arg1)",
-  "arrow.core.flatTap"
+    "flatTap(arg1)",
+    "arrow.core.flatTap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.flatTap(arg1: Function1<A, Kind<ForEval, B>>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@flatTap.flatTap<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@flatTap.flatTap<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("productL")
 @Suppress(
@@ -231,15 +227,15 @@ fun <A, B> Kind<ForEval, A>.flatTap(arg1: Function1<A, Kind<ForEval, B>>): Eval<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productL(arg1)",
-  "arrow.core.productL"
+    "flatMap { a -> arg1.map { a } }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.productL(arg1: Kind<ForEval, B>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@productL.productL<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@productL.productL<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("forEffect")
 @Suppress(
@@ -251,15 +247,15 @@ fun <A, B> Kind<ForEval, A>.productL(arg1: Kind<ForEval, B>): Eval<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffect(arg1)",
-  "arrow.core.forEffect"
+    "flatMap { a -> arg1.map { a } }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.forEffect(arg1: Kind<ForEval, B>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@forEffect.forEffect<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@forEffect.forEffect<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("productLEval")
 @Suppress(
@@ -271,15 +267,15 @@ fun <A, B> Kind<ForEval, A>.forEffect(arg1: Kind<ForEval, B>): Eval<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productLEval(arg1)",
-  "arrow.core.productLEval"
+    "flatMap { a -> arg1.value().map { a } }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.productLEval(arg1: Eval<Kind<ForEval, B>>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@productLEval.productLEval<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@productLEval.productLEval<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("forEffectEval")
 @Suppress(
@@ -291,15 +287,15 @@ fun <A, B> Kind<ForEval, A>.productLEval(arg1: Eval<Kind<ForEval, B>>): Eval<A> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffectEval(arg1)",
-  "arrow.core.forEffectEval"
+    "flatMap { a -> arg1.value().map { a } }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.forEffectEval(arg1: Eval<Kind<ForEval, B>>): Eval<A> =
-    arrow.core.Eval.monad().run {
-  this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.Eval<A>
-}
+  arrow.core.Eval.monad().run {
+    this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.Eval<A>
+  }
 
 @JvmName("mproduct")
 @Suppress(
@@ -311,15 +307,15 @@ fun <A, B> Kind<ForEval, A>.forEffectEval(arg1: Eval<Kind<ForEval, B>>): Eval<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mproduct(arg1)",
-  "arrow.core.mproduct"
+    "flatMap { a -> arg1(a).map { Tuple2(a, it) } }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, A>.mproduct(arg1: Function1<A, Kind<ForEval, B>>): Eval<Tuple2<A, B>> =
-    arrow.core.Eval.monad().run {
-  this@mproduct.mproduct<A, B>(arg1) as arrow.core.Eval<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Eval.monad().run {
+    this@mproduct.mproduct<A, B>(arg1) as arrow.core.Eval<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("ifM")
 @Suppress(
@@ -331,8 +327,8 @@ fun <A, B> Kind<ForEval, A>.mproduct(arg1: Function1<A, Kind<ForEval, B>>): Eval
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifM(arg1, arg2)",
-  "arrow.core.ifM"
+    "flatMap { if (it) arg1() else arg2() }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -353,15 +349,15 @@ fun <B> Kind<ForEval, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "selectM(arg1)",
-  "arrow.core.selectM"
+    "flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> just(b) }) }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, Either<A, B>>.selectM(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@selectM.selectM<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@selectM.selectM<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 @JvmName("select")
 @Suppress(
@@ -373,15 +369,15 @@ fun <A, B> Kind<ForEval, Either<A, B>>.selectM(arg1: Kind<ForEval, Function1<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "select(arg1)",
-  "arrow.core.select"
+    "flatMap { it.fold({ a -> arg1.map { ff -> ff(a) } }, { b -> just(b) }) }",
+    "arrow.core.flatMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForEval, Either<A, B>>.select(arg1: Kind<ForEval, Function1<A, B>>): Eval<B> =
-    arrow.core.Eval.monad().run {
-  this@select.select<A, B>(arg1) as arrow.core.Eval<B>
-}
+  arrow.core.Eval.monad().run {
+    this@select.select<A, B>(arg1) as arrow.core.Eval<B>
+  }
 
 /**
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
@@ -398,4 +394,5 @@ fun <A, B> Kind<ForEval, Either<A, B>>.select(arg1: Kind<ForEval, Function1<A, B
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Monad typeclass is deprecated. Use concrete methods on Eval")
 inline fun Companion.monad(): EvalMonad = monad_singleton

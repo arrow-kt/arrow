@@ -1,11 +1,17 @@
 package arrow.core
 
+import arrow.typeclasses.Monoid
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
-class ForEval private constructor() { companion object }
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
+class ForEval private constructor() {
+  companion object
+}
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 typealias EvalOf<A> = arrow.Kind<ForEval, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 inline fun <A> EvalOf<A>.fix(): Eval<A> =
   this as Eval<A>
 
@@ -67,6 +73,12 @@ sealed class Eval<out A> : EvalOf<A> {
 
   companion object {
 
+    @JvmName("tailRecMKind")
+    @Deprecated(
+      "Kind is deprecated, and will be removed in 0.13.0. Please use the tailRecM method defined for Eval instead",
+      ReplaceWith("tailRecM(f)"),
+      DeprecationLevel.WARNING
+    )
     fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
       f(a).fix().flatMap { eval: Either<A, B> ->
         when (eval) {
@@ -75,6 +87,19 @@ sealed class Eval<out A> : EvalOf<A> {
         }
       }
 
+    fun <A, B> tailRecM(a: A, f: (A) -> Eval<Either<A, B>>): Eval<B> =
+      f(a).flatMap { eval: Either<A, B> ->
+        when (eval) {
+          is Either.Left -> tailRecM(eval.a, f)
+          is Either.Right -> just(eval.b)
+        }
+      }
+
+    @Deprecated(
+      "just is deprecated in favor of now",
+      ReplaceWith("now(a)"),
+      DeprecationLevel.WARNING
+    )
     fun <A> just(a: A): Eval<A> =
       now(a)
 
@@ -147,7 +172,7 @@ sealed class Eval<out A> : EvalOf<A> {
     fun raise(t: Throwable): Eval<Nothing> =
       defer { throw t }
 
-    val Unit: Eval<Unit> = Now(kotlin.Unit)
+    val unit: Eval<Unit> = Now(kotlin.Unit)
 
     val True: Eval<Boolean> = Now(true)
 
@@ -242,6 +267,125 @@ sealed class Eval<out A> : EvalOf<A> {
 
       return curr.value() as A
     }
+
+    fun <A, B, C> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      map: (A, B) -> C
+    ): Eval<C> =
+      mapN(a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ -> map(aa, bb) }
+
+    fun <A, B, C, D> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      map: (A, B, C) -> D
+    ): Eval<D> =
+      mapN(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
+
+    fun <A, B, C, D, E> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      map: (A, B, C, D) -> E
+    ): Eval<E> =
+      mapN(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
+
+    fun <A, B, C, D, E, F> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      map: (A, B, C, D, E) -> F
+    ): Eval<F> =
+      mapN(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
+
+    fun <A, B, C, D, E, F, G> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      f: Eval<F>,
+      map: (A, B, C, D, E, F) -> G
+    ): Eval<G> =
+      mapN(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
+
+    fun <A, B, C, D, E, F, G, H> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      f: Eval<F>,
+      g: Eval<G>,
+      map: (A, B, C, D, E, F, G) -> H
+    ): Eval<H> =
+      mapN(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
+
+    fun <A, B, C, D, E, F, G, H, I> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      f: Eval<F>,
+      g: Eval<G>,
+      h: Eval<H>,
+      map: (A, B, C, D, E, F, G, H) -> I
+    ): Eval<I> =
+      mapN(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
+
+    fun <A, B, C, D, E, F, G, H, I, J> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      f: Eval<F>,
+      g: Eval<G>,
+      h: Eval<H>,
+      i: Eval<I>,
+      map: (A, B, C, D, E, F, G, H, I) -> J
+    ): Eval<J> =
+      mapN(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+
+    fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
+      a: Eval<A>,
+      b: Eval<B>,
+      c: Eval<C>,
+      d: Eval<D>,
+      e: Eval<E>,
+      f: Eval<F>,
+      g: Eval<G>,
+      h: Eval<H>,
+      i: Eval<I>,
+      j: Eval<J>,
+      map: (A, B, C, D, E, F, G, H, I, J) -> K
+    ): Eval<K> =
+      a.flatMap { aa ->
+        b.flatMap { bb ->
+          c.flatMap { cc ->
+            d.flatMap { dd ->
+              e.flatMap { ee ->
+                f.flatMap { ff ->
+                  g.flatMap { gg ->
+                    h.flatMap { hh ->
+                      i.flatMap { ii ->
+                        j.map { jj ->
+                          map(aa, bb, cc, dd, ee, ff, gg, hh, ii, jj)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
   }
 
   abstract fun value(): A
@@ -251,14 +395,21 @@ sealed class Eval<out A> : EvalOf<A> {
   inline fun <B> map(crossinline f: (A) -> B): Eval<B> =
     flatMap { a -> Now(f(a)) }
 
+  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the ap method defined for Eval instead")
   fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> =
     ff.fix().flatMap { f -> map(f) }.fix()
 
+  fun <B> ap(ff: Eval<(A) -> B>): Eval<B> =
+    ff.flatMap { f -> map(f) }
+
+  @JvmName("flatMapKind")
+  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for Eval instead")
   @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
   inline fun <B> flatMap(crossinline f: (A) -> EvalOf<B>): Eval<B> =
     when (this) {
       is FlatMap<A> -> object : FlatMap<B>() {
         override fun <S> start(): Eval<S> = (this@Eval).start()
+
         @IgnoreJRERequirement
         override fun <S> run(s: S): Eval<B> =
           object : FlatMap<B>() {
@@ -276,9 +427,42 @@ sealed class Eval<out A> : EvalOf<A> {
       }
     }
 
+  @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
+  fun <B> flatMap(f: (A) -> Eval<B>): Eval<B> =
+    when (this) {
+      is FlatMap<A> -> object : FlatMap<B>() {
+        override fun <S> start(): Eval<S> = (this@Eval).start()
+
+        @IgnoreJRERequirement
+        override fun <S> run(s: S): Eval<B> =
+          object : FlatMap<B>() {
+            override fun <S1> start(): Eval<S1> = (this@Eval).run(s) as Eval<S1>
+            override fun <S1> run(s1: S1): Eval<B> = f(s1 as A)
+          }
+      }
+      is Defer<A> -> object : FlatMap<B>() {
+        override fun <S> start(): Eval<S> = this@Eval.thunk() as Eval<S>
+        override fun <S> run(s: S): Eval<B> = f(s as A)
+      }
+      else -> object : FlatMap<B>() {
+        override fun <S> start(): Eval<S> = this@Eval as Eval<S>
+        override fun <S> run(s: S): Eval<B> = f(s as A)
+      }
+    }
+
+  @JvmName("coflatMapKind")
+  @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use the coflatMap method defined for Eval instead")
   inline fun <B> coflatMap(crossinline f: (EvalOf<A>) -> B): Eval<B> =
     Later { f(this) }
 
+  inline fun <B> coflatMap(crossinline f: (Eval<A>) -> B): Eval<B> =
+    Later { f(this) }
+
+  @Deprecated(
+    "extract is deprecated in favor of value",
+    ReplaceWith("value()"),
+    DeprecationLevel.WARNING
+  )
   fun extract(): A = value()
 
   /**
@@ -373,7 +557,27 @@ fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Ev
 }
 
 fun <A, B, Z> Eval<A>.zip(fb: Eval<B>, f: (A, B) -> Z): Eval<Z> =
-  flatMap { a: A -> fb.map { b -> f(a, b) } }
+  flatMap { a: A -> fb.map { b: B -> f(a, b) } }
 
 fun <A, B> Eval<A>.zip(fb: Eval<B>): Eval<Pair<A, B>> =
-  flatMap { a: A -> fb.map { b -> Pair(a, b) } }
+  flatMap { a: A -> fb.map { b: B -> Pair(a, b) } }
+
+fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
+  if (n <= 0) Eval.just(emptyList())
+  else Eval.mapN(this, replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
+
+fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
+  if (n <= 0) Eval.just(MA.empty())
+  else Eval.mapN(this@replicate, replicate(n - 1, MA)) { a: A, xs: A -> MA.run { a + xs } }
+}
+
+fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }
+
+fun <A, B, Z> Eval<A>.map2Eval(fb: Eval<Eval<B>>, f: (Tuple2<A, B>) -> Z): Eval<Eval<Z>> =
+  apEval(fb.map { it.map { b: B -> { a: A -> f(Tuple2(a, b)) } } })
+
+fun <A, B> Eval<A>.apTap(fb: Eval<B>): Eval<A> =
+  flatTap { fb }
+
+fun <A, B> Eval<A>.flatTap(f: (A) -> Eval<B>): Eval<A> =
+  flatMap { a -> f(a).map { a } }
