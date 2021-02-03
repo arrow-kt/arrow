@@ -1,7 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind2
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 interface Category<F> {
 
   fun <A> id(): Kind2<F, A, A>

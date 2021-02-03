@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.ForListK
 import arrow.core.None
@@ -15,6 +16,7 @@ import arrow.core.k
  *
  * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/alternative/">Alternative documentation</a>
  */
+@Deprecated(KindDeprecation)
 interface Alternative<F> : Applicative<F>, MonoidK<F> {
   /**
    * Repeats the computation until it fails. Requires it to succeed at least once.

@@ -2,6 +2,7 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.identity
 import arrow.documented
 import arrow.typeclasses.internal.Id
@@ -52,6 +53,7 @@ import arrow.typeclasses.internal.idApplicative
  * ```
  */
 @documented
+@Deprecated(KindDeprecation)
 interface Bitraverse<F> : Bifunctor<F>, Bifoldable<F> {
 
   fun <G, A, B, C, D> Kind2<F, A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>):

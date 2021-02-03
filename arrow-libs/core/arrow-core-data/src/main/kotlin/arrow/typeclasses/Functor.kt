@@ -1,9 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Tuple2
 import arrow.documented
 
+@Deprecated(KindDeprecation)
 /**
  * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
  * Examples of type constructors that can implement instances of the Functor type class include

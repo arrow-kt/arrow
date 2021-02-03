@@ -1,11 +1,13 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.documented
 import kotlin.coroutines.startCoroutine
 
+@Deprecated(KindDeprecation)
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
   fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =

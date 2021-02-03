@@ -1,11 +1,13 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.fix
 
+@Deprecated(KindDeprecation)
 /**
  * MonadLogic is a typeclass that extends a MonadPlus. It provides functions to control
  * when computations should be performed.

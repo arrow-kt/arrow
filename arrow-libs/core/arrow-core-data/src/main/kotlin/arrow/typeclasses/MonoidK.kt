@@ -1,7 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 /**
  * MonoidK is a universal monoid which operates on kinds.
  *

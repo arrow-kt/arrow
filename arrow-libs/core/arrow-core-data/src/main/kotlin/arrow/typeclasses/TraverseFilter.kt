@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -8,6 +9,7 @@ import arrow.typeclasses.internal.Id
 import arrow.typeclasses.internal.fix
 import arrow.typeclasses.internal.idApplicative
 
+@Deprecated(KindDeprecation)
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
   /**

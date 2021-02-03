@@ -1,8 +1,10 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Option
 
+@Deprecated(KindDeprecation)
 /**
  * The [Monoidal] type class adds an identity element to the [Semigroupal] type class by defining the function [identity].
  *

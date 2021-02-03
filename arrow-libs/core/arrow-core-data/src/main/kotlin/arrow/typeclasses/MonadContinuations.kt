@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -9,9 +10,11 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 
+@Deprecated(KindDeprecation)
 @RestrictsSuspension
 interface MonadSyntax<F> : Monad<F>, BindSyntax<F>
 
+@Deprecated(KindDeprecation)
 open class MonadContinuation<F, A>(
   M: Monad<F>,
   override val context: CoroutineContext = EmptyCoroutineContext

@@ -1,7 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 /**
  * [Divisible] extends [Divide] by providing an empty value
  */

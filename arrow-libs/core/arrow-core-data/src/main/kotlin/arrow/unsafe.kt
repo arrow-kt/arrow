@@ -22,9 +22,11 @@ private class UnsafeContinuation<A> : Continuation<A> {
   override val context: CoroutineContext = EmptyCoroutineContext
 }
 
+@Deprecated("unsafe is deprecated along side Arrow's Fx IO Data type. This will be removed in 0.13.0")
 @RestrictsSuspension
 object unsafe {
 
+  @Deprecated("unsafe is deprecated along side Arrow's Fx IO Data type. This will be removed in 0.13.0")
   operator fun <A> invoke(f: suspend unsafe.() -> A): A {
     val c = UnsafeContinuation<A>()
     f.startCoroutine(this, c)

@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.identity
 import java.io.Serializable
 import kotlin.coroutines.CoroutineContext
@@ -11,6 +12,7 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 import kotlin.coroutines.startCoroutine
 
+@Deprecated(KindDeprecation)
 /**
  * The dual of monads, used to extract values from F
  */
@@ -79,6 +81,7 @@ fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadSyntax<F>.() -> B): B {
   return continuation.returnedMonad
 }
 
+@Deprecated(KindDeprecation)
 interface ComonadFx<F> {
   val CM: Comonad<F>
 

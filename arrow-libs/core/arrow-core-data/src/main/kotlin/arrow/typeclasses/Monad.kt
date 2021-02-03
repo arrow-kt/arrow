@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
@@ -8,6 +9,7 @@ import arrow.core.identity
 import arrow.documented
 import kotlin.coroutines.startCoroutine
 
+@Deprecated(KindDeprecation)
 /**
  * [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
  * the results of previous computations.

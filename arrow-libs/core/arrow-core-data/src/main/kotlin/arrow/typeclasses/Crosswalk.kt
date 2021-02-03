@@ -1,8 +1,10 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.identity
 
+@Deprecated(KindDeprecation)
 interface Crosswalk<T> : Functor<T>, Foldable<T> {
   /**
    *  {: data-executable='true'}

@@ -1,8 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 
-@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+@Deprecated(KindDeprecation)
 interface SemigroupK<F> {
 
   /**

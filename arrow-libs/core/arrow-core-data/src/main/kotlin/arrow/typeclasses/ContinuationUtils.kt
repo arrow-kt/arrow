@@ -1,5 +1,6 @@
 package arrow.typeclasses
 
+import arrow.KindDeprecation
 import kotlin.coroutines.Continuation
 
 private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.jvm.internal.BaseContinuationImpl") }
@@ -10,6 +11,7 @@ private var <T> Continuation<T>.completion: Continuation<*>?
   get() = completionField.get(this) as Continuation<*>
   set(value) = completionField.set(this@completion, value)
 
+@Deprecated(KindDeprecation)
 var <T> Continuation<T>.stateStack: List<Map<String, *>>
   get() {
     if (!coroutineImplClass.isInstance(this)) return emptyList()

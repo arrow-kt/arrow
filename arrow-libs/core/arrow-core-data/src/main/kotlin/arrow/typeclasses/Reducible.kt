@@ -1,12 +1,14 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
 
+@Deprecated(KindDeprecation)
 /**
  * Data structures that can be reduced to a summary value.
  *

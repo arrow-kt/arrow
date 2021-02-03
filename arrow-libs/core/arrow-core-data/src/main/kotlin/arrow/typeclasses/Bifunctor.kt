@@ -2,8 +2,10 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.identity
 
+@Deprecated(KindDeprecation)
 /**
  * [Bifunctor] has the same properties of [Functor], but acting onto two types, instead of one.
  *

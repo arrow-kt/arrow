@@ -2,7 +2,9 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 /**
  * A type to represent λ[α => Kind[F, α, C]]
  *
@@ -12,8 +14,10 @@ interface Conested<out F, out B> {
   companion object
 }
 
+@Deprecated(KindDeprecation)
 typealias ConestedType<F, A, B> = Kind<Conested<F, B>, A>
 
+@Deprecated(KindDeprecation)
 typealias CounnestedType<F, A, B> = Kind<Kind<F, A>, B>
 
 @Suppress("UNCHECKED_CAST")
@@ -22,6 +26,7 @@ fun <F, A, B> CounnestedType<F, A, B>.conest(): ConestedType<F, A, B> = this as 
 @Suppress("UNCHECKED_CAST")
 fun <F, A, B> ConestedType<F, A, B>.counnest(): CounnestedType<F, A, B> = this as CounnestedType<F, A, B>
 
+@Deprecated(KindDeprecation)
 interface CocomposedFunctor<F, X> : Functor<Conested<F, X>> {
   fun F(): Bifunctor<F>
 

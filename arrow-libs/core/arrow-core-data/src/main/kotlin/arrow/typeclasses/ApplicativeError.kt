@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.OptionOf
@@ -9,6 +10,7 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 
+@Deprecated(KindDeprecation)
 interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> raiseError(e: E): Kind<F, A>

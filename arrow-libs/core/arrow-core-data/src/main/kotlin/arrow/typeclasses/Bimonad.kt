@@ -1,5 +1,8 @@
 package arrow.typeclasses
 
+import arrow.KindDeprecation
+
+@Deprecated(KindDeprecation)
 interface Bimonad<F> : Monad<F>, Comonad<F> {
 
   override val fx: BiMonadFx<F>

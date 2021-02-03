@@ -1,9 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Ior
 import arrow.core.Tuple2
 
+@Deprecated(KindDeprecation)
 /**
  * Unalign extends Semialign thereby supporting an inverse function to align: It splits a union shape
  * into a tuple representing the component parts.

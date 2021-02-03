@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.identity
 import arrow.core.Option
 import arrow.core.Either
@@ -13,6 +14,7 @@ import arrow.typeclasses.internal.Id
 import arrow.typeclasses.internal.fix
 import arrow.typeclasses.internal.idApplicative
 
+@Deprecated(KindDeprecation)
 /**
  * In functional programming it is very common to encode "behaviors" as data types - common behaviors include [Option] for possibly missing values, [Either] and [Validated] for possible errors, and [Ref]({{ '/effects/ref/' | relative_url }}) for asynchronous and concurrent access and modification of its content.
  *

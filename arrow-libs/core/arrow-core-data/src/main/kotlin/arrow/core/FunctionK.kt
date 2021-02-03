@@ -1,7 +1,9 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 interface FunctionK<F, G> {
 
   /**

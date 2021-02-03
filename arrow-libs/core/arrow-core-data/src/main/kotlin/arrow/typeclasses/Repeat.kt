@@ -1,7 +1,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 /**
  * Repeat extends Zip by providing a repeat structure.
  */

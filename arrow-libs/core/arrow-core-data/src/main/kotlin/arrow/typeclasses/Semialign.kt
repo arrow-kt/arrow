@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Ior
 import arrow.core.Option
 import arrow.core.Tuple2
@@ -8,6 +9,7 @@ import arrow.core.identity
 import arrow.core.some
 import arrow.core.toT
 
+@Deprecated(KindDeprecation)
 /**
  * A type class used for aligning of functors with non-uniform shapes.
  *

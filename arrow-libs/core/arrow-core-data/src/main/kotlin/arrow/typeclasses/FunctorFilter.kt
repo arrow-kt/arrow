@@ -1,11 +1,13 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.identity
 
+@Deprecated(KindDeprecation)
 /**
  * A Functor with the ability to [filterMap].
  */

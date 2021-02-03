@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Tuple10
 import arrow.core.Tuple2
 import arrow.core.Tuple3
@@ -13,6 +14,7 @@ import arrow.core.Tuple9
 import arrow.core.identity
 import arrow.core.toT
 
+@Deprecated(KindDeprecation)
 /**
  * [Divide] is a typeclass that models the divide part of divide and conquer.
  *

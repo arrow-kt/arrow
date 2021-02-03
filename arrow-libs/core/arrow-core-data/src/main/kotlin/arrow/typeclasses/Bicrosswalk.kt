@@ -2,8 +2,10 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
+import arrow.KindDeprecation
 import arrow.core.identity
 
+@Deprecated(KindDeprecation)
 interface Bicrosswalk<T> : Bifunctor<T>, Bifoldable<T> {
 
   /**

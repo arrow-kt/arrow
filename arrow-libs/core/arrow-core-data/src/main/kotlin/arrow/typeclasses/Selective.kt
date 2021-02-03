@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
@@ -8,6 +9,7 @@ import arrow.core.andThen
 import arrow.core.left
 import arrow.core.right
 
+@Deprecated(KindDeprecation)
 interface Selective<F> : Applicative<F> {
   fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B>
 

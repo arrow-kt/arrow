@@ -1,8 +1,10 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Tuple2
 
+@Deprecated(KindDeprecation)
 /**
  * Zip is a typeclass that extends a Functor by providing a zip operation that takes the intersection of non-uniform shapes.
  */

@@ -3,7 +3,9 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 
+@Deprecated(KindDeprecation)
 interface Applicative<F> : Apply<F> {
 
   fun <A> just(a: A): Kind<F, A>

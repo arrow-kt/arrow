@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.documented
@@ -91,6 +92,7 @@ import arrow.documented
  * ```
  */
 @documented
+@Deprecated(KindDeprecation)
 interface Semigroupal<F> {
 
   /**

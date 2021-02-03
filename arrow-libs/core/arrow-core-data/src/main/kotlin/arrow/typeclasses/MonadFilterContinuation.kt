@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
@@ -13,12 +14,14 @@ private object PredicateInterrupted : RuntimeException() {
   override fun fillInStackTrace(): Throwable = this
 }
 
+@Deprecated(KindDeprecation)
 @RestrictsSuspension
 interface MonadFilterSyntax<F> : MonadSyntax<F> {
   fun continueIf(predicate: Boolean): Unit
   suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B
 }
 
+@Deprecated(KindDeprecation)
 open class MonadFilterContinuation<F, A>(
   val MF: MonadFilter<F>,
   override val context: CoroutineContext = EmptyCoroutineContext

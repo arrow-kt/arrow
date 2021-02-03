@@ -3,6 +3,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Eval
 import arrow.core.Tuple10
 import arrow.core.Tuple2
@@ -14,6 +15,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 
+@Deprecated(KindDeprecation)
 interface Apply<F> : Functor<F> {
 
   /**

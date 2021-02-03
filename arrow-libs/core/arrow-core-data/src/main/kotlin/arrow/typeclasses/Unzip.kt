@@ -1,9 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Tuple2
 import arrow.core.identity
 
+@Deprecated(KindDeprecation)
 /**
  * The `Unzip` typeclass extends `Zip` by providing an inverse operation to zip.
  */

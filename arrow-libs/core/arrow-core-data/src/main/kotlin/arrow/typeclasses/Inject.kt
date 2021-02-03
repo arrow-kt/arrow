@@ -1,8 +1,10 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.FunctionK
 
+@Deprecated(KindDeprecation)
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *
