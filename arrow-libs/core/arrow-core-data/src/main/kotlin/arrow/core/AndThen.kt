@@ -1,13 +1,41 @@
 package arrow.core
 
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 class ForAndThen private constructor() { companion object }
+
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 typealias AndThenOf<A, B> = arrow.Kind2<ForAndThen, A, B>
+
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 typealias AndThenPartialOf<A> = arrow.Kind<ForAndThen, A>
+
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 typealias AndThenKindedJ<A, B> = arrow.HkJ2<ForAndThen, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B> AndThenOf<A, B>.fix(): AndThen<A, B> =
   this as AndThen<A, B>
 
+@Deprecated(
+  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  level = DeprecationLevel.WARNING
+)
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
 /**
@@ -41,6 +69,10 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```
  *
  */
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
@@ -80,7 +112,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     when (this) {
       // Fusing calls up to a certain threshold
       is Single ->
-        if (index != maxStackDepthSize) Single(f andThen g, index + 1)
+        if (index != maxStackDepthSize) Single({ a: A -> g(this(a)) }, index + 1)
         else andThenF(AndThen(g))
       else -> andThenF(AndThen(g))
     }
@@ -90,11 +122,10 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    *
    * ```kotlin:ank:playground
    * import arrow.core.AndThen
-   * import arrow.core.extensions.list.foldable.foldLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val f = (0..10000).toList().foldLeft(AndThen { i: Int -> i + 1 }) { acc, _ ->
+   *   val f = (0..10000).fold(AndThen { i: Int -> i + 1 }) { acc, _ ->
    *     acc.compose { it + 1 }
    *   }
    *
@@ -112,7 +143,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     when (this) {
       // Fusing calls up to a certain threshold
       is Single ->
-        if (index != maxStackDepthSize) Single(f compose g, index + 1)
+        if (index != maxStackDepthSize) Single({ c: C -> this(g(c)) }, index + 1)
         else composeF(AndThen(g))
       else -> composeF(AndThen(g))
     }
