@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 class ForSetK private constructor() { companion object }
@@ -32,9 +33,11 @@ data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
       else -> false
     }
 
+  @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>): String = "Set(${toList().k().show(SA)})"
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String =
+    set.toString()
 
   companion object {
 

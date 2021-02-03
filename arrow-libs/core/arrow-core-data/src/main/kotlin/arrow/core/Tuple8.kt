@@ -8,6 +8,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
 
 class ForTuple8 private constructor() {
@@ -21,39 +22,15 @@ inline fun <A, B, C, D, E, F, G, H> Tuple8Of<A, B, C, D, E, F, G, H>.fix(): Tupl
   this as Tuple8<A, B, C, D, E, F, G, H>
 
 data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H) : Tuple8Of<A, B, C, D, E, F, G, H> {
+  @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }).joinToString(", ") + ")"
 
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
+  override fun toString(): String =
+    "($a, $b, $c, $d, $e, $f, $g, $h)"
 
   companion object
 }
-
-private class Tuple8Show<A, B, C, D, E, F, G, H>(
-  private val SA: Show<A>,
-  private val SB: Show<B>,
-  private val SC: Show<C>,
-  private val SD: Show<D>,
-  private val SE: Show<E>,
-  private val SF: Show<F>,
-  private val SG: Show<G>,
-  private val SH: Show<H>
-) : Show<Tuple8<A, B, C, D, E, F, G, H>> {
-  override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
-    show(SA, SB, SC, SD, SE, SF, SG, SH)
-}
-
-fun <A, B, C, D, E, F, G, H> Show.Companion.tuple8(
-  SA: Show<A>,
-  SB: Show<B>,
-  SC: Show<C>,
-  SD: Show<D>,
-  SE: Show<E>,
-  SF: Show<F>,
-  SG: Show<G>,
-  SH: Show<H>
-): Show<Tuple8<A, B, C, D, E, F, G, H>> =
-  Tuple8Show(SA, SB, SC, SD, SE, SF, SG, SH)
 
 fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.eqv(
   EQA: Eq<A>,

@@ -3,21 +3,14 @@ package arrow.core.extensions.tuple10.show
 import arrow.core.Tuple10.Companion
 import arrow.core.extensions.Tuple10Show
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import kotlin.Suppress
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Show.tuple10(SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ)",
-    "arrow.core.Show",
-    "arrow.core.tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(ShowDeprecation)
 inline fun <A, B, C, D, E, F, G, H, I, J> Companion.show(
   SA: Show<A>,
   SB: Show<B>,

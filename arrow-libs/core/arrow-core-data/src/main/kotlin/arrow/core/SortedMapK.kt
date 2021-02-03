@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import kotlin.collections.flatMap
 
 class ForSortedMapK private constructor() { companion object }
@@ -65,9 +66,12 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
 
   override fun hashCode(): Int = map.hashCode()
 
-  fun show(SA: Show<A>, SB: Show<B>): String = "SortedMap(${toList().k().map { it.toTuple2() }.show(Show { show(SA, SB) })})"
+  @Deprecated(ShowDeprecation)
+  fun show(SA: Show<A>, SB: Show<B>): String =
+    "SortedMap(${toList().k().map { it.toTuple2() }.show(Show { show(SA, SB) })})"
 
-  override fun toString(): String = show(Show.any(), Show.any())
+  override fun toString(): String =
+    map.toString()
 
   companion object
 }

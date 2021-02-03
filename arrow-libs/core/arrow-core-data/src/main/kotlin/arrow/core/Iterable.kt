@@ -5,7 +5,6 @@ package arrow.core
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
 import kotlin.collections.foldRight as _foldRight
 
 inline fun <A, B> Iterable<A>.foldRight(initial: B, operation: (A, acc: B) -> B): B =
@@ -266,9 +265,6 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
  */
 fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Tuple2<A, B?>> =
   this.rightPadZip(other) { a, b -> a toT b }
-
-fun <A> Iterable<A>.show(SA: Show<A>): String = "[" +
-  joinToString(", ") { SA.run { it.show() } } + "]"
 
 @Suppress("UNCHECKED_CAST")
 private tailrec fun <A, B> go(

@@ -4,12 +4,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
-import arrow.typeclasses.Show
-
-private object BooleanShow : Show<Boolean> {
-  override fun Boolean.show(): String =
-    this.toString()
-}
 
 private object BooleanEq : Eq<Boolean> {
   override fun Boolean.eqv(b: Boolean): Boolean = this == b
@@ -23,9 +17,6 @@ private object BooleanOrder : Order<Boolean> {
 private object BooleanHash : Hash<Boolean> {
   override fun Boolean.hash(): Int = this.hashCode()
 }
-
-fun Show.Companion.boolean(): Show<Boolean> =
-  BooleanShow
 
 fun Eq.Companion.boolean(): Eq<Boolean> =
   BooleanEq

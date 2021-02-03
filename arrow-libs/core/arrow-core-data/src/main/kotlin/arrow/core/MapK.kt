@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 class ForMapK private constructor() { companion object }
@@ -54,9 +55,11 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
     }.value()
   }
 
+  @Deprecated(ShowDeprecation)
   fun show(SK: Show<K>, SA: Show<A>): String = "Map(${toList().k().map { it.toTuple2() }.show(Show { show(SK, SA) })})"
 
-  override fun toString(): String = show(Show.any(), Show.any())
+  override fun toString(): String =
+    map.toString()
 
   override fun equals(other: Any?): Boolean =
     when (other) {

@@ -1,9 +1,12 @@
 package arrow.typeclasses
 
+const val ShowDeprecation = "Show is deprecated in favor of toString(), since Kotlin's Std doesn't take Show into account"
+
 /**
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *
  */
+@Deprecated(ShowDeprecation)
 interface Show<in A> {
 
   /**

@@ -2,6 +2,7 @@ package arrow.core.extensions.ordering.show
 
 import arrow.core.Ordering.Companion
 import arrow.core.extensions.OrderingShow
+import arrow.typeclasses.ShowDeprecation
 import kotlin.PublishedApi
 import kotlin.Suppress
 
@@ -15,5 +16,5 @@ internal val show_singleton: OrderingShow = object : arrow.core.extensions.Order
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Show.ordering()", "arrow.core.Show", "arrow.core.ordering"))
+@Deprecated(ShowDeprecation)
 inline fun Companion.show(): OrderingShow = show_singleton

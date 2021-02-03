@@ -3,8 +3,11 @@ package arrow.core
 import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
-class ForListK private constructor() { companion object }
+class ForListK private constructor() {
+  companion object
+}
 typealias ListKOf<A> = arrow.Kind<ForListK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -420,10 +423,13 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   ): ListK<Tuple2<A, B?>> =
     this.rightPadZip(other) { a, b -> a toT b }
 
-  fun show(SA: Show<A>): String = "[" +
-    list.joinToString(", ") { SA.run { it.show() } } + "]"
+  @Deprecated(ShowDeprecation)
+  fun show(SA: Show<A>): String = SA.run {
+    joinToString(prefix = "[", separator = ", ", postfix = "]") { it.show() }
+  }
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String =
+   list.toString()
 
   companion object {
 

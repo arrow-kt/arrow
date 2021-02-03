@@ -8,6 +8,7 @@ import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
 // ////////
 // Byte
@@ -42,7 +43,7 @@ interface ByteEq : Eq<Byte> {
   override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.byte()", "arrow.core.Show", "arrow.core.byte"))
+@Deprecated(ShowDeprecation)
 interface ByteShow : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
@@ -56,7 +57,7 @@ interface ByteHash : Hash<Byte>, ByteEq {
 fun Byte.Companion.hash(): Hash<Byte> =
   object : ByteHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.byte()", "arrow.core.Show", "arrow.core.byte"))
+@Deprecated(ShowDeprecation)
 fun Byte.Companion.show(): Show<Byte> =
   object : ByteShow {}
 
@@ -113,7 +114,7 @@ interface DoubleEq : Eq<Double> {
   override fun Double.eqv(b: Double): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.double()", "arrow.core.Show", "arrow.core.double"))
+@Deprecated(ShowDeprecation)
 interface DoubleShow : Show<Double> {
   override fun Double.show(): String = toString()
 }
@@ -127,7 +128,7 @@ interface DoubleHash : Hash<Double>, DoubleEq {
 fun Double.Companion.hash(): Hash<Double> =
   object : DoubleHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.double()", "arrow.core.Show", "arrow.core.double"))
+@Deprecated(ShowDeprecation)
 fun Double.Companion.show(): Show<Double> =
   object : DoubleShow {}
 
@@ -178,7 +179,7 @@ interface IntEq : Eq<Int> {
   override fun Int.eqv(b: Int): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.int()", "arrow.core.Show", "arrow.core.int"))
+@Deprecated(ShowDeprecation)
 interface IntShow : Show<Int> {
   override fun Int.show(): String = toString()
 }
@@ -197,7 +198,7 @@ interface IntHash : Hash<Int> {
 @Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.int()", "arrow.core.Hash", "arrow.core.int"))
 fun Int.Companion.hash(): Hash<Int> = object : IntHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.int()", "arrow.core.Show", "arrow.core.int"))
+@Deprecated(ShowDeprecation)
 fun Int.Companion.show(): Show<Int> =
   object : IntShow {}
 
@@ -254,7 +255,7 @@ interface LongEq : Eq<Long> {
   override fun Long.eqv(b: Long): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.long()", "arrow.core.Show", "arrow.core.long"))
+@Deprecated(ShowDeprecation)
 interface LongShow : Show<Long> {
   override fun Long.show(): String = toString()
 }
@@ -268,7 +269,7 @@ interface LongHash : Hash<Long>, LongEq {
 fun Long.Companion.hash(): Hash<Long> =
   object : LongHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.long()", "arrow.core.Show", "arrow.core.long"))
+@Deprecated(ShowDeprecation)
 fun Long.Companion.show(): Show<Long> =
   object : LongShow {}
 
@@ -325,7 +326,7 @@ interface ShortEq : Eq<Short> {
   override fun Short.eqv(b: Short): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.short()", "arrow.core.Show", "arrow.core.short"))
+@Deprecated(ShowDeprecation)
 interface ShortShow : Show<Short> {
   override fun Short.show(): String = toString()
 }
@@ -339,7 +340,7 @@ interface ShortHash : Hash<Short>, ShortEq {
 fun Short.Companion.hash(): Hash<Short> =
   object : ShortHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.short()", "arrow.core.Show", "arrow.core.short"))
+@Deprecated(ShowDeprecation)
 fun Short.Companion.show(): Show<Short> =
   object : ShortShow {}
 
@@ -396,7 +397,7 @@ interface FloatEq : Eq<Float> {
   override fun Float.eqv(b: Float): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.float()", "arrow.core.Show", "arrow.core.float"))
+@Deprecated(ShowDeprecation)
 interface FloatShow : Show<Float> {
   override fun Float.show(): String = toString()
 }
@@ -410,7 +411,7 @@ interface FloatHash : Hash<Float>, FloatEq {
 fun Float.Companion.hash(): Hash<Float> =
   object : FloatHash {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.float()", "arrow.core.Show", "arrow.core.float"))
+@Deprecated(ShowDeprecation)
 fun Float.Companion.show(): Show<Float> =
   object : FloatShow {}
 

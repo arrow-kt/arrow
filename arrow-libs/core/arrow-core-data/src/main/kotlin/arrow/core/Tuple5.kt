@@ -8,6 +8,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
 
 class ForTuple5 private constructor() {
@@ -21,33 +22,16 @@ inline fun <A, B, C, D, E> Tuple5Of<A, B, C, D, E>.fix(): Tuple5<A, B, C, D, E> 
   this as Tuple5<A, B, C, D, E>
 
 data class Tuple5<out A, out B, out C, out D, out E>(val a: A, val b: B, val c: C, val d: D, val e: E) : Tuple5Of<A, B, C, D, E> {
+
+  @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }).joinToString(", ") + ")"
 
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
+  override fun toString(): String =
+    "($a, $b, $c, $d, $e)"
 
   companion object
 }
-
-private class Tuple5Show<A, B, C, D, E>(
-  private val SA: Show<A>,
-  private val SB: Show<B>,
-  private val SC: Show<C>,
-  private val SD: Show<D>,
-  private val SE: Show<E>
-) : Show<Tuple5<A, B, C, D, E>> {
-  override fun Tuple5<A, B, C, D, E>.show(): String =
-    show(SA, SB, SC, SD, SE)
-}
-
-fun <A, B, C, D, E> Show.Companion.tuple5(
-  SA: Show<A>,
-  SB: Show<B>,
-  SC: Show<C>,
-  SD: Show<D>,
-  SE: Show<E>
-): Show<Tuple5<A, B, C, D, E>> =
-  Tuple5Show(SA, SB, SC, SD, SE)
 
 fun <A, B, C, D, E> Tuple5<A, B, C, D, E>.eqv(
   EQA: Eq<A>,

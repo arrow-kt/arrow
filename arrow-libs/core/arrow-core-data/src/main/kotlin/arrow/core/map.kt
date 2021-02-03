@@ -4,7 +4,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
 import arrow.typeclasses.defaultSalt
 import kotlin.collections.flatMap as _flatMap
 
@@ -342,19 +341,6 @@ private class MapHash<K, A>(
 ) : Hash<Map<K, A>> {
   override fun Map<K, A>.hashWithSalt(salt: Int): Int =
     hashWithSalt(HK, HA, salt)
-}
-
-fun <K, A> Map<K, A>.show(SK: Show<K>, SA: Show<A>): String =
-  "Map(${toList().k().show(Show { show(SK, SA) })})"
-
-fun <K, A> Show.Companion.map(SK: Show<K>, SA: Show<A>): Show<Map<K, A>> =
-  MapShow(SK, SA)
-
-private class MapShow<K, A>(
-  private val SK: Show<K>,
-  private val SA: Show<A>
-) : Show<Map<K, A>> {
-  override fun Map<K, A>.show(): String = show(SK, SA)
 }
 
 fun <K, A> Map<K, A>.combine(SG: Semigroup<A>, b: Map<K, A>): Map<K, A> = with(SG) {

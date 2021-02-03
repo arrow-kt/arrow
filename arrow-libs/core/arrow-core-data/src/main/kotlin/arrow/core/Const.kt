@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
 class ForConst private constructor() { companion object }
 typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
@@ -37,11 +38,12 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   fun value(): A =
     value
 
+  @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>): String =
     "$Const(${SA.run { value.show() }})"
 
   override fun toString(): String =
-    show(Show.any())
+    "$Const($value)"
 }
 
 fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> =

@@ -5,8 +5,9 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Show.char()", "arrow.core.Show", "arrow.core.char"))
+@Deprecated(ShowDeprecation)
 interface CharShow : Show<Char> {
   override fun Char.show(): String =
     this.toString()
@@ -31,7 +32,7 @@ interface CharHash : Hash<Char>, CharEq {
   override fun Char.hash(): Int = this.hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Show.char()", "arrow.core.Show", "arrow.core.char"))
+@Deprecated(ShowDeprecation)
 fun Char.Companion.show(): Show<Char> =
   object : CharShow {}
 

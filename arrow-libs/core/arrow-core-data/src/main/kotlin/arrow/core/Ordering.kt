@@ -5,29 +5,42 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.hashWithSalt
 
 sealed class Ordering {
   override fun equals(other: Any?): Boolean = this === other // ref equality is fine because objects should be singletons
 
-  override fun toString(): String = show()
+  override fun toString(): String =
+    when (this) {
+      LT -> "LT"
+      GT -> "GT"
+      EQ -> "EQ"
+    }
 
-  override fun hashCode(): Int = toInt()
+  override fun hashCode(): Int =
+    when (this) {
+      LT -> -1
+      GT -> 1
+      EQ -> 0
+    }
 
-  fun toInt(): Int = when (this) {
-    LT -> -1
-    GT -> 1
-    EQ -> 0
-  }
+  fun toInt(): Int =
+    when (this) {
+      LT -> -1
+      GT -> 1
+      EQ -> 0
+    }
 
-  operator fun plus(b: Ordering): Ordering = when (this) {
-    LT -> LT
-    EQ -> b
-    GT -> GT
-  }
+  operator fun plus(b: Ordering): Ordering =
+    when (this) {
+      LT -> LT
+      EQ -> b
+      GT -> GT
+    }
 
-  fun hash(): Int = hashWithSalt(hashCode())
+  fun hash(): Int =
+    hashWithSalt(hashCode())
 
   fun hashWithSalt(salt: Int): Int =
     salt.hashWithSalt(hashCode())
@@ -67,11 +80,9 @@ sealed class Ordering {
 
   fun combine(b: Ordering): Ordering = this + b
 
-  fun show(): String = when (this) {
-    LT -> "LT"
-    GT -> "GT"
-    EQ -> "EQ"
-  }
+  @Deprecated(ShowDeprecation)
+  fun show(): String =
+    toString()
 
   companion object {
     fun fromInt(i: Int): Ordering = when (i) {
@@ -98,8 +109,6 @@ fun Monoid.Companion.ordering(): Monoid<Ordering> = OrderingMonoid
 
 fun Order.Companion.ordering(): Order<Ordering> = OrderingOrder
 
-fun Show.Companion.ordering(): Show<Ordering> = OrderingShow
-
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 private object OrderingEq : Eq<Ordering> {
   override fun Ordering.eqv(b: Ordering): Boolean =
@@ -125,9 +134,4 @@ private object OrderingMonoid : Monoid<Ordering> {
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 private object OrderingOrder : Order<Ordering> {
   override fun Ordering.compare(b: Ordering): Ordering = this.compare(b)
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-private object OrderingShow : Show<Ordering> {
-  override fun Ordering.show(): String = this.show()
 }

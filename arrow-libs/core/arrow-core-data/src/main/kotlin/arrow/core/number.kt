@@ -6,7 +6,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semiring
-import arrow.typeclasses.Show
 
 // ////////
 // Byte
@@ -37,19 +36,12 @@ private object ByteEq : Eq<Byte> {
   override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
-private object ByteShow : Show<Byte> {
-  override fun Byte.show(): String = toString()
-}
-
 private object ByteHash : Hash<Byte> {
   override fun Byte.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.byte(): Hash<Byte> =
   ByteHash
-
-fun Show.Companion.byte(): Show<Byte> =
-  ByteShow
 
 fun Eq.Companion.byte(): Eq<Byte> =
   ByteEq
@@ -95,19 +87,12 @@ private object DoubleEq : Eq<Double> {
   override fun Double.eqv(b: Double): Boolean = this == b
 }
 
-private object DoubleShow : Show<Double> {
-  override fun Double.show(): String = toString()
-}
-
 private object DoubleHash : Hash<Double> {
   override fun Double.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.double(): Hash<Double> =
   DoubleHash
-
-fun Show.Companion.double(): Show<Double> =
-  DoubleShow
 
 fun Eq.Companion.double(): Eq<Double> =
   DoubleEq
@@ -148,10 +133,6 @@ private object IntEq : Eq<Int> {
   override fun Int.eqv(b: Int): Boolean = this == b
 }
 
-private object IntShow : Show<Int> {
-  override fun Int.show(): String = toString()
-}
-
 private object IntOrder : Order<Int> {
   override fun Int.compare(b: Int): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Int.compareTo(b: Int): Int = this.compareTo(b)
@@ -163,9 +144,6 @@ private object IntHash : Hash<Int> {
 
 fun Hash.Companion.int(): Hash<Int> =
   IntHash
-
-fun Show.Companion.int(): Show<Int> =
-  IntShow
 
 fun Eq.Companion.int(): Eq<Int> =
   IntEq
@@ -211,19 +189,12 @@ private object LongEq : Eq<Long> {
   override fun Long.eqv(b: Long): Boolean = this == b
 }
 
-private object LongShow : Show<Long> {
-  override fun Long.show(): String = toString()
-}
-
 private object LongHash : Hash<Long> {
   override fun Long.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.long(): Hash<Long> =
   LongHash
-
-fun Show.Companion.long(): Show<Long> =
-  LongShow
 
 fun Eq.Companion.long(): Eq<Long> =
   LongEq
@@ -269,19 +240,12 @@ private object ShortEq : Eq<Short> {
   override fun Short.eqv(b: Short): Boolean = this == b
 }
 
-private object ShortShow : Show<Short> {
-  override fun Short.show(): String = toString()
-}
-
 private object ShortHash : Hash<Short> {
   override fun Short.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.short(): Hash<Short> =
   ShortHash
-
-fun Show.Companion.short(): Show<Short> =
-  ShortShow
 
 fun Eq.Companion.short(): Eq<Short> =
   ShortEq
@@ -327,19 +291,12 @@ private object FloatEq : Eq<Float> {
   override fun Float.eqv(b: Float): Boolean = this == b
 }
 
-private object FloatShow : Show<Float> {
-  override fun Float.show(): String = toString()
-}
-
 private object FloatHash : Hash<Float> {
   override fun Float.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.float(): Hash<Float> =
   FloatHash
-
-fun Show.Companion.float(): Show<Float> =
-  FloatShow
 
 fun Eq.Companion.float(): Eq<Float> =
   FloatEq

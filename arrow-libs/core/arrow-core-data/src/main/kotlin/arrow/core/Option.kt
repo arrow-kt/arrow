@@ -960,25 +960,26 @@ sealed class Option<out A> : OptionOf<A> {
     DeprecationLevel.WARNING
   )
   fun show(SA: Show<A>): String = fold(
-    {
-      "None"
-    },
-    {
-      "Some(${SA.run { it.show() }})"
-    }
+    { "None" },
+    { "Some(${SA.run { it.show() }})" }
   )
+
+  override fun toString(): String = fold(
+      { "Option.None" },
+      { "Option.Some($it)" }
+    )
 }
 
 object None : Option<Nothing>() {
   override fun isEmpty() = true
 
-  override fun toString(): String = "None"
+  override fun toString(): String = "Option.None"
 }
 
 data class Some<out T>(val t: T) : Option<T>() {
   override fun isEmpty() = false
 
-  override fun toString(): String = "Some($t)"
+  override fun toString(): String = "Option.Some($t)"
 }
 
 /**

@@ -3,8 +3,11 @@ package arrow.core
 import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 
-class ForSequenceK private constructor() { companion object }
+class ForSequenceK private constructor() {
+  companion object
+}
 typealias SequenceKOf<A> = arrow.Kind<ForSequenceK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -75,9 +78,12 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun toList(): List<A> = this.fix().sequence.toList()
 
-  fun show(SA: Show<A>): String = "Sequence(${toList().k().show(SA)})"
+  @Deprecated(ShowDeprecation)
+  fun show(SA: Show<A>): String =
+    "Sequence(${toList().k().show(SA)})"
 
-  override fun toString(): String = show(Show.any())
+  override fun toString(): String =
+    sequence.toString()
 
   companion object {
 

@@ -4,7 +4,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
 import arrow.typeclasses.hashWithSalt
 
 object SetExtensions
@@ -44,11 +43,6 @@ fun <A> Eq.Companion.set(EQ: () -> Eq<A>): Eq<Set<A>> = object : Eq<Set<A>> {
       acc && bool
     }
     else false
-}
-
-fun <A> Show.Companion.set(SA: () -> Show<A>): Show<Set<A>> = object : Show<Set<A>> {
-  override fun Set<A>.show(): String =
-    show(SA())
 }
 
 fun <A> Hash.Companion.set(HA: Hash<A>): Hash<Set<A>> = object : Hash<Set<A>> {

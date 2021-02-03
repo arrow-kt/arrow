@@ -8,6 +8,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
 
 class ForTuple10 private constructor() {
@@ -21,43 +22,16 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Tuple10Of<A, B, C, D, E, F, G, H, I, J
   this as Tuple10<A, B, C, D, E, F, G, H, I, J>
 
 data class Tuple10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I, val j: J) : Tuple10Of<A, B, C, D, E, F, G, H, I, J> {
+
+  @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>, SI: Show<I>, SJ: Show<J>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }, SI.run { i.show() }, SJ.run { j.show() }).joinToString(", ") + ")"
 
-  override fun toString(): String = show(Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any(), Show.any())
+  override fun toString(): String =
+    "($a, $b, $c, $d, $e, $f, $g, $h, $i, $j)"
 
   companion object
 }
-
-private class Tuple10Show<A, B, C, D, E, F, G, H, I, J>(
-  private val SA: Show<A>,
-  private val SB: Show<B>,
-  private val SC: Show<C>,
-  private val SD: Show<D>,
-  private val SE: Show<E>,
-  private val SF: Show<F>,
-  private val SG: Show<G>,
-  private val SH: Show<H>,
-  private val SI: Show<I>,
-  private val SJ: Show<J>
-) : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
-    show(SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ)
-}
-
-fun <A, B, C, D, E, F, G, H, I, J> Show.Companion.tuple10(
-  SA: Show<A>,
-  SB: Show<B>,
-  SC: Show<C>,
-  SD: Show<D>,
-  SE: Show<E>,
-  SF: Show<F>,
-  SG: Show<G>,
-  SH: Show<H>,
-  SI: Show<I>,
-  SJ: Show<J>
-): Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-  Tuple10Show(SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ)
 
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.eqv(
   EQA: Eq<A>,

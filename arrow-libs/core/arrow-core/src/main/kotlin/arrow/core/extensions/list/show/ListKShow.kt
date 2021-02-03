@@ -1,8 +1,9 @@
 package arrow.core.extensions.list.show
 
 import arrow.core.extensions.ListKShow
-import arrow.core.show as _show
+import arrow.core.k
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import kotlin.String
 import kotlin.Suppress
 import kotlin.collections.List
@@ -15,9 +16,9 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("show(arg1)", "arrow.core.show"))
+@Deprecated(ShowDeprecation, ReplaceWith("toString()"))
 fun <A> List<A>.show(SA: Show<A>): String =
-  _show(SA)
+  k().show(SA)
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -25,6 +26,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Show.list(arg1)", "arrow.core.list", "arrow.core.Show"))
+  @Deprecated(ShowDeprecation)
   inline fun <A> show(SA: Show<A>): ListKShow<A> = object : arrow.core.extensions.ListKShow<A> {
       override fun SA(): arrow.typeclasses.Show<A> = SA }}

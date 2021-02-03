@@ -7,7 +7,9 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForIor private constructor() { companion object }
+class ForIor private constructor() {
+  companion object
+}
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 typealias IorOf<A, B> = arrow.Kind2<ForIor, A, B>
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
@@ -596,7 +598,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isLeft: Boolean get() = true
     override val isBoth: Boolean get() = false
 
-    override fun toString(): String = "Left(${ value.toString() })"
+    override fun toString(): String = "Ior.Left($value)"
 
     companion object {
       @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Left(a)"))
@@ -609,7 +611,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = false
 
-    override fun toString(): String = "Right(${ value.toString() })"
+    override fun toString(): String = "Ior.Right($value)"
 
     companion object {
       @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Right(a)"))
@@ -622,7 +624,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = true
 
-    override fun toString(): String = "Both(${ leftValue.toString() }, ${ rightValue.toString() })"
+    override fun toString(): String = "Ior.Both($leftValue, rightValue)"
   }
 
   @Deprecated(
@@ -642,6 +644,12 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     { a, b -> "Both(${SL.run { a.show() }}, ${SR.run { b.show() }})" }
   )
 
+  override fun toString(): String = fold(
+    { "Ior.Left($it" },
+    { "Ior.Right($it)" },
+    { a, b -> "Ior.Both($a, $b)" }
+  )
+
   inline fun <C, D> bicrosswalk(
     fa: (A) -> Iterable<C>,
     fb: (B) -> Iterable<D>
@@ -650,7 +658,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       { a -> fa(a).map { it.leftIor() } },
       { b -> fb(b).map { it.rightIor() } },
       { a, b -> fa(a).align(fb(b)) }
-  )
+    )
 
   inline fun <C, D, K> bicrosswalkMap(
     fa: (A) -> Map<K, C>,
@@ -660,7 +668,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
       { a -> fa(a).mapValues { it.value.leftIor() } },
       { b -> fb(b).mapValues { it.value.rightIor() } },
       { a, b -> fa(a).align(fb(b)) }
-  )
+    )
 
   inline fun <C, D> bicrosswalkNull(
     fa: (A) -> C?,
@@ -704,21 +712,21 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold(
       { emptyList() },
       { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) }}
+      { a, b -> fa(b).map { Both(a, it) } }
     )
 
   inline fun <K, V> crosswalkMap(fa: (B) -> Map<K, V>): Map<K, Ior<A, V>> =
     fold(
       { emptyMap() },
       { b -> fa(b).mapValues { Right(it.value) } },
-      { a, b -> fa(b).mapValues { Both(a, it.value) }}
+      { a, b -> fa(b).mapValues { Both(a, it.value) } }
     )
 
   inline fun <A, B, C> crosswalkNull(ior: Ior<A, B>, fa: (B) -> C?): Ior<A, C>? =
     ior.fold(
       { a -> Left(a) },
       { b -> fa(b)?.let { Right(it) } },
-      { a, b -> fa(b)?.let { Both(a, it) }}
+      { a, b -> fa(b)?.let { Both(a, it) } }
     )
 
   inline fun all(predicate: (B) -> Boolean): Boolean =
@@ -794,21 +802,21 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold(
       { a -> listOf(Left(a)) },
       { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) }}
+      { a, b -> fa(b).map { Both(a, it) } }
     )
 
   inline fun <AA, C> traverseEither(fa: (B) -> Either<AA, C>): Either<AA, Ior<A, C>> =
     fold(
       { a -> Either.right(Left(a)) },
       { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) }}
+      { a, b -> fa(b).map { Both(a, it) } }
     )
 
   inline fun <AA, C> traverseValidated(fa: (B) -> Validated<AA, C>): Validated<AA, Ior<A, C>> =
     fold(
       { a -> Valid(Left(a)) },
       { b -> fa(b).map { Right(it) } },
-      { a, b -> fa(b).map { Both(a, it) }}
+      { a, b -> fa(b).map { Both(a, it) } }
     )
 
   inline fun <C> traverse_(fa: (B) -> Iterable<C>): List<Unit> =
@@ -977,7 +985,7 @@ fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int): Ior<A, List<B>> =
     is Ior.Right -> Ior.Right(List(n) { value })
     is Ior.Left -> this
     is Ior.Both -> bimap(
-      { List(n - 1) { leftValue}.fold(leftValue, { acc, a -> SA.run { acc + a }}) },
+      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
       { List(n) { rightValue } }
     )
   }
@@ -988,7 +996,7 @@ fun <A, B> Ior<A, B>.replicate(SA: Semigroup<A>, n: Int, MB: Monoid<B>): Ior<A, 
     is Ior.Right -> Ior.Right(MB.run { List(n) { value }.combineAll() })
     is Ior.Left -> this
     is Ior.Both -> bimap(
-      { List(n - 1) { leftValue}.fold(leftValue, { acc, a -> SA.run { acc + a }}) },
+      { List(n - 1) { leftValue }.fold(leftValue, { acc, a -> SA.run { acc + a } }) },
       { MB.run { List(n) { rightValue }.combineAll() } }
     )
   }
@@ -1039,7 +1047,7 @@ fun <A, B, C> Ior<A, B>.zip(SA: Semigroup<A>, fb: Ior<A, C>): Ior<A, Pair<B, C>>
   zip(SA, fb, ::Pair)
 
 fun <A, B, C, Z> Ior<A, B>.zipEval(SA: Semigroup<A>, other: Eval<Ior<A, C>>, f: (B, C) -> Z): Eval<Ior<A, Z>> =
-  other.map {zip(SA, it).map { a -> f(a.first, a.second) }}
+  other.map { zip(SA, it).map { a -> f(a.first, a.second) } }
 
 fun <A, B> Semigroup.Companion.ior(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Ior<A, B>> =
   IorSemigroup(SA, SB)
