@@ -4,6 +4,7 @@ import arrow.core.SortedMapK
 import arrow.core.SortedMapK.Companion
 import arrow.core.extensions.SortedMapKEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Comparable
 import kotlin.Deprecated
@@ -18,11 +19,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "neqv(EQK, EQA, arg1)",
-  "arrow.core.neqv"
-  ),
+  EqDeprecation,
+  ReplaceWith("this != arg1"),
   DeprecationLevel.WARNING
 )
 fun <K : Comparable<K>, A> SortedMapK<K, A>.neqv(
@@ -37,6 +35,7 @@ fun <K : Comparable<K>, A> SortedMapK<K, A>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(EqDeprecation)
 inline fun <K : Comparable<K>, A> Companion.eq(EQK: Eq<K>, EQA: Eq<A>): SortedMapKEq<K, A> =
   object : arrow.core.extensions.SortedMapKEq<K, A> {
     override fun EQK(): arrow.typeclasses.Eq<K> = EQK

@@ -3,7 +3,6 @@
 
 package arrow.core
 
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
@@ -68,34 +67,6 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
 
   companion object
 }
-
-fun <A, B> Pair<A, B>.eqv(
-  EQA: Eq<A>,
-  EQB: Eq<B>,
-  other: Pair<A, B>
-): Boolean =
-  EQA.run { first.eqv(other.first) } &&
-    EQB.run { this@eqv.second.eqv(other.second) }
-
-fun <A, B> Pair<A, B>.neqv(
-  EQA: Eq<A>,
-  EQB: Eq<B>,
-  other: Pair<A, B>
-): Boolean = !eqv(EQA, EQB, other)
-
-private class PairEq<A, B>(
-  private val EQA: Eq<A>,
-  private val EQB: Eq<B>
-) : Eq<Pair<A, B>> {
-  override fun Pair<A, B>.eqv(other: Pair<A, B>): Boolean =
-    eqv(EQA, EQB, other)
-}
-
-fun <A, B> Eq.Companion.pair(
-  EQA: Eq<A>,
-  EQB: Eq<B>
-): Eq<Pair<A, B>> =
-  PairEq(EQA, EQB)
 
 fun <A, B> Pair<A, B>.hashWithSalt(
   HA: Hash<A>,

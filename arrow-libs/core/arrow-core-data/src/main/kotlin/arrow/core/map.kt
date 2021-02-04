@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -303,27 +302,6 @@ fun <K, A, B, C> Map<K, A>.zip(other: Map<K, B>, f: (K, A, B) -> C): Map<K, C> =
   keys.intersect(other.keys).mapNotNull { key ->
     Nullable.mapN(this[key], other[key]) { a, b -> key to f(key, a, b) }
   }.toMap()
-
-fun <K, A> Map<K, A>.eqv(EQK: Eq<K>, EQA: Eq<A>, b: Map<K, A>): Boolean =
-  if (keys.eqv(EQK, b.keys)) EQA.run {
-    keys.map { key ->
-      b[key]?.let { getValue(key).eqv(it) } ?: false
-    }.fold(true) { b1, b2 -> b1 && b2 }
-  } else false
-
-fun <K, A> Map<K, A>.neqv(EQK: Eq<K>, EQA: Eq<A>, b: Map<K, A>): Boolean =
-  !eqv(EQK, EQA, b)
-
-fun <K, A> Eq.Companion.map(EQK: Eq<K>, EQA: Eq<A>): Eq<Map<K, A>> =
-  MapEq(EQK, EQA)
-
-private class MapEq<K, A>(
-  private val EQK: Eq<K>,
-  private val EQA: Eq<A>
-) : Eq<Map<K, A>> {
-  override fun Map<K, A>.eqv(b: Map<K, A>): Boolean =
-    eqv(EQK, EQA, b)
-}
 
 fun <K, A> Map<K, A>.hashWithSalt(HK: Hash<K>, HA: Hash<A>, salt: Int): Int =
   values.toHashSet().hashWithSalt(HA, salt)

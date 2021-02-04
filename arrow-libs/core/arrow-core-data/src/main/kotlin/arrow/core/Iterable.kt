@@ -2,7 +2,6 @@
 
 package arrow.core
 
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import kotlin.collections.foldRight as _foldRight
@@ -663,17 +662,6 @@ fun <A, B> Iterable<A>.foldMap(MB: Monoid<B>, f: (A) -> B): B = MB.run {
     acc.combine(f(a))
   }
 }
-
-fun <A> Iterable<A>.eqv(EQA: Eq<A>, other: Iterable<A>): Boolean = EQA.run {
-  if (this is Collection<*> && other is Collection && this.size != other.size) false
-  else {
-    zip(other) { a, b -> a.eqv(b) }
-      .fold(true) { acc, bool -> acc && bool }
-  }
-}
-
-fun <A> Iterable<A>.neqv(EQA: Eq<A>, other: Iterable<A>): Boolean =
-  !eqv(EQA, other)
 
 fun <A, B> Iterable<A>.crosswalk(f: (A) -> Iterable<B>): List<List<B>> =
   fold(emptyList()) { bs, a ->

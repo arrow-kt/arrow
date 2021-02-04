@@ -2,6 +2,7 @@ package arrow.core.extensions
 
 import arrow.core.Ordering
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
@@ -14,7 +15,7 @@ interface BooleanShow : Show<Boolean> {
     this.toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Eq.boolean()", "arrow.core.Eq", "arrow.core.boolean"))
+@Deprecated(EqDeprecation)
 interface BooleanEq : Eq<Boolean> {
   override fun Boolean.eqv(b: Boolean): Boolean = this == b
 }
@@ -34,7 +35,7 @@ interface BooleanHash : Hash<Boolean>, BooleanEq {
 fun Boolean.Companion.show(): Show<Boolean> =
   object : BooleanShow {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Eq.boolean()", "arrow.core.Eq", "arrow.core.boolean"))
+@Deprecated(EqDeprecation)
 fun Boolean.Companion.eq(): Eq<Boolean> =
   object : BooleanEq {}
 

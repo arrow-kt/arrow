@@ -4,6 +4,7 @@ import arrow.core.Ior
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 
 @JvmName("neqv")
 @Suppress(
@@ -13,11 +14,8 @@ import arrow.typeclasses.Eq
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "this.compareTo(arg1) != 0",
-    "arrow.core.compareTo"
-  ),
+  EqDeprecation,
+  ReplaceWith("this != arg1"),
   DeprecationLevel.WARNING
 )
 fun <L, R> Ior<L, R>.neqv(
@@ -33,7 +31,7 @@ fun <L, R> Ior<L, R>.neqv(
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "Eq typeclass is deprecated. Use concrete methods on Ior",
+  EqDeprecation,
   level = DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.eq(EQL: Eq<L>, EQR: Eq<R>): IorEq<L, R> = object :

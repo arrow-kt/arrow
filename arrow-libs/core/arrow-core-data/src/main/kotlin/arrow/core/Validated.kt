@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
@@ -951,10 +950,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     fold(::Valid, ::Invalid)
 }
 
-/** Construct an [Eq] instance which use [EQE] and [EQA] to compare the [Invalid] and [Valid] cases **/
-fun <E, A> Eq.Companion.validated(EQE: Eq<E>, EQA: Eq<A>): Eq<Validated<E, A>> =
-  ValidatedEq(EQE, EQA)
-
 fun <E, A> Hash.Companion.validated(HE: Hash<E>, HA: Hash<A>): Hash<Validated<E, A>> =
   ValidatedHash(HE, HA)
 
@@ -966,42 +961,6 @@ fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Se
 
 fun <E, A> Semigroup.Companion.monoid(SE: Semigroup<E>, MA: Monoid<A>): Monoid<Validated<E, A>> =
   ValidatedMonoid(SE, MA)
-
-/**
- * Compares two instances of [Validated] and returns true if they're considered not equal for this instance.
- *
- * @receiver object to compare with [other]
- * @param other object to compare with [this@neqv]
- * @returns false if [this@neqv] and [other] are equivalent, true otherwise.
- */
-fun <E, B> Validated<E, B>.neqv(
-  EQL: Eq<E>,
-  EQR: Eq<B>,
-  other: Validated<E, B>
-): Boolean =
-  !eqv(EQL, EQR, other)
-
-/**
- * Compares two instances of [Validated] and returns true if they're considered not equal for this instance.
- *
- * @receiver object to compare with [other]
- * @param other object to compare with [this@neqv]
- * @returns false if [this@neqv] and [other] are equivalent, true otherwise.
- */
-fun <E, B> Validated<E, B>.eqv(
-  EQL: Eq<E>,
-  EQR: Eq<B>,
-  other: Validated<E, B>
-): Boolean = when (this) {
-  is Valid -> when (other) {
-    is Invalid -> false
-    is Valid -> EQR.run { a.eqv(other.a) }
-  }
-  is Invalid -> when (other) {
-    is Invalid -> EQL.run { e.eqv(other.e) }
-    is Valid -> false
-  }
-}
 
 /**
  * Given [A] is a sub type of [B], re-type this value from Validated<E, A> to Validated<E, B>
@@ -1254,15 +1213,6 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-private class ValidatedEq<L, R>(
-  private val EQL: Eq<L>,
-  private val EQR: Eq<R>
-) : Eq<Validated<L, R>> {
-
-  override fun Validated<L, R>.eqv(b: Validated<L, R>): Boolean =
-    eqv(EQL, EQR, b)
-}
 
 private class ValidatedHash<L, R>(
   private val HL: Hash<L>,

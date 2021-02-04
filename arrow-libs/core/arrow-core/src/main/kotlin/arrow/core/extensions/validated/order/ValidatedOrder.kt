@@ -4,7 +4,6 @@ import arrow.core.Tuple2
 import arrow.core.Validated
 import arrow.core.Validated.Companion
 import arrow.core.compareTo
-import arrow.core.eqv
 import arrow.core.lt
 import arrow.core.lte
 import arrow.core.gt

@@ -3,6 +3,7 @@ package arrow.core.extensions.ordering.eq
 import arrow.core.Ordering
 import arrow.core.Ordering.Companion
 import arrow.core.extensions.OrderingEq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.PublishedApi
 import kotlin.Suppress
@@ -21,7 +22,7 @@ internal val eq_singleton: OrderingEq = object : arrow.core.extensions.OrderingE
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("neqv(arg1)"))
+@Deprecated(EqDeprecation, ReplaceWith("this != arg1"))
 fun Ordering.neqv(arg1: Ordering): Boolean = arrow.core.Ordering.eq().run {
   this@neqv.neqv(arg1) as kotlin.Boolean
 }
@@ -30,5 +31,5 @@ fun Ordering.neqv(arg1: Ordering): Boolean = arrow.core.Ordering.eq().run {
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.ordering()", "arrow.core.Eq", "arrow.core.ordering"))
+@Deprecated(EqDeprecation)
 inline fun Companion.eq(): OrderingEq = eq_singleton

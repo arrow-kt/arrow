@@ -4,6 +4,7 @@ import arrow.core.Hashed
 import arrow.core.Hashed.Companion
 import arrow.core.extensions.HashedEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -17,10 +18,9 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  EqDeprecation,
   ReplaceWith(
-  "neqv(EQA, arg1)",
-  "arrow.core.neqv"
+  "this != arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -32,5 +32,6 @@ fun <A> Hashed<A>.neqv(EQA: Eq<A>, arg1: Hashed<A>): Boolean = arrow.core.Hashed
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(EqDeprecation)
 inline fun <A> Companion.eq(EQA: Eq<A>): HashedEq<A> = object : arrow.core.extensions.HashedEq<A> {
     override fun EQA(): arrow.typeclasses.Eq<A> = EQA }

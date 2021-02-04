@@ -3,7 +3,6 @@
 
 package arrow.core
 
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
@@ -31,64 +30,6 @@ data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(val a:
 
   companion object
 }
-
-fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.eqv(
-  EQA: Eq<A>,
-  EQB: Eq<B>,
-  EQC: Eq<C>,
-  EQD: Eq<D>,
-  EQE: Eq<E>,
-  EQF: Eq<F>,
-  EQG: Eq<G>,
-  EQH: Eq<H>,
-  other: Tuple8<A, B, C, D, E, F, G, H>
-): Boolean =
-  EQA.run { a.eqv(other.a) } &&
-    EQB.run { this@eqv.b.eqv(other.b) } &&
-    EQC.run { c.eqv(other.c) } &&
-    EQD.run { d.eqv(other.d) } &&
-    EQE.run { e.eqv(other.e) } &&
-    EQF.run { f.eqv(other.f) } &&
-    EQG.run { g.eqv(other.g) } &&
-    EQH.run { h.eqv(other.h) }
-
-fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.neqv(
-  EQA: Eq<A>,
-  EQB: Eq<B>,
-  EQC: Eq<C>,
-  EQD: Eq<D>,
-  EQE: Eq<E>,
-  EQF: Eq<F>,
-  EQG: Eq<G>,
-  EQH: Eq<H>,
-  other: Tuple8<A, B, C, D, E, F, G, H>
-): Boolean = !eqv(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH, other)
-
-private class Tuple8Eq<A, B, C, D, E, F, G, H>(
-  private val EQA: Eq<A>,
-  private val EQB: Eq<B>,
-  private val EQC: Eq<C>,
-  private val EQD: Eq<D>,
-  private val EQE: Eq<E>,
-  private val EQF: Eq<F>,
-  private val EQG: Eq<G>,
-  private val EQH: Eq<H>
-) : Eq<Tuple8<A, B, C, D, E, F, G, H>> {
-  override fun Tuple8<A, B, C, D, E, F, G, H>.eqv(other: Tuple8<A, B, C, D, E, F, G, H>): Boolean =
-    eqv(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH, other)
-}
-
-fun <A, B, C, D, E, F, G, H> Eq.Companion.tuple8(
-  EQA: Eq<A>,
-  EQB: Eq<B>,
-  EQC: Eq<C>,
-  EQD: Eq<D>,
-  EQE: Eq<E>,
-  EQF: Eq<F>,
-  EQG: Eq<G>,
-  EQH: Eq<H>
-): Eq<Tuple8<A, B, C, D, E, F, G, H>> =
-  Tuple8Eq(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH)
 
 fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.hashWithSalt(
   HA: Hash<A>,

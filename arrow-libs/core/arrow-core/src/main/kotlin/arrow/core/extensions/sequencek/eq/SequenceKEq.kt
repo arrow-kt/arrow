@@ -4,6 +4,7 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -17,11 +18,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "neqv(EQ, arg1)",
-  "arrow.core.neqv"
-  ),
+  EqDeprecation,
+  ReplaceWith("this != arg1"),
   DeprecationLevel.WARNING
 )
 fun <A> SequenceK<A>.neqv(EQ: Eq<A>, arg1: SequenceK<A>): Boolean =
@@ -33,5 +31,6 @@ fun <A> SequenceK<A>.neqv(EQ: Eq<A>, arg1: SequenceK<A>): Boolean =
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(EqDeprecation)
 inline fun <A> Companion.eq(EQ: Eq<A>): SequenceKEq<A> = object :
     arrow.core.extensions.SequenceKEq<A> { override fun EQ(): arrow.typeclasses.Eq<A> = EQ }

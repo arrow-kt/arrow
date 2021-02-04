@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.extensions.eq
 import arrow.core.test.UnitSpec
 import arrow.core.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
@@ -63,7 +62,7 @@ class IterableTest : UnitSpec() {
         val result = a.rightPadZip(b)
 
         result == left.zip(right) { l, r -> l toT r }.filter { it.a != null } &&
-          result.map { it.a }.equalUnderTheLaw(a, Eq.list(Int.eq()))
+          result.map { it.a }.equalUnderTheLaw(a, Eq.any())
       }
     }
 
@@ -75,7 +74,7 @@ class IterableTest : UnitSpec() {
         val result = a.rightPadZip(b) { a, b -> a toT b }
 
         result == left.zip(right) { l, r -> l toT r }.filter { it.a != null } &&
-          result.map { it.a }.equalUnderTheLaw(a, Eq.list(Int.eq()))
+          result.map { it.a }.equalUnderTheLaw(a, Eq.any())
       }
     }
 

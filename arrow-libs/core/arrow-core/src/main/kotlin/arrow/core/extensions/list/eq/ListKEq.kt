@@ -1,9 +1,11 @@
 package arrow.core.extensions.list.eq
 
+import arrow.core.ListK
 import arrow.core.extensions.ListKEq
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.k
 import arrow.typeclasses.Eq
-import arrow.core.eqv as _eqv
-import arrow.core.neqv as _neqv
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Suppress
 import kotlin.collections.List
@@ -16,9 +18,9 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("neqv(EQL, EQR, arg1)", "arrow.core.neqv"))
+@Deprecated(EqDeprecation, ReplaceWith("this == arg1"))
 fun <A> List<A>.eqv(EQ: Eq<A>, arg1: List<A>): Boolean =
-  _eqv(EQ, arg1)
+  ListK.eq(EQ).run { this@eqv.k().eqv(arg1.k()) }
 
 @JvmName("neqv")
 @Suppress(
@@ -27,9 +29,9 @@ fun <A> List<A>.eqv(EQ: Eq<A>, arg1: List<A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("neqv(EQL, EQR, arg1)", "arrow.core.neqv"))
+@Deprecated(EqDeprecation, ReplaceWith("this != arg1"))
 fun <A> List<A>.neqv(EQ: Eq<A>, arg1: List<A>): Boolean =
-  _neqv(EQ, arg1)
+  ListK.eq(EQ).run { this@neqv.k().neqv(arg1.k()) }
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -37,6 +39,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.list(EQ)", "arrow.core.list", "arrow.core.Eq"))
+  @Deprecated(EqDeprecation)
   inline fun <A> eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> { override
       fun EQ(): arrow.typeclasses.Eq<A> = EQ }}

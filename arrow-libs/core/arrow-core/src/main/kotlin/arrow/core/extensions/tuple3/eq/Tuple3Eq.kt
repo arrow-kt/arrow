@@ -4,6 +4,7 @@ import arrow.core.Tuple3
 import arrow.core.Tuple3.Companion
 import arrow.core.extensions.Tuple3Eq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -17,10 +18,9 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  EqDeprecation,
   ReplaceWith(
-  "neqv(EQA, EQB, EQC, arg1)",
-  "arrow.core.neqv"
+  "this != arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,13 +38,8 @@ fun <A, B, C> Tuple3<A, B, C>.neqv(
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Tuple3 is deprecated in favor of Kotlin's Triple. ReplaceWith Triple and use Triple instance of Eq",
-    "arrow.core.Eq",
-    "arrow.core.triple"
-  ),
-  DeprecationLevel.WARNING
+  EqDeprecation,
+  level = DeprecationLevel.WARNING
 )
 inline fun <A, B, C> Companion.eq(
   EQA: Eq<A>,

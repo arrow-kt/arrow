@@ -4,6 +4,7 @@ import arrow.core.SetK
 import arrow.core.SetK.Companion
 import arrow.core.extensions.SetKEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Suppress
@@ -17,11 +18,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "!eqv(EQ, arg1)",
-    "arrow.core.eqv"
-  ),
+  EqDeprecation,
+  ReplaceWith("this != arg1"),
   DeprecationLevel.WARNING
 )
 fun <A> SetK<A>.neqv(EQ: Eq<A>, arg1: SetK<A>): Boolean = arrow.core.SetK.eq<A>(EQ).run {
@@ -33,13 +31,8 @@ fun <A> SetK<A>.neqv(EQ: Eq<A>, arg1: SetK<A>): Boolean = arrow.core.SetK.eq<A>(
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Eq.set<A>(EQ)",
-    "arrow.core.set",
-    "arrow.typeclasses.Eq"
-  ),
-  DeprecationLevel.WARNING
+  EqDeprecation,
+  level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.eq(EQ: Eq<A>): SetKEq<A> = object : arrow.core.extensions.SetKEq<A> {
   override fun EQ(): arrow.typeclasses.Eq<A> = EQ

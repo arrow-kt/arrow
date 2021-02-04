@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Companion
 import arrow.core.extensions.EitherEq
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import kotlin.Boolean
 import kotlin.Suppress
 import kotlin.jvm.JvmName
@@ -15,7 +16,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("neqv(EQL, EQR, arg1)", "arrow.core.neqv"))
+@Deprecated(EqDeprecation, ReplaceWith("this != arg1"))
 fun <L, R> Either<L, R>.neqv(
   EQL: Eq<L>,
   EQR: Eq<R>,
@@ -28,7 +29,7 @@ fun <L, R> Either<L, R>.neqv(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Eq.either(EQL, EQR)", "arrow.core.Eq", "arrow.core.either"))
+@Deprecated(EqDeprecation)
 inline fun <L, R> Companion.eq(EQL: Eq<L>, EQR: Eq<R>): EitherEq<L, R> = object :
   arrow.core.extensions.EitherEq<L, R> {
   override fun EQL(): arrow.typeclasses.Eq<L> = EQL
