@@ -5,7 +5,6 @@ import arrow.core.SequenceK
 import arrow.core.extensions.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.sequencek.eq.eq
-import arrow.core.list
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.functionAToB
 import arrow.optics.Traversal
@@ -36,7 +35,7 @@ class SequenceInstanceTest : UnitSpec() {
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = sequenceEq(String.eq()),
         EQOptionB = Option.eq(String.eq()),
-        EQListB = Eq.list(String.eq())
+        EQListB = Eq.any()
       )
     )
 
@@ -47,7 +46,7 @@ class SequenceInstanceTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
         EQA = sequenceEq(String.eq()),
-        EQListB = Eq.list(String.eq()),
+        EQListB = Eq.any(),
         EQOptionB = Option.eq(String.eq())
       )
     )
