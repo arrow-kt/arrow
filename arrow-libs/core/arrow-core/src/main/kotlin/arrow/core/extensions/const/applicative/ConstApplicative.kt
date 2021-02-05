@@ -24,14 +24,15 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just(MA)",
-  "arrow.core.just"
+    "just(a)",
+    "arrow.core.just"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> A.just(MA: Monoid<A>): Const<A, A> = arrow.core.Const.applicative<A>(MA).run {
-  this@just.just<A>() as arrow.core.Const<A, A>
-}
+fun <A> A.just(MA: Monoid<A>): Const<A, A> =
+  arrow.core.Const.applicative<A>(MA).run {
+    this@just.just<A>() as arrow.core.Const<A, A>
+  }
 
 @JvmName("unit")
 @Suppress(
@@ -43,14 +44,14 @@ fun <A> A.just(MA: Monoid<A>): Const<A, A> = arrow.core.Const.applicative<A>(MA)
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit(MA)",
-  "arrow.core.Const.unit"
+    "unit(MA)",
+    "arrow.core.unit"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> unit(MA: Monoid<A>): Const<A, Unit> = arrow.core.Const
-   .applicative<A>(MA)
-   .unit() as arrow.core.Const<A, kotlin.Unit>
+  .applicative<A>(MA)
+  .unit() as arrow.core.Const<A, kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -62,15 +63,15 @@ fun <A> unit(MA: Monoid<A>): Const<A, Unit> = arrow.core.Const
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(MA, arg1)",
-  "arrow.core.map"
+    "map(MA, arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.map(MA: Monoid<A>, arg1: Function1<A, B>): Const<A, B> =
-    arrow.core.Const.applicative<A>(MA).run {
-  this@map.map<A, B>(arg1) as arrow.core.Const<A, B>
-}
+  arrow.core.Const.applicative<A>(MA).run {
+    this@map.map<A, B>(arg1) as arrow.core.Const<A, B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,15 +83,15 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.map(MA: Monoid<A>, arg1: Function1<A, B>):
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(MA, arg1)",
-  "arrow.core.replicate"
+    "replicate(MA, arg1)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<Kind<ForConst, A>, A>.replicate(MA: Monoid<A>, arg1: Int): Const<A, List<A>> =
-    arrow.core.Const.applicative<A>(MA).run {
-  this@replicate.replicate<A>(arg1) as arrow.core.Const<A, kotlin.collections.List<A>>
-}
+  arrow.core.Const.applicative<A>(MA).run {
+    this@replicate.replicate<A>(arg1) as arrow.core.Const<A, kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -102,8 +103,8 @@ fun <A> Kind<Kind<ForConst, A>, A>.replicate(MA: Monoid<A>, arg1: Int): Const<A,
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(MA, arg1, arg2)",
-  "arrow.core.replicate"
+    "replicate(MA, arg1, arg2)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -119,6 +120,11 @@ fun <A> Kind<Kind<ForConst, A>, A>.replicate(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Applicative typeclass is deprecated. Use concrete methods on Const",
+  level = DeprecationLevel.WARNING
+)
 inline fun <A> Companion.applicative(MA: Monoid<A>): ConstApplicative<A> = object :
-    arrow.core.extensions.ConstApplicative<A> { override fun MA(): arrow.typeclasses.Monoid<A> = MA
-    }
+  arrow.core.extensions.ConstApplicative<A> {
+  override fun MA(): arrow.typeclasses.Monoid<A> = MA
+}

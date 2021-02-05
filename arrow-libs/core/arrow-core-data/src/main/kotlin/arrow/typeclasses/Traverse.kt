@@ -228,34 +228,6 @@ import arrow.typeclasses.internal.idApplicative
  *
  * For brevity and demonstration purposes we’ll implement an isomorphic [foldMap] method in terms of [traverse] by using [Const]. You can then implement [foldRight] in terms of [foldMap], and [foldLeft] can then be implemented in terms of [foldRight], though the resulting implementations may be slow.
  *
- * ```kotlin:ank:playground
- * import arrow.Kind
- * import arrow.core.Const
- * import arrow.core.ListK
- * import arrow.core.extensions.const.applicative.applicative
- * import arrow.core.extensions.listk.traverse.traverse
- * import arrow.core.extensions.monoid
- * import arrow.core.fix
- * import arrow.core.identity
- * import arrow.core.k
- * import arrow.typeclasses.Monoid
- * import arrow.typeclasses.Traverse
- *
- * //sampleStart
- * fun <F, B, A> Kind<F, A>.foldMap(f: (A) -> B, M: Monoid<B>, TF: Traverse<F>): B =
- *   TF.run {
- *     M.run {
- *       traverse(Const.applicative(M)) { a: A -> Const<B, Nothing>(f(a)) }.fix().value()
- *     }
- *   }
- *
- * val sing = listOf("Hello", " from ", "the", " other ", "side!").k().foldMap(::identity, String.monoid(), ListK.traverse())
- * //sampleEnd
- * fun main() {
- *   println("Sing=$sing")
- * }
- * ```
- *
  * ### Choose your implementation
  *
  * The type signature of [Traverse] appears highly abstract, although it's easier if you think about it as executing operations over collections - what [traverse] does as it walks the `Kind<F, A>` depending on the context `F` of the function. Let's see some examples where `F` is taken to be `List`.

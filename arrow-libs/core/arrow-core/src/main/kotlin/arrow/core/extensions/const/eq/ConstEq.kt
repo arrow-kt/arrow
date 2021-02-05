@@ -32,7 +32,7 @@ fun <A, T> Const<A, T>.neqv(EQ: Eq<A>, arg1: Const<A, T>): Boolean = arrow.core.
   "NOTHING_TO_INLINE"
 )
 @Deprecated(EqDeprecation)
-inline fun <A, T> Companion.eq(EQ: Eq<A>): ConstEq<A, T> = object : arrow.core.extensions.ConstEq<A,
-  T> {
-  override fun EQ(): arrow.typeclasses.Eq<A> = EQ
+inline fun <A, T> Companion.eq(EQ: Eq<A>): ConstEq<A, T> = object : arrow.core.extensions.ConstEq<A, T> {
+  override fun EQ(): arrow.typeclasses.Eq<A> =
+    EQ
 }

@@ -21,15 +21,15 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "compareTo(ORD, arg1)",
-  "arrow.core.compareTo"
+    "compare(ORD, arg1).toInt()",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.compareTo(ORD: Order<A>, arg1: Const<A, T>): Int = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@compareTo.compareTo(arg1) as kotlin.Int
-}
+fun <A, T> Const<A, T>.compareTo(ORD: Order<A>, arg1: Const<A, T>): Int =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@compareTo.compareTo(arg1) as kotlin.Int
+  }
 
 @JvmName("eqv")
 @Suppress(
@@ -41,15 +41,15 @@ fun <A, T> Const<A, T>.compareTo(ORD: Order<A>, arg1: Const<A, T>): Int = arrow.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqv(ORD, arg1)",
-  "arrow.core.eqv"
+    "eqv(ORD, arg1)",
+    "arrow.core.eqv"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.eqv(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@eqv.eqv(arg1) as kotlin.Boolean
-}
+fun <A, T> Const<A, T>.eqv(ORD: Order<A>, arg1: Const<A, T>): Boolean =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@eqv.eqv(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lt")
 @Suppress(
@@ -61,15 +61,15 @@ fun <A, T> Const<A, T>.eqv(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.co
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lt(ORD, arg1)",
-  "arrow.core.lt"
+    "compare(ORD, arg1) == LT",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.lt(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@lt.lt(arg1) as kotlin.Boolean
-}
+fun <A, T> Const<A, T>.lt(ORD: Order<A>, arg1: Const<A, T>): Boolean =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@lt.lt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lte")
 @Suppress(
@@ -81,15 +81,15 @@ fun <A, T> Const<A, T>.lt(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.cor
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lte(ORD, arg1)",
-  "arrow.core.lte"
+    "compare(ORD, arg1) != GT",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.lte(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@lte.lte(arg1) as kotlin.Boolean
-}
+fun <A, T> Const<A, T>.lte(ORD: Order<A>, arg1: Const<A, T>): Boolean =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@lte.lte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gt")
 @Suppress(
@@ -101,15 +101,15 @@ fun <A, T> Const<A, T>.lte(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.co
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "gt(ORD, arg1)",
-  "arrow.core.gt"
+    "compare(ORD, arg1) == GT",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.gt(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@gt.gt(arg1) as kotlin.Boolean
-}
+fun <A, T> Const<A, T>.gt(ORD: Order<A>, arg1: Const<A, T>): Boolean =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@gt.gt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gte")
 @Suppress(
@@ -121,15 +121,15 @@ fun <A, T> Const<A, T>.gt(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.cor
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "gte(ORD, arg1)",
-  "arrow.core.gte"
+    "compare(ORD, arg1) != LT",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, T> Const<A, T>.gte(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.core.Const.order<A,
-    T>(ORD).run {
-  this@gte.gte(arg1) as kotlin.Boolean
-}
+fun <A, T> Const<A, T>.gte(ORD: Order<A>, arg1: Const<A, T>): Boolean =
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@gte.gte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("max")
 @Suppress(
@@ -141,15 +141,15 @@ fun <A, T> Const<A, T>.gte(ORD: Order<A>, arg1: Const<A, T>): Boolean = arrow.co
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "max(ORD, arg1)",
-  "arrow.core.max"
+    "if (compare(ORD, arg1) == GT) this else arg1",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, T> Const<A, T>.max(ORD: Order<A>, arg1: Const<A, T>): Const<A, T> =
-    arrow.core.Const.order<A, T>(ORD).run {
-  this@max.max(arg1) as arrow.core.Const<A, T>
-}
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@max.max(arg1) as arrow.core.Const<A, T>
+  }
 
 @JvmName("min")
 @Suppress(
@@ -161,15 +161,15 @@ fun <A, T> Const<A, T>.max(ORD: Order<A>, arg1: Const<A, T>): Const<A, T> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "min(ORD, arg1)",
-  "arrow.core.min"
+    "if (compare(ORD, arg1) == LT) this else arg1",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, T> Const<A, T>.min(ORD: Order<A>, arg1: Const<A, T>): Const<A, T> =
-    arrow.core.Const.order<A, T>(ORD).run {
-  this@min.min(arg1) as arrow.core.Const<A, T>
-}
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@min.min(arg1) as arrow.core.Const<A, T>
+  }
 
 @JvmName("sort")
 @Suppress(
@@ -181,19 +181,24 @@ fun <A, T> Const<A, T>.min(ORD: Order<A>, arg1: Const<A, T>): Const<A, T> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "sort(ORD, arg1)",
-  "arrow.core.sort"
+    "if (compare(ORD, arg1) != LT) Tuple2(this, arg1) else Tuple2(arg1, this)",
+    "arrow.core.compare"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, T> Const<A, T>.sort(ORD: Order<A>, arg1: Const<A, T>): Tuple2<Const<A, T>, Const<A, T>> =
-    arrow.core.Const.order<A, T>(ORD).run {
-  this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Const<A, T>, arrow.core.Const<A, T>>
-}
+  arrow.core.Const.order<A, T>(ORD).run {
+    this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Const<A, T>, arrow.core.Const<A, T>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-inline fun <A, T> Companion.order(ORD: Order<A>): ConstOrder<A, T> = object :
-    arrow.core.extensions.ConstOrder<A, T> { override fun ORD(): arrow.typeclasses.Order<A> = ORD }
+@Deprecated(
+  "Order typeclass is deprecated. Use concrete methods on Const",
+  level = DeprecationLevel.WARNING
+)
+inline fun <A, T> Companion.order(ORD: Order<A>): ConstOrder<A, T> = object : arrow.core.extensions.ConstOrder<A, T> {
+  override fun ORD(): arrow.typeclasses.Order<A> = ORD
+}

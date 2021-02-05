@@ -20,8 +20,8 @@ import kotlin.jvm.JvmName
  * cached extension
  */
 @PublishedApi()
-internal val traverseFilter_singleton: ConstTraverseFilter<Any?> = object :
-    ConstTraverseFilter<Any?> {}
+internal val traverseFilter_singleton: ConstTraverseFilter<Any?> =
+  object : ConstTraverseFilter<Any?> {}
 
 @JvmName("traverseFilter")
 @Suppress(
@@ -30,22 +30,14 @@ internal val traverseFilter_singleton: ConstTraverseFilter<Any?> = object :
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverseFilter(arg1, arg2)",
-  "arrow.core.traverseFilter"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.traverseFilter(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, Option<B>>>
 ): Kind<G, Kind<Kind<ForConst, X>, B>> =
-    arrow.core.Const.traverseFilter<X>().run {
-  this@traverseFilter.traverseFilter<G, A, B>(arg1, arg2) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
-}
+  arrow.core.Const.traverseFilter<X>().run {
+    this@traverseFilter.traverseFilter<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
+  }
 
 @JvmName("filterMap")
 @Suppress(
@@ -54,18 +46,11 @@ fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.traverseFilter(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, A, B> Kind<Kind<ForConst, X>, A>.filterMap(arg1: Function1<A, Option<B>>): Const<X, B> =
-    arrow.core.Const.traverseFilter<X>().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.Const<X, B>
-}
+  arrow.core.Const.traverseFilter<X>().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.Const<X, B>
+  }
 
 @JvmName("filterA")
 @Suppress(
@@ -74,22 +59,15 @@ fun <X, A, B> Kind<Kind<ForConst, X>, A>.filterMap(arg1: Function1<A, Option<B>>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "filterA(arg1, arg2)",
-  "arrow.core.filterA"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, G, A> Kind<Kind<ForConst, X>, A>.filterA(
   arg1: Function1<A, Kind<G, Boolean>>,
   arg2: Applicative<G>
 ): Kind<G, Kind<Kind<ForConst, X>, A>> =
-    arrow.core.Const.traverseFilter<X>().run {
-  this@filterA.filterA<G, A>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst,
-    X>, A>>
-}
+  arrow.core.Const.traverseFilter<X>().run {
+    this@filterA.filterA<G, A>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst,
+      X>, A>>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -98,18 +76,11 @@ fun <X, G, A> Kind<Kind<ForConst, X>, A>.filterA(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "filter(arg1)",
-  "arrow.core.filter"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, A> Kind<Kind<ForConst, X>, A>.filter(arg1: Function1<A, Boolean>): Const<X, A> =
-    arrow.core.Const.traverseFilter<X>().run {
-  this@filter.filter<A>(arg1) as arrow.core.Const<X, A>
-}
+  arrow.core.Const.traverseFilter<X>().run {
+    this@filter.filter<A>(arg1) as arrow.core.Const<X, A>
+  }
 
 @JvmName("traverseFilterIsInstance")
 @Suppress(
@@ -118,26 +89,20 @@ fun <X, A> Kind<Kind<ForConst, X>, A>.filter(arg1: Function1<A, Boolean>): Const
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverseFilterIsInstance(arg1, arg2)",
-  "arrow.core.traverseFilterIsInstance"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.traverseFilterIsInstance(
   arg1: Applicative<G>,
   arg2: Class<B>
 ): Kind<G, Kind<Kind<ForConst, X>, B>> =
-    arrow.core.Const.traverseFilter<X>().run {
-  this@traverseFilterIsInstance.traverseFilterIsInstance<G, A, B>(arg1, arg2) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
-}
+  arrow.core.Const.traverseFilter<X>().run {
+    this@traverseFilterIsInstance.traverseFilterIsInstance<G, A, B>(arg1, arg2) as arrow.Kind<G,
+      arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 inline fun <X> Companion.traverseFilter(): ConstTraverseFilter<X> = traverseFilter_singleton as
-    arrow.core.extensions.ConstTraverseFilter<X>
+  arrow.core.extensions.ConstTraverseFilter<X>

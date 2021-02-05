@@ -27,21 +27,14 @@ internal val traverse_singleton: ConstTraverse<Any?> = object : ConstTraverse<An
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse(arg1, arg2)",
-  "arrow.core.traverse"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.traverse(
   arg1: Applicative<G>,
   arg2: Function1<A, Kind<G, B>>
-): Kind<G, Kind<Kind<ForConst, X>, B>> = arrow.core.Const.traverse<X>().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
-}
+): Kind<G, Kind<Kind<ForConst, X>, B>> =
+  arrow.core.Const.traverse<X>().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -50,19 +43,11 @@ fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.traverse(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence(arg1)",
-  "arrow.core.sequence"
-  ),
-  DeprecationLevel.WARNING
-)
-fun <X, G, A> Kind<Kind<ForConst, X>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
-    Kind<Kind<ForConst, X>, A>> = arrow.core.Const.traverse<X>().run {
-  this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst, X>,
-    A>>
-}
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+fun <X, G, A> Kind<Kind<ForConst, X>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<Kind<ForConst, X>, A>> =
+  arrow.core.Const.traverse<X>().run {
+    this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -74,15 +59,15 @@ fun <X, G, A> Kind<Kind<ForConst, X>, Kind<G, A>>.sequence(arg1: Applicative<G>)
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "map(arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <X, A, B> Kind<Kind<ForConst, X>, A>.map(arg1: Function1<A, B>): Const<X, B> =
-    arrow.core.Const.traverse<X>().run {
-  this@map.map<A, B>(arg1) as arrow.core.Const<X, B>
-}
+  arrow.core.Const.traverse<X>().run {
+    this@map.map<A, B>(arg1) as arrow.core.Const<X, B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -91,26 +76,23 @@ fun <X, A, B> Kind<Kind<ForConst, X>, A>.map(arg1: Function1<A, B>): Const<X, B>
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTraverse(arg1, arg2, arg3)",
-  "arrow.core.flatTraverse"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <X, G, A, B> Kind<Kind<ForConst, X>, A>.flatTraverse(
   arg1: Monad<Kind<ForConst, X>>,
   arg2: Applicative<G>,
   arg3: Function1<A, Kind<G, Kind<Kind<ForConst, X>, B>>>
-): Kind<G, Kind<Kind<ForConst, X>, B>> = arrow.core.Const.traverse<X>().run {
-  this@flatTraverse.flatTraverse<G, A, B>(arg1, arg2, arg3) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
-}
+): Kind<G, Kind<Kind<ForConst, X>, B>> =
+  arrow.core.Const.traverse<X>().run {
+    this@flatTraverse.flatTraverse<G, A, B>(arg1, arg2, arg3) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst, X>, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Traverse typeclass is deprecated. Use concrete methods on Const",
+  level = DeprecationLevel.WARNING
+)
 inline fun <X> Companion.traverse(): ConstTraverse<X> = traverse_singleton as
-    arrow.core.extensions.ConstTraverse<X>
+  arrow.core.extensions.ConstTraverse<X>

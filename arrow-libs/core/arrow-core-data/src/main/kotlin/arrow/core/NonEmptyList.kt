@@ -220,7 +220,7 @@ class NonEmptyList<out A>(
 
   @JvmName("flatMapKind")
   @Deprecated(
-    "Kind is deprecated, and will be removed in 0.13.0. Please the flatMap method defined for NonEmptyList instead",
+    "Kind is deprecated, and will be removed in 0.13.0. Please use the flatMap method defined for NonEmptyList instead",
     level = DeprecationLevel.WARNING
   )
   inline fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =

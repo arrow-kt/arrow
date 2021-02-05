@@ -52,15 +52,15 @@ internal val functor_singleton: ConstFunctor<Any?> = object : ConstFunctor<Any?>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "map(arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.map(arg1: Function1<A, B>): Const<A, B> =
-    arrow.core.Const.functor<A>().run {
-  this@map.map(arg1) as arrow.core.Const<A, B>
-}
+  arrow.core.Const.functor<A>().run {
+    this@map.map(arg1) as arrow.core.Const<A, B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -72,15 +72,15 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.map(arg1: Function1<A, B>): Const<A, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "map(arg1)",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
-fun <A, B> Kind<Kind<ForConst, A>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Const<A,
-    B> = arrow.core.Const.functor<A>().run {
-  this@imap.imap(arg1, arg2) as arrow.core.Const<A, B>
-}
+fun <A, B> Kind<Kind<ForConst, A>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Const<A, B> =
+  arrow.core.Const.functor<A>().run {
+    this@imap.imap(arg1, arg2) as arrow.core.Const<A, B>
+  }
 
 /**
  *  Lifts a function `A -> B` to the [F] structure returning a polymorphic function
@@ -113,18 +113,11 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.imap(arg1: Function1<A, B>, arg2: Function
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "lift(arg0)",
-  "arrow.core.Const.lift"
-  ),
-  DeprecationLevel.WARNING
-)
-fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForConst, A>, A>, Kind<Kind<ForConst,
-    A>, B>> = arrow.core.Const
-   .functor<A>()
-   .lift(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForConst, A>, A>,
+@Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
+fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForConst, A>, A>, Kind<Kind<ForConst, A>, B>> =
+  arrow.core.Const
+    .functor<A>()
+    .lift(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForConst, A>, A>,
     arrow.Kind<arrow.Kind<arrow.core.ForConst, A>, B>>
 
 @JvmName("void")
@@ -137,14 +130,15 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForConst, A>, A>, Ki
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+    "map { Unit }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
-fun <A> Kind<Kind<ForConst, A>, A>.void(): Const<A, Unit> = arrow.core.Const.functor<A>().run {
-  this@void.void() as arrow.core.Const<A, kotlin.Unit>
-}
+fun <A> Kind<Kind<ForConst, A>, A>.void(): Const<A, Unit> =
+  arrow.core.Const.functor<A>().run {
+    this@void.void() as arrow.core.Const<A, kotlin.Unit>
+  }
 
 /**
  *  Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
@@ -180,15 +174,15 @@ fun <A> Kind<Kind<ForConst, A>, A>.void(): Const<A, Unit> = arrow.core.Const.fun
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+    "map { a -> Tuple2(a, f(a)) }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.fproduct(arg1: Function1<A, B>): Const<A, Tuple2<A, B>> =
-    arrow.core.Const.functor<A>().run {
-  this@fproduct.fproduct(arg1) as arrow.core.Const<A, arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Const.functor<A>().run {
+    this@fproduct.fproduct(arg1) as arrow.core.Const<A, arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -223,15 +217,15 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.fproduct(arg1: Function1<A, B>): Const<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "map { arg1 }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.mapConst(arg1: B): Const<A, B> =
-    arrow.core.Const.functor<A>().run {
-  this@mapConst.mapConst(arg1) as arrow.core.Const<A, B>
-}
+  arrow.core.Const.functor<A>().run {
+    this@mapConst.mapConst(arg1) as arrow.core.Const<A, B>
+  }
 
 /**
  *  Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
@@ -246,15 +240,15 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.mapConst(arg1: B): Const<A, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "map { this }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> A.mapConst(arg1: Kind<Kind<ForConst, A>, B>): Const<A, A> =
-    arrow.core.Const.functor<A>().run {
-  this@mapConst.mapConst(arg1) as arrow.core.Const<A, A>
-}
+  arrow.core.Const.functor<A>().run {
+    this@mapConst.mapConst(arg1) as arrow.core.Const<A, A>
+  }
 
 /**
  *  Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
@@ -289,15 +283,15 @@ fun <A, B> A.mapConst(arg1: Kind<Kind<ForConst, A>, B>): Const<A, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+    "map { a -> Tuple2(arg1, a) }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.tupleLeft(arg1: B): Const<A, Tuple2<B, A>> =
-    arrow.core.Const.functor<A>().run {
-  this@tupleLeft.tupleLeft(arg1) as arrow.core.Const<A, arrow.core.Tuple2<B, A>>
-}
+  arrow.core.Const.functor<A>().run {
+    this@tupleLeft.tupleLeft(arg1) as arrow.core.Const<A, arrow.core.Tuple2<B, A>>
+  }
 
 /**
  *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -332,15 +326,15 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.tupleLeft(arg1: B): Const<A, Tuple2<B, A>>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+    "map { a -> Tuple2(a, arg1) }",
+    "arrow.core.map"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.tupleRight(arg1: B): Const<A, Tuple2<A, B>> =
-    arrow.core.Const.functor<A>().run {
-  this@tupleRight.tupleRight(arg1) as arrow.core.Const<A, arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Const.functor<A>().run {
+    this@tupleRight.tupleRight(arg1) as arrow.core.Const<A, arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>
@@ -376,19 +370,21 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.tupleRight(arg1: B): Const<A, Tuple2<A, B>
 )
 @Deprecated(
   "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
-  ),
+  ReplaceWith("this"),
   DeprecationLevel.WARNING
 )
-fun <A, B> Kind<Kind<ForConst, A>, A>.widen(): Const<A, B> = arrow.core.Const.functor<A>().run {
-  this@widen.widen() as arrow.core.Const<A, B>
-}
+fun <A, B> Kind<Kind<ForConst, A>, A>.widen(): Const<A, B> =
+  arrow.core.Const.functor<A>().run {
+    this@widen.widen() as arrow.core.Const<A, B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(
+  "Functor typeclass is deprecated. Use concrete methods on Const",
+  level = DeprecationLevel.WARNING
+)
 inline fun <A> Companion.functor(): ConstFunctor<A> = functor_singleton as
-    arrow.core.extensions.ConstFunctor<A>
+  arrow.core.extensions.ConstFunctor<A>
