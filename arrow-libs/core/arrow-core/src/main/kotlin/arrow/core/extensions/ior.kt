@@ -35,6 +35,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -285,10 +286,7 @@ interface IorHash<L, R> : Hash<Ior<L, R>> {
   }
 }
 
-@Deprecated(
-  message = "Order typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Ior",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 interface IorOrder<L, R> : Order<Ior<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>

@@ -24,6 +24,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Invariant
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -190,10 +191,7 @@ interface ConstEq<A, T> : Eq<Const<A, T>> {
     EQ().run { value().eqv(b.value()) }
 }
 
-@Deprecated(
-  message = "Order typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Const",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 interface ConstOrder<A, T> : Order<Const<A, T>> {
   fun ORD(): Order<A>
   override fun Const<A, T>.compare(b: Const<A, T>): Ordering =

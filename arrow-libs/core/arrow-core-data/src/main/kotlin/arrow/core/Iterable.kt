@@ -705,3 +705,12 @@ fun <A> Iterable<A>.replicate(n: Int): List<List<A>> =
 fun <A> Iterable<A>.replicate(n: Int, MA: Monoid<A>): List<A> =
   if (n <= 0) listOf(MA.empty())
   else ListK.mapN(this@replicate, replicate(n - 1, MA)) { a, xs -> MA.run { a + xs } }
+
+operator fun <A : Comparable<A>> Iterable<A>.compareTo(other: Iterable<A>): Int =
+  align(other) { ior -> ior.fold({ 1 }, { -1 }, { a1, a2 -> a1.compareTo(a2) }) }
+    .fold(0) { acc, i ->
+      when (acc) {
+        0 -> i
+        else -> acc
+      }
+    }

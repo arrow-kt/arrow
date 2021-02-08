@@ -6,6 +6,7 @@ import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
@@ -33,7 +34,7 @@ interface ByteSemiring : Semiring<Byte> {
   override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.byte()", "arrow.core.Order", "arrow.core.byte"))
+@Deprecated(OrderDeprecation)
 interface ByteOrder : Order<Byte> {
   override fun Byte.compare(b: Byte): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Byte.compareTo(b: Byte): Int = this.compareTo(b)
@@ -66,7 +67,7 @@ fun Byte.Companion.show(): Show<Byte> =
 fun Byte.Companion.eq(): Eq<Byte> =
   object : ByteEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.byte()", "arrow.core.Order", "arrow.core.byte"))
+@Deprecated(OrderDeprecation)
 fun Byte.Companion.order(): Order<Byte> =
   object : ByteOrder {}
 
@@ -104,7 +105,7 @@ interface DoubleSemiring : Semiring<Double> {
   override fun Double.combineMultiplicate(b: Double): Double = this * b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.double()", "arrow.core.Order", "arrow.core.double"))
+@Deprecated(OrderDeprecation)
 interface DoubleOrder : Order<Double> {
   override fun Double.compare(b: Double): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Double.compareTo(b: Double): Int = this.compareTo(b)
@@ -137,7 +138,7 @@ fun Double.Companion.show(): Show<Double> =
 fun Double.Companion.eq(): Eq<Double> =
   object : DoubleEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.double()", "arrow.core.Order", "arrow.core.double"))
+@Deprecated(OrderDeprecation)
 fun Double.Companion.order(): Order<Double> =
   object : DoubleOrder {}
 
@@ -185,7 +186,7 @@ interface IntShow : Show<Int> {
   override fun Int.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.int()", "arrow.core.Order", "arrow.core.int"))
+@Deprecated(OrderDeprecation)
 interface IntOrder : Order<Int> {
   override fun Int.compare(b: Int): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Int.compareTo(b: Int): Int = this.compareTo(b)
@@ -207,7 +208,7 @@ fun Int.Companion.show(): Show<Int> =
 fun Int.Companion.eq(): Eq<Int> =
   object : IntEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.int()", "arrow.core.Order", "arrow.core.int"))
+@Deprecated(OrderDeprecation)
 fun Int.Companion.order(): Order<Int> =
   object : IntOrder {}
 
@@ -245,7 +246,7 @@ interface LongSemiring : Semiring<Long> {
   override fun Long.combineMultiplicate(b: Long): Long = this * b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.long()", "arrow.core.Order", "arrow.core.long"))
+@Deprecated(OrderDeprecation)
 interface LongOrder : Order<Long> {
   override fun Long.compare(b: Long): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Long.compareTo(b: Long): Int = this.compareTo(b)
@@ -278,7 +279,7 @@ fun Long.Companion.show(): Show<Long> =
 fun Long.Companion.eq(): Eq<Long> =
   object : LongEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.long()", "arrow.core.Order", "arrow.core.long"))
+@Deprecated(OrderDeprecation)
 fun Long.Companion.order(): Order<Long> =
   object : LongOrder {}
 
@@ -316,7 +317,7 @@ interface ShortSemiring : Semiring<Short> {
   override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.short()", "arrow.core.Order", "arrow.core.short"))
+@Deprecated(OrderDeprecation)
 interface ShortOrder : Order<Short> {
   override fun Short.compare(b: Short): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Short.compareTo(b: Short): Int = this.compareTo(b)
@@ -349,7 +350,7 @@ fun Short.Companion.show(): Show<Short> =
 fun Short.Companion.eq(): Eq<Short> =
   object : ShortEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.short()", "arrow.core.Order", "arrow.core.short"))
+@Deprecated(OrderDeprecation)
 fun Short.Companion.order(): Order<Short> =
   object : ShortOrder {}
 
@@ -387,7 +388,7 @@ interface FloatSemiring : Semiring<Float> {
   override fun Float.combineMultiplicate(b: Float): Float = this * b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.float()", "arrow.core.Order", "arrow.core.float"))
+@Deprecated(OrderDeprecation)
 interface FloatOrder : Order<Float> {
   override fun Float.compare(b: Float): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Float.compareTo(b: Float): Int = this.compareTo(b)
@@ -420,7 +421,7 @@ fun Float.Companion.show(): Show<Float> =
 fun Float.Companion.eq(): Eq<Float> =
   object : FloatEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.float()", "arrow.core.Order", "arrow.core.float"))
+@Deprecated(OrderDeprecation)
 fun Float.Companion.order(): Order<Float> =
   object : FloatOrder {}
 

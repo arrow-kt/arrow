@@ -5,6 +5,7 @@ import arrow.core.Either.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.EitherOrder
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Suppress
@@ -17,7 +18,10 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("compareTo(OL, OR, arg1)", "arrow.core.compareTo"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
+)
 fun <L, R> Either<L, R>.compareTo(
   OL: Order<L>,
   OR: Order<R>,
@@ -33,7 +37,10 @@ fun <L, R> Either<L, R>.compareTo(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("eqv(OL, OR, arg1)", "arrow.core.eqv"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this == arg1")
+)
 fun <L, R> Either<L, R>.eqv(
   OL: Order<L>,
   OR: Order<R>,
@@ -49,7 +56,10 @@ fun <L, R> Either<L, R>.eqv(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("lt(OL, OR, arg1)", "arrow.core.lt"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this < arg1", "arrow.core.compareTo")
+)
 fun <L, R> Either<L, R>.lt(
   OL: Order<L>,
   OR: Order<R>,
@@ -65,7 +75,10 @@ fun <L, R> Either<L, R>.lt(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("lte(OL, OR, arg1)", "arrow.core.lte"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this <= arg1", "arrow.core.compareTo")
+)
 fun <L, R> Either<L, R>.lte(
   OL: Order<L>,
   OR: Order<R>,
@@ -81,7 +94,10 @@ fun <L, R> Either<L, R>.lte(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("gt(OL, OR, arg1)", "arrow.core.gt"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this > arg1", "arrow.core.compareTo")
+)
 fun <L, R> Either<L, R>.gt(
   OL: Order<L>,
   OR: Order<R>,
@@ -97,7 +113,10 @@ fun <L, R> Either<L, R>.gt(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("gte(OL, OR, arg1)", "arrow.core.gte"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this >= arg1", "arrow.core.compareTo")
+)
 fun <L, R> Either<L, R>.gte(
   OL: Order<L>,
   OR: Order<R>,
@@ -113,7 +132,10 @@ fun <L, R> Either<L, R>.gte(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("max(OL, OR, arg1)", "arrow.core.max"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("maxOf(this,arg1)")
+)
 fun <L, R> Either<L, R>.max(
   OL: Order<L>,
   OR: Order<R>,
@@ -129,7 +151,10 @@ fun <L, R> Either<L, R>.max(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("min(OL, OR, arg1)", "arrow.core.min"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("minOf(this,arg1)")
+)
 fun <L, R> Either<L, R>.min(
   OL: Order<L>,
   OR: Order<R>,
@@ -145,7 +170,10 @@ fun <L, R> Either<L, R>.min(
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("sort(OL, OR, arg1)", "arrow.core.sort"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
+)
 fun <L, R> Either<L, R>.sort(
   OL: Order<L>,
   OR: Order<R>,
@@ -158,7 +186,7 @@ fun <L, R> Either<L, R>.sort(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Order.either(OL, OR)", "arrow.core.Order", "arrow.core.either"))
+@Deprecated(OrderDeprecation)
 inline fun <L, R> Companion.order(OL: Order<L>, OR: Order<R>): EitherOrder<L, R> = object :
   arrow.core.extensions.EitherOrder<L, R> {
   override fun OL(): arrow.typeclasses.Order<L> = OL

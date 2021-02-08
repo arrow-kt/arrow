@@ -6,7 +6,6 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -1412,9 +1411,6 @@ fun <A, B> Hash.Companion.either(HA: Hash<A>, HB: Hash<B>): Hash<Either<A, B>> =
 fun <A, B> Show.Companion.either(SA: Show<A>, SB: Show<B>): Show<Either<A, B>> =
   EitherShow(SA, SB)
 
-fun <A, B> Order.Companion.either(OA: Order<A>, OB: Order<B>): Order<Either<A, B>> =
-  EitherOrder(OA, OB)
-
 fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
   EitherSemigroup(SA, SB)
 
@@ -1644,34 +1640,11 @@ inline fun <A, B, C> Either<A, B>.redeem(fe: (A) -> C, fa: (B) -> C): Either<A, 
     is Right -> map(fa)
   }
 
-fun <A, B> Either<A, B>.compare(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Ordering = fold(
-  { a1 -> b.fold({ a2 -> OA.run { a1.compare(a2) } }, { LT }) },
-  { b1 -> b.fold({ GT }, { b2 -> OB.run { b1.compare(b2) } }) }
-)
-
-fun <A, B> Either<A, B>.compareTo(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Int =
-  compare(OA, OB, b).toInt()
-
-fun <A, B> Either<A, B>.lt(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Boolean =
-  compare(OA, OB, b) == LT
-
-fun <A, B> Either<A, B>.lte(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Boolean =
-  compare(OA, OB, b) != GT
-
-fun <A, B> Either<A, B>.gt(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Boolean =
-  compare(OA, OB, b) == GT
-
-fun <A, B> Either<A, B>.gte(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Boolean =
-  compare(OA, OB, b) != LT
-
-fun <A, B> Either<A, B>.max(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Either<A, B> =
-  if (gt(OA, OB, b)) this else b
-
-fun <A, B> Either<A, B>.min(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Either<A, B> =
-  if (lt(OA, OB, b)) this else b
-
-fun <A, B> Either<A, B>.sort(OA: Order<A>, OB: Order<B>, b: Either<A, B>): Tuple2<Either<A, B>, Either<A, B>> =
-  if (gte(OA, OB, b)) Tuple2(this, b) else Tuple2(b, this)
+operator fun <A : Comparable<A>, B : Comparable<B>> Either<A, B>.compareTo(other: Either<A, B>): Int =
+  fold(
+    { a1 -> other.fold({ a2 -> a1.compareTo(a2) }, { -1 }) },
+    { b1 -> other.fold({ 1 }, { b2 -> b1.compareTo(b2) }) }
+  )
 
 fun <A, B> Either<A, B>.combine(SGA: Semigroup<A>, SGB: Semigroup<B>, b: Either<A, B>): Either<A, B> =
   when (this) {
@@ -1813,14 +1786,6 @@ private class EitherShow<L, R>(
 ) : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     show(SL, SR)
-}
-
-private class EitherOrder<L, R>(
-  private val OL: Order<L>,
-  private val OR: Order<R>
-) : Order<Either<L, R>> {
-  override fun Either<L, R>.compare(b: Either<L, R>): Ordering =
-    compare(OL, OR, b)
 }
 
 private open class EitherSemigroup<L, R>(

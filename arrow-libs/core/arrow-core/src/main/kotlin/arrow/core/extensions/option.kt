@@ -47,6 +47,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Repeat
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semialign
@@ -354,10 +355,7 @@ interface OptionHash<A> : Hash<Option<A>> {
     fold({ salt.hashWithSalt(0) }, { v -> HA().run { v.hashWithSalt(salt.hashWithSalt(1)) } })
 }
 
-@Deprecated(
-  message = "Order typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Option",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 interface OptionOrder<A> : Order<Option<A>> {
   fun OA(): Order<A>
   override fun Option<A>.compare(b: Option<A>): Ordering = fold({

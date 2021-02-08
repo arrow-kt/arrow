@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
@@ -71,29 +69,11 @@ fun <A, B, C> Hash.Companion.triple(
 ): Hash<Triple<A, B, C>> =
   TripleHash(HA, HB, HC)
 
-fun <A, B, C> Triple<A, B, C>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  other: Triple<A, B, C>
-): Ordering = listOf(
-  OA.run { first.compare(other.first) },
-  OB.run { second.compare(other.second) },
-  OC.run { third.compare(other.third) }
-).fold(Monoid.ordering())
-
-private class TripleOrder<A, B, C>(
-  private val OA: Order<A>,
-  private val OB: Order<B>,
-  private val OC: Order<C>
-) : Order<Triple<A, B, C>> {
-  override fun Triple<A, B, C>.compare(other: Triple<A, B, C>): Ordering =
-    compare(OA, OB, OC, other)
+operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>> Triple<A, B, C>.compareTo(other: Triple<A, B, C>): Int {
+  val first = first.compareTo(other.first)
+  return if (first == 0) {
+    val second = second.compareTo(other.second)
+    if (second == 0) third.compareTo(other.third)
+    else second
+  } else first
 }
-
-fun <A, B, C> Order.Companion.triple(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>
-): Order<Triple<A, B, C>> =
-  TripleOrder(OA, OB, OC)

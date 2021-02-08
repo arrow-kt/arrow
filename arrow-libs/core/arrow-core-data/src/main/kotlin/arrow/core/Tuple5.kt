@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
@@ -85,37 +83,18 @@ fun <A, B, C, D, E> Hash.Companion.tuple5(
 ): Hash<Tuple5<A, B, C, D, E>> =
   Tuple5Hash(HA, HB, HC, HD, HE)
 
-fun <A, B, C, D, E> Tuple5<A, B, C, D, E>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  other: Tuple5<A, B, C, D, E>
-): Ordering = listOf(
-  OA.run { a.compare(other.a) },
-  OB.run { b.compare(other.b) },
-  OC.run { c.compare(other.c) },
-  OD.run { d.compare(other.d) },
-  OE.run { e.compare(other.e) }
-).fold(Monoid.ordering())
-
-private class Tuple5Order<A, B, C, D, E>(
-  private val OA: Order<A>,
-  private val OB: Order<B>,
-  private val OC: Order<C>,
-  private val OD: Order<D>,
-  private val OE: Order<E>
-) : Order<Tuple5<A, B, C, D, E>> {
-  override fun Tuple5<A, B, C, D, E>.compare(other: Tuple5<A, B, C, D, E>): Ordering =
-    compare(OA, OB, OC, OD, OE, other)
+operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>>
+  Tuple5<A, B, C, D, E>.compareTo(other: Tuple5<A, B, C, D, E>): Int {
+  val first = a.compareTo(other.a)
+  return if (first == 0) {
+    val second = b.compareTo(other.b)
+    if (second == 0) {
+      val third = c.compareTo(other.c)
+      if (third == 0) {
+        val fourth = d.compareTo(other.d)
+        if (fourth == 0) e.compareTo(other.e)
+        else fourth
+      } else third
+    } else second
+  } else first
 }
-
-fun <A, B, C, D, E> Order.Companion.tuple5(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>
-): Order<Tuple5<A, B, C, D, E>> =
-  Tuple5Order(OA, OB, OC, OD, OE)

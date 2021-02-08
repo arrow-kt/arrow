@@ -6,6 +6,7 @@ import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
@@ -20,7 +21,7 @@ interface BooleanEq : Eq<Boolean> {
   override fun Boolean.eqv(b: Boolean): Boolean = this == b
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.boolean()", "arrow.core.Order", "arrow.core.boolean"))
+@Deprecated(OrderDeprecation)
 interface BooleanOrder : Order<Boolean> {
   override fun Boolean.compare(b: Boolean): Ordering = Ordering.fromInt(this.compareTo(b))
   override fun Boolean.compareTo(b: Boolean): Int = this.compareTo(b)
@@ -39,7 +40,7 @@ fun Boolean.Companion.show(): Show<Boolean> =
 fun Boolean.Companion.eq(): Eq<Boolean> =
   object : BooleanEq {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.boolean()", "arrow.core.Order", "arrow.core.boolean"))
+@Deprecated(OrderDeprecation)
 fun Boolean.Companion.order(): Order<Boolean> =
   object : BooleanOrder {}
 

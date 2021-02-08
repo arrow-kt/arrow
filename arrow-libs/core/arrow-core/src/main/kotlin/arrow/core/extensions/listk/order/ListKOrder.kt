@@ -8,6 +8,7 @@ import arrow.core.Ordering
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKOrder
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Suppress
@@ -20,7 +21,10 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("compare(OA, arg1)", "arrow.core.compare"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("Ordering.fromInt(this.compareTo(arg1))", "arrow.core.compareTo", "arrow.core.Ordering")
+)
 fun <A> Kind<ForListK, A>.compare(OA: Order<A>, arg1: Kind<ForListK, A>): Ordering =
     arrow.core.ListK.order<A>(OA).run {
   this@compare.compare(arg1) as arrow.core.Ordering
@@ -33,7 +37,10 @@ fun <A> Kind<ForListK, A>.compare(OA: Order<A>, arg1: Kind<ForListK, A>): Orderi
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("compareTo(OA, arg1)", "arrow.core.compareTo"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
+)
 fun <A> Kind<ForListK, A>.compareTo(OA: Order<A>, arg1: Kind<ForListK, A>): Int =
     arrow.core.ListK.order<A>(OA).run {
   this@compareTo.compareTo(arg1) as kotlin.Int
@@ -46,7 +53,10 @@ fun <A> Kind<ForListK, A>.compareTo(OA: Order<A>, arg1: Kind<ForListK, A>): Int 
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("eqv(OA, arg1)", "arrow.core.eqv"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this == arg1")
+)
 fun <A> Kind<ForListK, A>.eqv(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
     arrow.core.ListK.order<A>(OA).run {
   this@eqv.eqv(arg1) as kotlin.Boolean
@@ -59,7 +69,10 @@ fun <A> Kind<ForListK, A>.eqv(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("lt(OA, arg1)", "arrow.core.lt"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this < arg1", "arrow.core.compareTo")
+)
 fun <A> Kind<ForListK, A>.lt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
     arrow.core.ListK.order<A>(OA).run {
   this@lt.lt(arg1) as kotlin.Boolean
@@ -72,7 +85,10 @@ fun <A> Kind<ForListK, A>.lt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("lte(OA, arg1)", "arrow.core.lte"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this <= arg1", "arrow.core.compareTo")
+)
 fun <A> Kind<ForListK, A>.lte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
     arrow.core.ListK.order<A>(OA).run {
   this@lte.lte(arg1) as kotlin.Boolean
@@ -85,7 +101,10 @@ fun <A> Kind<ForListK, A>.lte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("gt(OA, arg1)", "arrow.core.gt"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this > arg1", "arrow.core.compareTo")
+)
 fun <A> Kind<ForListK, A>.gt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
     arrow.core.ListK.order<A>(OA).run {
   this@gt.gt(arg1) as kotlin.Boolean
@@ -98,7 +117,10 @@ fun <A> Kind<ForListK, A>.gt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("gte(OA, arg1)", "arrow.core.gte"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("this >= arg1", "arrow.core.compareTo")
+)
 fun <A> Kind<ForListK, A>.gte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
     arrow.core.ListK.order<A>(OA).run {
   this@gte.gte(arg1) as kotlin.Boolean
@@ -111,7 +133,10 @@ fun <A> Kind<ForListK, A>.gte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("max(OA, arg1)", "arrow.core.max"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("maxOf(this,arg1)")
+)
 fun <A> Kind<ForListK, A>.max(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
     arrow.core.ListK.order<A>(OA).run {
   this@max.max(arg1) as arrow.core.ListK<A>
@@ -124,7 +149,10 @@ fun <A> Kind<ForListK, A>.max(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("min(OA, arg1)", "arrow.core.min"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("minOf(this,arg1)")
+)
 fun <A> Kind<ForListK, A>.min(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
     arrow.core.ListK.order<A>(OA).run {
   this@min.min(arg1) as arrow.core.ListK<A>
@@ -137,7 +165,10 @@ fun <A> Kind<ForListK, A>.min(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("sort(OA, arg1)", "arrow.core.sort"))
+@Deprecated(
+  OrderDeprecation,
+  ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
+)
 fun <A> Kind<ForListK, A>.sort(OA: Order<A>, arg1: Kind<ForListK, A>): Tuple2<Kind<ForListK, A>,
     Kind<ForListK, A>> = arrow.core.ListK.order<A>(OA).run {
   this@sort.sort(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
@@ -148,6 +179,6 @@ fun <A> Kind<ForListK, A>.sort(OA: Order<A>, arg1: Kind<ForListK, A>): Tuple2<Ki
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("Order.list(OA)", "arrow.core.list", "arrow.core.Order"))
+@Deprecated(OrderDeprecation)
 inline fun <A> Companion.order(OA: Order<A>): ListKOrder<A> = object :
     arrow.core.extensions.ListKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }

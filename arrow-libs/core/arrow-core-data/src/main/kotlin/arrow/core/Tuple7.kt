@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
@@ -99,45 +97,24 @@ fun <A, B, C, D, E, F, G> Hash.Companion.tuple7(
 ): Hash<Tuple7<A, B, C, D, E, F, G>> =
   Tuple7Hash(HA, HB, HC, HD, HE, HF, HG)
 
-fun <A, B, C, D, E, F, G> Tuple7<A, B, C, D, E, F, G>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>,
-  other: Tuple7<A, B, C, D, E, F, G>
-): Ordering = listOf(
-  OA.run { a.compare(other.a) },
-  OB.run { b.compare(other.b) },
-  OC.run { c.compare(other.c) },
-  OD.run { d.compare(other.d) },
-  OE.run { e.compare(other.e) },
-  OF.run { f.compare(other.f) },
-  OG.run { g.compare(other.g) }
-).fold(Monoid.ordering())
-
-private class Tuple7Order<A, B, C, D, E, F, G>(
-  private val OA: Order<A>,
-  private val OB: Order<B>,
-  private val OC: Order<C>,
-  private val OD: Order<D>,
-  private val OE: Order<E>,
-  private val OF: Order<F>,
-  private val OG: Order<G>
-) : Order<Tuple7<A, B, C, D, E, F, G>> {
-  override fun Tuple7<A, B, C, D, E, F, G>.compare(other: Tuple7<A, B, C, D, E, F, G>): Ordering =
-    compare(OA, OB, OC, OD, OE, OF, OG, other)
+operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>>
+  Tuple7<A, B, C, D, E, F, G>.compareTo(other: Tuple7<A, B, C, D, E, F, G>): Int {
+  val first = a.compareTo(other.a)
+  return if (first == 0) {
+    val second = b.compareTo(other.b)
+    if (second == 0) {
+      val third = c.compareTo(other.c)
+      if (third == 0) {
+        val fourth = d.compareTo(other.d)
+        if (fourth == 0) {
+          val fifth = e.compareTo(other.e)
+          if (fifth == 0) {
+            val sixth = f.compareTo(other.f)
+            if (sixth == 0) g.compareTo(other.g)
+            else sixth
+          } else fifth
+        } else fourth
+      } else third
+    } else second
+  } else first
 }
-
-fun <A, B, C, D, E, F, G> Order.Companion.tuple7(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>
-): Order<Tuple7<A, B, C, D, E, F, G>> =
-  Tuple7Order(OA, OB, OC, OD, OE, OF, OG)

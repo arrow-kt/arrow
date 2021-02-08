@@ -5,6 +5,7 @@ import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKOrder
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Int
@@ -19,12 +20,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "compareTo(OA, arg1)",
-  "arrow.core.compareTo"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList().compareTo(arg1.toList())", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.compareTo(OA: Order<A>, arg1: SequenceK<A>): Int =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -39,12 +36,8 @@ fun <A> SequenceK<A>.compareTo(OA: Order<A>, arg1: SequenceK<A>): Int =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "eqv(OA, arg1)",
-  "arrow.core.eqv"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList() == arg1.toList()")
 )
 fun <A> SequenceK<A>.eqv(OA: Order<A>, arg1: SequenceK<A>): Boolean =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -59,12 +52,8 @@ fun <A> SequenceK<A>.eqv(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "lt(OA, arg1)",
-  "arrow.core.lt"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList() < arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.lt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -79,12 +68,8 @@ fun <A> SequenceK<A>.lt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "lte(OA, arg1)",
-  "arrow.core.lte"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList() <= arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.lte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -99,12 +84,8 @@ fun <A> SequenceK<A>.lte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "gt(OA, arg1)",
-  "arrow.core.gt"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList() > arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.gt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -119,12 +100,8 @@ fun <A> SequenceK<A>.gt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "gte(OA, arg1)",
-  "arrow.core.gte"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.toList() >= arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.gte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -139,12 +116,8 @@ fun <A> SequenceK<A>.gte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "max(OA, arg1)",
-  "arrow.core.max"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("maxOf(this.toList(), arg1.toList())")
 )
 fun <A> SequenceK<A>.max(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -159,12 +132,8 @@ fun <A> SequenceK<A>.max(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "min(OA, arg1)",
-  "arrow.core.min"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("minOf(this.toList(), arg1.toList())")
 )
 fun <A> SequenceK<A>.min(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -179,12 +148,8 @@ fun <A> SequenceK<A>.min(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sort(OA, arg1)",
-  "arrow.core.sort"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("sort(this.toList(), arg1.toList()).let { (a, b) -> Tuple2(b.asSequence(), a.asSequence()) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A> SequenceK<A>.sort(OA: Order<A>, arg1: SequenceK<A>): Tuple2<SequenceK<A>, SequenceK<A>> =
     arrow.core.SequenceK.order<A>(OA).run {
@@ -195,5 +160,6 @@ fun <A> SequenceK<A>.sort(OA: Order<A>, arg1: SequenceK<A>): Tuple2<SequenceK<A>
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
+@Deprecated(OrderDeprecation)
 inline fun <A> Companion.order(OA: Order<A>): SequenceKOrder<A> = object :
     arrow.core.extensions.SequenceKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }

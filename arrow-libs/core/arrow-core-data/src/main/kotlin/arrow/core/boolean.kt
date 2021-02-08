@@ -2,19 +2,10 @@ package arrow.core
 
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
-
-private object BooleanOrder : Order<Boolean> {
-  override fun Boolean.compare(b: Boolean): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Boolean.compareTo(b: Boolean): Int = this.compareTo(b)
-}
 
 private object BooleanHash : Hash<Boolean> {
   override fun Boolean.hash(): Int = this.hashCode()
 }
-
-fun Order.Companion.boolean(): Order<Boolean> =
-  BooleanOrder
 
 fun Hash.Companion.boolean(): Hash<Boolean> =
   BooleanHash

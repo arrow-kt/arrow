@@ -5,6 +5,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
@@ -49,7 +50,7 @@ interface StringShow : Show<String> {
 fun String.Companion.show(): Show<String> =
   object : StringShow {}
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Order.string()", "arrow.core.Order", "arrow.core.string"))
+@Deprecated(OrderDeprecation)
 interface StringOrder : Order<String> {
   override fun String.compare(b: String): Ordering =
     Ordering.fromInt(this.compareTo(b))
@@ -57,7 +58,7 @@ interface StringOrder : Order<String> {
   override fun String.compareTo(b: String): Int = this.compareTo(b)
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Order.string()", "arrow.core.Order", "arrow.core.string"))
+@Deprecated(OrderDeprecation)
 fun String.Companion.order(): Order<String> =
   object : StringOrder {}
 

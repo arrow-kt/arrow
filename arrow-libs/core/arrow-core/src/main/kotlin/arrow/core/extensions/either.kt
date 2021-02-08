@@ -39,6 +39,7 @@ import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
@@ -240,6 +241,7 @@ interface EitherHash<L, R> : Hash<Either<L, R>> {
     )
 }
 
+@Deprecated(OrderDeprecation)
 interface EitherOrder<L, R> : Order<Either<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>

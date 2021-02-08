@@ -4,6 +4,7 @@ import arrow.core.Tuple2
 import arrow.core.Tuple2.Companion
 import arrow.core.extensions.Tuple2Order
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Int
@@ -18,12 +19,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1).toInt()",
-    "arrow.core.compare"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
 )
 fun <A, B> Tuple2<A, B>.compareTo(
   OA: Order<A>,
@@ -41,13 +38,8 @@ fun <A, B> Tuple2<A, B>.compareTo(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1) == Ordering.LT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this == arg1")
 )
 fun <A, B> Tuple2<A, B>.eqv(
   OA: Order<A>,
@@ -65,13 +57,8 @@ fun <A, B> Tuple2<A, B>.eqv(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1) == Ordering.LT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this < arg1", "arrow.core.compareTo")
 )
 fun <A, B> Tuple2<A, B>.lt(
   OA: Order<A>,
@@ -89,13 +76,8 @@ fun <A, B> Tuple2<A, B>.lt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1) != Ordering.GT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this <= arg1", "arrow.core.compareTo")
 )
 fun <A, B> Tuple2<A, B>.lte(
   OA: Order<A>,
@@ -113,13 +95,8 @@ fun <A, B> Tuple2<A, B>.lte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1) == Ordering.GT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this > arg1", "arrow.core.compareTo")
 )
 fun <A, B> Tuple2<A, B>.gt(
   OA: Order<A>,
@@ -137,13 +114,8 @@ fun <A, B> Tuple2<A, B>.gt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Pair(this.a, this.b).compare(OA, OB, arg1) != Ordering.LT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this >= arg1", "arrow.core.compareTo")
 )
 fun <A, B> Tuple2<A, B>.gte(
   OA: Order<A>,
@@ -161,13 +133,8 @@ fun <A, B> Tuple2<A, B>.gte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "if(Pair(this.a, this.b).compare(OA, OB, arg1) == Ordering.GT) this else arg1",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("maxOf(this,arg1)")
 )
 fun <A, B> Tuple2<A, B>.max(
   OA: Order<A>,
@@ -185,13 +152,8 @@ fun <A, B> Tuple2<A, B>.max(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "if(Pair(this.a, this.b).compare(OA, OB, arg1) == Ordering.LT) this else arg1",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("minOf(this,arg1)")
 )
 fun <A, B> Tuple2<A, B>.min(
   OA: Order<A>,
@@ -209,13 +171,8 @@ fun <A, B> Tuple2<A, B>.min(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "if(Pair(this.a, this.b).compare(OA, OB, arg1) != Ordering.LT) Tuple2(this, b) else Tuple2(arg1, this)",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A, B> Tuple2<A, B>.sort(
   OA: Order<A>,
@@ -229,15 +186,7 @@ fun <A, B> Tuple2<A, B>.sort(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "Tuple2 is deprecated in favor of Kotlin's Pair. Use Pair functionality.",
-  ReplaceWith(
-    "Order.pair(OA, OB)",
-    "arrow.core.Order",
-    "arrow.core.pair"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 inline fun <A, B> Companion.order(OA: Order<A>, OB: Order<B>): Tuple2Order<A, B> = object :
     arrow.core.extensions.Tuple2Order<A, B> { override fun OA(): arrow.typeclasses.Order<A> = OA
 

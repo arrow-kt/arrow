@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semiring
 
@@ -26,20 +25,12 @@ private object ByteSemiring : Semiring<Byte> {
   override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
 }
 
-private object ByteOrder : Order<Byte> {
-  override fun Byte.compare(b: Byte): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Byte.compareTo(b: Byte): Int = this.compareTo(b)
-}
-
 private object ByteHash : Hash<Byte> {
   override fun Byte.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.byte(): Hash<Byte> =
   ByteHash
-
-fun Order.Companion.byte(): Order<Byte> =
-  ByteOrder
 
 fun Semigroup.Companion.byte(): Semigroup<Byte> =
   ByteSemigroup
@@ -70,20 +61,12 @@ private object DoubleSemiring : Semiring<Double> {
   override fun Double.combineMultiplicate(b: Double): Double = this * b
 }
 
-private object DoubleOrder : Order<Double> {
-  override fun Double.compare(b: Double): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Double.compareTo(b: Double): Int = this.compareTo(b)
-}
-
 private object DoubleHash : Hash<Double> {
   override fun Double.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.double(): Hash<Double> =
   DoubleHash
-
-fun Order.Companion.double(): Order<Double> =
-  DoubleOrder
 
 fun Semigroup.Companion.double(): Semigroup<Double> =
   DoubleSemigroup
@@ -114,20 +97,12 @@ private object IntSemiring : Semiring<Int> {
   override fun Int.combineMultiplicate(b: Int): Int = this * b
 }
 
-private object IntOrder : Order<Int> {
-  override fun Int.compare(b: Int): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Int.compareTo(b: Int): Int = this.compareTo(b)
-}
-
 private object IntHash : Hash<Int> {
   override fun Int.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.int(): Hash<Int> =
   IntHash
-
-fun Order.Companion.int(): Order<Int> =
-  IntOrder
 
 fun Semigroup.Companion.int(): Semigroup<Int> =
   IntSemigroup
@@ -158,20 +133,12 @@ private object LongSemiring : Semiring<Long> {
   override fun Long.combineMultiplicate(b: Long): Long = this * b
 }
 
-private object LongOrder : Order<Long> {
-  override fun Long.compare(b: Long): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Long.compareTo(b: Long): Int = this.compareTo(b)
-}
-
 private object LongHash : Hash<Long> {
   override fun Long.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.long(): Hash<Long> =
   LongHash
-
-fun Order.Companion.long(): Order<Long> =
-  LongOrder
 
 fun Semigroup.Companion.long(): Semigroup<Long> =
   LongSemigroup
@@ -202,20 +169,12 @@ private object ShortSemiring : Semiring<Short> {
   override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
 }
 
-private object ShortOrder : Order<Short> {
-  override fun Short.compare(b: Short): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Short.compareTo(b: Short): Int = this.compareTo(b)
-}
-
 private object ShortHash : Hash<Short> {
   override fun Short.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.short(): Hash<Short> =
   ShortHash
-
-fun Order.Companion.short(): Order<Short> =
-  ShortOrder
 
 fun Semigroup.Companion.short(): Semigroup<Short> =
   ShortSemigroup
@@ -246,20 +205,12 @@ private object FloatSemiring : Semiring<Float> {
   override fun Float.combineMultiplicate(b: Float): Float = this * b
 }
 
-private object FloatOrder : Order<Float> {
-  override fun Float.compare(b: Float): Ordering = Ordering.fromInt(this.compareTo(b))
-  override fun Float.compareTo(b: Float): Int = this.compareTo(b)
-}
-
 private object FloatHash : Hash<Float> {
   override fun Float.hash(): Int = hashCode()
 }
 
 fun Hash.Companion.float(): Hash<Float> =
   FloatHash
-
-fun Order.Companion.float(): Order<Float> =
-  FloatOrder
 
 fun Semigroup.Companion.float(): Semigroup<Float> =
   FloatSemigroup

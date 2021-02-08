@@ -2,10 +2,8 @@ package arrow.core
 
 import arrow.Kind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -246,16 +244,6 @@ inline fun <A> A.const(): Const<A, Nothing> =
 fun <A, T, U> Const<A, T>.contramap(f: (U) -> T): Const<A, U> =
   retag()
 
-fun <A, T> Const<A, T>.eqv(EQ: Eq<A>, b: Const<A, T>): Boolean =
-  EQ.run {
-    value().eqv(b.value())
-  }
-
-fun <A, T> Eq.Companion.const(EQ: Eq<A>): Eq<Const<A, T>> = object : Eq<Const<A, T>> {
-  override fun Const<A, T>.eqv(b: Const<A, T>): Boolean =
-    eqv(EQ, b)
-}
-
 @Deprecated(
   "Hash is going to be removed, please use hashCode() instead",
   ReplaceWith("hashCode()"),
@@ -266,15 +254,8 @@ fun <A, T> Const<A, T>.hashWithSalt(HA: Hash<A>, salt: Int): Int =
     value().hashWithSalt(salt)
   }
 
-@Deprecated(
-  "Order is going to be removed, please use compareTo() instead",
-  ReplaceWith("compareTo(b)"),
-  level = DeprecationLevel.WARNING
-)
-fun <A, T> Const<A, T>.compare(ORD: Order<A>, b: Const<A, T>): Ordering =
-  ORD.run {
-    value().compare(b.value())
-  }
+operator fun <A : Comparable<A>, T> Const<A, T>.compareTo(other: Const<A, T>): Int =
+  value().compareTo(other.value())
 
 fun <A, T> Semigroup.Companion.const(SA: Semigroup<A>): Semigroup<Const<A, T>> =
   object : Semigroup<Const<A, T>> {

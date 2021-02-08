@@ -6,6 +6,8 @@ import arrow.core.LT
 import arrow.core.Ordering
 import arrow.core.Tuple2
 
+const val OrderDeprecation = "Order is deprecated in favor of compareTo(), since Kotlin's Std doesn't take Order into account"
+
 /**
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *
@@ -14,6 +16,7 @@ import arrow.core.Tuple2
  * @see [Eq]
  * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/order/">Order documentation</a>
  */
+@Deprecated(OrderDeprecation)
 interface Order<F> : Eq<F> {
 
   /**

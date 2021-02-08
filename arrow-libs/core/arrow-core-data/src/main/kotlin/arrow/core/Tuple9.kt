@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
@@ -112,53 +110,30 @@ fun <A, B, C, D, E, F, G, H, I> Hash.Companion.tuple9(
 ): Hash<Tuple9<A, B, C, D, E, F, G, H, I>> =
   Tuple9Hash(HA, HB, HC, HD, HE, HF, HG, HH, HI)
 
-fun <A, B, C, D, E, F, G, H, I> Tuple9<A, B, C, D, E, F, G, H, I>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>,
-  OH: Order<H>,
-  OI: Order<I>,
-  other: Tuple9<A, B, C, D, E, F, G, H, I>
-): Ordering = listOf(
-  OA.run { a.compare(other.a) },
-  OB.run { b.compare(other.b) },
-  OC.run { c.compare(other.c) },
-  OD.run { d.compare(other.d) },
-  OE.run { e.compare(other.e) },
-  OF.run { f.compare(other.f) },
-  OG.run { g.compare(other.g) },
-  OH.run { h.compare(other.h) },
-  OI.run { i.compare(other.i) }
-).fold(Monoid.ordering())
-
-private class Tuple9Order<A, B, C, D, E, F, G, H, I>(
-  private val OA: Order<A>,
-  private val OB: Order<B>,
-  private val OC: Order<C>,
-  private val OD: Order<D>,
-  private val OE: Order<E>,
-  private val OF: Order<F>,
-  private val OG: Order<G>,
-  private val OH: Order<H>,
-  private val OI: Order<I>
-) : Order<Tuple9<A, B, C, D, E, F, G, H, I>> {
-  override fun Tuple9<A, B, C, D, E, F, G, H, I>.compare(other: Tuple9<A, B, C, D, E, F, G, H, I>): Ordering =
-    compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, other)
+operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>>
+  Tuple9<A, B, C, D, E, F, G, H, I>.compareTo(other: Tuple9<A, B, C, D, E, F, G, H, I>): Int {
+  val first = a.compareTo(other.a)
+  return if (first == 0) {
+    val second = b.compareTo(other.b)
+    if (second == 0) {
+      val third = c.compareTo(other.c)
+      if (third == 0) {
+        val fourth = d.compareTo(other.d)
+        if (fourth == 0) {
+          val fifth = e.compareTo(other.e)
+          if (fifth == 0) {
+            val sixth = f.compareTo(other.f)
+            if (sixth == 0) {
+              val seventh = g.compareTo(other.g)
+              if (seventh == 0) {
+                val eigth = h.compareTo(other.h)
+                if (eigth == 0) i.compareTo(other.i)
+                else eigth
+              } else seventh
+            } else sixth
+          } else fifth
+        } else fourth
+      } else third
+    } else second
+  } else first
 }
-
-fun <A, B, C, D, E, F, G, H, I> Order.Companion.tuple9(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>,
-  OH: Order<H>,
-  OI: Order<I>,
-): Order<Tuple9<A, B, C, D, E, F, G, H, I>> =
-  Tuple9Order(OA, OB, OC, OD, OE, OF, OG, OH, OI)

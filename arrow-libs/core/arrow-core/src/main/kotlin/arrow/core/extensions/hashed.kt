@@ -12,6 +12,7 @@ import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Show
 import arrow.typeclasses.hashWithSalt
 
@@ -33,6 +34,7 @@ interface HashedEqK : EqK<ForHashed> {
 }
 
 @extension
+@Deprecated(OrderDeprecation)
 interface HashedOrder<A> : Order<Hashed<A>> {
   fun ORD(): Order<A>
   override fun Hashed<A>.compare(b: Hashed<A>): Ordering = ORD().run { value.compare(b.value) }

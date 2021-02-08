@@ -5,6 +5,7 @@ import arrow.core.Tuple10.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.Tuple10Order
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Int
@@ -19,12 +20,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1).toInt()",
-  "arrow.core.compare"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.compareTo(
   OA: Order<A>,
@@ -51,13 +48,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.compare
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) == Ordering.EQ",
-  "arrow.core.compare",
-  "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this == arg1")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.eqv(
   OA: Order<A>,
@@ -84,13 +76,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.eqv(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) == Ordering.LT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this < arg1", "arrow.core.compareTo")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lt(
   OA: Order<A>,
@@ -117,13 +104,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) != Ordering.GT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this <= arg1", "arrow.core.compareTo")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lte(
   OA: Order<A>,
@@ -150,13 +132,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) == Ordering.GT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this > arg1", "arrow.core.compareTo")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gt(
   OA: Order<A>,
@@ -183,13 +160,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gt(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) != Ordering.LT",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this >= arg1", "arrow.core.compareTo")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gte(
   OA: Order<A>,
@@ -216,13 +188,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gte(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) == Ordering.GT) this else arg1",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("maxOf(this,arg1)")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.max(
   OA: Order<A>,
@@ -249,13 +216,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.max(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) == Ordering.LT) this else arg1",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("minOf(this,arg1)")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.min(
   OA: Order<A>,
@@ -282,13 +244,8 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.min(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "if(compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, arg1) != Ordering.LT) Tuple2(this, b) else Tuple2(arg1, this)",
-    "arrow.core.compare",
-    "arrow.core.Ordering"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.sort(
   OA: Order<A>,
@@ -313,15 +270,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.sort(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Order.tuple10(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ)",
-    "arrow.core.Order",
-    "arrow.core.tuple10"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 inline fun <A, B, C, D, E, F, G, H, I, J> Companion.order(
   OA: Order<A>,
   OB: Order<B>,

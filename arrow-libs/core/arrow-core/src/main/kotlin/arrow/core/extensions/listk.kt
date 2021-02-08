@@ -43,6 +43,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -199,6 +200,7 @@ interface ListKHash<A> : Hash<ListKOf<A>> {
     HA().run { foldLeft(salt) { hash, x -> x.hashWithSalt(hash) } }.hashWithSalt(fix().size)
 }
 
+@Deprecated(OrderDeprecation)
 interface ListKOrder<A> : Order<ListKOf<A>> {
   fun OA(): Order<A>
   override fun ListKOf<A>.compare(b: ListKOf<A>): Ordering =

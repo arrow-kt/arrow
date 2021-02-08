@@ -4,8 +4,6 @@
 package arrow.core
 
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
@@ -120,57 +118,33 @@ fun <A, B, C, D, E, F, G, H, I, J> Hash.Companion.tuple10(
 ): Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
   Tuple10Hash(HA, HB, HC, HD, HE, HF, HG, HH, HI, HJ)
 
-fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>,
-  OH: Order<H>,
-  OI: Order<I>,
-  OJ: Order<J>,
-  other: Tuple10<A, B, C, D, E, F, G, H, I, J>
-): Ordering = listOf(
-  OA.run { a.compare(other.a) },
-  OB.run { b.compare(other.b) },
-  OC.run { c.compare(other.c) },
-  OD.run { d.compare(other.d) },
-  OE.run { e.compare(other.e) },
-  OF.run { f.compare(other.f) },
-  OG.run { g.compare(other.g) },
-  OH.run { h.compare(other.h) },
-  OI.run { i.compare(other.i) },
-  OJ.run { j.compare(other.j) }
-).fold(Monoid.ordering())
-
-private class Tuple10Order<A, B, C, D, E, F, G, H, I, J>(
-  private val OA: Order<A>,
-  private val OB: Order<B>,
-  private val OC: Order<C>,
-  private val OD: Order<D>,
-  private val OE: Order<E>,
-  private val OF: Order<F>,
-  private val OG: Order<G>,
-  private val OH: Order<H>,
-  private val OI: Order<I>,
-  private val OJ: Order<J>,
-) : Order<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-  override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.compare(other: Tuple10<A, B, C, D, E, F, G, H, I, J>): Ordering =
-    compare(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ, other)
+operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>, J : Comparable<J>>
+  Tuple10<A, B, C, D, E, F, G, H, I, J>.compareTo(other: Tuple10<A, B, C, D, E, F, G, H, I, J>): Int {
+  val first = a.compareTo(other.a)
+  return if (first == 0) {
+    val second = b.compareTo(other.b)
+    if (second == 0) {
+      val third = c.compareTo(other.c)
+      if (third == 0) {
+        val fourth = d.compareTo(other.d)
+        if (fourth == 0) {
+          val fifth = e.compareTo(other.e)
+          if (fifth == 0) {
+            val sixth = f.compareTo(other.f)
+            if (sixth == 0) {
+              val seventh = g.compareTo(other.g)
+              if (seventh == 0) {
+                val eigth = h.compareTo(other.h)
+                if (eigth == 0) {
+                  val ninth = i.compareTo(other.i)
+                  if (ninth == 0) j.compareTo(other.j)
+                  else ninth
+                } else eigth
+              } else seventh
+            } else sixth
+          } else fifth
+        } else fourth
+      } else third
+    } else second
+  } else first
 }
-
-fun <A, B, C, D, E, F, G, H, I, J> Order.Companion.tuple10(
-  OA: Order<A>,
-  OB: Order<B>,
-  OC: Order<C>,
-  OD: Order<D>,
-  OE: Order<E>,
-  OF: Order<F>,
-  OG: Order<G>,
-  OH: Order<H>,
-  OI: Order<I>,
-  OJ: Order<J>
-): Order<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-  Tuple10Order(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ)

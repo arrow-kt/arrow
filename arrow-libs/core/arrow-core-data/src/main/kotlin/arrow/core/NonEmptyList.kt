@@ -3,14 +3,14 @@ package arrow.core
 import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForNonEmptyList private constructor() { companion object }
+class ForNonEmptyList private constructor() {
+  companion object
+}
 typealias NonEmptyListOf<A> = arrow.Kind<ForNonEmptyList, A>
 
 @Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
@@ -510,10 +510,8 @@ fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonE
 fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
   fix().plus(y.fix())
 
-fun <A> NonEmptyList<A>.compare(OA: Order<A>, b: NonEmptyList<A>): Ordering = OA.run {
-  align(b) { ior -> ior.fold({ GT }, { LT }, { a1, a2 -> a1.compare(a2) }) }
-    .fold(Monoid.ordering())
-}
+operator fun <A : Comparable<A>> NonEmptyList<A>.compareTo(other: NonEmptyList<A>): Int =
+  all.compareTo(other.all)
 
 fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
   this.flatMap(::identity)
@@ -525,11 +523,11 @@ fun <A, B> NonEmptyList<Tuple2<A, B>>.unzip(): Tuple2<NonEmptyList<A>, NonEmptyL
   this.unzipWith(::identity)
 
 fun <A, B, C> NonEmptyList<C>.unzipWith(f: (C) -> Tuple2<A, B>): Tuple2<NonEmptyList<A>, NonEmptyList<B>> =
- this.map(f).let { nel ->
-   nel.tail.unzip().bimap(
-     { NonEmptyList(nel.head.a, it) },
-     { NonEmptyList(nel.head.b, it) })
- }
+  this.map(f).let { nel ->
+    nel.tail.unzip().bimap(
+      { NonEmptyList(nel.head.a, it) },
+      { NonEmptyList(nel.head.b, it) })
+  }
 
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =
   foldRight(f(head).map { NonEmptyList.just(it) }) { a, acc ->
@@ -581,81 +579,8 @@ fun <E, A> NonEmptyList<Validated<E, NonEmptyList<A>>>.flatSequenceValidated(sem
 fun <E> NonEmptyList<Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
   traverseValidated_(semigroup, ::identity)
 
-/**
- * Check if [this@lt] is `lower than` [b]
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@lt]
- * @returns true if [this@lt] is `lower than` [b] and false otherwise
- */
-fun <A> NonEmptyList<A>.lt(OA: Order<A>, b: NonEmptyList<A>): Boolean =
-  compare(OA, b) == LT
-
-/**
- * Check if [this@lte] is `lower than or equal to` [b]
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@lte]
- * @returns true if [this@lte] is `lower than or equal to` [b] and false otherwise
- */
-fun <A> NonEmptyList<A>.lte(OA: Order<A>, b: NonEmptyList<A>): Boolean =
-  compare(OA, b) != GT
-
-/**
- * Check if [this@gt] is `greater than` [b]
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@gt]
- * @returns true if [this@gt] is `greater than` [b] and false otherwise
- */
-fun <A> NonEmptyList<A>.gt(OA: Order<A>, b: NonEmptyList<A>): Boolean =
-  compare(OA, b) == GT
-
-/**
- * Check if [this@gte] is `greater than or equal to` [b]
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@gte]
- * @returns true if [this@gte] is `greater than or equal to` [b] and false otherwise
- */
-fun <A> NonEmptyList<A>.gte(OA: Order<A>, b: NonEmptyList<A>): Boolean =
-  compare(OA, b) != LT
-
-/**
- * Determines the maximum of [this@max] and [b] in terms of order.
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@max]
- * @returns the maximum [this@max] if it is greater than [b] or [b] otherwise
- */
-fun <A> NonEmptyList<A>.max(OA: Order<A>, b: NonEmptyList<A>): NonEmptyList<A> =
-  if (gt(OA, b)) this else b
-
-/**
- * Determines the minimum of [this@min] and [b] in terms of order.
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@min]
- * @returns the minimum [this@min] if it is less than [b] or [b] otherwise
- */
-fun <A> NonEmptyList<A>.min(OA: Order<A>, b: NonEmptyList<A>): NonEmptyList<A> =
-  if (lt(OA, b)) this else b
-
-/**
- * Sorts [this@sort] and [b] in terms of order.
- *
- * @receiver object to compare with [b]
- * @param b object to compare with [this@sort]
- * @returns a sorted [Tuple2] of [this@sort] and [b].
- */
-fun <A> NonEmptyList<A>.sort(OA: Order<A>, b: NonEmptyList<A>): Tuple2<NonEmptyList<A>, NonEmptyList<A>> =
-  if (gte(OA, b)) Tuple2(this, b) else Tuple2(b, this)
-
 fun <A> Hash.Companion.nonEmptyList(HA: Hash<A>): Hash<NonEmptyList<A>> =
   NonEmptyListHash(HA)
-
-fun <A> Order.Companion.nonEmptyList(OA: Order<A>): Order<NonEmptyList<A>> =
-  NonEmptyListOrder(OA)
 
 @Suppress("UNCHECKED_CAST")
 fun <A> Semigroup.Companion.nonEmptyList(): Semigroup<NonEmptyList<A>> =
@@ -667,12 +592,6 @@ private class NonEmptyListHash<A>(
   override fun NonEmptyList<A>.hash(): Int = hash(HA)
 
   override fun NonEmptyList<A>.hashWithSalt(salt: Int): Int = hashWithSalt(HA, salt)
-}
-
-private class NonEmptyListOrder<A>(
-  private val OA: Order<A>
-) : Order<NonEmptyList<A>> {
-  override fun NonEmptyList<A>.compare(b: NonEmptyList<A>): Ordering = compare(OA, b)
 }
 
 object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {

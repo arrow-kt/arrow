@@ -5,6 +5,7 @@ import arrow.core.NonEmptyList.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.NonEmptyListOrder
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.Int
@@ -19,12 +20,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "compareTo(OA, arg1)",
-  "arrow.core.compareTo"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
 )
 fun <A> NonEmptyList<A>.compareTo(OA: Order<A>, arg1: NonEmptyList<A>): Int =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -39,12 +36,8 @@ fun <A> NonEmptyList<A>.compareTo(OA: Order<A>, arg1: NonEmptyList<A>): Int =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "eqv(OA, arg1)",
-  "arrow.core.eqv"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this == arg1")
 )
 fun <A> NonEmptyList<A>.eqv(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -59,12 +52,8 @@ fun <A> NonEmptyList<A>.eqv(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "lt(OA, arg1)",
-  "arrow.core.lt"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this < arg1", "arrow.core.compareTo")
 )
 fun <A> NonEmptyList<A>.lt(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -79,12 +68,8 @@ fun <A> NonEmptyList<A>.lt(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "lte(OA, arg1)",
-  "arrow.core.lte"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this <= arg1", "arrow.core.compareTo")
 )
 fun <A> NonEmptyList<A>.lte(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -99,12 +84,8 @@ fun <A> NonEmptyList<A>.lte(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "gt(OA, arg1)",
-  "arrow.core.gt"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this > arg1", "arrow.core.compareTo")
 )
 fun <A> NonEmptyList<A>.gt(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -119,12 +100,8 @@ fun <A> NonEmptyList<A>.gt(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "gte(OA, arg1)",
-  "arrow.core.gte"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("this >= arg1", "arrow.core.compareTo")
 )
 fun <A> NonEmptyList<A>.gte(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -139,12 +116,8 @@ fun <A> NonEmptyList<A>.gte(OA: Order<A>, arg1: NonEmptyList<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "max(OA, arg1)",
-  "arrow.core.max"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("maxOf(this,arg1)")
 )
 fun <A> NonEmptyList<A>.max(OA: Order<A>, arg1: NonEmptyList<A>): NonEmptyList<A> =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -159,12 +132,8 @@ fun <A> NonEmptyList<A>.max(OA: Order<A>, arg1: NonEmptyList<A>): NonEmptyList<A
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "min(OA, arg1)",
-  "arrow.core.min"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("minOf(this,arg1)")
 )
 fun <A> NonEmptyList<A>.min(OA: Order<A>, arg1: NonEmptyList<A>): NonEmptyList<A> =
     arrow.core.NonEmptyList.order<A>(OA).run {
@@ -179,12 +148,8 @@ fun <A> NonEmptyList<A>.min(OA: Order<A>, arg1: NonEmptyList<A>): NonEmptyList<A
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sort(OA, arg1)",
-  "arrow.core.sort"
-  ),
-  DeprecationLevel.WARNING
+  OrderDeprecation,
+  ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A> NonEmptyList<A>.sort(OA: Order<A>, arg1: NonEmptyList<A>): Tuple2<NonEmptyList<A>,
     NonEmptyList<A>> = arrow.core.NonEmptyList.order<A>(OA).run {
@@ -195,14 +160,7 @@ fun <A> NonEmptyList<A>.sort(OA: Order<A>, arg1: NonEmptyList<A>): Tuple2<NonEmp
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "@extension projected functions are deprecated",
-  ReplaceWith(
-    "Order.nonEmptyList(OA)",
-    "arrow.core.nonEmptyList", "arrow.core.Order"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(OrderDeprecation)
 inline fun <A> Companion.order(OA: Order<A>): NonEmptyListOrder<A> = object :
     arrow.core.extensions.NonEmptyListOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA
     }

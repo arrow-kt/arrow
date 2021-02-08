@@ -5,7 +5,6 @@ package arrow.core
 
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -99,28 +98,11 @@ fun <A, B> Hash.Companion.pair(
 ): Hash<Pair<A, B>> =
   PairHash(HA, HB)
 
-fun <A, B> Pair<A, B>.compare(
-  OA: Order<A>,
-  OB: Order<B>,
-  other: Pair<A, B>
-): Ordering = listOf(
-  OA.run { first.compare(other.first) },
-  OB.run { second.compare(other.second) }
-).fold(Monoid.ordering())
-
-private class PairOrder<A, B>(
-  private val OA: Order<A>,
-  private val OB: Order<B>
-) : Order<Pair<A, B>> {
-  override fun Pair<A, B>.compare(other: Pair<A, B>): Ordering =
-    compare(OA, OB, other)
+operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(other: Pair<A, B>): Int {
+  val first = first.compareTo(other.first)
+  return if (first == 0) second.compareTo(other.second)
+  else first
 }
-
-fun <A, B> Order.Companion.pair(
-  OA: Order<A>,
-  OB: Order<B>
-): Order<Pair<A, B>> =
-  PairOrder(OA, OB)
 
 fun <A, B> Semigroup.Companion.pair(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Pair<A, B>> =
   PairSemigroup(SA, SB)

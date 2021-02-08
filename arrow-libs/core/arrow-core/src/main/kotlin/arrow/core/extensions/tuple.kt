@@ -38,6 +38,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -196,6 +197,7 @@ interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>> {
     HA().run { HB().run { a.hashWithSalt(b.hashWithSalt(salt)) } }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple2Order<A, B> : Order<Tuple2<A, B>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -237,6 +239,7 @@ interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>> {
     HA().run { HB().run { HC().run { a.hashWithSalt(b.hashWithSalt(c.hashWithSalt(salt))) } } }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple3Order<A, B, C> : Order<Tuple3<A, B, C>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -284,6 +287,7 @@ interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>> {
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple4Order<A, B, C, D> : Order<Tuple4<A, B, C, D>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -348,6 +352,7 @@ interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>> {
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple5Order<A, B, C, D, E> : Order<Tuple5<A, B, C, D, E>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -421,6 +426,7 @@ interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>> {
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple6Order<A, B, C, D, E, F> : Order<Tuple6<A, B, C, D, E, F>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -515,6 +521,7 @@ interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>> {
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple7Order<A, B, C, D, E, F, G> : Order<Tuple7<A, B, C, D, E, F, G>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -614,6 +621,7 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple8Order<A, B, C, D, E, F, G, H> : Order<Tuple8<A, B, C, D, E, F, G, H>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -723,6 +731,7 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple9Order<A, B, C, D, E, F, G, H, I> : Order<Tuple9<A, B, C, D, E, F, G, H, I>> {
   fun OA(): Order<A>
   fun OB(): Order<B>
@@ -833,6 +842,7 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
     }
 }
 
+@Deprecated(OrderDeprecation)
 interface Tuple10Order<A, B, C, D, E, F, G, H, I, J> : Order<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   fun OA(): Order<A>
   fun OB(): Order<B>

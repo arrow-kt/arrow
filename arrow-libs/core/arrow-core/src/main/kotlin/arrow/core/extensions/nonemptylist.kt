@@ -32,6 +32,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Order
+import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
@@ -176,6 +177,7 @@ interface NonEmptyListHash<A> : Hash<NonEmptyList<A>> {
     HA().run { head.hashWithSalt(ListK.hash(HA()).run { tail.k().hashWithSalt(salt) }) }
 }
 
+@Deprecated(OrderDeprecation)
 interface NonEmptyListOrder<A> : Order<NonEmptyList<A>> {
   fun OA(): Order<A>
   override fun NonEmptyList<A>.compare(b: NonEmptyList<A>): Ordering =
