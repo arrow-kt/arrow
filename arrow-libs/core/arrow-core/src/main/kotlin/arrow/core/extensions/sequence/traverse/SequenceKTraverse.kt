@@ -5,11 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.extensions.SequenceKTraverse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("traverse")
@@ -20,12 +15,8 @@ import kotlin.sequences.Sequence
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse(arg1, arg2)",
-  "arrow.core.traverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with traverseEither or traverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
     Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
@@ -41,12 +32,8 @@ fun <G, A, B> Sequence<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence(arg1)",
-  "arrow.core.sequence"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForSequenceK, A>> =
     arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
@@ -64,8 +51,7 @@ fun <G, A> Sequence<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<For
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -82,12 +68,8 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "flatTraverse(arg1, arg2, arg3)",
-  "arrow.core.flatTraverse"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with flatTraverseEither or flatTraverseValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.flatTraverse(
   arg1: Monad<ForSequenceK>,
@@ -106,9 +88,17 @@ fun <G, A, B> Sequence<A>.flatTraverse(
 internal val traverse_singleton: SequenceKTraverse = object :
     arrow.core.extensions.SequenceKTraverse {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Traverse typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun traverse(): SequenceKTraverse = traverse_singleton}

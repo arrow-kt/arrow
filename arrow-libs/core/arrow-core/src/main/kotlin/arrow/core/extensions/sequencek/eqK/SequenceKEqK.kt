@@ -5,11 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKEqK
 import arrow.typeclasses.Eq
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -25,10 +20,9 @@ internal val eqK_singleton: SequenceKEqK = object : arrow.core.extensions.Sequen
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "this.toList() == arg1.toList()"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,12 +39,8 @@ fun <A> Kind<ForSequenceK, A>.eqK(arg1: Kind<ForSequenceK, A>, arg2: Eq<A>): Boo
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.SequenceK.liftEq"
-  ),
-  DeprecationLevel.WARNING
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.SequenceK
    .eqK()
@@ -59,5 +49,9 @@ fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.SequenceK
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.eqK(): SequenceKEqK = eqK_singleton

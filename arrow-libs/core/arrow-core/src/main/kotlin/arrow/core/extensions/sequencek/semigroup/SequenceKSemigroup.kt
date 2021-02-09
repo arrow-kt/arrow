@@ -3,11 +3,6 @@ package arrow.core.extensions.sequencek.semigroup
 import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKSemigroup
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -25,8 +20,7 @@ internal val semigroup_singleton: SequenceKSemigroup<Any?> = object : SequenceKS
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plus(arg1)",
-  "arrow.core.plus"
+    "this + arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,8 +39,7 @@ operator fun <A> SequenceK<A>.plus(arg1: SequenceK<A>): SequenceK<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "maybeCombine(arg1)",
-  "arrow.core.maybeCombine"
+    "(arg1?.plus(this) ?: emptySequence<A>())"
   ),
   DeprecationLevel.WARNING
 )
@@ -58,6 +51,14 @@ fun <A> SequenceK<A>.maybeCombine(arg1: SequenceK<A>): SequenceK<A> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "@extension projected functions are deprecated",
+  ReplaceWith(
+    "Semigroup.sequence<A>()",
+    "arrow.core.sequence", "arrow.typeclasses.Semigroup"
+  ),
+  DeprecationLevel.WARNING
 )
 inline fun <A> Companion.semigroup(): SequenceKSemigroup<A> = semigroup_singleton as
     arrow.core.extensions.SequenceKSemigroup<A>

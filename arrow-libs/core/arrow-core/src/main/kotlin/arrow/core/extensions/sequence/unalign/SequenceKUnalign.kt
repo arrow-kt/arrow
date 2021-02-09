@@ -5,11 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.Ior
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKUnalign
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("unalign")
@@ -22,8 +17,8 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unalign(arg0)",
-  "arrow.core.extensions.sequence.unalign.Sequence.unalign"
+    "arg0.unalign()",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
@@ -43,8 +38,8 @@ fun <A, B> unalign(arg0: Sequence<Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>, Kin
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unalignWith(arg0, arg1)",
-  "arrow.core.extensions.sequence.unalign.Sequence.unalignWith"
+    "arg0.unalign(arg1)",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
@@ -63,9 +58,17 @@ fun <A, B, C> unalignWith(arg0: Sequence<C>, arg1: Function1<C, Ior<A, B>>):
 internal val unalign_singleton: SequenceKUnalign = object : arrow.core.extensions.SequenceKUnalign
     {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Unalign typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun unalign(): SequenceKUnalign = unalign_singleton}

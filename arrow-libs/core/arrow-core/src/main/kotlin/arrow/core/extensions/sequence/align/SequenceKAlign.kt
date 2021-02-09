@@ -1,10 +1,6 @@
 package arrow.core.extensions.sequence.align
 
 import arrow.core.extensions.SequenceKAlign
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("empty")
@@ -17,8 +13,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "empty()",
-  "arrow.core.extensions.sequence.align.Sequence.empty"
+    "emptySequence<A>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -33,9 +28,17 @@ fun <A> empty(): Sequence<A> =
 @PublishedApi()
 internal val align_singleton: SequenceKAlign = object : arrow.core.extensions.SequenceKAlign {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Align typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun align(): SequenceKAlign = align_singleton}

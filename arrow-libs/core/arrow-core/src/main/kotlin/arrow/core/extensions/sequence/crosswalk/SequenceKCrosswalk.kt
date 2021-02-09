@@ -4,11 +4,6 @@ import arrow.Kind
 import arrow.core.ForSequenceK
 import arrow.core.extensions.SequenceKCrosswalk
 import arrow.typeclasses.Align
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("crosswalk")
@@ -19,12 +14,8 @@ import kotlin.sequences.Sequence
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "crosswalk(arg0, arg1, arg2)",
-  "arrow.core.extensions.sequence.crosswalk.Sequence.crosswalk"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with crosswalk, crosswalkMap or crosswalkNull from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A, B> crosswalk(
   arg0: Align<F>,
@@ -43,12 +34,8 @@ fun <F, A, B> crosswalk(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequenceL(arg0, arg1)",
-  "arrow.core.extensions.sequence.crosswalk.Sequence.sequenceL"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A> sequenceL(arg0: Align<F>, arg1: Sequence<Kind<F, A>>): Kind<F, Kind<ForSequenceK, A>> =
     arrow.core.extensions.sequence.crosswalk.Sequence
@@ -63,9 +50,17 @@ fun <F, A> sequenceL(arg0: Align<F>, arg1: Sequence<Kind<F, A>>): Kind<F, Kind<F
 internal val crosswalk_singleton: SequenceKCrosswalk = object :
     arrow.core.extensions.SequenceKCrosswalk {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Crosswalk typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun crosswalk(): SequenceKCrosswalk = crosswalk_singleton}

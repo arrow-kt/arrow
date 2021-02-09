@@ -4,12 +4,6 @@ import arrow.Kind
 import arrow.core.ForSequenceK
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKFunctor
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 /**
@@ -43,8 +37,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -63,8 +56,7 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -106,8 +98,7 @@ fun <A, B> Sequence<A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "lift(arg0)",
-  "arrow.core.extensions.sequence.functor.Sequence.lift"
+    "{ s: Sequence<A> -> s.map(arg0) }"
   ),
   DeprecationLevel.WARNING
 )
@@ -127,8 +118,8 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForSequenceK, A>, Kind<Fo
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+    "this.void()",
+    "arrow.core.void"
   ),
   DeprecationLevel.WARNING
 )
@@ -144,12 +135,8 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
  *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.sequencek.functor.*
- * import arrow.core.*
- *
- *
  *  import arrow.core.extensions.sequencek.applicative.just
+ *  import arrow.core.fproduct
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -170,8 +157,8 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+    "this.fproduct(arg1)",
+    "arrow.core.fproduct"
   ),
   DeprecationLevel.WARNING
 )
@@ -187,12 +174,8 @@ fun <A, B> Sequence<A>.fproduct(arg1: Function1<A, B>): Sequence<Tuple2<A, B>> =
  *  Kind<F, A> -> Kind<F, B>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.sequencek.functor.*
- * import arrow.core.*
- *
- *
- *  import arrow.core.extensions.sequencek.applicative.just
+ *  import arrow.core.extensions.sequence.applicative.just
+ *  import arrow.core.mapConst
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -213,8 +196,8 @@ fun <A, B> Sequence<A>.fproduct(arg1: Function1<A, B>): Sequence<Tuple2<A, B>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "this.mapConst(arg1)",
+    "arrow.core.mapConst"
   ),
   DeprecationLevel.WARNING
 )
@@ -236,8 +219,8 @@ fun <A, B> Sequence<A>.mapConst(arg1: B): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)",
-  "arrow.core.mapConst"
+    "arg1.mapConst(this)",
+    "arrow.core.mapConst"
   ),
   DeprecationLevel.WARNING
 )
@@ -252,12 +235,8 @@ fun <A, B> A.mapConst(arg1: Sequence<B>): Sequence<A> =
  *  Kind<F, A> -> Kind<F, Tuple2<B, A>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.sequencek.functor.*
- * import arrow.core.*
- *
- *
- *  import arrow.core.extensions.sequencek.applicative.just
+ *  import arrow.core.extensions.sequence.applicative.just
+ *  import arrow.core.tupleLeft
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -278,8 +257,8 @@ fun <A, B> A.mapConst(arg1: Sequence<B>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+    "this.tupleLeft(arg1)",
+    "arrow.core.tupleLeft"
   ),
   DeprecationLevel.WARNING
 )
@@ -295,12 +274,8 @@ fun <A, B> Sequence<A>.tupleLeft(arg1: B): Sequence<Tuple2<B, A>> =
  *  Kind<F, A> -> Kind<F, Tuple2<A, B>>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.sequencek.functor.*
- * import arrow.core.*
- *
- *
- *  import arrow.core.extensions.sequencek.applicative.just
+ *  import arrow.core.extensions.sequence.applicative.just
+ *  import arrow.core.tupleRight
  *
  *  fun main(args: Array<String>) {
  *   val result =
@@ -321,8 +296,8 @@ fun <A, B> Sequence<A>.tupleLeft(arg1: B): Sequence<Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+    "this.tupleRight(arg1)",
+    "arrow.core.tupleRight"
   ),
   DeprecationLevel.WARNING
 )
@@ -338,18 +313,15 @@ fun <A, B> Sequence<A>.tupleRight(arg1: B): Sequence<Tuple2<A, B>> =
  *  Kind<F, A> -> Kind<F, B>
  *
  *  ```kotlin:ank:playground
- *  import arrow.core.*
- * import arrow.core.extensions.sequencek.functor.*
- * import arrow.core.*
- *
- *
- *  import arrow.core.extensions.sequencek.applicative.just
  *  import arrow.Kind
+ *  import arrow.core.extensions.sequence.applicative.just
+ *  import arrow.core.k
+ *  import arrow.core.widen
  *
  *  fun main(args: Array<String>) {
  *   val result: Kind<*, CharSequence> =
  *   //sampleStart
- *   "Hello".just().map({ "$it World" }).widen()
+ *   "Hello".just().map { "$it World" }.widen().k()
  *   //sampleEnd
  *   println(result)
  *  }
@@ -365,8 +337,8 @@ fun <A, B> Sequence<A>.tupleRight(arg1: B): Sequence<Tuple2<A, B>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
+    "this.widen()",
+    "arrow.core.widen"
   ),
   DeprecationLevel.WARNING
 )
@@ -382,10 +354,18 @@ fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
 internal val functor_singleton: SequenceKFunctor = object : arrow.core.extensions.SequenceKFunctor
     {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
 
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Functor typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun functor(): SequenceKFunctor = functor_singleton}

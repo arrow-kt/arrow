@@ -3,10 +3,6 @@ package arrow.core.extensions.sequencek.repeat
 import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKRepeat
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,8 +20,7 @@ internal val repeat_singleton: SequenceKRepeat = object : arrow.core.extensions.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "repeat(a)",
-  "arrow.core.SequenceK.repeat"
+    "generateSequence { a }"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,5 +31,9 @@ fun <A> repeat(a: A): SequenceK<A> = arrow.core.SequenceK
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Repeat typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.repeat(): SequenceKRepeat = repeat_singleton

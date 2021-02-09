@@ -5,11 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKUnzip
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -27,8 +22,8 @@ internal val unzip_singleton: SequenceKUnzip = object : arrow.core.extensions.Se
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzip()",
-  "arrow.core.unzip"
+    "this.unzip()",
+    "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +43,8 @@ fun <A, B> Kind<ForSequenceK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForSequenceK, A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unzipWith(arg1)",
-  "arrow.core.unzipWith"
+    "this.unzip(arg1.andThen { t -> t.a to t.b })",
+    "arrow.core.andThen", "arrow.core.to", "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
@@ -62,5 +57,9 @@ fun <A, B, C> Kind<ForSequenceK, C>.unzipWith(arg1: Function1<C, Tuple2<A, B>>):
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Unzip typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.unzip(): SequenceKUnzip = unzip_singleton

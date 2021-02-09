@@ -7,12 +7,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonadLogic
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -31,8 +25,8 @@ internal val monadLogic_singleton: SequenceKMonadLogic = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "splitM()",
-  "arrow.core.splitM"
+    "this.split()",
+    "arrow.core.split"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +47,8 @@ fun <A> Kind<ForSequenceK, A>.splitM(): SequenceK<Option<Tuple2<Kind<ForSequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "interleave(arg1)",
-  "arrow.core.interleave"
+    "this.interleave(arg1)",
+    "arrow.core.interleave"
   ),
   DeprecationLevel.WARNING
 )
@@ -73,8 +67,8 @@ fun <A> Kind<ForSequenceK, A>.interleave(arg1: Kind<ForSequenceK, A>): SequenceK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unweave(arg1)",
-  "arrow.core.unweave"
+    "this.unweave(arg1)",
+    "arrow.core.unweave"
   ),
   DeprecationLevel.WARNING
 )
@@ -93,8 +87,8 @@ fun <A, B> Kind<ForSequenceK, A>.unweave(arg1: Function1<A, Kind<ForSequenceK, B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifThen(arg1, arg2)",
-  "arrow.core.ifThen"
+    "this.ifThen(arg1, arg2)",
+    "arrow.core.ifThen"
   ),
   DeprecationLevel.WARNING
 )
@@ -115,8 +109,8 @@ fun <A, B> Kind<ForSequenceK, A>.ifThen(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "once()",
-  "arrow.core.once"
+    "this.once()",
+    "arrow.core.once"
   ),
   DeprecationLevel.WARNING
 )
@@ -134,8 +128,7 @@ fun <A> Kind<ForSequenceK, A>.once(): SequenceK<A> = arrow.core.SequenceK.monadL
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "voidIfValue()",
-  "arrow.core.voidIfValue"
+    "this.firstOrNull()?.let { emptySequence() } ?: sequenceOf(Unit)"
   ),
   DeprecationLevel.WARNING
 )
@@ -147,5 +140,9 @@ fun <A> Kind<ForSequenceK, A>.voidIfValue(): SequenceK<Unit> =
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "MonadLogic typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadLogic(): SequenceKMonadLogic = monadLogic_singleton

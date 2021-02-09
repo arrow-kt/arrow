@@ -3,10 +3,6 @@ package arrow.core.extensions.sequencek.align
 import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKAlign
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -24,8 +20,7 @@ internal val align_singleton: SequenceKAlign = object : arrow.core.extensions.Se
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "empty()",
-  "arrow.core.SequenceK.empty"
+    "emptySequence<A>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,5 +31,9 @@ fun <A> empty(): SequenceK<A> = arrow.core.SequenceK
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Align typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.align(): SequenceKAlign = align_singleton

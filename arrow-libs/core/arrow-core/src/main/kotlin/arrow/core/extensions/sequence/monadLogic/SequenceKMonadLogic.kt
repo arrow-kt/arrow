@@ -5,12 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonadLogic
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("splitM")
@@ -23,8 +17,8 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "splitM()",
-  "arrow.core.splitM"
+    "this.split()",
+    "arrow.core.split"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,8 +39,8 @@ fun <A> Sequence<A>.splitM(): Sequence<Option<Tuple2<Kind<ForSequenceK, A>, A>>>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "interleave(arg1)",
-  "arrow.core.interleave"
+    "this.interleave(arg1)",
+    "arrow.core.interleave"
   ),
   DeprecationLevel.WARNING
 )
@@ -66,8 +60,8 @@ fun <A> Sequence<A>.interleave(arg1: Sequence<A>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unweave(arg1)",
-  "arrow.core.unweave"
+    "this.unweave(arg1)",
+    "arrow.core.unweave"
   ),
   DeprecationLevel.WARNING
 )
@@ -86,8 +80,8 @@ fun <A, B> Sequence<A>.unweave(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifThen(arg1, arg2)",
-  "arrow.core.ifThen"
+    "this.ifThen(arg1, arg2)",
+    "arrow.core.ifThen"
   ),
   DeprecationLevel.WARNING
 )
@@ -107,8 +101,8 @@ fun <A, B> Sequence<A>.ifThen(arg1: Sequence<B>, arg2: Function1<A, Kind<ForSequ
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "once()",
-  "arrow.core.once"
+    "this.once()",
+    "arrow.core.once"
   ),
   DeprecationLevel.WARNING
 )
@@ -127,8 +121,7 @@ fun <A> Sequence<A>.once(): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "voidIfValue()",
-  "arrow.core.voidIfValue"
+    "this.firstOrNull()?.let { emptySequence() } ?: sequenceOf(Unit)"
   ),
   DeprecationLevel.WARNING
 )
@@ -144,9 +137,17 @@ fun <A> Sequence<A>.voidIfValue(): Sequence<Unit> =
 internal val monadLogic_singleton: SequenceKMonadLogic = object :
     arrow.core.extensions.SequenceKMonadLogic {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "MonadLogic typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun monadLogic(): SequenceKMonadLogic = monadLogic_singleton}

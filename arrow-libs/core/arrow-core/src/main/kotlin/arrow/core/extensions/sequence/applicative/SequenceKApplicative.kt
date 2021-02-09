@@ -2,14 +2,6 @@ package arrow.core.extensions.sequence.applicative
 
 import arrow.core.extensions.SequenceKApplicative
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Int
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("just1")
@@ -22,8 +14,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just()",
-  "arrow.core.just"
+    "sequenceOf(this)"
   ),
   DeprecationLevel.WARNING
 )
@@ -42,8 +33,7 @@ fun <A> A.just(): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit()",
-  "arrow.core.extensions.sequence.applicative.Sequence.unit"
+    "sequenceOf(Unit)"
   ),
   DeprecationLevel.WARNING
 )
@@ -61,8 +51,7 @@ fun unit(): Sequence<Unit> = arrow.core.extensions.sequence.applicative.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -81,8 +70,8 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)",
-  "arrow.core.replicate"
+    "this.replicate(arg1)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -102,8 +91,8 @@ fun <A> Sequence<A>.replicate(arg1: Int): Sequence<List<A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)",
-  "arrow.core.replicate"
+    "this.replicate(arg1, arg2)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -119,9 +108,17 @@ fun <A> Sequence<A>.replicate(arg1: Int, arg2: Monoid<A>): Sequence<A> =
 internal val applicative_singleton: SequenceKApplicative = object :
     arrow.core.extensions.SequenceKApplicative {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Applicative typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun applicative(): SequenceKApplicative = applicative_singleton}

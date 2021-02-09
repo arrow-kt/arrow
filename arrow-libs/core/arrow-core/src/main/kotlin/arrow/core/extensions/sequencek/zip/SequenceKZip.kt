@@ -6,11 +6,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKZip
-import kotlin.Deprecated
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,8 +23,7 @@ internal val zip_singleton: SequenceKZip = object : arrow.core.extensions.Sequen
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zip(arg1)",
-  "arrow.core.zip"
+    "this.zip(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +42,7 @@ fun <A, B> Kind<ForSequenceK, A>.zip(arg1: Kind<ForSequenceK, B>): SequenceK<Tup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zipWith(arg1, arg2)",
-  "arrow.core.zipWith"
+    "this.zip(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -61,5 +54,9 @@ fun <A, B, C> Kind<ForSequenceK, A>.zipWith(arg1: Kind<ForSequenceK, B>, arg2: F
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Zip typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.zip(): SequenceKZip = zip_singleton

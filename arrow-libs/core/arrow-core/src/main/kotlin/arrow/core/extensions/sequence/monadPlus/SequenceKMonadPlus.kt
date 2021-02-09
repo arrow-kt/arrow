@@ -1,10 +1,6 @@
 package arrow.core.extensions.sequence.monadPlus
 
 import arrow.core.extensions.SequenceKMonadPlus
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("zeroM")
@@ -17,8 +13,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zeroM()",
-  "arrow.core.extensions.sequence.monadPlus.Sequence.zeroM"
+    "emptySequence<A>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -36,8 +31,7 @@ fun <A> zeroM(): Sequence<A> = arrow.core.extensions.sequence.monadPlus.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plusM(arg1)",
-  "arrow.core.plusM"
+    "this + arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -54,9 +48,17 @@ fun <A> Sequence<A>.plusM(arg1: Sequence<A>): Sequence<A> =
 internal val monadPlus_singleton: SequenceKMonadPlus = object :
     arrow.core.extensions.SequenceKMonadPlus {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "MonadPlus typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun monadPlus(): SequenceKMonadPlus = monadPlus_singleton}

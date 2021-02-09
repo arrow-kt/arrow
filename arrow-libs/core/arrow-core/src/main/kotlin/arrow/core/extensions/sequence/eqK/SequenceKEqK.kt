@@ -4,11 +4,6 @@ import arrow.Kind
 import arrow.core.ForSequenceK
 import arrow.core.extensions.SequenceKEqK
 import arrow.typeclasses.Eq
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("eqK")
@@ -19,10 +14,9 @@ import kotlin.sequences.Sequence
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "this.toList() == arg1.toList()"
   ),
   DeprecationLevel.WARNING
 )
@@ -39,12 +33,8 @@ fun <A> Sequence<A>.eqK(arg1: Sequence<A>, arg2: Eq<A>): Boolean =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.extensions.sequence.eqK.Sequence.liftEq"
-  ),
-  DeprecationLevel.WARNING
+  "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+  level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.extensions.sequence.eqK.Sequence
    .eqK()
@@ -56,9 +46,17 @@ fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.extensions.s
 @PublishedApi()
 internal val eqK_singleton: SequenceKEqK = object : arrow.core.extensions.SequenceKEqK {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
+    level = DeprecationLevel.WARNING
   )
   inline fun eqK(): SequenceKEqK = eqK_singleton}

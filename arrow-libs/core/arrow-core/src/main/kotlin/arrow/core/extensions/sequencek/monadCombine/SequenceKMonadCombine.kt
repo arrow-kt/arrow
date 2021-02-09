@@ -8,10 +8,6 @@ import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonadCombine
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Foldable
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,12 +24,8 @@ internal val monadCombine_singleton: SequenceKMonadCombine = object :
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "unite(arg1)",
-  "arrow.core.unite"
-  ),
-  DeprecationLevel.WARNING
+  "Foldable typeclass is deprecated. Replace with uniteEither or uniteValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForSequenceK, Kind<G, A>>.unite(arg1: Foldable<G>): SequenceK<A> =
     arrow.core.SequenceK.monadCombine().run {
@@ -48,12 +40,8 @@ fun <G, A> Kind<ForSequenceK, Kind<G, A>>.unite(arg1: Foldable<G>): SequenceK<A>
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "separate(arg1)",
-  "arrow.core.separate"
-  ),
-  DeprecationLevel.WARNING
+  "Bifoldable typeclass is deprecated. Replace with separateEither or separateValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForSequenceK, Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>):
     Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> = arrow.core.SequenceK.monadCombine().run {
@@ -64,5 +52,9 @@ fun <G, A, B> Kind<ForSequenceK, Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "MonadCombine typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadCombine(): SequenceKMonadCombine = monadCombine_singleton

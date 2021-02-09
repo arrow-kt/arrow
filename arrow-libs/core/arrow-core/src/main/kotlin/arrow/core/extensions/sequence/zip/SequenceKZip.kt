@@ -2,11 +2,6 @@ package arrow.core.extensions.sequence.zip
 
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKZip
-import kotlin.Deprecated
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("zip")
@@ -19,8 +14,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zip(arg1)",
-  "arrow.core.zip"
+    "this.zip(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -40,8 +34,7 @@ fun <A, B> Sequence<A>.zip(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zipWith(arg1, arg2)",
-  "arrow.core.zipWith"
+    "this.zip(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -57,9 +50,17 @@ fun <A, B, C> Sequence<A>.zipWith(arg1: Sequence<B>, arg2: Function2<A, B, C>): 
 @PublishedApi()
 internal val zip_singleton: SequenceKZip = object : arrow.core.extensions.SequenceKZip {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Zip typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun zip(): SequenceKZip = zip_singleton}

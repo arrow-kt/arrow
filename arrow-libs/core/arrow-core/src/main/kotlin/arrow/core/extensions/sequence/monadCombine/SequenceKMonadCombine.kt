@@ -6,10 +6,6 @@ import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonadCombine
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Foldable
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("unite")
@@ -20,12 +16,8 @@ import kotlin.sequences.Sequence
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "unite(arg1)",
-  "arrow.core.unite"
-  ),
-  DeprecationLevel.WARNING
+  "Foldable typeclass is deprecated. Replace with uniteEither or uniteValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.unite(arg1: Foldable<G>): Sequence<A> =
     arrow.core.extensions.sequence.monadCombine.Sequence.monadCombine().run {
@@ -40,12 +32,8 @@ fun <G, A> Sequence<Kind<G, A>>.unite(arg1: Foldable<G>): Sequence<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "separate(arg1)",
-  "arrow.core.separate"
-  ),
-  DeprecationLevel.WARNING
+  "Bifoldable typeclass is deprecated. Replace with separateEither or separateValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>): Tuple2<Kind<ForSequenceK,
     A>, Kind<ForSequenceK, B>> =
@@ -62,9 +50,17 @@ fun <G, A, B> Sequence<Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>): Tuple
 internal val monadCombine_singleton: SequenceKMonadCombine = object :
     arrow.core.extensions.SequenceKMonadCombine {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "MonadCombine typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun monadCombine(): SequenceKMonadCombine = monadCombine_singleton}

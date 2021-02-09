@@ -9,12 +9,6 @@ import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKSemialign
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Function2
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -33,8 +27,8 @@ internal val semialign_singleton: SequenceKSemialign = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "align(arg0, arg1)",
-  "arrow.core.SequenceK.align"
+    "arg0.align(arg1)",
+    "arrow.core.align"
   ),
   DeprecationLevel.WARNING
 )
@@ -53,8 +47,8 @@ fun <A, B> align(arg0: Kind<ForSequenceK, A>, arg1: Kind<ForSequenceK, B>): Sequ
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "alignWith(arg0, arg1, arg2)",
-  "arrow.core.SequenceK.alignWith"
+    "arg0.align(arg1, arg2)",
+    "arrow.core.align"
   ),
   DeprecationLevel.WARNING
 )
@@ -76,8 +70,8 @@ fun <A, B, C> alignWith(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "salign(arg1, arg2)",
-  "arrow.core.salign"
+    "this.align(arg1, arg2)",
+    "arrow.core.align"
   ),
   DeprecationLevel.WARNING
 )
@@ -96,8 +90,8 @@ fun <A> Kind<ForSequenceK, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForSequenceK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZip(arg1)",
-  "arrow.core.padZip"
+    "this.padZip(arg1)",
+    "arrow.core.padZip"
   ),
   DeprecationLevel.WARNING
 )
@@ -117,8 +111,8 @@ fun <A, B> Kind<ForSequenceK, A>.padZip(arg1: Kind<ForSequenceK, B>): SequenceK<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZipWith(arg1, arg2)",
-  "arrow.core.padZipWith"
+    "this.padZip(arg1, arg2)",
+    "arrow.core.padZip"
   ),
   DeprecationLevel.WARNING
 )
@@ -132,5 +126,9 @@ fun <A, B, C> Kind<ForSequenceK, A>.padZipWith(
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Semialign typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semialign(): SequenceKSemialign = semialign_singleton

@@ -6,10 +6,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKSemigroupK
 import arrow.typeclasses.Semigroup
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -28,8 +24,7 @@ internal val semigroupK_singleton: SequenceKSemigroupK = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineK(arg1)",
-  "arrow.core.combineK"
+    "this + arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,8 +43,8 @@ fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "algebra()",
-  "arrow.core.SequenceK.algebra"
+    "Semigroup.sequence<A>()",
+    "arrow.core.sequence", "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
@@ -60,5 +55,9 @@ fun <A> algebra(): Semigroup<Kind<ForSequenceK, A>> = arrow.core.SequenceK
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "SemigroupK typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semigroupK(): SequenceKSemigroupK = semigroupK_singleton

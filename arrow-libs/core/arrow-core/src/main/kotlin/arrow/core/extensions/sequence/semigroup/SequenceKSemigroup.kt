@@ -1,11 +1,6 @@
 package arrow.core.extensions.sequence.semigroup
 
 import arrow.core.extensions.SequenceKSemigroup
-import kotlin.Any
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("plus")
@@ -18,8 +13,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "plus(arg1)",
-  "arrow.core.plus"
+    "this + arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -38,8 +32,7 @@ operator fun <A> Sequence<A>.plus(arg1: Sequence<A>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "maybeCombine(arg1)",
-  "arrow.core.maybeCombine"
+    "(arg1?.plus(this) ?: emptySequence<A>())"
   ),
   DeprecationLevel.WARNING
 )
@@ -55,10 +48,22 @@ fun <A> Sequence<A>.maybeCombine(arg1: Sequence<A>): Sequence<A> =
 @PublishedApi()
 internal val semigroup_singleton: SequenceKSemigroup<Any?> = object : SequenceKSemigroup<Any?> {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "@extension projected functions are deprecated",
+    ReplaceWith(
+      "Semigroup.sequence<A>()",
+      "arrow.core.sequence", "arrow.typeclasses.Semigroup"
+    ),
+    DeprecationLevel.WARNING
   )
   inline fun <A> semigroup(): SequenceKSemigroup<A> = semigroup_singleton as
       arrow.core.extensions.SequenceKSemigroup<A>}

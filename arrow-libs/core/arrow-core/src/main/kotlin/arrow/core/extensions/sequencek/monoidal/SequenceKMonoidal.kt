@@ -3,10 +3,6 @@ package arrow.core.extensions.sequencek.monoidal
 import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKMonoidal
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -25,8 +21,7 @@ internal val monoidal_singleton: SequenceKMonoidal = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "identity()",
-  "arrow.core.SequenceK.identity"
+    "emptySequence<A>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -37,5 +32,9 @@ fun <A> identity(): SequenceK<A> = arrow.core.SequenceK
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Monoidal typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monoidal(): SequenceKMonoidal = monoidal_singleton

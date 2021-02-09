@@ -1,10 +1,6 @@
 package arrow.core.extensions.sequence.repeat
 
 import arrow.core.extensions.SequenceKRepeat
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("repeat")
@@ -17,8 +13,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "repeat(a)",
-  "arrow.core.extensions.sequence.repeat.Sequence.repeat"
+    "generateSequence { a }"
   ),
   DeprecationLevel.WARNING
 )
@@ -32,9 +27,17 @@ fun <A> repeat(a: A): Sequence<A> = arrow.core.extensions.sequence.repeat.Sequen
 @PublishedApi()
 internal val repeat_singleton: SequenceKRepeat = object : arrow.core.extensions.SequenceKRepeat {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Repeat typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun repeat(): SequenceKRepeat = repeat_singleton}

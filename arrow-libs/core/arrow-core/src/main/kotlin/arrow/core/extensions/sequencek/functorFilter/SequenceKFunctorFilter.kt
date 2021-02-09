@@ -6,13 +6,6 @@ import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKFunctorFilter
-import java.lang.Class
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -31,8 +24,7 @@ internal val functorFilter_singleton: SequenceKFunctorFilter = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull { arg1(it).orNull() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,8 +43,7 @@ fun <A, B> Kind<ForSequenceK, A>.filterMap(arg1: Function1<A, Option<B>>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flattenOption()",
-  "arrow.core.flattenOption"
+    "this.mapNotNull { it.orNull() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -71,8 +62,7 @@ fun <A> Kind<ForSequenceK, Option<A>>.flattenOption(): SequenceK<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filter(arg1)",
-  "arrow.core.filter"
+    "this.filter(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -91,8 +81,7 @@ fun <A> Kind<ForSequenceK, A>.filter(arg1: Function1<A, Boolean>): SequenceK<A> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterIsInstance(arg1)",
-  "arrow.core.filterIsInstance"
+    "this.filterIsInstance<B>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -104,5 +93,9 @@ fun <A, B> Kind<ForSequenceK, A>.filterIsInstance(arg1: Class<B>): SequenceK<B> 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "FunctorFilter typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.functorFilter(): SequenceKFunctorFilter = functorFilter_singleton

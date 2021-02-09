@@ -6,13 +6,6 @@ import arrow.core.Eval
 import arrow.core.ForSequenceK
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKMonad
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function0
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("flatMap")
@@ -25,8 +18,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatMap(arg1)",
-  "arrow.core.flatMap"
+    "this.flatMap(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,8 +37,8 @@ fun <A, B> Sequence<A>.flatMap(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tailRecM(arg0, arg1)",
-  "arrow.core.extensions.sequence.monad.Sequence.tailRecM"
+    "SequenceK.tailRecM(arg0, arg1)",
+    "arrow.core.SequenceK"
   ),
   DeprecationLevel.WARNING
 )
@@ -65,8 +57,7 @@ fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSequenceK, Either<A, B>>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -88,8 +79,8 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ap(arg1)",
-  "arrow.core.ap"
+    "this.ap(arg1)",
+    "arrow.core.ap"
   ),
   DeprecationLevel.WARNING
 )
@@ -108,8 +99,8 @@ fun <A, B> Sequence<A>.ap(arg1: Sequence<Function1<A, B>>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatten()",
-  "arrow.core.flatten"
+    "this.flatten()",
+    "arrow.core.flatten"
   ),
   DeprecationLevel.WARNING
 )
@@ -128,8 +119,7 @@ fun <A> Sequence<Sequence<A>>.flatten(): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedBy(arg1)",
-  "arrow.core.followedBy"
+    "this.flatMap { arg1 }"
   ),
   DeprecationLevel.WARNING
 )
@@ -149,8 +139,7 @@ fun <A, B> Sequence<A>.followedBy(arg1: Sequence<B>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "apTap(arg1)",
-  "arrow.core.apTap"
+    "this.flatMap { a -> arg1.map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -170,8 +159,7 @@ fun <A, B> Sequence<A>.apTap(arg1: Sequence<B>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "followedByEval(arg1)",
-  "arrow.core.followedByEval"
+    "this.flatMap { arg1.value() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -191,8 +179,7 @@ fun <A, B> Sequence<A>.followedByEval(arg1: Eval<Kind<ForSequenceK, B>>): Sequen
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "effectM(arg1)",
-  "arrow.core.effectM"
+    "this.flatMap { a -> arg1(a).map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -211,8 +198,7 @@ fun <A, B> Sequence<A>.effectM(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flatTap(arg1)",
-  "arrow.core.flatTap"
+    "this.flatMap { a -> arg1(a).map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -231,8 +217,7 @@ fun <A, B> Sequence<A>.flatTap(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productL(arg1)",
-  "arrow.core.productL"
+    "this.flatMap { a -> arg1.map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -252,8 +237,7 @@ fun <A, B> Sequence<A>.productL(arg1: Sequence<B>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffect(arg1)",
-  "arrow.core.forEffect"
+    "this.flatMap { a -> arg1.map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -273,8 +257,7 @@ fun <A, B> Sequence<A>.forEffect(arg1: Sequence<B>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "productLEval(arg1)",
-  "arrow.core.productLEval"
+    "this.flatMap { a -> arg1.value().map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -293,8 +276,7 @@ fun <A, B> Sequence<A>.productLEval(arg1: Eval<Kind<ForSequenceK, B>>): Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forEffectEval(arg1)",
-  "arrow.core.forEffectEval"
+    "this.flatMap { a -> arg1.value().map { a } }"
   ),
   DeprecationLevel.WARNING
 )
@@ -313,8 +295,8 @@ fun <A, B> Sequence<A>.forEffectEval(arg1: Eval<Kind<ForSequenceK, B>>): Sequenc
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mproduct(arg1)",
-  "arrow.core.mproduct"
+    "this.flatMap { a -> arg1(a).map { b -> Tuple2(a, b) } }",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -334,8 +316,8 @@ fun <A, B> Sequence<A>.mproduct(arg1: Function1<A, Kind<ForSequenceK, B>>): Sequ
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ifM(arg1, arg2)",
-  "arrow.core.ifM"
+    "this.ifM(arg1, arg2)",
+    "arrow.core.ifM"
   ),
   DeprecationLevel.WARNING
 )
@@ -357,8 +339,8 @@ fun <B> Sequence<Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "selectM(arg1)",
-  "arrow.core.selectM"
+    "this.selectM(arg1)",
+    "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
 )
@@ -378,8 +360,8 @@ fun <A, B> Sequence<Either<A, B>>.selectM(arg1: Sequence<Function1<A, B>>): Sequ
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "select(arg1)",
-  "arrow.core.select"
+    "this.selectM(arg1)",
+    "arrow.core.selectM"
   ),
   DeprecationLevel.WARNING
 )
@@ -395,6 +377,10 @@ fun <A, B> Sequence<Either<A, B>>.select(arg1: Sequence<Function1<A, B>>): Seque
 @PublishedApi()
 internal val monad_singleton: SequenceKMonad = object : arrow.core.extensions.SequenceKMonad {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   /**
    *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
@@ -410,5 +396,9 @@ object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Monad typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun monad(): SequenceKMonad = monad_singleton}

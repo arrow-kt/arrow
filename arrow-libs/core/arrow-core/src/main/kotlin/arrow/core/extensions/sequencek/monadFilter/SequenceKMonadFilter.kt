@@ -7,11 +7,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKMonadFilter
 import arrow.typeclasses.MonadFilterSyntax
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -30,8 +25,7 @@ internal val monadFilter_singleton: SequenceKMonadFilter = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull { arg1(it).orNull() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -48,12 +42,8 @@ fun <A, B> Kind<ForSequenceK, A>.filterMap(arg1: Function1<A, Option<B>>): Seque
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "bindingFilter(arg0)",
-  "arrow.core.SequenceK.bindingFilter"
-  ),
-  DeprecationLevel.WARNING
+  "Monad bindings are deprecated",
+  level = DeprecationLevel.WARNING
 )
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForSequenceK>.() -> B): SequenceK<B> =
     arrow.core.SequenceK
@@ -63,5 +53,9 @@ fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForSequenceK>.() -> B): Se
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "MonadFilter typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.monadFilter(): SequenceKMonadFilter = monadFilter_singleton

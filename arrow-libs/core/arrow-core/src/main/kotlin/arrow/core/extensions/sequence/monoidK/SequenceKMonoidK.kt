@@ -4,10 +4,6 @@ import arrow.Kind
 import arrow.core.ForSequenceK
 import arrow.core.extensions.SequenceKMonoidK
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 @JvmName("algebra")
 @Suppress(
@@ -19,8 +15,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "algebra()",
-  "arrow.core.extensions.sequence.monoidK.Sequence.algebra"
+    "Monoid.sequence<A>()",
+    "arrow.core.sequence", "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING
 )
@@ -35,9 +31,17 @@ fun <A> algebra(): Monoid<Kind<ForSequenceK, A>> = arrow.core.extensions.sequenc
 internal val monoidK_singleton: SequenceKMonoidK = object : arrow.core.extensions.SequenceKMonoidK
     {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "MonoidK typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun monoidK(): SequenceKMonoidK = monoidK_singleton}

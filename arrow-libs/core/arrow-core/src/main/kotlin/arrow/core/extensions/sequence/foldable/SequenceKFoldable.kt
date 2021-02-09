@@ -8,16 +8,6 @@ import arrow.core.extensions.SequenceKFoldable
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Function2
-import kotlin.Long
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("foldLeft")
@@ -30,8 +20,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldLeft(arg1, arg2)",
-  "arrow.core.foldLeft"
+    "this.fold(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -50,8 +39,8 @@ fun <A, B> Sequence<A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldRight(arg1, arg2)",
-  "arrow.core.foldRight"
+    "this.foldRight(arg1, arg2)",
+    "arrow.core.foldRight"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +59,7 @@ fun <A, B> Sequence<A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fold(arg1)",
-  "arrow.core.fold"
+    "this.fold(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,8 +78,8 @@ fun <A> Sequence<A>.fold(arg1: Monoid<A>): A =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceLeftToOption(arg1, arg2)",
-  "arrow.core.reduceLeftToOption"
+    "Option.fromNullable(this.reduceOrNull(arg1, arg2))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -111,8 +99,8 @@ fun <A, B> Sequence<A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceRightToOption(arg1, arg2)",
-  "arrow.core.reduceRightToOption"
+    "this.reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
+    "arrow.core.Option", "arrow.core.reduceRightEvalOrNull"
   ),
   DeprecationLevel.WARNING
 )
@@ -134,8 +122,8 @@ fun <A, B> Sequence<A>.reduceRightToOption(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceLeftOption(arg1)",
-  "arrow.core.reduceLeftOption"
+    "Option.fromNullable(this.reduceOrNull({ it }, arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -175,8 +163,8 @@ fun <A> Sequence<A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>): Eva
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(arg1)",
-  "arrow.core.combineAll"
+    "this.combineAll(arg1)",
+    "arrow.core.combineAll"
   ),
   DeprecationLevel.WARNING
 )
@@ -195,8 +183,8 @@ fun <A> Sequence<A>.combineAll(arg1: Monoid<A>): A =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "foldMap(arg1, arg2)",
-  "arrow.core.foldMap"
+    "this.foldMap(arg1, arg2)",
+    "arrow.core.foldMap"
   ),
   DeprecationLevel.WARNING
 )
@@ -215,8 +203,7 @@ fun <A, B> Sequence<A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "orEmpty(arg0, arg1)",
-  "arrow.core.extensions.sequence.foldable.Sequence.orEmpty"
+    "sequenceOf(arg1.empty())"
   ),
   DeprecationLevel.WARNING
 )
@@ -233,12 +220,8 @@ fun <A> orEmpty(arg0: Applicative<ForSequenceK>, arg1: Monoid<A>): Sequence<A> =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "traverse_(arg1, arg2)",
-  "arrow.core.traverse_"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with traverseEither_ or traverseValidated_ from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
     Unit> = arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
@@ -253,12 +236,8 @@ fun <G, A, B> Sequence<A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kin
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequence_(arg1)",
-  "arrow.core.sequence_"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequenceEither_ or sequenceValidated_ from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
     arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
@@ -275,8 +254,8 @@ fun <G, A> Sequence<Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "find(arg1)",
-  "arrow.core.find"
+    "Option.fromNullable(this.firstOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -295,8 +274,7 @@ fun <A> Sequence<A>.find(arg1: Function1<A, Boolean>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "exists(arg1)",
-  "arrow.core.exists"
+    "this.any(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -315,8 +293,7 @@ fun <A> Sequence<A>.exists(arg1: Function1<A, Boolean>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "forAll(arg1)",
-  "arrow.core.forAll"
+    "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -335,8 +312,7 @@ fun <A> Sequence<A>.forAll(arg1: Function1<A, Boolean>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "all(arg1)",
-  "arrow.core.all"
+    "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -355,8 +331,7 @@ fun <A> Sequence<A>.all(arg1: Function1<A, Boolean>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "isEmpty()",
-  "arrow.core.isEmpty"
+    "this.none()"
   ),
   DeprecationLevel.WARNING
 )
@@ -375,8 +350,7 @@ fun <A> Sequence<A>.isEmpty(): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "nonEmpty()",
-  "arrow.core.nonEmpty"
+    "this.any()"
   ),
   DeprecationLevel.WARNING
 )
@@ -395,8 +369,7 @@ fun <A> Sequence<A>.nonEmpty(): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "isNotEmpty()",
-  "arrow.core.isNotEmpty"
+    "this.any()"
   ),
   DeprecationLevel.WARNING
 )
@@ -415,8 +388,7 @@ fun <A> Sequence<A>.isNotEmpty(): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "size(arg1)",
-  "arrow.core.size"
+    "this.count()"
   ),
   DeprecationLevel.WARNING
 )
@@ -433,12 +405,8 @@ fun <A> Sequence<A>.size(arg1: Monoid<Long>): Long =
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldMapA(arg1, arg2, arg3)",
-  "arrow.core.foldMapA"
-  ),
-  DeprecationLevel.WARNING
+  "Applicative typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> Sequence<A>.foldMapA(
   arg1: AP,
@@ -457,12 +425,8 @@ fun <G, A, B, AP : Applicative<G>, MO : Monoid<B>> Sequence<A>.foldMapA(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldMapM(arg1, arg2, arg3)",
-  "arrow.core.foldMapM"
-  ),
-  DeprecationLevel.WARNING
+  "Monad typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B, MA : Monad<G>, MO : Monoid<B>> Sequence<A>.foldMapM(
   arg1: MA,
@@ -481,12 +445,8 @@ fun <G, A, B, MA : Monad<G>, MO : Monoid<B>> Sequence<A>.foldMapM(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "foldM(arg1, arg2, arg3)",
-  "arrow.core.foldM"
-  ),
-  DeprecationLevel.WARNING
+  "Monad typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.foldM(
   arg1: Monad<G>,
@@ -506,8 +466,8 @@ fun <G, A, B> Sequence<A>.foldM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "get(arg1)",
-  "arrow.core.get"
+    "Option.fromNullable(this.elementAtOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -526,8 +486,8 @@ fun <A> Sequence<A>.get(arg1: Long): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOption()",
-  "arrow.core.firstOption"
+    "Option.fromNullable(this.firstOrNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -546,8 +506,8 @@ fun <A> Sequence<A>.firstOption(): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOption(arg1)",
-  "arrow.core.firstOption"
+    "Option.fromNullable(this.firstOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -566,8 +526,8 @@ fun <A> Sequence<A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOrNone()",
-  "arrow.core.firstOrNone"
+    "Option.fromNullable(this.firstOrNull())",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -586,8 +546,8 @@ fun <A> Sequence<A>.firstOrNone(): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "firstOrNone(arg1)",
-  "arrow.core.firstOrNone"
+    "Option.fromNullable(this.firstOrNull(arg1))",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -606,8 +566,7 @@ fun <A> Sequence<A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "toList()",
-  "arrow.core.toList"
+    "this.toList()"
   ),
   DeprecationLevel.WARNING
 )
@@ -623,9 +582,17 @@ fun <A> Sequence<A>.toList(): List<A> =
 internal val foldable_singleton: SequenceKFoldable = object :
     arrow.core.extensions.SequenceKFoldable {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Foldable typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun foldable(): SequenceKFoldable = foldable_singleton}

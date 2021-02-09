@@ -2,13 +2,6 @@ package arrow.core.extensions.sequence.functorFilter
 
 import arrow.core.Option
 import arrow.core.extensions.SequenceKFunctorFilter
-import java.lang.Class
-import kotlin.Boolean
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 @JvmName("filterMap")
@@ -21,8 +14,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterMap(arg1)",
-  "arrow.core.filterMap"
+    "this.mapNotNull { arg1(it).orNull() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -41,8 +33,7 @@ fun <A, B> Sequence<A>.filterMap(arg1: Function1<A, Option<B>>): Sequence<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "flattenOption()",
-  "arrow.core.flattenOption"
+    "this.mapNotNull { it.orNull() }"
   ),
   DeprecationLevel.WARNING
 )
@@ -61,8 +52,7 @@ fun <A> Sequence<Option<A>>.flattenOption(): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filter(arg1)",
-  "arrow.core.filter"
+    "this.filter(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -81,8 +71,7 @@ fun <A> Sequence<A>.filter(arg1: Function1<A, Boolean>): Sequence<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterIsInstance(arg1)",
-  "arrow.core.filterIsInstance"
+    "this.filterIsInstance<B>()"
   ),
   DeprecationLevel.WARNING
 )
@@ -99,9 +88,17 @@ fun <A, B> Sequence<A>.filterIsInstance(arg1: Class<B>): Sequence<B> =
 internal val functorFilter_singleton: SequenceKFunctorFilter = object :
     arrow.core.extensions.SequenceKFunctorFilter {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "FunctorFilter typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun functorFilter(): SequenceKFunctorFilter = functorFilter_singleton}

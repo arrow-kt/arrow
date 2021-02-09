@@ -5,11 +5,6 @@ import arrow.core.ForSequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKCrosswalk
 import arrow.typeclasses.Align
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -26,12 +21,8 @@ internal val crosswalk_singleton: SequenceKCrosswalk = object :
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "crosswalk(arg0, arg1, arg2)",
-  "arrow.core.SequenceK.crosswalk"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with crosswalk, crosswalkMap or crosswalkNull from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A, B> crosswalk(
   arg0: Align<F>,
@@ -49,12 +40,8 @@ fun <F, A, B> crosswalk(
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "sequenceL(arg0, arg1)",
-  "arrow.core.SequenceK.sequenceL"
-  ),
-  DeprecationLevel.WARNING
+  "@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*",
+  level = DeprecationLevel.WARNING
 )
 fun <F, A> sequenceL(arg0: Align<F>, arg1: Kind<ForSequenceK, Kind<F, A>>): Kind<F,
     Kind<ForSequenceK, A>> = arrow.core.SequenceK
@@ -64,5 +51,9 @@ fun <F, A> sequenceL(arg0: Align<F>, arg1: Kind<ForSequenceK, Kind<F, A>>): Kind
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Crosswalk typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.crosswalk(): SequenceKCrosswalk = crosswalk_singleton

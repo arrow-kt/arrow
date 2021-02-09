@@ -6,14 +6,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.extensions.SequenceKApplicative
 import arrow.typeclasses.Monoid
-import kotlin.Deprecated
-import kotlin.Function1
-import kotlin.Int
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.collections.List
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -32,8 +24,7 @@ internal val applicative_singleton: SequenceKApplicative = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "just()",
-  "arrow.core.just"
+    "sequenceOf(this)"
   ),
   DeprecationLevel.WARNING
 )
@@ -51,8 +42,7 @@ fun <A> A.just(): SequenceK<A> = arrow.core.SequenceK.applicative().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "unit()",
-  "arrow.core.SequenceK.unit"
+    "sequenceOf(Unit)"
   ),
   DeprecationLevel.WARNING
 )
@@ -70,8 +60,7 @@ fun unit(): SequenceK<Unit> = arrow.core.SequenceK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)",
-  "arrow.core.map"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -90,8 +79,8 @@ fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)",
-  "arrow.core.replicate"
+    "this.replicate(arg1)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -110,8 +99,8 @@ fun <A> Kind<ForSequenceK, A>.replicate(arg1: Int): SequenceK<List<A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)",
-  "arrow.core.replicate"
+    "this.replicate(arg1, arg2)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -123,5 +112,9 @@ fun <A> Kind<ForSequenceK, A>.replicate(arg1: Int, arg2: Monoid<A>): SequenceK<A
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Applicative typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.applicative(): SequenceKApplicative = applicative_singleton

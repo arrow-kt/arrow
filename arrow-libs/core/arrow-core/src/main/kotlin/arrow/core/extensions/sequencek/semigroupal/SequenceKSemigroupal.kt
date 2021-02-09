@@ -6,10 +6,6 @@ import arrow.core.SequenceK
 import arrow.core.SequenceK.Companion
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKSemigroupal
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 
 /**
  * cached extension
@@ -31,8 +27,7 @@ internal val semigroupal_singleton: SequenceKSemigroupal = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "product(arg1)",
-  "arrow.core.product"
+    "this.zip(arg1, ::Pair)"
   ),
   DeprecationLevel.WARNING
 )
@@ -54,8 +49,7 @@ fun <A, B> Kind<ForSequenceK, A>.product(arg1: Kind<ForSequenceK, B>): SequenceK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "times(arg1)",
-  "arrow.core.times"
+    "this.zip(arg1, ::Pair)"
   ),
   DeprecationLevel.WARNING
 )
@@ -156,5 +150,9 @@ operator fun <A, B> Kind<ForSequenceK, A>.times(arg1: Kind<ForSequenceK, B>): Se
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
+)
+@Deprecated(
+  "Semigroupal typeclass is deprecated. Use concrete methods on Sequence",
+  level = DeprecationLevel.WARNING
 )
 inline fun Companion.semigroupal(): SequenceKSemigroupal = semigroupal_singleton

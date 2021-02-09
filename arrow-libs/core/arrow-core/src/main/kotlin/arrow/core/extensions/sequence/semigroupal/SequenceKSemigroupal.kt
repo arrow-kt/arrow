@@ -2,10 +2,6 @@ package arrow.core.extensions.sequence.semigroupal
 
 import arrow.core.Tuple2
 import arrow.core.extensions.SequenceKSemigroupal
-import kotlin.Deprecated
-import kotlin.PublishedApi
-import kotlin.Suppress
-import kotlin.jvm.JvmName
 import kotlin.sequences.Sequence
 
 /**
@@ -21,8 +17,7 @@ import kotlin.sequences.Sequence
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "product(arg1)",
-  "arrow.core.product"
+    "this.zip(arg1, ::Pair)"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,8 +40,7 @@ fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "times(arg1)",
-  "arrow.core.times"
+    "this.zip(arg1, ::Pair)"
   ),
   DeprecationLevel.WARNING
 )
@@ -63,6 +57,10 @@ operator fun <A, B> Sequence<A>.times(arg1: Sequence<B>): Sequence<Tuple2<A, B>>
 internal val semigroupal_singleton: SequenceKSemigroupal = object :
     arrow.core.extensions.SequenceKSemigroupal {}
 
+@Deprecated(
+  "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
+  level = DeprecationLevel.WARNING
+)
 object Sequence {
   /**
    *  The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
@@ -156,5 +154,9 @@ object Sequence {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
+  )
+  @Deprecated(
+    "Semigroupal typeclass is deprecated. Use concrete methods on Sequence",
+    level = DeprecationLevel.WARNING
   )
   inline fun semigroupal(): SequenceKSemigroupal = semigroupal_singleton}
