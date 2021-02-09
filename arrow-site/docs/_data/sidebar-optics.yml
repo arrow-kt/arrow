@@ -1,10 +1,10 @@
 options:
-  - title: Optics
+  - title: Quick Start
+    url: /optics/dsl/
+
+  - title: Types
 
     nested_options:
-
-      - title: Optics DSL
-        url: /optics/dsl/
 
       - title: Iso
         url: /optics/iso/
@@ -48,12 +48,8 @@ options:
       - title: Each
         url: /optics/each/
 
-  - title: API Docs
+  - title: Media
+    url: https://media.arrow-kt.io/tags/optics/
 
-    nested_options:
-
-      - title: Optics
-        url: /apidocs/arrow-optics/
-
-      - title: Optics MTL
-        url: /apidocs/arrow-optics-mtl/
+  - title: Docs
+    url: /apidocs/arrow-optics/

@@ -37,56 +37,6 @@ defaults:
     values:
       layout: "docs-fx"
   - scope:
-      path: "apidocs/arrow-aql"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-mtl"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-mtl-data"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-recursion"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-recursion-data"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-generic"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-free"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-free-data"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-check"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
-      path: "apidocs/arrow-check-kotlintest"
-      type: "pages"
-    values:
-      layout: "docs-incubator"
-  - scope:
       path: "apidocs"
       type: "pages"
     values:

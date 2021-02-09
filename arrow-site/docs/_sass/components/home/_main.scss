@@ -68,74 +68,6 @@
       }
     }
   }
-
-  .incubator-container {
-    display: flex;
-    justify-content: space-evenly;
-    padding: ($base-point-grid * 3) 0;
-
-    .incubator-text {
-      h2 {
-        font-size: 1.429rem;
-        text-transform: uppercase;
-        padding-bottom: 12px;
-        transition: color $base-duration $base-timing;
-      }
-    }
-
-    .incubator-link {
-      &.hover-mode {
-        &:hover {
-          color: $white;
-        }
-      }
-    }
-
-    .incubator-image {
-      position: relative;
-      width: 684px;
-
-      #incubator-base-animation {
-        position: absolute;
-        opacity: 1;
-        transition: $opacity-transition;
-      }
-
-      #incubator-core-animation {
-        position: absolute;
-        opacity: 0;
-        transition: $opacity-transition;
-      }
-
-      #incubator-fx-animation {
-        position: absolute;
-        opacity: 0;
-        transition: $opacity-transition;
-      }
-
-      #incubator-optics-animation {
-        position: absolute;
-        opacity: 0;
-        transition: $opacity-transition;
-      }
-
-      #incubator-meta-animation {
-        position: absolute;
-        opacity: 0;
-        transition: $opacity-transition;
-      }
-
-      #incubator-hover-animation {
-        opacity: 0;
-        transition: $opacity-transition;
-      }
-    }
-  }
-
-  .incubator-list {
-    list-style-image: url("../img/home/bullet.svg");
-    line-height: ($base-point-grid * 4);
-  }
 }
 // Responsive
 // -----------------------------------------------
@@ -160,28 +92,6 @@
           padding-right: 0;
           margin-bottom: ($base-point-grid * 8);
         }
-      }
-    }
-
-    .incubator-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-
-      .incubator-image {
-        width: 100%;
-      }
-
-      .incubator-text {
-        text-align: center;
-
-        ul {
-          li {
-            list-style: none;
-          }
-        }
-        margin-bottom: ($base-point-grid * 5);
       }
     }
   }

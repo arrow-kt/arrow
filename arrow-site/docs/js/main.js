@@ -85,15 +85,11 @@ function loadEvent() {
 
   function baseAnimation() {
     arrowBaseAnimation.play();
-    incubatorBaseAnimation.play();
   }
 
   // base elements
   const baseArrowLogo = document.getElementById('base-arrow-animation');
   baseArrowLogo.addEventListener('load', baseAnimation());
-
-  const incubatorBaseLogo = document.getElementById('incubator-base-animation');
-  incubatorBaseLogo.addEventListener('load', baseAnimation());
 
   // core elements
   const corePlayHover = document.getElementById('core');
@@ -104,7 +100,6 @@ function loadEvent() {
         corePlayHover.classList.add('active');
         checkActiveFeature(arrayArrowFeatures);
         arrowCoreAnimation.play();
-        incubatorCoreAnimation.play();
         arrowBaseAnimation.stop();
       }
   });
@@ -118,7 +113,6 @@ function loadEvent() {
       fxPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
       arrowFxAnimation.play();
-      incubatorFxAnimation.play();
       arrowBaseAnimation.stop();
     }
   });
@@ -132,7 +126,6 @@ function loadEvent() {
       metaPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
       arrowMetaAnimation.play();
-      incubatorMetaAnimation.play();
       arrowBaseAnimation.stop();
     }
   });
@@ -146,23 +139,10 @@ function loadEvent() {
       opticsPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
       arrowOpticsAnimation.play();
-      incubatorOpticsAnimation.play();
       arrowBaseAnimation.stop();
     }
   });
 
-  // incubator elements
-  const incubatorPlayHover = document.getElementById('incubator');
-
-  incubatorPlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > mobileModeBreakPoint) {
-      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-      incubatorPlayHover.classList.add('active');
-      checkActiveFeature(arrayArrowFeatures);
-      incubatorHoverAnimation.play();
-      arrowBaseAnimation.stop();
-    }
-  });
 }
 
 // Attach the functions to each event they are interested in

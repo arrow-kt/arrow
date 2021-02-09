@@ -9,7 +9,7 @@
       {% assign img_url = '/img/' | append: cat_id | append: '/arrow-' | append: cat_id | append: '-brand-sidebar.svg' %}
       <img src="{{ img_url | relative_url}}" alt="Arrow {{ cat_id }}">
     </a>
-    {% assign cat_title = "arrow "  | append: cat_id  %}
+    {% assign cat_title = cat_id  %}
     {% include _sidebar-cat-dropdown.html %}
   </div>
 

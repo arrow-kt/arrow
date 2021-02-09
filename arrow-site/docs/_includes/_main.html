@@ -3,7 +3,6 @@
     <div id="main-flex" class="main-flex">
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
-      {% if title != "arrow incubator" %}
       <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url }}">
 
         <div id="{{ item.id }}-header" class="item-header">
@@ -16,33 +15,9 @@
           <p id="{{ item.id }}-description">{{ item.description }}</p>
         </div>
       </a>
-      {% endif %}
       {% endfor %}
     </div>
   </div>
   {% include _header.html %}
-  <div class="wrapper">
-    <div id="incubator" class="incubator-container feature">
-      <div class="incubator-text">
-        <h2>Λrrow Incubator</h2>
-        <ul id="incubator-list" class="incubator-list">
-          {% for item in site.data.features.incubator %}
-          {% if item.title == 'Arrow Query Language' %}
-          {% assign aqlUrl = item.url %}
-          {% endif %}
-          <li class="incubator-items">
-            <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <a class="incubator-image" href="{{ aqlUrl }}">
-        <div id="incubator-base-animation" alt="Incubator"></div>
-        <div id="incubator-core-animation" alt="Incubator"></div>
-        <div id="incubator-fx-animation" alt="Incubator"></div>
-        <div id="incubator-optics-animation" alt="Incubator"></div>
-        <div id="incubator-meta-animation" alt="Incubator"></div>
-        <div id="incubator-hover-animation" alt="Incubator"></div>
-      </a>
-    </div>
+  <div class="wrapper"></div>
 </main>
