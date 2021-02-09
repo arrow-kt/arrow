@@ -35,6 +35,13 @@ jobs:
         mkdir $BASEDIR/logs
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
+    - name: "Landing page: build"
+      run: |
+        ./scripts/checkout-latest-landingpage.sh
+        bundle exec jekyll build -b docs -s docs
+        tree _site > $BASEDIR/logs/content_landingpage.log
+    - name: "Landing page: publish"
+      run: ./scripts/publish-landingpage.sh
     - name: "Next version: generate and validate docs for all the libraries"
       run: |
         . $BASEDIR/arrow-master/scripts/commons4gradle.sh
