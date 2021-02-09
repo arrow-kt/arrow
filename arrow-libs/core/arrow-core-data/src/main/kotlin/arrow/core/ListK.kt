@@ -1,16 +1,29 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForListK private constructor() {
   companion object
 }
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias ListKOf<A> = arrow.Kind<ForListK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A> ListKOf<A>.fix(): ListK<A> =
   this as ListK<A>
 

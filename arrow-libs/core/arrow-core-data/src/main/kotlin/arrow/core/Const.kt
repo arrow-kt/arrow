@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -8,22 +9,32 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForConst private constructor() {
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForConst private constructor() {
   companion object
 }
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias ConstPartialOf<A> = arrow.Kind<ForConst, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias ConstPartialOf<A> = arrow.Kind<ForConst, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-inline fun <A, T> ConstOf<A, T>.fix(): Const<A, T> =
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)inline fun <A, T> ConstOf<A, T>.fix(): Const<A, T> =
   this as Const<A, T>
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
 data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
 

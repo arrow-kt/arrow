@@ -1,20 +1,30 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForNonEmptyList private constructor() {
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForNonEmptyList private constructor() {
   companion object
 }
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias NonEmptyListOf<A> = arrow.Kind<ForNonEmptyList, A>
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A> NonEmptyListOf<A>.fix(): NonEmptyList<A> =
   this as NonEmptyList<A>
 

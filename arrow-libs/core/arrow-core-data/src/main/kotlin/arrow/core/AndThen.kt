@@ -1,39 +1,41 @@
 package arrow.core
 
+import arrow.KindDeprecation
+
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 class ForAndThen private constructor() { companion object }
 
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias AndThenOf<A, B> = arrow.Kind2<ForAndThen, A, B>
 
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias AndThenPartialOf<A> = arrow.Kind<ForAndThen, A>
 
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias AndThenKindedJ<A, B> = arrow.HkJ2<ForAndThen, A, B>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 inline fun <A, B> AndThenOf<A, B>.fix(): AndThen<A, B> =
   this as AndThen<A, B>
 
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)

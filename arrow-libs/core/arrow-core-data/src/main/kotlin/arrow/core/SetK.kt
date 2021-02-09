@@ -1,17 +1,24 @@
 package arrow.core
 
+import arrow.KindDeprecation
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForSetK private constructor() { companion object }
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForSetK private constructor() { companion object }
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias SetKOf<A> = arrow.Kind<ForSetK, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias SetKOf<A> = arrow.Kind<ForSetK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-inline fun <A> SetKOf<A>.fix(): SetK<A> =
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)inline fun <A> SetKOf<A>.fix(): SetK<A> =
   this as SetK<A>
 
 data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {

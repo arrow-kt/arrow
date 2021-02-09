@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -11,18 +12,26 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.hashWithSalt
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForEither private constructor() {
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForEither private constructor() {
   companion object
 }
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias EitherOf<A, B> = arrow.Kind2<ForEither, A, B>
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias EitherPartialOf<A> = arrow.Kind<ForEither, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias EitherOf<A, B> = arrow.Kind2<ForEither, A, B>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias EitherPartialOf<A> = arrow.Kind<ForEither, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-inline fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)inline fun <A, B> EitherOf<A, B>.fix(): Either<A, B> =
   this as Either<A, B>
 
 /**

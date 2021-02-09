@@ -1,16 +1,29 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForSequenceK private constructor() {
   companion object
 }
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias SequenceKOf<A> = arrow.Kind<ForSequenceK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A> SequenceKOf<A>.fix(): SequenceK<A> =
   this as SequenceK<A>
 

@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
@@ -14,18 +15,26 @@ typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
 typealias Invalid<E> = Validated.Invalid<E>
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForValidated private constructor() {
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForValidated private constructor() {
   companion object
 }
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias ValidatedOf<E, A> = arrow.Kind2<ForValidated, E, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias ValidatedPartialOf<E> = arrow.Kind<ForValidated, E>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-inline fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)inline fun <E, A> ValidatedOf<E, A>.fix(): Validated<E, A> =
   this as Validated<E, A>
 
 /**

@@ -1,20 +1,29 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-class ForMapK private constructor() { companion object }
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)class ForMapK private constructor() { companion object }
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-@Deprecated("Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead")
-inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
 
 data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
 

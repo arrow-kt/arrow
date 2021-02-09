@@ -1,25 +1,26 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.KindDeprecation
 import arrow.core.Either.Right
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 class ForOption private constructor() { companion object }
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias OptionOf<A> = arrow.Kind<ForOption, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
-  "Kind is deprecated, and will be removed in 0.13.0. Please use one of the provided concrete methods instead",
+  message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
