@@ -2,13 +2,13 @@
   <div class="wrapper">
     <div class="nav-flex">
       <a class="nav-brand" title="Arrow" href="/">
-        <img id="nav-brand-dark" src="{{ 'img/home/nav-brand.svg' | relative_url }}" title="{{ site.name }}" alt="Arrow">
-        <img id="nav-brand-white" src="{{ 'img/home/nav-brand-white.svg' | relative_url }}" title="{{ site.name }}" alt="Arrow">
+        <img id="nav-brand-dark" src="/img/home/nav-brand.svg" title="{{ site.name }}" alt="Arrow">
+        <img id="nav-brand-white" src="/img/home/nav-brand-white.svg" title="{{ site.name }}" alt="Arrow">
         <span id="nav-title">{{ site.name }}</span>
       </a>
       <div class="nav-menu">
         <button class="button nav-icon-close" title="Close" onClick="toggleClass('.nav-menu', 'open');">
-          <img id="nav-icon-close" src="{{ 'img/home/nav-icon-close-white.svg' | relative_url }}" alt="Close">
+          <img id="nav-icon-close" src="/img/home/nav-icon-close-white.svg" alt="Close">
         </button>
         <ul>
           {% for item in site.data.menu.nav%}
@@ -24,7 +24,7 @@
         </ul>
       </div>
       <button class="button nav-icon-open" title="Open" onClick="toggleClass('.nav-menu', 'open');">
-        <img id="nav-icon-open" src="{{ 'img/home/nav-icon-open-white.svg' | relative_url }}" alt="Open">
+        <img id="nav-icon-open" src="/img/home/nav-icon-open-white.svg" alt="Open">
       </button>
     </div>
   </div>
