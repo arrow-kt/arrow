@@ -977,7 +977,11 @@ object None : Option<Nothing>() {
   override fun toString(): String = "Option.None"
 }
 
-data class Some<out T>(val t: T) : Option<T>() {
+data class Some<out T>(
+  @Deprecated("Use value instead", ReplaceWith("value"))
+  val t: T
+) : Option<T>() {
+  val value: T = t
   override fun isEmpty() = false
 
   override fun toString(): String = "Option.Some($t)"

@@ -18,7 +18,37 @@ typealias Tuple9PartialOf<A, B, C, D, E, F, G, H> = arrow.Kind8<ForTuple9, A, B,
 inline fun <A, B, C, D, E, F, G, H, I> Tuple9Of<A, B, C, D, E, F, G, H, I>.fix(): Tuple9<A, B, C, D, E, F, G, H, I> =
   this as Tuple9<A, B, C, D, E, F, G, H, I>
 
-data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G, val h: H, val i: I) : Tuple9Of<A, B, C, D, E, F, G, H, I> {
+data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>(
+  @Deprecated("Use first instead", ReplaceWith("first"))
+  val a: A,
+  @Deprecated("Use second instead", ReplaceWith("second"))
+  val b: B,
+  @Deprecated("Use third instead", ReplaceWith("third"))
+  val c: C,
+  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
+  val d: D,
+  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
+  val e: E,
+  @Deprecated("Use sixth instead", ReplaceWith("sixth"))
+  val f: F,
+  @Deprecated("Use seventh instead", ReplaceWith("seventh"))
+  val g: G,
+  @Deprecated("Use eighth instead", ReplaceWith("eighth"))
+  val h: H,
+  @Deprecated("Use ninth instead", ReplaceWith("ninth"))
+  val i: I
+) : Tuple9Of<A, B, C, D, E, F, G, H, I> {
+
+  val first: A = a
+  val second: B = b
+  val third: C = c
+  val fourth: D = d
+  val fifth: E = e
+  val sixth: F = f
+  val seventh: G = g
+  val eight: H = h
+  val ninth: I = i
+
   @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>, SH: Show<H>, SI: Show<I>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }, SH.run { h.show() }, SI.run { i.show() }).joinToString(", ") + ")"
@@ -126,9 +156,9 @@ operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Compa
             if (sixth == 0) {
               val seventh = g.compareTo(other.g)
               if (seventh == 0) {
-                val eigth = h.compareTo(other.h)
-                if (eigth == 0) i.compareTo(other.i)
-                else eigth
+                val eighth = h.compareTo(other.h)
+                if (eighth == 0) i.compareTo(other.i)
+                else eighth
               } else seventh
             } else sixth
           } else fifth

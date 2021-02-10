@@ -18,7 +18,28 @@ typealias Tuple6PartialOf<A, B, C, D, E> = arrow.Kind5<ForTuple6, A, B, C, D, E>
 inline fun <A, B, C, D, E, F> Tuple6Of<A, B, C, D, E, F>.fix(): Tuple6<A, B, C, D, E, F> =
   this as Tuple6<A, B, C, D, E, F>
 
-data class Tuple6<out A, out B, out C, out D, out E, out F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F) : Tuple6Of<A, B, C, D, E, F> {
+data class Tuple6<out A, out B, out C, out D, out E, out F>(
+  @Deprecated("Use first instead", ReplaceWith("first"))
+  val a: A,
+  @Deprecated("Use second instead", ReplaceWith("second"))
+  val b: B,
+  @Deprecated("Use third instead", ReplaceWith("third"))
+  val c: C,
+  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
+  val d: D,
+  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
+  val e: E,
+  @Deprecated("Use sixth instead", ReplaceWith("sixth"))
+  val f: F
+) : Tuple6Of<A, B, C, D, E, F> {
+
+  val first: A = a
+  val second: B = b
+  val third: C = c
+  val fourth: D = d
+  val fifth: E = e
+  val sixth: F = f
+
   @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }).joinToString(", ") + ")"

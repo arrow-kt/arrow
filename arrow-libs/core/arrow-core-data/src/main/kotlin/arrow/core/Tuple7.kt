@@ -18,7 +18,31 @@ typealias Tuple7PartialOf<A, B, C, D, E, F> = arrow.Kind6<ForTuple7, A, B, C, D,
 inline fun <A, B, C, D, E, F, G> Tuple7Of<A, B, C, D, E, F, G>.fix(): Tuple7<A, B, C, D, E, F, G> =
   this as Tuple7<A, B, C, D, E, F, G>
 
-data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F, val g: G) : Tuple7Of<A, B, C, D, E, F, G> {
+data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(
+  @Deprecated("Use first instead", ReplaceWith("first"))
+  val a: A,
+  @Deprecated("Use second instead", ReplaceWith("second"))
+  val b: B,
+  @Deprecated("Use third instead", ReplaceWith("third"))
+  val c: C,
+  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
+  val d: D,
+  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
+  val e: E,
+  @Deprecated("Use sixth instead", ReplaceWith("sixth"))
+  val f: F,
+  @Deprecated("Use seventh instead", ReplaceWith("seventh"))
+  val g: G
+) : Tuple7Of<A, B, C, D, E, F, G> {
+
+  val first: A = a
+  val second: B = b
+  val third: C = c
+  val fourth: D = d
+  val fifth: E = e
+  val sixth: F = f
+  val seventh: G = g
+
   @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>, SF: Show<F>, SG: Show<G>): String =
     "(" + listOf(SA.run { a.show() }, SB.run { b.show() }, SC.run { c.show() }, SD.run { d.show() }, SE.run { e.show() }, SF.run { f.show() }, SG.run { g.show() }).joinToString(", ") + ")"

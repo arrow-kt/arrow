@@ -848,11 +848,19 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     { a -> HR.run { a.hashWithSalt(salt.hashWithSalt(1)) } }
   )
 
-  data class Valid<out A>(val a: A) : Validated<Nothing, A>() {
+  data class Valid<out A>(
+    @Deprecated("Use value instead", ReplaceWith("value"))
+    val a: A
+  ) : Validated<Nothing, A>() {
+    val value: A = a
     override fun toString(): String = "Validated.Valid($a)"
   }
 
-  data class Invalid<out E>(val e: E) : Validated<E, Nothing>() {
+  data class Invalid<out E>(
+    @Deprecated("Use value instead", ReplaceWith("value"))
+    val e: E
+  ) : Validated<E, Nothing>() {
+    val value: E = e
     override fun toString(): String = "Validated.Invalid($e)"
   }
 

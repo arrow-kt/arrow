@@ -18,7 +18,24 @@ typealias Tuple5PartialOf<A, B, C, D> = arrow.Kind4<ForTuple5, A, B, C, D>
 inline fun <A, B, C, D, E> Tuple5Of<A, B, C, D, E>.fix(): Tuple5<A, B, C, D, E> =
   this as Tuple5<A, B, C, D, E>
 
-data class Tuple5<out A, out B, out C, out D, out E>(val a: A, val b: B, val c: C, val d: D, val e: E) : Tuple5Of<A, B, C, D, E> {
+data class Tuple5<out A, out B, out C, out D, out E>(
+  @Deprecated("Use first instead", ReplaceWith("first"))
+  val a: A,
+  @Deprecated("Use second instead", ReplaceWith("second"))
+  val b: B,
+  @Deprecated("Use third instead", ReplaceWith("third"))
+  val c: C,
+  @Deprecated("Use fourth instead", ReplaceWith("fourth"))
+  val d: D,
+  @Deprecated("Use fifth instead", ReplaceWith("fifth"))
+  val e: E
+) : Tuple5Of<A, B, C, D, E> {
+
+  val first: A = a
+  val second: B = b
+  val third: C = c
+  val fourth: D = d
+  val fifth: E = e
 
   @Deprecated(ShowDeprecation)
   fun show(SA: Show<A>, SB: Show<B>, SC: Show<C>, SD: Show<D>, SE: Show<E>): String =

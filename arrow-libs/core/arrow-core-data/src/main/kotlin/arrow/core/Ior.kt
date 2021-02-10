@@ -633,7 +633,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isLeft: Boolean get() = false
     override val isBoth: Boolean get() = true
 
-    override fun toString(): String = "Ior.Both($leftValue, rightValue)"
+    override fun toString(): String = "Ior.Both($leftValue, $rightValue)"
   }
 
   @Deprecated(

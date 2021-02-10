@@ -1067,7 +1067,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Left<out A> @PublishedApi internal constructor(val a: A) : Either<A, Nothing>() {
+  data class Left<out A> @PublishedApi internal constructor(
+    @Deprecated("Use value instead", ReplaceWith("value"))
+    val a: A
+  ) : Either<A, Nothing>() {
+    val value: A = a
     override val isLeft = true
     override val isRight = false
 
@@ -1082,7 +1086,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Right<out B> @PublishedApi internal constructor(val b: B) : Either<Nothing, B>() {
+  data class Right<out B> @PublishedApi internal constructor(
+    @Deprecated("Use value instead", ReplaceWith("value"))
+    val b: B
+  ) : Either<Nothing, B>() {
+    val value: B = b
     override val isLeft = false
     override val isRight = true
 
