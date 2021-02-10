@@ -53,7 +53,7 @@ bundle install --gemfile Gemfile --path vendor/bundle
 bundle exec jekyll serve -s docs
 ```
 
-This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000/docs](http://127.0.0.1:4000/docs) so you can open it with a standard browser.
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
 
 If you get an error while installing the Ruby gem _http_parser_, check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
 
@@ -62,5 +62,5 @@ If you get an error while installing the Ruby gem _http_parser_, check if the pa
 Test for broken links in documentation using
 
 ```sh
-wget --spider -r -nd -nv -l 5 http://127.0.0.1:4000/docs/
+wget --spider -r -nd -nv -l 5 http://127.0.0.1:4000
 ```
