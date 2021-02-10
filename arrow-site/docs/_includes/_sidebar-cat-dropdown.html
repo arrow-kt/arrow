@@ -8,11 +8,10 @@
       </a>
       <ul>
         {% for item in site.data.features.content %}
-        {% assign cat_url = item.url | remove_first: '/docs' %}
         {% assign cat = item.title | downcase  %}
         {% if cat != cat_title %}
         <li>
-          <a href="{{ cat_url | relative_url }}">
+          <a href="{{ item.url | relative_url }}">
             <span>{{ item.title }}</span>
           </a>
         </li>

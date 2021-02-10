@@ -2,19 +2,19 @@ content:
     - title: Core
       description: Functional companion to Kotlin's Standard Library
       icon: img/home/arrow-core-lines
-      url: /docs/core/
+      url: /core/
       id: core
 
     - title: FX
       description: Functional Effects Framework companion to KotlinX Coroutines.
       icon: img/home/arrow-fx-lines
-      url: /docs/fx/
+      url: /fx/
       id: fx
 
     - title: Optics
       description: Deep access and transformations over immutable data
       icon: img/home/arrow-optics-lines
-      url: /docs/optics/dsl/
+      url: /optics/dsl/
       id: optics
 
     - title: Meta

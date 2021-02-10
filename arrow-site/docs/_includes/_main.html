@@ -3,7 +3,7 @@
     <div id="main-flex" class="main-flex">
       {% for item in site.data.features.content %}
       {% assign title = item.title | downcase  %}
-      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url }}">
+      <a id="{{ item.id }}" class="{{ item.id }} main-item feature" href="{{ item.url | relative_url }}">
 
         <div id="{{ item.id }}-header" class="item-header">
           <div id="icon-{{ item.id }}-content" class="icon-content">
