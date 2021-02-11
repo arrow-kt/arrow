@@ -1,5 +1,6 @@
 package arrow.optics
 
+import arrow.KindDeprecation
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
