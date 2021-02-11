@@ -7,6 +7,7 @@ package arrow
   AnnotationTarget.FUNCTION
 )
 @MustBeDocumented
+@Deprecated(KindDeprecation)
 annotation class extension
 
 val given: Nothing

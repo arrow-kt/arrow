@@ -8,6 +8,7 @@ import kotlin.annotation.AnnotationTarget.CLASS
 /**
  * Empty arrays means "Everything that matches annotated class"
  */
+@Deprecated("The product kapt generator will no longer be supported.")
 annotation class product(val deriving: Array<DerivingTarget> = [])
 
 enum class DerivingTarget {
