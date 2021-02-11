@@ -70,17 +70,17 @@ fun <K, E, A> Map<K, Validated<E, Map<K, A>>>.flatSequenceValidated(semigroup: S
 fun <K, E> Map<K, Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
   traverseValidated_(semigroup, ::identity)
 
-fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Tuple2<A, B>> =
-  mapValues { (_, a) -> Tuple2(a, f(a)) }
+fun <K, A, B> Map<K, A>.fproduct(f: (A) -> B): Map<K, Pair<A, B>> =
+  mapValues { (_, a) -> a to f(a) }
 
 fun <K, A> Map<K, A>.void(): Map<K, Unit> =
   mapValues { Unit }
 
-fun <K, A, B> Map<K, A>.tupleLeft(b: B): Map<K, Tuple2<B, A>> =
-  mapValues { (_, a) -> Tuple2(b, a) }
+fun <K, A, B> Map<K, A>.tupleLeft(b: B): Map<K, Pair<B, A>> =
+  mapValues { (_, a) -> b to a }
 
-fun <K, A, B> Map<K, A>.tupleRight(b: B): Map<K, Tuple2<A, B>> =
-  mapValues { (_, a) -> Tuple2(a, b) }
+fun <K, A, B> Map<K, A>.tupleRight(b: B): Map<K, Pair<A, B>> =
+  mapValues { (_, a) -> a to b }
 
 fun <K, B, A : B> Map<K, A>.widen(): Map<K, B> =
   this
@@ -153,12 +153,12 @@ fun <K, A> Map<K, A>.salign(SG: Semigroup<A>, other: Map<K, A>): Map<K, A> = SG.
 /**
  * Align two structures as in zip, but filling in blanks with null.
  */
-fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Tuple2<A?, B?>> =
+fun <K, A, B> Map<K, A>.padZip(other: Map<K, B>): Map<K, Pair<A?, B?>> =
   align(other) { (_, ior) ->
     ior.fold(
-      { it toT null },
-      { null toT it },
-      { a, b -> a toT b }
+      { it to null },
+      { null to it },
+      { a, b -> a to b }
     )
   }
 
@@ -181,8 +181,8 @@ fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K
  *   //sampleStart
  *   val result =
  *    mapOf(
- *      "first" to ("A" toT 1).bothIor(),
- *      "second" to ("B" toT 2).bothIor(),
+ *      "first" to ("A" to 1).bothIor(),
+ *      "second" to ("B" to 2).bothIor(),
  *      "third" to "C".leftIor()
  *    ).unalign()
  *   //sampleEnd
@@ -190,12 +190,12 @@ fun <K, A, B, C> Map<K, A>.padZip(other: Map<K, B>, fa: (K, A?, B?) -> C): Map<K
  * }
  * ```
  */
-fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Tuple2<Map<K, A>, Map<K, B>> =
-  entries.fold(emptyMap<K, A>() toT emptyMap()) { (ls, rs), (k, v) ->
+fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
+  entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
     v.fold(
-      { a -> ls.plus(k to a) toT rs },
-      { b -> ls toT rs.plus(k to b) },
-      { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+      { a -> ls.plus(k to a) to rs },
+      { b -> ls to rs.plus(k to b) },
+      { a, b -> ls.plus(k to a) to rs.plus(k to b) })
   }
 
 /**
@@ -214,11 +214,11 @@ fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Tuple2<Map<K, A>, Map<K, B>> =
  * }
  * ```
  */
-fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Tuple2<Map<K, A>, Map<K, B>> =
+fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fa).unalign()
 
 /**
- * Unzips the structure holding the resulting elements in an `Tuple2`
+ * Unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
@@ -226,15 +226,15 @@ fun <K, A, B, C> Map<K, C>.unalign(fa: (Map.Entry<K, C>) -> Ior<A, B>): Tuple2<M
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *      mapOf("first" to ("A" toT 1), "second" to ("B" toT 2)).unzip()
+ *      mapOf("first" to ("A" to 1), "second" to ("B" to 2)).unzip()
  *   //sampleEnd
  *   println(result)
  * }
  * ```
  */
-fun <K, A, B> Map<K, Tuple2<A, B>>.unzip(): Tuple2<Map<K, A>, Map<K, B>> =
-  entries.fold(emptyMap<K, A>() toT emptyMap()) { (ls, rs), (k, v) ->
-    ls.plus(k to v.a) toT rs.plus(k to v.b)
+fun <K, A, B> Map<K, Pair<A, B>>.unzip(): Pair<Map<K, A>, Map<K, B>> =
+  entries.fold(emptyMap<K, A>() to emptyMap()) { (ls, rs), (k, v) ->
+    ls.plus(k to v.first) to rs.plus(k to v.second)
   }
 
 /**
@@ -248,7 +248,7 @@ fun <K, A, B> Map<K, Tuple2<A, B>>.unzip(): Tuple2<Map<K, A>, Map<K, B>> =
  *   val result =
  *    mapOf("first" to "A:1", "second" to "B:2", "third" to "C:3").unzip { (_, e) ->
  *      e.split(":").let {
- *        it.first() toT it.last()
+ *        it.first() to it.last()
  *      }
  *    }
  *   //sampleEnd
@@ -256,12 +256,12 @@ fun <K, A, B> Map<K, Tuple2<A, B>>.unzip(): Tuple2<Map<K, A>, Map<K, B>> =
  * }
  * ```
  */
-fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Tuple2<A, B>): Tuple2<Map<K, A>, Map<K, B>> =
+fun <K, A, B, C> Map<K, C>.unzip(fc: (Map.Entry<K, C>) -> Pair<A, B>): Pair<Map<K, A>, Map<K, B>> =
   mapValues(fc).unzip()
 
 /**
  * Combines to structures by taking the intersection of their shapes
- * and using `Tuple2` to hold the elements.
+ * and using `Pair` to hold the elements.
  *
  * ```kotlin:ank:playground
  * import arrow.core.*

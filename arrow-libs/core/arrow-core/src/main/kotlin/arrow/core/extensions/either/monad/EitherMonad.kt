@@ -194,7 +194,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.forEffectEval(arg1: Eval<Kind<Kind<For
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("mproduct { arg1(it) }", "arrow.core.mproduct"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.mproduct(arg1: Function1<A, Kind<Kind<ForEither, L>, B>>): Either<L, Tuple2<A, B>> =
-  fix()._mproduct { arg1(it).fix() }
+  fix()._mproduct { arg1(it).fix() }.map { (a, b) -> Tuple2(a, b) }
 
 @JvmName("ifM")
 @Suppress(

@@ -711,7 +711,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     map { Unit }
 
   /**
-   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a tuple of the [A] value and the
+   * Applies [f] to an [A] inside [Validated] and returns the [Validated] structure with a pair of the [A] value and the
    * computed [B] value as result of applying [f]
    *
    *
@@ -727,8 +727,8 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    * }
    * ```
    */
-  inline fun <B> fproduct(f: (A) -> B): Validated<E, Tuple2<A, B>> =
-    map { a -> Tuple2(a, f(a)) }
+  inline fun <B> fproduct(f: (A) -> B): Validated<E, Pair<A, B>> =
+    map { a -> a to f(a) }
 
   /**
    * Replaces [A] inside [Validated] with [B] resulting in a Kind<F, B>
@@ -749,7 +749,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     map { b }
 
   /**
-   * Pairs [B] with [A] returning a Validated<E, Tuple2<B, A>>
+   * Pairs [B] with [A] returning a Validated<E, Pair<B, A>>
    *
    * ```kotlin:ank
    * import arrow.core.*
@@ -763,11 +763,11 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    * }
    * ```
    */
-  fun <B> tupleLeft(b: B): Validated<E, Tuple2<B, A>> =
-    map { a -> Tuple2(b, a) }
+  fun <B> tupleLeft(b: B): Validated<E, Pair<B, A>> =
+    map { a -> b to a }
 
   /**
-   * Pairs [A] with [B] returning a Validated<E, Tuple2<A, B>>
+   * Pairs [A] with [B] returning a Validated<E, Pair<A, B>>
    *
    * ```kotlin:ank:playground:extension
    * import arrow.core.*
@@ -781,11 +781,11 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
    * }
    * ```
    */
-  fun <B> tupleRight(b: B): Validated<E, Tuple2<A, B>> =
-    map { a -> Tuple2(a, b) }
+  fun <B> tupleRight(b: B): Validated<E, Pair<A, B>> =
+    map { a -> a to b }
 
   inline fun <B> traverse(fa: (A) -> Iterable<B>): List<Validated<E, B>> =
-    fold({ emptyList() }, { fa(it).map { Valid(it) } })
+    fold({ emptyList() }, { a -> fa(a).map { Valid(it) } })
 
   inline fun <B> traverse_(fa: (A) -> Iterable<B>): List<Unit> =
     fold({ emptyList() }, { fa(it).void() })

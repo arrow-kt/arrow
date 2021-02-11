@@ -980,11 +980,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    *  }
    *  ```
    */
-  fun <C> fproduct(f: (B) -> C): Either<A, Tuple2<B, C>> =
-    map { b -> Tuple2(b, f(b)) }
+  fun <C> fproduct(f: (B) -> C): Either<A, Pair<B, C>> =
+    map { b -> b to f(b) }
 
   /**
-   *  Pairs [C] with [B] returning a Either<A, Tuple2<C, B>>
+   *  Pairs [C] with [B] returning a Either<A, Pair<C, B>>
    *
    *  ```kotlin:ank:playground
    *  import arrow.core.*
@@ -998,11 +998,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    *  }
    *  ```
    */
-  fun <C> tupleLeft(c: C): Either<A, Tuple2<C, B>> =
-    map { b -> Tuple2(c, b) }
+  fun <C> tupleLeft(c: C): Either<A, Pair<C, B>> =
+    map { b -> c to b }
 
   /**
-   *  Pairs [C] with [B] returning a Either<A, Tuple2<B, C>>
+   *  Pairs [C] with [B] returning a Either<A, Pair<B, C>>
    *
    *  ```kotlin:ank:playground
    *  import arrow.core.*
@@ -1016,8 +1016,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    *  }
    *  ```
    */
-  fun <C> tupleRight(c: C): Either<A, Tuple2<B, C>> =
-    map { b -> Tuple2(b, c) }
+  fun <C> tupleRight(c: C): Either<A, Pair<B, C>> =
+    map { b -> b to c }
 
   fun replicate(n: Int): Either<A, List<B>> =
     if (n <= 0) emptyList<B>().right()
@@ -1598,9 +1598,6 @@ fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
 fun <A, B, C> Either<A, B>.apEval(ff: Eval<Either<A, (B) -> C>>): Eval<Either<A, C>> =
   ff.map { this.ap(it) }
 
-fun <A, B, C, Z> Either<A, B>.map2Eval(fb: Eval<Either<A, C>>, f: (Tuple2<B, C>) -> Z): Eval<Either<A, Z>> =
-  apEval(fb.map { it.map { c -> { b: B -> f(Tuple2(b, c)) } } })
-
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Left -> y.fix()
@@ -1702,30 +1699,6 @@ fun <A, C, B : C> Either<A, B>.widen(): Either<A, C> =
 fun <AA, A : AA, B> Either<A, B>.leftWiden(): Either<AA, B> =
   this
 
-@Deprecated(
-  "map2 will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of map2",
-  ReplaceWith(
-    "zip(fb) { b, c -> f(Tuple2(b, c)) }",
-    "arrow.core.Tuple2",
-    "arrow.core.zip"
-  )
-)
-fun <A, B, C, D> Either<A, B>.map2(fb: Either<A, C>, f: (Tuple2<B, C>) -> D): Either<A, D> =
-  product(fb).map(f)
-
-@Deprecated(
-  "product will be renamed to zip to be consistent with Kotlin Std's naming, please use zip instead of product",
-  ReplaceWith(
-    "zip(fb) { a, b -> Tuple2(a, b) }",
-    "arrow.core.Tuple2",
-    "arrow.core.zip"
-  )
-)
-fun <A, B, C> Either<A, B>.product(fb: Either<A, C>): Either<A, Tuple2<B, C>> =
-  flatMap { a ->
-    fb.map { b -> Tuple2(a, b) }
-  }
-
 fun <A, B, C, D> Either<A, B>.zip(fb: Either<A, C>, f: (B, C) -> D): Either<A, D> =
   flatMap { b ->
     fb.map { c -> f(b, c) }
@@ -1736,6 +1709,9 @@ fun <A, B, C> Either<A, B>.zip(fb: Either<A, C>): Either<A, Pair<B, C>> =
     fb.map { b -> Pair(a, b) }
   }
 
+fun <A, B, C, Z> Either<A, B>.zipEval(fb: Eval<Either<A, C>>, f: (B, C) -> Z): Eval<Either<A, Z>> =
+  fb.map { zip(it, f) }
+
 fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
   if (n <= 0) MB.empty().right()
   else MB.run {
@@ -1745,9 +1721,9 @@ fun <A, B> Either<A, B>.replicate(n: Int, MB: Monoid<B>): Either<A, B> =
     }
   }
 
-inline fun <A, B, C> Either<A, B>.mproduct(f: (B) -> Either<A, C>): Either<A, Tuple2<B, C>> =
+inline fun <A, B, C> Either<A, B>.mproduct(f: (B) -> Either<A, C>): Either<A, Pair<B, C>> =
   flatMap { a ->
-    f(a).map { b -> Tuple2(a, b) }
+    f(a).map { b -> a to b }
   }
 
 inline fun <A, B> Either<A, Boolean>.ifM(ifTrue: () -> Either<A, B>, ifFalse: () -> Either<A, B>): Either<A, B> =

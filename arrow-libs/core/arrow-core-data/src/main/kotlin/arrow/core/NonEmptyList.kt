@@ -331,8 +331,8 @@ class NonEmptyList<out A>(
       NonEmptyList(head.combine(b.head), tail.salign(SA, b.tail).toList())
     }
 
-  fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Tuple2<A?, B?>> =
-    NonEmptyList(Tuple2(head, other.head), tail.padZip(other.tail))
+  fun <B> padZip(other: NonEmptyList<B>): NonEmptyList<Pair<A?, B?>> =
+    NonEmptyList(head to other.head, tail.padZip(other.tail))
 
   companion object {
     operator fun <A> invoke(head: A, vararg t: A): NonEmptyList<A> =
@@ -529,14 +529,15 @@ fun <A> NonEmptyList<NonEmptyList<A>>.flatten(): NonEmptyList<A> =
 fun <A, B> NonEmptyList<Either<A, B>>.selectM(f: NonEmptyList<(A) -> B>): NonEmptyList<B> =
   this.flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> NonEmptyList.just(b) }) }
 
-fun <A, B> NonEmptyList<Tuple2<A, B>>.unzip(): Tuple2<NonEmptyList<A>, NonEmptyList<B>> =
-  this.unzipWith(::identity)
+fun <A, B> NonEmptyList<Pair<A, B>>.unzip(): Pair<NonEmptyList<A>, NonEmptyList<B>> =
+  this.unzip(::identity)
 
-fun <A, B, C> NonEmptyList<C>.unzipWith(f: (C) -> Tuple2<A, B>): Tuple2<NonEmptyList<A>, NonEmptyList<B>> =
+fun <A, B, C> NonEmptyList<C>.unzip(f: (C) -> Pair<A, B>): Pair<NonEmptyList<A>, NonEmptyList<B>> =
   this.map(f).let { nel ->
-    nel.tail.unzip().bimap(
-      { NonEmptyList(nel.head.a, it) },
-      { NonEmptyList(nel.head.b, it) })
+    nel.tail.unzip().let {
+      NonEmptyList(nel.head.first, it.first) to
+      NonEmptyList(nel.head.second, it.second)
+    }
   }
 
 inline fun <E, A, B> NonEmptyList<A>.traverseEither(f: (A) -> Either<E, B>): Either<E, NonEmptyList<B>> =

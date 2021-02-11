@@ -3,18 +3,37 @@
 
 package arrow.core
 
+import arrow.KindDeprecation
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.defaultSalt
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple5 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple5Of<A, B, C, D, E> = arrow.Kind5<ForTuple5, A, B, C, D, E>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple5PartialOf<A, B, C, D> = arrow.Kind4<ForTuple5, A, B, C, D>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E> Tuple5Of<A, B, C, D, E>.fix(): Tuple5<A, B, C, D, E> =
   this as Tuple5<A, B, C, D, E>
 

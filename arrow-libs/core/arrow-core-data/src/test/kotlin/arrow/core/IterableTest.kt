@@ -50,7 +50,7 @@ class IterableTest : UnitSpec() {
 
         val result = a.leftPadZip(b)
 
-        result == left.zip(right) { l, r -> l toT r }.filter { it.b != null }
+        result == left.zip(right) { l, r -> l to r }.filter { it.second != null }
       }
     }
 
@@ -61,8 +61,8 @@ class IterableTest : UnitSpec() {
 
         val result = a.rightPadZip(b)
 
-        result == left.zip(right) { l, r -> l toT r }.filter { it.a != null } &&
-          result.map { it.a }.equalUnderTheLaw(a, Eq.any())
+        result == left.zip(right) { l, r -> l to r }.filter { it.first != null } &&
+          result.map { it.first }.equalUnderTheLaw(a, Eq.any())
       }
     }
 
@@ -71,10 +71,10 @@ class IterableTest : UnitSpec() {
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
-        val result = a.rightPadZip(b) { a, b -> a toT b }
+        val result = a.rightPadZip(b) { a, b -> a to b }
 
-        result == left.zip(right) { l, r -> l toT r }.filter { it.a != null } &&
-          result.map { it.a }.equalUnderTheLaw(a, Eq.any())
+        result == left.zip(right) { l, r -> l to r }.filter { it.first != null } &&
+          result.map { it.first }.equalUnderTheLaw(a, Eq.any())
       }
     }
 
@@ -91,7 +91,7 @@ class IterableTest : UnitSpec() {
         val left = a.map { it } + List(max(0, b.count() - a.count())) { null }
         val right = b.map { it } + List(max(0, a.count() - b.count())) { null }
 
-        a.padZip(b) == left.zip(right) { l, r -> l toT r }
+        a.padZip(b) == left.zip(right) { l, r -> l to r }
       }
     }
   }

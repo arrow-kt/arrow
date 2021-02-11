@@ -920,6 +920,10 @@ fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, 
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)
 
+@Deprecated(
+  "Tuple2 is deprecated in favor of Kotlin's Pair. Please use the bothIor method defined for Pair instead.",
+  level = DeprecationLevel.WARNING
+)
 fun <A, B> Tuple2<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.a, this.b)
 
 fun <A> A.leftIor(): Ior<A, Nothing> = Ior.Left(this)

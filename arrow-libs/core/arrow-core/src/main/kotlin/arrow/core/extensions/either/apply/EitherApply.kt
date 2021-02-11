@@ -4,8 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.ap as _ap
 import arrow.core.apEval as _apEval
-import arrow.core.map2 as _map2
-import arrow.core.product as _product
+import arrow.core.zip as _zip
 import arrow.core.flatMap as _flatMap
 import arrow.core.Either.Companion
 import arrow.core.Eval
@@ -417,7 +416,7 @@ fun <L, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
 fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2(
   arg1: Kind<Kind<ForEither, L>, B>,
   arg2: Function1<Tuple2<A, B>, Z>
-): Either<L, Z> = fix()._map2(arg1.fix(), arg2)
+): Either<L, Z> = fix()._zip(arg1.fix()) { a, b -> arg2(Tuple2(a, b)) }
 
 @JvmName("product")
 @Suppress(
@@ -435,7 +434,7 @@ fun <L, A, B, Z> Kind<Kind<ForEither, L>, A>.map2(
   )
 )
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.product(arg1: Kind<Kind<ForEither, L>, B>): Either<L,
-  Tuple2<A, B>> = fix()._product(arg1.fix())
+  Tuple2<A, B>> = fix()._zip(arg1.fix()) { a, b -> Tuple2(a, b) }
 
 @JvmName("product1")
 @Suppress(

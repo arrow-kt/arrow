@@ -10,6 +10,7 @@ import arrow.core.tupleRight as _tupleRight
 import arrow.core.widen as _widen
 import arrow.core.Tuple2
 import arrow.core.extensions.ListKFunctor
+import arrow.core.toT
 import kotlin.Function1
 import kotlin.collections.map as _map
 import kotlin.PublishedApi
@@ -118,7 +119,7 @@ fun <A> List<A>.void(): List<Unit> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("fproduct(arg1)", "arrow.core.fproduct"))
 fun <A, B> List<A>.fproduct(arg1: Function1<A, B>): List<Tuple2<A, B>> =
-  _fproduct(arg1)
+  _fproduct(arg1)._map { it.first toT it.second }
 
 @JvmName("mapConst")
 @Suppress(
@@ -154,7 +155,7 @@ fun <A, B> A.mapConst(arg1: List<B>): List<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleLeft(arg1)", "arrow.core.tupleLeft"))
 fun <A, B> List<A>.tupleLeft(arg1: B): List<Tuple2<B, A>> =
-  _tupleLeft(arg1)
+  _tupleLeft(arg1)._map { it.first toT it.second }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -165,7 +166,7 @@ fun <A, B> List<A>.tupleLeft(arg1: B): List<Tuple2<B, A>> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleRight(arg1)", "arrow.core.tupleRight"))
 fun <A, B> List<A>.tupleRight(arg1: B): List<Tuple2<A, B>> =
-  _tupleRight(arg1)
+  _tupleRight(arg1)._map { it.first toT it.second }
 
 @JvmName("widen")
 @Suppress(

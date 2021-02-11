@@ -3,16 +3,35 @@
 
 package arrow.core
 
+import arrow.KindDeprecation
 import java.util.Collections
 import kotlin.collections.LinkedHashMap
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple11 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple11Of<A, B, C, D, E, F, G, H, I, J, K> = arrow.Kind11<ForTuple11, A, B, C, D, E, F, G, H, I, J, K>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple11PartialOf<A, B, C, D, E, F, G, H, I, J> = arrow.Kind10<ForTuple11, A, B, C, D, E, F, G, H, I, J>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K> Tuple11Of<A, B, C, D, E, F, G, H, I, J, K>.fix(): Tuple11<A, B, C, D, E, F, G, H, I, J, K> =
   this as Tuple11<A, B, C, D, E, F, G, H, I, J, K>
 
@@ -55,13 +74,31 @@ data class Tuple11<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple12 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple12Of<A, B, C, D, E, F, G, H, I, J, K, L> = arrow.Kind12<ForTuple12, A, B, C, D, E, F, G, H, I, J, K, L>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple12PartialOf<A, B, C, D, E, F, G, H, I, J, K> = arrow.Kind11<ForTuple12, A, B, C, D, E, F, G, H, I, J, K>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L> Tuple12Of<A, B, C, D, E, F, G, H, I, J, K, L>.fix(): Tuple12<A, B, C, D, E, F, G, H, I, J, K, L> =
   this as Tuple12<A, B, C, D, E, F, G, H, I, J, K, L>
 
@@ -107,13 +144,31 @@ data class Tuple12<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple13 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple13Of<A, B, C, D, E, F, G, H, I, J, K, L, M> = arrow.Kind13<ForTuple13, A, B, C, D, E, F, G, H, I, J, K, L, M>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple13PartialOf<A, B, C, D, E, F, G, H, I, J, K, L> = arrow.Kind12<ForTuple13, A, B, C, D, E, F, G, H, I, J, K, L>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M> Tuple13Of<A, B, C, D, E, F, G, H, I, J, K, L, M>.fix(): Tuple13<A, B, C, D, E, F, G, H, I, J, K, L, M> =
   this as Tuple13<A, B, C, D, E, F, G, H, I, J, K, L, M>
 
@@ -162,13 +217,31 @@ data class Tuple13<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple14 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple14Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N> = arrow.Kind14<ForTuple14, A, B, C, D, E, F, G, H, I, J, K, L, M, N>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple14PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M> = arrow.Kind13<ForTuple14, A, B, C, D, E, F, G, H, I, J, K, L, M>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N> Tuple14Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N>.fix(): Tuple14<A, B, C, D, E, F, G, H, I, J, K, L, M, N> =
   this as Tuple14<A, B, C, D, E, F, G, H, I, J, K, L, M, N>
 
@@ -220,13 +293,31 @@ data class Tuple14<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple15 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple15Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> = arrow.Kind15<ForTuple15, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple15PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N> = arrow.Kind14<ForTuple15, A, B, C, D, E, F, G, H, I, J, K, L, M, N>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> Tuple15Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>.fix(): Tuple15<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> =
   this as Tuple15<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
 
@@ -281,13 +372,31 @@ data class Tuple15<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple16 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple16Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> = arrow.Kind16<ForTuple16, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple16PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O> = arrow.Kind15<ForTuple16, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> Tuple16Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>.fix(): Tuple16<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> =
   this as Tuple16<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
 
@@ -345,13 +454,31 @@ data class Tuple16<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple17 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple17Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> = arrow.Kind17<ForTuple17, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple17PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P> = arrow.Kind16<ForTuple17, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> Tuple17Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>.fix(): Tuple17<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> =
   this as Tuple17<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
 
@@ -412,13 +539,31 @@ data class Tuple17<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple18 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple18Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> = arrow.Kind18<ForTuple18, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple18PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q> = arrow.Kind17<ForTuple18, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> Tuple18Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>.fix(): Tuple18<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> =
   this as Tuple18<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
 
@@ -482,13 +627,31 @@ data class Tuple18<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple19 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple19Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> = arrow.Kind19<ForTuple19, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple19PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R> = arrow.Kind18<ForTuple19, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> Tuple19Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>.fix(): Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> =
   this as Tuple19<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
 
@@ -555,13 +718,31 @@ data class Tuple19<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple20 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple20Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> = arrow.Kind20<ForTuple20, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple20PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S> = arrow.Kind19<ForTuple20, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> Tuple20Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>.fix(): Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> =
   this as Tuple20<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 
@@ -631,13 +812,31 @@ data class Tuple20<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple21 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple21Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> = arrow.Kind21<ForTuple21, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple21PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T> = arrow.Kind20<ForTuple21, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> Tuple21Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>.fix(): Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> =
   this as Tuple21<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
 
@@ -709,13 +908,31 @@ data class Tuple21<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 class ForTuple22 private constructor() {
   companion object
 }
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple22Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> = arrow.Kind22<ForTuple22, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>
+
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 typealias Tuple22PartialOf<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U> = arrow.Kind21<ForTuple22, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(
+  message = KindDeprecation,
+  level = DeprecationLevel.WARNING
+)
 inline fun <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> Tuple22Of<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>.fix(): Tuple22<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V> =
   this as Tuple22<A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>
 
@@ -796,10 +1013,18 @@ infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
 
 fun <A, B> Tuple2<A, B>.toPair(): Pair<A, B> = Pair(this.a, this.b)
 
+@Deprecated(
+  "Tuple2 is deprecated in favor of Kotlin's Pair. Please use Pair values instead.",
+  level = DeprecationLevel.WARNING
+)
 fun <A, B> Pair<A, B>.toTuple2(): Tuple2<A, B> = Tuple2(this.first, this.second)
 
 fun <A, B, C> Tuple3<A, B, C>.toTriple(): Triple<A, B, C> = Triple(this.a, this.b, this.c)
 
+@Deprecated(
+  "Tuple3 is deprecated in favor of Kotlin's Triple. Please use Triple values instead.",
+  level = DeprecationLevel.WARNING
+)
 fun <A, B, C> Triple<A, B, C>.toTuple3(): Tuple3<A, B, C> = Tuple3(this.first, this.second, this.third)
 
 fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {

@@ -117,16 +117,16 @@ inline fun <A, B> List<A>.reduceRightNull(
 }
 
 /**
- * Returns a [List<Tuple2<A?, B?>>] containing the zipped values of the two lists with null for padding.
+ * Returns a [List<Pair<A?, B?>>] containing the zipped values of the two lists with null for padding.
  *
  * Example:
  * ```kotlin:ank:playground
  * import arrow.core.*
  *
  * //sampleStart
- * val padRight = listOf(1, 2).padZip(listOf("a"))        // Result: [Tuple2(1, "a"), Tuple2(2, null)]
- * val padLeft = listOf(1).padZip(listOf("a", "b"))       // Result: [Tuple2(1, "a"), Tuple2(null, "b")]
- * val noPadding = listOf(1, 2).padZip(listOf("a", "b"))  // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val padRight = listOf(1, 2).padZip(listOf("a"))        // Result: [Pair(1, "a"), Pair(2, null)]
+ * val padLeft = listOf(1).padZip(listOf("a", "b"))       // Result: [Pair(1, "a"), Pair(null, "b")]
+ * val noPadding = listOf(1, 2).padZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -136,17 +136,17 @@ inline fun <A, B> List<A>.reduceRightNull(
  * }
  * ```
  */
-fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Tuple2<A?, B?>> =
+fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Pair<A?, B?>> =
   align(other) { ior ->
     ior.fold(
-      { it toT null },
-      { null toT it },
-      { a, b -> a toT b }
+      { it to null },
+      { null to it },
+      { a, b -> a to b }
     )
   }
 
 /**
- * Returns a [ListK<C>] containing the result of applying some transformation `(A?, B?) -> C`
+ * Returns a [List<C>] containing the result of applying some transformation `(A?, B?) -> C`
  * on a zip.
  *
  * Example:
@@ -154,9 +154,9 @@ fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Tuple2<A?, B?>> =
  * import arrow.core.*
  *
  * //sampleStart
- * val padZipRight = listOf(1, 2).padZip(listOf("a")) { l, r -> l toT r }     // Result: [Tuple2(1, "a"), Tuple2(2, null)]
- * val padZipLeft = listOf(1).padZip(listOf("a", "b")) { l, r -> l toT r }    // Result: [Tuple2(1, "a"), Tuple2(null, "b")]
- * val noPadding = listOf(1, 2).padZip(listOf("a", "b")) { l, r -> l toT r }  // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val padZipRight = listOf(1, 2).padZip(listOf("a")) { l, r -> l to r }     // Result: [Pair(1, "a"), Pair(2, null)]
+ * val padZipLeft = listOf(1).padZip(listOf("a", "b")) { l, r -> l to r }    // Result: [Pair(1, "a"), Pair(null, "b")]
+ * val noPadding = listOf(1, 2).padZip(listOf("a", "b")) { l, r -> l to r }  // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -167,7 +167,7 @@ fun <A, B> Iterable<A>.padZip(other: Iterable<B>): List<Tuple2<A?, B?>> =
  * ```
  */
 inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): List<C> =
-  padZip(other).map { fa(it.a, it.b) }
+  padZip(other).map { fa(it.first, it.second) }
 
 /**
  * Returns a [List<C>] containing the result of applying some transformation `(A?, B) -> C`
@@ -178,9 +178,9 @@ inline fun <A, B, C> Iterable<A>.padZip(other: Iterable<B>, fa: (A?, B?) -> C): 
  * import arrow.core.*
  *
  * //sampleStart
- * val left = listOf(1, 2).leftPadZip(listOf("a")) { l, r -> l toT r }      // Result: [Tuple2(1, "a")]
- * val right = listOf(1).leftPadZip(listOf("a", "b")) { l, r -> l toT r }   // Result: [Tuple2(1, "a"), Tuple2(null, "b")]
- * val both = listOf(1, 2).leftPadZip(listOf("a", "b")) { l, r -> l toT r } // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val left = listOf(1, 2).leftPadZip(listOf("a")) { l, r -> l to r }      // Result: [Pair(1, "a")]
+ * val right = listOf(1).leftPadZip(listOf("a", "b")) { l, r -> l to r }   // Result: [Pair(1, "a"), Pair(null, "b")]
+ * val both = listOf(1, 2).leftPadZip(listOf("a", "b")) { l, r -> l to r } // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -194,7 +194,7 @@ inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> 
   padZip(other) { a: A?, b: B? -> b?.let { fab(a, it) } }.mapNotNull(::identity)
 
 /**
- * Returns a [List<Tuple2<A?, B>>] containing the zipped values of the two listKs
+ * Returns a [List<Pair<A?, B>>] containing the zipped values of the two lists
  * with null for padding on the left.
  *
  * Example:
@@ -202,9 +202,9 @@ inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> 
  * import arrow.core.*
  *
  * //sampleStart
- * val padRight = listOf(1, 2).leftPadZip(listOf("a"))        // Result: [Tuple2(1, "a")]
- * val padLeft = listOf(1).leftPadZip(listOf("a", "b"))       // Result: [Tuple2(1, "a"), Tuple2(null, "b")]
- * val noPadding = listOf(1, 2).leftPadZip(listOf("a", "b"))  // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val padRight = listOf(1, 2).leftPadZip(listOf("a"))        // Result: [Pair(1, "a")]
+ * val padLeft = listOf(1).leftPadZip(listOf("a", "b"))       // Result: [Pair(1, "a"), Pair(null, "b")]
+ * val noPadding = listOf(1, 2).leftPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -214,8 +214,8 @@ inline fun <A, B, C> Iterable<A>.leftPadZip(other: Iterable<B>, fab: (A?, B) -> 
  * }
  * ```
  */
-fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Tuple2<A?, B>> =
-  this.leftPadZip(other) { a, b -> a toT b }
+fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Pair<A?, B>> =
+  this.leftPadZip(other) { a, b -> a to b }
 
 /**
  * Returns a [List<C>] containing the result of applying some transformation `(A, B?) -> C`
@@ -226,9 +226,9 @@ fun <A, B> Iterable<A>.leftPadZip(other: Iterable<B>): List<Tuple2<A?, B>> =
  * import arrow.core.*
  *
  * //sampleStart
- * val left = listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l toT r }      // Result: [Tuple2(1, "a"), Tuple2(null, "b")]
- * val right = listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l toT r }   // Result: [Tuple2(1, "a")]
- * val both = listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l toT r } // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val left = listOf(1, 2).rightPadZip(listOf("a")) { l, r -> l to r }      // Result: [Pair(1, "a"), Pair(null, "b")]
+ * val right = listOf(1).rightPadZip(listOf("a", "b")) { l, r -> l to r }   // Result: [Pair(1, "a")]
+ * val both = listOf(1, 2).rightPadZip(listOf("a", "b")) { l, r -> l to r } // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -242,7 +242,7 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
   other.leftPadZip(this) { a, b -> fa(b, a) }
 
 /**
- * Returns a [List<Tuple2<A, B?>>] containing the zipped values of the two listKs
+ * Returns a [List<Pair<A, B?>>] containing the zipped values of the two lists
  * with null for padding on the right.
  *
  * Example:
@@ -250,9 +250,9 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
  * import arrow.core.*
  *
  * //sampleStart
- * val padRight = listOf(1, 2).rightPadZip(listOf("a"))        // Result: [Tuple2(1, "a"), Tuple2(2, null)]
- * val padLeft = listOf(1).rightPadZip(listOf("a", "b"))       // Result: [Tuple2(1, "a")]
- * val noPadding = listOf(1, 2).rightPadZip(listOf("a", "b"))  // Result: [Tuple2(1, "a"), Tuple2(2, "b")]
+ * val padRight = listOf(1, 2).rightPadZip(listOf("a"))        // Result: [Pair(1, "a"), Pair(2, null)]
+ * val padLeft = listOf(1).rightPadZip(listOf("a", "b"))       // Result: [Pair(1, "a")]
+ * val noPadding = listOf(1, 2).rightPadZip(listOf("a", "b"))  // Result: [Pair(1, "a"), Pair(2, "b")]
  * //sampleEnd
  *
  * fun main() {
@@ -262,8 +262,8 @@ inline fun <A, B, C> Iterable<A>.rightPadZip(other: Iterable<B>, fa: (A, B?) -> 
  * }
  * ```
  */
-fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Tuple2<A, B?>> =
-  this.rightPadZip(other) { a, b -> a toT b }
+fun <A, B> Iterable<A>.rightPadZip(other: Iterable<B>): List<Pair<A, B?>> =
+  this.rightPadZip(other) { a, b -> a to b }
 
 @Suppress("UNCHECKED_CAST")
 private tailrec fun <A, B> go(
@@ -352,7 +352,7 @@ fun <A> Iterable<A>.salign(
 }
 
 /**
- * unzips the structure holding the resulting elements in an `Tuple2`
+ * unzips the structure holding the resulting elements in an `Pair`
  *
  * ```kotlin:ank:playground
  * import arrow.core.*
@@ -360,15 +360,15 @@ fun <A> Iterable<A>.salign(
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *      listOf("A" toT 1, "B" toT 2).k().unzip()
+ *      listOf("A" to 1, "B" to 2).k().unzip()
  *   //sampleEnd
  *   println(result)
  * }
  * ```
  */
-fun <A, B> Iterable<Tuple2<A, B>>.unzip(): Tuple2<List<A>, List<B>> =
-  fold(emptyList<A>() toT emptyList()) { (l, r), x ->
-    l + x.a toT r + x.b
+fun <A, B> Iterable<Pair<A, B>>.unzip(): Pair<List<A>, List<B>> =
+  fold(emptyList<A>() to emptyList()) { (l, r), x ->
+    l + x.first to r + x.second
   }
 
 /**
@@ -382,7 +382,7 @@ fun <A, B> Iterable<Tuple2<A, B>>.unzip(): Tuple2<List<A>, List<B>> =
  *   val result =
  *    listOf("A:1", "B:2", "C:3").k().unzip { e ->
  *      e.split(":").let {
- *        it.first() toT it.last()
+ *        it.first() to it.last()
  *      }
  *    }
  *   //sampleEnd
@@ -390,7 +390,7 @@ fun <A, B> Iterable<Tuple2<A, B>>.unzip(): Tuple2<List<A>, List<B>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Tuple2<A, B>): Tuple2<List<A>, List<B>> =
+inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Pair<A, B>): Pair<List<A>, List<B>> =
   map(fc).unzip()
 
 /**
@@ -402,19 +402,19 @@ inline fun <A, B, C> Iterable<C>.unzip(fc: (C) -> Tuple2<A, B>): Tuple2<List<A>,
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val result =
- *    listOf(("A" toT 1).bothIor(), ("B" toT 2).bothIor(), "C".leftIor())
+ *    listOf(("A" to 1).bothIor(), ("B" to 2).bothIor(), "C".leftIor())
  *      .unalign()
  *   //sampleEnd
  *   println(result)
  * }
  * ```
  */
-fun <A, B> Iterable<Ior<A, B>>.unalign(): Tuple2<List<A>, List<B>> =
-  fold(emptyList<A>() toT emptyList()) { (l, r), x ->
+fun <A, B> Iterable<Ior<A, B>>.unalign(): Pair<List<A>, List<B>> =
+  fold(emptyList<A>() to emptyList()) { (l, r), x ->
     x.fold(
-      { l + it toT r },
-      { l toT r + it },
-      { a, b -> l + a toT r + b }
+      { l + it to r },
+      { l to r + it },
+      { a, b -> l + a to r + b }
     )
   }
 
@@ -435,7 +435,7 @@ fun <A, B> Iterable<Ior<A, B>>.unalign(): Tuple2<List<A>, List<B>> =
  * }
  * ```
  */
-inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Tuple2<List<A>, List<B>> =
+inline fun <A, B, C> Iterable<C>.unalign(fa: (C) -> Ior<A, B>): Pair<List<A>, List<B>> =
   map(fa).unalign()
 
 fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
@@ -458,9 +458,9 @@ fun <A> Iterable<A>.combineAll(MA: Monoid<A>): A = MA.run {
  *   println(result)
  * }
  */
-fun <A> Iterable<A>.split(): Tuple2<List<A>, A>? =
+fun <A> Iterable<A>.split(): Pair<List<A>, A>? =
   firstOrNull()?.let { first ->
-    Tuple2(tail(), first)
+    tail() to first
   }
 
 fun <A> Iterable<A>.tail(): List<A> =
@@ -544,10 +544,10 @@ fun <A, B> Iterable<Validated<A, B>>.uniteValidated(): List<B> =
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Either.Left] and another List with its [Either.Right] values.
  */
-fun <A, B> Iterable<Either<A, B>>.separateEither(): Tuple2<List<A>, List<B>> {
+fun <A, B> Iterable<Either<A, B>>.separateEither(): Pair<List<A>, List<B>> {
   val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
   val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return Tuple2(asep, bsep)
+  return asep to bsep
 }
 
 /**
@@ -556,10 +556,10 @@ fun <A, B> Iterable<Either<A, B>>.separateEither(): Tuple2<List<A>, List<B>> {
  * @receiver Iterable of Validated
  * @return a tuple containing List with [Validated.Invalid] and another List with its [Validated.Valid] values.
  */
-fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Tuple2<List<A>, List<B>> {
+fun <A, B> Iterable<Validated<A, B>>.separateValidated(): Pair<List<A>, List<B>> {
   val asep = flatMap { gab -> gab.fold({ listOf(it) }, { emptyList() }) }
   val bsep = flatMap { gab -> gab.fold({ emptyList() }, { listOf(it) }) }
-  return Tuple2(asep, bsep)
+  return asep to bsep
 }
 
 fun <A> Iterable<Iterable<A>>.flatten(): List<A> =
@@ -589,11 +589,11 @@ fun <A, B> Iterable<Either<A, B>>.selectM(f: Iterable<(A) -> B>): List<B> =
  *  }
  *  ```
  */
-inline fun <A, B> Iterable<A>.fproduct(f: (A) -> B): List<Tuple2<A, B>> =
-  map { a -> Tuple2(a, f(a)) }
+inline fun <A, B> Iterable<A>.fproduct(f: (A) -> B): List<Pair<A, B>> =
+  map { a -> a to f(a) }
 
 /**
- *  Pairs [B] with [A] returning a List<Tuple2<B, A>>
+ *  Pairs [B] with [A] returning a List<Pair<B, A>>
  *
  *  ```kotlin:ank:playground
  *  import arrow.core.*
@@ -607,11 +607,11 @@ inline fun <A, B> Iterable<A>.fproduct(f: (A) -> B): List<Tuple2<A, B>> =
  *  }
  *  ```
  */
-fun <A, B> Iterable<A>.tupleLeft(b: B): List<Tuple2<B, A>> =
-  map { a -> Tuple2(b, a) }
+fun <A, B> Iterable<A>.tupleLeft(b: B): List<Pair<B, A>> =
+  map { a -> b to a }
 
 /**
- *  Pairs [A] with [B] returning a List<Tuple2<A, B>>
+ *  Pairs [A] with [B] returning a List<Pair<A, B>>
  *
  *  ```kotlin:ank:playground
  *  import arrow.core.*
@@ -625,8 +625,8 @@ fun <A, B> Iterable<A>.tupleLeft(b: B): List<Tuple2<B, A>> =
  *  }
  *  ```
  */
-fun <A, B> Iterable<A>.tupleRight(b: B): List<Tuple2<A, B>> =
-  map { a -> Tuple2(a, b) }
+fun <A, B> Iterable<A>.tupleRight(b: B): List<Pair<A, B>> =
+  map { a -> a to b }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Iterable<A> to Iterable<B>

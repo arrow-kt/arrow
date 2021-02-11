@@ -81,7 +81,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.void(): Validated<E, Unit> =
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("fproduct(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.fproduct(arg1: Function1<A, B>): Validated<E, Tuple2<A, B>> =
-  fix().fproduct(arg1)
+  fix().fproduct(arg1).map { (a, b) -> Tuple2(a, b) }
 
 @JvmName("mapConst")
 @Suppress(
@@ -114,7 +114,7 @@ fun <E, A, B> A.mapConst(arg1: Kind<Kind<ForValidated, E>, B>): Validated<E, A> 
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleLeft(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleLeft(arg1: B): Validated<E, Tuple2<B, A>> =
-  fix().tupleLeft(arg1)
+  fix().tupleLeft(arg1).map { (a, b) -> Tuple2(a, b) }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -125,7 +125,7 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleLeft(arg1: B): Validated<E, Tu
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("tupleRight(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.tupleRight(arg1: B): Validated<E, Tuple2<A, B>> =
-  fix().tupleRight(arg1)
+  fix().tupleRight(arg1).map { (a, b) -> Tuple2(a, b) }
 
 @JvmName("widen")
 @Suppress(

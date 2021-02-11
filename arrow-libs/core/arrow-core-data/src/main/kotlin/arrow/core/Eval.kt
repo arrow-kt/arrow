@@ -594,6 +594,9 @@ fun <A, B, Z> Eval<A>.zip(fb: Eval<B>, f: (A, B) -> Z): Eval<Z> =
 fun <A, B> Eval<A>.zip(fb: Eval<B>): Eval<Pair<A, B>> =
   flatMap { a: A -> fb.map { b: B -> Pair(a, b) } }
 
+fun <A, B, Z> Eval<A>.zipEval(fb: Eval<Eval<B>>, f: (A, B) -> Z): Eval<Eval<Z>> =
+  fb.map { zip(it, f) }
+
 fun <A> Eval<A>.replicate(n: Int): Eval<List<A>> =
   if (n <= 0) Eval.just(emptyList())
   else Eval.mapN(this, replicate(n - 1)) { a: A, xs: List<A> -> listOf(a) + xs }
@@ -604,9 +607,6 @@ fun <A> Eval<A>.replicate(n: Int, MA: Monoid<A>): Eval<A> = MA.run {
 }
 
 fun <A, B> Eval<A>.apEval(ff: Eval<Eval<(A) -> B>>): Eval<Eval<B>> = ff.map { this.ap(it) }
-
-fun <A, B, Z> Eval<A>.map2Eval(fb: Eval<Eval<B>>, f: (Tuple2<A, B>) -> Z): Eval<Eval<Z>> =
-  apEval(fb.map { it.map { b: B -> { a: A -> f(Tuple2(a, b)) } } })
 
 fun <A, B> Eval<A>.apTap(fb: Eval<B>): Eval<A> =
   flatTap { fb }
