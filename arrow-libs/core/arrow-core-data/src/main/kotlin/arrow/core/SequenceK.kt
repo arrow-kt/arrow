@@ -6,6 +6,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+const val SequenceKDeprecation =
+  "SequenceK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.sequences.Sequence instead." +
+    "Arrow provides extension functions on kotlin.sequences.Sequence to cover all the behavior defined for SequenceK"
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -27,6 +31,7 @@ typealias SequenceKOf<A> = arrow.Kind<ForSequenceK, A>
 inline fun <A> SequenceKOf<A>.fix(): SequenceK<A> =
   this as SequenceK<A>
 
+@Deprecated(SequenceKDeprecation)
 data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()
@@ -100,8 +105,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   companion object {
 
+    @Deprecated(SequenceKDeprecation, ReplaceWith("emptySequence<A>()"))
     fun <A> empty(): SequenceK<A> = emptySequence<A>().k()
 
+    @Deprecated(SequenceKDeprecation, ReplaceWith("sequenceOf<A>(a)"))
     fun <A> just(a: A): SequenceK<A> = sequenceOf(a).k()
 
     fun <B, C, D> mapN(
@@ -223,6 +230,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         }
       }
 
+    @Deprecated("tailRecM for Sequence is a terminal operator that breaks the Sequence semantics and will be no longer be supported")
     fun <A, B> tailRecM(a: A, f: (A) -> SequenceKOf<Either<A, B>>): SequenceK<B> {
       tailrec fun <A, B> go(
         buf: MutableList<B>,
@@ -250,36 +258,15 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       go(buf, f, f(a).fix())
       return SequenceK(buf.asSequence())
     }
-
-    fun <A, B> tailRecM(a: A, f: (A) -> Sequence<Either<A, B>>): Sequence<B> {
-      tailrec fun <A, B> go(
-        buf: MutableList<B>,
-        f: (A) -> Sequence<Either<A, B>>,
-        v: Sequence<Either<A, B>>
-      ) {
-        if (v.any()) {
-          when (val head: Either<A, B> = v.first()) {
-            is Either.Right -> {
-              buf += head.b
-              go(buf, f, v.drop(1))
-            }
-            is Either.Left -> {
-              go(buf, f, (f(head.a) + v.drop(1)))
-            }
-          }
-        }
-      }
-
-      val buf = mutableListOf<B>()
-      go(buf, f, f(a))
-      return buf.asSequence()
-    }
   }
 }
 
+@Deprecated(SequenceKDeprecation, ReplaceWith("this + y"))
 fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
 
+@Deprecated("Applicative is deprecated use sequenceEither or sequenceValidated on Sequence instead.")
 fun <A, G> SequenceKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, SequenceK<A>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(SequenceKDeprecation, ReplaceWith("this"))
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)

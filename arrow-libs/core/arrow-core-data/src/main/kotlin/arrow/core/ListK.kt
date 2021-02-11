@@ -6,6 +6,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+const val ListKDeprecation =
+  "ListK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.List instead." +
+    "Arrow provides extension functions on Iterable to cover all the behavior defined for ListK as extension functions"
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -138,6 +142,7 @@ inline fun <A> ListKOf<A>.fix(): ListK<A> =
  * ```
  *
  */
+@Deprecated(ListKDeprecation)
 data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
@@ -446,8 +451,10 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
 
   companion object {
 
+    @Deprecated(ListKDeprecation, ReplaceWith("listOf<A>(a)"))
     fun <A> just(a: A): ListK<A> = listOf(a).k()
 
+    @Deprecated(ListKDeprecation, ReplaceWith("emptyList<A>()"))
     fun <A> empty(): ListK<A> = emptyList<A>().k()
 
     @Suppress("UNCHECKED_CAST")
@@ -468,14 +475,17 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       }
     }
 
+    @Deprecated(ListKDeprecation, ReplaceWith("tailRecMIterable(a, f)"))
     fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForListK, Either<A, B>>): ListK<B> {
       val buf = ArrayList<B>()
       go(buf, f, f(a).fix())
       return ListK(buf)
     }
 
+    @Deprecated(ListKDeprecation, ReplaceWith("a.align(b, fa)"))
     fun <A, B, C> alignWith(a: ListK<A>, b: ListK<B>, fa: (Ior<A, B>) -> C): ListK<C> = align(a, b).map(fa)
 
+    @Deprecated(ListKDeprecation, ReplaceWith("a.align(b)"))
     fun <A, B> align(a: ListK<A>, b: ListK<B>): ListK<Ior<A, B>> = alignRec(a, b).k()
 
     private fun <X, Y> alignRec(ls: List<X>, rs: List<Y>): List<Ior<X, Y>> = when {
@@ -605,10 +615,13 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   }
 }
 
+@Deprecated(ListKDeprecation, ReplaceWith("this + y"))
 fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
   (fix() + y.fix()).k()
 
+@Deprecated(ListKDeprecation, ReplaceWith("this"))
 fun <A> List<A>.k(): ListK<A> = ListK(this)
 
+@Deprecated(ListKDeprecation, ReplaceWith("listOf(elements)"))
 fun <A> listKOf(vararg elements: A): ListK<A> =
   listOf(*elements).k()

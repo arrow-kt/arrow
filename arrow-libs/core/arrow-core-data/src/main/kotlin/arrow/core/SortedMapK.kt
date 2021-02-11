@@ -7,6 +7,10 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 import kotlin.collections.flatMap
 
+const val SortedMapKDeprecation =
+  "SortedMapK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use java.util.SortedMap instead." +
+    "Arrow provides extension functions on java.util.SortedMap and kotlin.collections.Map to cover all the behavior defined for SortedMapK"
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -35,6 +39,7 @@ typealias SortedMapKKindedJ<A, B> = arrow.HkJ2<ForSortedMapK, A, B>
 inline fun <A, B> SortedMapKOf<A, B>.fix(): SortedMapK<A, B> where A : kotlin.Comparable<A> =
   this as SortedMapK<A, B>
 
+@Deprecated(SortedMapKDeprecation)
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
 
   fun <C> map(f: (B) -> C): SortedMapK<A, C> =
@@ -97,27 +102,29 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
   companion object
 }
 
+@Deprecated(SortedMapKDeprecation, ReplaceWith("this"))
 fun <A : Comparable<A>, B> SortedMap<A, B>.k(): SortedMapK<A, B> = SortedMapK(this)
 
+@Deprecated(SortedMapKDeprecation, ReplaceWith("this.fold({ sortedMapOf<A, B>() }, { (k, v) -> sortedMapOf(k to v) })"))
 fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fold(
   { sortedMapOf<A, B>().k() },
   { mapEntry -> sortedMapOf(mapEntry.a to mapEntry.b).k() }
 )
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(SortedMapKDeprecation, ReplaceWith("this.map { (k, v) -> Pair(k, v) }.toMap().toSortedMap()"))
 fun <A : Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapK<A, B> =
   this.map { it.key to it.value }.toMap().toSortedMap().k()
 
+@Deprecated(SortedMapKDeprecation, ReplaceWith("Option.fromNullable(this[k])", "arrow.core.Option"))
 fun <A, B> SortedMap<A, B>.getOption(k: A): Option<B> = Option.fromNullable(this[k])
 
-fun <A : Comparable<A>, B> SortedMapK<A, B>.updated(k: A, value: B): SortedMapK<A, B> {
-  val sortedMutableMap = this.toSortedMap()
-  sortedMutableMap.put(k, value)
-
-  return sortedMutableMap.k()
-}
+@Deprecated(SortedMapKDeprecation, ReplaceWith("this.apply { put(k, value) }"))
+fun <A : Comparable<A>, B> SortedMapK<A, B>.updated(k: A, value: B): SortedMapK<A, B> =
+  this.apply { put(k, value) }
 
 fun <A, B, C> SortedMap<A, B>.foldLeft(b: SortedMap<A, C>, f: (SortedMap<A, C>, Map.Entry<A, B>) -> SortedMap<A, C>): SortedMap<A, C> {
   var result = b

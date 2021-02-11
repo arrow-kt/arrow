@@ -338,3 +338,12 @@ private class MapMonoid<K, A>(private val SG: Semigroup<A>) : Monoid<Map<K, A>> 
   override fun Map<K, A>.combine(b: Map<K, A>): Map<K, A> =
     combine(SG, b)
 }
+
+inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
+  this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
+
+inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
+  var result = b
+  this.forEach { result = f(result, it) }
+  return result
+}

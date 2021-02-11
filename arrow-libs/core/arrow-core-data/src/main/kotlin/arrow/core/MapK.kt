@@ -6,6 +6,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
 
+const val MapKDeprecation =
+  "MapK is deprecated along side Higher Kinded Types in Arrow. Prefer to simply use kotlin.collections.Map instead." +
+    "Arrow provides extension functions on kotlin.collections.Map to cover all the behavior defined for MapK"
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -23,8 +27,10 @@ import arrow.typeclasses.ShowDeprecation
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
+)
+inline fun <K, A> MapKOf<K, A>.fix(): MapK<K, A> = this as MapK<K, A>
 
+@Deprecated(MapKDeprecation)
 data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
 
   fun <B> map(f: (A) -> B): MapK<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
@@ -205,6 +211,7 @@ data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> 
   }
 }
 
+@Deprecated(MapKDeprecation, ReplaceWith("this"))
 fun <K, A> Map<K, A>.k(): MapK<K, A> = MapK(this)
 
 @Deprecated("Deprecated, use nullable instead", ReplaceWith("Tuple2<K, A>>?.let { ... }"))
@@ -214,24 +221,21 @@ fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
     is None -> emptyMap<K, A>().k()
   }
 
+@Deprecated("Applicative is deprecated use sequenceEither or sequenceValidated on Map instead.")
 fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
   fix().traverse(GA, ::identity)
 
+@Deprecated(MapKDeprecation, ReplaceWith("this.map { it.key to it.value }.toMap()"))
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()
 
 @Deprecated("Deprecated, use nullable instead", ReplaceWith("map[k]?.let { ... }"))
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
+@Deprecated(MapKDeprecation, ReplaceWith("this + Pair(k, value)"))
 fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (this + (k to value)).k()
 
 @Deprecated("Available for binary compat", level = DeprecationLevel.HIDDEN)
 fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -> Map<K, B>): Map<K, B> {
-  var result = b
-  this.forEach { result = f(result, it) }
-  return result
-}
-
-inline fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
   var result = b
   this.forEach { result = f(result, it) }
   return result
@@ -247,8 +251,6 @@ internal fun <K, A> Pair<K, A>?.asIterable(): Iterable<Pair<K, A>> =
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
   this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
 
-inline fun <K, A, B> Map<K, A>.foldRight(b: B, f: (Map.Entry<K, A>, B) -> B): B =
-  this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
-
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair", ReplaceWith("tuple.map { (k, v) -> Pair(k, v) }.toMap()"))
 fun <K, V> mapOf(vararg tuple: Tuple2<K, V>): MapK<K, V> =
   if (tuple.isNotEmpty()) tuple.map { it.a to it.b }.toMap().k() else emptyMap<K, V>().k()
