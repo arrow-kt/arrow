@@ -3,8 +3,8 @@ package arrow.fx.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.extension
 import arrow.fx.Timer
+import arrow.fx.reactor.DeprecateReactor
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.MonoKOf
@@ -31,13 +31,13 @@ import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.reactor.handleErrorWith as monoHandleErrorWith
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKFunctor : Functor<ForMonoK> {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
@@ -52,7 +52,7 @@ interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
     Eval.now(fix().ap(MonoK.defer { ff.value() }))
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
@@ -70,7 +70,7 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
     Eval.now(fix().ap(MonoK.defer { ff.value() }))
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKApplicativeError : ApplicativeError<ForMonoK, Throwable>, MonoKApplicative {
   override fun <A> raiseError(e: Throwable): MonoK<A> =
     MonoK.raiseError(e)
@@ -79,7 +79,7 @@ interface MonoKApplicativeError : ApplicativeError<ForMonoK, Throwable>, MonoKAp
     fix().monoHandleErrorWith { f(it).fix() }
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKMonadError : MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKApplicativeError {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
@@ -91,22 +91,22 @@ interface MonoKMonadError : MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKAp
     fix().monoHandleErrorWith { f(it).fix() }
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKMonadThrow : MonadThrow<ForMonoK>, MonoKMonadError
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKBracket : Bracket<ForMonoK, Throwable>, MonoKMonadThrow {
   override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKMonadDefer : MonadDefer<ForMonoK>, MonoKBracket {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKAsync : Async<ForMonoK>, MonoKMonadDefer {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
     MonoK.async(fa)
@@ -118,19 +118,19 @@ interface MonoKAsync : Async<ForMonoK>, MonoKMonadDefer {
     fix().continueOn(ctx)
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKEffect : Effect<ForMonoK>, MonoKAsync {
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     fix().runAsync(cb)
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKConcurrentEffect : ConcurrentEffect<ForMonoK>, MonoKEffect {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-@extension
+@Deprecated(DeprecateReactor)
 interface MonoKTimer : Timer<ForMonoK> {
   override fun sleep(duration: Duration): MonoK<Unit> =
     MonoK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
@@ -138,5 +138,6 @@ interface MonoKTimer : Timer<ForMonoK> {
 }
 
 // TODO FluxK does not yet have a Concurrent instance
+@Deprecated(DeprecateReactor)
 fun <A> MonoK.Companion.fx(c: suspend AsyncSyntax<ForMonoK>.() -> A): MonoK<A> =
   MonoK.async().fx.async(c).fix()
