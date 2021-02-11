@@ -6,7 +6,6 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.extension
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
 import arrow.fx.Timer
@@ -54,14 +53,12 @@ import kotlin.coroutines.CoroutineContext
 import arrow.fx.rx2.handleErrorWith as maybeHandleErrorWith
 import io.reactivex.disposables.Disposable as RxDisposable
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKFunctor : Functor<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKApplicative : Applicative<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
@@ -77,7 +74,6 @@ interface MaybeKApplicative : Applicative<ForMaybeK> {
     Eval.now(fix().ap(MaybeK.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
@@ -96,7 +92,6 @@ interface MaybeKMonad : Monad<ForMaybeK>, MaybeKApplicative {
     Eval.now(fix().ap(MaybeK.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKFoldable : Foldable<ForMaybeK> {
 
@@ -119,7 +114,6 @@ interface MaybeKFoldable : Foldable<ForMaybeK> {
     fix().nonEmpty()
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKApplicativeError :
   ApplicativeError<ForMaybeK, Throwable>,
@@ -131,7 +125,6 @@ interface MaybeKApplicativeError :
     fix().maybeHandleErrorWith { f(it).fix() }
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKMonadError :
   MonadError<ForMaybeK, Throwable>,
@@ -143,25 +136,21 @@ interface MaybeKMonadError :
     fix().maybeHandleErrorWith { f(it).fix() }
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKMonadThrow : MonadThrow<ForMaybeK>, MaybeKMonadError
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKBracket : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKMonadDefer : MonadDefer<ForMaybeK>, MaybeKBracket {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
@@ -174,7 +163,6 @@ interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
     fix().continueOn(ctx)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKEffect :
   Effect<ForMaybeK>,
@@ -283,7 +271,6 @@ fun MaybeK.Companion.concurrent(dispatchers: Dispatchers<ForMaybeK> = MaybeK.dis
   override fun dispatchers(): Dispatchers<ForMaybeK> = dispatchers
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForMaybeK, A>): A = fa().fix().unsafeRunSync()
@@ -292,7 +279,6 @@ interface MaybeKUnsafeRun : UnsafeRun<ForMaybeK> {
     fa().fix().unsafeRunAsync(cb)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
   override fun default(): CoroutineContext =
@@ -302,7 +288,6 @@ interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
     IOScheduler
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKTimer : Timer<ForMaybeK> {
   override fun sleep(duration: Duration): MaybeK<Unit> =
@@ -310,14 +295,12 @@ interface MaybeKTimer : Timer<ForMaybeK> {
       .map { Unit })
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK>, MaybeKFunctor {
   override fun <A, B> Kind<ForMaybeK, A>.filterMap(f: (A) -> Option<B>): Kind<ForMaybeK, B> =
     fix().filterMap(f)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface MaybeKMonadFilter : MonadFilter<ForMaybeK>, MaybeKMonad {
   override fun <A> empty(): MaybeK<A> =

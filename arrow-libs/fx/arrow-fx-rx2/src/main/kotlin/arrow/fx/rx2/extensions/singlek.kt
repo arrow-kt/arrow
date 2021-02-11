@@ -28,7 +28,6 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.fx.internal.AtomicBooleanW
 import arrow.fx.rx2.DeprecateRxJava
 import arrow.fx.rx2.asScheduler
@@ -53,14 +52,12 @@ import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as RxDisposable
 import arrow.fx.rx2.handleErrorWith as singleHandleErrorWith
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKFunctor : Functor<ForSingleK> {
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKApplicative : Applicative<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
@@ -76,7 +73,6 @@ interface SingleKApplicative : Applicative<ForSingleK> {
     Eval.now(fix().ap(SingleK.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
@@ -95,7 +91,6 @@ interface SingleKMonad : Monad<ForSingleK>, SingleKApplicative {
     Eval.now(fix().ap(SingleK.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKApplicativeError :
   ApplicativeError<ForSingleK, Throwable>,
@@ -107,7 +102,6 @@ interface SingleKApplicativeError :
     fix().singleHandleErrorWith { f(it).fix() }
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKMonadError :
   MonadError<ForSingleK, Throwable>,
@@ -119,25 +113,21 @@ interface SingleKMonadError :
     fix().singleHandleErrorWith { f(it).fix() }
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKMonadThrow : MonadThrow<ForSingleK>, SingleKMonadError
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKBracket : Bracket<ForSingleK, Throwable>, SingleKMonadThrow {
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKMonadDefer : MonadDefer<ForSingleK>, SingleKBracket {
   override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
     SingleK.defer(fa)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKAsync :
   Async<ForSingleK>,
@@ -152,7 +142,6 @@ interface SingleKAsync :
     fix().continueOn(ctx)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKEffect :
   Effect<ForSingleK>,
@@ -259,7 +248,6 @@ fun SingleK.Companion.concurrent(dispatchers: Dispatchers<ForSingleK> = SingleK.
   override fun dispatchers(): Dispatchers<ForSingleK> = dispatchers
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKDispatchers : Dispatchers<ForSingleK> {
   override fun default(): CoroutineContext =
@@ -269,14 +257,12 @@ interface SingleKDispatchers : Dispatchers<ForSingleK> {
     IOScheduler
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKConcurrentEffect : ConcurrentEffect<ForSingleK>, SingleKEffect {
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKTimer : Timer<ForSingleK> {
   override fun sleep(duration: Duration): SingleK<Unit> =
@@ -284,7 +270,6 @@ interface SingleKTimer : Timer<ForSingleK> {
       .map { Unit })
 }
 
-@extension
 @Deprecated(DeprecateRxJava)
 interface SingleKUnsafeRun : UnsafeRun<ForSingleK> {
 
