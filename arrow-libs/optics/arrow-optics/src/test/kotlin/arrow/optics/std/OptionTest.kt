@@ -5,7 +5,6 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.monoid.monoid
-import arrow.core.map2
 import arrow.optics.none
 import arrow.optics.some
 import arrow.optics.toEither
@@ -14,6 +13,7 @@ import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.option
+import arrow.core.zip
 import arrow.optics.test.laws.IsoLaws
 import arrow.optics.test.laws.PrismLaws
 import arrow.typeclasses.Eq
@@ -61,7 +61,7 @@ class OptionTest : UnitSpec() {
       EQB = Eq.any(),
       bMonoid = object : Monoid<Either<Unit, Int>> {
         override fun Either<Unit, Int>.combine(b: Either<Unit, Int>): Either<Unit, Int> =
-          this.map2(b) { (a, b) -> a + b }
+          this.zip(b) { a, b -> a + b }
 
         override fun empty(): Either<Unit, Int> = Right(0)
       }

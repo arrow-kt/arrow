@@ -3,12 +3,12 @@ package arrow.optics.std
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.Validated
-import arrow.core.map2
 import arrow.optics.toEither
 import arrow.core.test.UnitSpec
 import arrow.core.test.generators.either
 import arrow.core.test.generators.functionAToB
 import arrow.core.test.generators.validated
+import arrow.core.zip
 import arrow.optics.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
@@ -30,7 +30,7 @@ class ValidatedTest : UnitSpec() {
           override fun empty() = Right(0)
 
           override fun Either<String, Int>.combine(b: Either<String, Int>): Either<String, Int> =
-            this.map2(b) { (a, b) -> a + b }
+            this.zip(b) { a, b -> a + b }
         })
     )
   }
