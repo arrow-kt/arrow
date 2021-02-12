@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import arrow.fx.IO
+import arrow.fx.IODeprecation
 import arrow.fx.IOOf
 import arrow.fx.coroutines.SuspendConnection
 import arrow.fx.fix
@@ -25,9 +26,11 @@ internal open class ArrowInternalException(
 private const val initialIndex: Int = 0
 private const val chunkSize: Int = 8
 
+@Deprecated(IODeprecation)
 object Platform {
 
   @Suppress("UNCHECKED_CAST")
+  @Deprecated(IODeprecation)
   class ArrayStack<A> {
 
     private val initialArray: Array<Any?> = arrayOfNulls<Any?>(chunkSize)
@@ -126,8 +129,10 @@ object Platform {
    *  - therefore a "map fusion" that goes 128 in stack depth can use
    *    about 4 KB of stack space
    */
+  @Deprecated(IODeprecation)
   const val maxStackDepthSize = 127
 
+  @Deprecated(IODeprecation)
   inline fun <A> onceOnly(crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBooleanW(false)
 
@@ -149,6 +154,7 @@ object Platform {
     }
   }
 
+  @Deprecated(IODeprecation)
   fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
     val latch = OneShotLatch()
     var ref: Either<Throwable, A>? = null
@@ -177,6 +183,7 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
+  @Deprecated(IODeprecation)
   fun composeErrors(first: Throwable, vararg rest: Throwable): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
@@ -189,11 +196,13 @@ object Platform {
    * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
    * function would return a CompositeException.
    */
+  @Deprecated(IODeprecation)
   fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
   }
 
+  @Deprecated(IODeprecation)
   inline fun trampoline(crossinline f: () -> Unit): Unit =
     _trampoline.get().execute(Runnable { f() })
 

@@ -1,5 +1,6 @@
 package arrow.fx.internal
 
+import arrow.fx.IODeprecation
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.updateAndGet
 import kotlinx.atomicfu.getAndUpdate
@@ -7,6 +8,7 @@ import kotlinx.atomicfu.getAndUpdate
 /**
  * Internal wrapper for Atomic-FU Atomics to be used as local variables
  */
+@Deprecated(IODeprecation)
 class AtomicRefW<A>(a: A) {
   private val atomicRef = atomic(a)
 
@@ -35,6 +37,7 @@ class AtomicRefW<A>(a: A) {
     value.toString()
 }
 
+@Deprecated(IODeprecation)
 class AtomicBooleanW(a: Boolean) {
   private val atomicRef = atomic(a)
 
@@ -63,6 +66,7 @@ class AtomicBooleanW(a: Boolean) {
     value.toString()
 }
 
+@Deprecated(IODeprecation)
 class AtomicIntW(a: Int) {
   private val atomicRef = atomic(a)
 

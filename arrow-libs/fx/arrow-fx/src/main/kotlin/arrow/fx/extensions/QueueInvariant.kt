@@ -2,7 +2,6 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.extension
 import arrow.fx.IODeprecation
 import arrow.fx.Queue
 import arrow.fx.QueueOf
@@ -12,7 +11,6 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Invariant
 import arrow.undocumented
 
-@extension
 @undocumented
 @Deprecated(IODeprecation)
 interface QueueInvariant<F> : Invariant<QueuePartialOf<F>> {

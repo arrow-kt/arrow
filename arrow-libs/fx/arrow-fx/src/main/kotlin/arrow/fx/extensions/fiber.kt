@@ -2,6 +2,7 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Tuple2
+import arrow.fx.IODeprecation
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
@@ -15,6 +16,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
+@Deprecated(IODeprecation)
 fun <F> Fiber.Companion.functor(C: Concurrent<F>): Functor<Kind<ForFiber, F>> =
   object : Functor<FiberPartialOf<F>> {
     override fun <A, B> FiberOf<F, A>.map(f: (A) -> B): Fiber<F, B> = C.run {
@@ -23,6 +25,7 @@ fun <F> Fiber.Companion.functor(C: Concurrent<F>): Functor<Kind<ForFiber, F>> =
     }
   }
 
+@Deprecated(IODeprecation)
 fun <F> Fiber.Companion.apply(C: Concurrent<F>): Apply<Kind<ForFiber, F>> =
   object : Apply<FiberPartialOf<F>>, Functor<FiberPartialOf<F>> by functor(C) {
     override fun <A, B> Kind<FiberPartialOf<F>, A>.ap(ff: Kind<FiberPartialOf<F>, (A) -> B>): Kind<FiberPartialOf<F>, B> = C.run {
@@ -50,12 +53,14 @@ fun <F> Fiber.Companion.apply(C: Concurrent<F>): Apply<Kind<ForFiber, F>> =
     }
   }
 
+@Deprecated(IODeprecation)
 fun <F> Fiber.Companion.applicative(C: Concurrent<F>): Applicative<Kind<ForFiber, F>> =
   object : Applicative<FiberPartialOf<F>>, Apply<FiberPartialOf<F>> by apply(C) {
     override fun <A> just(a: A): Kind<FiberPartialOf<F>, A> =
       Fiber(C.just(a), C.unit())
   }
 
+@Deprecated(IODeprecation)
 fun <F, A> Fiber.Companion.semigroup(C: Concurrent<F>, S: Semigroup<A>) =
   object : Semigroup<Fiber<F, A>> {
     override fun Fiber<F, A>.combine(b: Fiber<F, A>): Fiber<F, A> = apply(C).run {
@@ -65,6 +70,7 @@ fun <F, A> Fiber.Companion.semigroup(C: Concurrent<F>, S: Semigroup<A>) =
     }
   }
 
+@Deprecated(IODeprecation)
 fun <F, A> Fiber.Companion.monoid(C: Concurrent<F>, M: Monoid<A>): Monoid<Fiber<F, A>> =
   object : Monoid<Fiber<F, A>>, Semigroup<Fiber<F, A>> by semigroup(C, M) {
     override fun empty(): Fiber<F, A> =

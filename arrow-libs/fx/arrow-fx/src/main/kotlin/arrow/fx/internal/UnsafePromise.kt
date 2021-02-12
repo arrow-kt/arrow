@@ -1,9 +1,11 @@
 package arrow.fx.internal
 
 import arrow.core.Either
+import arrow.fx.IODeprecation
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
+@Deprecated(IODeprecation)
 class UnsafePromise<A> {
 
   private sealed class State<out A> {

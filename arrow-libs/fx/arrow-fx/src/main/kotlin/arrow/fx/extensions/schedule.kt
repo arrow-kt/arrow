@@ -3,7 +3,6 @@ package arrow.fx.extensions
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.identity
-import arrow.extension
 import arrow.fx.ForSchedule
 import arrow.fx.IODeprecation
 import arrow.fx.Schedule
@@ -23,21 +22,18 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleFunctor<F, Input> : Functor<SchedulePartialOf<F, Input>> {
   override fun <A, B> Kind<SchedulePartialOf<F, Input>, A>.map(f: (A) -> B): Kind<SchedulePartialOf<F, Input>, B> =
     fix().map(f)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleAppy<F, Input> : Apply<SchedulePartialOf<F, Input>>, ScheduleFunctor<F, Input> {
   override fun <A, B> Kind<SchedulePartialOf<F, Input>, A>.ap(ff: Kind<SchedulePartialOf<F, Input>, (A) -> B>): Kind<SchedulePartialOf<F, Input>, B> =
     fix().and(ff.fix()).map { (a, f) -> f(a) }
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input>>, ScheduleAppy<F, Input> {
 
@@ -50,7 +46,6 @@ interface ScheduleApplicative<F, Input> : Applicative<SchedulePartialOf<F, Input
     fix().map(f)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleSemigroup<F, Input, Output> : Semigroup<Schedule<F, Input, Output>> {
   fun OI(): Semigroup<Output>
@@ -59,7 +54,6 @@ interface ScheduleSemigroup<F, Input, Output> : Semigroup<Schedule<F, Input, Out
     and(b).map { (a, b) -> OI().run { a + b } }
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>, ScheduleSemigroup<F, Input, Output> {
   override fun OI(): Monoid<Output>
@@ -69,14 +63,12 @@ interface ScheduleMonoid<F, Input, Output> : Monoid<Schedule<F, Input, Output>>,
     Schedule.forever<F, Input>(MF()).const(OI().empty())
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleSemigroupK<F, Input> : SemigroupK<SchedulePartialOf<F, Input>> {
   override fun <A> Kind<SchedulePartialOf<F, Input>, A>.combineK(y: Kind<SchedulePartialOf<F, Input>, A>): Kind<SchedulePartialOf<F, Input>, A> =
     fix().andThen(y.fix()).map { it.fold(::identity, ::identity) }
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleContravariant<F, Output> : Contravariant<Conested<Kind<ForSchedule, F>, Output>> {
   override fun <A, B> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForSchedule, F>, Output>, B> =
@@ -86,14 +78,12 @@ interface ScheduleContravariant<F, Output> : Contravariant<Conested<Kind<ForSche
     fix().contramap(f)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleProfunctor<F> : Profunctor<Kind<ForSchedule, F>> {
   override fun <A, B, C, D> Kind2<Kind<ForSchedule, F>, A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Kind2<Kind<ForSchedule, F>, C, D> =
     fix().dimap(fl, fr)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface ScheduleCategory<F> : Category<Kind<ForSchedule, F>> {
   fun MM(): Monad<F>

@@ -6,7 +6,6 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.identity
-import arrow.extension
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IODeprecation
@@ -54,14 +53,12 @@ import kotlin.coroutines.CoroutineContext
 import arrow.fx.handleError as ioHandleError
 import arrow.fx.handleErrorWith as ioHandleErrorWith
 
-@extension
 @Deprecated(IODeprecation)
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOApply : Apply<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
@@ -74,7 +71,6 @@ interface IOApply : Apply<ForIO> {
     Eval.now(fix().ap(IO.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOApplicative : Applicative<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
@@ -90,7 +86,6 @@ interface IOApplicative : Applicative<ForIO> {
     Eval.now(fix().ap(IO.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonad : Monad<ForIO> {
   override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
@@ -109,7 +104,6 @@ interface IOMonad : Monad<ForIO> {
     Eval.now(fix().ap(IO.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
@@ -128,7 +122,6 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
     IO.raiseError(e)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
 
@@ -156,11 +149,9 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
     Eval.now(fix().ap(IO.defer { ff.value() }))
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 
-@extension
 @Deprecated(IODeprecation)
 interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
@@ -176,7 +167,6 @@ interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
     fix().guaranteeCase(finalizer)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
@@ -185,7 +175,6 @@ interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun lazy(): IO<Unit> = IO.lazy
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
@@ -235,14 +224,15 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
     IO.raceN(this@raceN, fa, fb, fc)
 }
 
+@Deprecated(IODeprecation)
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
+@Deprecated(IODeprecation)
 fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
   Timer(CF)
 
-@extension
 @Deprecated(IODeprecation)
 interface IOEffect : Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
@@ -261,7 +251,6 @@ fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEf
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOSemigroup<A> : Semigroup<IO<A>> {
 
@@ -271,7 +260,6 @@ interface IOSemigroup<A> : Semigroup<IO<A>> {
     flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   override fun SG(): Monoid<A>
@@ -279,13 +267,11 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   override fun empty(): IO<A> = IO.just(SG().empty())
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOMonadIO : MonadIO<ForIO>, IOMonad {
   override fun <A> IO<A>.liftIO(): Kind<ForIO, A> = this
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOUnsafeRun : UnsafeRun<ForIO> {
 
@@ -295,7 +281,6 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
     fa().fix().unsafeRunAsync(cb)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
   override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
@@ -307,7 +292,6 @@ interface IOUnsafeCancellableRun : UnsafeCancellableRun<ForIO> {
     fa().fix().unsafeRunAsyncCancellable(onCancel, cb)
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
@@ -317,7 +301,6 @@ interface IODispatchers : Dispatchers<ForIO> {
     IODispatchers.IOPool
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IOEnvironment : Environment<ForIO> {
   override fun dispatchers(): Dispatchers<ForIO> =
@@ -327,7 +310,6 @@ interface IOEnvironment : Environment<ForIO> {
     IO { println("Found uncaught async exception!"); e.printStackTrace() }
 }
 
-@extension
 @Deprecated(IODeprecation)
 interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
 
@@ -335,12 +317,13 @@ interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
     IO.dispatchers()
 }
 
+@Deprecated(IODeprecation)
 fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 
-@extension
 @Deprecated(IODeprecation)
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
+@Deprecated(IODeprecation)
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
   IO.concurrent().fx.concurrent(c).fix()
 
@@ -348,6 +331,7 @@ fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers
  * Right value or alternatively to the result of applying the specified function to this Left value.
  */
+@Deprecated(IODeprecation)
 fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
   fold({ IO.raiseError(f(it)) }, { IO.just(it) })
 
@@ -355,10 +339,10 @@ fun <E, A> Either<E, A>.toIO(f: (E) -> Throwable): IO<A> =
  * converts this Either to an IO. The resulting IO will evaluate to this Eithers
  * Right value or Left exception.
  */
+@Deprecated(IODeprecation)
 fun <A> Either<Throwable, A>.toIO(): IO<A> =
   toIO(::identity)
 
-@extension
 @Deprecated(IODeprecation)
 interface IOSemigroupK : SemigroupK<ForIO> {
   override fun <A> Kind<ForIO, A>.combineK(y: Kind<ForIO, A>): Kind<ForIO, A> =

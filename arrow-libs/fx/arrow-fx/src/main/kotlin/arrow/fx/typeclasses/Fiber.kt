@@ -3,7 +3,19 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.fx.IODeprecation
 
-import arrow.higherkind
+@Deprecated(IODeprecation)
+class ForFiber private constructor() { companion object }
+
+@Deprecated(IODeprecation)
+typealias FiberOf<F, A> = arrow.Kind2<ForFiber, F, A>
+
+@Deprecated(IODeprecation)
+typealias FiberPartialOf<F> = arrow.Kind<ForFiber, F>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Deprecated(IODeprecation)
+inline fun <F, A> FiberOf<F, A>.fix(): Fiber<F, A> =
+  this as Fiber<F, A>
 
 /**
  * [Fiber] represents the pure result of an [Async] data type
@@ -12,7 +24,6 @@ import arrow.higherkind
  * You can think of fibers as being lightweight threads, a Fiber being a
  * concurrency primitive for doing cooperative multi-tasking.
  */
-@higherkind
 @Deprecated(IODeprecation)
 interface Fiber<F, out A> : FiberOf<F, A> {
 

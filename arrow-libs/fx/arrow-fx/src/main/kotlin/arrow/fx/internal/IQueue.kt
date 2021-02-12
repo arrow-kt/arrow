@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.toT
 import arrow.core.extensions.list.foldable.exists
 import arrow.core.extensions.list.foldable.nonEmpty
+import arrow.fx.IODeprecation
 
 /**
  *  Port of `scala.collection.immutable.Queue`
@@ -18,7 +19,7 @@ import arrow.core.extensions.list.foldable.nonEmpty
  *  queue is pivoted by replacing the ''out'' list by ''in.reverse'', and ''in'' by ''Nil''.
  *
  */
-
+@Deprecated(IODeprecation)
 class IQueue<A> internal constructor(val lIn: List<A>, val lOut: List<A>) : Iterable<A> {
 
   private fun <A> Iterable<A>.head() = first()

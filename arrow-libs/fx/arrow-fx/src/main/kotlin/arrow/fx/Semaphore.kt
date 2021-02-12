@@ -17,6 +17,7 @@ import arrow.typeclasses.ApplicativeError
  * A counting [Semaphore] is used to control access to a resource in a concurrent system.
  * It keeps track of the count of available resources.
  */
+@Deprecated(IODeprecation)
 interface Semaphore<F> {
 
   /**

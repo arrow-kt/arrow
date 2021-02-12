@@ -206,6 +206,7 @@ interface Ref<F, A> {
  * }
  * ```
  */
+@Deprecated(IODeprecation)
 interface RefFactory<F> {
 
   /**
