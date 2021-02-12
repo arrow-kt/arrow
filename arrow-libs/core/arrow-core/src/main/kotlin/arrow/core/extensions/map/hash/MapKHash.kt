@@ -2,6 +2,7 @@ package arrow.core.extensions.map.hash
 
 import arrow.core.extensions.MapKHash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -15,25 +16,19 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hash(HK, HA)",
-  "arrow.core.hash"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <K, A> Map<K, A>.hash(HK: Hash<K>, HA: Hash<A>): Int =
     arrow.core.extensions.map.hash.Map.hash<K, A>(HK, HA).run {
   arrow.core.MapK(this@hash).hash() as kotlin.Int
 }
 
+@Deprecated("Receiver Map object is deprecated, prefer to turn Map functions into top-level functions")
 object Map {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Hash.map(HK, HA)", "arrow.core.Hash", "arrow.core.map"))
+  @Deprecated(HashDeprecation)
   inline fun <K, A> hash(HK: Hash<K>, HA: Hash<A>): MapKHash<K, A> = object :
       arrow.core.extensions.MapKHash<K, A> { override fun HK(): arrow.typeclasses.Hash<K> = HK
 

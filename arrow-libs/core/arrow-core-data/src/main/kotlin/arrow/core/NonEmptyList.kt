@@ -3,7 +3,6 @@ package arrow.core
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
@@ -590,20 +589,9 @@ fun <E, A> NonEmptyList<Validated<E, NonEmptyList<A>>>.flatSequenceValidated(sem
 fun <E> NonEmptyList<Validated<E, *>>.sequenceValidated_(semigroup: Semigroup<E>): Validated<E, Unit> =
   traverseValidated_(semigroup, ::identity)
 
-fun <A> Hash.Companion.nonEmptyList(HA: Hash<A>): Hash<NonEmptyList<A>> =
-  NonEmptyListHash(HA)
-
 @Suppress("UNCHECKED_CAST")
 fun <A> Semigroup.Companion.nonEmptyList(): Semigroup<NonEmptyList<A>> =
   NonEmptyListSemigroup as Semigroup<NonEmptyList<A>>
-
-private class NonEmptyListHash<A>(
-  private val HA: Hash<A>,
-) : Hash<NonEmptyList<A>> {
-  override fun NonEmptyList<A>.hash(): Int = hash(HA)
-
-  override fun NonEmptyList<A>.hashWithSalt(salt: Int): Int = hashWithSalt(HA, salt)
-}
 
 object NonEmptyListSemigroup : Semigroup<NonEmptyList<Any?>> {
   override fun NonEmptyList<Any?>.combine(b: NonEmptyList<Any?>): NonEmptyList<Any?> =

@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -68,66 +66,6 @@ data class Tuple6<out A, out B, out C, out D, out E, out F>(
 
   companion object
 }
-
-fun <A, B, C, D, E, F> Tuple6<A, B, C, D, E, F>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        HD.run {
-          HE.run {
-            HF.run {
-              a.hashWithSalt(
-                b.hashWithSalt(
-                  c.hashWithSalt(
-                    d.hashWithSalt(
-                      e.hashWithSalt(
-                        f.hashWithSalt(salt)
-                      )))))
-            }
-          }
-        }
-      }
-    }
-  }
-
-fun <A, B, C, D, E, F> Tuple6<A, B, C, D, E, F>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>
-): Int = hashWithSalt(HA, HB, HC, HD, HE, HF, defaultSalt)
-
-private class Tuple6Hash<A, B, C, D, E, F>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>,
-  private val HD: Hash<D>,
-  private val HE: Hash<E>,
-  private val HF: Hash<F>
-) : Hash<Tuple6<A, B, C, D, E, F>> {
-  override fun Tuple6<A, B, C, D, E, F>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, HD, HE, HF, salt)
-}
-
-fun <A, B, C, D, E, F> Hash.Companion.tuple6(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>
-): Hash<Tuple6<A, B, C, D, E, F>> =
-  Tuple6Hash(HA, HB, HC, HD, HE, HF)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>>
   Tuple6<A, B, C, D, E, F>.compareTo(other: Tuple6<A, B, C, D, E, F>): Int {

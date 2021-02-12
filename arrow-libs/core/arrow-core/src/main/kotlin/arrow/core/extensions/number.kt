@@ -4,6 +4,7 @@ import arrow.core.Ordering
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
@@ -50,12 +51,12 @@ interface ByteShow : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.byte()", "arrow.core.Hash", "arrow.core.byte"))
+@Deprecated(HashDeprecation)
 interface ByteHash : Hash<Byte>, ByteEq {
   override fun Byte.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.byte()", "arrow.core.Hash", "arrow.core.byte"))
+@Deprecated(HashDeprecation)
 fun Byte.Companion.hash(): Hash<Byte> =
   object : ByteHash {}
 
@@ -121,12 +122,12 @@ interface DoubleShow : Show<Double> {
   override fun Double.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.double()", "arrow.core.Hash", "arrow.core.double"))
+@Deprecated(HashDeprecation)
 interface DoubleHash : Hash<Double>, DoubleEq {
   override fun Double.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.double()", "arrow.core.Hash", "arrow.core.double"))
+@Deprecated(HashDeprecation)
 fun Double.Companion.hash(): Hash<Double> =
   object : DoubleHash {}
 
@@ -192,12 +193,12 @@ interface IntOrder : Order<Int> {
   override fun Int.compareTo(b: Int): Int = this.compareTo(b)
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.int()", "arrow.core.Hash", "arrow.core.int"))
+@Deprecated(HashDeprecation)
 interface IntHash : Hash<Int> {
   override fun Int.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.int()", "arrow.core.Hash", "arrow.core.int"))
+@Deprecated(HashDeprecation)
 fun Int.Companion.hash(): Hash<Int> = object : IntHash {}
 
 @Deprecated(ShowDeprecation)
@@ -262,12 +263,12 @@ interface LongShow : Show<Long> {
   override fun Long.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.long()", "arrow.core.Hash", "arrow.core.long"))
+@Deprecated(HashDeprecation)
 interface LongHash : Hash<Long>, LongEq {
   override fun Long.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.long()", "arrow.core.Hash", "arrow.core.long"))
+@Deprecated(HashDeprecation)
 fun Long.Companion.hash(): Hash<Long> =
   object : LongHash {}
 
@@ -333,12 +334,12 @@ interface ShortShow : Show<Short> {
   override fun Short.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.short()", "arrow.core.Hash", "arrow.core.short"))
+@Deprecated(HashDeprecation)
 interface ShortHash : Hash<Short>, ShortEq {
   override fun Short.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.short()", "arrow.core.Hash", "arrow.core.short"))
+@Deprecated(HashDeprecation)
 fun Short.Companion.hash(): Hash<Short> =
   object : ShortHash {}
 
@@ -404,12 +405,12 @@ interface FloatShow : Show<Float> {
   override fun Float.show(): String = toString()
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.float()", "arrow.core.Hash", "arrow.core.float"))
+@Deprecated(HashDeprecation)
 interface FloatHash : Hash<Float>, FloatEq {
   override fun Float.hash(): Int = hashCode()
 }
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.float()", "arrow.core.Hash", "arrow.core.float"))
+@Deprecated(HashDeprecation)
 fun Float.Companion.hash(): Hash<Float> =
   object : FloatHash {}
 

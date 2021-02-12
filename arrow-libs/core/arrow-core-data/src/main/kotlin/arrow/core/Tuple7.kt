@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -71,74 +69,6 @@ data class Tuple7<out A, out B, out C, out D, out E, out F, out G>(
 
   companion object
 }
-
-fun <A, B, C, D, E, F, G> Tuple7<A, B, C, D, E, F, G>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        HD.run {
-          HE.run {
-            HF.run {
-              HG.run {
-                a.hashWithSalt(
-                  b.hashWithSalt(
-                    c.hashWithSalt(
-                      d.hashWithSalt(
-                        e.hashWithSalt(
-                          f.hashWithSalt(
-                            g.hashWithSalt(salt)
-                          ))))))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-fun <A, B, C, D, E, F, G> Tuple7<A, B, C, D, E, F, G>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  salt: Int
-): Int = hashWithSalt(HA, HB, HC, HD, HE, HF, HG, defaultSalt)
-
-private class Tuple7Hash<A, B, C, D, E, F, G>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>,
-  private val HD: Hash<D>,
-  private val HE: Hash<E>,
-  private val HF: Hash<F>,
-  private val HG: Hash<G>
-) : Hash<Tuple7<A, B, C, D, E, F, G>> {
-  override fun Tuple7<A, B, C, D, E, F, G>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, HD, HE, HF, HG, salt)
-}
-
-fun <A, B, C, D, E, F, G> Hash.Companion.tuple7(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>
-): Hash<Tuple7<A, B, C, D, E, F, G>> =
-  Tuple7Hash(HA, HB, HC, HD, HE, HF, HG)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>>
   Tuple7<A, B, C, D, E, F, G>.compareTo(other: Tuple7<A, B, C, D, E, F, G>): Int {

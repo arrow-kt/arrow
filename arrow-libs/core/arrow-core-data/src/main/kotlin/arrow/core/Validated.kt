@@ -3,13 +3,10 @@ package arrow.core
 import arrow.Kind
 import arrow.KindDeprecation
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
-import arrow.typeclasses.hashWithSalt
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>
@@ -840,14 +837,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
     { "Validated.Valid($it)" }
   )
 
-  fun hash(HL: Hash<E>, HR: Hash<A>): Int =
-    hashWithSalt(HL, HR, defaultSalt)
-
-  fun hashWithSalt(HL: Hash<E>, HR: Hash<A>, salt: Int): Int = fold(
-    { e -> HL.run { e.hashWithSalt(salt.hashWithSalt(0)) } },
-    { a -> HR.run { a.hashWithSalt(salt.hashWithSalt(1)) } }
-  )
-
   data class Valid<out A>(
     @Deprecated("Use value instead", ReplaceWith("value"))
     val a: A
@@ -965,9 +954,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   fun swap(): Validated<A, E> =
     fold(::Valid, ::Invalid)
 }
-
-fun <E, A> Hash.Companion.validated(HE: Hash<E>, HA: Hash<A>): Hash<Validated<E, A>> =
-  ValidatedHash(HE, HA)
 
 fun <E, A> Semigroup.Companion.validated(SE: Semigroup<E>, SA: Semigroup<A>): Semigroup<Validated<E, A>> =
   ValidatedSemigroup(SE, SA)
@@ -1203,14 +1189,6 @@ inline fun <A> A.validNel(): ValidatedNel<Nothing, A> =
 
 inline fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)
-
-private class ValidatedHash<L, R>(
-  private val HL: Hash<L>,
-  private val HR: Hash<R>
-) : Hash<Validated<L, R>> {
-  override fun Validated<L, R>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HL, HR, salt)
-}
 
 private open class ValidatedSemigroup<A, B>(
   private val SA: Semigroup<A>,

@@ -4,6 +4,7 @@ import arrow.core.Tuple7
 import arrow.core.Tuple7.Companion
 import arrow.core.extensions.Tuple7Hash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -16,14 +17,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hash(HA, HB, HC, HD, HE, HF, HG)",
-  "arrow.core.hash"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A, B, C, D, E, F, G> Tuple7<A, B, C, D, E, F, G>.hash(
   HA: Hash<A>,
   HB: Hash<B>,
@@ -40,15 +34,7 @@ fun <A, B, C, D, E, F, G> Tuple7<A, B, C, D, E, F, G>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Hash.tuple7(HA, HB, HC, HD, HE, HF, HG)",
-    "arrow.core.Hash",
-    "arrow.core.tuple7"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 inline fun <A, B, C, D, E, F, G> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

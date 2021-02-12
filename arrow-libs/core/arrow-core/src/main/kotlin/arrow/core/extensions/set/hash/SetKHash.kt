@@ -2,6 +2,7 @@ package arrow.core.extensions.set.hash
 
 import arrow.core.extensions.SetKHash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -15,33 +16,18 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Hash.set(HA).run { this.hash() }",
-    "arrow.core.set",
-    "arrow.typeclasses.Hash"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> Set<A>.hash(HA: Hash<A>): Int = arrow.core.extensions.set.hash.Set.hash<A>(HA).run {
   arrow.core.SetK(this@hash).hash() as kotlin.Int
 }
 
+@Deprecated("Receiver Set object is deprecated, prefer to turn Set functions into top-level functions")
 object Set {
   @Suppress(
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated(
-    "@extension kinded projected functions are deprecated",
-    ReplaceWith(
-      "Hash.set<A>(HA)",
-      "arrow.core.set",
-      "arrow.typeclasses.Hash"
-    ),
-    DeprecationLevel.WARNING
-  )
+  @Deprecated(HashDeprecation)
   inline fun <A> hash(HA: Hash<A>): SetKHash<A> = object : arrow.core.extensions.SetKHash<A> {
     override fun HA(): arrow.typeclasses.Hash<A> = HA
   }

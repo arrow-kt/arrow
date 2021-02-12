@@ -5,12 +5,10 @@ import arrow.KindDeprecation
 import arrow.core.Either.Companion.resolve
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.hashWithSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -1404,29 +1402,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
   fun void(): Either<A, Unit> =
     mapConst(Unit)
-
-  fun hash(HL: Hash<A>, HR: Hash<B>): Int =
-    fold(
-      { HL.run { it.hashWithSalt(0) } },
-      { HR.run { it.hashWithSalt(1) } }
-    )
-
-  fun hashWithSalt(HL: Hash<A>, HR: Hash<B>, salt: Int): Int =
-    fold(
-      { l -> HL.run { l.hashWithSalt(salt.hashWithSalt(0)) } },
-      { r -> HR.run { r.hashWithSalt(salt.hashWithSalt(1)) } }
-    )
 }
 
 fun <L> Left(left: L): Either<L, Nothing> = Left(left)
 
 fun <R> Right(right: R): Either<Nothing, R> = Right(right)
-
-fun <A, B> Hash.Companion.either(HA: Hash<A>, HB: Hash<B>): Hash<Either<A, B>> =
-  EitherHash(HA, HB)
-
-fun <A, B> Show.Companion.either(SA: Show<A>, SB: Show<B>): Show<Either<A, B>> =
-  EitherShow(SA, SB)
 
 fun <A, B> Semigroup.Companion.either(SA: Semigroup<A>, SB: Semigroup<B>): Semigroup<Either<A, B>> =
   EitherSemigroup(SA, SB)
@@ -1761,25 +1741,6 @@ fun <A, B> Either<Iterable<A>, Iterable<B>>.bisequence(): List<Either<A, B>> =
 
 fun <A, B, C> Either<Validated<A, B>, Validated<A, C>>.bisequenceValidated(): Validated<A, Either<B, C>> =
   bitraverseValidated(::identity, ::identity)
-
-private class EitherHash<L, R>(
-  private val HL: Hash<L>,
-  private val HR: Hash<R>
-) : Hash<Either<L, R>> {
-  override fun Either<L, R>.hash(): Int =
-    hash(HL, HR)
-
-  override fun Either<L, R>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HL, HR, salt)
-}
-
-private class EitherShow<L, R>(
-  private val SL: Show<L>,
-  private val SR: Show<R>
-) : Show<Either<L, R>> {
-  override fun Either<L, R>.show(): String =
-    show(SL, SR)
-}
 
 private open class EitherSemigroup<L, R>(
   private val SGL: Semigroup<L>,

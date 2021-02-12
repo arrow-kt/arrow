@@ -4,12 +4,10 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -84,37 +82,6 @@ data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
 
   companion object
 }
-
-fun <A, B> Pair<A, B>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      first.hashWithSalt(
-        second.hashWithSalt(salt))
-    }
-  }
-
-fun <A, B> Pair<A, B>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>
-): Int = hashWithSalt(HA, HB, defaultSalt)
-
-private class PairHash<A, B>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>
-) : Hash<Pair<A, B>> {
-  override fun Pair<A, B>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, salt)
-}
-
-fun <A, B> Hash.Companion.pair(
-  HA: Hash<A>,
-  HB: Hash<B>
-): Hash<Pair<A, B>> =
-  PairHash(HA, HB)
 
 operator fun <A : Comparable<A>, B : Comparable<B>> Pair<A, B>.compareTo(other: Pair<A, B>): Int {
   val first = first.compareTo(other.first)

@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -74,80 +72,6 @@ data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(
 
   companion object
 }
-
-fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        HD.run {
-          HE.run {
-            HF.run {
-              HG.run {
-                HH.run {
-                  a.hashWithSalt(
-                    b.hashWithSalt(
-                      c.hashWithSalt(
-                        d.hashWithSalt(
-                          e.hashWithSalt(
-                            f.hashWithSalt(
-                              g.hashWithSalt(
-                                h.hashWithSalt(salt)
-                              )))))))
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>
-): Int = hashWithSalt(HA, HB, HC, HD, HE, HF, HG, HH, defaultSalt)
-
-private class Tuple8Hash<A, B, C, D, E, F, G, H>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>,
-  private val HD: Hash<D>,
-  private val HE: Hash<E>,
-  private val HF: Hash<F>,
-  private val HG: Hash<G>,
-  private val HH: Hash<H>
-) : Hash<Tuple8<A, B, C, D, E, F, G, H>> {
-  override fun Tuple8<A, B, C, D, E, F, G, H>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, HD, HE, HF, HG, HH, salt)
-}
-
-fun <A, B, C, D, E, F, G, H> Hash.Companion.tuple8(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>
-): Hash<Tuple8<A, B, C, D, E, F, G, H>> =
-  Tuple8Hash(HA, HB, HC, HD, HE, HF, HG, HH)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>>
   Tuple8<A, B, C, D, E, F, G, H>.compareTo(other: Tuple8<A, B, C, D, E, F, G, H>): Int {

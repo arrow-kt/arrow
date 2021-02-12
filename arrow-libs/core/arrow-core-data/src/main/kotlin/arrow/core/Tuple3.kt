@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -48,45 +46,6 @@ data class Tuple3<out A, out B, out C>(val a: A, val b: B, val c: C) : Tuple3Of<
 
   companion object
 }
-
-fun <A, B, C> Triple<A, B, C>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        first.hashWithSalt(
-          second.hashWithSalt(
-            third.hashWithSalt(salt)
-          ))
-      }
-    }
-  }
-
-fun <A, B, C> Triple<A, B, C>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>
-): Int = hashWithSalt(HA, HB, HC, defaultSalt)
-
-private class TripleHash<A, B, C>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>
-) : Hash<Triple<A, B, C>> {
-  override fun Triple<A, B, C>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, salt)
-}
-
-fun <A, B, C> Hash.Companion.triple(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>
-): Hash<Triple<A, B, C>> =
-  TripleHash(HA, HB, HC)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>> Triple<A, B, C>.compareTo(other: Triple<A, B, C>): Int {
   val first = first.compareTo(other.first)

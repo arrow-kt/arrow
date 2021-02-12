@@ -4,6 +4,7 @@ import arrow.core.Ordering
 import arrow.typeclasses.Eq
 import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Show
@@ -29,7 +30,7 @@ interface CharOrder : Order<Char> {
     this.compareTo(b)
 }
 
-@Deprecated("Typeclass interface implementation will not be exposed directly anymore", ReplaceWith("Hash.char()", "arrow.core.Hash", "arrow.core.char"))
+@Deprecated(HashDeprecation)
 interface CharHash : Hash<Char>, CharEq {
   override fun Char.hash(): Int = this.hashCode()
 }
@@ -46,6 +47,6 @@ fun Char.Companion.eq(): Eq<Char> =
 fun Char.Companion.order(): Order<Char> =
   object : CharOrder {}
 
-@Deprecated("Typeclass instance have been moved to the companion object of the typeclass", ReplaceWith("Hash.char()", "arrow.core.Hash", "arrow.core.char"))
+@Deprecated(HashDeprecation)
 fun Char.Companion.hash(): Hash<Char> =
   object : CharHash {}

@@ -4,6 +4,7 @@ import arrow.core.Tuple9
 import arrow.core.Tuple9.Companion
 import arrow.core.extensions.Tuple9Hash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -16,14 +17,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hash(HA, HB, HC, HD, HE, HF, HG, HH, HI)",
-  "arrow.core.hash"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A, B, C, D, E, F, G, H, I> Tuple9<A, B, C, D, E, F, G, H, I>.hash(
   HA: Hash<A>,
   HB: Hash<B>,
@@ -42,15 +36,7 @@ fun <A, B, C, D, E, F, G, H, I> Tuple9<A, B, C, D, E, F, G, H, I>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "Hash.tuple9(HA, HB, HC, HD, HE, HF, HG, HH, HI)",
-    "arrow.core.Hash",
-    "arrow.core.tuple9"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 inline fun <A, B, C, D, E, F, G, H, I> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

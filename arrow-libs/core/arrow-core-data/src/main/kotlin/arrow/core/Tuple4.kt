@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -62,52 +60,6 @@ data class Tuple4<out A, out B, out C, out D>(
 
   companion object
 }
-
-fun <A, B, C, D> Tuple4<A, B, C, D>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        HD.run {
-          a.hashWithSalt(
-            b.hashWithSalt(
-              c.hashWithSalt(
-                d.hashWithSalt(salt)
-              )))
-        }
-      }
-    }
-  }
-
-fun <A, B, C, D> Tuple4<A, B, C, D>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>
-): Int = hashWithSalt(HA, HB, HC, HD, defaultSalt)
-
-private class Tuple4Hash<A, B, C, D>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>,
-  private val HD: Hash<D>
-) : Hash<Tuple4<A, B, C, D>> {
-  override fun Tuple4<A, B, C, D>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, HD, salt)
-}
-
-fun <A, B, C, D> Hash.Companion.tuple4(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>
-): Hash<Tuple4<A, B, C, D>> =
-  Tuple4Hash(HA, HB, HC, HD)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>> Tuple4<A, B, C, D>.compareTo(other: Tuple4<A, B, C, D>): Int {
   val first = a.compareTo(other.a)

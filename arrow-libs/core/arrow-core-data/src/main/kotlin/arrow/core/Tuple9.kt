@@ -4,10 +4,8 @@
 package arrow.core
 
 import arrow.KindDeprecation
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.ShowDeprecation
-import arrow.typeclasses.defaultSalt
 
 @Deprecated(
   message = KindDeprecation,
@@ -77,87 +75,6 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
 
   companion object
 }
-
-fun <A, B, C, D, E, F, G, H, I> Tuple9<A, B, C, D, E, F, G, H, I>.hashWithSalt(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>,
-  HI: Hash<I>,
-  salt: Int
-): Int =
-  HA.run {
-    HB.run {
-      HC.run {
-        HD.run {
-          HE.run {
-            HF.run {
-              HG.run {
-                HH.run {
-                  HI.run {
-                    a.hashWithSalt(
-                      b.hashWithSalt(
-                        c.hashWithSalt(
-                          d.hashWithSalt(
-                            e.hashWithSalt(
-                              f.hashWithSalt(
-                                g.hashWithSalt(
-                                  h.hashWithSalt(
-                                    i.hashWithSalt(salt)
-                                  ))))))))
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-fun <A, B, C, D, E, F, G, H, I> Tuple9<A, B, C, D, E, F, G, H, I>.hash(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>,
-  HI: Hash<I>
-): Int = hashWithSalt(HA, HB, HC, HD, HE, HF, HG, HH, HI, defaultSalt)
-
-private class Tuple9Hash<A, B, C, D, E, F, G, H, I>(
-  private val HA: Hash<A>,
-  private val HB: Hash<B>,
-  private val HC: Hash<C>,
-  private val HD: Hash<D>,
-  private val HE: Hash<E>,
-  private val HF: Hash<F>,
-  private val HG: Hash<G>,
-  private val HH: Hash<H>,
-  private val HI: Hash<I>
-) : Hash<Tuple9<A, B, C, D, E, F, G, H, I>> {
-  override fun Tuple9<A, B, C, D, E, F, G, H, I>.hashWithSalt(salt: Int): Int =
-    hashWithSalt(HA, HB, HC, HD, HE, HF, HG, HH, HI, salt)
-}
-
-fun <A, B, C, D, E, F, G, H, I> Hash.Companion.tuple9(
-  HA: Hash<A>,
-  HB: Hash<B>,
-  HC: Hash<C>,
-  HD: Hash<D>,
-  HE: Hash<E>,
-  HF: Hash<F>,
-  HG: Hash<G>,
-  HH: Hash<H>,
-  HI: Hash<I>
-): Hash<Tuple9<A, B, C, D, E, F, G, H, I>> =
-  Tuple9Hash(HA, HB, HC, HD, HE, HF, HG, HH, HI)
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>>
   Tuple9<A, B, C, D, E, F, G, H, I>.compareTo(other: Tuple9<A, B, C, D, E, F, G, H, I>): Int {

@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semiring
@@ -24,13 +23,6 @@ private object ByteSemiring : Semiring<Byte> {
   override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
   override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
 }
-
-private object ByteHash : Hash<Byte> {
-  override fun Byte.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.byte(): Hash<Byte> =
-  ByteHash
 
 fun Semigroup.Companion.byte(): Semigroup<Byte> =
   ByteSemigroup
@@ -61,13 +53,6 @@ private object DoubleSemiring : Semiring<Double> {
   override fun Double.combineMultiplicate(b: Double): Double = this * b
 }
 
-private object DoubleHash : Hash<Double> {
-  override fun Double.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.double(): Hash<Double> =
-  DoubleHash
-
 fun Semigroup.Companion.double(): Semigroup<Double> =
   DoubleSemigroup
 
@@ -96,13 +81,6 @@ private object IntSemiring : Semiring<Int> {
   override fun Int.combine(b: Int): Int = this + b
   override fun Int.combineMultiplicate(b: Int): Int = this * b
 }
-
-private object IntHash : Hash<Int> {
-  override fun Int.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.int(): Hash<Int> =
-  IntHash
 
 fun Semigroup.Companion.int(): Semigroup<Int> =
   IntSemigroup
@@ -133,13 +111,6 @@ private object LongSemiring : Semiring<Long> {
   override fun Long.combineMultiplicate(b: Long): Long = this * b
 }
 
-private object LongHash : Hash<Long> {
-  override fun Long.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.long(): Hash<Long> =
-  LongHash
-
 fun Semigroup.Companion.long(): Semigroup<Long> =
   LongSemigroup
 
@@ -169,13 +140,6 @@ private object ShortSemiring : Semiring<Short> {
   override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
 }
 
-private object ShortHash : Hash<Short> {
-  override fun Short.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.short(): Hash<Short> =
-  ShortHash
-
 fun Semigroup.Companion.short(): Semigroup<Short> =
   ShortSemigroup
 
@@ -204,13 +168,6 @@ private object FloatSemiring : Semiring<Float> {
   override fun Float.combine(b: Float): Float = this + b
   override fun Float.combineMultiplicate(b: Float): Float = this * b
 }
-
-private object FloatHash : Hash<Float> {
-  override fun Float.hash(): Int = hashCode()
-}
-
-fun Hash.Companion.float(): Hash<Float> =
-  FloatHash
 
 fun Semigroup.Companion.float(): Semigroup<Float> =
   FloatSemigroup

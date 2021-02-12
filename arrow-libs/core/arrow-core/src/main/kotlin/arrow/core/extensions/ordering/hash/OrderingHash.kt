@@ -2,6 +2,7 @@ package arrow.core.extensions.ordering.hash
 
 import arrow.core.Ordering
 import arrow.core.Ordering.Companion
+import arrow.core.OrderingDeprecation
 import arrow.core.extensions.OrderingHash
 import kotlin.Int
 import kotlin.PublishedApi
@@ -21,7 +22,7 @@ internal val hash_singleton: OrderingHash = object : arrow.core.extensions.Order
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("hashWithSalt(arg1)"))
+@Deprecated(OrderingDeprecation)
 fun Ordering.hashWithSalt(arg1: Int): Int = arrow.core.Ordering.hash().run {
   this@hashWithSalt.hashWithSalt(arg1) as kotlin.Int
 }
@@ -30,5 +31,5 @@ fun Ordering.hashWithSalt(arg1: Int): Int = arrow.core.Ordering.hash().run {
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Hash.ordering()", "arrow.core.Hash", "arrow.core.ordering"))
+@Deprecated(OrderingDeprecation)
 inline fun Companion.hash(): OrderingHash = hash_singleton

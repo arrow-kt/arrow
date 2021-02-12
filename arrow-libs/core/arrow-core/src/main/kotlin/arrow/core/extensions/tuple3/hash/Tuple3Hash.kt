@@ -4,6 +4,7 @@ import arrow.core.Tuple3
 import arrow.core.Tuple3.Companion
 import arrow.core.extensions.Tuple3Hash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -16,14 +17,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hash(HA, HB, HC)",
-  "arrow.core.hash"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A, B, C> Tuple3<A, B, C>.hash(
   HA: Hash<A>,
   HB: Hash<B>,
@@ -36,15 +30,7 @@ fun <A, B, C> Tuple3<A, B, C>.hash(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "Tuple3 is deprecated in favor of Kotlin's Triple. ReplaceWith Triple and use Triple instance of Hash",
-  ReplaceWith(
-    "Hash.triple(HA, HB, HC)",
-    "arrow.core.Hash",
-    "arrow.core.triple"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 inline fun <A, B, C> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,

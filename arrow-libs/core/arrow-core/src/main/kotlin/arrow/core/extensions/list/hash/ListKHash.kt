@@ -1,9 +1,11 @@
 package arrow.core.extensions.list.hash
 
+import arrow.core.ListK
 import arrow.core.extensions.ListKHash
+import arrow.core.extensions.listk.hash.hash
+import arrow.core.k
 import arrow.typeclasses.Hash
-import arrow.core.hash as _hash
-import arrow.core.hashWithSalt as _hashWithSalt
+import arrow.typeclasses.HashDeprecation
 import kotlin.Int
 import kotlin.Suppress
 import kotlin.collections.List
@@ -16,9 +18,11 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("hash(HA)", "arrow.core.hash"))
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> List<A>.hash(HA: Hash<A>): Int =
-  _hash(HA)
+  ListK.hash(HA).run {
+    this@hash.k().hash()
+  }
 
 @JvmName("hashWithSalt")
 @Suppress(
@@ -27,9 +31,11 @@ fun <A> List<A>.hash(HA: Hash<A>): Int =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension projected functions are deprecated", ReplaceWith("hashWithSalt(HA, arg1)", "arrow.core.hashWithSalt"))
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> List<A>.hashWithSalt(HA: Hash<A>, arg1: Int): Int =
-  _hashWithSalt(HA, arg1)
+  ListK.hash(HA).run {
+    this@hashWithSalt.k().hashWithSalt(arg1)
+  }
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -37,6 +43,6 @@ object List {
     "UNCHECKED_CAST",
     "NOTHING_TO_INLINE"
   )
-  @Deprecated("@extension projected functions are deprecated", ReplaceWith("Hash.list(HA)", "arrow.core.list", "arrow.core.Hash"))
+  @Deprecated(HashDeprecation)
   inline fun <A> hash(HA: Hash<A>): ListKHash<A> = object : arrow.core.extensions.ListKHash<A> {
       override fun HA(): arrow.typeclasses.Hash<A> = HA }}

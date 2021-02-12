@@ -4,6 +4,7 @@ import arrow.core.Option
 import arrow.core.Option.Companion
 import arrow.core.extensions.OptionHash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -16,13 +17,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hashCode()"
-  ),
-  DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> Option<A>.hash(HA: Hash<A>): Int = arrow.core.Option.hash<A>(HA).run {
   this@hash.hash() as kotlin.Int
 }
@@ -31,9 +26,6 @@ fun <A> Option<A>.hash(HA: Hash<A>): Int = arrow.core.Option.hash<A>(HA).run {
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
-@Deprecated(
-  "Hash typeclass is deprecated. Use concrete methods on Option",
-  level = DeprecationLevel.WARNING
-)
+@Deprecated(HashDeprecation)
 inline fun <A> Companion.hash(HA: Hash<A>): OptionHash<A> = object :
     arrow.core.extensions.OptionHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

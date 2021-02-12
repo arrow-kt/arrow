@@ -4,6 +4,7 @@ import arrow.core.Const
 import arrow.core.Const.Companion
 import arrow.core.extensions.ConstHash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import kotlin.Deprecated
 import kotlin.Int
 import kotlin.Suppress
@@ -17,11 +18,8 @@ import kotlin.jvm.JvmName
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-    "hash(HA)",
-    "arrow.core.hash"
-  ),
+  HashDeprecation,
+  ReplaceWith("hashCode()"),
   DeprecationLevel.WARNING
 )
 fun <A, T> Const<A, T>.hash(HA: Hash<A>): Int =
@@ -34,7 +32,7 @@ fun <A, T> Const<A, T>.hash(HA: Hash<A>): Int =
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "Hash typeclass is deprecated. Use concrete methods on Const",
+  HashDeprecation,
   level = DeprecationLevel.WARNING
 )
 inline fun <A, T> Companion.hash(HA: Hash<A>): ConstHash<A, T> = object : arrow.core.extensions.ConstHash<A, T> {

@@ -4,6 +4,7 @@ import arrow.core.Ior
 import arrow.core.Ior.Companion
 import arrow.core.extensions.IorHash
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 
 @JvmName("hash")
 @Suppress(
@@ -13,10 +14,8 @@ import arrow.typeclasses.Hash
   "UNUSED_PARAMETER"
 )
 @Deprecated(
-  "@extension kinded projected functions are deprecated",
-  ReplaceWith(
-  "hashCode()"
-  ),
+  HashDeprecation,
+  ReplaceWith("hashCode()"),
   DeprecationLevel.WARNING
 )
 fun <L, R> Ior<L, R>.hash(HL: Hash<L>, HR: Hash<R>): Int = arrow.core.Ior.hash<L, R>(HL, HR).run {
@@ -28,7 +27,7 @@ fun <L, R> Ior<L, R>.hash(HL: Hash<L>, HR: Hash<R>): Int = arrow.core.Ior.hash<L
   "NOTHING_TO_INLINE"
 )
 @Deprecated(
-  "Hash typeclass is deprecated. Use concrete methods on Ior",
+  HashDeprecation,
   level = DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.hash(HL: Hash<L>, HR: Hash<R>): IorHash<L, R> = object :
