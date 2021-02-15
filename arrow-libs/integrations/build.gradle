@@ -11,15 +11,3 @@ plugins {
 }
 
 apply from: "$ROOT_PROJECT"
-
-subprojects {
-    // -- Artifacts publication
-    apply from: "$PUBLICATION"
-
-    // -- Gradle Animal Sniffer Plugin: https://github.com/xvik/gradle-animalsniffer-plugin
-    apply plugin: 'ru.vyarus.animalsniffer'
-    apply plugin: 'java'
-    dependencies {
-        signature 'net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature'
-    }
-}
