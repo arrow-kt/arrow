@@ -6,6 +6,8 @@ plugins {
 apply plugin: 'kotlinx-atomicfu'
 
 apply from: "$SUB_PROJECT"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
 
 dependencies {
     compile project(":arrow-fx")

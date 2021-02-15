@@ -5,6 +5,7 @@ plugins {
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
 
 dependencies {
     compile project(":arrow-fx")

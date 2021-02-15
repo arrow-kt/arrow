@@ -7,6 +7,7 @@ apply plugin: 'kotlinx-atomicfu'
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
 
 dependencies {
   api "io.arrow-kt:arrow-core:$VERSION_NAME"
