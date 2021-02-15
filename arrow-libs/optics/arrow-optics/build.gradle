@@ -6,6 +6,8 @@ plugins {
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
 
 dependencies {
     compile "io.arrow-kt:arrow-core:$VERSION_NAME"
