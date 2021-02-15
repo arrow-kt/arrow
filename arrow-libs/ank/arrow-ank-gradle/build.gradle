@@ -5,6 +5,7 @@ plugins {
 }
 
 apply from: "$SUB_PROJECT"
+apply from: "$PUBLICATION"
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'

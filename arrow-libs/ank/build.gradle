@@ -11,8 +11,3 @@ plugins {
 configure("arrow-ank") {
     apply from: "$ROOT_PROJECT"
 }
-
-// -- Artifacts publication
-subprojects {    
-    apply from: "$PUBLICATION"
-}
