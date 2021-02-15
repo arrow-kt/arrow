@@ -5,6 +5,8 @@ plugins {
 }
 
 apply from: "$SUB_PROJECT"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
 
 dependencies {
     api project(":arrow-core")

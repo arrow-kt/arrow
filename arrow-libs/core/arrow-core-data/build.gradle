@@ -7,6 +7,8 @@ apply plugin: 'kotlinx-atomicfu'
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
 
 dependencies {
     api project(":arrow-annotations")

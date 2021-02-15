@@ -6,6 +6,8 @@ plugins {
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
 apply plugin: 'kotlinx-atomicfu'
 
 dependencies {

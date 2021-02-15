@@ -8,6 +8,7 @@ plugins {
 
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
 
 dependencies {
     api project(':arrow-annotations')
