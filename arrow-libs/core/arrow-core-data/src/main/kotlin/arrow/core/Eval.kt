@@ -7,19 +7,22 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)class ForEval private constructor() {
+)
+class ForEval private constructor() {
   companion object
 }
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias EvalOf<A> = arrow.Kind<ForEval, A>
+)
+typealias EvalOf<A> = arrow.Kind<ForEval, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline fun <A> EvalOf<A>.fix(): Eval<A> =
+)
+inline fun <A> EvalOf<A>.fix(): Eval<A> =
   this as Eval<A>
 
 @Deprecated(
@@ -183,14 +186,34 @@ sealed class Eval<out A> : EvalOf<A> {
     fun raise(t: Throwable): Eval<Nothing> =
       defer { throw t }
 
-    val unit: Eval<Unit> = Now(kotlin.Unit)
+    @Deprecated(
+      "This constructor is deprecated in favor of the Now constructor",
+      ReplaceWith("Eval.now(kotlin.Unit)", "arrow.core.Eval")
+    )
+    val Unit: Eval<Unit> = Now(kotlin.Unit)
 
+    @Deprecated(
+      "This constructor is deprecated in favor of the Now constructor",
+      ReplaceWith("Eval.now(true)", "arrow.core.Eval")
+    )
     val True: Eval<Boolean> = Now(true)
 
+    @Deprecated(
+      "This constructor is deprecated in favor of the Now constructor",
+      ReplaceWith("Eval.now(false)", "arrow.core.Eval")
+    )
     val False: Eval<Boolean> = Now(false)
 
+    @Deprecated(
+      "This constructor is deprecated in favor of the Now constructor",
+      ReplaceWith("Eval.now(0)", "arrow.core.Eval")
+    )
     val Zero: Eval<Int> = Now(0)
 
+    @Deprecated(
+      "This constructor is deprecated in favor of the Now constructor",
+      ReplaceWith("Eval.now(1)", "arrow.core.Eval")
+    )
     val One: Eval<Int> = Now(1)
 
     /**
@@ -284,7 +307,7 @@ sealed class Eval<out A> : EvalOf<A> {
       b: Eval<B>,
       map: (A, B) -> C
     ): Eval<C> =
-      mapN(a, b, unit, unit, unit, unit, unit, unit, unit) { aa, bb, _, _, _, _, _, _, _ -> map(aa, bb) }
+      mapN(a, b, Unit, Unit, Unit, Unit, Unit, Unit, Unit) { aa, bb, _, _, _, _, _, _, _ -> map(aa, bb) }
 
     fun <A, B, C, D> mapN(
       a: Eval<A>,
@@ -292,7 +315,7 @@ sealed class Eval<out A> : EvalOf<A> {
       c: Eval<C>,
       map: (A, B, C) -> D
     ): Eval<D> =
-      mapN(a, b, c, unit, unit, unit, unit, unit, unit, unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
+      mapN(a, b, c, Unit, Unit, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, _, _, _, _, _, _, _ -> map(aa, bb, cc) }
 
     fun <A, B, C, D, E> mapN(
       a: Eval<A>,
@@ -301,7 +324,7 @@ sealed class Eval<out A> : EvalOf<A> {
       d: Eval<D>,
       map: (A, B, C, D) -> E
     ): Eval<E> =
-      mapN(a, b, c, d, unit, unit, unit, unit, unit, unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
+      mapN(a, b, c, d, Unit, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, _, _, _, _, _, _ -> map(aa, bb, cc, dd) }
 
     fun <A, B, C, D, E, F> mapN(
       a: Eval<A>,
@@ -311,7 +334,7 @@ sealed class Eval<out A> : EvalOf<A> {
       e: Eval<E>,
       map: (A, B, C, D, E) -> F
     ): Eval<F> =
-      mapN(a, b, c, d, e, unit, unit, unit, unit, unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
+      mapN(a, b, c, d, e, Unit, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, ee, _, _, _, _, _ -> map(aa, bb, cc, dd, ee) }
 
     fun <A, B, C, D, E, F, G> mapN(
       a: Eval<A>,
@@ -322,7 +345,7 @@ sealed class Eval<out A> : EvalOf<A> {
       f: Eval<F>,
       map: (A, B, C, D, E, F) -> G
     ): Eval<G> =
-      mapN(a, b, c, d, e, f, unit, unit, unit, unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
+      mapN(a, b, c, d, e, f, Unit, Unit, Unit, Unit) { aa, bb, cc, dd, ee, ff, _, _, _, _ -> map(aa, bb, cc, dd, ee, ff) }
 
     fun <A, B, C, D, E, F, G, H> mapN(
       a: Eval<A>,
@@ -334,7 +357,7 @@ sealed class Eval<out A> : EvalOf<A> {
       g: Eval<G>,
       map: (A, B, C, D, E, F, G) -> H
     ): Eval<H> =
-      mapN(a, b, c, d, e, f, g, unit, unit, unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
+      mapN(a, b, c, d, e, f, g, Unit, Unit, Unit) { aa, bb, cc, dd, ee, ff, gg, _, _, _ -> map(aa, bb, cc, dd, ee, ff, gg) }
 
     fun <A, B, C, D, E, F, G, H, I> mapN(
       a: Eval<A>,
@@ -347,7 +370,7 @@ sealed class Eval<out A> : EvalOf<A> {
       h: Eval<H>,
       map: (A, B, C, D, E, F, G, H) -> I
     ): Eval<I> =
-      mapN(a, b, c, d, e, f, g, h, unit, unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
+      mapN(a, b, c, d, e, f, g, h, Unit, Unit) { aa, bb, cc, dd, ee, ff, gg, hh, _, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh) }
 
     fun <A, B, C, D, E, F, G, H, I, J> mapN(
       a: Eval<A>,
@@ -361,7 +384,7 @@ sealed class Eval<out A> : EvalOf<A> {
       i: Eval<I>,
       map: (A, B, C, D, E, F, G, H, I) -> J
     ): Eval<J> =
-      mapN(a, b, c, d, e, f, g, h, i, unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
+      mapN(a, b, c, d, e, f, g, h, i, Unit) { aa, bb, cc, dd, ee, ff, gg, hh, ii, _ -> map(aa, bb, cc, dd, ee, ff, gg, hh, ii) }
 
     fun <A, B, C, D, E, F, G, H, I, J, K> mapN(
       a: Eval<A>,

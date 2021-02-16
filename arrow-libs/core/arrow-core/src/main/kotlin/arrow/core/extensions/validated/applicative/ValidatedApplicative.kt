@@ -24,7 +24,7 @@ import kotlin.jvm.JvmName
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("valid<A>()", "arrow.core.valid"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.Valid(this)", "arrow.core.Validated"))
 fun <E, A> A.just(SE: Semigroup<E>): Validated<E, A> =
   valid()
 
@@ -35,9 +35,9 @@ fun <E, A> A.just(SE: Semigroup<E>): Validated<E, A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.unit<E>()", "arrow.core.Validated"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.Valid(Unit)", "arrow.core.Validated"))
 fun <E> unit(SE: Semigroup<E>): Validated<E, Unit> =
-  Validated.unit()
+  Validated.Valid(Unit)
 
 @JvmName("map")
 @Suppress(

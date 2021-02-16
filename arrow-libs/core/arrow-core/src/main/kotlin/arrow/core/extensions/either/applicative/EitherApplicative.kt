@@ -31,7 +31,7 @@ internal val applicative_singleton: EitherApplicative<Any?> = object : EitherApp
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this.right()", "arrow.core.right"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.Right(this)", "arrow.core.Either"))
 fun <L, A> A.just(): Either<L, A> =
   right()
 
@@ -42,9 +42,9 @@ fun <L, A> A.just(): Either<L, A> =
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
-@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.unit()", "arrow.core.unit"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.Right(Unit)", "arrow.core.Either"))
 fun <L> unit(): Either<L, Unit> =
-  Either.unit()
+  Either.Right(Unit)
 
 @JvmName("map")
 @Suppress(

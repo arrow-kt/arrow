@@ -610,7 +610,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override fun toString(): String = "Ior.Left($value)"
 
     companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Left(a)"))
+      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Left(a)", "arrow.core.Ior"))
       operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
     }
   }
@@ -623,7 +623,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override fun toString(): String = "Ior.Right($value)"
 
     companion object {
-      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Right(a)"))
+      @Deprecated("Deprecated, use the constructor instead", ReplaceWith("Ior.Right(a)", "arrow.core.Right"))
       operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
     }
   }

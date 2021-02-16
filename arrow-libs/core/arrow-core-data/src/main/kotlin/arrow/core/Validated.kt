@@ -544,9 +544,9 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
     val s = 1.inc()
 
-    val unit: Validated<Nothing, Unit> = Unit.valid()
-
-    fun <E> unit(): Validated<E, Unit> = unit
+    @PublishedApi
+    internal val unit: Validated<Nothing, Unit> =
+      Validated.Valid(Unit)
 
     inline fun <E, A, B, Z> mapN(
       SE: Semigroup<E>,

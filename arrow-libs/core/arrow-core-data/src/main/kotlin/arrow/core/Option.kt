@@ -431,9 +431,18 @@ sealed class Option<out A> : OptionOf<A> {
         None
       }
 
+    @Deprecated(
+      "empty is deprecated, and will be removed in 0.13.0. Please use None instead.",
+      ReplaceWith(
+        "None",
+        "arrow.core.None"
+      ),
+      DeprecationLevel.WARNING
+    )
     fun <A> empty(): Option<A> = None
 
-    val unit: Option<Unit> = Some(Unit)
+    @PublishedApi
+    internal val unit: Option<Unit> = Some(Unit)
 
     inline fun <A, B, C> mapN(
       a: Option<A>,
