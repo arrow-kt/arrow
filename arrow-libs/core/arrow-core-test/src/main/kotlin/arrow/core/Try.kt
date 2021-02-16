@@ -141,3 +141,10 @@ fun <A> A.success(): Try<A> = Success(this)
 fun Throwable.failure(): Try<Nothing> = Failure(this)
 
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)
+
+class ForTry private constructor() { companion object }
+typealias TryOf<A> = arrow.Kind<ForTry, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> TryOf<A>.fix(): Try<A> =
+  this as Try<A>

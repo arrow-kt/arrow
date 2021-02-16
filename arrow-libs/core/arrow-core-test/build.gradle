@@ -1,6 +1,5 @@
 plugins {
     id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
     id "org.jlleitschuh.gradle.ktlint"
 }
 
@@ -14,5 +13,4 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
     api "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
-    kapt project(":arrow-meta")
 }
