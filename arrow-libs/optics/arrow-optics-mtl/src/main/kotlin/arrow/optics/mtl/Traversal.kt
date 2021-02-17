@@ -6,6 +6,7 @@ package arrow.optics.mtl
 import arrow.core.Tuple2
 import arrow.mtl.State
 import arrow.mtl.map
+import arrow.optics.Every
 import arrow.optics.Traversal
 
 /**
@@ -30,11 +31,11 @@ import arrow.optics.Traversal
  * }
  * ```
  */
-fun <S, A> Traversal<S, A>.extract(): State<S, List<A>> =
+fun <S, A> Every<S, A>.extract(): State<S, List<A>> =
   State { s -> Tuple2(s, getAll(s)) }
 
 /** @see extract */
-fun <S, A> Traversal<S, A>.toState(): State<S, List<A>> = extract()
+fun <S, A> Every<S, A>.toState(): State<S, List<A>> = extract()
 
 /**
  * Extract and map the focus [A] viewed through the [PTraversal] and applies [f] to it.
@@ -60,7 +61,7 @@ fun <S, A> Traversal<S, A>.toState(): State<S, List<A>> = extract()
  * }
  * ```
  */
-fun <S, A, C> Traversal<S, A>.extractMap(f: (A) -> C): State<S, List<C>> =
+fun <S, A, C> Every<S, A>.extractMap(f: (A) -> C): State<S, List<C>> =
   extract().map { it.map(f) }
 
 /**
@@ -86,7 +87,7 @@ fun <S, A, C> Traversal<S, A>.extractMap(f: (A) -> C): State<S, List<C>> =
  * }
  * ```
  */
-fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, List<A>> = State { s ->
+fun <S, A> Every<S, A>.update(f: (A) -> A): State<S, List<A>> = State { s ->
   val newS = modify(s, f)
   Tuple2(newS, getAll(newS))
 }
@@ -113,7 +114,7 @@ fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, List<A>> = State { s ->
  * }
  * ```
  */
-fun <S, A> Traversal<S, A>.updateOld(f: (A) -> A): State<S, List<A>> =
+fun <S, A> Every<S, A>.updateOld(f: (A) -> A): State<S, List<A>> =
   State { s -> Tuple2(modify(s, f), getAll(s)) }
 
 /**
@@ -163,7 +164,7 @@ fun <S, A> Traversal<S, A>.update_(f: (A) -> A): State<S, Unit> =
  * }
  * ```
  */
-fun <S, A> Traversal<S, A>.assign(a: A): State<S, List<A>> =
+fun <S, A> Every<S, A>.assign(a: A): State<S, List<A>> =
   update { a }
 
 /**
@@ -188,7 +189,7 @@ fun <S, A> Traversal<S, A>.assign(a: A): State<S, List<A>> =
  * }
  * ```
  */
-fun <S, A> Traversal<S, A>.assignOld(a: A): State<S, List<A>> =
+fun <S, A> Every<S, A>.assignOld(a: A): State<S, List<A>> =
   updateOld { a }
 
 /**

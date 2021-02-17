@@ -30,39 +30,19 @@ val optionalHead: Optional<ListK<Int>, Int> = Optional(
 Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`.
 
 ```kotlin:ank
-import arrow.optics.extensions.*
+import arrow.optics.*
 
-ListK.head<Int>().set(listOf(1, 3, 6).k(), 5)
+POptional.listHead<Int>().set(listOf(1, 3, 6), 5)
 ```
 ```kotlin:ank
-ListK.head<Int>().modify(listOf(1, 3, 6).k()) { head -> head * 5 }
+POptional.listHead<Int>().modify(listOf(1, 3, 6).k()) { head -> head * 5 }
 ```
 
 We can also lift such functions.
 
 ```kotlin:ank
-val lifted = ListK.head<Int>().lift { head -> head * 5 }
+val lifted = POptional.listHead<Int>().lift { head -> head * 5 }
 lifted(emptyList<Int>().k())
-```
-
-Or modify or lift functions using `Applicative`.
-
-```kotlin:ank
-import arrow.fx.IO
-import arrow.core.extensions.option.applicative.*
-
-ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
-    Option.just(head/2)
-}
-```
-```kotlin:ank
-import arrow.fx.extensions.io.applicative.*
-import arrow.fx.fix
-
-val liftedFO = ListK.head<Int>().liftF(IO.applicative()) { head ->
-    IO.effect { head / 0 }
-}
-liftedFO(listOf(1, 3, 6).k()).fix().attempt().unsafeRunSync()
 ```
 
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens`, or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
@@ -72,7 +52,7 @@ An `Optional` instance can be manually constructed from any default or custom `I
 We can compose `Optional`s to build telescopes with an optional focus. Imagine we try to retrieve a `User`'s email from a backend. The result of our call is `Option<User>`. So, we first want to look into `Option`, which **optionally** could be a `Some`. And then we want to look into `User`, which optionally filled in his email.
 
 ```kotlin:ank
-import arrow.optics.some
+import arrow.optics.option
 
 data class Participant(val name: String, val email: String?)
 
@@ -81,15 +61,15 @@ val participantEmail: Optional<Participant, String> = Optional(
         set = { participant, email -> participant.copy(email = email) }
 )
 
-val optEmail: Optional<Option<Participant>, String> = Option.some<Participant>() compose participantEmail
+val optEmail: Optional<Option<Participant>, String> = PPrism.option<Participant>() compose participantEmail
 
-optEmail.getOption(Some(Participant("test", "email")))
+optEmail.getOrNull(Some(Participant("test", "email")))
 ```
 ```kotlin:ank
-optEmail.getOption(None)
+optEmail.getOrNull(None)
 ```
 ```kotlin:ank
-optEmail.getOption(Some(Participant("test", null)))
+optEmail.getOrNull(Some(Participant("test", null)))
 ```
 
 `Optional` can be composed with all optics, resulting in the following optics:
@@ -120,13 +100,13 @@ A `POptional` is very similar to [PLens]({{'/optics/lens#Plens' | relative_url }
 Given a `PPrism` with a focus into `Some` of `Option<Tuple2<Int, String>>` that can polymorphically change its content to `Tuple2<String, String>` and a `PLens` with a focus into the `Tuple2<Int, String>` that can morph the first parameter from `Int` to `String`, we can compose them together building an `Optional` that can look into `Option` and morph the first type of the `Tuple2` within.
 
 ```kotlin:ank
-val pprism = Option.PSome<Tuple2<Int, String>, Tuple2<String, String>>()
-val plens = Tuple2.pFirst<Int, String, String>()
+val pprism = PPrism.pOption<Pair<Int, String>, Pair<String, String>>()
+val plens = PLens.pPairFirst<Int, String, String>()
 
-val someTuple2: POptional<Option<Tuple2<Int, String>>, Option<Tuple2<String, String>>, Int, String> =
+val someTuple2: POptional<Option<Pair<Int, String>>, Option<Pair<String, String>>, Int, String> =
     pprism compose plens
 
-val lifted: (Option<Tuple2<Int, String>>) -> Option<Tuple2<String, String>> = someTuple2.lift { _ -> "Hello, " }
+val lifted: (Option<Pair<Int, String>>) -> Option<Pair<String, String>> = someTuple2.lift { _ -> "Hello, " }
 ```
 ```kotlin:ank
 lifted(None)

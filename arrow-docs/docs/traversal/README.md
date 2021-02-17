@@ -9,13 +9,26 @@ permalink: /optics/traversal/
 
 A `Traversal` is an optic that can see into a structure and get, set, or modify 0 to N foci.
 
-It is a generalization of [`Traverse#traverse`]({{'/apidocs/arrow-core-data/arrow.typeclasses/-traverse/' | relative_url }}). Given a `Traverse<F>`, we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
-We can think of `Kind<F, A>` as a structure `S` that has a focus `A`. So, given a `PTraversal<S, T, A, B>`, we can apply a function `(A) -> Kind<F, B>` to `S` and get `Kind<F, T>`.
+It is a generalization of `map`.
+A structure `S` that has a focus `A` to which we can apply a function `(A) -> B` to `S` and get `T`.
+For example, `S == List<Int>` to which we apply `(Int) -> String` and we get `T == List<String>`
 
- - `Traverse.traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<F, B>>`
- - `PTraversal.modifyF(s: S, f: (A) -> Kind<F, B>, GA: Applicative<F>): Kind<F, T>`
+A `Traversal` can simply be created by providing the `map` function.
 
-You can get a `Traversal` for any existing `Traverse`.
+```kotlin:ank:playground
+import arrow.optics.*
+
+fun main(): Unit {
+  //startSample
+  val traversal: PTraversal<List<Int>, List<String>, Int, String> =
+    PTraversal { s, f -> s.map(f) }
+  
+  val source = listOf(1, 2, 3, 4)
+  val target = traversal.modify(source, Int::toString)
+  //endSample
+  println(target)
+} 
+```
 
 Or by using any of the constructors of `Traversal`.
 
@@ -34,8 +47,8 @@ Composing `Traversal` can be used for accessing and modifying foci in nested str
 ### Polymorphic Traversal
 
 When dealing with polymorphic types, we can also have polymorphic `Traversal`s that allow us to morph the type of the foci.
-Previously, we used a `Traversal<ListKOf<Int>, Int>`; it was able to morph the `Int` values in the constructed type `ListK<Int>`.
-With a `PTraversal<ListKOf<Int>, ListKOf<String>, Int, String>`, we can morph an `Int` to a `String`, and thus, also morph the type from `ListK<Int>` to `ListK<String>`.
+Previously, we used a `Traversal<List<Int>, Int>`; it was able to morph the `Int` values in the constructed type `List<Int>`.
+With a `PTraversal<List<Int>, List<String>, Int, String>`, we can morph an `Int` to a `String`, and thus, also morph the type from `List<Int>` to `List<String>`.
 
 ### Laws
 

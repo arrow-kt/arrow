@@ -1,10 +1,7 @@
 package arrow.optics.test.laws
 
-import arrow.core.Const
 import arrow.core.compose
-import arrow.core.extensions.const.applicative.applicative
 import arrow.core.identity
-import arrow.core.value
 import arrow.optics.Lens
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
@@ -30,8 +27,7 @@ object LensLaws {
       Law("Lens law: is set idempotent") { lensSetIdempotent(lensGen, aGen, bGen, EQA) },
       Law("Lens law: modify identity") { lensModifyIdentity(lensGen, aGen, EQA) },
       Law("Lens law: compose modify") { lensComposeModify(lensGen, aGen, funcGen, EQA) },
-      Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, EQA) },
-      Law("Lens law: consistent get modify id") { lensConsistentGetModifyid(lensGen, aGen, EQB, MB) }
+      Law("Lens law: consistent set modify") { lensConsistentSetModify(lensGen, aGen, bGen, EQA) }
     )
 
   /**
@@ -86,14 +82,6 @@ object LensLaws {
     forAll(lensGen, aGen, bGen) { lens, a, b ->
       lens.run {
         set(a, b).equalUnderTheLaw(modify(a) { b }, EQA)
-      }
-    }
-
-  fun <A, B> lensConsistentGetModifyid(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, EQB: Eq<B>, MA: Monoid<B>) =
-    forAll(lensGen, aGen) { lens, a ->
-      lens.run {
-        get(a)
-          .equalUnderTheLaw(modifyF(Const.applicative(MA), a, ::Const).value(), EQB)
       }
     }
 }

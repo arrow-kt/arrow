@@ -69,23 +69,23 @@ The DSL also has special support for [Each]({{ '/optics/each' | relative_url }})
 `Each` can be used to focus into a structure `S` and see all its foci `A`. Here, we focus into all `Employee`s in the `Employees`.
 
 ```kotlin
-@optics data class Employees(val employees: ListK<Employee>)
+@optics data class Employees(val employees: List<Employee>)
 ```
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.optics.extensions.listk.each.*
+import arrow.optics.list
+import arrow.optics.Every
 
 val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
-val employees = Employees(listOf(john, jane).k())
+val employees = Employees(listOf(john, jane))
 
-Employees.employees.every(ListK.each()).company.address.street.name.modify(employees, String::capitalize)
+Employees.employees.every(Every.list<Employee>()).company.address.street.name.modify(employees, String::capitalize)
 ```
 
 If you are in the scope of `Each`, you don't need to specify the instance.
 
 ```kotlin:ank
-ListK.each<Employee>().run {
+Every.list<Employee>().run {
   Employees.employees.every.company.address.street.name.modify(employees, String::capitalize)
 }
 ```
@@ -95,27 +95,28 @@ ListK.each<Employee>().run {
 `At` can be used to focus in `A` at a given index `I` for a given structure `S`.
 
 ```kotlin
-@optics data class Db(val content: MapK<Int, String>)
+@optics data class Db(val content: Map<Int, String>)
 ```
 
 Here we focus into the value of a given key in `MapK`.
 
 ```kotlin:ank
-import arrow.optics.extensions.mapk.at.*
+import arrow.optics.map
+import arrow.optics.typeclasses.At
 
 val db = Db(mapOf(
   1 to "one",
   2 to "two",
   3 to "three"
-).k())
+))
 
-Db.content.at(MapK.at(), 2).some.modify(db, String::reversed)
+Db.content.at(At.map(), 2).some.modify(db, String::reversed)
 ```
 
 If you are in the scope of `At`, you don't need to specify the instance.
 
 ```kotlin:ank
-MapK.at<Int, String>().run {
+At.map<Int, String>().run {
   Db.content.at(2).some.modify(db, String::reversed)
 }
 ```
@@ -126,16 +127,17 @@ MapK.at<Int, String>().run {
 
 
 ```kotlin:ank
-import arrow.optics.extensions.listk.index.*
+import arrow.optics.list
+import arrow.optics.typeclasses.Index
 
-val updatedJohn = Employees.employees.index(ListK.index(), 0).company.address.street.name.modify(employees, String::capitalize)
+val updatedJohn = Employees.employees.index(Index.list(), 0).company.address.street.name.modify(employees, String::capitalize)
 updatedJohn
 ```
 
 In the scope of `Index`, you don't need to specify the instance, so we can enable `operator fun get` syntax.
 
 ```kotlin:ank
-ListK.index<Employee>().run {
+Index.list<Employee>().run {
   Employees.employees[0].company.address.street.name.getOption(updatedJohn)
 }
 ```
@@ -143,7 +145,7 @@ ListK.index<Employee>().run {
 Since [Index]({{ '/optics/index' | relative_url }}) returns an [Optional]({{ '/optics/optional' | relative_url }}), `index` and `[]` are safe operations.
 
 ```kotlin:ank
-ListK.index<Employee>().run {
+Index.list<Employee>().run {
   Employees.employees[2].company.address.street.name.getOption(employees)
 }
 ```

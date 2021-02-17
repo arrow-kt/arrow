@@ -1,12 +1,11 @@
 package arrow.optics.typeclasses
 
-import arrow.core.Option
-import arrow.core.Tuple2
 import arrow.optics.Iso
 import arrow.optics.Optional
+import arrow.optics.PLens
 import arrow.optics.Prism
-import arrow.optics.first
-import arrow.optics.second
+import arrow.optics.pairFirst
+import arrow.optics.pairSecond
 
 typealias Conj<S, A> = Snoc<S, A>
 
@@ -22,35 +21,35 @@ fun interface Snoc<S, A> {
   /**
    * Provides a [Prism] between a [S] and its [init] [S] and last element [A].
    */
-  fun snoc(): Prism<S, Tuple2<S, A>>
+  fun snoc(): Prism<S, Pair<S, A>>
 
   /**
    * Provides an [Optional] between [S] and its init [S].
    */
-  fun initOption(): Optional<S, S> = snoc() compose Tuple2.first()
+  fun initOption(): Optional<S, S> = snoc() compose PLens.pairFirst()
 
   /**
    * Provides an [Optional] between [S] and its last element [A].
    */
-  fun lastOption(): Optional<S, A> = snoc() compose Tuple2.second()
+  fun lastOption(): Optional<S, A> = snoc() compose PLens.pairSecond()
 
   /**
    * Selects all elements except the last.
    */
-  val S.init: Option<S>
-    get() = initOption().getOption(this)
+  val S.init: S?
+    get() = initOption().getOrNull(this)
 
   /**
    * Append an element [A] to [S].
    */
   infix fun S.snoc(last: A): S =
-    snoc().reverseGet(Tuple2(this, last))
+    snoc().reverseGet(Pair(this, last))
 
   /**
    * Deconstruct an [S] between its [init] and last element.
    */
-  fun S.unsnoc(): Option<Tuple2<S, A>> =
-    snoc().getOption(this)
+  fun S.unsnoc(): Pair<S, A>? =
+    snoc().getOrNull(this)
 
   companion object {
 
@@ -63,7 +62,7 @@ fun interface Snoc<S, A> {
     /**
      * Construct a [Snoc] instance from a [Prism].
      */
-    operator fun <S, A> invoke(prism: Prism<S, Tuple2<S, A>>): Snoc<S, A> =
+    operator fun <S, A> invoke(prism: Prism<S, Pair<S, A>>): Snoc<S, A> =
       Snoc { prism }
   }
 }

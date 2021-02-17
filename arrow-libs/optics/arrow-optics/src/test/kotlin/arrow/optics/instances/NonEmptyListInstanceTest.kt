@@ -50,7 +50,6 @@ class NonEmptyListInstanceTest : UnitSpec() {
         aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = Gen.functionAToB(Gen.string()),
-        EQOptionB = Eq.any(),
         EQA = Eq.any()
       )
     )

@@ -1,10 +1,7 @@
 package arrow.optics.test.laws
 
-import arrow.core.Const
 import arrow.core.compose
-import arrow.core.extensions.const.applicative.applicative
 import arrow.core.identity
-import arrow.core.value
 import arrow.optics.Iso
 import arrow.core.test.laws.Law
 import arrow.core.test.laws.equalUnderTheLaw
@@ -21,8 +18,7 @@ object IsoLaws {
       Law("Iso Law: round trip other way") { iso.roundTripOtherWay(bGen, EQB) },
       Law("Iso Law: modify identity is identity") { iso.modifyIdentity(aGen, EQA) },
       Law("Iso Law: compose modify") { iso.composeModify(aGen, funcGen, EQA) },
-      Law("Iso Law: consitent set with modify") { iso.consistentSetModify(aGen, bGen, EQA) },
-      Law("Iso Law: consitent get with modify identity") { iso.consitentGetModifyId(aGen, EQB, bMonoid) }
+      Law("Iso Law: consitent set with modify") { iso.consistentSetModify(aGen, bGen, EQA) }
     )
 
   fun <A, B> Iso<A, B>.roundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit =
@@ -48,10 +44,5 @@ object IsoLaws {
   fun <A, B> Iso<A, B>.consistentSetModify(aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =
     forAll(aGen, bGen) { a, b ->
       set(b).equalUnderTheLaw(modify(a) { b }, EQA)
-    }
-
-  fun <A, B> Iso<A, B>.consitentGetModifyId(aGen: Gen<A>, EQB: Eq<B>, bMonoid: Monoid<B>): Unit =
-    forAll(aGen) { a ->
-      get(a).equalUnderTheLaw(modifyF(Const.applicative(bMonoid), a, ::Const).value(), EQB)
     }
 }
