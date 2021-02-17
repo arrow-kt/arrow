@@ -18,9 +18,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.fold(emptyList()) { acc, l -> acc + l }"))
 fun <A> Collection<ListK<A>>.combineAll(): List<A> =
-    arrow.core.extensions.list.monoid.List.monoid<A>().run {
-  this@combineAll.combineAll() as kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.monoid.List.monoid<A>().run {
+    this@combineAll.combineAll() as kotlin.collections.List<A>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -47,4 +47,5 @@ object List {
   )
   @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.list<A>()", "arrow.core.list", "arrow.core.Monoid"))
   inline fun <A> monoid(): ListKMonoid<A> = monoid_singleton as
-      arrow.core.extensions.ListKMonoid<A>}
+    arrow.core.extensions.ListKMonoid<A>
+}

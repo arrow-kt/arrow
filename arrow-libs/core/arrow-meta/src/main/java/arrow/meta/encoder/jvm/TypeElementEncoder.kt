@@ -86,10 +86,12 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
               val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter { executableElement ->
                 declaredConstructorSignatures.any { it?.asString() == executableElement.jvmMethodSignature }
               }.mapNotNull { it.asConstructor(this@type) }
-              Either.Right(classBuilder.copy(
-                primaryConstructor = constructors.find { it.first }?.second,
-                superclass = if (typeElement.superclass is NoType) null else typeElement.superclass.asTypeName().toMeta()
-              ))
+              Either.Right(
+                classBuilder.copy(
+                  primaryConstructor = constructors.find { it.first }?.second,
+                  superclass = if (typeElement.superclass is NoType) null else typeElement.superclass.asTypeName().toMeta()
+                )
+              )
             }
             else -> Either.Left(EncodingError.UnsupportedElementType("Unsupported ${this@TypeElementEncoder}, as ($kind) to Type", this@type))
           }
@@ -170,7 +172,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           val t = it?.type
           if (t is TypeName.ParameterizedType &&
             t.rawName == "kotlin.coroutines.Continuation" &&
-            t.typeArguments.isNotEmpty()) t.typeArguments[0]
+            t.typeArguments.isNotEmpty()
+          ) t.typeArguments[0]
           else null
         } ?: returnType
       )
@@ -245,9 +248,9 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
   fun Func.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
     copy(
       receiverType = receiverType?.fixLiterals(meta, protoFun.receiverType),
-      parameters = if (parameters.size <= protoFun.valueParameterList.size)
+      parameters = if (parameters.size <= protoFun.valueParameterList.size) {
         parameters.mapIndexed { n, p -> p.fixLiterals(meta, protoFun.valueParameterList[n]) }
-      else parameters,
+      } else parameters,
       returnType = returnType?.fixLiterals(meta, protoFun.returnType)
     )
 
@@ -274,15 +277,17 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       meta.nameResolver.getString(it.id)
     }
     return if (
-      "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
+      "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2
+    ) {
       if (isMonadContinuation() || isContinuation()) asSuspendedContinuation()
       else TypeName.FunctionLiteral(
         receiverType = typeArguments[0],
         parameters = typeArguments.drop(1).dropLast(1),
         returnType = typeArguments.lastOrNull() ?: TypeName.Unit
       )
-    else
+    } else {
       this
+    }
   }
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
@@ -353,7 +358,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       val superTypeName = type.extractFullName(meta, true).removeVariance().asKotlin()
       val pckg = superTypeName.substringBefore("<").substringBeforeLast(".")
       val simpleName = superTypeName.substringBefore("<").substringAfterLast(".")
-      if (type.argumentList.isNotEmpty())
+      if (type.argumentList.isNotEmpty()) {
         TypeName.ParameterizedType(
           name = superTypeName.asKotlin(),
           enclosingType = asTypeName(),
@@ -363,7 +368,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           },
           rawType = TypeName.Classy(simpleName, "$pckg.$simpleName", PackageName(pckg), nullable = false)
         )
-      else TypeName.Classy(simpleName, superTypeName, PackageName(pckg), nullable = false)
+      } else TypeName.Classy(simpleName, superTypeName, PackageName(pckg), nullable = false)
     }
 
   fun TypeElement.typeVariables(): List<TypeName.TypeVariable> =
@@ -428,12 +433,12 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
 
   fun TypeElement.sealedSubClassNames(): List<TypeName> =
-    if (meta.classProto.sealedSubclassFqNameList.isNotEmpty())
+    if (meta.classProto.sealedSubclassFqNameList.isNotEmpty()) {
       meta.classProto.sealedSubclassFqNameList.map {
         val fqName = meta.nameOf(it).asKotlin()
         TypeName.Classy.from(fqName.substringBeforeLast("."), fqName.substringAfterLast("."))
       }
-    else emptyList()
+    } else emptyList()
 
   fun getTypeElement(name: String, elements: Elements): TypeElement? =
     @Suppress("SwallowedException")

@@ -17,6 +17,7 @@ const val ListKDeprecation =
 class ForListK private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -447,7 +448,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
   }
 
   override fun toString(): String =
-   list.toString()
+    list.toString()
 
   companion object {
 

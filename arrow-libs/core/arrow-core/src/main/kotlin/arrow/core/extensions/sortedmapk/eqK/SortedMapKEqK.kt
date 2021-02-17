@@ -21,8 +21,8 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqK(EQK, arg1, arg2)",
-  "arrow.core.eqK"
+    "eqK(EQK, arg1, arg2)",
+    "arrow.core.eqK"
   ),
   DeprecationLevel.WARNING
 )
@@ -44,19 +44,19 @@ fun <K : Comparable<K>, A> Kind<Kind<ForSortedMapK, K>, A>.eqK(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "liftEq(EQK, arg0)",
-  "arrow.core.SortedMapK.liftEq"
+    "liftEq(EQK, arg0)",
+    "arrow.core.SortedMapK.liftEq"
   ),
   DeprecationLevel.WARNING
 )
 fun <K : Comparable<K>, A> liftEq(EQK: Eq<K>, arg0: Eq<A>): Eq<Kind<Kind<ForSortedMapK, K>, A>> =
-    arrow.core.SortedMapK
-   .eqK<K>(EQK)
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForSortedMapK, K>, A>>
+  arrow.core.SortedMapK
+    .eqK<K>(EQK)
+    .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForSortedMapK, K>, A>>
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
 inline fun <K : Comparable<K>> Companion.eqK(EQK: Eq<K>): SortedMapKEqK<K> = object :
-    arrow.core.extensions.SortedMapKEqK<K> { override fun EQK(): arrow.typeclasses.Eq<K> = EQK }
+  arrow.core.extensions.SortedMapKEqK<K> { override fun EQK(): arrow.typeclasses.Eq<K> = EQK }

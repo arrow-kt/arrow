@@ -20,14 +20,15 @@ internal val monoidal_singleton: OptionMonoidal = object : arrow.core.extensions
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Option.empty<A>()",
-  "arrow.core.Option", "arrow.core.empty"
+    "Option.empty<A>()",
+    "arrow.core.Option",
+    "arrow.core.empty"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> identity(): Option<A> = arrow.core.Option
-   .monoidal()
-   .identity<A>() as arrow.core.Option<A>
+  .monoidal()
+  .identity<A>() as arrow.core.Option<A>
 
 @Suppress(
   "UNCHECKED_CAST",

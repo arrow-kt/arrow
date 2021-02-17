@@ -65,9 +65,9 @@ interface ProcessorUtils : KotlinMetadataUtils {
 
   fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
     val metadata = (
-      if (classElement.kotlinMetadata == null)
+      if (classElement.kotlinMetadata == null) {
         elementUtils.getTypeElement(classElement.qualifiedName.toString().asKotlin()).kotlinMetadata
-      else classElement.kotlinMetadata
+      } else classElement.kotlinMetadata
       ) ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
 
     return metadata.asClassOrPackageDataWrapper(classElement)
@@ -171,7 +171,6 @@ fun recurseFilesUpwards(fileNames: Set<String>): File =
   recurseFilesUpwards(fileNames, File(".").absoluteFile)
 
 fun recurseFilesUpwards(fileNames: Set<String>, currentDirectory: File): File {
-
   val filesInDir = currentDirectory.list()
 
   return if ((filesInDir.intersect(fileNames)).isNotEmpty()) {

@@ -25,7 +25,7 @@ interface MonoidSemigroup : arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`
   }
 
   companion object {
-    val defaultInstance : arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
+    val defaultInstance: arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
       object : MonoidSemigroup{}
   }
 }
@@ -33,16 +33,15 @@ interface MonoidSemigroup : arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`
 fun `arrow`.`ap`.`objects`.`generic`.`Monoid`.Companion.semigroup(): arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
   MonoidSemigroup.defaultInstance
 
-interface MonoidMonoid: arrow.typeclasses.Monoid<`arrow`.`ap`.`objects`.`generic`.`Monoid`>, MonoidSemigroup {
+interface MonoidMonoid : arrow.typeclasses.Monoid<`arrow`.`ap`.`objects`.`generic`.`Monoid`>, MonoidSemigroup {
   override fun empty(): `arrow`.`ap`.`objects`.`generic`.`Monoid` =
     `arrow`.`ap`.`objects`.`generic`.`Monoid`(with(`kotlin`.`String`.monoid()){ empty() }, with(`arrow`.`core`.`Option`.monoid<`kotlin`.`String`>(`kotlin`.`String`.monoid())){ empty() })
 
   companion object {
-    val defaultInstance : arrow.typeclasses.Monoid<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
+    val defaultInstance: arrow.typeclasses.Monoid<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
       object : MonoidMonoid{}
   }
 }
 
 fun `arrow`.`ap`.`objects`.`generic`.`Monoid`.Companion.monoid(): arrow.typeclasses.Monoid<`arrow`.`ap`.`objects`.`generic`.`Monoid`> =
   MonoidMonoid.defaultInstance
-

@@ -28,19 +28,19 @@ internal val invariant_singleton: MonoidInvariant<Any?> = object : MonoidInvaria
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "imap(arg1, arg2)",
-  "arrow.core.imap"
+    "imap(arg1, arg2)",
+    "arrow.core.imap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForMonoid, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Monoid<B> =
-    arrow.typeclasses.Monoid.invariant<A>().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.typeclasses.Monoid<B>
-}
+  arrow.typeclasses.Monoid.invariant<A>().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.typeclasses.Monoid<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
 inline fun <A> Companion.invariant(): MonoidInvariant<A> = invariant_singleton as
-    arrow.core.extensions.MonoidInvariant<A>
+  arrow.core.extensions.MonoidInvariant<A>

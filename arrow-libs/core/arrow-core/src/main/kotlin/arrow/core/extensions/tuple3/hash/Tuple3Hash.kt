@@ -35,9 +35,11 @@ inline fun <A, B, C> Companion.hash(
   HA: Hash<A>,
   HB: Hash<B>,
   HC: Hash<C>
-): Tuple3Hash<A, B, C> = object : arrow.core.extensions.Tuple3Hash<A, B, C> { override fun HA():
+): Tuple3Hash<A, B, C> = object : arrow.core.extensions.Tuple3Hash<A, B, C> {
+  override fun HA():
     arrow.typeclasses.Hash<A> = HA
 
   override fun HB(): arrow.typeclasses.Hash<B> = HB
 
-  override fun HC(): arrow.typeclasses.Hash<C> = HC }
+  override fun HC(): arrow.typeclasses.Hash<C> = HC
+}

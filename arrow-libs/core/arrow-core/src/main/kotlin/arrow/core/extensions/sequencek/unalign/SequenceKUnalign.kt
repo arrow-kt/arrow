@@ -12,7 +12,7 @@ import arrow.core.extensions.SequenceKUnalign
  */
 @PublishedApi()
 internal val unalign_singleton: SequenceKUnalign = object : arrow.core.extensions.SequenceKUnalign
-    {}
+{}
 
 @JvmName("unalign")
 @Suppress(
@@ -30,10 +30,10 @@ internal val unalign_singleton: SequenceKUnalign = object : arrow.core.extension
   DeprecationLevel.WARNING
 )
 fun <A, B> unalign(arg0: Kind<ForSequenceK, Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>,
-    Kind<ForSequenceK, B>> = arrow.core.SequenceK
-   .unalign()
-   .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
-    arrow.Kind<arrow.core.ForSequenceK, B>>
+  Kind<ForSequenceK, B>> = arrow.core.SequenceK
+  .unalign()
+  .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
+  arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @JvmName("unalignWith")
 @Suppress(
@@ -51,9 +51,9 @@ fun <A, B> unalign(arg0: Kind<ForSequenceK, Ior<A, B>>): Tuple2<Kind<ForSequence
   DeprecationLevel.WARNING
 )
 fun <A, B, C> unalignWith(arg0: Kind<ForSequenceK, C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> = arrow.core.SequenceK
-   .unalign()
-   .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
+  Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> = arrow.core.SequenceK
+    .unalign()
+    .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
     arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @Suppress(

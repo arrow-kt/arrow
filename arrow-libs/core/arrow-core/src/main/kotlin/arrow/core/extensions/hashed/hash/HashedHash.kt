@@ -17,4 +17,4 @@ internal val hash_singleton: HashedHash<Any?> = object : HashedHash<Any?> {}
   "NOTHING_TO_INLINE"
 )
 inline fun <A> Companion.hash(): HashedHash<A> = hash_singleton as
-    arrow.core.extensions.HashedHash<A>
+  arrow.core.extensions.HashedHash<A>

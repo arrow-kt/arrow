@@ -40,14 +40,14 @@ internal val functor_singleton: OptionFunctor = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map<B>(arg1)"
+    "map<B>(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
-    arrow.core.Option.functor().run {
-  this@map.map<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.functor().run {
+    this@map.map<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -64,9 +64,9 @@ fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Option<B> =
-    arrow.core.Option.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+  arrow.core.Option.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 /**
  *  Lifts a function `A -> B` to the [F] structure returning a polymorphic function
@@ -97,15 +97,15 @@ fun <A, B> Kind<ForOption, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>)
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "{ option: Option<A> -> option.map<B>(arg0)}",
-  "arrow.core.Option"
+    "{ option: Option<A> -> option.map<B>(arg0)}",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForOption, A>, Kind<ForOption, B>> =
-    arrow.core.Option
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForOption, A>,
+  arrow.core.Option
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForOption, A>,
     arrow.Kind<arrow.core.ForOption, B>>
 
 @JvmName("void")
@@ -118,7 +118,7 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForOption, A>, Kind<ForOp
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()"
+    "void()"
   ),
   DeprecationLevel.WARNING
 )
@@ -155,14 +155,14 @@ fun <A> Kind<ForOption, A>.void(): Option<Unit> = arrow.core.Option.functor().ru
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)"
+    "fproduct(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.fproduct(arg1: Function1<A, B>): Option<Tuple2<A, B>> =
-    arrow.core.Option.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Option.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -192,7 +192,7 @@ fun <A, B> Kind<ForOption, A>.fproduct(arg1: Function1<A, B>): Option<Tuple2<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "mapConst(arg1)"
+    "mapConst(arg1)"
   ),
   DeprecationLevel.WARNING
 )
@@ -213,7 +213,7 @@ fun <A, B> Kind<ForOption, A>.mapConst(arg1: B): Option<B> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg1.mapConst(this)"
+    "arg1.mapConst(this)"
   ),
   DeprecationLevel.WARNING
 )
@@ -249,14 +249,14 @@ fun <A, B> A.mapConst(arg1: Kind<ForOption, B>): Option<A> = arrow.core.Option.f
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)"
+    "tupleLeft(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.tupleLeft(arg1: B): Option<Tuple2<B, A>> =
-    arrow.core.Option.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<B, A>>
-}
+  arrow.core.Option.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<B, A>>
+  }
 
 /**
  *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -286,14 +286,14 @@ fun <A, B> Kind<ForOption, A>.tupleLeft(arg1: B): Option<Tuple2<B, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)"
+    "tupleRight(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.tupleRight(arg1: B): Option<Tuple2<A, B>> =
-    arrow.core.Option.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Option.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>

@@ -24,7 +24,9 @@ data class HigherKind(
   val aliasJ: String = if (tparams.size == 1) "io.kindedj.Hk" else "$hkjsPackage.HkJ${tparams.size}"
   val typeArgs: List<String> = target.classOrPackageProto.typeParameters.map { target.classOrPackageProto.nameResolver.getString(it.name) }
   val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
-    separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
+    separator = ", ",
+    transform = { target.classOrPackageProto.nameResolver.getString(it.name) }
+  )
   val typeConstraints = target.classOrPackageProto.typeConstraints()
   val name: String = "$kindName$KindPostFix"
   val nameJ: String = "$kindName$KindedJPostFix"
@@ -46,7 +48,9 @@ class HigherKindsFileGenerator(
       val elementsToGenerate = listOf(genKindMarker(hk), genKindTypeAliases(hk), genKindedJTypeAliases(hk), genEv(hk))
       val source: String = elementsToGenerate.joinToString(
         prefix = "${if (hk.`package` != "unnamed package") "package ${hk.`package`}" else ""}\n\n",
-        separator = "\n", postfix = "\n")
+        separator = "\n",
+        postfix = "\n"
+      )
       filer.writeSafe(
         if (hk.`package` != "unnamed package") hk.`package` else "",
         hk.target.classElement.qualifiedName,

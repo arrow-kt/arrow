@@ -148,8 +148,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.followedBy(
 )
 fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.apTap(MF: Monoid<F>, arg1: Kind<Kind<ForTuple2, F>, B>):
   Tuple2<F, A> = arrow.core.Tuple2.monad<F>(MF).run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.Tuple2<F, A>
-}
+    this@apTap.apTap<A, B>(arg1) as arrow.core.Tuple2<F, A>
+  }
 
 @JvmName("followedByEval")
 @Suppress(
@@ -220,7 +220,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.flatTap(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.let { (f, _) -> f toT this.b }", "arrow.core.toT"
+    "arg1.let { (f, _) -> f toT this.b }",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -242,7 +243,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.productL(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.let { (f, _) -> f toT this.b }", "arrow.core.toT"
+    "arg1.let { (f, _) -> f toT this.b }",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -264,7 +266,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.forEffect(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
+    "arg1.value().let { (f, _) -> f toT this.b }",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -285,7 +288,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.productLEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1.value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
+    "arg1.value().let { (f, _) -> f toT this.b }",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -306,7 +310,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, A>.forEffectEval(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "arg1(this.b).value().let { (f, _) -> f toT this.b }", "arrow.core.toT"
+    "arg1(this.b).value().let { (f, _) -> f toT this.b }",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -350,7 +355,8 @@ fun <F, B> Kind<Kind<ForTuple2, F>, Boolean>.ifM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })", "arrow.core.toT"
+    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )
@@ -372,7 +378,8 @@ fun <F, A, B> Kind<Kind<ForTuple2, F>, Either<A, B>>.selectM(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })", "arrow.core.toT"
+    "this.b.fold({ a -> arg1.a toT arg1.b(a)  }, { b -> MF.empty() toT b })",
+    "arrow.core.toT"
   ),
   DeprecationLevel.WARNING
 )

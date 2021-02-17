@@ -21,9 +21,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.eqK(arg1: Sequence<A>, arg2: Eq<A>): Boolean =
-    arrow.core.extensions.sequence.eqK.Sequence.eqK().run {
-  arrow.core.SequenceK(this@eqK).eqK<A>(arrow.core.SequenceK(arg1), arg2) as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.eqK.Sequence.eqK().run {
+    arrow.core.SequenceK(this@eqK).eqK<A>(arrow.core.SequenceK(arg1), arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -37,8 +37,8 @@ fun <A> Sequence<A>.eqK(arg1: Sequence<A>, arg2: Eq<A>): Boolean =
   level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.extensions.sequence.eqK.Sequence
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSequenceK, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSequenceK, A>>
 
 /**
  * cached extension
@@ -59,4 +59,5 @@ object Sequence {
     "Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0",
     level = DeprecationLevel.WARNING
   )
-  inline fun eqK(): SequenceKEqK = eqK_singleton}
+  inline fun eqK(): SequenceKEqK = eqK_singleton
+}

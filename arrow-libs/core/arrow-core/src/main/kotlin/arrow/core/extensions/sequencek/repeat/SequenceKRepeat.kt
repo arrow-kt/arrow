@@ -25,8 +25,8 @@ internal val repeat_singleton: SequenceKRepeat = object : arrow.core.extensions.
   DeprecationLevel.WARNING
 )
 fun <A> repeat(a: A): SequenceK<A> = arrow.core.SequenceK
-   .repeat()
-   .repeat<A>(a) as arrow.core.SequenceK<A>
+  .repeat()
+  .repeat<A>(a) as arrow.core.SequenceK<A>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -11,7 +11,7 @@ import arrow.core.extensions.OptionMonadPlus
  */
 @PublishedApi()
 internal val monadPlus_singleton: OptionMonadPlus = object : arrow.core.extensions.OptionMonadPlus
-    {}
+{}
 
 @JvmName("zeroM")
 @Suppress(
@@ -23,14 +23,15 @@ internal val monadPlus_singleton: OptionMonadPlus = object : arrow.core.extensio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Option.empty<A>()",
-  "arrow.core.Option", "arrow.core.empty"
+    "Option.empty<A>()",
+    "arrow.core.Option",
+    "arrow.core.empty"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> zeroM(): Option<A> = arrow.core.Option
-   .monadPlus()
-   .zeroM<A>() as arrow.core.Option<A>
+  .monadPlus()
+  .zeroM<A>() as arrow.core.Option<A>
 
 @JvmName("plusM")
 @Suppress(
@@ -42,15 +43,16 @@ fun <A> zeroM(): Option<A> = arrow.core.Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "orElse { arg1 }",
-  "arrow.core.Option", "arrow.core.orElse"
+    "orElse { arg1 }",
+    "arrow.core.Option",
+    "arrow.core.orElse"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.plusM(arg1: Kind<ForOption, A>): Option<A> =
-    arrow.core.Option.monadPlus().run {
-  this@plusM.plusM<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.monadPlus().run {
+    this@plusM.plusM<A>(arg1) as arrow.core.Option<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

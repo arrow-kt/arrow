@@ -358,11 +358,14 @@ interface OptionHash<A> : Hash<Option<A>> {
 @Deprecated(OrderDeprecation)
 interface OptionOrder<A> : Order<Option<A>> {
   fun OA(): Order<A>
-  override fun Option<A>.compare(b: Option<A>): Ordering = fold({
-    b.fold({ EQ }, { LT })
-  }, { a1 ->
-    b.fold({ GT }, { a2 -> OA().run { a1.compare(a2) } })
-  })
+  override fun Option<A>.compare(b: Option<A>): Ordering = fold(
+    {
+      b.fold({ EQ }, { LT })
+    },
+    { a1 ->
+      b.fold({ GT }, { a2 -> OA().run { a1.compare(a2) } })
+    }
+  )
 }
 
 @Deprecated(
@@ -600,8 +603,10 @@ interface OptionRepeat : Repeat<ForOption>, OptionZip {
 )
 interface OptionUnzip : Unzip<ForOption>, OptionZip {
   override fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
-    fix().fold({ Option.empty<A>() toT Option.empty() },
-      { it.a.some() toT it.b.some() })
+    fix().fold(
+      { Option.empty<A>() toT Option.empty() },
+      { it.a.some() toT it.b.some() }
+    )
 }
 
 @Deprecated(

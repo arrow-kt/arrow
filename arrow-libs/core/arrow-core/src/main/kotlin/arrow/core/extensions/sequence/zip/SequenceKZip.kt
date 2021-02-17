@@ -19,10 +19,10 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.zip(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.zip.Sequence.zip().run {
-  arrow.core.SequenceK(this@zip).zip<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.zip.Sequence.zip().run {
+    arrow.core.SequenceK(this@zip).zip<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("zipWith")
 @Suppress(
@@ -39,10 +39,10 @@ fun <A, B> Sequence<A>.zip(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Sequence<A>.zipWith(arg1: Sequence<B>, arg2: Function2<A, B, C>): Sequence<C> =
-    arrow.core.extensions.sequence.zip.Sequence.zip().run {
-  arrow.core.SequenceK(this@zipWith).zipWith<A, B, C>(arrow.core.SequenceK(arg1), arg2) as
-    kotlin.sequences.Sequence<C>
-}
+  arrow.core.extensions.sequence.zip.Sequence.zip().run {
+    arrow.core.SequenceK(this@zipWith).zipWith<A, B, C>(arrow.core.SequenceK(arg1), arg2) as
+      kotlin.sequences.Sequence<C>
+  }
 
 /**
  * cached extension
@@ -63,4 +63,5 @@ object Sequence {
     "Zip typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun zip(): SequenceKZip = zip_singleton}
+  inline fun zip(): SequenceKZip = zip_singleton
+}

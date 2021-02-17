@@ -19,9 +19,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.filterMap(arg1: Function1<A, Option<B>>): Sequence<B> =
-    arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
-  arrow.core.SequenceK(this@filterMap).filterMap<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
+    arrow.core.SequenceK(this@filterMap).filterMap<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -38,9 +38,9 @@ fun <A, B> Sequence<A>.filterMap(arg1: Function1<A, Option<B>>): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<Option<A>>.flattenOption(): Sequence<A> =
-    arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
-  arrow.core.SequenceK(this@flattenOption).flattenOption<A>() as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
+    arrow.core.SequenceK(this@flattenOption).flattenOption<A>() as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -57,9 +57,9 @@ fun <A> Sequence<Option<A>>.flattenOption(): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.filter(arg1: Function1<A, Boolean>): Sequence<A> =
-    arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
-  arrow.core.SequenceK(this@filter).filter<A>(arg1) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
+    arrow.core.SequenceK(this@filter).filter<A>(arg1) as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -76,17 +76,17 @@ fun <A> Sequence<A>.filter(arg1: Function1<A, Boolean>): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.filterIsInstance(arg1: Class<B>): Sequence<B> =
-    arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
-  arrow.core.SequenceK(this@filterIsInstance).filterIsInstance<A, B>(arg1) as
-    kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functorFilter.Sequence.functorFilter().run {
+    arrow.core.SequenceK(this@filterIsInstance).filterIsInstance<A, B>(arg1) as
+      kotlin.sequences.Sequence<B>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val functorFilter_singleton: SequenceKFunctorFilter = object :
-    arrow.core.extensions.SequenceKFunctorFilter {}
+  arrow.core.extensions.SequenceKFunctorFilter {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -101,4 +101,5 @@ object Sequence {
     "FunctorFilter typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun functorFilter(): SequenceKFunctorFilter = functorFilter_singleton}
+  inline fun functorFilter(): SequenceKFunctorFilter = functorFilter_singleton
+}

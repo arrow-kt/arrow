@@ -28,9 +28,9 @@ fun <L, F, A, B> crosswalk(
   arg1: Kind<Kind<ForIor, L>, A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<Kind<ForIor, L>, B>> = arrow.core.Ior
-   .crosswalk<L>()
-   .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForIor,
-    L>, B>>
+  .crosswalk<L>()
+  .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForIor,
+      L>, B>>
 
 @JvmName("sequenceL")
 @Suppress(
@@ -44,9 +44,9 @@ fun <L, F, A, B> crosswalk(
   level = DeprecationLevel.WARNING
 )
 fun <L, F, A> sequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, L>, Kind<F, A>>): Kind<F,
-    Kind<Kind<ForIor, L>, A>> = arrow.core.Ior
-   .crosswalk<L>()
-   .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForIor, L>, A>>
+  Kind<Kind<ForIor, L>, A>> = arrow.core.Ior
+  .crosswalk<L>()
+  .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForIor, L>, A>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -57,4 +57,4 @@ fun <L, F, A> sequenceL(arg0: Align<F>, arg1: Kind<Kind<ForIor, L>, Kind<F, A>>)
   level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.crosswalk(): IorCrosswalk<L> = crosswalk_singleton as
-    arrow.core.extensions.IorCrosswalk<L>
+  arrow.core.extensions.IorCrosswalk<L>

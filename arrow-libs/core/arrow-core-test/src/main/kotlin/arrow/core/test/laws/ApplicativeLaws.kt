@@ -23,7 +23,6 @@ object ApplicativeLaws {
   fun <F> laws(A: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> = laws(A, A, GENK, EQK)
 
   fun <F> laws(A: Applicative<F>, FF: Functor<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
-
     val EQ: Eq<Kind<F, Int>> = EQK.liftEq(Int.eq())
     val G = GENK.genK(Gen.int())
     val EQTuple2: Eq<Kind<F, Tuple2<Int, Int>>> = EQK.liftEq(Tuple2.eq(Int.eq(), Int.eq()))

@@ -21,11 +21,10 @@ interface SemigroupSemigroup : arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects
   }
 
   companion object {
-    val defaultInstance : arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Semigroup`> =
+    val defaultInstance: arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Semigroup`> =
       object : SemigroupSemigroup{}
   }
 }
 
 fun `arrow`.`ap`.`objects`.`generic`.`Semigroup`.Companion.semigroup(): arrow.typeclasses.Semigroup<`arrow`.`ap`.`objects`.`generic`.`Semigroup`> =
   SemigroupSemigroup.defaultInstance
-

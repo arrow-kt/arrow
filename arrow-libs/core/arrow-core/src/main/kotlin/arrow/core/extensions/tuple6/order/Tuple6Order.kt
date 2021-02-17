@@ -203,7 +203,7 @@ fun <A, B, C, D, E, F> Tuple6<A, B, C, D, E, F>.max(
   OF: Order<F>,
   arg1: Tuple6<A, B, C, D, E, F>
 ): Tuple6<A, B, C, D, E, F> = arrow.core.Tuple6.order<A, B, C, D, E,
-    F>(OA, OB, OC, OD, OE, OF).run {
+  F>(OA, OB, OC, OD, OE, OF).run {
   this@max.max(arg1) as arrow.core.Tuple6<A, B, C, D, E, F>
 }
 
@@ -232,7 +232,7 @@ fun <A, B, C, D, E, F> Tuple6<A, B, C, D, E, F>.min(
   OF: Order<F>,
   arg1: Tuple6<A, B, C, D, E, F>
 ): Tuple6<A, B, C, D, E, F> = arrow.core.Tuple6.order<A, B, C, D, E,
-    F>(OA, OB, OC, OD, OE, OF).run {
+  F>(OA, OB, OC, OD, OE, OF).run {
   this@min.min(arg1) as arrow.core.Tuple6<A, B, C, D, E, F>
 }
 
@@ -261,7 +261,7 @@ fun <A, B, C, D, E, F> Tuple6<A, B, C, D, E, F>.sort(
   OF: Order<F>,
   arg1: Tuple6<A, B, C, D, E, F>
 ): Tuple2<Tuple6<A, B, C, D, E, F>, Tuple6<A, B, C, D, E, F>> = arrow.core.Tuple6.order<A, B, C, D,
-    E, F>(OA, OB, OC, OD, OE, OF).run {
+  E, F>(OA, OB, OC, OD, OE, OF).run {
   this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple6<A, B, C, D, E, F>,
     arrow.core.Tuple6<A, B, C, D, E, F>>
 }
@@ -287,7 +287,7 @@ inline fun <A, B, C, D, E, F> Companion.order(
   OE: Order<E>,
   OF: Order<F>
 ): Tuple6Order<A, B, C, D, E, F> = object : arrow.core.extensions.Tuple6Order<A, B, C, D, E, F> {
-    override fun OA(): arrow.typeclasses.Order<A> = OA
+  override fun OA(): arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
@@ -297,4 +297,5 @@ inline fun <A, B, C, D, E, F> Companion.order(
 
   override fun OE(): arrow.typeclasses.Order<E> = OE
 
-  override fun OF(): arrow.typeclasses.Order<F> = OF }
+  override fun OF(): arrow.typeclasses.Order<F> = OF
+}

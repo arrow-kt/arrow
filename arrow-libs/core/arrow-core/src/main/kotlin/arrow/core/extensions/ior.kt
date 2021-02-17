@@ -106,19 +106,29 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
     fix().ap(SL(), ff)
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.apEval(ff: Eval<Kind<IorPartialOf<L>, (A) -> B>>): Eval<Kind<IorPartialOf<L>, B>> =
-    fix().fold({ l ->
-      Eval.now(l.leftIor())
-    }, { r ->
-      ff.map { it.fix().map { f -> f(r) } }
-    }, { l, r ->
-      ff.map { it.fix().fold({ ll ->
-        SL().run { l + ll }.leftIor()
-      }, { f ->
-        Ior.Both(l, f(r))
-      }, { ll, f ->
-        Ior.Both(SL().run { l + ll }, f(r))
-      }) }
-    })
+    fix().fold(
+      { l ->
+        Eval.now(l.leftIor())
+      },
+      { r ->
+        ff.map { it.fix().map { f -> f(r) } }
+      },
+      { l, r ->
+        ff.map {
+          it.fix().fold(
+            { ll ->
+              SL().run { l + ll }.leftIor()
+            },
+            { f ->
+              Ior.Both(l, f(r))
+            },
+            { ll, f ->
+              Ior.Both(SL().run { l + ll }, f(r))
+            }
+          )
+        }
+      }
+    )
 }
 
 @Deprecated(
@@ -199,8 +209,11 @@ interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
   override fun <G, A, B, C, D> IorOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, IorOf<C, D>> =
     fix().let {
       AP.run {
-        it.fold({ f(it).map { Ior.Left(it) } }, { g(it).map { Ior.Right(it) } },
-          { a, b -> mapN(f(a), g(b)) { Ior.Both(it.a, it.b) } })
+        it.fold(
+          { f(it).map { Ior.Left(it) } },
+          { g(it).map { Ior.Right(it) } },
+          { a, b -> mapN(f(a), g(b)) { Ior.Both(it.a, it.b) } }
+        )
       }
     }
 }
@@ -290,13 +303,17 @@ interface IorHash<L, R> : Hash<Ior<L, R>> {
 interface IorOrder<L, R> : Order<Ior<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
-  override fun Ior<L, R>.compare(b: Ior<L, R>): Ordering = fold({ l1 ->
-    b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT }, { _, _ -> LT })
-  }, { r1 ->
-    b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } }, { _, _ -> LT })
-  }, { l1, r1 ->
-    b.fold({ GT }, { GT }, { l2, r2 -> OL().run { l1.compare(l2) } + OR().run { r1.compare(r2) } })
-  })
+  override fun Ior<L, R>.compare(b: Ior<L, R>): Ordering = fold(
+    { l1 ->
+      b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT }, { _, _ -> LT })
+    },
+    { r1 ->
+      b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } }, { _, _ -> LT })
+    },
+    { l1, r1 ->
+      b.fold({ GT }, { GT }, { l2, r2 -> OL().run { l1.compare(l2) } + OR().run { r1.compare(r2) } })
+    }
+  )
 }
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =

@@ -25,9 +25,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@foldLeft).foldLeft<A, B>(arg1, arg2) as B
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@foldLeft).foldLeft<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("foldRight")
 @Suppress(
@@ -45,9 +45,9 @@ fun <A, B> Sequence<A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval<B>>): Eval<B> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@foldRight).foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@foldRight).foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
+  }
 
 @JvmName("fold")
 @Suppress(
@@ -64,9 +64,9 @@ fun <A, B> Sequence<A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.fold(arg1: Monoid<A>): A =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@fold).fold<A>(arg1) as A
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@fold).fold<A>(arg1) as A
+  }
 
 @JvmName("reduceLeftToOption")
 @Suppress(
@@ -84,10 +84,10 @@ fun <A> Sequence<A>.fold(arg1: Monoid<A>): A =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
-    Option<B> = arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@reduceLeftToOption).reduceLeftToOption<A, B>(arg1, arg2) as
-    arrow.core.Option<B>
-}
+  Option<B> = arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@reduceLeftToOption).reduceLeftToOption<A, B>(arg1, arg2) as
+      arrow.core.Option<B>
+  }
 
 @JvmName("reduceRightToOption")
 @Suppress(
@@ -100,7 +100,8 @@ fun <A, B> Sequence<A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
-    "arrow.core.Option", "arrow.core.reduceRightEvalOrNull"
+    "arrow.core.Option",
+    "arrow.core.reduceRightEvalOrNull"
   ),
   DeprecationLevel.WARNING
 )
@@ -128,9 +129,9 @@ fun <A, B> Sequence<A>.reduceRightToOption(
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@reduceLeftOption).reduceLeftOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@reduceLeftOption).reduceLeftOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("reduceRightOption")
 @Suppress(
@@ -142,16 +143,16 @@ fun <A> Sequence<A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceRightOption(arg1)",
-  "arrow.core.reduceRightOption"
+    "reduceRightOption(arg1)",
+    "arrow.core.reduceRightOption"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>): Eval<Option<A>> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@reduceRightOption).reduceRightOption<A>(arg1) as
-    arrow.core.Eval<arrow.core.Option<A>>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@reduceRightOption).reduceRightOption<A>(arg1) as
+      arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -169,9 +170,9 @@ fun <A> Sequence<A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>): Eva
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.combineAll(arg1: Monoid<A>): A =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@combineAll).combineAll<A>(arg1) as A
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@combineAll).combineAll<A>(arg1) as A
+  }
 
 @JvmName("foldMap")
 @Suppress(
@@ -189,9 +190,9 @@ fun <A> Sequence<A>.combineAll(arg1: Monoid<A>): A =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@foldMap).foldMap<A, B>(arg1, arg2) as B
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@foldMap).foldMap<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("orEmpty")
 @Suppress(
@@ -208,9 +209,9 @@ fun <A, B> Sequence<A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
   DeprecationLevel.WARNING
 )
 fun <A> orEmpty(arg0: Applicative<ForSequenceK>, arg1: Monoid<A>): Sequence<A> =
-    arrow.core.extensions.sequence.foldable.Sequence
-   .foldable()
-   .orEmpty<A>(arg0, arg1) as kotlin.sequences.Sequence<A>
+  arrow.core.extensions.sequence.foldable.Sequence
+    .foldable()
+    .orEmpty<A>(arg0, arg1) as kotlin.sequences.Sequence<A>
 
 @JvmName("traverse_")
 @Suppress(
@@ -224,7 +225,7 @@ fun <A> orEmpty(arg0: Applicative<ForSequenceK>, arg1: Monoid<A>): Sequence<A> =
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
-    Unit> = arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+  Unit> = arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
   arrow.core.SequenceK(this@traverse_).traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
 }
 
@@ -240,9 +241,9 @@ fun <G, A, B> Sequence<A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kin
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@sequence_).sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@sequence_).sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("find")
 @Suppress(
@@ -260,9 +261,9 @@ fun <G, A> Sequence<Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.find(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@find).find<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@find).find<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("exists")
 @Suppress(
@@ -279,9 +280,9 @@ fun <A> Sequence<A>.find(arg1: Function1<A, Boolean>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.exists(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@exists).exists<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@exists).exists<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("forAll")
 @Suppress(
@@ -298,9 +299,9 @@ fun <A> Sequence<A>.exists(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.forAll(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@forAll).forAll<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@forAll).forAll<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("all")
 @Suppress(
@@ -317,9 +318,9 @@ fun <A> Sequence<A>.forAll(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.all(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@all).all<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@all).all<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("isEmpty")
 @Suppress(
@@ -336,9 +337,9 @@ fun <A> Sequence<A>.all(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.isEmpty(): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@isEmpty).isEmpty<A>() as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@isEmpty).isEmpty<A>() as kotlin.Boolean
+  }
 
 @JvmName("nonEmpty")
 @Suppress(
@@ -355,9 +356,9 @@ fun <A> Sequence<A>.isEmpty(): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.nonEmpty(): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@nonEmpty).nonEmpty<A>() as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@nonEmpty).nonEmpty<A>() as kotlin.Boolean
+  }
 
 @JvmName("isNotEmpty")
 @Suppress(
@@ -374,9 +375,9 @@ fun <A> Sequence<A>.nonEmpty(): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.isNotEmpty(): Boolean =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@isNotEmpty).isNotEmpty<A>() as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@isNotEmpty).isNotEmpty<A>() as kotlin.Boolean
+  }
 
 @JvmName("size")
 @Suppress(
@@ -393,9 +394,9 @@ fun <A> Sequence<A>.isNotEmpty(): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.size(arg1: Monoid<Long>): Long =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@size).size<A>(arg1) as kotlin.Long
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@size).size<A>(arg1) as kotlin.Long
+  }
 
 @JvmName("foldMapA")
 @Suppress(
@@ -472,9 +473,9 @@ fun <G, A, B> Sequence<A>.foldM(
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.get(arg1: Long): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@get).get<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@get).get<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOption")
 @Suppress(
@@ -492,9 +493,9 @@ fun <A> Sequence<A>.get(arg1: Long): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.firstOption(): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@firstOption).firstOption<A>() as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@firstOption).firstOption<A>() as arrow.core.Option<A>
+  }
 
 @JvmName("firstOption")
 @Suppress(
@@ -512,9 +513,9 @@ fun <A> Sequence<A>.firstOption(): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@firstOption).firstOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@firstOption).firstOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOrNone")
 @Suppress(
@@ -532,9 +533,9 @@ fun <A> Sequence<A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.firstOrNone(): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@firstOrNone).firstOrNone<A>() as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@firstOrNone).firstOrNone<A>() as arrow.core.Option<A>
+  }
 
 @JvmName("firstOrNone")
 @Suppress(
@@ -552,9 +553,9 @@ fun <A> Sequence<A>.firstOrNone(): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@firstOrNone).firstOrNone<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@firstOrNone).firstOrNone<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("toList")
 @Suppress(
@@ -571,16 +572,16 @@ fun <A> Sequence<A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.toList(): List<A> =
-    arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
-  arrow.core.SequenceK(this@toList).toList<A>() as kotlin.collections.List<A>
-}
+  arrow.core.extensions.sequence.foldable.Sequence.foldable().run {
+    arrow.core.SequenceK(this@toList).toList<A>() as kotlin.collections.List<A>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val foldable_singleton: SequenceKFoldable = object :
-    arrow.core.extensions.SequenceKFoldable {}
+  arrow.core.extensions.SequenceKFoldable {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -595,4 +596,5 @@ object Sequence {
     "Foldable typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun foldable(): SequenceKFoldable = foldable_singleton}
+  inline fun foldable(): SequenceKFoldable = foldable_singleton
+}

@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val traverse_singleton: NonEmptyListTraverse = object :
-    arrow.core.extensions.NonEmptyListTraverse {}
+  arrow.core.extensions.NonEmptyListTraverse {}
 
 @JvmName("traverse")
 @Suppress(
@@ -51,7 +51,7 @@ fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
-    Kind<ForNonEmptyList, A>> = arrow.core.NonEmptyList.traverse().run {
+  Kind<ForNonEmptyList, A>> = arrow.core.NonEmptyList.traverse().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.core.ForNonEmptyList, A>>
 }
 
@@ -65,15 +65,15 @@ fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence(arg1: Applicative<G>): Kin
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix().map(arg1)",
-  "arrow.core.fix"
+    "fix().map(arg1)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, A>.map(arg1: Function1<A, B>): NonEmptyList<B> =
-    arrow.core.NonEmptyList.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.core.NonEmptyList<B>
-}
+  arrow.core.NonEmptyList.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.core.NonEmptyList<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

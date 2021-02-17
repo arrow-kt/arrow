@@ -21,7 +21,8 @@ inline fun <A, B, C, D, E, F, G, H> Companion.show(
   SG: Show<G>,
   SH: Show<H>
 ): Tuple8Show<A, B, C, D, E, F, G, H> = object : arrow.core.extensions.Tuple8Show<A, B, C, D, E, F,
-    G, H> { override fun SA(): arrow.typeclasses.Show<A> = SA
+    G, H> {
+  override fun SA(): arrow.typeclasses.Show<A> = SA
 
   override fun SB(): arrow.typeclasses.Show<B> = SB
 
@@ -35,4 +36,5 @@ inline fun <A, B, C, D, E, F, G, H> Companion.show(
 
   override fun SG(): arrow.typeclasses.Show<G> = SG
 
-  override fun SH(): arrow.typeclasses.Show<H> = SH }
+  override fun SH(): arrow.typeclasses.Show<H> = SH
+}

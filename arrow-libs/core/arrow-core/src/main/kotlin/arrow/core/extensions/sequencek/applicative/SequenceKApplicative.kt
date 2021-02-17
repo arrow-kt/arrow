@@ -12,7 +12,7 @@ import arrow.typeclasses.Monoid
  */
 @PublishedApi()
 internal val applicative_singleton: SequenceKApplicative = object :
-    arrow.core.extensions.SequenceKApplicative {}
+  arrow.core.extensions.SequenceKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -47,8 +47,8 @@ fun <A> A.just(): SequenceK<A> = arrow.core.SequenceK.applicative().run {
   DeprecationLevel.WARNING
 )
 fun unit(): SequenceK<Unit> = arrow.core.SequenceK
-   .applicative()
-   .unit() as arrow.core.SequenceK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.core.SequenceK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -65,9 +65,9 @@ fun unit(): SequenceK<Unit> = arrow.core.SequenceK
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
-    arrow.core.SequenceK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -85,9 +85,9 @@ fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.replicate(arg1: Int): SequenceK<List<A>> =
-    arrow.core.SequenceK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.core.SequenceK<kotlin.collections.List<A>>
-}
+  arrow.core.SequenceK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.core.SequenceK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -105,9 +105,9 @@ fun <A> Kind<ForSequenceK, A>.replicate(arg1: Int): SequenceK<List<A>> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.replicate(arg1: Int, arg2: Monoid<A>): SequenceK<A> =
-    arrow.core.SequenceK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.core.SequenceK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

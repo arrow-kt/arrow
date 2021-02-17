@@ -42,9 +42,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -61,9 +61,9 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Sequence<B> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@imap).imap<A, B>(arg1, arg2) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@imap).imap<A, B>(arg1, arg2) as kotlin.sequences.Sequence<B>
+  }
 
 /**
  *  Lifts a function `A -> B` to the [F] structure returning a polymorphic function
@@ -103,9 +103,9 @@ fun <A, B> Sequence<A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): Seque
   DeprecationLevel.WARNING
 )
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
-    arrow.core.extensions.sequence.functor.Sequence
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForSequenceK, A>,
+  arrow.core.extensions.sequence.functor.Sequence
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForSequenceK, A>,
     arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @JvmName("void")
@@ -124,9 +124,9 @@ fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForSequenceK, A>, Kind<Fo
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.void(): Sequence<Unit> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@void).void<A>() as kotlin.sequences.Sequence<kotlin.Unit>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@void).void<A>() as kotlin.sequences.Sequence<kotlin.Unit>
+  }
 
 /**
  *  Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
@@ -163,10 +163,10 @@ fun <A> Sequence<A>.void(): Sequence<Unit> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.fproduct(arg1: Function1<A, B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@fproduct).fproduct<A, B>(arg1) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@fproduct).fproduct<A, B>(arg1) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -202,9 +202,9 @@ fun <A, B> Sequence<A>.fproduct(arg1: Function1<A, B>): Sequence<Tuple2<A, B>> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.mapConst(arg1: B): Sequence<B> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@mapConst).mapConst<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@mapConst).mapConst<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 /**
  *  Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
@@ -225,9 +225,9 @@ fun <A, B> Sequence<A>.mapConst(arg1: B): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> A.mapConst(arg1: Sequence<B>): Sequence<A> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  this@mapConst.mapConst<A, B>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    this@mapConst.mapConst<A, B>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<A>
+  }
 
 /**
  *  Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
@@ -263,10 +263,10 @@ fun <A, B> A.mapConst(arg1: Sequence<B>): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.tupleLeft(arg1: B): Sequence<Tuple2<B, A>> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@tupleLeft).tupleLeft<A, B>(arg1) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<B, A>>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@tupleLeft).tupleLeft<A, B>(arg1) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<B, A>>
+  }
 
 /**
  *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -302,10 +302,10 @@ fun <A, B> Sequence<A>.tupleLeft(arg1: B): Sequence<Tuple2<B, A>> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.tupleRight(arg1: B): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@tupleRight).tupleRight<A, B>(arg1) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@tupleRight).tupleRight<A, B>(arg1) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>
@@ -343,16 +343,16 @@ fun <A, B> Sequence<A>.tupleRight(arg1: B): Sequence<Tuple2<A, B>> =
   DeprecationLevel.WARNING
 )
 fun <B, A : B> Sequence<A>.widen(): Sequence<B> =
-    arrow.core.extensions.sequence.functor.Sequence.functor().run {
-  arrow.core.SequenceK(this@widen).widen<B, A>() as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.functor.Sequence.functor().run {
+    arrow.core.SequenceK(this@widen).widen<B, A>() as kotlin.sequences.Sequence<B>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val functor_singleton: SequenceKFunctor = object : arrow.core.extensions.SequenceKFunctor
-    {}
+{}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -368,4 +368,5 @@ object Sequence {
     "Functor typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun functor(): SequenceKFunctor = functor_singleton}
+  inline fun functor(): SequenceKFunctor = functor_singleton
+}

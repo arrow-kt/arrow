@@ -16,7 +16,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroupK_singleton: NonEmptyListSemigroupK = object :
-    arrow.core.extensions.NonEmptyListSemigroupK {}
+  arrow.core.extensions.NonEmptyListSemigroupK {}
 
 @JvmName("combineK")
 @Suppress(
@@ -28,15 +28,15 @@ internal val semigroupK_singleton: NonEmptyListSemigroupK = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix().plus(arg1.fix())",
-  "arrow.core.fix"
+    "fix().plus(arg1.fix())",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.combineK(arg1: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
-    arrow.core.NonEmptyList.semigroupK().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.NonEmptyList<A>
-}
+  arrow.core.NonEmptyList.semigroupK().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.NonEmptyList<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -48,14 +48,15 @@ fun <A> Kind<ForNonEmptyList, A>.combineK(arg1: Kind<ForNonEmptyList, A>): NonEm
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Semigroup.nonEmptyList<A>()",
-  "arrow.core.nonEmptyList", "arrow.typeclasses.Semigroup"
+    "Semigroup.nonEmptyList<A>()",
+    "arrow.core.nonEmptyList",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Semigroup<Kind<ForNonEmptyList, A>> = arrow.core.NonEmptyList
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForNonEmptyList, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForNonEmptyList, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

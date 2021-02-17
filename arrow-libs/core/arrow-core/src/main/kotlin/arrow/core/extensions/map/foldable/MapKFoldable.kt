@@ -113,7 +113,8 @@ fun <K, A, B> Map<K, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "values.toList().reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
-    "arrow.core.reduceRightNullable", "arrow.core.Option"
+    "arrow.core.reduceRightNullable",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -134,7 +135,8 @@ fun <K, A, B> Map<K, A>.reduceRightToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(values.reduceOrNull({ it }, arg1))",
-    "arrow.core.reduceOrNull", "arrow.core.Option"
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -152,7 +154,8 @@ fun <K, A> Map<K, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "values.toList().reduceRightEvalOrNull({ it }, arg1).map { Option.fromNullable(it) }",
-    "arrow.core.reduceRightNullable", "arrow.core.Option"
+    "arrow.core.reduceRightNullable",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )

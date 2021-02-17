@@ -21,9 +21,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.align(arg1)", "arrow.core.align"))
 fun <A, B> align(arg0: List<A>, arg1: List<B>): List<Ior<A, B>> =
-    arrow.core.extensions.list.semialign.List
-   .semialign()
-   .align<A, B>(arrow.core.ListK(arg0), arrow.core.ListK(arg1)) as
+  arrow.core.extensions.list.semialign.List
+    .semialign()
+    .align<A, B>(arrow.core.ListK(arg0), arrow.core.ListK(arg1)) as
     kotlin.collections.List<arrow.core.Ior<A, B>>
 
 @JvmName("alignWith")
@@ -39,9 +39,9 @@ fun <A, B, C> alignWith(
   arg1: List<B>,
   arg2: Function1<Ior<A, B>, C>
 ): List<C> = arrow.core.extensions.list.semialign.List
-   .semialign()
-   .alignWith<A, B, C>(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arg2) as
-    kotlin.collections.List<C>
+  .semialign()
+  .alignWith<A, B, C>(arrow.core.ListK(arg0), arrow.core.ListK(arg1), arg2) as
+  kotlin.collections.List<C>
 
 @JvmName("salign")
 @Suppress(
@@ -52,10 +52,10 @@ fun <A, B, C> alignWith(
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.salign(arg1, arg2)", "arrow.core.salign"))
 fun <A> List<A>.salign(arg1: Semigroup<A>, arg2: List<A>): List<A> =
-    arrow.core.extensions.list.semialign.List.semialign().run {
-  arrow.core.ListK(this@salign).salign<A>(arg1, arrow.core.ListK(arg2)) as
-    kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.semialign.List.semialign().run {
+    arrow.core.ListK(this@salign).salign<A>(arg1, arrow.core.ListK(arg2)) as
+      kotlin.collections.List<A>
+  }
 
 @JvmName("padZip")
 @Suppress(
@@ -66,10 +66,10 @@ fun <A> List<A>.salign(arg1: Semigroup<A>, arg2: List<A>): List<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.padZip(arg1)", "arrow.core.padZip"))
 fun <A, B> List<A>.padZip(arg1: List<B>): List<Tuple2<Option<A>, Option<B>>> =
-    arrow.core.extensions.list.semialign.List.semialign().run {
-  arrow.core.ListK(this@padZip).padZip<A, B>(arrow.core.ListK(arg1)) as
-    kotlin.collections.List<arrow.core.Tuple2<arrow.core.Option<A>, arrow.core.Option<B>>>
-}
+  arrow.core.extensions.list.semialign.List.semialign().run {
+    arrow.core.ListK(this@padZip).padZip<A, B>(arrow.core.ListK(arg1)) as
+      kotlin.collections.List<arrow.core.Tuple2<arrow.core.Option<A>, arrow.core.Option<B>>>
+  }
 
 @JvmName("padZipWith")
 @Suppress(
@@ -80,10 +80,10 @@ fun <A, B> List<A>.padZip(arg1: List<B>): List<Tuple2<Option<A>, Option<B>>> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.padZip(arg1, arg2)", "arrow.core.padZip"))
 fun <A, B, C> List<A>.padZipWith(arg1: List<B>, arg2: Function2<Option<A>, Option<B>, C>): List<C> =
-    arrow.core.extensions.list.semialign.List.semialign().run {
-  arrow.core.ListK(this@padZipWith).padZipWith<A, B, C>(arrow.core.ListK(arg1), arg2) as
-    kotlin.collections.List<C>
-}
+  arrow.core.extensions.list.semialign.List.semialign().run {
+    arrow.core.ListK(this@padZipWith).padZipWith<A, B, C>(arrow.core.ListK(arg1), arg2) as
+      kotlin.collections.List<C>
+  }
 
 /**
  * cached extension
@@ -98,4 +98,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Semialign typeclasses is deprecated. Use concrete methods on List")
-  inline fun semialign(): ListKSemialign = semialign_singleton}
+  inline fun semialign(): ListKSemialign = semialign_singleton
+}

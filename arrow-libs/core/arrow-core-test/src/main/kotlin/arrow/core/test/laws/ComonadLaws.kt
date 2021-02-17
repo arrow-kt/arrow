@@ -17,14 +17,14 @@ object ComonadLaws {
     val EQ = EQK.liftEq(Int.eq())
 
     return FunctorLaws.laws(CM, GENK, EQK) + listOf(
-        Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(GEN, EQ) },
-        Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(GEN, EQ) },
-        Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(GEN, EQ) },
-        Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(GEN, EQ) },
-        Law("Comonad Laws: right identity") { CM.comonadRightIdentity(GEN, EQ) }
-        // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
-        // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
-      )
+      Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(GEN, EQ) },
+      Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(GEN, EQ) },
+      Law("Comonad Laws: map and coflatMap are coherent") { CM.mapAndCoflatmapCoherence(GEN, EQ) },
+      Law("Comonad Laws: left identity") { CM.comonadLeftIdentity(GEN, EQ) },
+      Law("Comonad Laws: right identity") { CM.comonadRightIdentity(GEN, EQ) }
+      // TODO: this test uses a wrpng assumption https://github.com/arrow-kt/arrow/issues/1857
+      // Law("Comonad Laws: cobinding") { CM.cobinding(G, EQ) }
+    )
   }
 
   fun <F> Comonad<F>.duplicateThenExtractIsId(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

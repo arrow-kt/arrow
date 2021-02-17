@@ -77,7 +77,7 @@ data class Tuple9<out A, out B, out C, out D, out E, out F, out G, out H, out I>
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>, I : Comparable<I>>
-  Tuple9<A, B, C, D, E, F, G, H, I>.compareTo(other: Tuple9<A, B, C, D, E, F, G, H, I>): Int {
+Tuple9<A, B, C, D, E, F, G, H, I>.compareTo(other: Tuple9<A, B, C, D, E, F, G, H, I>): Int {
   val first = a.compareTo(other.a)
   return if (first == 0) {
     val second = b.compareTo(other.b)

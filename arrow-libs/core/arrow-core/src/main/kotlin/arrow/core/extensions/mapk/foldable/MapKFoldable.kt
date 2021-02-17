@@ -124,7 +124,8 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.reduceLeftToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "values.toList().reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
-    "arrow.core.reduceRightNullable", "arrow.core.Option"
+    "arrow.core.reduceRightNullable",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -147,7 +148,8 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.reduceRightToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(values.reduceOrNull({ it }, arg1))",
-    "arrow.core.reduceOrNull", "arrow.core.Option"
+    "arrow.core.reduceOrNull",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -167,14 +169,15 @@ fun <K, A> Kind<Kind<ForMapK, K>, A>.reduceLeftOption(arg1: Function2<A, A, A>):
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "values.toList().reduceRightEvalOrNull({ it }, arg1).map { Option.fromNullable(it) }",
-    "arrow.core.reduceRightNullable", "arrow.core.Option"
+    "arrow.core.reduceRightNullable",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A> Kind<Kind<ForMapK, K>, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
   Eval<Option<A>> = arrow.core.MapK.foldable<K>().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(

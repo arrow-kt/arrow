@@ -42,9 +42,9 @@ fun <G, A, B, C, D> Kind<Kind<ForValidated, A>, B>.bitraverse(
 @Deprecated("@extension kinded projected functions are deprecated. Replace with bisequence or bisequenceEither from arrow.core.*")
 fun <G, A, B> Kind<Kind<ForValidated, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>):
   Kind<G, Kind<Kind<ForValidated, A>, B>> = arrow.core.Validated.bitraverse().run {
-  this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForValidated, A>, B>>
-}
+    this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.Kind<arrow.core.ForValidated, A>, B>>
+  }
 
 @JvmName("bimap")
 @Suppress(

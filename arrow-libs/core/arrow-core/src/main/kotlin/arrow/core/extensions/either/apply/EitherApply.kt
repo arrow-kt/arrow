@@ -53,7 +53,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.ap(arg1: Kind<Kind<ForEither, L>, Func
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("apEval(arg1)", "arrow.core.apEval"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.apEval(
   arg1: Eval<Kind<Kind<ForEither, L>, Function1<A,
-    B>>>
+        B>>>
 ): Eval<Kind<Kind<ForEither, L>, B>> =
   fix()._apEval(arg1.map { it.fix() })
 
@@ -446,7 +446,7 @@ fun <L, A, B> Kind<Kind<ForEither, L>, A>.product(arg1: Kind<Kind<ForEither, L>,
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }", "arrow.core.Either", "arrow.core.Tuple3"))
 fun <L, A, B, Z> Kind<Kind<ForEither, L>, Tuple2<A, B>>.product(arg1: Kind<Kind<ForEither, L>, Z>):
   Either<L, Tuple3<A, B, Z>> =
-  Either.mapN(fix(), arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }
+    Either.mapN(fix(), arg1.fix()) { (a, b), z -> Tuple3(a, b, z) }
 
 @JvmName("product2")
 @Suppress(
@@ -471,7 +471,7 @@ fun <L, A, B, C, Z> Kind<Kind<ForEither, L>, Tuple3<A, B, C>>.product(
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }", "arrow.core.Either", "arrow.core.Tuple5"))
 fun <L, A, B, C, D, Z> Kind<Kind<ForEither, L>, Tuple4<A, B, C,
-  D>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple5<A, B, C, D, Z>> =
+    D>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple5<A, B, C, D, Z>> =
   Either.mapN(fix(), arg1.fix()) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }
 
 @JvmName("product4")
@@ -483,7 +483,7 @@ fun <L, A, B, C, D, Z> Kind<Kind<ForEither, L>, Tuple4<A, B, C,
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Either", "arrow.core.Tuple6"))
 fun <L, A, B, C, D, E, Z> Kind<Kind<ForEither, L>, Tuple5<A, B, C, D,
-  E>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple6<A, B, C, D, E, Z>> =
+    E>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple6<A, B, C, D, E, Z>> =
   Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }
 
 @JvmName("product5")
@@ -495,7 +495,7 @@ fun <L, A, B, C, D, E, Z> Kind<Kind<ForEither, L>, Tuple5<A, B, C, D,
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Either", "arrow.core.Tuple7"))
 fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForEither, L>, Tuple6<A, B, C, D, E,
-  FF>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple7<A, B, C, D, E, FF, Z>> =
+    FF>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple7<A, B, C, D, E, FF, Z>> =
   Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff), z -> Tuple7(a, b, c, d, e, ff, z) }
 
 @JvmName("product6")
@@ -507,7 +507,7 @@ fun <L, A, B, C, D, E, FF, Z> Kind<Kind<ForEither, L>, Tuple6<A, B, C, D, E,
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }", "arrow.core.Either", "arrow.core.Tuple8"))
 fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForEither, L>, Tuple7<A, B, C, D, E, FF,
-  G>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple8<A, B, C, D, E, FF, G, Z>> =
+    G>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple8<A, B, C, D, E, FF, G, Z>> =
   Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }
 
 @JvmName("product7")
@@ -519,7 +519,7 @@ fun <L, A, B, C, D, E, FF, G, Z> Kind<Kind<ForEither, L>, Tuple7<A, B, C, D, E, 
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }", "arrow.core.Either", "arrow.core.Tuple9"))
 fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForEither, L>, Tuple8<A, B, C, D, E, FF, G,
-  H>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
+    H>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }
 
 @JvmName("product8")
@@ -531,8 +531,8 @@ fun <L, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForEither, L>, Tuple8<A, B, C, D, 
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }", "arrow.core.Either", "arrow.core.Tuple10"))
 fun <L, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForEither, L>, Tuple9<A, B, C, D, E, FF, G, H,
-  I>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple10<A, B, C, D, E, FF, G, H, I,
-  Z>> = Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }
+    I>>.product(arg1: Kind<Kind<ForEither, L>, Z>): Either<L, Tuple10<A, B, C, D, E, FF, G, H, I,
+    Z>> = Either.mapN(fix(), arg1.fix()) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }
 
 @JvmName("tupled")
 @Suppress(

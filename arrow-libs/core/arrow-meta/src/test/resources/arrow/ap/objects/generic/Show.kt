@@ -9,4 +9,3 @@ interface ShowShow : arrow.typeclasses.Show<`arrow`.`ap`.`objects`.`generic`.`Sh
 
 fun `arrow`.`ap`.`objects`.`generic`.`Show`.Companion.show(): arrow.typeclasses.Show<`arrow`.`ap`.`objects`.`generic`.`Show`> =
   object : ShowShow{}
-

@@ -22,9 +22,9 @@ fun <F, A, B> crosswalk(
   arg1: Sequence<A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.crosswalk.Sequence
-   .crosswalk()
-   .crosswalk<F, A, B>(arg0, arrow.core.SequenceK(arg1), arg2) as arrow.Kind<F,
-    arrow.Kind<arrow.core.ForSequenceK, B>>
+  .crosswalk()
+  .crosswalk<F, A, B>(arg0, arrow.core.SequenceK(arg1), arg2) as arrow.Kind<F,
+  arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @JvmName("sequenceL")
 @Suppress(
@@ -38,9 +38,9 @@ fun <F, A, B> crosswalk(
   level = DeprecationLevel.WARNING
 )
 fun <F, A> sequenceL(arg0: Align<F>, arg1: Sequence<Kind<F, A>>): Kind<F, Kind<ForSequenceK, A>> =
-    arrow.core.extensions.sequence.crosswalk.Sequence
-   .crosswalk()
-   .sequenceL<F, A>(arg0, arrow.core.SequenceK(arg1)) as arrow.Kind<F,
+  arrow.core.extensions.sequence.crosswalk.Sequence
+    .crosswalk()
+    .sequenceL<F, A>(arg0, arrow.core.SequenceK(arg1)) as arrow.Kind<F,
     arrow.Kind<arrow.core.ForSequenceK, A>>
 
 /**
@@ -48,7 +48,7 @@ fun <F, A> sequenceL(arg0: Align<F>, arg1: Sequence<Kind<F, A>>): Kind<F, Kind<F
  */
 @PublishedApi()
 internal val crosswalk_singleton: SequenceKCrosswalk = object :
-    arrow.core.extensions.SequenceKCrosswalk {}
+  arrow.core.extensions.SequenceKCrosswalk {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -63,4 +63,5 @@ object Sequence {
     "Crosswalk typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun crosswalk(): SequenceKCrosswalk = crosswalk_singleton}
+  inline fun crosswalk(): SequenceKCrosswalk = crosswalk_singleton
+}

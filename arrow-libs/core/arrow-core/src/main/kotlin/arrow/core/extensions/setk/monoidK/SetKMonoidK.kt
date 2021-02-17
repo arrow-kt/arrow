@@ -27,7 +27,8 @@ internal val monoidK_singleton: SetKMonoidK = object : arrow.core.extensions.Set
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Monoid.set<A>()",
-    "arrow.typeclasses.Monoid", "arrow.core.set"
+    "arrow.typeclasses.Monoid",
+    "arrow.core.set"
   ),
   DeprecationLevel.WARNING
 )

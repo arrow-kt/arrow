@@ -9,7 +9,7 @@ import arrow.core.extensions.SequenceKMonoidal
  */
 @PublishedApi()
 internal val monoidal_singleton: SequenceKMonoidal = object :
-    arrow.core.extensions.SequenceKMonoidal {}
+  arrow.core.extensions.SequenceKMonoidal {}
 
 @JvmName("identity")
 @Suppress(
@@ -26,8 +26,8 @@ internal val monoidal_singleton: SequenceKMonoidal = object :
   DeprecationLevel.WARNING
 )
 fun <A> identity(): SequenceK<A> = arrow.core.SequenceK
-   .monoidal()
-   .identity<A>() as arrow.core.SequenceK<A>
+  .monoidal()
+  .identity<A>() as arrow.core.SequenceK<A>
 
 @Suppress(
   "UNCHECKED_CAST",

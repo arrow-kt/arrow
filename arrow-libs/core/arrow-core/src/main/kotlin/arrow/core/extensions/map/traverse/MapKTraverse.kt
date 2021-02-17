@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverseEither or traverseValidated from arrow.core.*")
 fun <K, G, A, B> Map<K, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
-    Kind<Kind<ForMapK, K>, B>> = arrow.core.extensions.map.traverse.Map.traverse<K>().run {
+  Kind<Kind<ForMapK, K>, B>> = arrow.core.extensions.map.traverse.Map.traverse<K>().run {
   arrow.core.MapK(this@traverse).traverse<G, A, B>(arg1, arg2) as arrow.Kind<G,
     arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 }
@@ -36,10 +36,10 @@ fun <K, G, A, B> Map<K, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kin
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*")
 fun <K, G, A> Map<K, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<Kind<ForMapK, K>, A>> =
-    arrow.core.extensions.map.traverse.Map.traverse<K>().run {
-  arrow.core.MapK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>>
-}
+  arrow.core.extensions.map.traverse.Map.traverse<K>().run {
+    arrow.core.MapK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -54,9 +54,9 @@ fun <K, G, A> Map<K, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<Ki
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Map<K, A>.map(arg1: Function1<A, B>): Map<K, B> =
-    arrow.core.extensions.map.traverse.Map.traverse<K>().run {
-  arrow.core.MapK(this@map).map<A, B>(arg1) as kotlin.collections.Map<K, B>
-}
+  arrow.core.extensions.map.traverse.Map.traverse<K>().run {
+    arrow.core.MapK(this@map).map<A, B>(arg1) as kotlin.collections.Map<K, B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -88,4 +88,5 @@ object Map {
   )
   @Deprecated("Traverse typeclasses is deprecated. Use concrete methods on Map")
   inline fun <K> traverse(): MapKTraverse<K> = traverse_singleton as
-      arrow.core.extensions.MapKTraverse<K>}
+    arrow.core.extensions.MapKTraverse<K>
+}

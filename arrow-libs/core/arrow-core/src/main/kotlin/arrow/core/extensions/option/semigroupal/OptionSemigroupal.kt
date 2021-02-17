@@ -12,7 +12,7 @@ import arrow.core.extensions.OptionSemigroupal
  */
 @PublishedApi()
 internal val semigroupal_singleton: OptionSemigroupal = object :
-    arrow.core.extensions.OptionSemigroupal {}
+  arrow.core.extensions.OptionSemigroupal {}
 
 /**
  *  Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
@@ -32,9 +32,9 @@ internal val semigroupal_singleton: OptionSemigroupal = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.product(arg1: Kind<ForOption, B>): Option<Tuple2<A, B>> =
-    arrow.core.Option.semigroupal().run {
-  this@product.product<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Option.semigroupal().run {
+    this@product.product<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * syntax
@@ -54,9 +54,9 @@ fun <A, B> Kind<ForOption, A>.product(arg1: Kind<ForOption, B>): Option<Tuple2<A
   DeprecationLevel.WARNING
 )
 operator fun <A, B> Kind<ForOption, A>.times(arg1: Kind<ForOption, B>): Option<Tuple2<A, B>> =
-    arrow.core.Option.semigroupal().run {
-  this@times.times<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.Option.semigroupal().run {
+    this@times.times<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).

@@ -41,10 +41,10 @@ fun <A, B> Kind<Kind<ForValidated, A>, B>.eqK(
 )
 @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <A, B> liftEq(arg0: Eq<A>, arg1: Eq<B>): Eq<Kind<Kind<ForValidated, A>, B>> =
-    arrow.core.Validated
-   .eqK2()
-   .liftEq<A, B>(arg0, arg1) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForValidated,
-    A>, B>>
+  arrow.core.Validated
+    .eqK2()
+    .liftEq<A, B>(arg0, arg1) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForValidated,
+        A>, B>>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -19,9 +19,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> A.just(): Sequence<A> =
-    arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
-  this@just.just<A>() as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
+    this@just.just<A>() as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("unit")
 @Suppress(
@@ -38,8 +38,8 @@ fun <A> A.just(): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun unit(): Sequence<Unit> = arrow.core.extensions.sequence.applicative.Sequence
-   .applicative()
-   .unit() as kotlin.sequences.Sequence<kotlin.Unit>
+  .applicative()
+  .unit() as kotlin.sequences.Sequence<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): Sequence<Unit> = arrow.core.extensions.sequence.applicative.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
-    arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
-  arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
+    arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -76,10 +76,10 @@ fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.replicate(arg1: Int): Sequence<List<A>> =
-    arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
-  arrow.core.SequenceK(this@replicate).replicate<A>(arg1) as
-    kotlin.sequences.Sequence<kotlin.collections.List<A>>
-}
+  arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
+    arrow.core.SequenceK(this@replicate).replicate<A>(arg1) as
+      kotlin.sequences.Sequence<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -97,16 +97,16 @@ fun <A> Sequence<A>.replicate(arg1: Int): Sequence<List<A>> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.replicate(arg1: Int, arg2: Monoid<A>): Sequence<A> =
-    arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
-  arrow.core.SequenceK(this@replicate).replicate<A>(arg1, arg2) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.applicative.Sequence.applicative().run {
+    arrow.core.SequenceK(this@replicate).replicate<A>(arg1, arg2) as kotlin.sequences.Sequence<A>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val applicative_singleton: SequenceKApplicative = object :
-    arrow.core.extensions.SequenceKApplicative {}
+  arrow.core.extensions.SequenceKApplicative {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -121,4 +121,5 @@ object Sequence {
     "Applicative typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun applicative(): SequenceKApplicative = applicative_singleton}
+  inline fun applicative(): SequenceKApplicative = applicative_singleton
+}

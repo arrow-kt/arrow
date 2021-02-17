@@ -40,11 +40,18 @@ internal class ArrowEitherCallAdapter<E, R>(
         }
 
         override fun onResponse(call: Call<R>, response: Response<R>) {
-          onResponseFn(callback, this@EitherCall, errorConverter, response, { body, _ ->
-            Response.success(response.code(), body.right())
-          }, { errorBody, _ ->
-            Response.success(errorBody.left())
-          })
+          onResponseFn(
+            callback,
+            this@EitherCall,
+            errorConverter,
+            response,
+            { body, _ ->
+              Response.success(response.code(), body.right())
+            },
+            { errorBody, _ ->
+              Response.success(errorBody.left())
+            }
+          )
         }
       })
     }

@@ -14,7 +14,8 @@ class AutoFoldFileGenerator(
 
   fun generate(logger: (message: CharSequence) -> Unit) = annotatedList.map(this::processElement)
     .map { (element, fold) ->
-      Triple(element,
+      Triple(
+        element,
         "${foldAnnotationClass.simpleName}.${element.type.simpleName.toString().toLowerCase()}.kt",
         fileHeader(element.classData.`package`.escapedClassName) + fold
       )
@@ -48,19 +49,25 @@ class AutoFoldFileGenerator(
     if (params.isNotEmpty()) params.joinToString(prefix = "<", postfix = ">")
     else ""
 
-  private fun params(variants: List<Variant>, returnType: String, annotatedFold: AnnotatedFold): String = variants.joinToString(transform = { variant ->
-    if (variant.typeParams.size > annotatedFold.typeParams.size) autoFoldGenericError(annotatedFold, variant)
-    else "        crossinline ${variant.simpleName.decapitalize()}: (${variant.fullName.escapedClassName}${typeParams(variant.typeParams)}) -> $returnType"
-  }, separator = ",\n")
+  private fun params(variants: List<Variant>, returnType: String, annotatedFold: AnnotatedFold): String = variants.joinToString(
+    transform = { variant ->
+      if (variant.typeParams.size > annotatedFold.typeParams.size) autoFoldGenericError(annotatedFold, variant)
+      else "        crossinline ${variant.simpleName.decapitalize()}: (${variant.fullName.escapedClassName}${typeParams(variant.typeParams)}) -> $returnType"
+    },
+    separator = ",\n"
+  )
 
   private fun fileHeader(packageName: String) = """
     |${if (packageName != "`unnamed package`") "package $packageName" else ""}
     |
     |""".trimMargin()
 
-  private fun patternMatching(variants: List<Variant>): String = variants.joinToString(transform = { variant ->
-    "    is ${variant.fullName.escapedClassName} -> ${variant.simpleName.decapitalize().escapedClassName}(this)"
-  }, separator = "\n")
+  private fun patternMatching(variants: List<Variant>): String = variants.joinToString(
+    transform = { variant ->
+      "    is ${variant.fullName.escapedClassName} -> ${variant.simpleName.decapitalize().escapedClassName}(this)"
+    },
+    separator = "\n"
+  )
 
   private fun functionTypeParams(params: List<String>, returnType: String): String =
     if (params.isEmpty()) "<$returnType>"
@@ -83,5 +90,7 @@ class AutoFoldFileGenerator(
       |
       |${variant.fullName.escapedClassName.removeBackticks()}${typeParams(variant.typeParams)}
       |${" ".repeat(variant.fullName.escapedClassName.removeBackticks().length)} ^
-      """.trimMargin(), annotatedFold.type)
+      """.trimMargin(),
+    annotatedFold.type
+  )
 }

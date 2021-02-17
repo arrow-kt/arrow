@@ -185,9 +185,12 @@ interface NonEmptyListOrder<A> : Order<NonEmptyList<A>> {
 }
 
 fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
-  fa.reduceRightTo({ a -> NonEmptyList.of(a) }, { a, lnel ->
-    lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
-  }).value()
+  fa.reduceRightTo(
+    { a -> NonEmptyList.of(a) },
+    { a, lnel ->
+      lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
+    }
+  ).value()
 
 fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
   NonEmptyList.monad().fx.monad(c).fix()

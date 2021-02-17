@@ -10,7 +10,7 @@ import kotlin.Suppress
  */
 @PublishedApi()
 internal val bimonad_singleton: NonEmptyListBimonad = object :
-    arrow.core.extensions.NonEmptyListBimonad {}
+  arrow.core.extensions.NonEmptyListBimonad {}
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -18,5 +18,6 @@ internal val bimonad_singleton: NonEmptyListBimonad = object :
 )
 @Deprecated(
   "Bimonad typeclass is deprecated. Use concrete methods on NonEmptyList",
-  level = DeprecationLevel.WARNING)
+  level = DeprecationLevel.WARNING
+)
 inline fun Companion.bimonad(): NonEmptyListBimonad = bimonad_singleton

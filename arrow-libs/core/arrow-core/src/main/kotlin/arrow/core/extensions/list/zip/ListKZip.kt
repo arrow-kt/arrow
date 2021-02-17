@@ -45,4 +45,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Zip typeclasses is deprecated. Use concrete methods on Iterable")
-  inline fun zip(): ListKZip = zip_singleton}
+  inline fun zip(): ListKZip = zip_singleton
+}

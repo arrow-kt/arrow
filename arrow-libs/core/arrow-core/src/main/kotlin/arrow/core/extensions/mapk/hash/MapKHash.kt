@@ -28,6 +28,8 @@ fun <K, A> MapK<K, A>.hash(HK: Hash<K>, HA: Hash<A>): Int = arrow.core.MapK.hash
 )
 @Deprecated(HashDeprecation)
 inline fun <K, A> Companion.hash(HK: Hash<K>, HA: Hash<A>): MapKHash<K, A> = object :
-    arrow.core.extensions.MapKHash<K, A> { override fun HK(): arrow.typeclasses.Hash<K> = HK
+  arrow.core.extensions.MapKHash<K, A> {
+  override fun HK(): arrow.typeclasses.Hash<K> = HK
 
-  override fun HA(): arrow.typeclasses.Hash<A> = HA }
+  override fun HA(): arrow.typeclasses.Hash<A> = HA
+}

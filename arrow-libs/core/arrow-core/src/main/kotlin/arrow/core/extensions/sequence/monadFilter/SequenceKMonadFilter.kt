@@ -21,9 +21,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.filterMap(arg1: Function1<A, Option<B>>): Sequence<B> =
-    arrow.core.extensions.sequence.monadFilter.Sequence.monadFilter().run {
-  arrow.core.SequenceK(this@filterMap).filterMap<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.monadFilter.Sequence.monadFilter().run {
+    arrow.core.SequenceK(this@filterMap).filterMap<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -37,16 +37,16 @@ fun <A, B> Sequence<A>.filterMap(arg1: Function1<A, Option<B>>): Sequence<B> =
   level = DeprecationLevel.WARNING
 )
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForSequenceK>.() -> B): Sequence<B> =
-    arrow.core.extensions.sequence.monadFilter.Sequence
-   .monadFilter()
-   .bindingFilter<B>(arg0) as kotlin.sequences.Sequence<B>
+  arrow.core.extensions.sequence.monadFilter.Sequence
+    .monadFilter()
+    .bindingFilter<B>(arg0) as kotlin.sequences.Sequence<B>
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val monadFilter_singleton: SequenceKMonadFilter = object :
-    arrow.core.extensions.SequenceKMonadFilter {}
+  arrow.core.extensions.SequenceKMonadFilter {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -61,4 +61,5 @@ object Sequence {
     "MonadFilter typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun monadFilter(): SequenceKMonadFilter = monadFilter_singleton}
+  inline fun monadFilter(): SequenceKMonadFilter = monadFilter_singleton
+}

@@ -198,9 +198,9 @@ fun <A, B, C, D> Tuple4<A, B, C, D>.sort(
   OD: Order<D>,
   arg1: Tuple4<A, B, C, D>
 ): Tuple2<Tuple4<A, B, C, D>, Tuple4<A, B, C, D>> = arrow.core.Tuple4.order<A, B, C,
-    D>(OA, OB, OC, OD).run {
+  D>(OA, OB, OC, OD).run {
   this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple4<A, B, C, D>, arrow.core.Tuple4<A, B,
-    C, D>>
+      C, D>>
 }
 
 @Suppress(
@@ -213,11 +213,13 @@ inline fun <A, B, C, D> Companion.order(
   OB: Order<B>,
   OC: Order<C>,
   OD: Order<D>
-): Tuple4Order<A, B, C, D> = object : arrow.core.extensions.Tuple4Order<A, B, C, D> { override fun
-    OA(): arrow.typeclasses.Order<A> = OA
+): Tuple4Order<A, B, C, D> = object : arrow.core.extensions.Tuple4Order<A, B, C, D> {
+  override fun
+  OA(): arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
   override fun OC(): arrow.typeclasses.Order<C> = OC
 
-  override fun OD(): arrow.typeclasses.Order<D> = OD }
+  override fun OD(): arrow.typeclasses.Order<D> = OD
+}

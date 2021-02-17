@@ -31,9 +31,9 @@ fun <A> Kind<ForListK, A>.hash(HA: Hash<A>): Int = arrow.core.ListK.hash<A>(HA).
 )
 @Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> Kind<ForListK, A>.hashWithSalt(HA: Hash<A>, arg1: Int): Int =
-    arrow.core.ListK.hash<A>(HA).run {
-  this@hashWithSalt.hashWithSalt(arg1) as kotlin.Int
-}
+  arrow.core.ListK.hash<A>(HA).run {
+    this@hashWithSalt.hashWithSalt(arg1) as kotlin.Int
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -41,4 +41,4 @@ fun <A> Kind<ForListK, A>.hashWithSalt(HA: Hash<A>, arg1: Int): Int =
 )
 @Deprecated(HashDeprecation)
 inline fun <A> Companion.hash(HA: Hash<A>): ListKHash<A> = object :
-    arrow.core.extensions.ListKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }
+  arrow.core.extensions.ListKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

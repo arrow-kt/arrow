@@ -31,9 +31,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.ap(arg1: Sequence<Function1<A, B>>): Sequence<B> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@ap).ap<A, B>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@ap).ap<A, B>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("apEval")
 @Suppress(
@@ -51,10 +51,10 @@ fun <A, B> Sequence<A>.ap(arg1: Sequence<Function1<A, B>>): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.apEval(arg1: Eval<Kind<ForSequenceK, Function1<A, B>>>):
-    Eval<Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@apEval).apEval<A, B>(arg1) as
-    arrow.core.Eval<arrow.Kind<arrow.core.ForSequenceK, B>>
-}
+  Eval<Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@apEval).apEval<A, B>(arg1) as
+      arrow.core.Eval<arrow.Kind<arrow.core.ForSequenceK, B>>
+  }
 
 @JvmName("map2Eval")
 @Suppress(
@@ -90,7 +90,8 @@ fun <A, B, Z> Sequence<A>.map2Eval(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1) { a, b -> arg2(Tuple2(a, b)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple2"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -99,9 +100,9 @@ fun <A, B, Z> map(
   arg1: Sequence<B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arg2) as
-    kotlin.sequences.Sequence<Z>
+  .apply()
+  .map<A, B, Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arg2) as
+  kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -114,7 +115,8 @@ fun <A, B, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1) { a, b -> arg2(Tuple2(a, b)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple2"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
@@ -123,9 +125,9 @@ fun <A, B, Z> mapN(
   arg1: Sequence<B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arg2) as
-    kotlin.sequences.Sequence<Z>
+  .apply()
+  .mapN<A, B, Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arg2) as
+  kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -138,7 +140,8 @@ fun <A, B, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2) { a, b, c -> arg2(Tuple3(a, b, c)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple3"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
 )
@@ -148,10 +151,10 @@ fun <A, B, C, Z> map(
   arg2: Sequence<C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C,
+  .apply()
+  .map<A, B, C,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arg3) as
-    kotlin.sequences.Sequence<Z>
+  kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -164,7 +167,8 @@ fun <A, B, C, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2) { a, b, c -> arg2(Tuple3(a, b, c)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple3"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
 )
@@ -174,10 +178,10 @@ fun <A, B, C, Z> mapN(
   arg2: Sequence<C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C,
+  .apply()
+  .mapN<A, B, C,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arg3) as
-    kotlin.sequences.Sequence<Z>
+  kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -190,7 +194,8 @@ fun <A, B, C, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> arg2(Tuple4(a, b, c, d)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple4"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
 )
@@ -201,10 +206,10 @@ fun <A, B, C, D, Z> map(
   arg3: Sequence<D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D,
+  .apply()
+  .map<A, B, C, D,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arg4)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -217,7 +222,8 @@ fun <A, B, C, D, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> arg2(Tuple4(a, b, c, d)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple4"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
 )
@@ -228,10 +234,10 @@ fun <A, B, C, D, Z> mapN(
   arg3: Sequence<D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D,
+  .apply()
+  .mapN<A, B, C, D,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arg4)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -244,7 +250,8 @@ fun <A, B, C, D, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg2(Tuple5(a, b, c, d, e)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple5"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
 )
@@ -256,10 +263,10 @@ fun <A, B, C, D, E, Z> map(
   arg4: Sequence<E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E,
+  .apply()
+  .map<A, B, C, D, E,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arg5)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -272,7 +279,8 @@ fun <A, B, C, D, E, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> arg2(Tuple5(a, b, c, d, e)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple5"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
 )
@@ -284,10 +292,10 @@ fun <A, B, C, D, E, Z> mapN(
   arg4: Sequence<E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E,
+  .apply()
+  .mapN<A, B, C, D, E,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arg5)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -300,7 +308,8 @@ fun <A, B, C, D, E, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg2(Tuple6(a, b, c, d, e, f)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple6"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
 )
@@ -313,10 +322,10 @@ fun <A, B, C, D, E, FF, Z> map(
   arg5: Sequence<FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E, FF,
+  .apply()
+  .map<A, B, C, D, E, FF,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arg6)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -329,7 +338,8 @@ fun <A, B, C, D, E, FF, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> arg2(Tuple6(a, b, c, d, e, f)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple6"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
 )
@@ -342,10 +352,10 @@ fun <A, B, C, D, E, FF, Z> mapN(
   arg5: Sequence<FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E, FF,
+  .apply()
+  .mapN<A, B, C, D, E, FF,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arg6)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -358,7 +368,8 @@ fun <A, B, C, D, E, FF, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg2(Tuple7(a, b, c, d, e, f, g)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple7"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
 )
@@ -372,10 +383,10 @@ fun <A, B, C, D, E, FF, G, Z> map(
   arg6: Sequence<G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E, FF, G,
+  .apply()
+  .map<A, B, C, D, E, FF, G,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arg7)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -388,7 +399,8 @@ fun <A, B, C, D, E, FF, G, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> arg2(Tuple7(a, b, c, d, e, f, g)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple7"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
 )
@@ -402,10 +414,10 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   arg6: Sequence<G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E, FF, G,
+  .apply()
+  .mapN<A, B, C, D, E, FF, G,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arg7)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -418,7 +430,8 @@ fun <A, B, C, D, E, FF, G, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg2(Tuple8(a, b, c, d, e, f, g, h)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple8"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
 )
@@ -433,10 +446,10 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   arg7: Sequence<H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E, FF, G, H,
+  .apply()
+  .map<A, B, C, D, E, FF, G, H,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arg8)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -449,7 +462,8 @@ fun <A, B, C, D, E, FF, G, H, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> arg2(Tuple8(a, b, c, d, e, f, g, h)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple8"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
 )
@@ -464,10 +478,10 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   arg7: Sequence<H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E, FF, G, H,
+  .apply()
+  .mapN<A, B, C, D, E, FF, G, H,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arg8)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -480,7 +494,8 @@ fun <A, B, C, D, E, FF, G, H, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg2(Tuple9(a, b, c, d, e, f, g, h, i)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple9"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
 )
@@ -496,10 +511,10 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   arg8: Sequence<I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E, FF, G, H, I,
+  .apply()
+  .map<A, B, C, D, E, FF, G, H, I,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arg9)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -512,7 +527,8 @@ fun <A, B, C, D, E, FF, G, H, I, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> arg2(Tuple9(a, b, c, d, e, f, g, h, i)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple9"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
 )
@@ -528,10 +544,10 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg8: Sequence<I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E, FF, G, H, I,
+  .apply()
+  .mapN<A, B, C, D, E, FF, G, H, I,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arg9)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map")
 @Suppress(
@@ -544,7 +560,8 @@ fun <A, B, C, D, E, FF, G, H, I, Z> mapN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg2(Tuple10(a, b, c, d, e, f, g, h, i, j)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple10"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
 )
@@ -561,10 +578,10 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg9: Sequence<J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .map<A, B, C, D, E, FF, G, H, I, J,
+  .apply()
+  .map<A, B, C, D, E, FF, G, H, I, J,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arrow.core.SequenceK(arg9), arg10)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -577,7 +594,8 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> map(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> arg2(Tuple10(a, b, c, d, e, f, g, h, i, j)) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple10"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
 )
@@ -594,10 +612,10 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg9: Sequence<J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): Sequence<Z> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .mapN<A, B, C, D, E, FF, G, H, I, J,
+  .apply()
+  .mapN<A, B, C, D, E, FF, G, H, I, J,
     Z>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arrow.core.SequenceK(arg9), arg10)
-    as kotlin.sequences.Sequence<Z>
+  as kotlin.sequences.Sequence<Z>
 
 @JvmName("map2")
 @Suppress(
@@ -614,10 +632,10 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   DeprecationLevel.WARNING
 )
 fun <A, B, Z> Sequence<A>.map2(arg1: Sequence<B>, arg2: Function1<Tuple2<A, B>, Z>): Sequence<Z> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@map2).map2<A, B, Z>(arrow.core.SequenceK(arg1), arg2) as
-    kotlin.sequences.Sequence<Z>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@map2).map2<A, B, Z>(arrow.core.SequenceK(arg1), arg2) as
+      kotlin.sequences.Sequence<Z>
+  }
 
 @JvmName("product")
 @Suppress(
@@ -635,10 +653,10 @@ fun <A, B, Z> Sequence<A>.map2(arg1: Sequence<B>, arg2: Function1<Tuple2<A, B>, 
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@product).product<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("product1")
 @Suppress(
@@ -656,10 +674,10 @@ fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   DeprecationLevel.WARNING
 )
 fun <A, B, Z> Sequence<Tuple2<A, B>>.product(arg1: Sequence<Z>): Sequence<Tuple3<A, B, Z>> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, Z>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, Z>>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@product).product<A, B, Z>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, Z>>
+  }
 
 @JvmName("product2")
 @Suppress(
@@ -719,10 +737,10 @@ fun <A, B, C, D, Z> Sequence<Tuple4<A, B, C, D>>.product(arg1: Sequence<Z>): Seq
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D, E, Z> Sequence<Tuple5<A, B, C, D, E>>.product(arg1: Sequence<Z>):
-    Sequence<Tuple6<A, B, C, D, E, Z>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, C, D, E, Z>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, Z>>
-}
+  Sequence<Tuple6<A, B, C, D, E, Z>> = arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@product).product<A, B, C, D, E, Z>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, Z>>
+  }
 
 @JvmName("product5")
 @Suppress(
@@ -740,11 +758,11 @@ fun <A, B, C, D, E, Z> Sequence<Tuple5<A, B, C, D, E>>.product(arg1: Sequence<Z>
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D, E, FF, Z> Sequence<Tuple6<A, B, C, D, E, FF>>.product(arg1: Sequence<Z>):
-    Sequence<Tuple7<A, B, C, D, E, FF, Z>> =
+  Sequence<Tuple7<A, B, C, D, E, FF, Z>> =
     arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, Z>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, Z>>
-}
+      arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, Z>(arrow.core.SequenceK(arg1)) as
+        kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, Z>>
+    }
 
 @JvmName("product6")
 @Suppress(
@@ -762,11 +780,11 @@ fun <A, B, C, D, E, FF, Z> Sequence<Tuple6<A, B, C, D, E, FF>>.product(arg1: Seq
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D, E, FF, G, Z> Sequence<Tuple7<A, B, C, D, E, FF, G>>.product(arg1: Sequence<Z>):
-    Sequence<Tuple8<A, B, C, D, E, FF, G, Z>> =
+  Sequence<Tuple8<A, B, C, D, E, FF, G, Z>> =
     arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, Z>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
-}
+      arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, Z>(arrow.core.SequenceK(arg1)) as
+        kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
+    }
 
 @JvmName("product7")
 @Suppress(
@@ -785,10 +803,10 @@ fun <A, B, C, D, E, FF, G, Z> Sequence<Tuple7<A, B, C, D, E, FF, G>>.product(arg
 )
 fun <A, B, C, D, E, FF, G, H, Z> Sequence<Tuple8<A, B, C, D, E, FF, G,
     H>>.product(arg1: Sequence<Z>): Sequence<Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, H, Z>(arrow.core.SequenceK(arg1))
-    as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, Z>>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, H, Z>(arrow.core.SequenceK(arg1))
+      as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, Z>>
+  }
 
 @JvmName("product8")
 @Suppress(
@@ -807,11 +825,11 @@ fun <A, B, C, D, E, FF, G, H, Z> Sequence<Tuple8<A, B, C, D, E, FF, G,
 )
 fun <A, B, C, D, E, FF, G, H, I, Z> Sequence<Tuple9<A, B, C, D, E, FF, G, H,
     I>>.product(arg1: Sequence<Z>): Sequence<Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, H, I,
-    Z>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E,
-    FF, G, H, I, Z>>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@product).product<A, B, C, D, E, FF, G, H, I,
+      Z>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E,
+        FF, G, H, I, Z>>
+  }
 
 @JvmName("tupled")
 @Suppress(
@@ -824,14 +842,15 @@ fun <A, B, C, D, E, FF, G, H, I, Z> Sequence<Tuple9<A, B, C, D, E, FF, G, H,
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple2"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> tupled(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1)) as
+  arrow.core.extensions.sequence.apply.Sequence
+    .apply()
+    .tupled<A, B>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1)) as
     kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
 
 @JvmName("tupledN")
@@ -845,14 +864,15 @@ fun <A, B> tupled(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> 
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1) { a, b -> Tuple2(a, b) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple2"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> tupledN(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1)) as
+  arrow.core.extensions.sequence.apply.Sequence
+    .apply()
+    .tupledN<A, B>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1)) as
     kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
 
 @JvmName("tupled")
@@ -866,7 +886,8 @@ fun <A, B> tupledN(arg0: Sequence<A>, arg1: Sequence<B>): Sequence<Tuple2<A, B>>
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple3"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
 )
@@ -875,10 +896,10 @@ fun <A, B, C> tupled(
   arg1: Sequence<B>,
   arg2: Sequence<C>
 ): Sequence<Tuple3<A, B, C>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B,
+  .apply()
+  .tupled<A, B,
     C>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, C>>
+  kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, C>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -891,7 +912,8 @@ fun <A, B, C> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2) { a, b, c -> Tuple3(a, b, c) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple3"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple3"
   ),
   DeprecationLevel.WARNING
 )
@@ -900,10 +922,10 @@ fun <A, B, C> tupledN(
   arg1: Sequence<B>,
   arg2: Sequence<C>
 ): Sequence<Tuple3<A, B, C>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B,
+  .apply()
+  .tupledN<A, B,
     C>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, C>>
+  kotlin.sequences.Sequence<arrow.core.Tuple3<A, B, C>>
 
 @JvmName("tupled")
 @Suppress(
@@ -916,7 +938,8 @@ fun <A, B, C> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple4"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
 )
@@ -926,10 +949,10 @@ fun <A, B, C, D> tupled(
   arg2: Sequence<C>,
   arg3: Sequence<D>
 ): Sequence<Tuple4<A, B, C, D>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C,
+  .apply()
+  .tupled<A, B, C,
     D>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3))
-    as kotlin.sequences.Sequence<arrow.core.Tuple4<A, B, C, D>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple4<A, B, C, D>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -942,7 +965,8 @@ fun <A, B, C, D> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3) { a, b, c, d -> Tuple4(a, b, c, d) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple4"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple4"
   ),
   DeprecationLevel.WARNING
 )
@@ -952,10 +976,10 @@ fun <A, B, C, D> tupledN(
   arg2: Sequence<C>,
   arg3: Sequence<D>
 ): Sequence<Tuple4<A, B, C, D>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C,
+  .apply()
+  .tupledN<A, B, C,
     D>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3))
-    as kotlin.sequences.Sequence<arrow.core.Tuple4<A, B, C, D>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple4<A, B, C, D>>
 
 @JvmName("tupled")
 @Suppress(
@@ -968,7 +992,8 @@ fun <A, B, C, D> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple5"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
 )
@@ -979,10 +1004,10 @@ fun <A, B, C, D, E> tupled(
   arg3: Sequence<D>,
   arg4: Sequence<E>
 ): Sequence<Tuple5<A, B, C, D, E>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D,
+  .apply()
+  .tupled<A, B, C, D,
     E>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4))
-    as kotlin.sequences.Sequence<arrow.core.Tuple5<A, B, C, D, E>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple5<A, B, C, D, E>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -995,7 +1020,8 @@ fun <A, B, C, D, E> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4) { a, b, c, d, e -> Tuple5(a, b, c, d, e) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple5"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple5"
   ),
   DeprecationLevel.WARNING
 )
@@ -1006,10 +1032,10 @@ fun <A, B, C, D, E> tupledN(
   arg3: Sequence<D>,
   arg4: Sequence<E>
 ): Sequence<Tuple5<A, B, C, D, E>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D,
+  .apply()
+  .tupledN<A, B, C, D,
     E>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4))
-    as kotlin.sequences.Sequence<arrow.core.Tuple5<A, B, C, D, E>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple5<A, B, C, D, E>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1022,7 +1048,8 @@ fun <A, B, C, D, E> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple6"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
 )
@@ -1034,10 +1061,10 @@ fun <A, B, C, D, E, FF> tupled(
   arg4: Sequence<E>,
   arg5: Sequence<FF>
 ): Sequence<Tuple6<A, B, C, D, E, FF>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D, E,
+  .apply()
+  .tupled<A, B, C, D, E,
     FF>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5))
-    as kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, FF>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1050,7 +1077,8 @@ fun <A, B, C, D, E, FF> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5) { a, b, c, d, e, f -> Tuple6(a, b, c, d, e, f) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple6"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple6"
   ),
   DeprecationLevel.WARNING
 )
@@ -1062,10 +1090,10 @@ fun <A, B, C, D, E, FF> tupledN(
   arg4: Sequence<E>,
   arg5: Sequence<FF>
 ): Sequence<Tuple6<A, B, C, D, E, FF>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D, E,
+  .apply()
+  .tupledN<A, B, C, D, E,
     FF>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5))
-    as kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, FF>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1078,7 +1106,8 @@ fun <A, B, C, D, E, FF> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple7"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
 )
@@ -1091,10 +1120,10 @@ fun <A, B, C, D, E, FF, G> tupled(
   arg5: Sequence<FF>,
   arg6: Sequence<G>
 ): Sequence<Tuple7<A, B, C, D, E, FF, G>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D, E, FF,
+  .apply()
+  .tupled<A, B, C, D, E, FF,
     G>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6))
-    as kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, G>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1107,7 +1136,8 @@ fun <A, B, C, D, E, FF, G> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6) { a, b, c, d, e, f, g -> Tuple7(a, b, c, d, e, f, g) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple7"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple7"
   ),
   DeprecationLevel.WARNING
 )
@@ -1120,10 +1150,10 @@ fun <A, B, C, D, E, FF, G> tupledN(
   arg5: Sequence<FF>,
   arg6: Sequence<G>
 ): Sequence<Tuple7<A, B, C, D, E, FF, G>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D, E, FF,
+  .apply()
+  .tupledN<A, B, C, D, E, FF,
     G>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6))
-    as kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, G>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1136,7 +1166,8 @@ fun <A, B, C, D, E, FF, G> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple8"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
 )
@@ -1150,10 +1181,10 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   arg6: Sequence<G>,
   arg7: Sequence<H>
 ): Sequence<Tuple8<A, B, C, D, E, FF, G, H>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D, E, FF, G,
+  .apply()
+  .tupled<A, B, C, D, E, FF, G,
     H>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7))
-    as kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1166,7 +1197,8 @@ fun <A, B, C, D, E, FF, G, H> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) { a, b, c, d, e, f, g, h -> Tuple8(a, b, c, d, e, f, g, h) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple8"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple8"
   ),
   DeprecationLevel.WARNING
 )
@@ -1180,10 +1212,10 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   arg6: Sequence<G>,
   arg7: Sequence<H>
 ): Sequence<Tuple8<A, B, C, D, E, FF, G, H>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D, E, FF, G,
+  .apply()
+  .tupledN<A, B, C, D, E, FF, G,
     H>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7))
-    as kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1196,7 +1228,8 @@ fun <A, B, C, D, E, FF, G, H> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple9"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
 )
@@ -1211,10 +1244,10 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   arg7: Sequence<H>,
   arg8: Sequence<I>
 ): Sequence<Tuple9<A, B, C, D, E, FF, G, H, I>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D, E, FF, G, H,
+  .apply()
+  .tupled<A, B, C, D, E, FF, G, H,
     I>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8))
-    as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1227,7 +1260,8 @@ fun <A, B, C, D, E, FF, G, H, I> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) { a, b, c, d, e, f, g, h, i -> Tuple9(a, b, c, d, e, f, g, h, i) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple9"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple9"
   ),
   DeprecationLevel.WARNING
 )
@@ -1242,10 +1276,10 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   arg7: Sequence<H>,
   arg8: Sequence<I>
 ): Sequence<Tuple9<A, B, C, D, E, FF, G, H, I>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D, E, FF, G, H,
+  .apply()
+  .tupledN<A, B, C, D, E, FF, G, H,
     I>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8))
-    as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1258,7 +1292,8 @@ fun <A, B, C, D, E, FF, G, H, I> tupledN(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple10"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
 )
@@ -1274,10 +1309,10 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   arg8: Sequence<I>,
   arg9: Sequence<J>
 ): Sequence<Tuple10<A, B, C, D, E, FF, G, H, I, J>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupled<A, B, C, D, E, FF, G, H, I,
+  .apply()
+  .tupled<A, B, C, D, E, FF, G, H, I,
     J>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arrow.core.SequenceK(arg9))
-    as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1290,7 +1325,8 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupled(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "SequenceK.mapN(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) { a, b, c, d, e, f, g, h, i, j -> Tuple10(a, b, c, d, e, f, g, h, i, j) }",
-    "arrow.core.SequenceK", "arrow.core.Tuple10"
+    "arrow.core.SequenceK",
+    "arrow.core.Tuple10"
   ),
   DeprecationLevel.WARNING
 )
@@ -1306,10 +1342,10 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg8: Sequence<I>,
   arg9: Sequence<J>
 ): Sequence<Tuple10<A, B, C, D, E, FF, G, H, I, J>> = arrow.core.extensions.sequence.apply.Sequence
-   .apply()
-   .tupledN<A, B, C, D, E, FF, G, H, I,
+  .apply()
+  .tupledN<A, B, C, D, E, FF, G, H, I,
     J>(arrow.core.SequenceK(arg0), arrow.core.SequenceK(arg1), arrow.core.SequenceK(arg2), arrow.core.SequenceK(arg3), arrow.core.SequenceK(arg4), arrow.core.SequenceK(arg5), arrow.core.SequenceK(arg6), arrow.core.SequenceK(arg7), arrow.core.SequenceK(arg8), arrow.core.SequenceK(arg9))
-    as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
+  as kotlin.sequences.Sequence<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("followedBy")
 @Suppress(
@@ -1326,10 +1362,10 @@ fun <A, B, C, D, E, FF, G, H, I, J> tupledN(
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.followedBy(arg1: Sequence<B>): Sequence<B> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@followedBy).followedBy<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@followedBy).followedBy<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -1347,10 +1383,10 @@ fun <A, B> Sequence<A>.followedBy(arg1: Sequence<B>): Sequence<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.apTap(arg1: Sequence<B>): Sequence<A> =
-    arrow.core.extensions.sequence.apply.Sequence.apply().run {
-  arrow.core.SequenceK(this@apTap).apTap<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.apply.Sequence.apply().run {
+    arrow.core.SequenceK(this@apTap).apTap<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<A>
+  }
 
 /**
  * cached extension
@@ -1371,4 +1407,5 @@ object Sequence {
     "Apply typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun apply(): SequenceKApply = apply_singleton}
+  inline fun apply(): SequenceKApply = apply_singleton
+}

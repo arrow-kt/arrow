@@ -24,10 +24,10 @@ object BicrosswalkLaws {
     GENK: GenK2<T>,
     EQK: EqK2<T>
   ): List<Law> {
-
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {
       override fun constants(): Iterable<(Int) -> ListK<String>> = listOf(
-        { _: Int -> ListK.empty<String>() }, { _: Int -> ListK.just("value") }
+        { _: Int -> ListK.empty<String>() },
+        { _: Int -> ListK.just("value") }
       )
 
       override fun random(): Sequence<(Int) -> ListK<String>> = generateSequence({ int: Int -> List(abs(int % 1000)) { "$it" }.k() }) { it }

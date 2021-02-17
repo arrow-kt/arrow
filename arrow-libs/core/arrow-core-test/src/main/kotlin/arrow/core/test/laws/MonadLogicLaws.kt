@@ -33,7 +33,6 @@ object MonadLogicLaws {
     EQK: EqK<F>,
     iterations: Int
   ): List<Law> {
-
     val EQ = EQK.liftEq(Option.eq(Tuple2.eq(EQK.liftEq(Int.eq()), Int.eq())))
     val genFB = GK.genK(Gen.string())
     val genFunAToFB = Gen.functionAToB<Int, Kind<F, String>>(genFB)

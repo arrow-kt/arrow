@@ -88,18 +88,23 @@ internal open class DelimContScope<R>(private val f: suspend RestrictedScope<R>.
 
   @Suppress("UNCHECKED_CAST")
   fun invoke(): R {
-    f.startCoroutineUninterceptedOrReturn(this, Continuation(EmptyCoroutineContext) { result ->
-      resultVar = result.getOrThrow()
-    }).let {
+    f.startCoroutineUninterceptedOrReturn(
+      this,
+      Continuation(EmptyCoroutineContext) { result ->
+        resultVar = result.getOrThrow()
+      }
+    ).let {
       if (it == COROUTINE_SUSPENDED) {
         // we have a call to shift so we must start execution the blocks there
         while (true) {
           if (resultVar === EMPTY_VALUE) {
             val nextShiftFn = requireNotNull(nextShift) { "No further work to do but also no result!" }
             nextShift = null
-            nextShiftFn.startCoroutineUninterceptedOrReturn(Continuation(EmptyCoroutineContext) { result ->
-              resultVar = result.getOrThrow()
-            }).let { nextRes ->
+            nextShiftFn.startCoroutineUninterceptedOrReturn(
+              Continuation(EmptyCoroutineContext) { result ->
+                resultVar = result.getOrThrow()
+              }
+            ).let { nextRes ->
               // If we suspended here we can just continue to loop because we should now have a new function to run
               // If we did not suspend we short-circuited and are thus done with looping
               if (nextRes != COROUTINE_SUSPENDED) resultVar = nextRes as R

@@ -22,7 +22,8 @@ object MonoidalLaws {
     val GEN = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Tuple2.eq(Int.eq(), Int.eq()))
 
-    return SemigroupalLaws.laws(MDAL,
+    return SemigroupalLaws.laws(
+      MDAL,
       GENK,
       BIJECTION,
       EQK

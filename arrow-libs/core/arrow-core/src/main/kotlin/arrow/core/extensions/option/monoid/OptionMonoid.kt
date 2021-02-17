@@ -15,15 +15,15 @@ import arrow.typeclasses.Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(SG)",
-  "arrow.core.combineAll"
+    "combineAll(SG)",
+    "arrow.core.combineAll"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Collection<Option<A>>.combineAll(SG: Semigroup<A>): Option<A> =
-    arrow.core.Option.monoid<A>(SG).run {
-  this@combineAll.combineAll() as arrow.core.Option<A>
-}
+  arrow.core.Option.monoid<A>(SG).run {
+    this@combineAll.combineAll() as arrow.core.Option<A>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -35,14 +35,14 @@ fun <A> Collection<Option<A>>.combineAll(SG: Semigroup<A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.combineAll(SG)",
-  "arrow.core.combineAll"
+    "arg0.combineAll(SG)",
+    "arrow.core.combineAll"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> combineAll(SG: Semigroup<A>, arg0: List<Option<A>>): Option<A> = arrow.core.Option
-   .monoid<A>(SG)
-   .combineAll(arg0) as arrow.core.Option<A>
+  .monoid<A>(SG)
+  .combineAll(arg0) as arrow.core.Option<A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -52,9 +52,10 @@ fun <A> combineAll(SG: Semigroup<A>, arg0: List<Option<A>>): Option<A> = arrow.c
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Monoid.option<A>(SG)",
-    "arrow.core.option", "arrow.typeclasses.Monoid"
+    "arrow.core.option",
+    "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.monoid(SG: Semigroup<A>): OptionMonoid<A> = object :
-    arrow.core.extensions.OptionMonoid<A> { override fun SG(): arrow.typeclasses.Semigroup<A> = SG }
+  arrow.core.extensions.OptionMonoid<A> { override fun SG(): arrow.typeclasses.Semigroup<A> = SG }

@@ -25,8 +25,8 @@ internal val align_singleton: SequenceKAlign = object : arrow.core.extensions.Se
   DeprecationLevel.WARNING
 )
 fun <A> empty(): SequenceK<A> = arrow.core.SequenceK
-   .align()
-   .empty<A>() as arrow.core.SequenceK<A>
+  .align()
+  .empty<A>() as arrow.core.SequenceK<A>
 
 @Suppress(
   "UNCHECKED_CAST",

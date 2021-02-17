@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functorFilter_singleton: ListKFunctorFilter = object :
-    arrow.core.extensions.ListKFunctorFilter {}
+  arrow.core.extensions.ListKFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -29,9 +29,9 @@ internal val functorFilter_singleton: ListKFunctorFilter = object :
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("mapNotNull { arg1(it).orNull() }"))
 fun <A, B> Kind<ForListK, A>.filterMap(arg1: Function1<A, Option<B>>): ListK<B> =
-    arrow.core.ListK.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -53,9 +53,9 @@ fun <A> Kind<ForListK, Option<A>>.flattenOption(): ListK<A> = arrow.core.ListK.f
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("mapNotNull { it.orNull() }"))
 fun <A> Kind<ForListK, A>.filter(arg1: Function1<A, Boolean>): ListK<A> =
-    arrow.core.ListK.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -66,9 +66,9 @@ fun <A> Kind<ForListK, A>.filter(arg1: Function1<A, Boolean>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("filter(arg1::isInstance).map { arg1.cast(it) }"))
 fun <A, B> Kind<ForListK, A>.filterIsInstance(arg1: Class<B>): ListK<B> =
-    arrow.core.ListK.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

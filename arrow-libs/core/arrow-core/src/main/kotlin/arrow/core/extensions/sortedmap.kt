@@ -170,7 +170,8 @@ interface SortedMapKUnalign<K : Comparable<K>> : Unalign<SortedMapKPartialOf<K>>
         v.fold(
           { a -> ls.plus(k to a) toT rs },
           { b -> ls toT rs.plus(k to b) },
-          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) }
+        )
       }.bimap({ it.toSortedMap().k() }, { it.toSortedMap().k() })
     }
 }

@@ -60,9 +60,9 @@ fun <A, B> Kind<ForListK, A>.map(arg1: Function1<A, B>): ListK<B> = arrow.core.L
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <A, B> Kind<ForListK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): ListK<B> =
-    arrow.core.ListK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.core.ListK<B>
+  }
 
 /**
  *  Lifts a function `A -> B` to the [F] structure returning a polymorphic function
@@ -96,9 +96,9 @@ fun <A, B> Kind<ForListK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("{ l: List<A> -> l.map(arg0) }"))
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForListK, A>, Kind<ForListK, B>> =
-    arrow.core.ListK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForListK, A>,
+  arrow.core.ListK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("void")
@@ -122,9 +122,9 @@ fun <A> Kind<ForListK, A>.void(): ListK<Unit> = arrow.core.ListK.functor().run {
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("fproduct(arg1)", "arrow.core.fproduct"))
 fun <A, B> Kind<ForListK, A>.fproduct(arg1: Function1<A, B>): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -162,9 +162,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForListK, B>): ListK<A> = arrow.core.ListK.func
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleLeft(arg1)", "arrow.core.tupleLeft"))
 fun <A, B> Kind<ForListK, A>.tupleLeft(arg1: B): ListK<Tuple2<B, A>> =
-    arrow.core.ListK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<B, A>>
-}
+  arrow.core.ListK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -175,9 +175,9 @@ fun <A, B> Kind<ForListK, A>.tupleLeft(arg1: B): ListK<Tuple2<B, A>> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("tupleRight(arg1)", "arrow.core.tupleRight"))
 fun <A, B> Kind<ForListK, A>.tupleRight(arg1: B): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

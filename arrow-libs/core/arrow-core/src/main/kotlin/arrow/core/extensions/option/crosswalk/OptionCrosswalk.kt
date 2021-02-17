@@ -11,7 +11,7 @@ import arrow.typeclasses.Align
  */
 @PublishedApi()
 internal val crosswalk_singleton: OptionCrosswalk = object : arrow.core.extensions.OptionCrosswalk
-    {}
+{}
 
 @JvmName("crosswalk")
 @Suppress(
@@ -29,8 +29,8 @@ fun <F, A, B> crosswalk(
   arg1: Kind<ForOption, A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<ForOption, B>> = arrow.core.Option
-   .crosswalk()
-   .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForOption, B>>
+  .crosswalk()
+  .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForOption, B>>
 
 @JvmName("sequenceL")
 @Suppress(

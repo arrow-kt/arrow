@@ -68,7 +68,7 @@ data class Tuple6<out A, out B, out C, out D, out E, out F>(
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>>
-  Tuple6<A, B, C, D, E, F>.compareTo(other: Tuple6<A, B, C, D, E, F>): Int {
+Tuple6<A, B, C, D, E, F>.compareTo(other: Tuple6<A, B, C, D, E, F>): Int {
   val first = a.compareTo(other.a)
   return if (first == 0) {
     val second = b.compareTo(other.b)

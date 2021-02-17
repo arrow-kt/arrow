@@ -13,7 +13,7 @@ import arrow.typeclasses.MonadFilterSyntax
  */
 @PublishedApi()
 internal val monadFilter_singleton: SequenceKMonadFilter = object :
-    arrow.core.extensions.SequenceKMonadFilter {}
+  arrow.core.extensions.SequenceKMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val monadFilter_singleton: SequenceKMonadFilter = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.filterMap(arg1: Function1<A, Option<B>>): SequenceK<B> =
-    arrow.core.SequenceK.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -46,9 +46,9 @@ fun <A, B> Kind<ForSequenceK, A>.filterMap(arg1: Function1<A, Option<B>>): Seque
   level = DeprecationLevel.WARNING
 )
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForSequenceK>.() -> B): SequenceK<B> =
-    arrow.core.SequenceK
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.core.SequenceK<B>
+  arrow.core.SequenceK
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.core.SequenceK<B>
 
 @Suppress(
   "UNCHECKED_CAST",

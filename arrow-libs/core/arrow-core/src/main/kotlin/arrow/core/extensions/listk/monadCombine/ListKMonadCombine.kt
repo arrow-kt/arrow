@@ -17,7 +17,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadCombine_singleton: ListKMonadCombine = object :
-    arrow.core.extensions.ListKMonadCombine {}
+  arrow.core.extensions.ListKMonadCombine {}
 
 @JvmName("unite")
 @Suppress(
@@ -28,9 +28,9 @@ internal val monadCombine_singleton: ListKMonadCombine = object :
 )
 @Deprecated("Foldable typeclasses is deprecated. Use concrete methods on List")
 fun <G, A> Kind<ForListK, Kind<G, A>>.unite(arg1: Foldable<G>): ListK<A> =
-    arrow.core.ListK.monadCombine().run {
-  this@unite.unite<G, A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monadCombine().run {
+    this@unite.unite<G, A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("separate")
 @Suppress(
@@ -41,10 +41,10 @@ fun <G, A> Kind<ForListK, Kind<G, A>>.unite(arg1: Foldable<G>): ListK<A> =
 )
 @Deprecated("Foldable typeclasses is deprecated. Use concrete methods on List")
 fun <G, A, B> Kind<ForListK, Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>):
-    Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> = arrow.core.ListK.monadCombine().run {
-  this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
-    arrow.Kind<arrow.core.ForListK, B>>
-}
+  Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> = arrow.core.ListK.monadCombine().run {
+    this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
+      arrow.Kind<arrow.core.ForListK, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

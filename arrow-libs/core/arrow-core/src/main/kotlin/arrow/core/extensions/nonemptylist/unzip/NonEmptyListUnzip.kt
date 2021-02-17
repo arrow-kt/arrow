@@ -16,7 +16,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val unzip_singleton: NonEmptyListUnzip = object : arrow.core.extensions.NonEmptyListUnzip
-    {}
+{}
 
 @JvmName("unzip")
 @Suppress(
@@ -28,13 +28,15 @@ internal val unzip_singleton: NonEmptyListUnzip = object : arrow.core.extensions
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix<Tuple2<A, B>>().unzip<A, B>()",
-    "arrow.core.Tuple2", "arrow.core.fix", "arrow.core.unzip"
+    "fix<Tuple2<A, B>>().unzip<A, B>()",
+    "arrow.core.Tuple2",
+    "arrow.core.fix",
+    "arrow.core.unzip"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyList, A>,
-    Kind<ForNonEmptyList, B>> = arrow.core.NonEmptyList.unzip().run {
+  Kind<ForNonEmptyList, B>> = arrow.core.NonEmptyList.unzip().run {
   this@unzip.unzip<A, B>() as arrow.core.Tuple2<arrow.Kind<arrow.core.ForNonEmptyList, A>,
     arrow.Kind<arrow.core.ForNonEmptyList, B>>
 }
@@ -50,17 +52,18 @@ fun <A, B> Kind<ForNonEmptyList, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForNonEmptyL
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix<C>().unzipWith<A, B, C>(arg1)",
-    "arrow.core.fix", "arrow.core.unzipWith"
+    "arrow.core.fix",
+    "arrow.core.unzipWith"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Kind<ForNonEmptyList, C>.unzipWith(arg1: Function1<C, Tuple2<A, B>>):
-    Tuple2<Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, B>> =
+  Tuple2<Kind<ForNonEmptyList, A>, Kind<ForNonEmptyList, B>> =
     arrow.core.NonEmptyList.unzip().run {
-  this@unzipWith.unzipWith<A, B, C>(arg1) as
-    arrow.core.Tuple2<arrow.Kind<arrow.core.ForNonEmptyList, A>,
-    arrow.Kind<arrow.core.ForNonEmptyList, B>>
-}
+      this@unzipWith.unzipWith<A, B, C>(arg1) as
+        arrow.core.Tuple2<arrow.Kind<arrow.core.ForNonEmptyList, A>,
+          arrow.Kind<arrow.core.ForNonEmptyList, B>>
+    }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -68,5 +71,6 @@ fun <A, B, C> Kind<ForNonEmptyList, C>.unzipWith(arg1: Function1<C, Tuple2<A, B>
 )
 @Deprecated(
   "Unzip typeclass is deprecated. Use concrete methods on NonEmptyList",
-  level = DeprecationLevel.WARNING)
+  level = DeprecationLevel.WARNING
+)
 inline fun Companion.unzip(): NonEmptyListUnzip = unzip_singleton

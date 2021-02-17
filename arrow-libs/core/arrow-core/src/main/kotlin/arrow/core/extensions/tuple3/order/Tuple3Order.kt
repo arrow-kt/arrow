@@ -201,9 +201,11 @@ inline fun <A, B, C> Companion.order(
   OA: Order<A>,
   OB: Order<B>,
   OC: Order<C>
-): Tuple3Order<A, B, C> = object : arrow.core.extensions.Tuple3Order<A, B, C> { override fun OA():
+): Tuple3Order<A, B, C> = object : arrow.core.extensions.Tuple3Order<A, B, C> {
+  override fun OA():
     arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
-  override fun OC(): arrow.typeclasses.Order<C> = OC }
+  override fun OC(): arrow.typeclasses.Order<C> = OC
+}

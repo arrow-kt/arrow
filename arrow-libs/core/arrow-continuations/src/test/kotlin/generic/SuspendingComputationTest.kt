@@ -166,18 +166,22 @@ suspend fun completeOnCancellation(latch: CompletableDeferred<Unit>, cancelled: 
 
 internal suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { throw this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { throw this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
 
 internal suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }

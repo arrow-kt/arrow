@@ -81,17 +81,22 @@ object TraverseLaws {
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = idApplicative.run {
     val idApp = this
     forAll(Gen.functionAToB<Int, Kind<Id.Companion, Int>>(Gen.intSmall().map(::Id)), G) { f: (Int) -> Kind<Id.Companion, Int>, fa: Kind<F, Int> ->
-      fa.traverse(idApp, f).fix().value.equalUnderTheLaw(FF.run {
-        fa.map(f).map { it.fix().value }
-      }, EQ)
+      fa.traverse(idApp, f).fix().value.equalUnderTheLaw(
+        FF.run {
+          fa.map(f).map { it.fix().value }
+        },
+        EQ
+      )
     }
   }
 
   fun <F> Traverse<F>.sequentialComposition(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>) = idApplicative.run {
     val idApp = this
-    forAll(Gen.functionAToB<Int, Kind<Id.Companion, Int>>(Gen.intSmall().map(::Id)),
+    forAll(
       Gen.functionAToB<Int, Kind<Id.Companion, Int>>(Gen.intSmall().map(::Id)),
-      GEN) { f: (Int) -> Kind<Id.Companion, Int>, g: (Int) -> Kind<Id.Companion, Int>, fha: Kind<F, Int> ->
+      Gen.functionAToB<Int, Kind<Id.Companion, Int>>(Gen.intSmall().map(::Id)),
+      GEN
+    ) { f: (Int) -> Kind<Id.Companion, Int>, g: (Int) -> Kind<Id.Companion, Int>, fha: Kind<F, Int> ->
 
       val fa = fha.traverse(idApp, f).fix()
       val composed = fa.map { it.traverse(idApp, g) }.fix().value.fix().value

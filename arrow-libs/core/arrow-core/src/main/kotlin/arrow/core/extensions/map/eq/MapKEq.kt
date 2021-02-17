@@ -36,6 +36,9 @@ object Map {
   )
   @Deprecated(EqDeprecation)
   inline fun <K, A> eq(EQK: Eq<K>, EQA: Eq<A>): MapKEq<K, A> = object :
-      arrow.core.extensions.MapKEq<K, A> { override fun EQK(): arrow.typeclasses.Eq<K> = EQK
+    arrow.core.extensions.MapKEq<K, A> {
+    override fun EQK(): arrow.typeclasses.Eq<K> = EQK
 
-    override fun EQA(): arrow.typeclasses.Eq<A> = EQA }}
+    override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+  }
+}

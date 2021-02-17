@@ -48,7 +48,7 @@ fun <F, G, A, B> Kind<Kind<ForTuple2, F>, A>.traverse(
 fun <F, G, A> Kind<Kind<ForTuple2, F>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
   Kind<Kind<ForTuple2, F>, A>> = arrow.core.Tuple2.traverse<F>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForTuple2,
-    F>, A>>
+        F>, A>>
 }
 
 @JvmName("map")

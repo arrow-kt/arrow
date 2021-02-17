@@ -47,7 +47,7 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.contramap(arg1: Function1<B, A>): Const<A,
 )
 @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForConst, A>, B>, Kind<Kind<ForConst,
-  A>, A>> = arrow.core.Const
+      A>, A>> = arrow.core.Const
   .contravariant<A>()
   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForConst, A>, B>,
   arrow.Kind<arrow.Kind<arrow.core.ForConst, A>, A>>

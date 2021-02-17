@@ -28,9 +28,9 @@ internal val zip_singleton: SequenceKZip = object : arrow.core.extensions.Sequen
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.zip(arg1: Kind<ForSequenceK, B>): SequenceK<Tuple2<A, B>> =
-    arrow.core.SequenceK.zip().run {
-  this@zip.zip<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.SequenceK.zip().run {
+    this@zip.zip<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("zipWith")
 @Suppress(
@@ -47,9 +47,9 @@ fun <A, B> Kind<ForSequenceK, A>.zip(arg1: Kind<ForSequenceK, B>): SequenceK<Tup
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Kind<ForSequenceK, A>.zipWith(arg1: Kind<ForSequenceK, B>, arg2: Function2<A, B, C>):
-    SequenceK<C> = arrow.core.SequenceK.zip().run {
-  this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.SequenceK<C>
-}
+  SequenceK<C> = arrow.core.SequenceK.zip().run {
+    this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.SequenceK<C>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

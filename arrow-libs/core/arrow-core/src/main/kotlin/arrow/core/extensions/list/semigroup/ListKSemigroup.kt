@@ -16,9 +16,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("this.plus(arg1)"))
 operator fun <A> List<A>.plus(arg1: List<A>): List<A> =
-    arrow.core.extensions.list.semigroup.List.semigroup<A>().run {
-  arrow.core.ListK(this@plus).plus(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.semigroup.List.semigroup<A>().run {
+    arrow.core.ListK(this@plus).plus(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
+  }
 
 @JvmName("maybeCombine")
 @Suppress(
@@ -29,10 +29,10 @@ operator fun <A> List<A>.plus(arg1: List<A>): List<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("(arg1?.plus(this) ?: emptyList<A>())"))
 fun <A> List<A>.maybeCombine(arg1: List<A>): List<A> =
-    arrow.core.extensions.list.semigroup.List.semigroup<A>().run {
-  arrow.core.ListK(this@maybeCombine).maybeCombine(arrow.core.ListK(arg1)) as
-    kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.semigroup.List.semigroup<A>().run {
+    arrow.core.ListK(this@maybeCombine).maybeCombine(arrow.core.ListK(arg1)) as
+      kotlin.collections.List<A>
+  }
 
 /**
  * cached extension
@@ -48,4 +48,5 @@ object List {
   )
   @Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.list", "arrow.core.Semigroup"))
   inline fun <A> semigroup(): ListKSemigroup<A> = semigroup_singleton as
-      arrow.core.extensions.ListKSemigroup<A>}
+    arrow.core.extensions.ListKSemigroup<A>
+}

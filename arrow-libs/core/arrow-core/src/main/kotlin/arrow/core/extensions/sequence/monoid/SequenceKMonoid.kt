@@ -19,9 +19,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Collection<SequenceK<A>>.combineAll(): Sequence<A> =
-    arrow.core.extensions.sequence.monoid.Sequence.monoid<A>().run {
-  this@combineAll.combineAll() as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.monoid.Sequence.monoid<A>().run {
+    this@combineAll.combineAll() as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -38,9 +38,9 @@ fun <A> Collection<SequenceK<A>>.combineAll(): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A> combineAll(arg0: List<SequenceK<A>>): Sequence<A> =
-    arrow.core.extensions.sequence.monoid.Sequence
-   .monoid<A>()
-   .combineAll(arg0) as kotlin.sequences.Sequence<A>
+  arrow.core.extensions.sequence.monoid.Sequence
+    .monoid<A>()
+    .combineAll(arg0) as kotlin.sequences.Sequence<A>
 
 /**
  * cached extension
@@ -63,4 +63,5 @@ object Sequence {
     level = DeprecationLevel.WARNING
   )
   inline fun <A> monoid(): SequenceKMonoid<A> = monoid_singleton as
-      arrow.core.extensions.SequenceKMonoid<A>}
+    arrow.core.extensions.SequenceKMonoid<A>
+}

@@ -40,7 +40,7 @@ operator fun <A, B> List<A>.times(arg1: List<B>): List<Tuple2<A, B>> =
  */
 @PublishedApi()
 internal val semigroupal_singleton: ListKSemigroupal = object :
-    arrow.core.extensions.ListKSemigroupal {}
+  arrow.core.extensions.ListKSemigroupal {}
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -138,4 +138,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
-  inline fun semigroupal(): ListKSemigroupal = semigroupal_singleton}
+  inline fun semigroupal(): ListKSemigroupal = semigroupal_singleton
+}

@@ -74,7 +74,7 @@ data class Tuple8<out A, out B, out C, out D, out E, out F, out G, out H>(
 }
 
 operator fun <A : Comparable<A>, B : Comparable<B>, C : Comparable<C>, D : Comparable<D>, E : Comparable<E>, F : Comparable<F>, G : Comparable<G>, H : Comparable<H>>
-  Tuple8<A, B, C, D, E, F, G, H>.compareTo(other: Tuple8<A, B, C, D, E, F, G, H>): Int {
+Tuple8<A, B, C, D, E, F, G, H>.compareTo(other: Tuple8<A, B, C, D, E, F, G, H>): Int {
   val first = a.compareTo(other.a)
   return if (first == 0) {
     val second = b.compareTo(other.b)

@@ -31,6 +31,8 @@ fun <L, R> Ior<L, R>.hash(HL: Hash<L>, HR: Hash<R>): Int = arrow.core.Ior.hash<L
   level = DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.hash(HL: Hash<L>, HR: Hash<R>): IorHash<L, R> = object :
-    arrow.core.extensions.IorHash<L, R> { override fun HL(): arrow.typeclasses.Hash<L> = HL
+  arrow.core.extensions.IorHash<L, R> {
+  override fun HL(): arrow.typeclasses.Hash<L> = HL
 
-  override fun HR(): arrow.typeclasses.Hash<R> = HR }
+  override fun HR(): arrow.typeclasses.Hash<R> = HR
+}

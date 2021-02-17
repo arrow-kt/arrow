@@ -14,7 +14,7 @@ import arrow.typeclasses.Semigroup
  */
 @PublishedApi()
 internal val semialign_singleton: OptionSemialign = object : arrow.core.extensions.OptionSemialign
-    {}
+{}
 
 @JvmName("align")
 @Suppress(
@@ -26,14 +26,14 @@ internal val semialign_singleton: OptionSemialign = object : arrow.core.extensio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.align(arg1)"
+    "arg0.align(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> align(arg0: Kind<ForOption, A>, arg1: Kind<ForOption, B>): Option<Ior<A, B>> =
-    arrow.core.Option
-   .semialign()
-   .align<A, B>(arg0, arg1) as arrow.core.Option<arrow.core.Ior<A, B>>
+  arrow.core.Option
+    .semialign()
+    .align<A, B>(arg0, arg1) as arrow.core.Option<arrow.core.Ior<A, B>>
 
 @JvmName("alignWith")
 @Suppress(
@@ -45,7 +45,7 @@ fun <A, B> align(arg0: Kind<ForOption, A>, arg1: Kind<ForOption, B>): Option<Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.align(arg1, arg2)"
+    "arg0.align(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -54,8 +54,8 @@ fun <A, B, C> alignWith(
   arg1: Kind<ForOption, B>,
   arg2: Function1<Ior<A, B>, C>
 ): Option<C> = arrow.core.Option
-   .semialign()
-   .alignWith<A, B, C>(arg0, arg1, arg2) as arrow.core.Option<C>
+  .semialign()
+  .alignWith<A, B, C>(arg0, arg1, arg2) as arrow.core.Option<C>
 
 @JvmName("salign")
 @Suppress(
@@ -67,14 +67,14 @@ fun <A, B, C> alignWith(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "salign(arg1, arg2)"
+    "salign(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForOption, A>): Option<A> =
-    arrow.core.Option.semialign().run {
-  this@salign.salign<A>(arg1, arg2) as arrow.core.Option<A>
-}
+  arrow.core.Option.semialign().run {
+    this@salign.salign<A>(arg1, arg2) as arrow.core.Option<A>
+  }
 
 @JvmName("padZip")
 @Suppress(
@@ -86,14 +86,14 @@ fun <A> Kind<ForOption, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForOption, A>):
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZip(arg1)"
+    "padZip(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.padZip(arg1: Kind<ForOption, B>): Option<Tuple2<Option<A>, Option<B>>> =
   arrow.core.Option.semialign().run {
     this@padZip.padZip<A, B>(arg1) as arrow.core.Option<arrow.core.Tuple2<arrow.core.Option<A>,
-      arrow.core.Option<B>>>
+        arrow.core.Option<B>>>
   }
 
 @JvmName("padZipWith")
@@ -106,7 +106,7 @@ fun <A, B> Kind<ForOption, A>.padZip(arg1: Kind<ForOption, B>): Option<Tuple2<Op
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "padZip(arg1, arg2)"
+    "padZip(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )

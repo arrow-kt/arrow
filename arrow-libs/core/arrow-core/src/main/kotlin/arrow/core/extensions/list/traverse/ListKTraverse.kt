@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverseEither or traverseValidated from arrow.core.*")
 fun <G, A, B> List<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
-    Kind<ForListK, B>> = arrow.core.extensions.list.traverse.List.traverse().run {
+  Kind<ForListK, B>> = arrow.core.extensions.list.traverse.List.traverse().run {
   arrow.core.ListK(this@traverse).traverse<G, A, B>(arg1, arg2) as arrow.Kind<G,
     arrow.Kind<arrow.core.ForListK, B>>
 }
@@ -34,10 +34,10 @@ fun <G, A, B> List<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, 
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*")
 fun <G, A> List<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForListK, A>> =
-    arrow.core.extensions.list.traverse.List.traverse().run {
-  arrow.core.ListK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.core.ForListK, A>>
-}
+  arrow.core.extensions.list.traverse.List.traverse().run {
+    arrow.core.ListK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.core.ForListK, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -48,9 +48,9 @@ fun <G, A> List<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForList
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <A, B> List<A>.map(arg1: Function1<A, B>): List<B> =
-    arrow.core.extensions.list.traverse.List.traverse().run {
-  arrow.core.ListK(this@map).map<A, B>(arg1) as kotlin.collections.List<B>
-}
+  arrow.core.extensions.list.traverse.List.traverse().run {
+    arrow.core.ListK(this@map).map<A, B>(arg1) as kotlin.collections.List<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -82,4 +82,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Traverse typeclasses is deprecated. Use concrete methods on Iterable")
-  inline fun traverse(): ListKTraverse = traverse_singleton}
+  inline fun traverse(): ListKTraverse = traverse_singleton
+}

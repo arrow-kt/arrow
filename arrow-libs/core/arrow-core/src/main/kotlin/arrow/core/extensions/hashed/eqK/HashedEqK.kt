@@ -27,15 +27,15 @@ internal val eqK_singleton: HashedEqK = object : arrow.core.extensions.HashedEqK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "eqK(arg1, arg2)",
+    "arrow.core.eqK"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForHashed, A>.eqK(arg1: Kind<ForHashed, A>, arg2: Eq<A>): Boolean =
-    arrow.core.Hashed.eqK().run {
-  this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
-}
+  arrow.core.Hashed.eqK().run {
+    this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -47,14 +47,14 @@ fun <A> Kind<ForHashed, A>.eqK(arg1: Kind<ForHashed, A>, arg2: Eq<A>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.Hashed.liftEq"
+    "liftEq(arg0)",
+    "arrow.core.Hashed.liftEq"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForHashed, A>> = arrow.core.Hashed
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForHashed, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForHashed, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

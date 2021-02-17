@@ -1,4 +1,5 @@
 @file:Suppress("NAME_SHADOWING")
+
 package arrow.core
 
 import arrow.core.test.generators.intSmall

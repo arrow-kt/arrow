@@ -29,15 +29,15 @@ internal val zip_singleton: MapKZip<Any?> = object : MapKZip<Any?> {}
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "zip(arg1)",
-  "arrow.core.zip"
+    "zip(arg1)",
+    "arrow.core.zip"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.zip(arg1: Kind<Kind<ForMapK, K>, B>): MapK<K, Tuple2<A, B>> =
-    arrow.core.MapK.zip<K>().run {
-  this@zip.zip<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
-}
+  arrow.core.MapK.zip<K>().run {
+    this@zip.zip<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("zipWith")
 @Suppress(

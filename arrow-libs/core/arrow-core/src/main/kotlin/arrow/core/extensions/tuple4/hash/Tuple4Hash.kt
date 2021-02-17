@@ -37,11 +37,13 @@ inline fun <A, B, C, D> Companion.hash(
   HB: Hash<B>,
   HC: Hash<C>,
   HD: Hash<D>
-): Tuple4Hash<A, B, C, D> = object : arrow.core.extensions.Tuple4Hash<A, B, C, D> { override fun
-    HA(): arrow.typeclasses.Hash<A> = HA
+): Tuple4Hash<A, B, C, D> = object : arrow.core.extensions.Tuple4Hash<A, B, C, D> {
+  override fun
+  HA(): arrow.typeclasses.Hash<A> = HA
 
   override fun HB(): arrow.typeclasses.Hash<B> = HB
 
   override fun HC(): arrow.typeclasses.Hash<C> = HC
 
-  override fun HD(): arrow.typeclasses.Hash<D> = HD }
+  override fun HD(): arrow.typeclasses.Hash<D> = HD
+}

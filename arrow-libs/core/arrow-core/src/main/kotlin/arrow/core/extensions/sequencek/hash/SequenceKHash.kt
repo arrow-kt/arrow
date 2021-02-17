@@ -28,4 +28,4 @@ fun <A> SequenceK<A>.hash(HA: Hash<A>): Int = arrow.core.SequenceK.hash<A>(HA).r
 )
 @Deprecated(HashDeprecation)
 inline fun <A> Companion.hash(HA: Hash<A>): SequenceKHash<A> = object :
-    arrow.core.extensions.SequenceKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }
+  arrow.core.extensions.SequenceKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

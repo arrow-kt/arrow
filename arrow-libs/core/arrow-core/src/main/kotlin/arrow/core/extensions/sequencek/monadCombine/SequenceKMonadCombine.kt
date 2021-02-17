@@ -14,7 +14,7 @@ import arrow.typeclasses.Foldable
  */
 @PublishedApi()
 internal val monadCombine_singleton: SequenceKMonadCombine = object :
-    arrow.core.extensions.SequenceKMonadCombine {}
+  arrow.core.extensions.SequenceKMonadCombine {}
 
 @JvmName("unite")
 @Suppress(
@@ -28,9 +28,9 @@ internal val monadCombine_singleton: SequenceKMonadCombine = object :
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForSequenceK, Kind<G, A>>.unite(arg1: Foldable<G>): SequenceK<A> =
-    arrow.core.SequenceK.monadCombine().run {
-  this@unite.unite<G, A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monadCombine().run {
+    this@unite.unite<G, A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("separate")
 @Suppress(
@@ -44,10 +44,10 @@ fun <G, A> Kind<ForSequenceK, Kind<G, A>>.unite(arg1: Foldable<G>): SequenceK<A>
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForSequenceK, Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>):
-    Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> = arrow.core.SequenceK.monadCombine().run {
-  this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
-    arrow.Kind<arrow.core.ForSequenceK, B>>
-}
+  Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> = arrow.core.SequenceK.monadCombine().run {
+    this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
+      arrow.Kind<arrow.core.ForSequenceK, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -16,6 +16,7 @@ import arrow.typeclasses.ShowDeprecation
 class ForTuple2 private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING

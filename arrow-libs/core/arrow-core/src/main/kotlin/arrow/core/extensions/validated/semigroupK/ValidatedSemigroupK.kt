@@ -36,7 +36,7 @@ fun <E, A> algebra(SE: Semigroup<E>): Semigroup<Kind<Kind<ForValidated, E>, A>> 
   arrow.core.Validated
     .semigroupK<E>(SE)
     .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.Kind<arrow.core.ForValidated, E>,
-    A>>
+      A>>
 
 @Suppress(
   "UNCHECKED_CAST",

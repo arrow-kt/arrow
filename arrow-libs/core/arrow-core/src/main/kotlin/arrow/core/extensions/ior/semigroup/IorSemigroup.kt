@@ -15,8 +15,8 @@ import arrow.typeclasses.Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.combine(SGL, SGR, arg1)",
-  "arrow.core.combine"
+    "this.combine(SGL, SGR, arg1)",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
@@ -59,12 +59,15 @@ fun <L, R> Ior<L, R>.maybeCombine(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.ior(SGL, SGR)",
-    "arrow.core.ior", "arrow.typeclasses.Semigroup"
+    "arrow.core.ior",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.semigroup(SGL: Semigroup<L>, SGR: Semigroup<R>): IorSemigroup<L, R> =
-    object : arrow.core.extensions.IorSemigroup<L, R> { override fun SGL():
-    arrow.typeclasses.Semigroup<L> = SGL
+  object : arrow.core.extensions.IorSemigroup<L, R> {
+    override fun SGL():
+      arrow.typeclasses.Semigroup<L> = SGL
 
-  override fun SGR(): arrow.typeclasses.Semigroup<R> = SGR }
+    override fun SGR(): arrow.typeclasses.Semigroup<R> = SGR
+  }

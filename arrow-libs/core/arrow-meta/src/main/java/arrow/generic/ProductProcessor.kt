@@ -54,10 +54,11 @@ class ProductProcessor : AbstractProcessor() {
       val paramNames = element.getConstructorParamNames()
       val typeNames = element.getConstructorTypesNames()
       val properties = paramNames.zip(typeNames).map { Target(it.second, it.first) }
-      if (properties.size > 22)
+      if (properties.size > 22) {
         knownError("${element.enclosingElement}.${element.simpleName} up to 22 constructor parameters is supported")
-      else
+      } else {
         AnnotatedGeneric(element as TypeElement, elementClassData, properties, element.normalizedDerivingTargets())
+      }
     }
 
     else -> knownError(productAnnotationError(element, productAnnotationName, productAnnotationTarget))

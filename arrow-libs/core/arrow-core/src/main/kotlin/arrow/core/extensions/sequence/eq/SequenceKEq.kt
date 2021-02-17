@@ -22,9 +22,9 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.neqv(EQ: Eq<A>, arg1: Sequence<A>): Boolean =
-    arrow.core.extensions.sequence.eq.Sequence.eq<A>(EQ).run {
-  arrow.core.SequenceK(this@neqv).neqv(arrow.core.SequenceK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.sequence.eq.Sequence.eq<A>(EQ).run {
+    arrow.core.SequenceK(this@neqv).neqv(arrow.core.SequenceK(arg1)) as kotlin.Boolean
+  }
 
 object Sequence {
   @Suppress(
@@ -33,4 +33,6 @@ object Sequence {
   )
   @Deprecated(EqDeprecation)
   inline fun <A> eq(EQ: Eq<A>): SequenceKEq<A> = object : arrow.core.extensions.SequenceKEq<A> {
-      override fun EQ(): arrow.typeclasses.Eq<A> = EQ }}
+    override fun EQ(): arrow.typeclasses.Eq<A> = EQ
+  }
+}

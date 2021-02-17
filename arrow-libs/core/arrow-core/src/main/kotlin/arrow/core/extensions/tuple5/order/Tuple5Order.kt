@@ -207,9 +207,9 @@ fun <A, B, C, D, E> Tuple5<A, B, C, D, E>.sort(
   OE: Order<E>,
   arg1: Tuple5<A, B, C, D, E>
 ): Tuple2<Tuple5<A, B, C, D, E>, Tuple5<A, B, C, D, E>> = arrow.core.Tuple5.order<A, B, C, D,
-    E>(OA, OB, OC, OD, OE).run {
+  E>(OA, OB, OC, OD, OE).run {
   this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple5<A, B, C, D, E>, arrow.core.Tuple5<A,
-    B, C, D, E>>
+      B, C, D, E>>
 }
 
 @Suppress(
@@ -223,8 +223,9 @@ inline fun <A, B, C, D, E> Companion.order(
   OC: Order<C>,
   OD: Order<D>,
   OE: Order<E>
-): Tuple5Order<A, B, C, D, E> = object : arrow.core.extensions.Tuple5Order<A, B, C, D, E> { override
-    fun OA(): arrow.typeclasses.Order<A> = OA
+): Tuple5Order<A, B, C, D, E> = object : arrow.core.extensions.Tuple5Order<A, B, C, D, E> {
+  override
+  fun OA(): arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
@@ -232,4 +233,5 @@ inline fun <A, B, C, D, E> Companion.order(
 
   override fun OD(): arrow.typeclasses.Order<D> = OD
 
-  override fun OE(): arrow.typeclasses.Order<E> = OE }
+  override fun OE(): arrow.typeclasses.Order<E> = OE
+}

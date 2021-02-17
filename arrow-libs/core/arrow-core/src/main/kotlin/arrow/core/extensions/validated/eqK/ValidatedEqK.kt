@@ -34,9 +34,9 @@ fun <L, A> Kind<Kind<ForValidated, L>, A>.eqK(
 )
 @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <L, A> liftEq(EQL: Eq<L>, arg0: Eq<A>): Eq<Kind<Kind<ForValidated, L>, A>> =
-    arrow.core.Validated
-   .eqK<L>(EQL)
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForValidated, L>, A>>
+  arrow.core.Validated
+    .eqK<L>(EQL)
+    .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForValidated, L>, A>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -44,4 +44,4 @@ fun <L, A> liftEq(EQL: Eq<L>, arg0: Eq<A>): Eq<Kind<Kind<ForValidated, L>, A>> =
 )
 @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 inline fun <L> Companion.eqK(EQL: Eq<L>): ValidatedEqK<L> = object :
-    arrow.core.extensions.ValidatedEqK<L> { override fun EQL(): arrow.typeclasses.Eq<L> = EQL }
+  arrow.core.extensions.ValidatedEqK<L> { override fun EQL(): arrow.typeclasses.Eq<L> = EQL }

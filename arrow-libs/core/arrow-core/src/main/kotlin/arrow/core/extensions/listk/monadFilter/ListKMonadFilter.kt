@@ -17,7 +17,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadFilter_singleton: ListKMonadFilter = object :
-    arrow.core.extensions.ListKMonadFilter {}
+  arrow.core.extensions.ListKMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -28,9 +28,9 @@ internal val monadFilter_singleton: ListKMonadFilter = object :
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("mapNotNull { arg1(it).orNull() }"))
 fun <A, B> Kind<ForListK, A>.filterMap(arg1: Function1<A, Option<B>>): ListK<B> =
-    arrow.core.ListK.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -41,9 +41,9 @@ fun <A, B> Kind<ForListK, A>.filterMap(arg1: Function1<A, Option<B>>): ListK<B> 
 )
 @Deprecated("Monad bindings are deprecated")
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForListK>.() -> B): ListK<B> =
-    arrow.core.ListK
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.core.ListK<B>
+  arrow.core.ListK
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.core.ListK<B>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -18,10 +18,12 @@ object SemigroupalLaws {
     GENK: GenK<F>,
     bijection: (Kind<F, Tuple2<Tuple2<Int, Int>, Int>>) -> (Kind<F, Tuple2<Int, Tuple2<Int, Int>>>),
     EQK: EqK<F>
-  ): List<Law> = listOf(Law("Semigroupal: Bijective associativity") {
-    val EQ = EQK.liftEq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
-    SGAL.semigroupalAssociative(GENK.genK(Gen.int()), bijection, EQ)
-  })
+  ): List<Law> = listOf(
+    Law("Semigroupal: Bijective associativity") {
+      val EQ = EQK.liftEq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
+      SGAL.semigroupalAssociative(GENK.genK(Gen.int()), bijection, EQ)
+    }
+  )
 
   private fun <F> Semigroupal<F>.semigroupalAssociative(
     GEN: Gen<Kind<F, Int>>,

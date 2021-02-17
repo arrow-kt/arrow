@@ -714,7 +714,7 @@ fun <K, A, B, C, Z> Map<K, Tuple3<A, B, C>>.product(arg1: Map<K, Z>): Map<K, Tup
   DeprecationLevel.WARNING
 )
 fun <K, A, B, C, D, Z> Map<K, Tuple4<A, B, C, D>>.product(arg1: Map<K, Z>): Map<K, Tuple5<A, B, C,
-  D, Z>> = arrow.core.extensions.map.apply.Map.apply<K>().run {
+    D, Z>> = arrow.core.extensions.map.apply.Map.apply<K>().run {
   arrow.core.MapK(this@product).product<A, B, C, D, Z>(arrow.core.MapK(arg1)) as
     kotlin.collections.Map<K, arrow.core.Tuple5<A, B, C, D, Z>>
 }
@@ -736,7 +736,7 @@ fun <K, A, B, C, D, Z> Map<K, Tuple4<A, B, C, D>>.product(arg1: Map<K, Z>): Map<
   DeprecationLevel.WARNING
 )
 fun <K, A, B, C, D, E, Z> Map<K, Tuple5<A, B, C, D, E>>.product(arg1: Map<K, Z>): Map<K, Tuple6<A,
-  B, C, D, E, Z>> = arrow.core.extensions.map.apply.Map.apply<K>().run {
+    B, C, D, E, Z>> = arrow.core.extensions.map.apply.Map.apply<K>().run {
   arrow.core.MapK(this@product).product<A, B, C, D, E, Z>(arrow.core.MapK(arg1)) as
     kotlin.collections.Map<K, arrow.core.Tuple6<A, B, C, D, E, Z>>
 }
@@ -781,9 +781,9 @@ fun <K, A, B, C, D, E, FF, Z> Map<K, Tuple6<A, B, C, D, E, FF>>.product(arg1: Ma
 )
 fun <K, A, B, C, D, E, FF, G, Z> Map<K, Tuple7<A, B, C, D, E, FF, G>>.product(arg1: Map<K, Z>):
   Map<K, Tuple8<A, B, C, D, E, FF, G, Z>> = arrow.core.extensions.map.apply.Map.apply<K>().run {
-  arrow.core.MapK(this@product).product<A, B, C, D, E, FF, G, Z>(arrow.core.MapK(arg1)) as
-    kotlin.collections.Map<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
-}
+    arrow.core.MapK(this@product).product<A, B, C, D, E, FF, G, Z>(arrow.core.MapK(arg1)) as
+      kotlin.collections.Map<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
+  }
 
 @JvmName("product7")
 @Suppress(
@@ -803,7 +803,7 @@ fun <K, A, B, C, D, E, FF, G, Z> Map<K, Tuple7<A, B, C, D, E, FF, G>>.product(ar
 )
 fun <K, A, B, C, D, E, FF, G, H, Z> Map<K, Tuple8<A, B, C, D, E, FF, G, H>>.product(
   arg1: Map<K,
-Z>
+    Z>
 ): Map<K, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   arrow.core.extensions.map.apply.Map.apply<K>().run {
     arrow.core.MapK(this@product).product<A, B, C, D, E, FF, G, H, Z>(arrow.core.MapK(arg1)) as
@@ -827,7 +827,7 @@ Z>
   DeprecationLevel.WARNING
 )
 fun <K, A, B, C, D, E, FF, G, H, I, Z> Map<K, Tuple9<A, B, C, D, E, FF, G, H,
-  I>>.product(arg1: Map<K, Z>): Map<K, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
+    I>>.product(arg1: Map<K, Z>): Map<K, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
   arrow.core.extensions.map.apply.Map.apply<K>().run {
     arrow.core.MapK(this@product).product<A, B, C, D, E, FF, G, H, I, Z>(arrow.core.MapK(arg1)) as
       kotlin.collections.Map<K, arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>

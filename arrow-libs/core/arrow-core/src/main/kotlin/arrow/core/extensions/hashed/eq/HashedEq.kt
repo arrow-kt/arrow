@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
 @Deprecated(
   EqDeprecation,
   ReplaceWith(
-  "this != arg1"
+    "this != arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -34,4 +34,5 @@ fun <A> Hashed<A>.neqv(EQA: Eq<A>, arg1: Hashed<A>): Boolean = arrow.core.Hashed
 )
 @Deprecated(EqDeprecation)
 inline fun <A> Companion.eq(EQA: Eq<A>): HashedEq<A> = object : arrow.core.extensions.HashedEq<A> {
-    override fun EQA(): arrow.typeclasses.Eq<A> = EQA }
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+}

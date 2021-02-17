@@ -20,7 +20,6 @@ import io.kotlintest.properties.forAll
 object ReducibleLaws {
 
   fun <F> laws(RF: Reducible<F>, GA: Applicative<F>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
-
     val EQ = Int.eq()
     val EQOptionInt = Option.eq(Int.eq())
     val EQLong = Long.eq()

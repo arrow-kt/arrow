@@ -66,7 +66,7 @@ fun <X, G, A> Kind<Kind<ForConst, X>, A>.filterA(
 ): Kind<G, Kind<Kind<ForConst, X>, A>> =
   arrow.core.Const.traverseFilter<X>().run {
     this@filterA.filterA<G, A>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForConst,
-      X>, A>>
+          X>, A>>
   }
 
 @JvmName("filter")

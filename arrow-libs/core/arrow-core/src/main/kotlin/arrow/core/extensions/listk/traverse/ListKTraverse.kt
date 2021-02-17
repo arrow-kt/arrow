@@ -27,9 +27,9 @@ internal val traverse_singleton: ListKTraverse = object : arrow.core.extensions.
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverseEither or traverseValidated from arrow.core.*")
 fun <G, A, B> Kind<ForListK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Kind<ForListK, B>> = arrow.core.ListK.traverse().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForListK, B>>
-}
+  Kind<G, Kind<ForListK, B>> = arrow.core.ListK.traverse().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForListK, B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -40,9 +40,9 @@ fun <G, A, B> Kind<ForListK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*")
 fun <G, A> Kind<ForListK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForListK, A>> =
-    arrow.core.ListK.traverse().run {
-  this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.core.ForListK, A>>
-}
+  arrow.core.ListK.traverse().run {
+    this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.core.ForListK, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -53,9 +53,9 @@ fun <G, A> Kind<ForListK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Ki
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <A, B> Kind<ForListK, A>.map(arg1: Function1<A, B>): ListK<B> =
-    arrow.core.ListK.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

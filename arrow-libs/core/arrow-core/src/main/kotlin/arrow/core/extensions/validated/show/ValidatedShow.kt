@@ -12,6 +12,8 @@ import kotlin.Suppress
 )
 @Deprecated(ShowDeprecation)
 inline fun <L, R> Companion.show(SL: Show<L>, SR: Show<R>): ValidatedShow<L, R> = object :
-    arrow.core.extensions.ValidatedShow<L, R> { override fun SL(): arrow.typeclasses.Show<L> = SL
+  arrow.core.extensions.ValidatedShow<L, R> {
+  override fun SL(): arrow.typeclasses.Show<L> = SL
 
-  override fun SR(): arrow.typeclasses.Show<R> = SR }
+  override fun SR(): arrow.typeclasses.Show<R> = SR
+}

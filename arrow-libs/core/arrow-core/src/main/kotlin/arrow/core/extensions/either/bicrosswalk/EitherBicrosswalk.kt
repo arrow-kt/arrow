@@ -45,9 +45,9 @@ fun <F, A, B, C, D> bicrosswalk(
 @Deprecated("@extension kinded projected functions are deprecated. Replace with bisequence or bisequenceValidated from arrow.core.*")
 fun <F, A, B> bisequenceL(arg0: Align<F>, arg1: Kind<Kind<ForEither, Kind<F, A>>, Kind<F, B>>):
   Kind<F, Kind<Kind<ForEither, A>, B>> = arrow.core.Either
-  .bicrosswalk()
-  .bisequenceL<F, A, B>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForEither,
-  A>, B>>
+    .bicrosswalk()
+    .bisequenceL<F, A, B>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.Kind<arrow.core.ForEither,
+        A>, B>>
 
 @Suppress(
   "UNCHECKED_CAST",

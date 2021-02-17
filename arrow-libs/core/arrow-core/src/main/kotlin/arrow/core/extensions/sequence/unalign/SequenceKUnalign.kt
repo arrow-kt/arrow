@@ -44,19 +44,19 @@ fun <A, B> unalign(arg0: Sequence<Ior<A, B>>): Tuple2<Kind<ForSequenceK, A>, Kin
   DeprecationLevel.WARNING
 )
 fun <A, B, C> unalignWith(arg0: Sequence<C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
+  Tuple2<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
     arrow.core.extensions.sequence.unalign.Sequence
-   .unalign()
-   .unalignWith<A, B, C>(arrow.core.SequenceK(arg0), arg1) as
-    arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>, arrow.Kind<arrow.core.ForSequenceK,
-    B>>
+      .unalign()
+      .unalignWith<A, B, C>(arrow.core.SequenceK(arg0), arg1) as
+      arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>, arrow.Kind<arrow.core.ForSequenceK,
+          B>>
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val unalign_singleton: SequenceKUnalign = object : arrow.core.extensions.SequenceKUnalign
-    {}
+{}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -71,4 +71,5 @@ object Sequence {
     "Unalign typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun unalign(): SequenceKUnalign = unalign_singleton}
+  inline fun unalign(): SequenceKUnalign = unalign_singleton
+}

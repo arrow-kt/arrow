@@ -14,7 +14,7 @@ import arrow.typeclasses.Foldable
  */
 @PublishedApi()
 internal val monadCombine_singleton: OptionMonadCombine = object :
-    arrow.core.extensions.OptionMonadCombine {}
+  arrow.core.extensions.OptionMonadCombine {}
 
 @JvmName("unite")
 @Suppress(
@@ -28,9 +28,9 @@ internal val monadCombine_singleton: OptionMonadCombine = object :
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForOption, Kind<G, A>>.unite(arg1: Foldable<G>): Option<A> =
-    arrow.core.Option.monadCombine().run {
-  this@unite.unite<G, A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.monadCombine().run {
+    this@unite.unite<G, A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("separate")
 @Suppress(
@@ -44,10 +44,10 @@ fun <G, A> Kind<ForOption, Kind<G, A>>.unite(arg1: Foldable<G>): Option<A> =
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForOption, Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>):
-    Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> = arrow.core.Option.monadCombine().run {
-  this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
-    arrow.Kind<arrow.core.ForOption, B>>
-}
+  Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> = arrow.core.Option.monadCombine().run {
+    this@separate.separate<G, A, B>(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
+      arrow.Kind<arrow.core.ForOption, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

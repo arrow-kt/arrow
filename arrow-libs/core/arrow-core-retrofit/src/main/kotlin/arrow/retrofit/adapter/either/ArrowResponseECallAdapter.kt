@@ -40,12 +40,19 @@ internal class ArrowResponseECallAdapter<E, R>(
         }
 
         override fun onResponse(call: Call<R>, response: Response<R>) {
-          onResponseFn(callback, this@ResponseECall, errorConverter, response, { body, responseT ->
-            val bodyE: Either<E, R> = body.right()
-            Response.success(responseT.code(), ResponseE(responseT.raw(), bodyE))
-          }, { errorBody, responseV ->
-            Response.success<ResponseE<E, R>>(ResponseE(responseV.raw(), errorBody.left()))
-          })
+          onResponseFn(
+            callback,
+            this@ResponseECall,
+            errorConverter,
+            response,
+            { body, responseT ->
+              val bodyE: Either<E, R> = body.right()
+              Response.success(responseT.code(), ResponseE(responseT.raw(), bodyE))
+            },
+            { errorBody, responseV ->
+              Response.success<ResponseE<E, R>>(ResponseE(responseV.raw(), errorBody.left()))
+            }
+          )
         }
       })
     }

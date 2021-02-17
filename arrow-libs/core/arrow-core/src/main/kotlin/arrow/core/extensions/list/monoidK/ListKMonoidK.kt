@@ -17,8 +17,8 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("listMonoid<A>()", "arrow.core.listMonoid"))
 fun <A> algebra(): Monoid<Kind<ForListK, A>> = arrow.core.extensions.list.monoidK.List
-   .monoidK()
-   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForListK, A>>
+  .monoidK()
+  .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForListK, A>>
 
 /**
  * cached extension
@@ -33,4 +33,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
-  inline fun monoidK(): ListKMonoidK = monoidK_singleton}
+  inline fun monoidK(): ListKMonoidK = monoidK_singleton
+}

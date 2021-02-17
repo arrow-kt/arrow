@@ -22,10 +22,10 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.semigroupal.Sequence.semigroupal().run {
-  arrow.core.SequenceK(this@product).product<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.semigroupal.Sequence.semigroupal().run {
+    arrow.core.SequenceK(this@product).product<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * syntax
@@ -45,17 +45,17 @@ fun <A, B> Sequence<A>.product(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
   DeprecationLevel.WARNING
 )
 operator fun <A, B> Sequence<A>.times(arg1: Sequence<B>): Sequence<Tuple2<A, B>> =
-    arrow.core.extensions.sequence.semigroupal.Sequence.semigroupal().run {
-  arrow.core.SequenceK(this@times).times<A, B>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.extensions.sequence.semigroupal.Sequence.semigroupal().run {
+    arrow.core.SequenceK(this@times).times<A, B>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val semigroupal_singleton: SequenceKSemigroupal = object :
-    arrow.core.extensions.SequenceKSemigroupal {}
+  arrow.core.extensions.SequenceKSemigroupal {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -159,4 +159,5 @@ object Sequence {
     "Semigroupal typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun semigroupal(): SequenceKSemigroupal = semigroupal_singleton}
+  inline fun semigroupal(): SequenceKSemigroupal = semigroupal_singleton
+}

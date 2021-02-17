@@ -47,7 +47,7 @@ fun <E, G, A, B> Kind<Kind<ForValidated, E>, A>.traverse(
 fun <E, G, A> Kind<Kind<ForValidated, E>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
   Kind<Kind<ForValidated, E>, A>> = arrow.core.Validated.traverse<E>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForValidated,
-    E>, A>>
+        E>, A>>
 }
 
 @JvmName("map")

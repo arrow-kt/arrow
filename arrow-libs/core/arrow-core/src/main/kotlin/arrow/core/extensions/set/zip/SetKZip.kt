@@ -18,7 +18,8 @@ import kotlin.jvm.JvmName
   "@extension projected functions are deprecated",
   ReplaceWith(
     "this.zip(arg1, ::Tuple2)",
-    "arrow.core.zip", "arrow.core.Tuple2"
+    "arrow.core.zip",
+    "arrow.core.Tuple2"
   ),
   DeprecationLevel.WARNING
 )

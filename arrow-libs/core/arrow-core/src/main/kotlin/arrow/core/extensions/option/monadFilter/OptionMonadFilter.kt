@@ -12,7 +12,7 @@ import arrow.typeclasses.MonadFilterSyntax
  */
 @PublishedApi()
 internal val monadFilter_singleton: OptionMonadFilter = object :
-    arrow.core.extensions.OptionMonadFilter {}
+  arrow.core.extensions.OptionMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val monadFilter_singleton: OptionMonadFilter = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B> =
-    arrow.core.Option.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -46,9 +46,9 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
   level = DeprecationLevel.WARNING
 )
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForOption>.() -> B): Option<B> =
-    arrow.core.Option
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.core.Option<B>
+  arrow.core.Option
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.core.Option<B>
 
 @Suppress(
   "UNCHECKED_CAST",

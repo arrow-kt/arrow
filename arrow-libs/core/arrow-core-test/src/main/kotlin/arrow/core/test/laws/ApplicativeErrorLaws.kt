@@ -22,7 +22,6 @@ import kotlinx.coroutines.runBlocking
 object ApplicativeErrorLaws {
 
   fun <F> laws(AE: ApplicativeError<F, Throwable>, GENK: GenK<F>, EQK: EqK<F>): List<Law> {
-
     val EQ = EQK.liftEq(Int.eq())
     val EQ_EITHER = EQK.liftEq(Either.eq(Eq.any(), Int.eq()))
 

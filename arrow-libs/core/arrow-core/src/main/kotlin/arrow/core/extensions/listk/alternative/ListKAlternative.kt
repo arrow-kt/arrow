@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val alternative_singleton: ListKAlternative = object :
-    arrow.core.extensions.ListKAlternative {}
+  arrow.core.extensions.ListKAlternative {}
 
 @JvmName("some")
 @Suppress(
@@ -54,9 +54,9 @@ fun <A> Kind<ForListK, A>.many(): ListK<SequenceK<A>> = arrow.core.ListK.alterna
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this + arg1"))
 infix fun <A> Kind<ForListK, A>.alt(arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.alternative().run {
-  this@alt.alt<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.alternative().run {
+    this@alt.alt<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("orElse")
 @Suppress(
@@ -67,9 +67,9 @@ infix fun <A> Kind<ForListK, A>.alt(arg1: Kind<ForListK, A>): ListK<A> =
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this + arg1"))
 fun <A> Kind<ForListK, A>.orElse(arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.alternative().run {
-  this@orElse.orElse<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.alternative().run {
+    this@orElse.orElse<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("combineK")
 @Suppress(
@@ -80,9 +80,9 @@ fun <A> Kind<ForListK, A>.orElse(arg1: Kind<ForListK, A>): ListK<A> =
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this + arg1"))
 fun <A> Kind<ForListK, A>.combineK(arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.alternative().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.alternative().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("optional")
 @Suppress(
@@ -105,8 +105,8 @@ fun <A> Kind<ForListK, A>.optional(): ListK<Option<A>> = arrow.core.ListK.altern
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("if (arg0) listOf(Unit) else emptyList()"))
 fun guard(arg0: Boolean): ListK<Unit> = arrow.core.ListK
-   .alternative()
-   .guard(arg0) as arrow.core.ListK<kotlin.Unit>
+  .alternative()
+  .guard(arg0) as arrow.core.ListK<kotlin.Unit>
 
 @JvmName("lazyOrElse")
 @Suppress(
@@ -117,9 +117,9 @@ fun guard(arg0: Boolean): ListK<Unit> = arrow.core.ListK
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("this + arg1()"))
 fun <A> Kind<ForListK, A>.lazyOrElse(arg1: Function0<Kind<ForListK, A>>): ListK<A> =
-    arrow.core.ListK.alternative().run {
-  this@lazyOrElse.lazyOrElse<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.alternative().run {
+    this@lazyOrElse.lazyOrElse<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

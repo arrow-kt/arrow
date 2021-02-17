@@ -26,9 +26,9 @@ internal val unalign_singleton: ListKUnalign = object : arrow.core.extensions.Li
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.unalign()", "arrow.core.unalign"))
 fun <A, B> unalign(arg0: Kind<ForListK, Ior<A, B>>): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
-    arrow.core.ListK
-   .unalign()
-   .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
+  arrow.core.ListK
+    .unalign()
+    .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("unalignWith")
@@ -40,9 +40,9 @@ fun <A, B> unalign(arg0: Kind<ForListK, Ior<A, B>>): Tuple2<Kind<ForListK, A>, K
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.unalignWith(arg1)", "arrow.core.unalignWith"))
 fun <A, B, C> unalignWith(arg0: Kind<ForListK, C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> = arrow.core.ListK
-   .unalign()
-   .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
+  Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> = arrow.core.ListK
+    .unalign()
+    .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, B>>
 
 @Suppress(

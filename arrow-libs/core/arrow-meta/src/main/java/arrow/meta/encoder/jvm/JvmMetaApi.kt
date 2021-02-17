@@ -129,10 +129,12 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.defaultDummyArgValue]
    */
   override fun Parameter.defaultDummyArgValue(): Parameter =
-    copy(defaultValue = when {
-      type.simpleName == "Unit" -> Code("Unit")
-      else -> null
-    })
+    copy(
+      defaultValue = when {
+        type.simpleName == "Unit" -> Code("Unit")
+        else -> null
+      }
+    )
 
   /**
    * @see [MetaApi.downKindParameters]
@@ -385,10 +387,13 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    */
   override val TypeName.WildcardType.downKind: TypeName
     get() = if (upperBounds.isNotEmpty() &&
-      (upperBounds.find {
-        name.matches("arrow.Kind<(\\w?), (\\w?)>".toRegex()) ||
-          name.matches("arrow.Kind<arrow.Kind<(\\w?), (\\w?)>, (\\w?)>".toRegex())
-      } != null)) {
+      (
+        upperBounds.find {
+          name.matches("arrow.Kind<(\\w?), (\\w?)>".toRegex()) ||
+            name.matches("arrow.Kind<arrow.Kind<(\\w?), (\\w?)>, (\\w?)>".toRegex())
+        } != null
+        )
+    ) {
       this
     } else {
       name.downKind().let { (pckg, unPrefixedName, extraArgs) ->
@@ -556,10 +561,12 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       type = TypeName.typeNameOf(Deprecated::class),
       members = listOf(
         Code(""""$msg""""),
-        Code("""ReplaceWith(
+        Code(
+          """ReplaceWith(
           |"$replaceWithExpression",
           |"${imports.joinToString(", ")}"
-          |)""".trimMargin()),
+          |)""".trimMargin()
+        ),
         Code("DeprecationLevel.WARNING")
       ),
       useSiteTarget = null
@@ -583,8 +590,10 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       val dataTypeDownKinded = downKind
       return when {
         this is TypeName.TypeVariable &&
-          (dataTypeDownKinded.simpleName.startsWith("arrow.Kind") ||
-            dataTypeDownKinded.simpleName.startsWith("arrow.typeclasses.Conested")) -> {
+          (
+            dataTypeDownKinded.simpleName.startsWith("arrow.Kind") ||
+              dataTypeDownKinded.simpleName.startsWith("arrow.typeclasses.Conested")
+            ) -> {
           simpleName
             .substringAfterLast("arrow.Kind<")
             .substringAfterLast("arrow.typeclasses.Conested<")
@@ -650,9 +659,9 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
           typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty() -> {
             val dataTypeTypeArg = typeClassTypeName.typeArguments[0]
             val dataTypeName =
-              if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<"))
+              if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<")) {
                 TypeName.TypeVariable(dataTypeTypeArg.name.substringBefore("PartialOf<").substringAfter("<"))
-              else dataTypeTypeArg
+              } else dataTypeTypeArg
             // profunctor and other cases are parametric to Kind2 values or Conested
             val projectedCompanion = dataTypeName.projectedCompanion
             val dataTypeDownKinded = dataTypeName.downKind
@@ -666,8 +675,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
                 dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.rawName),
                 typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawName),
                 projectedCompanion =
-                if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
-                else projectedCompanion
+                  if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
+                  else projectedCompanion
               )
               else -> null
             }

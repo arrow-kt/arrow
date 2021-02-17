@@ -21,8 +21,8 @@ import kotlin.jvm.JvmName
   DeprecationLevel.WARNING
 )
 fun <K, A> empty(): Map<K, A> = arrow.core.extensions.map.align.Map
-   .align<K>()
-   .empty<A>() as kotlin.collections.Map<K, A>
+  .align<K>()
+  .empty<A>() as kotlin.collections.Map<K, A>
 
 /**
  * cached extension
@@ -36,4 +36,5 @@ object Map {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Align typeclasses is deprecated. Use concrete methods on Map")
-  inline fun <K> align(): MapKAlign<K> = align_singleton as arrow.core.extensions.MapKAlign<K>}
+  inline fun <K> align(): MapKAlign<K> = align_singleton as arrow.core.extensions.MapKAlign<K>
+}

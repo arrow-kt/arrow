@@ -35,10 +35,13 @@ interface SerializerDivisible : Divisible<ForSerializer>, SerializerDivide {
 interface SerializerDecidable : Decidable<ForSerializer>, SerializerDivisible {
   override fun <A, B, Z> choose(fa: Kind<ForSerializer, A>, fb: Kind<ForSerializer, B>, f: (Z) -> Either<A, B>): Kind<ForSerializer, Z> =
     Serializer {
-      f(it).fold({
-        "LEFT: " + fa.fix().func(it)
-      }, {
-        "RIGHT: " + fb.fix().func(it)
-      })
+      f(it).fold(
+        {
+          "LEFT: " + fa.fix().func(it)
+        },
+        {
+          "RIGHT: " + fb.fix().func(it)
+        }
+      )
     }
 }

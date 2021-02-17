@@ -232,7 +232,8 @@ object FoldableLaws {
     forAll(
       Gen.functionAToB<Boolean, Int>(Gen.intSmall()),
       Gen.functionBAToB<Boolean, Int>(Gen.intSmall()),
-      G) { f: (Boolean) -> Int, g: (Int, Boolean) -> Int, fa: Kind<F, Boolean> ->
+      G
+    ) { f: (Boolean) -> Int, g: (Int, Boolean) -> Int, fa: Kind<F, Boolean> ->
 
       val expected = fa.foldLeft(Option.empty<Int>()) { option, a ->
         when (option) {
@@ -247,7 +248,8 @@ object FoldableLaws {
     forAll(
       Gen.functionAToB<Boolean, Int>(Gen.intSmall()),
       Gen.functionABToB<Boolean, Eval<Int>>(Gen.intSmall().eval()),
-      G) { f: (Boolean) -> Int, g: (Boolean, Eval<Int>) -> Eval<Int>, fa: Kind<F, Boolean> ->
+      G
+    ) { f: (Boolean) -> Int, g: (Boolean, Eval<Int>) -> Eval<Int>, fa: Kind<F, Boolean> ->
 
       val expected = fa.foldRight(Eval.Now<Option<Int>>(Option.empty())) { a: Boolean, lb: Eval<Option<Int>> ->
         lb.flatMap { option ->
@@ -315,15 +317,16 @@ object FoldableLaws {
   fun <F> Foldable<F>.`get gets the item at the given index of the Foldable`(G: Gen<Kind<F, Int>>, EQ: Eq<Option<Int>>) =
     forAll(Gen.intSmall(), G) { index, fa: Kind<F, Int> ->
       val idx = index.toLong()
-      val expected = if (idx < 0L)
+      val expected = if (idx < 0L) {
         None
-      else
+      } else {
         fa.foldLeft<Int, Either<Int, Long>>(0L.right()) { i, a ->
           i.flatMap {
             if (it == idx) Left(a)
             else Right(it + 1L)
           }
         }.swap().toOption()
+      }
       fa.get(idx).equalUnderTheLaw(expected, EQ)
     }
 

@@ -1033,7 +1033,7 @@ fun <A, B, C, D, E> tupled(
 ): Const<A, Tuple5<A, B, C, D, E>> = arrow.core.Const
   .apply<A>(MA)
   .tupled<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.Const<A, arrow.core.Tuple5<A,
-  B, C, D, E>>
+    B, C, D, E>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1060,7 +1060,7 @@ fun <A, B, C, D, E> tupledN(
 ): Const<A, Tuple5<A, B, C, D, E>> = arrow.core.Const
   .apply<A>(MA)
   .tupledN<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.Const<A, arrow.core.Tuple5<A,
-  B, C, D, E>>
+    B, C, D, E>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1409,8 +1409,8 @@ fun <A, B> Kind<Kind<ForConst, A>, A>.followedBy(
 )
 fun <A, B> Kind<Kind<ForConst, A>, A>.apTap(MA: Monoid<A>, arg1: Kind<Kind<ForConst, A>, B>):
   Const<A, A> = arrow.core.Const.apply<A>(MA).run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.Const<A, A>
-}
+    this@apTap.apTap<A, B>(arg1) as arrow.core.Const<A, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

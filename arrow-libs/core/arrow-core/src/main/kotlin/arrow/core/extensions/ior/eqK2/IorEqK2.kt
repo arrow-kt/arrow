@@ -46,8 +46,8 @@ fun <A, B> Kind<Kind<ForIor, A>, B>.eqK(
   level = DeprecationLevel.WARNING
 )
 fun <A, B> liftEq(arg0: Eq<A>, arg1: Eq<B>): Eq<Kind<Kind<ForIor, A>, B>> = arrow.core.Ior
-   .eqK2()
-   .liftEq<A, B>(arg0, arg1) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>,
+  .eqK2()
+  .liftEq<A, B>(arg0, arg1) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>,
     B>>
 
 @Suppress(

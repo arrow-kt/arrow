@@ -25,9 +25,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("This method results in StackOverflow")
 fun <A> List<A>.some(): List<SequenceK<A>> =
-    arrow.core.extensions.list.alternative.List.alternative().run {
-  arrow.core.ListK(this@some).some<A>() as kotlin.collections.List<arrow.core.SequenceK<A>>
-}
+  arrow.core.extensions.list.alternative.List.alternative().run {
+    arrow.core.ListK(this@some).some<A>() as kotlin.collections.List<arrow.core.SequenceK<A>>
+  }
 
 @JvmName("many")
 @Suppress(

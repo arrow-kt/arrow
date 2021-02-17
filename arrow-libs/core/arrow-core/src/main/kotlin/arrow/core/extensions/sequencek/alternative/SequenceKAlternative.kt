@@ -12,7 +12,7 @@ import arrow.core.extensions.SequenceKAlternative
  */
 @PublishedApi()
 internal val alternative_singleton: SequenceKAlternative = object :
-    arrow.core.extensions.SequenceKAlternative {}
+  arrow.core.extensions.SequenceKAlternative {}
 
 @JvmName("some")
 @Suppress(
@@ -30,9 +30,9 @@ internal val alternative_singleton: SequenceKAlternative = object :
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
-    arrow.core.SequenceK.alternative().run {
-  this@some.some<A>() as arrow.core.SequenceK<arrow.core.SequenceK<A>>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@some.some<A>() as arrow.core.SequenceK<arrow.core.SequenceK<A>>
+  }
 
 @JvmName("many")
 @Suppress(
@@ -50,9 +50,9 @@ fun <A> Kind<ForSequenceK, A>.some(): SequenceK<SequenceK<A>> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.many(): SequenceK<SequenceK<A>> =
-    arrow.core.SequenceK.alternative().run {
-  this@many.many<A>() as arrow.core.SequenceK<arrow.core.SequenceK<A>>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@many.many<A>() as arrow.core.SequenceK<arrow.core.SequenceK<A>>
+  }
 
 @JvmName("alt")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A> Kind<ForSequenceK, A>.many(): SequenceK<SequenceK<A>> =
   DeprecationLevel.WARNING
 )
 infix fun <A> Kind<ForSequenceK, A>.alt(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.alternative().run {
-  this@alt.alt<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@alt.alt<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("orElse")
 @Suppress(
@@ -88,9 +88,9 @@ infix fun <A> Kind<ForSequenceK, A>.alt(arg1: Kind<ForSequenceK, A>): SequenceK<
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.orElse(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.alternative().run {
-  this@orElse.orElse<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@orElse.orElse<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("combineK")
 @Suppress(
@@ -107,9 +107,9 @@ fun <A> Kind<ForSequenceK, A>.orElse(arg1: Kind<ForSequenceK, A>): SequenceK<A> 
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.alternative().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("optional")
 @Suppress(
@@ -122,14 +122,15 @@ fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.map(::Some) + sequenceOf(None)",
-    "arrow.core.None", "arrow.core.Some"
+    "arrow.core.None",
+    "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.optional(): SequenceK<Option<A>> =
-    arrow.core.SequenceK.alternative().run {
-  this@optional.optional<A>() as arrow.core.SequenceK<arrow.core.Option<A>>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@optional.optional<A>() as arrow.core.SequenceK<arrow.core.Option<A>>
+  }
 
 @JvmName("guard")
 @Suppress(
@@ -146,8 +147,8 @@ fun <A> Kind<ForSequenceK, A>.optional(): SequenceK<Option<A>> =
   DeprecationLevel.WARNING
 )
 fun guard(arg0: Boolean): SequenceK<Unit> = arrow.core.SequenceK
-   .alternative()
-   .guard(arg0) as arrow.core.SequenceK<kotlin.Unit>
+  .alternative()
+  .guard(arg0) as arrow.core.SequenceK<kotlin.Unit>
 
 @JvmName("lazyOrElse")
 @Suppress(
@@ -164,9 +165,9 @@ fun guard(arg0: Boolean): SequenceK<Unit> = arrow.core.SequenceK
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.lazyOrElse(arg1: Function0<Kind<ForSequenceK, A>>): SequenceK<A> =
-    arrow.core.SequenceK.alternative().run {
-  this@lazyOrElse.lazyOrElse<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.alternative().run {
+    this@lazyOrElse.lazyOrElse<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

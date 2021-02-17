@@ -37,8 +37,8 @@ fun <A> Collection<ListK<A>>.combineAll(): ListK<A> = arrow.core.ListK.monoid<A>
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.fold(emptyList()) { acc, l -> acc + l }"))
 fun <A> combineAll(arg0: List<ListK<A>>): ListK<A> = arrow.core.ListK
-   .monoid<A>()
-   .combineAll(arg0) as arrow.core.ListK<A>
+  .monoid<A>()
+  .combineAll(arg0) as arrow.core.ListK<A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -46,4 +46,4 @@ fun <A> combineAll(arg0: List<ListK<A>>): ListK<A> = arrow.core.ListK
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("Monoid.list<A>()", "arrow.core.list", "arrow.core.Monoid"))
 inline fun <A> Companion.monoid(): ListKMonoid<A> = monoid_singleton as
-    arrow.core.extensions.ListKMonoid<A>
+  arrow.core.extensions.ListKMonoid<A>

@@ -12,7 +12,7 @@ import arrow.typeclasses.Semigroup
  */
 @PublishedApi()
 internal val semigroupK_singleton: OptionSemigroupK = object :
-    arrow.core.extensions.OptionSemigroupK {}
+  arrow.core.extensions.OptionSemigroupK {}
 
 @JvmName("combineK")
 @Suppress(
@@ -30,9 +30,9 @@ internal val semigroupK_singleton: OptionSemigroupK = object :
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.combineK(arg1: Kind<ForOption, A>): Option<A> =
-    arrow.core.Option.semigroupK().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.semigroupK().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -44,14 +44,15 @@ fun <A> Kind<ForOption, A>.combineK(arg1: Kind<ForOption, A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Semigroup.option<A>()",
-  "arrow.core.option", "arrow.typeclasses.Semigroup"
+    "Semigroup.option<A>()",
+    "arrow.core.option",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Semigroup<Kind<ForOption, A>> = arrow.core.Option
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForOption, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForOption, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -24,4 +24,4 @@ fun <A> NonEmptyList<A>.hash(HA: Hash<A>): Int = arrow.core.NonEmptyList.hash<A>
 )
 @Deprecated(HashDeprecation)
 inline fun <A> Companion.hash(HA: Hash<A>): NonEmptyListHash<A> = object :
-    arrow.core.extensions.NonEmptyListHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }
+  arrow.core.extensions.NonEmptyListHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

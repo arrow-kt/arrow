@@ -29,7 +29,8 @@ object MonadFilterLaws {
       Law("MonadFilter Laws: Right Empty") { MF.monadFilterRightEmpty(GEN, EQ) },
       Law("MonadFilter Laws: Consistency") { MF.monadFilterConsistency(GEN, EQ) },
       Law("MonadFilter Laws: Comprehension Guards") { MF.monadFilterEmptyComprehensions(EQ) },
-      Law("MonadFilter Laws: Comprehension bindWithFilter Guards") { MF.monadFilterBindWithFilterComprehensions(GEN, EQ) })
+      Law("MonadFilter Laws: Comprehension bindWithFilter Guards") { MF.monadFilterBindWithFilterComprehensions(GEN, EQ) }
+    )
   }
 
   fun <F> laws(

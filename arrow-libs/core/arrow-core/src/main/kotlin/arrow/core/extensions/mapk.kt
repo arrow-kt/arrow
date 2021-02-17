@@ -155,7 +155,8 @@ interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
         v.fold(
           { a -> ls.plus(k to a) toT rs },
           { b -> ls toT rs.plus(k to b) },
-          { a, b -> ls.plus(k to a) toT rs.plus(k to b) })
+          { a, b -> ls.plus(k to a) toT rs.plus(k to b) }
+        )
       }.bimap({ it.k() }, { it.k() })
     }
 }

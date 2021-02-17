@@ -52,7 +52,7 @@ inline fun <A, B, C, D, E, F, G> Companion.eq(
   EQF: Eq<F>,
   EQG: Eq<G>
 ): Tuple7Eq<A, B, C, D, E, F, G> = object : arrow.core.extensions.Tuple7Eq<A, B, C, D, E, F, G> {
-    override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
 
   override fun EQB(): arrow.typeclasses.Eq<B> = EQB
 
@@ -64,4 +64,5 @@ inline fun <A, B, C, D, E, F, G> Companion.eq(
 
   override fun EQF(): arrow.typeclasses.Eq<F> = EQF
 
-  override fun EQG(): arrow.typeclasses.Eq<G> = EQG }
+  override fun EQG(): arrow.typeclasses.Eq<G> = EQG
+}

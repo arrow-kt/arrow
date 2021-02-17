@@ -9,30 +9,30 @@ import io.kotlintest.shouldBe
 object SemiringLaws {
 
   fun <F> laws(SG: Semiring<F>, GEN: Gen<F>, EQ: Eq<F>): List<Law> =
-      listOf(
-        Law("Semiring: Additive commutativity") { SG.semiringAdditiveCommutativity(GEN, EQ) },
-        Law("Semiring: Additive left identity") { SG.semiringAdditiveLeftIdentity(GEN, EQ) },
-        Law("Semiring: Additive right identity") { SG.semiringAdditiveRightIdentity(GEN, EQ) },
-        Law("Semiring: Additive associativity") { SG.semiringAdditiveAssociativity(GEN, EQ) },
-        Law("Semiring: Multiplicative commutativity") { SG.semiringMultiplicativeCommutativity(GEN, EQ) },
-        Law("Semiring: Multiplicative left identity") { SG.semiringMultiplicativeLeftIdentity(GEN, EQ) },
-        Law("Semiring: Multiplicative right identity") { SG.semiringMultiplicativeRightIdentity(GEN, EQ) },
-        Law("Semiring: Multiplicative associativity") { SG.semiringMultiplicativeAssociativity(GEN, EQ) },
-        Law("Semiring: Right distributivity") { SG.semiringRightDistributivity(GEN, EQ) },
-        Law("Semiring: Left distributivity") { SG.semiringLeftDistributivity(GEN, EQ) },
-        Law("Semiring: Multiplicative left absorption") { SG.semiringMultiplicativeLeftAbsorption(GEN, EQ) },
-        Law("Semiring: Multiplicative right absorption") { SG.semiringMultiplicativeRightAbsorption(GEN, EQ) },
-        Law("Semiring: times is derived") { SG.timesIsDerived(GEN, EQ) },
-        Law("Semiring: plus is derived") { SG.plusIsDerived(GEN, EQ) },
-        Law("Semiring: maybeCombineAddition is derived") { SG.maybeCombineAdditionIsDerived(GEN, EQ) },
-        Law("Semiring: maybeCombineAddition left null") { SG.maybeCombineAdditionLeftNull(GEN, EQ) },
-        Law("Semiring: maybeCombineAddition right null") { SG.maybeCombineAdditionRightNull(GEN, EQ) },
-        Law("Semiring: maybeCombineAddition both null") { SG.maybeCombineAdditionBothNull(EQ) },
-        Law("Semiring: maybeCombineMultiplicate is derived") { SG.maybeCombineMultiplicateIsDerived(GEN, EQ) },
-        Law("Semiring: maybeCombineMultiplicate left null") { SG.maybeCombineMultiplicateLeftNull(GEN, EQ) },
-        Law("Semiring: maybeCombineMultiplicate right null") { SG.maybeCombineMultiplicateRightNull(GEN, EQ) },
-        Law("Semiring: maybeCombineMultiplicate both null") { SG.maybeCombineMultiplicateBothNull(EQ) }
-      )
+    listOf(
+      Law("Semiring: Additive commutativity") { SG.semiringAdditiveCommutativity(GEN, EQ) },
+      Law("Semiring: Additive left identity") { SG.semiringAdditiveLeftIdentity(GEN, EQ) },
+      Law("Semiring: Additive right identity") { SG.semiringAdditiveRightIdentity(GEN, EQ) },
+      Law("Semiring: Additive associativity") { SG.semiringAdditiveAssociativity(GEN, EQ) },
+      Law("Semiring: Multiplicative commutativity") { SG.semiringMultiplicativeCommutativity(GEN, EQ) },
+      Law("Semiring: Multiplicative left identity") { SG.semiringMultiplicativeLeftIdentity(GEN, EQ) },
+      Law("Semiring: Multiplicative right identity") { SG.semiringMultiplicativeRightIdentity(GEN, EQ) },
+      Law("Semiring: Multiplicative associativity") { SG.semiringMultiplicativeAssociativity(GEN, EQ) },
+      Law("Semiring: Right distributivity") { SG.semiringRightDistributivity(GEN, EQ) },
+      Law("Semiring: Left distributivity") { SG.semiringLeftDistributivity(GEN, EQ) },
+      Law("Semiring: Multiplicative left absorption") { SG.semiringMultiplicativeLeftAbsorption(GEN, EQ) },
+      Law("Semiring: Multiplicative right absorption") { SG.semiringMultiplicativeRightAbsorption(GEN, EQ) },
+      Law("Semiring: times is derived") { SG.timesIsDerived(GEN, EQ) },
+      Law("Semiring: plus is derived") { SG.plusIsDerived(GEN, EQ) },
+      Law("Semiring: maybeCombineAddition is derived") { SG.maybeCombineAdditionIsDerived(GEN, EQ) },
+      Law("Semiring: maybeCombineAddition left null") { SG.maybeCombineAdditionLeftNull(GEN, EQ) },
+      Law("Semiring: maybeCombineAddition right null") { SG.maybeCombineAdditionRightNull(GEN, EQ) },
+      Law("Semiring: maybeCombineAddition both null") { SG.maybeCombineAdditionBothNull(EQ) },
+      Law("Semiring: maybeCombineMultiplicate is derived") { SG.maybeCombineMultiplicateIsDerived(GEN, EQ) },
+      Law("Semiring: maybeCombineMultiplicate left null") { SG.maybeCombineMultiplicateLeftNull(GEN, EQ) },
+      Law("Semiring: maybeCombineMultiplicate right null") { SG.maybeCombineMultiplicateRightNull(GEN, EQ) },
+      Law("Semiring: maybeCombineMultiplicate both null") { SG.maybeCombineMultiplicateBothNull(EQ) }
+    )
 
   // a + b = b + a
   fun <F> Semiring<F>.semiringAdditiveCommutativity(GEN: Gen<F>, EQ: Eq<F>) =

@@ -44,15 +44,15 @@ fun <A, B> unalign(arg0: Kind<ForOption, Ior<A, B>>): Tuple2<Kind<ForOption, A>,
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.unalign(arg1)",
-  "arrow.core.unalign"
+    "arg0.unalign(arg1)",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C> unalignWith(arg0: Kind<ForOption, C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> = arrow.core.Option
-   .unalign()
-   .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
+  Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> = arrow.core.Option
+    .unalign()
+    .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
     arrow.Kind<arrow.core.ForOption, B>>
 
 @Suppress(

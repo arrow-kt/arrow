@@ -12,6 +12,7 @@ import arrow.typeclasses.Show
   level = DeprecationLevel.WARNING
 )
 class ForOption private constructor() { companion object }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -516,10 +517,11 @@ sealed class Option<out A> : OptionOf<A> {
       j: Option<J>,
       map: (A, B, C, D, E, F, G, H, I, J) -> K
     ): Option<K> =
-      if (a is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some)
+      if (a is Some && b is Some && c is Some && d is Some && e is Some && f is Some && g is Some && h is Some && i is Some && j is Some) {
         Some(map(a.t, b.t, c.t, d.t, e.t, f.t, g.t, h.t, i.t, j.t))
-      else
+      } else {
         None
+      }
   }
 
   /**
@@ -950,9 +952,9 @@ sealed class Option<out A> : OptionOf<A> {
   )
 
   override fun toString(): String = fold(
-      { "Option.None" },
-      { "Option.Some($it)" }
-    )
+    { "Option.None" },
+    { "Option.Some($it)" }
+  )
 }
 
 object None : Option<Nothing>() {
@@ -1029,10 +1031,12 @@ fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
   branch(f.fix(), Some(::identity))
 
 fun <A, B, C> Option<Either<A, B>>.branch(fa: Option<(A) -> C>, fb: Option<(B) -> C>): Option<C> =
-  flatMap { it.fold(
-    { a -> Some(a).ap(fa) },
-    { b -> Some(b).ap(fb) }
-  )}
+  flatMap {
+    it.fold(
+      { a -> Some(a).ap(fa) },
+      { b -> Some(b).ap(fb) }
+    )
+  }
 
 private fun Option<Boolean>.selector(): Option<Either<Unit, Unit>> =
   map { bool -> if (bool) Either.right(Unit) else Either.left(Unit) }
@@ -1050,7 +1054,8 @@ fun Option<Boolean>.andS(f: Option<Boolean>): Option<Boolean> =
   ifS(f, Some(false))
 
 fun <A> Option<A>.combineAll(MA: Monoid<A>): A = MA.run {
-  foldLeft(empty()) { acc, a -> acc.combine(a) } }
+  foldLeft(empty()) { acc, a -> acc.combine(a) }
+}
 
 inline fun <A> Option<A>.ensure(error: () -> Unit, predicate: (A) -> Boolean): Option<A> =
   when (this) {
@@ -1098,10 +1103,12 @@ inline fun <A> Option<Boolean>.ifM(ifTrue: () -> Option<A>, ifFalse: () -> Optio
   flatMap { if (it) ifTrue() else ifFalse() }
 
 fun <A, B> Option<Either<A, B>>.selectM(f: Option<(A) -> B>): Option<B> =
-  flatMap { it.fold(
-    { a -> Some(a).ap(f) },
-    { b -> Some(b) }
-  )}
+  flatMap {
+    it.fold(
+      { a -> Some(a).ap(f) },
+      { b -> Some(b) }
+    )
+  }
 
 inline fun <A, B> Option<A>.redeem(fe: (Unit) -> B, fb: (A) -> B): Option<B> =
   map(fb).handleError(fe)
@@ -1111,15 +1118,18 @@ inline fun <A, B> Option<A>.redeemWith(fe: (Unit) -> Option<B>, fb: (A) -> Optio
 
 fun <A> Option<A>.replicate(n: Int, MA: Monoid<A>): Option<A> = MA.run {
   if (n <= 0) Some(empty())
-  else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }}
+  else map { a -> List(n) { a }.fold(empty()) { acc, v -> acc + v } }
+}
 
 fun <A> Option<Either<Unit, A>>.rethrow(): Option<A> =
   flatMap { it.fold({ None }, { a -> Some(a) }) }
 
 fun <A> Option<A>.salign(SA: Semigroup<A>, b: Option<A>): Option<A> =
-  align(b) { it.fold(::identity, ::identity) { a, b ->
-    SA.run { a.combine(b) }
-  }}
+  align(b) {
+    it.fold(::identity, ::identity) { a, b ->
+      SA.run { a.combine(b) }
+    }
+  }
 
 /**
  * Separate the inner [Either] value into the [Either.Left] and [Either.Right].
@@ -1263,5 +1273,7 @@ private class OptionSemigroup<A>(
 
 operator fun <A : Comparable<A>> Option<A>.compareTo(other: Option<A>): Int = fold(
   { other.fold({ 0 }, { -1 }) },
-  { a1 -> other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
-  })
+  { a1 ->
+    other.fold({ 1 }, { a2 -> a1.compareTo(a2) })
+  }
+)

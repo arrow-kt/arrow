@@ -43,9 +43,11 @@ object SelectiveLaws {
     }
 
   fun <F> Selective<F>.distributivity(GK: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.either(Gen.int(), Gen.int()).applicative(this),
+    forAll(
+      Gen.either(Gen.int(), Gen.int()).applicative(this),
       GK.genK(Gen.functionAToB<Int, Int>(Gen.int())),
-      GK.genK(Gen.functionAToB<Int, Int>(Gen.int()))) { fe, f, g ->
+      GK.genK(Gen.functionAToB<Int, Int>(Gen.int()))
+    ) { fe, f, g ->
       fe.select(f.apTap(g)).equalUnderTheLaw(fe.select(f).apTap(fe.select(g)), EQ)
     }
 
@@ -58,13 +60,17 @@ object SelectiveLaws {
       x.select(y.select(z)).equalUnderTheLaw(
         x.map { it.map(::Right) }
           .select(y.map { e -> { a: Int -> e.bimap({ a toT it }, { it(a) }) } })
-          .select(z.map { f -> { t: Tuple2<Int, Int> -> f(t.a)(t.b) } }), EQ)
+          .select(z.map { f -> { t: Tuple2<Int, Int> -> f(t.a)(t.b) } }),
+        EQ
+      )
     }
 
   fun <F> Selective<F>.branch(GK: GenK<F>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(GK.genK(Gen.functionAToB<Double, Int>(Gen.int())),
+    forAll(
+      GK.genK(Gen.functionAToB<Double, Int>(Gen.int())),
       GK.genK(Gen.functionAToB<Float, Int>(Gen.int())),
-      Gen.either(Gen.double(), Gen.float())) { fl, fr, either ->
+      Gen.either(Gen.double(), Gen.float())
+    ) { fl, fr, either ->
       either.fold(
         { l -> just(either).branch(fl, fr).equalUnderTheLaw(fl.map { ff -> ff(l) }, EQ) },
         { r -> just(either).branch(fl, fr).equalUnderTheLaw(fr.map { ff -> ff(r) }, EQ) }

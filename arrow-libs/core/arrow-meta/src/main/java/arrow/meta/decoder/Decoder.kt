@@ -178,9 +178,11 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun TypeName.TypeVariable.lyrics(): TypeVariableName {
     val bounds = bounds.map { it.lyrics() }
 
-    return (if (bounds.isNotEmpty()) TypeVariableName(this.name, *bounds.toTypedArray(), variance = variance?.lyrics())
-    else TypeVariableName(this.name, variance?.lyrics())
-      .copy(reified = reified, nullable = nullable))
+    return (
+      if (bounds.isNotEmpty()) TypeVariableName(this.name, *bounds.toTypedArray(), variance = variance?.lyrics())
+      else TypeVariableName(this.name, variance?.lyrics())
+        .copy(reified = reified, nullable = nullable)
+      )
   }
 
   fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
@@ -242,17 +244,21 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
-    else Code(list.joinToString(",·") {
-      f(it).toString()
-    })
+    else Code(
+      list.joinToString(",·") {
+        f(it).toString()
+      }
+    )
   }
 
   fun Iterable<Func>.code(dummy: Unit = Unit): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
-    else Code(list.joinToString("\n\n  ") {
-      it.lyrics().toString()
-    })
+    else Code(
+      list.joinToString("\n\n  ") {
+        it.lyrics().toString()
+      }
+    )
   }
 
   operator fun Iterable<TypeName.TypeVariable>.unaryPlus(): Code {

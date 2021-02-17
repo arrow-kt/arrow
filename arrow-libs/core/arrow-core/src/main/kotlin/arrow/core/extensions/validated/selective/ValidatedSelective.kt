@@ -103,7 +103,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.orS(
 fun <E, A> Kind<Kind<ForValidated, E>, Boolean>.andS(
   SE: Semigroup<E>,
   arg1: Kind<Kind<ForValidated,
-    E>, Boolean>
+      E>, Boolean>
 ): Validated<E, Boolean> =
   fix().andS(arg1.fix())
 

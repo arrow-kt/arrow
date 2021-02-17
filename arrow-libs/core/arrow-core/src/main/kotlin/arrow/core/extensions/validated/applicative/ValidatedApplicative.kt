@@ -48,7 +48,7 @@ fun <E> unit(SE: Semigroup<E>): Validated<E, Unit> =
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.map(SE: Semigroup<E>, arg1: Function1<A, B>):
-    Validated<E, B> = fix().map(arg1)
+  Validated<E, B> = fix().map(arg1)
 
 @JvmName("replicate")
 @Suppress(
@@ -81,5 +81,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.replicate(
 )
 @Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")
 inline fun <E> Companion.applicative(SE: Semigroup<E>): ValidatedApplicative<E> = object :
-    arrow.core.extensions.ValidatedApplicative<E> { override fun SE():
-    arrow.typeclasses.Semigroup<E> = SE }
+  arrow.core.extensions.ValidatedApplicative<E> {
+  override fun SE():
+    arrow.typeclasses.Semigroup<E> = SE
+}

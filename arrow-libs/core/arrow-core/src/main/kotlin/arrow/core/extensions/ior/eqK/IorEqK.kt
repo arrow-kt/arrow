@@ -40,8 +40,8 @@ fun <A> Kind<Kind<ForIor, A>, A>.eqK(
   level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(EQA: Eq<A>, arg0: Eq<A>): Eq<Kind<Kind<ForIor, A>, A>> = arrow.core.Ior
-   .eqK<A>(EQA)
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>, A>>
+  .eqK<A>(EQA)
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>, A>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -52,4 +52,5 @@ fun <A> liftEq(EQA: Eq<A>, arg0: Eq<A>): Eq<Kind<Kind<ForIor, A>, A>> = arrow.co
   level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.eqK(EQA: Eq<A>): IorEqK<A> = object : arrow.core.extensions.IorEqK<A> {
-    override fun EQA(): arrow.typeclasses.Eq<A> = EQA }
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+}

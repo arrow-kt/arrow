@@ -20,15 +20,15 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(MB)",
-  "arrow.core.combineAll"
+    "combineAll(MB)",
+    "arrow.core.combineAll"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Collection<AndThen<A, B>>.combineAll(MB: Monoid<B>): AndThen<A, B> =
-    arrow.core.AndThen.monoid<A, B>(MB).run {
-  this@combineAll.combineAll() as arrow.core.AndThen<A, B>
-}
+  arrow.core.AndThen.monoid<A, B>(MB).run {
+    this@combineAll.combineAll() as arrow.core.AndThen<A, B>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -40,19 +40,20 @@ fun <A, B> Collection<AndThen<A, B>>.combineAll(MB: Monoid<B>): AndThen<A, B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combineAll(MB, arg0)",
-  "arrow.core.AndThen.combineAll"
+    "combineAll(MB, arg0)",
+    "arrow.core.AndThen.combineAll"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> combineAll(MB: Monoid<B>, arg0: List<AndThen<A, B>>): AndThen<A, B> = arrow.core.AndThen
-   .monoid<A, B>(MB)
-   .combineAll(arg0) as arrow.core.AndThen<A, B>
+  .monoid<A, B>(MB)
+  .combineAll(arg0) as arrow.core.AndThen<A, B>
 
 @Suppress(
   "UNCHECKED_CAST",
   "NOTHING_TO_INLINE"
 )
 inline fun <A, B> Companion.monoid(MB: Monoid<B>): AndThenMonoid<A, B> = object :
-    arrow.core.extensions.AndThenMonoid<A, B> { override fun MB(): arrow.typeclasses.Monoid<B> = MB
-    }
+  arrow.core.extensions.AndThenMonoid<A, B> {
+  override fun MB(): arrow.typeclasses.Monoid<B> = MB
+}

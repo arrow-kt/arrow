@@ -43,7 +43,7 @@ fun <A, B> Kind<Kind<ForEither, A>, B>.eqK(
 fun <A, B> liftEq(arg0: Eq<A>, arg1: Eq<B>): Eq<Kind<Kind<ForEither, A>, B>> = arrow.core.Either
   .eqK2()
   .liftEq<A, B>(arg0, arg1) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForEither, A>,
-  B>>
+    B>>
 
 @Suppress(
   "UNCHECKED_CAST",

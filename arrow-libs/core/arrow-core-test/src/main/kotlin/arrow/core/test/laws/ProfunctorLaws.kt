@@ -14,7 +14,6 @@ import io.kotlintest.properties.forAll
 object ProfunctorLaws {
 
   fun <F> laws(PF: Profunctor<F>, GENK: GenK2<F>, EQK: EqK2<F>): List<Law> {
-
     val G = GENK.genK(Gen.int(), Gen.int())
     val EQ = EQK.liftEq(Int.eq(), Int.eq())
 
@@ -25,7 +24,7 @@ object ProfunctorLaws {
       Law("Profunctor Laws: Rmap Identity") { PF.rMapIdentity(G, EQ) },
       Law("Profunctor Laws: Lmap Composition") { PF.lMapComposition(G, EQ) },
       Law("Profunctor Laws: Rmap Composition") { PF.rMapComposition(G, EQ) }
-      )
+    )
   }
 
   fun <F> Profunctor<F>.identity(f: Gen<Kind2<F, Int, Int>>, EQ: Eq<Kind2<F, Int, Int>>): Unit =

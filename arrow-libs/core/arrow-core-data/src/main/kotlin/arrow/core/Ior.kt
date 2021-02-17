@@ -10,23 +10,26 @@ import arrow.typeclasses.Show
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)class ForIor private constructor() {
+) class ForIor private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias IorOf<A, B> = arrow.Kind2<ForIor, A, B>
+) typealias IorOf<A, B> = arrow.Kind2<ForIor, A, B>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias IorPartialOf<A> = arrow.Kind<ForIor, A>
+) typealias IorPartialOf<A> = arrow.Kind<ForIor, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline fun <A, B> IorOf<A, B>.fix(): Ior<A, B> =
+)inline
+fun <A, B> IorOf<A, B>.fix(): Ior<A, B> =
   this as Ior<A, B>
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
@@ -1084,6 +1087,7 @@ operator fun <A : Comparable<A>, B : Comparable<B>> Ior<A, B>.compareTo(other: I
     other.fold(
       { 1 },
       { 1 },
-      { a2, b2 -> if (a1.compareTo(a2) == 0) b1.compareTo(b2) else a1.compareTo(a2) })
+      { a2, b2 -> if (a1.compareTo(a2) == 0) b1.compareTo(b2) else a1.compareTo(a2) }
+    )
   }
 )

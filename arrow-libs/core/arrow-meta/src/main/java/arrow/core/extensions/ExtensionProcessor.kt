@@ -213,12 +213,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
           .copy(
             kdoc = func.kdoc?.eval(this),
             modifiers =
-            func.modifiers.filter { it == Modifier.Suspend } +
-              when {
-                allArgs.size > 1 -> emptyList()
-                func.receiverType == null -> emptyList()
-                else -> func.modifiers
-              }, // remove infix and operator mods
+              func.modifiers.filter { it == Modifier.Suspend } +
+                when {
+                  allArgs.size > 1 -> emptyList()
+                  func.receiverType == null -> emptyList()
+                  else -> func.modifiers
+                }, // remove infix and operator mods
             typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),
@@ -256,7 +256,8 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
               } else {
                 staticExtensionImpl(companionOrFactory, func, typeVars, wrappedArgs)
               }
-            })
+            }
+          )
       }
       .toList()
   }

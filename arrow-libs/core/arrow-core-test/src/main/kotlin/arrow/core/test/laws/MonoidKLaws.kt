@@ -17,9 +17,10 @@ object MonoidKLaws {
     val EQ = EQK.liftEq(Int.eq())
 
     return SemigroupKLaws.laws(SGK, GENK, EQK) + listOf(
-        Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(GEN, EQ) },
-        Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
-        Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) })
+      Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(GEN, EQ) },
+      Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(GEN, EQ) },
+      Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(GEN, EQ) }
+    )
   }
 
   fun <F> MonoidK<F>.monoidKLeftIdentity(GEN: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =

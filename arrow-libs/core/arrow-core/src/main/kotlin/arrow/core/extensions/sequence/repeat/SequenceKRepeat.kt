@@ -18,8 +18,8 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> repeat(a: A): Sequence<A> = arrow.core.extensions.sequence.repeat.Sequence
-   .repeat()
-   .repeat<A>(a) as kotlin.sequences.Sequence<A>
+  .repeat()
+  .repeat<A>(a) as kotlin.sequences.Sequence<A>
 
 /**
  * cached extension
@@ -40,4 +40,5 @@ object Sequence {
     "Repeat typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun repeat(): SequenceKRepeat = repeat_singleton}
+  inline fun repeat(): SequenceKRepeat = repeat_singleton
+}

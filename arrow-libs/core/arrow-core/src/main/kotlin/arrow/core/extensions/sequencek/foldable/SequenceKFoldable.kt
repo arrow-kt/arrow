@@ -16,7 +16,7 @@ import arrow.typeclasses.Monoid
  */
 @PublishedApi()
 internal val foldable_singleton: SequenceKFoldable = object :
-    arrow.core.extensions.SequenceKFoldable {}
+  arrow.core.extensions.SequenceKFoldable {}
 
 @JvmName("foldLeft")
 @Suppress(
@@ -33,9 +33,9 @@ internal val foldable_singleton: SequenceKFoldable = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
-    arrow.core.SequenceK.foldable().run {
-  this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
-}
+  arrow.core.SequenceK.foldable().run {
+    this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("foldRight")
 @Suppress(
@@ -53,9 +53,9 @@ fun <A, B> Kind<ForSequenceK, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B 
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval<B>>):
-    Eval<B> = arrow.core.SequenceK.foldable().run {
-  this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
-}
+  Eval<B> = arrow.core.SequenceK.foldable().run {
+    this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
+  }
 
 @JvmName("fold")
 @Suppress(
@@ -108,7 +108,8 @@ fun <A, B> Kind<ForSequenceK, A>.reduceLeftToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
-    "arrow.core.Option", "arrow.core.reduceRightEvalOrNull"
+    "arrow.core.Option",
+    "arrow.core.reduceRightEvalOrNull"
   ),
   DeprecationLevel.WARNING
 )
@@ -136,9 +137,9 @@ fun <A, B> Kind<ForSequenceK, A>.reduceRightToOption(
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
-    arrow.core.SequenceK.foldable().run {
-  this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.SequenceK.foldable().run {
+    this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("reduceRightOption")
 @Suppress(
@@ -150,15 +151,15 @@ fun <A> Kind<ForSequenceK, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "reduceRightOption(arg1)",
-  "arrow.core.reduceRightOption"
+    "reduceRightOption(arg1)",
+    "arrow.core.reduceRightOption"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
-    Eval<Option<A>> = arrow.core.SequenceK.foldable().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+  Eval<Option<A>> = arrow.core.SequenceK.foldable().run {
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -195,9 +196,9 @@ fun <A> Kind<ForSequenceK, A>.combineAll(arg1: Monoid<A>): A = arrow.core.Sequen
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
-    arrow.core.SequenceK.foldable().run {
-  this@foldMap.foldMap<A, B>(arg1, arg2) as B
-}
+  arrow.core.SequenceK.foldable().run {
+    this@foldMap.foldMap<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("orEmpty")
 @Suppress(
@@ -214,9 +215,9 @@ fun <A, B> Kind<ForSequenceK, A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>)
   DeprecationLevel.WARNING
 )
 fun <A> orEmpty(arg0: Applicative<ForSequenceK>, arg1: Monoid<A>): SequenceK<A> =
-    arrow.core.SequenceK
-   .foldable()
-   .orEmpty<A>(arg0, arg1) as arrow.core.SequenceK<A>
+  arrow.core.SequenceK
+    .foldable()
+    .orEmpty<A>(arg0, arg1) as arrow.core.SequenceK<A>
 
 @JvmName("traverse_")
 @Suppress(
@@ -230,9 +231,9 @@ fun <A> orEmpty(arg0: Applicative<ForSequenceK>, arg1: Monoid<A>): SequenceK<A> 
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForSequenceK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Unit> = arrow.core.SequenceK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+  Kind<G, Unit> = arrow.core.SequenceK.foldable().run {
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(
@@ -246,9 +247,9 @@ fun <G, A, B> Kind<ForSequenceK, A>.traverse_(arg1: Applicative<G>, arg2: Functi
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForSequenceK, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
-    arrow.core.SequenceK.foldable().run {
-  this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
-}
+  arrow.core.SequenceK.foldable().run {
+    this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("find")
 @Suppress(
@@ -266,9 +267,9 @@ fun <G, A> Kind<ForSequenceK, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.find(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.SequenceK.foldable().run {
-  this@find.find<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.SequenceK.foldable().run {
+    this@find.find<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("exists")
 @Suppress(
@@ -285,9 +286,9 @@ fun <A> Kind<ForSequenceK, A>.find(arg1: Function1<A, Boolean>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.exists(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.SequenceK.foldable().run {
-  this@exists.exists<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.foldable().run {
+    this@exists.exists<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("forAll")
 @Suppress(
@@ -304,9 +305,9 @@ fun <A> Kind<ForSequenceK, A>.exists(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.forAll(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.SequenceK.foldable().run {
-  this@forAll.forAll<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.foldable().run {
+    this@forAll.forAll<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("all")
 @Suppress(
@@ -323,9 +324,9 @@ fun <A> Kind<ForSequenceK, A>.forAll(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.all(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.SequenceK.foldable().run {
-  this@all.all<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.foldable().run {
+    this@all.all<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("isEmpty")
 @Suppress(
@@ -510,9 +511,9 @@ fun <A> Kind<ForSequenceK, A>.firstOption(): Option<A> = arrow.core.SequenceK.fo
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.SequenceK.foldable().run {
-  this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.SequenceK.foldable().run {
+    this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOrNone")
 @Suppress(
@@ -549,9 +550,9 @@ fun <A> Kind<ForSequenceK, A>.firstOrNone(): Option<A> = arrow.core.SequenceK.fo
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.SequenceK.foldable().run {
-  this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.SequenceK.foldable().run {
+    this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("toList")
 @Suppress(

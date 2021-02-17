@@ -28,4 +28,6 @@ object List {
   )
   @Deprecated(ShowDeprecation)
   inline fun <A> show(SA: Show<A>): ListKShow<A> = object : arrow.core.extensions.ListKShow<A> {
-      override fun SA(): arrow.typeclasses.Show<A> = SA }}
+    override fun SA(): arrow.typeclasses.Show<A> = SA
+  }
+}

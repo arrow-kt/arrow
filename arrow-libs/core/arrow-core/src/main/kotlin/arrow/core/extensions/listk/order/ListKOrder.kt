@@ -26,9 +26,9 @@ import kotlin.jvm.JvmName
   ReplaceWith("Ordering.fromInt(this.compareTo(arg1))", "arrow.core.compareTo", "arrow.core.Ordering")
 )
 fun <A> Kind<ForListK, A>.compare(OA: Order<A>, arg1: Kind<ForListK, A>): Ordering =
-    arrow.core.ListK.order<A>(OA).run {
-  this@compare.compare(arg1) as arrow.core.Ordering
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@compare.compare(arg1) as arrow.core.Ordering
+  }
 
 @JvmName("compareTo")
 @Suppress(
@@ -42,9 +42,9 @@ fun <A> Kind<ForListK, A>.compare(OA: Order<A>, arg1: Kind<ForListK, A>): Orderi
   ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
 )
 fun <A> Kind<ForListK, A>.compareTo(OA: Order<A>, arg1: Kind<ForListK, A>): Int =
-    arrow.core.ListK.order<A>(OA).run {
-  this@compareTo.compareTo(arg1) as kotlin.Int
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@compareTo.compareTo(arg1) as kotlin.Int
+  }
 
 @JvmName("eqv")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Kind<ForListK, A>.compareTo(OA: Order<A>, arg1: Kind<ForListK, A>): Int 
   ReplaceWith("this == arg1")
 )
 fun <A> Kind<ForListK, A>.eqv(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.order<A>(OA).run {
-  this@eqv.eqv(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@eqv.eqv(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lt")
 @Suppress(
@@ -74,9 +74,9 @@ fun <A> Kind<ForListK, A>.eqv(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   ReplaceWith("this < arg1", "arrow.core.compareTo")
 )
 fun <A> Kind<ForListK, A>.lt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.order<A>(OA).run {
-  this@lt.lt(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@lt.lt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lte")
 @Suppress(
@@ -90,9 +90,9 @@ fun <A> Kind<ForListK, A>.lt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   ReplaceWith("this <= arg1", "arrow.core.compareTo")
 )
 fun <A> Kind<ForListK, A>.lte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.order<A>(OA).run {
-  this@lte.lte(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@lte.lte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gt")
 @Suppress(
@@ -106,9 +106,9 @@ fun <A> Kind<ForListK, A>.lte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   ReplaceWith("this > arg1", "arrow.core.compareTo")
 )
 fun <A> Kind<ForListK, A>.gt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.order<A>(OA).run {
-  this@gt.gt(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@gt.gt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gte")
 @Suppress(
@@ -122,9 +122,9 @@ fun <A> Kind<ForListK, A>.gt(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   ReplaceWith("this >= arg1", "arrow.core.compareTo")
 )
 fun <A> Kind<ForListK, A>.gte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.order<A>(OA).run {
-  this@gte.gte(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@gte.gte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("max")
 @Suppress(
@@ -138,9 +138,9 @@ fun <A> Kind<ForListK, A>.gte(OA: Order<A>, arg1: Kind<ForListK, A>): Boolean =
   ReplaceWith("maxOf(this,arg1)")
 )
 fun <A> Kind<ForListK, A>.max(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.order<A>(OA).run {
-  this@max.max(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@max.max(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("min")
 @Suppress(
@@ -154,9 +154,9 @@ fun <A> Kind<ForListK, A>.max(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
   ReplaceWith("minOf(this,arg1)")
 )
 fun <A> Kind<ForListK, A>.min(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.order<A>(OA).run {
-  this@min.min(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.order<A>(OA).run {
+    this@min.min(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("sort")
 @Suppress(
@@ -170,7 +170,7 @@ fun <A> Kind<ForListK, A>.min(OA: Order<A>, arg1: Kind<ForListK, A>): ListK<A> =
   ReplaceWith("sort(this, arg1).let { (a, b) -> Tuple2(b, a) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A> Kind<ForListK, A>.sort(OA: Order<A>, arg1: Kind<ForListK, A>): Tuple2<Kind<ForListK, A>,
-    Kind<ForListK, A>> = arrow.core.ListK.order<A>(OA).run {
+  Kind<ForListK, A>> = arrow.core.ListK.order<A>(OA).run {
   this@sort.sort(arg1) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, A>>
 }
@@ -181,4 +181,4 @@ fun <A> Kind<ForListK, A>.sort(OA: Order<A>, arg1: Kind<ForListK, A>): Tuple2<Ki
 )
 @Deprecated(OrderDeprecation)
 inline fun <A> Companion.order(OA: Order<A>): ListKOrder<A> = object :
-    arrow.core.extensions.ListKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }
+  arrow.core.extensions.ListKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }

@@ -168,8 +168,8 @@ fun <A> Kind<Kind<ForConst, A>, A>.reduceLeftOption(arg1: Function2<A, A, A>): O
 )
 fun <A> Kind<Kind<ForConst, A>, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
   Eval<Option<A>> = arrow.core.Const.foldable<A>().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(

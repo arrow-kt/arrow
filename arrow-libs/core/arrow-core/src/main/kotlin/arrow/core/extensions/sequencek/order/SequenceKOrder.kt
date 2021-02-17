@@ -24,9 +24,9 @@ import kotlin.jvm.JvmName
   ReplaceWith("this.toList().compareTo(arg1.toList())", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.compareTo(OA: Order<A>, arg1: SequenceK<A>): Int =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@compareTo.compareTo(arg1) as kotlin.Int
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@compareTo.compareTo(arg1) as kotlin.Int
+  }
 
 @JvmName("eqv")
 @Suppress(
@@ -40,9 +40,9 @@ fun <A> SequenceK<A>.compareTo(OA: Order<A>, arg1: SequenceK<A>): Int =
   ReplaceWith("this.toList() == arg1.toList()")
 )
 fun <A> SequenceK<A>.eqv(OA: Order<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@eqv.eqv(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@eqv.eqv(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lt")
 @Suppress(
@@ -56,9 +56,9 @@ fun <A> SequenceK<A>.eqv(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   ReplaceWith("this.toList() < arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.lt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@lt.lt(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@lt.lt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("lte")
 @Suppress(
@@ -72,9 +72,9 @@ fun <A> SequenceK<A>.lt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   ReplaceWith("this.toList() <= arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.lte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@lte.lte(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@lte.lte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gt")
 @Suppress(
@@ -88,9 +88,9 @@ fun <A> SequenceK<A>.lte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   ReplaceWith("this.toList() > arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.gt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@gt.gt(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@gt.gt(arg1) as kotlin.Boolean
+  }
 
 @JvmName("gte")
 @Suppress(
@@ -104,9 +104,9 @@ fun <A> SequenceK<A>.gt(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   ReplaceWith("this.toList() >= arg1.toList()", "arrow.core.compareTo")
 )
 fun <A> SequenceK<A>.gte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@gte.gte(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@gte.gte(arg1) as kotlin.Boolean
+  }
 
 @JvmName("max")
 @Suppress(
@@ -120,9 +120,9 @@ fun <A> SequenceK<A>.gte(OA: Order<A>, arg1: SequenceK<A>): Boolean =
   ReplaceWith("maxOf(this.toList(), arg1.toList())")
 )
 fun <A> SequenceK<A>.max(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@max.max(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@max.max(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("min")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A> SequenceK<A>.max(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
   ReplaceWith("minOf(this.toList(), arg1.toList())")
 )
 fun <A> SequenceK<A>.min(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@min.min(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@min.min(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("sort")
 @Suppress(
@@ -152,9 +152,9 @@ fun <A> SequenceK<A>.min(OA: Order<A>, arg1: SequenceK<A>): SequenceK<A> =
   ReplaceWith("sort(this.toList(), arg1.toList()).let { (a, b) -> Tuple2(b.asSequence(), a.asSequence()) }", "arrow.core.Tuple2", "arrow.core.sort")
 )
 fun <A> SequenceK<A>.sort(OA: Order<A>, arg1: SequenceK<A>): Tuple2<SequenceK<A>, SequenceK<A>> =
-    arrow.core.SequenceK.order<A>(OA).run {
-  this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>>
-}
+  arrow.core.SequenceK.order<A>(OA).run {
+    this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -162,4 +162,4 @@ fun <A> SequenceK<A>.sort(OA: Order<A>, arg1: SequenceK<A>): Tuple2<SequenceK<A>
 )
 @Deprecated(OrderDeprecation)
 inline fun <A> Companion.order(OA: Order<A>): SequenceKOrder<A> = object :
-    arrow.core.extensions.SequenceKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }
+  arrow.core.extensions.SequenceKOrder<A> { override fun OA(): arrow.typeclasses.Order<A> = OA }

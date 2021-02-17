@@ -20,9 +20,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.unalign()", "arrow.core.unalign"))
 fun <A, B> unalign(arg0: List<Ior<A, B>>): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
-    arrow.core.extensions.list.unalign.List
-   .unalign()
-   .unalign<A, B>(arrow.core.ListK(arg0)) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
+  arrow.core.extensions.list.unalign.List
+    .unalign()
+    .unalign<A, B>(arrow.core.ListK(arg0)) as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("unalignWith")
@@ -34,10 +34,10 @@ fun <A, B> unalign(arg0: List<Ior<A, B>>): Tuple2<Kind<ForListK, A>, Kind<ForLis
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("arg0.unalign(arg1)", "arrow.core.unalign"))
 fun <A, B, C> unalignWith(arg0: List<C>, arg1: Function1<C, Ior<A, B>>): Tuple2<Kind<ForListK, A>,
-    Kind<ForListK, B>> = arrow.core.extensions.list.unalign.List
-   .unalign()
-   .unalignWith<A, B, C>(arrow.core.ListK(arg0), arg1) as
-    arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>, arrow.Kind<arrow.core.ForListK, B>>
+  Kind<ForListK, B>> = arrow.core.extensions.list.unalign.List
+  .unalign()
+  .unalignWith<A, B, C>(arrow.core.ListK(arg0), arg1) as
+  arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>, arrow.Kind<arrow.core.ForListK, B>>
 
 /**
  * cached extension
@@ -52,4 +52,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Unalign typeclasses is deprecated. Use concrete methods on Iterable")
-  inline fun unalign(): ListKUnalign = unalign_singleton}
+  inline fun unalign(): ListKUnalign = unalign_singleton
+}

@@ -11,7 +11,7 @@ import arrow.core.extensions.OptionFunctorFilter
  */
 @PublishedApi()
 internal val functorFilter_singleton: OptionFunctorFilter = object :
-    arrow.core.extensions.OptionFunctorFilter {}
+  arrow.core.extensions.OptionFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -29,9 +29,9 @@ internal val functorFilter_singleton: OptionFunctorFilter = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B> =
-    arrow.core.Option.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -49,9 +49,9 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, Option<A>>.flattenOption(): Option<A> =
-    arrow.core.Option.functorFilter().run {
-  this@flattenOption.flattenOption<A>() as arrow.core.Option<A>
-}
+  arrow.core.Option.functorFilter().run {
+    this@flattenOption.flattenOption<A>() as arrow.core.Option<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -68,9 +68,9 @@ fun <A> Kind<ForOption, Option<A>>.flattenOption(): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.Option.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -82,15 +82,15 @@ fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "filterIsInstance<B>()",
-  "arrow.core.filterIsInstance"
+    "filterIsInstance<B>()",
+    "arrow.core.filterIsInstance"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.filterIsInstance(arg1: Class<B>): Option<B> =
-    arrow.core.Option.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

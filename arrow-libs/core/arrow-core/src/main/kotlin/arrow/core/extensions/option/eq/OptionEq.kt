@@ -31,4 +31,5 @@ fun <A> Option<A>.neqv(EQ: Eq<A>, arg1: Option<A>): Boolean = arrow.core.Option.
   level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.eq(EQ: Eq<A>): OptionEq<A> = object : arrow.core.extensions.OptionEq<A> {
-    override fun EQ(): arrow.typeclasses.Eq<A> = EQ }
+  override fun EQ(): arrow.typeclasses.Eq<A> = EQ
+}

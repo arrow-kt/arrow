@@ -30,9 +30,9 @@ internal val monad_singleton: ListKMonad = object : arrow.core.extensions.ListKM
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap(arg1)"))
 fun <A, B> Kind<ForListK, A>.flatMap(arg1: Function1<A, Kind<ForListK, B>>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@flatMap.flatMap<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@flatMap.flatMap<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("tailRecM")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A, B> Kind<ForListK, A>.flatMap(arg1: Function1<A, Kind<ForListK, B>>): Lis
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("tailRecMIterable(arg0) { arg1(it) }"))
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForListK, Either<A, B>>>): ListK<B> =
-    arrow.core.ListK
-   .monad()
-   .tailRecM<A, B>(arg0, arg1) as arrow.core.ListK<B>
+  arrow.core.ListK
+    .monad()
+    .tailRecM<A, B>(arg0, arg1) as arrow.core.ListK<B>
 
 @JvmName("map")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A, B> Kind<ForListK, A>.map(arg1: Function1<A, B>): ListK<B> = arrow.core.L
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("ap(arg1)", "arrow.core.ap"))
 fun <A, B> Kind<ForListK, A>.ap(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@ap.ap<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@ap.ap<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("flatten")
 @Suppress(
@@ -96,9 +96,9 @@ fun <A> Kind<ForListK, Kind<ForListK, A>>.flatten(): ListK<A> = arrow.core.ListK
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { arg1 }"))
 fun <A, B> Kind<ForListK, A>.followedBy(arg1: Kind<ForListK, B>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@followedBy.followedBy<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@followedBy.followedBy<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -109,9 +109,9 @@ fun <A, B> Kind<ForListK, A>.followedBy(arg1: Kind<ForListK, B>): ListK<B> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }"))
 fun <A, B> Kind<ForListK, A>.apTap(arg1: Kind<ForListK, B>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@apTap.apTap<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("followedByEval")
 @Suppress(
@@ -122,9 +122,9 @@ fun <A, B> Kind<ForListK, A>.apTap(arg1: Kind<ForListK, B>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { arg1.value() }"))
 fun <A, B> Kind<ForListK, A>.followedByEval(arg1: Eval<Kind<ForListK, B>>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("effectM")
 @Suppress(
@@ -135,9 +135,9 @@ fun <A, B> Kind<ForListK, A>.followedByEval(arg1: Eval<Kind<ForListK, B>>): List
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1(a).map { a } }"))
 fun <A, B> Kind<ForListK, A>.effectM(arg1: Function1<A, Kind<ForListK, B>>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@effectM.effectM<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@effectM.effectM<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("flatTap")
 @Suppress(
@@ -148,9 +148,9 @@ fun <A, B> Kind<ForListK, A>.effectM(arg1: Function1<A, Kind<ForListK, B>>): Lis
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1(a).map { a } }"))
 fun <A, B> Kind<ForListK, A>.flatTap(arg1: Function1<A, Kind<ForListK, B>>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@flatTap.flatTap<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@flatTap.flatTap<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("productL")
 @Suppress(
@@ -161,9 +161,9 @@ fun <A, B> Kind<ForListK, A>.flatTap(arg1: Function1<A, Kind<ForListK, B>>): Lis
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }"))
 fun <A, B> Kind<ForListK, A>.productL(arg1: Kind<ForListK, B>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@productL.productL<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@productL.productL<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("forEffect")
 @Suppress(
@@ -174,9 +174,9 @@ fun <A, B> Kind<ForListK, A>.productL(arg1: Kind<ForListK, B>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.map { a } }"))
 fun <A, B> Kind<ForListK, A>.forEffect(arg1: Kind<ForListK, B>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@forEffect.forEffect<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@forEffect.forEffect<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("productLEval")
 @Suppress(
@@ -187,9 +187,9 @@ fun <A, B> Kind<ForListK, A>.forEffect(arg1: Kind<ForListK, B>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.value().map { a } }"))
 fun <A, B> Kind<ForListK, A>.productLEval(arg1: Eval<Kind<ForListK, B>>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@productLEval.productLEval<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@productLEval.productLEval<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("forEffectEval")
 @Suppress(
@@ -200,9 +200,9 @@ fun <A, B> Kind<ForListK, A>.productLEval(arg1: Eval<Kind<ForListK, B>>): ListK<
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1.value().map { a } }"))
 fun <A, B> Kind<ForListK, A>.forEffectEval(arg1: Eval<Kind<ForListK, B>>): ListK<A> =
-    arrow.core.ListK.monad().run {
-  this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monad().run {
+    this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("mproduct")
 @Suppress(
@@ -213,9 +213,9 @@ fun <A, B> Kind<ForListK, A>.forEffectEval(arg1: Eval<Kind<ForListK, B>>): ListK
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("flatMap { a -> arg1(a).map { b -> Tuple2(a, b) } }"))
 fun <A, B> Kind<ForListK, A>.mproduct(arg1: Function1<A, Kind<ForListK, B>>): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.monad().run {
-  this@mproduct.mproduct<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.monad().run {
+    this@mproduct.mproduct<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("ifM")
 @Suppress(
@@ -241,9 +241,9 @@ fun <B> Kind<ForListK, Boolean>.ifM(
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("selectM(arg1)", "arrow.core.selectM"))
 fun <A, B> Kind<ForListK, Either<A, B>>.selectM(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@selectM.selectM<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@selectM.selectM<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("select")
 @Suppress(
@@ -254,9 +254,9 @@ fun <A, B> Kind<ForListK, Either<A, B>>.selectM(arg1: Kind<ForListK, Function1<A
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("select(arg1)", "arrow.core.select"))
 fun <A, B> Kind<ForListK, Either<A, B>>.select(arg1: Kind<ForListK, Function1<A, B>>): ListK<B> =
-    arrow.core.ListK.monad().run {
-  this@select.select<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monad().run {
+    this@select.select<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 /**
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or

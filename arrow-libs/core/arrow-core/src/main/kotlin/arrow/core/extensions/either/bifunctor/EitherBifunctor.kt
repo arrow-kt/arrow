@@ -30,7 +30,7 @@ internal val bifunctor_singleton: EitherBifunctor = object : arrow.core.extensio
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("bimap(arg1, arg2)"))
 fun <A, B, C, D> Kind<Kind<ForEither, A>, B>.bimap(arg1: Function1<A, C>, arg2: Function1<B, D>):
   Either<C, D> =
-  fix().bimap(arg1, arg2)
+    fix().bimap(arg1, arg2)
 
 @JvmName("lift")
 @Suppress(
@@ -41,10 +41,10 @@ fun <A, B, C, D> Kind<Kind<ForEither, A>, B>.bimap(arg1: Function1<A, C>, arg2: 
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Either.lift(arg0, arg1)"))
 fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<Kind<Kind<ForEither,
-  A>, B>, Kind<Kind<ForEither, C>, D>> = arrow.core.Either
+      A>, B>, Kind<Kind<ForEither, C>, D>> = arrow.core.Either
   .bifunctor()
   .lift<A, B, C, D>(arg0, arg1) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForEither, A>,
-  B>, arrow.Kind<arrow.Kind<arrow.core.ForEither, C>, D>>
+    B>, arrow.Kind<arrow.Kind<arrow.core.ForEither, C>, D>>
 
 @JvmName("mapLeft")
 @Suppress(
@@ -80,7 +80,7 @@ fun <X> rightFunctor(): Functor<Kind<ForEither, X>> = arrow.core.Either
 fun <X> leftFunctor(): Functor<Conested<ForEither, X>> = arrow.core.Either
   .bifunctor()
   .leftFunctor<X>() as arrow.typeclasses.Functor<arrow.typeclasses.Conested<arrow.core.ForEither,
-  X>>
+    X>>
 
 @JvmName("leftWiden")
 @Suppress(

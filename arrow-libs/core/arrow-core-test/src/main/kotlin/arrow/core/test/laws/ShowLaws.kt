@@ -14,9 +14,10 @@ object ShowLaws {
 
   fun <F> Show<F>.equalShow(EQ: Eq<F>, GEN: Gen<F>): Unit =
     forAll(GEN, GEN) { a, b ->
-      if (EQ.run { a.eqv(b) })
+      if (EQ.run { a.eqv(b) }) {
         a.show() == b.show()
-      else
+      } else {
         true
+      }
     }
 }

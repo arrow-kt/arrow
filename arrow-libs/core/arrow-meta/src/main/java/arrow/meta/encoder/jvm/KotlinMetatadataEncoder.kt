@@ -125,7 +125,6 @@ interface KotlinMetatadataEncoder {
     outputTypeAlias: Boolean = true,
     throwOnGeneric: Throwable? = null
   ): String {
-
     if (!hasClassName() && throwOnGeneric != null) throw throwOnGeneric
 
     val typeParam = getTypeParameter(typeParameter)

@@ -12,7 +12,7 @@ import arrow.typeclasses.Applicative
  */
 @PublishedApi()
 internal val traverseFilter_singleton: OptionTraverseFilter = object :
-    arrow.core.extensions.OptionTraverseFilter {}
+  arrow.core.extensions.OptionTraverseFilter {}
 
 @JvmName("traverseFilter")
 @Suppress(
@@ -49,9 +49,9 @@ fun <G, A, B> Kind<ForOption, A>.traverseFilter(
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B> =
-    arrow.core.Option.traverseFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.traverseFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("filterA")
 @Suppress(
@@ -65,9 +65,9 @@ fun <A, B> Kind<ForOption, A>.filterMap(arg1: Function1<A, Option<B>>): Option<B
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForOption, A>.filterA(arg1: Function1<A, Kind<G, Boolean>>, arg2: Applicative<G>):
-    Kind<G, Kind<ForOption, A>> = arrow.core.Option.traverseFilter().run {
-  this@filterA.filterA<G, A>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, A>>
-}
+  Kind<G, Kind<ForOption, A>> = arrow.core.Option.traverseFilter().run {
+    this@filterA.filterA<G, A>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, A>>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -84,9 +84,9 @@ fun <G, A> Kind<ForOption, A>.filterA(arg1: Function1<A, Kind<G, Boolean>>, arg2
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.Option.traverseFilter().run {
-  this@filter.filter<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.traverseFilter().run {
+    this@filter.filter<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("traverseFilterIsInstance")
 @Suppress(
@@ -100,10 +100,10 @@ fun <A> Kind<ForOption, A>.filter(arg1: Function1<A, Boolean>): Option<A> =
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForOption, A>.traverseFilterIsInstance(arg1: Applicative<G>, arg2: Class<B>):
-    Kind<G, Kind<ForOption, B>> = arrow.core.Option.traverseFilter().run {
-  this@traverseFilterIsInstance.traverseFilterIsInstance<G, A, B>(arg1, arg2) as arrow.Kind<G,
-    arrow.Kind<arrow.core.ForOption, B>>
-}
+  Kind<G, Kind<ForOption, B>> = arrow.core.Option.traverseFilter().run {
+    this@traverseFilterIsInstance.traverseFilterIsInstance<G, A, B>(arg1, arg2) as arrow.Kind<G,
+      arrow.Kind<arrow.core.ForOption, B>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

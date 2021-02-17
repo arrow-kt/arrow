@@ -12,7 +12,7 @@ import arrow.core.extensions.SequenceKSemigroupal
  */
 @PublishedApi()
 internal val semigroupal_singleton: SequenceKSemigroupal = object :
-    arrow.core.extensions.SequenceKSemigroupal {}
+  arrow.core.extensions.SequenceKSemigroupal {}
 
 /**
  *  Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
@@ -32,9 +32,9 @@ internal val semigroupal_singleton: SequenceKSemigroupal = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.product(arg1: Kind<ForSequenceK, B>): SequenceK<Tuple2<A, B>> =
-    arrow.core.SequenceK.semigroupal().run {
-  this@product.product<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.SequenceK.semigroupal().run {
+    this@product.product<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * syntax

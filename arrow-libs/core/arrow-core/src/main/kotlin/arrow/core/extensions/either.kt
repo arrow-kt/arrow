@@ -245,15 +245,20 @@ interface EitherHash<L, R> : Hash<Either<L, R>> {
 interface EitherOrder<L, R> : Order<Either<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
-  override fun Either<L, R>.compare(b: Either<L, R>): Ordering = fold({ l1 ->
-    b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT })
-  }, { r1 ->
-    b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } })
-  })
+  override fun Either<L, R>.compare(b: Either<L, R>): Ordering = fold(
+    { l1 ->
+      b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT })
+    },
+    { r1 ->
+      b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } })
+    }
+  )
 }
 
-@Deprecated("Fx blocks are now named based on each datatype, please use `either { }` instead",
-  replaceWith = ReplaceWith("either.eager<L, R>(c)"))
+@Deprecated(
+  "Fx blocks are now named based on each datatype, please use `either { }` instead",
+  replaceWith = ReplaceWith("either.eager<L, R>(c)")
+)
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
 

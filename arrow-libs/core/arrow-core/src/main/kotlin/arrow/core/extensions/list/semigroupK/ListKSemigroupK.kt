@@ -18,9 +18,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("product(arg1)", "arrow.core.product"))
 fun <A> List<A>.combineK(arg1: List<A>): List<A> =
-    arrow.core.extensions.list.semigroupK.List.semigroupK().run {
-  arrow.core.ListK(this@combineK).combineK<A>(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.semigroupK.List.semigroupK().run {
+    arrow.core.ListK(this@combineK).combineK<A>(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -31,15 +31,15 @@ fun <A> List<A>.combineK(arg1: List<A>): List<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("listMonoid<A>()", "arrow.core.listMonoid"))
 fun <A> algebra(): Semigroup<Kind<ForListK, A>> = arrow.core.extensions.list.semigroupK.List
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForListK, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForListK, A>>
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val semigroupK_singleton: ListKSemigroupK = object : arrow.core.extensions.ListKSemigroupK
-    {}
+{}
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -48,4 +48,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
-  inline fun semigroupK(): ListKSemigroupK = semigroupK_singleton}
+  inline fun semigroupK(): ListKSemigroupK = semigroupK_singleton
+}

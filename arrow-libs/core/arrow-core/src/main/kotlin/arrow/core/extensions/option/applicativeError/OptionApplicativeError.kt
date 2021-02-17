@@ -13,7 +13,7 @@ import arrow.typeclasses.ApplicativeError
  */
 @PublishedApi()
 internal val applicativeError_singleton: OptionApplicativeError = object :
-    arrow.core.extensions.OptionApplicativeError {}
+  arrow.core.extensions.OptionApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -31,9 +31,9 @@ internal val applicativeError_singleton: OptionApplicativeError = object :
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.handleErrorWith(arg1: Function1<Unit, Kind<ForOption, A>>): Option<A> =
-    arrow.core.Option.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -64,15 +64,17 @@ fun <A> Unit.raiseError(): Option<A> = arrow.core.Option.applicativeError().run 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fold<Option<A>>({ arg1(); None }, { Some(it) })",
-  "arrow.core.None", "arrow.core.Option", "arrow.core.Some"
+    "fold<Option<A>>({ arg1(); None }, { Some(it) })",
+    "arrow.core.None",
+    "arrow.core.Option",
+    "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Unit>): Option<A> =
-    arrow.core.Option.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -85,14 +87,15 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Unit>): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fold<Option<A>>({ arg1(it); None }, { Some(it) })",
-    "arrow.core.None", "arrow.core.Option"
+    "arrow.core.None",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Unit>): Option<A> =
-    arrow.core.Option.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -104,15 +107,15 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Unit>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "handleError(arg1)",
+    "handleError(arg1)",
     "arrow.core.handleError"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.handleError(arg1: Function1<Unit, A>): Option<A> =
-    arrow.core.Option.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -130,9 +133,9 @@ fun <A> Kind<ForOption, A>.handleError(arg1: Function1<Unit, A>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.redeem(arg1: Function1<Unit, B>, arg2: Function1<A, B>): Option<B> =
-    arrow.core.Option.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+  arrow.core.Option.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -144,15 +147,17 @@ fun <A, B> Kind<ForOption, A>.redeem(arg1: Function1<Unit, B>, arg2: Function1<A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map<Either<Unit, A>> { Right(it) }.handleError<Either<Unit, A>> { Left(it) }",
-  "arrow.core.Left", "arrow.core.Right", "arrow.core.handleError"
+    "map<Either<Unit, A>> { Right(it) }.handleError<Either<Unit, A>> { Left(it) }",
+    "arrow.core.Left",
+    "arrow.core.Right",
+    "arrow.core.handleError"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.attempt(): Option<Either<Unit, A>> =
-    arrow.core.Option.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.core.Option<arrow.core.Either<kotlin.Unit, A>>
-}
+  arrow.core.Option.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.core.Option<arrow.core.Either<kotlin.Unit, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -164,14 +169,15 @@ fun <A> Kind<ForOption, A>.attempt(): Option<Either<Unit, A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Option.catch(arg0, arg1)",
-  "arrow.core.Option", "arrow.core.catch"
+    "Option.catch(arg0, arg1)",
+    "arrow.core.Option",
+    "arrow.core.catch"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> catch(arg0: Function1<Throwable, Unit>, arg1: Function0<A>): Option<A> = arrow.core.Option
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.core.Option<A>
+  .applicativeError()
+  .catch<A>(arg0, arg1) as arrow.core.Option<A>
 
 @JvmName("catch")
 @Suppress(
@@ -185,9 +191,9 @@ fun <A> catch(arg0: Function1<Throwable, Unit>, arg1: Function0<A>): Option<A> =
   level = DeprecationLevel.WARNING
 )
 fun <A> ApplicativeError<ForOption, Throwable>.catch(arg1: Function0<A>): Option<A> =
-    arrow.core.Option.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -200,14 +206,15 @@ fun <A> ApplicativeError<ForOption, Throwable>.catch(arg1: Function0<A>): Option
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.catch(arg0) { arg1() }",
-    "arrow.core.Option", "arrow.core.catch"
+    "arrow.core.Option",
+    "arrow.core.catch"
   ),
   level = DeprecationLevel.WARNING
 )
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Unit>, arg1: suspend () -> A): Option<A> =
-    arrow.core.Option
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.core.Option<A>
+  arrow.core.Option
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.core.Option<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -221,9 +228,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Unit>, arg1: suspend () -
   level = DeprecationLevel.WARNING
 )
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.core.Option.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.core.Option.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

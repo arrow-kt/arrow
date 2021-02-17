@@ -28,4 +28,4 @@ fun <A> Option<A>.hash(HA: Hash<A>): Int = arrow.core.Option.hash<A>(HA).run {
 )
 @Deprecated(HashDeprecation)
 inline fun <A> Companion.hash(HA: Hash<A>): OptionHash<A> = object :
-    arrow.core.extensions.OptionHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }
+  arrow.core.extensions.OptionHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }

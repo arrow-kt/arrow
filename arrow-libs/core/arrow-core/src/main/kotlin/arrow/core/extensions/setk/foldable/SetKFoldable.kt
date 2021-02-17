@@ -104,8 +104,8 @@ fun <A> Kind<ForSetK, A>.fold(arg1: Monoid<A>): A = arrow.core.SetK.foldable().r
 )
 fun <A, B> Kind<ForSetK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
   Option<B> = arrow.core.SetK.foldable().run {
-  this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+    this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 @JvmName("reduceRightToOption")
 @Suppress(
@@ -238,8 +238,8 @@ fun <A> orEmpty(arg0: Applicative<ForSetK>, arg1: Monoid<A>): SetK<A> = arrow.co
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverseValidated_ or traverseEither_ from arrow.core.*")
 fun <G, A, B> Kind<ForSetK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.core.SetK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(

@@ -22,14 +22,15 @@ internal val monoidK_singleton: OptionMonoidK = object : arrow.core.extensions.O
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Monoid.option<A>()",
-  "arrow.core.option", "arrow.typeclasses.Monoid"
+    "Monoid.option<A>()",
+    "arrow.core.option",
+    "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Monoid<Kind<ForOption, A>> = arrow.core.Option
-   .monoidK()
-   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForOption, A>>
+  .monoidK()
+  .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForOption, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

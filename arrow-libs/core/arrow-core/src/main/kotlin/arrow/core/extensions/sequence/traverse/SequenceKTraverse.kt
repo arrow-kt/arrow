@@ -19,7 +19,7 @@ import kotlin.sequences.Sequence
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Sequence<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>): Kind<G,
-    Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
+  Kind<ForSequenceK, B>> = arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
   arrow.core.SequenceK(this@traverse).traverse<G, A, B>(arg1, arg2) as arrow.Kind<G,
     arrow.Kind<arrow.core.ForSequenceK, B>>
 }
@@ -36,10 +36,10 @@ fun <G, A, B> Sequence<A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForSequenceK, A>> =
-    arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
-  arrow.core.SequenceK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.core.ForSequenceK, A>>
-}
+  arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
+    arrow.core.SequenceK(this@sequence).sequence<G, A>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.core.ForSequenceK, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun <G, A> Sequence<Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<For
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.map(arg1: Function1<A, B>): Sequence<B> =
-    arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
-  arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
+    arrow.core.SequenceK(this@map).map<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -76,17 +76,17 @@ fun <G, A, B> Sequence<A>.flatTraverse(
   arg2: Applicative<G>,
   arg3: Function1<A, Kind<G, Kind<ForSequenceK, B>>>
 ): Kind<G, Kind<ForSequenceK, B>> =
-    arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
-  arrow.core.SequenceK(this@flatTraverse).flatTraverse<G, A, B>(arg1, arg2, arg3) as arrow.Kind<G,
-    arrow.Kind<arrow.core.ForSequenceK, B>>
-}
+  arrow.core.extensions.sequence.traverse.Sequence.traverse().run {
+    arrow.core.SequenceK(this@flatTraverse).flatTraverse<G, A, B>(arg1, arg2, arg3) as arrow.Kind<G,
+      arrow.Kind<arrow.core.ForSequenceK, B>>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val traverse_singleton: SequenceKTraverse = object :
-    arrow.core.extensions.SequenceKTraverse {}
+  arrow.core.extensions.SequenceKTraverse {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -101,4 +101,5 @@ object Sequence {
     "Traverse typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun traverse(): SequenceKTraverse = traverse_singleton}
+  inline fun traverse(): SequenceKTraverse = traverse_singleton
+}

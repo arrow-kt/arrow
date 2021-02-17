@@ -11,4 +11,3 @@ fun arrow.generic.HList2<`kotlin`.`String`, `arrow`.`core`.`Option`<`kotlin`.`St
 
 fun `arrow`.`ap`.`objects`.`generic`.`HList`.toHListLabeled(): arrow.generic.HList2<arrow.core.Tuple2<String, `kotlin`.`String`>, arrow.core.Tuple2<String, `arrow`.`core`.`Option`<`kotlin`.`String`>>> =
   arrow.generic.hListOf(("field" toT field), ("option" toT option))
-

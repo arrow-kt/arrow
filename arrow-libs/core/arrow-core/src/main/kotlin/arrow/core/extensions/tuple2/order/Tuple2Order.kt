@@ -188,6 +188,8 @@ fun <A, B> Tuple2<A, B>.sort(
 )
 @Deprecated(OrderDeprecation)
 inline fun <A, B> Companion.order(OA: Order<A>, OB: Order<B>): Tuple2Order<A, B> = object :
-    arrow.core.extensions.Tuple2Order<A, B> { override fun OA(): arrow.typeclasses.Order<A> = OA
+  arrow.core.extensions.Tuple2Order<A, B> {
+  override fun OA(): arrow.typeclasses.Order<A> = OA
 
-  override fun OB(): arrow.typeclasses.Order<B> = OB }
+  override fun OB(): arrow.typeclasses.Order<B> = OB
+}

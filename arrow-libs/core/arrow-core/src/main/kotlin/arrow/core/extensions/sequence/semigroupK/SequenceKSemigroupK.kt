@@ -21,10 +21,10 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.combineK(arg1: Sequence<A>): Sequence<A> =
-    arrow.core.extensions.sequence.semigroupK.Sequence.semigroupK().run {
-  arrow.core.SequenceK(this@combineK).combineK<A>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.semigroupK.Sequence.semigroupK().run {
+    arrow.core.SequenceK(this@combineK).combineK<A>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -37,21 +37,22 @@ fun <A> Sequence<A>.combineK(arg1: Sequence<A>): Sequence<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.sequence<A>()",
-    "arrow.core.sequence", "arrow.typeclasses.Semigroup"
+    "arrow.core.sequence",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Semigroup<Kind<ForSequenceK, A>> =
-    arrow.core.extensions.sequence.semigroupK.Sequence
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForSequenceK, A>>
+  arrow.core.extensions.sequence.semigroupK.Sequence
+    .semigroupK()
+    .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForSequenceK, A>>
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val semigroupK_singleton: SequenceKSemigroupK = object :
-    arrow.core.extensions.SequenceKSemigroupK {}
+  arrow.core.extensions.SequenceKSemigroupK {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -66,4 +67,5 @@ object Sequence {
     "SemigroupK typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun semigroupK(): SequenceKSemigroupK = semigroupK_singleton}
+  inline fun semigroupK(): SequenceKSemigroupK = semigroupK_singleton
+}

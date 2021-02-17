@@ -43,15 +43,15 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse(
 @Deprecated(
   "@extension kinded projected functions are deprecated. Replace with sequence, sequenceEither or sequenceValidated from arrow.core.*",
   ReplaceWith(
-  "sequence(arg1)",
-  "arrow.core.sequence"
+    "sequence(arg1)",
+    "arrow.core.sequence"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
-    Kind<Kind<ForIor, L>, A>> = arrow.core.Ior.traverse<L>().run {
+  Kind<Kind<ForIor, L>, A>> = arrow.core.Ior.traverse<L>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForIor, L>,
-    A>>
+      A>>
 }
 
 @JvmName("map")
@@ -64,14 +64,14 @@ fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence(arg1: Applicative<G>): 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.map(arg1)"
+    "this.map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(arg1: Function1<A, B>): Ior<L, B> =
-    arrow.core.Ior.traverse<L>().run {
-  this@map.map<A, B>(arg1) as arrow.core.Ior<L, B>
-}
+  arrow.core.Ior.traverse<L>().run {
+    this@map.map<A, B>(arg1) as arrow.core.Ior<L, B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -102,4 +102,4 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.flatTraverse(
   level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.traverse(): IorTraverse<L> = traverse_singleton as
-    arrow.core.extensions.IorTraverse<L>
+  arrow.core.extensions.IorTraverse<L>

@@ -13,7 +13,7 @@ import arrow.typeclasses.Monad
  */
 @PublishedApi()
 internal val traverse_singleton: SequenceKTraverse = object :
-    arrow.core.extensions.SequenceKTraverse {}
+  arrow.core.extensions.SequenceKTraverse {}
 
 @JvmName("traverse")
 @Suppress(
@@ -27,10 +27,10 @@ internal val traverse_singleton: SequenceKTraverse = object :
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForSequenceK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Kind<ForSequenceK, B>> = arrow.core.SequenceK.traverse().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForSequenceK,
-    B>>
-}
+  Kind<G, Kind<ForSequenceK, B>> = arrow.core.SequenceK.traverse().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForSequenceK,
+        B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -63,9 +63,9 @@ fun <G, A> Kind<ForSequenceK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
-    arrow.core.SequenceK.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

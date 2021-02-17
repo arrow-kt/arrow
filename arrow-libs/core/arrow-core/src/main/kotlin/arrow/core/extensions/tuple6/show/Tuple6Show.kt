@@ -19,7 +19,7 @@ inline fun <A, B, C, D, E, F> Companion.show(
   SE: Show<E>,
   SF: Show<F>
 ): Tuple6Show<A, B, C, D, E, F> = object : arrow.core.extensions.Tuple6Show<A, B, C, D, E, F> {
-    override fun SA(): arrow.typeclasses.Show<A> = SA
+  override fun SA(): arrow.typeclasses.Show<A> = SA
 
   override fun SB(): arrow.typeclasses.Show<B> = SB
 
@@ -29,4 +29,5 @@ inline fun <A, B, C, D, E, F> Companion.show(
 
   override fun SE(): arrow.typeclasses.Show<E> = SE
 
-  override fun SF(): arrow.typeclasses.Show<F> = SF }
+  override fun SF(): arrow.typeclasses.Show<F> = SF
+}

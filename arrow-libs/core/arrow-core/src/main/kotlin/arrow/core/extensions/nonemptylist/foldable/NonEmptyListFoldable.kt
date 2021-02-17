@@ -16,7 +16,7 @@ import arrow.typeclasses.Monoid
  */
 @PublishedApi()
 internal val foldable_singleton: NonEmptyListFoldable = object :
-    arrow.core.extensions.NonEmptyListFoldable {}
+  arrow.core.extensions.NonEmptyListFoldable {}
 
 @JvmName("foldLeft")
 @Suppress(
@@ -34,9 +34,9 @@ internal val foldable_singleton: NonEmptyListFoldable = object :
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
-    arrow.core.NonEmptyList.foldable().run {
-  this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("foldRight")
 @Suppress(
@@ -53,9 +53,9 @@ fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>):
   )
 )
 fun <A, B> Kind<ForNonEmptyList, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval<B>>):
-    Eval<B> = arrow.core.NonEmptyList.foldable().run {
-  this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
-}
+  Eval<B> = arrow.core.NonEmptyList.foldable().run {
+    this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
+  }
 
 @JvmName("fold")
 @Suppress(
@@ -68,7 +68,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, 
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix().combineAll<A>(arg1)",
-    "arrow.core.combineAll", "arrow.core.fix"
+    "arrow.core.combineAll",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -87,7 +88,9 @@ fun <A> Kind<ForNonEmptyList, A>.fold(arg1: Monoid<A>): A = arrow.core.NonEmptyL
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().reduceOrNull(arg1, arg2))",
-    "arrow.core.Option", "arrow.core.fix", "arrow.core.reduceOrNull"
+    "arrow.core.Option",
+    "arrow.core.fix",
+    "arrow.core.reduceOrNull"
   ),
   DeprecationLevel.WARNING
 )
@@ -109,7 +112,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.reduceLeftToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix().reduceRightEvalOrNull(arg1, arg2).map { Option.fromNullable(it) }",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -132,14 +136,17 @@ fun <A, B> Kind<ForNonEmptyList, A>.reduceRightToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable<A>(this.fix().reduceOrNull<A, A>(::identity, arg1))",
-    "arrow.core.Option", "arrow.core.fix", "arrow.core.identity", "arrow.core.reduceOrNull"
+    "arrow.core.Option",
+    "arrow.core.fix",
+    "arrow.core.identity",
+    "arrow.core.reduceOrNull"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("reduceRightOption")
 @Suppress(
@@ -152,14 +159,17 @@ fun <A> Kind<ForNonEmptyList, A>.reduceLeftOption(arg1: Function2<A, A, A>): Opt
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix().reduceRightEvalOrNull<A, A>(::identity, arg1).map<Option<A>> { Option.fromNullable<A>(it) }",
-    "arrow.core.Option", "arrow.core.fix", "arrow.core.identity", "arrow.core.reduceRightEvalOrNull"
+    "arrow.core.Option",
+    "arrow.core.fix",
+    "arrow.core.identity",
+    "arrow.core.reduceRightEvalOrNull"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
-    Eval<Option<A>> = arrow.core.NonEmptyList.foldable().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+  Eval<Option<A>> = arrow.core.NonEmptyList.foldable().run {
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -172,14 +182,15 @@ fun <A> Kind<ForNonEmptyList, A>.reduceRightOption(arg1: Function2<A, Eval<A>, E
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix().combineAll<A>(arg1)",
-    "arrow.core.combineAll", "arrow.core.fix"
+    "arrow.core.combineAll",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.combineAll(arg1: Monoid<A>): A =
-    arrow.core.NonEmptyList.foldable().run {
-  this@combineAll.combineAll<A>(arg1) as A
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@combineAll.combineAll<A>(arg1) as A
+  }
 
 @JvmName("foldMap")
 @Suppress(
@@ -192,14 +203,15 @@ fun <A> Kind<ForNonEmptyList, A>.combineAll(arg1: Monoid<A>): A =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "fix().foldMap<A, B>(arg1, arg2)",
-    "arrow.core.fix", "arrow.core.foldMap"
+    "arrow.core.fix",
+    "arrow.core.foldMap"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
-    arrow.core.NonEmptyList.foldable().run {
-  this@foldMap.foldMap<A, B>(arg1, arg2) as B
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@foldMap.foldMap<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("orEmpty")
 @Suppress(
@@ -217,9 +229,9 @@ fun <A, B> Kind<ForNonEmptyList, A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, 
   DeprecationLevel.WARNING
 )
 fun <A> orEmpty(arg0: Applicative<ForNonEmptyList>, arg1: Monoid<A>): NonEmptyList<A> =
-    arrow.core.NonEmptyList
-   .foldable()
-   .orEmpty<A>(arg0, arg1) as arrow.core.NonEmptyList<A>
+  arrow.core.NonEmptyList
+    .foldable()
+    .orEmpty<A>(arg0, arg1) as arrow.core.NonEmptyList<A>
 
 @JvmName("traverse_")
 @Suppress(
@@ -251,9 +263,9 @@ fun <G, A, B> Kind<ForNonEmptyList, A>.traverse_(
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("find")
 @Suppress(
@@ -266,14 +278,15 @@ fun <G, A> Kind<ForNonEmptyList, Kind<G, A>>.sequence_(arg1: Applicative<G>): Ki
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().firstOrNull(arg1))",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.find(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@find.find<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@find.find<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("exists")
 @Suppress(
@@ -291,9 +304,9 @@ fun <A> Kind<ForNonEmptyList, A>.find(arg1: Function1<A, Boolean>): Option<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.exists(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.NonEmptyList.foldable().run {
-  this@exists.exists<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@exists.exists<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("forAll")
 @Suppress(
@@ -311,9 +324,9 @@ fun <A> Kind<ForNonEmptyList, A>.exists(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.forAll(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.NonEmptyList.foldable().run {
-  this@forAll.forAll<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@forAll.forAll<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("all")
 @Suppress(
@@ -331,9 +344,9 @@ fun <A> Kind<ForNonEmptyList, A>.forAll(arg1: Function1<A, Boolean>): Boolean =
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.all(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.NonEmptyList.foldable().run {
-  this@all.all<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@all.all<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("isEmpty")
 @Suppress(
@@ -408,9 +421,9 @@ fun <A> Kind<ForNonEmptyList, A>.isNotEmpty(): Boolean = arrow.core.NonEmptyList
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.size(arg1: Monoid<Long>): Long =
-    arrow.core.NonEmptyList.foldable().run {
-  this@size.size<A>(arg1) as kotlin.Long
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@size.size<A>(arg1) as kotlin.Long
+  }
 
 @JvmName("foldMapA")
 @Suppress(
@@ -476,9 +489,9 @@ fun <G, A, B> Kind<ForNonEmptyList, A>.foldM(
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.get(arg1: Long): Option<A> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@get.get<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@get.get<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOption")
 @Suppress(
@@ -491,7 +504,8 @@ fun <A> Kind<ForNonEmptyList, A>.get(arg1: Long): Option<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().firstOrNull())",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -510,14 +524,15 @@ fun <A> Kind<ForNonEmptyList, A>.firstOption(): Option<A> = arrow.core.NonEmptyL
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().firstOrNull(arg1))",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOrNone")
 @Suppress(
@@ -530,7 +545,8 @@ fun <A> Kind<ForNonEmptyList, A>.firstOption(arg1: Function1<A, Boolean>): Optio
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().firstOrNull())",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -549,14 +565,15 @@ fun <A> Kind<ForNonEmptyList, A>.firstOrNone(): Option<A> = arrow.core.NonEmptyL
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Option.fromNullable(this.fix().firstOrNull(arg1))",
-    "arrow.core.Option", "arrow.core.fix"
+    "arrow.core.Option",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.NonEmptyList.foldable().run {
-  this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.NonEmptyList.foldable().run {
+    this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("toList")
 @Suppress(

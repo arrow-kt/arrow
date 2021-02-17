@@ -35,6 +35,8 @@ fun <L, R> Ior<L, R>.neqv(
   level = DeprecationLevel.WARNING
 )
 inline fun <L, R> Companion.eq(EQL: Eq<L>, EQR: Eq<R>): IorEq<L, R> = object :
-    arrow.core.extensions.IorEq<L, R> { override fun EQL(): arrow.typeclasses.Eq<L> = EQL
+  arrow.core.extensions.IorEq<L, R> {
+  override fun EQL(): arrow.typeclasses.Eq<L> = EQL
 
-  override fun EQR(): arrow.typeclasses.Eq<R> = EQR }
+  override fun EQR(): arrow.typeclasses.Eq<R> = EQR
+}

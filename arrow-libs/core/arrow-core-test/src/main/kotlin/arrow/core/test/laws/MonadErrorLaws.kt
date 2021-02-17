@@ -80,16 +80,20 @@ object MonadErrorLaws {
   }
 
   fun <F> MonadError<F, Throwable>.monadErrorDerivesRedeemWith(EQ: Eq<Kind<F, Int>>) =
-    forAll(Gen.int().applicativeError(this),
+    forAll(
+      Gen.int().applicativeError(this),
       Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicativeError(this)),
-      Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this))) { fa, fe, fb ->
+      Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this))
+    ) { fa, fe, fb ->
       fa.redeemWith(fe, fb).equalUnderTheLaw(fa.flatMap(fb).handleErrorWith(fe), EQ)
     }
 
   fun <F> MonadError<F, Throwable>.monadErrorRedeemWithPureIsFlatMap(EQ: Eq<Kind<F, Int>>) =
-    forAll(Gen.int().applicative(this),
+    forAll(
+      Gen.int().applicative(this),
       Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicativeError(this)),
-      Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this))) { fa, fe, fb ->
+      Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this))
+    ) { fa, fe, fb ->
       fa.redeemWith(fe, fb).equalUnderTheLaw(fa.flatMap(fb), EQ)
     }
 }

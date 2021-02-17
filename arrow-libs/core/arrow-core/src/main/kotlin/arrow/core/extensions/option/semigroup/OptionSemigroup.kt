@@ -15,15 +15,15 @@ import arrow.typeclasses.Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combine(SG, arg1)",
-  "arrow.core.combine"
+    "combine(SG, arg1)",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Option<A>.plus(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
-    arrow.core.Option.semigroup<A>(SG).run {
-  this@plus.plus(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.semigroup<A>(SG).run {
+    this@plus.plus(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("maybeCombine")
 @Suppress(
@@ -35,15 +35,15 @@ fun <A> Option<A>.plus(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "combine(SG, arg1)",
-  "arrow.core.combine"
+    "combine(SG, arg1)",
+    "arrow.core.combine"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Option<A>.maybeCombine(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
-    arrow.core.Option.semigroup<A>(SG).run {
-  this@maybeCombine.maybeCombine(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Option.semigroup<A>(SG).run {
+    this@maybeCombine.maybeCombine(arg1) as arrow.core.Option<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -53,10 +53,13 @@ fun <A> Option<A>.maybeCombine(SG: Semigroup<A>, arg1: Option<A>): Option<A> =
   "@extension projected functions are deprecated",
   ReplaceWith(
     "Semigroup.option<A>(EQ)",
-    "arrow.core.option", "arrow.typeclasses.Semigroup"
+    "arrow.core.option",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.semigroup(SG: Semigroup<A>): OptionSemigroup<A> = object :
-    arrow.core.extensions.OptionSemigroup<A> { override fun SG(): arrow.typeclasses.Semigroup<A> =
-    SG }
+  arrow.core.extensions.OptionSemigroup<A> {
+  override fun SG(): arrow.typeclasses.Semigroup<A> =
+    SG
+}

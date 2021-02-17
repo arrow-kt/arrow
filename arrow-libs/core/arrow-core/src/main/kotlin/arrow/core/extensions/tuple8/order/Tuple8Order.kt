@@ -184,7 +184,7 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.max(
   OH: Order<H>,
   arg1: Tuple8<A, B, C, D, E, F, G, H>
 ): Tuple8<A, B, C, D, E, F, G, H> = arrow.core.Tuple8.order<A, B, C, D, E, F, G,
-    H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
+  H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
   this@max.max(arg1) as arrow.core.Tuple8<A, B, C, D, E, F, G, H>
 }
 
@@ -210,7 +210,7 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.min(
   OH: Order<H>,
   arg1: Tuple8<A, B, C, D, E, F, G, H>
 ): Tuple8<A, B, C, D, E, F, G, H> = arrow.core.Tuple8.order<A, B, C, D, E, F, G,
-    H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
+  H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
   this@min.min(arg1) as arrow.core.Tuple8<A, B, C, D, E, F, G, H>
 }
 
@@ -236,10 +236,10 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.sort(
   OH: Order<H>,
   arg1: Tuple8<A, B, C, D, E, F, G, H>
 ): Tuple2<Tuple8<A, B, C, D, E, F, G, H>, Tuple8<A, B, C, D, E, F, G, H>> =
-    arrow.core.Tuple8.order<A, B, C, D, E, F, G, H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
-  this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple8<A, B, C, D, E, F, G, H>,
-    arrow.core.Tuple8<A, B, C, D, E, F, G, H>>
-}
+  arrow.core.Tuple8.order<A, B, C, D, E, F, G, H>(OA, OB, OC, OD, OE, OF, OG, OH).run {
+    this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple8<A, B, C, D, E, F, G, H>,
+      arrow.core.Tuple8<A, B, C, D, E, F, G, H>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -264,7 +264,8 @@ inline fun <A, B, C, D, E, F, G, H> Companion.order(
   OG: Order<G>,
   OH: Order<H>
 ): Tuple8Order<A, B, C, D, E, F, G, H> = object : arrow.core.extensions.Tuple8Order<A, B, C, D, E,
-    F, G, H> { override fun OA(): arrow.typeclasses.Order<A> = OA
+    F, G, H> {
+  override fun OA(): arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
@@ -278,4 +279,5 @@ inline fun <A, B, C, D, E, F, G, H> Companion.order(
 
   override fun OG(): arrow.typeclasses.Order<G> = OG
 
-  override fun OH(): arrow.typeclasses.Order<H> = OH }
+  override fun OH(): arrow.typeclasses.Order<H> = OH
+}

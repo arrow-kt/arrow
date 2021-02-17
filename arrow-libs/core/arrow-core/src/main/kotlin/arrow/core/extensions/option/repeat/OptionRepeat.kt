@@ -20,14 +20,14 @@ internal val repeat_singleton: OptionRepeat = object : arrow.core.extensions.Opt
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Option(a)",
-  "arrow.core.Option"
+    "Option(a)",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> repeat(a: A): Option<A> = arrow.core.Option
-   .repeat()
-   .repeat<A>(a) as arrow.core.Option<A>
+  .repeat()
+  .repeat<A>(a) as arrow.core.Option<A>
 
 @Suppress(
   "UNCHECKED_CAST",

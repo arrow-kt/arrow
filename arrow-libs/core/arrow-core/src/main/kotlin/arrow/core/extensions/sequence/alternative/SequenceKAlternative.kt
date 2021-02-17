@@ -22,10 +22,10 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@some).some<A>() as
-    kotlin.sequences.Sequence<kotlin.sequences.Sequence<A>>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@some).some<A>() as
+      kotlin.sequences.Sequence<kotlin.sequences.Sequence<A>>
+  }
 
 @JvmName("many")
 @Suppress(
@@ -43,10 +43,10 @@ fun <A> Sequence<A>.some(): Sequence<Sequence<A>> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@many).many<A>() as
-    kotlin.sequences.Sequence<kotlin.sequences.Sequence<A>>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@many).many<A>() as
+      kotlin.sequences.Sequence<kotlin.sequences.Sequence<A>>
+  }
 
 @JvmName("alt")
 @Suppress(
@@ -63,9 +63,9 @@ fun <A> Sequence<A>.many(): Sequence<Sequence<A>> =
   DeprecationLevel.WARNING
 )
 infix fun <A> Sequence<A>.alt(arg1: Sequence<A>): Sequence<A> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@alt).alt<A>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@alt).alt<A>(arrow.core.SequenceK(arg1)) as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("orElse")
 @Suppress(
@@ -82,10 +82,10 @@ infix fun <A> Sequence<A>.alt(arg1: Sequence<A>): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.orElse(arg1: Sequence<A>): Sequence<A> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@orElse).orElse<A>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@orElse).orElse<A>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("combineK")
 @Suppress(
@@ -102,10 +102,10 @@ fun <A> Sequence<A>.orElse(arg1: Sequence<A>): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.combineK(arg1: Sequence<A>): Sequence<A> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@combineK).combineK<A>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@combineK).combineK<A>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("optional")
 @Suppress(
@@ -118,15 +118,16 @@ fun <A> Sequence<A>.combineK(arg1: Sequence<A>): Sequence<A> =
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "this.map(::Some) + sequenceOf(None)",
-    "arrow.core.None", "arrow.core.Some"
+    "arrow.core.None",
+    "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.optional(): Sequence<Option<A>> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@optional).optional<A>() as
-    kotlin.sequences.Sequence<arrow.core.Option<A>>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@optional).optional<A>() as
+      kotlin.sequences.Sequence<arrow.core.Option<A>>
+  }
 
 @JvmName("guard")
 @Suppress(
@@ -143,8 +144,8 @@ fun <A> Sequence<A>.optional(): Sequence<Option<A>> =
   DeprecationLevel.WARNING
 )
 fun guard(arg0: Boolean): Sequence<Unit> = arrow.core.extensions.sequence.alternative.Sequence
-   .alternative()
-   .guard(arg0) as kotlin.sequences.Sequence<kotlin.Unit>
+  .alternative()
+  .guard(arg0) as kotlin.sequences.Sequence<kotlin.Unit>
 
 @JvmName("lazyOrElse")
 @Suppress(
@@ -161,16 +162,16 @@ fun guard(arg0: Boolean): Sequence<Unit> = arrow.core.extensions.sequence.altern
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.lazyOrElse(arg1: Function0<Kind<ForSequenceK, A>>): Sequence<A> =
-    arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
-  arrow.core.SequenceK(this@lazyOrElse).lazyOrElse<A>(arg1) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.alternative.Sequence.alternative().run {
+    arrow.core.SequenceK(this@lazyOrElse).lazyOrElse<A>(arg1) as kotlin.sequences.Sequence<A>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val alternative_singleton: SequenceKAlternative = object :
-    arrow.core.extensions.SequenceKAlternative {}
+  arrow.core.extensions.SequenceKAlternative {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -185,4 +186,5 @@ object Sequence {
     "Alternative typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun alternative(): SequenceKAlternative = alternative_singleton}
+  inline fun alternative(): SequenceKAlternative = alternative_singleton
+}

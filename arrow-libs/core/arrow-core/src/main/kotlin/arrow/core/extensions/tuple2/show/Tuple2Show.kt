@@ -12,6 +12,8 @@ import kotlin.Suppress
 )
 @Deprecated(ShowDeprecation)
 inline fun <A, B> Companion.show(SA: Show<A>, SB: Show<B>): Tuple2Show<A, B> = object :
-    arrow.core.extensions.Tuple2Show<A, B> { override fun SA(): arrow.typeclasses.Show<A> = SA
+  arrow.core.extensions.Tuple2Show<A, B> {
+  override fun SA(): arrow.typeclasses.Show<A> = SA
 
-  override fun SB(): arrow.typeclasses.Show<B> = SB }
+  override fun SB(): arrow.typeclasses.Show<B> = SB
+}

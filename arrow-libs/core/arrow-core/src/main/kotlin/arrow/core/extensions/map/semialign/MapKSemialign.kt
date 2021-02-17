@@ -120,7 +120,7 @@ fun <K, A, B> Map<K, A>.padZip(arg1: Map<K, B>): Map<K, Tuple2<Option<A>, Option
 )
 fun <K, A, B, C> Map<K, A>.padZipWith(arg1: Map<K, B>, arg2: Function2<Option<A>, Option<B>, C>):
   Map<K, C> =
-  padZip(arg1) { _, a, b -> arg2(Option.fromNullable(a), Option.fromNullable(b)) }
+    padZip(arg1) { _, a, b -> arg2(Option.fromNullable(a), Option.fromNullable(b)) }
 
 /**
  * cached extension

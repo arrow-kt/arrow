@@ -26,13 +26,13 @@ internal val category_singleton: AndThenCategory = object : arrow.core.extension
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "compose(arg1)",
-  "arrow.core.compose"
+    "compose(arg1)",
+    "arrow.core.compose"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Kind<Kind<ForAndThen, B>, C>.compose(arg1: Kind<Kind<ForAndThen, A>, B>): AndThen<A,
-    C> = arrow.core.AndThen.category().run {
+  C> = arrow.core.AndThen.category().run {
   this@compose.compose<A, B, C>(arg1) as arrow.core.AndThen<A, C>
 }
 
@@ -46,13 +46,13 @@ fun <A, B, C> Kind<Kind<ForAndThen, B>, C>.compose(arg1: Kind<Kind<ForAndThen, A
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "andThen(arg1)",
-  "arrow.core.andThen"
+    "andThen(arg1)",
+    "arrow.core.andThen"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Kind<Kind<ForAndThen, A>, B>.andThen(arg1: Kind<Kind<ForAndThen, B>, C>): AndThen<A,
-    C> = arrow.core.AndThen.category().run {
+  C> = arrow.core.AndThen.category().run {
   this@andThen.andThen<A, B, C>(arg1) as arrow.core.AndThen<A, C>
 }
 

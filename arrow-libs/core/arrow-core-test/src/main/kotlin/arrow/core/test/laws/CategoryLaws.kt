@@ -19,7 +19,6 @@ object CategoryLaws {
   }
 
   fun <F> laws(C: Category<F>, f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): List<Law> {
-
     val G = Gen.int().map(f)
 
     return categoryLaws<F>(C, G, EQ)

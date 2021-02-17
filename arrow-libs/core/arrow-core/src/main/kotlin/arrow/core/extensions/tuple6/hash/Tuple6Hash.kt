@@ -42,7 +42,7 @@ inline fun <A, B, C, D, E, F> Companion.hash(
   HE: Hash<E>,
   HF: Hash<F>
 ): Tuple6Hash<A, B, C, D, E, F> = object : arrow.core.extensions.Tuple6Hash<A, B, C, D, E, F> {
-    override fun HA(): arrow.typeclasses.Hash<A> = HA
+  override fun HA(): arrow.typeclasses.Hash<A> = HA
 
   override fun HB(): arrow.typeclasses.Hash<B> = HB
 
@@ -52,4 +52,5 @@ inline fun <A, B, C, D, E, F> Companion.hash(
 
   override fun HE(): arrow.typeclasses.Hash<E> = HE
 
-  override fun HF(): arrow.typeclasses.Hash<F> = HF }
+  override fun HF(): arrow.typeclasses.Hash<F> = HF
+}

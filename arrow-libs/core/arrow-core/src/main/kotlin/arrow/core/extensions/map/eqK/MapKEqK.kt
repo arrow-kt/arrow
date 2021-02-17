@@ -35,9 +35,9 @@ fun <K, A> Map<K, A>.eqK(
 )
 @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
 fun <K, A> liftEq(EQK: Eq<K>, arg0: Eq<A>): Eq<Kind<Kind<ForMapK, K>, A>> =
-    arrow.core.extensions.map.eqK.Map
-   .eqK<K>(EQK)
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>>
+  arrow.core.extensions.map.eqK.Map
+    .eqK<K>(EQK)
+    .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>>
 
 object Map {
   @Suppress(
@@ -45,5 +45,8 @@ object Map {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Kind/type constructors will be deprecated, so this typeclass will no longer be available from 0.13.0")
-  inline fun <K> eqK(EQK: Eq<K>): MapKEqK<K> = object : arrow.core.extensions.MapKEqK<K> { override
-      fun EQK(): arrow.typeclasses.Eq<K> = EQK }}
+  inline fun <K> eqK(EQK: Eq<K>): MapKEqK<K> = object : arrow.core.extensions.MapKEqK<K> {
+    override
+    fun EQK(): arrow.typeclasses.Eq<K> = EQK
+  }
+}

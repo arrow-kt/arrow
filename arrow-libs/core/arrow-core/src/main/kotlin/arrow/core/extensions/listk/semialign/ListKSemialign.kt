@@ -74,7 +74,7 @@ fun <A> Kind<ForListK, A>.salign(arg1: Semigroup<A>, arg2: Kind<ForListK, A>): L
 fun <A, B> Kind<ForListK, A>.padZip(arg1: Kind<ForListK, B>): ListK<Tuple2<Option<A>, Option<B>>> =
   arrow.core.ListK.semialign().run {
     this@padZip.padZip<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<arrow.core.Option<A>,
-      arrow.core.Option<B>>>
+        arrow.core.Option<B>>>
   }
 
 @JvmName("padZipWith")

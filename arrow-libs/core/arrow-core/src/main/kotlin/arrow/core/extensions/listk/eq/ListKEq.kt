@@ -19,9 +19,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(EqDeprecation, ReplaceWith("this == arg1"))
 fun <A> Kind<ForListK, A>.eqv(EQ: Eq<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.eq<A>(EQ).run {
-  this@eqv.eqv(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.eq<A>(EQ).run {
+    this@eqv.eqv(arg1) as kotlin.Boolean
+  }
 
 @JvmName("neqv")
 @Suppress(
@@ -32,9 +32,9 @@ fun <A> Kind<ForListK, A>.eqv(EQ: Eq<A>, arg1: Kind<ForListK, A>): Boolean =
 )
 @Deprecated(EqDeprecation, ReplaceWith("this != arg1"))
 fun <A> Kind<ForListK, A>.neqv(EQ: Eq<A>, arg1: Kind<ForListK, A>): Boolean =
-    arrow.core.ListK.eq<A>(EQ).run {
-  this@neqv.neqv(arg1) as kotlin.Boolean
-}
+  arrow.core.ListK.eq<A>(EQ).run {
+    this@neqv.neqv(arg1) as kotlin.Boolean
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -42,4 +42,5 @@ fun <A> Kind<ForListK, A>.neqv(EQ: Eq<A>, arg1: Kind<ForListK, A>): Boolean =
 )
 @Deprecated(EqDeprecation)
 inline fun <A> Companion.eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> {
-    override fun EQ(): arrow.typeclasses.Eq<A> = EQ }
+  override fun EQ(): arrow.typeclasses.Eq<A> = EQ
+}

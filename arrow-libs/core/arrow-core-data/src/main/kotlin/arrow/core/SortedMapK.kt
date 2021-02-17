@@ -16,21 +16,25 @@ const val SortedMapKDeprecation =
   level = DeprecationLevel.WARNING
 )
 class ForSortedMapK private constructor() { companion object }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias SortedMapKOf<A, B> = arrow.Kind2<ForSortedMapK, A, B>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias SortedMapKPartialOf<A> = arrow.Kind<ForSortedMapK, A>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias SortedMapKKindedJ<A, B> = arrow.HkJ2<ForSortedMapK, A, B>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,

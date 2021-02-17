@@ -17,6 +17,7 @@ const val SequenceKDeprecation =
 class ForSequenceK private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -245,10 +246,11 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
               go(buf, f, v.drop(1).k())
             }
             is Either.Left -> {
-              if (v.count() == 1)
+              if (v.count() == 1) {
                 go(buf, f, (f(head.a).fix()).k())
-              else
+              } else {
                 go(buf, f, (f(head.a).fix() + v.drop(1)).k())
+              }
             }
           }
         }

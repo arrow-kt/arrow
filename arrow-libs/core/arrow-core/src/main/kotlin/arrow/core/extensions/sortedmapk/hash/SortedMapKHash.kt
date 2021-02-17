@@ -20,9 +20,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <K : Comparable<K>, A> SortedMapK<K, A>.hash(HK: Hash<K>, HA: Hash<A>): Int =
-    arrow.core.SortedMapK.hash<K, A>(HK, HA).run {
-  this@hash.hash() as kotlin.Int
-}
+  arrow.core.SortedMapK.hash<K, A>(HK, HA).run {
+    this@hash.hash() as kotlin.Int
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -30,7 +30,9 @@ fun <K : Comparable<K>, A> SortedMapK<K, A>.hash(HK: Hash<K>, HA: Hash<A>): Int 
 )
 @Deprecated(HashDeprecation)
 inline fun <K : Comparable<K>, A> Companion.hash(HK: Hash<K>, HA: Hash<A>): SortedMapKHash<K, A> =
-    object : arrow.core.extensions.SortedMapKHash<K, A> { override fun HK():
-    arrow.typeclasses.Hash<K> = HK
+  object : arrow.core.extensions.SortedMapKHash<K, A> {
+    override fun HK():
+      arrow.typeclasses.Hash<K> = HK
 
-  override fun HA(): arrow.typeclasses.Hash<A> = HA }
+    override fun HA(): arrow.typeclasses.Hash<A> = HA
+  }

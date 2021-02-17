@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val bifoldable_singleton: ValidatedBifoldable = object :
-    arrow.core.extensions.ValidatedBifoldable {}
+  arrow.core.extensions.ValidatedBifoldable {}
 
 @JvmName("bifoldLeft")
 @Suppress(

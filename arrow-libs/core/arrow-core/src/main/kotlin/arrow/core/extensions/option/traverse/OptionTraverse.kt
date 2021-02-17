@@ -26,9 +26,9 @@ internal val traverse_singleton: OptionTraverse = object : arrow.core.extensions
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<ForOption, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Kind<ForOption, B>> = arrow.core.Option.traverse().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, B>>
-}
+  Kind<G, Kind<ForOption, B>> = arrow.core.Option.traverse().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -42,9 +42,9 @@ fun <G, A, B> Kind<ForOption, A>.traverse(arg1: Applicative<G>, arg2: Function1<
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Kind<ForOption, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForOption, A>> =
-    arrow.core.Option.traverse().run {
-  this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, A>>
-}
+  arrow.core.Option.traverse().run {
+    this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.core.ForOption, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -56,14 +56,14 @@ fun <G, A> Kind<ForOption, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)"
+    "map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
-    arrow.core.Option.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

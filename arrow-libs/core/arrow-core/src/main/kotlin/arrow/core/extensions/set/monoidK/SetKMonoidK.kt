@@ -20,7 +20,8 @@ import kotlin.jvm.JvmName
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Monoid.set<A>()",
-    "arrow.typeclasses.Monoid", "arrow.core.set"
+    "arrow.typeclasses.Monoid",
+    "arrow.core.set"
   ),
   DeprecationLevel.WARNING
 )

@@ -39,6 +39,8 @@ fun <A, B> Tuple2<A, B>.neqv(
   level = DeprecationLevel.WARNING
 )
 inline fun <A, B> Companion.eq(EQA: Eq<A>, EQB: Eq<B>): Tuple2Eq<A, B> = object :
-    arrow.core.extensions.Tuple2Eq<A, B> { override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+  arrow.core.extensions.Tuple2Eq<A, B> {
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
 
-  override fun EQB(): arrow.typeclasses.Eq<B> = EQB }
+  override fun EQB(): arrow.typeclasses.Eq<B> = EQB
+}

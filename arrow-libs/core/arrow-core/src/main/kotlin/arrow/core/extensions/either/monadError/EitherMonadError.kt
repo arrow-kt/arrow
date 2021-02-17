@@ -33,7 +33,7 @@ internal val monadError_singleton: EitherMonadError<Any?> = object : EitherMonad
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("ensure(arg1, arg2)", "arrow.core.ensure"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.ensure(arg1: Function0<L>, arg2: Function1<A, Boolean>):
   Either<L, A> =
-  fix()._ensure(arg1, arg2)
+    fix()._ensure(arg1, arg2)
 
 @JvmName("redeemWith")
 @Suppress(
@@ -45,7 +45,7 @@ fun <L, A> Kind<Kind<ForEither, L>, A>.ensure(arg1: Function0<L>, arg2: Function
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("redeemWith(arg1, arg2)", "arrow.core.redeemWith"))
 fun <L, A, B> Kind<Kind<ForEither, L>, A>.redeemWith(
   arg1: Function1<L, Kind<Kind<ForEither, L>,
-    B>>,
+      B>>,
   arg2: Function1<A, Kind<Kind<ForEither, L>, B>>
 ): Either<L, B> =
   fix()._redeemWith({ arg1(it).fix() }, { arg2(it).fix() })

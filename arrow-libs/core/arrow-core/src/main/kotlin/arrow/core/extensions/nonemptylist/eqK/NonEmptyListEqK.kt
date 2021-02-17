@@ -27,15 +27,15 @@ internal val eqK_singleton: NonEmptyListEqK = object : arrow.core.extensions.Non
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "eqK(arg1, arg2)",
+    "arrow.core.eqK"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.eqK(arg1: Kind<ForNonEmptyList, A>, arg2: Eq<A>): Boolean =
-    arrow.core.NonEmptyList.eqK().run {
-  this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
-}
+  arrow.core.NonEmptyList.eqK().run {
+    this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -47,14 +47,14 @@ fun <A> Kind<ForNonEmptyList, A>.eqK(arg1: Kind<ForNonEmptyList, A>, arg2: Eq<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.NonEmptyList.liftEq"
+    "liftEq(arg0)",
+    "arrow.core.NonEmptyList.liftEq"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForNonEmptyList, A>> = arrow.core.NonEmptyList
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForNonEmptyList, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForNonEmptyList, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

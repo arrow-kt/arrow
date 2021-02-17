@@ -81,8 +81,8 @@ fun <A> Kind<ForListK, A>.fold(arg1: Monoid<A>): A = arrow.core.ListK.foldable()
 )
 fun <A, B> Kind<ForListK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
   Option<B> = arrow.core.ListK.foldable().run {
-  this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+    this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 @JvmName("reduceRightToOption")
 @Suppress(
@@ -190,8 +190,8 @@ fun <A> orEmpty(arg0: Applicative<ForListK>, arg1: Monoid<A>): ListK<A> = arrow.
 @Deprecated("@extension kinded projected functions are deprecated. Replace with traverseValidated_ or traverseEither_ from arrow.core.*")
 fun <G, A, B> Kind<ForListK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.core.ListK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(

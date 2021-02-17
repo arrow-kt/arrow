@@ -48,7 +48,8 @@ inline fun <A, B, C, D, E, F, G, H, I> Companion.hash(
   HH: Hash<H>,
   HI: Hash<I>
 ): Tuple9Hash<A, B, C, D, E, F, G, H, I> = object : arrow.core.extensions.Tuple9Hash<A, B, C, D, E,
-    F, G, H, I> { override fun HA(): arrow.typeclasses.Hash<A> = HA
+    F, G, H, I> {
+  override fun HA(): arrow.typeclasses.Hash<A> = HA
 
   override fun HB(): arrow.typeclasses.Hash<B> = HB
 
@@ -64,4 +65,5 @@ inline fun <A, B, C, D, E, F, G, H, I> Companion.hash(
 
   override fun HH(): arrow.typeclasses.Hash<H> = HH
 
-  override fun HI(): arrow.typeclasses.Hash<I> = HI }
+  override fun HI(): arrow.typeclasses.Hash<I> = HI
+}

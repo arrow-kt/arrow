@@ -36,7 +36,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.compare
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Int = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@compareTo.compareTo(arg1) as kotlin.Int
 }
 
@@ -64,7 +64,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.eqv(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@eqv.eqv(arg1) as kotlin.Boolean
 }
 
@@ -92,7 +92,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lt(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@lt.lt(arg1) as kotlin.Boolean
 }
 
@@ -120,7 +120,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.lte(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@lte.lte(arg1) as kotlin.Boolean
 }
 
@@ -148,7 +148,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gt(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@gt.gt(arg1) as kotlin.Boolean
 }
 
@@ -176,7 +176,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.gte(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@gte.gte(arg1) as kotlin.Boolean
 }
 
@@ -204,7 +204,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.max(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Tuple10<A, B, C, D, E, F, G, H, I, J> = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@max.max(arg1) as arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>
 }
 
@@ -232,7 +232,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.min(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Tuple10<A, B, C, D, E, F, G, H, I, J> = arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
-    J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
+  J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
   this@min.min(arg1) as arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>
 }
 
@@ -260,11 +260,11 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.sort(
   OJ: Order<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Tuple2<Tuple10<A, B, C, D, E, F, G, H, I, J>, Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-    arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
+  arrow.core.Tuple10.order<A, B, C, D, E, F, G, H, I,
     J>(OA, OB, OC, OD, OE, OF, OG, OH, OI, OJ).run {
-  this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>,
-    arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>>
-}
+    this@sort.sort(arg1) as arrow.core.Tuple2<arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>,
+      arrow.core.Tuple10<A, B, C, D, E, F, G, H, I, J>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -283,7 +283,8 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.order(
   OI: Order<I>,
   OJ: Order<J>
 ): Tuple10Order<A, B, C, D, E, F, G, H, I, J> = object : arrow.core.extensions.Tuple10Order<A, B, C,
-    D, E, F, G, H, I, J> { override fun OA(): arrow.typeclasses.Order<A> = OA
+    D, E, F, G, H, I, J> {
+  override fun OA(): arrow.typeclasses.Order<A> = OA
 
   override fun OB(): arrow.typeclasses.Order<B> = OB
 
@@ -301,4 +302,5 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.order(
 
   override fun OI(): arrow.typeclasses.Order<I> = OI
 
-  override fun OJ(): arrow.typeclasses.Order<J> = OJ }
+  override fun OJ(): arrow.typeclasses.Order<J> = OJ
+}

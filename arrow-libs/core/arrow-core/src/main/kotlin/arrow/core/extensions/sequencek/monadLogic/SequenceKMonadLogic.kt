@@ -13,7 +13,7 @@ import arrow.core.extensions.SequenceKMonadLogic
  */
 @PublishedApi()
 internal val monadLogic_singleton: SequenceKMonadLogic = object :
-    arrow.core.extensions.SequenceKMonadLogic {}
+  arrow.core.extensions.SequenceKMonadLogic {}
 
 @JvmName("splitM")
 @Suppress(
@@ -31,11 +31,11 @@ internal val monadLogic_singleton: SequenceKMonadLogic = object :
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.splitM(): SequenceK<Option<Tuple2<Kind<ForSequenceK, A>, A>>> =
-    arrow.core.SequenceK.monadLogic().run {
-  this@splitM.splitM<A>() as
-    arrow.core.SequenceK<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
-    A>>>
-}
+  arrow.core.SequenceK.monadLogic().run {
+    this@splitM.splitM<A>() as
+      arrow.core.SequenceK<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>,
+            A>>>
+  }
 
 @JvmName("interleave")
 @Suppress(
@@ -53,9 +53,9 @@ fun <A> Kind<ForSequenceK, A>.splitM(): SequenceK<Option<Tuple2<Kind<ForSequence
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.interleave(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.monadLogic().run {
-  this@interleave.interleave<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monadLogic().run {
+    this@interleave.interleave<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("unweave")
 @Suppress(
@@ -73,9 +73,9 @@ fun <A> Kind<ForSequenceK, A>.interleave(arg1: Kind<ForSequenceK, A>): SequenceK
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.unweave(arg1: Function1<A, Kind<ForSequenceK, B>>): SequenceK<B> =
-    arrow.core.SequenceK.monadLogic().run {
-  this@unweave.unweave<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monadLogic().run {
+    this@unweave.unweave<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("ifThen")
 @Suppress(
@@ -133,9 +133,9 @@ fun <A> Kind<ForSequenceK, A>.once(): SequenceK<A> = arrow.core.SequenceK.monadL
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.voidIfValue(): SequenceK<Unit> =
-    arrow.core.SequenceK.monadLogic().run {
-  this@voidIfValue.voidIfValue<A>() as arrow.core.SequenceK<kotlin.Unit>
-}
+  arrow.core.SequenceK.monadLogic().run {
+    this@voidIfValue.voidIfValue<A>() as arrow.core.SequenceK<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

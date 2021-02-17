@@ -24,8 +24,8 @@ internal val monoidK_singleton: ListKMonoidK = object : arrow.core.extensions.Li
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("listMonoid<A>()", "arrow.core.listMonoid"))
 fun <A> algebra(): Monoid<Kind<ForListK, A>> = arrow.core.ListK
-   .monoidK()
-   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForListK, A>>
+  .monoidK()
+  .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForListK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

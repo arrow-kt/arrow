@@ -28,4 +28,4 @@ fun <A> Kind<ForListK, A>.show(SA: Show<A>): String = arrow.core.ListK.show<A>(S
 )
 @Deprecated(ShowDeprecation)
 inline fun <A> Companion.show(SA: Show<A>): ListKShow<A> = object :
-    arrow.core.extensions.ListKShow<A> { override fun SA(): arrow.typeclasses.Show<A> = SA }
+  arrow.core.extensions.ListKShow<A> { override fun SA(): arrow.typeclasses.Show<A> = SA }

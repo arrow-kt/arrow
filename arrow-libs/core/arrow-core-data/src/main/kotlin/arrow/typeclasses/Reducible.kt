@@ -146,10 +146,11 @@ interface NonEmptyReducible<F, G> : Reducible<F> {
   }
 
   override fun <A> Kind<F, A>.get(idx: Long): Option<A> =
-    if (idx == 0L)
+    if (idx == 0L) {
       Some(this.split().a)
-    else
+    } else {
       FG().run { split().b.get(idx - 1L) }
+    }
 
   fun <A, B> Kind<F, A>.foldM_(M: Monad<G>, z: B, f: (B, A) -> Kind<G, B>): Kind<G, B> = M.run {
     val (a, ga) = split()

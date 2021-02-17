@@ -30,9 +30,9 @@ internal val monad_singleton: SequenceKMonad = object : arrow.core.extensions.Se
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.flatMap(arg1: Function1<A, Kind<ForSequenceK, B>>): SequenceK<B> =
-    arrow.core.SequenceK.monad().run {
-  this@flatMap.flatMap<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monad().run {
+    this@flatMap.flatMap<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("tailRecM")
 @Suppress(
@@ -50,9 +50,9 @@ fun <A, B> Kind<ForSequenceK, A>.flatMap(arg1: Function1<A, Kind<ForSequenceK, B
   DeprecationLevel.WARNING
 )
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSequenceK, Either<A, B>>>): SequenceK<B> =
-    arrow.core.SequenceK
-   .monad()
-   .tailRecM<A, B>(arg0, arg1) as arrow.core.SequenceK<B>
+  arrow.core.SequenceK
+    .monad()
+    .tailRecM<A, B>(arg0, arg1) as arrow.core.SequenceK<B>
 
 @JvmName("map")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSequenceK, Either<A, B>>
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
-    arrow.core.SequenceK.monad().run {
-  this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monad().run {
+    this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 /**
  *  @see [Apply.ap]
@@ -92,9 +92,9 @@ fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.ap(arg1: Kind<ForSequenceK, Function1<A, B>>): SequenceK<B> =
-    arrow.core.SequenceK.monad().run {
-  this@ap.ap<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monad().run {
+    this@ap.ap<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("flatten")
 @Suppress(
@@ -112,9 +112,9 @@ fun <A, B> Kind<ForSequenceK, A>.ap(arg1: Kind<ForSequenceK, Function1<A, B>>): 
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, Kind<ForSequenceK, A>>.flatten(): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@flatten.flatten<A>() as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@flatten.flatten<A>() as arrow.core.SequenceK<A>
+  }
 
 @JvmName("followedBy")
 @Suppress(
@@ -131,9 +131,9 @@ fun <A> Kind<ForSequenceK, Kind<ForSequenceK, A>>.flatten(): SequenceK<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.followedBy(arg1: Kind<ForSequenceK, B>): SequenceK<B> =
-    arrow.core.SequenceK.monad().run {
-  this@followedBy.followedBy<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monad().run {
+    this@followedBy.followedBy<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -150,9 +150,9 @@ fun <A, B> Kind<ForSequenceK, A>.followedBy(arg1: Kind<ForSequenceK, B>): Sequen
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.apTap(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@apTap.apTap<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("followedByEval")
 @Suppress(
@@ -169,9 +169,9 @@ fun <A, B> Kind<ForSequenceK, A>.apTap(arg1: Kind<ForSequenceK, B>): SequenceK<A
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.followedByEval(arg1: Eval<Kind<ForSequenceK, B>>): SequenceK<B> =
-    arrow.core.SequenceK.monad().run {
-  this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.monad().run {
+    this@followedByEval.followedByEval<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("effectM")
 @Suppress(
@@ -188,9 +188,9 @@ fun <A, B> Kind<ForSequenceK, A>.followedByEval(arg1: Eval<Kind<ForSequenceK, B>
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.effectM(arg1: Function1<A, Kind<ForSequenceK, B>>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@effectM.effectM<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@effectM.effectM<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("flatTap")
 @Suppress(
@@ -207,9 +207,9 @@ fun <A, B> Kind<ForSequenceK, A>.effectM(arg1: Function1<A, Kind<ForSequenceK, B
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.flatTap(arg1: Function1<A, Kind<ForSequenceK, B>>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@flatTap.flatTap<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@flatTap.flatTap<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("productL")
 @Suppress(
@@ -226,9 +226,9 @@ fun <A, B> Kind<ForSequenceK, A>.flatTap(arg1: Function1<A, Kind<ForSequenceK, B
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.productL(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@productL.productL<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@productL.productL<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("forEffect")
 @Suppress(
@@ -245,9 +245,9 @@ fun <A, B> Kind<ForSequenceK, A>.productL(arg1: Kind<ForSequenceK, B>): Sequence
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.forEffect(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@forEffect.forEffect<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@forEffect.forEffect<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("productLEval")
 @Suppress(
@@ -264,9 +264,9 @@ fun <A, B> Kind<ForSequenceK, A>.forEffect(arg1: Kind<ForSequenceK, B>): Sequenc
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.productLEval(arg1: Eval<Kind<ForSequenceK, B>>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@productLEval.productLEval<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@productLEval.productLEval<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("forEffectEval")
 @Suppress(
@@ -283,9 +283,9 @@ fun <A, B> Kind<ForSequenceK, A>.productLEval(arg1: Eval<Kind<ForSequenceK, B>>)
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.forEffectEval(arg1: Eval<Kind<ForSequenceK, B>>): SequenceK<A> =
-    arrow.core.SequenceK.monad().run {
-  this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monad().run {
+    this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("mproduct")
 @Suppress(
@@ -303,9 +303,9 @@ fun <A, B> Kind<ForSequenceK, A>.forEffectEval(arg1: Eval<Kind<ForSequenceK, B>>
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.mproduct(arg1: Function1<A, Kind<ForSequenceK, B>>):
-    SequenceK<Tuple2<A, B>> = arrow.core.SequenceK.monad().run {
-  this@mproduct.mproduct<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
-}
+  SequenceK<Tuple2<A, B>> = arrow.core.SequenceK.monad().run {
+    this@mproduct.mproduct<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("ifM")
 @Suppress(
@@ -345,9 +345,9 @@ fun <B> Kind<ForSequenceK, Boolean>.ifM(
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, Either<A, B>>.selectM(arg1: Kind<ForSequenceK, Function1<A, B>>):
-    SequenceK<B> = arrow.core.SequenceK.monad().run {
-  this@selectM.selectM<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  SequenceK<B> = arrow.core.SequenceK.monad().run {
+    this@selectM.selectM<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("select")
 @Suppress(
@@ -365,9 +365,9 @@ fun <A, B> Kind<ForSequenceK, Either<A, B>>.selectM(arg1: Kind<ForSequenceK, Fun
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, Either<A, B>>.select(arg1: Kind<ForSequenceK, Function1<A, B>>):
-    SequenceK<B> = arrow.core.SequenceK.monad().run {
-  this@select.select<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  SequenceK<B> = arrow.core.SequenceK.monad().run {
+    this@select.select<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 /**
  *  [Monad] abstract over the ability to declare sequential computations that are dependent in the order or

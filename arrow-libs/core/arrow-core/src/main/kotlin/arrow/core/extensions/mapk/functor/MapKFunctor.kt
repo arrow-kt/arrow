@@ -33,9 +33,9 @@ internal val functor_singleton: MapKFunctor<Any?> = object : MapKFunctor<Any?> {
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.map(arg1: Function1<A, B>): MapK<K, B> =
-    arrow.core.MapK.functor<K>().run {
-  this@map.map<A, B>(arg1) as arrow.core.MapK<K, B>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@map.map<A, B>(arg1) as arrow.core.MapK<K, B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -50,7 +50,7 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.map(arg1: Function1<A, B>): MapK<K, B> =
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): MapK<K,
-    B> = arrow.core.MapK.functor<K>().run {
+  B> = arrow.core.MapK.functor<K>().run {
   this@imap.imap<A, B>(arg1, arg2) as arrow.core.MapK<K, B>
 }
 
@@ -63,10 +63,10 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.imap(arg1: Function1<A, B>, arg2: Functi
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("{ l: Map<K, A> -> l.mapValues { (_, a) -> arg0(a) } }"))
 fun <K, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK,
-    K>, B>> = arrow.core.MapK
-   .functor<K>()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
-    arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
+      K>, B>> = arrow.core.MapK
+  .functor<K>()
+  .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
+  arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 
 @JvmName("void")
 @Suppress(
@@ -78,8 +78,8 @@ fun <K, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForMapK, K>, A>, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "void()",
-  "arrow.core.void"
+    "void()",
+    "arrow.core.void"
   ),
   DeprecationLevel.WARNING
 )
@@ -97,15 +97,15 @@ fun <K, A> Kind<Kind<ForMapK, K>, A>.void(): MapK<K, Unit> = arrow.core.MapK.fun
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fproduct(arg1)",
-  "arrow.core.fproduct"
+    "fproduct(arg1)",
+    "arrow.core.fproduct"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.fproduct(arg1: Function1<A, B>): MapK<K, Tuple2<A, B>> =
-    arrow.core.MapK.functor<K>().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -120,9 +120,9 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.fproduct(arg1: Function1<A, B>): MapK<K,
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.mapConst(arg1: B): MapK<K, B> =
-    arrow.core.MapK.functor<K>().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.core.MapK<K, B>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.core.MapK<K, B>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -137,9 +137,9 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.mapConst(arg1: B): MapK<K, B> =
   DeprecationLevel.WARNING
 )
 fun <K, A, B> A.mapConst(arg1: Kind<Kind<ForMapK, K>, B>): MapK<K, A> =
-    arrow.core.MapK.functor<K>().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.core.MapK<K, A>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.core.MapK<K, A>
+  }
 
 @JvmName("tupleLeft")
 @Suppress(
@@ -151,15 +151,15 @@ fun <K, A, B> A.mapConst(arg1: Kind<Kind<ForMapK, K>, B>): MapK<K, A> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleLeft(arg1)",
-  "arrow.core.tupleLeft"
+    "tupleLeft(arg1)",
+    "arrow.core.tupleLeft"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.tupleLeft(arg1: B): MapK<K, Tuple2<B, A>> =
-    arrow.core.MapK.functor<K>().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<B, A>>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -171,15 +171,15 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.tupleLeft(arg1: B): MapK<K, Tuple2<B, A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "tupleRight(arg1)",
-  "arrow.core.tupleRight"
+    "tupleRight(arg1)",
+    "arrow.core.tupleRight"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.tupleRight(arg1: B): MapK<K, Tuple2<A, B>> =
-    arrow.core.MapK.functor<K>().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
-}
+  arrow.core.MapK.functor<K>().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(
@@ -191,8 +191,8 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.tupleRight(arg1: B): MapK<K, Tuple2<A, B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "widen()",
-  "arrow.core.widen"
+    "widen()",
+    "arrow.core.widen"
   ),
   DeprecationLevel.WARNING
 )
@@ -206,4 +206,4 @@ fun <K, B, A : B> Kind<Kind<ForMapK, K>, A>.widen(): MapK<K, B> = arrow.core.Map
 )
 @Deprecated("Functor typeclasses is deprecated. Use concrete methods on Map")
 inline fun <K> Companion.functor(): MapKFunctor<K> = functor_singleton as
-    arrow.core.extensions.MapKFunctor<K>
+  arrow.core.extensions.MapKFunctor<K>

@@ -17,7 +17,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val bitraverse_singleton: Tuple2Bitraverse = object :
-    arrow.core.extensions.Tuple2Bitraverse {}
+  arrow.core.extensions.Tuple2Bitraverse {}
 
 @JvmName("bitraverse")
 @Suppress(
@@ -45,10 +45,10 @@ fun <G, A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bitraverse(
 )
 @Deprecated("Applicative typeclass is deprecated. Use concrete methods on Pair")
 fun <G, A, B> Kind<Kind<ForTuple2, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>):
-    Kind<G, Kind<Kind<ForTuple2, A>, B>> = arrow.core.Tuple2.bitraverse().run {
-  this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForTuple2, A>, B>>
-}
+  Kind<G, Kind<Kind<ForTuple2, A>, B>> = arrow.core.Tuple2.bitraverse().run {
+    this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.Kind<arrow.core.ForTuple2, A>, B>>
+  }
 
 @JvmName("bimap")
 @Suppress(
@@ -66,9 +66,9 @@ fun <G, A, B> Kind<Kind<ForTuple2, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: App
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D> Kind<Kind<ForTuple2, A>, B>.bimap(arg1: Function1<A, C>, arg2: Function1<B, D>):
-    Tuple2<C, D> = arrow.core.Tuple2.bitraverse().run {
-  this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Tuple2<C, D>
-}
+  Tuple2<C, D> = arrow.core.Tuple2.bitraverse().run {
+    this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Tuple2<C, D>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

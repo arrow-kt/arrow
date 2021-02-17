@@ -109,7 +109,7 @@ fun <E, A> Kind<Kind<ForValidated, E>, A>.attempt(SE: Semigroup<E>): Validated<E
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
 )
- @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.catch(arg0, arg1)", "arrow.core.catch"))
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.catch(arg0, arg1)", "arrow.core.catch"))
 fun <E, A> catch(
   SE: Semigroup<E>,
   arg0: Function1<Throwable, E>,
@@ -145,7 +145,7 @@ suspend fun <E, A> effectCatch(
   arg0: Function1<Throwable, E>,
   arg1: suspend () -> A
 ): Validated<E, A> =
-   Validated.catch(arg0) { arg1() }
+  Validated.catch(arg0) { arg1() }
 
 @JvmName("effectCatch")
 @Suppress(

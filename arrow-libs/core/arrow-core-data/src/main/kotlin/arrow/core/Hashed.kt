@@ -9,16 +9,19 @@ import arrow.typeclasses.HashDeprecation
   level = DeprecationLevel.WARNING
 )
 class ForHashed private constructor() { companion object }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias HashedOf<A> = arrow.Kind<ForHashed, A>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
 )
 typealias HashedKindedJ<A> = io.kindedj.Hk<ForHashed, A>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,

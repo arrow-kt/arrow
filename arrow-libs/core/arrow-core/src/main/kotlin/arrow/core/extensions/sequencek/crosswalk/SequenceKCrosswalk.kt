@@ -11,7 +11,7 @@ import arrow.typeclasses.Align
  */
 @PublishedApi()
 internal val crosswalk_singleton: SequenceKCrosswalk = object :
-    arrow.core.extensions.SequenceKCrosswalk {}
+  arrow.core.extensions.SequenceKCrosswalk {}
 
 @JvmName("crosswalk")
 @Suppress(
@@ -29,8 +29,8 @@ fun <F, A, B> crosswalk(
   arg1: Kind<ForSequenceK, A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<ForSequenceK, B>> = arrow.core.SequenceK
-   .crosswalk()
-   .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForSequenceK, B>>
+  .crosswalk()
+  .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @JvmName("sequenceL")
 @Suppress(
@@ -44,9 +44,9 @@ fun <F, A, B> crosswalk(
   level = DeprecationLevel.WARNING
 )
 fun <F, A> sequenceL(arg0: Align<F>, arg1: Kind<ForSequenceK, Kind<F, A>>): Kind<F,
-    Kind<ForSequenceK, A>> = arrow.core.SequenceK
-   .crosswalk()
-   .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.core.ForSequenceK, A>>
+  Kind<ForSequenceK, A>> = arrow.core.SequenceK
+  .crosswalk()
+  .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.core.ForSequenceK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

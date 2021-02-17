@@ -84,10 +84,11 @@ sealed class TypeName : Tree() {
     val returnType: TypeName
   ) : TypeName() {
     override val simpleName: String
-      get() = if (receiverType != null)
+      get() = if (receiverType != null) {
         "(${receiverType.simpleName}).(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
-    else
+      } else {
         "(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
+      }
 
     override val rawName: String
       get() {

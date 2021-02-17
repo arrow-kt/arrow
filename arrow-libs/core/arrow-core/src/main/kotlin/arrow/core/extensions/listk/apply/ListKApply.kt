@@ -49,8 +49,8 @@ fun <A, B> Kind<ForListK, A>.ap(arg1: Kind<ForListK, Function1<A, B>>): ListK<B>
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg1.map { this.ap(it.fix()) }.map { it.k() }", "arrow.core.k", "arrow.core.fix"))
 fun <A, B> Kind<ForListK, A>.apEval(arg1: Eval<Kind<ForListK, Function1<A, B>>>):
   Eval<Kind<ForListK, B>> = arrow.core.ListK.apply().run {
-  this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.core.ForListK, B>>
-}
+    this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.core.ForListK, B>>
+  }
 
 @JvmName("map2Eval")
 @Suppress(
@@ -63,7 +63,7 @@ fun <A, B> Kind<ForListK, A>.apEval(arg1: Eval<Kind<ForListK, Function1<A, B>>>)
 fun <A, B, Z> Kind<ForListK, A>.map2Eval(
   arg1: Eval<Kind<ForListK, B>>,
   arg2: Function1<Tuple2<A,
-    B>, Z>
+      B>, Z>
 ): Eval<Kind<ForListK, Z>> = arrow.core.ListK.apply().run {
   this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as arrow.core.Eval<arrow.Kind<arrow.core.ForListK, Z>>
 }
@@ -446,8 +446,8 @@ fun <A, B, C, D, E, FF, G, H, I, J, Z> mapN(
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { a, b -> arg2(Tuple2(a, b)) }", "arrow.core.Tuple2", "kotlin.collections.zip"))
 fun <A, B, Z> Kind<ForListK, A>.map2(arg1: Kind<ForListK, B>, arg2: Function1<Tuple2<A, B>, Z>):
   ListK<Z> = arrow.core.ListK.apply().run {
-  this@map2.map2<A, B, Z>(arg1, arg2) as arrow.core.ListK<Z>
-}
+    this@map2.map2<A, B, Z>(arg1, arg2) as arrow.core.ListK<Z>
+  }
 
 @JvmName("product")
 @Suppress(
@@ -484,7 +484,7 @@ fun <A, B, Z> Kind<ForListK, Tuple2<A, B>>.product(arg1: Kind<ForListK, Z>): Lis
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c), z -> Tuple4(a, b, c, z) }", "arrow.core.Tuple4", "kotlin.collections.zip"))
 fun <A, B, C, Z> Kind<ForListK, Tuple3<A, B, C>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple4<A,
-  B, C, Z>> = arrow.core.ListK.apply().run {
+    B, C, Z>> = arrow.core.ListK.apply().run {
   this@product.product<A, B, C, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple4<A, B, C, Z>>
 }
 
@@ -498,8 +498,8 @@ fun <A, B, C, Z> Kind<ForListK, Tuple3<A, B, C>>.product(arg1: Kind<ForListK, Z>
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d), z -> Tuple5(a, b, c, d, z) }", "arrow.core.Tuple5", "kotlin.collections.zip"))
 fun <A, B, C, D, Z> Kind<ForListK, Tuple4<A, B, C, D>>.product(arg1: Kind<ForListK, Z>):
   ListK<Tuple5<A, B, C, D, Z>> = arrow.core.ListK.apply().run {
-  this@product.product<A, B, C, D, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple5<A, B, C, D, Z>>
-}
+    this@product.product<A, B, C, D, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple5<A, B, C, D, Z>>
+  }
 
 @JvmName("product4")
 @Suppress(
@@ -511,9 +511,9 @@ fun <A, B, C, D, Z> Kind<ForListK, Tuple4<A, B, C, D>>.product(arg1: Kind<ForLis
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e), z -> Tuple6(a, b, c, d, e, z) }", "arrow.core.Tuple6", "kotlin.collections.zip"))
 fun <A, B, C, D, E, Z> Kind<ForListK, Tuple5<A, B, C, D, E>>.product(arg1: Kind<ForListK, Z>):
   ListK<Tuple6<A, B, C, D, E, Z>> = arrow.core.ListK.apply().run {
-  this@product.product<A, B, C, D, E, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple6<A, B, C, D, E,
-    Z>>
-}
+    this@product.product<A, B, C, D, E, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple6<A, B, C, D, E,
+        Z>>
+  }
 
 @JvmName("product5")
 @Suppress(
@@ -528,7 +528,7 @@ fun <A, B, C, D, E, FF, Z> Kind<ForListK, Tuple6<A, B, C, D, E, FF>>.product(
     Z>
 ): ListK<Tuple7<A, B, C, D, E, FF, Z>> = arrow.core.ListK.apply().run {
   this@product.product<A, B, C, D, E, FF, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple7<A, B, C, D,
-    E, FF, Z>>
+      E, FF, Z>>
 }
 
 @JvmName("product6")
@@ -540,10 +540,10 @@ fun <A, B, C, D, E, FF, Z> Kind<ForListK, Tuple6<A, B, C, D, E, FF>>.product(
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g), z -> Tuple8(a, b, c, d, e, ff, g, z) }", "arrow.core.Tuple8", "kotlin.collections.zip"))
 fun <A, B, C, D, E, FF, G, Z> Kind<ForListK, Tuple7<A, B, C, D, E, FF,
-  G>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple8<A, B, C, D, E, FF, G, Z>> =
+    G>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple8<A, B, C, D, E, FF, G, Z>> =
   arrow.core.ListK.apply().run {
     this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple8<A, B, C,
-      D, E, FF, G, Z>>
+        D, E, FF, G, Z>>
   }
 
 @JvmName("product7")
@@ -555,10 +555,10 @@ fun <A, B, C, D, E, FF, G, Z> Kind<ForListK, Tuple7<A, B, C, D, E, FF,
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g, h), z -> Tuple9(a, b, c, d, e, ff, g, h, z) }", "arrow.core.Tuple9", "kotlin.collections.zip"))
 fun <A, B, C, D, E, FF, G, H, Z> Kind<ForListK, Tuple8<A, B, C, D, E, FF, G,
-  H>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple9<A, B, C, D, E, FF, G, H, Z>> =
+    H>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple9<A, B, C, D, E, FF, G, H, Z>> =
   arrow.core.ListK.apply().run {
     this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as arrow.core.ListK<arrow.core.Tuple9<A, B,
-      C, D, E, FF, G, H, Z>>
+        C, D, E, FF, G, H, Z>>
   }
 
 @JvmName("product8")
@@ -570,7 +570,7 @@ fun <A, B, C, D, E, FF, G, H, Z> Kind<ForListK, Tuple8<A, B, C, D, E, FF, G,
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("zip(arg1) { (a, b, c, d, e, ff, g, h, i), z -> Tuple10(a, b, c, d, e, ff, g, h, i, z) }", "arrow.core.Tuple10", "kotlin.collections.zip"))
 fun <A, B, C, D, E, FF, G, H, I, Z> Kind<ForListK, Tuple9<A, B, C, D, E, FF, G, H,
-  I>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
+    I>>.product(arg1: Kind<ForListK, Z>): ListK<Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
   arrow.core.ListK.apply().run {
     this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as
       arrow.core.ListK<arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
@@ -685,7 +685,7 @@ fun <A, B, C, D, E> tupled(
 ): ListK<Tuple5<A, B, C, D, E>> = arrow.core.ListK
   .apply()
   .tupled<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.ListK<arrow.core.Tuple5<A, B,
-  C, D, E>>
+    C, D, E>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -704,7 +704,7 @@ fun <A, B, C, D, E> tupledN(
 ): ListK<Tuple5<A, B, C, D, E>> = arrow.core.ListK
   .apply()
   .tupledN<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.ListK<arrow.core.Tuple5<A, B,
-  C, D, E>>
+    C, D, E>>
 
 @JvmName("tupled")
 @Suppress(

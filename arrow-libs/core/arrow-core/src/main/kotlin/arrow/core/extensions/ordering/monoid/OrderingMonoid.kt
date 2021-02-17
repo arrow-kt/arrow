@@ -33,10 +33,11 @@ fun Collection<Ordering>.combineAll(): Ordering = arrow.core.Ordering.monoid().r
   "USELESS_CAST",
   "EXTENSION_SHADOWED_BY_MEMBER",
   "UNUSED_PARAMETER"
-)	@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.combineAll()", "arrow.core.combineAll"))
+)
+@Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("arg0.combineAll()", "arrow.core.combineAll"))
 fun combineAll(arg0: List<Ordering>): Ordering = arrow.core.Ordering
-   .monoid()
-   .combineAll(arg0) as arrow.core.Ordering
+  .monoid()
+  .combineAll(arg0) as arrow.core.Ordering
 
 @Suppress(
   "UNCHECKED_CAST",

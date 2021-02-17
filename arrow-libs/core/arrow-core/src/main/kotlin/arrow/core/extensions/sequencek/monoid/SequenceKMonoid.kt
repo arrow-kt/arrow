@@ -43,8 +43,8 @@ fun <A> Collection<SequenceK<A>>.combineAll(): SequenceK<A> = arrow.core.Sequenc
   DeprecationLevel.WARNING
 )
 fun <A> combineAll(arg0: List<SequenceK<A>>): SequenceK<A> = arrow.core.SequenceK
-   .monoid<A>()
-   .combineAll(arg0) as arrow.core.SequenceK<A>
+  .monoid<A>()
+  .combineAll(arg0) as arrow.core.SequenceK<A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -56,4 +56,4 @@ fun <A> combineAll(arg0: List<SequenceK<A>>): SequenceK<A> = arrow.core.Sequence
   level = DeprecationLevel.WARNING
 )
 inline fun <A> Companion.monoid(): SequenceKMonoid<A> = monoid_singleton as
-    arrow.core.extensions.SequenceKMonoid<A>
+  arrow.core.extensions.SequenceKMonoid<A>

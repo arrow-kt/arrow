@@ -18,8 +18,8 @@ import arrow.typeclasses.Semigroup
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Ior.Right(this)",
-  "arrow.core.Ior"
+    "Ior.Right(this)",
+    "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
@@ -37,14 +37,14 @@ fun <L, A> A.just(SL: Semigroup<L>): Ior<L, A> = arrow.core.Ior.applicative<L>(S
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Ior.unit<L>()",
-  "arrow.core.Ior"
+    "Ior.unit<L>()",
+    "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
 fun <L> unit(SL: Semigroup<L>): Ior<L, Unit> = arrow.core.Ior
-   .applicative<L>(SL)
-   .unit() as arrow.core.Ior<L, kotlin.Unit>
+  .applicative<L>(SL)
+  .unit() as arrow.core.Ior<L, kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,14 +56,14 @@ fun <L> unit(SL: Semigroup<L>): Ior<L, Unit> = arrow.core.Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)"
+    "map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(SL: Semigroup<L>, arg1: Function1<A, B>): Ior<L, B> =
-    arrow.core.Ior.applicative<L>(SL).run {
-  this@map.map<A, B>(arg1) as arrow.core.Ior<L, B>
-}
+  arrow.core.Ior.applicative<L>(SL).run {
+    this@map.map<A, B>(arg1) as arrow.core.Ior<L, B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -75,15 +75,15 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.map(SL: Semigroup<L>, arg1: Function1<A, 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(SL, arg1)",
-  "arrow.core.replicate"
+    "replicate(SL, arg1)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.replicate(SL: Semigroup<L>, arg1: Int): Ior<L, List<A>> =
-    arrow.core.Ior.applicative<L>(SL).run {
-  this@replicate.replicate<A>(arg1) as arrow.core.Ior<L, kotlin.collections.List<A>>
-}
+  arrow.core.Ior.applicative<L>(SL).run {
+    this@replicate.replicate<A>(arg1) as arrow.core.Ior<L, kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -95,8 +95,8 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.replicate(SL: Semigroup<L>, arg1: Int): Ior<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(SL, arg1, arg2)",
-  "arrow.core.replicate"
+    "replicate(SL, arg1, arg2)",
+    "arrow.core.replicate"
   ),
   DeprecationLevel.WARNING
 )
@@ -117,5 +117,6 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.replicate(
   level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.applicative(SL: Semigroup<L>): IorApplicative<L> = object :
-    arrow.core.extensions.IorApplicative<L> { override fun SL(): arrow.typeclasses.Semigroup<L> = SL
-    }
+  arrow.core.extensions.IorApplicative<L> {
+  override fun SL(): arrow.typeclasses.Semigroup<L> = SL
+}

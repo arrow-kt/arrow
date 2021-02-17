@@ -30,4 +30,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Align typeclasses is deprecated. Use concrete methods on List")
-  inline fun align(): ListKAlign = align_singleton}
+  inline fun align(): ListKAlign = align_singleton
+}

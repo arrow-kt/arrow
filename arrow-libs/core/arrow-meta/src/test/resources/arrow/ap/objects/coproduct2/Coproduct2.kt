@@ -16,6 +16,6 @@ fun <A> Coproduct2<A, *>.select(): Option<A> = (this as? First)?.a.toOption()
 fun <B> Coproduct2<*, B>.select(dummy0: Unit = Unit): Option<B> = (this as? Second)?.b.toOption()
 
 fun <A, B, RESULT> Coproduct2<A, B>.fold(a: (A) -> RESULT, b: (B) -> RESULT): RESULT = when (this) {
-    is First -> a(this.a)
-    is Second -> b(this.b)
+  is First -> a(this.a)
+  is Second -> b(this.b)
 }

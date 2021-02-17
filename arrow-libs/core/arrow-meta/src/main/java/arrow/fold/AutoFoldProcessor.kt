@@ -42,17 +42,21 @@ class AutoFoldProcessor : AbstractProcessor() {
                 .map(nameResolver::getString)
                 .map { it.replace('/', '.') }
                 .map {
-                  Variant(it,
+                  Variant(
+                    it,
                     elementUtils.getTypeElement(it).typeParameters.map(TypeParameterElement::toString),
-                    it.substringAfterLast("."))
+                    it.substringAfterLast(".")
+                  )
                 }
             )
           }
 
-          else -> knownError("""
+          else -> knownError(
+            """
             |$this is an invalid target for @autofold.
             |Generation of fold is only supported for sealed classes.
-            """.trimMargin())
+            """.trimMargin()
+          )
         }
       }
 

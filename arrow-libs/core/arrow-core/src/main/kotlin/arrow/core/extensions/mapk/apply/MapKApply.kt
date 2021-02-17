@@ -38,13 +38,13 @@ internal val apply_singleton: MapKApply<Any?> = object : MapKApply<Any?> {}
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "ap(arg1)",
-  "arrow.core.ap"
+    "ap(arg1)",
+    "arrow.core.ap"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.ap(arg1: Kind<Kind<ForMapK, K>, Function1<A, B>>): MapK<K,
-    B> = arrow.core.MapK.apply<K>().run {
+  B> = arrow.core.MapK.apply<K>().run {
   this@ap.ap<A, B>(arg1) as arrow.core.MapK<K, B>
 }
 
@@ -64,10 +64,10 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.ap(arg1: Kind<Kind<ForMapK, K>, Function
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.apEval(arg1: Eval<Kind<Kind<ForMapK, K>, Function1<A, B>>>):
-    Eval<Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK.apply<K>().run {
-  this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>,
-    B>>
-}
+  Eval<Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK.apply<K>().run {
+    this@apEval.apEval<A, B>(arg1) as arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>,
+        B>>
+  }
 
 @JvmName("map2Eval")
 @Suppress(
@@ -89,10 +89,10 @@ fun <K, A, B, Z> Kind<Kind<ForMapK, K>, A>.map2Eval(
   arg1: Eval<Kind<Kind<ForMapK, K>, B>>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): Eval<Kind<Kind<ForMapK, K>, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as
-    arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as
+      arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, Z>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -115,8 +115,8 @@ fun <K, A, B, Z> map(
   arg1: Kind<Kind<ForMapK, K>, B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, Z>(arg0, arg1, arg2) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, Z>(arg0, arg1, arg2) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -139,8 +139,8 @@ fun <K, A, B, Z> mapN(
   arg1: Kind<Kind<ForMapK, K>, B>,
   arg2: Function1<Tuple2<A, B>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, Z>(arg0, arg1, arg2) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, Z>(arg0, arg1, arg2) as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -164,8 +164,8 @@ fun <K, A, B, C, Z> map(
   arg2: Kind<Kind<ForMapK, K>, C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, Z>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, Z>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -189,8 +189,8 @@ fun <K, A, B, C, Z> mapN(
   arg2: Kind<Kind<ForMapK, K>, C>,
   arg3: Function1<Tuple3<A, B, C>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, Z>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, Z>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -215,8 +215,8 @@ fun <K, A, B, C, D, Z> map(
   arg3: Kind<Kind<ForMapK, K>, D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, Z>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, Z>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -241,8 +241,8 @@ fun <K, A, B, C, D, Z> mapN(
   arg3: Kind<Kind<ForMapK, K>, D>,
   arg4: Function1<Tuple4<A, B, C, D>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, Z>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, Z>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -268,8 +268,8 @@ fun <K, A, B, C, D, E, Z> map(
   arg4: Kind<Kind<ForMapK, K>, E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, Z>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, E, Z>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -295,8 +295,8 @@ fun <K, A, B, C, D, E, Z> mapN(
   arg4: Kind<Kind<ForMapK, K>, E>,
   arg5: Function1<Tuple5<A, B, C, D, E>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, Z>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, E, Z>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -323,8 +323,8 @@ fun <K, A, B, C, D, E, FF, Z> map(
   arg5: Kind<Kind<ForMapK, K>, FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, FF, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, E, FF, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -351,8 +351,8 @@ fun <K, A, B, C, D, E, FF, Z> mapN(
   arg5: Kind<Kind<ForMapK, K>, FF>,
   arg6: Function1<Tuple6<A, B, C, D, E, FF>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, FF, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, E, FF, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -380,9 +380,9 @@ fun <K, A, B, C, D, E, FF, G, Z> map(
   arg6: Kind<Kind<ForMapK, K>, G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, FF, G, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
-    arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, E, FF, G, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
+  arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -410,9 +410,9 @@ fun <K, A, B, C, D, E, FF, G, Z> mapN(
   arg6: Kind<Kind<ForMapK, K>, G>,
   arg7: Function1<Tuple7<A, B, C, D, E, FF, G>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, FF, G, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
-    arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, E, FF, G, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
+  arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -441,9 +441,9 @@ fun <K, A, B, C, D, E, FF, G, H, Z> map(
   arg7: Kind<Kind<ForMapK, K>, H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, FF, G, H, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
-    arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, E, FF, G, H, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
+  arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -472,9 +472,9 @@ fun <K, A, B, C, D, E, FF, G, H, Z> mapN(
   arg7: Kind<Kind<ForMapK, K>, H>,
   arg8: Function1<Tuple8<A, B, C, D, E, FF, G, H>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, FF, G, H, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
-    arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, E, FF, G, H, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
+  arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -504,9 +504,9 @@ fun <K, A, B, C, D, E, FF, G, H, I, Z> map(
   arg8: Kind<Kind<ForMapK, K>, I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, FF, G, H, I, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-    as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .map<A, B, C, D, E, FF, G, H, I, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+  as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
 @Suppress(
@@ -536,9 +536,9 @@ fun <K, A, B, C, D, E, FF, G, H, I, Z> mapN(
   arg8: Kind<Kind<ForMapK, K>, I>,
   arg9: Function1<Tuple9<A, B, C, D, E, FF, G, H, I>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, FF, G, H, I, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-    as arrow.core.MapK<K, Z>
+  .apply<K>()
+  .mapN<A, B, C, D, E, FF, G, H, I, Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+  as arrow.core.MapK<K, Z>
 
 @JvmName("map")
 @Suppress(
@@ -569,8 +569,8 @@ fun <K, A, B, C, D, E, FF, G, H, I, J, Z> map(
   arg9: Kind<Kind<ForMapK, K>, J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .map<A, B, C, D, E, FF, G, H, I, J,
+  .apply<K>()
+  .map<A, B, C, D, E, FF, G, H, I, J,
     Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) as arrow.core.MapK<K, Z>
 
 @JvmName("mapN")
@@ -602,8 +602,8 @@ fun <K, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
   arg9: Kind<Kind<ForMapK, K>, J>,
   arg10: Function1<Tuple10<A, B, C, D, E, FF, G, H, I, J>, Z>
 ): MapK<K, Z> = arrow.core.MapK
-   .apply<K>()
-   .mapN<A, B, C, D, E, FF, G, H, I, J,
+  .apply<K>()
+  .mapN<A, B, C, D, E, FF, G, H, I, J,
     Z>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) as arrow.core.MapK<K, Z>
 
 @JvmName("map2")
@@ -667,9 +667,9 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.product(arg1: Kind<Kind<ForMapK, K>, B>)
   DeprecationLevel.WARNING
 )
 fun <K, A, B, Z> Kind<Kind<ForMapK, K>, Tuple2<A, B>>.product(arg1: Kind<Kind<ForMapK, K>, Z>):
-    MapK<K, Tuple3<A, B, Z>> = arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, Z>>
-}
+  MapK<K, Tuple3<A, B, Z>> = arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, Z>>
+  }
 
 @JvmName("product2")
 @Suppress(
@@ -689,7 +689,7 @@ fun <K, A, B, Z> Kind<Kind<ForMapK, K>, Tuple2<A, B>>.product(arg1: Kind<Kind<Fo
 )
 fun <K, A, B, C, Z> Kind<Kind<ForMapK, K>, Tuple3<A, B, C>>.product(
   arg1: Kind<Kind<ForMapK, K>,
-Z>
+    Z>
 ): MapK<K, Tuple4<A, B, C, Z>> = arrow.core.MapK.apply<K>().run {
   this@product.product<A, B, C, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple4<A, B, C, Z>>
 }
@@ -712,7 +712,7 @@ Z>
 )
 fun <K, A, B, C, D, Z> Kind<Kind<ForMapK, K>, Tuple4<A, B, C, D>>.product(
   arg1: Kind<Kind<ForMapK,
-K>, Z>
+      K>, Z>
 ): MapK<K, Tuple5<A, B, C, D, Z>> = arrow.core.MapK.apply<K>().run {
   this@product.product<A, B, C, D, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple5<A, B, C, D, Z>>
 }
@@ -735,10 +735,10 @@ K>, Z>
 )
 fun <K, A, B, C, D, E, Z> Kind<Kind<ForMapK, K>, Tuple5<A, B, C, D,
     E>>.product(arg1: Kind<Kind<ForMapK, K>, Z>): MapK<K, Tuple6<A, B, C, D, E, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, C, D, E, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple6<A, B, C, D,
-    E, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, C, D, E, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple6<A, B, C, D,
+        E, Z>>
+  }
 
 @JvmName("product5")
 @Suppress(
@@ -758,10 +758,10 @@ fun <K, A, B, C, D, E, Z> Kind<Kind<ForMapK, K>, Tuple5<A, B, C, D,
 )
 fun <K, A, B, C, D, E, FF, Z> Kind<Kind<ForMapK, K>, Tuple6<A, B, C, D, E,
     FF>>.product(arg1: Kind<Kind<ForMapK, K>, Z>): MapK<K, Tuple7<A, B, C, D, E, FF, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, C, D, E, FF, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple7<A, B, C,
-    D, E, FF, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, C, D, E, FF, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple7<A, B, C,
+        D, E, FF, Z>>
+  }
 
 @JvmName("product6")
 @Suppress(
@@ -781,10 +781,10 @@ fun <K, A, B, C, D, E, FF, Z> Kind<Kind<ForMapK, K>, Tuple6<A, B, C, D, E,
 )
 fun <K, A, B, C, D, E, FF, G, Z> Kind<Kind<ForMapK, K>, Tuple7<A, B, C, D, E, FF,
     G>>.product(arg1: Kind<Kind<ForMapK, K>, Z>): MapK<K, Tuple8<A, B, C, D, E, FF, G, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple8<A, B,
-    C, D, E, FF, G, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple8<A, B,
+        C, D, E, FF, G, Z>>
+  }
 
 @JvmName("product7")
 @Suppress(
@@ -804,10 +804,10 @@ fun <K, A, B, C, D, E, FF, G, Z> Kind<Kind<ForMapK, K>, Tuple7<A, B, C, D, E, FF
 )
 fun <K, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForMapK, K>, Tuple8<A, B, C, D, E, FF, G,
     H>>.product(arg1: Kind<Kind<ForMapK, K>, Z>): MapK<K, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple9<A,
-    B, C, D, E, FF, G, H, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as arrow.core.MapK<K, arrow.core.Tuple9<A,
+        B, C, D, E, FF, G, H, Z>>
+  }
 
 @JvmName("product8")
 @Suppress(
@@ -827,10 +827,10 @@ fun <K, A, B, C, D, E, FF, G, H, Z> Kind<Kind<ForMapK, K>, Tuple8<A, B, C, D, E,
 )
 fun <K, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForMapK, K>, Tuple9<A, B, C, D, E, FF, G, H,
     I>>.product(arg1: Kind<Kind<ForMapK, K>, Z>): MapK<K, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    arrow.core.MapK.apply<K>().run {
-  this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as arrow.core.MapK<K,
-    arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as arrow.core.MapK<K,
+      arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
+  }
 
 @JvmName("tupled")
 @Suppress(
@@ -849,9 +849,9 @@ fun <K, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<ForMapK, K>, Tuple9<A, B, C, D,
   DeprecationLevel.WARNING
 )
 fun <K, A, B> tupled(arg0: Kind<Kind<ForMapK, K>, A>, arg1: Kind<Kind<ForMapK, K>, B>): MapK<K,
-    Tuple2<A, B>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B>(arg0, arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
+  Tuple2<A, B>> = arrow.core.MapK
+  .apply<K>()
+  .tupled<A, B>(arg0, arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -870,9 +870,9 @@ fun <K, A, B> tupled(arg0: Kind<Kind<ForMapK, K>, A>, arg1: Kind<Kind<ForMapK, K
   DeprecationLevel.WARNING
 )
 fun <K, A, B> tupledN(arg0: Kind<Kind<ForMapK, K>, A>, arg1: Kind<Kind<ForMapK, K>, B>): MapK<K,
-    Tuple2<A, B>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B>(arg0, arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
+  Tuple2<A, B>> = arrow.core.MapK
+  .apply<K>()
+  .tupledN<A, B>(arg0, arg1) as arrow.core.MapK<K, arrow.core.Tuple2<A, B>>
 
 @JvmName("tupled")
 @Suppress(
@@ -895,8 +895,8 @@ fun <K, A, B, C> tupled(
   arg1: Kind<Kind<ForMapK, K>, B>,
   arg2: Kind<Kind<ForMapK, K>, C>
 ): MapK<K, Tuple3<A, B, C>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C>(arg0, arg1, arg2) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, C>>
+  .apply<K>()
+  .tupled<A, B, C>(arg0, arg1, arg2) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, C>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -919,8 +919,8 @@ fun <K, A, B, C> tupledN(
   arg1: Kind<Kind<ForMapK, K>, B>,
   arg2: Kind<Kind<ForMapK, K>, C>
 ): MapK<K, Tuple3<A, B, C>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C>(arg0, arg1, arg2) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, C>>
+  .apply<K>()
+  .tupledN<A, B, C>(arg0, arg1, arg2) as arrow.core.MapK<K, arrow.core.Tuple3<A, B, C>>
 
 @JvmName("tupled")
 @Suppress(
@@ -944,8 +944,8 @@ fun <K, A, B, C, D> tupled(
   arg2: Kind<Kind<ForMapK, K>, C>,
   arg3: Kind<Kind<ForMapK, K>, D>
 ): MapK<K, Tuple4<A, B, C, D>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, arrow.core.Tuple4<A, B, C, D>>
+  .apply<K>()
+  .tupled<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, arrow.core.Tuple4<A, B, C, D>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -969,8 +969,8 @@ fun <K, A, B, C, D> tupledN(
   arg2: Kind<Kind<ForMapK, K>, C>,
   arg3: Kind<Kind<ForMapK, K>, D>
 ): MapK<K, Tuple4<A, B, C, D>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, arrow.core.Tuple4<A, B, C, D>>
+  .apply<K>()
+  .tupledN<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.core.MapK<K, arrow.core.Tuple4<A, B, C, D>>
 
 @JvmName("tupled")
 @Suppress(
@@ -995,8 +995,8 @@ fun <K, A, B, C, D, E> tupled(
   arg3: Kind<Kind<ForMapK, K>, D>,
   arg4: Kind<Kind<ForMapK, K>, E>
 ): MapK<K, Tuple5<A, B, C, D, E>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, arrow.core.Tuple5<A,
+  .apply<K>()
+  .tupled<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, arrow.core.Tuple5<A,
     B, C, D, E>>
 
 @JvmName("tupledN")
@@ -1022,8 +1022,8 @@ fun <K, A, B, C, D, E> tupledN(
   arg3: Kind<Kind<ForMapK, K>, D>,
   arg4: Kind<Kind<ForMapK, K>, E>
 ): MapK<K, Tuple5<A, B, C, D, E>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, arrow.core.Tuple5<A,
+  .apply<K>()
+  .tupledN<A, B, C, D, E>(arg0, arg1, arg2, arg3, arg4) as arrow.core.MapK<K, arrow.core.Tuple5<A,
     B, C, D, E>>
 
 @JvmName("tupled")
@@ -1050,9 +1050,9 @@ fun <K, A, B, C, D, E, FF> tupled(
   arg4: Kind<Kind<ForMapK, K>, E>,
   arg5: Kind<Kind<ForMapK, K>, FF>
 ): MapK<K, Tuple6<A, B, C, D, E, FF>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E, FF>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K,
-    arrow.core.Tuple6<A, B, C, D, E, FF>>
+  .apply<K>()
+  .tupled<A, B, C, D, E, FF>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K,
+  arrow.core.Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1078,9 +1078,9 @@ fun <K, A, B, C, D, E, FF> tupledN(
   arg4: Kind<Kind<ForMapK, K>, E>,
   arg5: Kind<Kind<ForMapK, K>, FF>
 ): MapK<K, Tuple6<A, B, C, D, E, FF>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E, FF>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K,
-    arrow.core.Tuple6<A, B, C, D, E, FF>>
+  .apply<K>()
+  .tupledN<A, B, C, D, E, FF>(arg0, arg1, arg2, arg3, arg4, arg5) as arrow.core.MapK<K,
+  arrow.core.Tuple6<A, B, C, D, E, FF>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1107,9 +1107,9 @@ fun <K, A, B, C, D, E, FF, G> tupled(
   arg5: Kind<Kind<ForMapK, K>, FF>,
   arg6: Kind<Kind<ForMapK, K>, G>
 ): MapK<K, Tuple7<A, B, C, D, E, FF, G>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E, FF, G>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K,
-    arrow.core.Tuple7<A, B, C, D, E, FF, G>>
+  .apply<K>()
+  .tupled<A, B, C, D, E, FF, G>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K,
+  arrow.core.Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1136,9 +1136,9 @@ fun <K, A, B, C, D, E, FF, G> tupledN(
   arg5: Kind<Kind<ForMapK, K>, FF>,
   arg6: Kind<Kind<ForMapK, K>, G>
 ): MapK<K, Tuple7<A, B, C, D, E, FF, G>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E, FF, G>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K,
-    arrow.core.Tuple7<A, B, C, D, E, FF, G>>
+  .apply<K>()
+  .tupledN<A, B, C, D, E, FF, G>(arg0, arg1, arg2, arg3, arg4, arg5, arg6) as arrow.core.MapK<K,
+  arrow.core.Tuple7<A, B, C, D, E, FF, G>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1166,9 +1166,9 @@ fun <K, A, B, C, D, E, FF, G, H> tupled(
   arg6: Kind<Kind<ForMapK, K>, G>,
   arg7: Kind<Kind<ForMapK, K>, H>
 ): MapK<K, Tuple8<A, B, C, D, E, FF, G, H>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E, FF, G, H>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
-    arrow.core.MapK<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
+  .apply<K>()
+  .tupled<A, B, C, D, E, FF, G, H>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
+  arrow.core.MapK<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1196,9 +1196,9 @@ fun <K, A, B, C, D, E, FF, G, H> tupledN(
   arg6: Kind<Kind<ForMapK, K>, G>,
   arg7: Kind<Kind<ForMapK, K>, H>
 ): MapK<K, Tuple8<A, B, C, D, E, FF, G, H>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E, FF, G, H>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
-    arrow.core.MapK<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
+  .apply<K>()
+  .tupledN<A, B, C, D, E, FF, G, H>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7) as
+  arrow.core.MapK<K, arrow.core.Tuple8<A, B, C, D, E, FF, G, H>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1227,9 +1227,9 @@ fun <K, A, B, C, D, E, FF, G, H, I> tupled(
   arg7: Kind<Kind<ForMapK, K>, H>,
   arg8: Kind<Kind<ForMapK, K>, I>
 ): MapK<K, Tuple9<A, B, C, D, E, FF, G, H, I>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E, FF, G, H, I>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
-    arrow.core.MapK<K, arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
+  .apply<K>()
+  .tupled<A, B, C, D, E, FF, G, H, I>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
+  arrow.core.MapK<K, arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1258,9 +1258,9 @@ fun <K, A, B, C, D, E, FF, G, H, I> tupledN(
   arg7: Kind<Kind<ForMapK, K>, H>,
   arg8: Kind<Kind<ForMapK, K>, I>
 ): MapK<K, Tuple9<A, B, C, D, E, FF, G, H, I>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E, FF, G, H, I>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
-    arrow.core.MapK<K, arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
+  .apply<K>()
+  .tupledN<A, B, C, D, E, FF, G, H, I>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) as
+  arrow.core.MapK<K, arrow.core.Tuple9<A, B, C, D, E, FF, G, H, I>>
 
 @JvmName("tupled")
 @Suppress(
@@ -1290,10 +1290,10 @@ fun <K, A, B, C, D, E, FF, G, H, I, J> tupled(
   arg8: Kind<Kind<ForMapK, K>, I>,
   arg9: Kind<Kind<ForMapK, K>, J>
 ): MapK<K, Tuple10<A, B, C, D, E, FF, G, H, I, J>> = arrow.core.MapK
-   .apply<K>()
-   .tupled<A, B, C, D, E, FF, G, H, I,
+  .apply<K>()
+  .tupled<A, B, C, D, E, FF, G, H, I,
     J>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) as arrow.core.MapK<K,
-    arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
+  arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -1323,10 +1323,10 @@ fun <K, A, B, C, D, E, FF, G, H, I, J> tupledN(
   arg8: Kind<Kind<ForMapK, K>, I>,
   arg9: Kind<Kind<ForMapK, K>, J>
 ): MapK<K, Tuple10<A, B, C, D, E, FF, G, H, I, J>> = arrow.core.MapK
-   .apply<K>()
-   .tupledN<A, B, C, D, E, FF, G, H, I,
+  .apply<K>()
+  .tupledN<A, B, C, D, E, FF, G, H, I,
     J>(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) as arrow.core.MapK<K,
-    arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
+  arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, J>>
 
 @JvmName("followedBy")
 @Suppress(
@@ -1344,9 +1344,9 @@ fun <K, A, B, C, D, E, FF, G, H, I, J> tupledN(
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.followedBy(arg1: Kind<Kind<ForMapK, K>, B>): MapK<K, B> =
-    arrow.core.MapK.apply<K>().run {
-  this@followedBy.followedBy<A, B>(arg1) as arrow.core.MapK<K, B>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@followedBy.followedBy<A, B>(arg1) as arrow.core.MapK<K, B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -1365,9 +1365,9 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.followedBy(arg1: Kind<Kind<ForMapK, K>, 
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.apTap(arg1: Kind<Kind<ForMapK, K>, B>): MapK<K, A> =
-    arrow.core.MapK.apply<K>().run {
-  this@apTap.apTap<A, B>(arg1) as arrow.core.MapK<K, A>
-}
+  arrow.core.MapK.apply<K>().run {
+    this@apTap.apTap<A, B>(arg1) as arrow.core.MapK<K, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -1375,4 +1375,4 @@ fun <K, A, B> Kind<Kind<ForMapK, K>, A>.apTap(arg1: Kind<Kind<ForMapK, K>, B>): 
 )
 @Deprecated("Align typeclasses is deprecated. Use concrete methods on Map")
 inline fun <K> Companion.apply(): MapKApply<K> = apply_singleton as
-    arrow.core.extensions.MapKApply<K>
+  arrow.core.extensions.MapKApply<K>

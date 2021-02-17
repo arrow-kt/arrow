@@ -46,9 +46,9 @@ fun <G, A, B, C, D> Kind<Kind<ForEither, A>, B>.bitraverse(
 @Deprecated("@extension kinded projected functions are deprecated. Replace with bisequence or bisequenceValidated from arrow.core.*")
 fun <G, A, B> Kind<Kind<ForEither, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>):
   Kind<G, Kind<Kind<ForEither, A>, B>> = arrow.core.Either.bitraverse().run {
-  this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
-    arrow.Kind<arrow.Kind<arrow.core.ForEither, A>, B>>
-}
+    this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
+      arrow.Kind<arrow.Kind<arrow.core.ForEither, A>, B>>
+  }
 
 @JvmName("bimap")
 @Suppress(
@@ -60,7 +60,7 @@ fun <G, A, B> Kind<Kind<ForEither, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: App
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("bimap(arg1, arg2)"))
 fun <A, B, C, D> Kind<Kind<ForEither, A>, B>.bimap(arg1: Function1<A, C>, arg2: Function1<B, D>):
   Either<C, D> =
-  fix().bimap(arg1, arg2)
+    fix().bimap(arg1, arg2)
 
 /**
  *  The type class `Bitraverse` defines the behaviour of two separetes `Traverse` over a data type.

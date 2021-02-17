@@ -30,7 +30,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.hash(
   HI: Hash<I>,
   HJ: Hash<J>
 ): Int = arrow.core.Tuple10.hash<A, B, C, D, E, F, G, H, I,
-    J>(HA, HB, HC, HD, HE, HF, HG, HH, HI, HJ).run {
+  J>(HA, HB, HC, HD, HE, HF, HG, HH, HI, HJ).run {
   this@hash.hash() as kotlin.Int
 }
 
@@ -51,7 +51,8 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.hash(
   HI: Hash<I>,
   HJ: Hash<J>
 ): Tuple10Hash<A, B, C, D, E, F, G, H, I, J> = object : arrow.core.extensions.Tuple10Hash<A, B, C,
-    D, E, F, G, H, I, J> { override fun HA(): arrow.typeclasses.Hash<A> = HA
+    D, E, F, G, H, I, J> {
+  override fun HA(): arrow.typeclasses.Hash<A> = HA
 
   override fun HB(): arrow.typeclasses.Hash<B> = HB
 
@@ -69,4 +70,5 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.hash(
 
   override fun HI(): arrow.typeclasses.Hash<I> = HI
 
-  override fun HJ(): arrow.typeclasses.Hash<J> = HJ }
+  override fun HJ(): arrow.typeclasses.Hash<J> = HJ
+}

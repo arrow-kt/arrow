@@ -15,7 +15,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroupal_singleton: ListKSemigroupal = object :
-    arrow.core.extensions.ListKSemigroupal {}
+  arrow.core.extensions.ListKSemigroupal {}
 
 /**
  *  Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
@@ -29,9 +29,9 @@ internal val semigroupal_singleton: ListKSemigroupal = object :
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1, ::Tuple2)", "arrow.core.Tuple2", "kotlin.collections.zip"))
 fun <A, B> Kind<ForListK, A>.product(arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.semigroupal().run {
-  this@product.product<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.semigroupal().run {
+    this@product.product<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  * syntax
@@ -45,9 +45,9 @@ fun <A, B> Kind<ForListK, A>.product(arg1: Kind<ForListK, B>): ListK<Tuple2<A, B
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1, ::Tuple2)", "arrow.core.Tuple2", "kotlin.collections.zip"))
 operator fun <A, B> Kind<ForListK, A>.times(arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.semigroupal().run {
-  this@times.times<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.semigroupal().run {
+    this@times.times<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).

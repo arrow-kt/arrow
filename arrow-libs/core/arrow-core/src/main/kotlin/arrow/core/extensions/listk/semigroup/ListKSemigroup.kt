@@ -44,4 +44,4 @@ fun <A> ListK<A>.maybeCombine(arg1: ListK<A>): ListK<A> = arrow.core.ListK.semig
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.list<A>()", "arrow.core.list", "arrow.core.Semigroup"))
 inline fun <A> Companion.semigroup(): ListKSemigroup<A> = semigroup_singleton as
-    arrow.core.extensions.ListKSemigroup<A>
+  arrow.core.extensions.ListKSemigroup<A>

@@ -40,5 +40,8 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated(EqDeprecation)
-  inline fun <A> eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> { override
-      fun EQ(): arrow.typeclasses.Eq<A> = EQ }}
+  inline fun <A> eq(EQ: Eq<A>): ListKEq<A> = object : arrow.core.extensions.ListKEq<A> {
+    override
+    fun EQ(): arrow.typeclasses.Eq<A> = EQ
+  }
+}

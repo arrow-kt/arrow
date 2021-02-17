@@ -7,22 +7,21 @@ import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)
-class ForEval private constructor() {
+) class ForEval private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)
-typealias EvalOf<A> = arrow.Kind<ForEval, A>
+) typealias EvalOf<A> = arrow.Kind<ForEval, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)
-inline fun <A> EvalOf<A>.fix(): Eval<A> =
+)inline
+fun <A> EvalOf<A>.fix(): Eval<A> =
   this as Eval<A>
 
 @Deprecated(

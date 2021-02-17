@@ -22,8 +22,8 @@ internal val align_singleton: ListKAlign = object : arrow.core.extensions.ListKA
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("emptyList()"))
 fun <A> empty(): ListK<A> = arrow.core.ListK
-   .align()
-   .empty<A>() as arrow.core.ListK<A>
+  .align()
+  .empty<A>() as arrow.core.ListK<A>
 
 @Suppress(
   "UNCHECKED_CAST",

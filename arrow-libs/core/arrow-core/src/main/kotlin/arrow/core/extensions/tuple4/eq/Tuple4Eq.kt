@@ -45,11 +45,13 @@ inline fun <A, B, C, D> Companion.eq(
   EQB: Eq<B>,
   EQC: Eq<C>,
   EQD: Eq<D>
-): Tuple4Eq<A, B, C, D> = object : arrow.core.extensions.Tuple4Eq<A, B, C, D> { override fun EQA():
+): Tuple4Eq<A, B, C, D> = object : arrow.core.extensions.Tuple4Eq<A, B, C, D> {
+  override fun EQA():
     arrow.typeclasses.Eq<A> = EQA
 
   override fun EQB(): arrow.typeclasses.Eq<B> = EQB
 
   override fun EQC(): arrow.typeclasses.Eq<C> = EQC
 
-  override fun EQD(): arrow.typeclasses.Eq<D> = EQD }
+  override fun EQD(): arrow.typeclasses.Eq<D> = EQD
+}

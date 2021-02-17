@@ -16,4 +16,3 @@ fun <B> `arrow`.`ap`.`objects`.`generic`.`Tupled`.foldLabeled(f: (arrow.core.Tup
 
 fun arrow.core.Tuple2<`kotlin`.`String`, `arrow`.`core`.`Option`<`kotlin`.`String`>>.toTupled(): `arrow`.`ap`.`objects`.`generic`.`Tupled` =
   `arrow`.`ap`.`objects`.`generic`.`Tupled`(this.a, this.b)
-

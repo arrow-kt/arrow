@@ -27,9 +27,9 @@ internal val eqK_singleton: SequenceKEqK = object : arrow.core.extensions.Sequen
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.eqK(arg1: Kind<ForSequenceK, A>, arg2: Eq<A>): Boolean =
-    arrow.core.SequenceK.eqK().run {
-  this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
-}
+  arrow.core.SequenceK.eqK().run {
+    this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -43,8 +43,8 @@ fun <A> Kind<ForSequenceK, A>.eqK(arg1: Kind<ForSequenceK, A>, arg2: Eq<A>): Boo
   level = DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForSequenceK, A>> = arrow.core.SequenceK
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSequenceK, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForSequenceK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

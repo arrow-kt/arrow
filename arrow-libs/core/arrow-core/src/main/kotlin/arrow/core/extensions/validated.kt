@@ -107,8 +107,10 @@ interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
   override fun <G, A, B, C, D> ValidatedOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, ValidatedOf<C, D>> =
     fix().let {
       AP.run {
-        it.fold({ f(it).map { Invalid(it) } },
-          { g(it).map { Valid(it) } })
+        it.fold(
+          { f(it).map { Invalid(it) } },
+          { g(it).map { Valid(it) } }
+        )
       }
     }
 }
@@ -178,11 +180,14 @@ interface ValidatedHash<L, R> : Hash<Validated<L, R>> {
 interface ValidatedOrder<L, R> : Order<Validated<L, R>> {
   fun OL(): Order<L>
   fun OR(): Order<R>
-  override fun Validated<L, R>.compare(b: Validated<L, R>): Ordering = fold({ l1 ->
-    b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT })
-  }, { r1 ->
-    b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } })
-  })
+  override fun Validated<L, R>.compare(b: Validated<L, R>): Ordering = fold(
+    { l1 ->
+      b.fold({ l2 -> OL().run { l1.compare(l2) } }, { LT })
+    },
+    { r1 ->
+      b.fold({ GT }, { r2 -> OR().run { r1.compare(r2) } })
+    }
+  )
 }
 
 @Deprecated("Applicative typeclass is deprecated. Use concrete methods on Validated")

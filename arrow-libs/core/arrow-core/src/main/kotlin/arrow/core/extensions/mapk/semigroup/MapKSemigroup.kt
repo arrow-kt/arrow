@@ -24,9 +24,9 @@ import kotlin.jvm.JvmName
   DeprecationLevel.WARNING
 )
 fun <K, A> MapK<K, A>.plus(SG: Semigroup<A>, arg1: MapK<K, A>): MapK<K, A> =
-    arrow.core.MapK.semigroup<K, A>(SG).run {
-  this@plus.plus(arg1) as arrow.core.MapK<K, A>
-}
+  arrow.core.MapK.semigroup<K, A>(SG).run {
+    this@plus.plus(arg1) as arrow.core.MapK<K, A>
+  }
 
 @JvmName("maybeCombine")
 @Suppress(
@@ -44,9 +44,9 @@ fun <K, A> MapK<K, A>.plus(SG: Semigroup<A>, arg1: MapK<K, A>): MapK<K, A> =
   DeprecationLevel.WARNING
 )
 fun <K, A> MapK<K, A>.maybeCombine(SG: Semigroup<A>, arg1: MapK<K, A>): MapK<K, A> =
-    arrow.core.MapK.semigroup<K, A>(SG).run {
-  this@maybeCombine.maybeCombine(arg1) as arrow.core.MapK<K, A>
-}
+  arrow.core.MapK.semigroup<K, A>(SG).run {
+    this@maybeCombine.maybeCombine(arg1) as arrow.core.MapK<K, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -54,5 +54,7 @@ fun <K, A> MapK<K, A>.maybeCombine(SG: Semigroup<A>, arg1: MapK<K, A>): MapK<K, 
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("Semigroup.map(SG)", "arrow.core.Semigroup", "arrow.core.map"))
 inline fun <K, A> Companion.semigroup(SG: Semigroup<A>): MapKSemigroup<K, A> = object :
-    arrow.core.extensions.MapKSemigroup<K, A> { override fun SG(): arrow.typeclasses.Semigroup<A> =
-    SG }
+  arrow.core.extensions.MapKSemigroup<K, A> {
+  override fun SG(): arrow.typeclasses.Semigroup<A> =
+    SG
+}

@@ -33,7 +33,7 @@ fun <A, B, C, D, E, F, G, H> Tuple8<A, B, C, D, E, F, G, H>.neqv(
   EQH: Eq<H>,
   arg1: Tuple8<A, B, C, D, E, F, G, H>
 ): Boolean = arrow.core.Tuple8.eq<A, B, C, D, E, F, G,
-    H>(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH).run {
+  H>(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH).run {
   this@neqv.neqv(arg1) as kotlin.Boolean
 }
 
@@ -55,7 +55,8 @@ inline fun <A, B, C, D, E, F, G, H> Companion.eq(
   EQG: Eq<G>,
   EQH: Eq<H>
 ): Tuple8Eq<A, B, C, D, E, F, G, H> = object : arrow.core.extensions.Tuple8Eq<A, B, C, D, E, F, G,
-    H> { override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+    H> {
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
 
   override fun EQB(): arrow.typeclasses.Eq<B> = EQB
 
@@ -69,4 +70,5 @@ inline fun <A, B, C, D, E, F, G, H> Companion.eq(
 
   override fun EQG(): arrow.typeclasses.Eq<G> = EQG
 
-  override fun EQH(): arrow.typeclasses.Eq<H> = EQH }
+  override fun EQH(): arrow.typeclasses.Eq<H> = EQH
+}

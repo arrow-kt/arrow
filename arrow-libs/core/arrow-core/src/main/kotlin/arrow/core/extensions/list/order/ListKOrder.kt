@@ -22,9 +22,9 @@ import kotlin.jvm.JvmName
   ReplaceWith("Ordering.fromInt(this.compareTo(arg1))", "arrow.core.compareTo", "arrow.core.Ordering")
 )
 fun <A> List<A>.compare(OA: Order<A>, arg1: List<A>): Ordering =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@compare).compare(arrow.core.ListK(arg1)) as arrow.core.Ordering
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@compare).compare(arrow.core.ListK(arg1)) as arrow.core.Ordering
+  }
 
 @JvmName("compareTo")
 @Suppress(
@@ -38,9 +38,9 @@ fun <A> List<A>.compare(OA: Order<A>, arg1: List<A>): Ordering =
   ReplaceWith("this.compareTo(arg1)", "arrow.core.compareTo")
 )
 fun <A> List<A>.compareTo(OA: Order<A>, arg1: List<A>): Int =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@compareTo).compareTo(arrow.core.ListK(arg1)) as kotlin.Int
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@compareTo).compareTo(arrow.core.ListK(arg1)) as kotlin.Int
+  }
 
 @JvmName("eqv")
 @Suppress(
@@ -54,9 +54,9 @@ fun <A> List<A>.compareTo(OA: Order<A>, arg1: List<A>): Int =
   ReplaceWith("this == arg1")
 )
 fun <A> List<A>.eqv(OA: Order<A>, arg1: List<A>): Boolean =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@eqv).eqv(arrow.core.ListK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@eqv).eqv(arrow.core.ListK(arg1)) as kotlin.Boolean
+  }
 
 @JvmName("lt")
 @Suppress(
@@ -70,9 +70,9 @@ fun <A> List<A>.eqv(OA: Order<A>, arg1: List<A>): Boolean =
   ReplaceWith("this < arg1", "arrow.core.compareTo")
 )
 fun <A> List<A>.lt(OA: Order<A>, arg1: List<A>): Boolean =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@lt).lt(arrow.core.ListK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@lt).lt(arrow.core.ListK(arg1)) as kotlin.Boolean
+  }
 
 @JvmName("lte")
 @Suppress(
@@ -86,9 +86,9 @@ fun <A> List<A>.lt(OA: Order<A>, arg1: List<A>): Boolean =
   ReplaceWith("this <= arg1", "arrow.core.compareTo")
 )
 fun <A> List<A>.lte(OA: Order<A>, arg1: List<A>): Boolean =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@lte).lte(arrow.core.ListK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@lte).lte(arrow.core.ListK(arg1)) as kotlin.Boolean
+  }
 
 @JvmName("gt")
 @Suppress(
@@ -102,9 +102,9 @@ fun <A> List<A>.lte(OA: Order<A>, arg1: List<A>): Boolean =
   ReplaceWith("this > arg1", "arrow.core.compareTo")
 )
 fun <A> List<A>.gt(OA: Order<A>, arg1: List<A>): Boolean =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@gt).gt(arrow.core.ListK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@gt).gt(arrow.core.ListK(arg1)) as kotlin.Boolean
+  }
 
 @JvmName("gte")
 @Suppress(
@@ -118,9 +118,9 @@ fun <A> List<A>.gt(OA: Order<A>, arg1: List<A>): Boolean =
   ReplaceWith("this >= arg1", "arrow.core.compareTo")
 )
 fun <A> List<A>.gte(OA: Order<A>, arg1: List<A>): Boolean =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@gte).gte(arrow.core.ListK(arg1)) as kotlin.Boolean
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@gte).gte(arrow.core.ListK(arg1)) as kotlin.Boolean
+  }
 
 @JvmName("max")
 @Suppress(
@@ -134,9 +134,9 @@ fun <A> List<A>.gte(OA: Order<A>, arg1: List<A>): Boolean =
   ReplaceWith("maxOf(this,arg1)")
 )
 fun <A> List<A>.max(OA: Order<A>, arg1: List<A>): List<A> =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@max).max(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@max).max(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
+  }
 
 @JvmName("min")
 @Suppress(
@@ -150,9 +150,9 @@ fun <A> List<A>.max(OA: Order<A>, arg1: List<A>): List<A> =
   ReplaceWith("minOf(this,arg1)")
 )
 fun <A> List<A>.min(OA: Order<A>, arg1: List<A>): List<A> =
-    arrow.core.extensions.list.order.List.order<A>(OA).run {
-  arrow.core.ListK(this@min).min(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
-}
+  arrow.core.extensions.list.order.List.order<A>(OA).run {
+    arrow.core.ListK(this@min).min(arrow.core.ListK(arg1)) as kotlin.collections.List<A>
+  }
 
 @Deprecated("Receiver List object is deprecated, prefer to turn List functions into top-level functions")
 object List {
@@ -162,4 +162,6 @@ object List {
   )
   @Deprecated(OrderDeprecation)
   inline fun <A> order(OA: Order<A>): ListKOrder<A> = object : arrow.core.extensions.ListKOrder<A> {
-      override fun OA(): arrow.typeclasses.Order<A> = OA }}
+    override fun OA(): arrow.typeclasses.Order<A> = OA
+  }
+}

@@ -18,7 +18,6 @@ abstract class APTest(
     generationDir: File = createTempDir(),
     actualFileLocation: (File) -> String = { it.path }
   ) {
-
     processor.forEach { (name, sources, dest, proc, error) ->
 
       val parent = File(".").absoluteFile.parent
@@ -35,23 +34,22 @@ abstract class APTest(
       }
 
       name {
-
         val compilation = javac()
           .withProcessors(proc)
           .withOptions(listOf("-Akapt.kotlin.generated=$generationDir", "-proc:only"))
-          .compile(sources.map {
-            val stub = File(stubs, it).toURI().toURL()
-            JavaFileObjects.forResource(stub)
-          })
+          .compile(
+            sources.map {
+              val stub = File(stubs, it).toURI().toURL()
+              JavaFileObjects.forResource(stub)
+            }
+          )
 
         if (error != null) {
-
           assertThat(compilation)
             .failed()
           assertThat(compilation)
             .hadErrorContaining(error)
         } else {
-
           assertThat(compilation)
             .succeeded()
 

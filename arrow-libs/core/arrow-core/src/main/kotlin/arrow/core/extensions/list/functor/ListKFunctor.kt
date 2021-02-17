@@ -94,9 +94,9 @@ fun <A, B> List<A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): List<B> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("{ l: List<A> -> l.map(arg0) }"))
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForListK, A>, Kind<ForListK, B>> =
-    arrow.core.extensions.list.functor.List
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForListK, A>,
+  arrow.core.extensions.list.functor.List
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForListK, A>,
     arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("void")
@@ -192,4 +192,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Functor typeclasses is deprecated. Use concrete methods on List")
-  inline fun functor(): ListKFunctor = functor_singleton}
+  inline fun functor(): ListKFunctor = functor_singleton
+}

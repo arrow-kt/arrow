@@ -11,7 +11,7 @@ import arrow.core.extensions.NonEmptyListComonad
  */
 @PublishedApi()
 internal val comonad_singleton: NonEmptyListComonad = object :
-    arrow.core.extensions.NonEmptyListComonad {}
+  arrow.core.extensions.NonEmptyListComonad {}
 
 @JvmName("coflatMap")
 @Suppress(
@@ -23,15 +23,15 @@ internal val comonad_singleton: NonEmptyListComonad = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix().coflatMap(arg1)",
-  "arrow.core.fix"
+    "fix().coflatMap(arg1)",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(arg1: Function1<Kind<ForNonEmptyList, A>, B>):
-    NonEmptyList<B> = arrow.core.NonEmptyList.comonad().run {
-  this@coflatMap.coflatMap<A, B>(arg1) as arrow.core.NonEmptyList<B>
-}
+  NonEmptyList<B> = arrow.core.NonEmptyList.comonad().run {
+    this@coflatMap.coflatMap<A, B>(arg1) as arrow.core.NonEmptyList<B>
+  }
 
 @JvmName("extract")
 @Suppress(
@@ -43,8 +43,8 @@ fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(arg1: Function1<Kind<ForNonEmptyLi
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix().extract()",
-  "arrow.core.fix"
+    "fix().extract()",
+    "arrow.core.fix"
   ),
   DeprecationLevel.WARNING
 )
@@ -62,15 +62,16 @@ fun <A> Kind<ForNonEmptyList, A>.extract(): A = arrow.core.NonEmptyList.comonad(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "fix().coflatMap<NonEmptyListOf<A>>(::identity)",
-  "arrow.core.fix", "arrow.core.identity"
+    "fix().coflatMap<NonEmptyListOf<A>>(::identity)",
+    "arrow.core.fix",
+    "arrow.core.identity"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForNonEmptyList, A>.duplicate(): NonEmptyList<NonEmptyList<A>> =
-    arrow.core.NonEmptyList.comonad().run {
-  this@duplicate.duplicate<A>() as arrow.core.NonEmptyList<arrow.core.NonEmptyList<A>>
-}
+  arrow.core.NonEmptyList.comonad().run {
+    this@duplicate.duplicate<A>() as arrow.core.NonEmptyList<arrow.core.NonEmptyList<A>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -78,5 +79,6 @@ fun <A> Kind<ForNonEmptyList, A>.duplicate(): NonEmptyList<NonEmptyList<A>> =
 )
 @Deprecated(
   "Comonad typeclass is deprecated. Use concrete methods on NonEmptyList",
-  level = DeprecationLevel.WARNING)
+  level = DeprecationLevel.WARNING
+)
 inline fun Companion.comonad(): NonEmptyListComonad = comonad_singleton

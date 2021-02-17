@@ -18,9 +18,9 @@ import kotlin.sequences.Sequence
 )
 @Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
 fun <A> Sequence<A>.hash(HA: Hash<A>): Int =
-    arrow.core.extensions.sequence.hash.Sequence.hash<A>(HA).run {
-  arrow.core.SequenceK(this@hash).hash() as kotlin.Int
-}
+  arrow.core.extensions.sequence.hash.Sequence.hash<A>(HA).run {
+    arrow.core.SequenceK(this@hash).hash() as kotlin.Int
+  }
 
 @Deprecated("Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions")
 object Sequence {
@@ -30,4 +30,5 @@ object Sequence {
   )
   @Deprecated(HashDeprecation, ReplaceWith("hashCode()"))
   inline fun <A> hash(HA: Hash<A>): SequenceKHash<A> = object :
-      arrow.core.extensions.SequenceKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }}
+    arrow.core.extensions.SequenceKHash<A> { override fun HA(): arrow.typeclasses.Hash<A> = HA }
+}

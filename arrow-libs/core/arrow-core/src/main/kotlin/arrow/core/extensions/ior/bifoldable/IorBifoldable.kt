@@ -23,7 +23,7 @@ internal val bifoldable_singleton: IorBifoldable = object : arrow.core.extension
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.bifoldLeft(arg1, arg2, arg3)"
+    "this.bifoldLeft(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )
@@ -45,7 +45,7 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.bifoldLeft(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.bifoldRight(arg1, arg2, arg3)"
+    "this.bifoldRight(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )
@@ -67,7 +67,7 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.bifoldRight(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.bifoldMap(arg1, arg2, arg3)"
+    "this.bifoldMap(arg1, arg2, arg3)"
   ),
   DeprecationLevel.WARNING
 )

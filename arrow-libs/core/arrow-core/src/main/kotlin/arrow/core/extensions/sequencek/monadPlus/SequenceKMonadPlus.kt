@@ -11,7 +11,7 @@ import arrow.core.extensions.SequenceKMonadPlus
  */
 @PublishedApi()
 internal val monadPlus_singleton: SequenceKMonadPlus = object :
-    arrow.core.extensions.SequenceKMonadPlus {}
+  arrow.core.extensions.SequenceKMonadPlus {}
 
 @JvmName("zeroM")
 @Suppress(
@@ -28,8 +28,8 @@ internal val monadPlus_singleton: SequenceKMonadPlus = object :
   DeprecationLevel.WARNING
 )
 fun <A> zeroM(): SequenceK<A> = arrow.core.SequenceK
-   .monadPlus()
-   .zeroM<A>() as arrow.core.SequenceK<A>
+  .monadPlus()
+  .zeroM<A>() as arrow.core.SequenceK<A>
 
 @JvmName("plusM")
 @Suppress(
@@ -46,9 +46,9 @@ fun <A> zeroM(): SequenceK<A> = arrow.core.SequenceK
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.plusM(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.monadPlus().run {
-  this@plusM.plusM<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.monadPlus().run {
+    this@plusM.plusM<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

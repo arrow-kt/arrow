@@ -12,7 +12,7 @@ import arrow.core.extensions.SequenceKFunctor
  */
 @PublishedApi()
 internal val functor_singleton: SequenceKFunctor = object : arrow.core.extensions.SequenceKFunctor
-    {}
+{}
 
 /**
  *  Transform the [F] wrapped value [A] into [B] preserving the [F] structure
@@ -50,9 +50,9 @@ internal val functor_singleton: SequenceKFunctor = object : arrow.core.extension
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
-    arrow.core.SequenceK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForSequenceK, A>.map(arg1: Function1<A, B>): SequenceK<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): SequenceK<B> =
-    arrow.core.SequenceK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.core.SequenceK<B>
+  }
 
 /**
  *  Lifts a function `A -> B` to the [F] structure returning a polymorphic function
@@ -111,9 +111,9 @@ fun <A, B> Kind<ForSequenceK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, 
   DeprecationLevel.WARNING
 )
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForSequenceK, A>, Kind<ForSequenceK, B>> =
-    arrow.core.SequenceK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForSequenceK, A>,
+  arrow.core.SequenceK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.core.ForSequenceK, A>,
     arrow.Kind<arrow.core.ForSequenceK, B>>
 
 @JvmName("void")
@@ -170,9 +170,9 @@ fun <A> Kind<ForSequenceK, A>.void(): SequenceK<Unit> = arrow.core.SequenceK.fun
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.fproduct(arg1: Function1<A, B>): SequenceK<Tuple2<A, B>> =
-    arrow.core.SequenceK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.SequenceK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
@@ -208,9 +208,9 @@ fun <A, B> Kind<ForSequenceK, A>.fproduct(arg1: Function1<A, B>): SequenceK<Tupl
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.mapConst(arg1: B): SequenceK<B> =
-    arrow.core.SequenceK.functor().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.core.SequenceK<B>
-}
+  arrow.core.SequenceK.functor().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.core.SequenceK<B>
+  }
 
 /**
  *  Replaces the [B] value inside [F] with [A] resulting in a Kind<F, A>
@@ -231,9 +231,9 @@ fun <A, B> Kind<ForSequenceK, A>.mapConst(arg1: B): SequenceK<B> =
   DeprecationLevel.WARNING
 )
 fun <A, B> A.mapConst(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
-    arrow.core.SequenceK.functor().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.functor().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.core.SequenceK<A>
+  }
 
 /**
  *  Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
@@ -269,9 +269,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForSequenceK, B>): SequenceK<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.tupleLeft(arg1: B): SequenceK<Tuple2<B, A>> =
-    arrow.core.SequenceK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<B, A>>
-}
+  arrow.core.SequenceK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<B, A>>
+  }
 
 /**
  *  Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
@@ -307,9 +307,9 @@ fun <A, B> Kind<ForSequenceK, A>.tupleLeft(arg1: B): SequenceK<Tuple2<B, A>> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForSequenceK, A>.tupleRight(arg1: B): SequenceK<Tuple2<A, B>> =
-    arrow.core.SequenceK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.SequenceK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.core.SequenceK<arrow.core.Tuple2<A, B>>
+  }
 
 /**
  *  Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>

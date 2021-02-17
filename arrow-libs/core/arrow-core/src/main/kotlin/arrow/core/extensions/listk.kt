@@ -336,7 +336,8 @@ interface ListKCrosswalk : Crosswalk<ForListK>, ListKFunctor, ListKFoldable {
           ior.fold(
             { ListK.just(it) },
             ::identity,
-            { l, r -> ListK.just(l) + r.fix() })
+            { l, r -> ListK.just(l) + r.fix() }
+          )
         }
       }
     }

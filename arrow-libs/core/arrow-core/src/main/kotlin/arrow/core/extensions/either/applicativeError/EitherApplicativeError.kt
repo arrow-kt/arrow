@@ -40,7 +40,7 @@ internal val applicativeError_singleton: EitherApplicativeError<Any?> = object :
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("handleErrorWith(arg1)", "arrow.core.handleErrorWith"))
 fun <L, A> Kind<Kind<ForEither, L>, A>.handleErrorWith(
   arg1: Function1<L, Kind<Kind<ForEither, L>,
-    A>>
+      A>>
 ): Either<L, A> =
   fix()._handleErrorWith(arg1)
 

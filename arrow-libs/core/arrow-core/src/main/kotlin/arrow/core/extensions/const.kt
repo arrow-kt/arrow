@@ -208,7 +208,6 @@ interface ConstEqK<A> : EqK<ConstPartialOf<A>> {
 
   override fun <T> Kind<ConstPartialOf<A>, T>.eqK(other: Kind<ConstPartialOf<A>, T>, EQ: Eq<T>): Boolean =
     (this.fix() to other.fix()).let {
-
       Const.eq<A, T>(EQA()).run {
         it.first.eqv(it.second)
       }

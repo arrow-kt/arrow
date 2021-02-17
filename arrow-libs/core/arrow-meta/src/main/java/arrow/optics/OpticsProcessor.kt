@@ -103,12 +103,13 @@ class OpticsProcessor : AbstractProcessor() {
   }
 
   private fun evalAnnotatedPrismElement(element: Element): List<Focus> = when (element.classType) {
-    SEALED_CLASS -> element.kotlinMetadata.let { it as KotlinClassMetadata }.data.let { (nameResolver, classProto) ->
-      classProto.sealedSubclassFqNameList
-        .map(nameResolver::getString)
-        .map { it.replace('/', '.') }
-        .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
-    }
+    SEALED_CLASS ->
+      element.kotlinMetadata.let { it as KotlinClassMetadata }.data.let { (nameResolver, classProto) ->
+        classProto.sealedSubclassFqNameList
+          .map(nameResolver::getString)
+          .map { it.replace('/', '.') }
+          .map { Focus(it, it.substringAfterLast(".").decapitalize()) }
+      }
 
     else -> knownError(element.prismErrorMessage, element)
   }
@@ -120,8 +121,9 @@ class OpticsProcessor : AbstractProcessor() {
   }
 
   private fun evalAnnotatedIsoElement(element: Element): List<Focus> = when (element.classType) {
-    DATA_CLASS -> element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Focus.Companion::invoke)
-      .takeIf { it.size <= 22 } ?: knownError(element.isoTooBigErrorMessage, element)
+    DATA_CLASS ->
+      element.getConstructorTypesNames().zip(element.getConstructorParamNames(), Focus.Companion::invoke)
+        .takeIf { it.size <= 22 } ?: knownError(element.isoTooBigErrorMessage, element)
     else -> knownError(element.isoErrorMessage, element)
   }
 

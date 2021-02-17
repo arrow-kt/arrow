@@ -12,7 +12,7 @@ import arrow.typeclasses.Semigroup
  */
 @PublishedApi()
 internal val semigroupK_singleton: SequenceKSemigroupK = object :
-    arrow.core.extensions.SequenceKSemigroupK {}
+  arrow.core.extensions.SequenceKSemigroupK {}
 
 @JvmName("combineK")
 @Suppress(
@@ -29,9 +29,9 @@ internal val semigroupK_singleton: SequenceKSemigroupK = object :
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A> =
-    arrow.core.SequenceK.semigroupK().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.SequenceK<A>
-}
+  arrow.core.SequenceK.semigroupK().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.SequenceK<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -44,13 +44,14 @@ fun <A> Kind<ForSequenceK, A>.combineK(arg1: Kind<ForSequenceK, A>): SequenceK<A
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Semigroup.sequence<A>()",
-    "arrow.core.sequence", "arrow.typeclasses.Semigroup"
+    "arrow.core.sequence",
+    "arrow.typeclasses.Semigroup"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Semigroup<Kind<ForSequenceK, A>> = arrow.core.SequenceK
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForSequenceK, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForSequenceK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -29,8 +29,8 @@ fun <F, A, B> crosswalk(
   arg1: Kind<ForListK, A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<ForListK, B>> = arrow.core.ListK
-   .crosswalk()
-   .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK, B>>
+  .crosswalk()
+  .crosswalk<F, A, B>(arg0, arg1, arg2) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("sequenceL")
 @Suppress(
@@ -41,9 +41,9 @@ fun <F, A, B> crosswalk(
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceValidated or sequenceEither from arrow.core.*")
 fun <F, A> sequenceL(arg0: Align<F>, arg1: Kind<ForListK, Kind<F, A>>): Kind<F, Kind<ForListK, A>> =
-    arrow.core.ListK
-   .crosswalk()
-   .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK, A>>
+  arrow.core.ListK
+    .crosswalk()
+    .sequenceL<F, A>(arg0, arg1) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -45,7 +45,7 @@ fun <G, A, B, C, D> Kind<Kind<ForIor, A>, B>.bitraverse(
   level = DeprecationLevel.WARNING
 )
 fun <G, A, B> Kind<Kind<ForIor, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applicative<G>): Kind<G,
-    Kind<Kind<ForIor, A>, B>> = arrow.core.Ior.bitraverse().run {
+  Kind<Kind<ForIor, A>, B>> = arrow.core.Ior.bitraverse().run {
   this@bisequence.bisequence<G, A, B>(arg1) as arrow.Kind<G,
     arrow.Kind<arrow.Kind<arrow.core.ForIor, A>, B>>
 }
@@ -60,14 +60,14 @@ fun <G, A, B> Kind<Kind<ForIor, Kind<G, A>>, Kind<G, B>>.bisequence(arg1: Applic
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.bimap(arg1, arg2)"
+    "this.bimap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D> Kind<Kind<ForIor, A>, B>.bimap(arg1: Function1<A, C>, arg2: Function1<B, D>):
-    Ior<C, D> = arrow.core.Ior.bitraverse().run {
-  this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Ior<C, D>
-}
+  Ior<C, D> = arrow.core.Ior.bitraverse().run {
+    this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Ior<C, D>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

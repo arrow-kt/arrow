@@ -27,14 +27,14 @@ internal val foldable_singleton: IorFoldable<Any?> = object : IorFoldable<Any?> 
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.foldLeft(arg1, arg2)"
+    "this.foldLeft(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
-    arrow.core.Ior.foldable<L>().run {
-  this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@foldLeft.foldLeft<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("foldRight")
 @Suppress(
@@ -46,7 +46,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldLeft(arg1: B, arg2: Function2<B, A, B
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.foldRight(arg1, arg2)"
+    "this.foldRight(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
@@ -67,7 +67,7 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldRight(
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.fold({ arg1.empty() }, { it }, { _, b -> b })",
+    "this.fold({ arg1.empty() }, { it }, { _, b -> b })",
   ),
   DeprecationLevel.WARNING
 )
@@ -108,7 +108,8 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.reduceLeftToOption(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Eval.now(Option.fromNullable(this.map(arg1).orNull()))",
-    "arrow.core.Eval", "arrow.core.Option"
+    "arrow.core.Eval",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
@@ -136,9 +137,9 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.reduceRightToOption(
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option<A> =
-    arrow.core.Ior.foldable<L>().run {
-  this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@reduceLeftOption.reduceLeftOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("reduceRightOption")
 @Suppress(
@@ -151,14 +152,15 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.reduceLeftOption(arg1: Function2<A, A, A>): 
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Eval.now(Option.fromNullable(this.orNull()))",
-    "arrow.core.Eval", "arrow.core.Option"
+    "arrow.core.Eval",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
-    Eval<Option<A>> = arrow.core.Ior.foldable<L>().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+  Eval<Option<A>> = arrow.core.Ior.foldable<L>().run {
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -170,14 +172,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.reduceRightOption(arg1: Function2<A, Eval<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.fold({ arg1.empty() }, { it }, { _, b -> b })"
+    "this.fold({ arg1.empty() }, { it }, { _, b -> b })"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.combineAll(arg1: Monoid<A>): A =
-    arrow.core.Ior.foldable<L>().run {
-  this@combineAll.combineAll<A>(arg1) as A
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@combineAll.combineAll<A>(arg1) as A
+  }
 
 @JvmName("foldMap")
 @Suppress(
@@ -189,14 +191,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.combineAll(arg1: Monoid<A>): A =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.foldMap(arg1, arg2)"
+    "this.foldMap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldMap(arg1: Monoid<B>, arg2: Function1<A, B>): B =
-    arrow.core.Ior.foldable<L>().run {
-  this@foldMap.foldMap<A, B>(arg1, arg2) as B
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@foldMap.foldMap<A, B>(arg1, arg2) as B
+  }
 
 @JvmName("orEmpty")
 @Suppress(
@@ -208,14 +210,14 @@ fun <L, A, B> Kind<Kind<ForIor, L>, A>.foldMap(arg1: Monoid<B>, arg2: Function1<
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Ior.Right(arg1.empty)",
-  "arrow.core.Ior"
+    "Ior.Right(arg1.empty)",
+    "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> orEmpty(arg0: Applicative<Kind<ForIor, L>>, arg1: Monoid<A>): Ior<L, A> = arrow.core.Ior
-   .foldable<L>()
-   .orEmpty<A>(arg0, arg1) as arrow.core.Ior<L, A>
+  .foldable<L>()
+  .orEmpty<A>(arg0, arg1) as arrow.core.Ior<L, A>
 
 @JvmName("traverse_")
 @Suppress(
@@ -247,9 +249,9 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.traverse_(
   level = DeprecationLevel.WARNING
 )
 fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence_(arg1: Applicative<G>): Kind<G, Unit> =
-    arrow.core.Ior.foldable<L>().run {
-  this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@sequence_.sequence_<G, A>(arg1) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("find")
 @Suppress(
@@ -267,9 +269,9 @@ fun <L, G, A> Kind<Kind<ForIor, L>, Kind<G, A>>.sequence_(arg1: Applicative<G>):
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.find(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.Ior.foldable<L>().run {
-  this@find.find<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@find.find<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("exists")
 @Suppress(
@@ -281,14 +283,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.find(arg1: Function1<A, Boolean>): Option<A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.exists(arg1)"
+    "this.exists(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.exists(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.Ior.foldable<L>().run {
-  this@exists.exists<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@exists.exists<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("forAll")
 @Suppress(
@@ -300,14 +302,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.exists(arg1: Function1<A, Boolean>): Boolean
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.all(arg1)"
+    "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.forAll(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.Ior.foldable<L>().run {
-  this@forAll.forAll<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@forAll.forAll<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("all")
 @Suppress(
@@ -319,14 +321,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.forAll(arg1: Function1<A, Boolean>): Boolean
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.all(arg1)"
+    "this.all(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.all(arg1: Function1<A, Boolean>): Boolean =
-    arrow.core.Ior.foldable<L>().run {
-  this@all.all<A>(arg1) as kotlin.Boolean
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@all.all<A>(arg1) as kotlin.Boolean
+  }
 
 @JvmName("isEmpty")
 @Suppress(
@@ -338,7 +340,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.all(arg1: Function1<A, Boolean>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.isEmpty()"
+    "this.isEmpty()"
   ),
   DeprecationLevel.WARNING
 )
@@ -392,14 +394,14 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.isNotEmpty(): Boolean = arrow.core.Ior.folda
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.fold({ 0 }, { 1 }, { 1 })"
+    "this.fold({ 0 }, { 1 }, { 1 })"
   ),
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.size(arg1: Monoid<Long>): Long =
-    arrow.core.Ior.foldable<L>().run {
-  this@size.size<A>(arg1) as kotlin.Long
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@size.size<A>(arg1) as kotlin.Long
+  }
 
 @JvmName("foldMapA")
 @Suppress(
@@ -469,7 +471,8 @@ fun <L, G, A, B> Kind<Kind<ForIor, L>, A>.foldM(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "if (arg1 == 0L) this.fold({ None }, { Some(it) }, { _, b -> Some(b) }) else None",
-    "arrow.core.None", "arrow.core.Some"
+    "arrow.core.None",
+    "arrow.core.Some"
   ),
   DeprecationLevel.WARNING
 )
@@ -512,9 +515,9 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOption(): Option<A> = arrow.core.Ior.fo
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.firstOption(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.Ior.foldable<L>().run {
-  this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@firstOption.firstOption<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("firstOrNone")
 @Suppress(
@@ -551,9 +554,9 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOrNone(): Option<A> = arrow.core.Ior.fo
   DeprecationLevel.WARNING
 )
 fun <L, A> Kind<Kind<ForIor, L>, A>.firstOrNone(arg1: Function1<A, Boolean>): Option<A> =
-    arrow.core.Ior.foldable<L>().run {
-  this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
-}
+  arrow.core.Ior.foldable<L>().run {
+    this@firstOrNone.firstOrNone<A>(arg1) as arrow.core.Option<A>
+  }
 
 @JvmName("toList")
 @Suppress(
@@ -565,7 +568,7 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.firstOrNone(arg1: Function1<A, Boolean>): Op
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "listOfNotNull(this.orNull())"
+    "listOfNotNull(this.orNull())"
   ),
   DeprecationLevel.WARNING
 )
@@ -582,4 +585,4 @@ fun <L, A> Kind<Kind<ForIor, L>, A>.toList(): List<A> = arrow.core.Ior.foldable<
   level = DeprecationLevel.WARNING
 )
 inline fun <L> Companion.foldable(): IorFoldable<L> = foldable_singleton as
-    arrow.core.extensions.IorFoldable<L>
+  arrow.core.extensions.IorFoldable<L>

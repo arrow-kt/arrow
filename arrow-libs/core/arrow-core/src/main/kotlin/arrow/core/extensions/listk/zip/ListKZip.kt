@@ -26,9 +26,9 @@ internal val zip_singleton: ListKZip = object : arrow.core.extensions.ListKZip {
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1).map { it.toTuple2() }", "arrow.core.toTuple2"))
 fun <A, B> Kind<ForListK, A>.zip(arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
-    arrow.core.ListK.zip().run {
-  this@zip.zip<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
-}
+  arrow.core.ListK.zip().run {
+    this@zip.zip<A, B>(arg1) as arrow.core.ListK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("zipWith")
 @Suppress(
@@ -39,9 +39,9 @@ fun <A, B> Kind<ForListK, A>.zip(arg1: Kind<ForListK, B>): ListK<Tuple2<A, B>> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("zip(arg1, arg2)"))
 fun <A, B, C> Kind<ForListK, A>.zipWith(arg1: Kind<ForListK, B>, arg2: Function2<A, B, C>): ListK<C> =
-    arrow.core.ListK.zip().run {
-  this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.ListK<C>
-}
+  arrow.core.ListK.zip().run {
+    this@zipWith.zipWith<A, B, C>(arg1, arg2) as arrow.core.ListK<C>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

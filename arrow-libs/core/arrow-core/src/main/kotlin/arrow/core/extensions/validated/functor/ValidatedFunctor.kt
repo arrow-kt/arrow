@@ -30,9 +30,9 @@ internal val functor_singleton: ValidatedFunctor<Any?> = object : ValidatedFunct
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.map(arg1: Function1<A, B>): Validated<E, B> =
-    arrow.core.Validated.functor<E>().run {
-  this@map.map<A, B>(arg1) as arrow.core.Validated<E, B>
-}
+  arrow.core.Validated.functor<E>().run {
+    this@map.map<A, B>(arg1) as arrow.core.Validated<E, B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -43,9 +43,9 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.map(arg1: Function1<A, B>): Validat
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("map(arg1)"))
 fun <E, A, B> Kind<Kind<ForValidated, E>, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
-    Validated<E, B> = arrow.core.Validated.functor<E>().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.core.Validated<E, B>
-}
+  Validated<E, B> = arrow.core.Validated.functor<E>().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.core.Validated<E, B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -56,10 +56,10 @@ fun <E, A, B> Kind<Kind<ForValidated, E>, A>.imap(arg1: Function1<A, B>, arg2: F
 )
 @Deprecated("@extension kinded projected functions are deprecated", ReplaceWith("Validated.lift(arg1)", "arrow.core.lift"))
 fun <E, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<ForValidated, E>, A>,
-    Kind<Kind<ForValidated, E>, B>> = arrow.core.Validated
-   .functor<E>()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForValidated, E>, A>,
-    arrow.Kind<arrow.Kind<arrow.core.ForValidated, E>, B>>
+  Kind<Kind<ForValidated, E>, B>> = arrow.core.Validated
+  .functor<E>()
+  .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForValidated, E>, A>,
+  arrow.Kind<arrow.Kind<arrow.core.ForValidated, E>, B>>
 
 @JvmName("void")
 @Suppress(
@@ -144,4 +144,4 @@ fun <E, B, A : B> Kind<Kind<ForValidated, E>, A>.widen(): Validated<E, B> =
 )
 @Deprecated("Functor typeclasses is deprecated. Use concrete methods on Validated")
 inline fun <E> Companion.functor(): ValidatedFunctor<E> = functor_singleton as
-    arrow.core.extensions.ValidatedFunctor<E>
+  arrow.core.extensions.ValidatedFunctor<E>

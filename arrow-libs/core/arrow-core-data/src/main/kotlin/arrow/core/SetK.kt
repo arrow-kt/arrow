@@ -11,12 +11,12 @@ const val SetKDeprecation =
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)class ForSetK private constructor() { companion object }
+) class ForSetK private constructor() { companion object }
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias SetKOf<A> = arrow.Kind<ForSetK, A>
+) typealias SetKOf<A> = arrow.Kind<ForSetK, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(

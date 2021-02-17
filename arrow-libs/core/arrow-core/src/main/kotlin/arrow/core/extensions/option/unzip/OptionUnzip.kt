@@ -28,10 +28,10 @@ internal val unzip_singleton: OptionUnzip = object : arrow.core.extensions.Optio
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForOption, A>, Kind<ForOption, B>> =
-    arrow.core.Option.unzip().run {
-  this@unzip.unzip<A, B>() as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
-    arrow.Kind<arrow.core.ForOption, B>>
-}
+  arrow.core.Option.unzip().run {
+    this@unzip.unzip<A, B>() as arrow.core.Tuple2<arrow.Kind<arrow.core.ForOption, A>,
+      arrow.Kind<arrow.core.ForOption, B>>
+  }
 
 @JvmName("unzipWith")
 @Suppress(

@@ -23,11 +23,11 @@ import kotlin.sequences.Sequence
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.splitM(): Sequence<Option<Tuple2<Kind<ForSequenceK, A>, A>>> =
-    arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@splitM).splitM<A>() as
-    kotlin.sequences.Sequence<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK,
-    A>, A>>>
-}
+  arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@splitM).splitM<A>() as
+      kotlin.sequences.Sequence<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK,
+              A>, A>>>
+  }
 
 @JvmName("interleave")
 @Suppress(
@@ -45,10 +45,10 @@ fun <A> Sequence<A>.splitM(): Sequence<Option<Tuple2<Kind<ForSequenceK, A>, A>>>
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.interleave(arg1: Sequence<A>): Sequence<A> =
-    arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@interleave).interleave<A>(arrow.core.SequenceK(arg1)) as
-    kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@interleave).interleave<A>(arrow.core.SequenceK(arg1)) as
+      kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("unweave")
 @Suppress(
@@ -66,9 +66,9 @@ fun <A> Sequence<A>.interleave(arg1: Sequence<A>): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.unweave(arg1: Function1<A, Kind<ForSequenceK, B>>): Sequence<B> =
-    arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@unweave).unweave<A, B>(arg1) as kotlin.sequences.Sequence<B>
-}
+  arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@unweave).unweave<A, B>(arg1) as kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("ifThen")
 @Suppress(
@@ -86,10 +86,10 @@ fun <A, B> Sequence<A>.unweave(arg1: Function1<A, Kind<ForSequenceK, B>>): Seque
   DeprecationLevel.WARNING
 )
 fun <A, B> Sequence<A>.ifThen(arg1: Sequence<B>, arg2: Function1<A, Kind<ForSequenceK, B>>):
-    Sequence<B> = arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@ifThen).ifThen<A, B>(arrow.core.SequenceK(arg1), arg2) as
-    kotlin.sequences.Sequence<B>
-}
+  Sequence<B> = arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@ifThen).ifThen<A, B>(arrow.core.SequenceK(arg1), arg2) as
+      kotlin.sequences.Sequence<B>
+  }
 
 @JvmName("once")
 @Suppress(
@@ -107,9 +107,9 @@ fun <A, B> Sequence<A>.ifThen(arg1: Sequence<B>, arg2: Function1<A, Kind<ForSequ
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.once(): Sequence<A> =
-    arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@once).once<A>() as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@once).once<A>() as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("voidIfValue")
 @Suppress(
@@ -126,16 +126,16 @@ fun <A> Sequence<A>.once(): Sequence<A> =
   DeprecationLevel.WARNING
 )
 fun <A> Sequence<A>.voidIfValue(): Sequence<Unit> =
-    arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
-  arrow.core.SequenceK(this@voidIfValue).voidIfValue<A>() as kotlin.sequences.Sequence<kotlin.Unit>
-}
+  arrow.core.extensions.sequence.monadLogic.Sequence.monadLogic().run {
+    arrow.core.SequenceK(this@voidIfValue).voidIfValue<A>() as kotlin.sequences.Sequence<kotlin.Unit>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val monadLogic_singleton: SequenceKMonadLogic = object :
-    arrow.core.extensions.SequenceKMonadLogic {}
+  arrow.core.extensions.SequenceKMonadLogic {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -150,4 +150,5 @@ object Sequence {
     "MonadLogic typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun monadLogic(): SequenceKMonadLogic = monadLogic_singleton}
+  inline fun monadLogic(): SequenceKMonadLogic = monadLogic_singleton
+}

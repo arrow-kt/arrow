@@ -39,7 +39,10 @@ object AlternativeLaws {
     }
 
   fun <F> Alternative<F>.alternativeLeftDistributivity(G: Gen<Kind<F, Int>>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(G, G, Gen.functionAToB<Int, Int>(Gen.int())
+    forAll(
+      G,
+      G,
+      Gen.functionAToB<Int, Int>(Gen.int())
     ) { fa: Kind<F, Int>, fa2: Kind<F, Int>, f: (Int) -> Int ->
       fa.combineK(fa2).map(f).equalUnderTheLaw(fa.map(f).combineK(fa2.map(f)), EQ)
     }

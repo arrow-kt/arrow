@@ -193,7 +193,8 @@ fun <K, A, B> Map<K, Ior<A, B>>.unalign(): Pair<Map<K, A>, Map<K, B>> =
     v.fold(
       { a -> ls.plus(k to a) to rs },
       { b -> ls to rs.plus(k to b) },
-      { a, b -> ls.plus(k to a) to rs.plus(k to b) })
+      { a, b -> ls.plus(k to a) to rs.plus(k to b) }
+    )
   }
 
 /**

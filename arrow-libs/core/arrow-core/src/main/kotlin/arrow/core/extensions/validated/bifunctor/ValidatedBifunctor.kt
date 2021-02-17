@@ -43,7 +43,7 @@ fun <A, B, C, D> Kind<Kind<ForValidated, A>, B>.bimap(arg1: Function1<A, C>, arg
 fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<Kind<Kind<ForValidated, A>, B>, Kind<Kind<ForValidated, C>, D>> = arrow.core.Validated
   .bifunctor()
   .lift<A, B, C, D>(arg0, arg1) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForValidated,
-  A>, B>, arrow.Kind<arrow.Kind<arrow.core.ForValidated, C>, D>>
+      A>, B>, arrow.Kind<arrow.Kind<arrow.core.ForValidated, C>, D>>
 
 @JvmName("mapLeft")
 @Suppress(

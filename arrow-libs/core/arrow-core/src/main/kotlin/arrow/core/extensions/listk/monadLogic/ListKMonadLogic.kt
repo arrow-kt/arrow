@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadLogic_singleton: ListKMonadLogic = object : arrow.core.extensions.ListKMonadLogic
-    {}
+{}
 
 @JvmName("splitM")
 @Suppress(
@@ -29,10 +29,10 @@ internal val monadLogic_singleton: ListKMonadLogic = object : arrow.core.extensi
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("split()", "arrow.core.split()"))
 fun <A> Kind<ForListK, A>.splitM(): ListK<Option<Tuple2<Kind<ForListK, A>, A>>> =
-    arrow.core.ListK.monadLogic().run {
-  this@splitM.splitM<A>() as
-    arrow.core.ListK<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>, A>>>
-}
+  arrow.core.ListK.monadLogic().run {
+    this@splitM.splitM<A>() as
+      arrow.core.ListK<arrow.core.Option<arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>, A>>>
+  }
 
 @JvmName("interleave")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A> Kind<ForListK, A>.splitM(): ListK<Option<Tuple2<Kind<ForListK, A>, A>>> 
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("interleave(arg1)", "arrow.core.interleave"))
 fun <A> Kind<ForListK, A>.interleave(arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.monadLogic().run {
-  this@interleave.interleave<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.monadLogic().run {
+    this@interleave.interleave<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("unweave")
 @Suppress(
@@ -56,9 +56,9 @@ fun <A> Kind<ForListK, A>.interleave(arg1: Kind<ForListK, A>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("unweave(arg1)", "arrow.core.unweave"))
 fun <A, B> Kind<ForListK, A>.unweave(arg1: Function1<A, Kind<ForListK, B>>): ListK<B> =
-    arrow.core.ListK.monadLogic().run {
-  this@unweave.unweave<A, B>(arg1) as arrow.core.ListK<B>
-}
+  arrow.core.ListK.monadLogic().run {
+    this@unweave.unweave<A, B>(arg1) as arrow.core.ListK<B>
+  }
 
 @JvmName("ifThen")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForListK, A>.unweave(arg1: Function1<A, Kind<ForListK, B>>): Lis
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("ifThen(arg1, arg2)", "arrow.core.ifThen"))
 fun <A, B> Kind<ForListK, A>.ifThen(arg1: Kind<ForListK, B>, arg2: Function1<A, Kind<ForListK, B>>):
-    ListK<B> = arrow.core.ListK.monadLogic().run {
-  this@ifThen.ifThen<A, B>(arg1, arg2) as arrow.core.ListK<B>
-}
+  ListK<B> = arrow.core.ListK.monadLogic().run {
+    this@ifThen.ifThen<A, B>(arg1, arg2) as arrow.core.ListK<B>
+  }
 
 @JvmName("once")
 @Suppress(

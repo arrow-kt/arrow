@@ -20,14 +20,14 @@ internal val align_singleton: OptionAlign = object : arrow.core.extensions.Optio
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Option.empty<A>()",
-  "arrow.core.Option"
+    "Option.empty<A>()",
+    "arrow.core.Option"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> empty(): Option<A> = arrow.core.Option
-   .align()
-   .empty<A>() as arrow.core.Option<A>
+  .align()
+  .empty<A>() as arrow.core.Option<A>
 
 @Suppress(
   "UNCHECKED_CAST",

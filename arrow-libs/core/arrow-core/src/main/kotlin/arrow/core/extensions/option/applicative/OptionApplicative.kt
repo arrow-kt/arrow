@@ -12,7 +12,7 @@ import arrow.typeclasses.Monoid
  */
 @PublishedApi()
 internal val applicative_singleton: OptionApplicative = object :
-    arrow.core.extensions.OptionApplicative {}
+  arrow.core.extensions.OptionApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -24,8 +24,8 @@ internal val applicative_singleton: OptionApplicative = object :
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "some()",
-  "arrow.core.some"
+    "some()",
+    "arrow.core.some"
   ),
   DeprecationLevel.WARNING
 )
@@ -43,14 +43,14 @@ fun <A> A.just(): Option<A> = arrow.core.Option.applicative().run {
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Unit.some()",
-  "arrow.core.some"
+    "Unit.some()",
+    "arrow.core.some"
   ),
   DeprecationLevel.WARNING
 )
 fun unit(): Option<Unit> = arrow.core.Option
-   .applicative()
-   .unit() as arrow.core.Option<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.core.Option<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -62,14 +62,14 @@ fun unit(): Option<Unit> = arrow.core.Option
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "map(arg1)"
+    "map(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
-    arrow.core.Option.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.core.Option<B>
-}
+  arrow.core.Option.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.core.Option<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -81,14 +81,14 @@ fun <A, B> Kind<ForOption, A>.map(arg1: Function1<A, B>): Option<B> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1)"
+    "replicate(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.replicate(arg1: Int): Option<List<A>> =
-    arrow.core.Option.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.core.Option<kotlin.collections.List<A>>
-}
+  arrow.core.Option.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.core.Option<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -100,14 +100,14 @@ fun <A> Kind<ForOption, A>.replicate(arg1: Int): Option<List<A>> =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "replicate(arg1, arg2)"
+    "replicate(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.replicate(arg1: Int, arg2: Monoid<A>): Option<A> =
-    arrow.core.Option.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.core.Option<A>
-}
+  arrow.core.Option.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.core.Option<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

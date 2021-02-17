@@ -11,29 +11,32 @@ import arrow.typeclasses.ShowDeprecation
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)class ForConst private constructor() {
+) class ForConst private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
+) typealias ConstOf<A, T> = arrow.Kind2<ForConst, A, T>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias ConstPartialOf<A> = arrow.Kind<ForConst, A>
+) typealias ConstPartialOf<A> = arrow.Kind<ForConst, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)inline fun <A, T> ConstOf<A, T>.fix(): Const<A, T> =
+)inline
+fun <A, T> ConstOf<A, T>.fix(): Const<A, T> =
   this as Const<A, T>
 
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
+) fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
 data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
 

@@ -22,8 +22,8 @@ internal val monoidal_singleton: ListKMonoidal = object : arrow.core.extensions.
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("emptyList<A>()"))
 fun <A> identity(): ListK<A> = arrow.core.ListK
-   .monoidal()
-   .identity<A>() as arrow.core.ListK<A>
+  .monoidal()
+  .identity<A>() as arrow.core.ListK<A>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -47,7 +47,7 @@ fun <L, G, A, B> Kind<Kind<ForEither, L>, A>.traverse(
 fun <L, G, A> Kind<Kind<ForEither, L>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
   Kind<Kind<ForEither, L>, A>> = arrow.core.Either.traverse<L>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForEither,
-    L>, A>>
+        L>, A>>
 }
 
 @JvmName("map")

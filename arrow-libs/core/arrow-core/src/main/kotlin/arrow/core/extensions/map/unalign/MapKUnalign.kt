@@ -23,16 +23,16 @@ import kotlin.jvm.JvmName
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.unalign()",
-  "arrow.core.unalign"
+    "arg0.unalign()",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B> unalign(arg0: Map<K, Ior<A, B>>): Tuple2<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK,
-    K>, B>> = arrow.core.extensions.map.unalign.Map
-   .unalign<K>()
-   .unalign<A, B>(arrow.core.MapK(arg0)) as
-    arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
+      K>, B>> = arrow.core.extensions.map.unalign.Map
+  .unalign<K>()
+  .unalign<A, B>(arrow.core.MapK(arg0)) as
+  arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
     arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 
 @JvmName("unalignWith")
@@ -45,18 +45,18 @@ fun <K, A, B> unalign(arg0: Map<K, Ior<A, B>>): Tuple2<Kind<Kind<ForMapK, K>, A>
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "arg0.unalign { (_, c) -> arg1(c) }",
-  "arrow.core.unalign"
+    "arg0.unalign { (_, c) -> arg1(c) }",
+    "arrow.core.unalign"
   ),
   DeprecationLevel.WARNING
 )
 fun <K, A, B, C> unalignWith(arg0: Map<K, C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK, K>, B>> =
+  Tuple2<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK, K>, B>> =
     arrow.core.extensions.map.unalign.Map
-   .unalign<K>()
-   .unalignWith<A, B, C>(arrow.core.MapK(arg0), arg1) as
-    arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
-    arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
+      .unalign<K>()
+      .unalignWith<A, B, C>(arrow.core.MapK(arg0), arg1) as
+      arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
+        arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 
 /**
  * cached extension
@@ -71,4 +71,5 @@ object Map {
   )
   @Deprecated("Unalign typeclasses is deprecated. Use concrete methods on Map")
   inline fun <K> unalign(): MapKUnalign<K> = unalign_singleton as
-      arrow.core.extensions.MapKUnalign<K>}
+    arrow.core.extensions.MapKUnalign<K>
+}

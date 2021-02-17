@@ -45,9 +45,9 @@ fun <K, G, A, B> Kind<Kind<ForMapK, K>, A>.traverse(
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceEither or sequenceValidated from arrow.core.*")
 fun <K, G, A> Kind<Kind<ForMapK, K>, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G,
-    Kind<Kind<ForMapK, K>, A>> = arrow.core.MapK.traverse<K>().run {
+  Kind<Kind<ForMapK, K>, A>> = arrow.core.MapK.traverse<K>().run {
   this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>,
-    A>>
+      A>>
 }
 
 @JvmName("map")
@@ -63,9 +63,9 @@ fun <K, G, A> Kind<Kind<ForMapK, K>, Kind<G, A>>.sequence(arg1: Applicative<G>):
   DeprecationLevel.WARNING
 )
 fun <K, A, B> Kind<Kind<ForMapK, K>, A>.map(arg1: Function1<A, B>): MapK<K, B> =
-    arrow.core.MapK.traverse<K>().run {
-  this@map.map<A, B>(arg1) as arrow.core.MapK<K, B>
-}
+  arrow.core.MapK.traverse<K>().run {
+    this@map.map<A, B>(arg1) as arrow.core.MapK<K, B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(
@@ -90,4 +90,4 @@ fun <K, G, A, B> Kind<Kind<ForMapK, K>, A>.flatTraverse(
 )
 @Deprecated("Traverse typeclasses is deprecated. Use concrete methods on Map")
 inline fun <K> Companion.traverse(): MapKTraverse<K> = traverse_singleton as
-    arrow.core.extensions.MapKTraverse<K>
+  arrow.core.extensions.MapKTraverse<K>

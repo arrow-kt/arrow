@@ -12,6 +12,8 @@ import kotlin.Suppress
 )
 @Deprecated(ShowDeprecation)
 inline fun <K, A> Companion.show(SK: Show<K>, SA: Show<A>): MapKShow<K, A> = object :
-    arrow.core.extensions.MapKShow<K, A> { override fun SK(): arrow.typeclasses.Show<K> = SK
+  arrow.core.extensions.MapKShow<K, A> {
+  override fun SK(): arrow.typeclasses.Show<K> = SK
 
-  override fun SA(): arrow.typeclasses.Show<A> = SA }
+  override fun SA(): arrow.typeclasses.Show<A> = SA
+}

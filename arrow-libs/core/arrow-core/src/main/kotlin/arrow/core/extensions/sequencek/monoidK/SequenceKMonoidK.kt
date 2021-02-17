@@ -11,7 +11,7 @@ import arrow.typeclasses.Monoid
  */
 @PublishedApi()
 internal val monoidK_singleton: SequenceKMonoidK = object : arrow.core.extensions.SequenceKMonoidK
-    {}
+{}
 
 @JvmName("algebra")
 @Suppress(
@@ -24,13 +24,14 @@ internal val monoidK_singleton: SequenceKMonoidK = object : arrow.core.extension
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
     "Monoid.sequence<A>()",
-    "arrow.core.sequence", "arrow.typeclasses.Monoid"
+    "arrow.core.sequence",
+    "arrow.typeclasses.Monoid"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> algebra(): Monoid<Kind<ForSequenceK, A>> = arrow.core.SequenceK
-   .monoidK()
-   .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForSequenceK, A>>
+  .monoidK()
+  .algebra<A>() as arrow.typeclasses.Monoid<arrow.Kind<arrow.core.ForSequenceK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

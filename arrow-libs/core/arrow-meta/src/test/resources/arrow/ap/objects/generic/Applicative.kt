@@ -18,4 +18,3 @@ fun arrow.core.Tuple2<`kotlin`.`String`, `arrow`.`core`.`Option`<`kotlin`.`Strin
 
 fun <F> arrow.typeclasses.Applicative<F>.mapToApplicative(field: arrow.Kind<F, `kotlin`.`String`>, option: arrow.Kind<F, `arrow`.`core`.`Option`<`kotlin`.`String`>>): arrow.Kind<F, `arrow`.`ap`.`objects`.`generic`.`Applicative`> =
   this.mapN(field, option) { it.toApplicative() }
-

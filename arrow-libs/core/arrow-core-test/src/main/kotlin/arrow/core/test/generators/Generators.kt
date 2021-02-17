@@ -124,11 +124,13 @@ fun Gen.Companion.nonZeroInt(): Gen<Int> = Gen.int().filter { it != 0 }
 fun Gen.Companion.intPredicate(): Gen<(Int) -> Boolean> =
   Gen.nonZeroInt().flatMap { num ->
     val absNum = Math.abs(num)
-    Gen.from(listOf<(Int) -> Boolean>(
-      { it > num },
-      { it <= num },
-      { it % absNum == 0 },
-      { it % absNum == absNum - 1 })
+    Gen.from(
+      listOf<(Int) -> Boolean>(
+        { it > num },
+        { it <= num },
+        { it % absNum == 0 },
+        { it % absNum == absNum - 1 }
+      )
     )
   }
 

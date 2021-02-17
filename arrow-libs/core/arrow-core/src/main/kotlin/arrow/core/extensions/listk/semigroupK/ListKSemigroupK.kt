@@ -15,7 +15,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroupK_singleton: ListKSemigroupK = object : arrow.core.extensions.ListKSemigroupK
-    {}
+{}
 
 @JvmName("combineK")
 @Suppress(
@@ -26,9 +26,9 @@ internal val semigroupK_singleton: ListKSemigroupK = object : arrow.core.extensi
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("product(arg1)", "arrow.core.product"))
 fun <A> Kind<ForListK, A>.combineK(arg1: Kind<ForListK, A>): ListK<A> =
-    arrow.core.ListK.semigroupK().run {
-  this@combineK.combineK<A>(arg1) as arrow.core.ListK<A>
-}
+  arrow.core.ListK.semigroupK().run {
+    this@combineK.combineK<A>(arg1) as arrow.core.ListK<A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -39,8 +39,8 @@ fun <A> Kind<ForListK, A>.combineK(arg1: Kind<ForListK, A>): ListK<A> =
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("listMonoid<A>()", "arrow.core.listMonoid"))
 fun <A> algebra(): Semigroup<Kind<ForListK, A>> = arrow.core.ListK
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForListK, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.core.ForListK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

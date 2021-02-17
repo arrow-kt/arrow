@@ -20,9 +20,9 @@ import kotlin.sequences.Sequence
   level = DeprecationLevel.WARNING
 )
 fun <G, A> Sequence<Kind<G, A>>.unite(arg1: Foldable<G>): Sequence<A> =
-    arrow.core.extensions.sequence.monadCombine.Sequence.monadCombine().run {
-  arrow.core.SequenceK(this@unite).unite<G, A>(arg1) as kotlin.sequences.Sequence<A>
-}
+  arrow.core.extensions.sequence.monadCombine.Sequence.monadCombine().run {
+    arrow.core.SequenceK(this@unite).unite<G, A>(arg1) as kotlin.sequences.Sequence<A>
+  }
 
 @JvmName("separate")
 @Suppress(
@@ -37,18 +37,18 @@ fun <G, A> Sequence<Kind<G, A>>.unite(arg1: Foldable<G>): Sequence<A> =
 )
 fun <G, A, B> Sequence<Kind<Kind<G, A>, B>>.separate(arg1: Bifoldable<G>): Tuple2<Kind<ForSequenceK,
     A>, Kind<ForSequenceK, B>> =
-    arrow.core.extensions.sequence.monadCombine.Sequence.monadCombine().run {
-  arrow.core.SequenceK(this@separate).separate<G, A, B>(arg1) as
-    arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>, arrow.Kind<arrow.core.ForSequenceK,
-    B>>
-}
+  arrow.core.extensions.sequence.monadCombine.Sequence.monadCombine().run {
+    arrow.core.SequenceK(this@separate).separate<G, A, B>(arg1) as
+      arrow.core.Tuple2<arrow.Kind<arrow.core.ForSequenceK, A>, arrow.Kind<arrow.core.ForSequenceK,
+          B>>
+  }
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val monadCombine_singleton: SequenceKMonadCombine = object :
-    arrow.core.extensions.SequenceKMonadCombine {}
+  arrow.core.extensions.SequenceKMonadCombine {}
 
 @Deprecated(
   "Receiver Sequence object is deprecated, prefer to turn Sequence functions into top-level functions",
@@ -63,4 +63,5 @@ object Sequence {
     "MonadCombine typeclass is deprecated. Use concrete methods on Sequence",
     level = DeprecationLevel.WARNING
   )
-  inline fun monadCombine(): SequenceKMonadCombine = monadCombine_singleton}
+  inline fun monadCombine(): SequenceKMonadCombine = monadCombine_singleton
+}

@@ -27,15 +27,15 @@ internal val eqK_singleton: OptionEqK = object : arrow.core.extensions.OptionEqK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "eqK(arg1, arg2)",
-  "arrow.core.eqK"
+    "eqK(arg1, arg2)",
+    "arrow.core.eqK"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> Kind<ForOption, A>.eqK(arg1: Kind<ForOption, A>, arg2: Eq<A>): Boolean =
-    arrow.core.Option.eqK().run {
-  this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
-}
+  arrow.core.Option.eqK().run {
+    this@eqK.eqK<A>(arg1, arg2) as kotlin.Boolean
+  }
 
 @JvmName("liftEq")
 @Suppress(
@@ -47,14 +47,14 @@ fun <A> Kind<ForOption, A>.eqK(arg1: Kind<ForOption, A>, arg2: Eq<A>): Boolean =
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "liftEq(arg0)",
-  "arrow.core.Option.liftEq"
+    "liftEq(arg0)",
+    "arrow.core.Option.liftEq"
   ),
   DeprecationLevel.WARNING
 )
 fun <A> liftEq(arg0: Eq<A>): Eq<Kind<ForOption, A>> = arrow.core.Option
-   .eqK()
-   .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForOption, A>>
+  .eqK()
+  .liftEq<A>(arg0) as arrow.typeclasses.Eq<arrow.Kind<arrow.core.ForOption, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

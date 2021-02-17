@@ -10,10 +10,10 @@ import arrow.typeclasses.ShowDeprecation
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)
-class ForNonEmptyList private constructor() {
+) class ForNonEmptyList private constructor() {
   companion object
 }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
@@ -493,7 +493,8 @@ fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonE
   "Kind is deprecated, and will be removed in 0.13.0. Please the plus method defined for NonEmptyList instead",
   ReplaceWith(
     "fix().plus(y.fix())",
-    "arrow.core.fix", "arrow.core.plus"
+    "arrow.core.fix",
+    "arrow.core.plus"
   ),
   DeprecationLevel.WARNING
 )

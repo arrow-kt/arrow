@@ -12,4 +12,4 @@ import kotlin.Suppress
 )
 @Deprecated(ShowDeprecation)
 inline fun <A, T> Companion.show(SA: Show<A>): ConstShow<A, T> = object :
-    arrow.core.extensions.ConstShow<A, T> { override fun SA(): arrow.typeclasses.Show<A> = SA }
+  arrow.core.extensions.ConstShow<A, T> { override fun SA(): arrow.typeclasses.Show<A> = SA }

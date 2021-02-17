@@ -35,10 +35,10 @@ internal val unalign_singleton: MapKUnalign<Any?> = object : MapKUnalign<Any?> {
   DeprecationLevel.WARNING
 )
 fun <K, A, B> unalign(arg0: Kind<Kind<ForMapK, K>, Ior<A, B>>): Tuple2<Kind<Kind<ForMapK, K>, A>,
-    Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK
-   .unalign<K>()
-   .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
-    arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
+  Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK
+  .unalign<K>()
+  .unalign<A, B>(arg0) as arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, A>,
+  arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 
 @JvmName("unalignWith")
 @Suppress(
@@ -56,10 +56,10 @@ fun <K, A, B> unalign(arg0: Kind<Kind<ForMapK, K>, Ior<A, B>>): Tuple2<Kind<Kind
   DeprecationLevel.WARNING
 )
 fun <K, A, B, C> unalignWith(arg0: Kind<Kind<ForMapK, K>, C>, arg1: Function1<C, Ior<A, B>>):
-    Tuple2<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK
-   .unalign<K>()
-   .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK,
-    K>, A>, arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
+  Tuple2<Kind<Kind<ForMapK, K>, A>, Kind<Kind<ForMapK, K>, B>> = arrow.core.MapK
+    .unalign<K>()
+    .unalignWith<A, B, C>(arg0, arg1) as arrow.core.Tuple2<arrow.Kind<arrow.Kind<arrow.core.ForMapK,
+        K>, A>, arrow.Kind<arrow.Kind<arrow.core.ForMapK, K>, B>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -67,4 +67,4 @@ fun <K, A, B, C> unalignWith(arg0: Kind<Kind<ForMapK, K>, C>, arg1: Function1<C,
 )
 @Deprecated("Unalign typeclasses is deprecated. Use concrete methods on Map")
 inline fun <K> Companion.unalign(): MapKUnalign<K> = unalign_singleton as
-    arrow.core.extensions.MapKUnalign<K>
+  arrow.core.extensions.MapKUnalign<K>

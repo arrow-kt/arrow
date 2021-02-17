@@ -25,10 +25,10 @@ internal val unzip_singleton: ListKUnzip = object : arrow.core.extensions.ListKU
 )
 @Deprecated("@extension projected functions are deprecated", ReplaceWith("unzip()", "arrow.core.unzip"))
 fun <A, B> Kind<ForListK, Tuple2<A, B>>.unzip(): Tuple2<Kind<ForListK, A>, Kind<ForListK, B>> =
-    arrow.core.ListK.unzip().run {
-  this@unzip.unzip<A, B>() as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
-    arrow.Kind<arrow.core.ForListK, B>>
-}
+  arrow.core.ListK.unzip().run {
+    this@unzip.unzip<A, B>() as arrow.core.Tuple2<arrow.Kind<arrow.core.ForListK, A>,
+      arrow.Kind<arrow.core.ForListK, B>>
+  }
 
 @JvmName("unzipWith")
 @Suppress(

@@ -24,14 +24,14 @@ internal val bifunctor_singleton: IorBifunctor = object : arrow.core.extensions.
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.bimap(arg1, arg2)"
+    "this.bimap(arg1, arg2)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D> Kind<Kind<ForIor, A>, B>.bimap(arg1: Function1<A, C>, arg2: Function1<B, D>):
-    Ior<C, D> = arrow.core.Ior.bifunctor().run {
-  this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Ior<C, D>
-}
+  Ior<C, D> = arrow.core.Ior.bifunctor().run {
+    this@bimap.bimap<A, B, C, D>(arg1, arg2) as arrow.core.Ior<C, D>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -43,15 +43,15 @@ fun <A, B, C, D> Kind<Kind<ForIor, A>, B>.bimap(arg1: Function1<A, C>, arg2: Fun
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "Ior.lift(arg0, arg1)",
-  "arrow.core.Ior"
+    "Ior.lift(arg0, arg1)",
+    "arrow.core.Ior"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<Kind<Kind<ForIor, A>,
     B>, Kind<Kind<ForIor, C>, D>> = arrow.core.Ior
-   .bifunctor()
-   .lift<A, B, C, D>(arg0, arg1) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>,
+  .bifunctor()
+  .lift<A, B, C, D>(arg0, arg1) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.core.ForIor, A>,
     B>, arrow.Kind<arrow.Kind<arrow.core.ForIor, C>, D>>
 
 @JvmName("mapLeft")
@@ -64,14 +64,14 @@ fun <A, B, C, D> lift(arg0: Function1<A, C>, arg1: Function1<B, D>): Function1<K
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.mapLeft(arg1)"
+    "this.mapLeft(arg1)"
   ),
   DeprecationLevel.WARNING
 )
 fun <A, B, C> Kind<Kind<ForIor, A>, B>.mapLeft(arg1: Function1<A, C>): Ior<C, B> =
-    arrow.core.Ior.bifunctor().run {
-  this@mapLeft.mapLeft<A, B, C>(arg1) as arrow.core.Ior<C, B>
-}
+  arrow.core.Ior.bifunctor().run {
+    this@mapLeft.mapLeft<A, B, C>(arg1) as arrow.core.Ior<C, B>
+  }
 
 @JvmName("rightFunctor")
 @Suppress(
@@ -85,8 +85,8 @@ fun <A, B, C> Kind<Kind<ForIor, A>, B>.mapLeft(arg1: Function1<A, C>): Ior<C, B>
   level = DeprecationLevel.WARNING
 )
 fun <X> rightFunctor(): Functor<Kind<ForIor, X>> = arrow.core.Ior
-   .bifunctor()
-   .rightFunctor<X>() as arrow.typeclasses.Functor<arrow.Kind<arrow.core.ForIor, X>>
+  .bifunctor()
+  .rightFunctor<X>() as arrow.typeclasses.Functor<arrow.Kind<arrow.core.ForIor, X>>
 
 @JvmName("leftFunctor")
 @Suppress(
@@ -100,8 +100,8 @@ fun <X> rightFunctor(): Functor<Kind<ForIor, X>> = arrow.core.Ior
   level = DeprecationLevel.WARNING
 )
 fun <X> leftFunctor(): Functor<Conested<ForIor, X>> = arrow.core.Ior
-   .bifunctor()
-   .leftFunctor<X>() as arrow.typeclasses.Functor<arrow.typeclasses.Conested<arrow.core.ForIor, X>>
+  .bifunctor()
+  .leftFunctor<X>() as arrow.typeclasses.Functor<arrow.typeclasses.Conested<arrow.core.ForIor, X>>
 
 @JvmName("leftWiden")
 @Suppress(
@@ -113,15 +113,15 @@ fun <X> leftFunctor(): Functor<Conested<ForIor, X>> = arrow.core.Ior
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "this.leftWiden()",
-  "arrow.core.leftWiden"
+    "this.leftWiden()",
+    "arrow.core.leftWiden"
   ),
   DeprecationLevel.WARNING
 )
 fun <AA, B, A : AA> Kind<Kind<ForIor, A>, B>.leftWiden(): Ior<AA, B> =
-    arrow.core.Ior.bifunctor().run {
-  this@leftWiden.leftWiden<AA, B, A>() as arrow.core.Ior<AA, B>
-}
+  arrow.core.Ior.bifunctor().run {
+    this@leftWiden.leftWiden<AA, B, A>() as arrow.core.Ior<AA, B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

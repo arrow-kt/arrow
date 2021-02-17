@@ -12,4 +12,4 @@ import kotlin.Suppress
 )
 @Deprecated(ShowDeprecation)
 inline fun <A> Companion.show(SA: Show<A>): SequenceKShow<A> = object :
-    arrow.core.extensions.SequenceKShow<A> { override fun SA(): arrow.typeclasses.Show<A> = SA }
+  arrow.core.extensions.SequenceKShow<A> { override fun SA(): arrow.typeclasses.Show<A> = SA }

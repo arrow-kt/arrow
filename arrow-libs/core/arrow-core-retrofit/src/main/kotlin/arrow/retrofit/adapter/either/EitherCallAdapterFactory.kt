@@ -38,8 +38,10 @@ class EitherCallAdapterFactory : CallAdapter.Factory() {
 
     if (returnType !is ParameterizedType) {
       val name = parseTypeName(returnType)
-      throw IllegalArgumentException("Return type must be parameterized as " +
-        "$name<Foo> or $name<out Foo>")
+      throw IllegalArgumentException(
+        "Return type must be parameterized as " +
+          "$name<Foo> or $name<out Foo>"
+      )
     }
 
     return when (rawType) {
@@ -66,8 +68,10 @@ class EitherCallAdapterFactory : CallAdapter.Factory() {
   private inline fun extractErrorAndReturnType(wrapperType: Type, returnType: ParameterizedType): Pair<Type, Type> {
     if (wrapperType !is ParameterizedType) {
       val name = parseTypeName(returnType)
-      throw IllegalArgumentException("Return type must be parameterized as " +
-        "$name<ErrorBody, ResponseBody> or $name<out ErrorBody, out ResponseBody>")
+      throw IllegalArgumentException(
+        "Return type must be parameterized as " +
+          "$name<ErrorBody, ResponseBody> or $name<out ErrorBody, out ResponseBody>"
+      )
     }
     val errorType = getParameterUpperBound(0, wrapperType)
     val bodyType = getParameterUpperBound(1, wrapperType)

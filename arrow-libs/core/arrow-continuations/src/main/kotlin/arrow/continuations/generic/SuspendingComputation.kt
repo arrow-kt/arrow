@@ -45,11 +45,14 @@ internal open class SuspendMonadContinuation<R>(
           }
         }
         else -> { // If not `UNDECIDED` then we need to pass result to `parent`
-          val res: Result<R> = result.fold({ Result.success(it) }, { t ->
-            val x = t.shiftedOrNull()
-            if (x === EMPTY_VALUE) Result.failure(t)
-            else Result.success(EMPTY_VALUE.unbox(x))
-          })
+          val res: Result<R> = result.fold(
+            { Result.success(it) },
+            { t ->
+              val x = t.shiftedOrNull()
+              if (x === EMPTY_VALUE) Result.failure(t)
+              else Result.success(EMPTY_VALUE.unbox(x))
+            }
+          )
           parent.resumeWith(res)
           return
         }

@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
 @Deprecated(
   EqDeprecation,
   ReplaceWith(
-  "this != arg1"
+    "this != arg1"
   ),
   DeprecationLevel.WARNING
 )
@@ -49,8 +49,9 @@ inline fun <A, B, C, D, E> Companion.eq(
   EQC: Eq<C>,
   EQD: Eq<D>,
   EQE: Eq<E>
-): Tuple5Eq<A, B, C, D, E> = object : arrow.core.extensions.Tuple5Eq<A, B, C, D, E> { override fun
-    EQA(): arrow.typeclasses.Eq<A> = EQA
+): Tuple5Eq<A, B, C, D, E> = object : arrow.core.extensions.Tuple5Eq<A, B, C, D, E> {
+  override fun
+  EQA(): arrow.typeclasses.Eq<A> = EQA
 
   override fun EQB(): arrow.typeclasses.Eq<B> = EQB
 
@@ -58,4 +59,5 @@ inline fun <A, B, C, D, E> Companion.eq(
 
   override fun EQD(): arrow.typeclasses.Eq<D> = EQD
 
-  override fun EQE(): arrow.typeclasses.Eq<E> = EQE }
+  override fun EQE(): arrow.typeclasses.Eq<E> = EQE
+}

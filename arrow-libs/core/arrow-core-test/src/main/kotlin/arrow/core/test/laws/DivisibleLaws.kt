@@ -19,9 +19,9 @@ object DivisibleLaws {
     val G = GENK.genK(Gen.int())
     val EQ = EQK.liftEq(Int.eq())
     return DivideLaws.laws(DF, GENK, EQK) + listOf(
-        Law("Divisible laws: Left identity") { DF.leftIdentity(G, EQ) },
-        Law("Divisible laws: Right identity") { DF.rightIdentity(G, EQ) }
-      )
+      Law("Divisible laws: Left identity") { DF.leftIdentity(G, EQ) },
+      Law("Divisible laws: Right identity") { DF.rightIdentity(G, EQ) }
+    )
   }
 
   fun <F> Divisible<F>.leftIdentity(

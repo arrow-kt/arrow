@@ -184,6 +184,8 @@ fun <L, R> Ior<L, R>.sort(
 )
 @Deprecated(OrderDeprecation)
 inline fun <L, R> Companion.order(OL: Order<L>, OR: Order<R>): IorOrder<L, R> = object :
-    arrow.core.extensions.IorOrder<L, R> { override fun OL(): arrow.typeclasses.Order<L> = OL
+  arrow.core.extensions.IorOrder<L, R> {
+  override fun OL(): arrow.typeclasses.Order<L> = OL
 
-  override fun OR(): arrow.typeclasses.Order<R> = OR }
+  override fun OR(): arrow.typeclasses.Order<R> = OR
+}

@@ -23,9 +23,9 @@ fun <F, A, B> crosswalk(
   arg1: List<A>,
   arg2: Function1<A, Kind<F, B>>
 ): Kind<F, Kind<ForListK, B>> = arrow.core.extensions.list.crosswalk.List
-   .crosswalk()
-   .crosswalk<F, A, B>(arg0, arrow.core.ListK(arg1), arg2) as arrow.Kind<F,
-    arrow.Kind<arrow.core.ForListK, B>>
+  .crosswalk()
+  .crosswalk<F, A, B>(arg0, arrow.core.ListK(arg1), arg2) as arrow.Kind<F,
+  arrow.Kind<arrow.core.ForListK, B>>
 
 @JvmName("sequenceL")
 @Suppress(
@@ -36,10 +36,10 @@ fun <F, A, B> crosswalk(
 )
 @Deprecated("@extension kinded projected functions are deprecated. Replace with sequenceValidated or sequenceEither from arrow.core.*")
 fun <F, A> sequenceL(arg0: Align<F>, arg1: List<Kind<F, A>>): Kind<F, Kind<ForListK, A>> =
-    arrow.core.extensions.list.crosswalk.List
-   .crosswalk()
-   .sequenceL<F, A>(arg0, arrow.core.ListK(arg1)) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK,
-    A>>
+  arrow.core.extensions.list.crosswalk.List
+    .crosswalk()
+    .sequenceL<F, A>(arg0, arrow.core.ListK(arg1)) as arrow.Kind<F, arrow.Kind<arrow.core.ForListK,
+      A>>
 
 /**
  * cached extension
@@ -54,4 +54,5 @@ object List {
     "NOTHING_TO_INLINE"
   )
   @Deprecated("Crosswalk typeclasses is deprecated. Use concrete methods on List")
-  inline fun crosswalk(): ListKCrosswalk = crosswalk_singleton}
+  inline fun crosswalk(): ListKCrosswalk = crosswalk_singleton
+}

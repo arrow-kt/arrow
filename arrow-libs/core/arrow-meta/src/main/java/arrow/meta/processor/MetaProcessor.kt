@@ -72,18 +72,22 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
           ElementKind.INTERFACE, ElementKind.CLASS -> {
             val typeElement = element as TypeElement
             val encodingResult = typeElement.type()
-            encodingResult.fold({ knownError(it.toString()) }, {
-              transform(
-                if (element.kind.isInterface)
-                  AnnotatedElement.Interface(
+            encodingResult.fold(
+              { knownError(it.toString()) },
+              {
+                transform(
+                  if (element.kind.isInterface) {
+                    AnnotatedElement.Interface(
+                      typeElement = typeElement,
+                      type = it
+                    )
+                  } else AnnotatedElement.Class(
                     typeElement = typeElement,
                     type = it
                   )
-                else AnnotatedElement.Class(
-                  typeElement = typeElement,
-                  type = it
-                ))
-            })
+                )
+              }
+            )
           }
           else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
         }
@@ -94,7 +98,8 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
       transformList.forEach {
         // Due to FilerException: Illegal name arrow.core.extensions.const.functor
         if (it.packageName.contains(".const.") ||
-          it.packageName.contains(".try.")) {
+          it.packageName.contains(".try.")
+        ) {
           it.writeTo(generatedDir)
         } else {
           it.writeSafeTo(filer)

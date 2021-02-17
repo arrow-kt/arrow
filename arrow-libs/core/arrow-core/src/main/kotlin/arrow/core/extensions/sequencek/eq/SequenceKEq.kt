@@ -23,9 +23,9 @@ import kotlin.jvm.JvmName
   DeprecationLevel.WARNING
 )
 fun <A> SequenceK<A>.neqv(EQ: Eq<A>, arg1: SequenceK<A>): Boolean =
-    arrow.core.SequenceK.eq<A>(EQ).run {
-  this@neqv.neqv(arg1) as kotlin.Boolean
-}
+  arrow.core.SequenceK.eq<A>(EQ).run {
+    this@neqv.neqv(arg1) as kotlin.Boolean
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -33,4 +33,4 @@ fun <A> SequenceK<A>.neqv(EQ: Eq<A>, arg1: SequenceK<A>): Boolean =
 )
 @Deprecated(EqDeprecation)
 inline fun <A> Companion.eq(EQ: Eq<A>): SequenceKEq<A> = object :
-    arrow.core.extensions.SequenceKEq<A> { override fun EQ(): arrow.typeclasses.Eq<A> = EQ }
+  arrow.core.extensions.SequenceKEq<A> { override fun EQ(): arrow.typeclasses.Eq<A> = EQ }

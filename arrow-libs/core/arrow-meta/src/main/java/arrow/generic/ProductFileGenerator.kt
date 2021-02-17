@@ -70,7 +70,7 @@ class ProductFileGenerator(
             |""".trimMargin()
 
   private fun semigroupExtensions(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(SEMIGROUP))
+    if (product.deriving.contains(SEMIGROUP)) {
       """|
                 |fun ${product.sourceClassName}.combine(other: ${product.sourceClassName}): ${product.sourceClassName} =
                 |  this + other
@@ -81,17 +81,17 @@ class ProductFileGenerator(
                 |operator fun ${product.sourceClassName}.plus(other: ${product.sourceClassName}): ${product.sourceClassName} =
                 |  with(${product.sourceClassName}.semigroup()) { this@plus.combine(other) }
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun monoidExtensions(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(MONOID))
+    if (product.deriving.contains(MONOID)) {
       """|fun empty${product.sourceSimpleName}(): ${product.sourceClassName} =
                 |  ${product.sourceClassName}.monoid().empty()
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun tupledExtensions(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(TUPLED) && product.hasTupleFocus)
+    if (product.deriving.contains(TUPLED) && product.hasTupleFocus) {
       """|
                 |fun ${product.sourceClassName}.tupled(): ${focusType(product)} =
                 |  ${tupleConstructor(product)}
@@ -107,10 +107,10 @@ class ProductFileGenerator(
                 |fun ${focusType(product)}.to${product.sourceSimpleName}(): ${product.sourceClassName} =
                 |  ${classConstructorFromTuple(product.sourceClassName, product.focusSize)}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun hListExtensions(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(HLIST))
+    if (product.deriving.contains(HLIST)) {
       """|
                 |fun ${product.sourceClassName}.toHList(): ${focusHListType(product)} =
                 |  ${hListConstructor(product)}
@@ -121,19 +121,19 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.toHListLabeled(): ${labeledHListFocusType(product)} =
                 |  ${product.targets.joinToString(prefix = "arrow.generic.hListOf(", postfix = ")") { """("${it.paramName}" toT ${it.paramName})""" }}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun applicativeExtensions(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(APPLICATIVE) && product.hasTupleFocus)
+    if (product.deriving.contains(APPLICATIVE) && product.hasTupleFocus) {
       """|
                 |fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
                 |  this.map(${product.targets.joinToString(", ") { it.paramName }}) { it.to${product.sourceSimpleName}() }
                 |
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun semigroupInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(SEMIGROUP))
+    if (product.deriving.contains(SEMIGROUP)) {
       """|
                 |interface ${product.sourceSimpleName}Semigroup : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
@@ -151,10 +151,10 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.Companion.semigroup(): ${Semigroup.type}<${product.sourceClassName}> =
                 |  ${product.sourceSimpleName}Semigroup.defaultInstance
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun monoidInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(MONOID))
+    if (product.deriving.contains(MONOID)) {
       """|
                 |interface ${product.sourceSimpleName}Monoid: arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}Semigroup {
                 |  override fun empty(): ${product.sourceClassName} =
@@ -169,10 +169,10 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.Companion.monoid(): ${Monoid.type}<${product.sourceClassName}> =
                 |  ${product.sourceSimpleName}Monoid.defaultInstance
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun eqInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(EQ))
+    if (product.deriving.contains(EQ)) {
       """|
                 |interface ${product.sourceSimpleName}Eq : arrow.typeclasses.Eq<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
@@ -187,10 +187,10 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.Companion.eq(): ${Eq.type}<${product.sourceClassName}> =
                 |  ${product.sourceSimpleName}Eq.defaultInstance
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun showInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(SHOW))
+    if (product.deriving.contains(SHOW)) {
       """|
                 |interface ${product.sourceSimpleName}Show : arrow.typeclasses.Show<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.show(): String =
@@ -200,7 +200,7 @@ class ProductFileGenerator(
                 |fun ${product.sourceClassName}.Companion.show(): ${Show.type}<${product.sourceClassName}> =
                 |  object : ${product.sourceSimpleName}Show{}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun deriveElementImports(product: AnnotatedGeneric): String =
     product.deriving.fold(emptySet<String>()) { imports, target ->
@@ -237,7 +237,7 @@ class ProductFileGenerator(
     }.joinToString(separator = "\n")
 
   private fun deriveElementInstances(product: AnnotatedGeneric): String =
-    if (product.deriving.isNotEmpty())
+    if (product.deriving.isNotEmpty()) {
       """|${if (product.classData.`package`.escapedClassName != "`unnamed package`") "package ${product.classData.`package`.escapedClassName}" else ""}
             |
             |${deriveElementImports(product)}
@@ -261,7 +261,7 @@ class ProductFileGenerator(
             |${showInstance(product)}
             |
             |""".trimMargin().replace("(?m)^\\s+\$".toRegex(), "")
-    else ""
+    } else ""
 
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to deriveElementInstances(product)
 
@@ -269,9 +269,9 @@ class ProductFileGenerator(
     substringBefore("<")
 
   private fun String.typeArg(): String =
-    if (contains("<"))
+    if (contains("<")) {
       "<${substringAfter("<").substringBeforeLast(">")}>"
-    else ""
+    } else ""
 
   private fun String.instance(product: AnnotatedGeneric, instance: String, factory: String): String =
     if (contains("<")) {
@@ -304,11 +304,15 @@ class ProductFileGenerator(
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = { "this.${letters[it]}" })
 
   private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
-    (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
-      "this." + (0 until it).fold("") { acc, _ ->
-        acc + "tail."
-      } + "head"
-    })
+    (0 until propertiesSize).joinToString(
+      prefix = "$sourceClassName(",
+      postfix = ")",
+      transform = {
+        "this." + (0 until it).fold("") { acc, _ ->
+          acc + "tail."
+        } + "head"
+      }
+    )
 
   private fun kindedProperties(prefix: String, product: AnnotatedGeneric): String =
     product.targets.map { it.paramName }.zip(product.targetNames).joinToString(
@@ -337,7 +341,7 @@ class ProductFileGenerator(
     sourceClassName in name
 
   private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(SEMIGROUP) && product.hasTupleFocus)
+    if (product.deriving.contains(SEMIGROUP) && product.hasTupleFocus) {
       """|
                 |interface Tuple${product.focusSize}Semigroup<${product.expandedTypeArgs()}>
                 | : ${Semigroup.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
@@ -361,10 +365,10 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun monoidTupleNInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(MONOID) && product.hasTupleFocus)
+    if (product.deriving.contains(MONOID) && product.hasTupleFocus) {
       """|
                 |interface Tuple${product.focusSize}Monoid<${product.expandedTypeArgs()}>
                 | : ${Monoid.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
@@ -392,10 +396,10 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun eqTupleNInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(EQ) && product.hasTupleFocus)
+    if (product.deriving.contains(EQ) && product.hasTupleFocus) {
       """|
                 |interface Tuple${product.focusSize}Eq<${product.expandedTypeArgs()}>
                 | : ${Eq.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
@@ -419,11 +423,11 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   // TODO Add deriving target for Order instance
   private fun orderTupleNInstance(product: AnnotatedGeneric): String =
-    if (product.hasTupleFocus)
+    if (product.hasTupleFocus) {
       """|
                 |interface Tuple${product.focusSize}Order<${product.expandedTypeArgs()}>
                 | : ${Order.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
@@ -448,10 +452,10 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-    else ""
+    } else ""
 
   private fun showTupleNInstance(product: AnnotatedGeneric): String =
-    if (product.deriving.contains(SHOW) && product.hasTupleFocus)
+    if (product.deriving.contains(SHOW) && product.hasTupleFocus) {
       """|
                 |interface Tuple${product.focusSize}Show<${product.expandedTypeArgs()}>
                 | : ${Show.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
@@ -474,5 +478,5 @@ class ProductFileGenerator(
                 |    }
                 |}
                 |""".trimMargin()
-    else ""
+    } else ""
 }

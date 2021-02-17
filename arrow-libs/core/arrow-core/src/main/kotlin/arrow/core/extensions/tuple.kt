@@ -610,7 +610,13 @@ interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, 
                               f.hashWithSalt(
                                 g.hashWithSalt(
                                   h.hashWithSalt(salt)
-                                )))))))
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
                   }
                 }
               }
@@ -719,7 +725,14 @@ interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, 
                                   g.hashWithSalt(
                                     h.hashWithSalt(
                                       i.hashWithSalt(salt)
-                                    ))))))))
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
                     }
                   }
                 }
@@ -829,7 +842,15 @@ interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E
                                       h.hashWithSalt(
                                         i.hashWithSalt(
                                           j.hashWithSalt(salt)
-                                        )))))))))
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
                       }
                     }
                   }

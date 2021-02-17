@@ -23,11 +23,11 @@ object CrosswalkLaws {
     GENK: GenK<T>,
     EQK: EqK<T>
   ): List<Law> {
-
     val funGen = object : Gen<(Int) -> Kind<ForListK, String>> {
       override fun constants(): Iterable<(Int) -> ListK<String>> = listOf(
         { int: Int -> listOf("$int").k() },
-        { int: Int -> List(abs(int % 100)) { "$it" }.k() })
+        { int: Int -> List(abs(int % 100)) { "$it" }.k() }
+      )
 
       override fun random(): Sequence<(Int) -> ListK<String>> = emptySequence()
     }

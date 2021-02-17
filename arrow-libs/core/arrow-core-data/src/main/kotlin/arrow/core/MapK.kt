@@ -13,15 +13,17 @@ const val MapKDeprecation =
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)class ForMapK private constructor() { companion object }
+) class ForMapK private constructor() { companion object }
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
+) typealias MapKOf<K, A> = arrow.Kind2<ForMapK, K, A>
+
 @Deprecated(
   message = KindDeprecation,
   level = DeprecationLevel.WARNING
-)typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
+) typealias MapKPartialOf<K> = arrow.Kind<ForMapK, K>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 @Deprecated(

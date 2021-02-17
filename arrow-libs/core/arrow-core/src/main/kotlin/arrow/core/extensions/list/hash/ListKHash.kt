@@ -45,4 +45,6 @@ object List {
   )
   @Deprecated(HashDeprecation)
   inline fun <A> hash(HA: Hash<A>): ListKHash<A> = object : arrow.core.extensions.ListKHash<A> {
-      override fun HA(): arrow.typeclasses.Hash<A> = HA }}
+    override fun HA(): arrow.typeclasses.Hash<A> = HA
+  }
+}

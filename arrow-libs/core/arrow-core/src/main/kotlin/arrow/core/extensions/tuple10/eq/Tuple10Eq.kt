@@ -35,7 +35,7 @@ fun <A, B, C, D, E, F, G, H, I, J> Tuple10<A, B, C, D, E, F, G, H, I, J>.neqv(
   EQJ: Eq<J>,
   arg1: Tuple10<A, B, C, D, E, F, G, H, I, J>
 ): Boolean = arrow.core.Tuple10.eq<A, B, C, D, E, F, G, H, I,
-    J>(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH, EQI, EQJ).run {
+  J>(EQA, EQB, EQC, EQD, EQE, EQF, EQG, EQH, EQI, EQJ).run {
   this@neqv.neqv(arg1) as kotlin.Boolean
 }
 
@@ -59,7 +59,8 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.eq(
   EQI: Eq<I>,
   EQJ: Eq<J>
 ): Tuple10Eq<A, B, C, D, E, F, G, H, I, J> = object : arrow.core.extensions.Tuple10Eq<A, B, C, D, E,
-    F, G, H, I, J> { override fun EQA(): arrow.typeclasses.Eq<A> = EQA
+    F, G, H, I, J> {
+  override fun EQA(): arrow.typeclasses.Eq<A> = EQA
 
   override fun EQB(): arrow.typeclasses.Eq<B> = EQB
 
@@ -77,4 +78,5 @@ inline fun <A, B, C, D, E, F, G, H, I, J> Companion.eq(
 
   override fun EQI(): arrow.typeclasses.Eq<I> = EQI
 
-  override fun EQJ(): arrow.typeclasses.Eq<J> = EQJ }
+  override fun EQJ(): arrow.typeclasses.Eq<J> = EQJ
+}

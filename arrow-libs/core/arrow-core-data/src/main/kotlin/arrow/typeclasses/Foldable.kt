@@ -211,15 +211,16 @@ interface Foldable<F> {
    * Get the element at the index of the Foldable.
    */
   fun <A> Kind<F, A>.get(idx: Long): Option<A> =
-    if (idx < 0L)
+    if (idx < 0L) {
       None
-    else
+    } else {
       foldLeft<A, Either<A, Long>>(0L.right()) { i, a ->
         i.flatMap {
           if (it == idx) Left(a)
           else Right(it + 1L)
         }
       }.swap().toOption()
+    }
 
   /**
    * Get the first element of the foldable or none
