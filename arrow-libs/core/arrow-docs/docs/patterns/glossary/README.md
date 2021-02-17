@@ -133,19 +133,19 @@ When creating an instance with the `@extension` annotation, the processor genera
 
 ```kotlin:ank:silent
 import arrow.core.Option
-import arrow.core.extensions.fx
+import arrow.core.computations.option
 
-Option.fx {
-  val (a) = Option(1)
-  val (b) = Option(a + 1)
+option.eager<Int> {
+  val a = Option(1).bind()
+  val b = Option(a + 1).bind()
   a + b
 }
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.option.apply.map
+import arrow.core.Option
 
-map(Option(1), Option(2), Option(3)) { (one, two, three) ->
+Option.mapN(Option(1), Option(2), Option(3)) { one, two, three ->
   one + two + three
 }
 ```
@@ -158,28 +158,29 @@ listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.fx
+import arrow.core.Some
+import arrow.core.computations.option
 
-Option.fx {
-    val a = Some(1)()
-    val b = Some(a+1)()
+option.eager<Int> {
+    val a = Some(1).bind()
+    val b = Some(a+1).bind()
     a + b
 }
 ```
 
 ```kotlin:ank:silent
-import arrow.core.extensions.option.apply.map
+import arrow.core.Option
 
-map(Some(1), Some(2), Some(3)) { (one, two, three) ->
+Option.mapN(Some(1), Some(2), Some(3)) { one, two, three ->
   one + two + three
 }
 ```
 
 ```kotlin:ank:silent
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.either.applicative.applicative
+import arrow.core.Right
+import arrow.core.sequenceEither
 
-listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
+listOf(Right(1), Right(2), Right(3)).sequenceEither()
 ```
 
 ### Type constructors

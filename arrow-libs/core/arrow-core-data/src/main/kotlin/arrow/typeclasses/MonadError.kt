@@ -67,8 +67,8 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  *    //sampleStart
  *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, Salad> =
  *      fx.monadThrow {
- *        val lettuce = takeFoodFromRefrigerator()()
- *        val knife = getKnife()()
+ *        val lettuce = takeFoodFromRefrigerator().bind()
+ *        val knife = getKnife().bind()
  *        val salad = launchImpure(knife, lettuce) // this throws!
  *        salad
  *      }
@@ -117,8 +117,8 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    *    //sampleStart
    *    fun <F> MonadThrow<F>.prepareLunch(): Kind<F, SaladPrepared> =
    *      fx.monadThrow {
-   *        val lettuce = takeFoodFromRefrigerator()()
-   *        val knife = getKnife()()
+   *        val lettuce = takeFoodFromRefrigerator().bind()
+   *        val knife = getKnife().bind()
    *        val salad = launchImpure(knife, lettuce) // this throws!
    *        salad
    *      }

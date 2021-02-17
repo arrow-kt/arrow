@@ -28,9 +28,9 @@ suspend fun main() {
 
 suspend fun prepareLunch(): Either<CookingException, Salad> =
   either<CookingException, Salad> {
-    val lettuce = takeFoodFromRefrigerator()()
-    val knife = getKnife()()
-    val lunch = prepare(knife, lettuce)()
+    val lettuce = takeFoodFromRefrigerator().bind()
+    val knife = getKnife().bind()
+    val lunch = prepare(knife, lettuce).bind()
     lunch
   }
 

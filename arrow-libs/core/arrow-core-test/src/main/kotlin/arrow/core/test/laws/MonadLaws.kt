@@ -83,9 +83,9 @@ object MonadLaws {
   private fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
       fx.monad {
-        val a = just(num)()
-        val b = just(a + 1)()
-        val c = just(b + 1)()
+        val a = just(num).bind()
+        val b = just(a + 1).bind()
+        val c = just(b + 1).bind()
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
     }

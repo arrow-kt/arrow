@@ -114,7 +114,6 @@ NonEmptyList.fx {
 ```kotlin:ank
 import arrow.core.*
 import java.util.*
-import arrow.core.extensions.nonemptylist.apply.map
 
 data class Person(val id: UUID, val name: String, val year: Int)
 
@@ -123,7 +122,7 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-map(nelId, nelName, nelYear) { (id, name, year) ->
+NonEmptyList.mapN(nelId, nelName, nelYear) { id, name, year ->
   Person(id, name, year)
 }
 ```

@@ -85,10 +85,10 @@ class EitherTest : UnitSpec() {
       OrderLaws.laws(Either.order(String.order(), Int.order()), GEN),
       BicrosswalkLaws.laws(Either.bicrosswalk(), Either.genK2(), Either.eqK2()),
       FxLaws.suspended<EitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::invoke) {
-        it()
+        it.bind()
       },
       FxLaws.eager<RestrictedEitherEffect<String, *>, Either<String, Int>, Int>(Gen.int().map(::Right), GEN.map { it }, Eq.any(), either::eager) {
-        it()
+        it.bind()
       }
     )
 

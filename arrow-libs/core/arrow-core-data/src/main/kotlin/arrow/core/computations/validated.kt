@@ -11,17 +11,17 @@ import kotlin.coroutines.RestrictsSuspension
 )
 fun interface ValidatedEffect<E, A> : Effect<Validated<E, A>> {
 
-  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
-  suspend fun <B> Validated<E, B>.bind(): B = this()
-
-  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
-  suspend operator fun <B> Validated<E, B>.not(): B = this()
-
-  suspend operator fun <B> Validated<E, B>.invoke(): B =
+  suspend fun <B> Validated<E, B>.bind(): B =
     when (this) {
       is Validated.Valid -> a
-      is Validated.Invalid -> control().shift(this@invoke)
+      is Validated.Invalid -> control().shift(this@bind)
     }
+
+  @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))
+  suspend operator fun <B> Validated<E, B>.not(): B = bind()
+
+  @Deprecated("This operator can have problems when you do not capture the value, please use bind() instead", ReplaceWith("bind()"))
+  suspend operator fun <B> Validated<E, B>.component1(): B = bind()
 }
 
 @Deprecated(

@@ -54,5 +54,5 @@ open class MonadFilterContinuation<F, A>(
   override suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B =
     MF.run {
       this@bindWithFilter.filter(f)
-    }()
+    }.bind()
 }

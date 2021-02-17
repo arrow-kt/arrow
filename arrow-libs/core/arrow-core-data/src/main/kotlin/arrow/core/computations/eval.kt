@@ -6,14 +6,16 @@ import kotlin.coroutines.RestrictsSuspension
 
 fun interface EvalEffect<A> : Effect<Eval<A>> {
 
-  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
-  suspend fun <B> Eval<B>.bind(): B = this()
-
-  @Deprecated("The monadic operator for the Arrow 1.x series will become invoke in 0.13", ReplaceWith("()"))
-  suspend operator fun <B> Eval<B>.not(): B = this()
-
-  suspend operator fun <B> Eval<B>.invoke(): B =
+  suspend fun <B> Eval<B>.bind(): B =
     value()
+
+  @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))
+  suspend operator fun <B> Eval<B>.not(): B =
+    bind()
+
+  @Deprecated("This operator can have problems when you do not capture the value, please use bind() instead", ReplaceWith("bind()"))
+  suspend operator fun <B> Eval<B>.component1(): B =
+    bind()
 }
 
 @RestrictsSuspension

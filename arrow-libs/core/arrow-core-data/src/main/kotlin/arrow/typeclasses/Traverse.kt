@@ -324,7 +324,7 @@ import arrow.typeclasses.internal.idApplicative
  *
  * suspend fun List<User>.processLogin(): Either<NotFound, List<Profile>> =
  *   either {
- *     parTraverse { userInfo(it)() }
+ *     parTraverse { userInfo(it).bind() }
  *   }
  *
  * suspend fun program(): Unit {

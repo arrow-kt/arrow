@@ -1,6 +1,9 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.computations.OptionEffect
+import arrow.core.computations.RestrictedOptionEffect
+import arrow.core.computations.option
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
@@ -34,6 +37,7 @@ import arrow.core.test.laws.AlignLaws
 import arrow.core.test.laws.CrosswalkLaws
 import arrow.core.test.laws.EqKLaws
 import arrow.core.test.laws.FunctorFilterLaws
+import arrow.core.test.laws.FxLaws
 import arrow.core.test.laws.HashLaws
 import arrow.core.test.laws.MonadCombineLaws
 import arrow.core.test.laws.MonadPlusLaws
@@ -120,8 +124,28 @@ class OptionTest : UnitSpec() {
         Option.monadPlus(),
         Option.genK(),
         Option.eqK()
-      )
+      ),
+      FxLaws.suspended<OptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Eq.any(), option::invoke) {
+        it.bind()
+      },
+      FxLaws.eager<RestrictedOptionEffect<*>, Option<String>, String>(Gen.string().map(Option.Companion::invoke), Gen.option(Gen.string()), Eq.any(), option::eager) {
+        it.bind()
+      }
     )
+
+    "bind null in option computation" {
+      option {
+        "s".length.bind()
+      } shouldBe Some(1)
+    }
+
+    "short circuit null" {
+      option {
+        val number: Int = "s".length
+        (number.takeIf { it > 1 }?.toString()).bind()
+        throw IllegalStateException("This should not be executed")
+      } shouldBe None
+    }
 
     "fromNullable should work for both null and non-null values of nullable types" {
       forAll { a: Int? ->

@@ -76,10 +76,10 @@ class ValidatedTest : UnitSpec() {
         Validated.eqK2()
       ),
       FxLaws.suspended<ValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Eq.any(), validated::invoke) {
-        it()
+        it.bind()
       },
       FxLaws.eager<RestrictedValidatedEffect<String, *>, Validated<String, Int>, Int>(Gen.int().map(::Valid), Gen.int().map(::Valid), Eq.any(), validated::eager) {
-        it()
+        it.bind()
       }
     )
 

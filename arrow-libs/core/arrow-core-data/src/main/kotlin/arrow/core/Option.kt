@@ -127,7 +127,6 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * ```kotlin:ank:playground
  * import arrow.core.Option
  *
- *
  * //sampleStart
  * val myString: String? = "Nullable string"
  * val option: Option<String> = Option.fromNullable(myString)
@@ -173,7 +172,7 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * }
  * ```
  *
- * An alternative for pattern matching is performing Functor/Foldable style operations. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.
+ * An alternative for pattern matching is folding. This is possible because an option could be looked at as a collection or foldable structure with either one or zero elements.
  *
  * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the option:
  *
@@ -254,24 +253,7 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * }
  * ```
  *
- * Some Iterable extensions are available, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
- *
- * ```kotlin:ank:playground
- * import arrow.core.firstOrNone
- *
- * //sampleStart
- * val myList: List<Int> = listOf(1,2,3,4)
- *
- * val first4 = myList.firstOrNone { it == 4 }
- * val first5 = myList.firstOrNone { it == 5 }
- * //sampleEnd
- * fun main () {
- *  println("first4 = $first4")
- *  println("first5 = $first5")
- * }
- * ```
- *
- * Sample usage
+ * You can easily convert between `A?` and `Option<A>` by using the `toOption()` extension or `Option.fromNullable` constructor.
  *
  * ```kotlin:ank:playground
  * import arrow.core.firstOrNone
@@ -280,20 +262,17 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * //sampleStart
  * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
  *
- * val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
- * val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
+ * val empty = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
+ * val filled = Option.fromNullable(foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() })
+ *
  * //sampleEnd
  * fun main() {
- *  println("ugly = $ugly")
- *  println("pretty = $pretty")
+ *  println("empty = $empty")
+ *  println("filled = $filled")
  * }
  * ```
  *
- * Arrow contains `Option` instances for many useful typeclasses that allow you to use and transform optional values
- *
- * [`Functor`](../../../../arrow/typeclasses/functor/)
- *
- * Transforming the inner contents
+ * ### Transforming the inner contents
  *
  * ```kotlin:ank:playground
  * import arrow.core.Some
@@ -307,9 +286,7 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * }
  * ```
  *
- * [`Applicative`](../../../../arrow/typeclasses/applicative/)
- *
- * Computing over independent values
+ * ### Computing over independent values
  *
  * ```kotlin:ank:playground
  * import arrow.core.Some
@@ -324,46 +301,44 @@ inline fun <A> OptionOf<A>.fix(): Option<A> = this as Option<A>
  * }
  * ```
  *
- * [`Monad`](../../../../arrow/typeclasses/monad/)
- *
- * Computing over dependent values ignoring absence
+ * ### Computing over dependent values ignoring absence
  *
  * ```kotlin:ank:playground
- * import arrow.core.extensions.fx
+ * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.Option
  *
- * val value =
+ * suspend fun value(): Option<Int> =
  * //sampleStart
- *  Option.fx {
- *  val (a) = Some(1)
- *  val (b) = Some(1 + a)
- *  val (c) = Some(1 + b)
- *  a + b + c
+ *  option {
+ *    val a = Some(1).bind()
+ *    val b = Some(1 + a).bind()
+ *    val c = Some(1 + b).bind()
+ *    a + b + c
  * }
  * //sampleEnd
- * fun main() {
- *  println(value)
+ * suspend fun main() {
+ *  println(value())
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.extensions.fx
+ * import arrow.core.computations.option
  * import arrow.core.Some
  * import arrow.core.none
  * import arrow.core.Option
  *
- * val value =
+ * suspend fun value(): Option<Int> =
  * //sampleStart
- *  Option.fx {
- *    val (x) = none<Int>()
- *    val (y) = Some(1 + x)
- *    val (z) = Some(1 + y)
+ *  option {
+ *    val x = none<Int>().bind()
+ *    val y = Some(1 + x).bind()
+ *    val z = Some(1 + y).bind()
  *    x + y + z
  *  }
  * //sampleEnd
- * fun main() {
- *  println(value)
+ * suspend fun main() {
+ *  println(value())
  * }
  * ```
  *

@@ -159,7 +159,7 @@ import arrow.core.Right
 
 suspend fun test(): Either<String, Int> =
  either {
-   val one = Right(1)()
+   val one = Right(1).bind()
    1 + one 
  }
  
@@ -234,9 +234,9 @@ suspend fun dean(name: Name): Either<NotFound, Dean> =
 suspend fun main(): Unit {
   //sampleStart
   val dean = either<NotFound, Dean> {
-    val alice = student(Name("Alice"))()
-    val uca = university(alice.universityId)()
-    val james = dean(uca.deanName)()
+    val alice = student(Name("Alice")).bind()
+    val uca = university(alice.universityId).bind()
+    val james = dean(uca.deanName).bind()
     james
   }
   //sampleEnd

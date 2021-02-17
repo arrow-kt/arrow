@@ -14,23 +14,16 @@ import arrow.Kind
  * }
  * ```
  */
-interface BindSyntax<F> : Invoke<F> {
+@Deprecated("Higher Kinded Types are deprecated, and so is polymorphic binding. Check arrow.core.computations for computations blocks for nullable, either, eval and const.")
+interface BindSyntax<F>{
 
-  @Deprecated("This operator can have problems when you do not capture the value, please use () or invoke() instead", ReplaceWith("invoke()"))
-  suspend fun <A> Kind<F, A>.bind(): A =
-    invoke()
+  suspend fun <A> Kind<F, A>.bind(): A
 
-  @Deprecated("This operator can have problems when you do not capture the value, please use () or invoke() instead", ReplaceWith("invoke()"))
+  @Deprecated("This operator is being deprecated due to confusion with Boolean, and unifying a single API. Use bind() instead.", ReplaceWith("bind()"))
   suspend operator fun <A> Kind<F, A>.not(): A =
-    invoke()
+    bind()
 
-  // TODO remove it completely
-  @Deprecated("This operator can have problems when you do not capture the value, please use () or invoke() instead", ReplaceWith("invoke()"))
+  @Deprecated("This operator can have problems when you do not capture the value, please use bind() instead", ReplaceWith("bind()"))
   suspend operator fun <A> Kind<F, A>.component1(): A =
-    invoke()
-}
-
-// TODO: make it fun interface when suspend fun is allowed inside
-interface Invoke<F> {
-  suspend operator fun <A> Kind<F, A>.invoke(): A
+    bind()
 }

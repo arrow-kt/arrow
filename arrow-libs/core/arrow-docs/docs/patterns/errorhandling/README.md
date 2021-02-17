@@ -141,7 +141,7 @@ Arrow provides [monadic comprehensions]({{ '/patterns/monad_comprehensions' | re
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.fx
+import arrow.core.computations.option
 
 object Lettuce
 object Knife
@@ -153,10 +153,10 @@ fun prepare(tool: Knife, ingredient: Lettuce): Option<Salad> = Some(Salad)
 
 //sampleStart
 fun prepareLunchOption(): Option<Salad> =
-  Option.fx {
-    val lettuce = takeFoodFromRefrigerator()()
-    val knife = getKnife()()
-    val salad = prepare(knife, lettuce)()
+  option.eager {
+    val lettuce = takeFoodFromRefrigerator().bind()
+    val knife = getKnife().bind()
+    val salad = prepare(knife, lettuce).bind()
     salad
   }
 //sampleEnd
@@ -215,7 +215,7 @@ All values on the left side assume to be `Right` biased and, whenever a `Left` v
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.extensions.fx
+import arrow.core.computations.either
 
 object Lettuce
 object Knife
@@ -237,10 +237,10 @@ fun lunch(knife: Knife, food: Lettuce): Either<InsufficientAmountOfLettuce, Sala
 
 //sampleStart
 suspend fun prepareEither(): Either<CookingException, Salad> =
-  Either.fx {
-    val lettuce = takeFoodFromRefrigerator()()
-    val knife = getKnife()()
-    val salad = lunch(knife, lettuce)()
+  either {
+    val lettuce = takeFoodFromRefrigerator().bind()
+    val knife = getKnife().bind()
+    val salad = lunch(knife, lettuce).bind()
     salad
   }
 //sampleEnd
