@@ -55,7 +55,7 @@ class SingleKTests : RxJavaSpec() {
     "Multi-thread Singles finish correctly" {
       forFew(10, Gen.choose(10L, 50)) { delay ->
         SingleK.fx {
-          val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().invoke()
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS).k().bind()
           a
         }.value()
           .test()
@@ -74,9 +74,9 @@ class SingleKTests : RxJavaSpec() {
         var threadRef: Thread? = null
 
         val value: Single<Long> = SingleK.fx {
-          val a = Single.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io()).k().invoke()
+          val a = Single.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io()).k().bind()
           threadRef = Thread.currentThread()
-          val b = Single.just(a).observeOn(Schedulers.computation()).k().invoke()
+          val b = Single.just(a).observeOn(Schedulers.computation()).k().bind()
           b
         }.value()
 
@@ -91,7 +91,7 @@ class SingleKTests : RxJavaSpec() {
     "Single dispose forces binding to cancel without completing too" {
       forFew(5, Gen.choose(10L, 50)) { delay ->
         val value: Single<Long> = SingleK.fx {
-          val a = Single.timer(delay + awaitDelay, TimeUnit.MILLISECONDS).k().invoke()
+          val a = Single.timer(delay + awaitDelay, TimeUnit.MILLISECONDS).k().bind()
           a
         }.value()
 
@@ -165,7 +165,7 @@ class SingleKTests : RxJavaSpec() {
       fun getSingle(): Single<Int> = Single.just(1)
 
       SingleK.fx {
-        val s = effect { getSingle().k().suspended() }.invoke()
+        val s = effect { getSingle().k().suspended() }.bind()
 
         s shouldBe 1
       }.unsafeRunSync()
@@ -175,7 +175,7 @@ class SingleKTests : RxJavaSpec() {
       val error = IllegalArgumentException()
 
       SingleK.fx {
-        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().invoke()
+        val s = effect { Single.error<Int>(error).k().suspended() }.attempt().bind()
 
         s shouldBe error.left()
       }.unsafeRunSync()

@@ -277,7 +277,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   suspend fun AsyncSyntax<F>.continueOn(ctx: CoroutineContext): Unit =
-    ctx.shift().invoke()
+    ctx.shift().bind()
 
   /**
    * Shift evaluation to provided [CoroutineContext].

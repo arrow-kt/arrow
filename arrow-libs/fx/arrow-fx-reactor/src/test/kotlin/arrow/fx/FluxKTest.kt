@@ -75,7 +75,7 @@ class FluxKTest : UnitSpec() {
 
     "Multi-thread Fluxes finish correctly" {
       val value: Flux<Int> = FluxK.fx {
-        val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().invoke()
+        val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
 
@@ -91,12 +91,12 @@ class FluxKTest : UnitSpec() {
         val a = Flux.just(0L)
           .delayElements(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
           .k()
-          .invoke()
+          .bind()
         threadRef = Thread.currentThread()
         val b = Flux.just(a)
           .subscribeOn(Schedulers.newSingle("anotherThread"))
           .k()
-          .invoke()
+          .bind()
         b
       }.value()
 
@@ -112,7 +112,7 @@ class FluxKTest : UnitSpec() {
 
     "Flux cancellation forces binding to cancel without completing too" {
       val value: Flux<Long> = FluxK.fx {
-        val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().invoke()
+        val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
         a
       }.value()
 

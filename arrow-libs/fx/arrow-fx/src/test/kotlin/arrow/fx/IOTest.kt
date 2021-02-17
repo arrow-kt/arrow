@@ -377,11 +377,11 @@ class IOTest : ArrowFxSpec() {
 
     "fx can switch execution context state across not/bind" {
       val program = IO.fx {
-        val ctx = effect { kotlin.coroutines.coroutineContext }.invoke()
-        effect { ctx shouldBe EmptyCoroutineContext }.invoke()
+        val ctx = effect { kotlin.coroutines.coroutineContext }.bind()
+        effect { ctx shouldBe EmptyCoroutineContext }.bind()
         continueOn(all)
-        val ctx2 = effect { Thread.currentThread().name }.invoke()
-        effect { ctx2 shouldBe "all" }.invoke()
+        val ctx2 = effect { Thread.currentThread().name }.bind()
+        effect { ctx2 shouldBe "all" }.bind()
       }
 
       program.unsafeRunSync()
@@ -389,11 +389,11 @@ class IOTest : ArrowFxSpec() {
 
     "fx can pass context state across not/bind" {
       val program = IO.fx {
-        val ctx = effect { kotlin.coroutines.coroutineContext }.invoke()
-        effect { ctx shouldBe EmptyCoroutineContext }.invoke()
+        val ctx = effect { kotlin.coroutines.coroutineContext }.bind()
+        effect { ctx shouldBe EmptyCoroutineContext }.bind()
         continueOn(CoroutineName("Simon"))
-        val ctx2 = effect { kotlin.coroutines.coroutineContext }.invoke()
-        effect { ctx2 shouldBe CoroutineName("Simon") }.invoke()
+        val ctx2 = effect { kotlin.coroutines.coroutineContext }.bind()
+        effect { ctx2 shouldBe CoroutineName("Simon") }.bind()
       }
 
       program.unsafeRunSync()
@@ -402,9 +402,9 @@ class IOTest : ArrowFxSpec() {
     "fx will respect thread switching across not/bind" {
       val program = IO.fx {
         continueOn(all)
-        val initialThread = effect { Thread.currentThread().name }.invoke()
-        (0..130).map { i -> effect { i } }.parSequence().invoke()
-        val continuedThread = effect { Thread.currentThread().name }.invoke()
+        val initialThread = effect { Thread.currentThread().name }.bind()
+        (0..130).map { i -> effect { i } }.parSequence().bind()
+        val continuedThread = effect { Thread.currentThread().name }.bind()
         continuedThread shouldBe initialThread
       }
 
@@ -574,8 +574,8 @@ class IOTest : ArrowFxSpec() {
 
     "IO.binding should for comprehend over IO" {
       val result = IO.fx {
-        val x = IO.just(1).invoke()
-        val y = IO { x + 1 }.invoke()
+        val x = IO.just(1).bind()
+        val y = IO { x + 1 }.bind()
         y
       }.fix()
       result.unsafeRunSync() shouldBe 2
@@ -583,7 +583,7 @@ class IOTest : ArrowFxSpec() {
 
     "IO bracket cancellation should release resource with cancel exit status" {
       IO.fx<ExitCase<Throwable>> {
-        val p = Promise<ExitCase<Throwable>>().invoke()
+        val p = Promise<ExitCase<Throwable>>().bind()
         IO.just(0L).bracketCase(
           use = { IO.never },
           release = { _, exitCase -> p.complete(exitCase) }
@@ -591,31 +591,31 @@ class IOTest : ArrowFxSpec() {
           .unsafeRunAsyncCancellable { }
           .invoke() // cancel immediately
 
-        p.get().invoke()
+        p.get().bind()
       }.unsafeRunSync() shouldBe ExitCase.Cancelled
     }
 
     "Cancellable should run CancelToken" {
       IO.fx<Unit> {
-        val p = Promise<Unit>().invoke()
+        val p = Promise<Unit>().bind()
         IO.cancellable<Unit> {
           p.complete(Unit)
         }.unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get().invoke()
+        p.get().bind()
       }.unsafeRunSync() shouldBe Unit
     }
 
     "CancellableF should run CancelToken" {
       IO.fx<Unit> {
-        val p = Promise<Unit>().invoke()
+        val p = Promise<Unit>().bind()
         IO.cancellableF<Unit> {
           IO { p.complete(Unit) }
         }.unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get().invoke()
+        p.get().bind()
       }.unsafeRunSync() shouldBe Unit
     }
 
@@ -632,9 +632,9 @@ class IOTest : ArrowFxSpec() {
 
     "guarantee should be called on finish with error" {
       IO.fx {
-        val p = Promise<Unit>().invoke()
-        effect { throw Exception() }.guarantee(p.complete(Unit)).attempt().invoke()
-        p.get().invoke()
+        val p = Promise<Unit>().bind()
+        effect { throw Exception() }.guarantee(p.complete(Unit)).attempt().bind()
+        p.get().bind()
       }.unsafeRunTimed(1.seconds) shouldBe Unit.some()
     }
 
@@ -656,7 +656,7 @@ class IOTest : ArrowFxSpec() {
         dispatchers().io().raceN(
           timer().sleep(10.seconds).followedBy(effect { 1 }),
           effect { 3 }
-        ).fork().invoke().join().invoke()
+        ).fork().bind().join().bind()
       }.unsafeRunSync() shouldBe 3.right()
     }
 
@@ -666,7 +666,7 @@ class IOTest : ArrowFxSpec() {
           timer().sleep(10.seconds).followedBy(effect { 1 }),
           timer().sleep(10.seconds).followedBy(effect { 3 }),
           effect { 2 }
-        ).fork().invoke().join().invoke()
+        ).fork().bind().join().bind()
       }.unsafeRunSync() shouldBe Race3.Third(2)
     }
 
@@ -760,21 +760,21 @@ class IOTest : ArrowFxSpec() {
         IO.effect { infiniteLoop().suspended() }
 
       IO.fx {
-        val p = Promise<ExitCase<Throwable>>().invoke()
+        val p = Promise<ExitCase<Throwable>>().bind()
         val (_, cancel) = IO.unit.bracketCase(
           release = { _, ec -> p.complete(ec) },
           use = { wrappedInfiniteLoop }
-        ).fork().invoke()
-        sleep(100.milliseconds).invoke()
-        cancel.invoke()
-        val result = p.get().invoke()
-        effect { result shouldBe ExitCase.Cancelled }.invoke()
+        ).fork().bind()
+        sleep(100.milliseconds).bind()
+        cancel.bind()
+        val result = p.get().bind()
+        effect { result shouldBe ExitCase.Cancelled }.bind()
       }.suspended()
     }
 
     "Arrow Fx Coroutines bracket works inside IO.effect" {
       IO.fx {
-        val p = Promise<arrow.fx.coroutines.ExitCase>().invoke()
+        val p = Promise<arrow.fx.coroutines.ExitCase>().bind()
         val (_, cancel) = IO.effect {
           arrow.fx.coroutines.bracketCase(
             acquire = { },
@@ -783,10 +783,10 @@ class IOTest : ArrowFxSpec() {
             },
             release = { _, ex -> p.complete(ex).fix().suspended() }
           )
-        }.fork().invoke()
-        sleep(2.seconds).invoke()
-        cancel.invoke()
-        p.get().invoke()
+        }.fork().bind()
+        sleep(2.seconds).bind()
+        cancel.bind()
+        p.get().bind()
       }.unsafeRunSync().shouldBeInstanceOf<arrow.fx.coroutines.ExitCase>()
     }
 

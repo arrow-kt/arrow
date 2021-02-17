@@ -279,7 +279,7 @@ interface Concurrent<F> : Async<F> {
    *     }
    *   }
    *
-   *   println(result2) //Run with `fix().unsafeRunAsyncCancellable { }.invoke()`
+   *   println(result2) //Run with `fix().unsafeRunAsyncCancellable { }.bind()`
    *   //sampleEnd
    * }
    * ```

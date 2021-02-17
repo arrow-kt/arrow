@@ -115,14 +115,14 @@ class CoroutinesIntegrationTest : UnitSpec() {
       forAll(Gen.int()) { i ->
         IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          val promise = Promise<Int>().invoke()
+          val promise = Promise<Int>().bind()
           effect {
             scope.launch {
               IO.cancellable<Unit> { promise.complete(i) }.suspendCancellable()
             }
-          }.invoke()
-          effect { scope.cancel() }.invoke()
-          promise.get().invoke()
+          }.bind()
+          effect { scope.cancel() }.bind()
+          promise.get().bind()
         }.equalUnderTheLaw(IO.just(i), IO.eqK(500.milliseconds).liftEq(Int.eq()))
       }
     }
@@ -163,12 +163,12 @@ class CoroutinesIntegrationTest : UnitSpec() {
       forAll(Gen.int()) { i ->
         IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          val promise = Promise<Int>().invoke()
+          val promise = Promise<Int>().bind()
           effect {
             IO.cancellable<Unit> { promise.complete(i) }.unsafeRunScoped(scope) { }
-          }.invoke()
-          effect { scope.cancel() }.invoke()
-          promise.get().invoke()
+          }.bind()
+          effect { scope.cancel() }.bind()
+          promise.get().bind()
         }.equalUnderTheLaw(IO.just(i), IO.eqK(500.milliseconds).liftEq(Int.eq()))
       }
     }
@@ -176,12 +176,12 @@ class CoroutinesIntegrationTest : UnitSpec() {
     "unsafeRunScoped can cancel even for infinite asyncs" {
       IO.fx {
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-        val promise = Promise<Int>().invoke()
+        val promise = Promise<Int>().bind()
         effect {
           IO(all) { -1 }.flatMap { IO.async<Int> { } }.onCancel(promise.complete(1)).unsafeRunScoped(scope) { }
-        }.invoke()
-        sleep(500.milliseconds).effectMap { scope.cancel() }.invoke()
-        promise.get().invoke()
+        }.bind()
+        sleep(500.milliseconds).effectMap { scope.cancel() }.bind()
+        promise.get().bind()
       }.equalUnderTheLaw(IO.just(1), IO.eqK(2.seconds).liftEq(Int.eq()))
     }
 
@@ -211,11 +211,11 @@ class CoroutinesIntegrationTest : UnitSpec() {
     "forkScoped can cancel even for infinite asyncs" {
       IO.fx {
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-        val promise = Promise<Int>().invoke()
+        val promise = Promise<Int>().bind()
 
-        val (_, _) = IO.never.onCancel(promise.complete(1)).forkScoped(scope).invoke()
-        sleep(500.milliseconds).effectMap { scope.cancel() }.invoke()
-        promise.get().invoke()
+        val (_, _) = IO.never.onCancel(promise.complete(1)).forkScoped(scope).bind()
+        sleep(500.milliseconds).effectMap { scope.cancel() }.bind()
+        promise.get().bind()
       }.shouldBeEq(IO.just(1), IO.eqK().liftEq(Int.eq()))
     }
 
@@ -223,8 +223,8 @@ class CoroutinesIntegrationTest : UnitSpec() {
       forAll(Gen.int()) { i ->
         IO.fx {
           val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-          val (join, _) = IO.effect { i }.forkScoped(scope).invoke()
-          join.invoke()
+          val (join, _) = IO.effect { i }.forkScoped(scope).bind()
+          join.bind()
         }.equalUnderTheLaw(IO.just(i), IO.eqK().liftEq(Int.eq()))
       }
     }
@@ -232,19 +232,19 @@ class CoroutinesIntegrationTest : UnitSpec() {
     "forkScoped should cancel correctly" {
       IO.fx {
         val scope = TestCoroutineScope(Job() + TestCoroutineDispatcher())
-        val startLatch = Promise<Unit>().invoke()
-        val promise = Promise<ExitCase<Throwable>>().invoke()
+        val startLatch = Promise<Unit>().bind()
+        val promise = Promise<ExitCase<Throwable>>().bind()
 
         IO.unit.bracketCase(
           use = { startLatch.complete(Unit).followedBy(IO.never) },
           release = { _, ex -> promise.complete(ex) }
-        ).forkScoped(scope).invoke()
+        ).forkScoped(scope).bind()
 
-        startLatch.get().invoke()
+        startLatch.get().bind()
 
-        effect { scope.cancel() }.invoke()
+        effect { scope.cancel() }.bind()
 
-        promise.get().invoke()
+        promise.get().bind()
       }.equalUnderTheLaw(IO.just(ExitCase.Cancelled), IO.eqK().liftEq(ExitCase.eq(Eq.any())))
     }
 
@@ -256,29 +256,29 @@ class CoroutinesIntegrationTest : UnitSpec() {
           scope.cancel()
           IO {
             ref.value = null
-          }.forkScoped(scope).invoke()
+          }.forkScoped(scope).bind()
 
           ref.value
         }.equalUnderTheLaw(IO.just<Int?>(i), IO.eqK().liftEq(Int.eq().nullable()))
       }
     }
   }
-}
 
-// TODO move to Arrow Core
-fun <A> Eq<A>.nullable(): Eq<A?> = Eq { a, b ->
-  a?.let { aa ->
-    b?.let { bb ->
-      aa.eqv(bb)
-    } ?: false
-  } ?: b?.let { false } ?: true
-}
+  // TODO move to Arrow Core
+  fun <A> Eq<A>.nullable(): Eq<A?> = Eq { a, b ->
+    a?.let { aa ->
+      b?.let { bb ->
+        aa.eqv(bb)
+      } ?: false
+    } ?: b?.let { false } ?: true
+  }
 
-internal fun IO.Companion.eqK(timeout: Duration = 5.seconds) = object : EqK<ForIO> {
-  override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
-    Either.eq(Eq.any(), EQ).run {
-      IO.applicative().mapN(fix().attempt(), other.attempt()) { (a, b) -> a.eqv(b) }
-        .waitFor(timeout)
-        .unsafeRunSync()
-    }
+  internal fun IO.Companion.eqK(timeout: Duration = 5.seconds) = object : EqK<ForIO> {
+    override fun <A> Kind<ForIO, A>.eqK(other: Kind<ForIO, A>, EQ: Eq<A>): Boolean =
+      Either.eq(Eq.any(), EQ).run {
+        IO.applicative().mapN(fix().attempt(), other.attempt()) { (a, b) -> a.eqv(b) }
+          .waitFor(timeout)
+          .unsafeRunSync()
+      }
+  }
 }

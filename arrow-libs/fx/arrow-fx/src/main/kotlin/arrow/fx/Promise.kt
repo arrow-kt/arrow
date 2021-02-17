@@ -300,7 +300,7 @@ interface Promise<F, A> {
       release: (C, Promise<F, B>) -> Kind<F, Unit>,
       CF: Concurrent<F>
     ): Kind<F, B> = CF.fx.concurrent {
-      val releaseRef = Ref<Option<Tuple2<C, Promise<F, B>>>>(None)()
+      val releaseRef = Ref<Option<Tuple2<C, Promise<F, B>>>>(None).bind()
       fx.concurrent {
 
         // creates a new promise for `use` and returns
@@ -308,11 +308,11 @@ interface Promise<F, A> {
           val pb = unsafeCancellable<F, B>(this)
           val (fc, a2) = use(pb, a)
           a2 toT (fc toT pb)
-        }.invoke()
-        val c = fc.invoke()
-        (releaseRef.set(Some(c toT pb)).followedBy(just(pb))).uncancellable().invoke()
-        pb.get().invoke()
-      }.guarantee(releaseRef.get().flatMap { it.map { (c, fb) -> release(c, fb) }.getOrElse { just(Unit) } }).invoke()
+        }.bind()
+        val c = fc.bind()
+        (releaseRef.set(Some(c toT pb)).followedBy(just(pb))).uncancellable().bind()
+        pb.get().bind()
+      }.guarantee(releaseRef.get().flatMap { it.map { (c, fb) -> release(c, fb) }.getOrElse { just(Unit) } }).bind()
     }
   }
 

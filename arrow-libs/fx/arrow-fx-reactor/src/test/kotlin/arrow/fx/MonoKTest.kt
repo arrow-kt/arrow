@@ -65,7 +65,7 @@ class MonoKTest : UnitSpec() {
 
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = MonoK.fx {
-        val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().invoke()
+        val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
 
@@ -81,12 +81,12 @@ class MonoKTest : UnitSpec() {
         val a = Mono.just(0L)
           .delayElement(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
           .k()
-          .invoke()
+          .bind()
         threadRef = Thread.currentThread()
         val b = Mono.just(a)
           .subscribeOn(Schedulers.newSingle("anotherThread"))
           .k()
-          .invoke()
+          .bind()
         b
       }.value()
 
@@ -102,7 +102,7 @@ class MonoKTest : UnitSpec() {
 
     "Mono dispose forces binding to cancel without completing too" {
       val value: Mono<Long> = MonoK.fx {
-        val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().invoke()
+        val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().bind()
         a
       }.value()
 
@@ -160,7 +160,7 @@ class MonoKTest : UnitSpec() {
 
     "MonoK should suspend" {
       MonoK.fx {
-        val s = effect { Mono.just(1).k().suspended()!! }.invoke()
+        val s = effect { Mono.just(1).k().suspended()!! }.bind()
 
         s shouldBe 1
       }.unsafeRunSync()
@@ -170,7 +170,7 @@ class MonoKTest : UnitSpec() {
       val error = IllegalArgumentException()
 
       MonoK.fx {
-        val s = effect { Mono.error<Int>(error).k().suspended()!! }.attempt().invoke()
+        val s = effect { Mono.error<Int>(error).k().suspended()!! }.attempt().bind()
 
         s shouldBe error.left()
       }.unsafeRunSync()
@@ -178,7 +178,7 @@ class MonoKTest : UnitSpec() {
 
     "Empty MonoK should suspend" {
       MonoK.fx {
-        val s = effect { Mono.empty<Int>().k().suspended() }.invoke()
+        val s = effect { Mono.empty<Int>().k().suspended() }.bind()
 
         s shouldBe null
       }.unsafeRunSync()

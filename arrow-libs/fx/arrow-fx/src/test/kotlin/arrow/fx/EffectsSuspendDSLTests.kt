@@ -73,7 +73,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
           // we only care to know the name of the thread, ignore the number
           effect { getThreadName().split("-")[0] },
           effect { getThreadName().split("-")[0] }
-        ).invoke()
+        ).bind()
         result
       }
       unsafe { runBlocking { program } } shouldBe Tuple2("test", "test")
@@ -83,7 +83,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       shouldThrow<TestError> {
         fxTest {
           IO.fx {
-            TestError.raiseError<Int>().invoke()
+            TestError.raiseError<Int>().bind()
           }
         }
       }
@@ -92,7 +92,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "handleError" {
       fxTest {
         IO.fx {
-          effect { throw TestError }.handleError { 1 }.invoke()
+          effect { throw TestError }.handleError { 1 }.bind()
         }
       } shouldBe 1
     }
@@ -100,7 +100,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "attempt success" {
       fxTest {
         IO.fx {
-          effect { 1 }.attempt().invoke()
+          effect { 1 }.attempt().bind()
         }
       } shouldBe Right(1)
     }
@@ -108,7 +108,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "attempt failure" {
       fxTest {
         IO.fx {
-          effect { throw TestError }.attempt().invoke()
+          effect { throw TestError }.attempt().bind()
         }
       } shouldBe Left(TestError)
     }
@@ -116,8 +116,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         IO.fx {
-          val suspendedValue = effect { suspend { 1 }() }.invoke()
-          val ioValue = IO.just(1).invoke()
+          val suspendedValue = effect { suspend { 1 }() }.bind()
+          val ioValue = IO.just(1).bind()
           suspendedValue == ioValue
         }
       } shouldBe true
@@ -129,7 +129,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
         IO.fx {
           val asyncResult = async<Int> { cb ->
             cb(Right(result))
-          }.invoke()
+          }.bind()
           asyncResult
         }
       } shouldBe result
@@ -139,9 +139,9 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       fxTest {
         IO.fx {
           continueOn(ctxA)
-          val contextA = effect { Thread.currentThread().name }.invoke()
+          val contextA = effect { Thread.currentThread().name }.bind()
           continueOn(ctxB)
-          val contextB = effect { Thread.currentThread().name }.invoke()
+          val contextB = effect { Thread.currentThread().name }.bind()
           contextA != contextB
         }
       } shouldBe true
@@ -150,8 +150,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
     "CoroutineContext.defer" {
       fxTest {
         IO.fx {
-          val contextA = effect(ctxA) { Thread.currentThread().name }.invoke()
-          val contextB = effect(ctxB) { Thread.currentThread().name }.invoke()
+          val contextA = effect(ctxA) { Thread.currentThread().name }.bind()
+          val contextB = effect(ctxB) { Thread.currentThread().name }.bind()
           contextA != contextB
         }
       } shouldBe true
@@ -165,7 +165,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
           effect { const }.bracketCase(
             release = { n, exit -> effect { msg.value = const } },
             use = { effect { it } }
-          ).invoke()
+          ).bind()
         }
       }
       msg.value shouldBe const
@@ -181,7 +181,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
             effect { const }.bracketCase(
               release = { n, exit -> effect { msg.value = const } },
               use = { effect { throw TestError } }
-            ).invoke()
+            ).bind()
           }
         }
       }
@@ -192,8 +192,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       val const = 1
       fxTest {
         IO.fx {
-          val fiber = effect { const }.fork(dispatchers().default()).invoke()
-          val n = fiber.join().invoke()
+          val fiber = effect { const }.fork(dispatchers().default()).bind()
+          val n = fiber.join().bind()
           n
         }
       } shouldBe const
@@ -206,7 +206,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
             effect { 1 },
             effect { 2 },
             effect { 3 }
-          ).parTraverse(::identity).invoke()
+          ).parTraverse(::identity).bind()
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -218,7 +218,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
             effect { 1 },
             effect { 2 },
             effect { 3 }
-          ).parSequence().invoke()
+          ).parSequence().bind()
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -230,7 +230,7 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
         const
 
       fun <F> Concurrent<F>.program(): Kind<F, Int> =
-        fx.concurrent { effect { sideEffect() }.invoke() }
+        fx.concurrent { effect { sideEffect() }.bind() }
 
       fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
         unsafe { runBlocking { fx.program() } }
@@ -246,8 +246,8 @@ class EffectsSuspendDSLTests : ArrowFxSpec() {
       }
       fxTest {
         IO.fx {
-          val appliedPureEffect1: String = effect { sideEffect() }.invoke()
-          val appliedPureEffect2: String = effect { sideEffect() }.invoke()
+          val appliedPureEffect1: String = effect { sideEffect() }.bind()
+          val appliedPureEffect2: String = effect { sideEffect() }.bind()
           appliedPureEffect1
         }
       } shouldBe done

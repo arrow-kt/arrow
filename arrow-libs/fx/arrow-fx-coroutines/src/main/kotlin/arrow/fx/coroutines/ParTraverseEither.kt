@@ -174,6 +174,6 @@ suspend fun <A, B, E> Iterable<A>.parTraverseEither(
 ): Either<E, List<B>> =
   either {
     coroutineScope {
-      map { async(ctx) { f.invoke(it)() } }.awaitAll()
+      map { async(ctx) { f.invoke(it).bind() } }.awaitAll()
     }
   }

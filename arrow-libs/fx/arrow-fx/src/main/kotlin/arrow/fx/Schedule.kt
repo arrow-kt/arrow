@@ -512,8 +512,8 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
             this@ScheduleImpl.update(i, s).flatMap { dec ->
               if (dec.cont) just(dec.bimap({ it.left() }, { it.left() }))
               else M.fx.monad {
-                val newState = other.initialState()
-                val newDec = other.update(i, newState)()
+                val newState = other.initialState.bind()
+                val newDec = other.update(i, newState).bind()
                 newDec.bimap({ it.right() }, { it.right() })
               }
             }
@@ -555,8 +555,8 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
     override fun <C> foldM(initial: Kind<F, C>, f: (C, Output) -> Kind<F, C>): Schedule<F, Input, C> =
       ScheduleImpl(M, M.tupledN(initialState, initial)) { i, s ->
         M.fx.monad {
-          val dec = update(i, s.a).invoke()
-          val c = f(s.b, dec.finish.value()).invoke()
+          val dec = update(i, s.a).bind()
+          val c = f(s.b, dec.finish.value()).bind()
           dec.bimap({ s -> s toT c }, { c })
         }
       }
@@ -609,8 +609,8 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       updated { update ->
         { a: A, s: State ->
           M.fx.monad {
-            val dec = update(a, s).invoke()
-            f(a, dec).invoke()
+            val dec = update(a, s).bind()
+            f(a, dec).bind()
           }
         }
       }

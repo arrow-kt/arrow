@@ -36,9 +36,9 @@ class RefTest : ArrowFxSpec() {
       "getAndSet - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx.monad {
-            val ref = RF.just(a).invoke()
-            val old = ref.getAndSet(b).invoke()
-            val new = ref.get().invoke()
+            val ref = RF.just(a).bind()
+            val old = ref.getAndSet(b).bind()
+            val new = ref.get().bind()
             old shouldBe a
             new shouldBe b
           }.test()
@@ -48,10 +48,10 @@ class RefTest : ArrowFxSpec() {
       "access - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx.monad {
-            val ref = RF.just(a).invoke()
-            val (_, setter) = ref.access().invoke()
-            val success = setter(b).invoke()
-            val result = ref.get().invoke()
+            val ref = RF.just(a).bind()
+            val (_, setter) = ref.access().bind()
+            val success = setter(b).bind()
+            val result = ref.get().bind()
             success shouldBe true
             result shouldBe b
           }.test()
@@ -61,11 +61,11 @@ class RefTest : ArrowFxSpec() {
       "access - setter should fail if value is modified before setter is called" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
           fx.monad {
-            val ref = RF.just(a).invoke()
-            val (_, setter) = ref.access().invoke()
-            ref.set(b).invoke()
-            val success = setter(c).invoke()
-            val result = ref.get().invoke()
+            val ref = RF.just(a).bind()
+            val (_, setter) = ref.access().bind()
+            ref.set(b).bind()
+            val success = setter(c).bind()
+            val result = ref.get().bind()
             success shouldBe false
             result shouldBe b
           }.test()
@@ -75,12 +75,12 @@ class RefTest : ArrowFxSpec() {
       "access - setter should fail if called twice" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
           fx.monad {
-            val ref = RF.just(a).invoke()
-            val (_, setter) = ref.access().invoke()
-            val cond1 = setter(b).invoke()
-            ref.set(c).invoke()
-            val cond2 = setter(d).invoke()
-            val result = ref.get().invoke()
+            val ref = RF.just(a).bind()
+            val (_, setter) = ref.access().bind()
+            val cond1 = setter(b).bind()
+            ref.set(c).bind()
+            val cond2 = setter(d).bind()
+            val result = ref.get().bind()
             cond1 shouldBe true
             cond2 shouldBe false
             result shouldBe c
@@ -91,9 +91,9 @@ class RefTest : ArrowFxSpec() {
       "tryUpdate - modification occurs successfully" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
           fx.monad {
-            val ref = RF.just(a).invoke()
-            ref.tryUpdate(f).invoke()
-            val res = ref.get().invoke()
+            val ref = RF.just(a).bind()
+            ref.tryUpdate(f).bind()
+            val res = ref.get().bind()
             res shouldBe f(a)
           }.test()
         }
