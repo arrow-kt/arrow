@@ -3,6 +3,8 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint"
 }
 
+apply plugin: 'kotlinx-atomicfu'
+
 apply from: "$SUB_PROJECT"
 apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
@@ -13,4 +15,5 @@ dependencies {
     testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testImplementation project(":arrow-core-test")
+    testImplementation "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
 }
