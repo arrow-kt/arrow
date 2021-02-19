@@ -7,8 +7,10 @@ echo "For version: $VERSION ..."
 
 cd $BASEDIR/arrow-site
 git checkout .
-git clean -dxf -e vendor -e .bundle
-if [ -d $BASEDIR/arrow-site-$VERSION ]; then cp $BASEDIR/arrow-site-$VERSION/docs/_data/sidebar* docs/_data/; fi
+git clean -dxf # -e vendor -e .bundle
+git checkout $LAST_TAG # Reason: incompatible changes
+bundle install --gemfile Gemfile --path vendor/bundle
+# if [ -d $BASEDIR/arrow-site-$VERSION ]; then cp $BASEDIR/arrow-site-$VERSION/docs/_data/sidebar* docs/_data/; fi
 perl -pe "s/latest/$VERSION/g" -i docs/_includes/_head-docs.html # TODO
 
 cd $BASEDIR/arrow

@@ -25,7 +25,7 @@ jobs:
       run: |
         mkdir $BASEDIR/logs
         brew install tree
-        bundle install --gemfile Gemfile --path vendor/bundle
+    #    bundle install --gemfile Gemfile --path vendor/bundle
     #- name: "Landing page: build"
     #  run: |
     #    ./scripts/checkout-latest-landingpage.sh
@@ -62,10 +62,10 @@ jobs:
             for version in $(cat update-other-versions.txt); do
                 export VERSION=$version
                 export SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
-                git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
-                LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
+                # git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
+                export LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
                 echo ">> Last tag: $LAST_TAG"
-                cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
+                # cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
                 ./scripts/generate-and-validate-doc.sh
                 cd $BASEDIR/arrow-site
                 rm -f docs/index.md
