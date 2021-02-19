@@ -20,6 +20,7 @@ replaceOSSbyBintrayRepository "*.gradle"
 replaceOSSbyBintrayRepository "gradle/*.gradle"
 
 for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+    checkAndDownload $repository
     cd $BASEDIR/$repository
     git checkout .
     git checkout -f $(git tag -l --sort=version:refname ${VERSION}* | tail -1)

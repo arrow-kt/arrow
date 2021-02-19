@@ -26,24 +26,24 @@ jobs:
         mkdir $BASEDIR/logs
         brew install tree
         bundle install --gemfile Gemfile --path vendor/bundle
-    - name: "Landing page: build"
-      run: |
-        ./scripts/checkout-latest-landingpage.sh
-        bundle exec jekyll build -b docs -s docs
-        tree _site > $BASEDIR/logs/content_landingpage.log
-    - name: "Next version: generate and validate docs for all the libraries"
-      run: |
-        . $BASEDIR/arrow-master/scripts/commons4gradle.sh
-        for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
-            checkAndDownload $repository
-            addArrowDocs $BASEDIR/$repository/settings.gradle
-            $BASEDIR/arrow-master/scripts/project-generate-and-validate-doc.sh $repository
-        done
-    - name: "Next version: build"
-      run: |
-        rm -f docs/index.md
-        bundle exec jekyll build -b docs/next -s docs
-        tree _site > $BASEDIR/logs/content_docs-next.log
+    #- name: "Landing page: build"
+    #  run: |
+    #    ./scripts/checkout-latest-landingpage.sh
+    #    bundle exec jekyll build -b docs -s docs
+    #    tree _site > $BASEDIR/logs/content_landingpage.log
+    #- name: "Next version: generate and validate docs for all the libraries"
+    #  run: |
+    #    . $BASEDIR/arrow-master/scripts/commons4gradle.sh
+    #    for repository in $(cat $BASEDIR/arrow/lists/libs.txt); do
+    #        checkAndDownload $repository
+    #        addArrowDocs $BASEDIR/$repository/settings.gradle
+    #        $BASEDIR/arrow-master/scripts/project-generate-and-validate-doc.sh $repository
+    #    done
+    #- name: "Next version: build"
+    #  run: |
+    #    rm -f docs/index.md
+    #    bundle exec jekyll build -b docs/next -s docs
+    #    tree _site > $BASEDIR/logs/content_docs-next.log
     #- name: "Latest release: generate and validate docs for all the libraries"
     #  run: |
     #    export VERSION=$(grep LATEST_VERSION $BASEDIR/arrow-master/gradle.properties | cut -d= -f2)
@@ -56,23 +56,23 @@ jobs:
     #  run: |
     #    bundle exec jekyll build -b docs -s docs
     #    tree _site > $BASEDIR/logs/content_docs.log
-    #- name: "Other versions: generate and validate docs for all the libraries"
-    #  run: |
-    #    if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
-    #        for version in $(cat update-other-versions.txt); do
-    #            export VERSION=$version
-    #            export SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
-    #            git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
-    #            LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
-    #            echo ">> Last tag: $LAST_TAG"
-    #            cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
-    #            ./scripts/generate-and-validate-doc.sh
-    #            cd $BASEDIR/arrow-site
-    #            rm -f docs/index.md
-    #            bundle exec jekyll build -b docs/$SHORT_VERSION -s docs
-    #            tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
-    #        done
-    #    fi
+    - name: "Other versions: generate and validate docs for all the libraries"
+      run: |
+        if [ -f $BASEDIR/arrow-site/update-other-versions.txt ]; then
+            for version in $(cat update-other-versions.txt); do
+                export VERSION=$version
+                export SHORT_VERSION=$(echo $VERSION | cut -d. -f1-2)
+                git clone https://github.com/arrow-kt/arrow-site.git $BASEDIR/arrow-site-$VERSION
+                LAST_TAG=$(git tag -l --sort=version:refname ${VERSION}* | tail -1)
+                echo ">> Last tag: $LAST_TAG"
+                cd $BASEDIR/arrow-site-$VERSION; git checkout $LAST_TAG; cd -
+                ./scripts/generate-and-validate-doc.sh
+                cd $BASEDIR/arrow-site
+                rm -f docs/index.md
+                bundle exec jekyll build -b docs/$SHORT_VERSION -s docs
+                tree _site > $BASEDIR/logs/content_docs-${SHORT_VERSION}.log
+            done
+        fi
     - uses: actions/upload-artifact@v1
       with:
         name: logs
