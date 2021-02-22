@@ -1,0 +1,39 @@
+name: Test bucket
+
+on: pull_request
+
+jobs:
+  test_bucket:
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      AWS_CLOUDFRONT_ID: ${{ secrets.AWS_CLOUDFRONT_ID }}
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: "Site: generate sitemap.xml"
+      run: |
+        mkdir logs
+        echo '<?xml version="1.0" encoding="UTF-8"?>' > sitemap.xml
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' >> sitemap.xml
+        aws s3 ls s3://$S3_BUCKET/docs --recursive > docs-content.log
+        grep -e " docs/[^0-9|next].*index.html$" docs-content.log > logs/main-pages.log
+        while read line; do
+          PAGE_DATE=$(echo $line | cut -d' ' -f1)
+          PAGE_PATH=$(echo $line | cut -d' ' -f4)
+          echo "<url><loc>https://arrow-kt.io/${PAGE_PATH}</loc><lastmod>${PAGE_DATE}</lastmod></url>"
+        done < $BASEDIR/logs/main-pages.log >> sitemap.xml
+        echo '</urlset>' >> sitemap.xml
+        cp sitemap.xml logs/
+    - name: CloudFront cache invalidation
+      run: aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_ID --paths "/*"
+    - name: List S3
+      run: aws s3 ls s3://$S3_BUCKET --recursive --summarize > logs/site-content.log
+    - uses: actions/upload-artifact@v1
+      with:
+        name: logs
+        path: logs
