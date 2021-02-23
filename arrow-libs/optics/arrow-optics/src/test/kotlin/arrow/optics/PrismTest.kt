@@ -146,14 +146,14 @@ class PrismTest : UnitSpec() {
       "asFold should behave as valid Fold: combineAll" {
         forAll(genSum) { sum: SumType ->
           combineAll(String.monoid(), sum) ==
-              sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genSum) { sum: SumType ->
           fold(String.monoid(), sum) ==
-              sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 
@@ -173,15 +173,18 @@ class PrismTest : UnitSpec() {
     "Joining two prisms together with same target should yield same result" {
       forAll(genSum) { a ->
         (sumPrism compose stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
-            (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
+          (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
       }
     }
 
     "Checking if a prism exists with a target" {
       forAll(genSum, genSum, Gen.bool()) { a, other, bool ->
-        Prism.only(a, object : Eq<SumType> {
-          override fun SumType.eqv(b: SumType): Boolean = bool
-        }).isEmpty(other) == bool
+        Prism.only(
+          a,
+          object : Eq<SumType> {
+            override fun SumType.eqv(b: SumType): Boolean = bool
+          }
+        ).isEmpty(other) == bool
       }
     }
 

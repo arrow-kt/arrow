@@ -21,9 +21,9 @@ import arrow.optics.extensions.MapKIndex
   level = DeprecationLevel.WARNING
 )
 fun <K, V, T> PLens<T, T, MapK<K, V>, MapK<K, V>>.index(i: K): POptional<T, T, V, V> =
-    arrow.optics.extensions.map.index.Map.index<K, V>().run {
-  this@index.index<T>(i) as arrow.optics.POptional<T, T, V, V>
-}
+  arrow.optics.extensions.map.index.Map.index<K, V>().run {
+    this@index.index<T>(i) as arrow.optics.POptional<T, T, V, V>
+  }
 
 /**
  * cached extension
@@ -46,4 +46,5 @@ object Map {
     DeprecationLevel.WARNING
   )
   inline fun <K, V> index(): MapKIndex<K, V> = index_singleton as
-      arrow.optics.extensions.MapKIndex<K, V>}
+    arrow.optics.extensions.MapKIndex<K, V>
+}

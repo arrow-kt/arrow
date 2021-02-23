@@ -23,9 +23,9 @@ import kotlin.collections.List
   DeprecationLevel.WARNING
 )
 fun <A> initOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> =
-    arrow.optics.extensions.list.snoc.List
-   .snoc<A>()
-   .initOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
+  arrow.optics.extensions.list.snoc.List
+    .snoc<A>()
+    .initOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
     arrow.core.ListK<A>, arrow.core.ListK<A>>
 
 @JvmName("lastOption")
@@ -44,8 +44,8 @@ fun <A> initOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> =
   DeprecationLevel.WARNING
 )
 fun <A> lastOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.optics.extensions.list.snoc.List
-   .snoc<A>()
-   .lastOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .snoc<A>()
+  .lastOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @JvmName("snoc")
 @Suppress(
@@ -63,9 +63,9 @@ fun <A> lastOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.optics.extensi
   DeprecationLevel.WARNING
 )
 infix fun <A> List<A>.snoc(last: A): List<A> =
-    arrow.optics.extensions.list.snoc.List.snoc<A>().run {
-  arrow.core.ListK(this@snoc).snoc(last) as kotlin.collections.List<A>
-}
+  arrow.optics.extensions.list.snoc.List.snoc<A>().run {
+    arrow.core.ListK(this@snoc).snoc(last) as kotlin.collections.List<A>
+  }
 
 @JvmName("unsnoc")
 @Suppress(
@@ -83,10 +83,10 @@ infix fun <A> List<A>.snoc(last: A): List<A> =
   DeprecationLevel.WARNING
 )
 fun <A> List<A>.unsnoc(): Option<Tuple2<ListK<A>, A>> =
-    arrow.optics.extensions.list.snoc.List.snoc<A>().run {
-  arrow.core.ListK(this@unsnoc).unsnoc() as arrow.core.Option<arrow.core.Tuple2<arrow.core.ListK<A>,
-    A>>
-}
+  arrow.optics.extensions.list.snoc.List.snoc<A>().run {
+    arrow.core.ListK(this@unsnoc).unsnoc() as arrow.core.Option<arrow.core.Tuple2<arrow.core.ListK<A>,
+        A>>
+  }
 
 /**
  * cached extension

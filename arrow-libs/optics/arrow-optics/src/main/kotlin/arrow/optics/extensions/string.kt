@@ -49,7 +49,8 @@ fun String.Companion.traversal(): Traversal<String, Char> = object : Traversal<S
   "Each is being deprecated. Use the instance for String from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.string()",
-    "arrow.optics.Traversal", "arrow.optics.string"),
+    "arrow.optics.Traversal", "arrow.optics.string"
+  ),
   DeprecationLevel.WARNING
 )
 fun String.Companion.each(): Each<String, Char> = StringEach()
@@ -61,7 +62,8 @@ fun String.Companion.each(): Each<String, Char> = StringEach()
   "Each is being deprecated. Use the instance for String from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.string()",
-    "arrow.optics.Traversal", "arrow.optics.string"),
+    "arrow.optics.Traversal", "arrow.optics.string"
+  ),
   DeprecationLevel.WARNING
 )
 interface StringEach : Each<String, Char> {
@@ -102,7 +104,8 @@ fun String.Companion.filterIndex(): FilterIndex<String, Int, Char> = StringFilte
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "FilterIndex.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.FilterIndex"),
+    "arrow.optics.string", "arrow.optics.typeclasses.FilterIndex"
+  ),
   DeprecationLevel.WARNING
 )
 interface StringFilterIndex : FilterIndex<String, Int, Char> {
@@ -144,7 +147,8 @@ fun String.Companion.index(): Index<String, Int, Char> = StringIndex()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Index.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Index"),
+    "arrow.optics.string", "arrow.optics.typeclasses.Index"
+  ),
   DeprecationLevel.WARNING
 )
 interface StringIndex : Index<String, Int, Char> {
@@ -178,7 +182,8 @@ fun String.Companion.cons(): Cons<String, Char> = StringCons()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Cons.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Cons"),
+    "arrow.optics.string", "arrow.optics.typeclasses.Cons"
+  ),
   DeprecationLevel.WARNING
 )
 interface StringCons : Cons<String, Char> {
@@ -214,7 +219,8 @@ fun String.Companion.snoc(): Snoc<String, Char> = StringSnoc()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Snoc.string()",
-    "arrow.optics.string", "arrow.optics.typeclasses.Snoc"),
+    "arrow.optics.string", "arrow.optics.typeclasses.Snoc"
+  ),
   DeprecationLevel.WARNING
 )
 interface StringSnoc : Snoc<String, Char> {

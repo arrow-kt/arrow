@@ -33,8 +33,8 @@ internal val each_singleton: Each<NonEmptyList<Any?>, Any?> = object : NonEmptyL
   DeprecationLevel.WARNING
 )
 fun <A> each(): PTraversal<NonEmptyList<A>, NonEmptyList<A>, A, A> = arrow.core.NonEmptyList
-   .each<A>()
-   .each() as arrow.optics.PTraversal<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A, A>
+  .each<A>()
+  .each() as arrow.optics.PTraversal<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -49,4 +49,4 @@ fun <A> each(): PTraversal<NonEmptyList<A>, NonEmptyList<A>, A, A> = arrow.core.
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.each(): Each<NonEmptyList<A>, A> = each_singleton as
-    arrow.optics.typeclasses.Each<NonEmptyList<A>, A>
+  arrow.optics.typeclasses.Each<NonEmptyList<A>, A>

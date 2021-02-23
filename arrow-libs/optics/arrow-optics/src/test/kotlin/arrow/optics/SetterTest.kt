@@ -19,29 +19,35 @@ class SetterTest : UnitSpec() {
 
   init {
 
-    testLaws(SetterLaws.laws(
-      setter = Setter.id(),
-      aGen = Gen.int(),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      SetterLaws.laws(
+        setter = Setter.id(),
+        aGen = Gen.int(),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any()
+      )
+    )
 
-    testLaws(SetterLaws.laws(
-      setter = tokenSetter,
-      aGen = genToken,
-      bGen = Gen.string(),
-      funcGen = Gen.functionAToB(Gen.string()),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      SetterLaws.laws(
+        setter = tokenSetter,
+        aGen = genToken,
+        bGen = Gen.string(),
+        funcGen = Gen.functionAToB(Gen.string()),
+        EQA = Eq.any()
+      )
+    )
 
-    testLaws(SetterLaws.laws(
-      setter = Setter.fromFunctor<ForOption, String, String>(Option.functor()),
-      aGen = Gen.option(Gen.string()).map<Kind<ForOption, String>> { it },
-      bGen = Gen.string(),
-      funcGen = Gen.functionAToB(Gen.string()),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      SetterLaws.laws(
+        setter = Setter.fromFunctor<ForOption, String, String>(Option.functor()),
+        aGen = Gen.option(Gen.string()).map<Kind<ForOption, String>> { it },
+        bGen = Gen.string(),
+        funcGen = Gen.functionAToB(Gen.string()),
+        EQA = Eq.any()
+      )
+    )
 
     "Joining two lenses together with same target should yield same result" {
       val userTokenStringSetter = userSetter compose tokenSetter

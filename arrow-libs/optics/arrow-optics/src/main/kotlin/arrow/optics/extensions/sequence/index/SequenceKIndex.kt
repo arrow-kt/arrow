@@ -21,9 +21,9 @@ import arrow.optics.extensions.SequenceKIndex
   DeprecationLevel.WARNING
 )
 fun <A> index(i: Int): POptional<SequenceK<A>, SequenceK<A>, A, A> =
-    arrow.optics.extensions.sequence.index.Sequence
-   .index<A>()
-   .index(i) as arrow.optics.POptional<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
+  arrow.optics.extensions.sequence.index.Sequence
+    .index<A>()
+    .index(i) as arrow.optics.POptional<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
 
 @JvmName("get")
 @Suppress(
@@ -41,9 +41,9 @@ fun <A> index(i: Int): POptional<SequenceK<A>, SequenceK<A>, A, A> =
   level = DeprecationLevel.WARNING
 )
 operator fun <A, T> PLens<T, T, SequenceK<A>, SequenceK<A>>.get(i: Int): POptional<T, T, A, A> =
-    arrow.optics.extensions.sequence.index.Sequence.index<A>().run {
-  this@get.get<T>(i) as arrow.optics.POptional<T, T, A, A>
-}
+  arrow.optics.extensions.sequence.index.Sequence.index<A>().run {
+    this@get.get<T>(i) as arrow.optics.POptional<T, T, A, A>
+  }
 
 /**
  * cached extension
@@ -66,4 +66,5 @@ object Sequence {
     DeprecationLevel.WARNING
   )
   inline fun <A> index(): SequenceKIndex<A> = index_singleton as
-      arrow.optics.extensions.SequenceKIndex<A>}
+    arrow.optics.extensions.SequenceKIndex<A>
+}

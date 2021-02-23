@@ -34,9 +34,9 @@ internal val snoc_singleton: ListKSnoc<Any?> = object : ListKSnoc<Any?> {}
   DeprecationLevel.WARNING
 )
 fun <A> initOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> = arrow.core.ListK
-   .snoc<A>()
-   .initOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
-    arrow.core.ListK<A>, arrow.core.ListK<A>>
+  .snoc<A>()
+  .initOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
+  arrow.core.ListK<A>, arrow.core.ListK<A>>
 
 @JvmName("lastOption")
 @Suppress(
@@ -54,8 +54,8 @@ fun <A> initOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> = arrow.
   DeprecationLevel.WARNING
 )
 fun <A> lastOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
-   .snoc<A>()
-   .lastOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .snoc<A>()
+  .lastOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @JvmName("snoc")
 @Suppress(
@@ -108,4 +108,4 @@ fun <A> ListK<A>.unsnoc(): Option<Tuple2<ListK<A>, A>> = arrow.core.ListK.snoc<A
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.snoc(): ListKSnoc<A> = snoc_singleton as
-    arrow.optics.extensions.ListKSnoc<A>
+  arrow.optics.extensions.ListKSnoc<A>

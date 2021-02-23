@@ -20,8 +20,8 @@ import arrow.optics.extensions.ListKIndex
   DeprecationLevel.WARNING
 )
 fun <A> index(i: Int): POptional<ListK<A>, ListK<A>, A, A> = arrow.optics.extensions.list.index.List
-   .index<A>()
-   .index(i) as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .index<A>()
+  .index(i) as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 /**
  * cached extension

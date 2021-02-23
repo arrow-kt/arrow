@@ -22,12 +22,13 @@ internal val each_singleton: SequenceKEach<Any?> = object : SequenceKEach<Any?> 
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"),
+    "arrow.optics.Traversal", "arrow.optics.sequence"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> each(): PTraversal<SequenceK<A>, SequenceK<A>, A, A> = arrow.core.SequenceK
-   .each<A>()
-   .each() as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
+  .each<A>()
+  .each() as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -37,8 +38,9 @@ fun <A> each(): PTraversal<SequenceK<A>, SequenceK<A>, A, A> = arrow.core.Sequen
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"),
+    "arrow.optics.Traversal", "arrow.optics.sequence"
+  ),
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.each(): SequenceKEach<A> = each_singleton as
-    arrow.optics.extensions.SequenceKEach<A>
+  arrow.optics.extensions.SequenceKEach<A>

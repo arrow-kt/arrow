@@ -28,17 +28,19 @@ class NonEmptyListTest : UnitSpec() {
       )
     )
 
-    testLaws(LensLaws.laws(
-      lens = Lens.nonEmptyListTail(),
-      aGen = Gen.nonEmptyList(Gen.string()),
-      bGen = Gen.list(Gen.string()),
-      funcGen = Gen.functionAToB(Gen.list(Gen.string())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = object : Monoid<List<String>> {
-        override fun empty(): List<String> = emptyList()
-        override fun List<String>.combine(b: List<String>): List<String> = this + b
-      }
-    ))
+    testLaws(
+      LensLaws.laws(
+        lens = Lens.nonEmptyListTail(),
+        aGen = Gen.nonEmptyList(Gen.string()),
+        bGen = Gen.list(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.list(Gen.string())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        MB = object : Monoid<List<String>> {
+          override fun empty(): List<String> = emptyList()
+          override fun List<String>.combine(b: List<String>): List<String> = this + b
+        }
+      )
+    )
   }
 }

@@ -27,42 +27,50 @@ class ListTest : UnitSpec() {
 
   init {
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listHead(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listHead(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listTail(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.list(Gen.int()),
-      funcGen = Gen.functionAToB(Gen.list(Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listTail(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.list(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.list(Gen.int())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(IsoLaws.laws(
-      iso = Iso.listToOptionNel(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
-      funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      bMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
-    ))
+    testLaws(
+      IsoLaws.laws(
+        iso = Iso.listToOptionNel(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
+        funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
+      )
+    )
 
-    testLaws(IsoLaws.laws(
-      iso = ListExtensions.toListK(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.list(Gen.int()).map { it.k() },
-      funcGen = Gen.functionAToB(Gen.list(Gen.int()).map { it.k() }),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      bMonoid = ListK.monoid())
+    testLaws(
+      IsoLaws.laws(
+        iso = ListExtensions.toListK(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.list(Gen.int()).map { it.k() },
+        funcGen = Gen.functionAToB(Gen.list(Gen.int()).map { it.k() }),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = ListK.monoid()
+      )
     )
   }
 }

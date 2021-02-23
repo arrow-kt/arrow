@@ -17,14 +17,16 @@ class OptionInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(TraversalLaws.laws(
-      traversal = Traversal.option(),
-      aGen = Gen.option(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = Gen.functionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = Traversal.option(),
+        aGen = Gen.option(Gen.string()),
+        bGen = Gen.string(),
+        funcGen = Gen.functionAToB(Gen.string()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
   }
 }

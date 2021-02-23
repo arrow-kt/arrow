@@ -36,14 +36,16 @@ class EitherTest : UnitSpec() {
           }
         }
     }
-    testLaws(IsoLaws.laws(
-      iso = Either.toValidated(),
-      aGen = Gen.either(Gen.string(), Gen.int()),
-      bGen = Gen.validated(Gen.string(), Gen.int()),
-      funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      bMonoid = VAL_MONOID
-    ))
+    testLaws(
+      IsoLaws.laws(
+        iso = Either.toValidated(),
+        aGen = Gen.either(Gen.string(), Gen.int()),
+        bGen = Gen.validated(Gen.string(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = VAL_MONOID
+      )
+    )
   }
 }

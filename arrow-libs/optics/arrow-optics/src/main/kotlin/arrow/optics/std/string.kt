@@ -72,7 +72,8 @@ fun PTraversal.Companion.string(): Traversal<String, Char> = object : Traversal<
  * @return [FilterIndex] instance
  */
 fun FilterIndex.Companion.string(): FilterIndex<String, Int, Char> = FilterIndex { p ->
-  Iso.stringToList() compose FilterIndex.list<Char>().filter(p) }
+  Iso.stringToList() compose FilterIndex.list<Char>().filter(p)
+}
 
 /**
  * [Index] instance for [String].
@@ -82,7 +83,8 @@ fun FilterIndex.Companion.string(): FilterIndex<String, Int, Char> = FilterIndex
  * @return [Index] instance
  */
 fun Index.Companion.string(): Index<String, Int, Char> = Index { i ->
-  Iso.stringToList() compose Index.list<Char>().index(i) }
+  Iso.stringToList() compose Index.list<Char>().index(i)
+}
 
 /**
  * [Cons] instance for [String].

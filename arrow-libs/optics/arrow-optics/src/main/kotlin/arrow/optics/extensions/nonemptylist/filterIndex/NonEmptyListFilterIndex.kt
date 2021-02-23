@@ -37,9 +37,9 @@ internal val filterIndex_singleton: FilterIndex<NonEmptyList<Any?>, Int, Any?> =
   DeprecationLevel.WARNING
 )
 fun <A> filter(p: Function1<Int, Boolean>): PTraversal<NonEmptyList<A>, NonEmptyList<A>, A, A> =
-    arrow.core.NonEmptyList
-   .filterIndex<A>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A,
+  arrow.core.NonEmptyList
+    .filterIndex<A>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A,
     A>
 
 @Suppress(

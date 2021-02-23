@@ -28,9 +28,9 @@ internal val at_singleton: MapKAt<Any?, Any?> = object : MapKAt<Any?, Any?> {}
   level = DeprecationLevel.WARNING
 )
 fun <K, V, T> PLens<T, T, MapK<K, V>, MapK<K, V>>.at(i: K): PLens<T, T, Option<V>, Option<V>> =
-    arrow.core.MapK.at<K, V>().run {
-  this@at.at<T>(i) as arrow.optics.PLens<T, T, arrow.core.Option<V>, arrow.core.Option<V>>
-}
+  arrow.core.MapK.at<K, V>().run {
+    this@at.at<T>(i) as arrow.optics.PLens<T, T, arrow.core.Option<V>, arrow.core.Option<V>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

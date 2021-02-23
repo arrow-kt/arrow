@@ -20,9 +20,9 @@ import arrow.optics.extensions.MapKFilterIndex
   DeprecationLevel.WARNING
 )
 fun <K, V> filter(p: Function1<K, Boolean>): PTraversal<MapK<K, V>, MapK<K, V>, V, V> =
-    arrow.optics.extensions.map.filterIndex.Map
-   .filterIndex<K, V>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
+  arrow.optics.extensions.map.filterIndex.Map
+    .filterIndex<K, V>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
 
 /**
  * cached extension
@@ -38,4 +38,5 @@ object Map {
     "NOTHING_TO_INLINE"
   )
   inline fun <K, V> filterIndex(): MapKFilterIndex<K, V> = filterIndex_singleton as
-      arrow.optics.extensions.MapKFilterIndex<K, V>}
+    arrow.optics.extensions.MapKFilterIndex<K, V>
+}

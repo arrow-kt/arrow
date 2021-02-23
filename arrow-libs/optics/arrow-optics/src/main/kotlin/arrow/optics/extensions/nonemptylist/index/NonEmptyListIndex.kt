@@ -35,8 +35,8 @@ internal val index_singleton: Index<NonEmptyList<Any?>, Int, Any?> = object : No
   DeprecationLevel.WARNING
 )
 fun <A> index(i: Int): POptional<NonEmptyList<A>, NonEmptyList<A>, A, A> = arrow.core.NonEmptyList
-   .index<A>()
-   .index(i) as arrow.optics.POptional<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A, A>
+  .index<A>()
+  .index(i) as arrow.optics.POptional<arrow.core.NonEmptyList<A>, arrow.core.NonEmptyList<A>, A, A>
 
 @JvmName("get")
 @Suppress(
@@ -48,8 +48,8 @@ fun <A> index(i: Int): POptional<NonEmptyList<A>, NonEmptyList<A>, A, A> = arrow
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "get(i)",
-  "arrow.core.get"
+    "get(i)",
+    "arrow.core.get"
   ),
   DeprecationLevel.WARNING
 )

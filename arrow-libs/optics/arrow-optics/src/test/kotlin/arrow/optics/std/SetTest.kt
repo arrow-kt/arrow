@@ -15,14 +15,16 @@ class SetTest : UnitSpec() {
 
   init {
 
-    testLaws(IsoLaws.laws(
-      iso = SetExtensions.toSetK(),
-      aGen = Gen.set(Gen.int()),
-      bGen = Gen.genSetK(Gen.int()),
-      funcGen = Gen.functionAToB(Gen.genSetK(Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      bMonoid = SetK.monoid()
-    ))
+    testLaws(
+      IsoLaws.laws(
+        iso = SetExtensions.toSetK(),
+        aGen = Gen.set(Gen.int()),
+        bGen = Gen.genSetK(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.genSetK(Gen.int())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = SetK.monoid()
+      )
+    )
   }
 }

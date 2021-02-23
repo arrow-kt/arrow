@@ -28,9 +28,9 @@ internal val filterIndex_singleton: MapKFilterIndex<Any?, Any?> = object : MapKF
   DeprecationLevel.WARNING
 )
 fun <K, V> filter(p: Function1<K, Boolean>): PTraversal<MapK<K, V>, MapK<K, V>, V, V> =
-    arrow.core.MapK
-   .filterIndex<K, V>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
+  arrow.core.MapK
+    .filterIndex<K, V>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -45,4 +45,4 @@ fun <K, V> filter(p: Function1<K, Boolean>): PTraversal<MapK<K, V>, MapK<K, V>, 
   DeprecationLevel.WARNING
 )
 inline fun <K, V> Companion.filterIndex(): MapKFilterIndex<K, V> = filterIndex_singleton as
-    arrow.optics.extensions.MapKFilterIndex<K, V>
+  arrow.optics.extensions.MapKFilterIndex<K, V>

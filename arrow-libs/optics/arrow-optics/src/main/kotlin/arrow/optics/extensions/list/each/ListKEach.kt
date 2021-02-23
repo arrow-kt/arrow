@@ -15,12 +15,13 @@ import arrow.optics.extensions.ListKEach
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> each(): PTraversal<ListK<A>, ListK<A>, A, A> = arrow.optics.extensions.list.each.List
-   .each<A>()
-   .each() as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .each<A>()
+  .each() as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 /**
  * cached extension
@@ -38,7 +39,8 @@ object List {
     "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.list<A>()",
-      "arrow.optics.Traversal", "arrow.optics.list"),
+      "arrow.optics.Traversal", "arrow.optics.list"
+    ),
     DeprecationLevel.WARNING
   )
   inline fun <A> each(): ListKEach<A> = each_singleton as arrow.optics.extensions.ListKEach<A>

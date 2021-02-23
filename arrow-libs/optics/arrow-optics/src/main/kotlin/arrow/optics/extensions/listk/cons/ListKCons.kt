@@ -35,8 +35,8 @@ internal val cons_singleton: ListKCons<Any?> = object : ListKCons<Any?> {}
   DeprecationLevel.WARNING
 )
 fun <A> firstOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
-   .cons<A>()
-   .firstOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .cons<A>()
+  .firstOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @JvmName("tailOption")
 @Suppress(
@@ -54,9 +54,9 @@ fun <A> firstOption(): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
   DeprecationLevel.WARNING
 )
 fun <A> tailOption(): POptional<ListK<A>, ListK<A>, ListK<A>, ListK<A>> = arrow.core.ListK
-   .cons<A>()
-   .tailOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
-    arrow.core.ListK<A>, arrow.core.ListK<A>>
+  .cons<A>()
+  .tailOption() as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>,
+  arrow.core.ListK<A>, arrow.core.ListK<A>>
 
 @JvmName("cons")
 @Suppress(
@@ -112,10 +112,10 @@ fun <A> ListK<A>.uncons(): Option<Tuple2<A, ListK<A>>> = arrow.core.ListK.cons<A
   DeprecationLevel.WARNING
 )
 fun <A> cons(): PPrism<ListK<A>, ListK<A>, Tuple2<A, ListK<A>>, Tuple2<A, ListK<A>>> =
-    arrow.core.ListK
-   .cons<A>()
-   .cons() as arrow.optics.PPrism<arrow.core.ListK<A>, arrow.core.ListK<A>, arrow.core.Tuple2<A,
-    arrow.core.ListK<A>>, arrow.core.Tuple2<A, arrow.core.ListK<A>>>
+  arrow.core.ListK
+    .cons<A>()
+    .cons() as arrow.optics.PPrism<arrow.core.ListK<A>, arrow.core.ListK<A>, arrow.core.Tuple2<A,
+      arrow.core.ListK<A>>, arrow.core.Tuple2<A, arrow.core.ListK<A>>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -130,4 +130,4 @@ fun <A> cons(): PPrism<ListK<A>, ListK<A>, Tuple2<A, ListK<A>>, Tuple2<A, ListK<
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.cons(): ListKCons<A> = cons_singleton as
-    arrow.optics.extensions.ListKCons<A>
+  arrow.optics.extensions.ListKCons<A>

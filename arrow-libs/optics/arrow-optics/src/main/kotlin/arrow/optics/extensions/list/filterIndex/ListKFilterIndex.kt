@@ -20,9 +20,9 @@ import arrow.optics.extensions.ListKFilterIndex
   DeprecationLevel.WARNING
 )
 fun <A> filter(p: Function1<Int, Boolean>): PTraversal<ListK<A>, ListK<A>, A, A> =
-    arrow.optics.extensions.list.filterIndex.List
-   .filterIndex<A>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  arrow.optics.extensions.list.filterIndex.List
+    .filterIndex<A>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 /**
  * cached extension
@@ -45,5 +45,5 @@ object List {
     DeprecationLevel.WARNING
   )
   inline fun <A> filterIndex(): ListKFilterIndex<A> = filterIndex_singleton as
-      arrow.optics.extensions.ListKFilterIndex<A>
+    arrow.optics.extensions.ListKFilterIndex<A>
 }

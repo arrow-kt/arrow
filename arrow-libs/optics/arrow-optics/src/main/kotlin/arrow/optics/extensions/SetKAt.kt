@@ -13,8 +13,10 @@ import arrow.optics.typeclasses.At
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "At.set<A>()",
-    "arrow.optics.set", "arrow.optics.typeclasses.At"),
-  DeprecationLevel.WARNING)
+    "arrow.optics.set", "arrow.optics.typeclasses.At"
+  ),
+  DeprecationLevel.WARNING
+)
 interface SetKAt<A> : At<SetK<A>, A, Boolean> {
   override fun at(i: A): Lens<SetK<A>, Boolean> = PLens(
     get = { it.contains(i) },

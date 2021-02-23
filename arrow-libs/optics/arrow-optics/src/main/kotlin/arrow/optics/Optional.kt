@@ -164,15 +164,21 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Join two [POptional] with the same focus [B]
    */
   infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
-    POptional({ sources ->
-      sources.fold({ leftSource ->
-        getOrModify(leftSource).bimap({ Either.Left(it) }, ::identity)
-      }, { rightSource ->
-        other.getOrModify(rightSource).bimap({ Either.Right(it) }, ::identity)
-      })
-    }, { sources, focus ->
-      sources.bimap({ leftSource -> this.set(leftSource, focus) }, { rightSource -> other.set(rightSource, focus) })
-    })
+    POptional(
+      { sources ->
+        sources.fold(
+          { leftSource ->
+            getOrModify(leftSource).bimap({ Either.Left(it) }, ::identity)
+          },
+          { rightSource ->
+            other.getOrModify(rightSource).bimap({ Either.Right(it) }, ::identity)
+          }
+        )
+      },
+      { sources, focus ->
+        sources.bimap({ leftSource -> this.set(leftSource, focus) }, { rightSource -> other.set(rightSource, focus) })
+      }
+    )
 
   /**
    * Create a product of the [POptional] and a type [C]

@@ -17,14 +17,16 @@ class EitherInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(TraversalLaws.laws(
-      traversal = Traversal.either(),
-      aGen = Gen.either(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = Traversal.either(),
+        aGen = Gen.either(Gen.string(), Gen.int()),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
   }
 }

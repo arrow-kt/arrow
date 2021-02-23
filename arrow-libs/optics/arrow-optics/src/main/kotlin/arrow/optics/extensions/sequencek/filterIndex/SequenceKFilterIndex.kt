@@ -10,7 +10,7 @@ import arrow.optics.extensions.SequenceKFilterIndex
  */
 @PublishedApi()
 internal val filterIndex_singleton: SequenceKFilterIndex<Any?> = object : SequenceKFilterIndex<Any?>
-    {}
+{}
 
 @JvmName("filter")
 @Suppress(
@@ -28,9 +28,9 @@ internal val filterIndex_singleton: SequenceKFilterIndex<Any?> = object : Sequen
   DeprecationLevel.WARNING
 )
 fun <A> filter(p: Function1<Int, Boolean>): PTraversal<SequenceK<A>, SequenceK<A>, A, A> =
-    arrow.core.SequenceK
-   .filterIndex<A>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
+  arrow.core.SequenceK
+    .filterIndex<A>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -45,4 +45,4 @@ fun <A> filter(p: Function1<Int, Boolean>): PTraversal<SequenceK<A>, SequenceK<A
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.filterIndex(): SequenceKFilterIndex<A> = filterIndex_singleton as
-    arrow.optics.extensions.SequenceKFilterIndex<A>
+  arrow.optics.extensions.SequenceKFilterIndex<A>

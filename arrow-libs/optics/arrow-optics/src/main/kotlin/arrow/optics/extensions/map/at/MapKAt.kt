@@ -21,9 +21,9 @@ import arrow.optics.extensions.MapKAt
   level = DeprecationLevel.WARNING
 )
 fun <K, V, T> PLens<T, T, MapK<K, V>, MapK<K, V>>.at(i: K): PLens<T, T, Option<V>, Option<V>> =
-    arrow.optics.extensions.map.at.Map.at<K, V>().run {
-  this@at.at<T>(i) as arrow.optics.PLens<T, T, arrow.core.Option<V>, arrow.core.Option<V>>
-}
+  arrow.optics.extensions.map.at.Map.at<K, V>().run {
+    this@at.at<T>(i) as arrow.optics.PLens<T, T, arrow.core.Option<V>, arrow.core.Option<V>>
+  }
 
 /**
  * cached extension
@@ -45,4 +45,5 @@ object Map {
     ),
     DeprecationLevel.WARNING
   )
-  inline fun <K, V> at(): MapKAt<K, V> = at_singleton as arrow.optics.extensions.MapKAt<K, V>}
+  inline fun <K, V> at(): MapKAt<K, V> = at_singleton as arrow.optics.extensions.MapKAt<K, V>
+}

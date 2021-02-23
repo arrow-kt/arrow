@@ -29,68 +29,82 @@ class OptionalTest : UnitSpec() {
 
   init {
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listHead(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listHead(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any())
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.id(),
-      aGen = Gen.int(),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.id(),
+        aGen = Gen.int(),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any())
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listHead<Int>().first(),
-      aGen = Gen.tuple2(Gen.list(Gen.int()), Gen.bool()),
-      bGen = Gen.tuple2(Gen.int(), Gen.bool()),
-      funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listHead<Int>().first(),
+        aGen = Gen.tuple2(Gen.list(Gen.int()), Gen.bool()),
+        bGen = Gen.tuple2(Gen.int(), Gen.bool()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any())
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listHead<Int>().first(),
-      aGen = Gen.tuple2(Gen.list(Gen.int()), Gen.bool()),
-      bGen = Gen.tuple2(Gen.int(), Gen.bool()),
-      funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listHead<Int>().first(),
+        aGen = Gen.tuple2(Gen.list(Gen.int()), Gen.bool()),
+        bGen = Gen.tuple2(Gen.int(), Gen.bool()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.bool())),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any())
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optional = Optional.listHead<Int>().second(),
-      aGen = Gen.tuple2(Gen.bool(), Gen.list(Gen.int())),
-      bGen = Gen.tuple2(Gen.bool(), Gen.int()),
-      funcGen = Gen.functionAToB(Gen.tuple2(Gen.bool(), Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optional = Optional.listHead<Int>().second(),
+        aGen = Gen.tuple2(Gen.bool(), Gen.list(Gen.int())),
+        bGen = Gen.tuple2(Gen.bool(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.bool(), Gen.int())),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any())
+      )
+    )
 
-    testLaws(TraversalLaws.laws(
-      traversal = Optional.listHead<Int>().asTraversal(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = Optional.listHead<Int>().asTraversal(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
-    testLaws(SetterLaws.laws(
-      setter = Optional.listHead<Int>().asSetter(),
-      aGen = Gen.list(Gen.int()),
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      SetterLaws.laws(
+        setter = Optional.listHead<Int>().asSetter(),
+        aGen = Gen.list(Gen.int()),
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any()
+      )
+    )
 
     "asSetter should set absent optional" {
       forAll(genIncompleteUser, genToken) { user, token ->

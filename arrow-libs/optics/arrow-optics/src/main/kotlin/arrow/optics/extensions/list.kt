@@ -29,8 +29,10 @@ import arrow.typeclasses.Applicative
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
-  DeprecationLevel.WARNING)
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
+  DeprecationLevel.WARNING
+)
 fun <A> ListExtensions.traversal(): Traversal<List<A>, A> = ListTraversal()
 
 /**
@@ -40,7 +42,8 @@ fun <A> ListExtensions.traversal(): Traversal<List<A>, A> = ListTraversal()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListTraversal<A> : Traversal<List<A>, A> {
@@ -62,7 +65,8 @@ interface ListTraversal<A> : Traversal<List<A>, A> {
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> ListExtensions.each(): Each<List<A>, A> = ListEach()
@@ -74,7 +78,8 @@ fun <A> ListExtensions.each(): Each<List<A>, A> = ListEach()
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListEach<A> : Each<List<A>, A> {
@@ -92,8 +97,9 @@ interface ListEach<A> : Each<List<A>, A> {
 @Deprecated(
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
-  "FilterIndex.list<A>()",
-  "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"),
+    "FilterIndex.list<A>()",
+    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> ListExtensions.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIndex()
@@ -105,7 +111,8 @@ fun <A> ListExtensions.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterI
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "FilterIndex.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"),
+    "arrow.optics.list", "arrow.optics.typeclasses.FilterIndex"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListFilterIndex<A> : FilterIndex<List<A>, Int, A> {
@@ -130,7 +137,8 @@ interface ListFilterIndex<A> : FilterIndex<List<A>, Int, A> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Index.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Index"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Index"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> ListExtensions.index(): Index<List<A>, Int, A> = ListIndex()
@@ -142,7 +150,8 @@ fun <A> ListExtensions.index(): Index<List<A>, Int, A> = ListIndex()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Index.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Index"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Index"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListIndex<A> : Index<List<A>, Int, A> {
@@ -161,7 +170,8 @@ interface ListIndex<A> : Index<List<A>, Int, A> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Cons.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> ListExtensions.cons(): Cons<List<A>, A> = ListCons()
@@ -173,7 +183,8 @@ fun <A> ListExtensions.cons(): Cons<List<A>, A> = ListCons()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Cons.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Cons"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Cons"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListCons<A> : Cons<List<A>, A> {
@@ -192,7 +203,8 @@ interface ListCons<A> : Cons<List<A>, A> {
   "Typeclass instance have been moved to the companion object of the typeclass.",
   ReplaceWith(
     "Snoc.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> ListExtensions.snoc(): Snoc<List<A>, A> = ListSnoc()
@@ -204,7 +216,8 @@ fun <A> ListExtensions.snoc(): Snoc<List<A>, A> = ListSnoc()
   "Typeclass interface implementation will not be exposed directly anymore.",
   ReplaceWith(
     "Snoc.list<A>()",
-    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"),
+    "arrow.optics.list", "arrow.optics.typeclasses.Snoc"
+  ),
   DeprecationLevel.WARNING
 )
 interface ListSnoc<A> : Snoc<List<A>, A> {

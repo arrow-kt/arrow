@@ -74,10 +74,12 @@ class BoundedTest : UnitSpec() {
       Employee.company.address.street.name.modify(
         john,
         String::toUpperCase
-      ) shouldBe (Employee.company compose
+      ) shouldBe (
+        Employee.company compose
           Company.address compose
           Address.street compose
-          Street.name).modify(john, String::toUpperCase)
+          Street.name
+        ).modify(john, String::toUpperCase)
     }
 
     "Index enables special Index syntax" {
@@ -86,12 +88,14 @@ class BoundedTest : UnitSpec() {
           employees,
           String::toUpperCase
         )
-      } shouldBe (CompanyEmployees.employees compose
+      } shouldBe (
+        CompanyEmployees.employees compose
           Index.list<Employee>().index(1) compose
           Employee.company compose
           Company.address compose
           Address.street compose
-          Street.name).modify(employees, String::toUpperCase)
+          Street.name
+        ).modify(employees, String::toUpperCase)
     }
 
     "Working with At in Optics should be same as in DSL" {

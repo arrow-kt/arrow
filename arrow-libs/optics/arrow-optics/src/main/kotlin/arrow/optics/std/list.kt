@@ -32,7 +32,8 @@ import arrow.typeclasses.Applicative
     "Optional.listHead<A>()",
     "arrow.optics.Optional", "arrow.optics.listHead"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
   getOption = { Option.fromNullable(it.firstOrNull()) },
   set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
@@ -55,7 +56,8 @@ fun <A> POptional.Companion.listHead(): Optional<List<A>, A> = Optional(
     "Optional.listTail<A>()",
     "arrow.optics.Optional", "arrow.optics.listTail"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
   getOption = { if (it.isEmpty()) None else Some(it.drop(1)) },
   set = { list, newTail ->
@@ -86,7 +88,8 @@ fun <A> POptional.Companion.listTail(): Optional<List<A>, List<A>> = Optional(
     "Iso.listToPOptionNel<A, B>()",
     "arrow.optics.Iso", "arrow.optics.listToPOptionNel"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <A, B> ListK.Companion.toPOptionNel(): PIso<List<A>, List<B>, Option<NonEmptyList<A>>, Option<NonEmptyList<B>>> = PIso(
   get = { aas -> if (aas.isEmpty()) None else Some(NonEmptyList(aas.first(), aas.drop(1))) },
   reverseGet = { optNel -> optNel.fold({ emptyList() }, NonEmptyList<B>::all) }
@@ -110,7 +113,8 @@ fun <A, B> PIso.Companion.listToPOptionNel(): PIso<List<A>, List<B>, Option<NonE
     "Iso.listToOptionNel<A>()",
     "arrow.optics.Iso", "arrow.optics.listToOptionNel"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = toPOptionNel()
 
 /**
@@ -123,7 +127,8 @@ fun <A> PIso.Companion.listToOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> 
  */
 @Deprecated(
   "ListK is being deprecated, and this function will be removed in 0.13.0.",
-  level = DeprecationLevel.WARNING)
+  level = DeprecationLevel.WARNING
+)
 fun <A, B> ListExtensions.toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
   get = List<A>::k,
   reverseGet = ::identity
@@ -134,7 +139,8 @@ fun <A, B> ListExtensions.toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>>
  */
 @Deprecated(
   "ListK is being deprecated, and this function will be removed in 0.13.0.",
-  level = DeprecationLevel.WARNING)
+  level = DeprecationLevel.WARNING
+)
 fun <A> ListExtensions.toListK(): Iso<List<A>, ListK<A>> = toPListK()
 
 /**

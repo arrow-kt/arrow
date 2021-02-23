@@ -20,16 +20,16 @@ import arrow.optics.extensions.SequenceKFilterIndex
   DeprecationLevel.WARNING
 )
 fun <A> filter(p: Function1<Int, Boolean>): PTraversal<SequenceK<A>, SequenceK<A>, A, A> =
-    arrow.optics.extensions.sequence.filterIndex.Sequence
-   .filterIndex<A>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
+  arrow.optics.extensions.sequence.filterIndex.Sequence
+    .filterIndex<A>()
+    .filter(p) as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
 
 /**
  * cached extension
  */
 @PublishedApi()
 internal val filterIndex_singleton: SequenceKFilterIndex<Any?> = object : SequenceKFilterIndex<Any?>
-    {}
+{}
 
 @Deprecated("Receiver Sequence object is deprecated, and it will be removed in 0.13.")
 object Sequence {
@@ -46,4 +46,5 @@ object Sequence {
     DeprecationLevel.WARNING
   )
   inline fun <A> filterIndex(): SequenceKFilterIndex<A> = filterIndex_singleton as
-      arrow.optics.extensions.SequenceKFilterIndex<A>}
+    arrow.optics.extensions.SequenceKFilterIndex<A>
+}

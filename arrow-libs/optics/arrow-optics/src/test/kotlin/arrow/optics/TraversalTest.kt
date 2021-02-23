@@ -47,15 +47,17 @@ class TraversalTest : UnitSpec() {
       )
     )
 
-    testLaws(TraversalLaws.laws(
-      traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
-      aGen = Gen.tuple2(Gen.float(), Gen.float()),
-      bGen = Gen.float(),
-      funcGen = Gen.functionAToB(Gen.float()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = Traversal({ it.a }, { it.b }, { a, b, _ -> a toT b }),
+        aGen = Gen.tuple2(Gen.float(), Gen.float()),
+        bGen = Gen.float(),
+        funcGen = Gen.functionAToB(Gen.float()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
     with(listKTraverse.asFold()) {
 

@@ -25,6 +25,7 @@ class StringTest : UnitSpec() {
           override fun List<Char>.combine(b: List<Char>): List<Char> = this + b
           override fun empty(): List<Char> = emptyList()
         }
-      ))
+      )
+    )
   }
 }

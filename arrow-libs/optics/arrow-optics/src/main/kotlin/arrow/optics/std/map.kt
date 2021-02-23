@@ -22,7 +22,8 @@ import arrow.typeclasses.Applicative
     "Iso.mapToSet<K>()",
     "arrow.optics.Iso", "arrow.optics.mapToSet"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <K> MapK.Companion.toSetK(): Iso<MapK<K, Unit>, SetK<K>> = Iso(
   get = { it.keys.k() },
   reverseGet = { keys -> keys.map { it to Unit }.toMap().k() }
@@ -40,11 +41,14 @@ fun <K, V> At.Companion.map(): At<Map<K, V>, K, Option<V>> = At { i ->
   PLens(
     get = { it.getOption(i) },
     set = { map, optV ->
-      optV.fold({
-        (map - i)
-      }, {
-        (map + (i to it))
-      })
+      optV.fold(
+        {
+          (map - i)
+        },
+        {
+          (map + (i to it))
+        }
+      )
     }
   )
 }

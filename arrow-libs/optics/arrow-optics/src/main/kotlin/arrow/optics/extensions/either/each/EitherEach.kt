@@ -27,8 +27,8 @@ internal val each_singleton: EitherEach<Any?, Any?> = object : EitherEach<Any?, 
   DeprecationLevel.WARNING
 )
 fun <L, R> each(): PTraversal<Either<L, R>, Either<L, R>, R, R> = arrow.core.Either
-   .each<L, R>()
-   .each() as arrow.optics.PTraversal<arrow.core.Either<L, R>, arrow.core.Either<L, R>, R, R>
+  .each<L, R>()
+  .each() as arrow.optics.PTraversal<arrow.core.Either<L, R>, arrow.core.Either<L, R>, R, R>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -40,6 +40,7 @@ fun <L, R> each(): PTraversal<Either<L, R>, Either<L, R>, R, R> = arrow.core.Eit
     "Traversal.either<L, R>()",
     "arrow.optics.Traversal", "arrow.optics.either"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 inline fun <L, R> Companion.each(): EitherEach<L, R> = each_singleton as
-    arrow.optics.extensions.EitherEach<L, R>
+  arrow.optics.extensions.EitherEach<L, R>

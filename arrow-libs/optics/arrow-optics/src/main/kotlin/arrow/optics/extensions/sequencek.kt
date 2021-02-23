@@ -24,7 +24,8 @@ import arrow.typeclasses.Applicative
   "SequenceK is being deprecated. Use the instance for Sequence from the companion object of the typeclass.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"),
+    "arrow.optics.Traversal", "arrow.optics.sequence"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : Traversal<SequenceK<A>, A> {
@@ -39,8 +40,10 @@ fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : T
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"),
-  DeprecationLevel.WARNING)
+    "arrow.optics.Traversal", "arrow.optics.sequence"
+  ),
+  DeprecationLevel.WARNING
+)
 interface SequenceKEach<A> : Each<SequenceK<A>, A> {
   override fun each(): Traversal<SequenceK<A>, A> =
     SequenceK.traversal()

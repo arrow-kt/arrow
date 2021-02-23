@@ -395,7 +395,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * @return [Traversal] with a focus in [A]
    */
   val <U, V> PPrism<U, V, S, T>.every: PTraversal<U, V, A, B> get() =
-  this.compose(this@PTraversal)
+    this.compose(this@PTraversal)
 
   /**
    * DSL to compose [Traversal] with a [Optional] for a structure [S] to see all its foci [A]

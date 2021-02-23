@@ -57,10 +57,13 @@ object PrismLaws {
 
   fun <A, B> Prism<A, B>.consistentGetOptionModifyId(aGen: Gen<A>, EQOptionB: Eq<Option<B>>): Unit =
     forAll(aGen) { a ->
-      modifyF(Const.applicative(object : Monoid<Option<B>> {
-        override fun Option<B>.combine(b: Option<B>): Option<B> = orElse { b }
+      modifyF(
+        Const.applicative(object : Monoid<Option<B>> {
+          override fun Option<B>.combine(b: Option<B>): Option<B> = orElse { b }
 
-        override fun empty(): Option<B> = None
-      }), a) { Const(Some(it)) }.value().equalUnderTheLaw(getOption(a), EQOptionB)
+          override fun empty(): Option<B> = None
+        }),
+        a
+      ) { Const(Some(it)) }.value().equalUnderTheLaw(getOption(a), EQOptionB)
     }
 }

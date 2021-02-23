@@ -34,8 +34,8 @@ internal val index_singleton: ListKIndex<Any?> = object : ListKIndex<Any?> {}
   DeprecationLevel.WARNING
 )
 fun <A> index(i: Int): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
-   .index<A>()
-   .index(i) as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .index<A>()
+  .index(i) as arrow.optics.POptional<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @JvmName("get")
 @Suppress(
@@ -47,15 +47,15 @@ fun <A> index(i: Int): POptional<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
 @Deprecated(
   "@extension kinded projected functions are deprecated",
   ReplaceWith(
-  "get(i)",
-  "arrow.core.get"
+    "get(i)",
+    "arrow.core.get"
   ),
   DeprecationLevel.WARNING
 )
 operator fun <A, T> PLens<T, T, ListK<A>, ListK<A>>.get(i: Int): POptional<T, T, A, A> =
-    arrow.core.ListK.index<A>().run {
-  this@get.get<T>(i) as arrow.optics.POptional<T, T, A, A>
-}
+  arrow.core.ListK.index<A>().run {
+    this@get.get<T>(i) as arrow.optics.POptional<T, T, A, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -70,4 +70,4 @@ operator fun <A, T> PLens<T, T, ListK<A>, ListK<A>>.get(i: Int): POptional<T, T,
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.index(): ListKIndex<A> = index_singleton as
-    arrow.optics.extensions.ListKIndex<A>
+  arrow.optics.extensions.ListKIndex<A>

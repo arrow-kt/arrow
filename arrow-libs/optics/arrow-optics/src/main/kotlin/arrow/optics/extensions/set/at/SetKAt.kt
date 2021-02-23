@@ -26,9 +26,9 @@ import kotlin.jvm.JvmName
   DeprecationLevel.WARNING
 )
 fun <A, T> PLens<T, T, SetK<A>, SetK<A>>.at(i: A): PLens<T, T, Boolean, Boolean> =
-    arrow.optics.extensions.set.at.Set.at<A>().run {
-  this@at.at<T>(i) as arrow.optics.PLens<T, T, kotlin.Boolean, kotlin.Boolean>
-}
+  arrow.optics.extensions.set.at.Set.at<A>().run {
+    this@at.at<T>(i) as arrow.optics.PLens<T, T, kotlin.Boolean, kotlin.Boolean>
+  }
 
 /**
  * cached extension
@@ -49,4 +49,5 @@ object Set {
     ),
     DeprecationLevel.WARNING
   )
-  inline fun <A> at(): SetKAt<A> = at_singleton as arrow.optics.extensions.SetKAt<A>}
+  inline fun <A> at(): SetKAt<A> = at_singleton as arrow.optics.extensions.SetKAt<A>
+}

@@ -12,14 +12,16 @@ import io.kotlintest.properties.Gen
 class IdInstancesTest : UnitSpec() {
 
   init {
-    testLaws(IsoLaws.laws(
-      iso = Id.toValue(),
-      aGen = Gen.int().map { Id(it) },
-      bGen = Gen.int(),
-      funcGen = Gen.functionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      bMonoid = Int.monoid()
-    ))
+    testLaws(
+      IsoLaws.laws(
+        iso = Id.toValue(),
+        aGen = Gen.int().map { Id(it) },
+        bGen = Gen.int(),
+        funcGen = Gen.functionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        bMonoid = Int.monoid()
+      )
+    )
   }
 }

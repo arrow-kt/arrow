@@ -15,12 +15,13 @@ import arrow.optics.extensions.MapKEach
   "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.map<K, V>()",
-    "arrow.optics.Traversal", "arrow.optics.map"),
+    "arrow.optics.Traversal", "arrow.optics.map"
+  ),
   DeprecationLevel.WARNING
 )
 fun <K, V> each(): PTraversal<MapK<K, V>, MapK<K, V>, V, V> = arrow.optics.extensions.map.each.Map
-   .each<K, V>()
-   .each() as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
+  .each<K, V>()
+  .each() as arrow.optics.PTraversal<arrow.core.MapK<K, V>, arrow.core.MapK<K, V>, V, V>
 
 /**
  * cached extension
@@ -38,7 +39,8 @@ object Map {
     "Each is being deprecated. Use the instance for Map from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.map<K, V>()",
-      "arrow.optics.Traversal", "arrow.optics.map"),
+      "arrow.optics.Traversal", "arrow.optics.map"
+    ),
     DeprecationLevel.WARNING
   )
   inline fun <K, V> each(): MapKEach<K, V> = each_singleton as arrow.optics.extensions.MapKEach<K, V>

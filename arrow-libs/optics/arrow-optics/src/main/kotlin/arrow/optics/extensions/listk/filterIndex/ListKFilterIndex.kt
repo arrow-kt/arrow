@@ -35,8 +35,8 @@ internal val filterIndex_singleton: ListKFilterIndex<Any?> = object : ListKFilte
   DeprecationLevel.WARNING
 )
 fun <A> filter(p: Function1<Int, Boolean>): PTraversal<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
-   .filterIndex<A>()
-   .filter(p) as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .filterIndex<A>()
+  .filter(p) as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",

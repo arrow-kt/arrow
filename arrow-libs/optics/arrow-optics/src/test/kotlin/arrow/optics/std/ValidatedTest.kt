@@ -31,7 +31,8 @@ class ValidatedTest : UnitSpec() {
 
           override fun Either<String, Int>.combine(b: Either<String, Int>): Either<String, Int> =
             this.zip(b) { a, b -> a + b }
-        })
+        }
+      )
     )
   }
 }

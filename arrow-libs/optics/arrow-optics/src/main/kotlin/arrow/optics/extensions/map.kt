@@ -25,7 +25,8 @@ import arrow.typeclasses.Applicative
     "At.map<K, V>()",
     "arrow.optics.map", "arrow.optics.typeclasses.At"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <K, V> MapInstances.at(): At<Map<K, V>, K, Option<V>> = MapAt()
 
 /**
@@ -43,11 +44,14 @@ interface MapAt<K, V> : At<Map<K, V>, K, Option<V>> {
   override fun at(i: K): Lens<Map<K, V>, Option<V>> = PLens(
     get = { it.getOption(i) },
     set = { map, optV ->
-      optV.fold({
-        (map - i)
-      }, {
-        (map + (i to it))
-      })
+      optV.fold(
+        {
+          (map - i)
+        },
+        {
+          (map + (i to it))
+        }
+      )
     }
   )
 
@@ -67,7 +71,8 @@ interface MapAt<K, V> : At<Map<K, V>, K, Option<V>> {
     "Traversal.map<K, V>()",
     "arrow.optics.Traversal", "arrow.optics.map"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <K, V> MapInstances.traversal(): Traversal<Map<K, V>, V> = MapTraversal()
 
 /**
@@ -136,7 +141,8 @@ interface MapEach<K, V> : Each<Map<K, V>, V> {
     "FilterIndex.map<K, V>()",
     "arrow.optics.map", "arrow.optics.typeclasses.FilterIndex"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <K, V> MapInstances.filterIndex(): FilterIndex<Map<K, V>, K, V> = filterMapIndex()
 
 /**
@@ -177,7 +183,8 @@ interface filterMapIndex<K, V> : FilterIndex<Map<K, V>, K, V> {
     "Index.map<K, V>()",
     "arrow.optics.map", "arrow.optics.typeclasses.Index"
   ),
-  DeprecationLevel.WARNING)
+  DeprecationLevel.WARNING
+)
 fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndex()
 
 /**

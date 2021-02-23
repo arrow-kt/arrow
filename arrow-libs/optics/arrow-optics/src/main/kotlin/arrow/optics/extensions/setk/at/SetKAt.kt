@@ -33,9 +33,9 @@ internal val at_singleton: SetKAt<Any?> = object : SetKAt<Any?> {}
   DeprecationLevel.WARNING
 )
 fun <A, T> PLens<T, T, SetK<A>, SetK<A>>.at(i: A): PLens<T, T, Boolean, Boolean> =
-    arrow.core.SetK.at<A>().run {
-  this@at.at<T>(i) as arrow.optics.PLens<T, T, kotlin.Boolean, kotlin.Boolean>
-}
+  arrow.core.SetK.at<A>().run {
+    this@at.at<T>(i) as arrow.optics.PLens<T, T, kotlin.Boolean, kotlin.Boolean>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

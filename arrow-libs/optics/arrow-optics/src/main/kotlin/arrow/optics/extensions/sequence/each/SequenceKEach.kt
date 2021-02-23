@@ -15,13 +15,14 @@ import arrow.optics.extensions.SequenceKEach
   "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.sequence<A>()",
-    "arrow.optics.Traversal", "arrow.optics.sequence"),
+    "arrow.optics.Traversal", "arrow.optics.sequence"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> each(): PTraversal<SequenceK<A>, SequenceK<A>, A, A> =
-    arrow.optics.extensions.sequence.each.Sequence
-   .each<A>()
-   .each() as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
+  arrow.optics.extensions.sequence.each.Sequence
+    .each<A>()
+    .each() as arrow.optics.PTraversal<arrow.core.SequenceK<A>, arrow.core.SequenceK<A>, A, A>
 
 /**
  * cached extension
@@ -39,8 +40,10 @@ object Sequence {
     "Each is being deprecated. Use the instance for Sequence from Traversal's companion object instead.",
     ReplaceWith(
       "Traversal.sequence<A>()",
-      "arrow.optics.Traversal", "arrow.optics.sequence"),
+      "arrow.optics.Traversal", "arrow.optics.sequence"
+    ),
     DeprecationLevel.WARNING
   )
   inline fun <A> each(): SequenceKEach<A> = each_singleton as
-      arrow.optics.extensions.SequenceKEach<A>}
+    arrow.optics.extensions.SequenceKEach<A>
+}

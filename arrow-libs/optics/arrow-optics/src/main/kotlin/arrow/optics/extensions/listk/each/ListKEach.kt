@@ -22,12 +22,13 @@ internal val each_singleton: ListKEach<Any?> = object : ListKEach<Any?> {}
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 fun <A> each(): PTraversal<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
-   .each<A>()
-   .each() as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
+  .each<A>()
+  .each() as arrow.optics.PTraversal<arrow.core.ListK<A>, arrow.core.ListK<A>, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -37,8 +38,9 @@ fun <A> each(): PTraversal<ListK<A>, ListK<A>, A, A> = arrow.core.ListK
   "Each is being deprecated. Use the instance for List from Traversal's companion object instead.",
   ReplaceWith(
     "Traversal.list<A>()",
-    "arrow.optics.Traversal", "arrow.optics.list"),
+    "arrow.optics.Traversal", "arrow.optics.list"
+  ),
   DeprecationLevel.WARNING
 )
 inline fun <A> Companion.each(): ListKEach<A> = each_singleton as
-    arrow.optics.extensions.ListKEach<A>
+  arrow.optics.extensions.ListKEach<A>
