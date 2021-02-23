@@ -65,9 +65,9 @@ internal val async_singleton: IOAsync = object : arrow.fx.extensions.IOAsync {}
 )
 @Deprecated(IODeprecation)
 fun <A> asyncF(k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForIO, Unit>>): IO<A> =
-    arrow.fx.IO
-   .async()
-   .asyncF<A>(k) as arrow.fx.IO<A>
+  arrow.fx.IO
+    .async()
+    .asyncF<A>(k) as arrow.fx.IO<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -140,8 +140,8 @@ fun <A> Kind<ForIO, A>.continueOn(ctx: CoroutineContext): IO<A> = arrow.fx.IO.as
 )
 @Deprecated(IODeprecation)
 fun <A> later(ctx: CoroutineContext, f: Function0<A>): IO<A> = arrow.fx.IO
-   .async()
-   .later<A>(ctx, f) as arrow.fx.IO<A>
+  .async()
+  .later<A>(ctx, f) as arrow.fx.IO<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -176,8 +176,8 @@ fun <A> later(ctx: CoroutineContext, f: Function0<A>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> defer(ctx: CoroutineContext, f: Function0<Kind<ForIO, A>>): IO<A> = arrow.fx.IO
-   .async()
-   .defer<A>(ctx, f) as arrow.fx.IO<A>
+  .async()
+  .defer<A>(ctx, f) as arrow.fx.IO<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -193,8 +193,8 @@ fun <A> defer(ctx: CoroutineContext, f: Function0<Kind<ForIO, A>>): IO<A> = arro
 )
 @Deprecated(IODeprecation)
 fun <A> laterOrRaise(ctx: CoroutineContext, f: Function0<Either<Throwable, A>>): IO<A> = arrow.fx.IO
-   .async()
-   .laterOrRaise<A>(ctx, f) as arrow.fx.IO<A>
+  .async()
+  .laterOrRaise<A>(ctx, f) as arrow.fx.IO<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -262,8 +262,8 @@ fun CoroutineContext.shift(): IO<Unit> = arrow.fx.IO.async().run {
 )
 @Deprecated(IODeprecation)
 fun <A> never(): IO<A> = arrow.fx.IO
-   .async()
-   .never<A>() as arrow.fx.IO<A>
+  .async()
+  .never<A>() as arrow.fx.IO<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect

@@ -43,7 +43,7 @@ fun <F, A, B, C, D> Kind<Kind<Kind<ForSchedule, F>, A>, B>.dimap(
 )
 @Deprecated(IODeprecation)
 fun <F, A, B, C> Kind<Kind<Kind<ForSchedule, F>, A>, B>.lmap(arg1: Function1<C, A>): Schedule<F, C,
-    B> = arrow.fx.Schedule.profunctor<F>().run {
+  B> = arrow.fx.Schedule.profunctor<F>().run {
   this@lmap.lmap<A, B, C>(arg1) as arrow.fx.Schedule<F, C, B>
 }
 
@@ -56,7 +56,7 @@ fun <F, A, B, C> Kind<Kind<Kind<ForSchedule, F>, A>, B>.lmap(arg1: Function1<C, 
 )
 @Deprecated(IODeprecation)
 fun <F, A, B, D> Kind<Kind<Kind<ForSchedule, F>, A>, B>.rmap(arg1: Function1<B, D>): Schedule<F, A,
-    D> = arrow.fx.Schedule.profunctor<F>().run {
+  D> = arrow.fx.Schedule.profunctor<F>().run {
   this@rmap.rmap<A, B, D>(arg1) as arrow.fx.Schedule<F, A, D>
 }
 
@@ -66,4 +66,4 @@ fun <F, A, B, D> Kind<Kind<Kind<ForSchedule, F>, A>, B>.rmap(arg1: Function1<B, 
 )
 @Deprecated(IODeprecation)
 inline fun <F> Companion.profunctor(): ScheduleProfunctor<F> = profunctor_singleton as
-    arrow.fx.extensions.ScheduleProfunctor<F>
+  arrow.fx.extensions.ScheduleProfunctor<F>

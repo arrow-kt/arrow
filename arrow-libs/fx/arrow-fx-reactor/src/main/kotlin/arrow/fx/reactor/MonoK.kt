@@ -109,33 +109,39 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
    */
   @Deprecated(DeprecateReactor)
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
-    MonoK(Mono.create<B> { sink ->
-      val isCancelled = AtomicBooleanW(false)
-      sink.onCancel { isCancelled.value = true }
-      val a: A? = mono.block()
-      if (a != null) {
-        if (isCancelled.value) release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error)
-        else try {
-          sink.onDispose(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MonoK.raiseError<B>(e) } }
-            .mono
-            .doOnCancel { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
-            .subscribe(sink::success, sink::error)
-          )
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().mono.subscribe({
-              sink.error(e)
-            }, { e2 ->
-              sink.error(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
+    MonoK(
+      Mono.create<B> { sink ->
+        val isCancelled = AtomicBooleanW(false)
+        sink.onCancel { isCancelled.value = true }
+        val a: A? = mono.block()
+        if (a != null) {
+          if (isCancelled.value) release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error)
+          else try {
+            sink.onDispose(
+              use(a).fix()
+                .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+                .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MonoK.raiseError<B>(e) } }
+                .mono
+                .doOnCancel { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
+                .subscribe(sink::success, sink::error)
+            )
+          } catch (e: Throwable) {
+            if (NonFatal(e)) {
+              release(a, ExitCase.Error(e)).fix().mono.subscribe(
+                {
+                  sink.error(e)
+                },
+                { e2 ->
+                  sink.error(Platform.composeErrors(e, e2))
+                }
+              )
+            } else {
+              throw e
+            }
           }
-        }
-      } else sink.success(null)
-    })
+        } else sink.success(null)
+      }
+    )
 
   @Deprecated(DeprecateReactor)
   fun continueOn(ctx: CoroutineContext): MonoK<A> =
@@ -211,11 +217,14 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): MonoK<A> =
       Mono.create<A> { sink ->
         fa { either: Either<Throwable, A> ->
-          either.fold({
-            sink.error(it)
-          }, {
-            sink.success(it)
-          })
+          either.fold(
+            {
+              sink.error(it)
+            },
+            {
+              sink.success(it)
+            }
+          )
         }
       }.k()
 
@@ -223,11 +232,14 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>): MonoK<A> =
       Mono.create { sink: MonoSink<A> ->
         fa { either: Either<Throwable, A> ->
-          either.fold({
-            sink.error(it)
-          }, {
-            sink.success(it)
-          })
+          either.fold(
+            {
+              sink.error(it)
+            },
+            {
+              sink.success(it)
+            }
+          )
         }.fix().mono.subscribe({}, sink::error)
       }.k()
 
@@ -298,19 +310,28 @@ data class MonoK<out A>(val mono: Mono<out A>) : MonoKOf<A> {
         }
 
         val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForMonoK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, sink::error)
-          }, { Unit })
-        }, sink::error)
+        val disp = fa2.value().subscribe(
+          { token ->
+            val cancel = cancelOrToken.getAndSet(Right(token))
+            cancel?.fold(
+              {
+                token.value().subscribe({}, sink::error)
+              },
+              { Unit }
+            )
+          },
+          sink::error
+        )
 
         sink.onDispose {
           disp.dispose()
           val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, sink::error)
-          })
+          token?.fold(
+            {},
+            {
+              it.value().subscribe({}, sink::error)
+            }
+          )
         }
       }.k()
 

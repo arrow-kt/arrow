@@ -114,56 +114,78 @@ suspend fun <A, B, C> oldRaceTriple(
       promise: UnsafePromise<A>
     ): Unit {
       if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-        suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
-          suspend { connC.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r3 ->
-            conn.pop()
+        suspend { connB.cancel() }.startCoroutineUnintercepted(
+          Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
+            suspend { connC.cancel() }.startCoroutineUnintercepted(
+              Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r3 ->
+                conn.pop()
 
-            val errorResult = r2.fold({
-              r3.fold({ error }, { e3 -> Platform.composeErrors(error, e3) })
-            }, { e2 ->
-              r3.fold({ Platform.composeErrors(error, e2) }, { e3 -> Platform.composeErrors(error, e2, e3) })
-            })
+                val errorResult = r2.fold(
+                  {
+                    r3.fold({ error }, { e3 -> Platform.composeErrors(error, e3) })
+                  },
+                  { e2 ->
+                    r3.fold({ Platform.composeErrors(error, e2) }, { e3 -> Platform.composeErrors(error, e2, e3) })
+                  }
+                )
 
-            cont.resumeWith(Result.failure(errorResult))
-          })
-        })
+                cont.resumeWith(Result.failure(errorResult))
+              }
+            )
+          }
+        )
       } else {
         promise.complete(Result.failure(error))
       }
     }
 
-    fa.startCoroutineCancellable(CancellableContinuation(ctx + jobA, connA) { result ->
-      result.fold({ a ->
-        if (active.getAndSet(false)) {
-          conn.pop()
-          cont.resumeWith(Result.success(RaceTriple.First(a, Fiber(promiseB, connB), Fiber(promiseC, connC))))
-        } else {
-          promiseA.complete(Result.success(a))
-        }
-      }, { error -> onError(error, connB, connC, promiseA) })
-    })
+    fa.startCoroutineCancellable(
+      CancellableContinuation(ctx + jobA, connA) { result ->
+        result.fold(
+          { a ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cont.resumeWith(Result.success(RaceTriple.First(a, Fiber(promiseB, connB), Fiber(promiseC, connC))))
+            } else {
+              promiseA.complete(Result.success(a))
+            }
+          },
+          { error -> onError(error, connB, connC, promiseA) }
+        )
+      }
+    )
 
-    fb.startCoroutineCancellable(CancellableContinuation(ctx + jobB, connB) { result ->
-      result.fold({ b ->
-        if (active.getAndSet(false)) {
-          conn.pop()
-          cont.resumeWith(Result.success(RaceTriple.Second(Fiber(promiseA, connA), b, Fiber(promiseC, connC))))
-        } else {
-          promiseB.complete(Result.success(b))
-        }
-      }, { error -> onError(error, connA, connC, promiseB) })
-    })
+    fb.startCoroutineCancellable(
+      CancellableContinuation(ctx + jobB, connB) { result ->
+        result.fold(
+          { b ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cont.resumeWith(Result.success(RaceTriple.Second(Fiber(promiseA, connA), b, Fiber(promiseC, connC))))
+            } else {
+              promiseB.complete(Result.success(b))
+            }
+          },
+          { error -> onError(error, connA, connC, promiseB) }
+        )
+      }
+    )
 
-    fc.startCoroutineCancellable(CancellableContinuation(ctx + jobC, connC) { result ->
-      result.fold({ c ->
-        if (active.getAndSet(false)) {
-          conn.pop()
-          cont.resumeWith(Result.success(RaceTriple.Third(Fiber(promiseA, connA), Fiber(promiseB, connB), c)))
-        } else {
-          promiseC.complete(Result.success(c))
-        }
-      }, { error -> onError(error, connA, connB, promiseC) })
-    })
+    fc.startCoroutineCancellable(
+      CancellableContinuation(ctx + jobC, connC) { result ->
+        result.fold(
+          { c ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cont.resumeWith(Result.success(RaceTriple.Third(Fiber(promiseA, connA), Fiber(promiseB, connB), c)))
+            } else {
+              promiseC.complete(Result.success(c))
+            }
+          },
+          { error -> onError(error, connA, connB, promiseC) }
+        )
+      }
+    )
 
     COROUTINE_SUSPENDED
   }

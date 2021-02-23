@@ -220,8 +220,8 @@ fun <A, B> Kind<ForIO, A>.mproduct(arg1: Function1<A, Kind<ForIO, B>>): IO<Tuple
 @Deprecated(IODeprecation)
 fun <B> Kind<ForIO, Boolean>.ifM(arg1: Function0<Kind<ForIO, B>>, arg2: Function0<Kind<ForIO, B>>):
   IO<B> = arrow.fx.IO.monad().run {
-  this@ifM.ifM<B>(arg1, arg2) as arrow.fx.IO<B>
-}
+    this@ifM.ifM<B>(arg1, arg2) as arrow.fx.IO<B>
+  }
 
 @JvmName("selectM")
 @Suppress(

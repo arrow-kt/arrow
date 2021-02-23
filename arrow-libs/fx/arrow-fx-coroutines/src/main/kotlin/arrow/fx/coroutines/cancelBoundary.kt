@@ -34,9 +34,11 @@ import kotlin.coroutines.coroutineContext
  */
 @Deprecated(
   "Use coroutineContext.ensureActive()",
-  ReplaceWith("coroutineContext.ensureActive()",
+  ReplaceWith(
+    "coroutineContext.ensureActive()",
     "kotlinx.coroutines.ensureActive",
-    "kotlin.coroutines.coroutineContext")
+    "kotlin.coroutines.coroutineContext"
+  )
 )
 suspend fun cancelBoundary(): Unit =
   coroutineContext.ensureActive()

@@ -20,9 +20,9 @@ import kotlin.jvm.JvmName
 fun <F, Input, Output> Schedule<F, Input, Output>.plus(
   OI: Semigroup<Output>,
   arg1: Schedule<F,
-      Input, Output>
+    Input, Output>
 ): Schedule<F, Input, Output> = arrow.fx.Schedule.semigroup<F, Input,
-    Output>(OI).run {
+  Output>(OI).run {
   this@plus.plus(arg1) as arrow.fx.Schedule<F, Input, Output>
 }
 
@@ -38,7 +38,7 @@ fun <F, Input, Output> Schedule<F, Input, Output>.maybeCombine(
   OI: Semigroup<Output>,
   arg1: Schedule<F, Input, Output>
 ): Schedule<F, Input, Output> = arrow.fx.Schedule.semigroup<F,
-    Input, Output>(OI).run {
+  Input, Output>(OI).run {
   this@maybeCombine.maybeCombine(arg1) as arrow.fx.Schedule<F, Input, Output>
 }
 
@@ -48,5 +48,7 @@ fun <F, Input, Output> Schedule<F, Input, Output>.maybeCombine(
 )
 @Deprecated(IODeprecation)
 inline fun <F, Input, Output> Companion.semigroup(OI: Semigroup<Output>): ScheduleSemigroup<F,
-    Input, Output> = object : arrow.fx.extensions.ScheduleSemigroup<F, Input, Output> { override fun
-    OI(): arrow.typeclasses.Semigroup<Output> = OI }
+  Input, Output> = object : arrow.fx.extensions.ScheduleSemigroup<F, Input, Output> {
+  override fun
+  OI(): arrow.typeclasses.Semigroup<Output> = OI
+}

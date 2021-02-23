@@ -31,7 +31,7 @@ internal val effect_singleton: FlowableKEffect = object : arrow.fx.rx2.extension
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.runAsync(
   arg1: Function1<Either<Throwable, A>, Kind<ForFlowableK,
-Unit>>
+      Unit>>
 ): FlowableK<Unit> = arrow.fx.rx2.FlowableK.effect().run {
   this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.FlowableK<kotlin.Unit>
 }

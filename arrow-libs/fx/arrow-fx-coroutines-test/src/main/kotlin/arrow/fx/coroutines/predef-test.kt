@@ -169,18 +169,22 @@ fun <A> Result<A>.toEither(): Either<Throwable, A> =
 
 suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { throw this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { throw this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
 
 suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
@@ -210,9 +214,11 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable {
 
 suspend fun CoroutineContext.shift(): Unit =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(this) {
-      cont.resume(Unit)
-    })
+    suspend { this }.startCoroutine(
+      Continuation(this) {
+        cont.resume(Unit)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }

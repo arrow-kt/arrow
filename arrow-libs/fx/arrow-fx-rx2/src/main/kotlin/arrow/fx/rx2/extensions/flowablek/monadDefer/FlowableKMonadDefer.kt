@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadDefer_singleton: FlowableKMonadDefer = object :
-    arrow.fx.rx2.extensions.FlowableKMonadDefer {}
+  arrow.fx.rx2.extensions.FlowableKMonadDefer {}
 
 @JvmName("defer")
 @Suppress(
@@ -32,8 +32,8 @@ internal val monadDefer_singleton: FlowableKMonadDefer = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: Function0<Kind<ForFlowableK, A>>): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .defer<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  .monadDefer()
+  .defer<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 @JvmName("later")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> defer(arg0: Function0<Kind<ForFlowableK, A>>): FlowableK<A> = arrow.fx.r
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Function0<A>): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 @JvmName("later")
 @Suppress(
@@ -56,8 +56,8 @@ fun <A> later(arg0: Function0<A>): FlowableK<A> = arrow.fx.rx2.FlowableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Kind<ForFlowableK, A>): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 @JvmName("lazy")
 @Suppress(
@@ -68,8 +68,8 @@ fun <A> later(arg0: Kind<ForFlowableK, A>): FlowableK<A> = arrow.fx.rx2.Flowable
 )
 @Deprecated(DeprecateRxJava)
 fun lazy(): FlowableK<Unit> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .lazy() as arrow.fx.rx2.FlowableK<kotlin.Unit>
+  .monadDefer()
+  .lazy() as arrow.fx.rx2.FlowableK<kotlin.Unit>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -80,8 +80,8 @@ fun lazy(): FlowableK<Unit> = arrow.fx.rx2.FlowableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .laterOrRaise<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  .monadDefer()
+  .laterOrRaise<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -92,8 +92,8 @@ fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): FlowableK<A> = arro
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Ref(arg0: A): FlowableK<Ref<ForFlowableK, A>> = arrow.fx.rx2.FlowableK
-   .monadDefer()
-   .Ref<A>(arg0) as arrow.fx.rx2.FlowableK<arrow.fx.Ref<arrow.fx.rx2.ForFlowableK, A>>
+  .monadDefer()
+  .Ref<A>(arg0) as arrow.fx.rx2.FlowableK<arrow.fx.Ref<arrow.fx.rx2.ForFlowableK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -66,8 +66,8 @@ internal val async_singleton: SingleKAsync = object : arrow.fx.rx2.extensions.Si
 @Deprecated(DeprecateRxJava)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForSingleK, Unit>>):
   SingleK<A> = arrow.fx.rx2.SingleK
-  .async()
-  .asyncF<A>(arg0) as arrow.fx.rx2.SingleK<A>
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.rx2.SingleK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]

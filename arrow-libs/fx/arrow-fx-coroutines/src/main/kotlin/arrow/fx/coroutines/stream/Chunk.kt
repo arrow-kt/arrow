@@ -86,9 +86,11 @@ abstract class Chunk<out O> {
     when (val s = size()) {
       0 -> Empty
       1 -> Singleton(f(this[0]))
-      else -> array(Array<Any?>(s) { i ->
-        f(get(i))
-      } as Array<A>)
+      else -> array(
+        Array<Any?>(s) { i ->
+          f(get(i))
+        } as Array<A>
+      )
     }
 
   /** Maps `f` over the elements of this chunk and concatenates the result. */
@@ -100,11 +102,13 @@ abstract class Chunk<out O> {
 
       val totalSize = buff.fold(0) { acc, c -> acc + c.size() }
 
-      array(ArrayList<O2>(totalSize).apply {
-        buff.forEach { c ->
-          c.forEach { o2 -> add(o2) }
-        }
-      }.toArray() as Array<O2>)
+      array(
+        ArrayList<O2>(totalSize).apply {
+          buff.forEach { c ->
+            c.forEach { o2 -> add(o2) }
+          }
+        }.toArray() as Array<O2>
+      )
     }
 
   /** Returns a chunk that has only the elements that satisfy the supplied predicate. */
@@ -144,9 +148,11 @@ abstract class Chunk<out O> {
       n <= 0 -> empty()
       n == 1 -> fromNullable(firstOrNull())
       n >= size() -> this
-      else -> array(Array<Any?>(n) { i ->
-        get(i)
-      } as Array<out O>)
+      else -> array(
+        Array<Any?>(n) { i ->
+          get(i)
+        } as Array<out O>
+      )
     }
 
   /** Takes the last `n` elements of this chunk. */
@@ -157,9 +163,11 @@ abstract class Chunk<out O> {
       else -> {
         val size = size()
         if (n >= size) this
-        else array(Array<Any?>(n) { i ->
-          get(size - i)
-        } as Array<out O>)
+        else array(
+          Array<Any?>(n) { i ->
+            get(size - i)
+          } as Array<out O>
+        )
       }
     }
 
@@ -168,9 +176,11 @@ abstract class Chunk<out O> {
     when {
       n <= 0 -> this
       n >= size() -> empty()
-      else -> array(Array<Any?>(size() - n) { i ->
-        get(i + n)
-      } as Array<O>)
+      else -> array(
+        Array<Any?>(size() - n) { i ->
+          get(i + n)
+        } as Array<O>
+      )
     }
 
   fun tail(): Chunk<O> =
@@ -203,9 +213,11 @@ abstract class Chunk<out O> {
    */
   inline fun <O2, O3> zipWith(that: Chunk<O2>, f: (O, O2) -> O3): Chunk<O3> {
     val sz = min(size(), that.size())
-    return array(Array<Any?>(sz) { i ->
-      f(get(i), that[i])
-    } as Array<O3>)
+    return array(
+      Array<Any?>(sz) { i ->
+        f(get(i), that[i])
+      } as Array<O3>
+    )
   }
 
   /** alias for `fold` **/
@@ -313,11 +325,13 @@ abstract class Chunk<out O> {
    */
   inline fun <S, O2> mapAccumulate(init: S, f: (S, O) -> Pair<S, O2>): Pair<S, Chunk<O2>> {
     var s = init
-    val ch = array(Array<Any?>(size()) { i ->
-      val (s2, o2) = f(s, get(i))
-      s = s2
-      o2
-    } as Array<O2>)
+    val ch = array(
+      Array<Any?>(size()) { i ->
+        val (s2, o2) = f(s, get(i))
+        s = s2
+        o2
+      } as Array<O2>
+    )
 
     return Pair(s, ch)
   }
@@ -342,13 +356,15 @@ abstract class Chunk<out O> {
     val size = if (emitFinal) size() + 1 else size()
     var acc = z
 
-    val ch = array(Array<Any?>(size) { i ->
-      if (emitFinal && size == i) acc
-      else {
-        acc = f(acc, get(i))
-        acc
-      }
-    } as Array<O2>)
+    val ch = array(
+      Array<Any?>(size) { i ->
+        if (emitFinal && size == i) acc
+        else {
+          acc = f(acc, get(i))
+          acc
+        }
+      } as Array<O2>
+    )
 
     return Pair(ch, acc)
   }

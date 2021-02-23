@@ -158,18 +158,22 @@ internal fun <A> Result<A>.toEither(): Either<Throwable, A> =
 
 internal suspend fun Throwable.suspend(): Nothing =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { throw this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { throw this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
 
 internal suspend fun <A> A.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
-      cont.intercepted().resumeWith(it)
-    })
+    suspend { this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        cont.intercepted().resumeWith(it)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
@@ -179,17 +183,19 @@ internal fun <A> A.suspended(): suspend () -> A =
 
 internal suspend fun <A> Either<Throwable, A>.suspend(): A =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(Dispatchers.Default) {
-      it.fold(
-        {
-          it.fold(
-            { e -> cont.intercepted().resumeWithException(e) },
-            { a -> cont.intercepted().resume(a) }
-          )
-        },
-        { e -> cont.intercepted().resumeWithException(e) }
-      )
-    })
+    suspend { this }.startCoroutine(
+      Continuation(Dispatchers.Default) {
+        it.fold(
+          {
+            it.fold(
+              { e -> cont.intercepted().resumeWithException(e) },
+              { a -> cont.intercepted().resume(a) }
+            )
+          },
+          { e -> cont.intercepted().resumeWithException(e) }
+        )
+      }
+    )
 
     COROUTINE_SUSPENDED
   }
@@ -219,9 +225,11 @@ inline fun <A> assertThrowable(executable: () -> A): Throwable {
 
 internal suspend fun CoroutineContext.shift(): Unit =
   suspendCoroutineUninterceptedOrReturn { cont ->
-    suspend { this }.startCoroutine(Continuation(this) {
-      cont.resume(Unit)
-    })
+    suspend { this }.startCoroutine(
+      Continuation(this) {
+        cont.resume(Unit)
+      }
+    )
 
     COROUTINE_SUSPENDED
   }

@@ -65,9 +65,9 @@ internal val async_singleton: MonoKAsync = object : arrow.fx.reactor.extensions.
 )
 @Deprecated(DeprecateReactor)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForMonoK, Unit>>):
-    MonoK<A> = arrow.fx.reactor.MonoK
-   .async()
-   .asyncF<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  MonoK<A> = arrow.fx.reactor.MonoK
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -104,9 +104,9 @@ fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForMo
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.continueOn(arg1: CoroutineContext): MonoK<A> =
-    arrow.fx.reactor.MonoK.async().run {
-  this@continueOn.continueOn<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.async().run {
+    this@continueOn.continueOn<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -141,8 +141,8 @@ fun <A> Kind<ForMonoK, A>.continueOn(arg1: CoroutineContext): MonoK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): MonoK<A> = arrow.fx.reactor.MonoK
-   .async()
-   .later<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  .async()
+  .later<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -179,8 +179,8 @@ fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): MonoK<A> = arrow.fx.r
 )
 @Deprecated(DeprecateReactor)
 fun <A> effect(arg0: suspend () -> A): MonoK<A> = arrow.fx.reactor.MonoK
-   .async()
-   .effect<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  .async()
+  .effect<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -217,8 +217,8 @@ fun <A> effect(arg0: suspend () -> A): MonoK<A> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): MonoK<A> = arrow.fx.reactor.MonoK
-   .async()
-   .effect<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  .async()
+  .effect<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -253,9 +253,9 @@ fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): MonoK<A> = arrow.
 )
 @Deprecated(DeprecateReactor)
 fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForMonoK, A>>): MonoK<A> =
-    arrow.fx.reactor.MonoK
-   .async()
-   .defer<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  arrow.fx.reactor.MonoK
+    .async()
+    .defer<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -271,9 +271,9 @@ fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForMonoK, A>>): MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A> laterOrRaise(arg0: CoroutineContext, arg1: Function0<Either<Throwable, A>>): MonoK<A> =
-    arrow.fx.reactor.MonoK
-   .async()
-   .laterOrRaise<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  arrow.fx.reactor.MonoK
+    .async()
+    .laterOrRaise<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -341,8 +341,8 @@ fun CoroutineContext.shift(): MonoK<Unit> = arrow.fx.reactor.MonoK.async().run {
 )
 @Deprecated(DeprecateReactor)
 fun <A> never(): MonoK<A> = arrow.fx.reactor.MonoK
-   .async()
-   .never<A>() as arrow.fx.reactor.MonoK<A>
+  .async()
+  .never<A>() as arrow.fx.reactor.MonoK<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect
@@ -377,9 +377,9 @@ fun <A> never(): MonoK<A> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.effectMap(arg1: suspend (A) -> B): MonoK<B> =
-    arrow.fx.reactor.MonoK.async().run {
-  this@effectMap.effectMap<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
-}
+  arrow.fx.reactor.MonoK.async().run {
+    this@effectMap.effectMap<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
+  }
 
 /**
  *  [Async] models how a data type runs an asynchronous computation that may fail.

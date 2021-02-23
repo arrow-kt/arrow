@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadError_singleton: FluxKMonadError = object :
-    arrow.fx.reactor.extensions.FluxKMonadError {}
+  arrow.fx.reactor.extensions.FluxKMonadError {}
 
 @JvmName("ensure")
 @Suppress(
@@ -32,9 +32,9 @@ internal val monadError_singleton: FluxKMonadError = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.ensure(arg1: Function0<Throwable>, arg2: Function1<A, Boolean>): FluxK<A> =
-    arrow.fx.reactor.FluxK.monadError().run {
-  this@ensure.ensure<A>(arg1, arg2) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.monadError().run {
+    this@ensure.ensure<A>(arg1, arg2) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("redeemWith")
 @Suppress(
@@ -60,9 +60,9 @@ fun <A, B> Kind<ForFluxK, A>.redeemWith(
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, Either<Throwable, A>>.rethrow(): FluxK<A> =
-    arrow.fx.reactor.FluxK.monadError().run {
-  this@rethrow.rethrow<A>() as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.monadError().run {
+    this@rethrow.rethrow<A>() as arrow.fx.reactor.FluxK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

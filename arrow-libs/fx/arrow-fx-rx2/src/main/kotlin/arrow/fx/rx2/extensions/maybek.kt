@@ -179,9 +179,14 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
           val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
-          emitter.onSuccess(Fiber(s.firstElement().k(), MaybeK {
-            conn.dispose()
-          }))
+          emitter.onSuccess(
+            Fiber(
+              s.firstElement().k(),
+              MaybeK {
+                conn.dispose()
+              }
+            )
+          )
         }
       }.k()
     }
@@ -215,14 +220,20 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
 
         val ffa = Fiber(sa.firstElement().k(), MaybeK { dda.dispose() })
         val ffb = Fiber(sb.firstElement().k(), MaybeK { ddb.dispose() })
-        sa.subscribe({
-          shouldDisposeSb.value = false
-          emitter.onSuccess(RacePair.First(it, ffb))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sb.subscribe({
-          shouldDisposeSa.value = false
-          emitter.onSuccess(RacePair.Second(ffa, it))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        sa.subscribe(
+          {
+            shouldDisposeSb.value = false
+            emitter.onSuccess(RacePair.First(it, ffb))
+          },
+          { e -> emitter.tryOnError(e) }, emitter::onComplete
+        )
+        sb.subscribe(
+          {
+            shouldDisposeSa.value = false
+            emitter.onSuccess(RacePair.Second(ffa, it))
+          },
+          { e -> emitter.tryOnError(e) }, emitter::onComplete
+        )
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -247,21 +258,30 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         val ffa = Fiber(sa.firstElement().k(), MaybeK { dda.dispose() })
         val ffb = Fiber(sb.firstElement().k(), MaybeK { ddb.dispose() })
         val ffc = Fiber(sc.firstElement().k(), MaybeK { ddc.dispose() })
-        sa.subscribe({
-          shouldDisposeSb.value = false
-          shouldDisposeSc.value = false
-          emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sb.subscribe({
-          shouldDisposeSa.value = false
-          shouldDisposeSc.value = false
-          emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sc.subscribe({
-          shouldDisposeSa.value = false
-          shouldDisposeSb.value = false
-          emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        sa.subscribe(
+          {
+            shouldDisposeSb.value = false
+            shouldDisposeSc.value = false
+            emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
+          },
+          { e -> emitter.tryOnError(e) }, emitter::onComplete
+        )
+        sb.subscribe(
+          {
+            shouldDisposeSa.value = false
+            shouldDisposeSc.value = false
+            emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
+          },
+          { e -> emitter.tryOnError(e) }, emitter::onComplete
+        )
+        sc.subscribe(
+          {
+            shouldDisposeSa.value = false
+            shouldDisposeSb.value = false
+            emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
+          },
+          { e -> emitter.tryOnError(e) }, emitter::onComplete
+        )
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
@@ -291,8 +311,10 @@ interface MaybeKDispatchers : Dispatchers<ForMaybeK> {
 @Deprecated(DeprecateRxJava)
 interface MaybeKTimer : Timer<ForMaybeK> {
   override fun sleep(duration: Duration): MaybeK<Unit> =
-    MaybeK(Maybe.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
-      .map { Unit })
+    MaybeK(
+      Maybe.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+        .map { Unit }
+    )
 }
 
 @Deprecated(DeprecateRxJava)

@@ -211,8 +211,10 @@ fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
 @Deprecated(DeprecateReactor)
 interface FluxKTimer : Timer<ForFluxK> {
   override fun sleep(duration: Duration): FluxK<Unit> =
-    FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
-      .map { Unit }.toFlux())
+    FluxK(
+      Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+        .map { Unit }.toFlux()
+    )
 }
 
 @Deprecated(DeprecateReactor)

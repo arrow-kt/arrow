@@ -26,8 +26,9 @@ internal class ForwardCancellable {
   suspend fun cancel(): Unit {
     fun loop(conn: SuspendConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.value.let { current ->
       when (current) {
-        is Empty -> if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
-          loop(conn, cb)
+        is Empty ->
+          if (!state.compareAndSet(current, Empty(listOf(cb) + current.stack)))
+            loop(conn, cb)
 
         is Active -> {
           state.lazySet(finished) // GC purposes
@@ -50,16 +51,17 @@ internal class ForwardCancellable {
         value.fix().unsafeRunAsync {}
         throw IllegalStateException(current.toString())
       }
-      is Empty -> if (current == init) {
-        // If `init`, then `cancel` was not triggered yet
-        if (!state.compareAndSet(current, Active(value)))
-          complete(value)
-      } else {
-        if (!state.compareAndSet(current, finished))
-          complete(value)
-        else
-          execute(value, current.stack)
-      }
+      is Empty ->
+        if (current == init) {
+          // If `init`, then `cancel` was not triggered yet
+          if (!state.compareAndSet(current, Active(value)))
+            complete(value)
+        } else {
+          if (!state.compareAndSet(current, finished))
+            complete(value)
+          else
+            execute(value, current.stack)
+        }
     }
   }
 

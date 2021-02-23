@@ -43,11 +43,14 @@ class MonoKTest : UnitSpec() {
 
   fun <T> EQ(): Eq<MonoKOf<T>> = object : Eq<MonoKOf<T>> {
     override fun MonoKOf<T>.eqv(b: MonoKOf<T>): Boolean =
-      unsafeRunEq({
-        this.value().block()
-      }, {
-        b.value().block()
-      })
+      unsafeRunEq(
+        {
+          this.value().block()
+        },
+        {
+          b.value().block()
+        }
+      )
   }
 
   fun EQK() = object : EqK<ForMonoK> {

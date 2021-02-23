@@ -76,9 +76,11 @@ suspend fun <A> ForkScoped(scope: CoroutineScope, f: suspend () -> A): Fiber<A> 
   val promise = CompletableDeferred<Result<A>>(job)
 
   return if (job == null || job.isActive) {
-    val disposable = f.startCoroutineCancellable(CancellableContinuation(newContext) {
-      promise.complete(it)
-    })
+    val disposable = f.startCoroutineCancellable(
+      CancellableContinuation(newContext) {
+        promise.complete(it)
+      }
+    )
 
     job?.invokeOnCompletion { e ->
       if (e is CancellationException) disposable.invoke()

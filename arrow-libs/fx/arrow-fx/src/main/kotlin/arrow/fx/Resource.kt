@@ -231,7 +231,8 @@ sealed class Resource<F, E, A> : ResourceOf<F, E, A> {
                   stack.isEmpty() -> onOutput(a)
                   else -> loop(stack.first()(a), stack.drop(1))
                 }
-              })
+              }
+            )
           }
       }
 

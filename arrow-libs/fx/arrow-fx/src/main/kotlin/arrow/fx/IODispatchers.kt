@@ -32,10 +32,13 @@ fun ExecutorService.asCoroutineContext(): CoroutineContext =
 
 private class ExecutorServiceContext(val pool: ExecutorService) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
   override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
-    ExecutorServiceContinuation(pool, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@ExecutorServiceContext && element is ContinuationInterceptor)
-        element.interceptContinuation(cont) else cont
-    })
+    ExecutorServiceContinuation(
+      pool,
+      continuation.context.fold(continuation) { cont, element ->
+        if (element != this@ExecutorServiceContext && element is ContinuationInterceptor)
+          element.interceptContinuation(cont) else cont
+      }
+    )
 }
 
 private class ExecutorServiceContinuation<T>(

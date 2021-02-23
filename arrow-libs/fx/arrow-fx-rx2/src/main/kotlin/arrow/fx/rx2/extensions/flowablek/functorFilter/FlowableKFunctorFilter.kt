@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functorFilter_singleton: FlowableKFunctorFilter = object :
-    arrow.fx.rx2.extensions.FlowableKFunctorFilter {}
+  arrow.fx.rx2.extensions.FlowableKFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -31,9 +31,9 @@ internal val functorFilter_singleton: FlowableKFunctorFilter = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.filterMap(arg1: Function1<A, Option<B>>): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -44,9 +44,9 @@ fun <A, B> Kind<ForFlowableK, A>.filterMap(arg1: Function1<A, Option<B>>): Flowa
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, Option<A>>.flattenOption(): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.functorFilter().run {
-  this@flattenOption.flattenOption<A>() as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.functorFilter().run {
+    this@flattenOption.flattenOption<A>() as arrow.fx.rx2.FlowableK<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -57,9 +57,9 @@ fun <A> Kind<ForFlowableK, Option<A>>.flattenOption(): FlowableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.filter(arg1: Function1<A, Boolean>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.fx.rx2.FlowableK<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -70,9 +70,9 @@ fun <A> Kind<ForFlowableK, A>.filter(arg1: Function1<A, Boolean>): FlowableK<A> 
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.filterIsInstance(arg1: Class<B>): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

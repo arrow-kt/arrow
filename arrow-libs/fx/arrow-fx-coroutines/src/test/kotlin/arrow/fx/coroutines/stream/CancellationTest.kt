@@ -10,54 +10,56 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 
-class CancellationTest : ArrowFxSpec(spec = {
+class CancellationTest : ArrowFxSpec(
+  spec = {
 
-  "constant" {
-    checkAll(Arb.int()) { i ->
-      Stream.constant(i).assertCancellable()
-    }
-  }
-
-  "bracketed stream" {
-    checkAll(Arb.int()) { i ->
-      val exitCase = Promise<ExitCase>()
-
-      assertCancellable { latch ->
-        Stream.bracketCase(
-          { latch.complete(Unit) },
-          { _, ex ->
-            exitCase.complete(ex)
-              .mapLeft { failure("Bracket finalizer may only be called once") }
-              .rethrow()
-          }
-        ).flatMap { Stream.constant(i) }
-      }
-
-      exitCase.get().shouldBeInstanceOf<ExitCase.Cancelled>()
-    }
-  }
-
-  "parJoin" {
-    checkAll(Arb.int()) { i ->
-      val s = Stream.constant(i)
-      assertCancellable { latch ->
-        Stream(s, s, Stream.effect { latch.complete(Unit) })
-          .parJoin(3)
+    "constant" {
+      checkAll(Arb.int()) { i ->
+        Stream.constant(i).assertCancellable()
       }
     }
-  }
 
-  "concurrently" {
-    checkAll(Arb.int()) { i ->
-      val s = Stream.constant(i)
-      assertCancellable { latch ->
-        // concurrent stream is started before this stream is
-        Stream.effect { latch.complete(Unit) }.flatMap { s }
-          .concurrently(s)
+    "bracketed stream" {
+      checkAll(Arb.int()) { i ->
+        val exitCase = Promise<ExitCase>()
+
+        assertCancellable { latch ->
+          Stream.bracketCase(
+            { latch.complete(Unit) },
+            { _, ex ->
+              exitCase.complete(ex)
+                .mapLeft { failure("Bracket finalizer may only be called once") }
+                .rethrow()
+            }
+          ).flatMap { Stream.constant(i) }
+        }
+
+        exitCase.get().shouldBeInstanceOf<ExitCase.Cancelled>()
+      }
+    }
+
+    "parJoin" {
+      checkAll(Arb.int()) { i ->
+        val s = Stream.constant(i)
+        assertCancellable { latch ->
+          Stream(s, s, Stream.effect { latch.complete(Unit) })
+            .parJoin(3)
+        }
+      }
+    }
+
+    "concurrently" {
+      checkAll(Arb.int()) { i ->
+        val s = Stream.constant(i)
+        assertCancellable { latch ->
+          // concurrent stream is started before this stream is
+          Stream.effect { latch.complete(Unit) }.flatMap { s }
+            .concurrently(s)
+        }
       }
     }
   }
-})
+)
 
 @JvmName("assertStreamCancellable")
 private suspend fun <A> assertCancellable(fa: (latch: Promise<Unit>) -> Stream<A>): Unit {

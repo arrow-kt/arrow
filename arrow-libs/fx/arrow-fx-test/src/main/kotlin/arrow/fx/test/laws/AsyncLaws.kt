@@ -130,13 +130,16 @@ object AsyncLaws {
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
     forAll(50, Gen.string().applicativeError(this), Gen.int()) { fa, b ->
       Promise.uncancellable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
-        val br = later { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
-          when (exitCase) {
-            is ExitCase.Completed -> r.complete(b)
-            is ExitCase.Error -> r.complete(b)
-            else -> just<Unit>(Unit)
+        val br = later { promise }.bracketCase(
+          use = { fa },
+          release = { r, exitCase ->
+            when (exitCase) {
+              is ExitCase.Completed -> r.complete(b)
+              is ExitCase.Error -> r.complete(b)
+              else -> just<Unit>(Unit)
+            }
           }
-        })
+        )
 
         asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().mapConst(Unit) } }
           .flatMap { promise.get() }
@@ -187,9 +190,9 @@ object AsyncLaws {
     forFew(5, Gen.intSmall()) { threadId1: Int ->
       val ctx = newSingleThreadContext(threadId1.toString())
       fx.async {
-          continueOn(ctx)
-          getCurrentThread()
-        }
+        continueOn(ctx)
+        getCurrentThread()
+      }
         .equalUnderTheLaw(fx.async { ctx.shift().bind(); getCurrentThread() }, EQ)
     }
 

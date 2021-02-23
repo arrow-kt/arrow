@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: ObservableKApplicative = object :
-    arrow.fx.rx2.extensions.ObservableKApplicative {}
+  arrow.fx.rx2.extensions.ObservableKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): ObservableK<A> = arrow.fx.rx2.ObservableK.applicative().run {
 )
 @Deprecated(DeprecateRxJava)
 fun unit(): ObservableK<Unit> = arrow.fx.rx2.ObservableK
-   .applicative()
-   .unit() as arrow.fx.rx2.ObservableK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.rx2.ObservableK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): ObservableK<Unit> = arrow.fx.rx2.ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.map(arg1: Function1<A, B>): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForObservableK, A>.map(arg1: Function1<A, B>): ObservableK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.replicate(arg1: Int): ObservableK<List<A>> =
-    arrow.fx.rx2.ObservableK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.rx2.ObservableK<kotlin.collections.List<A>>
-}
+  arrow.fx.rx2.ObservableK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.rx2.ObservableK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForObservableK, A>.replicate(arg1: Int): ObservableK<List<A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.replicate(arg1: Int, arg2: Monoid<A>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

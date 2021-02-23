@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val bracket_singleton: FlowableKBracket = object : arrow.fx.rx2.extensions.FlowableKBracket
-    {}
+{}
 
 /**
  *  A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -80,12 +80,12 @@ internal val bracket_singleton: FlowableKBracket = object : arrow.fx.rx2.extensi
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>,
-Kind<ForFlowableK, Unit>>,
+    Kind<ForFlowableK, Unit>>,
   arg2: Function1<A, Kind<ForFlowableK, B>>
 ): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.bracket().run {
-  this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.bracket().run {
+    this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
+  }
 
 /**
  *  Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
@@ -134,9 +134,9 @@ fun <A, B> Kind<ForFlowableK, A>.bracket(
   arg1: Function1<A, Kind<ForFlowableK, Unit>>,
   arg2: Function1<A, Kind<ForFlowableK, B>>
 ): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.bracket().run {
-  this@bracket.bracket<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.bracket().run {
+    this@bracket.bracket<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
+  }
 
 /**
  *  Meant for ensuring a given task continues execution even when interrupted.
@@ -184,9 +184,9 @@ fun <A> Kind<ForFlowableK, A>.uncancelable(): FlowableK<A> = arrow.fx.rx2.Flowab
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.guarantee(arg1: Kind<ForFlowableK, Unit>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.bracket().run {
-  this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.bracket().run {
+    this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.FlowableK<A>
+  }
 
 /**
  *  Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
@@ -209,7 +209,7 @@ fun <A> Kind<ForFlowableK, A>.guarantee(arg1: Kind<ForFlowableK, Unit>): Flowabl
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.guaranteeCase(
   arg1: Function1<ExitCase<Throwable>, Kind<ForFlowableK,
-Unit>>
+      Unit>>
 ): FlowableK<A> = arrow.fx.rx2.FlowableK.bracket().run {
   this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.rx2.FlowableK<A>
 }
@@ -228,9 +228,9 @@ Unit>>
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.onCancel(arg1: Kind<ForFlowableK, Unit>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.bracket().run {
-  this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.bracket().run {
+    this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.FlowableK<A>
+  }
 
 /**
  *  Executes the given `finalizer` with the given error when the source is finished in error.
@@ -244,9 +244,9 @@ fun <A> Kind<ForFlowableK, A>.onCancel(arg1: Kind<ForFlowableK, Unit>): Flowable
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.onError(arg1: Function1<Throwable, Kind<ForFlowableK, Unit>>):
-    FlowableK<A> = arrow.fx.rx2.FlowableK.bracket().run {
-  this@onError.onError<A>(arg1) as arrow.fx.rx2.FlowableK<A>
-}
+  FlowableK<A> = arrow.fx.rx2.FlowableK.bracket().run {
+    this@onError.onError<A>(arg1) as arrow.fx.rx2.FlowableK<A>
+  }
 
 /**
  *  Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource

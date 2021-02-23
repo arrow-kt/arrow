@@ -38,8 +38,8 @@ fun Collection<Duration>.combineAll(): Duration = arrow.fx.typeclasses.Duration.
 )
 @Deprecated(IODeprecation)
 fun combineAll(arg0: List<Duration>): Duration = arrow.fx.typeclasses.Duration
-   .monoid()
-   .combineAll(arg0) as arrow.fx.typeclasses.Duration
+  .monoid()
+  .combineAll(arg0) as arrow.fx.typeclasses.Duration
 
 @Suppress(
   "UNCHECKED_CAST",

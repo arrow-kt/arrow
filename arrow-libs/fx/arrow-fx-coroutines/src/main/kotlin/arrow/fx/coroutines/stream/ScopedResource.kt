@@ -66,21 +66,27 @@ internal class ScopedResource {
       when {
         conn.isCancelled() -> {
           // state is closed and there are no leases, finalizer has to be invoked right away
-          Pair(s, suspend {
-            Either.catch {
-              finalizer(ExitCase.Cancelled(CancellationException()))
-              false
+          Pair(
+            s,
+            suspend {
+              Either.catch {
+                finalizer(ExitCase.Cancelled(CancellationException()))
+                false
+              }
             }
-          })
+          )
         }
         s.isFinished() -> {
           // state is closed and there are no leases, finalizer has to be invoked right away
-          Pair(s, suspend {
-            Either.catch {
-              finalizer(ExitCase.Completed)
-              false
+          Pair(
+            s,
+            suspend {
+              Either.catch {
+                finalizer(ExitCase.Completed)
+                false
+              }
             }
-          })
+          )
         }
         else -> {
           val attemptFinalizer: suspend (ExitCase) -> Either<Throwable, Unit> =
@@ -109,10 +115,13 @@ internal class ScopedResource {
           state.modify { s ->
             // Scope is closed and this is last lease, assure finalizer is removed from the state and run
             // previous finalizer shall be always present at this point, this shall invoke it
-            Pair(s.copy(finalizer = null), when (val ff = s.finalizer) {
-              null -> suspend { Either.Right(Unit) }
-              else -> suspend { ff(ExitCase.Completed) }
-            })
+            Pair(
+              s.copy(finalizer = null),
+              when (val ff = s.finalizer) {
+                null -> suspend { Either.Right(Unit) }
+                else -> suspend { ff(ExitCase.Completed) }
+              }
+            )
           }.invoke()
         } else Either.Right(Unit)
       }

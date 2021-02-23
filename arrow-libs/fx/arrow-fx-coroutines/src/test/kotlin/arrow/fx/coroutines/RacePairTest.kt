@@ -11,137 +11,146 @@ import kotlinx.coroutines.withContext
 import io.kotest.property.checkAll
 import java.util.concurrent.Executors
 
-class RacePairTest : ArrowFxSpec(spec = {
+class RacePairTest : ArrowFxSpec(
+  spec = {
 
-  "race pair returns to original context" {
-    val racerName = "racePair"
-    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
+    "race pair returns to original context" {
+      val racerName = "racePair"
+      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
 
-    checkAll(Arb.int(1..2)) { choose ->
-      single.zip(racer).use { (single, raceCtx) ->
-        withContext(single) {
-          threadName() shouldBe singleThreadName
+      checkAll(Arb.int(1..2)) { choose ->
+        single.zip(racer).use { (single, raceCtx) ->
+          withContext(single) {
+            threadName() shouldBe singleThreadName
 
-          val racedOn = when (choose) {
-            1 -> racePair(raceCtx, { threadName() }, { never<Nothing>() })
-              .fold({ a, _ -> a }, { _, _ -> null })
-            else -> racePair(raceCtx, { never<Nothing>() }, { threadName() })
-              .fold({ _, _ -> null }, { _, b -> b })
-          }
-
-          racedOn shouldBe racerName
-          threadName() shouldBe singleThreadName
-        }
-      }
-    }
-  }
-
-  "race pair returns to original context on failure" {
-    val racerName = "racePair"
-    val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
-
-    checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
-      single.zip(racer).use { (single, raceCtx) ->
-        withContext(single) {
-          threadName() shouldBe singleThreadName
-
-          Either.catch {
-            when (choose) {
-              1 -> racePair(raceCtx, { e.suspend() }, { never<Nothing>() })
-                .fold({ a, _ -> a }, { _, _ -> null })
-              else -> racePair(raceCtx, { never<Nothing>() }, { e.suspend() })
-                .fold({ _, _ -> null }, { _, b -> b })
+            val racedOn = when (choose) {
+              1 ->
+                racePair(raceCtx, { threadName() }, { never<Nothing>() })
+                  .fold({ a, _ -> a }, { _, _ -> null })
+              else ->
+                racePair(raceCtx, { never<Nothing>() }, { threadName() })
+                  .fold({ _, _ -> null }, { _, b -> b })
             }
-          } should leftException(e)
 
-          threadName() shouldBe singleThreadName
+            racedOn shouldBe racerName
+            threadName() shouldBe singleThreadName
+          }
         }
       }
     }
-  }
 
-  "race pair mirrors left winner" {
-    checkAll(Arb.either(Arb.throwable(), Arb.int())) { fa ->
+    "race pair returns to original context on failure" {
+      val racerName = "racePair"
+      val racer = Resource.fromExecutor { Executors.newFixedThreadPool(2, NamedThreadFactory { racerName }) }
 
-      Either.catch {
-        racePair({ fa.rethrow() }, { never<Unit>() })
-          .fold(Pair<Int, Fiber<Unit>>::first) { fail("never can not win race") }
-      } should either(fa)
+      checkAll(Arb.int(1..2), Arb.throwable()) { choose, e ->
+        single.zip(racer).use { (single, raceCtx) ->
+          withContext(single) {
+            threadName() shouldBe singleThreadName
+
+            Either.catch {
+              when (choose) {
+                1 ->
+                  racePair(raceCtx, { e.suspend() }, { never<Nothing>() })
+                    .fold({ a, _ -> a }, { _, _ -> null })
+                else ->
+                  racePair(raceCtx, { never<Nothing>() }, { e.suspend() })
+                    .fold({ _, _ -> null }, { _, b -> b })
+              }
+            } should leftException(e)
+
+            threadName() shouldBe singleThreadName
+          }
+        }
+      }
     }
-  }
 
-  "race pair mirrors right winner" {
-    checkAll(Arb.either(Arb.throwable(), Arb.int())) { fa ->
+    "race pair mirrors left winner" {
+      checkAll(Arb.either(Arb.throwable(), Arb.int())) { fa ->
 
-      Either.catch {
-        racePair({ never<Unit>() }, { fa.rethrow() })
-          .fold({ fail("never can not win race") }, Pair<Fiber<Unit>, Int>::second)
-      } should either(fa)
+        Either.catch {
+          racePair({ fa.rethrow() }, { never<Unit>() })
+            .fold(Pair<Int, Fiber<Unit>>::first) { fail("never can not win race") }
+        } should either(fa)
+      }
     }
-  }
 
-  "race pair can cancel loser" {
-    checkAll(
-      Arb.either(Arb.throwable(), Arb.int()),
-      Arb.bool(),
-      Arb.int()
-    ) { fa, leftWinner, i ->
-      val s = Semaphore(0)
-      val p = Promise<Int>()
-      val winner = suspend { s.acquire(); fa.rethrow() }
-      val loser = suspend { bracket(acquire = { s.release() }, use = { never<String>() }, release = { p.complete(i) }) }
+    "race pair mirrors right winner" {
+      checkAll(Arb.either(Arb.throwable(), Arb.int())) { fa ->
 
-      Either.catch {
-        if (leftWinner) racePair(winner, loser)
-        else racePair(loser, winner)
-      }.fold({ p.get() }, {
-        it.fold(
-          { (_, fiberB) -> ForkConnected { fiberB.cancel() }; p.get() },
-          { (fiberA, _) -> ForkConnected { fiberA.cancel() }; p.get() }
-        )
-      }) shouldBe i
+        Either.catch {
+          racePair({ never<Unit>() }, { fa.rethrow() })
+            .fold({ fail("never can not win race") }, Pair<Fiber<Unit>, Int>::second)
+        } should either(fa)
+      }
     }
-  }
 
-  "race pair can join left" {
-    checkAll(Arb.int()) { i ->
-      val p = Promise<Int>()
-      racePair({ p.get() }, { Unit })
-        .fold(
-          { fail("promise.get cannot win race") },
-          { (fiber, _) -> p.complete(i); fiber.join() }
+    "race pair can cancel loser" {
+      checkAll(
+        Arb.either(Arb.throwable(), Arb.int()),
+        Arb.bool(),
+        Arb.int()
+      ) { fa, leftWinner, i ->
+        val s = Semaphore(0)
+        val p = Promise<Int>()
+        val winner = suspend { s.acquire(); fa.rethrow() }
+        val loser = suspend { bracket(acquire = { s.release() }, use = { never<String>() }, release = { p.complete(i) }) }
+
+        Either.catch {
+          if (leftWinner) racePair(winner, loser)
+          else racePair(loser, winner)
+        }.fold(
+          { p.get() },
+          {
+            it.fold(
+              { (_, fiberB) -> ForkConnected { fiberB.cancel() }; p.get() },
+              { (fiberA, _) -> ForkConnected { fiberA.cancel() }; p.get() }
+            )
+          }
         ) shouldBe i
+      }
+    }
+
+    "race pair can join left" {
+      checkAll(Arb.int()) { i ->
+        val p = Promise<Int>()
+        racePair({ p.get() }, { Unit })
+          .fold(
+            { fail("promise.get cannot win race") },
+            { (fiber, _) -> p.complete(i); fiber.join() }
+          ) shouldBe i
+      }
+    }
+
+    "race pair can join right" {
+      checkAll(Arb.int()) { i ->
+        val p = Promise<Int>()
+        racePair({ Unit }, { p.get() })
+          .fold(
+            { (_, fiber) -> p.complete(i); fiber.join() },
+            { fail("promise.get cannot win race") }
+          ) shouldBe i
+      }
+    }
+
+    "cancelling race pair cancels both" {
+      checkAll(Arb.int(), Arb.int()) { a, b ->
+        val s = Semaphore(0)
+        val pa = Promise<Int>()
+        val pb = Promise<Int>()
+
+        val loserA = suspend { bracket({ s.release() }, use = { never<Int>() }, release = { pa.complete(a) }) }
+        val loserB = suspend { bracket({ s.release() }, use = { never<Int>() }, release = { pb.complete(b) }) }
+
+        val fiber = ForkAndForget { racePair(loserA, loserB) }
+
+        s.acquireN(2) // Wait until both racers started
+
+        fiber.cancel()
+
+        pa.get() shouldBe a
+        pb.get() shouldBe b
+      }
     }
   }
-
-  "race pair can join right" {
-    checkAll(Arb.int()) { i ->
-      val p = Promise<Int>()
-      racePair({ Unit }, { p.get() })
-        .fold(
-          { (_, fiber) -> p.complete(i); fiber.join() },
-          { fail("promise.get cannot win race") }
-        ) shouldBe i
-    }
-  }
-
-  "cancelling race pair cancels both" {
-    checkAll(Arb.int(), Arb.int()) { a, b ->
-      val s = Semaphore(0)
-      val pa = Promise<Int>()
-      val pb = Promise<Int>()
-
-      val loserA = suspend { bracket({ s.release() }, use = { never<Int>() }, release = { pa.complete(a) }) }
-      val loserB = suspend { bracket({ s.release() }, use = { never<Int>() }, release = { pb.complete(b) }) }
-
-      val fiber = ForkAndForget { racePair(loserA, loserB) }
-
-      s.acquireN(2) // Wait until both racers started
-
-      fiber.cancel()
-
-      pa.get() shouldBe a
-      pb.get() shouldBe b
-    }
-  }
-})
+)

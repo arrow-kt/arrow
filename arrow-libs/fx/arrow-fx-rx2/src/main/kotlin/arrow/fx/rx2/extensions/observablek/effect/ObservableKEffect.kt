@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val effect_singleton: ObservableKEffect = object :
-    arrow.fx.rx2.extensions.ObservableKEffect {}
+  arrow.fx.rx2.extensions.ObservableKEffect {}
 
 @JvmName("runAsync")
 @Suppress(
@@ -32,7 +32,7 @@ internal val effect_singleton: ObservableKEffect = object :
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.runAsync(
   arg1: Function1<Either<Throwable, A>, Kind<ForObservableK,
-Unit>>
+      Unit>>
 ): ObservableK<Unit> = arrow.fx.rx2.ObservableK.effect().run {
   this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.ObservableK<kotlin.Unit>
 }

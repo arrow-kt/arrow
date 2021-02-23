@@ -552,17 +552,20 @@ sealed class Schedule<Input, Output> {
     override fun <A : Input, B> andThen(other: Schedule<A, B>): Schedule<A, Either<Output, B>> =
       ScheduleImpl<Either<State, Any?>, A, Either<Output, B>>(suspend { Either.Left(initialState.invoke()) }) { i, s ->
         (other as ScheduleImpl<Any?, A, B>)
-        s.fold({ state ->
-          val dec = this@ScheduleImpl.update(i, state)
-          if (dec.cont) dec.bimap({ it.left() }, { it.left() })
-          else {
-            val newState = other.initialState.invoke()
-            val newDec = other.update(i, newState)
-            newDec.bimap({ it.right() }, { it.right() })
+        s.fold(
+          { state ->
+            val dec = this@ScheduleImpl.update(i, state)
+            if (dec.cont) dec.bimap({ it.left() }, { it.left() })
+            else {
+              val newState = other.initialState.invoke()
+              val newDec = other.update(i, newState)
+              newDec.bimap({ it.right() }, { it.right() })
+            }
+          },
+          { state ->
+            other.update(i, state).bimap({ it.right() }, { it.right() })
           }
-        }, { state ->
-          other.update(i, state).bimap({ it.right() }, { it.right() })
-        })
+        )
       }
 
     override fun modifyNanos(f: suspend (output: Output, duration: Double) -> Double): Schedule<Input, Output> =
@@ -619,12 +622,15 @@ sealed class Schedule<Input, Output> {
     override infix fun <A, B> choose(other: Schedule<A, B>): Schedule<Either<Input, A>, Either<Output, B>> =
       (other as ScheduleImpl<Any?, A, B>).let { other ->
         ScheduleImpl(suspend { Pair(initialState.invoke(), other.initialState.invoke()) }) { i, s ->
-          i.fold({
-            update(it, s.first).mapLeft { state -> Pair(state, s.second) }.map { output -> output.left() }
-          }, {
-            other.update(it, s.second).mapLeft { otherState -> Pair(s.first, otherState) }
-              .map { otherOutput -> otherOutput.right() }
-          })
+          i.fold(
+            {
+              update(it, s.first).mapLeft { state -> Pair(state, s.second) }.map { output -> output.left() }
+            },
+            {
+              other.update(it, s.second).mapLeft { otherState -> Pair(s.first, otherState) }
+                .map { otherOutput -> otherOutput.right() }
+            }
+          )
         }
       }
 

@@ -116,9 +116,12 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
                 .doOnError { t: Throwable ->
                   defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.tryOnError(t) }, { e -> emitter.tryOnError(Platform.composeErrors(t, e)) })
                 }.doOnComplete {
-                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, { e ->
-                    emitter.tryOnError(e)
-                  })
+                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe(
+                    { emitter.onComplete() },
+                    { e ->
+                      emitter.tryOnError(e)
+                    }
+                  )
                 }
                 .doOnDispose {
                   defer { release(a, ExitCase.Cancelled) }.value().subscribe({}, {})
@@ -233,12 +236,15 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
       Observable.create<A> { emitter ->
         fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            emitter.tryOnError(e)
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
+          either.fold(
+            { e ->
+              emitter.tryOnError(e)
+            },
+            { a ->
+              emitter.onNext(a)
+              emitter.onComplete()
+            }
+          )
         }
       }.k()
 
@@ -246,12 +252,15 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     fun <A> asyncF(fa: ObservableKProcF<A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it)
-          }, {
-            emitter.onNext(it)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it)
+            },
+            {
+              emitter.onNext(it)
+              emitter.onComplete()
+            }
+          )
         }.fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
 
         emitter.setCancellable { dispose.dispose() }
@@ -288,12 +297,15 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
       Observable.create<A> { emitter ->
         val token = fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            emitter.tryOnError(e)
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
+          either.fold(
+            { e ->
+              emitter.tryOnError(e)
+            },
+            { a ->
+              emitter.onNext(a)
+              emitter.onComplete()
+            }
+          )
         }
         emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
@@ -310,12 +322,15 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it).let { Unit }
+            },
+            { a ->
+              emitter.onNext(a)
+              emitter.onComplete()
+            }
+          )
         }
 
         val fa2 = try {
@@ -326,19 +341,28 @@ data class ObservableK<out A>(val observable: Observable<out A>) : ObservableKOf
         }
 
         val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForObservableK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
-          }, {})
-        }, { e -> emitter.tryOnError(e) })
+        val disp = fa2.value().subscribe(
+          { token ->
+            val cancel = cancelOrToken.getAndSet(Right(token))
+            cancel?.fold(
+              {
+                token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+              },
+              {}
+            )
+          },
+          { e -> emitter.tryOnError(e) }
+        )
 
         emitter.setCancellable {
           disp.dispose()
           val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
-          })
+          token?.fold(
+            {},
+            {
+              it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+            }
+          )
         }
       }.k()
 

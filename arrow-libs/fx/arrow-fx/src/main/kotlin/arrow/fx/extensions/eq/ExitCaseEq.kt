@@ -19,9 +19,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(IODeprecation)
 fun <E> ExitCase<E>.neqv(EQE: Eq<E>, arg1: ExitCase<E>): Boolean =
-    arrow.fx.typeclasses.ExitCase.eq<E>(EQE).run {
-  this@neqv.neqv(arg1) as kotlin.Boolean
-}
+  arrow.fx.typeclasses.ExitCase.eq<E>(EQE).run {
+    this@neqv.neqv(arg1) as kotlin.Boolean
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -29,4 +29,4 @@ fun <E> ExitCase<E>.neqv(EQE: Eq<E>, arg1: ExitCase<E>): Boolean =
 )
 @Deprecated(IODeprecation)
 inline fun <E> Companion.eq(EQE: Eq<E>): ExitCaseEq<E> = object : arrow.fx.extensions.ExitCaseEq<E>
-    { override fun EQE(): arrow.typeclasses.Eq<E> = EQE }
+{ override fun EQE(): arrow.typeclasses.Eq<E> = EQE }

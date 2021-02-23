@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: MaybeKApplicativeError = object :
-    arrow.fx.rx2.extensions.MaybeKApplicativeError {}
+  arrow.fx.rx2.extensions.MaybeKApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -33,9 +33,9 @@ internal val applicativeError_singleton: MaybeKApplicativeError = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.handleErrorWith(arg1: Function1<Throwable, Kind<ForMaybeK, A>>):
-    MaybeK<A> = arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  MaybeK<A> = arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Throwable.raiseError(): MaybeK<A> = arrow.fx.rx2.MaybeK.applicativeError
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): MaybeK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): MaybeK<A> 
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.handleError(arg1: Function1<Throwable, A>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForMaybeK, A>.handleError(arg1: Function1<Throwable, A>): MaybeK<A>
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>):
-    MaybeK<B> = arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.MaybeK<B>
-}
+  MaybeK<B> = arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -110,9 +110,9 @@ fun <A, B> Kind<ForMaybeK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Functi
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.attempt(): MaybeK<Either<Throwable, A>> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.fx.rx2.MaybeK<arrow.core.Either<kotlin.Throwable, A>>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.fx.rx2.MaybeK<arrow.core.Either<kotlin.Throwable, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -123,9 +123,9 @@ fun <A> Kind<ForMaybeK, A>.attempt(): MaybeK<Either<Throwable, A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  arrow.fx.rx2.MaybeK
+    .applicativeError()
+    .catch<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 @JvmName("catch")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> ApplicativeError<ForMaybeK, Throwable>.catch(arg1: Function0<A>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -149,9 +149,9 @@ fun <A> ApplicativeError<ForMaybeK, Throwable>.catch(arg1: Function0<A>): MaybeK
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A): MaybeK<A> =
-    arrow.fx.rx2.MaybeK
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  arrow.fx.rx2.MaybeK
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -162,9 +162,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.rx2.MaybeK.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.rx2.MaybeK.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

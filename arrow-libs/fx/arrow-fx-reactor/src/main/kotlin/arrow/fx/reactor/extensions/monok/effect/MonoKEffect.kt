@@ -30,9 +30,9 @@ internal val effect_singleton: MonoKEffect = object : arrow.fx.reactor.extension
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.runAsync(arg1: Function1<Either<Throwable, A>, Kind<ForMonoK, Unit>>):
-    MonoK<Unit> = arrow.fx.reactor.MonoK.effect().run {
-  this@runAsync.runAsync<A>(arg1) as arrow.fx.reactor.MonoK<kotlin.Unit>
-}
+  MonoK<Unit> = arrow.fx.reactor.MonoK.effect().run {
+    this@runAsync.runAsync<A>(arg1) as arrow.fx.reactor.MonoK<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

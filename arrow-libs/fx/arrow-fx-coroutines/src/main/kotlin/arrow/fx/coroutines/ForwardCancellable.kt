@@ -64,14 +64,15 @@ internal class ForwardCancellable(private val ctx: CoroutineContext) {
         Platform.unsafeRunSync(value.cancel)
         throw ArrowInternalException("$ArrowExceptionMessage\nForwardCancellable.complete called twice")
       }
-      is State.Empty -> if (current == init) {
-        // If `init`, then `cancel` was not triggered yet
-        if (!state.compareAndSet(current, State.Active(value)))
-          complete(value)
-      } else {
-        if (!state.compareAndSet(current, finished)) complete(value)
-        else execute(ctx, value, current.stack)
-      }
+      is State.Empty ->
+        if (current == init) {
+          // If `init`, then `cancel` was not triggered yet
+          if (!state.compareAndSet(current, State.Active(value)))
+            complete(value)
+        } else {
+          if (!state.compareAndSet(current, finished)) complete(value)
+          else execute(ctx, value, current.stack)
+        }
     }
   }
 
@@ -97,18 +98,20 @@ internal class ForwardCancellable(private val ctx: CoroutineContext) {
     private val finished: State = State.Active(CancelToken.unit)
 
     private fun execute(ctx: CoroutineContext, token: CancelToken, stack: List<(Result<Unit>) -> Unit>): Unit =
-      token.cancel.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable) { r ->
-        val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
-          try {
-            cb(r)
-            acc
-          } catch (t: Throwable) {
-            acc + t.nonFatalOrThrow()
+      token.cancel.startCoroutineUnintercepted(
+        Continuation(ctx + SuspendConnection.uncancellable) { r ->
+          val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
+            try {
+              cb(r)
+              acc
+            } catch (t: Throwable) {
+              acc + t.nonFatalOrThrow()
+            }
           }
+          // AsyncErrorHandler for exceptions from running CancelToken.
+          if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
+          else Unit
         }
-        // AsyncErrorHandler for exceptions from running CancelToken.
-        if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
-        else Unit
-      })
+      )
   }
 }

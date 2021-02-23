@@ -30,9 +30,9 @@ internal val effect_singleton: FluxKEffect = object : arrow.fx.reactor.extension
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.runAsync(arg1: Function1<Either<Throwable, A>, Kind<ForFluxK, Unit>>):
-    FluxK<Unit> = arrow.fx.reactor.FluxK.effect().run {
-  this@runAsync.runAsync<A>(arg1) as arrow.fx.reactor.FluxK<kotlin.Unit>
-}
+  FluxK<Unit> = arrow.fx.reactor.FluxK.effect().run {
+    this@runAsync.runAsync<A>(arg1) as arrow.fx.reactor.FluxK<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

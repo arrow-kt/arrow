@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: SingleKApplicative = object :
-    arrow.fx.rx2.extensions.SingleKApplicative {}
+  arrow.fx.rx2.extensions.SingleKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): SingleK<A> = arrow.fx.rx2.SingleK.applicative().run {
 )
 @Deprecated(DeprecateRxJava)
 fun unit(): SingleK<Unit> = arrow.fx.rx2.SingleK
-   .applicative()
-   .unit() as arrow.fx.rx2.SingleK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.rx2.SingleK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): SingleK<Unit> = arrow.fx.rx2.SingleK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
-    arrow.fx.rx2.SingleK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.replicate(arg1: Int): SingleK<List<A>> =
-    arrow.fx.rx2.SingleK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.rx2.SingleK<kotlin.collections.List<A>>
-}
+  arrow.fx.rx2.SingleK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.rx2.SingleK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForSingleK, A>.replicate(arg1: Int): SingleK<List<A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.replicate(arg1: Int, arg2: Monoid<A>): SingleK<A> =
-    arrow.fx.rx2.SingleK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.SingleK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

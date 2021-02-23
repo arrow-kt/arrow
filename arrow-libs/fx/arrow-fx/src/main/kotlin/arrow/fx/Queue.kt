@@ -210,25 +210,25 @@ interface Dequeue<F, A> {
  * You can use [Enqueue] to restrict certain functions or layers of your applications to only produce values.
  *
  * ```kotlin:ank:playground
-  * import arrow.fx.*
-  * import arrow.fx.extensions.*
-  * import arrow.fx.typeclasses.*
-  * import kotlin.coroutines.EmptyCoroutineContext
-  *
-  * //sampleStart
-  * suspend fun main(args: Array<String>): Unit = IO.fx {
-  *   fun produceInts(e: Enqueue<ForIO, Int>, max: Int): IOOf<Unit> =
-  *     (0..max).parTraverse(EmptyCoroutineContext) { i ->
-  *       IO.sleep(i * 10.milliseconds).followedBy(e.offer(i))
-  *     }.void()
-  *
-  *   val queue = !Queue.unbounded<Int>()
-  *   !produceInts(queue, 1000).fork()
-  *   !IO.sleep(4.seconds)
-  *   val res = !queue.takeAll()
-  *   !effect { println(res) }
-  * }.suspended()
-  * //sampleEnd
+ * import arrow.fx.*
+ * import arrow.fx.extensions.*
+ * import arrow.fx.typeclasses.*
+ * import kotlin.coroutines.EmptyCoroutineContext
+ *
+ * //sampleStart
+ * suspend fun main(args: Array<String>): Unit = IO.fx {
+ *   fun produceInts(e: Enqueue<ForIO, Int>, max: Int): IOOf<Unit> =
+ *     (0..max).parTraverse(EmptyCoroutineContext) { i ->
+ *       IO.sleep(i * 10.milliseconds).followedBy(e.offer(i))
+ *     }.void()
+ *
+ *   val queue = !Queue.unbounded<Int>()
+ *   !produceInts(queue, 1000).fork()
+ *   !IO.sleep(4.seconds)
+ *   val res = !queue.takeAll()
+ *   !effect { println(res) }
+ * }.suspended()
+ * //sampleEnd
  * ```
  *
  * @see Queue in the case your functions or layers are allowed to take and offer.

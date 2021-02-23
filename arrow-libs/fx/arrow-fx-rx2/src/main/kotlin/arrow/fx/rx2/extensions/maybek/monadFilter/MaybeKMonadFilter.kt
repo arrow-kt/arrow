@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadFilter_singleton: MaybeKMonadFilter = object :
-    arrow.fx.rx2.extensions.MaybeKMonadFilter {}
+  arrow.fx.rx2.extensions.MaybeKMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val monadFilter_singleton: MaybeKMonadFilter = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.filterMap(arg1: Function1<A, Option<B>>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A, B> Kind<ForMaybeK, A>.filterMap(arg1: Function1<A, Option<B>>): MaybeK<B
 )
 @Deprecated(DeprecateRxJava)
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForMaybeK>.() -> B): MaybeK<B> =
-    arrow.fx.rx2.MaybeK
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.fx.rx2.MaybeK<B>
+  arrow.fx.rx2.MaybeK
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.fx.rx2.MaybeK<B>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadDefer_singleton: FluxKMonadDefer = object :
-    arrow.fx.reactor.extensions.FluxKMonadDefer {}
+  arrow.fx.reactor.extensions.FluxKMonadDefer {}
 
 @JvmName("defer")
 @Suppress(
@@ -32,8 +32,8 @@ internal val monadDefer_singleton: FluxKMonadDefer = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> defer(arg0: Function0<Kind<ForFluxK, A>>): FluxK<A> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .defer<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  .monadDefer()
+  .defer<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("later")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> defer(arg0: Function0<Kind<ForFluxK, A>>): FluxK<A> = arrow.fx.reactor.F
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: Function0<A>): FluxK<A> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("later")
 @Suppress(
@@ -56,8 +56,8 @@ fun <A> later(arg0: Function0<A>): FluxK<A> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: Kind<ForFluxK, A>): FluxK<A> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("lazy")
 @Suppress(
@@ -68,8 +68,8 @@ fun <A> later(arg0: Kind<ForFluxK, A>): FluxK<A> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun lazy(): FluxK<Unit> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .lazy() as arrow.fx.reactor.FluxK<kotlin.Unit>
+  .monadDefer()
+  .lazy() as arrow.fx.reactor.FluxK<kotlin.Unit>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -80,8 +80,8 @@ fun lazy(): FluxK<Unit> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): FluxK<A> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .laterOrRaise<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  .monadDefer()
+  .laterOrRaise<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -92,8 +92,8 @@ fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): FluxK<A> = arrow.fx
 )
 @Deprecated(DeprecateReactor)
 fun <A> Ref(arg0: A): FluxK<Ref<ForFluxK, A>> = arrow.fx.reactor.FluxK
-   .monadDefer()
-   .Ref<A>(arg0) as arrow.fx.reactor.FluxK<arrow.fx.Ref<arrow.fx.reactor.ForFluxK, A>>
+  .monadDefer()
+  .Ref<A>(arg0) as arrow.fx.reactor.FluxK<arrow.fx.Ref<arrow.fx.reactor.ForFluxK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

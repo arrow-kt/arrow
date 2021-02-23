@@ -119,15 +119,18 @@ fun <A> Stream.Companion.cancellable(@BuilderInference f: suspend EmitterSyntax<
     val error = UnsafePromise<Throwable>()
     val cancel = Promise<CancelToken>()
 
-    bracketCase({
-      ForkAndForget { emitterCallback(f, cancel, error, q) }
-    }, { f, exit ->
-      when (exit) {
-        is ExitCase.Cancelled -> cancel.get().cancel.invoke()
-        else -> Unit
+    bracketCase(
+      {
+        ForkAndForget { emitterCallback(f, cancel, error, q) }
+      },
+      { f, exit ->
+        when (exit) {
+          is ExitCase.Cancelled -> cancel.get().cancel.invoke()
+          else -> Unit
+        }
+        f.cancel()
       }
-      f.cancel()
-    }).flatMap {
+    ).flatMap {
       q.dequeue()
         .interruptWhen { Either.Left(error.join()) }
         .terminateOn { it === END }
@@ -144,9 +147,11 @@ private suspend fun <A> emitterCallback(
   val cb = { ch: Chunk<A> ->
     suspend {
       q.enqueue1(ch)
-    }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
-      r.fold({ Unit }, { e -> error.complete(Result.success(e)) })
-    })
+    }.startCoroutine(
+      Continuation(EmptyCoroutineContext) { r ->
+        r.fold({ Unit }, { e -> error.complete(Result.success(e)) })
+      }
+    )
   }
 
   val emitter = object : EmitterSyntax<A> {
@@ -171,15 +176,18 @@ private suspend fun <A> emitterCallback(
     }
   }
 
-  guaranteeCase({
-    val cancelT = emitter.f()
-    cancel.complete(cancelT)
-  }, { exit ->
-    when (exit) {
-      is ExitCase.Failure -> error.complete(Result.success(exit.failure))
-      else -> Unit
+  guaranteeCase(
+    {
+      val cancelT = emitter.f()
+      cancel.complete(cancelT)
+    },
+    { exit ->
+      when (exit) {
+        is ExitCase.Failure -> error.complete(Result.success(exit.failure))
+        else -> Unit
+      }
     }
-  })
+  )
 }
 
 private object END : Chunk<Nothing>() {

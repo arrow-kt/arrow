@@ -76,8 +76,8 @@ fun <A> Kind<ForFluxK, A>.fold(arg1: Monoid<A>): A = arrow.fx.reactor.FluxK.fold
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
   Option<B> = arrow.fx.reactor.FluxK.foldable().run {
-  this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+    this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 @JvmName("reduceRightToOption")
 @Suppress(
@@ -169,8 +169,8 @@ fun <A> orEmpty(arg0: Applicative<ForFluxK>, arg1: Monoid<A>): FluxK<A> = arrow.
 @Deprecated(DeprecateReactor)
 fun <G, A, B> Kind<ForFluxK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.fx.reactor.FluxK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(

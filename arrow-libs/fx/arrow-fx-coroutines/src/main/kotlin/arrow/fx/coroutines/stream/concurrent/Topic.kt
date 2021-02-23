@@ -101,19 +101,25 @@ class Topic<A> internal constructor(
       }
 
   private fun subscriber(size: Int): Stream<Pair<Pair<Token, Int>, Stream<IQueue<A>>>> =
-    Stream.bracket({
-      Pair(Token(), size).also { selector ->
-        pubSub.subscribe(Either.Right(selector))
-      }
-    }, { selector ->
-      pubSub.unsubscribe(Either.Right(selector))
-    }).map { selector ->
-      Pair(selector, pubSub.getStream(Either.Right(selector)).flatMap {
-        when (it) {
-          is Either.Right -> Stream.just(it.b)
-          is Either.Left -> Stream.empty() // Impossible
+    Stream.bracket(
+      {
+        Pair(Token(), size).also { selector ->
+          pubSub.subscribe(Either.Right(selector))
         }
-      })
+      },
+      { selector ->
+        pubSub.unsubscribe(Either.Right(selector))
+      }
+    ).map { selector ->
+      Pair(
+        selector,
+        pubSub.getStream(Either.Right(selector)).flatMap {
+          when (it) {
+            is Either.Right -> Stream.just(it.b)
+            is Either.Left -> Stream.empty() // Impossible
+          }
+        }
+      )
     }
 
   companion object {
@@ -156,8 +162,9 @@ private fun <A> boundedSubscribers(start: A): PubSub.Strategy<A, IQueue<A>, Topi
     override fun get(selector: Pair<Token, Int>, state: Topic.State<A>): Pair<Topic.State<A>, Option<IQueue<A>>> =
       when (val r = state.subscribers[selector]) {
         null -> Pair(regEmpty(selector, state), Some(IQueue(state.last)))
-        else -> if (r.isEmpty()) Pair(state, None)
-        else Pair(regEmpty(selector, state), Some(r))
+        else ->
+          if (r.isEmpty()) Pair(state, None)
+          else Pair(regEmpty(selector, state), Some(r))
       }
 
     override fun empty(state: Topic.State<A>): Boolean =

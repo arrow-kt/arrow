@@ -41,11 +41,14 @@ class FlowableKTests : RxJavaSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
     override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean =
-      unsafeRunEq({
-        this.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
-      }, {
-        b.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
-      })
+      unsafeRunEq(
+        {
+          this.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
+        },
+        {
+          b.value().timeout(5, TimeUnit.SECONDS).blockingFirst()
+        }
+      )
   }
 
   fun EQK() = object : EqK<ForFlowableK> {
@@ -144,9 +147,11 @@ class FlowableKTests : RxJavaSpec() {
     "FlowableK cancellable should cancel CancelToken on dispose" {
       Promise.uncancellable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
         FlowableK {
-          FlowableK.cancellable<Unit>(fa = {
-            latch.complete(Unit)
-          }).flowable.subscribe().dispose()
+          FlowableK.cancellable<Unit>(
+            fa = {
+              latch.complete(Unit)
+            }
+          ).flowable.subscribe().dispose()
         }.flatMap { latch.get() }
       }.value()
         .test()

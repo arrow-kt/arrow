@@ -272,11 +272,13 @@ interface IOParMap {
 
     fun complete(a: A, b: B) {
       conn.pop()
-      cb(try {
-        Either.Right(a toT b)
-      } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
-      })
+      cb(
+        try {
+          Either.Right(a toT b)
+        } catch (e: Throwable) {
+          Either.Left(e.nonFatalOrThrow())
+        }
+      )
     }
 
     fun sendError(other: SuspendConnection, e: Throwable) = when (state.getAndSet(e)) {
@@ -288,29 +290,35 @@ interface IOParMap {
     }
 
     IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
-      resultA.fold({ e ->
-        sendError(connB, e)
-      }, { a ->
-        when (val oldState = state.getAndSet(Left(a))) {
-          null -> Unit // Wait for B
-          is Throwable -> Unit // ParMapN already failed and A was cancelled.
-          is Either.Left<*> -> Unit // Already state.getAndSet
-          is Either.Right<*> -> complete(a, (oldState as Either.Right<B>).b)
+      resultA.fold(
+        { e ->
+          sendError(connB, e)
+        },
+        { a ->
+          when (val oldState = state.getAndSet(Left(a))) {
+            null -> Unit // Wait for B
+            is Throwable -> Unit // ParMapN already failed and A was cancelled.
+            is Either.Left<*> -> Unit // Already state.getAndSet
+            is Either.Right<*> -> complete(a, (oldState as Either.Right<B>).b)
+          }
         }
-      })
+      )
     }
 
     IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
-      resultB.fold({ e ->
-        sendError(connA, e)
-      }, { b ->
-        when (val oldState = state.getAndSet(Right(b))) {
-          null -> Unit // Wait for A
-          is Throwable -> Unit // ParMapN already failed and B was cancelled.
-          is Either.Right<*> -> Unit // IO cannot finish twice
-          is Either.Left<*> -> complete((oldState as Either.Left<A>).a, b)
+      resultB.fold(
+        { e ->
+          sendError(connA, e)
+        },
+        { b ->
+          when (val oldState = state.getAndSet(Right(b))) {
+            null -> Unit // Wait for A
+            is Throwable -> Unit // ParMapN already failed and B was cancelled.
+            is Either.Right<*> -> Unit // IO cannot finish twice
+            is Either.Left<*> -> complete((oldState as Either.Left<A>).a, b)
+          }
         }
-      })
+      )
     }
   }
 
@@ -335,11 +343,13 @@ interface IOParMap {
 
     fun complete(a: A, b: B, c: C) {
       conn.pop()
-      cb(try {
-        Either.Right(Tuple3(a, b, c))
-      } catch (e: Throwable) {
-        Either.Left(e.nonFatalOrThrow())
-      })
+      cb(
+        try {
+          Either.Right(Tuple3(a, b, c))
+        } catch (e: Throwable) {
+          Either.Left(e.nonFatalOrThrow())
+        }
+      )
     }
 
     fun tryComplete(result: Option<Tuple3<Option<A>, Option<B>, Option<C>>>): Unit =
@@ -350,49 +360,71 @@ interface IOParMap {
         IO.effect { other.cancel() }.unsafeRunAsync { r1 ->
           IO.effect { other2.cancel() }.unsafeRunAsync { r2 ->
             conn.pop()
-            cb(Left(r1.fold({ e2 ->
-              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
-            }, {
-              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
-            })))
+            cb(
+              Left(
+                r1.fold(
+                  { e2 ->
+                    r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
+                  },
+                  {
+                    r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
+                  }
+                )
+              )
+            )
           }
         }
       } else Unit
 
     IORunLoop.startCancellable(IOForkedStart(fa, ctx), connA) { resultA ->
-      resultA.fold({ e ->
-        sendError(connB, connC, e)
-      }, { a ->
-        tryComplete(state.updateAndGet { current ->
-          current
-            .map { it.copy(a = a.some()) }
-            .handleError { Tuple3(a.some(), none(), none()) }
-        })
-      })
+      resultA.fold(
+        { e ->
+          sendError(connB, connC, e)
+        },
+        { a ->
+          tryComplete(
+            state.updateAndGet { current ->
+              current
+                .map { it.copy(a = a.some()) }
+                .handleError { Tuple3(a.some(), none(), none()) }
+            }
+          )
+        }
+      )
     }
 
     IORunLoop.startCancellable(IOForkedStart(fb, ctx), connB) { resultB ->
-      resultB.fold({ e ->
-        sendError(connA, connC, e)
-      }, { b ->
-        tryComplete(state.updateAndGet { current ->
-          current
-            .map { it.copy(b = b.some()) }
-            .handleError { Tuple3(none(), b.some(), none()) }
-        })
-      })
+      resultB.fold(
+        { e ->
+          sendError(connA, connC, e)
+        },
+        { b ->
+          tryComplete(
+            state.updateAndGet { current ->
+              current
+                .map { it.copy(b = b.some()) }
+                .handleError { Tuple3(none(), b.some(), none()) }
+            }
+          )
+        }
+      )
     }
 
     IORunLoop.startCancellable(IOForkedStart(fc, ctx), connC) { resultC ->
-      resultC.fold({ e ->
-        sendError(connA, connB, e)
-      }, { c ->
-        tryComplete(state.updateAndGet { current ->
-          current
-            .map { it.copy(c = c.some()) }
-            .handleError { Tuple3(none(), none(), c.some()) }
-        })
-      })
+      resultC.fold(
+        { e ->
+          sendError(connA, connB, e)
+        },
+        { c ->
+          tryComplete(
+            state.updateAndGet { current ->
+              current
+                .map { it.copy(c = c.some()) }
+                .handleError { Tuple3(none(), none(), c.some()) }
+            }
+          )
+        }
+      )
     }
   }
 
@@ -408,7 +440,8 @@ interface IOParMap {
     fd: IOOf<D>,
     f: (A, B, C, D) -> E
   ): IO<E> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, ::Tuple2),
       parMapN(ctx, fc, fd, ::Tuple2)
     ) { (a, b), (c, d) ->
@@ -431,7 +464,8 @@ interface IOParMap {
     fc: IOOf<C>,
     fd: IOOf<D>
   ): IO<Tuple4<A, B, C, D>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb),
       parTupledN(ctx, fc, fd)
     ) { (a, b), (c, d) ->
@@ -451,7 +485,8 @@ interface IOParMap {
     fe: IOOf<E>,
     f: (A, B, C, D, E) -> G
   ): IO<G> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, ::Tuple2)
     ) { (a, b, c), (d, e) ->
@@ -476,7 +511,8 @@ interface IOParMap {
     fd: IOOf<D>,
     fe: IOOf<E>
   ): IO<Tuple5<A, B, C, D, E>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe)
     ) { (abc, de) ->
@@ -499,7 +535,8 @@ interface IOParMap {
     fg: IOOf<G>,
     f: (A, B, C, D, E, G) -> H
   ): IO<H> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3)
     ) { (a, b, c), (d, e, g) ->
@@ -526,7 +563,8 @@ interface IOParMap {
     fe: IOOf<E>,
     fg: IOOf<G>
   ): IO<Tuple6<A, B, C, D, E, G>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg)
     ) { (abc, deg) ->
@@ -550,7 +588,8 @@ interface IOParMap {
     fh: IOOf<H>,
     f: (A, B, C, D, E, G, H) -> I
   ): IO<I> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, ::Tuple2),
       parMapN(ctx, fg, fh, ::Tuple2)
@@ -580,7 +619,8 @@ interface IOParMap {
     fg: IOOf<G>,
     fh: IOOf<H>
   ): IO<Tuple7<A, B, C, D, E, G, H>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe),
       parTupledN(ctx, fg, fh)
@@ -607,7 +647,8 @@ interface IOParMap {
     fi: IOOf<I>,
     f: (A, B, C, D, E, G, H, I) -> J
   ): IO<J> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3),
       parMapN(ctx, fh, fi, ::Tuple2)
@@ -639,7 +680,8 @@ interface IOParMap {
     fh: IOOf<H>,
     fi: IOOf<I>
   ): IO<Tuple8<A, B, C, D, E, G, H, I>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),
       parTupledN(ctx, fh, fi)
@@ -667,7 +709,8 @@ interface IOParMap {
     fj: IOOf<J>,
     f: (A, B, C, D, E, G, H, I, J) -> K
   ): IO<K> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parMapN(ctx, fa, fb, fc, ::Tuple3),
       parMapN(ctx, fd, fe, fg, ::Tuple3),
       parMapN(ctx, fh, fi, fj, ::Tuple3)
@@ -701,7 +744,8 @@ interface IOParMap {
     fi: IOOf<I>,
     fj: IOOf<J>
   ): IO<Tuple9<A, B, C, D, E, G, H, I, J>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),
       parTupledN(ctx, fh, fi, fj)

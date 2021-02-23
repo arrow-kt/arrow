@@ -104,27 +104,30 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
    */
   @Deprecated(DeprecateRxJava)
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
-    Flowable.create<B>({ emitter ->
-      val dispose =
-        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
-          .value()
-          .concatMap { a ->
-            if (emitter.isCancelled) {
-              release(a, ExitCase.Cancelled).value().subscribe({}, emitter::onError)
-              Flowable.never<B>()
-            } else {
-              Flowable.defer { use(a).value() }
-                .doOnError { t: Throwable ->
-                  Flowable.defer { release(a, ExitCase.Error(t.nonFatalOrThrow())).value() }.subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
-                }.doOnComplete {
-                  Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
-                }.doOnCancel {
-                  Flowable.defer { release(a, ExitCase.Cancelled).value() }.subscribe({}, {})
-                }
-            }
-          }.subscribe(emitter::onNext, {}, {})
-      emitter.setCancellable { dispose.dispose() }
-    }, mode).k()
+    Flowable.create<B>(
+      { emitter ->
+        val dispose =
+          handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
+            .value()
+            .concatMap { a ->
+              if (emitter.isCancelled) {
+                release(a, ExitCase.Cancelled).value().subscribe({}, emitter::onError)
+                Flowable.never<B>()
+              } else {
+                Flowable.defer { use(a).value() }
+                  .doOnError { t: Throwable ->
+                    Flowable.defer { release(a, ExitCase.Error(t.nonFatalOrThrow())).value() }.subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                  }.doOnComplete {
+                    Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
+                  }.doOnCancel {
+                    Flowable.defer { release(a, ExitCase.Cancelled).value() }.subscribe({}, {})
+                  }
+              }
+            }.subscribe(emitter::onNext, {}, {})
+        emitter.setCancellable { dispose.dispose() }
+      },
+      mode
+    ).k()
 
   @Deprecated(DeprecateRxJava)
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
@@ -227,31 +230,43 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
      */
     @Deprecated(DeprecateRxJava)
     fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create<A>({ emitter ->
-        fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            emitter.tryOnError(e)
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
-        }
-      }, mode).k()
+      Flowable.create<A>(
+        { emitter ->
+          fa { either: Either<Throwable, A> ->
+            either.fold(
+              { e ->
+                emitter.tryOnError(e)
+              },
+              { a ->
+                emitter.onNext(a)
+                emitter.onComplete()
+              }
+            )
+          }
+        },
+        mode
+      ).k()
 
     @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: FlowableKProcF<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create({ emitter: FlowableEmitter<A> ->
-        val dispose = fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            emitter.tryOnError(e)
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
-        }.fix().flowable.subscribe({}, emitter::onError)
+      Flowable.create(
+        { emitter: FlowableEmitter<A> ->
+          val dispose = fa { either: Either<Throwable, A> ->
+            either.fold(
+              { e ->
+                emitter.tryOnError(e)
+              },
+              { a ->
+                emitter.onNext(a)
+                emitter.onComplete()
+              }
+            )
+          }.fix().flowable.subscribe({}, emitter::onError)
 
-        emitter.setCancellable { dispose.dispose() }
-      }, mode).k()
+          emitter.setCancellable { dispose.dispose() }
+        },
+        mode
+      ).k()
 
     @Deprecated(DeprecateRxJava)
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
@@ -259,17 +274,23 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
 
     @Deprecated(DeprecateRxJava)
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create<A>({ emitter ->
-        val token = fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            emitter.tryOnError(e)
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
-        }
-        emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
-      }, mode).k()
+      Flowable.create<A>(
+        { emitter ->
+          val token = fa { either: Either<Throwable, A> ->
+            either.fold(
+              { e ->
+                emitter.tryOnError(e)
+              },
+              { a ->
+                emitter.onNext(a)
+                emitter.onComplete()
+              }
+            )
+          }
+          emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
+        },
+        mode
+      ).k()
 
     @Deprecated(DeprecateRxJava)
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
@@ -277,39 +298,54 @@ data class FlowableK<out A>(val flowable: Flowable<out A>) : FlowableKOf<A> {
 
     @Deprecated(DeprecateRxJava)
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create({ emitter: FlowableEmitter<A> ->
-        val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, { a ->
-            emitter.onNext(a)
-            emitter.onComplete()
-          })
-        }
+      Flowable.create(
+        { emitter: FlowableEmitter<A> ->
+          val cb = { either: Either<Throwable, A> ->
+            either.fold(
+              {
+                emitter.tryOnError(it).let { Unit }
+              },
+              { a ->
+                emitter.onNext(a)
+                emitter.onComplete()
+              }
+            )
+          }
 
-        val fa2 = try {
-          fa(cb)
-        } catch (t: Throwable) {
-          cb(Left(t.nonFatalOrThrow()))
-          just(just(Unit))
-        }
+          val fa2 = try {
+            fa(cb)
+          } catch (t: Throwable) {
+            cb(Left(t.nonFatalOrThrow()))
+            just(just(Unit))
+          }
 
-        val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForFlowableK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
-          }, {})
-        }, { e -> emitter.tryOnError(e) })
+          val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForFlowableK>>?>(null)
+          val disp = fa2.value().subscribe(
+            { token ->
+              val cancel = cancelOrToken.getAndSet(Right(token))
+              cancel?.fold(
+                {
+                  token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+                },
+                {}
+              )
+            },
+            { e -> emitter.tryOnError(e) }
+          )
 
-        emitter.setCancellable {
-          disp.dispose()
-          val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
-          })
-        }
-      }, mode).k()
+          emitter.setCancellable {
+            disp.dispose()
+            val token = cancelOrToken.getAndSet(Left(Unit))
+            token?.fold(
+              {},
+              {
+                it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+              }
+            )
+          }
+        },
+        mode
+      ).k()
 
     @Deprecated(DeprecateRxJava)
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {

@@ -40,9 +40,11 @@ internal class ShiftTick(
   private val cb: (Either<Throwable, Unit>) -> Unit
 ) : Runnable {
   override fun run() {
-    suspend { Unit }.startCoroutine(Continuation(ctx) {
-      it.fold({ unit -> cb(Right(unit)) }, { e -> cb(Left(e)) })
-    })
+    suspend { Unit }.startCoroutine(
+      Continuation(ctx) {
+        it.fold({ unit -> cb(Right(unit)) }, { e -> cb(Left(e)) })
+      }
+    )
   }
 }
 

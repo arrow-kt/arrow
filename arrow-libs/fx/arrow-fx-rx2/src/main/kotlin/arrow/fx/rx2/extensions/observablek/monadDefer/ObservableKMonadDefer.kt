@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadDefer_singleton: ObservableKMonadDefer = object :
-    arrow.fx.rx2.extensions.ObservableKMonadDefer {}
+  arrow.fx.rx2.extensions.ObservableKMonadDefer {}
 
 @JvmName("defer")
 @Suppress(
@@ -32,8 +32,8 @@ internal val monadDefer_singleton: ObservableKMonadDefer = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: Function0<Kind<ForObservableK, A>>): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .defer<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  .monadDefer()
+  .defer<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("later")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> defer(arg0: Function0<Kind<ForObservableK, A>>): ObservableK<A> = arrow.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Function0<A>): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("later")
 @Suppress(
@@ -56,8 +56,8 @@ fun <A> later(arg0: Function0<A>): ObservableK<A> = arrow.fx.rx2.ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Kind<ForObservableK, A>): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("lazy")
 @Suppress(
@@ -68,8 +68,8 @@ fun <A> later(arg0: Kind<ForObservableK, A>): ObservableK<A> = arrow.fx.rx2.Obse
 )
 @Deprecated(DeprecateRxJava)
 fun lazy(): ObservableK<Unit> = arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .lazy() as arrow.fx.rx2.ObservableK<kotlin.Unit>
+  .monadDefer()
+  .lazy() as arrow.fx.rx2.ObservableK<kotlin.Unit>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -80,9 +80,9 @@ fun lazy(): ObservableK<Unit> = arrow.fx.rx2.ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .laterOrRaise<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  arrow.fx.rx2.ObservableK
+    .monadDefer()
+    .laterOrRaise<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -93,8 +93,8 @@ fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Ref(arg0: A): ObservableK<Ref<ForObservableK, A>> = arrow.fx.rx2.ObservableK
-   .monadDefer()
-   .Ref<A>(arg0) as arrow.fx.rx2.ObservableK<arrow.fx.Ref<arrow.fx.rx2.ForObservableK, A>>
+  .monadDefer()
+  .Ref<A>(arg0) as arrow.fx.rx2.ObservableK<arrow.fx.Ref<arrow.fx.rx2.ForObservableK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

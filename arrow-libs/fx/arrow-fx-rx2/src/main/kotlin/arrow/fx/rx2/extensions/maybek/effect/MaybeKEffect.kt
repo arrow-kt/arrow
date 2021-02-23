@@ -30,9 +30,9 @@ internal val effect_singleton: MaybeKEffect = object : arrow.fx.rx2.extensions.M
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.runAsync(arg1: Function1<Either<Throwable, A>, Kind<ForMaybeK, Unit>>):
-    MaybeK<Unit> = arrow.fx.rx2.MaybeK.effect().run {
-  this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.MaybeK<kotlin.Unit>
-}
+  MaybeK<Unit> = arrow.fx.rx2.MaybeK.effect().run {
+    this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.MaybeK<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

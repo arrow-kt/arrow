@@ -301,18 +301,21 @@ interface Concurrent<F> : Async<F> {
         }
       }
 
-      k(cb1).bracketCase(use = {
-        async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) {
-            cb(rightUnit)
+      k(cb1).bracketCase(
+        use = {
+          async<Unit> { cb ->
+            if (!state.compareAndSet(null, cb)) {
+              cb(rightUnit)
+            }
+          }
+        },
+        release = { token, exitCase ->
+          when (exitCase) {
+            is ExitCase.Cancelled -> token
+            else -> just(Unit)
           }
         }
-      }, release = { token, exitCase ->
-        when (exitCase) {
-          is ExitCase.Cancelled -> token
-          else -> just(Unit)
-        }
-      })
+      )
     }
 
   @Deprecated("Renaming this api for consistency", ReplaceWith("cancellable(k)"))
@@ -620,7 +623,8 @@ interface Concurrent<F> : Async<F> {
     fd: Kind<F, D>,
     fe: Kind<F, E>
   ): Kind<F, Tuple5<A, B, C, D, E>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe)
     ) { (abc, de) ->
@@ -667,7 +671,8 @@ interface Concurrent<F> : Async<F> {
     fe: Kind<F, E>,
     fg: Kind<F, G>
   ): Kind<F, Tuple6<A, B, C, D, E, G>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg)
     ) { (abc, deg) ->
@@ -717,7 +722,8 @@ interface Concurrent<F> : Async<F> {
     fg: Kind<F, G>,
     fh: Kind<F, H>
   ): Kind<F, Tuple7<A, B, C, D, E, G, H>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe),
       parTupledN(ctx, fg, fh)
@@ -772,7 +778,8 @@ interface Concurrent<F> : Async<F> {
     fh: Kind<F, H>,
     fi: Kind<F, I>
   ): Kind<F, Tuple8<A, B, C, D, E, G, H, I>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),
       parTupledN(ctx, fh, fi)
@@ -830,7 +837,8 @@ interface Concurrent<F> : Async<F> {
     fi: Kind<F, I>,
     fj: Kind<F, J>
   ): Kind<F, Tuple9<A, B, C, D, E, G, H, I, J>> =
-    parMapN(ctx,
+    parMapN(
+      ctx,
       parTupledN(ctx, fa, fb, fc),
       parTupledN(ctx, fd, fe, fg),
       parTupledN(ctx, fh, fi, fj)
@@ -900,11 +908,14 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>
   ): Kind<F, Race2<A, B>> =
     racePair(fa, fb).flatMap {
-      it.fold({ a, (_, cancelB) ->
-        cancelB.map { Left(a) }
-      }, { (_, cancelA), b ->
-        cancelA.map { Right(b) }
-      })
+      it.fold(
+        { a, (_, cancelB) ->
+          cancelB.map { Left(a) }
+        },
+        { (_, cancelA), b ->
+          cancelA.map { Right(b) }
+        }
+      )
     }
 
   /**
@@ -956,11 +967,14 @@ interface Concurrent<F> : Async<F> {
       raceN(a, b, c),
       raceN(d, e)
     ).map { res ->
-      res.fold({
-        it.fold({ a -> Race5.First(a) }, { b -> Race5.Second(b) }, { c -> Race5.Third(c) })
-      }, {
-        it.fold({ d -> Race5.Fourth(d) }, { e -> Race5.Fifth(e) })
-      })
+      res.fold(
+        {
+          it.fold({ a -> Race5.First(a) }, { b -> Race5.Second(b) }, { c -> Race5.Third(c) })
+        },
+        {
+          it.fold({ d -> Race5.Fourth(d) }, { e -> Race5.Fifth(e) })
+        }
+      )
     }
 
   /**
@@ -978,11 +992,14 @@ interface Concurrent<F> : Async<F> {
       raceN(a, b, c),
       raceN(d, e, g)
     ).map { res ->
-      res.fold({
-        it.fold({ a -> Race6.First(a) }, { b -> Race6.Second(b) }, { c -> Race6.Third(c) })
-      }, {
-        it.fold({ d -> Race6.Fourth(d) }, { e -> Race6.Fifth(e) }, { g -> Race6.Sixth(g) })
-      })
+      res.fold(
+        {
+          it.fold({ a -> Race6.First(a) }, { b -> Race6.Second(b) }, { c -> Race6.Third(c) })
+        },
+        {
+          it.fold({ d -> Race6.Fourth(d) }, { e -> Race6.Fifth(e) }, { g -> Race6.Sixth(g) })
+        }
+      )
     }
 
   /**
@@ -1002,13 +1019,17 @@ interface Concurrent<F> : Async<F> {
       raceN(d, e),
       raceN(g, h)
     ).map { res ->
-      res.fold({
-        it.fold({ a -> Race7.First(a) }, { b -> Race7.Second(b) }, { c -> Race7.Third(c) })
-      }, {
-        it.fold({ d -> Race7.Fourth(d) }, { e -> Race7.Fifth(e) })
-      }, {
-        it.fold({ g -> Race7.Sixth(g) }, { h -> Race7.Seventh(h) })
-      })
+      res.fold(
+        {
+          it.fold({ a -> Race7.First(a) }, { b -> Race7.Second(b) }, { c -> Race7.Third(c) })
+        },
+        {
+          it.fold({ d -> Race7.Fourth(d) }, { e -> Race7.Fifth(e) })
+        },
+        {
+          it.fold({ g -> Race7.Sixth(g) }, { h -> Race7.Seventh(h) })
+        }
+      )
     }
 
   /**
@@ -1030,15 +1051,20 @@ interface Concurrent<F> : Async<F> {
       raceN(e, g),
       raceN(h, i)
     ).map { res ->
-      res.fold({
-        it.fold({ a -> Race8.First(a) }, { b -> Race8.Second(b) })
-      }, {
-        it.fold({ c -> Race8.Third(c) }, { d -> Race8.Fourth(d) })
-      }, {
-        it.fold({ e -> Race8.Fifth(e) }, { g -> Race8.Sixth(g) })
-      }, {
-        it.fold({ h -> Race8.Seventh(h) }, { i -> Race8.Eighth(i) })
-      })
+      res.fold(
+        {
+          it.fold({ a -> Race8.First(a) }, { b -> Race8.Second(b) })
+        },
+        {
+          it.fold({ c -> Race8.Third(c) }, { d -> Race8.Fourth(d) })
+        },
+        {
+          it.fold({ e -> Race8.Fifth(e) }, { g -> Race8.Sixth(g) })
+        },
+        {
+          it.fold({ h -> Race8.Seventh(h) }, { i -> Race8.Eighth(i) })
+        }
+      )
     }
 
   /**
@@ -1061,15 +1087,20 @@ interface Concurrent<F> : Async<F> {
       raceN(g, h),
       raceN(i, j)
     ).map { res ->
-      res.fold({
-        it.fold({ a -> Race9.First(a) }, { b -> Race9.Second(b) }, { c -> Race9.Third(c) })
-      }, {
-        it.fold({ d -> Race9.Fourth(d) }, { e -> Race9.Fifth(e) })
-      }, {
-        it.fold({ g -> Race9.Sixth(g) }, { h -> Race9.Seventh(h) })
-      }, {
-        it.fold({ i -> Race9.Eighth(i) }, { j -> Race9.Ninth(j) })
-      })
+      res.fold(
+        {
+          it.fold({ a -> Race9.First(a) }, { b -> Race9.Second(b) }, { c -> Race9.Third(c) })
+        },
+        {
+          it.fold({ d -> Race9.Fourth(d) }, { e -> Race9.Fifth(e) })
+        },
+        {
+          it.fold({ g -> Race9.Sixth(g) }, { h -> Race9.Seventh(h) })
+        },
+        {
+          it.fold({ i -> Race9.Eighth(i) }, { j -> Race9.Ninth(j) })
+        }
+      )
     }
 
   /**

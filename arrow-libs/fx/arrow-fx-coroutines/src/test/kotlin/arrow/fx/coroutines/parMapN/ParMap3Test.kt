@@ -28,161 +28,166 @@ import io.kotest.property.arbitrary.string
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
-class ParMap3Test : ArrowFxSpec(spec = {
-  "parMapN 3 returns to original context" {
-    val mapCtxName = "parMap3"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+class ParMap3Test : ArrowFxSpec(
+  spec = {
+    "parMapN 3 returns to original context" {
+      val mapCtxName = "parMap3"
+      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
-    checkAll {
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
-        withContext(_single) {
-          threadName() shouldBe singleThreadName
+      checkAll {
+        single.zip(mapCtx).use { (_single, _mapCtx) ->
+          withContext(_single) {
+            threadName() shouldBe singleThreadName
 
-          val (s1, s2, s3) = parMapN(_mapCtx, threadName, threadName, threadName) { a, b, c -> Triple(a, b, c) }
+            val (s1, s2, s3) = parMapN(_mapCtx, threadName, threadName, threadName) { a, b, c -> Triple(a, b, c) }
 
-          s1 shouldBe mapCtxName
-          s2 shouldBe mapCtxName
-          s3 shouldBe mapCtxName
-          threadName() shouldBe singleThreadName
+            s1 shouldBe mapCtxName
+            s2 shouldBe mapCtxName
+            s3 shouldBe mapCtxName
+            threadName() shouldBe singleThreadName
+          }
         }
       }
     }
-  }
 
-  "parMapN 3 returns to original context on failure" {
-    val mapCtxName = "parMap3"
-    val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
+    "parMapN 3 returns to original context on failure" {
+      val mapCtxName = "parMap3"
+      val mapCtx = Resource.fromExecutor { Executors.newFixedThreadPool(3, NamedThreadFactory { mapCtxName }) }
 
-    checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
-      single.zip(mapCtx).use { (_single, _mapCtx) ->
-        withContext(_single) {
-          threadName() shouldBe singleThreadName
+      checkAll(Arb.int(1..3), Arb.throwable()) { choose, e ->
+        single.zip(mapCtx).use { (_single, _mapCtx) ->
+          withContext(_single) {
+            threadName() shouldBe singleThreadName
 
-          Either.catch {
-            when (choose) {
-              1 -> parMapN(
-                _mapCtx,
-                suspend { e.suspend() },
-                suspend { never<Nothing>() },
-                suspend { never<Nothing>() }) { _, _, _ -> Unit }
-              2 -> parMapN(
-                _mapCtx,
-                suspend { never<Nothing>() },
-                suspend { e.suspend() },
-                suspend { never<Nothing>() }) { _, _, _ -> Unit }
-              else -> parMapN(
-                _mapCtx,
-                suspend { never<Nothing>() },
-                suspend { never<Nothing>() },
-                suspend { e.suspend() }) { _, _, _ -> Unit }
-            }
-          } should leftException(e)
+            Either.catch {
+              when (choose) {
+                1 -> parMapN(
+                  _mapCtx,
+                  suspend { e.suspend() },
+                  suspend { never<Nothing>() },
+                  suspend { never<Nothing>() }
+                ) { _, _, _ -> Unit }
+                2 -> parMapN(
+                  _mapCtx,
+                  suspend { never<Nothing>() },
+                  suspend { e.suspend() },
+                  suspend { never<Nothing>() }
+                ) { _, _, _ -> Unit }
+                else -> parMapN(
+                  _mapCtx,
+                  suspend { never<Nothing>() },
+                  suspend { never<Nothing>() },
+                  suspend { e.suspend() }
+                ) { _, _, _ -> Unit }
+              }
+            } should leftException(e)
 
-          threadName() shouldBe singleThreadName
+            threadName() shouldBe singleThreadName
+          }
         }
       }
     }
-  }
 
-  "parMapN 3 runs in parallel" {
-    checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
-      val r = Atomic("")
-      val modifyGate1 = Promise<Unit>()
-      val modifyGate2 = Promise<Unit>()
+    "parMapN 3 runs in parallel" {
+      checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
+        val r = Atomic("")
+        val modifyGate1 = Promise<Unit>()
+        val modifyGate2 = Promise<Unit>()
 
-      parMapN(
-        {
-          modifyGate2.get()
-          r.update { i -> "$i$a" }
-        },
-        {
-          modifyGate1.get()
-          r.update { i -> "$i$b" }
-          modifyGate2.complete(Unit)
-        },
-        {
-          r.set("$c")
-          modifyGate1.complete(Unit)
+        parMapN(
+          {
+            modifyGate2.get()
+            r.update { i -> "$i$a" }
+          },
+          {
+            modifyGate1.get()
+            r.update { i -> "$i$b" }
+            modifyGate2.complete(Unit)
+          },
+          {
+            r.set("$c")
+            modifyGate1.complete(Unit)
+          }
+        ) { _a, _b, _c ->
+          Triple(_a, _b, _c)
         }
-      ) { _a, _b, _c ->
-        Triple(_a, _b, _c)
-      }
 
-      r.get() shouldBe "$c$b$a"
-    }
-  }
-
-  "parMapN 3 finishes on single thread" {
-    checkAll(Arb.string()) {
-      single.use { ctx ->
-        parMapN(ctx, threadName, threadName, threadName) { a, b, c -> Triple(a, b, c) }
-      } shouldBe Triple("single", "single", "single")
-    }
-  }
-
-  "Cancelling parMapN 3 cancels all participants" {
-    checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
-      val s = Semaphore(0L)
-      val pa = Promise<Pair<Int, ExitCase>>()
-      val pb = Promise<Pair<Int, ExitCase>>()
-      val pc = Promise<Pair<Int, ExitCase>>()
-
-      val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-      val loserB = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
-      val loserC = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
-
-      val f = ForkAndForget { parMapN(loserA, loserB, loserC) { _a, _b, _c -> Triple(_a, _b, _c) } }
-
-      s.acquireN(3) // Suspend until all racers started
-      f.cancel()
-
-      pa.get().let { (res, exit) ->
-        res shouldBe a
-        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-      }
-      pb.get().let { (res, exit) ->
-        res shouldBe b
-        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-      }
-      pc.get().let { (res, exit) ->
-        res shouldBe c
-        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+        r.get() shouldBe "$c$b$a"
       }
     }
-  }
 
-  "parMapN 3 cancels losers if a failure occurs in one of the tasks" {
-    checkAll(
-      Arb.throwable(),
-      Arb.element(listOf(1, 2, 3)),
-      Arb.int(),
-      Arb.int()
-    ) { e, winningTask, a, b ->
-      val s = Semaphore(0L)
-      val pa = Promise<Pair<Int, ExitCase>>()
-      val pb = Promise<Pair<Int, ExitCase>>()
+    "parMapN 3 finishes on single thread" {
+      checkAll(Arb.string()) {
+        single.use { ctx ->
+          parMapN(ctx, threadName, threadName, threadName) { a, b, c -> Triple(a, b, c) }
+        } shouldBe Triple("single", "single", "single")
+      }
+    }
 
-      val winner = suspend { s.acquireN(2); throw e }
-      val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
-      val loserB = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+    "Cancelling parMapN 3 cancels all participants" {
+      checkAll(Arb.int(), Arb.int(), Arb.int()) { a, b, c ->
+        val s = Semaphore(0L)
+        val pa = Promise<Pair<Int, ExitCase>>()
+        val pb = Promise<Pair<Int, ExitCase>>()
+        val pc = Promise<Pair<Int, ExitCase>>()
 
-      val r = Either.catch {
-        when (winningTask) {
-          1 -> parMapN(winner, loserA, loserB) { _, _, _ -> Unit }
-          2 -> parMapN(loserA, winner, loserB) { _, _, _ -> Unit }
-          else -> parMapN(loserA, loserB, winner) { _, _, _ -> Unit }
+        val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+        val loserC = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pc.complete(Pair(c, ex)) } }
+
+        val f = ForkAndForget { parMapN(loserA, loserB, loserC) { _a, _b, _c -> Triple(_a, _b, _c) } }
+
+        s.acquireN(3) // Suspend until all racers started
+        f.cancel()
+
+        pa.get().let { (res, exit) ->
+          res shouldBe a
+          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+        }
+        pb.get().let { (res, exit) ->
+          res shouldBe b
+          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+        }
+        pc.get().let { (res, exit) ->
+          res shouldBe c
+          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
         }
       }
+    }
 
-      pa.get().let { (res, exit) ->
-        res shouldBe a
-        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+    "parMapN 3 cancels losers if a failure occurs in one of the tasks" {
+      checkAll(
+        Arb.throwable(),
+        Arb.element(listOf(1, 2, 3)),
+        Arb.int(),
+        Arb.int()
+      ) { e, winningTask, a, b ->
+        val s = Semaphore(0L)
+        val pa = Promise<Pair<Int, ExitCase>>()
+        val pb = Promise<Pair<Int, ExitCase>>()
+
+        val winner = suspend { s.acquireN(2); throw e }
+        val loserA = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pa.complete(Pair(a, ex)) } }
+        val loserB = suspend { guaranteeCase({ s.release(); never<Int>() }) { ex -> pb.complete(Pair(b, ex)) } }
+
+        val r = Either.catch {
+          when (winningTask) {
+            1 -> parMapN(winner, loserA, loserB) { _, _, _ -> Unit }
+            2 -> parMapN(loserA, winner, loserB) { _, _, _ -> Unit }
+            else -> parMapN(loserA, loserB, winner) { _, _, _ -> Unit }
+          }
+        }
+
+        pa.get().let { (res, exit) ->
+          res shouldBe a
+          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+        }
+        pb.get().let { (res, exit) ->
+          res shouldBe b
+          exit.shouldBeInstanceOf<ExitCase.Cancelled>()
+        }
+        r should leftException(e)
       }
-      pb.get().let { (res, exit) ->
-        res shouldBe b
-        exit.shouldBeInstanceOf<ExitCase.Cancelled>()
-      }
-      r should leftException(e)
     }
   }
-})
+)

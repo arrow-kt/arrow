@@ -30,9 +30,9 @@ internal val effect_singleton: SingleKEffect = object : arrow.fx.rx2.extensions.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.runAsync(arg1: Function1<Either<Throwable, A>, Kind<ForSingleK, Unit>>):
-    SingleK<Unit> = arrow.fx.rx2.SingleK.effect().run {
-  this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.SingleK<kotlin.Unit>
-}
+  SingleK<Unit> = arrow.fx.rx2.SingleK.effect().run {
+    this@runAsync.runAsync<A>(arg1) as arrow.fx.rx2.SingleK<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

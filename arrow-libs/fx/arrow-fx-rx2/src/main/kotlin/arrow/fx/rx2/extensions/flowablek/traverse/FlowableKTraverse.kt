@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val traverse_singleton: FlowableKTraverse = object :
-    arrow.fx.rx2.extensions.FlowableKTraverse {}
+  arrow.fx.rx2.extensions.FlowableKTraverse {}
 
 @JvmName("traverse")
 @Suppress(
@@ -30,10 +30,10 @@ internal val traverse_singleton: FlowableKTraverse = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <G, A, B> Kind<ForFlowableK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Kind<ForFlowableK, B>> = arrow.fx.rx2.FlowableK.traverse().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.fx.rx2.ForFlowableK,
-    B>>
-}
+  Kind<G, Kind<ForFlowableK, B>> = arrow.fx.rx2.FlowableK.traverse().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.fx.rx2.ForFlowableK,
+        B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -57,9 +57,9 @@ fun <G, A> Kind<ForFlowableK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.map(arg1: Function1<A, B>): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

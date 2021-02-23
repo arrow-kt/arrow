@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: MaybeKApplicative = object :
-    arrow.fx.rx2.extensions.MaybeKApplicative {}
+  arrow.fx.rx2.extensions.MaybeKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): MaybeK<A> = arrow.fx.rx2.MaybeK.applicative().run {
 )
 @Deprecated(DeprecateRxJava)
 fun unit(): MaybeK<Unit> = arrow.fx.rx2.MaybeK
-   .applicative()
-   .unit() as arrow.fx.rx2.MaybeK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.rx2.MaybeK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): MaybeK<Unit> = arrow.fx.rx2.MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.map(arg1: Function1<A, B>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForMaybeK, A>.map(arg1: Function1<A, B>): MaybeK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.replicate(arg1: Int): MaybeK<List<A>> =
-    arrow.fx.rx2.MaybeK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.rx2.MaybeK<kotlin.collections.List<A>>
-}
+  arrow.fx.rx2.MaybeK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.rx2.MaybeK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForMaybeK, A>.replicate(arg1: Int): MaybeK<List<A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.replicate(arg1: Int, arg2: Monoid<A>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

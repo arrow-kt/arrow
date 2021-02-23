@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadDefer_singleton: SingleKMonadDefer = object :
-    arrow.fx.rx2.extensions.SingleKMonadDefer {}
+  arrow.fx.rx2.extensions.SingleKMonadDefer {}
 
 @JvmName("defer")
 @Suppress(
@@ -32,8 +32,8 @@ internal val monadDefer_singleton: SingleKMonadDefer = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: Function0<Kind<ForSingleK, A>>): SingleK<A> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .defer<A>(arg0) as arrow.fx.rx2.SingleK<A>
+  .monadDefer()
+  .defer<A>(arg0) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("later")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> defer(arg0: Function0<Kind<ForSingleK, A>>): SingleK<A> = arrow.fx.rx2.S
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Function0<A>): SingleK<A> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.SingleK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("later")
 @Suppress(
@@ -56,8 +56,8 @@ fun <A> later(arg0: Function0<A>): SingleK<A> = arrow.fx.rx2.SingleK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: Kind<ForSingleK, A>): SingleK<A> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.rx2.SingleK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("lazy")
 @Suppress(
@@ -68,8 +68,8 @@ fun <A> later(arg0: Kind<ForSingleK, A>): SingleK<A> = arrow.fx.rx2.SingleK
 )
 @Deprecated(DeprecateRxJava)
 fun lazy(): SingleK<Unit> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .lazy() as arrow.fx.rx2.SingleK<kotlin.Unit>
+  .monadDefer()
+  .lazy() as arrow.fx.rx2.SingleK<kotlin.Unit>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -80,8 +80,8 @@ fun lazy(): SingleK<Unit> = arrow.fx.rx2.SingleK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): SingleK<A> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .laterOrRaise<A>(arg0) as arrow.fx.rx2.SingleK<A>
+  .monadDefer()
+  .laterOrRaise<A>(arg0) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -92,8 +92,8 @@ fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): SingleK<A> = arrow.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Ref(arg0: A): SingleK<Ref<ForSingleK, A>> = arrow.fx.rx2.SingleK
-   .monadDefer()
-   .Ref<A>(arg0) as arrow.fx.rx2.SingleK<arrow.fx.Ref<arrow.fx.rx2.ForSingleK, A>>
+  .monadDefer()
+  .Ref<A>(arg0) as arrow.fx.rx2.SingleK<arrow.fx.Ref<arrow.fx.rx2.ForSingleK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

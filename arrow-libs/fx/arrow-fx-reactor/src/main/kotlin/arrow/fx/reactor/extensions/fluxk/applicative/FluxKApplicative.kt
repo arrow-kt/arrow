@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: FluxKApplicative = object :
-    arrow.fx.reactor.extensions.FluxKApplicative {}
+  arrow.fx.reactor.extensions.FluxKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): FluxK<A> = arrow.fx.reactor.FluxK.applicative().run {
 )
 @Deprecated(DeprecateReactor)
 fun unit(): FluxK<Unit> = arrow.fx.reactor.FluxK
-   .applicative()
-   .unit() as arrow.fx.reactor.FluxK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.reactor.FluxK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): FluxK<Unit> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.map(arg1: Function1<A, B>): FluxK<B> =
-    arrow.fx.reactor.FluxK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForFluxK, A>.map(arg1: Function1<A, B>): FluxK<B> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.replicate(arg1: Int): FluxK<List<A>> =
-    arrow.fx.reactor.FluxK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.reactor.FluxK<kotlin.collections.List<A>>
-}
+  arrow.fx.reactor.FluxK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.reactor.FluxK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForFluxK, A>.replicate(arg1: Int): FluxK<List<A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.replicate(arg1: Int, arg2: Monoid<A>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.reactor.FluxK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

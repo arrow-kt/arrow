@@ -81,13 +81,13 @@ internal interface PubSub<I, O, Selector> : Publish<I>, Subscribe<O, Selector> {
 
   data class Publisher<A>(val token: Token, val i: A, val signal: UnsafePromise<Unit>) {
     fun complete(): Unit {
-        signal.complete(Result.success(Unit))
+      signal.complete(Result.success(Unit))
     }
   }
 
   data class Subscriber<A, Selector>(val token: Token, val selector: Selector, val signal: UnsafePromise<A>) {
     fun complete(a: A): Unit {
-        signal.complete(Result.success(a))
+      signal.complete(Result.success(a))
     }
   }
 

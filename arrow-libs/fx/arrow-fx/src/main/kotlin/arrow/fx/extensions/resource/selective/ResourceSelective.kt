@@ -28,9 +28,9 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, Either<A, B>>.select(
   BR: Bracket<F, E>,
   arg1: Kind<Kind<Kind<ForResource, F>, E>, Function1<A, B>>
 ): Resource<F, E, B> =
-    arrow.fx.Resource.selective<F, E>(BR).run {
-  this@select.select<A, B>(arg1) as arrow.fx.Resource<F, E, B>
-}
+  arrow.fx.Resource.selective<F, E>(BR).run {
+    this@select.select<A, B>(arg1) as arrow.fx.Resource<F, E, B>
+  }
 
 @JvmName("branch")
 @Suppress(
@@ -60,9 +60,9 @@ fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, Boolean>.whenS(
   BR: Bracket<F, E>,
   arg1: Kind<Kind<Kind<ForResource, F>, E>, Function0<Unit>>
 ): Resource<F, E, Unit> =
-    arrow.fx.Resource.selective<F, E>(BR).run {
-  this@whenS.whenS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Unit>
-}
+  arrow.fx.Resource.selective<F, E>(BR).run {
+    this@whenS.whenS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Unit>
+  }
 
 @JvmName("ifS")
 @Suppress(
@@ -92,9 +92,9 @@ fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, Boolean>.orS(
   BR: Bracket<F, E>,
   arg1: Kind<Kind<Kind<ForResource, F>, E>, Boolean>
 ): Resource<F, E, Boolean> =
-    arrow.fx.Resource.selective<F, E>(BR).run {
-  this@orS.orS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Boolean>
-}
+  arrow.fx.Resource.selective<F, E>(BR).run {
+    this@orS.orS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Boolean>
+  }
 
 @JvmName("andS")
 @Suppress(
@@ -108,9 +108,9 @@ fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, Boolean>.andS(
   BR: Bracket<F, E>,
   arg1: Kind<Kind<Kind<ForResource, F>, E>, Boolean>
 ): Resource<F, E, Boolean> =
-    arrow.fx.Resource.selective<F, E>(BR).run {
-  this@andS.andS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Boolean>
-}
+  arrow.fx.Resource.selective<F, E>(BR).run {
+    this@andS.andS<A>(arg1) as arrow.fx.Resource<F, E, kotlin.Boolean>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -118,5 +118,7 @@ fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, Boolean>.andS(
 )
 @Deprecated(IODeprecation)
 inline fun <F, E> Companion.selective(BR: Bracket<F, E>): ResourceSelective<F, E> = object :
-    arrow.fx.extensions.ResourceSelective<F, E> { override fun BR(): arrow.fx.typeclasses.Bracket<F,
-    E> = BR }
+  arrow.fx.extensions.ResourceSelective<F, E> {
+  override fun BR(): arrow.fx.typeclasses.Bracket<F,
+    E> = BR
+}

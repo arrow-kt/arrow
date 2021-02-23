@@ -65,9 +65,9 @@ internal val async_singleton: FluxKAsync = object : arrow.fx.reactor.extensions.
 )
 @Deprecated(DeprecateReactor)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForFluxK, Unit>>):
-    FluxK<A> = arrow.fx.reactor.FluxK
-   .async()
-   .asyncF<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  FluxK<A> = arrow.fx.reactor.FluxK
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -104,9 +104,9 @@ fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForFl
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.continueOn(arg1: CoroutineContext): FluxK<A> =
-    arrow.fx.reactor.FluxK.async().run {
-  this@continueOn.continueOn<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.async().run {
+    this@continueOn.continueOn<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -141,8 +141,8 @@ fun <A> Kind<ForFluxK, A>.continueOn(arg1: CoroutineContext): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): FluxK<A> = arrow.fx.reactor.FluxK
-   .async()
-   .later<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  .async()
+  .later<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -179,8 +179,8 @@ fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): FluxK<A> = arrow.fx.r
 )
 @Deprecated(DeprecateReactor)
 fun <A> effect(arg0: suspend () -> A): FluxK<A> = arrow.fx.reactor.FluxK
-   .async()
-   .effect<A>(arg0) as arrow.fx.reactor.FluxK<A>
+  .async()
+  .effect<A>(arg0) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -217,8 +217,8 @@ fun <A> effect(arg0: suspend () -> A): FluxK<A> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): FluxK<A> = arrow.fx.reactor.FluxK
-   .async()
-   .effect<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  .async()
+  .effect<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -253,9 +253,9 @@ fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): FluxK<A> = arrow.
 )
 @Deprecated(DeprecateReactor)
 fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForFluxK, A>>): FluxK<A> =
-    arrow.fx.reactor.FluxK
-   .async()
-   .defer<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  arrow.fx.reactor.FluxK
+    .async()
+    .defer<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -271,9 +271,9 @@ fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForFluxK, A>>): FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A> laterOrRaise(arg0: CoroutineContext, arg1: Function0<Either<Throwable, A>>): FluxK<A> =
-    arrow.fx.reactor.FluxK
-   .async()
-   .laterOrRaise<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  arrow.fx.reactor.FluxK
+    .async()
+    .laterOrRaise<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -341,8 +341,8 @@ fun CoroutineContext.shift(): FluxK<Unit> = arrow.fx.reactor.FluxK.async().run {
 )
 @Deprecated(DeprecateReactor)
 fun <A> never(): FluxK<A> = arrow.fx.reactor.FluxK
-   .async()
-   .never<A>() as arrow.fx.reactor.FluxK<A>
+  .async()
+  .never<A>() as arrow.fx.reactor.FluxK<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect
@@ -377,9 +377,9 @@ fun <A> never(): FluxK<A> = arrow.fx.reactor.FluxK
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.effectMap(arg1: suspend (A) -> B): FluxK<B> =
-    arrow.fx.reactor.FluxK.async().run {
-  this@effectMap.effectMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.async().run {
+    this@effectMap.effectMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 /**
  *  [Async] models how a data type runs an asynchronous computation that may fail.

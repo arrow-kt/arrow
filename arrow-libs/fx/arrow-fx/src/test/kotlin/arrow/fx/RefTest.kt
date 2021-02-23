@@ -102,11 +102,11 @@ class RefTest : ArrowFxSpec() {
       "tryUpdate - should fail to update if modification has occurred" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
           RF.just(a).flatMap { ref ->
-              ref.tryUpdate {
-                ref.update(Int::inc).unsafeRunSync()
-                f(it)
-              }
+            ref.tryUpdate {
+              ref.update(Int::inc).unsafeRunSync()
+              f(it)
             }
+          }
             .map { it shouldBe false }
             .test()
         }

@@ -84,8 +84,9 @@ sealed class SuspendConnection : AbstractCoroutineContextElement(SuspendConnecti
 
     override tailrec fun push(token: suspend () -> Unit): Unit = when (val list = state.value) {
       // If connection is already cancelled cancel token immediately.
-      null -> token
-        .startCoroutine(Continuation(EmptyCoroutineContext) { })
+      null ->
+        token
+          .startCoroutine(Continuation(EmptyCoroutineContext) { })
       else ->
         if (state.compareAndSet(list, listOf(token) + list)) Unit
         else push(token)

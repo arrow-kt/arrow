@@ -14,7 +14,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val dispatchers_singleton: MaybeKDispatchers = object :
-    arrow.fx.rx2.extensions.MaybeKDispatchers {}
+  arrow.fx.rx2.extensions.MaybeKDispatchers {}
 
 @JvmName("default")
 @Suppress(
@@ -25,8 +25,8 @@ internal val dispatchers_singleton: MaybeKDispatchers = object :
 )
 @Deprecated(DeprecateRxJava)
 fun default(): CoroutineContext = arrow.fx.rx2.MaybeK
-   .dispatchers()
-   .default() as kotlin.coroutines.CoroutineContext
+  .dispatchers()
+  .default() as kotlin.coroutines.CoroutineContext
 
 @JvmName("io")
 @Suppress(
@@ -37,8 +37,8 @@ fun default(): CoroutineContext = arrow.fx.rx2.MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun io(): CoroutineContext = arrow.fx.rx2.MaybeK
-   .dispatchers()
-   .io() as kotlin.coroutines.CoroutineContext
+  .dispatchers()
+  .io() as kotlin.coroutines.CoroutineContext
 
 @Suppress(
   "UNCHECKED_CAST",

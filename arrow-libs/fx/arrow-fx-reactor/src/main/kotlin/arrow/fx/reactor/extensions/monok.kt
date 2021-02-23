@@ -133,8 +133,10 @@ interface MonoKConcurrentEffect : ConcurrentEffect<ForMonoK>, MonoKEffect {
 @Deprecated(DeprecateReactor)
 interface MonoKTimer : Timer<ForMonoK> {
   override fun sleep(duration: Duration): MonoK<Unit> =
-    MonoK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
-      .map { Unit })
+    MonoK(
+      Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+        .map { Unit }
+    )
 }
 
 // TODO FluxK does not yet have a Concurrent instance

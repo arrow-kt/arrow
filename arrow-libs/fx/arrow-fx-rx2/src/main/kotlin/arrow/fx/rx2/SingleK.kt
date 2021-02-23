@@ -201,25 +201,33 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
      */
     @Deprecated(DeprecateRxJava)
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
-      SingleK(Single.create<A> { emitter ->
-        fa { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.onError(it)
-          }, {
-            emitter.onSuccess(it)
-          })
+      SingleK(
+        Single.create<A> { emitter ->
+          fa { either: Either<Throwable, A> ->
+            either.fold(
+              {
+                emitter.onError(it)
+              },
+              {
+                emitter.onSuccess(it)
+              }
+            )
+          }
         }
-      })
+      )
 
     @Deprecated(DeprecateRxJava)
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.onError(it)
-          }, {
-            emitter.onSuccess(it)
-          })
+          either.fold(
+            {
+              emitter.onError(it)
+            },
+            {
+              emitter.onSuccess(it)
+            }
+          )
         }.fix().single.subscribe({}, emitter::onError)
 
         emitter.setCancellable { dispose.dispose() }
@@ -256,11 +264,14 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, {
-            emitter.onSuccess(it)
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it).let { Unit }
+            },
+            {
+              emitter.onSuccess(it)
+            }
+          )
         }
 
         val token = try {
@@ -285,11 +296,14 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, {
-            emitter.onSuccess(it)
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it).let { Unit }
+            },
+            {
+              emitter.onSuccess(it)
+            }
+          )
         }
 
         val fa2 = try {
@@ -300,19 +314,28 @@ data class SingleK<out A>(val single: Single<out A>) : SingleKOf<A> {
         }
 
         val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForSingleK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
-          }, {})
-        }, { e -> emitter.tryOnError(e) })
+        val disp = fa2.value().subscribe(
+          { token ->
+            val cancel = cancelOrToken.getAndSet(Right(token))
+            cancel?.fold(
+              {
+                token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+              },
+              {}
+            )
+          },
+          { e -> emitter.tryOnError(e) }
+        )
 
         emitter.setCancellable {
           disp.dispose()
           val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
-          })
+          token?.fold(
+            {},
+            {
+              it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+            }
+          )
         }
       }.k()
 

@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadFilter_singleton: FlowableKMonadFilter = object :
-    arrow.fx.rx2.extensions.FlowableKMonadFilter {}
+  arrow.fx.rx2.extensions.FlowableKMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val monadFilter_singleton: FlowableKMonadFilter = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.filterMap(arg1: Function1<A, Option<B>>): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A, B> Kind<ForFlowableK, A>.filterMap(arg1: Function1<A, Option<B>>): Flowa
 )
 @Deprecated(DeprecateRxJava)
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForFlowableK>.() -> B): FlowableK<B> =
-    arrow.fx.rx2.FlowableK
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.fx.rx2.FlowableK<B>
+  arrow.fx.rx2.FlowableK
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.fx.rx2.FlowableK<B>
 
 @Suppress(
   "UNCHECKED_CAST",

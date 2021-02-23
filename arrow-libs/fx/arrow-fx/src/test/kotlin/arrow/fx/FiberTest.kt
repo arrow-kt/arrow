@@ -19,9 +19,13 @@ class FiberTest : ArrowFxSpec() {
   init {
     testLaws(
       ApplicativeLaws.laws(Fiber.applicative(IO.concurrent()), Fiber.functor(IO.concurrent()), Fiber.genK(IO.applicative()), Fiber.eqK()),
-      MonoidLaws.laws(Fiber.monoid(IO.concurrent(), Int.monoid()), Gen.int().map { i ->
-        Fiber(IO.just(i), IO.unit)
-      }, Fiber.eq(IO.eq()))
+      MonoidLaws.laws(
+        Fiber.monoid(IO.concurrent(), Int.monoid()),
+        Gen.int().map { i ->
+          Fiber(IO.just(i), IO.unit)
+        },
+        Fiber.eq(IO.eq())
+      )
     )
   }
 }

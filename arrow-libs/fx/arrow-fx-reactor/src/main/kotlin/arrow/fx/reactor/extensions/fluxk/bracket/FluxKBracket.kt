@@ -79,7 +79,7 @@ internal val bracket_singleton: FluxKBracket = object : arrow.fx.reactor.extensi
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>, Kind<ForFluxK,
-    Unit>>,
+      Unit>>,
   arg2: Function1<A, Kind<ForFluxK, B>>
 ): FluxK<B> =
   arrow.fx.reactor.FluxK.bracket().run {
@@ -207,8 +207,8 @@ fun <A> Kind<ForFluxK, A>.guarantee(arg1: Kind<ForFluxK, Unit>): FluxK<A> =
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.guaranteeCase(arg1: Function1<ExitCase<Throwable>, Kind<ForFluxK, Unit>>):
   FluxK<A> = arrow.fx.reactor.FluxK.bracket().run {
-  this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+    this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 /**
  *  Executes the given [finalizer] when the source is cancelled, allowing registering a cancellation token.

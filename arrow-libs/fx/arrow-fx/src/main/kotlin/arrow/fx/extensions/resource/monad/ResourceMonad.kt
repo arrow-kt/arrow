@@ -90,7 +90,7 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.ap(
 )
 @Deprecated(IODeprecation)
 fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, Kind<Kind<Kind<ForResource, F>, E>,
-  A>>.flatten(BR: Bracket<F, E>): Resource<F, E, A> = arrow.fx.Resource.monad<F, E>(BR).run {
+    A>>.flatten(BR: Bracket<F, E>): Resource<F, E, A> = arrow.fx.Resource.monad<F, E>(BR).run {
   this@flatten.flatten<A>() as arrow.fx.Resource<F, E, A>
 }
 

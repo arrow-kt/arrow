@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val unsafeRun_singleton: SingleKUnsafeRun = object :
-    arrow.fx.rx2.extensions.SingleKUnsafeRun {}
+  arrow.fx.rx2.extensions.SingleKUnsafeRun {}
 
 @JvmName("runBlocking")
 @Suppress(
@@ -32,9 +32,9 @@ internal val unsafeRun_singleton: SingleKUnsafeRun = object :
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <A> unsafe.runBlocking(arg1: Function0<Kind<ForSingleK, A>>): A =
-    arrow.fx.rx2.SingleK.unsafeRun().run {
-  this@runBlocking.runBlocking<A>(arg1) as A
-}
+  arrow.fx.rx2.SingleK.unsafeRun().run {
+    this@runBlocking.runBlocking<A>(arg1) as A
+  }
 
 @JvmName("runNonBlocking")
 @Suppress(

@@ -15,7 +15,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadThrow_singleton: MaybeKMonadThrow = object :
-    arrow.fx.rx2.extensions.MaybeKMonadThrow {}
+  arrow.fx.rx2.extensions.MaybeKMonadThrow {}
 
 @JvmName("raiseNonFatal")
 @Suppress(

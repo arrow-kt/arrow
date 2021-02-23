@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: MonoKApplicativeError = object :
-    arrow.fx.reactor.extensions.MonoKApplicativeError {}
+  arrow.fx.reactor.extensions.MonoKApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -33,9 +33,9 @@ internal val applicativeError_singleton: MonoKApplicativeError = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.handleErrorWith(arg1: Function1<Throwable, Kind<ForMonoK, A>>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Throwable.raiseError(): MonoK<A> = arrow.fx.reactor.MonoK.applicativeErr
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): MonoK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): MonoK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.handleError(arg1: Function1<Throwable, A>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForMonoK, A>.handleError(arg1: Function1<Throwable, A>): MonoK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>): MonoK<B> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.reactor.MonoK<B>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.reactor.MonoK<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -110,9 +110,9 @@ fun <A, B> Kind<ForMonoK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Functio
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.attempt(): MonoK<Either<Throwable, A>> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.fx.reactor.MonoK<arrow.core.Either<kotlin.Throwable, A>>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.fx.reactor.MonoK<arrow.core.Either<kotlin.Throwable, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -123,9 +123,9 @@ fun <A> Kind<ForMonoK, A>.attempt(): MonoK<Either<Throwable, A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): MonoK<A> =
-    arrow.fx.reactor.MonoK
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  arrow.fx.reactor.MonoK
+    .applicativeError()
+    .catch<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("catch")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): MonoK<
 )
 @Deprecated(DeprecateReactor)
 fun <A> ApplicativeError<ForMonoK, Throwable>.catch(arg1: Function0<A>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -149,9 +149,9 @@ fun <A> ApplicativeError<ForMonoK, Throwable>.catch(arg1: Function0<A>): MonoK<A
 )
 @Deprecated(DeprecateReactor)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A): MonoK<A> =
-    arrow.fx.reactor.MonoK
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
+  arrow.fx.reactor.MonoK
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -162,9 +162,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(DeprecateReactor)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.reactor.MonoK.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.reactor.MonoK.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

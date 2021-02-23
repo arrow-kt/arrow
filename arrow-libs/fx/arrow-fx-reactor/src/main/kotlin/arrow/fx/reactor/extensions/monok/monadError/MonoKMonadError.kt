@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadError_singleton: MonoKMonadError = object :
-    arrow.fx.reactor.extensions.MonoKMonadError {}
+  arrow.fx.reactor.extensions.MonoKMonadError {}
 
 @JvmName("ensure")
 @Suppress(
@@ -32,9 +32,9 @@ internal val monadError_singleton: MonoKMonadError = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.ensure(arg1: Function0<Throwable>, arg2: Function1<A, Boolean>): MonoK<A> =
-    arrow.fx.reactor.MonoK.monadError().run {
-  this@ensure.ensure<A>(arg1, arg2) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.monadError().run {
+    this@ensure.ensure<A>(arg1, arg2) as arrow.fx.reactor.MonoK<A>
+  }
 
 @JvmName("redeemWith")
 @Suppress(
@@ -60,9 +60,9 @@ fun <A, B> Kind<ForMonoK, A>.redeemWith(
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, Either<Throwable, A>>.rethrow(): MonoK<A> =
-    arrow.fx.reactor.MonoK.monadError().run {
-  this@rethrow.rethrow<A>() as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.monadError().run {
+    this@rethrow.rethrow<A>() as arrow.fx.reactor.MonoK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functorFilter_singleton: ObservableKFunctorFilter = object :
-    arrow.fx.rx2.extensions.ObservableKFunctorFilter {}
+  arrow.fx.rx2.extensions.ObservableKFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -31,9 +31,9 @@ internal val functorFilter_singleton: ObservableKFunctorFilter = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.filterMap(arg1: Function1<A, Option<B>>): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -44,9 +44,9 @@ fun <A, B> Kind<ForObservableK, A>.filterMap(arg1: Function1<A, Option<B>>): Obs
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, Option<A>>.flattenOption(): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.functorFilter().run {
-  this@flattenOption.flattenOption<A>() as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.functorFilter().run {
+    this@flattenOption.flattenOption<A>() as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -57,9 +57,9 @@ fun <A> Kind<ForObservableK, Option<A>>.flattenOption(): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.filter(arg1: Function1<A, Boolean>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -70,9 +70,9 @@ fun <A> Kind<ForObservableK, A>.filter(arg1: Function1<A, Boolean>): ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.filterIsInstance(arg1: Class<B>): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

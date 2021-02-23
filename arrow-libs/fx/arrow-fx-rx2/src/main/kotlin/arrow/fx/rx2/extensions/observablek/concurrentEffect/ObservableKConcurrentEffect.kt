@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val concurrentEffect_singleton: ObservableKConcurrentEffect = object :
-    arrow.fx.rx2.extensions.ObservableKConcurrentEffect {}
+  arrow.fx.rx2.extensions.ObservableKConcurrentEffect {}
 
 @JvmName("runAsyncCancellable")
 @Suppress(
@@ -33,12 +33,12 @@ internal val concurrentEffect_singleton: ObservableKConcurrentEffect = object :
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.runAsyncCancellable(
   arg1: Function1<Either<Throwable, A>,
-Kind<ForObservableK, Unit>>
+    Kind<ForObservableK, Unit>>
 ): ObservableK<Function0<Unit>> =
-    arrow.fx.rx2.ObservableK.concurrentEffect().run {
-  this@runAsyncCancellable.runAsyncCancellable<A>(arg1) as
-    arrow.fx.rx2.ObservableK<kotlin.Function0<kotlin.Unit>>
-}
+  arrow.fx.rx2.ObservableK.concurrentEffect().run {
+    this@runAsyncCancellable.runAsyncCancellable<A>(arg1) as
+      arrow.fx.rx2.ObservableK<kotlin.Function0<kotlin.Unit>>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

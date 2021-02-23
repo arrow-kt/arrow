@@ -29,9 +29,9 @@ internal val functor_singleton: MonoKFunctor = object : arrow.fx.reactor.extensi
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.map(arg1: Function1<A, B>): MonoK<B> =
-    arrow.fx.reactor.MonoK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
-}
+  arrow.fx.reactor.MonoK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -42,9 +42,9 @@ fun <A, B> Kind<ForMonoK, A>.map(arg1: Function1<A, B>): MonoK<B> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): MonoK<B> =
-    arrow.fx.reactor.MonoK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.reactor.MonoK<B>
-}
+  arrow.fx.reactor.MonoK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.reactor.MonoK<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -55,9 +55,9 @@ fun <A, B> Kind<ForMonoK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForMonoK, A>, Kind<ForMonoK, B>> =
-    arrow.fx.reactor.MonoK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.reactor.ForMonoK, A>,
+  arrow.fx.reactor.MonoK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.reactor.ForMonoK, A>,
     arrow.Kind<arrow.fx.reactor.ForMonoK, B>>
 
 @JvmName("void")
@@ -81,9 +81,9 @@ fun <A> Kind<ForMonoK, A>.void(): MonoK<Unit> = arrow.fx.reactor.MonoK.functor()
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.fproduct(arg1: Function1<A, B>): MonoK<Tuple2<A, B>> =
-    arrow.fx.reactor.MonoK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.reactor.MonoK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -118,9 +118,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForMonoK, B>): MonoK<A> = arrow.fx.reactor.Mono
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.tupleLeft(arg1: B): MonoK<Tuple2<B, A>> =
-    arrow.fx.reactor.MonoK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<B, A>>
-}
+  arrow.fx.reactor.MonoK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -131,9 +131,9 @@ fun <A, B> Kind<ForMonoK, A>.tupleLeft(arg1: B): MonoK<Tuple2<B, A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.tupleRight(arg1: B): MonoK<Tuple2<A, B>> =
-    arrow.fx.reactor.MonoK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.reactor.MonoK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.reactor.MonoK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

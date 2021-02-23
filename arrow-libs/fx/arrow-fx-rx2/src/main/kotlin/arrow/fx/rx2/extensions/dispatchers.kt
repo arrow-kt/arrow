@@ -20,10 +20,13 @@ fun Scheduler.asCoroutineContext(): CoroutineContext =
 
 private class SchedulerContext(val scheduler: Scheduler) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
   override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
-    SchedulerContinuation(scheduler, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@SchedulerContext && element is ContinuationInterceptor)
-        element.interceptContinuation(cont) else cont
-    })
+    SchedulerContinuation(
+      scheduler,
+      continuation.context.fold(continuation) { cont, element ->
+        if (element != this@SchedulerContext && element is ContinuationInterceptor)
+          element.interceptContinuation(cont) else cont
+      }
+    )
 }
 
 private class SchedulerContinuation<T>(

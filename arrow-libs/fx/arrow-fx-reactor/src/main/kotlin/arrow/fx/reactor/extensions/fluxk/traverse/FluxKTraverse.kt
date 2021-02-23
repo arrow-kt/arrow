@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val traverse_singleton: FluxKTraverse = object : arrow.fx.reactor.extensions.FluxKTraverse
-    {}
+{}
 
 @JvmName("traverse")
 @Suppress(
@@ -30,10 +30,10 @@ internal val traverse_singleton: FluxKTraverse = object : arrow.fx.reactor.exten
 )
 @Deprecated(DeprecateReactor)
 fun <G, A, B> Kind<ForFluxK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
-    Kind<G, Kind<ForFluxK, B>> = arrow.fx.reactor.FluxK.traverse().run {
-  this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.fx.reactor.ForFluxK,
-    B>>
-}
+  Kind<G, Kind<ForFluxK, B>> = arrow.fx.reactor.FluxK.traverse().run {
+    this@traverse.traverse<G, A, B>(arg1, arg2) as arrow.Kind<G, arrow.Kind<arrow.fx.reactor.ForFluxK,
+        B>>
+  }
 
 @JvmName("sequence")
 @Suppress(
@@ -44,9 +44,9 @@ fun <G, A, B> Kind<ForFluxK, A>.traverse(arg1: Applicative<G>, arg2: Function1<A
 )
 @Deprecated(DeprecateReactor)
 fun <G, A> Kind<ForFluxK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Kind<ForFluxK, A>> =
-    arrow.fx.reactor.FluxK.traverse().run {
-  this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.fx.reactor.ForFluxK, A>>
-}
+  arrow.fx.reactor.FluxK.traverse().run {
+    this@sequence.sequence<G, A>(arg1) as arrow.Kind<G, arrow.Kind<arrow.fx.reactor.ForFluxK, A>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -57,9 +57,9 @@ fun <G, A> Kind<ForFluxK, Kind<G, A>>.sequence(arg1: Applicative<G>): Kind<G, Ki
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.map(arg1: Function1<A, B>): FluxK<B> =
-    arrow.fx.reactor.FluxK.traverse().run {
-  this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.traverse().run {
+    this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("flatTraverse")
 @Suppress(

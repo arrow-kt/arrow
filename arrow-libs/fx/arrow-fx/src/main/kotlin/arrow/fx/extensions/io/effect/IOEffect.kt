@@ -30,9 +30,9 @@ internal val effect_singleton: IOEffect = object : arrow.fx.extensions.IOEffect 
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.runAsync(cb: Function1<Either<Throwable, A>, Kind<ForIO, Unit>>): IO<Unit> =
-    arrow.fx.IO.effect().run {
-  this@runAsync.runAsync<A>(cb) as arrow.fx.IO<kotlin.Unit>
-}
+  arrow.fx.IO.effect().run {
+    this@runAsync.runAsync<A>(cb) as arrow.fx.IO<kotlin.Unit>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

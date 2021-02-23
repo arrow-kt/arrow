@@ -99,28 +99,30 @@ object ConcurrentLaws {
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForShouldStayOnOriginalContext(EQK.liftEq(String.eq())) },
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgram(EQ) },
       Law("Concurrent Laws: onError outer and inner finalizer is run when error is raised") { CF.waitForTimesOutProgramWithDefault(EQ) }
-    ) + (if (testStackSafety) {
-      listOf(
-        Law("Concurrent Laws: ParMapN arity-2 should be stack safe") { CF.parMap2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-3 should be stack safe") { CF.parMap3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-4 should be stack safe") { CF.parMap4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-5 should be stack safe") { CF.parMap5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-6 should be stack safe") { CF.parMap6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-7 should be stack safe") { CF.parMap7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-8 should be stack safe") { CF.parMap8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: ParMapN arity-9 should be stack safe") { CF.parMap9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RacePair should be stack safe") { CF.racePairStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceTriple should be stack safe") { CF.raceTripleStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-2 should be stack safe") { CF.race2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-3 should be stack safe") { CF.race3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-4 should be stack safe") { CF.race4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-5 should be stack safe") { CF.race5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-6 should be stack safe") { CF.race6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-7 should be stack safe") { CF.race7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
-        Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) }
+    ) + (
+      if (testStackSafety) {
+        listOf(
+          Law("Concurrent Laws: ParMapN arity-2 should be stack safe") { CF.parMap2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-3 should be stack safe") { CF.parMap3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-4 should be stack safe") { CF.parMap4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-5 should be stack safe") { CF.parMap5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-6 should be stack safe") { CF.parMap6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-7 should be stack safe") { CF.parMap7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-8 should be stack safe") { CF.parMap8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: ParMapN arity-9 should be stack safe") { CF.parMap9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RacePair should be stack safe") { CF.racePairStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceTriple should be stack safe") { CF.raceTripleStackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-2 should be stack safe") { CF.race2StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-3 should be stack safe") { CF.race3StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-4 should be stack safe") { CF.race4StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-5 should be stack safe") { CF.race5StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-6 should be stack safe") { CF.race6StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-7 should be stack safe") { CF.race7StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-8 should be stack safe") { CF.race8StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) },
+          Law("Concurrent Laws: RaceN arity-9 should be stack safe") { CF.race9StackSafe(iterations, EQK.liftEq(Int.eq()), ctx) }
+        )
+      } else emptyList()
       )
-    } else emptyList())
   }
 
   fun <F> laws(
@@ -403,9 +405,12 @@ object ConcurrentLaws {
     forAll(50, Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = ctx.racePair(fa, never).flatMap { either ->
-        either.fold({ a, fiberB ->
-          fiberB.cancel().map { a }
-        }, { _, _ -> raiseError(AssertionError("never() finished race")) })
+        either.fold(
+          { a, fiberB ->
+            fiberB.cancel().map { a }
+          },
+          { _, _ -> raiseError(AssertionError("never() finished race")) }
+        )
       }
 
       received.equalUnderTheLaw(ctx.raceN(fa, never).map { it.fold(::identity, ::identity) }, EQ)
@@ -415,9 +420,12 @@ object ConcurrentLaws {
     forAll(50, Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = ctx.racePair(never, fa).flatMap { either ->
-        either.fold({ _, _ ->
-          raiseError<Int>(AssertionError("never() finished race"))
-        }, { fiberA, b -> fiberA.cancel().map { b } })
+        either.fold(
+          { _, _ ->
+            raiseError<Int>(AssertionError("never() finished race"))
+          },
+          { fiberA, b -> fiberA.cancel().map { b } }
+        )
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, fa).map { it.fold(::identity, ::identity) }, EQ)
@@ -435,12 +443,15 @@ object ConcurrentLaws {
 
         race.attempt()
           .flatMap { attempt ->
-            attempt.fold({ p.get() },
+            attempt.fold(
+              { p.get() },
               {
                 it.fold(
                   { _, fiberB -> fiberB.cancel().fork(ctx).flatMap { p.get() } },
-                  { fiberA, _ -> fiberA.cancel().fork(ctx).flatMap { p.get() } })
-              })
+                  { fiberA, _ -> fiberA.cancel().fork(ctx).flatMap { p.get() } }
+                )
+              }
+            )
           }.bind()
       }
 
@@ -495,7 +506,8 @@ object ConcurrentLaws {
         either.fold(
           { a, fiberB, fiberC -> fiberB.cancel().followedBy(fiberC.cancel()).map { a } },
           { _, _, _ -> raiseError(AssertionError("never() finished race")) },
-          { _, _, _ -> raiseError(AssertionError("never() finished race")) })
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) }
+        )
       }
 
       received.equalUnderTheLaw(ctx.raceN(fa, never, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -508,7 +520,8 @@ object ConcurrentLaws {
         either.fold(
           { _, _, _ -> raiseError<Int>(AssertionError("never() finished race")) },
           { fiberA, b, fiberC -> fiberA.cancel().followedBy(fiberC.cancel()).map { b } },
-          { _, _, _ -> raiseError(AssertionError("never() finished race")) })
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) }
+        )
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, fa, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -521,7 +534,8 @@ object ConcurrentLaws {
         either.fold(
           { _, _, _ -> raiseError<Int>(AssertionError("never() finished race")) },
           { _, _, _ -> raiseError(AssertionError("never() finished race")) },
-          { fiberA, fiberB, c -> fiberA.cancel().followedBy(fiberB.cancel()).map { c } })
+          { fiberA, fiberB, c -> fiberA.cancel().followedBy(fiberB.cancel()).map { c } }
+        )
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, never, fa).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -548,7 +562,8 @@ object ConcurrentLaws {
 
         race.attempt()
           .flatMap { attempt ->
-            attempt.fold({ combinePromises },
+            attempt.fold(
+              { combinePromises },
               {
                 it.fold(
                   { _, fiberB, fiberC ->
@@ -559,8 +574,10 @@ object ConcurrentLaws {
                   },
                   { fiberA, fiberB, _ ->
                     fiberA.cancel().followedBy(fiberB.cancel()).fork(ctx).flatMap { combinePromises }
-                  })
-              })
+                  }
+                )
+              }
+            )
           }.bind()
       }
 
@@ -633,7 +650,8 @@ object ConcurrentLaws {
       num
     }
 
-    parTupledN(single,
+    parTupledN(
+      single,
       makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)
     ).equalUnderTheLaw(just(Tuple6(6, 3, 2, 4, 1, 5)), EQ) shouldBe true
     order.toList() shouldBe listOf(1, 2, 3, 4, 5, 6)

@@ -103,32 +103,44 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
    */
   @Deprecated(DeprecateReactor)
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
-    FluxK(Flux.create<B> { sink ->
-      flux.subscribe({ a ->
-        if (sink.isCancelled) release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error)
-        else try {
-          sink.onDispose(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FluxK.raiseError<B>(e) } }
-            .flux
-            .doOnCancel { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error) }
-            .subscribe({ sink.next(it) }, sink::error, { }, {
-              sink.onRequest(it::request)
-            })
-          )
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().flux.subscribe({
-              sink.error(e)
-            }, { e2 ->
-              sink.error(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
-          }
-        }
-      }, sink::error, sink::complete)
-    })
+    FluxK(
+      Flux.create<B> { sink ->
+        flux.subscribe(
+          { a ->
+            if (sink.isCancelled) release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error)
+            else try {
+              sink.onDispose(
+                use(a).fix()
+                  .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+                  .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FluxK.raiseError<B>(e) } }
+                  .flux
+                  .doOnCancel { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error) }
+                  .subscribe(
+                    { sink.next(it) }, sink::error, { },
+                    {
+                      sink.onRequest(it::request)
+                    }
+                  )
+              )
+            } catch (e: Throwable) {
+              if (NonFatal(e)) {
+                release(a, ExitCase.Error(e)).fix().flux.subscribe(
+                  {
+                    sink.error(e)
+                  },
+                  { e2 ->
+                    sink.error(Platform.composeErrors(e, e2))
+                  }
+                )
+              } else {
+                throw e
+              }
+            }
+          },
+          sink::error, sink::complete
+        )
+      }
+    )
 
   @Deprecated(DeprecateReactor)
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
@@ -236,12 +248,15 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> async(fa: ((Either<Throwable, A>) -> Unit) -> Unit): FluxK<A> =
       Flux.create<A> { sink ->
         fa { callback: Either<Throwable, A> ->
-          callback.fold({
-            sink.error(it)
-          }, {
-            sink.next(it)
-            sink.complete()
-          })
+          callback.fold(
+            {
+              sink.error(it)
+            },
+            {
+              sink.next(it)
+              sink.complete()
+            }
+          )
         }
       }.k()
 
@@ -249,12 +264,15 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> asyncF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>): FluxK<A> =
       Flux.create { sink: FluxSink<A> ->
         fa { callback: Either<Throwable, A> ->
-          callback.fold({
-            sink.error(it)
-          }, {
-            sink.next(it)
-            sink.complete()
-          })
+          callback.fold(
+            {
+              sink.error(it)
+            },
+            {
+              sink.next(it)
+              sink.complete()
+            }
+          )
         }.fix().flux.subscribe({}, sink::error)
       }.k()
 
@@ -266,12 +284,15 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFluxK>): FluxK<A> =
       Flux.create<A> { sink ->
         val token = fa { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            sink.error(e)
-          }, { a ->
-            sink.next(a)
-            sink.complete()
-          })
+          either.fold(
+            { e ->
+              sink.error(e)
+            },
+            { a ->
+              sink.next(a)
+              sink.complete()
+            }
+          )
         }
         sink.onDispose { token.value().subscribe({}, sink::error) }
       }.k()
@@ -284,12 +305,15 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> FluxKOf<CancelToken<ForFluxK>>): FluxK<A> =
       Flux.create<A> { sink ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({ e ->
-            sink.error(e)
-          }, { a ->
-            sink.next(a)
-            sink.complete()
-          })
+          either.fold(
+            { e ->
+              sink.error(e)
+            },
+            { a ->
+              sink.next(a)
+              sink.complete()
+            }
+          )
         }
 
         val fa2 = try {
@@ -300,19 +324,28 @@ data class FluxK<out A>(val flux: Flux<out A>) : FluxKOf<A> {
         }
 
         val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForFluxK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, sink::error)
-          }, { Unit })
-        }, sink::error)
+        val disp = fa2.value().subscribe(
+          { token ->
+            val cancel = cancelOrToken.getAndSet(Right(token))
+            cancel?.fold(
+              {
+                token.value().subscribe({}, sink::error)
+              },
+              { Unit }
+            )
+          },
+          sink::error
+        )
 
         sink.onDispose {
           disp.dispose()
           val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, sink::error)
-          })
+          token?.fold(
+            {},
+            {
+              it.value().subscribe({}, sink::error)
+            }
+          )
         }
       }.k()
 

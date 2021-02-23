@@ -106,7 +106,8 @@ interface IORace {
     ioC: IOOf<C>,
     ioD: IOOf<D>
   ): IO<Race4<out A, out B, out C, out D>> =
-    race2(ctx,
+    race2(
+      ctx,
       race2(ctx, ioA, ioB),
       race2(ctx, ioC, ioD)
     ).map { res ->
@@ -127,7 +128,8 @@ interface IORace {
     ioD: IOOf<D>,
     ioE: IOOf<E>
   ): IO<Race5<out A, out B, out C, out D, out E>> =
-    race2(ctx,
+    race2(
+      ctx,
       race3(ctx, ioA, ioB, ioC),
       race2(ctx, ioD, ioE)
     ).map { res ->
@@ -149,7 +151,8 @@ interface IORace {
     ioE: IOOf<E>,
     ioF: IOOf<F>
   ): IO<Race6<out A, out B, out C, out D, out E, out F>> =
-    race2(ctx,
+    race2(
+      ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF)
     ).map { res ->
@@ -172,7 +175,8 @@ interface IORace {
     ioF: IOOf<F>,
     ioG: IOOf<G>
   ): IO<Race7<out A, out B, out C, out D, out E, out F, out G>> =
-    race3(ctx,
+    race3(
+      ctx,
       race3(ctx, ioA, ioB, ioC),
       race2(ctx, ioD, ioE),
       race2(ctx, ioF, ioG)
@@ -198,7 +202,8 @@ interface IORace {
     ioG: IOOf<G>,
     ioH: IOOf<H>
   ): IO<Race8<out A, out B, out C, out D, out E, out F, out G, out H>> =
-    race3(ctx,
+    race3(
+      ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF),
       race2(ctx, ioG, ioH)
@@ -225,7 +230,8 @@ interface IORace {
     ioH: IOOf<H>,
     ioI: IOOf<I>
   ): IO<Race9<out A, out B, out C, out D, out E, out F, out G, out H, out I>> =
-    race3(ctx,
+    race3(
+      ctx,
       race3(ctx, ioA, ioB, ioC),
       race3(ctx, ioD, ioE, ioF),
       race3(ctx, ioG, ioH, ioI)
@@ -274,19 +280,25 @@ interface IORace {
       conn.pushPair(connA, connB)
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
-        result.fold({
-          onError(active, cb, conn, connB, it)
-        }, {
-          onSuccess(active, conn, connB, cb, Left(it))
-        })
+        result.fold(
+          {
+            onError(active, cb, conn, connB, it)
+          },
+          {
+            onSuccess(active, conn, connB, cb, Left(it))
+          }
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
-        result.fold({
-          onError(active, cb, conn, connA, it)
-        }, {
-          onSuccess(active, conn, connA, cb, Right(it))
-        })
+        result.fold(
+          {
+            onError(active, cb, conn, connA, it)
+          },
+          {
+            onSuccess(active, conn, connA, cb, Right(it))
+          }
+        )
       }
     }
 
@@ -322,21 +334,32 @@ interface IORace {
       IO.effect { other2.cancel() }.unsafeRunAsync { r2 ->
         IO.effect { other3.cancel() }.unsafeRunAsync { r3 ->
           main.pop()
-          cb(Left(
-            r2.fold({ err2 ->
-              r3.fold({ err3 ->
-                Platform.composeErrors(err, err2, err3)
-              }, {
-                Platform.composeErrors(err, err2)
-              })
-            }, {
-              r3.fold({ err3 ->
-                Platform.composeErrors(err, err3)
-              }, {
-                err
-              })
-            })
-          ))
+          cb(
+            Left(
+              r2.fold(
+                { err2 ->
+                  r3.fold(
+                    { err3 ->
+                      Platform.composeErrors(err, err2, err3)
+                    },
+                    {
+                      Platform.composeErrors(err, err2)
+                    }
+                  )
+                },
+                {
+                  r3.fold(
+                    { err3 ->
+                      Platform.composeErrors(err, err3)
+                    },
+                    {
+                      err
+                    }
+                  )
+                }
+              )
+            )
+          )
         }
       }
     } else Unit
@@ -349,27 +372,36 @@ interface IORace {
       conn.push(listOf(connA::cancel, connB::cancel, connC::cancel))
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { result ->
-        result.fold({
-          onError(active, cb, conn, connB, connC, it)
-        }, {
-          onSuccess(active, conn, connB, connC, cb, Race3.First(it))
-        })
+        result.fold(
+          {
+            onError(active, cb, conn, connB, connC, it)
+          },
+          {
+            onSuccess(active, conn, connB, connC, cb, Race3.First(it))
+          }
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { result ->
-        result.fold({
-          onError(active, cb, conn, connA, connC, it)
-        }, {
-          onSuccess(active, conn, connA, connC, cb, Race3.Second(it))
-        })
+        result.fold(
+          {
+            onError(active, cb, conn, connA, connC, it)
+          },
+          {
+            onSuccess(active, conn, connA, connC, cb, Race3.Second(it))
+          }
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { result ->
-        result.fold({
-          onError(active, cb, conn, connA, connB, it)
-        }, {
-          onSuccess(active, conn, connA, connB, cb, Race3.Third(it))
-        })
+        result.fold(
+          {
+            onError(active, cb, conn, connA, connB, it)
+          },
+          {
+            onSuccess(active, conn, connA, connB, cb, Race3.Third(it))
+          }
+        )
       }
     }
 
@@ -422,43 +454,49 @@ interface IORace {
       conn.pushPair(connA, connB)
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
-              conn.pop()
-              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+        either.fold(
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
+                conn.pop()
+                cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+              }
+            } else {
+              promiseA.complete(Left(error))
             }
-          } else {
-            promiseA.complete(Left(error))
+          },
+          { a ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
+            } else {
+              promiseA.complete(Right(a))
+            }
           }
-        }, { a ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
-          } else {
-            promiseA.complete(Right(a))
-          }
-        })
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
-              conn.pop()
-              cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+        either.fold(
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
+                conn.pop()
+                cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
+              }
+            } else {
+              promiseB.complete(Left(error))
             }
-          } else {
-            promiseB.complete(Left(error))
+          },
+          { b ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
+            } else {
+              promiseB.complete(Right(b))
+            }
           }
-        }, { b ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
-          } else {
-            promiseB.complete(Right(b))
-          }
-        })
+        )
       }
     }
 
@@ -512,84 +550,102 @@ interface IORace {
       conn.push(listOf(connA::cancel, connB::cancel, connC::cancel))
 
       IORunLoop.startCancellable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
-              IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
+        either.fold(
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              IO.effect { connB.cancel() }.unsafeRunAsync { r2 ->
+                IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
+                  conn.pop()
+                  val errorResult = r2.fold(
+                    { e2 ->
+                      r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                    },
+                    {
+                      r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                    }
+                  )
+                  cb(Left(errorResult))
+                }
               }
+            } else {
+              promiseA.complete(Left(error))
             }
-          } else {
-            promiseA.complete(Left(error))
+          },
+          { a ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
+            } else {
+              promiseA.complete(Right(a))
+            }
           }
-        }, { a ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
-          } else {
-            promiseA.complete(Right(a))
-          }
-        })
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
-              IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
+        either.fold(
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
+                IO.effect { connC.cancel() }.unsafeRunAsync { r3 ->
+                  conn.pop()
+                  val errorResult = r2.fold(
+                    { e2 ->
+                      r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                    },
+                    {
+                      r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                    }
+                  )
+                  cb(Left(errorResult))
+                }
               }
+            } else {
+              promiseB.complete(Left(error))
             }
-          } else {
-            promiseB.complete(Left(error))
+          },
+          { b ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
+            } else {
+              promiseB.complete(Right(b))
+            }
           }
-        }, { b ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
-          } else {
-            promiseB.complete(Right(b))
-          }
-        })
+        )
       }
 
       IORunLoop.startCancellable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
-        either.fold({ error ->
-          if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-            IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
-              IO.effect { connB.cancel() }.unsafeRunAsync { r3 ->
-                conn.pop()
-                val errorResult = r2.fold({ e2 ->
-                  r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
-                }, {
-                  r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
-                })
-                cb(Left(errorResult))
+        either.fold(
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              IO.effect { connA.cancel() }.unsafeRunAsync { r2 ->
+                IO.effect { connB.cancel() }.unsafeRunAsync { r3 ->
+                  conn.pop()
+                  val errorResult = r2.fold(
+                    { e2 ->
+                      r3.fold({ e3 -> Platform.composeErrors(error, e2, e3) }, { Platform.composeErrors(error, e2) })
+                    },
+                    {
+                      r3.fold({ e3 -> Platform.composeErrors(error, e3) }, { error })
+                    }
+                  )
+                  cb(Left(errorResult))
+                }
               }
+            } else {
+              promiseC.complete(Left(error))
             }
-          } else {
-            promiseC.complete(Left(error))
+          },
+          { c ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
+            } else {
+              promiseC.complete(Right(c))
+            }
           }
-        }, { c ->
-          if (active.getAndSet(false)) {
-            conn.pop()
-            cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
-          } else {
-            promiseC.complete(Right(c))
-          }
-        })
+        )
       }
     }
 }

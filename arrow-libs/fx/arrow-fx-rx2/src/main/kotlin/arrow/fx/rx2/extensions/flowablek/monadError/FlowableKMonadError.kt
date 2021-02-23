@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadError_singleton: FlowableKMonadError = object :
-    arrow.fx.rx2.extensions.FlowableKMonadError {}
+  arrow.fx.rx2.extensions.FlowableKMonadError {}
 
 @JvmName("ensure")
 @Suppress(
@@ -32,9 +32,9 @@ internal val monadError_singleton: FlowableKMonadError = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.ensure(arg1: Function0<Throwable>, arg2: Function1<A, Boolean>):
-    FlowableK<A> = arrow.fx.rx2.FlowableK.monadError().run {
-  this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.FlowableK<A>
-}
+  FlowableK<A> = arrow.fx.rx2.FlowableK.monadError().run {
+    this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.FlowableK<A>
+  }
 
 @JvmName("redeemWith")
 @Suppress(
@@ -48,9 +48,9 @@ fun <A, B> Kind<ForFlowableK, A>.redeemWith(
   arg1: Function1<Throwable, Kind<ForFlowableK, B>>,
   arg2: Function1<A, Kind<ForFlowableK, B>>
 ): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.monadError().run {
-  this@redeemWith.redeemWith<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.monadError().run {
+    this@redeemWith.redeemWith<A, B>(arg1, arg2) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @JvmName("rethrow")
 @Suppress(
@@ -61,9 +61,9 @@ fun <A, B> Kind<ForFlowableK, A>.redeemWith(
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, Either<Throwable, A>>.rethrow(): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.monadError().run {
-  this@rethrow.rethrow<A>() as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.monadError().run {
+    this@rethrow.rethrow<A>() as arrow.fx.rx2.FlowableK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

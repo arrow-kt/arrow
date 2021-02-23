@@ -205,8 +205,8 @@ fun <A> Kind<ForIO, A>.guarantee(finalizer: Kind<ForIO, Unit>): IO<A> = arrow.fx
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.guaranteeCase(finalizer: Function1<ExitCase<Throwable>, Kind<ForIO, Unit>>):
   IO<A> = arrow.fx.IO.bracket().run {
-  this@guaranteeCase.guaranteeCase<A>(finalizer) as arrow.fx.IO<A>
-}
+    this@guaranteeCase.guaranteeCase<A>(finalizer) as arrow.fx.IO<A>
+  }
 
 /**
  *  Executes the given [finalizer] when the source is cancelled, allowing registering a cancellation token.

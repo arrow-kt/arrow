@@ -26,11 +26,14 @@ open class RacePair {
 
   private fun racePairHelper(): IO<Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
     IO.racePair(IODispatchers.CommonPool, acc, IO { 1 }).flatMap { ei ->
-      ei.fold({ a, (_, cancel) ->
-        cancel.map { a }
-      }, { (_, cancel), b ->
-        cancel.map { b }
-      })
+      ei.fold(
+        { a, (_, cancel) ->
+          cancel.map { a }
+        },
+        { (_, cancel), b ->
+          cancel.map { b }
+        }
+      )
     }
   }
 

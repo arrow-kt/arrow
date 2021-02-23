@@ -191,12 +191,15 @@ class MVarTest : ArrowFxSpec() {
 
         fun consumer(ch: Channel<Int>, sum: Long): IO<Long> =
           ch.take().flatMap {
-            it.fold({
-              IO.just(sum) // we are done!
-            }, { x ->
-              // next please
-              consumer(ch, sum + x)
-            })
+            it.fold(
+              {
+                IO.just(sum) // we are done!
+              },
+              { x ->
+                // next please
+                consumer(ch, sum + x)
+              }
+            )
           }
 
         fun exec(channel: Channel<Int>): IO<Long> {
@@ -225,11 +228,14 @@ class MVarTest : ArrowFxSpec() {
 
         fun consumer(ch: Channel<Long>, sum: Long): IO<Long> =
           ch.take().flatMap {
-            it.fold({
-              IO.just(sum) // we are done!
-            }, { x ->
-              consumer(ch, sum + x) // next please
-            })
+            it.fold(
+              {
+                IO.just(sum) // we are done!
+              },
+              { x ->
+                consumer(ch, sum + x) // next please
+              }
+            )
           }
 
         val count = 10000L

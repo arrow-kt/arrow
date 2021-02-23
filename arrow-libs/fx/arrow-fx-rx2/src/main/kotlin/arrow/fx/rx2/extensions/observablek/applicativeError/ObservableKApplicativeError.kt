@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: ObservableKApplicativeError = object :
-    arrow.fx.rx2.extensions.ObservableKApplicativeError {}
+  arrow.fx.rx2.extensions.ObservableKApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -34,7 +34,7 @@ internal val applicativeError_singleton: ObservableKApplicativeError = object :
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.handleErrorWith(
   arg1: Function1<Throwable, Kind<ForObservableK,
-A>>
+      A>>
 ): ObservableK<A> = arrow.fx.rx2.ObservableK.applicativeError().run {
   this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.rx2.ObservableK<A>
 }
@@ -60,9 +60,9 @@ fun <A> Throwable.raiseError(): ObservableK<A> = arrow.fx.rx2.ObservableK.applic
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -73,9 +73,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): ObservableK<A
 )
 @Deprecated(DeprecateRxJava)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -86,9 +86,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): Observable
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.handleError(arg1: Function1<Throwable, A>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -99,9 +99,9 @@ fun <A> Kind<ForObservableK, A>.handleError(arg1: Function1<Throwable, A>): Obse
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>):
-    ObservableK<B> = arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
-}
+  ObservableK<B> = arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -112,9 +112,9 @@ fun <A, B> Kind<ForObservableK, A>.redeem(arg1: Function1<Throwable, B>, arg2: F
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.attempt(): ObservableK<Either<Throwable, A>> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.fx.rx2.ObservableK<arrow.core.Either<kotlin.Throwable, A>>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.fx.rx2.ObservableK<arrow.core.Either<kotlin.Throwable, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -125,9 +125,9 @@ fun <A> Kind<ForObservableK, A>.attempt(): ObservableK<Either<Throwable, A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  arrow.fx.rx2.ObservableK
+    .applicativeError()
+    .catch<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("catch")
 @Suppress(
@@ -138,9 +138,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): Observ
 )
 @Deprecated(DeprecateRxJava)
 fun <A> ApplicativeError<ForObservableK, Throwable>.catch(arg1: Function0<A>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -151,9 +151,9 @@ fun <A> ApplicativeError<ForObservableK, Throwable>.catch(arg1: Function0<A>): O
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A):
-    ObservableK<A> = arrow.fx.rx2.ObservableK
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  ObservableK<A> = arrow.fx.rx2.ObservableK
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -164,9 +164,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.rx2.ObservableK.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.rx2.ObservableK.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -11,7 +11,7 @@ import kotlin.Suppress
  */
 @PublishedApi()
 internal val timer_singleton: ObservableKTimer = object : arrow.fx.rx2.extensions.ObservableKTimer
-    {}
+{}
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val bracket_singleton: ObservableKBracket = object :
-    arrow.fx.rx2.extensions.ObservableKBracket {}
+  arrow.fx.rx2.extensions.ObservableKBracket {}
 
 /**
  *  A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -80,12 +80,12 @@ internal val bracket_singleton: ObservableKBracket = object :
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>,
-Kind<ForObservableK, Unit>>,
+    Kind<ForObservableK, Unit>>,
   arg2: Function1<A, Kind<ForObservableK, B>>
 ): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
+  }
 
 /**
  *  Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
@@ -134,9 +134,9 @@ fun <A, B> Kind<ForObservableK, A>.bracket(
   arg1: Function1<A, Kind<ForObservableK, Unit>>,
   arg2: Function1<A, Kind<ForObservableK, B>>
 ): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@bracket.bracket<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@bracket.bracket<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
+  }
 
 /**
  *  Meant for ensuring a given task continues execution even when interrupted.
@@ -150,9 +150,9 @@ fun <A, B> Kind<ForObservableK, A>.bracket(
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.uncancellable(): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@uncancellable.uncancellable<A>() as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@uncancellable.uncancellable<A>() as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("uncancelable")
 @Suppress(
@@ -163,9 +163,9 @@ fun <A> Kind<ForObservableK, A>.uncancellable(): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.uncancelable(): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@uncancelable.uncancelable<A>() as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@uncancelable.uncancelable<A>() as arrow.fx.rx2.ObservableK<A>
+  }
 
 /**
  *  Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled.
@@ -186,9 +186,9 @@ fun <A> Kind<ForObservableK, A>.uncancelable(): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.guarantee(arg1: Kind<ForObservableK, Unit>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 /**
  *  Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
@@ -211,7 +211,7 @@ fun <A> Kind<ForObservableK, A>.guarantee(arg1: Kind<ForObservableK, Unit>): Obs
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.guaranteeCase(
   arg1: Function1<ExitCase<Throwable>,
-Kind<ForObservableK, Unit>>
+    Kind<ForObservableK, Unit>>
 ): ObservableK<A> = arrow.fx.rx2.ObservableK.bracket().run {
   this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.rx2.ObservableK<A>
 }
@@ -230,9 +230,9 @@ Kind<ForObservableK, Unit>>
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.onCancel(arg1: Kind<ForObservableK, Unit>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.bracket().run {
-  this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.bracket().run {
+    this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 /**
  *  Executes the given `finalizer` with the given error when the source is finished in error.
@@ -246,9 +246,9 @@ fun <A> Kind<ForObservableK, A>.onCancel(arg1: Kind<ForObservableK, Unit>): Obse
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.onError(arg1: Function1<Throwable, Kind<ForObservableK, Unit>>):
-    ObservableK<A> = arrow.fx.rx2.ObservableK.bracket().run {
-  this@onError.onError<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  ObservableK<A> = arrow.fx.rx2.ObservableK.bracket().run {
+    this@onError.onError<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 /**
  *  Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource

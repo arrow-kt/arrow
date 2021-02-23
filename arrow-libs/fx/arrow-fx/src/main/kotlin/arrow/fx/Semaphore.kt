@@ -270,22 +270,28 @@ internal class DefaultSemaphore<F>(
       if (n == 0L) just(Unit)
       else promise.flatMap { p ->
         state.modify { old ->
-          val u = old.fold({ waiting ->
-            Left(waiting + listOf(n toT p))
-          }, { m ->
-            if (n <= m) Right(m - n)
-            else Left(listOf((n - m) toT p))
-          })
+          val u = old.fold(
+            { waiting ->
+              Left(waiting + listOf(n toT p))
+            },
+            { m ->
+              if (n <= m) Right(m - n)
+              else Left(listOf((n - m) toT p))
+            }
+          )
 
           Tuple2(u, u)
         }.flatMap { u ->
-          u.fold({ waiting ->
-            waiting.lastOrNone()
-              .map { (_, promise) -> promise.get() }
-              .getOrElse { raiseError(RuntimeException("Semaphore has empty waiting queue rather than 0 count")) }
-          }, {
-            just(Unit)
-          })
+          u.fold(
+            { waiting ->
+              waiting.lastOrNone()
+                .map { (_, promise) -> promise.get() }
+                .getOrElse { raiseError(RuntimeException("Semaphore has empty waiting queue rather than 0 count")) }
+            },
+            {
+              just(Unit)
+            }
+          )
         }
       }
     }
@@ -294,17 +300,26 @@ internal class DefaultSemaphore<F>(
     assertNonNegative(n).flatMap {
       if (n == 0L) just(true)
       else state.modify { old ->
-        val u = old.fold({ waiting -> Left(waiting) }, { m ->
-          if (m >= n) Right(m - n) else Right(m)
-        })
+        val u = old.fold(
+          { waiting -> Left(waiting) },
+          { m ->
+            if (m >= n) Right(m - n) else Right(m)
+          }
+        )
 
         u toT Tuple2(old, u)
       }.map { (previous, now) ->
-        now.fold({ false }, { n ->
-          previous.fold({ false }, { m ->
-            n != m
-          })
-        })
+        now.fold(
+          { false },
+          { n ->
+            previous.fold(
+              { false },
+              { m ->
+                n != m
+              }
+            )
+          }
+        )
       }
     }
 
@@ -312,29 +327,35 @@ internal class DefaultSemaphore<F>(
     assertNonNegative(n).flatMap {
       if (n == 0L) just(Unit)
       else state.modify { old ->
-        val u = old.fold({ waiting: AcquiredPermits<F> ->
-          tailrec fun loop(m: Long, waiting2: AcquiredPermits<F>): State<F> =
-            if (waiting2.isNotEmpty() && m > 0) {
-              val (k, gate) = waiting2.first()
-              if (k > m) loop(0, listOf(Tuple2(k - m, gate)) + waiting2.drop(1))
-              else loop(m - k, waiting2.drop(1))
-            } else {
-              if (waiting2.isNotEmpty()) Left(waiting2)
-              else Right(m)
-            }
+        val u = old.fold(
+          { waiting: AcquiredPermits<F> ->
+            tailrec fun loop(m: Long, waiting2: AcquiredPermits<F>): State<F> =
+              if (waiting2.isNotEmpty() && m > 0) {
+                val (k, gate) = waiting2.first()
+                if (k > m) loop(0, listOf(Tuple2(k - m, gate)) + waiting2.drop(1))
+                else loop(m - k, waiting2.drop(1))
+              } else {
+                if (waiting2.isNotEmpty()) Left(waiting2)
+                else Right(m)
+              }
 
-          loop(n, waiting)
-        }, { m ->
-          Right(m + n)
-        })
+            loop(n, waiting)
+          },
+          { m ->
+            Right(m + n)
+          }
+        )
 
         Tuple2(u, Tuple2(old, u))
       }.flatMap { (previous, now) ->
-        previous.fold({ waiting ->
-          val newSize = now.fold({ newWaiting -> newWaiting.size }, { 0 })
-          val released = waiting.size - newSize
-          waiting.take(released).foldRight(just(Unit)) { (_, promise), tl -> promise.complete(Unit).flatMap { tl } }
-        }, { just(Unit) })
+        previous.fold(
+          { waiting ->
+            val newSize = now.fold({ newWaiting -> newWaiting.size }, { 0 })
+            val released = waiting.size - newSize
+            waiting.take(released).foldRight(just(Unit)) { (_, promise), tl -> promise.complete(Unit).flatMap { tl } }
+          },
+          { just(Unit) }
+        )
       }
     }
 

@@ -123,10 +123,10 @@ fun Duration.min(arg1: Duration): Duration = arrow.fx.typeclasses.Duration.order
 )
 @Deprecated(IODeprecation)
 fun Duration.sort(arg1: Duration): Tuple2<Duration, Duration> =
-    arrow.fx.typeclasses.Duration.order().run {
-  this@sort.sort(arg1) as arrow.core.Tuple2<arrow.fx.typeclasses.Duration,
-    arrow.fx.typeclasses.Duration>
-}
+  arrow.fx.typeclasses.Duration.order().run {
+    this@sort.sort(arg1) as arrow.core.Tuple2<arrow.fx.typeclasses.Duration,
+      arrow.fx.typeclasses.Duration>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

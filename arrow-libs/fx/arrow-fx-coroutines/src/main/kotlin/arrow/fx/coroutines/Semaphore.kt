@@ -377,11 +377,14 @@ private class SemaphoreDefault(private val state: Atomic<SemaphoreState>) : Sema
     return if (n == 0L) Unit
     else {
       val (prev, new) = state.modify { old ->
-        val update = old.fold({ waiting ->
-          calculateNewState(n, waiting)
-        }, { m -> // Nobody waiting for permits
-          Either.Right(m + n)
-        })
+        val update = old.fold(
+          { waiting ->
+            calculateNewState(n, waiting)
+          },
+          { m -> // Nobody waiting for permits
+            Either.Right(m + n)
+          }
+        )
 
         Pair(update, Pair(old, update))
       }

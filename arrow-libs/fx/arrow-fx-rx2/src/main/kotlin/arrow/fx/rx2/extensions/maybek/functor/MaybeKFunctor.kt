@@ -29,9 +29,9 @@ internal val functor_singleton: MaybeKFunctor = object : arrow.fx.rx2.extensions
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.map(arg1: Function1<A, B>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -42,9 +42,9 @@ fun <A, B> Kind<ForMaybeK, A>.map(arg1: Function1<A, B>): MaybeK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -55,9 +55,9 @@ fun <A, B> Kind<ForMaybeK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>)
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForMaybeK, A>, Kind<ForMaybeK, B>> =
-    arrow.fx.rx2.MaybeK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForMaybeK, A>,
+  arrow.fx.rx2.MaybeK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForMaybeK, A>,
     arrow.Kind<arrow.fx.rx2.ForMaybeK, B>>
 
 @JvmName("void")
@@ -81,9 +81,9 @@ fun <A> Kind<ForMaybeK, A>.void(): MaybeK<Unit> = arrow.fx.rx2.MaybeK.functor().
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.fproduct(arg1: Function1<A, B>): MaybeK<Tuple2<A, B>> =
-    arrow.fx.rx2.MaybeK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.MaybeK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -118,9 +118,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForMaybeK, B>): MaybeK<A> = arrow.fx.rx2.MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.tupleLeft(arg1: B): MaybeK<Tuple2<B, A>> =
-    arrow.fx.rx2.MaybeK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<B, A>>
-}
+  arrow.fx.rx2.MaybeK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -131,9 +131,9 @@ fun <A, B> Kind<ForMaybeK, A>.tupleLeft(arg1: B): MaybeK<Tuple2<B, A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.tupleRight(arg1: B): MaybeK<Tuple2<A, B>> =
-    arrow.fx.rx2.MaybeK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.MaybeK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.MaybeK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

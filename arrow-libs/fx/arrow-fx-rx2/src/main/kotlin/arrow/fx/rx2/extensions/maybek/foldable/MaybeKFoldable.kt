@@ -51,8 +51,8 @@ fun <A, B> Kind<ForMaybeK, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B =
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval<B>>):
   Eval<B> = arrow.fx.rx2.MaybeK.foldable().run {
-  this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
-}
+    this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
+  }
 
 @JvmName("fold")
 @Suppress(
@@ -76,8 +76,8 @@ fun <A> Kind<ForMaybeK, A>.fold(arg1: Monoid<A>): A = arrow.fx.rx2.MaybeK.foldab
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.reduceLeftToOption(arg1: Function1<A, B>, arg2: Function2<B, A, B>):
   Option<B> = arrow.fx.rx2.MaybeK.foldable().run {
-  this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
-}
+    this@reduceLeftToOption.reduceLeftToOption<A, B>(arg1, arg2) as arrow.core.Option<B>
+  }
 
 @JvmName("reduceRightToOption")
 @Suppress(
@@ -169,8 +169,8 @@ fun <A> orEmpty(arg0: Applicative<ForMaybeK>, arg1: Monoid<A>): MaybeK<A> = arro
 @Deprecated(DeprecateRxJava)
 fun <G, A, B> Kind<ForMaybeK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.fx.rx2.MaybeK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(

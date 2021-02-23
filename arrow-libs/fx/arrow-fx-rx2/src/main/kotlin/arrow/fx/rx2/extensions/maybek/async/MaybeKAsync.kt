@@ -65,9 +65,9 @@ internal val async_singleton: MaybeKAsync = object : arrow.fx.rx2.extensions.May
 )
 @Deprecated(DeprecateRxJava)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForMaybeK, Unit>>):
-    MaybeK<A> = arrow.fx.rx2.MaybeK
-   .async()
-   .asyncF<A>(arg0) as arrow.fx.rx2.MaybeK<A>
+  MaybeK<A> = arrow.fx.rx2.MaybeK
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -104,9 +104,9 @@ fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForMa
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.continueOn(arg1: CoroutineContext): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.async().run {
-  this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.async().run {
+    this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -141,8 +141,8 @@ fun <A> Kind<ForMaybeK, A>.continueOn(arg1: CoroutineContext): MaybeK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): MaybeK<A> = arrow.fx.rx2.MaybeK
-   .async()
-   .later<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  .async()
+  .later<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -179,8 +179,8 @@ fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): MaybeK<A> = arrow.fx.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: suspend () -> A): MaybeK<A> = arrow.fx.rx2.MaybeK
-   .async()
-   .effect<A>(arg0) as arrow.fx.rx2.MaybeK<A>
+  .async()
+  .effect<A>(arg0) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -217,8 +217,8 @@ fun <A> effect(arg0: suspend () -> A): MaybeK<A> = arrow.fx.rx2.MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): MaybeK<A> = arrow.fx.rx2.MaybeK
-   .async()
-   .effect<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  .async()
+  .effect<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -253,9 +253,9 @@ fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): MaybeK<A> = arrow
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForMaybeK, A>>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK
-   .async()
-   .defer<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  arrow.fx.rx2.MaybeK
+    .async()
+    .defer<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -271,9 +271,9 @@ fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForMaybeK, A>>): Mayb
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: CoroutineContext, arg1: Function0<Either<Throwable, A>>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK
-   .async()
-   .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
+  arrow.fx.rx2.MaybeK
+    .async()
+    .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -341,8 +341,8 @@ fun CoroutineContext.shift(): MaybeK<Unit> = arrow.fx.rx2.MaybeK.async().run {
 )
 @Deprecated(DeprecateRxJava)
 fun <A> never(): MaybeK<A> = arrow.fx.rx2.MaybeK
-   .async()
-   .never<A>() as arrow.fx.rx2.MaybeK<A>
+  .async()
+  .never<A>() as arrow.fx.rx2.MaybeK<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect
@@ -377,9 +377,9 @@ fun <A> never(): MaybeK<A> = arrow.fx.rx2.MaybeK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.effectMap(arg1: suspend (A) -> B): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.async().run {
-  this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.async().run {
+    this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 /**
  *  [Async] models how a data type runs an asynchronous computation that may fail.

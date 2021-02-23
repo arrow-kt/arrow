@@ -682,10 +682,13 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
    */
   fun <S, O2> mapAccumulate(init: S, f: (S, O) -> Pair<S, O2>): Stream<Pair<S, O2>> =
     scanChunks(init) { acc, c ->
-      c.mapAccumulate(acc, { s: S, o: O ->
-        val (newS, newO) = f(s, o)
-        Pair(newS, Pair(newS, newO))
-      })
+      c.mapAccumulate(
+        acc,
+        { s: S, o: O ->
+          val (newS, newO) = f(s, o)
+          Pair(newS, Pair(newS, newO))
+        }
+      )
     }
 
   /**
@@ -1423,19 +1426,22 @@ inline fun <A> StreamOf<A>.fix(): Stream<A> =
     doneR: Promise<Either<Throwable, Unit>>,
     interruptL: Promise<Unit>
   ): Unit =
-    guaranteeCase({
-      haltWhenTrue
-        .takeWhile(Boolean::not)
-        .interruptWhen { Right(interruptR.get()) }
-        .drain()
-    }, { ex ->
-      val r = when (ex) {
-        is ExitCase.Failure -> Left(ex.failure)
-        else -> Right(Unit)
+    guaranteeCase(
+      {
+        haltWhenTrue
+          .takeWhile(Boolean::not)
+          .interruptWhen { Right(interruptR.get()) }
+          .drain()
+      },
+      { ex ->
+        val r = when (ex) {
+          is ExitCase.Failure -> Left(ex.failure)
+          else -> Right(Unit)
+        }
+        doneR.complete(r) // complete result promise
+        interruptL.complete(Unit) // interrupt right with `Unit`
       }
-      doneR.complete(r) // complete result promise
-      interruptL.complete(Unit) // interrupt right with `Unit`
-    })
+    )
 
   /** Fails this stream with a [TimeoutException] if it does not complete within given `timeout`. */
   fun timeout(timeout: Duration): Stream<O> =
@@ -2236,8 +2242,9 @@ fun <O> Stream<O>.intersperse(separator: O): Stream<O> =
         pull2.unconsOrNull().flatMap { uncons ->
           when (uncons) {
             null -> Pull.just(null)
-            else -> Pull.output(uncons.head.intersperse(separator))
-              .flatMap { Pull.just(uncons.tail) }
+            else ->
+              Pull.output(uncons.head.intersperse(separator))
+                .flatMap { Pull.just(uncons.tail) }
           }
         }
       }
@@ -2598,7 +2605,7 @@ private fun <A, B, C> Pull<A, Unit>.zipWith_(
 }
 
 typealias ZipWithCont<I, O> =
-    (Either<Pair<Chunk<I>, Pull<I, Unit>>, Pull<I, Unit>>) -> Pull<O, Unit>
+  (Either<Pair<Chunk<I>, Pull<I, Unit>>, Pull<I, Unit>>) -> Pull<O, Unit>
 
 /** `Monoid` instance for `Stream`. */
 fun <O> Stream.Companion.monoid(): Monoid<Stream<O>> =

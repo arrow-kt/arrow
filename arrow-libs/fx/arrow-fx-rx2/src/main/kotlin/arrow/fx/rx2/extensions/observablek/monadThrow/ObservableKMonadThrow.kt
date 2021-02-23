@@ -15,7 +15,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadThrow_singleton: ObservableKMonadThrow = object :
-    arrow.fx.rx2.extensions.ObservableKMonadThrow {}
+  arrow.fx.rx2.extensions.ObservableKMonadThrow {}
 
 @JvmName("raiseNonFatal")
 @Suppress(

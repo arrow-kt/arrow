@@ -52,8 +52,8 @@ fun <A, B> Kind<ForFlowableK, A>.foldLeft(arg1: B, arg2: Function2<B, A, B>): B 
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.foldRight(arg1: Eval<B>, arg2: Function2<A, Eval<B>, Eval<B>>):
   Eval<B> = arrow.fx.rx2.FlowableK.foldable().run {
-  this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
-}
+    this@foldRight.foldRight<A, B>(arg1, arg2) as arrow.core.Eval<B>
+  }
 
 @JvmName("fold")
 @Suppress(
@@ -123,8 +123,8 @@ fun <A> Kind<ForFlowableK, A>.reduceLeftOption(arg1: Function2<A, A, A>): Option
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.reduceRightOption(arg1: Function2<A, Eval<A>, Eval<A>>):
   Eval<Option<A>> = arrow.fx.rx2.FlowableK.foldable().run {
-  this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
-}
+    this@reduceRightOption.reduceRightOption<A>(arg1) as arrow.core.Eval<arrow.core.Option<A>>
+  }
 
 @JvmName("combineAll")
 @Suppress(
@@ -175,8 +175,8 @@ fun <A> orEmpty(arg0: Applicative<ForFlowableK>, arg1: Monoid<A>): FlowableK<A> 
 @Deprecated(DeprecateRxJava)
 fun <G, A, B> Kind<ForFlowableK, A>.traverse_(arg1: Applicative<G>, arg2: Function1<A, Kind<G, B>>):
   Kind<G, Unit> = arrow.fx.rx2.FlowableK.foldable().run {
-  this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
-}
+    this@traverse_.traverse_<G, A, B>(arg1, arg2) as arrow.Kind<G, kotlin.Unit>
+  }
 
 @JvmName("sequence_")
 @Suppress(

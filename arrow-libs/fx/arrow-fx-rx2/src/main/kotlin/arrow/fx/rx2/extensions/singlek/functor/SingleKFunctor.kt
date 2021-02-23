@@ -29,9 +29,9 @@ internal val functor_singleton: SingleKFunctor = object : arrow.fx.rx2.extension
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
-    arrow.fx.rx2.SingleK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -42,9 +42,9 @@ fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): SingleK<B> =
-    arrow.fx.rx2.SingleK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -55,9 +55,9 @@ fun <A, B> Kind<ForSingleK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForSingleK, A>, Kind<ForSingleK, B>> =
-    arrow.fx.rx2.SingleK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForSingleK, A>,
+  arrow.fx.rx2.SingleK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForSingleK, A>,
     arrow.Kind<arrow.fx.rx2.ForSingleK, B>>
 
 @JvmName("void")
@@ -81,9 +81,9 @@ fun <A> Kind<ForSingleK, A>.void(): SingleK<Unit> = arrow.fx.rx2.SingleK.functor
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.fproduct(arg1: Function1<A, B>): SingleK<Tuple2<A, B>> =
-    arrow.fx.rx2.SingleK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.SingleK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -118,9 +118,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForSingleK, B>): SingleK<A> = arrow.fx.rx2.Sing
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.tupleLeft(arg1: B): SingleK<Tuple2<B, A>> =
-    arrow.fx.rx2.SingleK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<B, A>>
-}
+  arrow.fx.rx2.SingleK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -131,9 +131,9 @@ fun <A, B> Kind<ForSingleK, A>.tupleLeft(arg1: B): SingleK<Tuple2<B, A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.tupleRight(arg1: B): SingleK<Tuple2<A, B>> =
-    arrow.fx.rx2.SingleK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.SingleK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.SingleK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

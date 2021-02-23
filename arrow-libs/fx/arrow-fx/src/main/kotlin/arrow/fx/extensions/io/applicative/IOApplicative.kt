@@ -43,8 +43,8 @@ fun <A> A.just(): IO<A> = arrow.fx.IO.applicative().run {
 )
 @Deprecated(IODeprecation)
 fun unit(): IO<Unit> = arrow.fx.IO
-   .applicative()
-   .unit() as arrow.fx.IO<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.IO<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -79,9 +79,9 @@ fun <A> Kind<ForIO, A>.replicate(arg1: Int): IO<List<A>> = arrow.fx.IO.applicati
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.replicate(arg1: Int, arg2: Monoid<A>): IO<A> =
-    arrow.fx.IO.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.IO<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functorFilter_singleton: FluxKFunctorFilter = object :
-    arrow.fx.reactor.extensions.FluxKFunctorFilter {}
+  arrow.fx.reactor.extensions.FluxKFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -31,9 +31,9 @@ internal val functorFilter_singleton: FluxKFunctorFilter = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.filterMap(arg1: Function1<A, Option<B>>): FluxK<B> =
-    arrow.fx.reactor.FluxK.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -44,9 +44,9 @@ fun <A, B> Kind<ForFluxK, A>.filterMap(arg1: Function1<A, Option<B>>): FluxK<B> 
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, Option<A>>.flattenOption(): FluxK<A> =
-    arrow.fx.reactor.FluxK.functorFilter().run {
-  this@flattenOption.flattenOption<A>() as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.functorFilter().run {
+    this@flattenOption.flattenOption<A>() as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -57,9 +57,9 @@ fun <A> Kind<ForFluxK, Option<A>>.flattenOption(): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.filter(arg1: Function1<A, Boolean>): FluxK<A> =
-    arrow.fx.reactor.FluxK.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -70,9 +70,9 @@ fun <A> Kind<ForFluxK, A>.filter(arg1: Function1<A, Boolean>): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.filterIsInstance(arg1: Class<B>): FluxK<B> =
-    arrow.fx.reactor.FluxK.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

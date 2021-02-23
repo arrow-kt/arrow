@@ -177,11 +177,12 @@ sealed class Pull<out O, out R> {
 
     inline fun <B> map(f: (R) -> B): Result<B> =
       when (this) {
-        is Pure -> try {
-          Pure(f(this.r))
-        } catch (e: Throwable) {
-          Fail(e.nonFatalOrThrow())
-        }
+        is Pure ->
+          try {
+            Pure(f(this.r))
+          } catch (e: Throwable) {
+            Fail(e.nonFatalOrThrow())
+          }
         is Fail -> this
         is Interrupted<*> -> this
       }
@@ -304,11 +305,12 @@ fun <O, O2 : O, R, R2> Pull<O, R>.flatMap(f: (R) -> Pull<O2, R2>): Pull<O2, R2> 
   object : Pull.Bind<O2, R, R2>(this@flatMap as Pull<O2, R>) {
     override fun cont(r: Result<R>): Pull<O2, R2> =
       when (r) {
-        is Pure -> try {
-          f(r.r)
-        } catch (e: Throwable) {
-          Fail(e.nonFatalOrThrow())
-        }
+        is Pure ->
+          try {
+            f(r.r)
+          } catch (e: Throwable) {
+            Fail(e.nonFatalOrThrow())
+          }
         is Fail -> r
         is Interrupted<*> -> r
       }

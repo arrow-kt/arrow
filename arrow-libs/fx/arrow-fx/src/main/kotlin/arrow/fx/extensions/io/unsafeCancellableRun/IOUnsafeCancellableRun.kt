@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val unsafeCancellableRun_singleton: IOUnsafeCancellableRun = object :
-    arrow.fx.extensions.IOUnsafeCancellableRun {}
+  arrow.fx.extensions.IOUnsafeCancellableRun {}
 
 @JvmName("runNonBlockingCancellable")
 @Suppress(

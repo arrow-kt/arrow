@@ -32,8 +32,8 @@ fun <A> Collection<IO<A>>.combineAll(SG: Monoid<A>): IO<A> = arrow.fx.IO.monoid<
 )
 @Deprecated(IODeprecation)
 fun <A> combineAll(SG: Monoid<A>, arg0: List<IO<A>>): IO<A> = arrow.fx.IO
-   .monoid<A>(SG)
-   .combineAll(arg0) as arrow.fx.IO<A>
+  .monoid<A>(SG)
+  .combineAll(arg0) as arrow.fx.IO<A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -41,4 +41,4 @@ fun <A> combineAll(SG: Monoid<A>, arg0: List<IO<A>>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 inline fun <A> Companion.monoid(SG: Monoid<A>): IOMonoid<A> = object :
-    arrow.fx.extensions.IOMonoid<A> { override fun SG(): arrow.typeclasses.Monoid<A> = SG }
+  arrow.fx.extensions.IOMonoid<A> { override fun SG(): arrow.typeclasses.Monoid<A> = SG }

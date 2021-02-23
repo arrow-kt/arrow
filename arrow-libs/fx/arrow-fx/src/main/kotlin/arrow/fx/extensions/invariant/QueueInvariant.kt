@@ -34,4 +34,4 @@ fun <F, A, B> Kind<Kind<ForQueue, F>, A>.imap(
 )
 @Deprecated(IODeprecation)
 inline fun <F> Companion.invariant(FR: Functor<F>): QueueInvariant<F> = object :
-    arrow.fx.extensions.QueueInvariant<F> { override fun FR(): arrow.typeclasses.Functor<F> = FR }
+  arrow.fx.extensions.QueueInvariant<F> { override fun FR(): arrow.typeclasses.Functor<F> = FR }

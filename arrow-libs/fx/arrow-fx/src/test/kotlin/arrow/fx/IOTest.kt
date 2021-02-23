@@ -162,13 +162,16 @@ class IOTest : ArrowFxSpec() {
 
     "should return an error when running an exception with unsafeRunAsync" {
       IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
-        either.fold({
-          when (it) {
-            is MyException -> {
+        either.fold(
+          {
+            when (it) {
+              is MyException -> {
+              }
+              else -> fail("Should only throw MyException")
             }
-            else -> fail("Should only throw MyException")
-          }
-        }, { fail("") })
+          },
+          { fail("") }
+        )
       }
     }
 
@@ -220,14 +223,17 @@ class IOTest : ArrowFxSpec() {
 
     "should return an error when running an exception with runAsync" {
       IO.raiseError<Int>(MyException()).runAsync { either ->
-        either.fold({
-          when (it) {
-            is MyException -> {
-              IO { }
+        either.fold(
+          {
+            when (it) {
+              is MyException -> {
+                IO { }
+              }
+              else -> fail("Should only throw MyException")
             }
-            else -> fail("Should only throw MyException")
-          }
-        }, { fail("") })
+          },
+          { fail("") }
+        )
       }.unsafeRunSync()
     }
 
@@ -455,7 +461,8 @@ class IOTest : ArrowFxSpec() {
           .map { num }.order()
 
       val result =
-        IO.parMapN(all,
+        IO.parMapN(
+          all,
           makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()
         ) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
@@ -499,8 +506,10 @@ class IOTest : ArrowFxSpec() {
         }
 
       val result =
-        IO.parMapN(all,
-          makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
+        IO.parMapN(
+          all,
+          makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }
+        ) { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
 
@@ -510,11 +519,13 @@ class IOTest : ArrowFxSpec() {
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext".config(enabled = false) {
       val result =
-        IO.parTupledN(all,
+        IO.parTupledN(
+          all,
           IO { Thread.currentThread().name },
           IO.defer { just(Thread.currentThread().name) },
           IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
-          IO(other) { Thread.currentThread().name })
+          IO(other) { Thread.currentThread().name }
+        )
           .unsafeRunSync()
 
       result shouldBe Tuple4("all", "all", "all", "other")

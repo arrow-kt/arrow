@@ -19,10 +19,13 @@ class CancelBoundary : StringSpec({
     val latch = Promise<Unit>()
     val exit = Promise<ExitCase>()
     val f = ForkConnected {
-      guaranteeCase({
-        latch.complete(Unit)
-        forever()
-      }, { ec -> exit.complete(ec) })
+      guaranteeCase(
+        {
+          latch.complete(Unit)
+          forever()
+        },
+        { ec -> exit.complete(ec) }
+      )
     }
     latch.get()
     f.cancel()

@@ -79,7 +79,7 @@ internal val bracket_singleton: MaybeKBracket = object : arrow.fx.rx2.extensions
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>, Kind<ForMaybeK,
-    Unit>>,
+      Unit>>,
   arg2: Function1<A, Kind<ForMaybeK, B>>
 ): MaybeK<B> = arrow.fx.rx2.MaybeK.bracket().run {
   this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.MaybeK<B>
@@ -207,7 +207,7 @@ fun <A> Kind<ForMaybeK, A>.guarantee(arg1: Kind<ForMaybeK, Unit>): MaybeK<A> =
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.guaranteeCase(
   arg1: Function1<ExitCase<Throwable>, Kind<ForMaybeK,
-    Unit>>
+      Unit>>
 ): MaybeK<A> = arrow.fx.rx2.MaybeK.bracket().run {
   this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.rx2.MaybeK<A>
 }

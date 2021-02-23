@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: SingleKApplicativeError = object :
-    arrow.fx.rx2.extensions.SingleKApplicativeError {}
+  arrow.fx.rx2.extensions.SingleKApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -33,9 +33,9 @@ internal val applicativeError_singleton: SingleKApplicativeError = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.handleErrorWith(arg1: Function1<Throwable, Kind<ForSingleK, A>>):
-    SingleK<A> = arrow.fx.rx2.SingleK.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  SingleK<A> = arrow.fx.rx2.SingleK.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Throwable.raiseError(): SingleK<A> = arrow.fx.rx2.SingleK.applicativeErr
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): SingleK<A> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): SingleK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): SingleK<A> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): SingleK<A>
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.handleError(arg1: Function1<Throwable, A>): SingleK<A> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForSingleK, A>.handleError(arg1: Function1<Throwable, A>): SingleK<
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>):
-    SingleK<B> = arrow.fx.rx2.SingleK.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
-}
+  SingleK<B> = arrow.fx.rx2.SingleK.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -110,9 +110,9 @@ fun <A, B> Kind<ForSingleK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Funct
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.attempt(): SingleK<Either<Throwable, A>> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.fx.rx2.SingleK<arrow.core.Either<kotlin.Throwable, A>>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.fx.rx2.SingleK<arrow.core.Either<kotlin.Throwable, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -123,9 +123,9 @@ fun <A> Kind<ForSingleK, A>.attempt(): SingleK<Either<Throwable, A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): SingleK<A> =
-    arrow.fx.rx2.SingleK
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.rx2.SingleK<A>
+  arrow.fx.rx2.SingleK
+    .applicativeError()
+    .catch<A>(arg0, arg1) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("catch")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): Single
 )
 @Deprecated(DeprecateRxJava)
 fun <A> ApplicativeError<ForSingleK, Throwable>.catch(arg1: Function0<A>): SingleK<A> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -149,9 +149,9 @@ fun <A> ApplicativeError<ForSingleK, Throwable>.catch(arg1: Function0<A>): Singl
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A):
-    SingleK<A> = arrow.fx.rx2.SingleK
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.SingleK<A>
+  SingleK<A> = arrow.fx.rx2.SingleK
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.rx2.SingleK<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -162,9 +162,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.rx2.SingleK.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.rx2.SingleK.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

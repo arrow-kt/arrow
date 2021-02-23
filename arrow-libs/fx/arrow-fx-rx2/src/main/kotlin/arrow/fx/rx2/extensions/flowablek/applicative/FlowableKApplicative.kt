@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: FlowableKApplicative = object :
-    arrow.fx.rx2.extensions.FlowableKApplicative {}
+  arrow.fx.rx2.extensions.FlowableKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): FlowableK<A> = arrow.fx.rx2.FlowableK.applicative().run {
 )
 @Deprecated(DeprecateRxJava)
 fun unit(): FlowableK<Unit> = arrow.fx.rx2.FlowableK
-   .applicative()
-   .unit() as arrow.fx.rx2.FlowableK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.rx2.FlowableK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): FlowableK<Unit> = arrow.fx.rx2.FlowableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.map(arg1: Function1<A, B>): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForFlowableK, A>.map(arg1: Function1<A, B>): FlowableK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.replicate(arg1: Int): FlowableK<List<A>> =
-    arrow.fx.rx2.FlowableK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.rx2.FlowableK<kotlin.collections.List<A>>
-}
+  arrow.fx.rx2.FlowableK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.rx2.FlowableK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForFlowableK, A>.replicate(arg1: Int): FlowableK<List<A>> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.replicate(arg1: Int, arg2: Monoid<A>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.rx2.FlowableK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

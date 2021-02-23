@@ -30,9 +30,9 @@ fun <A> IO<A>.plus(SG: Semigroup<A>, arg1: IO<A>): IO<A> = arrow.fx.IO.semigroup
 )
 @Deprecated(IODeprecation)
 fun <A> IO<A>.maybeCombine(SG: Semigroup<A>, arg1: IO<A>): IO<A> =
-    arrow.fx.IO.semigroup<A>(SG).run {
-  this@maybeCombine.maybeCombine(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.semigroup<A>(SG).run {
+    this@maybeCombine.maybeCombine(arg1) as arrow.fx.IO<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -40,4 +40,4 @@ fun <A> IO<A>.maybeCombine(SG: Semigroup<A>, arg1: IO<A>): IO<A> =
 )
 @Deprecated(IODeprecation)
 inline fun <A> Companion.semigroup(SG: Semigroup<A>): IOSemigroup<A> = object :
-    arrow.fx.extensions.IOSemigroup<A> { override fun SG(): arrow.typeclasses.Semigroup<A> = SG }
+  arrow.fx.extensions.IOSemigroup<A> { override fun SG(): arrow.typeclasses.Semigroup<A> = SG }

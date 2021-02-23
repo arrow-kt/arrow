@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functor_singleton: ObservableKFunctor = object :
-    arrow.fx.rx2.extensions.ObservableKFunctor {}
+  arrow.fx.rx2.extensions.ObservableKFunctor {}
 
 @JvmName("map")
 @Suppress(
@@ -30,9 +30,9 @@ internal val functor_singleton: ObservableKFunctor = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.map(arg1: Function1<A, B>): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A, B> Kind<ForObservableK, A>.map(arg1: Function1<A, B>): ObservableK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
-    ObservableK<B> = arrow.fx.rx2.ObservableK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
-}
+  ObservableK<B> = arrow.fx.rx2.ObservableK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -56,9 +56,9 @@ fun <A, B> Kind<ForObservableK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForObservableK, A>, Kind<ForObservableK, B>> =
-    arrow.fx.rx2.ObservableK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForObservableK, A>,
+  arrow.fx.rx2.ObservableK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.rx2.ForObservableK, A>,
     arrow.Kind<arrow.fx.rx2.ForObservableK, B>>
 
 @JvmName("void")
@@ -82,9 +82,9 @@ fun <A> Kind<ForObservableK, A>.void(): ObservableK<Unit> = arrow.fx.rx2.Observa
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.fproduct(arg1: Function1<A, B>): ObservableK<Tuple2<A, B>> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -95,9 +95,9 @@ fun <A, B> Kind<ForObservableK, A>.fproduct(arg1: Function1<A, B>): ObservableK<
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.mapConst(arg1: B): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -108,9 +108,9 @@ fun <A, B> Kind<ForObservableK, A>.mapConst(arg1: B): ObservableK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> A.mapConst(arg1: Kind<ForObservableK, B>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@mapConst.mapConst<A, B>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 @JvmName("tupleLeft")
 @Suppress(
@@ -121,9 +121,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForObservableK, B>): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.tupleLeft(arg1: B): ObservableK<Tuple2<B, A>> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<B, A>>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -134,9 +134,9 @@ fun <A, B> Kind<ForObservableK, A>.tupleLeft(arg1: B): ObservableK<Tuple2<B, A>>
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.tupleRight(arg1: B): ObservableK<Tuple2<A, B>> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.rx2.ObservableK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(
@@ -147,9 +147,9 @@ fun <A, B> Kind<ForObservableK, A>.tupleRight(arg1: B): ObservableK<Tuple2<A, B>
 )
 @Deprecated(DeprecateRxJava)
 fun <B, A : B> Kind<ForObservableK, A>.widen(): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.functor().run {
-  this@widen.widen<B, A>() as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.functor().run {
+    this@widen.widen<B, A>() as arrow.fx.rx2.ObservableK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

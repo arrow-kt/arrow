@@ -147,10 +147,12 @@ suspend fun <A> cancellableF(cb: suspend ((Result<A>) -> Unit) -> CancelToken): 
 
     suspend {
       withContext(NonCancellable) { cb(cont1::resumeWith) }
-    }.startCoroutine(Continuation(cont.context) { res ->
-      if (active.value && !cont.context.isActive) Platform.unsafeRunSync { res.getOrThrow().invoke() }
-      else cont.invokeOnCancellation { Platform.unsafeRunSync { res.getOrThrow().invoke() } }
-    })
+    }.startCoroutine(
+      Continuation(cont.context) { res ->
+        if (active.value && !cont.context.isActive) Platform.unsafeRunSync { res.getOrThrow().invoke() }
+        else cont.invokeOnCancellation { Platform.unsafeRunSync { res.getOrThrow().invoke() } }
+      }
+    )
   }
 
 suspend fun <A> never(): A =

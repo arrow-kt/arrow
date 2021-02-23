@@ -108,8 +108,9 @@ internal suspend fun <O> Stream<Stream<O>>.runOuter(
 
   when (r) {
     is Either.Right -> decrementRunning(done, outputQ, running)
-    is Either.Left -> stop(done, outputQ, Some(r.a))
-      .also { decrementRunning(done, outputQ, running) }
+    is Either.Left ->
+      stop(done, outputQ, Some(r.a))
+        .also { decrementRunning(done, outputQ, running) }
   }
 }
 
@@ -186,18 +187,21 @@ fun <O> Stream<Stream<O>>.parJoin(
     // all the streams will be terminated. If err is supplied, that will get attached to any error currently present
     val outputQ = Queue.synchronousNoneTerminated<Chunk<O>>()
 
-    Stream.bracket({
-      ForkAndForget(ctx) { runOuter(ctx, done, outputQ, running, available) }
-    }, {
-      stop(done, outputQ, None)
+    Stream.bracket(
+      {
+        ForkAndForget(ctx) { runOuter(ctx, done, outputQ, running, available) }
+      },
+      {
+        stop(done, outputQ, None)
 
-      running.discrete() // Await everyone stop running
-        .dropWhile { it > 0 }
-        .take(1)
-        .drain()
+        running.discrete() // Await everyone stop running
+          .dropWhile { it > 0 }
+          .take(1)
+          .drain()
 
-      signalResult(done)
-    }).flatMap {
+        signalResult(done)
+      }
+    ).flatMap {
       outputQ.dequeue()
         .flatMap(Stream.Companion::chunk)
     }

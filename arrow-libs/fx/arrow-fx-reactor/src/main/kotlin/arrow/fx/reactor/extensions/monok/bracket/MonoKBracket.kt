@@ -79,7 +79,7 @@ internal val bracket_singleton: MonoKBracket = object : arrow.fx.reactor.extensi
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>, Kind<ForMonoK,
-    Unit>>,
+      Unit>>,
   arg2: Function1<A, Kind<ForMonoK, B>>
 ): MonoK<B> =
   arrow.fx.reactor.MonoK.bracket().run {
@@ -208,8 +208,8 @@ fun <A> Kind<ForMonoK, A>.guarantee(arg1: Kind<ForMonoK, Unit>): MonoK<A> =
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.guaranteeCase(arg1: Function1<ExitCase<Throwable>, Kind<ForMonoK, Unit>>):
   MonoK<A> = arrow.fx.reactor.MonoK.bracket().run {
-  this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.reactor.MonoK<A>
-}
+    this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.reactor.MonoK<A>
+  }
 
 /**
  *  Executes the given [finalizer] when the source is cancelled, allowing registering a cancellation token.

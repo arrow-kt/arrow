@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val unsafeRun_singleton: MaybeKUnsafeRun = object : arrow.fx.rx2.extensions.MaybeKUnsafeRun
-    {}
+{}
 
 @JvmName("runBlocking")
 @Suppress(
@@ -32,9 +32,9 @@ internal val unsafeRun_singleton: MaybeKUnsafeRun = object : arrow.fx.rx2.extens
 )
 @Deprecated(DeprecateRxJava)
 suspend fun <A> unsafe.runBlocking(arg1: Function0<Kind<ForMaybeK, A>>): A =
-    arrow.fx.rx2.MaybeK.unsafeRun().run {
-  this@runBlocking.runBlocking<A>(arg1) as A
-}
+  arrow.fx.rx2.MaybeK.unsafeRun().run {
+    this@runBlocking.runBlocking<A>(arg1) as A
+  }
 
 @JvmName("runNonBlocking")
 @Suppress(

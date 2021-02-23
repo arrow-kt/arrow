@@ -230,12 +230,15 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
     fun <A> async(fa: MaybeKProc<A>): MaybeK<A> =
       Maybe.create<A> { emitter ->
         fa { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it)
-          }, {
-            it?.let(emitter::onSuccess)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it)
+            },
+            {
+              it?.let(emitter::onSuccess)
+              emitter.onComplete()
+            }
+          )
         }
       }.k()
 
@@ -243,12 +246,15 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
     fun <A> asyncF(fa: MaybeKProcF<A>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val dispose = fa { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it)
-          }, {
-            it?.let(emitter::onSuccess)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it)
+            },
+            {
+              it?.let(emitter::onSuccess)
+              emitter.onComplete()
+            }
+          )
         }.fix().maybe.subscribe({}, { e -> emitter.tryOnError(e) })
 
         emitter.setCancellable { dispose.dispose() }
@@ -285,12 +291,15 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
     fun <A> cancellable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, {
-            it?.let(emitter::onSuccess)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it).let { Unit }
+            },
+            {
+              it?.let(emitter::onSuccess)
+              emitter.onComplete()
+            }
+          )
         }
 
         val token = try {
@@ -315,12 +324,15 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
     fun <A> cancellableF(fa: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.tryOnError(it).let { Unit }
-          }, {
-            it?.let(emitter::onSuccess)
-            emitter.onComplete()
-          })
+          either.fold(
+            {
+              emitter.tryOnError(it).let { Unit }
+            },
+            {
+              it?.let(emitter::onSuccess)
+              emitter.onComplete()
+            }
+          )
         }
 
         val fa2 = try {
@@ -331,19 +343,28 @@ data class MaybeK<out A>(val maybe: Maybe<out A>) : MaybeKOf<A> {
         }
 
         val cancelOrToken = AtomicRefW<Either<Unit, CancelToken<ForMaybeK>>?>(null)
-        val disp = fa2.value().subscribe({ token ->
-          val cancel = cancelOrToken.getAndSet(Right(token))
-          cancel?.fold({
-            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
-          }, {})
-        }, { e -> emitter.tryOnError(e) })
+        val disp = fa2.value().subscribe(
+          { token ->
+            val cancel = cancelOrToken.getAndSet(Right(token))
+            cancel?.fold(
+              {
+                token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+              },
+              {}
+            )
+          },
+          { e -> emitter.tryOnError(e) }
+        )
 
         emitter.setCancellable {
           disp.dispose()
           val token = cancelOrToken.getAndSet(Left(Unit))
-          token?.fold({}, {
-            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
-          })
+          token?.fold(
+            {},
+            {
+              it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+            }
+          )
         }
       }.k()
 

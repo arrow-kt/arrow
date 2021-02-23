@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicative_singleton: MonoKApplicative = object :
-    arrow.fx.reactor.extensions.MonoKApplicative {}
+  arrow.fx.reactor.extensions.MonoKApplicative {}
 
 @JvmName("just1")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> A.just(): MonoK<A> = arrow.fx.reactor.MonoK.applicative().run {
 )
 @Deprecated(DeprecateReactor)
 fun unit(): MonoK<Unit> = arrow.fx.reactor.MonoK
-   .applicative()
-   .unit() as arrow.fx.reactor.MonoK<kotlin.Unit>
+  .applicative()
+  .unit() as arrow.fx.reactor.MonoK<kotlin.Unit>
 
 @JvmName("map")
 @Suppress(
@@ -56,9 +56,9 @@ fun unit(): MonoK<Unit> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForMonoK, A>.map(arg1: Function1<A, B>): MonoK<B> =
-    arrow.fx.reactor.MonoK.applicative().run {
-  this@map.map<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
-}
+  arrow.fx.reactor.MonoK.applicative().run {
+    this@map.map<A, B>(arg1) as arrow.fx.reactor.MonoK<B>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -69,9 +69,9 @@ fun <A, B> Kind<ForMonoK, A>.map(arg1: Function1<A, B>): MonoK<B> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.replicate(arg1: Int): MonoK<List<A>> =
-    arrow.fx.reactor.MonoK.applicative().run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.reactor.MonoK<kotlin.collections.List<A>>
-}
+  arrow.fx.reactor.MonoK.applicative().run {
+    this@replicate.replicate<A>(arg1) as arrow.fx.reactor.MonoK<kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(
@@ -82,9 +82,9 @@ fun <A> Kind<ForMonoK, A>.replicate(arg1: Int): MonoK<List<A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.replicate(arg1: Int, arg2: Monoid<A>): MonoK<A> =
-    arrow.fx.reactor.MonoK.applicative().run {
-  this@replicate.replicate<A>(arg1, arg2) as arrow.fx.reactor.MonoK<A>
-}
+  arrow.fx.reactor.MonoK.applicative().run {
+    this@replicate.replicate<A>(arg1, arg2) as arrow.fx.reactor.MonoK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

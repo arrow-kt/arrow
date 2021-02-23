@@ -45,7 +45,7 @@ suspend fun <A> unsafe.runBlocking(fa: Function0<Kind<ForIO, A>>): A = arrow.fx.
 suspend fun <A> unsafe.runNonBlocking(
   fa: Function0<Kind<ForIO, A>>,
   cb: Function1<Either<Throwable,
-    A>, Unit>
+      A>, Unit>
 ): Unit = arrow.fx.IO.unsafeRun().run {
   this@runNonBlocking.runNonBlocking<A>(fa, cb) as kotlin.Unit
 }

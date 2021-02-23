@@ -1,6 +1,7 @@
 buildscript {
   apply from: "$COMMON_SETUP"
   repositories {
+    jcenter()
     mavenCentral()
   }
   dependencies {

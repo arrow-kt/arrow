@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val contravariant_singleton: ScheduleContravariant<Any?, Any?> = object :
-    ScheduleContravariant<Any?, Any?> {}
+  ScheduleContravariant<Any?, Any?> {}
 
 @JvmName("contramap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val contravariant_singleton: ScheduleContravariant<Any?, Any?> = object
 @Deprecated(IODeprecation)
 fun <F, Output, A, B> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.contramap(
   arg1: Function1<B,
-A>
+    A>
 ): Kind<Conested<Kind<ForSchedule, F>, Output>, B> = arrow.fx.Schedule.contravariant<F,
-    Output>().run {
+  Output>().run {
   this@contramap.contramap<A, B>(arg1) as
     arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>, B>
 }
@@ -46,12 +46,12 @@ A>
 )
 @Deprecated(IODeprecation)
 fun <F, Output, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Conested<Kind<ForSchedule, F>,
-    Output>, B>, Kind<Conested<Kind<ForSchedule, F>, Output>, A>> = arrow.fx.Schedule
-   .contravariant<F, Output>()
-   .lift<A, B>(arg0) as
-    kotlin.Function1<arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>,
-    Output>, B>, arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>,
-    A>>
+      Output>, B>, Kind<Conested<Kind<ForSchedule, F>, Output>, A>> = arrow.fx.Schedule
+  .contravariant<F, Output>()
+  .lift<A, B>(arg0) as
+  kotlin.Function1<arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>,
+        Output>, B>, arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>,
+      A>>
 
 @JvmName("imap")
 @Suppress(
@@ -65,10 +65,10 @@ fun <F, Output, A, B> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.imap(
   arg1: Function1<A, B>,
   arg2: Function1<B, A>
 ): Kind<Conested<Kind<ForSchedule, F>, Output>, B> =
-    arrow.fx.Schedule.contravariant<F, Output>().run {
-  this@imap.imap<A, B>(arg1, arg2) as
-    arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>, B>
-}
+  arrow.fx.Schedule.contravariant<F, Output>().run {
+    this@imap.imap<A, B>(arg1, arg2) as
+      arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>, B>
+  }
 
 @JvmName("narrow")
 @Suppress(
@@ -79,11 +79,11 @@ fun <F, Output, A, B> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.imap(
 )
 @Deprecated(IODeprecation)
 fun <F, Output, A, B : A> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.narrow():
-    Kind<Conested<Kind<ForSchedule, F>, Output>, B> = arrow.fx.Schedule.contravariant<F,
+  Kind<Conested<Kind<ForSchedule, F>, Output>, B> = arrow.fx.Schedule.contravariant<F,
     Output>().run {
-  this@narrow.narrow<A, B>() as
-    arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>, B>
-}
+    this@narrow.narrow<A, B>() as
+      arrow.Kind<arrow.typeclasses.Conested<arrow.Kind<arrow.fx.ForSchedule, F>, Output>, B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -91,4 +91,4 @@ fun <F, Output, A, B : A> Kind<Conested<Kind<ForSchedule, F>, Output>, A>.narrow
 )
 @Deprecated(IODeprecation)
 inline fun <F, Output> Companion.contravariant(): ScheduleContravariant<F, Output> =
-    contravariant_singleton as arrow.fx.extensions.ScheduleContravariant<F, Output>
+  contravariant_singleton as arrow.fx.extensions.ScheduleContravariant<F, Output>

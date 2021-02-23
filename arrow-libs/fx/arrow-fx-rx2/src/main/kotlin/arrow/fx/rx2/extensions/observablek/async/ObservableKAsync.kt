@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val async_singleton: ObservableKAsync = object : arrow.fx.rx2.extensions.ObservableKAsync
-    {}
+{}
 
 /**
  *  [async] variant that can suspend side effects in the provided registration function.
@@ -66,9 +66,9 @@ internal val async_singleton: ObservableKAsync = object : arrow.fx.rx2.extension
 )
 @Deprecated(DeprecateRxJava)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForObservableK, Unit>>):
-    ObservableK<A> = arrow.fx.rx2.ObservableK
-   .async()
-   .asyncF<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  ObservableK<A> = arrow.fx.rx2.ObservableK
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -105,9 +105,9 @@ fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForOb
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForObservableK, A>.continueOn(arg1: CoroutineContext): ObservableK<A> =
-    arrow.fx.rx2.ObservableK.async().run {
-  this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.ObservableK<A>
-}
+  arrow.fx.rx2.ObservableK.async().run {
+    this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.ObservableK<A>
+  }
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -142,8 +142,8 @@ fun <A> Kind<ForObservableK, A>.continueOn(arg1: CoroutineContext): ObservableK<
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .async()
-   .later<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  .async()
+  .later<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -180,8 +180,8 @@ fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): ObservableK<A> = arro
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: suspend () -> A): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .async()
-   .effect<A>(arg0) as arrow.fx.rx2.ObservableK<A>
+  .async()
+  .effect<A>(arg0) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -218,9 +218,9 @@ fun <A> effect(arg0: suspend () -> A): ObservableK<A> = arrow.fx.rx2.ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): ObservableK<A> =
-    arrow.fx.rx2.ObservableK
-   .async()
-   .effect<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  arrow.fx.rx2.ObservableK
+    .async()
+    .effect<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -255,9 +255,9 @@ fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): ObservableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForObservableK, A>>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK
-   .async()
-   .defer<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  arrow.fx.rx2.ObservableK
+    .async()
+    .defer<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -273,9 +273,9 @@ fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForObservableK, A>>):
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: CoroutineContext, arg1: Function0<Either<Throwable, A>>): ObservableK<A> =
-    arrow.fx.rx2.ObservableK
-   .async()
-   .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
+  arrow.fx.rx2.ObservableK
+    .async()
+    .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -343,8 +343,8 @@ fun CoroutineContext.shift(): ObservableK<Unit> = arrow.fx.rx2.ObservableK.async
 )
 @Deprecated(DeprecateRxJava)
 fun <A> never(): ObservableK<A> = arrow.fx.rx2.ObservableK
-   .async()
-   .never<A>() as arrow.fx.rx2.ObservableK<A>
+  .async()
+  .never<A>() as arrow.fx.rx2.ObservableK<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect
@@ -379,9 +379,9 @@ fun <A> never(): ObservableK<A> = arrow.fx.rx2.ObservableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForObservableK, A>.effectMap(arg1: suspend (A) -> B): ObservableK<B> =
-    arrow.fx.rx2.ObservableK.async().run {
-  this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
-}
+  arrow.fx.rx2.ObservableK.async().run {
+    this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.ObservableK<B>
+  }
 
 /**
  *  [Async] models how a data type runs an asynchronous computation that may fail.

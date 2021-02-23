@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: IOApplicativeError = object :
-    arrow.fx.extensions.IOApplicativeError {}
+  arrow.fx.extensions.IOApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -33,9 +33,9 @@ internal val applicativeError_singleton: IOApplicativeError = object :
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.handleErrorWith(arg1: Function1<Throwable, Kind<ForIO, A>>): IO<A> =
-    arrow.fx.IO.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.IO<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Throwable.raiseError(): IO<A> = arrow.fx.IO.applicativeError().run {
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): IO<A> =
-    arrow.fx.IO.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.IO<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): IO<A> =
 )
 @Deprecated(IODeprecation)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): IO<A> =
-    arrow.fx.IO.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.IO<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): IO<A> =
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.handleError(arg1: Function1<Throwable, A>): IO<A> =
-    arrow.fx.IO.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.IO<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForIO, A>.handleError(arg1: Function1<Throwable, A>): IO<A> =
 )
 @Deprecated(IODeprecation)
 fun <A, B> Kind<ForIO, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>): IO<B> =
-    arrow.fx.IO.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.IO<B>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.IO<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -122,8 +122,8 @@ fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> = arrow.fx.IO.applica
 )
 @Deprecated(IODeprecation)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): IO<A> = arrow.fx.IO
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.IO<A>
+  .applicativeError()
+  .catch<A>(arg0, arg1) as arrow.fx.IO<A>
 
 @JvmName("catch")
 @Suppress(
@@ -134,9 +134,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): IO<A> 
 )
 @Deprecated(IODeprecation)
 fun <A> ApplicativeError<ForIO, Throwable>.catch(arg1: Function0<A>): IO<A> =
-    arrow.fx.IO.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.IO<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -147,9 +147,9 @@ fun <A> ApplicativeError<ForIO, Throwable>.catch(arg1: Function0<A>): IO<A> =
 )
 @Deprecated(IODeprecation)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A): IO<A> =
-    arrow.fx.IO
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.IO<A>
+  arrow.fx.IO
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.IO<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -160,9 +160,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(IODeprecation)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.IO.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.IO.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

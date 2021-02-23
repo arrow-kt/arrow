@@ -56,10 +56,10 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.imap(
 @Deprecated(IODeprecation)
 fun <F, E, A, B> lift(BR: Bracket<F, E>, arg0: Function1<A, B>):
   Function1<Kind<Kind<Kind<ForResource, F>, E>, A>, Kind<Kind<Kind<ForResource, F>, E>, B>> =
-  arrow.fx.Resource
-    .functor<F, E>(BR)
-    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForResource, F>,
-    E>, A>, arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForResource, F>, E>, B>>
+    arrow.fx.Resource
+      .functor<F, E>(BR)
+      .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForResource, F>,
+          E>, A>, arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForResource, F>, E>, B>>
 
 @JvmName("void")
 @Suppress(
@@ -99,8 +99,8 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.fproduct(
 @Deprecated(IODeprecation)
 fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.mapConst(BR: Bracket<F, E>, arg1: B):
   Resource<F, E, B> = arrow.fx.Resource.functor<F, E>(BR).run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Resource<F, E, B>
-}
+    this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Resource<F, E, B>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -112,8 +112,8 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.mapConst(BR: Bracket<F, 
 @Deprecated(IODeprecation)
 fun <F, E, A, B> A.mapConst(BR: Bracket<F, E>, arg1: Kind<Kind<Kind<ForResource, F>, E>, B>):
   Resource<F, E, A> = arrow.fx.Resource.functor<F, E>(BR).run {
-  this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Resource<F, E, A>
-}
+    this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Resource<F, E, A>
+  }
 
 @JvmName("tupleLeft")
 @Suppress(
@@ -125,8 +125,8 @@ fun <F, E, A, B> A.mapConst(BR: Bracket<F, E>, arg1: Kind<Kind<Kind<ForResource,
 @Deprecated(IODeprecation)
 fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.tupleLeft(BR: Bracket<F, E>, arg1: B):
   Resource<F, E, Tuple2<B, A>> = arrow.fx.Resource.functor<F, E>(BR).run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.Resource<F, E, arrow.core.Tuple2<B, A>>
-}
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.Resource<F, E, arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -138,8 +138,8 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.tupleLeft(BR: Bracket<F,
 @Deprecated(IODeprecation)
 fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.tupleRight(BR: Bracket<F, E>, arg1: B):
   Resource<F, E, Tuple2<A, B>> = arrow.fx.Resource.functor<F, E>(BR).run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.Resource<F, E, arrow.core.Tuple2<A, B>>
-}
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.Resource<F, E, arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

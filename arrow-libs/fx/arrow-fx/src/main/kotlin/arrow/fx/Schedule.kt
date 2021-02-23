@@ -508,18 +508,21 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       ScheduleImpl<F, Either<State, Any?>, A, Either<Output, B>>(M, M.run { initialState.map(::Left) }) { i, s ->
         (other as ScheduleImpl<F, Any?, A, B>)
         M.run {
-          s.fold({ s ->
-            this@ScheduleImpl.update(i, s).flatMap { dec ->
-              if (dec.cont) just(dec.bimap({ it.left() }, { it.left() }))
-              else M.fx.monad {
-                val newState = other.initialState.bind()
-                val newDec = other.update(i, newState).bind()
-                newDec.bimap({ it.right() }, { it.right() })
+          s.fold(
+            { s ->
+              this@ScheduleImpl.update(i, s).flatMap { dec ->
+                if (dec.cont) just(dec.bimap({ it.left() }, { it.left() }))
+                else M.fx.monad {
+                  val newState = other.initialState.bind()
+                  val newDec = other.update(i, newState).bind()
+                  newDec.bimap({ it.right() }, { it.right() })
+                }
               }
+            },
+            { s ->
+              other.update(i, s).map { it.bimap({ it.right() }, { it.right() }) }
             }
-          }, { s ->
-            other.update(i, s).map { it.bimap({ it.right() }, { it.right() }) }
-          })
+          )
         }
       }
 
@@ -587,11 +590,14 @@ sealed class Schedule<F, Input, Output> : ScheduleOf<F, Input, Output> {
       (other as ScheduleImpl<F, Any?, A, B>).let { other ->
         ScheduleImpl(M, M.tupledN(initialState, other.initialState)) { i, s ->
           M.run {
-            i.fold({
-              update(it, s.a).map { it.mapLeft { it toT s.b }.mapRight { it.left() } }
-            }, {
-              other.update(it, s.b).map { it.mapLeft { s.a toT it }.mapRight { it.right() } }
-            })
+            i.fold(
+              {
+                update(it, s.a).map { it.mapLeft { it toT s.b }.mapRight { it.left() } }
+              },
+              {
+                other.update(it, s.b).map { it.mapLeft { s.a toT it }.mapRight { it.right() } }
+              }
+            )
           }
         }
       }

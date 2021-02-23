@@ -158,9 +158,14 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
           val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
-          emitter.onSuccess(Fiber(s.firstOrError().k(), SingleK {
-            conn.dispose()
-          }))
+          emitter.onSuccess(
+            Fiber(
+              s.firstOrError().k(),
+              SingleK {
+                conn.dispose()
+              }
+            )
+          )
         }
       }.k()
     }
@@ -193,14 +198,20 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
         val ffa = Fiber(sa.firstOrError().k(), SingleK { dda.dispose() })
 
-        sa.subscribe({
-          shouldDisposeSb.value = false
-          emitter.onSuccess(RacePair.First(it, ffb))
-        }, { e -> emitter.tryOnError(e) })
-        sb.subscribe({
-          shouldDisposeSa.value = false
-          emitter.onSuccess(RacePair.Second(ffa, it))
-        }, { e -> emitter.tryOnError(e) })
+        sa.subscribe(
+          {
+            shouldDisposeSb.value = false
+            emitter.onSuccess(RacePair.First(it, ffb))
+          },
+          { e -> emitter.tryOnError(e) }
+        )
+        sb.subscribe(
+          {
+            shouldDisposeSa.value = false
+            emitter.onSuccess(RacePair.Second(ffa, it))
+          },
+          { e -> emitter.tryOnError(e) }
+        )
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -224,21 +235,30 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffa = Fiber(sa.firstOrError().k(), SingleK { dda.dispose() })
         val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
         val ffc = Fiber(sc.firstOrError().k(), SingleK { ddc.dispose() })
-        sa.subscribe({
-          shouldDisposeSb.value = false
-          shouldDisposeSc.value = false
-          emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, { e -> emitter.tryOnError(e) })
-        sb.subscribe({
-          shouldDisposeSa.value = false
-          shouldDisposeSc.value = false
-          emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, { e -> emitter.tryOnError(e) })
-        sc.subscribe({
-          shouldDisposeSa.value = false
-          shouldDisposeSb.value = false
-          emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, { e -> emitter.tryOnError(e) })
+        sa.subscribe(
+          {
+            shouldDisposeSb.value = false
+            shouldDisposeSc.value = false
+            emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
+          },
+          { e -> emitter.tryOnError(e) }
+        )
+        sb.subscribe(
+          {
+            shouldDisposeSa.value = false
+            shouldDisposeSc.value = false
+            emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
+          },
+          { e -> emitter.tryOnError(e) }
+        )
+        sc.subscribe(
+          {
+            shouldDisposeSa.value = false
+            shouldDisposeSb.value = false
+            emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
+          },
+          { e -> emitter.tryOnError(e) }
+        )
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
@@ -266,8 +286,10 @@ interface SingleKConcurrentEffect : ConcurrentEffect<ForSingleK>, SingleKEffect 
 @Deprecated(DeprecateRxJava)
 interface SingleKTimer : Timer<ForSingleK> {
   override fun sleep(duration: Duration): SingleK<Unit> =
-    SingleK(Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
-      .map { Unit })
+    SingleK(
+      Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+        .map { Unit }
+    )
 }
 
 @Deprecated(DeprecateRxJava)

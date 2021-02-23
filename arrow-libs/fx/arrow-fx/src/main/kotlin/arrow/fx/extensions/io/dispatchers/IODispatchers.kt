@@ -24,8 +24,8 @@ internal val dispatchers_singleton: IODispatchers = object : arrow.fx.extensions
 )
 @Deprecated(IODeprecation)
 fun io(): CoroutineContext = arrow.fx.IO
-   .dispatchers()
-   .io() as kotlin.coroutines.CoroutineContext
+  .dispatchers()
+  .io() as kotlin.coroutines.CoroutineContext
 
 @Suppress(
   "UNCHECKED_CAST",

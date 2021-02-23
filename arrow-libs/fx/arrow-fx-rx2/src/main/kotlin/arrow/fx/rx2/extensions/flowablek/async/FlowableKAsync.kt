@@ -65,9 +65,9 @@ internal val async_singleton: FlowableKAsync = object : arrow.fx.rx2.extensions.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForFlowableK, Unit>>):
-    FlowableK<A> = arrow.fx.rx2.FlowableK
-   .async()
-   .asyncF<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  FlowableK<A> = arrow.fx.rx2.FlowableK
+    .async()
+    .asyncF<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Continue the evaluation on provided [CoroutineContext]
@@ -104,9 +104,9 @@ fun <A> asyncF(arg0: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForFl
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForFlowableK, A>.continueOn(arg1: CoroutineContext): FlowableK<A> =
-    arrow.fx.rx2.FlowableK.async().run {
-  this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.FlowableK<A>
-}
+  arrow.fx.rx2.FlowableK.async().run {
+    this@continueOn.continueOn<A>(arg1) as arrow.fx.rx2.FlowableK<A>
+  }
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -141,8 +141,8 @@ fun <A> Kind<ForFlowableK, A>.continueOn(arg1: CoroutineContext): FlowableK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .async()
-   .later<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
+  .async()
+  .later<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -179,8 +179,8 @@ fun <A> later(arg0: CoroutineContext, arg1: Function0<A>): FlowableK<A> = arrow.
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: suspend () -> A): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .async()
-   .effect<A>(arg0) as arrow.fx.rx2.FlowableK<A>
+  .async()
+  .effect<A>(arg0) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Delay a suspended effect on provided [CoroutineContext].
@@ -217,8 +217,8 @@ fun <A> effect(arg0: suspend () -> A): FlowableK<A> = arrow.fx.rx2.FlowableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .async()
-   .effect<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
+  .async()
+  .effect<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -253,9 +253,9 @@ fun <A> effect(arg0: CoroutineContext, arg1: suspend () -> A): FlowableK<A> = ar
 )
 @Deprecated(DeprecateRxJava)
 fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForFlowableK, A>>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK
-   .async()
-   .defer<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
+  arrow.fx.rx2.FlowableK
+    .async()
+    .defer<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Delay a computation on provided [CoroutineContext].
@@ -271,9 +271,9 @@ fun <A> defer(arg0: CoroutineContext, arg1: Function0<Kind<ForFlowableK, A>>): F
 )
 @Deprecated(DeprecateRxJava)
 fun <A> laterOrRaise(arg0: CoroutineContext, arg1: Function0<Either<Throwable, A>>): FlowableK<A> =
-    arrow.fx.rx2.FlowableK
-   .async()
-   .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
+  arrow.fx.rx2.FlowableK
+    .async()
+    .laterOrRaise<A>(arg0, arg1) as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Shift evaluation to provided [CoroutineContext].
@@ -341,8 +341,8 @@ fun CoroutineContext.shift(): FlowableK<Unit> = arrow.fx.rx2.FlowableK.async().r
 )
 @Deprecated(DeprecateRxJava)
 fun <A> never(): FlowableK<A> = arrow.fx.rx2.FlowableK
-   .async()
-   .never<A>() as arrow.fx.rx2.FlowableK<A>
+  .async()
+  .never<A>() as arrow.fx.rx2.FlowableK<A>
 
 /**
  *  Helper function that provides an easy way to construct a suspend effect
@@ -377,9 +377,9 @@ fun <A> never(): FlowableK<A> = arrow.fx.rx2.FlowableK
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForFlowableK, A>.effectMap(arg1: suspend (A) -> B): FlowableK<B> =
-    arrow.fx.rx2.FlowableK.async().run {
-  this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
-}
+  arrow.fx.rx2.FlowableK.async().run {
+    this@effectMap.effectMap<A, B>(arg1) as arrow.fx.rx2.FlowableK<B>
+  }
 
 /**
  *  [Async] models how a data type runs an asynchronous computation that may fail.

@@ -45,7 +45,7 @@ open class LeftBind {
   fun kio(): Int =
     arrow.benchmarks.effects.kio.LeftBind.leftBind(depth, size, 0)
 
-      // RxJava & Reactor are not stack-safe and overflow in the benchmark.
+  // RxJava & Reactor are not stack-safe and overflow in the benchmark.
 
 //    fun monoLoop(i: Int): Mono<Int> =
 //    if (i % depth == 0) Mono.fromSupplier { i + 1 }.flatMap { monoLoop(it) }

@@ -19,7 +19,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadFilter_singleton: FluxKMonadFilter = object :
-    arrow.fx.reactor.extensions.FluxKMonadFilter {}
+  arrow.fx.reactor.extensions.FluxKMonadFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -30,9 +30,9 @@ internal val monadFilter_singleton: FluxKMonadFilter = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.filterMap(arg1: Function1<A, Option<B>>): FluxK<B> =
-    arrow.fx.reactor.FluxK.monadFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.monadFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("bindingFilter")
 @Suppress(
@@ -43,9 +43,9 @@ fun <A, B> Kind<ForFluxK, A>.filterMap(arg1: Function1<A, Option<B>>): FluxK<B> 
 )
 @Deprecated(DeprecateReactor)
 fun <B> bindingFilter(arg0: suspend MonadFilterSyntax<ForFluxK>.() -> B): FluxK<B> =
-    arrow.fx.reactor.FluxK
-   .monadFilter()
-   .bindingFilter<B>(arg0) as arrow.fx.reactor.FluxK<B>
+  arrow.fx.reactor.FluxK
+    .monadFilter()
+    .bindingFilter<B>(arg0) as arrow.fx.reactor.FluxK<B>
 
 @Suppress(
   "UNCHECKED_CAST",

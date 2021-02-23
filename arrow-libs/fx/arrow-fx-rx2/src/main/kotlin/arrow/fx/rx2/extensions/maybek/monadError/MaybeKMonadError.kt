@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadError_singleton: MaybeKMonadError = object :
-    arrow.fx.rx2.extensions.MaybeKMonadError {}
+  arrow.fx.rx2.extensions.MaybeKMonadError {}
 
 @JvmName("ensure")
 @Suppress(
@@ -32,9 +32,9 @@ internal val monadError_singleton: MaybeKMonadError = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.ensure(arg1: Function0<Throwable>, arg2: Function1<A, Boolean>):
-    MaybeK<A> = arrow.fx.rx2.MaybeK.monadError().run {
-  this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.MaybeK<A>
-}
+  MaybeK<A> = arrow.fx.rx2.MaybeK.monadError().run {
+    this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("redeemWith")
 @Suppress(
@@ -60,9 +60,9 @@ fun <A, B> Kind<ForMaybeK, A>.redeemWith(
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, Either<Throwable, A>>.rethrow(): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.monadError().run {
-  this@rethrow.rethrow<A>() as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.monadError().run {
+    this@rethrow.rethrow<A>() as arrow.fx.rx2.MaybeK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val applicativeError_singleton: FluxKApplicativeError = object :
-    arrow.fx.reactor.extensions.FluxKApplicativeError {}
+  arrow.fx.reactor.extensions.FluxKApplicativeError {}
 
 @JvmName("handleErrorWith")
 @Suppress(
@@ -33,9 +33,9 @@ internal val applicativeError_singleton: FluxKApplicativeError = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.handleErrorWith(arg1: Function1<Throwable, Kind<ForFluxK, A>>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@handleErrorWith.handleErrorWith<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("raiseError1")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A> Throwable.raiseError(): FluxK<A> = arrow.fx.reactor.FluxK.applicativeErr
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@fromOption.fromOption<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@fromOption.fromOption<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("fromEither")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A> Kind<ForOption, A>.fromOption(arg1: Function0<Throwable>): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@fromEither.fromEither<A, EE>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("handleError")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, EE> Either<EE, A>.fromEither(arg1: Function1<EE, Throwable>): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.handleError(arg1: Function1<Throwable, A>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@handleError.handleError<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@handleError.handleError<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("redeem")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForFluxK, A>.handleError(arg1: Function1<Throwable, A>): FluxK<A> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Function1<A, B>): FluxK<B> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@redeem.redeem<A, B>(arg1, arg2) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("attempt")
 @Suppress(
@@ -110,9 +110,9 @@ fun <A, B> Kind<ForFluxK, A>.redeem(arg1: Function1<Throwable, B>, arg2: Functio
 )
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForFluxK, A>.attempt(): FluxK<Either<Throwable, A>> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@attempt.attempt<A>() as arrow.fx.reactor.FluxK<arrow.core.Either<kotlin.Throwable, A>>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@attempt.attempt<A>() as arrow.fx.reactor.FluxK<arrow.core.Either<kotlin.Throwable, A>>
+  }
 
 @JvmName("catch")
 @Suppress(
@@ -123,9 +123,9 @@ fun <A> Kind<ForFluxK, A>.attempt(): FluxK<Either<Throwable, A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): FluxK<A> =
-    arrow.fx.reactor.FluxK
-   .applicativeError()
-   .catch<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  arrow.fx.reactor.FluxK
+    .applicativeError()
+    .catch<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("catch")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A> catch(arg0: Function1<Throwable, Throwable>, arg1: Function0<A>): FluxK<
 )
 @Deprecated(DeprecateReactor)
 fun <A> ApplicativeError<ForFluxK, Throwable>.catch(arg1: Function0<A>): FluxK<A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@catch.catch<A>(arg1) as arrow.fx.reactor.FluxK<A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@catch.catch<A>(arg1) as arrow.fx.reactor.FluxK<A>
+  }
 
 @JvmName("effectCatch")
 @Suppress(
@@ -149,9 +149,9 @@ fun <A> ApplicativeError<ForFluxK, Throwable>.catch(arg1: Function0<A>): FluxK<A
 )
 @Deprecated(DeprecateReactor)
 suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend () -> A): FluxK<A> =
-    arrow.fx.reactor.FluxK
-   .applicativeError()
-   .effectCatch<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
+  arrow.fx.reactor.FluxK
+    .applicativeError()
+    .effectCatch<A>(arg0, arg1) as arrow.fx.reactor.FluxK<A>
 
 @JvmName("effectCatch")
 @Suppress(
@@ -162,9 +162,9 @@ suspend fun <A> effectCatch(arg0: Function1<Throwable, Throwable>, arg1: suspend
 )
 @Deprecated(DeprecateReactor)
 suspend fun <F, A> ApplicativeError<F, Throwable>.effectCatch(arg1: suspend () -> A): Kind<F, A> =
-    arrow.fx.reactor.FluxK.applicativeError().run {
-  this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
-}
+  arrow.fx.reactor.FluxK.applicativeError().run {
+    this@effectCatch.effectCatch<F, A>(arg1) as arrow.Kind<F, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

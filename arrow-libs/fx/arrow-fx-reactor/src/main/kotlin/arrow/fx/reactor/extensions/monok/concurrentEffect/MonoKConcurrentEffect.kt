@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val concurrentEffect_singleton: MonoKConcurrentEffect = object :
-    arrow.fx.reactor.extensions.MonoKConcurrentEffect {}
+  arrow.fx.reactor.extensions.MonoKConcurrentEffect {}
 
 @JvmName("runAsyncCancellable")
 @Suppress(
@@ -33,7 +33,7 @@ internal val concurrentEffect_singleton: MonoKConcurrentEffect = object :
 @Deprecated(DeprecateReactor)
 fun <A> Kind<ForMonoK, A>.runAsyncCancellable(
   arg1: Function1<Either<Throwable, A>, Kind<ForMonoK,
-Unit>>
+      Unit>>
 ): MonoK<Function0<Unit>> = arrow.fx.reactor.MonoK.concurrentEffect().run {
   this@runAsyncCancellable.runAsyncCancellable<A>(arg1) as
     arrow.fx.reactor.MonoK<kotlin.Function0<kotlin.Unit>>

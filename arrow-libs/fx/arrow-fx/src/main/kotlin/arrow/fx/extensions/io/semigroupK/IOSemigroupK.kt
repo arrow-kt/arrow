@@ -39,8 +39,8 @@ fun <A> Kind<ForIO, A>.combineK(arg1: Kind<ForIO, A>): IO<A> = arrow.fx.IO.semig
 )
 @Deprecated(IODeprecation)
 fun <A> algebra(): Semigroup<Kind<ForIO, A>> = arrow.fx.IO
-   .semigroupK()
-   .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.fx.ForIO, A>>
+  .semigroupK()
+  .algebra<A>() as arrow.typeclasses.Semigroup<arrow.Kind<arrow.fx.ForIO, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

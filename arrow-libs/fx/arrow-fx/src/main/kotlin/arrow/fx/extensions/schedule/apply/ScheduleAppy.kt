@@ -39,7 +39,7 @@ internal val apply_singleton: ScheduleAppy<Any?, Any?> = object : ScheduleAppy<A
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.ap(
   arg1: Kind<Kind<Kind<ForSchedule,
-    F>, Input>, Function1<A, B>>
+        F>, Input>, Function1<A, B>>
 ): Schedule<F, Input, B> = arrow.fx.Schedule.apply<F, Input>().run {
   this@ap.ap<A, B>(arg1) as arrow.fx.Schedule<F, Input, B>
 }
@@ -55,9 +55,9 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.ap(
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>,
   A>.apEval(arg1: Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, Function1<A, B>>>):
   Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, B>> = arrow.fx.Schedule.apply<F, Input>().run {
-  this@apEval.apEval<A, B>(arg1) as
-    arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, B>>
-}
+    this@apEval.apEval<A, B>(arg1) as
+      arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, B>>
+  }
 
 @JvmName("map2Eval")
 @Suppress(
@@ -68,14 +68,11 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, Z> Kind<Kind<Kind<ForSchedule, F>, Input>,
-  A>.map2Eval(
-    arg1: Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, B>>,
-    arg2: Function1<Tuple2<A, B>, Z>
-  ): Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, Z>> = arrow.fx.Schedule.apply<F,
-  Input>().run {
-  this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as
-    arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, Z>>
-}
+  A>.map2Eval(arg1: Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, B>>, arg2: Function1<Tuple2<A, B>, Z>):
+  Eval<Kind<Kind<Kind<ForSchedule, F>, Input>, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    this@map2Eval.map2Eval<A, B, Z>(arg1, arg2) as
+      arrow.core.Eval<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, Z>>
+  }
 
 @JvmName("map")
 @Suppress(
@@ -460,8 +457,8 @@ fun <F, Input, A, B, C, D, E, FF, G, H, I, J, Z> mapN(
 fun <F, Input, A, B, Z> Kind<Kind<Kind<ForSchedule, F>, Input>,
   A>.map2(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, B>, arg2: Function1<Tuple2<A, B>, Z>):
   Schedule<F, Input, Z> = arrow.fx.Schedule.apply<F, Input>().run {
-  this@map2.map2<A, B, Z>(arg1, arg2) as arrow.fx.Schedule<F, Input, Z>
-}
+    this@map2.map2<A, B, Z>(arg1, arg2) as arrow.fx.Schedule<F, Input, Z>
+  }
 
 @JvmName("product")
 @Suppress(
@@ -486,8 +483,8 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple2<A,
-  B>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple3<A, B,
-  Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    B>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple3<A, B,
+    Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, Z>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple3<A, B, Z>>
 }
 
@@ -500,10 +497,10 @@ fun <F, Input, A, B, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple2<A,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple3<A, B,
-  C>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple4<A, B,
-  C, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    C>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple4<A, B,
+    C, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, Z>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple4<A, B, C,
-    Z>>
+      Z>>
 }
 
 @JvmName("product3")
@@ -515,10 +512,10 @@ fun <F, Input, A, B, C, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple3<A, B,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple4<A, B, C,
-  D>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple5<A, B,
-  C, D, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    D>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple5<A, B,
+    C, D, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, Z>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple5<A, B,
-    C, D, Z>>
+      C, D, Z>>
 }
 
 @JvmName("product4")
@@ -530,10 +527,10 @@ fun <F, Input, A, B, C, D, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple4<A, 
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, E, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple5<A, B, C, D,
-  E>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple6<A, B,
-  C, D, E, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    E>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple6<A, B,
+    C, D, E, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, E, Z>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple6<A,
-    B, C, D, E, Z>>
+      B, C, D, E, Z>>
 }
 
 @JvmName("product5")
@@ -545,8 +542,8 @@ fun <F, Input, A, B, C, D, E, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple5<
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, E, FF, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple6<A, B, C, D, E,
-  FF>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple7<A, B,
-  C, D, E, FF, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
+    FF>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input, Tuple7<A, B,
+    C, D, E, FF, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, E, FF, Z>(arg1) as arrow.fx.Schedule<F, Input,
     arrow.core.Tuple7<A, B, C, D, E, FF, Z>>
 }
@@ -560,7 +557,7 @@ fun <F, Input, A, B, C, D, E, FF, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tup
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, E, FF, G, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple7<A, B, C, D,
-  E, FF, G>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input,
+    E, FF, G>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input,
   Tuple8<A, B, C, D, E, FF, G, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, E, FF, G, Z>(arg1) as arrow.fx.Schedule<F, Input,
     arrow.core.Tuple8<A, B, C, D, E, FF, G, Z>>
@@ -575,7 +572,7 @@ fun <F, Input, A, B, C, D, E, FF, G, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, 
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, E, FF, G, H, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple8<A, B, C,
-  D, E, FF, G, H>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input,
+    D, E, FF, G, H>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F, Input,
   Tuple9<A, B, C, D, E, FF, G, H, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, E, FF, G, H, Z>(arg1) as arrow.fx.Schedule<F, Input,
     arrow.core.Tuple9<A, B, C, D, E, FF, G, H, Z>>
@@ -590,7 +587,7 @@ fun <F, Input, A, B, C, D, E, FF, G, H, Z> Kind<Kind<Kind<ForSchedule, F>, Input
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B, C, D, E, FF, G, H, I, Z> Kind<Kind<Kind<ForSchedule, F>, Input>, Tuple9<A, B,
-  C, D, E, FF, G, H, I>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F,
+    C, D, E, FF, G, H, I>>.product(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, Z>): Schedule<F,
   Input, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> = arrow.fx.Schedule.apply<F, Input>().run {
   this@product.product<A, B, C, D, E, FF, G, H, I, Z>(arg1) as arrow.fx.Schedule<F, Input,
     arrow.core.Tuple10<A, B, C, D, E, FF, G, H, I, Z>>
@@ -676,7 +673,7 @@ fun <F, Input, A, B, C, D> tupled(
 ): Schedule<F, Input, Tuple4<A, B, C, D>> = arrow.fx.Schedule
   .apply<F, Input>()
   .tupled<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.fx.Schedule<F, Input, arrow.core.Tuple4<A,
-  B, C, D>>
+    B, C, D>>
 
 @JvmName("tupledN")
 @Suppress(
@@ -694,7 +691,7 @@ fun <F, Input, A, B, C, D> tupledN(
 ): Schedule<F, Input, Tuple4<A, B, C, D>> = arrow.fx.Schedule
   .apply<F, Input>()
   .tupledN<A, B, C, D>(arg0, arg1, arg2, arg3) as arrow.fx.Schedule<F, Input, arrow.core.Tuple4<A,
-  B, C, D>>
+    B, C, D>>
 
 @JvmName("tupled")
 @Suppress(

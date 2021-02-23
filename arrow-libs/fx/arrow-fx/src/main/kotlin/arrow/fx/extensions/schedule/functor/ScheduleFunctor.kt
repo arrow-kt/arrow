@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functor_singleton: ScheduleFunctor<Any?, Any?> = object : ScheduleFunctor<Any?, Any?>
-    {}
+{}
 
 @JvmName("map")
 @Suppress(
@@ -31,9 +31,9 @@ internal val functor_singleton: ScheduleFunctor<Any?, Any?> = object : ScheduleF
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.map(arg1: Function1<A, B>):
-    Schedule<F, Input, B> = arrow.fx.Schedule.functor<F, Input>().run {
-  this@map.map<A, B>(arg1) as arrow.fx.Schedule<F, Input, B>
-}
+  Schedule<F, Input, B> = arrow.fx.Schedule.functor<F, Input>().run {
+    this@map.map<A, B>(arg1) as arrow.fx.Schedule<F, Input, B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -60,9 +60,9 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.imap(
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<Kind<ForSchedule, F>, Input>,
     A>, Kind<Kind<Kind<ForSchedule, F>, Input>, B>> = arrow.fx.Schedule
-   .functor<F, Input>()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>,
-    Input>, A>, arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, B>>
+  .functor<F, Input>()
+  .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>,
+      Input>, A>, arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>, B>>
 
 @JvmName("void")
 @Suppress(
@@ -73,9 +73,9 @@ fun <F, Input, A, B> lift(arg0: Function1<A, B>): Function1<Kind<Kind<Kind<ForSc
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.void(): Schedule<F, Input, Unit> =
-    arrow.fx.Schedule.functor<F, Input>().run {
-  this@void.void<A>() as arrow.fx.Schedule<F, Input, kotlin.Unit>
-}
+  arrow.fx.Schedule.functor<F, Input>().run {
+    this@void.void<A>() as arrow.fx.Schedule<F, Input, kotlin.Unit>
+  }
 
 @JvmName("fproduct")
 @Suppress(
@@ -86,9 +86,9 @@ fun <F, Input, A> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.void(): Schedule<F,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.fproduct(arg1: Function1<A, B>):
-    Schedule<F, Input, Tuple2<A, B>> = arrow.fx.Schedule.functor<F, Input>().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple2<A, B>>
-}
+  Schedule<F, Input, Tuple2<A, B>> = arrow.fx.Schedule.functor<F, Input>().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -99,7 +99,7 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.fproduct(arg1: F
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.mapConst(arg1: B): Schedule<F,
-    Input, B> = arrow.fx.Schedule.functor<F, Input>().run {
+  Input, B> = arrow.fx.Schedule.functor<F, Input>().run {
   this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Schedule<F, Input, B>
 }
 
@@ -112,7 +112,7 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.mapConst(arg1: B
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> A.mapConst(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, B>): Schedule<F,
-    Input, A> = arrow.fx.Schedule.functor<F, Input>().run {
+  Input, A> = arrow.fx.Schedule.functor<F, Input>().run {
   this@mapConst.mapConst<A, B>(arg1) as arrow.fx.Schedule<F, Input, A>
 }
 
@@ -125,7 +125,7 @@ fun <F, Input, A, B> A.mapConst(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, B>
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.tupleLeft(arg1: B): Schedule<F,
-    Input, Tuple2<B, A>> = arrow.fx.Schedule.functor<F, Input>().run {
+  Input, Tuple2<B, A>> = arrow.fx.Schedule.functor<F, Input>().run {
   this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple2<B, A>>
 }
 
@@ -138,7 +138,7 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.tupleLeft(arg1: 
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.tupleRight(arg1: B): Schedule<F,
-    Input, Tuple2<A, B>> = arrow.fx.Schedule.functor<F, Input>().run {
+  Input, Tuple2<A, B>> = arrow.fx.Schedule.functor<F, Input>().run {
   this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.Schedule<F, Input, arrow.core.Tuple2<A, B>>
 }
 
@@ -151,9 +151,9 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.tupleRight(arg1:
 )
 @Deprecated(IODeprecation)
 fun <F, Input, B, A : B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.widen(): Schedule<F, Input, B> =
-    arrow.fx.Schedule.functor<F, Input>().run {
-  this@widen.widen<B, A>() as arrow.fx.Schedule<F, Input, B>
-}
+  arrow.fx.Schedule.functor<F, Input>().run {
+    this@widen.widen<B, A>() as arrow.fx.Schedule<F, Input, B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -161,4 +161,4 @@ fun <F, Input, B, A : B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.widen(): Sch
 )
 @Deprecated(IODeprecation)
 inline fun <F, Input> Companion.functor(): ScheduleFunctor<F, Input> = functor_singleton as
-    arrow.fx.extensions.ScheduleFunctor<F, Input>
+  arrow.fx.extensions.ScheduleFunctor<F, Input>

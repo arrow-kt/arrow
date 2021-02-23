@@ -67,8 +67,8 @@ fun <F, E, A, B> Kind<Kind<Kind<ForResource, F>, E>, A>.map(
 @Deprecated(IODeprecation)
 fun <F, E, A> Kind<Kind<Kind<ForResource, F>, E>, A>.replicate(BR: Bracket<F, E>, arg1: Int):
   Resource<F, E, List<A>> = arrow.fx.Resource.applicative<F, E>(BR).run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.Resource<F, E, kotlin.collections.List<A>>
-}
+    this@replicate.replicate<A>(arg1) as arrow.fx.Resource<F, E, kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(

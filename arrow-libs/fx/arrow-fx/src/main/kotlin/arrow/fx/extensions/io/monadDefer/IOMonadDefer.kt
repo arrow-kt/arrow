@@ -30,8 +30,8 @@ internal val monadDefer_singleton: IOMonadDefer = object : arrow.fx.extensions.I
 )
 @Deprecated(IODeprecation)
 fun <A> defer(fa: Function0<Kind<ForIO, A>>): IO<A> = arrow.fx.IO
-   .monadDefer()
-   .defer<A>(fa) as arrow.fx.IO<A>
+  .monadDefer()
+  .defer<A>(fa) as arrow.fx.IO<A>
 
 @JvmName("later")
 @Suppress(
@@ -42,8 +42,8 @@ fun <A> defer(fa: Function0<Kind<ForIO, A>>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> later(f: Function0<A>): IO<A> = arrow.fx.IO
-   .monadDefer()
-   .later<A>(f) as arrow.fx.IO<A>
+  .monadDefer()
+  .later<A>(f) as arrow.fx.IO<A>
 
 @JvmName("later")
 @Suppress(
@@ -54,8 +54,8 @@ fun <A> later(f: Function0<A>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> later(fa: Kind<ForIO, A>): IO<A> = arrow.fx.IO
-   .monadDefer()
-   .later<A>(fa) as arrow.fx.IO<A>
+  .monadDefer()
+  .later<A>(fa) as arrow.fx.IO<A>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -66,8 +66,8 @@ fun <A> later(fa: Kind<ForIO, A>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> laterOrRaise(f: Function0<Either<Throwable, A>>): IO<A> = arrow.fx.IO
-   .monadDefer()
-   .laterOrRaise<A>(f) as arrow.fx.IO<A>
+  .monadDefer()
+  .laterOrRaise<A>(f) as arrow.fx.IO<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -78,8 +78,8 @@ fun <A> laterOrRaise(f: Function0<Either<Throwable, A>>): IO<A> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> Ref(a: A): IO<Ref<ForIO, A>> = arrow.fx.IO
-   .monadDefer()
-   .Ref<A>(a) as arrow.fx.IO<arrow.fx.Ref<arrow.fx.ForIO, A>>
+  .monadDefer()
+  .Ref<A>(a) as arrow.fx.IO<arrow.fx.Ref<arrow.fx.ForIO, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

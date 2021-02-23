@@ -20,9 +20,9 @@ import kotlin.jvm.JvmName
 )
 @Deprecated(IODeprecation)
 fun <F, E, A> IO<A>.liftIO(FIO: MonadIO<F>, BR: Bracket<F, E>): Resource<F, E, A> =
-    arrow.fx.Resource.monadIO<F, E>(FIO, BR).run {
-  this@liftIO.liftIO<A>() as arrow.fx.Resource<F, E, A>
-}
+  arrow.fx.Resource.monadIO<F, E>(FIO, BR).run {
+    this@liftIO.liftIO<A>() as arrow.fx.Resource<F, E, A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -30,7 +30,9 @@ fun <F, E, A> IO<A>.liftIO(FIO: MonadIO<F>, BR: Bracket<F, E>): Resource<F, E, A
 )
 @Deprecated(IODeprecation)
 inline fun <F, E> Companion.monadIO(FIO: MonadIO<F>, BR: Bracket<F, E>): ResourceMonadIO<F, E> =
-    object : arrow.fx.extensions.ResourceMonadIO<F, E> { override fun FIO():
-    arrow.fx.typeclasses.MonadIO<F> = FIO
+  object : arrow.fx.extensions.ResourceMonadIO<F, E> {
+    override fun FIO():
+      arrow.fx.typeclasses.MonadIO<F> = FIO
 
-  override fun BR(): arrow.fx.typeclasses.Bracket<F, E> = BR }
+    override fun BR(): arrow.fx.typeclasses.Bracket<F, E> = BR
+  }

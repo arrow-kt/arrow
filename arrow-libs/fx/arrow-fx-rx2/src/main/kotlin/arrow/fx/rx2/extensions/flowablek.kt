@@ -187,15 +187,23 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
 
   override fun <A> Kind<ForFlowableK, A>.fork(coroutineContext: CoroutineContext): FlowableK<Fiber<ForFlowableK, A>> =
     coroutineContext.asScheduler().let { scheduler ->
-      Flowable.create<Fiber<ForFlowableK, A>>({ emitter ->
-        if (!emitter.isCancelled) {
-          val s: ReplaySubject<A> = ReplaySubject.create<A>()
-          val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
-          emitter.onNext(Fiber(s.toFlowable(BS()).k(), FlowableK {
-            conn.dispose()
-          }))
-        }
-      }, BS()).k()
+      Flowable.create<Fiber<ForFlowableK, A>>(
+        { emitter ->
+          if (!emitter.isCancelled) {
+            val s: ReplaySubject<A> = ReplaySubject.create<A>()
+            val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+            emitter.onNext(
+              Fiber(
+                s.toFlowable(BS()).k(),
+                FlowableK {
+                  conn.dispose()
+                }
+              )
+            )
+          }
+        },
+        BS()
+      ).k()
     }
 
   override fun <A, B> parTupledN(ctx: CoroutineContext, fa: FlowableKOf<A>, fb: FlowableKOf<B>): FlowableK<Tuple2<A, B>> =
@@ -212,46 +220,67 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
 
   override fun <A, B> CoroutineContext.racePair(fa: FlowableKOf<A>, fb: FlowableKOf<B>): FlowableK<RacePair<ForFlowableK, A, B>> =
     asScheduler().let { scheduler ->
-      Flowable.create<RacePair<ForFlowableK, A, B>>({ emitter ->
-        val sa = ReplaySubject.create<A>()
-        val sb = ReplaySubject.create<B>()
-        val dda = fa.value().subscribe(sa::onNext, sa::onError)
-        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
-        emitter.setCancellable { dda.dispose(); ddb.dispose() }
-        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
-        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
-        sa.subscribe({
-          emitter.onNext(RacePair.First(it, ffb))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sb.subscribe({
-          emitter.onNext(RacePair.Second(ffa, it))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+      Flowable.create<RacePair<ForFlowableK, A, B>>(
+        { emitter ->
+          val sa = ReplaySubject.create<A>()
+          val sb = ReplaySubject.create<B>()
+          val dda = fa.value().subscribe(sa::onNext, sa::onError)
+          val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+          emitter.setCancellable { dda.dispose(); ddb.dispose() }
+          val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+          val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+          sa.subscribe(
+            {
+              emitter.onNext(RacePair.First(it, ffb))
+            },
+            { e -> emitter.tryOnError(e) }, emitter::onComplete
+          )
+          sb.subscribe(
+            {
+              emitter.onNext(RacePair.Second(ffa, it))
+            },
+            { e -> emitter.tryOnError(e) }, emitter::onComplete
+          )
+        },
+        BS()
+      ).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: FlowableKOf<A>, fb: FlowableKOf<B>, fc: FlowableKOf<C>): FlowableK<RaceTriple<ForFlowableK, A, B, C>> =
     asScheduler().let { scheduler ->
-      Flowable.create<RaceTriple<ForFlowableK, A, B, C>>({ emitter ->
-        val sa = ReplaySubject.create<A>()
-        val sb = ReplaySubject.create<B>()
-        val sc = ReplaySubject.create<C>()
-        val dda = fa.value().subscribe(sa::onNext, sa::onError)
-        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
-        val ddc = fc.value().subscribe(sc::onNext, sc::onError)
-        emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
-        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
-        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
-        val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
-        sa.subscribe({
-          emitter.onNext(RaceTriple.First(it, ffb, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sb.subscribe({
-          emitter.onNext(RaceTriple.Second(ffa, it, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-        sc.subscribe({
-          emitter.onNext(RaceTriple.Third(ffa, ffb, it))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
-      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+      Flowable.create<RaceTriple<ForFlowableK, A, B, C>>(
+        { emitter ->
+          val sa = ReplaySubject.create<A>()
+          val sb = ReplaySubject.create<B>()
+          val sc = ReplaySubject.create<C>()
+          val dda = fa.value().subscribe(sa::onNext, sa::onError)
+          val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+          val ddc = fc.value().subscribe(sc::onNext, sc::onError)
+          emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
+          val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+          val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+          val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
+          sa.subscribe(
+            {
+              emitter.onNext(RaceTriple.First(it, ffb, ffc))
+            },
+            { e -> emitter.tryOnError(e) }, emitter::onComplete
+          )
+          sb.subscribe(
+            {
+              emitter.onNext(RaceTriple.Second(ffa, it, ffc))
+            },
+            { e -> emitter.tryOnError(e) }, emitter::onComplete
+          )
+          sc.subscribe(
+            {
+              emitter.onNext(RaceTriple.Third(ffa, ffb, it))
+            },
+            { e -> emitter.tryOnError(e) }, emitter::onComplete
+          )
+        },
+        BS()
+      ).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
 
@@ -377,8 +406,10 @@ fun FlowableK.Companion.effectMissing(): FlowableKEffect = object : FlowableKEff
 @Deprecated(DeprecateRxJava)
 interface FlowableKTimer : Timer<ForFlowableK> {
   override fun sleep(duration: Duration): FlowableK<Unit> =
-    FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
-      .map { Unit })
+    FlowableK(
+      Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+        .map { Unit }
+    )
 }
 
 @Deprecated(DeprecateRxJava)

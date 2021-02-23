@@ -41,9 +41,9 @@ fun <A, B> Kind<ForIO, A>.map(arg1: Function1<A, B>): IO<B> = arrow.fx.IO.functo
 )
 @Deprecated(IODeprecation)
 fun <A, B> Kind<ForIO, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): IO<B> =
-    arrow.fx.IO.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.IO<B>
-}
+  arrow.fx.IO.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.IO<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -54,8 +54,8 @@ fun <A, B> Kind<ForIO, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): IO
 )
 @Deprecated(IODeprecation)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForIO, A>, Kind<ForIO, B>> = arrow.fx.IO
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.ForIO, A>, arrow.Kind<arrow.fx.ForIO,
+  .functor()
+  .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.ForIO, A>, arrow.Kind<arrow.fx.ForIO,
     B>>
 
 @JvmName("void")
@@ -79,9 +79,9 @@ fun <A> Kind<ForIO, A>.void(): IO<Unit> = arrow.fx.IO.functor().run {
 )
 @Deprecated(IODeprecation)
 fun <A, B> Kind<ForIO, A>.fproduct(arg1: Function1<A, B>): IO<Tuple2<A, B>> =
-    arrow.fx.IO.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.IO<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.IO.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.IO<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(

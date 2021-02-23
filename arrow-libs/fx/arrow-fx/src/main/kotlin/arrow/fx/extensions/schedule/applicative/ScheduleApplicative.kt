@@ -67,8 +67,8 @@ fun <F, Input, A, B> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.map(
 @Deprecated(IODeprecation)
 fun <F, Input, A> Kind<Kind<Kind<ForSchedule, F>, Input>, A>.replicate(MF: Monad<F>, arg1: Int):
   Schedule<F, Input, List<A>> = arrow.fx.Schedule.applicative<F, Input>(MF).run {
-  this@replicate.replicate<A>(arg1) as arrow.fx.Schedule<F, Input, kotlin.collections.List<A>>
-}
+    this@replicate.replicate<A>(arg1) as arrow.fx.Schedule<F, Input, kotlin.collections.List<A>>
+  }
 
 @JvmName("replicate")
 @Suppress(

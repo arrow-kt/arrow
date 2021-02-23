@@ -20,7 +20,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val functorFilter_singleton: MaybeKFunctorFilter = object :
-    arrow.fx.rx2.extensions.MaybeKFunctorFilter {}
+  arrow.fx.rx2.extensions.MaybeKFunctorFilter {}
 
 @JvmName("filterMap")
 @Suppress(
@@ -31,9 +31,9 @@ internal val functorFilter_singleton: MaybeKFunctorFilter = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.filterMap(arg1: Function1<A, Option<B>>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.functorFilter().run {
-  this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.functorFilter().run {
+    this@filterMap.filterMap<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @JvmName("flattenOption")
 @Suppress(
@@ -44,9 +44,9 @@ fun <A, B> Kind<ForMaybeK, A>.filterMap(arg1: Function1<A, Option<B>>): MaybeK<B
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, Option<A>>.flattenOption(): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.functorFilter().run {
-  this@flattenOption.flattenOption<A>() as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.functorFilter().run {
+    this@flattenOption.flattenOption<A>() as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("filter")
 @Suppress(
@@ -57,9 +57,9 @@ fun <A> Kind<ForMaybeK, Option<A>>.flattenOption(): MaybeK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForMaybeK, A>.filter(arg1: Function1<A, Boolean>): MaybeK<A> =
-    arrow.fx.rx2.MaybeK.functorFilter().run {
-  this@filter.filter<A>(arg1) as arrow.fx.rx2.MaybeK<A>
-}
+  arrow.fx.rx2.MaybeK.functorFilter().run {
+    this@filter.filter<A>(arg1) as arrow.fx.rx2.MaybeK<A>
+  }
 
 @JvmName("filterIsInstance")
 @Suppress(
@@ -70,9 +70,9 @@ fun <A> Kind<ForMaybeK, A>.filter(arg1: Function1<A, Boolean>): MaybeK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForMaybeK, A>.filterIsInstance(arg1: Class<B>): MaybeK<B> =
-    arrow.fx.rx2.MaybeK.functorFilter().run {
-  this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
-}
+  arrow.fx.rx2.MaybeK.functorFilter().run {
+    this@filterIsInstance.filterIsInstance<A, B>(arg1) as arrow.fx.rx2.MaybeK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

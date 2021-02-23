@@ -434,12 +434,14 @@ sealed class IO<out A> : IOOf<A> {
           val cancellable = ForwardCancellable()
           conn.push { cancellable.cancel() }
           if (conn.isNotCancelled()) {
-            cancellable.complete(try {
-              cb(cbb2)
-            } catch (throwable: Throwable) {
-              cbb2(Left(throwable.nonFatalOrThrow()))
-              unit
-            })
+            cancellable.complete(
+              try {
+                cb(cbb2)
+              } catch (throwable: Throwable) {
+                cbb2(Left(throwable.nonFatalOrThrow()))
+                unit
+              }
+            )
           }
         }
       }
@@ -515,18 +517,21 @@ sealed class IO<out A> : IOOf<A> {
           }
         }
 
-        cb(k1).fix().bracketCase(use = {
-          async<Unit> { cb ->
-            if (!state.compareAndSet(null, cb)) {
-              cb(rightUnit)
+        cb(k1).fix().bracketCase(
+          use = {
+            async<Unit> { cb ->
+              if (!state.compareAndSet(null, cb)) {
+                cb(rightUnit)
+              }
+            }
+          },
+          release = { token, exitCase ->
+            when (exitCase) {
+              is ExitCase.Cancelled -> token
+              else -> just(Unit)
             }
           }
-        }, release = { token, exitCase ->
-          when (exitCase) {
-            is ExitCase.Cancelled -> token
-            else -> just(Unit)
-          }
-        })
+        )
       }
 
     @Deprecated("Renaming this api for consistency", ReplaceWith("cancellableF(cb)"))
@@ -1140,7 +1145,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun invoke(value: E): IO<A> = just(g(value))
 
     override fun <B> map(f: (A) -> B): IO<B> =
-    // Allowed to do maxStackDepthSize map operations in sequence before
+      // Allowed to do maxStackDepthSize map operations in sequence before
       // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)

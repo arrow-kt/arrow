@@ -23,9 +23,9 @@ fun <F, A, B, C> Kind<Kind<Kind<ForSchedule, F>, B>, C>.compose(
   MM: Monad<F>,
   arg1: Kind<Kind<Kind<ForSchedule, F>, A>, B>
 ): Schedule<F, A, C> =
-    arrow.fx.Schedule.category<F>(MM).run {
-  this@compose.compose<A, B, C>(arg1) as arrow.fx.Schedule<F, A, C>
-}
+  arrow.fx.Schedule.category<F>(MM).run {
+    this@compose.compose<A, B, C>(arg1) as arrow.fx.Schedule<F, A, C>
+  }
 
 @JvmName("andThen")
 @Suppress(
@@ -39,9 +39,9 @@ fun <F, A, B, C> Kind<Kind<Kind<ForSchedule, F>, A>, B>.andThen(
   MM: Monad<F>,
   arg1: Kind<Kind<Kind<ForSchedule, F>, B>, C>
 ): Schedule<F, A, C> =
-    arrow.fx.Schedule.category<F>(MM).run {
-  this@andThen.andThen<A, B, C>(arg1) as arrow.fx.Schedule<F, A, C>
-}
+  arrow.fx.Schedule.category<F>(MM).run {
+    this@andThen.andThen<A, B, C>(arg1) as arrow.fx.Schedule<F, A, C>
+  }
 
 @JvmName("id")
 @Suppress(
@@ -52,8 +52,8 @@ fun <F, A, B, C> Kind<Kind<Kind<ForSchedule, F>, A>, B>.andThen(
 )
 @Deprecated(IODeprecation)
 fun <F, A> id(MM: Monad<F>): Schedule<F, A, A> = arrow.fx.Schedule
-   .category<F>(MM)
-   .id<A>() as arrow.fx.Schedule<F, A, A>
+  .category<F>(MM)
+  .id<A>() as arrow.fx.Schedule<F, A, A>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -61,4 +61,4 @@ fun <F, A> id(MM: Monad<F>): Schedule<F, A, A> = arrow.fx.Schedule
 )
 @Deprecated(IODeprecation)
 inline fun <F> Companion.category(MM: Monad<F>): ScheduleCategory<F> = object :
-    arrow.fx.extensions.ScheduleCategory<F> { override fun MM(): arrow.typeclasses.Monad<F> = MM }
+  arrow.fx.extensions.ScheduleCategory<F> { override fun MM(): arrow.typeclasses.Monad<F> = MM }

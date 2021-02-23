@@ -14,7 +14,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroup_singleton: DurationSemigroup = object : arrow.fx.extensions.DurationSemigroup
-    {}
+{}
 
 @JvmName("plus")
 @Suppress(
@@ -25,9 +25,9 @@ internal val semigroup_singleton: DurationSemigroup = object : arrow.fx.extensio
 )
 @Deprecated(IODeprecation)
 operator fun Duration.plus(arg1: Duration): Duration =
-    arrow.fx.typeclasses.Duration.semigroup().run {
-  this@plus.plus(arg1) as arrow.fx.typeclasses.Duration
-}
+  arrow.fx.typeclasses.Duration.semigroup().run {
+    this@plus.plus(arg1) as arrow.fx.typeclasses.Duration
+  }
 
 @JvmName("maybeCombine")
 @Suppress(
@@ -38,9 +38,9 @@ operator fun Duration.plus(arg1: Duration): Duration =
 )
 @Deprecated(IODeprecation)
 fun Duration.maybeCombine(arg1: Duration): Duration =
-    arrow.fx.typeclasses.Duration.semigroup().run {
-  this@maybeCombine.maybeCombine(arg1) as arrow.fx.typeclasses.Duration
-}
+  arrow.fx.typeclasses.Duration.semigroup().run {
+    this@maybeCombine.maybeCombine(arg1) as arrow.fx.typeclasses.Duration
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

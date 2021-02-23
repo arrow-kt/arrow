@@ -23,16 +23,18 @@ fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   shouldBeEq(b, eq).let { true }
 
 fun <A> IOOf<A>.equalUnderTheLaw(b: IOOf<A>, EQA: Eq<A> = Eq.any(), timeout: Duration = 20.seconds): Boolean =
-  (this should object : Matcher<IOOf<A>> {
-    override fun test(value: IOOf<A>): Result =
-      arrow.core.Either.eq(Eq.any(), EQA).run {
-        IO.applicative().mapN(value.fix().attempt(), b.fix().attempt()) { (a, b) ->
+  (
+    this should object : Matcher<IOOf<A>> {
+      override fun test(value: IOOf<A>): Result =
+        arrow.core.Either.eq(Eq.any(), EQA).run {
+          IO.applicative().mapN(value.fix().attempt(), b.fix().attempt()) { (a, b) ->
             Result(a.eqv(b), "Expected: $b but found: $a", "$b and $a should be equal")
           }
-          .waitFor(timeout)
-          .unsafeRunSync()
-      }
-  }).let { true }
+            .waitFor(timeout)
+            .unsafeRunSync()
+        }
+    }
+    ).let { true }
 
 fun <A> A.shouldBeEq(b: A, eq: Eq<A>): Unit = this should matchUnderEq(eq, b)
 

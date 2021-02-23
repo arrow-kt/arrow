@@ -202,11 +202,14 @@ class MaybeKTests : RxJavaSpec() {
 
 private fun <T> MaybeK.Companion.eq(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>> {
   override fun MaybeKOf<T>.eqv(b: MaybeKOf<T>): Boolean =
-    unsafeRunEq({
-      this.value().timeout(5, TimeUnit.SECONDS).blockingGet()
-    }, {
-      b.value().timeout(5, TimeUnit.SECONDS).blockingGet()
-    })
+    unsafeRunEq(
+      {
+        this.value().timeout(5, TimeUnit.SECONDS).blockingGet()
+      },
+      {
+        b.value().timeout(5, TimeUnit.SECONDS).blockingGet()
+      }
+    )
 }
 
 private fun MaybeK.Companion.eqK() = object : EqK<ForMaybeK> {

@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val semigroupK_singleton: ScheduleSemigroupK<Any?, Any?> = object :
-    ScheduleSemigroupK<Any?, Any?> {}
+  ScheduleSemigroupK<Any?, Any?> {}
 
 @JvmName("combineK")
 @Suppress(
@@ -29,10 +29,10 @@ internal val semigroupK_singleton: ScheduleSemigroupK<Any?, Any?> = object :
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A> Kind<Kind<Kind<ForSchedule, F>, Input>,
-    A>.combineK(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, A>): Schedule<F, Input, A> =
-    arrow.fx.Schedule.semigroupK<F, Input>().run {
-  this@combineK.combineK<A>(arg1) as arrow.fx.Schedule<F, Input, A>
-}
+  A>.combineK(arg1: Kind<Kind<Kind<ForSchedule, F>, Input>, A>): Schedule<F, Input, A> =
+  arrow.fx.Schedule.semigroupK<F, Input>().run {
+    this@combineK.combineK<A>(arg1) as arrow.fx.Schedule<F, Input, A>
+  }
 
 @JvmName("algebra")
 @Suppress(
@@ -43,11 +43,11 @@ fun <F, Input, A> Kind<Kind<Kind<ForSchedule, F>, Input>,
 )
 @Deprecated(IODeprecation)
 fun <F, Input, A> algebra(): Semigroup<Kind<Kind<Kind<ForSchedule, F>, Input>, A>> =
-    arrow.fx.Schedule
-   .semigroupK<F, Input>()
-   .algebra<A>() as
+  arrow.fx.Schedule
+    .semigroupK<F, Input>()
+    .algebra<A>() as
     arrow.typeclasses.Semigroup<arrow.Kind<arrow.Kind<arrow.Kind<arrow.fx.ForSchedule, F>, Input>,
-    A>>
+        A>>
 
 @Suppress(
   "UNCHECKED_CAST",
@@ -55,4 +55,4 @@ fun <F, Input, A> algebra(): Semigroup<Kind<Kind<Kind<ForSchedule, F>, Input>, A
 )
 @Deprecated(IODeprecation)
 inline fun <F, Input> Companion.semigroupK(): ScheduleSemigroupK<F, Input> = semigroupK_singleton as
-    arrow.fx.extensions.ScheduleSemigroupK<F, Input>
+  arrow.fx.extensions.ScheduleSemigroupK<F, Input>

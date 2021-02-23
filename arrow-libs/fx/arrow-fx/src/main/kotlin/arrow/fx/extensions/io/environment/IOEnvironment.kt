@@ -25,8 +25,8 @@ internal val environment_singleton: IOEnvironment = object : arrow.fx.extensions
 )
 @Deprecated(IODeprecation)
 fun dispatchers(): Dispatchers<ForIO> = arrow.fx.IO
-   .environment()
-   .dispatchers() as arrow.fx.typeclasses.Dispatchers<arrow.fx.ForIO>
+  .environment()
+  .dispatchers() as arrow.fx.typeclasses.Dispatchers<arrow.fx.ForIO>
 
 @Suppress(
   "UNCHECKED_CAST",

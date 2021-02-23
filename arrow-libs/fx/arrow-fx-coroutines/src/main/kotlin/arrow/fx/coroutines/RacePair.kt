@@ -87,45 +87,59 @@ suspend fun <A, B> oldRacePair(
 
     conn.pushPair(connA, connB)
 
-    fa.startCoroutineCancellable(CancellableContinuation(ctx + jobA, connA) { result ->
-      result.fold({ a ->
-        if (active.getAndSet(false)) {
-          conn.pop()
-          cont.resumeWith(Result.success(Either.Left(Pair(a, Fiber(promiseB, connB)))))
-        } else {
-          promiseA.complete(Result.success(a))
-        }
-      }, { error ->
-        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connB.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
-            conn.pop()
-            cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
-          })
-        } else {
-          promiseA.complete(Result.failure(error))
-        }
-      })
-    })
+    fa.startCoroutineCancellable(
+      CancellableContinuation(ctx + jobA, connA) { result ->
+        result.fold(
+          { a ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cont.resumeWith(Result.success(Either.Left(Pair(a, Fiber(promiseB, connB)))))
+            } else {
+              promiseA.complete(Result.success(a))
+            }
+          },
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              suspend { connB.cancel() }.startCoroutineUnintercepted(
+                Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
+                  conn.pop()
+                  cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
+                }
+              )
+            } else {
+              promiseA.complete(Result.failure(error))
+            }
+          }
+        )
+      }
+    )
 
-    fb.startCoroutineCancellable(CancellableContinuation(ctx + jobB, connB) { result ->
-      result.fold({ b ->
-        if (active.getAndSet(false)) {
-          conn.pop()
-          cont.resumeWith(Result.success(Either.Right(Pair(Fiber(promiseA, connA), b))))
-        } else {
-          promiseB.complete(Result.success(b))
-        }
-      }, { error ->
-        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          suspend { connA.cancel() }.startCoroutineUnintercepted(Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
-            conn.pop()
-            cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
-          })
-        } else {
-          promiseB.complete(Result.failure(error))
-        }
-      })
-    })
+    fb.startCoroutineCancellable(
+      CancellableContinuation(ctx + jobB, connB) { result ->
+        result.fold(
+          { b ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              cont.resumeWith(Result.success(Either.Right(Pair(Fiber(promiseA, connA), b))))
+            } else {
+              promiseB.complete(Result.success(b))
+            }
+          },
+          { error ->
+            if (active.getAndSet(false)) { // if an error finishes first, stop the race.
+              suspend { connA.cancel() }.startCoroutineUnintercepted(
+                Continuation(ctx + SuspendConnection.uncancellable + NonCancellable) { r2 ->
+                  conn.pop()
+                  cont.resumeWith(Result.failure(r2.fold({ error }, { Platform.composeErrors(error, it) })))
+                }
+              )
+            } else {
+              promiseB.complete(Result.failure(error))
+            }
+          }
+        )
+      }
+    )
 
     COROUTINE_SUSPENDED
   }

@@ -79,12 +79,12 @@ internal val bracket_singleton: SingleKBracket = object : arrow.fx.rx2.extension
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.bracketCase(
   arg1: Function2<A, ExitCase<Throwable>, Kind<ForSingleK,
-Unit>>,
+      Unit>>,
   arg2: Function1<A, Kind<ForSingleK, B>>
 ): SingleK<B> =
-    arrow.fx.rx2.SingleK.bracket().run {
-  this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.bracket().run {
+    this@bracketCase.bracketCase<A, B>(arg1, arg2) as arrow.fx.rx2.SingleK<B>
+  }
 
 /**
  *  Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
@@ -182,9 +182,9 @@ fun <A> Kind<ForSingleK, A>.uncancelable(): SingleK<A> = arrow.fx.rx2.SingleK.br
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.guarantee(arg1: Kind<ForSingleK, Unit>): SingleK<A> =
-    arrow.fx.rx2.SingleK.bracket().run {
-  this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.bracket().run {
+    this@guarantee.guarantee<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 /**
  *  Executes the given `finalizer` when the source is finished, either in success or in error, or if cancelled, allowing
@@ -207,7 +207,7 @@ fun <A> Kind<ForSingleK, A>.guarantee(arg1: Kind<ForSingleK, Unit>): SingleK<A> 
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.guaranteeCase(
   arg1: Function1<ExitCase<Throwable>, Kind<ForSingleK,
-Unit>>
+      Unit>>
 ): SingleK<A> = arrow.fx.rx2.SingleK.bracket().run {
   this@guaranteeCase.guaranteeCase<A>(arg1) as arrow.fx.rx2.SingleK<A>
 }
@@ -226,9 +226,9 @@ Unit>>
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.onCancel(arg1: Kind<ForSingleK, Unit>): SingleK<A> =
-    arrow.fx.rx2.SingleK.bracket().run {
-  this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.bracket().run {
+    this@onCancel.onCancel<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 /**
  *  Executes the given `finalizer` with the given error when the source is finished in error.
@@ -242,9 +242,9 @@ fun <A> Kind<ForSingleK, A>.onCancel(arg1: Kind<ForSingleK, Unit>): SingleK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.onError(arg1: Function1<Throwable, Kind<ForSingleK, Unit>>): SingleK<A> =
-    arrow.fx.rx2.SingleK.bracket().run {
-  this@onError.onError<A>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.bracket().run {
+    this@onError.onError<A>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 /**
  *  Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource

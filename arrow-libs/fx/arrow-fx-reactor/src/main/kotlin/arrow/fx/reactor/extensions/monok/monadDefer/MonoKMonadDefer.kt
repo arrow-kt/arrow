@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadDefer_singleton: MonoKMonadDefer = object :
-    arrow.fx.reactor.extensions.MonoKMonadDefer {}
+  arrow.fx.reactor.extensions.MonoKMonadDefer {}
 
 @JvmName("defer")
 @Suppress(
@@ -32,8 +32,8 @@ internal val monadDefer_singleton: MonoKMonadDefer = object :
 )
 @Deprecated(DeprecateReactor)
 fun <A> defer(arg0: Function0<Kind<ForMonoK, A>>): MonoK<A> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .defer<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  .monadDefer()
+  .defer<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("later")
 @Suppress(
@@ -44,8 +44,8 @@ fun <A> defer(arg0: Function0<Kind<ForMonoK, A>>): MonoK<A> = arrow.fx.reactor.M
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: Function0<A>): MonoK<A> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("later")
 @Suppress(
@@ -56,8 +56,8 @@ fun <A> later(arg0: Function0<A>): MonoK<A> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A> later(arg0: Kind<ForMonoK, A>): MonoK<A> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .later<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  .monadDefer()
+  .later<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("lazy")
 @Suppress(
@@ -68,8 +68,8 @@ fun <A> later(arg0: Kind<ForMonoK, A>): MonoK<A> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun lazy(): MonoK<Unit> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .lazy() as arrow.fx.reactor.MonoK<kotlin.Unit>
+  .monadDefer()
+  .lazy() as arrow.fx.reactor.MonoK<kotlin.Unit>
 
 @JvmName("laterOrRaise")
 @Suppress(
@@ -80,8 +80,8 @@ fun lazy(): MonoK<Unit> = arrow.fx.reactor.MonoK
 )
 @Deprecated(DeprecateReactor)
 fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): MonoK<A> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .laterOrRaise<A>(arg0) as arrow.fx.reactor.MonoK<A>
+  .monadDefer()
+  .laterOrRaise<A>(arg0) as arrow.fx.reactor.MonoK<A>
 
 @JvmName("Ref")
 @Suppress(
@@ -92,8 +92,8 @@ fun <A> laterOrRaise(arg0: Function0<Either<Throwable, A>>): MonoK<A> = arrow.fx
 )
 @Deprecated(DeprecateReactor)
 fun <A> Ref(arg0: A): MonoK<Ref<ForMonoK, A>> = arrow.fx.reactor.MonoK
-   .monadDefer()
-   .Ref<A>(arg0) as arrow.fx.reactor.MonoK<arrow.fx.Ref<arrow.fx.reactor.ForMonoK, A>>
+  .monadDefer()
+  .Ref<A>(arg0) as arrow.fx.reactor.MonoK<arrow.fx.Ref<arrow.fx.reactor.ForMonoK, A>>
 
 @Suppress(
   "UNCHECKED_CAST",

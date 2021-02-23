@@ -60,7 +60,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val concurrent_singleton: IODefaultConcurrent = object :
-    arrow.fx.extensions.IODefaultConcurrent {}
+  arrow.fx.extensions.IODefaultConcurrent {}
 
 @JvmName("timer")
 @Suppress(
@@ -71,8 +71,8 @@ internal val concurrent_singleton: IODefaultConcurrent = object :
 )
 @Deprecated(IODeprecation)
 fun timer(): Timer<ForIO> = arrow.fx.IO
-   .concurrent()
-   .timer() as arrow.fx.Timer<arrow.fx.ForIO>
+  .concurrent()
+  .timer() as arrow.fx.Timer<arrow.fx.ForIO>
 
 @JvmName("parApplicative")
 @Suppress(
@@ -83,8 +83,8 @@ fun timer(): Timer<ForIO> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun parApplicative(): Applicative<ForIO> = arrow.fx.IO
-   .concurrent()
-   .parApplicative() as arrow.typeclasses.Applicative<arrow.fx.ForIO>
+  .concurrent()
+  .parApplicative() as arrow.typeclasses.Applicative<arrow.fx.ForIO>
 
 @JvmName("parApplicative")
 @Suppress(
@@ -95,8 +95,8 @@ fun parApplicative(): Applicative<ForIO> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun parApplicative(ctx: CoroutineContext): Applicative<ForIO> = arrow.fx.IO
-   .concurrent()
-   .parApplicative(ctx) as arrow.typeclasses.Applicative<arrow.fx.ForIO>
+  .concurrent()
+  .parApplicative(ctx) as arrow.typeclasses.Applicative<arrow.fx.ForIO>
 
 @JvmName("fork")
 @Suppress(
@@ -107,9 +107,9 @@ fun parApplicative(ctx: CoroutineContext): Applicative<ForIO> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
-    arrow.fx.IO.concurrent().run {
-  this@fork.fork<A>(ctx) as arrow.fx.IO<arrow.fx.typeclasses.Fiber<arrow.fx.ForIO, A>>
-}
+  arrow.fx.IO.concurrent().run {
+    this@fork.fork<A>(ctx) as arrow.fx.IO<arrow.fx.typeclasses.Fiber<arrow.fx.ForIO, A>>
+  }
 
 @JvmName("fork")
 @Suppress(
@@ -150,7 +150,7 @@ fun <A, B, C> CoroutineContext.raceTriple(
   fc: Kind<ForIO, C>
 ): IO<RaceTriple<ForIO, A, B, C>> = arrow.fx.IO.concurrent().run {
   this@raceTriple.raceTriple<A, B, C>(fa, fb, fc) as arrow.fx.IO<arrow.fx.RaceTriple<arrow.fx.ForIO,
-    A, B, C>>
+      A, B, C>>
 }
 
 @JvmName("cancellable")
@@ -162,9 +162,9 @@ fun <A, B, C> CoroutineContext.raceTriple(
 )
 @Deprecated(IODeprecation)
 fun <A> cancellable(k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForIO, Unit>>): IO<A> =
-    arrow.fx.IO
-   .concurrent()
-   .cancellable<A>(k) as arrow.fx.IO<A>
+  arrow.fx.IO
+    .concurrent()
+    .cancellable<A>(k) as arrow.fx.IO<A>
 
 @JvmName("cancelable")
 @Suppress(
@@ -175,9 +175,9 @@ fun <A> cancellable(k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<For
 )
 @Deprecated(IODeprecation)
 fun <A> cancelable(k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForIO, Unit>>): IO<A> =
-    arrow.fx.IO
-   .concurrent()
-   .cancelable<A>(k) as arrow.fx.IO<A>
+  arrow.fx.IO
+    .concurrent()
+    .cancelable<A>(k) as arrow.fx.IO<A>
 
 @JvmName("cancellableF")
 @Suppress(
@@ -189,10 +189,10 @@ fun <A> cancelable(k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForI
 @Deprecated(IODeprecation)
 fun <A> cancellableF(
   k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForIO, Kind<ForIO,
-Unit>>>
+        Unit>>>
 ): IO<A> = arrow.fx.IO
-   .concurrent()
-   .cancellableF<A>(k) as arrow.fx.IO<A>
+  .concurrent()
+  .cancellableF<A>(k) as arrow.fx.IO<A>
 
 @JvmName("cancelableF")
 @Suppress(
@@ -204,10 +204,10 @@ Unit>>>
 @Deprecated(IODeprecation)
 fun <A> cancelableF(
   k: Function1<Function1<Either<Throwable, A>, Unit>, Kind<ForIO, Kind<ForIO,
-Unit>>>
+        Unit>>>
 ): IO<A> = arrow.fx.IO
-   .concurrent()
-   .cancelableF<A>(k) as arrow.fx.IO<A>
+  .concurrent()
+  .cancelableF<A>(k) as arrow.fx.IO<A>
 
 @JvmName("parTraverse")
 @Suppress(
@@ -247,9 +247,9 @@ fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: Function1<A, Kind<ForIO
 )
 @Deprecated(IODeprecation)
 fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: Function1<A, Kind<ForIO, B>>):
-    IO<List<B>> = arrow.fx.IO.concurrent().run {
-  this@parTraverse.parTraverse<A, B>(ctx, f) as arrow.fx.IO<kotlin.collections.List<B>>
-}
+  IO<List<B>> = arrow.fx.IO.concurrent().run {
+    this@parTraverse.parTraverse<A, B>(ctx, f) as arrow.fx.IO<kotlin.collections.List<B>>
+  }
 
 @JvmName("parTraverse")
 @Suppress(
@@ -260,9 +260,9 @@ fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: Function1<A, Kind<F
 )
 @Deprecated(IODeprecation)
 fun <A, B> Iterable<A>.parTraverse(f: Function1<A, Kind<ForIO, B>>): IO<List<B>> =
-    arrow.fx.IO.concurrent().run {
-  this@parTraverse.parTraverse<A, B>(f) as arrow.fx.IO<kotlin.collections.List<B>>
-}
+  arrow.fx.IO.concurrent().run {
+    this@parTraverse.parTraverse<A, B>(f) as arrow.fx.IO<kotlin.collections.List<B>>
+  }
 
 @JvmName("parSequence")
 @Suppress(
@@ -286,9 +286,9 @@ fun <G, A> Kind<G, Kind<ForIO, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineCo
 )
 @Deprecated(IODeprecation)
 fun <G, A> Kind<G, Kind<ForIO, A>>.parSequence(TG: Traverse<G>): IO<Kind<G, A>> =
-    arrow.fx.IO.concurrent().run {
-  this@parSequence.parSequence<G, A>(TG) as arrow.fx.IO<arrow.Kind<G, A>>
-}
+  arrow.fx.IO.concurrent().run {
+    this@parSequence.parSequence<G, A>(TG) as arrow.fx.IO<arrow.Kind<G, A>>
+  }
 
 @JvmName("parSequence")
 @Suppress(
@@ -299,9 +299,9 @@ fun <G, A> Kind<G, Kind<ForIO, A>>.parSequence(TG: Traverse<G>): IO<Kind<G, A>> 
 )
 @Deprecated(IODeprecation)
 fun <A> Iterable<Kind<ForIO, A>>.parSequence(ctx: CoroutineContext): IO<List<A>> =
-    arrow.fx.IO.concurrent().run {
-  this@parSequence.parSequence<A>(ctx) as arrow.fx.IO<kotlin.collections.List<A>>
-}
+  arrow.fx.IO.concurrent().run {
+    this@parSequence.parSequence<A>(ctx) as arrow.fx.IO<kotlin.collections.List<A>>
+  }
 
 @JvmName("parSequence")
 @Suppress(
@@ -329,8 +329,8 @@ fun <A, B, C> parMapN(
   fb: Kind<ForIO, B>,
   f: Function1<Tuple2<A, B>, C>
 ): IO<C> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C>(ctx, fa, fb, f) as arrow.fx.IO<C>
+  .concurrent()
+  .parMapN<A, B, C>(ctx, fa, fb, f) as arrow.fx.IO<C>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -345,8 +345,8 @@ fun <A, B> parTupledN(
   fa: Kind<ForIO, A>,
   fb: Kind<ForIO, B>
 ): IO<Tuple2<A, B>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B>(ctx, fa, fb) as arrow.fx.IO<arrow.core.Tuple2<A, B>>
+  .concurrent()
+  .parTupledN<A, B>(ctx, fa, fb) as arrow.fx.IO<arrow.core.Tuple2<A, B>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -379,8 +379,8 @@ fun <A, B, C, D> parMapN(
   fc: Kind<ForIO, C>,
   f: Function1<Tuple3<A, B, C>, D>
 ): IO<D> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C, D>(ctx, fa, fb, fc, f) as arrow.fx.IO<D>
+  .concurrent()
+  .parMapN<A, B, C, D>(ctx, fa, fb, fc, f) as arrow.fx.IO<D>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -396,8 +396,8 @@ fun <A, B, C> parTupledN(
   fb: Kind<ForIO, B>,
   fc: Kind<ForIO, C>
 ): IO<Tuple3<A, B, C>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B, C>(ctx, fa, fb, fc) as arrow.fx.IO<arrow.core.Tuple3<A, B, C>>
+  .concurrent()
+  .parTupledN<A, B, C>(ctx, fa, fb, fc) as arrow.fx.IO<arrow.core.Tuple3<A, B, C>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -432,8 +432,8 @@ fun <A, B, C, D, E> parMapN(
   fd: Kind<ForIO, D>,
   f: Function1<Tuple4<A, B, C, D>, E>
 ): IO<E> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C, D, E>(ctx, fa, fb, fc, fd, f) as arrow.fx.IO<E>
+  .concurrent()
+  .parMapN<A, B, C, D, E>(ctx, fa, fb, fc, fd, f) as arrow.fx.IO<E>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -450,8 +450,8 @@ fun <A, B, C, D> parTupledN(
   fc: Kind<ForIO, C>,
   fd: Kind<ForIO, D>
 ): IO<Tuple4<A, B, C, D>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B, C, D>(ctx, fa, fb, fc, fd) as arrow.fx.IO<arrow.core.Tuple4<A, B, C, D>>
+  .concurrent()
+  .parTupledN<A, B, C, D>(ctx, fa, fb, fc, fd) as arrow.fx.IO<arrow.core.Tuple4<A, B, C, D>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -488,8 +488,8 @@ fun <A, B, C, D, E, G> parMapN(
   fe: Kind<ForIO, E>,
   f: Function1<Tuple5<A, B, C, D, E>, G>
 ): IO<G> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C, D, E, G>(ctx, fa, fb, fc, fd, fe, f) as arrow.fx.IO<G>
+  .concurrent()
+  .parMapN<A, B, C, D, E, G>(ctx, fa, fb, fc, fd, fe, f) as arrow.fx.IO<G>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -633,9 +633,9 @@ fun <A, B, C, D, E, G, H> parTupledN(
   fg: Kind<ForIO, G>,
   fh: Kind<ForIO, H>
 ): IO<Tuple7<A, B, C, D, E, G, H>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B, C, D, E, G, H>(ctx, fa, fb, fc, fd, fe, fg, fh) as
-    arrow.fx.IO<arrow.core.Tuple7<A, B, C, D, E, G, H>>
+  .concurrent()
+  .parTupledN<A, B, C, D, E, G, H>(ctx, fa, fb, fc, fd, fe, fg, fh) as
+  arrow.fx.IO<arrow.core.Tuple7<A, B, C, D, E, G, H>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -678,8 +678,8 @@ fun <A, B, C, D, E, G, H, I, J> parMapN(
   fi: Kind<ForIO, I>,
   f: Function1<Tuple8<A, B, C, D, E, G, H, I>, J>
 ): IO<J> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C, D, E, G, H, I, J>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, f) as arrow.fx.IO<J>
+  .concurrent()
+  .parMapN<A, B, C, D, E, G, H, I, J>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, f) as arrow.fx.IO<J>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -700,9 +700,9 @@ fun <A, B, C, D, E, G, H, I> parTupledN(
   fh: Kind<ForIO, H>,
   fi: Kind<ForIO, I>
 ): IO<Tuple8<A, B, C, D, E, G, H, I>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B, C, D, E, G, H, I>(ctx, fa, fb, fc, fd, fe, fg, fh, fi) as
-    arrow.fx.IO<arrow.core.Tuple8<A, B, C, D, E, G, H, I>>
+  .concurrent()
+  .parTupledN<A, B, C, D, E, G, H, I>(ctx, fa, fb, fc, fd, fe, fg, fh, fi) as
+  arrow.fx.IO<arrow.core.Tuple8<A, B, C, D, E, G, H, I>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -748,9 +748,9 @@ fun <A, B, C, D, E, G, H, I, J, K> parMapN(
   fj: Kind<ForIO, J>,
   f: Function1<Tuple9<A, B, C, D, E, G, H, I, J>, K>
 ): IO<K> = arrow.fx.IO
-   .concurrent()
-   .parMapN<A, B, C, D, E, G, H, I, J, K>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj, f) as
-    arrow.fx.IO<K>
+  .concurrent()
+  .parMapN<A, B, C, D, E, G, H, I, J, K>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj, f) as
+  arrow.fx.IO<K>
 
 @JvmName("parTupledN")
 @Suppress(
@@ -772,9 +772,9 @@ fun <A, B, C, D, E, G, H, I, J> parTupledN(
   fi: Kind<ForIO, I>,
   fj: Kind<ForIO, J>
 ): IO<Tuple9<A, B, C, D, E, G, H, I, J>> = arrow.fx.IO
-   .concurrent()
-   .parTupledN<A, B, C, D, E, G, H, I, J>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj) as
-    arrow.fx.IO<arrow.core.Tuple9<A, B, C, D, E, G, H, I, J>>
+  .concurrent()
+  .parTupledN<A, B, C, D, E, G, H, I, J>(ctx, fa, fb, fc, fd, fe, fg, fh, fi, fj) as
+  arrow.fx.IO<arrow.core.Tuple9<A, B, C, D, E, G, H, I, J>>
 
 @JvmName("parMapN")
 @Suppress(
@@ -809,9 +809,9 @@ fun <A, B, C, D, E, G, H, I, J, K> CoroutineContext.parMapN(
 )
 @Deprecated(IODeprecation)
 fun <A, B> CoroutineContext.raceN(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<Either<A, B>> =
-    arrow.fx.IO.concurrent().run {
-  this@raceN.raceN<A, B>(fa, fb) as arrow.fx.IO<arrow.core.Either<A, B>>
-}
+  arrow.fx.IO.concurrent().run {
+    this@raceN.raceN<A, B>(fa, fb) as arrow.fx.IO<arrow.core.Either<A, B>>
+  }
 
 @JvmName("raceN")
 @Suppress(
@@ -881,7 +881,7 @@ fun <A, B, C, D, E, G> CoroutineContext.raceN(
   g: Kind<ForIO, G>
 ): IO<Race6<A, B, C, D, E, G>> = arrow.fx.IO.concurrent().run {
   this@raceN.raceN<A, B, C, D, E, G>(a, b, c, d, e, g) as arrow.fx.IO<arrow.fx.Race6<A, B, C, D, E,
-    G>>
+      G>>
 }
 
 @JvmName("raceN")
@@ -902,7 +902,7 @@ fun <A, B, C, D, E, G, H> CoroutineContext.raceN(
   h: Kind<ForIO, H>
 ): IO<Race7<A, B, C, D, E, G, H>> = arrow.fx.IO.concurrent().run {
   this@raceN.raceN<A, B, C, D, E, G, H>(a, b, c, d, e, g, h) as arrow.fx.IO<arrow.fx.Race7<A, B, C,
-    D, E, G, H>>
+      D, E, G, H>>
 }
 
 @JvmName("raceN")
@@ -924,7 +924,7 @@ fun <A, B, C, D, E, G, H, I> CoroutineContext.raceN(
   i: Kind<ForIO, I>
 ): IO<Race8<A, B, C, D, E, G, H, I>> = arrow.fx.IO.concurrent().run {
   this@raceN.raceN<A, B, C, D, E, G, H, I>(a, b, c, d, e, g, h, i) as arrow.fx.IO<arrow.fx.Race8<A,
-    B, C, D, E, G, H, I>>
+      B, C, D, E, G, H, I>>
 }
 
 @JvmName("raceN")
@@ -959,8 +959,8 @@ fun <A, B, C, D, E, G, H, I, J> CoroutineContext.raceN(
 )
 @Deprecated(IODeprecation)
 fun <A> Promise(): IO<Promise<ForIO, A>> = arrow.fx.IO
-   .concurrent()
-   .Promise<A>() as arrow.fx.IO<arrow.fx.Promise<arrow.fx.ForIO, A>>
+  .concurrent()
+  .Promise<A>() as arrow.fx.IO<arrow.fx.Promise<arrow.fx.ForIO, A>>
 
 @JvmName("Semaphore")
 @Suppress(
@@ -971,8 +971,8 @@ fun <A> Promise(): IO<Promise<ForIO, A>> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun Semaphore(n: Long): IO<Semaphore<ForIO>> = arrow.fx.IO
-   .concurrent()
-   .Semaphore(n) as arrow.fx.IO<arrow.fx.Semaphore<arrow.fx.ForIO>>
+  .concurrent()
+  .Semaphore(n) as arrow.fx.IO<arrow.fx.Semaphore<arrow.fx.ForIO>>
 
 @JvmName("MVar")
 @Suppress(
@@ -983,8 +983,8 @@ fun Semaphore(n: Long): IO<Semaphore<ForIO>> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> MVar(a: A): IO<MVar<ForIO, A>> = arrow.fx.IO
-   .concurrent()
-   .MVar<A>(a) as arrow.fx.IO<arrow.fx.MVar<arrow.fx.ForIO, A>>
+  .concurrent()
+  .MVar<A>(a) as arrow.fx.IO<arrow.fx.MVar<arrow.fx.ForIO, A>>
 
 @JvmName("bindingConcurrent")
 @Suppress(
@@ -995,8 +995,8 @@ fun <A> MVar(a: A): IO<MVar<ForIO, A>> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<ForIO, *>.() -> B): IO<B> = arrow.fx.IO
-   .concurrent()
-   .bindingConcurrent<B>(c) as arrow.fx.IO<B>
+  .concurrent()
+  .bindingConcurrent<B>(c) as arrow.fx.IO<B>
 
 @JvmName("sleep")
 @Suppress(
@@ -1007,8 +1007,8 @@ fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<ForIO, *>.() -> B): 
 )
 @Deprecated(IODeprecation)
 fun sleep(duration: Duration): IO<Unit> = arrow.fx.IO
-   .concurrent()
-   .sleep(duration) as arrow.fx.IO<kotlin.Unit>
+  .concurrent()
+  .sleep(duration) as arrow.fx.IO<kotlin.Unit>
 
 @JvmName("waitFor")
 @Suppress(
@@ -1019,9 +1019,9 @@ fun sleep(duration: Duration): IO<Unit> = arrow.fx.IO
 )
 @Deprecated(IODeprecation)
 fun <A> Kind<ForIO, A>.waitFor(duration: Duration, p2_772401952: Kind<ForIO, A>): IO<A> =
-    arrow.fx.IO.concurrent().run {
-  this@waitFor.waitFor<A>(duration, p2_772401952) as arrow.fx.IO<A>
-}
+  arrow.fx.IO.concurrent().run {
+    this@waitFor.waitFor<A>(duration, p2_772401952) as arrow.fx.IO<A>
+  }
 
 @JvmName("waitFor")
 @Suppress(
@@ -1044,8 +1044,8 @@ fun <A> Kind<ForIO, A>.waitFor(duration: Duration): IO<A> = arrow.fx.IO.concurre
 )
 @Deprecated(IODeprecation)
 fun dispatchers(): Dispatchers<ForIO> = arrow.fx.IO
-   .concurrent()
-   .dispatchers() as arrow.fx.typeclasses.Dispatchers<arrow.fx.ForIO>
+  .concurrent()
+  .dispatchers() as arrow.fx.typeclasses.Dispatchers<arrow.fx.ForIO>
 
 @Suppress(
   "UNCHECKED_CAST",

@@ -466,14 +466,22 @@ internal object IORunLoop {
     val restore: (Any?, Throwable?, SuspendConnection, CoroutineContext, SuspendConnection, CoroutineContext) -> Pair<SuspendConnection, CoroutineContext>
   ) : IOFrame<Any?, IO<Any?>> {
 
-    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current, ctx ->
-      restore(a, null, old, oldCtx, current, ctx)
-    }, null)
+    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(
+      IO.Pure(a),
+      { current, ctx ->
+        restore(a, null, old, oldCtx, current, ctx)
+      },
+      null
+    )
 
     override fun recover(e: Throwable): IO<Any> =
-      IO.ContextSwitch(IO.RaiseError(e), { current, ctx ->
-        restore(null, e, old, oldCtx, current, ctx)
-      }, null)
+      IO.ContextSwitch(
+        IO.RaiseError(e),
+        { current, ctx ->
+          restore(null, e, old, oldCtx, current, ctx)
+        },
+        null
+      )
   }
 }
 

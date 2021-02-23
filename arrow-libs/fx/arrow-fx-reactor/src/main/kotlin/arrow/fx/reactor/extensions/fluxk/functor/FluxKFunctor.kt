@@ -29,9 +29,9 @@ internal val functor_singleton: FluxKFunctor = object : arrow.fx.reactor.extensi
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.map(arg1: Function1<A, B>): FluxK<B> =
-    arrow.fx.reactor.FluxK.functor().run {
-  this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.functor().run {
+    this@map.map<A, B>(arg1) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("imap")
 @Suppress(
@@ -42,9 +42,9 @@ fun <A, B> Kind<ForFluxK, A>.map(arg1: Function1<A, B>): FluxK<B> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>): FluxK<B> =
-    arrow.fx.reactor.FluxK.functor().run {
-  this@imap.imap<A, B>(arg1, arg2) as arrow.fx.reactor.FluxK<B>
-}
+  arrow.fx.reactor.FluxK.functor().run {
+    this@imap.imap<A, B>(arg1, arg2) as arrow.fx.reactor.FluxK<B>
+  }
 
 @JvmName("lift")
 @Suppress(
@@ -55,9 +55,9 @@ fun <A, B> Kind<ForFluxK, A>.imap(arg1: Function1<A, B>, arg2: Function1<B, A>):
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> lift(arg0: Function1<A, B>): Function1<Kind<ForFluxK, A>, Kind<ForFluxK, B>> =
-    arrow.fx.reactor.FluxK
-   .functor()
-   .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.reactor.ForFluxK, A>,
+  arrow.fx.reactor.FluxK
+    .functor()
+    .lift<A, B>(arg0) as kotlin.Function1<arrow.Kind<arrow.fx.reactor.ForFluxK, A>,
     arrow.Kind<arrow.fx.reactor.ForFluxK, B>>
 
 @JvmName("void")
@@ -81,9 +81,9 @@ fun <A> Kind<ForFluxK, A>.void(): FluxK<Unit> = arrow.fx.reactor.FluxK.functor()
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.fproduct(arg1: Function1<A, B>): FluxK<Tuple2<A, B>> =
-    arrow.fx.reactor.FluxK.functor().run {
-  this@fproduct.fproduct<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.reactor.FluxK.functor().run {
+    this@fproduct.fproduct<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("mapConst")
 @Suppress(
@@ -118,9 +118,9 @@ fun <A, B> A.mapConst(arg1: Kind<ForFluxK, B>): FluxK<A> = arrow.fx.reactor.Flux
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.tupleLeft(arg1: B): FluxK<Tuple2<B, A>> =
-    arrow.fx.reactor.FluxK.functor().run {
-  this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<B, A>>
-}
+  arrow.fx.reactor.FluxK.functor().run {
+    this@tupleLeft.tupleLeft<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<B, A>>
+  }
 
 @JvmName("tupleRight")
 @Suppress(
@@ -131,9 +131,9 @@ fun <A, B> Kind<ForFluxK, A>.tupleLeft(arg1: B): FluxK<Tuple2<B, A>> =
 )
 @Deprecated(DeprecateReactor)
 fun <A, B> Kind<ForFluxK, A>.tupleRight(arg1: B): FluxK<Tuple2<A, B>> =
-    arrow.fx.reactor.FluxK.functor().run {
-  this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<A, B>>
-}
+  arrow.fx.reactor.FluxK.functor().run {
+    this@tupleRight.tupleRight<A, B>(arg1) as arrow.fx.reactor.FluxK<arrow.core.Tuple2<A, B>>
+  }
 
 @JvmName("widen")
 @Suppress(

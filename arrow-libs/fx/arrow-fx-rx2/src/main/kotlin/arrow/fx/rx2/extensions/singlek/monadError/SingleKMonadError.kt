@@ -21,7 +21,7 @@ import kotlin.jvm.JvmName
  */
 @PublishedApi()
 internal val monadError_singleton: SingleKMonadError = object :
-    arrow.fx.rx2.extensions.SingleKMonadError {}
+  arrow.fx.rx2.extensions.SingleKMonadError {}
 
 @JvmName("ensure")
 @Suppress(
@@ -32,9 +32,9 @@ internal val monadError_singleton: SingleKMonadError = object :
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, A>.ensure(arg1: Function0<Throwable>, arg2: Function1<A, Boolean>):
-    SingleK<A> = arrow.fx.rx2.SingleK.monadError().run {
-  this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.SingleK<A>
-}
+  SingleK<A> = arrow.fx.rx2.SingleK.monadError().run {
+    this@ensure.ensure<A>(arg1, arg2) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("redeemWith")
 @Suppress(
@@ -60,9 +60,9 @@ fun <A, B> Kind<ForSingleK, A>.redeemWith(
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, Either<Throwable, A>>.rethrow(): SingleK<A> =
-    arrow.fx.rx2.SingleK.monadError().run {
-  this@rethrow.rethrow<A>() as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monadError().run {
+    this@rethrow.rethrow<A>() as arrow.fx.rx2.SingleK<A>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",

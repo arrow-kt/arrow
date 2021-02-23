@@ -32,9 +32,9 @@ internal val monad_singleton: SingleKMonad = object : arrow.fx.rx2.extensions.Si
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.flatMap(arg1: Function1<A, Kind<ForSingleK, B>>): SingleK<B> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@flatMap.flatMap<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@flatMap.flatMap<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("tailRecM")
 @Suppress(
@@ -45,9 +45,9 @@ fun <A, B> Kind<ForSingleK, A>.flatMap(arg1: Function1<A, Kind<ForSingleK, B>>):
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSingleK, Either<A, B>>>): SingleK<B> =
-    arrow.fx.rx2.SingleK
-   .monad()
-   .tailRecM<A, B>(arg0, arg1) as arrow.fx.rx2.SingleK<B>
+  arrow.fx.rx2.SingleK
+    .monad()
+    .tailRecM<A, B>(arg0, arg1) as arrow.fx.rx2.SingleK<B>
 
 @JvmName("map")
 @Suppress(
@@ -58,9 +58,9 @@ fun <A, B> tailRecM(arg0: A, arg1: Function1<A, Kind<ForSingleK, Either<A, B>>>)
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@map.map<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("ap")
 @Suppress(
@@ -71,9 +71,9 @@ fun <A, B> Kind<ForSingleK, A>.map(arg1: Function1<A, B>): SingleK<B> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.ap(arg1: Kind<ForSingleK, Function1<A, B>>): SingleK<B> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@ap.ap<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@ap.ap<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("flatten")
 @Suppress(
@@ -84,9 +84,9 @@ fun <A, B> Kind<ForSingleK, A>.ap(arg1: Kind<ForSingleK, Function1<A, B>>): Sing
 )
 @Deprecated(DeprecateRxJava)
 fun <A> Kind<ForSingleK, Kind<ForSingleK, A>>.flatten(): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@flatten.flatten<A>() as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@flatten.flatten<A>() as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("followedBy")
 @Suppress(
@@ -97,9 +97,9 @@ fun <A> Kind<ForSingleK, Kind<ForSingleK, A>>.flatten(): SingleK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.followedBy(arg1: Kind<ForSingleK, B>): SingleK<B> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@followedBy.followedBy<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@followedBy.followedBy<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("apTap")
 @Suppress(
@@ -110,9 +110,9 @@ fun <A, B> Kind<ForSingleK, A>.followedBy(arg1: Kind<ForSingleK, B>): SingleK<B>
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.apTap(arg1: Kind<ForSingleK, B>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@apTap.apTap<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@apTap.apTap<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("followedByEval")
 @Suppress(
@@ -123,9 +123,9 @@ fun <A, B> Kind<ForSingleK, A>.apTap(arg1: Kind<ForSingleK, B>): SingleK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.followedByEval(arg1: Eval<Kind<ForSingleK, B>>): SingleK<B> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@followedByEval.followedByEval<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@followedByEval.followedByEval<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("effectM")
 @Suppress(
@@ -136,9 +136,9 @@ fun <A, B> Kind<ForSingleK, A>.followedByEval(arg1: Eval<Kind<ForSingleK, B>>): 
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.effectM(arg1: Function1<A, Kind<ForSingleK, B>>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@effectM.effectM<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@effectM.effectM<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("flatTap")
 @Suppress(
@@ -149,9 +149,9 @@ fun <A, B> Kind<ForSingleK, A>.effectM(arg1: Function1<A, Kind<ForSingleK, B>>):
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.flatTap(arg1: Function1<A, Kind<ForSingleK, B>>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@flatTap.flatTap<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@flatTap.flatTap<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("productL")
 @Suppress(
@@ -162,9 +162,9 @@ fun <A, B> Kind<ForSingleK, A>.flatTap(arg1: Function1<A, Kind<ForSingleK, B>>):
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.productL(arg1: Kind<ForSingleK, B>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@productL.productL<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@productL.productL<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("forEffect")
 @Suppress(
@@ -175,9 +175,9 @@ fun <A, B> Kind<ForSingleK, A>.productL(arg1: Kind<ForSingleK, B>): SingleK<A> =
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.forEffect(arg1: Kind<ForSingleK, B>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@forEffect.forEffect<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@forEffect.forEffect<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("productLEval")
 @Suppress(
@@ -188,9 +188,9 @@ fun <A, B> Kind<ForSingleK, A>.forEffect(arg1: Kind<ForSingleK, B>): SingleK<A> 
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.productLEval(arg1: Eval<Kind<ForSingleK, B>>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@productLEval.productLEval<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@productLEval.productLEval<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("forEffectEval")
 @Suppress(
@@ -201,9 +201,9 @@ fun <A, B> Kind<ForSingleK, A>.productLEval(arg1: Eval<Kind<ForSingleK, B>>): Si
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, A>.forEffectEval(arg1: Eval<Kind<ForSingleK, B>>): SingleK<A> =
-    arrow.fx.rx2.SingleK.monad().run {
-  this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
-}
+  arrow.fx.rx2.SingleK.monad().run {
+    this@forEffectEval.forEffectEval<A, B>(arg1) as arrow.fx.rx2.SingleK<A>
+  }
 
 @JvmName("mproduct")
 @Suppress(
@@ -242,9 +242,9 @@ fun <B> Kind<ForSingleK, Boolean>.ifM(
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, Either<A, B>>.selectM(arg1: Kind<ForSingleK, Function1<A, B>>):
-    SingleK<B> = arrow.fx.rx2.SingleK.monad().run {
-  this@selectM.selectM<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  SingleK<B> = arrow.fx.rx2.SingleK.monad().run {
+    this@selectM.selectM<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @JvmName("select")
 @Suppress(
@@ -255,9 +255,9 @@ fun <A, B> Kind<ForSingleK, Either<A, B>>.selectM(arg1: Kind<ForSingleK, Functio
 )
 @Deprecated(DeprecateRxJava)
 fun <A, B> Kind<ForSingleK, Either<A, B>>.select(arg1: Kind<ForSingleK, Function1<A, B>>):
-    SingleK<B> = arrow.fx.rx2.SingleK.monad().run {
-  this@select.select<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
-}
+  SingleK<B> = arrow.fx.rx2.SingleK.monad().run {
+    this@select.select<A, B>(arg1) as arrow.fx.rx2.SingleK<B>
+  }
 
 @Suppress(
   "UNCHECKED_CAST",
