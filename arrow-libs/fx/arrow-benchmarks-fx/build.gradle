@@ -24,9 +24,6 @@ apply plugin: "com.47deg.hood"
 apply from: "$SUB_PROJECT"
 
 dependencies {
-    compile project(":arrow-fx")
-    compile project(":arrow-fx-rx2")
-    compile project(":arrow-fx-reactor")
     compile project(":arrow-benchmarks-fx:arrow-scala-benchmarks")
     compile project(":arrow-benchmarks-fx:arrow-kio-benchmarks")
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
