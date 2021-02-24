@@ -39,7 +39,7 @@ private fun processElement(iso: AnnotatedElement, target: Target): String {
       1 -> "${iso.sourceClassName}(it)"
       2 -> "pair: ${focusType()} -> ${iso.sourceClassName}(pair.first, pair.second)"
       3 -> "triple: ${focusType()} -> ${iso.sourceClassName}(triple.first, triple.second, triple.third)"
-      else -> (foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })
+      else -> "tuple: ${focusType()} -> ${(foci.indices).joinToString(prefix = "${iso.sourceClassName}(", postfix = ")", transform = { "tuple.${letters[it]}" })}"
     }
 
   return """
