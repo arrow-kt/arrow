@@ -44,7 +44,6 @@ include 'arrow-fx-coroutines'
 include 'arrow-fx-coroutines-test'
 include 'arrow-fx-suspend-connection'
 include 'arrow-fx-coroutines-kotlinx-coroutines'
-include 'arrow-fx-reactor'
 include 'arrow-fx-kotlinx-coroutines'
 include 'arrow-fx-test'
 include 'arrow-fx-stm'
@@ -54,7 +53,6 @@ project(":arrow-fx-coroutines").projectDir = file("fx/arrow-fx-coroutines")
 project(":arrow-fx-coroutines-test").projectDir = file("fx/arrow-fx-coroutines-test")
 project(":arrow-fx-suspend-connection").projectDir = file("fx/arrow-fx-suspend-connection")
 project(":arrow-fx-coroutines-kotlinx-coroutines").projectDir = file("fx/arrow-fx-coroutines-kotlinx-coroutines")
-project(":arrow-fx-reactor").projectDir = file("fx/arrow-fx-reactor")
 project(":arrow-fx-kotlinx-coroutines").projectDir = file("fx/arrow-fx-kotlinx-coroutines")
 project(":arrow-fx-test").projectDir = file("fx/arrow-fx-test")
 project(":arrow-fx-stm").projectDir = file("fx/arrow-fx-stm")
