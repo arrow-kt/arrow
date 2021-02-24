@@ -285,7 +285,6 @@ interface ListKFunctorFilter : FunctorFilter<ForListK> {
     fix().map(f)
 }
 
-
 @Deprecated(
   message = "fx bindings for list are no longer supported. Use mapN or flatMap instead.",
   level = DeprecationLevel.WARNING

@@ -26,31 +26,46 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.hashWithSalt
 import arrow.core.handleErrorWith as validatedHandleErrorWith
 import arrow.core.traverse as validatedTraverse
 
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedFunctor<E> : Functor<ValidatedPartialOf<E>> {
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }
 
+@Deprecated(
+  message = "BiFunctor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedBifunctor : Bifunctor<ForValidated> {
   override fun <A, B, C, D> ValidatedOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Validated<C, D> =
     fix().bimap(fl, fr)
 }
 
+@Deprecated(
+  message = "Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E> {
 
   fun SE(): Semigroup<E>
@@ -62,6 +77,10 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
 }
 
+@Deprecated(
+  message = "Selective typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
@@ -70,6 +89,10 @@ interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApp
     fix().fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> just(r) }) })
 }
 
+@Deprecated(
+  message = "ApplicativeError typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicative<E> {
 
   override fun SE(): Semigroup<E>
@@ -80,6 +103,10 @@ interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>,
     fix().validatedHandleErrorWith(f)
 }
 
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -89,12 +116,20 @@ interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
     fix().foldRight(lb, f)
 }
 
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)
 }
 
+@Deprecated(
+  message = "BiFoldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedBifoldable : Bifoldable<ForValidated> {
   override fun <A, B, C> ValidatedOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
     fix().fold({ f(c, it) }, { g(c, it) })
@@ -103,6 +138,10 @@ interface ValidatedBifoldable : Bifoldable<ForValidated> {
     fix().fold({ f(it, c) }, { g(it, c) })
 }
 
+@Deprecated(
+  message = "BiTraverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
   override fun <G, A, B, C, D> ValidatedOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, ValidatedOf<C, D>> =
     fix().let {
@@ -115,6 +154,10 @@ interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
     }
 }
 
+@Deprecated(
+  message = "SemigroupK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
 
   fun SE(): Semigroup<E>
@@ -123,6 +166,10 @@ interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
     fix().combineK(SE(), y)
 }
 
+@Deprecated(
+  message = EqDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
 
   fun EQL(): Eq<L>
@@ -141,6 +188,10 @@ interface ValidatedEq<L, R> : Eq<Validated<L, R>> {
   }
 }
 
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
   fun EQL(): Eq<L>
 
@@ -150,6 +201,10 @@ interface ValidatedEqK<L> : EqK<ValidatedPartialOf<L>> {
     }
 }
 
+@Deprecated(
+  message = "EqK2 typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Validated.",
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedEqK2 : EqK2<ForValidated> {
   override fun <A, B> Kind2<ForValidated, A, B>.eqK(other: Kind2<ForValidated, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
@@ -159,12 +214,20 @@ interface ValidatedEqK2 : EqK2<ForValidated> {
     }
 }
 
+@Deprecated(
+  message = ShowDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedShow<L, R> : Show<Validated<L, R>> {
   fun SL(): Show<L>
   fun SR(): Show<R>
   override fun Validated<L, R>.show(): String = show(SL(), SR())
 }
 
+@Deprecated(
+  message = HashDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface ValidatedHash<L, R> : Hash<Validated<L, R>> {
   fun HL(): Hash<L>
   fun HR(): Hash<R>
