@@ -1,9 +1,10 @@
 package arrow.syntax.function
 
-import arrow.fx.coroutines.parMapN
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
@@ -18,7 +19,10 @@ class MemoizationTest : FreeSpec() {
 
           val memoized = ::sum.memoize()
 
-          val (first, second) = parMapN({ memoized() }, { memoized() }, ::Pair)
+          val (first, second) = listOf(
+            async { memoized() },
+            async { memoized() }
+          ).awaitAll()
 
           first == second
         }
