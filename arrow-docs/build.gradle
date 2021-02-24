@@ -23,12 +23,8 @@ dependencies {
     compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
     compile "io.arrow-kt:arrow-core-data:$VERSION_NAME"
     compile "io.arrow-kt:arrow-syntax:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
     compile "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
 
     kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"

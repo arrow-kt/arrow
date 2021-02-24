@@ -101,7 +101,7 @@ suspend fun User.process(): Either<PersistenceError, ProcessedUser> =
 
 ###### IO<Either<E, A>>
 
- ```kotlin:ank
+ ```kotlin
 import arrow.fx.*
 
 fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
@@ -187,7 +187,7 @@ In contrast, when using `suspend`, the Kotlin compiler is aware of function comp
 
 Let's take our previous example from ergonomics:
  
-```kotlin:ank
+```kotlin
 import arrow.fx.IO
 
 fun number(): IO<Int> = IO.just(1)
