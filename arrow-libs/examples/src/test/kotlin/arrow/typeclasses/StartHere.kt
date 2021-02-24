@@ -16,7 +16,7 @@ data class User(val id: Index)
 suspend fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): User =
   Either.catch {
     dao.query("SELECT * FROM Users where id = $i").toUserFromDatabase()
-  }.orNull() ?:  network.fetch(i, mapOf()).toUserFromNetwork()
+  }.orNull() ?: network.fetch(i, mapOf()).toUserFromNetwork()
 
 inline fun <A> realWorld(f: () -> A): A = Math.random().let {
     if (it > 0.0003) {

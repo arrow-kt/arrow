@@ -28,7 +28,6 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 ```kotlin:ank
 import arrow.core.*
 import arrow.core.extensions.*
-import arrow.fx.*
 
 Some(1).flatMap { a ->
   Some(a + 1)
