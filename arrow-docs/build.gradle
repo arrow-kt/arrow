@@ -1,0 +1,43 @@
+buildscript {
+    ext {
+        def customProperties = new Properties()
+        customProperties.load(file("../arrow-libs/gradle.properties").newInputStream())
+        customProperties.each { key, value -> set(key, value) }
+        apply from: "../arrow-libs/gradle/setup.gradle"
+    }
+    dependencies {
+        classpath "io.arrow-kt:arrow-ank-gradle:$VERSION_NAME"
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "$KOTLIN_VERSION"
+    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION"
+    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION"
+}
+
+apply from: "../arrow-libs/gradle/main.gradle"
+apply from: "../arrow-libs/gradle/subproject.gradle"
+
+dependencies {
+    compile "io.arrow-kt:arrow-optics:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-core-data:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-syntax:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
+    compile "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
+
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+}
+
+apply plugin: 'ank-gradle-plugin'
+
+ank {
+    source = file("${projectDir}/docs")
+    target = file("${rootDir}/../arrow-site/docs")
+    classpath = sourceSets.main.runtimeClasspath
+}

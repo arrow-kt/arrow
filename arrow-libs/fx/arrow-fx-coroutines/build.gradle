@@ -10,7 +10,7 @@ apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 
 dependencies {
-  api "io.arrow-kt:arrow-core:$VERSION_NAME"
+  api project(":arrow-core")
   implementation project(":arrow-fx-suspend-connection")
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 

@@ -1,4 +1,4 @@
-<a href="https://arrow-kt.io" title="Arrow website"><img src="logo/arrow-dark.svg" width="200" alt=""></a>
+<a href="https://arrow-kt.io" title="Arrow website"><img src="img/logo/arrow-dark.svg" width="200" alt=""></a>
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Latest snapshot](https://img.shields.io/maven-metadata/v?color=important&label=latest%20snapshot&metadataUrl=https%3A%2F%2Foss.jfrog.org%2Fartifactory%2Foss-snapshot-local%2Fio%2Farrow-kt%2Farrow-core%2Fmaven-metadata.xml)](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/arrow-core/)
@@ -11,15 +11,12 @@
 Λrrow is a library for Typed Functional Programming in Kotlin.
 
 Arrow aims to provide a [*lingua franca*](https://en.wikipedia.org/wiki/Lingua_franca) of interfaces and abstractions across Kotlin libraries.
-For this, it includes the most popular data types, type classes and abstractions such as `Option`, `Try`, `Either`, `IO`, `Functor`, `Applicative`, `Monad` to empower users to write pure FP apps and libraries built atop higher order abstractions.
+For this, it includes the most popular data types such as `Option`, `Either`, `Validated` etc and functional operators such as `traverse` and computation blocks to empower users to write pure FP apps and libraries built atop higher order abstractions.
 
 Use the list below to learn more about Λrrow's main features.
 
 - [Documentation](http://arrow-kt.io)
-- [Patterns](http://arrow-kt.io/docs/patterns/glossary/): tutorials and approaches to day-to-day challenges using FP
-- [Libraries](http://arrow-kt.io/docs/quickstart/libraries/): all the libraries provided by Λrrow
 - [Type classes](http://arrow-kt.io/docs/typeclasses/intro/): defining behaviors for data
-- [Data types](http://arrow-kt.io/docs/datatypes/intro/): common abstractions
 - [Effects](http://arrow-kt.io/docs/effects/io/): interfacing with external systems
 - [Optics](http://arrow-kt.io/docs/optics/iso/): inspecting and modifying data structures
 
@@ -29,26 +26,6 @@ Use the list below to learn more about Λrrow's main features.
 - [Media: blogs, presentations, etc.](https://media.arrow-kt.io)
 
 If you have a blog post, talk, or upcoming event on Arrow, please considering opening an issue or PR to add to the collection over at the [Arrow Media](https://github.com/arrow-kt/arrow-media) repo. 
-
-## About this repository
-
-This repository orchestrates the global configuration and checks of the **Λrrow** libraries and other related repositories.
-
-|   |    | SSH | HTTPS | 
-| - | ------- | -------------- | ---------------- |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Core](https://github.com/arrow-kt/arrow-core) | `git@github.com:arrow-kt/arrow-core.git` | `https://github.com/arrow-kt/arrow-core.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/fx/arrow-fx-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Fx](https://github.com/arrow-kt/arrow-fx) | `git@github.com:arrow-kt/arrow-fx.git` | `https://github.com/arrow-kt/arrow-fx.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/optics/arrow-optics-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Optics](https://github.com/arrow-kt/arrow-optics) | `git@github.com:arrow-kt/arrow-optics.git` | `https://github.com/arrow-kt/arrow-optics.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/meta/arrow-meta-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Meta](https://github.com/arrow-kt/arrow-meta) | `git@github.com:arrow-kt/arrow-meta.git` | `https://github.com/arrow-kt/arrow-meta.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/incubator/arrow-incubator-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Incubator](https://github.com/arrow-kt/arrow-incubator) | `git@github.com:arrow-kt/arrow-incubator.git` | `https://github.com/arrow-kt/arrow-incubator.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Integrations](https://github.com/arrow-kt/arrow-integrations) | `git@github.com:arrow-kt/arrow-integrations.git` | `https://github.com/arrow-kt/arrow-integrations.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow UI](https://github.com/arrow-kt/arrow-ui) | `git@github.com:arrow-kt/arrow-ui.git` | `https://github.com/arrow-kt/arrow-ui.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Check](https://github.com/arrow-kt/arrow-check) | `git@github.com:arrow-kt/arrow-check.git` | `https://github.com/arrow-kt/arrow-check.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Ank](https://github.com/arrow-kt/arrow-ank) | `git@github.com:arrow-kt/arrow-ank.git` | `https://github.com/arrow-kt/arrow-ank.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Site](https://github.com/arrow-kt/arrow-site) | `git@github.com:arrow-kt/arrow-site.git` | `https://github.com/arrow-kt/arrow-site.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Examples](https://github.com/arrow-kt/arrow-examples) | `git@github.com:arrow-kt/arrow-examples.git` | `https://github.com/arrow-kt/arrow-examples.git` |
-
-Find more details in [Move arrow repository content to multi-repo](https://github.com/arrow-kt/arrow/tree/master/docs/move-to-multi-repo).
 
 ## Join Us
 
@@ -61,7 +38,7 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 - [#arrow-contributors on Kotlin Slack](https://kotlinlang.slack.com/archives/C8UK6RTHU)
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
-Find more details in [CONTRIBUTING](https://github.com/arrow-kt/arrow/blob/master/CONTRIBUTING.md).
+Find more details in [CONTRIBUTING](CONTRIBUTING.md).
 
 ## Setup
 
@@ -90,7 +67,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } 
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
         maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local/" } // for SNAPSHOT builds
     }
 }
@@ -151,10 +128,6 @@ dependencies {
 }
 ```
 
-##### Other libraries
-
-Here is the complete [library list](https://arrow-kt.io/docs/quickstart/libraries/) for a more granular dependency set-up.
-
 #### Additional Setup
 
 For projects that wish to use their own `@higherkind`, `@optics`, and other meta programming facilities provided by Arrow
@@ -212,12 +185,11 @@ To avoid specifying the Arrow version for every dependency, a BOM file is availa
     ...
 ```
 
-[Example of use](https://github.com/arrow-kt/arrow-examples/blob/master/build.gradle)
-
 ### Maven
- 
+
 #### Basic Setup
 
+Make sure to have at least the latest version of JDK 1.8 installed.
 Add to your `pom.xml` file the following properties:
 ```xml
 <properties>
@@ -226,7 +198,7 @@ Add to your `pom.xml` file the following properties:
 </properties>
 ```
 
-Add the dependencies that you want to use
+Add the dependencies that you want to use:
 ```xml
 <dependency>
     <groupId>io.arrow-kt</groupId>

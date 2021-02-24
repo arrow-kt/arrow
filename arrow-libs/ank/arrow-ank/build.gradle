@@ -8,7 +8,7 @@ apply from: "$DOC_CREATION"
 apply from: "$PUBLICATION"
 
 dependencies {
-    compile "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
+    compile project(":arrow-fx-coroutines")
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION"
     compile "org.jetbrains.kotlin:kotlin-script-util:$KOTLIN_VERSION"

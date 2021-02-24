@@ -14,7 +14,7 @@ dependencies {
     implementation project(":arrow-fx-suspend-connection")
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+    compile project(":arrow-core")
 
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile project(":arrow-fx-coroutines")

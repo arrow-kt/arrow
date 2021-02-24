@@ -4,7 +4,7 @@ plugins {
     id "scala"
 }
 
-apply from: "$SUB_PROJECT"
+apply from: "../$SUB_PROJECT"
 
 dependencies {
     api "org.scala-lang:scala-library:$SCALA_LIBRARY_VERSION"

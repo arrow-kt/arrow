@@ -10,10 +10,10 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
-    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+    compile project(":arrow-core")
 
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kapt project(":arrow-meta")
+    kaptTest project(":arrow-meta")
 
     testCompile "junit:junit:$JUNIT_VERSION"
 

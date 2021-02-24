@@ -40,7 +40,7 @@ captures/
 
 # Intellij
 *.iml
-.idea/*
+.idea
 !.idea/vcs.xml
 
 # Keystore files
@@ -110,6 +110,14 @@ fabric.properties
 # Jekyll
 _site
 .sass-cache
+vendor
+.bundle
+
+# Ruby
+Gemfile.lock
+
+# Site
+arrow-site/docs
 
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
