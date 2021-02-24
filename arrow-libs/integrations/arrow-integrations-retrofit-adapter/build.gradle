@@ -9,7 +9,6 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
-    compile project(":arrow-fx")
     compile project(":arrow-annotations")
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     compileOnly project(":arrow-meta")
@@ -19,5 +18,4 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     testCompile "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
-    testCompile project(":arrow-fx")
 }

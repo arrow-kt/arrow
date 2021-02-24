@@ -33,7 +33,6 @@ include 'arrow-fx-coroutines'
 include 'arrow-fx-coroutines-test'
 include 'arrow-fx-suspend-connection'
 
-project(":arrow-fx").projectDir = file("../fx/arrow-fx")
 project(":arrow-fx-test").projectDir = file("../fx/arrow-fx-test")
 project(":arrow-fx-coroutines").projectDir = file("../fx/arrow-fx-coroutines")
 project(":arrow-fx-coroutines-test").projectDir = file("../fx/arrow-fx-coroutines-test")
