@@ -48,7 +48,6 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`.
 
 ```kotlin:ank
-import arrow.fx.IO
 import arrow.core.extensions.option.applicative.*
 
 ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
@@ -56,13 +55,13 @@ ListK.head<Int>().modifyF(Option.applicative(), listOf(1, 3, 6).k()) { head ->
 }
 ```
 ```kotlin:ank
-import arrow.fx.extensions.io.applicative.*
-import arrow.fx.fix
+import arrow.core.Either
+import arrow.core.extensions.option.applicative.*
 
-val liftedFO = ListK.head<Int>().liftF(IO.applicative()) { head ->
-    IO.effect { head / 0 }
+val liftedFO = ListK.head<Int>().liftF(Option.applicative()) { head ->
+    Either.catch { head / 0 }.toOption()
 }
-liftedFO(listOf(1, 3, 6).k()).fix().attempt().unsafeRunSync()
+liftedFO(listOf(1, 3, 6).k())
 ```
 
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens`, or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.

@@ -1,6 +1,5 @@
 package arrow.benchmarks
 
-import arrow.fx.IO
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -20,16 +19,6 @@ open class DeepBind {
 
   @Param("20")
   var depth: Int = 0
-
-  fun ioFibLazy(n: Int): IO<Int> =
-    if (n <= 1) IO { n }
-    else ioFibLazy(n - 1).flatMap { a ->
-      ioFibLazy(n - 2).flatMap { b -> IO { a + b } }
-    }
-
-  @Benchmark
-  fun io(): Int =
-    ioFibLazy(depth).unsafeRunSync()
 
   @Benchmark
   fun cats(): Any =
