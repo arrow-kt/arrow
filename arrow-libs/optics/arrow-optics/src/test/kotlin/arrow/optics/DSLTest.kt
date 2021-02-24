@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.core.None
-import arrow.core.k
 import arrow.core.test.UnitSpec
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Index
@@ -56,7 +55,7 @@ class BoundedTest : UnitSpec() {
       Company("Kategory", Address("Functional city", Street(42, "lambda street")))
     )
 
-    val employees = CompanyEmployees(listOf(john, jane).k())
+    val employees = CompanyEmployees(listOf(john, jane))
 
     val db = Db(
       mapOf(
