@@ -28,24 +28,35 @@ import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semialign
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Zip
 import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKFunctor<K> : Functor<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKFoldable<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
@@ -54,12 +65,19 @@ interface MapKFoldable<K> : Foldable<MapKPartialOf<K>> {
     fix().foldRight(lb, f)
 }
 
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKTraverse<K> : Traverse<MapKPartialOf<K>>, MapKFoldable<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
 }
 
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass."
+)
 interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 
   fun SG(): Semigroup<A>
@@ -70,6 +88,10 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
   }
 }
 
+@Deprecated(
+  message = "FunctorFilter typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.filterMap(f: (A) -> Option<B>): Kind<MapKPartialOf<K>, B> =
     fix().map(f).sequence(Option.applicative()).fix().fold({ emptyMap<K, B>().k() }, ::identity)
@@ -78,6 +100,10 @@ interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
     fix().map(f)
 }
 
+@Deprecated(
+  message = "Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKApply<K> : Apply<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
     fix().ap(ff.fix())
@@ -86,6 +112,9 @@ interface MapKApply<K> : Apply<MapKPartialOf<K>> {
     fix().map(f)
 }
 
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass."
+)
 interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
 
   override fun SG(): Semigroup<A>
@@ -93,6 +122,10 @@ interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
   override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }
 
+@Deprecated(
+  message = EqDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface MapKEq<K, A> : Eq<MapK<K, A>> {
 
   fun EQK(): Eq<K>
@@ -109,12 +142,20 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
     } else false
 }
 
+@Deprecated(
+  message = ShowDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface MapKShow<K, A> : Show<MapK<K, A>> {
   fun SK(): Show<K>
   fun SA(): Show<A>
   override fun MapK<K, A>.show(): String = show(SK(), SA())
 }
 
+@Deprecated(
+  message = HashDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface MapKHash<K, A> : Hash<MapK<K, A>> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
@@ -129,6 +170,10 @@ interface MapKHash<K, A> : Hash<MapK<K, A>> {
     }
 }
 
+@Deprecated(
+  message = "Semialign typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
   override fun <A, B> align(
     a: Kind<MapKPartialOf<K>, A>,
@@ -144,10 +189,18 @@ interface MapKSemialign<K> : Semialign<MapKPartialOf<K>>, MapKFunctor<K> {
   }
 }
 
+@Deprecated(
+  message = "Align typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKAlign<K> : Align<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A> empty(): Kind<MapKPartialOf<K>, A> = emptyMap<K, A>().k()
 }
 
+@Deprecated(
+  message = "Unalign typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A, B> unalign(ior: Kind<MapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
     ior.fix().let { map ->
@@ -161,6 +214,10 @@ interface MapKUnalign<K> : Unalign<MapKPartialOf<K>>, MapKSemialign<K> {
     }
 }
 
+@Deprecated(
+  message = "Zip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.zip(other: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
     (this.fix() to other.fix()).let { (ls, rs) ->
@@ -172,6 +229,10 @@ interface MapKZip<K> : Zip<MapKPartialOf<K>>, MapKSemialign<K> {
     }
 }
 
+@Deprecated(
+  message = "Unzip typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
   override fun <A, B> Kind<MapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<MapKPartialOf<K>, A>, Kind<MapKPartialOf<K>, B>> =
     this.fix().let { map ->
@@ -181,6 +242,10 @@ interface MapKUnzip<K> : Unzip<MapKPartialOf<K>>, MapKZip<K> {
     }.bimap({ it.k() }, { it.k() })
 }
 
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Map.",
+  level = DeprecationLevel.WARNING
+)
 interface MapKEqK<K> : EqK<MapKPartialOf<K>> {
 
   fun EQK(): Eq<K>

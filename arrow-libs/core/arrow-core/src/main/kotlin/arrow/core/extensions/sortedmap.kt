@@ -5,6 +5,7 @@ import arrow.core.Eval
 import arrow.core.Ior
 import arrow.core.SetK
 import arrow.core.SortedMapK
+import arrow.core.SortedMapKDeprecation
 import arrow.core.SortedMapKOf
 import arrow.core.SortedMapKPartialOf
 import arrow.core.Tuple2
@@ -19,7 +20,6 @@ import arrow.core.k
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.updated
-import arrow.extension
 import arrow.typeclasses.Align
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
@@ -36,14 +36,17 @@ import arrow.typeclasses.Unalign
 import arrow.typeclasses.Unzip
 import arrow.typeclasses.Zip
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
     fix().map(f)
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>> SortedMapK.Companion.functor(): SortedMapKFunctor<A> =
   object : SortedMapKFunctor<A> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKFoldable<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.foldLeft(b: C, f: (C, B) -> C): C =
     fix().foldLeft(b, f)
@@ -52,17 +55,21 @@ interface SortedMapKFoldable<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A
     fix().foldRight(lb, f)
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>> SortedMapK.Companion.foldable(): SortedMapKFoldable<A> =
   object : SortedMapKFoldable<A> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKTraverse<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A>>, SortedMapKFoldable<A> {
   override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
     fix().traverse(AP, f)
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>> SortedMapK.Companion.traverse(): SortedMapKTraverse<A> =
   object : SortedMapKTraverse<A> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKSemigroup<A : Comparable<A>, B> : Semigroup<SortedMapK<A, B>> {
   fun SG(): Semigroup<B>
 
@@ -73,33 +80,38 @@ interface SortedMapKSemigroup<A : Comparable<A>, B> : Semigroup<SortedMapK<A, B>
     else b.fix().foldLeft<B>(this.fix()) { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) }
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>, B> SortedMapK.Companion.semigroup(SB: Semigroup<B>): SortedMapKSemigroup<A, B> =
   object : SortedMapKSemigroup<A, B> {
     override fun SG(): Semigroup<B> = SB
   }
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKMonoid<A : Comparable<A>, B> : Monoid<SortedMapK<A, B>>, SortedMapKSemigroup<A, B> {
   override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>, B> SortedMapK.Companion.monoid(SB: Semigroup<B>): SortedMapKMonoid<A, B> =
   object : SortedMapKMonoid<A, B> {
     override fun SG(): Semigroup<B> = SB
   }
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKShow<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
   override fun SortedMapKOf<A, B>.show(): String = fix().show(SA(), SB())
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <A : Comparable<A>, B> SortedMapK.Companion.show(SA: Show<A>, SB: Show<B>): SortedMapKShow<A, B> =
   object : SortedMapKShow<A, B> {
     override fun SA(): Show<A> = SA
     override fun SB(): Show<B> = SB
   }
 
-@extension
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
   fun EQK(): Eq<K>
 
@@ -115,7 +127,7 @@ interface SortedMapKEq<K : Comparable<K>, A> : Eq<SortedMapK<K, A>> {
     } else false
 }
 
-@extension
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKHash<K : Comparable<K>, A> : Hash<SortedMapK<K, A>> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
@@ -130,6 +142,7 @@ interface SortedMapKHash<K : Comparable<K>, A> : Hash<SortedMapK<K, A>> {
     }
 }
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKSemialign<K : Comparable<K>> : Semialign<SortedMapKPartialOf<K>>, SortedMapKFunctor<K> {
   override fun <A, B> align(
     a: Kind<SortedMapKPartialOf<K>, A>,
@@ -145,17 +158,20 @@ interface SortedMapKSemialign<K : Comparable<K>> : Semialign<SortedMapKPartialOf
   }
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>> SortedMapK.Companion.semialign(): SortedMapKSemialign<K> =
   object : SortedMapKSemialign<K> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKAlign<K : Comparable<K>> : Align<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
   override fun <A> empty(): Kind<SortedMapKPartialOf<K>, A> = emptyMap<K, A>().toSortedMap().k()
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>> SortedMapK.Companion.align(): SortedMapKAlign<K> =
   object : SortedMapKAlign<K> {}
 
-@extension
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKEqK<K : Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
   fun EQK(): Eq<K>
 
@@ -163,6 +179,7 @@ interface SortedMapKEqK<K : Comparable<K>> : EqK<SortedMapKPartialOf<K>> {
     SortedMapK.eq(EQK(), EQ).run { this@eqK.fix().eqv(other.fix()) }
 }
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKUnalign<K : Comparable<K>> : Unalign<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
   override fun <A, B> unalign(ior: Kind<SortedMapKPartialOf<K>, Ior<A, B>>): Tuple2<Kind<SortedMapKPartialOf<K>, A>, Kind<SortedMapKPartialOf<K>, B>> =
     ior.fix().let { map ->
@@ -176,8 +193,10 @@ interface SortedMapKUnalign<K : Comparable<K>> : Unalign<SortedMapKPartialOf<K>>
     }
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>> SortedMapK.Companion.unalign() = object : SortedMapKUnalign<K> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKZip<K : Comparable<K>> : Zip<SortedMapKPartialOf<K>>, SortedMapKSemialign<K> {
   override fun <A, B> Kind<SortedMapKPartialOf<K>, A>.zip(other: Kind<SortedMapKPartialOf<K>, B>): Kind<SortedMapKPartialOf<K>, Tuple2<A, B>> =
     (this.fix() to other.fix()).let { (ls, rs) ->
@@ -189,8 +208,10 @@ interface SortedMapKZip<K : Comparable<K>> : Zip<SortedMapKPartialOf<K>>, Sorted
     }
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>> SortedMapK.Companion.zip() = object : SortedMapKZip<K> {}
 
+@Deprecated(SortedMapKDeprecation)
 interface SortedMapKUnzip<K : Comparable<K>> : Unzip<SortedMapKPartialOf<K>>, SortedMapKZip<K> {
   override fun <A, B> Kind<SortedMapKPartialOf<K>, Tuple2<A, B>>.unzip(): Tuple2<Kind<SortedMapKPartialOf<K>, A>, Kind<SortedMapKPartialOf<K>, B>> =
     this.fix().let { map ->
@@ -200,4 +221,5 @@ interface SortedMapKUnzip<K : Comparable<K>> : Unzip<SortedMapKPartialOf<K>>, So
     }.bimap({ it.toSortedMap().k() }, { it.toSortedMap().k() })
 }
 
+@Deprecated(SortedMapKDeprecation)
 fun <K : Comparable<K>> SortedMapK.Companion.unzip() = object : SortedMapKUnzip<K> {}

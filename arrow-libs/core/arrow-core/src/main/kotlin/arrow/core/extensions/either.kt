@@ -28,11 +28,13 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.EqK
 import arrow.typeclasses.EqK2
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
@@ -43,6 +45,7 @@ import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.hashWithSalt
 import arrow.core.ap as eitherAp
@@ -51,6 +54,13 @@ import arrow.core.extensions.traverse as eitherTraverse
 import arrow.core.flatMap as eitherFlatMap
 import arrow.core.handleErrorWith as eitherHandleErrorWith
 
+@Deprecated(
+  "arrow.core.extensions.combine is deprecated use arrow.core.combine",
+  ReplaceWith(
+    "combine(SGL, SGR, b)",
+    "arrow.core.commbine"
+  )
+)
 fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
   val a = this
 
@@ -66,6 +76,11 @@ fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<
   }
 }
 
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass.",
+  ReplaceWith("Semigroup.either()", "arrow.core.either", "arrow.typeclasses.Semigroup"),
+  DeprecationLevel.WARNING
+)
 interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
 
   fun SGL(): Semigroup<L>
@@ -74,6 +89,11 @@ interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
   override fun Either<L, R>.combine(b: Either<L, R>): Either<L, R> = fix().combine(SGL(), SGR(), b)
 }
 
+@Deprecated(
+  "Typeclass instance have been moved to the companion object of the typeclass.",
+  ReplaceWith("Monoid.either()", "arrow.core.either", "arrow.typeclasses.Monoid"),
+  DeprecationLevel.WARNING
+)
 interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {
   fun MOL(): Monoid<L>
   fun MOR(): Monoid<R>
@@ -84,15 +104,27 @@ interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {
   override fun empty(): Either<L, R> = Right(MOR().empty())
 }
 
+@Deprecated(
+  message = "Functor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherFunctor<L> : Functor<EitherPartialOf<L>> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
+@Deprecated(
+  message = "Bifunctor typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherBifunctor : Bifunctor<ForEither> {
   override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
 }
 
+@Deprecated(
+  message = "Apply typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
@@ -104,6 +136,10 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
     fix().eitherAp(ff)
 }
 
+@Deprecated(
+  message = "Applicative typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
@@ -111,6 +147,10 @@ interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherApply<L>
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
+@Deprecated(
+  message = "Monad typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
@@ -135,6 +175,10 @@ internal object EitherMonadFx : MonadFx<EitherPartialOf<Any?>> {
     super.monad(c).fix()
 }
 
+@Deprecated(
+  message = "ApplicativeError typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, EitherApplicative<L> {
 
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
@@ -143,8 +187,16 @@ interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, E
     fix().eitherHandleErrorWith(f)
 }
 
+@Deprecated(
+  message = "MonadError typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherMonadError<L> : MonadError<EitherPartialOf<L>, L>, EitherApplicativeError<L>, EitherMonad<L>
 
+@Deprecated(
+  message = "Foldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
 
   override fun <A, B> EitherOf<L, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -154,6 +206,10 @@ interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
+@Deprecated(
+  message = "BiFoldable typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherBifoldable : Bifoldable<ForEither> {
   override fun <A, B, C> EitherOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().bifoldLeft(c, f, g)
 
@@ -161,26 +217,46 @@ interface EitherBifoldable : Bifoldable<ForEither> {
     fix().bifoldRight(c, f, g)
 }
 
+@Deprecated(
+  message = "traverse with Applicative has been deprecated, use the concretely defined traverse or traverseValidated on Either",
+  level = DeprecationLevel.WARNING
+)
 fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
   fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
+@Deprecated(
+  message = "Traverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
   override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
     fix().eitherTraverse(AP, f)
 }
 
+@Deprecated(
+  message = "BiTraverse typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherBitraverse : Bitraverse<ForEither>, EitherBifoldable {
   override fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, EitherOf<C, D>> =
     fix().let { AP.run { it.fold({ f(it).map { Either.Left(it) } }, { g(it).map { Either.Right(it) } }) } }
 }
 
+@Deprecated(
+  message = "SemigroupK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 
   override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
     fix().eitherCombineK(y)
 }
 
+@Deprecated(
+  message = EqDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 
   fun EQL(): Eq<L>
@@ -199,6 +275,10 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
   }
 }
 
+@Deprecated(
+  message = "EqK typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
   fun EQL(): Eq<L>
 
@@ -208,6 +288,10 @@ interface EitherEqK<L> : EqK<EitherPartialOf<L>> {
     }
 }
 
+@Deprecated(
+  message = "EqK2 typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherEqK2 : EqK2<ForEither> {
   override fun <A, B> Kind2<ForEither, A, B>.eqK(other: Kind2<ForEither, A, B>, EQA: Eq<A>, EQB: Eq<B>): Boolean =
     (this.fix() to other.fix()).let {
@@ -217,12 +301,20 @@ interface EitherEqK2 : EqK2<ForEither> {
     }
 }
 
+@Deprecated(
+  message = ShowDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface EitherShow<L, R> : Show<Either<L, R>> {
   fun SL(): Show<L>
   fun SR(): Show<R>
   override fun Either<L, R>.show(): String = show(SL(), SR())
 }
 
+@Deprecated(
+  message = HashDeprecation,
+  level = DeprecationLevel.WARNING
+)
 interface EitherHash<L, R> : Hash<Either<L, R>> {
 
   fun HL(): Hash<L>
@@ -262,6 +354,10 @@ interface EitherOrder<L, R> : Order<Either<L, R>> {
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()
 
+@Deprecated(
+  message = "Bicrosswalk typeclass is deprecated and will be removed in 0.13.0. Use concrete methods on Either",
+  level = DeprecationLevel.WARNING
+)
 interface EitherBicrosswalk : Bicrosswalk<ForEither>, EitherBifunctor, EitherBifoldable {
   override fun <F, A, B, C, D> bicrosswalk(
     ALIGN: Align<F>,

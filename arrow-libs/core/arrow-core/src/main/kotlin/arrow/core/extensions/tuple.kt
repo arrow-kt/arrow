@@ -32,26 +32,30 @@ import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.EqDeprecation
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.HashDeprecation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Order
 import arrow.typeclasses.OrderDeprecation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
+import arrow.typeclasses.ShowDeprecation
 import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tuple2Traverse
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
 // TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
-
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
@@ -61,6 +65,7 @@ interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
     fix().ap(ff.fix())
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<F> {
   fun MF(): Monoid<F>
 
@@ -74,6 +79,7 @@ interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<
     MF().empty() toT a
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
 
   override fun MF(): Monoid<F>
@@ -96,6 +102,7 @@ interface Tuple2Monad<F> : Monad<Tuple2PartialOf<F>>, Tuple2Applicative<F> {
   }
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Bifunctor : Bifunctor<ForTuple2> {
   override fun <A, B, C, D> Tuple2Of<A, B>.bimap(
     fl: (A) -> C,
@@ -103,6 +110,7 @@ interface Tuple2Bifunctor : Bifunctor<ForTuple2> {
   ) = fix().bimap(fl, fr)
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Comonad<F> : Comonad<Tuple2PartialOf<F>>, Tuple2Functor<F> {
   override fun <A, B> Tuple2Of<F, A>.coflatMap(f: (Tuple2Of<F, A>) -> B) =
     fix().coflatMap(f)
@@ -111,6 +119,7 @@ interface Tuple2Comonad<F> : Comonad<Tuple2PartialOf<F>>, Tuple2Functor<F> {
     fix().extract()
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
   override fun <A, B> Tuple2Of<F, A>.foldLeft(b: B, f: (B, A) -> B) =
     fix().foldL(b, f)
@@ -119,6 +128,7 @@ interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
     fix().foldR(lb, f)
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Bifoldable : Bifoldable<ForTuple2> {
   override fun <A, B, C> Tuple2Of<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().let { g(f(c, it.a), it.b) }
 
@@ -126,19 +136,23 @@ interface Tuple2Bifoldable : Bifoldable<ForTuple2> {
     fix().let { f(it.a, g(it.b, c)) }
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = GA.run {
   fix().let { f(it.b).map(it.a::toT) }
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
   fix().tuple2Traverse(GA, ::identity)
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
     tuple2Traverse(AP, f)
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
     AP.run {
@@ -146,6 +160,7 @@ interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
     }
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
 
   fun SA(): Semigroup<A>
@@ -159,6 +174,7 @@ interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
   }
 }
 
+@Deprecated("Tuple2 is deprecated in favor of Kotlin's Pair")
 interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
 
   fun MA(): Monoid<A>
@@ -172,6 +188,7 @@ interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
   override fun empty(): Tuple2<A, B> = Tuple2(MA().empty(), MB().empty())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
 
   fun EQA(): Eq<A>
@@ -182,6 +199,7 @@ interface Tuple2Eq<A, B> : Eq<Tuple2<A, B>> {
     EQA().run { a.eqv(b.a) && EQB().run { this@eqv.b.eqv(b.b) } }
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -189,6 +207,7 @@ interface Tuple2Show<A, B> : Show<Tuple2<A, B>> {
     show(SA(), SB())
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple2Hash<A, B> : Hash<Tuple2<A, B>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -208,6 +227,7 @@ interface Tuple2Order<A, B> : Order<Tuple2<A, B>> {
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
 
   fun EQA(): Eq<A>
@@ -222,6 +242,7 @@ interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
       EQC().run { c.eqv(b.c) }
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -230,6 +251,7 @@ interface Tuple3Show<A, B, C> : Show<Tuple3<A, B, C>> {
     show(SA(), SB(), SC())
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple3Hash<A, B, C> : Hash<Tuple3<A, B, C>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -252,6 +274,7 @@ interface Tuple3Order<A, B, C> : Order<Tuple3<A, B, C>> {
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
   fun EQA(): Eq<A>
@@ -269,6 +292,7 @@ interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
       EQD().run { d.eqv(b.d) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple4Hash<A, B, C, D> : Hash<Tuple4<A, B, C, D>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -302,6 +326,7 @@ interface Tuple4Order<A, B, C, D> : Order<Tuple4<A, B, C, D>> {
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -311,6 +336,7 @@ interface Tuple4Show<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
     show(SA(), SB(), SC(), SD())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
   fun EQA(): Eq<A>
@@ -331,6 +357,7 @@ interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
       EQE().run { e.eqv(b.e) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple5Hash<A, B, C, D, E> : Hash<Tuple5<A, B, C, D, E>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -369,6 +396,7 @@ interface Tuple5Order<A, B, C, D, E> : Order<Tuple5<A, B, C, D, E>> {
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -379,6 +407,7 @@ interface Tuple5Show<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
     show(SA(), SB(), SC(), SD(), SE())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
   fun EQA(): Eq<A>
@@ -402,6 +431,7 @@ interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
       EQF().run { f.eqv(b.f) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple6Hash<A, B, C, D, E, F> : Hash<Tuple6<A, B, C, D, E, F>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -445,6 +475,7 @@ interface Tuple6Order<A, B, C, D, E, F> : Order<Tuple6<A, B, C, D, E, F>> {
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -456,6 +487,7 @@ interface Tuple6Show<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
     show(SA(), SB(), SC(), SD(), SE(), SF())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
 
   fun EQA(): Eq<A>
@@ -482,6 +514,7 @@ interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
       EQG().run { g.eqv(b.g) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple7Hash<A, B, C, D, E, F, G> : Hash<Tuple7<A, B, C, D, E, F, G>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -542,6 +575,7 @@ interface Tuple7Order<A, B, C, D, E, F, G> : Order<Tuple7<A, B, C, D, E, F, G>> 
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -554,6 +588,7 @@ interface Tuple7Show<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
     show(SA(), SB(), SC(), SD(), SE(), SF(), SG())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> {
 
   fun EQA(): Eq<A>
@@ -583,6 +618,7 @@ interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> 
       EQH().run { h.eqv(b.h) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple8Hash<A, B, C, D, E, F, G, H> : Hash<Tuple8<A, B, C, D, E, F, G, H>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -650,6 +686,7 @@ interface Tuple8Order<A, B, C, D, E, F, G, H> : Order<Tuple8<A, B, C, D, E, F, G
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -663,6 +700,7 @@ interface Tuple8Show<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, 
     show(SA(), SB(), SC(), SD(), SE(), SF(), SG(), SH())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H, I>> {
 
   fun EQA(): Eq<A>
@@ -695,6 +733,7 @@ interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H
       EQI().run { i.eqv(b.i) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple9Hash<A, B, C, D, E, F, G, H, I> : Hash<Tuple9<A, B, C, D, E, F, G, H, I>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -769,6 +808,7 @@ interface Tuple9Order<A, B, C, D, E, F, G, H, I> : Order<Tuple9<A, B, C, D, E, F
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
@@ -783,6 +823,7 @@ interface Tuple9Show<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, 
     show(SA(), SB(), SC(), SD(), SE(), SF(), SG(), SH(), SI())
 }
 
+@Deprecated(EqDeprecation)
 interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
 
   fun EQA(): Eq<A>
@@ -809,6 +850,7 @@ interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F,
       EQJ().run { j.eqv(b.j) }
 }
 
+@Deprecated(HashDeprecation)
 interface Tuple10Hash<A, B, C, D, E, F, G, H, I, J> : Hash<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   fun HA(): Hash<A>
   fun HB(): Hash<B>
@@ -890,6 +932,7 @@ interface Tuple10Order<A, B, C, D, E, F, G, H, I, J> : Order<Tuple10<A, B, C, D,
   ).fold(Ordering.monoid())
 }
 
+@Deprecated(ShowDeprecation)
 interface Tuple10Show<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   fun SA(): Show<A>
   fun SB(): Show<B>
