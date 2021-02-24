@@ -1,0 +1,24 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply from: "$SUB_PROJECT"
+apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
+
+dependencies {
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+
+    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+
+    testCompile "junit:junit:$JUNIT_VERSION"
+
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+
+    testCompile project(":arrow-optics-test")
+}
