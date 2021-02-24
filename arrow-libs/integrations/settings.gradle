@@ -28,12 +28,10 @@ project(":arrow-syntax").projectDir = file("../core/arrow-syntax")
 // To allow the use of local projects from ../fx:
 
 include 'arrow-fx'
-include 'arrow-fx-test'
 include 'arrow-fx-coroutines'
 include 'arrow-fx-coroutines-test'
 include 'arrow-fx-suspend-connection'
 
-project(":arrow-fx-test").projectDir = file("../fx/arrow-fx-test")
 project(":arrow-fx-coroutines").projectDir = file("../fx/arrow-fx-coroutines")
 project(":arrow-fx-coroutines-test").projectDir = file("../fx/arrow-fx-coroutines-test")
 project(":arrow-fx-suspend-connection").projectDir = file("../fx/arrow-fx-suspend-connection")
