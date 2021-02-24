@@ -1,0 +1,23 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply plugin: 'kotlinx-atomicfu'
+
+apply from: "$SUB_PROJECT"
+apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
+
+dependencies {
+    implementation project(":arrow-fx-suspend-connection")
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
+
+    compile "io.arrow-kt:arrow-core:$VERSION_NAME"
+
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testCompile project(":arrow-fx-coroutines")
+    testCompile project(":arrow-fx-test")
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+}

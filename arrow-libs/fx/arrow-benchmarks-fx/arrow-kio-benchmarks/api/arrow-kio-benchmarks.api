@@ -1,0 +1,61 @@
+public final class arrow/benchmarks/effects/kio/AttemptNonRaised {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/AttemptNonRaised;
+	public final fun attemptNonRaised (I)I
+	public final fun loopHappy (II)Lit/msec/kio/KIO;
+}
+
+public final class arrow/benchmarks/effects/kio/AttemptRaisedError {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/AttemptRaisedError;
+	public final fun attemptRaisedError (I)Lit/msec/kio/result/Result;
+}
+
+public final class arrow/benchmarks/effects/kio/DeepBind {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/DeepBind;
+	public final fun fib (I)Lit/msec/kio/result/Result;
+	public final fun loop (I)Lit/msec/kio/KIO;
+}
+
+public final class arrow/benchmarks/effects/kio/Delay {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/Delay;
+	public final fun unsafeIODelayLoop (II)I
+}
+
+public final class arrow/benchmarks/effects/kio/LeftBind {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/LeftBind;
+	public final fun leftBind (III)I
+	public final fun loop (III)Lit/msec/kio/KIO;
+}
+
+public final class arrow/benchmarks/effects/kio/Map {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/Map;
+	public final fun kioMapTest (II)J
+}
+
+public final class arrow/benchmarks/effects/kio/MapStream {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/MapStream;
+	public final fun getAddOne ()Lkotlin/jvm/functions/Function1;
+	public final fun mapStream (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
+	public final fun range (II)Larrow/benchmarks/effects/kio/MapStream$Stream;
+	public final fun sum (J)Lkotlin/jvm/functions/Function1;
+	public final fun test (II)J
+}
+
+public final class arrow/benchmarks/effects/kio/MapStream$Stream {
+	public fun <init> (ILit/msec/kio/KIO;)V
+	public final fun component1 ()I
+	public final fun component2 ()Lit/msec/kio/KIO;
+	public final fun copy (ILit/msec/kio/KIO;)Larrow/benchmarks/effects/kio/MapStream$Stream;
+	public static synthetic fun copy$default (Larrow/benchmarks/effects/kio/MapStream$Stream;ILit/msec/kio/KIO;ILjava/lang/Object;)Larrow/benchmarks/effects/kio/MapStream$Stream;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNext ()Lit/msec/kio/KIO;
+	public final fun getValue ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/benchmarks/effects/kio/Pure {
+	public static final field INSTANCE Larrow/benchmarks/effects/kio/Pure;
+	public final fun kioPureLoop (II)Lit/msec/kio/KIO;
+	public final fun unsafeKIOPureLoop (II)I
+}
+

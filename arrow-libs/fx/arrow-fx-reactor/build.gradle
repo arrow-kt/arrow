@@ -1,0 +1,19 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply from: "$SUB_PROJECT"
+apply from: "$DOC_CREATION"
+apply from: "$PUBLICATION"
+
+dependencies {
+    compile project(":arrow-fx")
+    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+    testCompile project(":arrow-fx-test")
+
+    compile "io.projectreactor:reactor-core:$PROJECT_REACTOR_VERSION"
+    testCompile "io.projectreactor:reactor-test:$PROJECT_REACTOR_VERSION"
+}

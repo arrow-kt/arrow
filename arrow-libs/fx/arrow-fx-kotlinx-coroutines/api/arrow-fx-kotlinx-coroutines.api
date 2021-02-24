@@ -1,0 +1,7 @@
+public final class arrow/integrations/kotlinx/ExtensionsKt {
+	public static final fun forkScoped (Larrow/Kind;Lkotlinx/coroutines/CoroutineScope;)Larrow/fx/IO;
+	public static final fun suspendCancellable (Larrow/Kind;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun unsafeRunIO (Lkotlinx/coroutines/CoroutineScope;Larrow/Kind;Lkotlin/jvm/functions/Function1;)V
+	public static final fun unsafeRunScoped (Larrow/Kind;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/functions/Function1;)V
+}
+

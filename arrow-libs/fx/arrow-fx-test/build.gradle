@@ -1,0 +1,17 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jlleitschuh.gradle.ktlint"
+}
+
+apply plugin: 'kotlinx-atomicfu'
+
+apply from: "$SUB_PROJECT"
+apply from: "$PUBLICATION"
+apply from: "$ANIMALSNIFFER"
+
+dependencies {
+    compile project(":arrow-fx")
+    api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
+    testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
+    compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
+}
