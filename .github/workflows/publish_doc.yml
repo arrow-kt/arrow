@@ -4,10 +4,10 @@ on:
   push:
     branches:
     - master
-    # paths:
-    # - 'arrow-libs/**'
-    # - 'arrow-docs/**'
-    # - 'arrow-site/**'
+    paths:
+    - 'arrow-libs/**'
+    - 'arrow-docs/**'
+    - 'arrow-site/**'
 
 jobs:
   publish_doc:

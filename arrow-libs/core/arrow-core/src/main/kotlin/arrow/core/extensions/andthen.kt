@@ -9,7 +9,6 @@ import arrow.core.AndThenPartialOf
 import arrow.core.ForAndThen
 import arrow.core.fix
 import arrow.core.invoke
-import arrow.extension
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monoid
@@ -23,7 +22,10 @@ import arrow.typeclasses.counnest
 import arrow.typeclasses.conest
 import arrow.typeclasses.Contravariant
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
   fun SB(): Semigroup<B>
 
@@ -32,7 +34,10 @@ interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
   }
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
 
   fun MB(): Monoid<B>
@@ -43,13 +48,19 @@ interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
     AndThen { MB().empty() }
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
   override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
     fix().ap(ff)
@@ -58,7 +69,10 @@ interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
     fix().map(f)
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X> {
   override fun <A> just(a: A): AndThenOf<X, A> =
     AndThen.just(a)
@@ -70,7 +84,10 @@ interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunct
     fix().map(f)
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
   override fun <A, B> AndThenOf<X, A>.flatMap(f: (A) -> AndThenOf<X, B>): AndThen<X, B> =
     fix().flatMap(f)
@@ -85,7 +102,10 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
     fix().ap(ff)
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenCategory : Category<ForAndThen> {
   override fun <A> id(): AndThen<A, A> =
     AndThen.id()
@@ -94,14 +114,20 @@ interface AndThenCategory : Category<ForAndThen> {
     fix().compose(arr::invoke)
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenContravariant<O> : Contravariant<Conested<ForAndThen, O>> {
 
   override fun <A, B> Kind<Conested<ForAndThen, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForAndThen, O>, B> =
     counnest().fix().contramap(f).conest()
 }
 
-@extension
+@Deprecated(
+  "AndThen is becoming an internal data type that automatically tries to make andThen stack safe",
+  level = DeprecationLevel.WARNING
+)
 interface AndThenProfunctor : Profunctor<ForAndThen> {
   override fun <A, B, C, D> AndThenOf<A, B>.dimap(fl: (C) -> A, fr: (B) -> D): AndThen<C, D> =
     fix().andThen(fr).compose(fl)

@@ -4,8 +4,8 @@ on:
   push:
     branches:
     - master
-    # paths:
-    # - 'arrow-stack/**'
+    paths:
+    - 'arrow-stack/**'
 
 jobs:
   publish-arrow-stack:
