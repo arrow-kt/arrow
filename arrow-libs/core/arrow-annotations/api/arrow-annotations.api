@@ -1,0 +1,63 @@
+public final class arrow/DerivingTarget : java/lang/Enum {
+	public static final field APPLICATIVE Larrow/DerivingTarget;
+	public static final field EQ Larrow/DerivingTarget;
+	public static final field HLIST Larrow/DerivingTarget;
+	public static final field MONOID Larrow/DerivingTarget;
+	public static final field SEMIGROUP Larrow/DerivingTarget;
+	public static final field SHOW Larrow/DerivingTarget;
+	public static final field TUPLED Larrow/DerivingTarget;
+	public static fun valueOf (Ljava/lang/String;)Larrow/DerivingTarget;
+	public static fun values ()[Larrow/DerivingTarget;
+}
+
+public final class arrow/ExtensionKt {
+	public static final fun getGiven ()Ljava/lang/Void;
+	public static final fun given ()Ljava/lang/Object;
+}
+
+public final class arrow/HksKt {
+	public static final field KindDeprecation Ljava/lang/String;
+}
+
+public abstract interface class arrow/Kind {
+}
+
+public abstract interface annotation class arrow/autofold : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class arrow/coproduct : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class arrow/documented : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class arrow/extension : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class arrow/higherkind : java/lang/annotation/Annotation {
+}
+
+public final class arrow/optics/OpticsTarget : java/lang/Enum {
+	public static final field DSL Larrow/optics/OpticsTarget;
+	public static final field ISO Larrow/optics/OpticsTarget;
+	public static final field LENS Larrow/optics/OpticsTarget;
+	public static final field OPTIONAL Larrow/optics/OpticsTarget;
+	public static final field PRISM Larrow/optics/OpticsTarget;
+	public static fun valueOf (Ljava/lang/String;)Larrow/optics/OpticsTarget;
+	public static fun values ()[Larrow/optics/OpticsTarget;
+}
+
+public abstract interface annotation class arrow/optics/optics : java/lang/annotation/Annotation {
+	public abstract fun targets ()[Larrow/optics/OpticsTarget;
+}
+
+public abstract interface annotation class arrow/product : java/lang/annotation/Annotation {
+	public abstract fun deriving ()[Larrow/DerivingTarget;
+}
+
+public abstract interface annotation class arrow/synthetic : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class arrow/undocumented : java/lang/annotation/Annotation {
+}
+

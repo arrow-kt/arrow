@@ -1,0 +1,208 @@
+public final class arrow/fx/test/eq/EqKKt {
+	public static final fun eq (Larrow/fx/IO$Companion;Larrow/typeclasses/Eq;Larrow/fx/typeclasses/Duration;)Larrow/typeclasses/Eq;
+	public static final fun eq (Larrow/fx/typeclasses/Fiber$Companion;Larrow/typeclasses/Eq;)Larrow/typeclasses/Eq;
+	public static synthetic fun eq$default (Larrow/fx/IO$Companion;Larrow/typeclasses/Eq;Larrow/fx/typeclasses/Duration;ILjava/lang/Object;)Larrow/typeclasses/Eq;
+	public static final fun eqK (Larrow/fx/IO$Companion;)Larrow/typeclasses/EqK;
+	public static final fun eqK (Larrow/fx/Schedule$Decision$Companion;)Larrow/typeclasses/EqK;
+	public static final fun eqK (Larrow/fx/typeclasses/Fiber$Companion;)Larrow/typeclasses/EqK;
+	public static final fun throwableEq ()Larrow/typeclasses/Eq;
+	public static final fun unsafeRunEq (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Larrow/typeclasses/Eq;)Z
+	public static synthetic fun unsafeRunEq$default (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Larrow/typeclasses/Eq;ILjava/lang/Object;)Z
+}
+
+public final class arrow/fx/test/generators/GeneratorsKt {
+	public static final fun duration ()Lio/kotlintest/properties/Gen;
+	public static final fun genK (Larrow/fx/IO$Companion;)Larrow/core/test/generators/GenK;
+	public static final fun genK (Larrow/fx/Schedule$Decision$Companion;)Larrow/core/test/generators/GenK;
+	public static final fun genK (Larrow/fx/typeclasses/Fiber$Companion;Larrow/typeclasses/Applicative;)Larrow/core/test/generators/GenK;
+	public static final fun raiseError (Lio/kotlintest/properties/Gen;Larrow/typeclasses/ApplicativeError;)Lio/kotlintest/properties/Gen;
+	public static final fun timeUnit (Lio/kotlintest/properties/Gen$Companion;)Lio/kotlintest/properties/Gen;
+}
+
+public final class arrow/fx/test/laws/AsyncLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/AsyncLaws;
+	public final fun asyncCanBeDerivedFromAsyncF (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun asyncConstructor (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun asyncError (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun asyncSuccess (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun bracketReleaseIscalledOnCompletedOrError (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun continueOn (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun continueOnComprehension (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun derivedContinueOn (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun derivedDefer (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun derivedLaterOrRaise (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun derivedShift (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun effectCanCallSuspend (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun effectEquivalence (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;)V
+	public final fun effectMapSuspendEffect (Larrow/fx/typeclasses/Async;Larrow/core/test/generators/GenK;Larrow/typeclasses/Eq;)V
+	public final fun fxLazyEvaluation (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/fx/typeclasses/Async;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public final fun laws (Larrow/fx/typeclasses/Async;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/AsyncLaws;Larrow/fx/typeclasses/Async;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/AsyncLaws;Larrow/fx/typeclasses/Async;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+}
+
+public final class arrow/fx/test/laws/BracketLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/BracketLaws;
+	public final fun acquireAndReleaseAreUncancellable (Larrow/fx/typeclasses/Bracket;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Eq;)V
+	public final fun bracketCaseFailureInAcquisitionRemainsFailure (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketCaseWithJustUnitEqvMap (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketCaseWithJustUnitIsUncancellable (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketIsDerivedFromBracketCase (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketMustNotRunReleaseTaskOnAcquireError (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketMustRunReleaseTaskOnUseError (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketPropagatesTransformerEffects (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun bracketShouldBeStackSafe (Larrow/fx/typeclasses/Bracket;ILarrow/typeclasses/Eq;)V
+	public final fun guaranteeCaseIsDerivedFromBracketCase (Larrow/fx/typeclasses/Bracket;Lkotlin/jvm/functions/Function1;Larrow/typeclasses/Eq;)V
+	public final fun guaranteeCaseMustRunFinalizerOnError (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun guaranteeCaseShouldBeStackSafe (Larrow/fx/typeclasses/Bracket;ILarrow/typeclasses/Eq;)V
+	public final fun guaranteeIsDerivedFromBracket (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/fx/typeclasses/Bracket;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public final fun laws (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/BracketLaws;Larrow/fx/typeclasses/Bracket;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/BracketLaws;Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+	public final fun onErrorMustRunFinalizerOnError (Larrow/fx/typeclasses/Bracket;Larrow/typeclasses/Eq;)V
+	public final fun uncancellablePreventsCancelledCase (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Larrow/Kind;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/fx/test/laws/ConcurrentLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/ConcurrentLaws;
+	public final fun acquireBracketIsNotCancellable (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun actionConcurrentWithPureValueIsJustAction (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun asyncCancellableCoherence (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun asyncFRegisterCanBeCancelled (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun cancelOnBracketReleases (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun cancellableCancellableFCoherence (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun cancellableFReceivesCancelSignal (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun cancellableReceivesCancelSignal (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun getTestError ()Ljava/lang/RuntimeException;
+	public final fun guaranteeFinalizerIsNotCancellable (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun guaranteeFinalizerOnCancel (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun joinIsIdempotent (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun laws (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Timer;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;Lkotlin/coroutines/CoroutineContext;ZI)Ljava/util/List;
+	public final fun laws (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Timer;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;Lkotlin/coroutines/CoroutineContext;ZI)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/ConcurrentLaws;Larrow/fx/typeclasses/Concurrent;Larrow/fx/Timer;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;Lkotlin/coroutines/CoroutineContext;ZIILjava/lang/Object;)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/ConcurrentLaws;Larrow/fx/typeclasses/Concurrent;Larrow/fx/Timer;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;Lkotlin/coroutines/CoroutineContext;ZIILjava/lang/Object;)Ljava/util/List;
+	public final fun onCancelFinalizerOnCancel (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun onErrorIsNotRunByDefault (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun onErrorIsRunWhenErrorIsRaised (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun outerAndInnerOnErrorIsRun (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap2StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap3StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap4StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap5StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap6StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap7StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap8StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMap9StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMapCancelCancelsBoth (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun parMapStartsAllAtSameTime (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun parSequenceForksTheEffects (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun parTraverseCanTraverseEffectfullComputations (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun parTraverseForksTheEffects (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun parTraverseResultsInTheCorrectError (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun race2StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race3StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race4StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race5StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race6StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race7StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race8StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun race9StackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceCancelCancelsBoth (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceCancelsLoser (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceMirrorsLeftWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceMirrorsRightWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairCanCancelsLoser (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairCanJoinLeft (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairCanJoinRight (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairCancelCancelsBoth (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairMirrorsLeftWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairMirrorsRightWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun racePairStackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleCanCancelsLoser (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleCanJoinLeft (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleCanJoinMiddle (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleCanJoinRight (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleCancelCancelsAll (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleMirrorsLeftWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleMirrorsMiddleWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleMirrorsRightWinner (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun raceTripleStackSafe (Larrow/fx/typeclasses/Concurrent;ILarrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun releaseBracketIsNotCancellable (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun startCancelIsUnit (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun startJoinIsIdentity (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;Lkotlin/coroutines/CoroutineContext;)V
+	public final fun uncancellableMirrorsSource (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun waitForShouldStayOnOriginalContext (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun waitForTimesOutProgram (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+	public final fun waitForTimesOutProgramWithDefault (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/fx/test/laws/LawKt {
+	public static final fun equalUnderTheLaw (Larrow/Kind;Larrow/Kind;Larrow/typeclasses/Eq;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun equalUnderTheLaw (Ljava/lang/Object;Ljava/lang/Object;Larrow/typeclasses/Eq;)Z
+	public static synthetic fun equalUnderTheLaw$default (Larrow/Kind;Larrow/Kind;Larrow/typeclasses/Eq;Larrow/fx/typeclasses/Duration;ILjava/lang/Object;)Z
+	public static final fun forFew (ILio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lkotlin/jvm/functions/Function5;)V
+	public static final fun forFew (ILio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lkotlin/jvm/functions/Function4;)V
+	public static final fun forFew (ILio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lkotlin/jvm/functions/Function3;)V
+	public static final fun forFew (ILio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lkotlin/jvm/functions/Function2;)V
+	public static final fun forFew (ILio/kotlintest/properties/Gen;Lkotlin/jvm/functions/Function1;)V
+	public static final fun matchUnderEq (Larrow/typeclasses/Eq;Ljava/lang/Object;)Lio/kotlintest/Matcher;
+	public static final fun shouldBeEq (Ljava/lang/Object;Ljava/lang/Object;Larrow/typeclasses/Eq;)V
+	public static final fun shouldNotBeEq (Ljava/lang/Object;Ljava/lang/Object;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/fx/test/laws/MonadDeferLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/MonadDeferLaws;
+	public final fun deferConstantEqualsPure (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun deferSuspendsEvaluation (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun delaySuspendsEvaluation (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun derivedLaterConsistent (Larrow/fx/typeclasses/MonadDefer;Larrow/core/test/generators/GenK;Larrow/typeclasses/Eq;)V
+	public final fun derivedLazyConsistent (Larrow/fx/typeclasses/MonadDefer;Larrow/core/test/generators/GenK;Larrow/typeclasses/Eq;)V
+	public final fun flatMapSuspendsEvaluation (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun laterConstantEqualsPure (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun laterOrRaiseConstantLeftEqualsRaiseError (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun laterOrRaiseConstantRightEqualsPure (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun laterThrowEqualsRaiseError (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/fx/typeclasses/MonadDefer;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public final fun laws (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZI)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+	public static synthetic fun laws$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;ZIILjava/lang/Object;)Ljava/util/List;
+	public final fun mapSuspendsEvaluation (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun propagateErrorsThroughBind (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun repeatedSyncEvaluationNotMemoized (Larrow/fx/typeclasses/MonadDefer;Larrow/typeclasses/Eq;)V
+	public final fun stackSafetyOnRepeatedMaps (Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;)V
+	public static synthetic fun stackSafetyOnRepeatedMaps$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;ILjava/lang/Object;)V
+	public final fun stackSafetyOverRepeatedAttempts (Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;)V
+	public static synthetic fun stackSafetyOverRepeatedAttempts$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;ILjava/lang/Object;)V
+	public final fun stackSafetyOverRepeatedLeftBinds (Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;)V
+	public static synthetic fun stackSafetyOverRepeatedLeftBinds$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;ILjava/lang/Object;)V
+	public final fun stackSafetyOverRepeatedRightBinds (Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;)V
+	public static synthetic fun stackSafetyOverRepeatedRightBinds$default (Larrow/fx/test/laws/MonadDeferLaws;Larrow/fx/typeclasses/MonadDefer;ILarrow/typeclasses/Eq;ILjava/lang/Object;)V
+}
+
+public final class arrow/fx/test/laws/MonadThrowLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/MonadThrowLaws;
+	public final fun laws (Larrow/typeclasses/MonadThrow;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;)Ljava/util/List;
+	public final fun laws (Larrow/typeclasses/MonadThrow;Larrow/typeclasses/Functor;Larrow/typeclasses/Apply;Larrow/typeclasses/Selective;Larrow/core/test/generators/GenK;Larrow/typeclasses/EqK;)Ljava/util/List;
+	public final fun monadRaiseNonFatalRaiseError (Larrow/typeclasses/MonadThrow;Larrow/typeclasses/Eq;)V
+	public final fun monadRaiseNonFatalThrowsError (Larrow/typeclasses/MonadThrow;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/fx/test/laws/TimerLaws {
+	public static final field INSTANCE Larrow/fx/test/laws/TimerLaws;
+	public final fun laws (Larrow/fx/typeclasses/Async;Larrow/fx/Timer;Larrow/typeclasses/EqK;)Ljava/util/List;
+	public final fun negativeSleepShouldBeImmediate (Larrow/fx/typeclasses/Async;Larrow/fx/Timer;Larrow/typeclasses/Eq;)V
+	public final fun sleepShouldLastSpecifiedTime (Larrow/fx/typeclasses/Async;Larrow/fx/Timer;Larrow/fx/test/laws/TimerLaws$Clock;Larrow/typeclasses/Eq;)V
+}
+
+public abstract interface class arrow/fx/test/laws/TimerLaws$Clock {
+	public static final field Companion Larrow/fx/test/laws/TimerLaws$Clock$Companion;
+	public abstract fun timeMillis ()Larrow/Kind;
+	public abstract fun timeNano ()Larrow/Kind;
+}
+
+public final class arrow/fx/test/laws/TimerLaws$Clock$Companion {
+	public final fun invoke (Larrow/fx/typeclasses/Async;)Larrow/fx/test/laws/TimerLaws$Clock;
+}
+

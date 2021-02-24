@@ -1,0 +1,82 @@
+public final class arrow/optics/test/generators/GeneratorsKt {
+	public static final fun char (Lio/kotlintest/properties/Gen$Companion;)Lio/kotlintest/properties/Gen;
+}
+
+public final class arrow/optics/test/laws/IsoLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/IsoLaws;
+	public final fun composeModify (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consistentSetModify (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consitentGetModifyId (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Monoid;)V
+	public final fun laws (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;Larrow/typeclasses/Monoid;)Ljava/util/List;
+	public final fun modifyIdentity (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun roundTripOneWay (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun roundTripOtherWay (Larrow/optics/PIso;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/optics/test/laws/LensLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/LensLaws;
+	public final fun laws (Larrow/optics/PLens;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;Larrow/typeclasses/Monoid;)Ljava/util/List;
+	public final fun laws (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;Larrow/typeclasses/Monoid;)Ljava/util/List;
+	public final fun lensComposeModify (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun lensConsistentGetModifyid (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Monoid;)V
+	public final fun lensConsistentSetModify (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun lensGetSet (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun lensModifyIdentity (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun lensSetGet (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun lensSetIdempotent (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/optics/test/laws/OptionalLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/OptionalLaws;
+	public final fun composeModify (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consistentGetOptionModifyId (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consistentSetModify (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun getOptionSet (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/optics/POptional;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;)Ljava/util/List;
+	public final fun laws (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;)Ljava/util/List;
+	public final fun modifyIdentity (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun setGetOption (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun setIdempotent (Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/optics/test/laws/OptionalLaws$FirstOption {
+	public fun <init> (Larrow/core/Option;)V
+	public final fun component1 ()Larrow/core/Option;
+	public final fun copy (Larrow/core/Option;)Larrow/optics/test/laws/OptionalLaws$FirstOption;
+	public static synthetic fun copy$default (Larrow/optics/test/laws/OptionalLaws$FirstOption;Larrow/core/Option;ILjava/lang/Object;)Larrow/optics/test/laws/OptionalLaws$FirstOption;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getOption ()Larrow/core/Option;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/optics/test/laws/PrismLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/PrismLaws;
+	public final fun composeModify (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consistentGetOptionModifyId (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun consistentSetModify (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;)Ljava/util/List;
+	public final fun modifyIdentity (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun partialRoundTripOneWay (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun roundTripOtherWay (Larrow/optics/PPrism;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/optics/test/laws/SetterLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/SetterLaws;
+	public final fun composeModify (Larrow/optics/PSetter;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Lio/kotlintest/properties/Gen;)V
+	public final fun consistentSetModify (Larrow/optics/PSetter;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/optics/PSetter;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)Ljava/util/List;
+	public final fun modifyIdentity (Larrow/optics/PSetter;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun setIdempotent (Larrow/optics/PSetter;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+
+public final class arrow/optics/test/laws/TraversalLaws {
+	public static final field INSTANCE Larrow/optics/test/laws/TraversalLaws;
+	public final fun composeModify (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun headOption (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun laws (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;Larrow/typeclasses/Eq;)Ljava/util/List;
+	public final fun modifyGetAll (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun modifyIdentity (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+	public final fun setIdempotent (Larrow/optics/PTraversal;Lio/kotlintest/properties/Gen;Lio/kotlintest/properties/Gen;Larrow/typeclasses/Eq;)V
+}
+

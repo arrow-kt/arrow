@@ -1,0 +1,105 @@
+public abstract class arrow/fx/coroutines/ArrowFxSpec : io/kotest/core/spec/style/FreeSpec {
+	public fun <init> ()V
+	public fun <init> (ILkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (ILkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function10;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function9;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function8;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function7;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function6;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function5;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function4;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lio/kotest/property/Arb;Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun checkAll (Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun forFew (ILkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class arrow/fx/coroutines/NamedThreadFactory : java/util/concurrent/ThreadFactory {
+	public fun <init> (Lkotlin/jvm/functions/Function1;)V
+	public fun newThread (Ljava/lang/Runnable;)Ljava/lang/Thread;
+}
+
+public final class arrow/fx/coroutines/Predef_testKt {
+	public static final fun assertCancellable (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun assertThrowable (Lkotlin/jvm/functions/Function0;)Ljava/lang/Throwable;
+	public static final fun catchSystemErr (Lkotlin/jvm/functions/Function0;)Ljava/lang/String;
+	public static final fun catchSystemErrInto (Ljava/io/OutputStream;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;
+	public static final fun charRange (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun either (Larrow/core/Either;)Lio/kotest/matchers/Matcher;
+	public static final fun either (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun function (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun functionAToB (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun getSingle ()Larrow/fx/coroutines/Resource;
+	public static final fun getSingleThreadName ()Ljava/lang/String;
+	public static final fun getThreadName ()Lkotlin/jvm/functions/Function1;
+	public static final fun intRange (Lio/kotest/property/Arb$Companion;II)Lio/kotest/property/Arb;
+	public static synthetic fun intRange$default (Lio/kotest/property/Arb$Companion;IIILjava/lang/Object;)Lio/kotest/property/Arb;
+	public static final fun leftException (Ljava/lang/Throwable;)Lio/kotest/matchers/Matcher;
+	public static final fun longRange (Lio/kotest/property/Arb$Companion;JJ)Lio/kotest/property/Arb;
+	public static synthetic fun longRange$default (Lio/kotest/property/Arb$Companion;JJILjava/lang/Object;)Lio/kotest/property/Arb;
+	public static final fun nullable (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun rethrow (Larrow/core/Either;)Ljava/lang/Object;
+	public static final fun shift (Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun suspend (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun suspend (Ljava/lang/Throwable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun suspended (Ljava/lang/Object;)Lkotlin/jvm/functions/Function1;
+	public static final fun throwable (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun toEither (Ljava/lang/Object;)Larrow/core/Either;
+	public static final fun unit (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun unsafeEquals-MiKvLTk (Lkotlin/jvm/functions/Function1;)Lio/kotest/matchers/Matcher;
+	public static final fun validated (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun validatedNel (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+}
+
+public final class arrow/fx/coroutines/SideEffect {
+	public fun <init> ()V
+	public fun <init> (I)V
+	public synthetic fun <init> (IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/fx/coroutines/SideEffect;
+	public static synthetic fun copy$default (Larrow/fx/coroutines/SideEffect;IILjava/lang/Object;)Larrow/fx/coroutines/SideEffect;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCounter ()I
+	public fun hashCode ()I
+	public final fun increment ()V
+	public final fun setCounter (I)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/coroutines/stream/ArbKt {
+	public static final synthetic fun array (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+	public static final fun arrayChunkGenerator (Lio/kotest/property/Arb;Lio/kotest/property/Shrinker;Lkotlin/ranges/IntRange;Lkotlin/jvm/functions/Function3;)Lio/kotest/property/Arb;
+	public static synthetic fun arrayChunkGenerator$default (Lio/kotest/property/Arb;Lio/kotest/property/Shrinker;Lkotlin/ranges/IntRange;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lio/kotest/property/Arb;
+	public static final fun booleanChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun byteChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun doubleChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun floatChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun intChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun longChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+	public static final fun shortChunk (Lio/kotest/property/Arb$Companion;)Lio/kotest/property/Arb;
+}
+
+public final class arrow/fx/coroutines/stream/ChunkShrinker : io/kotest/property/Shrinker {
+	public fun <init> ()V
+	public fun shrink (Larrow/fx/coroutines/stream/Chunk;)Ljava/util/List;
+	public synthetic fun shrink (Ljava/lang/Object;)Ljava/util/List;
+}
+
+public abstract class arrow/fx/coroutines/stream/StreamSpec : arrow/fx/coroutines/ArrowFxSpec {
+	public fun <init> ()V
+	public fun <init> (ILkotlin/ranges/IntRange;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (ILkotlin/ranges/IntRange;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getDepth ()Lkotlin/ranges/IntRange;
+	public final fun long (Lio/kotest/property/Arb$Companion;Lkotlin/ranges/LongRange;)Lio/kotest/property/Arb;
+	public static synthetic fun long$default (Larrow/fx/coroutines/stream/StreamSpec;Lio/kotest/property/Arb$Companion;Lkotlin/ranges/LongRange;ILjava/lang/Object;)Lio/kotest/property/Arb;
+	public final fun stream (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lkotlin/ranges/IntRange;)Lio/kotest/property/Arb;
+	public static synthetic fun stream$default (Larrow/fx/coroutines/stream/StreamSpec;Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;Lkotlin/ranges/IntRange;ILjava/lang/Object;)Lio/kotest/property/Arb;
+	public final fun suspended (Lio/kotest/property/Arb$Companion;Lio/kotest/property/Arb;)Lio/kotest/property/Arb;
+}
+
+public final class arrow/fx/coroutines/stream/StreamSpec$LongShrinker : io/kotest/property/Shrinker {
+	public fun <init> (Lkotlin/ranges/LongRange;)V
+	public fun shrink (J)Ljava/util/List;
+	public synthetic fun shrink (Ljava/lang/Object;)Ljava/util/List;
+}
+

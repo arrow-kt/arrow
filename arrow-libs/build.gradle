@@ -16,6 +16,18 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION" apply false
     id "org.jetbrains.dokka" version "$DOKKA_VERSION" apply false
     id "ru.vyarus.animalsniffer" version "$ANIMALS_SNIFFER_VERSION" apply false
+    id "org.jetbrains.kotlinx.binary-compatibility-validator" version "$KOTLINX_VALIDATOR_VERSION"
 }
 
 apply from: "gradle/$ROOT_PROJECT"
+
+apiValidation {
+    ignoredProjects += [
+            "arrow-ank-gradle",
+            "arrow-ank",
+            "arrow-meta",
+            "arrow-meta-test-models",
+            "examples"
+    ]
+    validationDisabled = true
+}

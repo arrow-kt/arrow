@@ -1,221 +1,28 @@
-public final class arrow/fx/ConcurrentQueue : arrow/fx/Queue, arrow/fx/typeclasses/Concurrent {
-	public static final field Companion Larrow/fx/ConcurrentQueue$Companion;
-	public fun MVar ()Larrow/Kind;
-	public fun MVar (Ljava/lang/Object;)Larrow/Kind;
-	public fun Promise ()Larrow/Kind;
-	public fun Ref (Ljava/lang/Object;)Larrow/Kind;
-	public fun Semaphore (J)Larrow/Kind;
-	public fun andS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun ap (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun apEval (Larrow/Kind;Larrow/core/Eval;)Larrow/core/Eval;
-	public fun apTap (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun async (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun asyncF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun attempt (Larrow/Kind;)Larrow/Kind;
-	public fun awaitShutdown ()Larrow/Kind;
-	public fun bindingConcurrent (Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun bracket (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun bracketCase (Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun branch (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun cancelable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancelableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancellable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancellableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun catch (Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun continueOn (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun continueOn (Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun defer (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun defer (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun dispatchers ()Larrow/fx/typeclasses/Dispatchers;
-	public fun effect (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effect (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effectCatch (Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun effectCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun effectM (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effectMap (Larrow/Kind;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun ensure (Larrow/Kind;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatMap (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatTap (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatten (Larrow/Kind;)Larrow/Kind;
-	public fun followedBy (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun followedByEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun forEffect (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun forEffectEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun fork (Larrow/Kind;)Larrow/Kind;
-	public fun fork (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun fproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun fromEither (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun fromOption (Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun fromTry (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public synthetic fun getFx ()Larrow/fx/typeclasses/AsyncFx;
-	public fun getFx ()Larrow/fx/typeclasses/ConcurrentFx;
-	public synthetic fun getFx ()Larrow/typeclasses/MonadFx;
-	public synthetic fun getFx ()Larrow/typeclasses/MonadThrowFx;
-	public fun guarantee (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun guaranteeCase (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun handleError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun handleErrorWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun ifM (Larrow/Kind;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun ifS (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun imap (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun just (Ljava/lang/Object;)Larrow/Kind;
-	public fun just (Ljava/lang/Object;Lkotlin/Unit;)Larrow/Kind;
-	public fun later (Larrow/Kind;)Larrow/Kind;
-	public fun later (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun later (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun laterOrRaise (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun laterOrRaise (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun lazy ()Larrow/Kind;
-	public fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map2 (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map2Eval (Larrow/Kind;Larrow/core/Eval;Lkotlin/jvm/functions/Function1;)Larrow/core/Eval;
-	public fun mapConst (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun mapConst (Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun never ()Larrow/Kind;
-	public fun offer (Ljava/lang/Object;)Larrow/Kind;
-	public fun onCancel (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun onError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun orS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parApplicative ()Larrow/typeclasses/Applicative;
-	public fun parApplicative (Lkotlin/coroutines/CoroutineContext;)Larrow/typeclasses/Applicative;
-	public fun parMapN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function9;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function8;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function7;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function6;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function5;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function4;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function3;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun parSequence (Larrow/Kind;Larrow/typeclasses/Traverse;)Larrow/Kind;
-	public fun parSequence (Larrow/Kind;Larrow/typeclasses/Traverse;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun parSequence (Ljava/lang/Iterable;)Larrow/Kind;
-	public fun parSequence (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun parTraverse (Larrow/Kind;Larrow/typeclasses/Traverse;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Traverse;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTupledN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun productL (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun productLEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun racePair (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceTriple (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public synthetic fun raiseError (Ljava/lang/Object;)Larrow/Kind;
-	public synthetic fun raiseError (Ljava/lang/Object;Lkotlin/Unit;)Larrow/Kind;
-	public fun raiseError (Ljava/lang/Throwable;)Larrow/Kind;
-	public fun raiseError (Ljava/lang/Throwable;Lkotlin/Unit;)Larrow/Kind;
-	public fun raiseNonFatal (Ljava/lang/Throwable;)Larrow/Kind;
-	public fun redeem (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun redeemWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun replicate (Larrow/Kind;I)Larrow/Kind;
-	public fun replicate (Larrow/Kind;ILarrow/typeclasses/Monoid;)Larrow/Kind;
-	public fun rethrow (Larrow/Kind;)Larrow/Kind;
-	public fun select (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun selectM (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun shift (Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun shutdown ()Larrow/Kind;
-	public fun size ()Larrow/Kind;
-	public fun sleep (Larrow/fx/typeclasses/Duration;)Larrow/Kind;
-	public fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun take ()Larrow/Kind;
-	public fun timer ()Larrow/fx/Timer;
-	public fun tupleLeft (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun tupleRight (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun uncancelable (Larrow/Kind;)Larrow/Kind;
-	public fun uncancellable (Larrow/Kind;)Larrow/Kind;
-	public fun unit ()Larrow/Kind;
-	public fun unit (Larrow/Kind;)Larrow/Kind;
-	public fun void (Larrow/Kind;)Larrow/Kind;
-	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
-	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
-	public fun whenS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun widen (Larrow/Kind;)Larrow/Kind;
-}
-
-public final class arrow/fx/ConcurrentQueue$Companion {
-	public final fun empty (Larrow/fx/typeclasses/Concurrent;)Larrow/Kind;
-}
-
 public final class arrow/fx/ConnectionCancellationException : java/util/concurrent/CancellationException {
 	public static final field INSTANCE Larrow/fx/ConnectionCancellationException;
 }
 
 public abstract interface class arrow/fx/Dequeue {
+	public abstract fun peek ()Larrow/Kind;
+	public abstract fun peekAll ()Larrow/Kind;
 	public abstract fun take ()Larrow/Kind;
+	public abstract fun takeAll ()Larrow/Kind;
+	public abstract fun tryPeek ()Larrow/Kind;
+	public abstract fun tryTake ()Larrow/Kind;
 }
 
 public abstract interface class arrow/fx/Enqueue {
 	public abstract fun offer (Ljava/lang/Object;)Larrow/Kind;
+	public abstract fun offerAll (Ljava/lang/Iterable;)Larrow/Kind;
+	public abstract fun offerAll ([Ljava/lang/Object;)Larrow/Kind;
+	public abstract fun tryOffer (Ljava/lang/Object;)Larrow/Kind;
+	public abstract fun tryOfferAll (Ljava/lang/Iterable;)Larrow/Kind;
+	public abstract fun tryOfferAll ([Ljava/lang/Object;)Larrow/Kind;
+}
+
+public final class arrow/fx/Enqueue$DefaultImpls {
+	public static fun offerAll (Larrow/fx/Enqueue;[Ljava/lang/Object;)Larrow/Kind;
+	public static fun tryOfferAll (Larrow/fx/Enqueue;[Ljava/lang/Object;)Larrow/Kind;
 }
 
 public final class arrow/fx/ForDecision {
@@ -291,6 +98,8 @@ public final class arrow/fx/IO$Companion : arrow/fx/IOParMap, arrow/fx/IORace {
 	public final fun defer (Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
 	public final fun effect (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public final fun effect (Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
+	public final fun effectEither (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
+	public final fun effectEither (Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public final fun eval (Larrow/core/Eval;)Larrow/fx/IO;
 	public final fun getLazy ()Larrow/fx/IO;
 	public final fun getNever ()Larrow/fx/IO;
@@ -371,12 +180,6 @@ public final class arrow/fx/IO$Companion : arrow/fx/IOParMap, arrow/fx/IORace {
 	public final fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 }
 
-public final class arrow/fx/IOConnectionKt {
-	public static final fun IOConnection (Lkotlin/Unit;)Larrow/fx/KindConnection;
-	public static synthetic fun IOConnection$default (Lkotlin/Unit;ILjava/lang/Object;)Larrow/fx/KindConnection;
-	public static final fun toDisposable (Larrow/fx/KindConnection;)Lkotlin/jvm/functions/Function0;
-}
-
 public final class arrow/fx/IODispatchers {
 	public static final field INSTANCE Larrow/fx/IODispatchers;
 	public final fun getCommonPool ()Lkotlin/coroutines/CoroutineContext;
@@ -388,9 +191,16 @@ public final class arrow/fx/IODispatchersKt {
 }
 
 public final class arrow/fx/IOKt {
+	public static final field IODeprecation Ljava/lang/String;
+	public static final fun effectMapEither (Larrow/fx/IO;Lkotlin/jvm/functions/Function2;)Larrow/fx/IO;
 	public static final fun fix (Larrow/Kind;)Larrow/fx/IO;
+	public static final fun flattenEither (Larrow/fx/IO;)Larrow/fx/IO;
 	public static final fun handleError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static final fun handleErrorWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
+	public static final fun mapEither (Larrow/fx/IO;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
+	public static final fun repeat (Larrow/Kind;Larrow/fx/Schedule;)Larrow/fx/IO;
+	public static final fun retry (Larrow/Kind;Larrow/fx/Schedule;)Larrow/fx/IO;
+	public static final fun void (Larrow/Kind;)Larrow/fx/IO;
 }
 
 public abstract interface class arrow/fx/IOParMap {
@@ -537,27 +347,6 @@ public final class arrow/fx/IORace$DefaultImpls {
 	public static fun raceTriple (Larrow/fx/IORace;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 }
 
-public abstract class arrow/fx/KindConnection {
-	public static final field Companion Larrow/fx/KindConnection$Companion;
-	public abstract fun cancel ()Larrow/Kind;
-	public final fun isCanceled ()Z
-	public abstract fun isCancelled ()Z
-	public final fun isNotCanceled ()Z
-	public final fun isNotCancelled ()Z
-	public abstract fun pop ()Larrow/Kind;
-	public abstract fun push (Larrow/Kind;)V
-	public abstract fun push ([Larrow/Kind;)V
-	public final fun pushPair (Larrow/Kind;Larrow/Kind;)V
-	public final fun pushPair (Larrow/fx/KindConnection;Larrow/fx/KindConnection;)V
-	public abstract fun tryReactivate ()Z
-}
-
-public final class arrow/fx/KindConnection$Companion {
-	public final fun invoke (Larrow/fx/typeclasses/MonadDefer;Lkotlin/jvm/functions/Function1;)Larrow/fx/KindConnection;
-	public final fun uncancelable (Larrow/typeclasses/Applicative;)Larrow/fx/KindConnection;
-	public final fun uncancellable (Larrow/typeclasses/Applicative;)Larrow/fx/KindConnection;
-}
-
 public abstract interface class arrow/fx/MVar {
 	public static final field Companion Larrow/fx/MVar$Companion;
 	public abstract fun isEmpty ()Larrow/Kind;
@@ -628,75 +417,84 @@ public final class arrow/fx/Promise$Companion {
 
 public abstract interface class arrow/fx/Queue : arrow/Kind, arrow/fx/Dequeue, arrow/fx/Enqueue {
 	public static final field Companion Larrow/fx/Queue$Companion;
-	public abstract fun awaitShutdown ()Larrow/Kind;
-	public abstract fun shutdown ()Larrow/Kind;
 	public abstract fun size ()Larrow/Kind;
+}
+
+public abstract class arrow/fx/Queue$BackpressureStrategy {
+}
+
+public final class arrow/fx/Queue$BackpressureStrategy$Bounded : arrow/fx/Queue$BackpressureStrategy {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/fx/Queue$BackpressureStrategy$Bounded;
+	public static synthetic fun copy$default (Larrow/fx/Queue$BackpressureStrategy$Bounded;IILjava/lang/Object;)Larrow/fx/Queue$BackpressureStrategy$Bounded;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCapacity ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/Queue$BackpressureStrategy$Dropping : arrow/fx/Queue$BackpressureStrategy {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/fx/Queue$BackpressureStrategy$Dropping;
+	public static synthetic fun copy$default (Larrow/fx/Queue$BackpressureStrategy$Dropping;IILjava/lang/Object;)Larrow/fx/Queue$BackpressureStrategy$Dropping;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCapacity ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/Queue$BackpressureStrategy$Sliding : arrow/fx/Queue$BackpressureStrategy {
+	public fun <init> (I)V
+	public final fun component1 ()I
+	public final fun copy (I)Larrow/fx/Queue$BackpressureStrategy$Sliding;
+	public static synthetic fun copy$default (Larrow/fx/Queue$BackpressureStrategy$Sliding;IILjava/lang/Object;)Larrow/fx/Queue$BackpressureStrategy$Sliding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCapacity ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class arrow/fx/Queue$BackpressureStrategy$Unbounded : arrow/fx/Queue$BackpressureStrategy {
+	public static final field INSTANCE Larrow/fx/Queue$BackpressureStrategy$Unbounded;
 }
 
 public final class arrow/fx/Queue$Companion {
 	public final fun bounded (ILarrow/fx/typeclasses/Concurrent;)Larrow/Kind;
 	public final fun dropping (ILarrow/fx/typeclasses/Concurrent;)Larrow/Kind;
+	public final fun factory (Larrow/fx/typeclasses/Concurrent;)Larrow/fx/QueueFactory;
 	public final fun sliding (ILarrow/fx/typeclasses/Concurrent;)Larrow/Kind;
 	public final fun unbounded (Larrow/fx/typeclasses/Concurrent;)Larrow/Kind;
 }
 
-public abstract class arrow/fx/Queue$State {
-	public abstract fun size ()Larrow/Kind;
+public final class arrow/fx/Queue$DefaultImpls {
+	public static fun offerAll (Larrow/fx/Queue;[Ljava/lang/Object;)Larrow/Kind;
+	public static fun tryOfferAll (Larrow/fx/Queue;[Ljava/lang/Object;)Larrow/Kind;
 }
 
-public final class arrow/fx/Queue$State$Deficit : arrow/fx/Queue$State {
-	public fun <init> (Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;)V
-	public final fun component1 ()Larrow/fx/internal/IQueue;
-	public final fun component2 ()Larrow/typeclasses/Applicative;
-	public final fun component3 ()Larrow/Kind;
-	public final fun copy (Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;)Larrow/fx/Queue$State$Deficit;
-	public static synthetic fun copy$default (Larrow/fx/Queue$State$Deficit;Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;ILjava/lang/Object;)Larrow/fx/Queue$State$Deficit;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAP ()Larrow/typeclasses/Applicative;
-	public final fun getShutdownHook ()Larrow/Kind;
-	public final fun getTakers ()Larrow/fx/internal/IQueue;
-	public fun hashCode ()I
-	public fun size ()Larrow/Kind;
-	public fun toString ()Ljava/lang/String;
+public abstract interface class arrow/fx/QueueFactory {
+	public static final field Companion Larrow/fx/QueueFactory$Companion;
+	public abstract fun CF ()Larrow/fx/typeclasses/Concurrent;
+	public abstract fun bounded (I)Larrow/Kind;
+	public abstract fun dropping (I)Larrow/Kind;
+	public abstract fun sliding (I)Larrow/Kind;
+	public abstract fun unbounded ()Larrow/Kind;
 }
 
-public final class arrow/fx/Queue$State$Shutdown : arrow/fx/Queue$State {
-	public fun <init> (Larrow/typeclasses/ApplicativeError;)V
-	public final fun component1 ()Larrow/typeclasses/ApplicativeError;
-	public final fun copy (Larrow/typeclasses/ApplicativeError;)Larrow/fx/Queue$State$Shutdown;
-	public static synthetic fun copy$default (Larrow/fx/Queue$State$Shutdown;Larrow/typeclasses/ApplicativeError;ILjava/lang/Object;)Larrow/fx/Queue$State$Shutdown;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAE ()Larrow/typeclasses/ApplicativeError;
-	public fun hashCode ()I
-	public fun size ()Larrow/Kind;
-	public fun toString ()Ljava/lang/String;
+public final class arrow/fx/QueueFactory$Companion {
+	public final fun invoke (Larrow/fx/typeclasses/Concurrent;)Larrow/fx/QueueFactory;
 }
 
-public final class arrow/fx/Queue$State$Surplus : arrow/fx/Queue$State {
-	public fun <init> (Larrow/fx/internal/IQueue;Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;)V
-	public final fun component1 ()Larrow/fx/internal/IQueue;
-	public final fun component2 ()Larrow/fx/internal/IQueue;
-	public final fun component3 ()Larrow/typeclasses/Applicative;
-	public final fun component4 ()Larrow/Kind;
-	public final fun copy (Larrow/fx/internal/IQueue;Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;)Larrow/fx/Queue$State$Surplus;
-	public static synthetic fun copy$default (Larrow/fx/Queue$State$Surplus;Larrow/fx/internal/IQueue;Larrow/fx/internal/IQueue;Larrow/typeclasses/Applicative;Larrow/Kind;ILjava/lang/Object;)Larrow/fx/Queue$State$Surplus;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getAP ()Larrow/typeclasses/Applicative;
-	public final fun getPutters ()Larrow/fx/internal/IQueue;
-	public final fun getQueue ()Larrow/fx/internal/IQueue;
-	public final fun getShutdownHook ()Larrow/Kind;
-	public fun hashCode ()I
-	public fun size ()Larrow/Kind;
-	public fun toString ()Ljava/lang/String;
+public final class arrow/fx/QueueFactory$DefaultImpls {
+	public static fun bounded (Larrow/fx/QueueFactory;I)Larrow/Kind;
+	public static fun dropping (Larrow/fx/QueueFactory;I)Larrow/Kind;
+	public static fun sliding (Larrow/fx/QueueFactory;I)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/QueueFactory;)Larrow/Kind;
 }
 
 public final class arrow/fx/QueueKt {
 	public static final fun fix (Larrow/Kind;)Larrow/fx/Queue;
-}
-
-public final class arrow/fx/QueueShutdown : java/lang/RuntimeException {
-	public static final field INSTANCE Larrow/fx/QueueShutdown;
-	public fun fillInStackTrace ()Ljava/lang/Throwable;
 }
 
 public abstract class arrow/fx/Race3 {
@@ -1367,7 +1165,7 @@ public final class arrow/fx/Schedule$Companion {
 	public final fun linear (Larrow/typeclasses/Monad;Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
 	public final fun logInput (Larrow/typeclasses/Monad;Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
 	public final fun logOutput (Larrow/typeclasses/Monad;Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
-	public final fun never (Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
+	public final fun never (Larrow/fx/typeclasses/Async;)Larrow/fx/Schedule;
 	public final fun once (Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
 	public final fun recurs (Larrow/typeclasses/Monad;I)Larrow/fx/Schedule;
 	public final fun spaced (Larrow/typeclasses/Monad;Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
@@ -1392,7 +1190,6 @@ public abstract interface class arrow/fx/Schedule$Companion$ScheduleFor {
 	public abstract fun linear (Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
 	public abstract fun logInput (Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
 	public abstract fun logOutput (Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
-	public abstract fun never ()Larrow/fx/Schedule;
 	public abstract fun once ()Larrow/fx/Schedule;
 	public abstract fun recurs (I)Larrow/fx/Schedule;
 	public abstract fun spaced (Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
@@ -1416,7 +1213,6 @@ public final class arrow/fx/Schedule$Companion$ScheduleFor$DefaultImpls {
 	public static fun linear (Larrow/fx/Schedule$Companion$ScheduleFor;Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
 	public static fun logInput (Larrow/fx/Schedule$Companion$ScheduleFor;Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
 	public static fun logOutput (Larrow/fx/Schedule$Companion$ScheduleFor;Lkotlin/jvm/functions/Function1;)Larrow/fx/Schedule;
-	public static fun never (Larrow/fx/Schedule$Companion$ScheduleFor;)Larrow/fx/Schedule;
 	public static fun once (Larrow/fx/Schedule$Companion$ScheduleFor;)Larrow/fx/Schedule;
 	public static fun recurs (Larrow/fx/Schedule$Companion$ScheduleFor;I)Larrow/fx/Schedule;
 	public static fun spaced (Larrow/fx/Schedule$Companion$ScheduleFor;Larrow/fx/typeclasses/Duration;)Larrow/fx/Schedule;
@@ -1502,6 +1298,65 @@ public abstract interface class arrow/fx/Timer {
 
 public final class arrow/fx/Timer$Companion {
 	public final fun invoke (Larrow/fx/typeclasses/Concurrent;)Larrow/fx/Timer;
+}
+
+public abstract interface class arrow/fx/extensions/DurationEq : arrow/typeclasses/Eq {
+	public abstract fun eqv (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+}
+
+public final class arrow/fx/extensions/DurationEq$DefaultImpls {
+	public static fun eqv (Larrow/fx/extensions/DurationEq;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun neqv (Larrow/fx/extensions/DurationEq;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+}
+
+public abstract interface class arrow/fx/extensions/DurationHash : arrow/typeclasses/Hash {
+	public abstract fun hash (Larrow/fx/typeclasses/Duration;)I
+}
+
+public final class arrow/fx/extensions/DurationHash$DefaultImpls {
+	public static fun hash (Larrow/fx/extensions/DurationHash;Larrow/fx/typeclasses/Duration;)I
+	public static fun hashWithSalt (Larrow/fx/extensions/DurationHash;Larrow/fx/typeclasses/Duration;I)I
+}
+
+public abstract interface class arrow/fx/extensions/DurationMonoid : arrow/fx/extensions/DurationSemigroup, arrow/typeclasses/Monoid {
+	public abstract fun empty ()Larrow/fx/typeclasses/Duration;
+}
+
+public final class arrow/fx/extensions/DurationMonoid$DefaultImpls {
+	public static fun combine (Larrow/fx/extensions/DurationMonoid;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun combineAll (Larrow/fx/extensions/DurationMonoid;Ljava/util/Collection;)Larrow/fx/typeclasses/Duration;
+	public static fun combineAll (Larrow/fx/extensions/DurationMonoid;Ljava/util/List;)Larrow/fx/typeclasses/Duration;
+	public static fun empty (Larrow/fx/extensions/DurationMonoid;)Larrow/fx/typeclasses/Duration;
+	public static fun maybeCombine (Larrow/fx/extensions/DurationMonoid;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun plus (Larrow/fx/extensions/DurationMonoid;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+}
+
+public abstract interface class arrow/fx/extensions/DurationOrder : arrow/typeclasses/Order {
+	public abstract fun compare (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/core/Ordering;
+}
+
+public final class arrow/fx/extensions/DurationOrder$DefaultImpls {
+	public static fun compare (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/core/Ordering;
+	public static fun compareTo (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)I
+	public static fun eqv (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun gt (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun gte (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun lt (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun lte (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun max (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun min (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun neqv (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static fun sort (Larrow/fx/extensions/DurationOrder;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/core/Tuple2;
+}
+
+public abstract interface class arrow/fx/extensions/DurationSemigroup : arrow/typeclasses/Semigroup {
+	public abstract fun combine (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+}
+
+public final class arrow/fx/extensions/DurationSemigroup$DefaultImpls {
+	public static fun combine (Larrow/fx/extensions/DurationSemigroup;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun maybeCombine (Larrow/fx/extensions/DurationSemigroup;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static fun plus (Larrow/fx/extensions/DurationSemigroup;Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
 }
 
 public abstract interface class arrow/fx/extensions/ExitCaseEq : arrow/typeclasses/Eq {
@@ -1594,7 +1449,6 @@ public final class arrow/fx/extensions/IOApplicative$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOApplicative;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOApplicative;Larrow/Kind;)Larrow/Kind;
 }
@@ -1620,7 +1474,6 @@ public final class arrow/fx/extensions/IOApplicativeError$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOApplicativeError;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun handleError (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun handleErrorWith (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun imap (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -1685,7 +1538,6 @@ public final class arrow/fx/extensions/IOApplicativeError$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOApplicativeError;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOApplicativeError;Larrow/Kind;)Larrow/Kind;
 }
@@ -1756,7 +1608,6 @@ public final class arrow/fx/extensions/IOApply$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOApply;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOApply;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOApply;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOApply;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOApply;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOApply;Larrow/Kind;)Larrow/Kind;
 }
@@ -1804,7 +1655,6 @@ public final class arrow/fx/extensions/IOAsync$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOAsync;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOAsync;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOAsync;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOAsync;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOAsync;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/extensions/IOAsync;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOAsync;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -1896,7 +1746,6 @@ public final class arrow/fx/extensions/IOAsync$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/extensions/IOAsync;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOAsync;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOAsync;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOAsync;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOAsync;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOAsync;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOAsync;Larrow/Kind;)Larrow/Kind;
@@ -1934,7 +1783,6 @@ public final class arrow/fx/extensions/IOBracket$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOBracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOBracket;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOBracket;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOBracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOBracket;)Larrow/typeclasses/MonadThrowFx;
 	public static fun guarantee (Larrow/fx/extensions/IOBracket;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOBracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2018,7 +1866,6 @@ public final class arrow/fx/extensions/IOBracket$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/extensions/IOBracket;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOBracket;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOBracket;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOBracket;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOBracket;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOBracket;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOBracket;Larrow/Kind;)Larrow/Kind;
@@ -2050,6 +1897,7 @@ public final class arrow/fx/extensions/IOConcurrent$DefaultImpls {
 	public static fun asyncF (Larrow/fx/extensions/IOConcurrent;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun attempt (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;)Larrow/fx/IO;
 	public static fun bindingConcurrent (Larrow/fx/extensions/IOConcurrent;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/extensions/IOConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun bracketCase (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun branch (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
@@ -2063,6 +1911,7 @@ public final class arrow/fx/extensions/IOConcurrent$DefaultImpls {
 	public static fun continueOn (Larrow/fx/extensions/IOConcurrent;Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun defer (Larrow/fx/extensions/IOConcurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public static fun defer (Larrow/fx/extensions/IOConcurrent;Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
+	public static fun dropping (Larrow/fx/extensions/IOConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/extensions/IOConcurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effect (Larrow/fx/extensions/IOConcurrent;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effectCatch (Larrow/fx/extensions/IOConcurrent;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2082,7 +1931,6 @@ public final class arrow/fx/extensions/IOConcurrent$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOConcurrent;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOConcurrent;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2195,6 +2043,7 @@ public final class arrow/fx/extensions/IOConcurrent$DefaultImpls {
 	public static fun selectM (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/extensions/IOConcurrent;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/extensions/IOConcurrent;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/extensions/IOConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun tailRecM (Larrow/fx/extensions/IOConcurrent;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun timer (Larrow/fx/extensions/IOConcurrent;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -2217,10 +2066,10 @@ public final class arrow/fx/extensions/IOConcurrent$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/extensions/IOConcurrent;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOConcurrent;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IOConcurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -2246,6 +2095,7 @@ public final class arrow/fx/extensions/IOConcurrentEffect$DefaultImpls {
 	public static fun asyncF (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun attempt (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;)Larrow/fx/IO;
 	public static fun bindingConcurrent (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun bracketCase (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun branch (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
@@ -2259,6 +2109,7 @@ public final class arrow/fx/extensions/IOConcurrentEffect$DefaultImpls {
 	public static fun continueOn (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun defer (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public static fun defer (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
+	public static fun dropping (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effect (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effectCatch (Larrow/fx/extensions/IOConcurrentEffect;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2278,7 +2129,6 @@ public final class arrow/fx/extensions/IOConcurrentEffect$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOConcurrentEffect;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOConcurrentEffect;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2393,6 +2243,7 @@ public final class arrow/fx/extensions/IOConcurrentEffect$DefaultImpls {
 	public static fun selectM (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/extensions/IOConcurrentEffect;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun tailRecM (Larrow/fx/extensions/IOConcurrentEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun timer (Larrow/fx/extensions/IOConcurrentEffect;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -2415,10 +2266,10 @@ public final class arrow/fx/extensions/IOConcurrentEffect$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/extensions/IOConcurrentEffect;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOConcurrentEffect;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IOConcurrentEffect;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -2444,6 +2295,7 @@ public final class arrow/fx/extensions/IODefaultConcurrent$DefaultImpls {
 	public static fun asyncF (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun attempt (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;)Larrow/fx/IO;
 	public static fun bindingConcurrent (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/extensions/IODefaultConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun bracketCase (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun branch (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
@@ -2458,6 +2310,7 @@ public final class arrow/fx/extensions/IODefaultConcurrent$DefaultImpls {
 	public static fun defer (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public static fun defer (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
 	public static fun dispatchers (Larrow/fx/extensions/IODefaultConcurrent;)Larrow/fx/typeclasses/Dispatchers;
+	public static fun dropping (Larrow/fx/extensions/IODefaultConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effect (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effectCatch (Larrow/fx/extensions/IODefaultConcurrent;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2477,7 +2330,6 @@ public final class arrow/fx/extensions/IODefaultConcurrent$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IODefaultConcurrent;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IODefaultConcurrent;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2590,6 +2442,7 @@ public final class arrow/fx/extensions/IODefaultConcurrent$DefaultImpls {
 	public static fun selectM (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/extensions/IODefaultConcurrent;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/extensions/IODefaultConcurrent;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/extensions/IODefaultConcurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun tailRecM (Larrow/fx/extensions/IODefaultConcurrent;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun timer (Larrow/fx/extensions/IODefaultConcurrent;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -2612,10 +2465,10 @@ public final class arrow/fx/extensions/IODefaultConcurrent$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/extensions/IODefaultConcurrent;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IODefaultConcurrent;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IODefaultConcurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -2640,6 +2493,7 @@ public final class arrow/fx/extensions/IODefaultConcurrentEffect$DefaultImpls {
 	public static fun asyncF (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun attempt (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;)Larrow/fx/IO;
 	public static fun bindingConcurrent (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun bracketCase (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun branch (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
@@ -2654,6 +2508,7 @@ public final class arrow/fx/extensions/IODefaultConcurrentEffect$DefaultImpls {
 	public static fun defer (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public static fun defer (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
 	public static fun dispatchers (Larrow/fx/extensions/IODefaultConcurrentEffect;)Larrow/fx/typeclasses/Dispatchers;
+	public static fun dropping (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effect (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun effectCatch (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -2673,7 +2528,6 @@ public final class arrow/fx/extensions/IODefaultConcurrentEffect$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IODefaultConcurrentEffect;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2788,6 +2642,7 @@ public final class arrow/fx/extensions/IODefaultConcurrentEffect$DefaultImpls {
 	public static fun selectM (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/extensions/IODefaultConcurrentEffect;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun tailRecM (Larrow/fx/extensions/IODefaultConcurrentEffect;Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun timer (Larrow/fx/extensions/IODefaultConcurrentEffect;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -2810,10 +2665,10 @@ public final class arrow/fx/extensions/IODefaultConcurrentEffect$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IODefaultConcurrentEffect;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/extensions/IODefaultConcurrentEffect;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -2870,7 +2725,6 @@ public final class arrow/fx/extensions/IOEffect$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOEffect;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOEffect;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOEffect;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/extensions/IOEffect;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -2963,7 +2817,6 @@ public final class arrow/fx/extensions/IOEffect$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/extensions/IOEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOEffect;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOEffect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOEffect;Larrow/Kind;)Larrow/Kind;
@@ -2992,7 +2845,6 @@ public final class arrow/fx/extensions/IOFunctor$DefaultImpls {
 	public static fun mapConst (Larrow/fx/extensions/IOFunctor;Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
 	public static fun tupleLeft (Larrow/fx/extensions/IOFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
 	public static fun tupleRight (Larrow/fx/extensions/IOFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOFunctor;Larrow/Kind;)Larrow/Kind;
 }
@@ -3089,7 +2941,6 @@ public final class arrow/fx/extensions/IOMonad$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOMonad;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOMonad;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOMonad;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOMonad;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOMonad;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOMonad;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOMonad;Larrow/Kind;)Larrow/Kind;
@@ -3127,7 +2978,6 @@ public final class arrow/fx/extensions/IOMonadDefer$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOMonadDefer;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOMonadDefer;)Larrow/typeclasses/MonadThrowFx;
 	public static fun guarantee (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Larrow/Kind;)Larrow/fx/IO;
 	public static fun guaranteeCase (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -3215,7 +3065,6 @@ public final class arrow/fx/extensions/IOMonadDefer$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOMonadDefer;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOMonadDefer;Larrow/Kind;)Larrow/Kind;
@@ -3255,7 +3104,6 @@ public final class arrow/fx/extensions/IOMonadError$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOMonadError;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOMonadError;)Larrow/typeclasses/MonadFx;
 	public static fun handleError (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun handleErrorWith (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -3332,7 +3180,6 @@ public final class arrow/fx/extensions/IOMonadError$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOMonadError;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOMonadError;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOMonadError;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOMonadError;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOMonadError;Larrow/Kind;)Larrow/Kind;
@@ -3427,7 +3274,6 @@ public final class arrow/fx/extensions/IOMonadIO$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOMonadIO;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOMonadIO;Larrow/Kind;)Larrow/Kind;
@@ -3459,7 +3305,6 @@ public final class arrow/fx/extensions/IOMonadThrow$DefaultImpls {
 	public static fun fproduct (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/extensions/IOMonadThrow;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/extensions/IOMonadThrow;)Larrow/typeclasses/MonadThrowFx;
 	public static fun handleError (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static fun handleErrorWith (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
@@ -3537,7 +3382,6 @@ public final class arrow/fx/extensions/IOMonadThrow$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/IOMonadThrow;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/IOMonadThrow;Larrow/Kind;)Larrow/Kind;
@@ -3690,7 +3534,6 @@ public final class arrow/fx/extensions/ResourceApplicative$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ResourceApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ResourceApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/ResourceApplicative;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ResourceApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ResourceApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ResourceApplicative;Larrow/Kind;)Larrow/Kind;
 }
@@ -3709,7 +3552,6 @@ public final class arrow/fx/extensions/ResourceFunctor$DefaultImpls {
 	public static fun mapConst (Larrow/fx/extensions/ResourceFunctor;Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
 	public static fun tupleLeft (Larrow/fx/extensions/ResourceFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
 	public static fun tupleRight (Larrow/fx/extensions/ResourceFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ResourceFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ResourceFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ResourceFunctor;Larrow/Kind;)Larrow/Kind;
 }
@@ -3807,7 +3649,6 @@ public final class arrow/fx/extensions/ResourceMonad$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/ResourceMonad;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ResourceMonad;Larrow/Kind;)Larrow/Kind;
@@ -3904,7 +3745,6 @@ public final class arrow/fx/extensions/ResourceMonadIO$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/ResourceMonadIO;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ResourceMonadIO;Larrow/Kind;)Larrow/Kind;
@@ -4002,7 +3842,6 @@ public final class arrow/fx/extensions/ResourceSelective$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/ResourceSelective;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ResourceSelective;Larrow/Kind;)Larrow/Kind;
@@ -4018,92 +3857,6 @@ public final class arrow/fx/extensions/ResourceSemigroup$DefaultImpls {
 	public static fun combine (Larrow/fx/extensions/ResourceSemigroup;Larrow/fx/Resource;Larrow/fx/Resource;)Larrow/fx/Resource;
 	public static fun maybeCombine (Larrow/fx/extensions/ResourceSemigroup;Larrow/fx/Resource;Larrow/fx/Resource;)Larrow/fx/Resource;
 	public static fun plus (Larrow/fx/extensions/ResourceSemigroup;Larrow/fx/Resource;Larrow/fx/Resource;)Larrow/fx/Resource;
-}
-
-public abstract interface class arrow/fx/extensions/ScheduleAlternative : arrow/fx/extensions/ScheduleApplicative, arrow/fx/extensions/ScheduleMonoidK, arrow/typeclasses/Alternative {
-	public abstract fun MF ()Larrow/typeclasses/Monad;
-	public abstract fun combineK (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public abstract fun orElse (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-}
-
-public final class arrow/fx/extensions/ScheduleAlternative$DefaultImpls {
-	public static fun algebra (Larrow/fx/extensions/ScheduleAlternative;)Larrow/typeclasses/Monoid;
-	public static fun alt (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun ap (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun apEval (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/core/Eval;)Larrow/core/Eval;
-	public static fun apTap (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun combineK (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun empty (Larrow/fx/extensions/ScheduleAlternative;)Larrow/Kind;
-	public static fun followedBy (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun fproduct (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun guard (Larrow/fx/extensions/ScheduleAlternative;Z)Larrow/Kind;
-	public static fun imap (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun just (Larrow/fx/extensions/ScheduleAlternative;Ljava/lang/Object;)Larrow/Kind;
-	public static fun just (Larrow/fx/extensions/ScheduleAlternative;Ljava/lang/Object;Lkotlin/Unit;)Larrow/Kind;
-	public static fun lazyOrElse (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun lift (Larrow/fx/extensions/ScheduleAlternative;Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public static fun many (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map2 (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun map2Eval (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/core/Eval;Lkotlin/jvm/functions/Function1;)Larrow/core/Eval;
-	public static fun mapConst (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun mapConst (Larrow/fx/extensions/ScheduleAlternative;Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun mapN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public static fun optional (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
-	public static fun orElse (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun product (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public static fun replicate (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;I)Larrow/Kind;
-	public static fun replicate (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;ILarrow/typeclasses/Monoid;)Larrow/Kind;
-	public static fun some (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
-	public static fun tupleLeft (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun tupleRight (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupled (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun tupledN (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ScheduleAlternative;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
-	public static fun void (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
-	public static fun widen (Larrow/fx/extensions/ScheduleAlternative;Larrow/Kind;)Larrow/Kind;
 }
 
 public abstract interface class arrow/fx/extensions/ScheduleApplicative : arrow/fx/extensions/ScheduleAppy, arrow/typeclasses/Applicative {
@@ -4177,7 +3930,6 @@ public final class arrow/fx/extensions/ScheduleApplicative$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ScheduleApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ScheduleApplicative;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/extensions/ScheduleApplicative;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ScheduleApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ScheduleApplicative;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ScheduleApplicative;Larrow/Kind;)Larrow/Kind;
 }
@@ -4246,7 +3998,6 @@ public final class arrow/fx/extensions/ScheduleAppy$DefaultImpls {
 	public static fun tupledN (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ScheduleAppy;Larrow/Kind;)Larrow/Kind;
 }
@@ -4289,7 +4040,6 @@ public final class arrow/fx/extensions/ScheduleFunctor$DefaultImpls {
 	public static fun mapConst (Larrow/fx/extensions/ScheduleFunctor;Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
 	public static fun tupleLeft (Larrow/fx/extensions/ScheduleFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
 	public static fun tupleRight (Larrow/fx/extensions/ScheduleFunctor;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public static fun unit (Larrow/fx/extensions/ScheduleFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/extensions/ScheduleFunctor;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/extensions/ScheduleFunctor;Larrow/Kind;)Larrow/Kind;
 }
@@ -4307,17 +4057,6 @@ public final class arrow/fx/extensions/ScheduleMonoid$DefaultImpls {
 	public static fun empty (Larrow/fx/extensions/ScheduleMonoid;)Larrow/fx/Schedule;
 	public static fun maybeCombine (Larrow/fx/extensions/ScheduleMonoid;Larrow/fx/Schedule;Larrow/fx/Schedule;)Larrow/fx/Schedule;
 	public static fun plus (Larrow/fx/extensions/ScheduleMonoid;Larrow/fx/Schedule;Larrow/fx/Schedule;)Larrow/fx/Schedule;
-}
-
-public abstract interface class arrow/fx/extensions/ScheduleMonoidK : arrow/fx/extensions/ScheduleSemigroupK, arrow/typeclasses/MonoidK {
-	public abstract fun MF ()Larrow/typeclasses/Monad;
-	public abstract fun empty ()Larrow/Kind;
-}
-
-public final class arrow/fx/extensions/ScheduleMonoidK$DefaultImpls {
-	public static fun algebra (Larrow/fx/extensions/ScheduleMonoidK;)Larrow/typeclasses/Monoid;
-	public static fun combineK (Larrow/fx/extensions/ScheduleMonoidK;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public static fun empty (Larrow/fx/extensions/ScheduleMonoidK;)Larrow/Kind;
 }
 
 public abstract interface class arrow/fx/extensions/ScheduleProfunctor : arrow/typeclasses/Profunctor {
@@ -4350,9 +4089,49 @@ public final class arrow/fx/extensions/ScheduleSemigroupK$DefaultImpls {
 	public static fun combineK (Larrow/fx/extensions/ScheduleSemigroupK;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 }
 
+public final class arrow/fx/extensions/duration/eq/DurationEqKt {
+	public static final fun eq (Larrow/fx/typeclasses/Duration$Companion;)Larrow/fx/extensions/DurationEq;
+	public static final fun neqv (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+}
+
+public final class arrow/fx/extensions/duration/hash/DurationHashKt {
+	public static final fun hash (Larrow/fx/typeclasses/Duration$Companion;)Larrow/fx/extensions/DurationHash;
+	public static final fun hashWithSalt (Larrow/fx/typeclasses/Duration;I)I
+}
+
+public final class arrow/fx/extensions/duration/monoid/DurationMonoidKt {
+	public static final fun combineAll (Ljava/util/Collection;)Larrow/fx/typeclasses/Duration;
+	public static final fun combineAll (Ljava/util/List;)Larrow/fx/typeclasses/Duration;
+	public static final fun monoid (Larrow/fx/typeclasses/Duration$Companion;)Larrow/fx/extensions/DurationMonoid;
+}
+
+public final class arrow/fx/extensions/duration/order/DurationOrderKt {
+	public static final fun compareTo (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)I
+	public static final fun eqv (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun gt (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun gte (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun lt (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun lte (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Z
+	public static final fun max (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static final fun min (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static final fun order (Larrow/fx/typeclasses/Duration$Companion;)Larrow/fx/extensions/DurationOrder;
+	public static final fun sort (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/core/Tuple2;
+}
+
+public final class arrow/fx/extensions/duration/semigroup/DurationSemigroupKt {
+	public static final fun maybeCombine (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static final fun plus (Larrow/fx/typeclasses/Duration;Larrow/fx/typeclasses/Duration;)Larrow/fx/typeclasses/Duration;
+	public static final fun semigroup (Larrow/fx/typeclasses/Duration$Companion;)Larrow/fx/extensions/DurationSemigroup;
+}
+
 public final class arrow/fx/extensions/exitcase/eq/ExitCaseEqKt {
 	public static final fun eq (Larrow/fx/typeclasses/ExitCase$Companion;Larrow/typeclasses/Eq;)Larrow/fx/extensions/ExitCaseEq;
 	public static final fun neqv (Larrow/fx/typeclasses/ExitCase;Larrow/typeclasses/Eq;Larrow/fx/typeclasses/ExitCase;)Z
+}
+
+public final class arrow/fx/extensions/invariant/QueueInvariantKt {
+	public static final fun imap (Larrow/Kind;Larrow/typeclasses/Functor;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/Queue;
+	public static final fun invariant (Larrow/fx/Queue$Companion;Larrow/typeclasses/Functor;)Larrow/fx/extensions/QueueInvariant;
 }
 
 public final class arrow/fx/extensions/io/applicative/IOApplicativeKt {
@@ -4373,7 +4152,6 @@ public final class arrow/fx/extensions/io/applicativeError/IOApplicativeErrorKt 
 	public static final fun effectCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun fromEither (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static final fun fromOption (Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/fx/IO;
-	public static final fun fromTry (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static final fun handleError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static final fun handleErrorWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/fx/IO;
 	public static final fun raiseError1 (Ljava/lang/Throwable;)Larrow/fx/IO;
@@ -4552,7 +4330,6 @@ public final class arrow/fx/extensions/io/functor/IOFunctorKt {
 	public static final fun mapConst (Ljava/lang/Object;Larrow/Kind;)Larrow/fx/IO;
 	public static final fun tupleLeft (Larrow/Kind;Ljava/lang/Object;)Larrow/fx/IO;
 	public static final fun tupleRight (Larrow/Kind;Ljava/lang/Object;)Larrow/fx/IO;
-	public static final fun unit (Larrow/Kind;)Larrow/fx/IO;
 	public static final fun void (Larrow/Kind;)Larrow/fx/IO;
 	public static final fun widen (Larrow/Kind;)Larrow/fx/IO;
 }
@@ -4634,11 +4411,6 @@ public final class arrow/fx/extensions/io/unsafeRun/IOUnsafeRunKt {
 	public static final fun unsafeRun (Larrow/fx/IO$Companion;)Larrow/fx/extensions/IOUnsafeRun;
 }
 
-public final class arrow/fx/extensions/queue/invariant/QueueInvariantKt {
-	public static final fun imap (Larrow/Kind;Larrow/typeclasses/Functor;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/fx/Queue;
-	public static final fun invariant (Larrow/fx/Queue$Companion;Larrow/typeclasses/Functor;)Larrow/fx/extensions/QueueInvariant;
-}
-
 public final class arrow/fx/extensions/resource/applicative/ResourceApplicativeKt {
 	public static final fun applicative (Larrow/fx/Resource$Companion;Larrow/fx/typeclasses/Bracket;)Larrow/fx/extensions/ResourceApplicative;
 	public static final fun just1 (Ljava/lang/Object;Larrow/fx/typeclasses/Bracket;)Larrow/fx/Resource;
@@ -4658,7 +4430,6 @@ public final class arrow/fx/extensions/resource/functor/ResourceFunctorKt {
 	public static final fun mapConst (Ljava/lang/Object;Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/fx/Resource;
 	public static final fun tupleLeft (Larrow/Kind;Larrow/fx/typeclasses/Bracket;Ljava/lang/Object;)Larrow/fx/Resource;
 	public static final fun tupleRight (Larrow/Kind;Larrow/fx/typeclasses/Bracket;Ljava/lang/Object;)Larrow/fx/Resource;
-	public static final fun unit (Larrow/Kind;Larrow/fx/typeclasses/Bracket;)Larrow/fx/Resource;
 	public static final fun void (Larrow/Kind;Larrow/fx/typeclasses/Bracket;)Larrow/fx/Resource;
 	public static final fun widen (Larrow/Kind;Larrow/fx/typeclasses/Bracket;)Larrow/fx/Resource;
 }
@@ -4710,18 +4481,6 @@ public final class arrow/fx/extensions/resource/semigroup/ResourceSemigroupKt {
 	public static final fun maybeCombine (Larrow/fx/Resource;Larrow/typeclasses/Semigroup;Larrow/fx/typeclasses/Bracket;Larrow/fx/Resource;)Larrow/fx/Resource;
 	public static final fun plus (Larrow/fx/Resource;Larrow/typeclasses/Semigroup;Larrow/fx/typeclasses/Bracket;Larrow/fx/Resource;)Larrow/fx/Resource;
 	public static final fun semigroup (Larrow/fx/Resource$Companion;Larrow/typeclasses/Semigroup;Larrow/fx/typeclasses/Bracket;)Larrow/fx/extensions/ResourceSemigroup;
-}
-
-public final class arrow/fx/extensions/schedule/alternative/ScheduleAlternativeKt {
-	public static final fun alt (Larrow/Kind;Larrow/typeclasses/Monad;Larrow/Kind;)Larrow/fx/Schedule;
-	public static final fun alternative (Larrow/fx/Schedule$Companion;Larrow/typeclasses/Monad;)Larrow/fx/extensions/ScheduleAlternative;
-	public static final fun combineK (Larrow/Kind;Larrow/typeclasses/Monad;Larrow/Kind;)Larrow/fx/Schedule;
-	public static final fun guard (Larrow/typeclasses/Monad;Z)Larrow/fx/Schedule;
-	public static final fun lazyOrElse (Larrow/Kind;Larrow/typeclasses/Monad;Lkotlin/jvm/functions/Function0;)Larrow/fx/Schedule;
-	public static final fun many (Larrow/Kind;Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
-	public static final fun optional (Larrow/Kind;Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
-	public static final fun orElse (Larrow/Kind;Larrow/typeclasses/Monad;Larrow/Kind;)Larrow/fx/Schedule;
-	public static final fun some (Larrow/Kind;Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
 }
 
 public final class arrow/fx/extensions/schedule/applicative/ScheduleApplicativeKt {
@@ -4814,7 +4573,6 @@ public final class arrow/fx/extensions/schedule/functor/ScheduleFunctorKt {
 	public static final fun mapConst (Ljava/lang/Object;Larrow/Kind;)Larrow/fx/Schedule;
 	public static final fun tupleLeft (Larrow/Kind;Ljava/lang/Object;)Larrow/fx/Schedule;
 	public static final fun tupleRight (Larrow/Kind;Ljava/lang/Object;)Larrow/fx/Schedule;
-	public static final fun unit (Larrow/Kind;)Larrow/fx/Schedule;
 	public static final fun void (Larrow/Kind;)Larrow/fx/Schedule;
 	public static final fun widen (Larrow/Kind;)Larrow/fx/Schedule;
 }
@@ -4823,12 +4581,6 @@ public final class arrow/fx/extensions/schedule/monoid/ScheduleMonoidKt {
 	public static final fun combineAll (Larrow/typeclasses/Monoid;Larrow/typeclasses/Monad;Ljava/util/List;)Larrow/fx/Schedule;
 	public static final fun combineAll (Ljava/util/Collection;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
 	public static final fun monoid (Larrow/fx/Schedule$Companion;Larrow/typeclasses/Monoid;Larrow/typeclasses/Monad;)Larrow/fx/extensions/ScheduleMonoid;
-}
-
-public final class arrow/fx/extensions/schedule/monoidK/ScheduleMonoidKKt {
-	public static final fun algebra (Larrow/typeclasses/Monad;)Larrow/typeclasses/Monoid;
-	public static final fun empty (Larrow/typeclasses/Monad;)Larrow/fx/Schedule;
-	public static final fun monoidK (Larrow/fx/Schedule$Companion;Larrow/typeclasses/Monad;)Larrow/fx/extensions/ScheduleMonoidK;
 }
 
 public final class arrow/fx/extensions/schedule/profunctor/ScheduleProfunctorKt {
@@ -4850,224 +4602,53 @@ public final class arrow/fx/extensions/schedule/semigroupK/ScheduleSemigroupKKt 
 	public static final fun semigroupK (Larrow/fx/Schedule$Companion;)Larrow/fx/extensions/ScheduleSemigroupK;
 }
 
-public final class arrow/fx/internal/CancellableQueue : arrow/fx/Queue, arrow/fx/typeclasses/Concurrent {
-	public static final field Companion Larrow/fx/internal/CancellableQueue$Companion;
-	public fun MVar ()Larrow/Kind;
-	public fun MVar (Ljava/lang/Object;)Larrow/Kind;
-	public fun Promise ()Larrow/Kind;
-	public fun Ref (Ljava/lang/Object;)Larrow/Kind;
-	public fun Semaphore (J)Larrow/Kind;
-	public fun andS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun ap (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun apEval (Larrow/Kind;Larrow/core/Eval;)Larrow/core/Eval;
-	public fun apTap (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun async (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun asyncF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun attempt (Larrow/Kind;)Larrow/Kind;
-	public fun awaitShutdown ()Larrow/Kind;
-	public fun bindingConcurrent (Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun bracket (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun bracketCase (Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun branch (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun cancelable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancelableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancellable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun cancellableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun catch (Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun catch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun continueOn (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun continueOn (Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun defer (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun defer (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun dispatchers ()Larrow/fx/typeclasses/Dispatchers;
-	public fun effect (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effect (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effectCatch (Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun effectCatch (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun effectM (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun effectMap (Larrow/Kind;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun ensure (Larrow/Kind;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatMap (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatTap (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun flatten (Larrow/Kind;)Larrow/Kind;
-	public fun followedBy (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun followedByEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun forEffect (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun forEffectEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun fork (Larrow/Kind;)Larrow/Kind;
-	public fun fork (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun fproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun fromEither (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun fromOption (Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun fromTry (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public synthetic fun getFx ()Larrow/fx/typeclasses/AsyncFx;
-	public fun getFx ()Larrow/fx/typeclasses/ConcurrentFx;
-	public synthetic fun getFx ()Larrow/typeclasses/MonadFx;
-	public synthetic fun getFx ()Larrow/typeclasses/MonadThrowFx;
-	public fun guarantee (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun guaranteeCase (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun handleError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun handleErrorWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun ifM (Larrow/Kind;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun ifS (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun imap (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public final fun isEmpty ()Larrow/Kind;
-	public final fun isNotEmpty ()Larrow/Kind;
-	public fun just (Ljava/lang/Object;)Larrow/Kind;
-	public fun just (Ljava/lang/Object;Lkotlin/Unit;)Larrow/Kind;
-	public fun later (Larrow/Kind;)Larrow/Kind;
-	public fun later (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun later (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun laterOrRaise (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun laterOrRaise (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun lazy ()Larrow/Kind;
-	public fun lift (Lkotlin/jvm/functions/Function1;)Lkotlin/jvm/functions/Function1;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map2 (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun map2Eval (Larrow/Kind;Larrow/core/Eval;Lkotlin/jvm/functions/Function1;)Larrow/core/Eval;
-	public fun mapConst (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun mapConst (Ljava/lang/Object;Larrow/Kind;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mapN (Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun mproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun never ()Larrow/Kind;
-	public fun offer (Ljava/lang/Object;)Larrow/Kind;
-	public fun onCancel (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun onError (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun orS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parApplicative ()Larrow/typeclasses/Applicative;
-	public fun parApplicative (Lkotlin/coroutines/CoroutineContext;)Larrow/typeclasses/Applicative;
-	public fun parMapN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function9;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function8;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function7;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function6;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function5;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function4;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function3;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parMapN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
-	public fun parSequence (Larrow/Kind;Larrow/typeclasses/Traverse;)Larrow/Kind;
-	public fun parSequence (Larrow/Kind;Larrow/typeclasses/Traverse;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun parSequence (Ljava/lang/Iterable;)Larrow/Kind;
-	public fun parSequence (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun parTraverse (Larrow/Kind;Larrow/typeclasses/Traverse;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;Larrow/typeclasses/Traverse;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Ljava/lang/Iterable;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTraverse (Ljava/lang/Iterable;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun parTupledN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun parTupledN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun product (Larrow/Kind;Larrow/Kind;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;Lkotlin/Unit;)Larrow/Kind;
-	public fun productL (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun productLEval (Larrow/Kind;Larrow/core/Eval;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceN (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun racePair (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun raceTriple (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public synthetic fun raiseError (Ljava/lang/Object;)Larrow/Kind;
-	public synthetic fun raiseError (Ljava/lang/Object;Lkotlin/Unit;)Larrow/Kind;
-	public fun raiseError (Ljava/lang/Throwable;)Larrow/Kind;
-	public fun raiseError (Ljava/lang/Throwable;Lkotlin/Unit;)Larrow/Kind;
-	public fun raiseNonFatal (Ljava/lang/Throwable;)Larrow/Kind;
-	public final fun read ()Larrow/Kind;
-	public fun redeem (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun redeemWith (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun replicate (Larrow/Kind;I)Larrow/Kind;
-	public fun replicate (Larrow/Kind;ILarrow/typeclasses/Monoid;)Larrow/Kind;
-	public fun rethrow (Larrow/Kind;)Larrow/Kind;
-	public fun select (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun selectM (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun shift (Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
-	public fun shutdown ()Larrow/Kind;
-	public fun size ()Larrow/Kind;
-	public fun sleep (Larrow/fx/typeclasses/Duration;)Larrow/Kind;
-	public fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
-	public fun take ()Larrow/Kind;
-	public fun timer ()Larrow/fx/Timer;
-	public final fun tryOffer (Ljava/lang/Object;)Larrow/Kind;
-	public final fun tryTake ()Larrow/Kind;
-	public fun tupleLeft (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun tupleRight (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupled (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun uncancelable (Larrow/Kind;)Larrow/Kind;
-	public fun uncancellable (Larrow/Kind;)Larrow/Kind;
-	public fun unit ()Larrow/Kind;
-	public fun unit (Larrow/Kind;)Larrow/Kind;
-	public fun void (Larrow/Kind;)Larrow/Kind;
-	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
-	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
-	public fun whenS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
-	public fun widen (Larrow/Kind;)Larrow/Kind;
+public final class arrow/fx/internal/AtomicBooleanW {
+	public fun <init> (Z)V
+	public final fun compareAndSet (ZZ)Z
+	public final fun getAndSet (Z)Z
+	public final fun getAndUpdate (Lkotlin/jvm/functions/Function1;)Z
+	public final fun getValue ()Z
+	public final fun lazySet (Z)V
+	public final fun setValue (Z)V
+	public fun toString ()Ljava/lang/String;
+	public final fun updateAndGet (Lkotlin/jvm/functions/Function1;)Z
 }
 
-public final class arrow/fx/internal/CancellableQueue$Companion {
-	public final fun empty (Larrow/fx/typeclasses/Concurrent;)Larrow/Kind;
-	public final fun invoke (Ljava/util/List;Larrow/fx/typeclasses/Concurrent;)Larrow/Kind;
+public final class arrow/fx/internal/AtomicIntW {
+	public fun <init> (I)V
+	public final fun addAndGet (I)I
+	public final fun compareAndSet (II)Z
+	public final fun decrementAndGet ()I
+	public final fun getAndAdd (I)I
+	public final fun getAndDecrement ()I
+	public final fun getAndIncrement ()I
+	public final fun getAndSet (I)I
+	public final fun getAndUpdate (Lkotlin/jvm/functions/Function1;)I
+	public final fun getValue ()I
+	public final fun incrementAndGet ()I
+	public final fun lazySet (I)V
+	public final fun setValue (I)V
+	public fun toString ()Ljava/lang/String;
+	public final fun updateAndGet (Lkotlin/jvm/functions/Function1;)I
+}
+
+public final class arrow/fx/internal/AtomicRefW {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun compareAndSet (Ljava/lang/Object;Ljava/lang/Object;)Z
+	public final fun getAndSet (Ljava/lang/Object;)Ljava/lang/Object;
+	public final fun getAndUpdate (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public final fun getValue ()Ljava/lang/Object;
+	public final fun lazySet (Ljava/lang/Object;)V
+	public final fun setValue (Ljava/lang/Object;)V
+	public fun toString ()Ljava/lang/String;
+	public final fun updateAndGet (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
 }
 
 public final class arrow/fx/internal/IQueue : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
 	public static final field Companion Larrow/fx/internal/IQueue$Companion;
 	public final fun dequeue ()Larrow/core/Tuple2;
 	public final fun dequeueOption ()Larrow/core/Option;
+	public final fun drop (I)Larrow/fx/internal/IQueue;
 	public final fun enqueue (Ljava/lang/Iterable;)Larrow/fx/internal/IQueue;
 	public final fun enqueue (Ljava/lang/Object;)Larrow/fx/internal/IQueue;
 	public final fun exists (Lkotlin/jvm/functions/Function1;)Z
@@ -5180,7 +4761,6 @@ public final class arrow/fx/typeclasses/Async$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/Async;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/Async;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/Async;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/Async;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/Async;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/typeclasses/Async;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/Async;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -5268,7 +4848,6 @@ public final class arrow/fx/typeclasses/Async$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/Async;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/Async;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/Async;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/Async;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/Async;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/Async;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/Async;Larrow/Kind;)Larrow/Kind;
@@ -5311,7 +4890,6 @@ public class arrow/fx/typeclasses/AsyncContinuation : arrow/typeclasses/MonadThr
 	public fun fproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun fromEither (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun fromOption (Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun fromTry (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun getContext ()Lkotlin/coroutines/CoroutineContext;
 	public fun getFx ()Larrow/fx/typeclasses/AsyncFx;
 	public synthetic fun getFx ()Larrow/typeclasses/MonadFx;
@@ -5409,7 +4987,6 @@ public class arrow/fx/typeclasses/AsyncContinuation : arrow/typeclasses/MonadThr
 	public fun uncancelable (Larrow/Kind;)Larrow/Kind;
 	public fun uncancellable (Larrow/Kind;)Larrow/Kind;
 	public fun unit ()Larrow/Kind;
-	public fun unit (Larrow/Kind;)Larrow/Kind;
 	public fun void (Larrow/Kind;)Larrow/Kind;
 	public fun whenS (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public fun widen (Larrow/Kind;)Larrow/Kind;
@@ -5460,7 +5037,6 @@ public final class arrow/fx/typeclasses/AsyncSyntax$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/AsyncSyntax;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/AsyncSyntax;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -5549,7 +5125,6 @@ public final class arrow/fx/typeclasses/AsyncSyntax$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/AsyncSyntax;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/AsyncSyntax;Larrow/Kind;)Larrow/Kind;
@@ -5589,7 +5164,6 @@ public final class arrow/fx/typeclasses/Bracket$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/Bracket;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/Bracket;)Larrow/typeclasses/MonadFx;
 	public static fun guarantee (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -5668,7 +5242,6 @@ public final class arrow/fx/typeclasses/Bracket$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/Bracket;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/Bracket;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/Bracket;Larrow/Kind;)Larrow/Kind;
@@ -5684,11 +5257,13 @@ public abstract interface class arrow/fx/typeclasses/Concurrent : arrow/fx/typec
 	public abstract fun Promise ()Larrow/Kind;
 	public abstract fun Semaphore (J)Larrow/Kind;
 	public abstract fun bindingConcurrent (Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public abstract fun bounded (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public abstract fun cancelable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public abstract fun cancelableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public abstract fun cancellable (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public abstract fun cancellableF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public abstract fun dispatchers ()Larrow/fx/typeclasses/Dispatchers;
+	public abstract fun dropping (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public abstract fun fork (Larrow/Kind;)Larrow/Kind;
 	public abstract fun fork (Larrow/Kind;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public abstract fun getFx ()Larrow/fx/typeclasses/ConcurrentFx;
@@ -5737,7 +5312,9 @@ public abstract interface class arrow/fx/typeclasses/Concurrent : arrow/fx/typec
 	public abstract fun racePair (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public abstract fun raceTriple (Lkotlin/coroutines/CoroutineContext;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public abstract fun sleep (Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public abstract fun sliding (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public abstract fun timer ()Larrow/fx/Timer;
+	public abstract fun unbounded (Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public abstract fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public abstract fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
 }
@@ -5755,6 +5332,7 @@ public final class arrow/fx/typeclasses/Concurrent$DefaultImpls {
 	public static fun async (Larrow/fx/typeclasses/Concurrent;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun attempt (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun bindingConcurrent (Larrow/fx/typeclasses/Concurrent;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun branch (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun cancelable (Larrow/fx/typeclasses/Concurrent;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -5765,6 +5343,7 @@ public final class arrow/fx/typeclasses/Concurrent$DefaultImpls {
 	public static fun catch (Larrow/fx/typeclasses/Concurrent;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public static fun continueOn (Larrow/fx/typeclasses/Concurrent;Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun defer (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
+	public static fun dropping (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun effect (Larrow/fx/typeclasses/Concurrent;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun effectCatch (Larrow/fx/typeclasses/Concurrent;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -5782,7 +5361,6 @@ public final class arrow/fx/typeclasses/Concurrent$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/Concurrent;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/Concurrent;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -5890,6 +5468,7 @@ public final class arrow/fx/typeclasses/Concurrent$DefaultImpls {
 	public static fun selectM (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/typeclasses/Concurrent;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/typeclasses/Concurrent;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun timer (Larrow/fx/typeclasses/Concurrent;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
 	public static fun tupleRight (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -5911,10 +5490,10 @@ public final class arrow/fx/typeclasses/Concurrent$DefaultImpls {
 	public static fun tupledN (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/typeclasses/Concurrent;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/Concurrent;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/typeclasses/Concurrent;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -5938,6 +5517,7 @@ public class arrow/fx/typeclasses/ConcurrentContinuation : arrow/fx/typeclasses/
 	public fun asyncF (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun attempt (Larrow/Kind;)Larrow/Kind;
 	public fun bindingConcurrent (Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public fun bounded (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public fun bracket (Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun bracketCase (Larrow/Kind;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun branch (Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
@@ -5952,6 +5532,7 @@ public class arrow/fx/typeclasses/ConcurrentContinuation : arrow/fx/typeclasses/
 	public fun defer (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public fun defer (Lkotlin/jvm/functions/Function0;)Larrow/Kind;
 	public fun dispatchers ()Larrow/fx/typeclasses/Dispatchers;
+	public fun dropping (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public fun effect (Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun effect (Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun effectCatch (Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -5971,7 +5552,6 @@ public class arrow/fx/typeclasses/ConcurrentContinuation : arrow/fx/typeclasses/
 	public fun fproduct (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun fromEither (Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun fromOption (Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public fun fromTry (Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun getContext ()Lkotlin/coroutines/CoroutineContext;
 	public synthetic fun getFx ()Larrow/fx/typeclasses/AsyncFx;
 	public fun getFx ()Larrow/fx/typeclasses/ConcurrentFx;
@@ -6090,6 +5670,7 @@ public class arrow/fx/typeclasses/ConcurrentContinuation : arrow/fx/typeclasses/
 	public fun selectM (Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public fun shift (Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public fun sleep (Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public fun sliding (Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public fun tailRecM (Ljava/lang/Object;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public fun timer ()Larrow/fx/Timer;
 	public fun tupleLeft (Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -6112,10 +5693,10 @@ public class arrow/fx/typeclasses/ConcurrentContinuation : arrow/fx/typeclasses/
 	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public fun tupledN (Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public fun unbounded (Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public fun uncancelable (Larrow/Kind;)Larrow/Kind;
 	public fun uncancellable (Larrow/Kind;)Larrow/Kind;
 	public fun unit ()Larrow/Kind;
-	public fun unit (Larrow/Kind;)Larrow/Kind;
 	public fun void (Larrow/Kind;)Larrow/Kind;
 	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public fun waitFor (Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -6157,7 +5738,6 @@ public final class arrow/fx/typeclasses/ConcurrentEffect$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/ConcurrentEffect;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -6245,7 +5825,6 @@ public final class arrow/fx/typeclasses/ConcurrentEffect$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/ConcurrentEffect;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/ConcurrentEffect;Larrow/Kind;)Larrow/Kind;
@@ -6279,6 +5858,7 @@ public final class arrow/fx/typeclasses/ConcurrentSyntax$DefaultImpls {
 	public static fun async (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun attempt (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun bindingConcurrent (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/jvm/functions/Function2;)Larrow/Kind;
+	public static fun bounded (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun bracket (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun branch (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun cancelable (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -6290,6 +5870,7 @@ public final class arrow/fx/typeclasses/ConcurrentSyntax$DefaultImpls {
 	public static fun component1 (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun continueOn (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/typeclasses/AsyncSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static fun defer (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
+	public static fun dropping (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun effect (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun effect (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun effectCatch (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/typeclasses/ApplicativeError;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -6307,7 +5888,6 @@ public final class arrow/fx/typeclasses/ConcurrentSyntax$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/ConcurrentSyntax;)Larrow/fx/typeclasses/ConcurrentFx;
 	public static fun guarantee (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -6416,6 +5996,7 @@ public final class arrow/fx/typeclasses/ConcurrentSyntax$DefaultImpls {
 	public static fun selectM (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun shift (Larrow/fx/typeclasses/ConcurrentSyntax;Lkotlin/coroutines/CoroutineContext;)Larrow/Kind;
 	public static fun sleep (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
+	public static fun sliding (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/Queue$Companion;I)Larrow/Kind;
 	public static fun timer (Larrow/fx/typeclasses/ConcurrentSyntax;)Larrow/fx/Timer;
 	public static fun tupleLeft (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
 	public static fun tupleRight (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Ljava/lang/Object;)Larrow/Kind;
@@ -6437,10 +6018,10 @@ public final class arrow/fx/typeclasses/ConcurrentSyntax$DefaultImpls {
 	public static fun tupledN (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
+	public static fun unbounded (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/fx/Queue$Companion;)Larrow/Kind;
 	public static fun uncancelable (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/ConcurrentSyntax;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/fx/typeclasses/Duration;)Larrow/Kind;
 	public static fun waitFor (Larrow/fx/typeclasses/ConcurrentSyntax;Larrow/Kind;Larrow/fx/typeclasses/Duration;Larrow/Kind;)Larrow/Kind;
@@ -6456,6 +6037,7 @@ public abstract interface class arrow/fx/typeclasses/Dispatchers {
 public final class arrow/fx/typeclasses/Duration {
 	public static final field Companion Larrow/fx/typeclasses/Duration$Companion;
 	public fun <init> (JLjava/util/concurrent/TimeUnit;)V
+	public final fun compareTo (Larrow/fx/typeclasses/Duration;)I
 	public final fun component1 ()J
 	public final fun component2 ()Ljava/util/concurrent/TimeUnit;
 	public final fun copy (JLjava/util/concurrent/TimeUnit;)Larrow/fx/typeclasses/Duration;
@@ -6526,7 +6108,6 @@ public final class arrow/fx/typeclasses/Effect$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/Effect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/Effect;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/Effect;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/Effect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/Effect;)Larrow/fx/typeclasses/AsyncFx;
 	public static fun guarantee (Larrow/fx/typeclasses/Effect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/Effect;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -6614,7 +6195,6 @@ public final class arrow/fx/typeclasses/Effect$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/Effect;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/Effect;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/Effect;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/Effect;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/Effect;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/Effect;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/Effect;Larrow/Kind;)Larrow/Kind;
@@ -6670,15 +6250,15 @@ public final class arrow/fx/typeclasses/Fiber$DefaultImpls {
 	public static fun component2 (Larrow/fx/typeclasses/Fiber;)Larrow/Kind;
 }
 
+public final class arrow/fx/typeclasses/FiberKt {
+	public static final fun fix (Larrow/Kind;)Larrow/fx/typeclasses/Fiber;
+}
+
 public final class arrow/fx/typeclasses/ForFiber {
 	public static final field Companion Larrow/fx/typeclasses/ForFiber$Companion;
 }
 
 public final class arrow/fx/typeclasses/ForFiber$Companion {
-}
-
-public final class arrow/fx/typeclasses/Higherkind_arrow_fx_typeclasses_FiberKt {
-	public static final fun fix (Larrow/Kind;)Larrow/fx/typeclasses/Fiber;
 }
 
 public abstract interface class arrow/fx/typeclasses/MonadDefer : arrow/fx/typeclasses/Bracket, arrow/typeclasses/MonadThrow {
@@ -6714,7 +6294,6 @@ public final class arrow/fx/typeclasses/MonadDefer$DefaultImpls {
 	public static fun fproduct (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromEither (Larrow/fx/typeclasses/MonadDefer;Larrow/core/Either;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun fromOption (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function0;)Larrow/Kind;
-	public static fun fromTry (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
 	public static fun getFx (Larrow/fx/typeclasses/MonadDefer;)Larrow/typeclasses/MonadThrowFx;
 	public static fun guarantee (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun guaranteeCase (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Lkotlin/jvm/functions/Function1;)Larrow/Kind;
@@ -6798,7 +6377,6 @@ public final class arrow/fx/typeclasses/MonadDefer$DefaultImpls {
 	public static fun uncancelable (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun uncancellable (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/MonadDefer;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/MonadDefer;Larrow/Kind;)Larrow/Kind;
@@ -6889,7 +6467,6 @@ public final class arrow/fx/typeclasses/MonadIO$DefaultImpls {
 	public static fun tupledN (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun tupledN (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun unit (Larrow/fx/typeclasses/MonadIO;)Larrow/Kind;
-	public static fun unit (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun void (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;)Larrow/Kind;
 	public static fun whenS (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;Larrow/Kind;)Larrow/Kind;
 	public static fun widen (Larrow/fx/typeclasses/MonadIO;Larrow/Kind;)Larrow/Kind;

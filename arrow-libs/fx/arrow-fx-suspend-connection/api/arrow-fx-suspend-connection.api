@@ -1,0 +1,40 @@
+public abstract class arrow/fx/coroutines/SuspendConnection : kotlin/coroutines/AbstractCoroutineContextElement {
+	public static final field Key Larrow/fx/coroutines/SuspendConnection$Key;
+	public abstract fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun isCancelled ()Z
+	public final fun isNotCancelled ()Z
+	public abstract fun pop ()Lkotlin/jvm/functions/Function1;
+	public abstract fun push (Ljava/util/List;)V
+	public abstract fun push (Lkotlin/jvm/functions/Function1;)V
+	public final fun pushPair (Larrow/fx/coroutines/SuspendConnection;Larrow/fx/coroutines/SuspendConnection;)V
+	public final fun pushPair (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun tryReactivate ()Z
+}
+
+public final class arrow/fx/coroutines/SuspendConnection$DefaultConnection : arrow/fx/coroutines/SuspendConnection {
+	public fun <init> ()V
+	public fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isCancelled ()Z
+	public fun pop ()Lkotlin/jvm/functions/Function1;
+	public fun push (Ljava/util/List;)V
+	public fun push (Lkotlin/jvm/functions/Function1;)V
+	public fun toString ()Ljava/lang/String;
+	public fun tryReactivate ()Z
+}
+
+public final class arrow/fx/coroutines/SuspendConnection$Key : kotlin/coroutines/CoroutineContext$Key {
+	public final fun getUncancellable ()Larrow/fx/coroutines/SuspendConnection;
+	public final fun invoke ()Larrow/fx/coroutines/SuspendConnection;
+}
+
+public final class arrow/fx/coroutines/SuspendConnection$Uncancellable : arrow/fx/coroutines/SuspendConnection {
+	public static final field INSTANCE Larrow/fx/coroutines/SuspendConnection$Uncancellable;
+	public fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun isCancelled ()Z
+	public fun pop ()Lkotlin/jvm/functions/Function1;
+	public fun push (Ljava/util/List;)V
+	public fun push (Lkotlin/jvm/functions/Function1;)V
+	public fun toString ()Ljava/lang/String;
+	public fun tryReactivate ()Z
+}
+
