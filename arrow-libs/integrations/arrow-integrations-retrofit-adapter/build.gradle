@@ -9,16 +9,16 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
-    compile "io.arrow-kt:arrow-fx:$VERSION_NAME"
-    compile "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+    compile project(":arrow-fx")
+    compile project(":arrow-annotations")
     compile "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
-    compileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    testCompileOnly "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    testCompile "io.arrow-kt:arrow-core-test:$VERSION_NAME"
+    compileOnly project(":arrow-meta")
+    testCompileOnly project(":arrow-meta")
+    testCompile project(":arrow-core-test")
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testCompile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testCompile "com.squareup.retrofit2:converter-gson:$RETROFIT_VERSION"
     testCompile "com.squareup.okhttp3:mockwebserver:$MOCKWEBSERVER_VERSION"
-    testCompile "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
-    testCompile "io.arrow-kt:arrow-fx:$VERSION_NAME"
+    testCompile project(":arrow-fx-rx2")
+    testCompile project(":arrow-fx")
 }

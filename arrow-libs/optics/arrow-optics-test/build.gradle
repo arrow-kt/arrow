@@ -10,7 +10,7 @@ apply from: "$ANIMALSNIFFER"
 dependencies {
     compile project(":arrow-optics")
 
-    compile "io.arrow-kt:arrow-core-test:$VERSION_NAME"
+    compile project(":arrow-core-test")
     compile "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
 
     testRuntime "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"

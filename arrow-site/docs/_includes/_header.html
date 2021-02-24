@@ -10,7 +10,7 @@
             <li></li>
             <li></li>
           </ul>
-          {% capture library_snippet %}{% include_relative landscape/{{ library }}-home-code.md  %}{% endcapture %}
+          {% capture library_snippet %}{% include_relative landingpage/{{ library }}-home-code.md  %}{% endcapture %}
           <div class="browser-code">{{ library_snippet | markdownify }}</div>
         </div>
         {% endfor %}

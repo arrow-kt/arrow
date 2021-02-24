@@ -1,7 +1,5 @@
 # Λrrow Λnk
 
-[![Arrow Core logo](https://raw.githubusercontent.com/arrow-kt/arrow-site/master/docs/img/core/arrow-core-brand-sidebar.svg?sanitize=true)](https://arrow-kt.io)
-
 _Compile time docs verification and evaluation for Kotlin and Java._
 
 _Λnk_ short for [Ankhesenpaaten](https://en.wikipedia.org/wiki/Ankhesenamun) wife and sister of [Tutankhamun](https://en.wikipedia.org/wiki/Tutankhamun), is a [Gradle](https://gradle.org/) plugin to verify code snippets in library docs for the Kotlin and Java programming languages.
@@ -265,14 +263,3 @@ Which produces:
 ## Patterns
 
 Although Λnk supports both the _Tutorial_ mode (`import`s and variables previously declared are remembered) and the _Docs_ mode (all the necessary data is provided on each example without depending on declarations from previous snippets); the _Docs_ mode performs better. This is because the smaller the scope, the less memory and calculations need to be made, which means faster.
-
-## How-tos
-
-Λrrow Ank is part of [**Λrrow**](https://arrow-kt.io).
-
-Global properties and checks come from [**arrow**](https://github.com/arrow-kt/arrow) repository.
-
-* [How to build the library](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-build-a-library.md)
-* [How to generate and validate the documentation](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-generate-and-validate-documentation.md)
-* [How to run the website in your local server](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-run-the-website-in-your-local-server.md)
-* [How to propose an improvement](https://github.com/arrow-kt/arrow/blob/master/docs/libraries/how-to-propose-an-improvement.md)

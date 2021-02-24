@@ -1,4 +1,6 @@
-rootProject.name = 'arrow-core-lib'
+// This file allows to open just core libraries
+
+rootProject.name = 'arrow-core-libs'
 
 include 'arrow-meta:arrow-meta-test-models'
 include 'arrow-meta'
@@ -9,3 +11,13 @@ include 'arrow-core-data'
 include 'arrow-core-test'
 include 'arrow-continuations'
 include 'arrow-core-retrofit'
+
+// To allow the use of local projects from ../fx:
+
+include 'arrow-fx-coroutines'
+include 'arrow-fx-coroutines-test'
+include 'arrow-fx-suspend-connection'
+
+project(":arrow-fx-coroutines").projectDir = file("../fx/arrow-fx-coroutines")
+project(":arrow-fx-coroutines-test").projectDir = file("../fx/arrow-fx-coroutines-test")
+project(":arrow-fx-suspend-connection").projectDir = file("../fx/arrow-fx-suspend-connection")

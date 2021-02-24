@@ -1,7 +1,0 @@
-arrow-core
-arrow-ui
-arrow-fx
-arrow-optics
-arrow-ank
-arrow-integrations
-arrow-examples

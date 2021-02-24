@@ -9,45 +9,186 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 - [#arrow-contributors on Kotlin Slack](https://kotlinlang.slack.com/archives/C8UK6RTHU)
 - [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
 
-# Repositories
+# How-tos
 
-`arrow` repository is just an orchestrator for all the **Λrrow** libraries (configuration, global integration checks, etc). For instance, it includes these configuration files:
+In this page you'll find these guidelines for contributions:
 
-| File | Description | Comment |
-| ---- | ----------- | ------- |
-| [`gradle.properties`](https://github.com/arrow-kt/arrow/blob/master/gradle.properties) | Global properties | Every library loads these properties when starting a Gradle execution. |
-| [`generic-conf.gradle`](https://github.com/arrow-kt/arrow/blob/master/generic-conf.gradle) | Global build configuration | Every library loads this configuration when starting a Gradle execution. **Note**: it shouldn't include particular configuration for a library. For instance, `arrow-benchmarks-fx` adds JitPack.io repository in its `build.gradle`. |
-| [`subproject-conf.gradle`](https://github.com/arrow-kt/arrow/blob/master/subproject-conf.gradle) | Global sub-project build configuration | Every library loads this configuration when starting a Gradle sub-project execution. |
-| [`doc-conf.gradle`](https://github.com/arrow-kt/arrow/blob/master/doc-conf.gradle) | Configuration to build and check the documentation | This file is loaded for those libraries that generate documentation. |
-| [`publish-conf.gradle`](https://github.com/arrow-kt/arrow/blob/master/publish-conf.gradle) | Configuration to publish a library | This file is loaded for those libraries that must be published in artifact repositories. |
+- [How to build the libraries](#how-to-build-the-libraries)
+- [How to generate and validate the documentation](#how-to-generate-and-validate-the-documentation)
+- [How to run the website in your local workspace](#how-to-run-the-website-in-your-local-workspace)
+- [How to propose an improvement](#how-to-propose-an-improvement)
+- [Notes](#notes)
+   - [How to upgrade Gradle](#how-to-upgrade-gradle)
+   - [How to add a new module](#how-to-add-a-new-module)
+   - [Gradle dependency configurations](#gradle-dependency-configurations)
 
-You'll find the **Λrrow** source code in these repositories:
+Can't find what you're looking for? Please, contact us at [#arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) or [create an issue](https://github.com/arrow-kt/arrow/issues/new/choose).
 
-|   |    | SSH | HTTPS | 
-| - | ------- | -------------- | ---------------- |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Core](https://github.com/arrow-kt/arrow-core) | `git@github.com:arrow-kt/arrow-core.git` | `https://github.com/arrow-kt/arrow-core.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/fx/arrow-fx-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Fx](https://github.com/arrow-kt/arrow-fx) | `git@github.com:arrow-kt/arrow-fx.git` | `https://github.com/arrow-kt/arrow-fx.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/optics/arrow-optics-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Optics](https://github.com/arrow-kt/arrow-optics) | `git@github.com:arrow-kt/arrow-optics.git` | `https://github.com/arrow-kt/arrow-optics.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/meta/arrow-meta-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Meta](https://github.com/arrow-kt/arrow-meta) | `git@github.com:arrow-kt/arrow-meta.git` | `https://github.com/arrow-kt/arrow-meta.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/incubator/arrow-incubator-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Incubator](https://github.com/arrow-kt/arrow-incubator) | `git@github.com:arrow-kt/arrow-incubator.git` | `https://github.com/arrow-kt/arrow-incubator.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Integrations](https://github.com/arrow-kt/arrow-integrations) | `git@github.com:arrow-kt/arrow-integrations.git` | `https://github.com/arrow-kt/arrow-integrations.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow UI](https://github.com/arrow-kt/arrow-ui) | `git@github.com:arrow-kt/arrow-ui.git` | `https://github.com/arrow-kt/arrow-ui.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Check](https://github.com/arrow-kt/arrow-check) | `git@github.com:arrow-kt/arrow-check.git` | `https://github.com/arrow-kt/arrow-check.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/core/arrow-core-brand-sidebar.svg" alt="" width="50px"> | [Λrrow Ank](https://github.com/arrow-kt/arrow-ank) | `git@github.com:arrow-kt/arrow-ank.git` | `https://github.com/arrow-kt/arrow-ank.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Site](https://github.com/arrow-kt/arrow-site) | `git@github.com:arrow-kt/arrow-site.git` | `https://github.com/arrow-kt/arrow-site.git` |
-| <img src="https://github.com/arrow-kt/arrow-site/blob/master/docs/img/home/arrow-brand-error.svg" alt="" width="50px"> | [Λrrow Examples](https://github.com/arrow-kt/arrow-examples) | `git@github.com:arrow-kt/arrow-examples.git` | `https://github.com/arrow-kt/arrow-examples.git` |
+## How to build the libraries
 
-Every repository includes these guidelines in its README file:
+### Requirements
 
-* [How to build the library](docs/libraries/how-to-build-a-library.md)
-* [How to generate and validate the documentation](docs/libraries/how-to-generate-and-validate-documentation.md)
-* [How to run the website in your local server](docs/libraries/how-to-run-the-website-in-your-local-server.md)
-* [How to propose an improvement](docs/libraries/how-to-propose-an-improvement.md)
+- JDK 8
 
-[Λrrow Meta](https://github.com/arrow-kt/arrow-meta) still follows its own guidelines.
+### Steps
 
-Find some scripts to download all the repositories in [`utils`](docs/move-to-multi-repo/utils/) directory.
+To build all the libraries (compilation + tests) and examples:
 
-# Can't find what you're looking for?
+```bash
+cd arrow-libs
+./gradlew build
+```
 
-Please, contact us at [#arrow on Kotlin Slack](https://kotlinlang.slack.com/messages/C5UPMM0A0) or [create an issue](https://github.com/arrow-kt/arrow/issues/new/choose).
+To build just CORE libraries, FX libraries, OPTICS libraries, etc. select the correspondent directory.
+
+For instance, for CORE libraries:
+
+```bash
+cd arrow-libs/core
+./gradlew build
+```
+
+## How to generate and validate the documentation
+
+Dokka is responsible for generating documentation based on source code annotations. Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those.
+
+In order to generate the documentation and validate it:
+
+```bash
+cd arrow-libs
+./gradlew dokka
+
+cd ../arrow-docs
+./gradlew runAnk
+```
+
+### Doc snippets policies
+
+Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please,
+use the following priority check list:
+
+#### 1. Snippets for public API docs
+
+If the snippet is just docs for a public method of a type (as in arguments, return type, or how it should be used from call sites), that should be inlined in the Kdocs of that given method using Dokka. That's done under the actual type file. [Here you have a simple example for `Option` methods](https://github.com/arrow-kt/arrow/blob/11a65faa9eed23182994778fa0ce218b69bfc4ba/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt#L14).
+
+That will automatically inline the docs of each method into the docs of the given data type. This is intended to be used just for public APIs exposed to users of the library.
+
+#### 2. Snippets for broader samples
+
+If your snippet is showing examples on how to use the public APIs in a broader scenario (like describing FP patterns or similar), then you'll add those snippets to the described docs Markdown file.
+
+For the mentioned cases, you should double-check which `Ank` modifiers you want to use for the snippets (`silent`, `replace`, or `outFile(<file>)`). You'll find more details about each one of those in [Ank docs](https://github.com/arrow-kt/arrow-ank). See some real examples [on this docs PR](https://github.com/arrow-kt/arrow/pull/1134/files).
+
+Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add this `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making them runnable).
+
+## How to run the website in your local workspace
+
+After generating and validating the documentation (previous step):
+
+```sh
+cd arrow-site
+bundle install --gemfile Gemfile --path vendor/bundle
+bundle exec jekyll serve -s docs
+```
+
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
+
+If you get an error while installing the Ruby gem _http_parser_, check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
+
+### How to test links
+
+Test for broken links in documentation using
+
+```sh
+wget --spider -r -nd -nv -l 5 http://127.0.0.1:4000
+```
+
+## How to propose an improvement 
+
+If it's the first time you contribute with a GitHub repository, take a look at [Collaborating with issues and pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
+
+### How to create an issue
+
+Please, follow the link to [create an issue](https://github.com/arrow-kt/arrow/issues/new/choose).
+
+### How to create a pull request
+
+#### Requirements to change an existing feature
+
+If you want to propose a fix, rename, move, etc. please, ensure that these checks pass:
+
+* Required checks:
+    * `arrow libraries: build`
+    * `arrow libraries: build documentation`
+* The approval by 2 maintainers of the Arrow Community.
+
+#### Requirements to add a new feature
+
+Please, ensure these points when adding a new feature:
+
+* Include documentation via [Dokka](https://kotlinlang.org/docs/reference/kotlin-doc.html). Please, find examples in the existing code to follow the same pattern.
+* [Use Ank to validate for code snippets](https://github.com/arrow-kt/arrow/blob/master/arrow-libs/ank/README.md)
+* Include tests that cover the proper cases
+
+When creating the pull request, ensure that these checks pass:
+
+* Required automatic checks:
+    * `arrow libraries: build`
+    * `arrow libraries: build documentation`
+* The approval by 2 maintainers of the Arrow Community.
+
+#### How to download the tests report
+
+Both successful or failed build checks allow to download the tests report to review it:
+
+![how-to-download-tests-report](img/doc/download-report.png)
+
+#### What happens when merging a pull request
+
+When merging the pull request, a new SNAPSHOT library will be published into [OSS repository](https://oss.jfrog.org/artifactory/oss-snapshot-local/io/arrow-kt/).
+
+On the other hand, the documentation for the next version (SNAPSHOT) will be updated:
+
+* [Arrow Core](https://arrow-kt.io/docs/next/core/)
+* [Arrow Fx](https://arrow-kt.io/docs/next/fx/)
+* [Arrow Optics](https://arrow-kt.io/docs/next/optics/dsl/)
+
+If any of these actions fails, an issue will be created to be solved as soon as possible.
+
+## Notes
+
+### How to upgrade Gradle
+
+The use of Gradle appears in several places: `arrow-libs`, `arrow-libs/core`, `arrow-stack`, etc.
+
+However, links are being used so it's just necessary to upgrade Gradle in `arrow-libs` directory:
+
+```
+cd arrow-libs
+./gradlew wrapper --gradle-version <new-version>
+```
+
+### How to add a new module
+
+This short guideline provides all the things to keep in mind when adding a new module:
+
+- Configuration:
+  - Add `<module>/gradle.properties`
+  - Add `<module>/build.gradle`
+  - Update `settings.xml`
+- Website:
+  - Update [sidebar files](arrow-site/docs/_data)
+- Utilities:
+  - Update BOM file: [build.gradle](arrow-stack/build.gradle)
+  
+### Gradle dependency configurations
+
+| Configuration | Use | Note |
+| ------------- | --- | ---- |
+| `api` | compilation | exported to consumers for compilation |
+| `implementation` | compilation + runtime | exported to consumers for runtime | 
+| `compileOnly` | just compilation | not exported to consumers | 
+| `runtimeOnly` | just runtime | exported to consumers for runtime | 
+| `testImplementation` | test compilation + test runtime |  | 
+| `testCompileOnly` | test compilation |  | 
+| `testRuntimeOnly` | test runtime |  |

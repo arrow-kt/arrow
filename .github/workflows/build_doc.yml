@@ -1,0 +1,28 @@
+name: "Build documentation"
+
+on: [pull_request]
+
+jobs:
+  build_doc:
+
+    env:
+      JAVA_OPTS: -Xms512m -Xmx1024m
+
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Create APIdoc
+      working-directory: arrow-libs
+      run: ./gradlew dokka
+    - name: Validate documentation
+      working-directory: arrow-docs
+      run: ./gradlew runAnk
+    - name: Build site
+      working-directory: arrow-site
+      run: |
+         bundle install --gemfile Gemfile --path vendor/bundle
+         bundle exec jekyll build -s docs

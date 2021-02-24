@@ -1,0 +1,87 @@
+buildscript {
+    ext {
+        def customProperties = new Properties()
+        customProperties.load(file("../arrow-libs/gradle.properties").newInputStream())
+        customProperties.each { key, value -> set(key, value) }
+        apply from: rootProject.file('../arrow-libs/gradle/setup.gradle')
+    }
+}
+
+plugins {
+    id "maven-publish"
+    id "java-platform"
+}
+
+dependencies {
+    constraints {
+        api "io.arrow-kt:arrow-annotations:$VERSION_NAME"
+        api "io.arrow-kt:arrow-continuations:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core-data:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core-retrofit:$VERSION_NAME"
+        api "io.arrow-kt:arrow-core-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-coroutines-kotlinx-coroutines:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-kotlinx-coroutines:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-reactor:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-rx2:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-fx-stm:$VERSION_NAME"
+        api "io.arrow-kt:arrow-integrations-retrofit-adapter:$VERSION_NAME"
+        api "io.arrow-kt:arrow-meta:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics-mtl:$VERSION_NAME"
+        api "io.arrow-kt:arrow-optics-test:$VERSION_NAME"
+        api "io.arrow-kt:arrow-syntax:$VERSION_NAME"
+        api "io.arrow-kt:arrow-ui:$VERSION_NAME"
+        api "io.arrow-kt:arrow-ui-data:$VERSION_NAME"
+    }
+}
+
+publishing {
+    publications {
+        myPlatform(MavenPublication) {
+            groupId = GROUP
+            artifactId = POM_ARTIFACT_ID
+            version = VERSION_NAME
+
+            from components.javaPlatform
+
+            pom {
+                name = POM_NAME
+                packaging = POM_PACKAGING
+                description = POM_DESCRIPTION
+                url = POM_URL
+
+                scm {
+                    url = POM_SCM_URL
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_DEV_CONNECTION
+                }
+                licenses {
+                    license {
+                        name = POM_LICENCE_NAME
+                        url = POM_LICENCE_URL
+                        distribution = POM_LICENCE_DIST
+                    }
+                }
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username System.getenv('BINTRAY_USER')
+                password System.getenv('BINTRAY_API_KEY')
+            }
+            url = VERSION_NAME.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY : RELEASE_REPOSITORY
+        }
+    }
+}

@@ -1,50 +1,20 @@
-buildscript {
-    apply from: "$COMMON_SETUP"
-}
-
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "$KOTLIN_VERSION"
-    id "org.jetbrains.kotlin.kapt" version "$KOTLIN_VERSION"
-    id "org.jlleitschuh.gradle.ktlint" version "$KTLINT_GRADLE_VERSION"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+    id "org.jlleitschuh.gradle.ktlint"
     id "idea"
 }
 
-apply from: "$ROOT_PROJECT"
-
-idea {
-    module {
-        sourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-        generatedSourceDirs += files(
-                'build/generated/source/kapt/main',
-                'build/generated/source/kapt/debug',
-                'build/generated/source/kapt/release',
-                'build/generated/source/kaptKotlin/main',
-                'build/generated/source/kaptKotlin/debug',
-                'build/generated/source/kaptKotlin/release',
-                'build/tmp/kapt/main/kotlinGenerated')
-    }
-}
-
 dependencies {
-    testImplementation platform("io.arrow-kt:arrow-stack:$VERSION_NAME")
-
-    kapt "io.arrow-kt:arrow-meta:$VERSION_NAME"
-    kaptTest "io.arrow-kt:arrow-meta:$VERSION_NAME"
+    kapt project(":arrow-meta")
+    kaptTest project(":arrow-meta")
     testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
-    testImplementation "io.arrow-kt:arrow-annotations"
-    testImplementation "io.arrow-kt:arrow-core"
-    testImplementation "io.arrow-kt:arrow-fx"
-    testImplementation "io.arrow-kt:arrow-fx-rx2"
-    testImplementation "io.arrow-kt:arrow-optics"
-    testImplementation "io.arrow-kt:arrow-ui"
-    testImplementation "io.arrow-kt:arrow-meta"
+    testImplementation project(":arrow-annotations")
+    testImplementation project(":arrow-core")
+    testImplementation project(":arrow-fx")
+    testImplementation project(":arrow-fx-rx2")
+    testImplementation project(":arrow-optics")
+    testImplementation project(":arrow-meta")
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$KOTLIN_TEST_VERSION", excludeArrow
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
 }

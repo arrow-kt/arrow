@@ -11,7 +11,7 @@ apply from: "$PUBLICATION"
 apply from: "$ANIMALSNIFFER"
 
 dependencies {
-    api "io.arrow-kt:arrow-core:$VERSION_NAME"
+    api project(":arrow-core")
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_COROUTINES_VERSION"
 
     testImplementation project(":arrow-fx-coroutines-test")

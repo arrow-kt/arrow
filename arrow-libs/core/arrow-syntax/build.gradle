@@ -15,5 +15,5 @@ dependencies {
     testCompileOnly "org.jetbrains.kotlin:kotlin-reflect:$KOTLIN_VERSION"
     testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$JUNIT_VINTAGE_VERSION"
     testImplementation project(":arrow-core-test")
-    testImplementation "io.arrow-kt:arrow-fx-coroutines:$VERSION_NAME"
+    testImplementation project(":arrow-fx-coroutines")
 }
